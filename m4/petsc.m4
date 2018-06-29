@@ -28,6 +28,21 @@ AC_DEFUN([CONFIGURE_PETSC],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-required)])],
                      [petscrequired=no])
 
+  # Setting --enable-petsc-hypre-required causes an error to be
+  # emitted during configure if PETSc with builtin Hypre is not
+  # detected successfully.  This is useful for app codes which require
+  # both PETSc and Hypre (like MOOSE-based apps), since it prevents
+  # libmesh from being accidentally built without PETSc and Hypre
+  # support.
+  AC_ARG_ENABLE(petsc-hypre-required,
+                AC_HELP_STRING([--enable-petsc-hypre-required],
+                               [Error if a PETSc with Hypre is not detected by configure]),
+                [AS_CASE("${enableval}",
+                         [yes], [petschyprerequired=yes],
+                         [no],  [petschyprerequired=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-hypre-required)])],
+                     [petschyprerequired=no])
+
   # Trump --enable-petsc with --disable-mpi
   AS_IF([test "x$enablempi" = xno],
         [enablepetsc=no])
@@ -217,6 +232,7 @@ AC_DEFUN([CONFIGURE_PETSC],
           PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
 
           # Check for Hypre
+          petsc_have_hypre=no
           AS_IF([test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf], dnl 2.3.x
                 [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`],
                 [test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables], dnl 3.0.x
@@ -227,7 +243,8 @@ AC_DEFUN([CONFIGURE_PETSC],
                 [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/lib/petsc/conf/petscvariables`])
 
           AS_IF([test "x$HYPRE_LIB" != x],
-                [AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)])
+                [petsc_have_hypre=yes
+                 AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)])
 
           # Try to compile a trivial PETSc program to check our
           # configuration... this should handle cases where we slipped
@@ -391,7 +408,7 @@ AC_DEFUN([CONFIGURE_PETSC],
           AS_IF([test "x$PETSC_MPI" != x],
                 [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])])
 
-          AS_IF([test "x$HYPRE_LIB" != x],
+          AS_IF([test "x$petsc_have_hypre" = "xyes"],
                 [AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])])
 
           AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
@@ -408,4 +425,8 @@ AC_DEFUN([CONFIGURE_PETSC],
         dnl AC_MSG_ERROR calls in our m4 files would return a different
         dnl error code, but currently this is not implemented.
         [AC_MSG_ERROR([*** PETSc was not found, but --enable-petsc-required was specified.], 3)])
+
+  # If PETSc + Hypre is required, throw an error if we don't have it.
+  AS_IF([test "x$petschyprerequired" = "xyes" && test "x$petsc_have_hypre" != "xyes"],
+        [AC_MSG_ERROR([*** PETSc with Hypre was not found, but --enable-petsc-hypre-required was specified.], 4)])
 ])
