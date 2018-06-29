@@ -32781,6 +32781,7 @@ fi
             petsc_have_party=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARTY`
             petsc_have_ptscotch=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PTSCOTCH`
             petsc_have_parmetis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARMETIS`
+            petsc_have_hypre=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_HYPRE`
 
 else
   enablepetsc=no
@@ -33390,26 +33391,6 @@ fi
           # We sometimes need the full CC_INCLUDES to access a
           # PETSc-snooped MPI
           PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
-
-          # Check for Hypre
-          petsc_have_hypre=no
-          if test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf; then :
-                  HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
-elif test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables; then :
-                  HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
-elif test -r $PETSC_DIR/conf/petscvariables; then :
-                  HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
-elif test -r $PETSC_DIR/lib/petsc/conf/petscvariables; then :
-                  HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/lib/petsc/conf/petscvariables`
-elif test -r $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables; then :
-                  HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables`
-fi
-
-          if test "x$HYPRE_LIB" != x; then :
-  petsc_have_hypre=yes
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Hypre support >>>" >&5
-$as_echo "<<< Configuring library with Hypre support >>>" >&6; }
-fi
 
           # Try to compile a trivial PETSc program to check our
           # configuration... this should handle cases where we slipped
