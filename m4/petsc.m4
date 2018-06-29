@@ -417,6 +417,6 @@ AC_DEFUN([CONFIGURE_PETSC],
         [AC_MSG_ERROR([*** PETSc was not found, but --enable-petsc-required was specified.], 3)])
 
   # If PETSc + Hypre is required, throw an error if we don't have it.
-  AS_IF([test "x$petschyprerequired" = "xyes" && test $petsc_have_hypre -gt 0],
+  AS_IF([test "x$petschyprerequired" = "xyes" && test $petsc_have_hypre -eq 0],
         [AC_MSG_ERROR([*** PETSc with Hypre was not found, but --enable-petsc-hypre-required was specified.], 4)])
 ])
