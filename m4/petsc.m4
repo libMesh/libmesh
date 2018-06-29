@@ -85,6 +85,10 @@ AC_DEFUN([CONFIGURE_PETSC],
                     [enablepetsc=no])
     AC_LANG_POP
 
+    dnl We now have a -gt check for this that occurs at the end of the file, so make sure
+    dnl it is initialized to some sensible value to avoid syntax errors.
+    petsc_have_hypre=0
+
     # Grab PETSc version and substitute into Makefile.
     # If version 2.x, also check that PETSC_ARCH is set
     AS_IF([test "$enablepetsc" !=  no],
