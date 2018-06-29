@@ -240,7 +240,9 @@ AC_DEFUN([CONFIGURE_PETSC],
                 [test -r $PETSC_DIR/conf/petscvariables], dnl 3.0.x
                 [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`],
                 [test -r $PETSC_DIR/lib/petsc/conf/petscvariables], dnl 3.6.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/lib/petsc/conf/petscvariables`])
+                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/lib/petsc/conf/petscvariables`],
+                [test -r $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables], dnl 3.6.x, arch build
+                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables`])
 
           AS_IF([test "x$HYPRE_LIB" != x],
                 [petsc_have_hypre=yes
