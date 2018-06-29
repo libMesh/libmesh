@@ -115,6 +115,7 @@ AC_DEFUN([CONFIGURE_PETSC],
             petsc_have_party=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARTY`
             petsc_have_ptscotch=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PTSCOTCH`
             petsc_have_parmetis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARMETIS`
+            petsc_have_hypre=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_HYPRE`
           ],
           [enablepetsc=no])
 
@@ -230,23 +231,6 @@ AC_DEFUN([CONFIGURE_PETSC],
           # We sometimes need the full CC_INCLUDES to access a
           # PETSc-snooped MPI
           PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
-
-          # Check for Hypre
-          petsc_have_hypre=no
-          AS_IF([test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf], dnl 2.3.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`],
-                [test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables], dnl 3.0.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`],
-                [test -r $PETSC_DIR/conf/petscvariables], dnl 3.0.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`],
-                [test -r $PETSC_DIR/lib/petsc/conf/petscvariables], dnl 3.6.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/lib/petsc/conf/petscvariables`],
-                [test -r $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables], dnl 3.6.x, arch build
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables`])
-
-          AS_IF([test "x$HYPRE_LIB" != x],
-                [petsc_have_hypre=yes
-                 AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)])
 
           # Try to compile a trivial PETSc program to check our
           # configuration... this should handle cases where we slipped
