@@ -35159,7 +35159,7 @@ $as_echo "#define HAVE_MPI 1" >>confdefs.h
 
 fi
 
-          if test "x$petsc_have_hypre" = "xyes"; then :
+          if test $petsc_have_hypre -gt 0; then :
 
 $as_echo "#define HAVE_PETSC_HYPRE 1" >>confdefs.h
 
@@ -35184,7 +35184,7 @@ fi
 fi
 
   # If PETSc + Hypre is required, throw an error if we don't have it.
-  if test "x$petschyprerequired" = "xyes" && test "x$petsc_have_hypre" != "xyes"; then :
+  if test "x$petschyprerequired" = "xyes" && test $petsc_have_hypre -gt 0; then :
   as_fn_error 4 "*** PETSc with Hypre was not found, but --enable-petsc-hypre-required was specified." "$LINENO" 5
 fi
 
