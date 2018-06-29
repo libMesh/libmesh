@@ -27,6 +27,22 @@
 
 using namespace libMesh;
 
+// Anonymous namespace to avoid linker conflicts
+namespace {
+
+Number bilinear_test (const Point& p,
+                      const Parameters&,
+                      const std::string&,
+                      const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = p(1);
+
+  return 4*x*y - 3*x + 2*y - 1;
+}
+
+}
+
 class EquationSystemsTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( EquationSystemsTest );
@@ -38,6 +54,7 @@ public:
   CPPUNIT_TEST( testPostInitAddElem );
   CPPUNIT_TEST( testReinitWithNodeElem );
   CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
+  CPPUNIT_TEST( testRepartitionThenReinit );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -171,6 +188,37 @@ public:
                                  elem->child_ptr(c)->refinement_flag());
       }
 #endif
+  }
+
+
+
+  void testRepartitionThenReinit()
+  {
+    Mesh mesh(*TestCommWorld);
+    mesh.allow_renumbering(false);
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", FIRST);
+    MeshTools::Generation::build_square(mesh,5,5);
+    es.init();
+    sys.project_solution(bilinear_test, NULL, es.parameters);
+
+    // Force (in parallel) a different partitioning - we'll simply put
+    // everything on rank 0, which hopefully is not what our default
+    // partitioner did!
+    mesh.partition(1);
+
+    // Make sure the solution is still intact after reinit
+    es.reinit();
+
+    for (Real x = 0.1; x < 1; x += 0.2)
+      for (Real y = 0.1; y < 1; y += 0.2)
+        {
+          Point p(x,y);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                       libmesh_real(bilinear_test(p,es.parameters,"","")),
+                                       TOLERANCE*TOLERANCE);
+        }
   }
 
 

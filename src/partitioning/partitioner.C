@@ -158,6 +158,11 @@ void Partitioner::single_partition (MeshBase & mesh)
 {
   this->single_partition_range(mesh.elements_begin(),
                                mesh.elements_end());
+
+  // Redistribute, in case someone (like our unit tests) is doing
+  // something silly (like moving a whole already-distributed mesh
+  // back onto rank 0).
+  mesh.redistribute();
 }
 
 
