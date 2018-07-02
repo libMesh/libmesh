@@ -4,6 +4,40 @@ dnl if they are run after the autoconf test that sets -std=c++11.
 dnl ----------------------------------------------------------------
 
 dnl Test C++11 std::tuple and several related helper functions.
+AC_DEFUN([LIBMESH_TEST_CXX11_BEGIN_END],
+  [
+    have_cxx11_begin_end=no
+
+    AC_MSG_CHECKING(for C++11 std::begin/end support for arrays)
+    AC_LANG_PUSH([C++])
+
+    dnl For this and all of the C++ standards tests: Save the original
+    dnl CXXFLAGS (if any) before appending the $switch determined by
+    dnl AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    dnl the user in the libmesh_CXXFLAGS environment variable, letting
+    dnl that override everything else.
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <iterator>
+    @%:@include <algorithm>
+    ]], [[
+    int array[5] = {3, 1, 5, 2, 4};
+    std::sort(std::begin(array), std::end(array));
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx11_begin_end=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+  ])
+
+dnl Test C++11 std::tuple and several related helper functions.
 AC_DEFUN([LIBMESH_TEST_CXX11_TUPLE],
   [
     have_cxx11_tuple=no

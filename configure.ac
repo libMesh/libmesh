@@ -295,6 +295,10 @@ LIBMESH_TEST_CXX11_DECLTYPE
 AS_IF([test "x$have_cxx11_decltype" != "xyes"],
       [AC_MSG_ERROR([libMesh requires the C++11 decltype keyword])])
 
+LIBMESH_TEST_CXX11_BEGIN_END
+AS_IF([test "x$have_cxx11_begin_end" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 std::begin/end support])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
