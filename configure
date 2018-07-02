@@ -9646,6 +9646,64 @@ if test "x$have_cxx11_decltype" != "xyes"; then :
   as_fn_error $? "libMesh requires the C++11 decltype keyword" "$LINENO" 5
 fi
 
+
+    have_cxx11_begin_end=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::begin/end support for arrays" >&5
+$as_echo_n "checking for C++11 std::begin/end support for arrays... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+                        old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <iterator>
+    #include <algorithm>
+
+int
+main ()
+{
+
+    int array[5] = {3, 1, 5, 2, 4};
+    std::sort(std::begin(array), std::end(array));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        have_cxx11_begin_end=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+if test "x$have_cxx11_begin_end" != "xyes"; then :
+  as_fn_error $? "libMesh requires C++11 std::begin/end support" "$LINENO" 5
+fi
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
