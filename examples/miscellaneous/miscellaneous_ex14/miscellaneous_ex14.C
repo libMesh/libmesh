@@ -193,15 +193,9 @@ int main (int argc, char** argv)
 
   // Reassign subdomain_id() of all infinite elements.
   // Otherwise, the Exodus-API will fail.
-  MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.elements_end();
-  for (; elem_it != elem_end; ++elem_it)
-    {
-      Elem * elem = *elem_it;
-      if(elem->infinite()){
-        elem->subdomain_id() = 1;
-      }
-    }
+  for (auto & elem : mesh.element_ptr_range())
+    if (elem->infinite())
+      elem->subdomain_id() = 1;
 
   // find the neighbours; for correct linking the two areas
   mesh.find_neighbors();
@@ -410,15 +404,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
   // later modify this program to include refinement, we will
   // be safe and will only consider the active elements;
   // hence we use a variant of the \p active_elem_iterator.
-  MeshBase::const_element_iterator       el  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      // Store a pointer to the element we are currently
-      // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
-
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
