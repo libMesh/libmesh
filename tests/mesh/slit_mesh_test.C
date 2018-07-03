@@ -322,14 +322,8 @@ public:
     const std::vector<Point> & xyz = fe->get_xyz();
     fe->get_phi();
 
-    MeshBase::const_element_iterator       el     =
-      _mesh->active_local_elements_begin();
-    const MeshBase::const_element_iterator end_el =
-      _mesh->active_local_elements_end();
-
-    for (; el != end_el; ++el)
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
-        const Elem * elem = *el;
         context.pre_fe_reinit(*_sys, elem);
         context.elem_fe_reinit();
 
