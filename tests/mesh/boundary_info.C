@@ -182,12 +182,8 @@ public:
       const boundary_id_type BOUNDARY_ID_MIN_Y = 1;
       const boundary_id_type EDGE_BOUNDARY_ID = 20;
 
-      MeshBase::const_element_iterator       el     = mesh.elements_begin();
-      const MeshBase::const_element_iterator end_el = mesh.elements_end();
-      for ( ; el != end_el; ++el)
+      for (const auto & elem : mesh.element_ptr_range())
         {
-          const Elem * elem = *el;
-
           unsigned int side_max_x = 0, side_min_y = 0;
           bool found_side_max_x = false, found_side_min_y = false;
 
