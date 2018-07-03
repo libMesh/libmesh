@@ -21,11 +21,13 @@
 #include <iostream>
 
 // Local Includes
+#include "libmesh/parallel_sort.h"
+
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel.h"
-#include "libmesh/parallel_hilbert.h"
-#include "libmesh/parallel_sort.h"
 #include "libmesh/parallel_bin_sorter.h"
+#include "libmesh/parallel_hilbert.h"
+#include "libmesh/parallel_sync.h"
 
 namespace libMesh
 {
@@ -194,74 +196,53 @@ template <typename KeyType, typename IdxType>
 void Sort<KeyType,IdxType>::communicate_bins()
 {
 #ifdef LIBMESH_HAVE_MPI
-  // Create storage for the global bin sizes.  This
-  // is the number of keys which will be held in
-  // each bin over all processors.
+  // Find each section of our data to send
+  IdxType local_offset = 0;
+  std::map<processor_id_type, std::vector<KeyType> > pushed_keys, received_keys;
+
+  for (processor_id_type i=0; i != _n_procs; ++i)
+    {
+      IdxType next_offset = local_offset + _local_bin_sizes[i];
+        if (_local_bin_sizes[i])
+          {
+            auto begin = _data.begin() + local_offset;
+            auto end = _data.begin() + next_offset;
+            pushed_keys[i].assign(begin, end);
+          }
+
+      local_offset = next_offset;
+    }
+
+  auto keys_action_functor =
+    [& received_keys]
+    (processor_id_type pid,
+     const std::vector<KeyType> & keys)
+    {
+      received_keys[pid] = keys;
+    };
+
+  Parallel::push_parallel_vector_data
+    (this->comm(), pushed_keys, keys_action_functor);
+
+  std::size_t my_bin_size = 0;
+  for (auto & p : received_keys)
+    my_bin_size += p.second.size();
+
+  _my_bin.clear();
+  _my_bin.reserve(my_bin_size);
+
+  for (auto & p : received_keys)
+    _my_bin.insert(_my_bin.end(), p.second.begin(), p.second.end());
+
+#ifdef DEBUG
   std::vector<IdxType> global_bin_sizes = _local_bin_sizes;
 
-  // Sum to find the total number of entries in each bin.
   this->comm().sum(global_bin_sizes);
 
-  // Create a vector to temporarily hold the results of MPI_Gatherv
-  // calls.  The vector dest  may be saved away to _my_bin depending on which
-  // processor is being MPI_Gatherv'd.
-  std::vector<KeyType> dest;
+  libmesh_assert_equal_to
+    (global_bin_sizes[this->processor_id()], _my_bin.size());
+#endif
 
-  IdxType local_offset = 0;
-
-  for (processor_id_type i=0; i<_n_procs; ++i)
-    {
-      // Vector to receive the total bin size for each
-      // processor.  Processor i's bin size will be
-      // held in proc_bin_size[i]
-      std::vector<int> proc_bin_size;
-
-      // Find the number of contributions coming from each
-      // processor for this bin.  Note: allgather combines
-      // the MPI_Gather and MPI_Bcast operations into one.
-      this->comm().allgather(static_cast<int>(_local_bin_sizes[i]),
-                             proc_bin_size);
-
-      // Compute the offsets into my_bin for each processor's
-      // portion of the bin.  These are basically partial sums
-      // of the proc_bin_size vector.
-      std::vector<int> displacements(_n_procs);
-      for (processor_id_type j=1; j<_n_procs; ++j)
-        displacements[j] = proc_bin_size[j-1] + displacements[j-1];
-
-      // Resize the destination buffer
-      dest.resize (global_bin_sizes[i]);
-
-      // Points to the beginning of the bin to be sent
-      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : nullptr;
-
-      // Enough storage to hold all bin contributions
-      void * recvbuf = (dest.empty()) ? nullptr : &dest[0];
-
-      // If the sendbuf is nullptr, make sure we aren't claiming to send something.
-      if (sendbuf == nullptr && _local_bin_sizes[i] != 0)
-        libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
-
-      KeyType example;
-
-      MPI_Gatherv(sendbuf,
-                  _local_bin_sizes[i],                       // How much data is in the bin being sent.
-                  Parallel::StandardType<KeyType>(&example), // The data type we are sorting
-                  recvbuf,
-                  &proc_bin_size[0],          // How much is to be received from each processor
-                  &displacements[0],          // Offsets into the receive buffer
-                  Parallel::StandardType<KeyType>(&example), // The data type we are sorting
-                  i,                                         // The root process (we do this once for each proc)
-                  this->comm().get());
-
-      // Copy the destination buffer if it
-      // corresponds to the bin for this processor
-      if (i == _proc_id)
-        _my_bin = dest;
-
-      // Increment the local offset counter
-      local_offset += _local_bin_sizes[i];
-    }
 #endif // LIBMESH_HAVE_MPI
 }
 
