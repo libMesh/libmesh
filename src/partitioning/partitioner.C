@@ -917,13 +917,10 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
   _global_index_by_pid_map.clear();
 
   // create the mapping which is contiguous by processor
-  {
-    MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-
-    MeshCommunication().find_local_indices (bbox, it, end,
-                                              _global_index_by_pid_map);
-  }
+  MeshCommunication().find_local_indices (bbox,
+                                          mesh.active_local_elements_begin(),
+                                          mesh.active_local_elements_end(),
+                                          _global_index_by_pid_map);
 
   SyncLocalIDs sync(_global_index_by_pid_map);
 
