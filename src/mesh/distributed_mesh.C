@@ -1225,18 +1225,9 @@ void DistributedMesh::renumber_nodes_and_elements ()
   std::set<dof_id_type> used_nodes;
 
   // flag the nodes we need
-  {
-    element_iterator  it = elements_begin();
-    element_iterator end = elements_end();
-
-    for (; it != end; ++it)
-      {
-        Elem * el = *it;
-
-        for (unsigned int n=0; n != el->n_nodes(); ++n)
-          used_nodes.insert(el->node_id(n));
-      }
-  }
+  for (auto & elem : this->element_ptr_range())
+    for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      used_nodes.insert(elem->node_id(n));
 
   // Nodes not connected to any local elements, and nullptr node entries
   // in our container, are deleted
