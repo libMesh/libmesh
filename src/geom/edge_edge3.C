@@ -25,6 +25,10 @@
 namespace libMesh
 {
 
+// Edge3 class static member initializations
+const int Edge3::num_nodes;
+const int Edge3::num_children;
+
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Edge3::_embedding_matrix[2][3][3] =
@@ -71,7 +75,7 @@ bool Edge3::is_node_on_side(const unsigned int n,
                             const unsigned int s) const
 {
   libmesh_assert_less (s, 2);
-  libmesh_assert_less (n, 3);
+  libmesh_assert_less (n, Edge3::num_nodes);
   return (s == n);
 }
 

@@ -78,7 +78,7 @@ public:
   /**
    * \returns 6.
    */
-  virtual unsigned int n_nodes() const override { return 6; }
+  virtual unsigned int n_nodes() const override { return num_nodes; }
 
   /**
    * \returns 4.
@@ -181,10 +181,18 @@ public:
   second_order_child_vertex (const unsigned int n) const override;
 
   /**
+   * Geometric constants for Tri6.
+   */
+  static const int num_nodes = 6;
+  static const int num_sides = 3;
+  static const int num_children = 4;
+  static const int nodes_per_side = 3;
+
+  /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[3][3];
+  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
    * An optimized method for approximating the area of a
@@ -203,7 +211,7 @@ protected:
   /**
    * Data for links to nodes.
    */
-  Node * _nodelinks_data[6];
+  Node * _nodelinks_data[num_nodes];
 
 
 
@@ -221,7 +229,7 @@ protected:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const float _embedding_matrix[4][6][6];
+  static const float _embedding_matrix[num_children][num_nodes][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
@@ -233,17 +241,17 @@ private:
    * Matrix that tells which vertices define the location
    * of mid-side (or second-order) nodes
    */
-  static const unsigned short int _second_order_adjacent_vertices[3][2];
+  static const unsigned short int _second_order_adjacent_vertices[num_sides][2];
 
   /**
    * Vector that names a child sharing each second order node.
    */
-  static const unsigned short int _second_order_vertex_child_number[6];
+  static const unsigned short int _second_order_vertex_child_number[num_nodes];
 
   /**
    * Vector that names the child vertex index for each second order node.
    */
-  static const unsigned short int _second_order_vertex_child_index[6];
+  static const unsigned short int _second_order_vertex_child_index[num_nodes];
 };
 
 

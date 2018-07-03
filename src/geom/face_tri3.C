@@ -29,7 +29,12 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tri3 class static member initializations
-const unsigned int Tri3::side_nodes_map[3][2] =
+const int Tri3::num_nodes;
+const int Tri3::num_sides;
+const int Tri3::num_children;
+const int Tri3::nodes_per_side;
+
+const unsigned int Tri3::side_nodes_map[Tri3::num_sides][Tri3::nodes_per_side] =
   {
     {0, 1}, // Side 0
     {1, 2}, // Side 1
@@ -39,7 +44,7 @@ const unsigned int Tri3::side_nodes_map[3][2] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tri3::_embedding_matrix[4][3][3] =
+const float Tri3::_embedding_matrix[Tri3::num_children][Tri3::num_nodes][Tri3::num_nodes] =
   {
     // embedding matrix for child 0
     {
@@ -100,18 +105,16 @@ bool Tri3::is_node_on_side(const unsigned int n,
                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Tri3::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
 Order Tri3::default_order() const

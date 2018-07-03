@@ -126,10 +126,18 @@ public:
                             std::vector<dof_id_type> & conn) const override;
 
   /**
+   * Geometric constants for Quad4.
+   */
+  static const int num_nodes = 4;
+  static const int num_sides = 4;
+  static const int num_children = 4;
+  static const int nodes_per_side = 2;
+
+  /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[4][2];
+  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
    * An optimized method for computing the area of a
@@ -143,7 +151,7 @@ protected:
   /**
    * Data for links to nodes.
    */
-  Node * _nodelinks_data[4];
+  Node * _nodelinks_data[num_nodes];
 
 
 
@@ -161,7 +169,7 @@ protected:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const float _embedding_matrix[4][4][4];
+  static const float _embedding_matrix[num_children][num_nodes][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 

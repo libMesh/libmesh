@@ -137,21 +137,31 @@ public:
                             std::vector<dof_id_type> & conn) const override;
 
   /**
+   * Geometric constants for Prism6.
+   */
+  static const int num_nodes = 6;
+  static const int num_sides = 5;
+  static const int num_edges = 9;
+  static const int num_children = 8;
+  static const int nodes_per_side = 4;
+  static const int nodes_per_edge = 2;
+
+  /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[5][4];
+  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
    * This maps the child elements with the associated side of the parent element
    */
-  static const unsigned int side_elems_map[5][4];
+  static const unsigned int side_elems_map[num_sides][nodes_per_side];
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
    * element node numbers.
    */
-  static const unsigned int edge_nodes_map[9][2];
+  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
    * Specialized function for computing the element volume.
@@ -163,7 +173,7 @@ protected:
   /**
    * Data for links to nodes.
    */
-  Node * _nodelinks_data[6];
+  Node * _nodelinks_data[num_nodes];
 
 
 
@@ -181,7 +191,7 @@ protected:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const float _embedding_matrix[8][6][6];
+  static const float _embedding_matrix[num_children][num_nodes][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 

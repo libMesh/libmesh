@@ -37,7 +37,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfPrism6 class static member initializations
-const unsigned int InfPrism6::side_nodes_map[4][4] =
+const int InfPrism6::num_nodes;
+const int InfPrism6::num_sides;
+const int InfPrism6::num_edges;
+const int InfPrism6::num_children;
+const int InfPrism6::nodes_per_side;
+const int InfPrism6::nodes_per_edge;
+
+const unsigned int InfPrism6::side_nodes_map[InfPrism6::num_sides][InfPrism6::nodes_per_side] =
   {
     { 0, 1, 2, 99}, // Side 0
     { 0, 1, 3, 4},  // Side 1
@@ -45,7 +52,7 @@ const unsigned int InfPrism6::side_nodes_map[4][4] =
     { 2, 0, 5, 3}   // Side 3
   };
 
-const unsigned int InfPrism6::edge_nodes_map[6][2] =
+const unsigned int InfPrism6::edge_nodes_map[InfPrism6::num_edges][InfPrism6::nodes_per_edge] =
   {
     {0, 1}, // Edge 0
     {1, 2}, // Edge 1
@@ -82,31 +89,26 @@ bool InfPrism6::is_node_on_side(const unsigned int n,
                                 const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 InfPrism6::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  std::vector<unsigned int> nodes(side_nodes_map[s],
-                                  side_nodes_map[s] +
-                                      sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0]));
-  nodes.erase(std::remove(nodes.begin(), nodes.end(), 99), nodes.end());
-  return nodes;
+  auto trim = (s > 0) ? 0 : 1;
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
 }
 
 bool InfPrism6::is_node_on_edge(const unsigned int n,
                                 const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 
@@ -224,7 +226,7 @@ void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfPrism6::_embedding_matrix[4][6][6] =
+const float InfPrism6::_embedding_matrix[InfPrism6::num_children][InfPrism6::num_nodes][InfPrism6::num_nodes] =
   {
     // embedding matrix for child 0
     {

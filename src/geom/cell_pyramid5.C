@@ -33,7 +33,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Pyramid5 class static member initializations
-const unsigned int Pyramid5::side_nodes_map[5][4] =
+const int Pyramid5::num_nodes;
+const int Pyramid5::num_sides;
+const int Pyramid5::num_edges;
+const int Pyramid5::num_children;
+const int Pyramid5::nodes_per_side;
+const int Pyramid5::nodes_per_edge;
+
+const unsigned int Pyramid5::side_nodes_map[Pyramid5::num_sides][Pyramid5::nodes_per_side] =
   {
     {0, 1, 4, 99}, // Side 0
     {1, 2, 4, 99}, // Side 1
@@ -42,7 +49,7 @@ const unsigned int Pyramid5::side_nodes_map[5][4] =
     {0, 3, 2,  1}  // Side 4
   };
 
-const unsigned int Pyramid5::edge_nodes_map[8][2] =
+const unsigned int Pyramid5::edge_nodes_map[Pyramid5::num_edges][Pyramid5::nodes_per_edge] =
   {
     {0, 1}, // Edge 0
     {1, 2}, // Edge 1
@@ -78,31 +85,26 @@ bool Pyramid5::is_node_on_side(const unsigned int n,
                                const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Pyramid5::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  std::vector<unsigned int> nodes(side_nodes_map[s],
-                                  side_nodes_map[s] +
-                                      sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0]));
-  nodes.erase(std::remove(nodes.begin(), nodes.end(), 99), nodes.end());
-  return nodes;
+  auto trim = (s == 4) ? 0 : 1;
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
 }
 
 bool Pyramid5::is_node_on_edge(const unsigned int n,
                                const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 

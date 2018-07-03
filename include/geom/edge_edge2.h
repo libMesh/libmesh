@@ -153,12 +153,18 @@ public:
    */
   virtual dof_id_type key () const override;
 
+  /**
+   * Geometric constants for Edge2.
+   */
+  static const int num_nodes = 2;
+  static const int num_children = 2;
+
 protected:
 
   /**
    * Data for links to nodes.
    */
-  Node * _nodelinks_data[2];
+  Node * _nodelinks_data[num_nodes];
 
 
 
@@ -176,7 +182,7 @@ protected:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const float _embedding_matrix[2][2][2];
+  static const float _embedding_matrix[num_children][num_nodes][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 

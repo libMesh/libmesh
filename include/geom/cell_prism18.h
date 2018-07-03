@@ -92,7 +92,7 @@ public:
   /**
    * \returns 18.
    */
-  virtual unsigned int n_nodes() const override { return 18; }
+  virtual unsigned int n_nodes() const override { return num_nodes; }
 
   /**
    * \returns 8.
@@ -203,16 +203,26 @@ public:
   second_order_child_vertex (const unsigned int n) const override;
 
   /**
+   * Geometric constants for Prism18.
+   */
+  static const int num_nodes = 18;
+  static const int num_sides = 5;
+  static const int num_edges = 9;
+  static const int num_children = 8;
+  static const int nodes_per_side = 9;
+  static const int nodes_per_edge = 3;
+
+  /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[5][9];
+  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
    * element node numbers.
    */
-  static const unsigned int edge_nodes_map[9][3];
+  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
    * A specialization for computing the volume of a Prism18.
@@ -224,7 +234,7 @@ protected:
   /**
    * Data for links to nodes.
    */
-  Node * _nodelinks_data[18];
+  Node * _nodelinks_data[num_nodes];
 
 
 
@@ -242,7 +252,7 @@ protected:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const float _embedding_matrix[8][18][18];
+  static const float _embedding_matrix[num_children][num_nodes][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 

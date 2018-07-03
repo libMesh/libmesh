@@ -32,7 +32,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Hex8 class static member initializations
-const unsigned int Hex8::side_nodes_map[6][4] =
+const int Hex8::num_nodes;
+const int Hex8::num_sides;
+const int Hex8::num_edges;
+const int Hex8::num_children;
+const int Hex8::nodes_per_side;
+const int Hex8::nodes_per_edge;
+
+const unsigned int Hex8::side_nodes_map[Hex8::num_sides][Hex8::nodes_per_side] =
   {
     {0, 3, 2, 1}, // Side 0
     {0, 1, 5, 4}, // Side 1
@@ -42,7 +49,7 @@ const unsigned int Hex8::side_nodes_map[6][4] =
     {4, 5, 6, 7}  // Side 5
   };
 
-const unsigned int Hex8::edge_nodes_map[12][2] =
+const unsigned int Hex8::edge_nodes_map[Hex8::num_edges][Hex8::nodes_per_edge] =
   {
     {0, 1}, // Edge 0
     {1, 2}, // Edge 1
@@ -81,28 +88,25 @@ bool Hex8::is_node_on_side(const unsigned int n,
                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Hex8::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
 bool Hex8::is_node_on_edge(const unsigned int n,
                            const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 
@@ -210,7 +214,7 @@ void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Hex8::_embedding_matrix[8][8][8] =
+const float Hex8::_embedding_matrix[Hex8::num_children][Hex8::num_nodes][Hex8::num_nodes] =
   {
     // The 8 children of the Hex-type elements can be thought of as being
     // associated with the 8 vertices of the Hex.  Some of the children are
