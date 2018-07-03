@@ -770,51 +770,40 @@ bool UnstructuredMesh::contract ()
   // Flag indicating if this call actually changes the mesh
   bool mesh_changed = false;
 
-  element_iterator in        = elements_begin();
-  const element_iterator end = elements_end();
-
 #ifdef DEBUG
-  for ( ; in != end; ++in)
-    if (*in != nullptr)
-      {
-        Elem * el = *in;
-        libmesh_assert(el->active() || el->subactive() || el->ancestor());
-      }
-  in = elements_begin();
+  for (const auto & elem : this->element_ptr_range())
+    libmesh_assert(elem->active() || elem->subactive() || elem->ancestor());
 #endif
 
   // Loop over the elements.
-  for ( ; in != end; ++in)
-    if (*in != nullptr)
-      {
-        Elem * el = *in;
+  for (auto & elem : this->element_ptr_range())
+    {
+      // Delete all the subactive ones
+      if (elem->subactive())
+        {
+          // No level-0 element should be subactive.
+          // Note that we CAN'T test elem->level(), as that
+          // touches elem->parent()->dim(), and elem->parent()
+          // might have already been deleted!
+          libmesh_assert(elem->parent());
 
-        // Delete all the subactive ones
-        if (el->subactive())
-          {
-            // No level-0 element should be subactive.
-            // Note that we CAN'T test elem->level(), as that
-            // touches elem->parent()->dim(), and elem->parent()
-            // might have already been deleted!
-            libmesh_assert(el->parent());
+          // Delete the element
+          // This just sets a pointer to nullptr, and doesn't
+          // invalidate any iterators
+          this->delete_elem(elem);
 
-            // Delete the element
-            // This just sets a pointer to nullptr, and doesn't
-            // invalidate any iterators
-            this->delete_elem(el);
-
-            // the mesh has certainly changed
-            mesh_changed = true;
-          }
-        else
-          {
-            // Compress all the active ones
-            if (el->active())
-              el->contract();
-            else
-              libmesh_assert (el->ancestor());
-          }
-      }
+          // the mesh has certainly changed
+          mesh_changed = true;
+        }
+      else
+        {
+          // Compress all the active ones
+          if (elem->active())
+            elem->contract();
+          else
+            libmesh_assert (elem->ancestor());
+        }
+    }
 
   // Strip any newly-created nullptr voids out of the element array
   this->renumber_nodes_and_elements();
@@ -824,11 +813,9 @@ bool UnstructuredMesh::contract ()
   this->clear_point_locator();
 
   // Allow our GhostingFunctor objects to reinit if necessary.
-  std::set<GhostingFunctor *>::iterator        gf_it = this->ghosting_functors_begin();
-  const std::set<GhostingFunctor *>::iterator gf_end = this->ghosting_functors_end();
-  for (; gf_it != gf_end; ++gf_it)
+  for (auto & gf : as_range(this->ghosting_functors_begin(),
+                            this->ghosting_functors_end()))
     {
-      GhostingFunctor *gf = *gf_it;
       libmesh_assert(gf);
       gf->mesh_reinit();
     }
