@@ -670,10 +670,6 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh & pid_mesh,
     }
 #endif
 
-  // Create iterators to loop over the list of elements
-  //   const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
-  //   const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
-
   const_element_iterator       it     = this->active_pid_elements_begin(pid);
   const const_element_iterator it_end = this->active_pid_elements_end(pid);
 
