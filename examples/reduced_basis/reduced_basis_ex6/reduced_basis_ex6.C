@@ -303,13 +303,8 @@ void transform_mesh_and_plot(EquationSystems & es,
   // Loop over the mesh nodes and move them!
   MeshBase & mesh = es.get_mesh();
 
-  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.nodes_end();
-
-  for ( ; node_it != node_end; node_it++)
+  for (auto & node : mesh.node_ptr_range())
     {
-      Node * node = *node_it;
-
       Real x = (*node)(0);
       Real z = (*node)(2);
 
