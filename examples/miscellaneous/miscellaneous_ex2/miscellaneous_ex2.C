@@ -228,14 +228,8 @@ int main (int argc, char ** argv)
   {
     NumericVector<Number> & freq_indep_rhs = f_system.get_vector("rhs");
 
-    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
-    const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-
-    for ( ; node_it != node_end; ++node_it)
+    for (const auto & node : mesh.node_ptr_range())
       {
-        // the current node pointer
-        Node * node = *node_it;
-
         // Get the data read in from the dataset for the current Node, if any.
         const std::vector<Number> * nodal_data = unvio.get_data(node);
 
