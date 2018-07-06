@@ -209,9 +209,9 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
-	parallel/packed_range_test.C parallel/parallel_test.C \
-	parallel/parallel_point_test.C quadrature/quadrature_test.C \
-	solvers/time_solver_test_common.h \
+	parallel/packed_range_test.C parallel/parallel_sort_test.C \
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
@@ -264,6 +264,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	numerics/unit_tests_dbg-type_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-dense_matrix_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-packed_range_test.$(OBJEXT) \
+	parallel/unit_tests_dbg-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT) \
@@ -311,9 +312,9 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
-	parallel/packed_range_test.C parallel/parallel_test.C \
-	parallel/parallel_point_test.C quadrature/quadrature_test.C \
-	solvers/time_solver_test_common.h \
+	parallel/packed_range_test.C parallel/parallel_sort_test.C \
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
@@ -365,6 +366,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	numerics/unit_tests_devel-type_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_devel-dense_matrix_test.$(OBJEXT) \
 	parallel/unit_tests_devel-packed_range_test.$(OBJEXT) \
+	parallel/unit_tests_devel-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_devel-quadrature_test.$(OBJEXT) \
@@ -409,9 +411,9 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
-	parallel/packed_range_test.C parallel/parallel_test.C \
-	parallel/parallel_point_test.C quadrature/quadrature_test.C \
-	solvers/time_solver_test_common.h \
+	parallel/packed_range_test.C parallel/parallel_sort_test.C \
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
@@ -463,6 +465,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-dense_matrix_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-packed_range_test.$(OBJEXT) \
+	parallel/unit_tests_oprof-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT) \
@@ -507,9 +510,9 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
-	parallel/packed_range_test.C parallel/parallel_test.C \
-	parallel/parallel_point_test.C quadrature/quadrature_test.C \
-	solvers/time_solver_test_common.h \
+	parallel/packed_range_test.C parallel/parallel_sort_test.C \
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
@@ -561,6 +564,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	numerics/unit_tests_opt-type_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_opt-dense_matrix_test.$(OBJEXT) \
 	parallel/unit_tests_opt-packed_range_test.$(OBJEXT) \
+	parallel/unit_tests_opt-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_opt-quadrature_test.$(OBJEXT) \
@@ -604,9 +608,9 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
-	parallel/packed_range_test.C parallel/parallel_test.C \
-	parallel/parallel_point_test.C quadrature/quadrature_test.C \
-	solvers/time_solver_test_common.h \
+	parallel/packed_range_test.C parallel/parallel_sort_test.C \
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
@@ -658,6 +662,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	numerics/unit_tests_prof-type_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_prof-dense_matrix_test.$(OBJEXT) \
 	parallel/unit_tests_prof-packed_range_test.$(OBJEXT) \
+	parallel/unit_tests_prof-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_prof-quadrature_test.$(OBJEXT) \
@@ -1121,9 +1126,9 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
-	parallel/packed_range_test.C parallel/parallel_test.C \
-	parallel/parallel_point_test.C quadrature/quadrature_test.C \
-	solvers/time_solver_test_common.h \
+	parallel/packed_range_test.C parallel/parallel_sort_test.C \
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
@@ -1329,6 +1334,8 @@ parallel/$(DEPDIR)/$(am__dirstamp):
 	@: > parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_dbg-packed_range_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_dbg-parallel_sort_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_dbg-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_dbg-parallel_point_test.$(OBJEXT):  \
@@ -1472,6 +1479,8 @@ numerics/unit_tests_devel-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_devel-packed_range_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_devel-parallel_sort_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_devel-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_devel-parallel_point_test.$(OBJEXT):  \
@@ -1584,6 +1593,8 @@ numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT):  \
 numerics/unit_tests_oprof-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_oprof-packed_range_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_oprof-parallel_sort_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_oprof-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
@@ -1698,6 +1709,8 @@ numerics/unit_tests_opt-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_opt-packed_range_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_opt-parallel_sort_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_opt-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_opt-parallel_point_test.$(OBJEXT):  \
@@ -1810,6 +1823,8 @@ numerics/unit_tests_prof-type_tensor_test.$(OBJEXT):  \
 numerics/unit_tests_prof-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_prof-packed_range_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_prof-parallel_sort_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_prof-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
@@ -2081,18 +2096,23 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-vector_value_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-packed_range_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-parallel_sort_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-packed_range_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-parallel_sort_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-packed_range_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-parallel_sort_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_opt-packed_range_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_opt-parallel_sort_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-packed_range_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_dbg-quadrature_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po@am__quote@
@@ -2783,6 +2803,20 @@ parallel/unit_tests_dbg-packed_range_test.obj: parallel/packed_range_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/packed_range_test.C' object='parallel/unit_tests_dbg-packed_range_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_dbg-packed_range_test.obj `if test -f 'parallel/packed_range_test.C'; then $(CYGPATH_W) 'parallel/packed_range_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/packed_range_test.C'; fi`
+
+parallel/unit_tests_dbg-parallel_sort_test.o: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_dbg-parallel_sort_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_dbg-parallel_sort_test.Tpo -c -o parallel/unit_tests_dbg-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_dbg-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_dbg-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_dbg-parallel_sort_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_dbg-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+
+parallel/unit_tests_dbg-parallel_sort_test.obj: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_dbg-parallel_sort_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_dbg-parallel_sort_test.Tpo -c -o parallel/unit_tests_dbg-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_dbg-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_dbg-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_dbg-parallel_sort_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_dbg-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
 
 parallel/unit_tests_dbg-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_dbg-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_dbg-parallel_test.Tpo -c -o parallel/unit_tests_dbg-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
@@ -3554,6 +3588,20 @@ parallel/unit_tests_devel-packed_range_test.obj: parallel/packed_range_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-packed_range_test.obj `if test -f 'parallel/packed_range_test.C'; then $(CYGPATH_W) 'parallel/packed_range_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/packed_range_test.C'; fi`
 
+parallel/unit_tests_devel-parallel_sort_test.o: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_sort_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_sort_test.Tpo -c -o parallel/unit_tests_devel-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_devel-parallel_sort_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+
+parallel/unit_tests_devel-parallel_sort_test.obj: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_sort_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_sort_test.Tpo -c -o parallel/unit_tests_devel-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_devel-parallel_sort_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
+
 parallel/unit_tests_devel-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo -c -o parallel/unit_tests_devel-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po
@@ -4323,6 +4371,20 @@ parallel/unit_tests_oprof-packed_range_test.obj: parallel/packed_range_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/packed_range_test.C' object='parallel/unit_tests_oprof-packed_range_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-packed_range_test.obj `if test -f 'parallel/packed_range_test.C'; then $(CYGPATH_W) 'parallel/packed_range_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/packed_range_test.C'; fi`
+
+parallel/unit_tests_oprof-parallel_sort_test.o: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_sort_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_sort_test.Tpo -c -o parallel/unit_tests_oprof-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_oprof-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_oprof-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_oprof-parallel_sort_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+
+parallel/unit_tests_oprof-parallel_sort_test.obj: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_sort_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_sort_test.Tpo -c -o parallel/unit_tests_oprof-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_oprof-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_oprof-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_oprof-parallel_sort_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
 
 parallel/unit_tests_oprof-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Tpo -c -o parallel/unit_tests_oprof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
@@ -5094,6 +5156,20 @@ parallel/unit_tests_opt-packed_range_test.obj: parallel/packed_range_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-packed_range_test.obj `if test -f 'parallel/packed_range_test.C'; then $(CYGPATH_W) 'parallel/packed_range_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/packed_range_test.C'; fi`
 
+parallel/unit_tests_opt-parallel_sort_test.o: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_sort_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_sort_test.Tpo -c -o parallel/unit_tests_opt-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_opt-parallel_sort_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+
+parallel/unit_tests_opt-parallel_sort_test.obj: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_sort_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_sort_test.Tpo -c -o parallel/unit_tests_opt-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_opt-parallel_sort_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
+
 parallel/unit_tests_opt-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo -c -o parallel/unit_tests_opt-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Po
@@ -5863,6 +5939,20 @@ parallel/unit_tests_prof-packed_range_test.obj: parallel/packed_range_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/packed_range_test.C' object='parallel/unit_tests_prof-packed_range_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-packed_range_test.obj `if test -f 'parallel/packed_range_test.C'; then $(CYGPATH_W) 'parallel/packed_range_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/packed_range_test.C'; fi`
+
+parallel/unit_tests_prof-parallel_sort_test.o: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_sort_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Tpo -c -o parallel/unit_tests_prof-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_prof-parallel_sort_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_sort_test.o `test -f 'parallel/parallel_sort_test.C' || echo '$(srcdir)/'`parallel/parallel_sort_test.C
+
+parallel/unit_tests_prof-parallel_sort_test.obj: parallel/parallel_sort_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_sort_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Tpo -c -o parallel/unit_tests_prof-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Tpo parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_sort_test.C' object='parallel/unit_tests_prof-parallel_sort_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_sort_test.obj `if test -f 'parallel/parallel_sort_test.C'; then $(CYGPATH_W) 'parallel/parallel_sort_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_sort_test.C'; fi`
 
 parallel/unit_tests_prof-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Tpo -c -o parallel/unit_tests_prof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C

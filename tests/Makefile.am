@@ -61,6 +61,7 @@ unit_tests_sources = \
   numerics/type_tensor_test.C \
   numerics/dense_matrix_test.C \
   parallel/packed_range_test.C \
+  parallel/parallel_sort_test.C \
   parallel/parallel_test.C \
   parallel/parallel_point_test.C \
   quadrature/quadrature_test.C \
