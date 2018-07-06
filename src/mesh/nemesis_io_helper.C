@@ -2144,25 +2144,21 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
   ExodusII_IO_Helper::ElementMaps em;
 
   // FIXME: We already built this list once, we should reuse that information!
-  std::vector<dof_id_type > bndry_elem_list;
-  std::vector<unsigned short int > bndry_side_list;
-  std::vector<boundary_id_type > bndry_id_list;
-
-  mesh.get_boundary_info().build_side_list
-    (bndry_elem_list, bndry_side_list, bndry_id_list);
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> bndry_elem_side_id_list =
+    mesh.get_boundary_info().build_side_list();
 
   // Integer looping, skipping non-local elements
-  for (std::size_t i=0; i<bndry_elem_list.size(); ++i)
+  for (std::size_t i=0; i<bndry_elem_side_id_list.size(); ++i)
     {
       // Get pointer to current Elem
-      const Elem * elem = mesh.elem_ptr(bndry_elem_list[i]);
+      const Elem * elem = mesh.elem_ptr(std::get<0>(bndry_elem_side_id_list[i]));
 
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
       // We need to build up active elements if AMR is enabled and add
       // them to the exodus sidesets instead of the potentially inactive "parent" elements
       // Technically we don't need to "reset" the tree since the vector was just created.
-      elem->active_family_tree_by_side(family, bndry_side_list[i], /*reset tree=*/false);
+      elem->active_family_tree_by_side(family, std::get<1>(bndry_elem_side_id_list[i]), /*reset tree=*/false);
 #else
       // If AMR is not even enabled, just push back the element itself
       family.push_back( elem );
@@ -2189,8 +2185,8 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
               std::map<int,int>::iterator it = this->libmesh_elem_num_to_exodus.find( f_id );
               if (it != this->libmesh_elem_num_to_exodus.end())
                 {
-                  local_elem_boundary_id_lists[ bndry_id_list[i] ].push_back( it->second );
-                  local_elem_boundary_id_side_lists[ bndry_id_list[i] ].push_back(conv.get_inverse_side_map( bndry_side_list[i] ));
+                  local_elem_boundary_id_lists[ std::get<2>(bndry_elem_side_id_list[i]) ].push_back( it->second );
+                  local_elem_boundary_id_side_lists[ std::get<2>(bndry_elem_side_id_list[i]) ].push_back(conv.get_inverse_side_map( std::get<1>(bndry_elem_side_id_list[i]) ));
                 }
               else
                 libmesh_error_msg("Error, no Exodus mapping for Elem " \
