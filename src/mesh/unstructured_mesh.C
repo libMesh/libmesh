@@ -683,7 +683,7 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh & pid_mesh,
 
 
 void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
-                                       const_element_iterator & it,
+                                       const const_element_iterator & it,
                                        const const_element_iterator & it_end) const
 {
   // Just in case the subdomain_mesh already has some information
@@ -706,10 +706,8 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
   // Container to catch boundary IDs handed back by BoundaryInfo
   std::vector<boundary_id_type> bc_ids;
 
-  for (; it != it_end; ++it)
+  for (const auto & old_elem : as_range(it, it_end))
     {
-      const Elem * old_elem = *it;
-
       // Add an equivalent element type to the new_mesh.
       // Copy ids for this element.
       Elem * new_elem = Elem::build(old_elem->type()).release();
@@ -733,7 +731,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
           if (!new_mesh.query_node_ptr(this_node_id))
             {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              Node *newn =
+              Node * newn =
 #endif
                 new_mesh.add_point (old_elem->point(n),
                                     this_node_id,
