@@ -396,15 +396,10 @@ void UnstructuredMesh::all_first_order ()
       this->insert_elem(lo_elem);
     }
 
-  const MeshBase::node_iterator nd_end = this->nodes_end();
-  MeshBase::node_iterator nd = this->nodes_begin();
-  while (nd != nd_end)
-    {
-      Node * the_node = *nd;
-      ++nd;
-      if (!node_touched_by_me[the_node->id()])
-        this->delete_node(the_node);
-    }
+  // Deleting nodes does not invalidate iterators, so this is safe.
+  for (const auto & node : this->node_ptr_range())
+    if (!node_touched_by_me[node->id()])
+      this->delete_node(node);
 
   // If crazy people applied boundary info to non-vertices and then
   // deleted those non-vertices, we should make sure their boundary id
