@@ -101,14 +101,8 @@ public:
     _fe->get_dphidz();
 #endif
 
-    MeshBase::const_element_iterator
-      elem_it  = _mesh->active_local_elements_begin(),
-      elem_end = _mesh->active_local_elements_end();
-
-    if (elem_it == elem_end)
-      _elem = nullptr;
-    else
-      _elem = *elem_it;
+    auto rng = _mesh->active_local_element_ptr_range();
+    _elem = rng.begin() == rng.end() ? nullptr : *(rng.begin());
 
     _sys->get_dof_map().dof_indices(_elem, _dof_indices);
 
