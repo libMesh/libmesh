@@ -94,7 +94,7 @@ void Communicator::split(int color, int key, Communicator & target) const
     (MPI_Comm_split(this->get(), color, key, &newcomm));
 
   target.assign(newcomm);
-  target._I_duped_it = true;
+  target._I_duped_it = (color != MPI_UNDEFINED);
   target.send_mode(this->send_mode());
 }
 #else
