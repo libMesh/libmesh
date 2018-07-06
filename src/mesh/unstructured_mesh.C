@@ -670,10 +670,9 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh & pid_mesh,
     }
 #endif
 
-  const_element_iterator       it     = this->active_pid_elements_begin(pid);
-  const const_element_iterator it_end = this->active_pid_elements_end(pid);
-
-  this->create_submesh (pid_mesh, it, it_end);
+  this->create_submesh (pid_mesh,
+                        this->active_pid_elements_begin(pid),
+                        this->active_pid_elements_end(pid));
 }
 
 
