@@ -317,15 +317,8 @@ void scale_mesh_and_plot(EquationSystems & es,
   // Loop over the mesh nodes and move them!
   MeshBase & mesh = es.get_mesh();
 
-  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.nodes_end();
-
-  for ( ; node_it != node_end; node_it++)
-    {
-      Node * node = *node_it;
-
-      (*node)(0) *= mu.get_value("x_scaling");
-    }
+  for (auto & node : mesh.node_ptr_range())
+    (*node)(0) *= mu.get_value("x_scaling");
 
   // Post-process the solution to compute the stresses
   compute_stresses(es);
@@ -335,14 +328,8 @@ void scale_mesh_and_plot(EquationSystems & es,
 #endif
 
   // Loop over the mesh nodes and move them!
-  node_it = mesh.nodes_begin();
-
-  for ( ; node_it != node_end; node_it++)
-    {
-      Node * node = *node_it;
-
-      (*node)(0) /= mu.get_value("x_scaling");
-    }
+  for (auto & node : mesh.node_ptr_range())
+    (*node)(0) /= mu.get_value("x_scaling");
 }
 
 void compute_stresses(EquationSystems & es)
