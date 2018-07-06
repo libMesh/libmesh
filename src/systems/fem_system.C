@@ -132,8 +132,8 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
         }
     }
 
-  for (_femcontext.side = 0;
-       _femcontext.side != _femcontext.get_elem().n_sides();
+  const unsigned char n_sides = _femcontext.get_elem().n_sides();
+  for (_femcontext.side = 0; _femcontext.side != n_sides;
        ++_femcontext.side)
     {
       // Don't compute on non-boundary sides unless requested
@@ -423,8 +423,8 @@ public:
 
         _sys.element_postprocess(_femcontext);
 
-        for (_femcontext.side = 0;
-             _femcontext.side != _femcontext.get_elem().n_sides();
+        const unsigned char n_sides = _femcontext.get_elem().n_sides();
+        for (_femcontext.side = 0; _femcontext.side != n_sides;
              ++_femcontext.side)
           {
             // Don't compute on non-boundary sides unless requested
@@ -551,8 +551,8 @@ public:
           }
 #endif
 
-        for (_femcontext.side = 0;
-             _femcontext.side != _femcontext.get_elem().n_sides();
+        const unsigned char n_sides = _femcontext.get_elem().n_sides();
+        for (_femcontext.side = 0; _femcontext.side != n_sides;
              ++_femcontext.side)
           {
             // Don't compute on non-boundary sides unless requested
@@ -721,8 +721,8 @@ public:
 #endif
 
 
-        for (_femcontext.side = 0;
-             _femcontext.side != _femcontext.get_elem().n_sides();
+        const unsigned char n_sides = _femcontext.get_elem().n_sides();
+        for (_femcontext.side = 0; _femcontext.side != n_sides;
              ++_femcontext.side)
           {
             // Don't compute on non-boundary sides unless requested

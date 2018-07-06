@@ -1838,8 +1838,8 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
   libmesh_assert_equal_to (dof_indices_in.size(), Ue.size());
   bool has_constrained_dofs = false;
 
-  for (unsigned int il=0;
-       il != cast_int<unsigned int>(dof_indices_in.size()); il++)
+  const unsigned int n_original_dofs = dof_indices_in.size();
+  for (unsigned int il=0; il != n_original_dofs; ++il)
     {
       const dof_id_type ig = dof_indices_in[il];
 
@@ -1870,8 +1870,6 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
       Ue.zero();
 
       // compute Ue = C Ug, with proper mapping.
-      const unsigned int n_original_dofs =
-        cast_int<unsigned int>(dof_indices_in.size());
       for (unsigned int i=0; i != n_original_dofs; i++)
         {
           Ue.el(i) = H(i);
@@ -1896,9 +1894,6 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
 #else
 
   // Trivial mapping
-
-  const unsigned int n_original_dofs =
-    cast_int<unsigned int>(dof_indices_in.size());
 
   libmesh_assert_equal_to (n_original_dofs, Ue.size());
 

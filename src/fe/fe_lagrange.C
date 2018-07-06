@@ -720,9 +720,11 @@ void lagrange_compute_constraints (DofConstraints & constraints,
           dof_map.dof_indices (parent_side.get(), parent_dof_indices,
                                variable_number);
 
-          for (unsigned int my_dof=0;
-               my_dof<FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
-               my_dof++)
+          const unsigned int n_side_dofs =
+            FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
+          const unsigned int n_parent_side_dofs =
+            FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
+          for (unsigned int my_dof=0; my_dof != n_side_dofs; my_dof++)
             {
               libmesh_assert_less (my_dof, my_side->n_nodes());
 
@@ -733,8 +735,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
               // we bother creating a constraint row
               bool self_constraint = false;
               for (unsigned int their_dof=0;
-                   their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
-                   their_dof++)
+                   their_dof != n_parent_side_dofs; their_dof++)
                 {
                   libmesh_assert_less (their_dof, parent_side->n_nodes());
 
@@ -777,8 +778,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
 
               // Compute the parent's side shape function values.
               for (unsigned int their_dof=0;
-                   their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
-                   their_dof++)
+                   their_dof != n_parent_side_dofs; their_dof++)
                 {
                   libmesh_assert_less (their_dof, parent_side->n_nodes());
 

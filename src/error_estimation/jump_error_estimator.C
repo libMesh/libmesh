@@ -209,8 +209,9 @@ void JumpErrorEstimator::estimate_error (const System & system,
                     active_family_tree_by_neighbor(active_neighbors,
                                                    parent);
                   // Compute the flux to each active neighbor
-                  for (unsigned int a=0;
-                       a != active_neighbors.size(); ++a)
+                  for (std::size_t a=0,
+                        n_active_neighbors = active_neighbors.size();
+                       a != n_active_neighbors; ++a)
                     {
                       const Elem * f = active_neighbors[a];
                       // FIXME - what about when f->level <

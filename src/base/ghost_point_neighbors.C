@@ -74,10 +74,10 @@ void GhostPointNeighbors::operator()
                   std::vector<const Elem*> family;
                   neigh->active_family_tree_by_neighbor(family, elem);
 
-                  for (std::size_t i=0; i!=family.size(); ++i)
-                    if (family[i]->processor_id() != p)
+                  for (const Elem * f : family)
+                    if (f->processor_id() != p)
                       coupled_elements.insert
-                        (std::make_pair(family[i], nullcm));
+                        (std::make_pair(f, nullcm));
                 }
               else
 #endif

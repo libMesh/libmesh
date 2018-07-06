@@ -327,8 +327,8 @@ void Build::operator()(const ConstElemRange & range)
       // Get the row of the sparsity pattern
       SparsityPattern::Row & row = sparsity_pattern[i];
 
-      for (std::size_t j=0; j<row.size(); j++)
-        if ((row[j] < first_dof_on_proc) || (row[j] >= end_dof_on_proc))
+      for (auto & df : row)
+        if ((df < first_dof_on_proc) || (df >= end_dof_on_proc))
           n_oz[i]++;
         else
           n_nz[i]++;
@@ -385,8 +385,8 @@ void Build::join (const SparsityPattern::Build & other)
           // fix the number of on and off-processor nonzeros in this row
           n_nz[r] = n_oz[r] = 0;
 
-          for (std::size_t j=0; j<my_row.size(); j++)
-            if ((my_row[j] < first_dof_on_proc) || (my_row[j] >= end_dof_on_proc))
+          for (auto & df : my_row)
+            if ((df < first_dof_on_proc) || (df >= end_dof_on_proc))
               n_oz[r]++;
             else
               n_nz[r]++;
@@ -402,11 +402,10 @@ void Build::join (const SparsityPattern::Build & other)
 
   // Move nonlocal row information to ourselves; the other thread
   // won't need it in the map after that.
-  NonlocalGraph::const_iterator it = other.nonlocal_pattern.begin();
-  for (; it != other.nonlocal_pattern.end(); ++it)
+  for (auto & p : other.nonlocal_pattern)
     {
 #ifndef NDEBUG
-      const dof_id_type dof_id = it->first;
+      const dof_id_type dof_id = p.first;
 
       processor_id_type dbg_proc_id = 0;
       while (dof_id >= dof_map.end_dof(dbg_proc_id))
@@ -414,16 +413,16 @@ void Build::join (const SparsityPattern::Build & other)
       libmesh_assert (dbg_proc_id != this->processor_id());
 #endif
 
-      const SparsityPattern::Row & their_row = it->second;
+      const SparsityPattern::Row & their_row = p.second;
 
       // We should have no empty values in a map
       libmesh_assert (!their_row.empty());
 
-      NonlocalGraph::iterator my_it = nonlocal_pattern.find(it->first);
+      NonlocalGraph::iterator my_it = nonlocal_pattern.find(p.first);
       if (my_it == nonlocal_pattern.end())
         {
           //          nonlocal_pattern[it->first].swap(their_row);
-          nonlocal_pattern[it->first] = their_row;
+          nonlocal_pattern[p.first] = their_row;
         }
       else
         {
@@ -587,16 +586,16 @@ void Build::parallel_sync ()
         // fix the number of on and off-processor nonzeros in this row
         n_nz[my_r] = n_oz[my_r] = 0;
 
-        for (std::size_t j=0; j<my_row.size(); j++)
-          if ((my_row[j] < local_first_dof) || (my_row[j] >= local_end_dof))
+        for (auto & df : my_row)
+          if ((df < local_first_dof) || (df >= local_end_dof))
             n_oz[my_r]++;
           else
             n_nz[my_r]++;
       }
       else
       {
-        for (std::size_t j=0; j<their_row.size(); j++)
-          if ((their_row[j] < local_first_dof) || (their_row[j] >= local_end_dof))
+        for (auto & df : their_row)
+          if ((df < local_first_dof) || (df >= local_end_dof))
             n_oz[my_r]++;
           else
             n_nz[my_r]++;

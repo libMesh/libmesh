@@ -45,14 +45,10 @@ void SiblingCoupling::operator()
       parent->active_family_tree(active_siblings);
 #endif
 
-      for (std::size_t a=0; a != active_siblings.size(); ++a)
-        {
-          const Elem * sibling = active_siblings[a];
-
-          if (sibling->processor_id() != p)
-            coupled_elements.insert
-              (std::make_pair(sibling, _dof_coupling));
-        }
+      for (const Elem * sibling : active_siblings)
+        if (sibling->processor_id() != p)
+          coupled_elements.insert
+            (std::make_pair(sibling, _dof_coupling));
     }
 }
 
