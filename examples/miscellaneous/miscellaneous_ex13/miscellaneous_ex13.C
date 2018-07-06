@@ -756,15 +756,9 @@ void assemble_shell (EquationSystems & es,
       //Finish assembling rhs so we can set one value
       system.rhs->close();
 
-      MeshBase::const_node_iterator nodeit = mesh.nodes_begin();
-      const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-
-      for ( ; nodeit!=node_end; ++nodeit)
-        {
-          Node & node = **nodeit;
-          if ((node-C).norm() < 1e-3)
-            system.rhs->set(node.dof_number(0, 2, 0), -q/4);
-        }
+      for (const auto & node : mesh.node_ptr_range())
+        if (((*node) - C).norm() < 1e-3)
+          system.rhs->set(node->dof_number(0, 2, 0), -q/4);
     }
 
 #else
