@@ -1016,19 +1016,14 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
   std::vector<xdr_id_type> xfer_bcs, recv_bcs;
   std::vector<std::size_t> bc_sizes(this->n_processors());
 
-  // Boundary conditions are only specified for level-0 elements
-  MeshBase::const_element_iterator
-    it  = mesh.local_level_elements_begin(0),
-    end = mesh.local_level_elements_end(0);
-
   // Container to catch boundary IDs handed back by BoundaryInfo
   std::vector<boundary_id_type> bc_ids;
 
+  // Boundary conditions are only specified for level-0 elements
   dof_id_type n_local_level_0_elem=0;
-  for (; it!=end; ++it, n_local_level_0_elem++)
+  for (const auto & elem : as_range(mesh.local_level_elements_begin(0),
+                                    mesh.local_level_elements_end(0)))
     {
-      const Elem * elem = *it;
-
       if (bc_type == "side")
         {
           for (auto s : elem->side_index_range())
@@ -1075,6 +1070,9 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
         {
           libmesh_error_msg("bc_type not recognized: " + bc_type);
         }
+
+      // Increment the level-0 element counter.
+      n_local_level_0_elem++;
     }
 
   xfer_bcs.push_back(n_local_level_0_elem);
