@@ -765,34 +765,22 @@ void DistributedMesh::clear ()
   // Call parent clear function
   MeshBase::clear();
 
-
   // Clear our elements and nodes
-  {
-    elem_iterator_imp        it = _elements.begin();
-    const elem_iterator_imp end = _elements.end();
-
-    // There is no need to remove the elements from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
-
-    _elements.clear();
-  }
+  // There is no need to remove the elements from
+  // the BoundaryInfo data structure since we
+  // already cleared it.
+  for (auto & elem : _elements)
+    delete elem;
 
   // clear the nodes data structure
-  {
-    node_iterator_imp it  = _nodes.begin();
-    node_iterator_imp end = _nodes.end();
+  // There is no need to remove the nodes from
+  // the BoundaryInfo data structure since we
+  // already cleared it.
+  for (auto & node : _nodes)
+    delete node;
 
-    // There is no need to remove the nodes from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
-
-    _nodes.clear();
-  }
+  _elements.clear();
+  _nodes.clear();
 
   // We're no longer distributed if we were before
   _is_serial = true;
