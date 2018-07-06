@@ -147,7 +147,7 @@ public:
    * them to the new mesh.
    */
   void create_submesh (UnstructuredMesh & new_mesh,
-                       const_element_iterator & it,
+                       const const_element_iterator & it,
                        const const_element_iterator & it_end) const;
 
 

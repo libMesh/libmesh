@@ -298,11 +298,8 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids) const
 
   ids.clear();
 
-  const_element_iterator el  = this->active_local_elements_begin();
-  const_element_iterator end = this->active_local_elements_end();
-
-  for (; el!=end; ++el)
-    ids.insert((*el)->subdomain_id());
+  for (const auto & elem : this->active_local_element_ptr_range())
+    ids.insert(elem->subdomain_id());
 
   // Some subdomains may only live on other processors
   this->comm().set_union(ids);
@@ -364,11 +361,8 @@ dof_id_type MeshBase::n_sub_elem () const
 {
   dof_id_type ne=0;
 
-  const_element_iterator       el  = this->elements_begin();
-  const const_element_iterator end = this->elements_end();
-
-  for (; el!=end; ++el)
-    ne += (*el)->n_sub_elem();
+  for (const auto & elem : this->element_ptr_range())
+    ne += elem->n_sub_elem();
 
   return ne;
 }
@@ -379,11 +373,8 @@ dof_id_type MeshBase::n_active_sub_elem () const
 {
   dof_id_type ne=0;
 
-  const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end();
-
-  for (; el!=end; ++el)
-    ne += (*el)->n_sub_elem();
+  for (const auto & elem : this->active_element_ptr_range())
+    ne += elem->n_sub_elem();
 
   return ne;
 }
@@ -475,13 +466,10 @@ unsigned int MeshBase::recalculate_n_partitions()
   // This requires an inspection on every processor
   parallel_object_only();
 
-  const_element_iterator el  = this->active_local_elements_begin();
-  const_element_iterator end = this->active_local_elements_end();
-
   unsigned int max_proc_id=0;
 
-  for (; el!=end; ++el)
-    max_proc_id = std::max(max_proc_id, static_cast<unsigned int>((*el)->processor_id()));
+  for (const auto & elem : this->active_local_element_ptr_range())
+    max_proc_id = std::max(max_proc_id, static_cast<unsigned int>(elem->processor_id()));
 
   // The number of partitions is one more than the max processor ID.
   _n_parts = max_proc_id+1;
@@ -598,11 +586,8 @@ void MeshBase::cache_elem_dims()
   // particular dimension have been deleted.
   _elem_dims.clear();
 
-  const_element_iterator el  = this->active_elements_begin();
-  const_element_iterator end = this->active_elements_end();
-
-  for (; el!=end; ++el)
-    _elem_dims.insert((*el)->dim());
+  for (const auto & elem : this->active_element_ptr_range())
+    _elem_dims.insert(elem->dim());
 
   // Some different dimension elements may only live on other processors
   this->comm().set_union(_elem_dims);
@@ -621,16 +606,12 @@ void MeshBase::cache_elem_dims()
   // early...
   if (_spatial_dimension < 3)
     {
-      const_node_iterator node_it  = this->nodes_begin();
-      const_node_iterator node_end = this->nodes_end();
-      for (; node_it != node_end; ++node_it)
+      for (const auto & node : this->node_ptr_range())
         {
-          Node & node = **node_it;
-
 #if LIBMESH_DIM > 1
           // Note: the exact floating point comparison is intentional,
           // we don't want to get tripped up by tolerances.
-          if (node(1) != 0.)
+          if ((*node)(1) != 0.)
             {
               _spatial_dimension = 2;
 #if LIBMESH_DIM == 2
@@ -643,7 +624,7 @@ void MeshBase::cache_elem_dims()
 #endif
 
 #if LIBMESH_DIM > 2
-          if (node(2) != 0.)
+          if ((*node)(2) != 0.)
             {
               // Spatial dimension can't get any higher than this, so
               // we can break out.
@@ -667,13 +648,8 @@ void MeshBase::detect_interior_parents()
   //This map will be used to set interior parents
   std::unordered_map<dof_id_type, std::vector<dof_id_type>> node_to_elem;
 
-  const_element_iterator el  = this->active_elements_begin();
-  const_element_iterator end = this->active_elements_end();
-
-  for (; el!=end; ++el)
+  for (const auto & elem : this->active_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       // Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
       for (unsigned int n=0; n<elem->n_vertices(); n++)
         {
@@ -684,11 +660,8 @@ void MeshBase::detect_interior_parents()
     }
 
   // Automatically set interior parents
-  el = this->elements_begin();
-  for (; el!=end; ++el)
+  for (const auto & element : this->element_ptr_range())
     {
-      Elem * element = *el;
-
       // Ignore an 3D element or an element that already has an interior parent
       if (element->dim()>=LIBMESH_DIM || element->interior_parent())
         continue;

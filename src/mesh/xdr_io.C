@@ -365,18 +365,15 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
   const unsigned int n_active_levels = MeshTools::n_active_levels (mesh);
   std::vector<xdr_id_type> n_global_elem_at_level(n_active_levels);
 
-  MeshBase::const_element_iterator it  = mesh.local_elements_end(), end=it;
-
   // Find the number of local and global elements at each level
 #ifndef NDEBUG
   xdr_id_type tot_n_elem = 0;
 #endif
   for (unsigned int level=0; level<n_active_levels; level++)
     {
-      it  = mesh.local_level_elements_begin(level);
-      end = mesh.local_level_elements_end(level);
-
-      n_global_elem_at_level[level] = MeshTools::n_elem(it, end);
+      n_global_elem_at_level[level] =
+        MeshTools::n_elem(mesh.local_level_elements_begin(level),
+                          mesh.local_level_elements_end(level));
 
       this->comm().sum(n_global_elem_at_level[level]);
 #ifndef NDEBUG
@@ -403,14 +400,13 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
 
   //-------------------------------------------
   // First write the level-0 elements directly.
-  it  = mesh.local_level_elements_begin(0);
-  end = mesh.local_level_elements_end(0);
-  for (; it != end; ++it, ++my_next_elem)
+  for (const auto & elem : as_range(mesh.local_level_elements_begin(0),
+                                    mesh.local_level_elements_end(0)))
     {
-      pack_element (xfer_conn, *it);
+      pack_element (xfer_conn, elem);
 #ifdef LIBMESH_ENABLE_AMR
-      parent_id_map[(*it)->id()] = std::make_pair(this->processor_id(),
-                                                  my_next_elem);
+      parent_id_map[elem->id()] = std::make_pair(this->processor_id(),
+                                                 my_next_elem++);
 #endif
     }
   xfer_conn.push_back(my_next_elem); // toss in the number of elements transferred.
@@ -515,14 +511,11 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
     {
       xfer_conn.clear();
 
-      it  = mesh.local_level_elements_begin(level-1);
-      end = mesh.local_level_elements_end  (level-1);
-
       dof_id_type my_n_elem_written_at_level = 0;
-      for (; it != end; ++it)
-        if (!(*it)->active()) // we only want the parents elements at this level, and
-          {                   // there is no direct iterator for this obscure use
-            const Elem * parent = *it;
+      for (const auto & parent : as_range(mesh.local_level_elements_begin(level-1),
+                                          mesh.local_level_elements_end(level-1)))
+        if (!parent->active()) // we only want the parents elements at this level, and
+          {                    // there is no direct iterator for this obscure use
             id_map_type::iterator pos = parent_id_map.find(parent->id());
             libmesh_assert (pos != parent_id_map.end());
             const processor_id_type parent_pid = pos->second.first;
@@ -652,16 +645,14 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
       {
         std::map<processor_id_type, std::vector<dof_id_type>> requested_ids;
 
-        it  = mesh.local_level_elements_begin(level);
-        end = mesh.local_level_elements_end(level);
-
-        for (; it!=end; ++it)
-          if (!child_id_map.count((*it)->id()))
+        for (const auto & elem : as_range(mesh.local_level_elements_begin(level),
+                                          mesh.local_level_elements_end(level)))
+          if (!child_id_map.count(elem->id()))
             {
-              libmesh_assert_not_equal_to ((*it)->parent()->processor_id(), this->processor_id());
-              const processor_id_type pid = (*it)->parent()->processor_id();
+              libmesh_assert_not_equal_to (elem->parent()->processor_id(), this->processor_id());
+              const processor_id_type pid = elem->parent()->processor_id();
               if (pid != this->processor_id())
-                requested_ids[pid].push_back((*it)->id());
+                requested_ids[pid].push_back(elem->id());
             }
 
         auto gather_functor =
@@ -1025,19 +1016,14 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
   std::vector<xdr_id_type> xfer_bcs, recv_bcs;
   std::vector<std::size_t> bc_sizes(this->n_processors());
 
-  // Boundary conditions are only specified for level-0 elements
-  MeshBase::const_element_iterator
-    it  = mesh.local_level_elements_begin(0),
-    end = mesh.local_level_elements_end(0);
-
   // Container to catch boundary IDs handed back by BoundaryInfo
   std::vector<boundary_id_type> bc_ids;
 
+  // Boundary conditions are only specified for level-0 elements
   dof_id_type n_local_level_0_elem=0;
-  for (; it!=end; ++it, n_local_level_0_elem++)
+  for (const auto & elem : as_range(mesh.local_level_elements_begin(0),
+                                    mesh.local_level_elements_end(0)))
     {
-      const Elem * elem = *it;
-
       if (bc_type == "side")
         {
           for (auto s : elem->side_index_range())
@@ -1084,6 +1070,9 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
         {
           libmesh_error_msg("bc_type not recognized: " + bc_type);
         }
+
+      // Increment the level-0 element counter.
+      n_local_level_0_elem++;
     }
 
   xfer_bcs.push_back(n_local_level_0_elem);

@@ -372,28 +372,21 @@ void assemble_poisson(EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices, dof_indices2;
 
-  // Now we will loop over all the elements in the mesh.
-  // We will compute the element matrix and right-hand-side
-  // contribution.  See example 3 for a discussion of the
-  // element iterators.  Here we use the const_local_elem_iterator
-  // to indicate we only want to loop over elements that are assigned
-  // to the local processor.  This allows each processor to compute
-  // its components of the global matrix.
+  // Now we will loop over all the "local" elements in the mesh.  We
+  // will compute the element matrix and right-hand-side contribution.
+  // See example 3 for a discussion of the element iterators.  Here we
+  // only want to loop over elements that are owned by the local
+  // processor.  This allows each processor to compute its components
+  // of the global matrix.
   //
   // "PARALLEL CHANGE"
-  MeshBase::const_element_iterator       el     = mesh.local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
     {
       // Start logging the shape function initialization.
       // This is done through a simple function call with
       // the name of the event to log.
       perf_log.push("elem init");
-
-      // Store a pointer to the element we are currently
-      // working on.  This allows for nicer syntax later.
-      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global

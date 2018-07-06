@@ -458,9 +458,9 @@ void process_cmd_line(int argc,
 // and this is just one way to get them...
 void construct_mesh_of_active_elements(Mesh & new_mesh, const Mesh & mesh)
 {
-  MeshBase::const_element_iterator       it     = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator it_end = mesh.active_elements_end();
-  mesh.create_submesh(new_mesh, it, it_end);
+  mesh.create_submesh(new_mesh,
+                      mesh.active_elements_begin(),
+                      mesh.active_elements_end());
 }
 
 

@@ -917,13 +917,10 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
   _global_index_by_pid_map.clear();
 
   // create the mapping which is contiguous by processor
-  {
-    MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-
-    MeshCommunication().find_local_indices (bbox, it, end,
-                                              _global_index_by_pid_map);
-  }
+  MeshCommunication().find_local_indices (bbox,
+                                          mesh.active_local_elements_begin(),
+                                          mesh.active_local_elements_end(),
+                                          _global_index_by_pid_map);
 
   SyncLocalIDs sync(_global_index_by_pid_map);
 
@@ -933,12 +930,9 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
   dof_id_type pid_offset=0;
   for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
     {
-      MeshBase::const_element_iterator       it  = mesh.active_pid_elements_begin(pid);
-      const MeshBase::const_element_iterator end = mesh.active_pid_elements_end(pid);
-
-      for (; it != end; ++it)
+      for (const auto & elem : as_range(mesh.active_pid_elements_begin(pid),
+                                        mesh.active_pid_elements_end(pid)))
         {
-          const Elem * elem = *it;
           libmesh_assert_less (_global_index_by_pid_map[elem->id()], _n_active_elem_on_proc[pid]);
 
           _global_index_by_pid_map[elem->id()] += pid_offset;
