@@ -619,21 +619,6 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                   if (assemble_matrix)
                     input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
                 }
-#ifdef LIBMESH_ENABLE_DEPRECATED
-              else if(elem_assembly->is_nodal_rhs_values_overriden)
-                {
-                  // This is the "old" implementation, to be deprecated soon.
-                  // Only enter this if ElemAssembly::get_nodal_rhs_values has
-                  // a non-default implementation.
-                  libmesh_deprecated();
-
-                  std::map<numeric_index_type, Number> rhs_values;
-                  elem_assembly->get_nodal_rhs_values(rhs_values, *this, node);
-
-                  for (const auto & pr : rhs_values)
-                    input_vector->add(pr.first, pr.second);
-                }
-#endif
             }
         }
     }
