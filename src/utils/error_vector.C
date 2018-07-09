@@ -20,19 +20,21 @@
 #include <limits>
 
 // Local includes
-#include "libmesh/elem.h"
-#include "libmesh/error_vector.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/error_vector.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/explicit_system.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/gmv_io.h"
-#include "libmesh/tecplot_io.h"
+
 #include "libmesh/exodusII_io.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/nemesis_io.h"
+#include "libmesh/tecplot_io.h"
 #include "libmesh/xdr_io.h"
-#include "libmesh/enum_xdr_mode.h"
 
 namespace libMesh
 {
@@ -274,6 +276,15 @@ void ErrorVector::plot_error(const std::string & filename,
       TecplotIO (mesh).write_equation_systems
         (filename, temp_es);
     }
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  else if ((filename.rfind(".nem") < filename.size()) ||
+           (filename.rfind(".n") < filename.size()))
+    {
+      Nemesis_IO io(mesh);
+      io.write(filename);
+      io.write_element_data(temp_es);
+    }
+#endif
 #ifdef LIBMESH_HAVE_EXODUS_API
   else if ((filename.rfind(".exo") < filename.size()) ||
            (filename.rfind(".e") < filename.size()))
