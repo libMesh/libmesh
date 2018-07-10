@@ -92,7 +92,7 @@ ifeq ($(METHOD),dbg)
 endif
 
 #
-# If METHOD=oprof, compile in profile mode.
+# If METHOD=oprof, compile in oprofile (also useful for perf) mode.
 ifeq ($(METHOD),oprofile)
   METHOD := oprof
 endif
