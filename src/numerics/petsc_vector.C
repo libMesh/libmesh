@@ -747,12 +747,9 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
     idx[n_sl+i] = i + this->first_local_index();
 
   // Create the index set & scatter object
-  if (idx.empty())
-    ierr = ISCreateLibMesh(this->comm().get(),
-                           n_sl+this->local_size(), PETSC_NULL, PETSC_USE_POINTER, &is);
-  else
-    ierr = ISCreateLibMesh(this->comm().get(),
-                           n_sl+this->local_size(), &idx[0], PETSC_USE_POINTER, &is);
+  PetscInt * idxptr = idx.empty() ? nullptr : &idx[0];
+  ierr = ISCreateLibMesh(this->comm().get(), n_sl+this->local_size(),
+                         idxptr, PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
   ierr = VecScatterCreate(_vec,          is,
