@@ -796,12 +796,11 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   // Create an IS using the libmesh routine.  PETSc does not own the
   // IS memory in this case, it is automatically cleaned up by the
   // std::vector destructor.
+  PetscInt * idxptr =
+    indices.empty() ? nullptr : numeric_petsc_cast(&indices[0]);
   IS is;
-  ierr = ISCreateLibMesh(this->comm().get(),
-                         indices.size(),
-                         numeric_petsc_cast(&indices[0]),
-                         PETSC_USE_POINTER,
-                         &is);
+  ierr = ISCreateLibMesh(this->comm().get(), indices.size(), idxptr,
+                         PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
   // Create the VecScatter object. "PETSC_NULL" means "use the identity IS".
