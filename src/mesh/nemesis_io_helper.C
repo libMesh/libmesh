@@ -621,11 +621,14 @@ void Nemesis_IO_Helper::put_node_cmap(std::vector<std::vector<int>> & node_cmap_
 
   for (std::size_t i=0; i<node_cmap_node_ids_in.size(); ++i)
     {
+      int * node_ids_ptr = node_cmap_node_ids_in[i].empty() ?
+        nullptr : &node_cmap_node_ids_in[i][0];
+      int * proc_ids_ptr = node_cmap_proc_ids_in[i].empty() ?
+        nullptr : &node_cmap_proc_ids_in[i][0];
+
       nemesis_err_flag =
-        Nemesis::ne_put_node_cmap(ex_id,
-                                  this->node_cmap_ids[i],
-                                  &node_cmap_node_ids_in[i][0],
-                                  &node_cmap_proc_ids_in[i][0],
+        Nemesis::ne_put_node_cmap(ex_id, this->node_cmap_ids[i],
+                                  node_ids_ptr, proc_ids_ptr,
                                   this->processor_id());
 
       EX_CHECK_ERR(nemesis_err_flag, "Error writing node communication map to file!");
