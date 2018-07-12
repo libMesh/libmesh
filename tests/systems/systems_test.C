@@ -16,6 +16,7 @@
 #include <libmesh/sparse_matrix.h>
 #include "libmesh/string_to_enum.h"
 #include <libmesh/cell_tet4.h>
+#include <libmesh/zero_function.h>
 
 #include "test_comm.h"
 
@@ -53,6 +54,7 @@ public:
   CPPUNIT_TEST( testProjectHierarchicTri6 );
   CPPUNIT_TEST( testProjectHierarchicHex27 );
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
+  CPPUNIT_TEST( testBoundaryProjectCube );
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -212,6 +214,145 @@ public:
                                          libmesh_real(cubic_test(p,es.parameters,"","")),
                                          TOLERANCE*TOLERANCE);
           }
+  }
+
+  void testBoundaryProjectCube()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    const boundary_id_type BOUNDARY_ID_MIN_Z  = 0;
+    const boundary_id_type BOUNDARY_ID_MIN_Y  = 1;
+    const boundary_id_type BOUNDARY_ID_MAX_X  = 2;
+    const boundary_id_type BOUNDARY_ID_MAX_Y  = 3;
+    const boundary_id_type BOUNDARY_ID_MIN_X  = 4;
+    const boundary_id_type BOUNDARY_ID_MAX_Z  = 5;
+    const boundary_id_type NODE_BOUNDARY_ID  = 10;
+    const boundary_id_type EDGE_BOUNDARY_ID  = 20;
+    const boundary_id_type SIDE_BOUNDARY_ID  = BOUNDARY_ID_MIN_X;
+
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+    unsigned int u_var = sys.add_variable("u", FIRST, LAGRANGE);
+
+    MeshTools::Generation::build_cube (mesh,
+                                       3, 3, 3,
+                                       0., 1., 0., 1., 0., 1.,
+                                       HEX8);
+
+    // Count the number of nodes on SIDE_BOUNDARY_ID
+    std::set<dof_id_type> projected_nodes_set;
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        for (auto side : elem->side_index_range())
+          {
+            std::vector<boundary_id_type> vec_to_fill;
+            mesh.get_boundary_info().boundary_ids(elem, side, vec_to_fill);
+
+            auto vec_it = std::find(vec_to_fill.begin(), vec_to_fill.end(), SIDE_BOUNDARY_ID);
+            if (vec_it != vec_to_fill.end())
+              {
+                for (unsigned int node_index=0; node_index<elem->n_nodes(); node_index++)
+                  {
+                    if( elem->is_node_on_side(node_index, side))
+                      {
+                        projected_nodes_set.insert(elem->node_id(node_index));
+                      }
+                  }
+              }
+          }
+      }
+
+  // Also add some edge and node boundary IDs
+  for (const auto & elem : mesh.element_ptr_range())
+    {
+      unsigned int
+        side_max_x = 0, side_min_y = 0,
+        side_max_y = 0, side_max_z = 0;
+
+      bool
+        found_side_max_x = false, found_side_max_y = false,
+        found_side_min_y = false, found_side_max_z = false;
+
+      for (auto side : elem->side_index_range())
+        {
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+            {
+              side_max_x = side;
+              found_side_max_x = true;
+            }
+
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+            {
+              side_min_y = side;
+              found_side_min_y = true;
+            }
+
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+            {
+              side_max_y = side;
+              found_side_max_y = true;
+            }
+
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+            {
+              side_max_z = side;
+              found_side_max_z = true;
+            }
+        }
+
+      // If elem has sides on boundaries
+      // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
+      // then let's set a node boundary condition
+      if (found_side_max_x && found_side_max_y && found_side_max_z)
+        for (auto n : elem->node_index_range())
+          if (elem->is_node_on_side(n, side_max_x) &&
+              elem->is_node_on_side(n, side_max_y) &&
+              elem->is_node_on_side(n, side_max_z))
+            {
+              projected_nodes_set.insert(elem->node_id(n));
+              mesh.get_boundary_info().add_node(elem->node_ptr(n), NODE_BOUNDARY_ID);
+            }
+
+      // If elem has sides on boundaries
+      // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
+      // then let's set an edge boundary condition
+      if (found_side_max_x && found_side_min_y)
+        for (auto e : elem->edge_index_range())
+          if (elem->is_edge_on_side(e, side_max_x) &&
+              elem->is_edge_on_side(e, side_min_y))
+            {
+              mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
+
+              for (unsigned int node_index=0; node_index<elem->n_nodes(); node_index++)
+                {
+                  if (elem->is_node_on_edge(node_index, e))
+                    {
+                      projected_nodes_set.insert(elem->node_id(node_index));
+                    }
+                }
+            }
+    }
+
+    es.init();
+
+    sys.solution->add(1.0);
+
+    std::set<boundary_id_type> boundary_ids;
+    boundary_ids.insert(NODE_BOUNDARY_ID);
+    boundary_ids.insert(EDGE_BOUNDARY_ID);
+    boundary_ids.insert(SIDE_BOUNDARY_ID);
+    std::vector<unsigned int> variables;
+    variables.push_back(u_var);
+    ZeroFunction<> zf;
+    sys.boundary_project_solution(boundary_ids, variables, &zf);
+
+    // We set the solution to be 1 everywhere and then zero on specific boundary
+    // nodes, so the final l1 norm of the solution is the difference between the
+    // number of nodes in the mesh and the number of nodes we zero on.
+    Real ref_l1_norm = static_cast<Real>(mesh.n_nodes()) - static_cast<Real>(projected_nodes_set.size());
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(sys.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
   }
 
 #ifdef LIBMESH_ENABLE_AMR
