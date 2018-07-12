@@ -1,5 +1,8 @@
+// Ignore overloaded-virtual warnings coming from cppunit headers
+#include <libmesh/ignore_warnings.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
+#include <libmesh/restore_warnings.h>
 
 #include <libmesh/libmesh.h>
 
