@@ -133,6 +133,23 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   this->add_dofs_to_section(system, section, node_map, elem_map, scalar_map);
 
   // Final setup of PetscSection
+  // Until Matt Knepley finishes implementing the commented out function
+  // below, the PetscSection will be assuming node-major ordering
+  // so let's throw and error if the user tries to use this without
+  // node-major order
+  if (!libMesh::on_command_line("--node-major-dofs"))
+    libmesh_error_msg("ERROR: Must use --node-major-dofs with PetscSection!");
+
+  //else if (!system.identify_variable_groups())
+  //  ierr = PetscSectionSetUseFieldOffsets(section,PETSC_TRUE);CHKERRABORT(system.comm().get(),ierr);
+  //else
+  //  {
+  //    std::string msg = "ERROR: Only node-major or var-major ordering supported for PetscSection!\n";
+  //    msg += "       var-group-major ordering not supported!\n";
+  //    msg += "       Must use --node-major-dofs or set System::identify_variable_groups() = false!\n";
+  //    libmesh_error_msg(msg);
+  //  }
+
   ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
 
   // Sanity checking at least that local_n_dofs match
