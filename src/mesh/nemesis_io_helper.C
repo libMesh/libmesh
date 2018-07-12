@@ -1890,18 +1890,10 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
 
     // The number of node communication maps is the number of other processors
     // with which we share nodes. (I think.) This is just the size of the map we just
-    // created, minus 1.
+    // created, minus 1 unless this processor has no nodes of its own.
     this->num_node_cmaps =
-      cast_int<int>(proc_nodes_touched.size() - 1);
-
-    // If we've got no elements on this processor and haven't touched
-    // any nodes, however, then that's 0 other processors with which
-    // we share nodes, not -1.
-    if (this->num_node_cmaps == -1)
-      {
-        libmesh_assert (pmesh.active_elements_begin() == pmesh.active_elements_end());
-        this->num_node_cmaps = 0;
-      }
+      cast_int<int>(proc_nodes_touched.size() -
+                    proc_nodes_touched.count(this->processor_id()));
 
     // We can't be connecting to more processors than exist outside
     // ourselves
