@@ -73,11 +73,16 @@ public:
   std::vector<Parmetis::idx_t>  vtxdist;
   std::vector<Parmetis::idx_t>  xadj;
   std::vector<Parmetis::idx_t>  adjncy;
-  std::vector<Parmetis::idx_t>  part;
+  std::vector<dof_id_type>  part;
   std::vector<Parmetis::real_t> tpwgts;
   std::vector<Parmetis::real_t> ubvec;
   std::vector<Parmetis::idx_t>  options;
   std::vector<Parmetis::idx_t>  vwgt;
+
+  // We plan to pass part as a buffer to ParMETIS, so it had better be
+  // using the same type!
+  static_assert(sizeof(Parmetis::idx_t) == sizeof(dof_id_type),
+                "ParMETIS and libMesh ID sizes must match!");
 
   Parmetis::idx_t wgtflag;
   Parmetis::idx_t ncon;
