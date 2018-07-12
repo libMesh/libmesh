@@ -189,8 +189,6 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
                                        &mpi_comm);
 
   // Assign the returned processor ids
-  static_assert(sizeof(dof_id_type) == sizeof(Parmetis::idx_t),
-                "libMesh and Parmetis integer sizes must match!");
   this->assign_partitioning (mesh, _pmetis->part);
 
 #endif // #ifndef LIBMESH_HAVE_PARMETIS ... else ...
