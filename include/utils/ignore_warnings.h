@@ -48,6 +48,10 @@
 #pragma GCC diagnostic ignored "-Wdeprecated"
 // But this is helpful with some MPI stacks
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+// And this is for cppunit
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+// And this is for Trilinos
+#pragma GCC diagnostic ignored "-Wextra"
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #if (__GNUC__ > 5)
