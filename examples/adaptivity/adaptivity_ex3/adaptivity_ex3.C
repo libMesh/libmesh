@@ -407,7 +407,11 @@ int main(int argc, char ** argv)
               std::ostringstream ss;
               ss << r_step;
 #ifdef LIBMESH_HAVE_EXODUS_API
+#  ifdef LIBMESH_HAVE_NEMESIS_API
+              std::string error_output = "error_" + ss.str() + ".n";
+#  else
               std::string error_output = "error_" + ss.str() + ".e";
+#  endif
 #else
               std::string error_output = "error_" + ss.str() + ".gmv";
 #endif

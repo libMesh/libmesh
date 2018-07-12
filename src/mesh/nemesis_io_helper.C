@@ -574,18 +574,18 @@ void Nemesis_IO_Helper::put_cmap_params(std::vector<int> & node_cmap_ids_in,
                                         std::vector<int> & elem_cmap_ids_in,
                                         std::vector<int> & elem_cmap_elem_cnts_in)
 {
-  // We might not have cmaps on every processor in some corner
-  // cases
-  if (node_cmap_ids.size())
-    {
-      nemesis_err_flag =
-        Nemesis::ne_put_cmap_params(ex_id,
-                                    &node_cmap_ids_in[0],
-                                    &node_cmap_node_cnts_in[0],
-                                    &elem_cmap_ids_in[0],
-                                    &elem_cmap_elem_cnts_in[0],
-                                    this->processor_id());
-    }
+  libmesh_assert(!node_cmap_ids_in.empty());
+  libmesh_assert(!node_cmap_node_cnts_in.empty());
+  libmesh_assert(!elem_cmap_ids_in.empty());
+  libmesh_assert(!elem_cmap_elem_cnts_in.empty());
+
+  nemesis_err_flag =
+    Nemesis::ne_put_cmap_params(ex_id,
+                                &node_cmap_ids_in[0],
+                                &node_cmap_node_cnts_in[0],
+                                &elem_cmap_ids_in[0],
+                                &elem_cmap_elem_cnts_in[0],
+                                this->processor_id());
 
   EX_CHECK_ERR(nemesis_err_flag, "Error writing cmap parameters!");
 }
@@ -621,11 +621,14 @@ void Nemesis_IO_Helper::put_node_cmap(std::vector<std::vector<int>> & node_cmap_
 
   for (std::size_t i=0; i<node_cmap_node_ids_in.size(); ++i)
     {
+      int * node_ids_ptr = node_cmap_node_ids_in[i].empty() ?
+        nullptr : &node_cmap_node_ids_in[i][0];
+      int * proc_ids_ptr = node_cmap_proc_ids_in[i].empty() ?
+        nullptr : &node_cmap_proc_ids_in[i][0];
+
       nemesis_err_flag =
-        Nemesis::ne_put_node_cmap(ex_id,
-                                  this->node_cmap_ids[i],
-                                  &node_cmap_node_ids_in[i][0],
-                                  &node_cmap_proc_ids_in[i][0],
+        Nemesis::ne_put_node_cmap(ex_id, this->node_cmap_ids[i],
+                                  node_ids_ptr, proc_ids_ptr,
                                   this->processor_id());
 
       EX_CHECK_ERR(nemesis_err_flag, "Error writing node communication map to file!");
@@ -859,49 +862,48 @@ void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, 
   // when the mesh file is read back in.
   this->compute_communication_map_parameters();
 
-  // Write communication map parameters to file.
-  this->put_cmap_params(this->node_cmap_ids,
-                        this->node_cmap_node_cnts,
-                        this->elem_cmap_ids,
-                        this->elem_cmap_elem_cnts);
+  // Do we have communication maps to write?  Note that
+  // ne_put_cmap_params expects us to have either *both* node and elem
+  // cmaps or *neither*
+  if (!this->node_cmap_ids.empty() &&
+      !this->node_cmap_node_cnts.empty() &&
+      !this->elem_cmap_ids.empty() &&
+      !this->elem_cmap_elem_cnts.empty())
+    {
+      // Write communication map parameters to file.
+      this->put_cmap_params(this->node_cmap_ids,
+                            this->node_cmap_node_cnts,
+                            this->elem_cmap_ids,
+                            this->elem_cmap_elem_cnts);
 
+      // Ready the node communication maps.  The node IDs which
+      // are communicated are the ones currently stored in
+      // proc_nodes_touched_intersections.
+      this->compute_node_communication_maps();
 
-  // Ready the node communication maps.  The node IDs which
-  // are communicated are the ones currently stored in
-  // proc_nodes_touched_intersections.
-  this->compute_node_communication_maps();
+      // Write the packed node communication vectors to file.
+      this->put_node_cmap(this->node_cmap_node_ids,
+                          this->node_cmap_proc_ids);
 
-  // Write the packed node communication vectors to file.
-  this->put_node_cmap(this->node_cmap_node_ids,
-                      this->node_cmap_proc_ids);
+      // Ready the node maps.  These have nothing to do with communication, they map
+      // the nodes to internal, border, and external nodes in the file.
+      this->compute_node_maps();
 
+      // Call the Nemesis API to write the node maps to file.
+      this->put_node_map(this->node_mapi,
+                         this->node_mapb,
+                         this->node_mape);
 
-  // Ready the node maps.  These have nothing to do with communication, they map
-  // the nodes to internal, border, and external nodes in the file.
-  this->compute_node_maps();
+      // Ready the element communication maps.  This includes border
+      // element IDs, sides which are on the border, and the processors to which
+      // they are to be communicated...
+      this->compute_elem_communication_maps();
 
-  // Call the Nemesis API to write the node maps to file.
-  this->put_node_map(this->node_mapi,
-                     this->node_mapb,
-                     this->node_mape);
-
-
-
-  // Ready the element communication maps.  This includes border
-  // element IDs, sides which are on the border, and the processors to which
-  // they are to be communicated...
-  this->compute_elem_communication_maps();
-
-
-
-  // Call the Nemesis API to write the packed element communication maps vectors to file
-  this->put_elem_cmap(this->elem_cmap_elem_ids,
-                      this->elem_cmap_side_ids,
-                      this->elem_cmap_proc_ids);
-
-
-
-
+      // Call the Nemesis API to write the packed element communication maps vectors to file
+      this->put_elem_cmap(this->elem_cmap_elem_ids,
+                          this->elem_cmap_side_ids,
+                          this->elem_cmap_proc_ids);
+    }
 
 
   // Ready the Nemesis element maps (internal and border) for writing to file.
@@ -910,7 +912,6 @@ void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, 
   // Call the Nemesis API to write the internal and border element IDs.
   this->put_elem_map(this->elem_mapi,
                      this->elem_mapb);
-
 
   // Now write Exodus-specific initialization information, some of which is
   // different when you are using Nemesis.
@@ -1109,6 +1110,10 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
   // Make sure there's no left-over information
   this->node_cmap_node_ids.clear();
   this->node_cmap_proc_ids.clear();
+
+  libmesh_assert_less_equal
+    (this->proc_nodes_touched_intersections.size(),
+     std::size_t(this->num_node_cmaps));
 
   // Allocate enough space for all our node maps
   this->node_cmap_node_ids.resize(this->num_node_cmaps);
@@ -1883,18 +1888,10 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
 
     // The number of node communication maps is the number of other processors
     // with which we share nodes. (I think.) This is just the size of the map we just
-    // created, minus 1.
+    // created, minus 1 unless this processor has no nodes of its own.
     this->num_node_cmaps =
-      cast_int<int>(proc_nodes_touched.size() - 1);
-
-    // If we've got no elements on this processor and haven't touched
-    // any nodes, however, then that's 0 other processors with which
-    // we share nodes, not -1.
-    if (this->num_node_cmaps == -1)
-      {
-        libmesh_assert (pmesh.active_elements_begin() == pmesh.active_elements_end());
-        this->num_node_cmaps = 0;
-      }
+      cast_int<int>(proc_nodes_touched.size() -
+                    proc_nodes_touched.count(this->processor_id()));
 
     // We can't be connecting to more processors than exist outside
     // ourselves
@@ -1959,6 +1956,10 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
         // Swap our intermediate result into the final set
         this->border_node_ids.swap(intermediate_result);
       }
+
+    libmesh_assert_less_equal
+      (this->proc_nodes_touched_intersections.size(),
+       std::size_t(this->num_node_cmaps));
 
     if (verbose)
       {
