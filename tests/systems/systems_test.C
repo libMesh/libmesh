@@ -220,7 +220,7 @@ public:
   {
     Mesh mesh(*TestCommWorld);
 
-    const boundary_id_type BOUNDARY_ID_MIN_Z  = 0;
+    // const boundary_id_type BOUNDARY_ID_MIN_Z  = 0;
     const boundary_id_type BOUNDARY_ID_MIN_Y  = 1;
     const boundary_id_type BOUNDARY_ID_MAX_X  = 2;
     const boundary_id_type BOUNDARY_ID_MAX_Y  = 3;
