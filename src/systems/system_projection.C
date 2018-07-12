@@ -1281,6 +1281,10 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
           std::vector<bool> is_boundary_node(n_nodes, false),
             is_boundary_edge(n_edges, false),
             is_boundary_side(n_sides, false);
+
+          // We also maintain a separate list of nodeset-based boundary nodes
+          std::vector<bool> is_boundary_nodeset(n_nodes, false);
+
           for (unsigned char s=0; s != n_sides; ++s)
             {
               // First see if this side has been requested
@@ -1305,6 +1309,31 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 if (elem->is_edge_on_side(e,s))
                   is_boundary_edge[e] = true;
             }
+
+            // We can also project on nodes, so we should also independently
+            // check whether the nodes have been requested
+            for (unsigned int n=0; n != n_nodes; ++n)
+              {
+                boundary_info.boundary_ids (elem->node_ptr(n), bc_ids);
+
+                for (const auto & bc_id : bc_ids)
+                  if (b.count(bc_id))
+                    {
+                      is_boundary_node[n] = true;
+                      is_boundary_nodeset[n] = true;
+                    }
+              }
+
+            // We can also project on edges, so we should also independently
+            // check whether the edges have been requested
+            for (unsigned short e=0; e != n_edges; ++e)
+              {
+                boundary_info.edge_boundary_ids (elem, e, bc_ids);
+
+                for (const auto & bc_id : bc_ids)
+                  if (b.count(bc_id))
+                    is_boundary_edge[e] = true;
+              }
 
           // Update the DOF indices for this element based on
           // the current mesh
@@ -1339,7 +1368,8 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
               const unsigned int nc =
                 FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
                                              n);
-              if (!elem->is_vertex(n) || !is_boundary_node[n])
+              if ((!elem->is_vertex(n) || !is_boundary_node[n]) &&
+                  !is_boundary_nodeset[n])
                 {
                   current_dof += nc;
                   continue;
