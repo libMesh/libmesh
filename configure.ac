@@ -150,10 +150,12 @@ AS_IF([test "x$enablemarch" != "xno"],
         AX_GCC_ARCHFLAG([no],
                         [
                           dnl Action if success - append $ax_cv_gcc_archflag to CXXFLAGS flags for
-                          dnl optimized and devel METHODS. I don't think it is needed with -O0 when
+                          dnl all but debugging METHODS. I don't think it is needed with -O0 when
                           dnl debugging.
                           CXXFLAGS_OPT="$CXXFLAGS_OPT $ax_cv_gcc_archflag"
                           CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $ax_cv_gcc_archflag"
+                          CXXFLAGS_PROF="$CXXFLAGS_PROF $ax_cv_gcc_archflag"
+                          CXXFLAGS_OPROF="$CXXFLAGS_OPROF $ax_cv_gcc_archflag"
                         ])
       ])
 
