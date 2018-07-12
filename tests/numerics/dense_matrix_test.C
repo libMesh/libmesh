@@ -33,8 +33,8 @@ public:
 
   CPPUNIT_TEST_SUITE(DenseMatrixTest);
 
-  CPPUNIT_TEST(testOuterProduct);
   CPPUNIT_TEST(testSVD);
+  CPPUNIT_TEST(testSVDinverse);
   CPPUNIT_TEST(testEVDreal);
   CPPUNIT_TEST(testEVDcomplex);
   CPPUNIT_TEST(testComplexSVD);
@@ -43,33 +43,6 @@ public:
 
 
 private:
-
-  void testOuterProduct()
-  {
-    DenseVector<Real> a(2);
-    a(0) = 1.0;
-    a(1) = 2.0;
-
-    DenseVector<Real> b(3);
-    b(0) = 3.0;
-    b(1) = 4.0;
-    b(2) = 5.0;
-
-    DenseMatrix<Real> a_times_b;
-    a_times_b.outer_product(a, b);
-
-    DenseMatrix<Real> a_times_b_correct(2, 3);
-    a_times_b_correct(0, 0) = 3.0;
-    a_times_b_correct(0, 1) = 4.0;
-    a_times_b_correct(0, 2) = 5.0;
-    a_times_b_correct(1, 0) = 6.0;
-    a_times_b_correct(1, 1) = 8.0;
-    a_times_b_correct(1, 2) = 10.0;
-
-    for (unsigned int i = 0; i < a.size(); ++i)
-      for (unsigned int j = 0; j < b.size(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(a_times_b(i,j)), libmesh_real(a_times_b_correct(i,j)), TOLERANCE*TOLERANCE);
-  }
 
   void testSVD()
   {
@@ -108,7 +81,30 @@ private:
     for (unsigned i=0; i<sigma.size(); ++i)
       CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
   }
+  void testSVDinverse()
+  {
+    DenseMatrix<Number> Ainv;
+    DenseMatrix<Number> A;
 
+    A.resize(3, 3);
+    A(0,0) = 4.0; A(0,1) = 5.0; A(0,2)= 7.0;
+    A(1,0) = 5.0; A(1,1) = 4.0; A(1,2)= 8.0;
+    A(2,0) = 6.0; A(2,1) = 3.0; A(2,2)= 2.0;
+
+    A.svdinv(Ainv);
+
+    // Solution for this case is (verified with numpy)
+    DenseMatrix<Number> true_Ainv(3,3); //, true_VT(2,2);
+
+    true_Ainv(0,0) = -0.253968253968254; true_Ainv(0,1) = 0.174603174603175; true_Ainv(0,2)= 0.190476190476190;
+    true_Ainv(1,0) = 0.603174603174603; true_Ainv(1,1) = -0.539682539682540; true_Ainv(1,2) = 0.047619047619048;
+    true_Ainv(2,0) = -0.142857142857143; true_Ainv(2,1) = 0.285714285714286; true_Ainv(2,2) =-0.142857142857143;
+
+
+    for (unsigned i=0; i<Ainv.m(); ++i)
+      for (unsigned j=0; j<Ainv.n(); ++j)
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(Ainv(i,j)), libmesh_real(true_Ainv(i,j)), TOLERANCE*TOLERANCE);
+  }
   // This function is called by testEVD for different matrices.  The
   // Lapack results are compared to known eigenvalue real and
   // imaginary parts for the matrix in question, which must also be
