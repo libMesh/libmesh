@@ -1,6 +1,6 @@
 ###############################################################################
 ## Please note:
-##   The ./configure script generates this Make.common from 
+##   The ./configure script generates this Make.common from
 ##   contrib/utils/Make.common.in, so if you want to change something,
 ##   then do it in the latter file (here!) and re-run
 ##   ./configure in the top level directory
@@ -10,7 +10,7 @@
 #
 # The Make.common file defines the build environment for libMesh
 # and all its helper applications. For backwards-compatible builds (before v0.8.0)
-# you can include this Make.common file in your project.  Note this is not the 
+# you can include this Make.common file in your project.  Note this is not the
 # preferred method for using libMesh -- we provide libmesh-config as a better
 # solution.
 #
@@ -27,7 +27,7 @@ libmesh_install_dir := $(prefix)
 libmesh_LIBTOOL ?= @prefix@/contrib/bin/libtool
 
 ###############################################################################
-# the following lines will be replaced by the output 
+# the following lines will be replaced by the output
 # of ./configure
 hosttype            := @host@
 hostos              := @host_os@
@@ -50,7 +50,7 @@ oprof-mode := off
 syn-mode   := off
 devel-mode := off
 
-# Unless we find a valid or an unset METHOD 
+# Unless we find a valid or an unset METHOD
 # variable, there's something wrong.
 mode := "INVALID"
 
@@ -92,13 +92,26 @@ ifeq ($(METHOD),dbg)
 endif
 
 #
-# If METHOD=oprof, compile in profile mode.
+# If METHOD=oprof, compile in oprofile (also useful for perf) mode.
 ifeq ($(METHOD),oprofile)
   METHOD := oprof
 endif
 ifeq ($(METHOD),oprof)
   oprof-mode := on
   mode       := "oprofile"
+endif
+
+#
+# If METHOD=prof, compile in profiling mode.
+ifeq ($(METHOD),pro)
+  METHOD := prof
+endif
+ifeq ($(METHOD),profiling)
+  METHOD := prof
+endif
+ifeq ($(METHOD),prof)
+  prof-mode := on
+  mode       := "profiling"
 endif
 
 # If the user had a METHOD variable we didn't
