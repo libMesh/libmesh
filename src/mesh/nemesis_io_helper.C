@@ -1113,6 +1113,10 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
   this->node_cmap_node_ids.clear();
   this->node_cmap_proc_ids.clear();
 
+  libmesh_assert_less_equal
+    (this->proc_nodes_touched_intersections.size(),
+     std::size_t(this->num_node_cmaps));
+
   // Allocate enough space for all our node maps
   this->node_cmap_node_ids.resize(this->num_node_cmaps);
   this->node_cmap_proc_ids.resize(this->num_node_cmaps);
@@ -1962,6 +1966,10 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
         // Swap our intermediate result into the final set
         this->border_node_ids.swap(intermediate_result);
       }
+
+    libmesh_assert_less_equal
+      (this->proc_nodes_touched_intersections.size(),
+       std::size_t(this->num_node_cmaps));
 
     if (verbose)
       {
