@@ -78,13 +78,14 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   // so we don't need to worry about processor numbering for the local
   // point ids.
   std::unordered_map<dof_id_type,dof_id_type> node_map;
+  std::unordered_map<dof_id_type,dof_id_type> elem_map;
 
   // First we tell the PetscSection about all of our points that have
   // dofs associated with them.
-  this->set_point_range_in_section(system, section, node_map);
+  this->set_point_range_in_section(system, section, node_map, elem_map);
 
   // Now we can build up the dofs per "point" in the PetscSection
-  this->add_dofs_to_section(system, section, node_map);
+  this->add_dofs_to_section(system, section, node_map, elem_map);
 
   // Final setup of PetscSection
   ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
@@ -94,7 +95,8 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
 
 void PetscDMWrapper::set_point_range_in_section (const System & system,
                                                  PetscSection & section,
-                                                 std::unordered_map<dof_id_type,dof_id_type> & node_map)
+                                                 std::unordered_map<dof_id_type,dof_id_type> & node_map,
+                                                 std::unordered_map<dof_id_type,dof_id_type> & elem_map)
 {
   // We're expecting this to be empty coming in
   libmesh_assert(node_map.empty());
@@ -133,6 +135,7 @@ void PetscDMWrapper::set_point_range_in_section (const System & system,
     {
       // Conservative estimate of space needed so we don't thrash
       node_map.reserve(mesh.n_local_nodes());
+      elem_map.reserve(mesh.n_active_local_elem());
 
       // We loop over active elements and then cache the global/local node mapping to make sure
       // we only count active nodes. For example, if we're calling this function and we're
@@ -175,7 +178,14 @@ void PetscDMWrapper::set_point_range_in_section (const System & system,
           // which has no interior node). Thus, we also need to check element interiors for DoFs
           // as well and, if the finite element has them, we also need to count the Elem in our
           // "point" accounting.
+          if( elem->n_dofs(system.number()) > 0 )
+            {
+              dof_id_type elem_id = elem->id();
+              elem_map.insert(std::make_pair(elem_id,pend));
+              pend++;
+            }
         }
+
     }
 
   PetscErrorCode ierr = PetscSectionSetChart(section, pstart, pend);
@@ -184,20 +194,19 @@ void PetscDMWrapper::set_point_range_in_section (const System & system,
 
 void PetscDMWrapper::add_dofs_to_section (const System & system,
                                           PetscSection & section,
-                                          const std::unordered_map<dof_id_type,dof_id_type> & node_map)
+                                          const std::unordered_map<dof_id_type,dof_id_type> & node_map,
+                                          const std::unordered_map<dof_id_type,dof_id_type> & elem_map)
 {
   const MeshBase & mesh = system.get_mesh();
 
   PetscErrorCode ierr;
 
   // Now we go through and add dof information for each "point".
+  //
   // In libMesh, for most finite elements, we just associate those DoFs with the
   // geometric nodes. So can we loop over the nodes we cached in the node_map and
   // the DoFs for each field for that node. We need to give PETSc the local id
   // we built up in the node map.
-  //
-  // TODO: Currently, we're only adding the dofs at nodes! We need to generalize
-  //       for element interior DoFs as well!
   for (const auto & nmap : node_map )
     {
       const dof_id_type global_node_id = nmap.first;
@@ -228,6 +237,41 @@ void PetscDMWrapper::add_dofs_to_section (const System & system,
       ierr = PetscSectionSetDof( section, local_node_id, total_n_dofs_at_node );
       CHKERRABORT(system.comm().get(),ierr);
     }
+
+  // Some finite element types associate dofs with the element. So now we go through
+  // any of those with the Elem as the point we add to the PetscSection with accompanying
+  // dofs
+  for (const auto & emap : elem_map )
+    {
+      const dof_id_type global_elem_id = emap.first;
+      const dof_id_type local_elem_id = emap.second;
+
+      libmesh_assert( mesh.query_elem_ptr(global_elem_id) );
+
+      const Elem & elem = mesh.elem_ref(global_elem_id);
+
+      unsigned int total_n_dofs_at_elem = 0;
+
+      // We are assuming variables are also numbered 0 to n_vars()-1
+      for( unsigned int v = 0; v < system.n_vars(); v++ )
+        {
+          unsigned int n_dofs_at_elem = elem.n_dofs(system.number(), v);
+
+          if( n_dofs_at_elem > 0 )
+            {
+              ierr = PetscSectionSetFieldDof( section, local_elem_id, v, n_dofs_at_elem );
+              CHKERRABORT(system.comm().get(),ierr);
+
+              total_n_dofs_at_elem += n_dofs_at_elem;
+            }
+        }
+
+      libmesh_assert_equal_to(total_n_dofs_at_elem, elem.n_dofs(system.number()));
+
+      ierr = PetscSectionSetDof( section, local_elem_id, total_n_dofs_at_elem );
+      CHKERRABORT(system.comm().get(),ierr);
+    }
+
 }
 
 void PetscDMWrapper::init_dm_data(unsigned int n_levels)

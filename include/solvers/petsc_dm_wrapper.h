@@ -101,9 +101,6 @@ private:
    * face, or element. Then, we also add the DoF numbering for each variable
    * for each of the "points". The PetscSection, together the with PetscSF
    * will allow for recursive fieldsplits from the command line using PETSc.
-   *
-   * TODO: Currently only populates nodal DoF data. Need to generalize
-   *       elem DoFs as well.
    */
   void build_section(const System & system, PetscSection & section);
 
@@ -117,7 +114,8 @@ private:
    */
   void set_point_range_in_section( const System & system,
                                    PetscSection & section,
-                                   std::unordered_map<dof_id_type,dof_id_type> & node_map);
+                                   std::unordered_map<dof_id_type,dof_id_type> & node_map,
+                                   std::unordered_map<dof_id_type,dof_id_type> & elem_map);
 
   //! Helper function for build_section.
   /**
@@ -125,7 +123,8 @@ private:
    */
   void add_dofs_to_section (const System & system,
                             PetscSection & section,
-                            const std::unordered_map<dof_id_type,dof_id_type> & node_map);
+                            const std::unordered_map<dof_id_type,dof_id_type> & node_map,
+                            const std::unordered_map<dof_id_type,dof_id_type> & elem_map);
 
 };
 
