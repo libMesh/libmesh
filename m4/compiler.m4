@@ -329,10 +329,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # be changed at a later stage
   RPATHFLAG="-Wl,-rpath,"
 
-  # Flag for profiling mode; can me modified at a later stage
+  # Flag for profiling mode; can be modified at a later stage
   PROFILING_FLAGS="-pg"
 
-  # Flag for assembly-output mode; can me modified at a later stage
+  # Flag for assembly-output mode; can be modified at a later stage
   ASSEMBLY_FLAGS="-S"
 
   # The -g flag is necessary for OProfile to produce annotations
