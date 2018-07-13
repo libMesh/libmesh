@@ -89,7 +89,8 @@ namespace libMesh
 template <typename T>
 PetscMatrix<T>::PetscMatrix(const Parallel::Communicator & comm_in) :
   SparseMatrix<T>(comm_in),
-  _destroy_mat_on_exit(true)
+  _destroy_mat_on_exit(true),
+  _mat_type(AIJ)
 {}
 
 
@@ -100,7 +101,8 @@ template <typename T>
 PetscMatrix<T>::PetscMatrix(Mat mat_in,
                             const Parallel::Communicator & comm_in) :
   SparseMatrix<T>(comm_in),
-  _destroy_mat_on_exit(false)
+  _destroy_mat_on_exit(false),
+  _mat_type(AIJ)
 {
   this->_mat = mat_in;
   this->_is_initialized = true;
@@ -115,6 +117,11 @@ PetscMatrix<T>::~PetscMatrix()
   this->clear();
 }
 
+template <typename T>
+void PetscMatrix<T>::set_matrix_type(PetscMatrixType mat_type)
+{
+  _mat_type = mat_type;
+}
 
 template <typename T>
 void PetscMatrix<T>::init (const numeric_index_type m_in,
@@ -175,12 +182,26 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   else
 #endif
     {
-      ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSeqAIJSetPreallocation(_mat, n_nz, PETSC_NULL);
-      LIBMESH_CHKERR(ierr);
-      ierr = MatMPIAIJSetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
-      LIBMESH_CHKERR(ierr);
+      switch (_mat_type) {
+        case AIJ:
+          ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSeqAIJSetPreallocation(_mat, n_nz, PETSC_NULL);
+          LIBMESH_CHKERR(ierr);
+          ierr = MatMPIAIJSetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
+          LIBMESH_CHKERR(ierr);
+          break;
+
+#if !PETSC_VERSION_LESS_THAN(3,9,4)
+        case HYPRE:
+          ierr = MatSetType(_mat, MATHYPRE);
+          ierr = MatHYPRESetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
+          LIBMESH_CHKERR(ierr);
+          break;
+#endif
+
+        default: libmesh_error_msg("Unsupported petsc matrix type");
+      }
     }
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
@@ -274,19 +295,36 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   else
 #endif
     {
+      switch (_mat_type) {
+        case AIJ:
+          ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSeqAIJSetPreallocation (_mat,
+                                            0,
+                                            numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]));
+          LIBMESH_CHKERR(ierr);
+          ierr = MatMPIAIJSetPreallocation (_mat,
+                                            0,
+                                            numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
+                                            0,
+                                            numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
+          break;
 
-      ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSeqAIJSetPreallocation (_mat,
-                                        0,
-                                        numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]));
-      LIBMESH_CHKERR(ierr);
-      ierr = MatMPIAIJSetPreallocation (_mat,
-                                        0,
-                                        numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
-                                        0,
-                                        numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
-      LIBMESH_CHKERR(ierr);
+#if !PETSC_VERSION_LESS_THAN(3,9,4)
+        case HYPRE:
+          ierr = MatSetType(_mat, MATHYPRE);
+          ierr = MatHYPRESetPreallocation (_mat,
+                                            0,
+                                            numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
+                                            0,
+                                            numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
+          LIBMESH_CHKERR(ierr);
+          break;
+#endif
+
+        default: libmesh_error_msg("Unsupported petsc matrix type");
+      }
+
     }
 
   // Is prefix information available somewhere? Perhaps pass in the system name?
@@ -376,20 +414,35 @@ void PetscMatrix<T>::init ()
   else
 #endif
     {
-      // no block storage case
-      ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-      LIBMESH_CHKERR(ierr);
+      switch (_mat_type) {
+        case AIJ:
+          ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSeqAIJSetPreallocation (_mat,
+                                            0,
+                                            numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]));
+          LIBMESH_CHKERR(ierr);
+          ierr = MatMPIAIJSetPreallocation (_mat,
+                                            0,
+                                            numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
+                                            0,
+                                            numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
+          break;
 
-      ierr = MatSeqAIJSetPreallocation (_mat,
-                                        0,
-                                        numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]));
-      LIBMESH_CHKERR(ierr);
-      ierr = MatMPIAIJSetPreallocation (_mat,
-                                        0,
-                                        numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
-                                        0,
-                                        numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
-      LIBMESH_CHKERR(ierr);
+#if !PETSC_VERSION_LESS_THAN(3,9,4)
+        case HYPRE:
+          ierr = MatSetType(_mat, MATHYPRE);
+          ierr = MatHYPRESetPreallocation (_mat,
+                                            0,
+                                            numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
+                                            0,
+                                            numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
+          LIBMESH_CHKERR(ierr);
+          break;
+#endif
+
+        default: libmesh_error_msg("Unsupported petsc matrix type");
+      }
     }
 
   // Is prefix information available somewhere? Perhaps pass in the system name?
