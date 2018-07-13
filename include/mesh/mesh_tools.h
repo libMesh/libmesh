@@ -39,6 +39,7 @@ enum ElemType : int;
 #include <vector>
 #include <set>
 #include <limits>
+#include <unordered_set>
 
 namespace libMesh
 {
@@ -134,12 +135,27 @@ void build_nodes_to_elem_map (const MeshBase & mesh,
 //    */
 //   void all_tri (MeshBase & mesh);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 /**
  * Fills the vector "on_boundary" with flags that tell whether each node
  * is on the domain boundary (true)) or not (false).
  */
 void find_boundary_nodes (const MeshBase & mesh,
                           std::vector<bool> & on_boundary);
+#endif
+
+/**
+ * Returns a std::set containing Node IDs for all of the boundary nodes
+ */
+std::unordered_set<dof_id_type> find_boundary_nodes(const MeshBase & mesh);
+
+/**
+ * Returns a std::set containing Node IDs for all of the block boundary nodes
+ *
+ * A "block boundary node" is a node that is connected to elemenents from 2
+ * or more blockse
+ */
+std::unordered_set<dof_id_type> find_block_boundary_nodes(const MeshBase & mesh);
 
 /**
  * \returns Two points defining a cartesian box that bounds the
