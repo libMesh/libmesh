@@ -45701,6 +45701,7 @@ esac
 
           $as_echo
 done
+$as_echo "Any warnings-to-errors flags....... : $ANY_WERROR_FLAG"
 $as_echo "Install dir........................ : $prefix"
 $as_echo "Build user......................... : $USER"
 $as_echo "Build host......................... : $BUILD_HOST"
