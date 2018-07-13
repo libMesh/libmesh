@@ -49,6 +49,7 @@ for method in ${METHODS}; do
      dnl blank line
      AS_ECHO([])
 done
+AS_ECHO(["Any warnings-to-errors flags....... : $ANY_WERROR_FLAG"])
 AS_ECHO(["Install dir........................ : $prefix"])
 AS_ECHO(["Build user......................... : $USER"])
 AS_ECHO(["Build host......................... : $BUILD_HOST"])
