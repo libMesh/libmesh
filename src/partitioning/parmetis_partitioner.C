@@ -185,13 +185,11 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
                                        &itr,
                                        &_pmetis->options[0],
                                        &_pmetis->edgecut,
-                                       _pmetis->part.empty()    ? nullptr : &_pmetis->part[0],
+                                       _pmetis->part.empty()    ? nullptr : reinterpret_cast<Parmetis::idx_t *>(&_pmetis->part[0]),
                                        &mpi_comm);
 
   // Assign the returned processor ids
-  static_assert(sizeof(dof_id_type) == sizeof(Parmetis::idx_t),
-                "libMesh and Parmetis integer sizes must match!");
-  this->assign_partitioning (mesh, reinterpret_cast<std::vector<dof_id_type> &> (_pmetis->part));
+  this->assign_partitioning (mesh, _pmetis->part);
 
 #endif // #ifndef LIBMESH_HAVE_PARMETIS ... else ...
 
