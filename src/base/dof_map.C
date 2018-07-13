@@ -2322,8 +2322,7 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
 bool DofMap::semilocal_index (dof_id_type dof_index) const
 {
   // If it's not in the local indices
-  if (dof_index < this->first_dof() ||
-      dof_index >= this->end_dof())
+  if (!this->local_index(dof_index))
     {
       // and if it's not in the ghost indices, then we're not
       // semilocal
