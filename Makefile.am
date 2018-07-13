@@ -8,6 +8,12 @@ ACLOCAL_AMFLAGS  = -I m4
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_LDFLAGS       = $(libmesh_LDFLAGS)
 
+# We might have turned on -Werror
+CXXFLAGS_DBG += $(ANY_WERROR_FLAG)
+CXXFLAGS_DEVEL += $(ANY_WERROR_FLAG)
+CXXFLAGS_OPROF += $(ANY_WERROR_FLAG)
+CXXFLAGS_OPT += $(ANY_WERROR_FLAG)
+CXXFLAGS_PROF += $(ANY_WERROR_FLAG)
 
 # We need to set the no-undefined flag for linking
 # with libtool, because Windows requires all shared

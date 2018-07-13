@@ -312,6 +312,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 # CPPFLAGS_DBG    : preprocessor flags for debug mode
 # PROFILING_FLAGS : flags to enable code profiling
 # ASSEMBLY_FLAGS  : flags to enable assembly language output
+# WERROR_FLAGS    : flags to turn compiler warnings into errors
 #
 # Usage: SET_CXX_FLAGS
 #
@@ -329,11 +330,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # be changed at a later stage
   RPATHFLAG="-Wl,-rpath,"
 
-  # Flag for profiling mode; can me modified at a later stage
+  # Flag for profiling mode; can be modified at a later stage
   PROFILING_FLAGS="-pg"
 
-  # Flag for assembly-output mode; can me modified at a later stage
+  # Flag for assembly-output mode; can be modified at a later stage
   ASSEMBLY_FLAGS="-S"
+
+  # Flag to turn warnings into errors; can be modified at a later stage
+  WERROR_FLAGS="-Werror"
 
   # The -g flag is necessary for OProfile to produce annotations
   # -fno-omit-frame-pointer flag turns off an optimization that

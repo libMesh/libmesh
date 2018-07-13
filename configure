@@ -968,6 +968,7 @@ HAVE_CXX11_RANGEFOR_FALSE
 HAVE_CXX11_RANGEFOR_TRUE
 HAVE_CXX11_AUTO_FALSE
 HAVE_CXX11_AUTO_TRUE
+ANY_WERROR_FLAG
 CFLAGS_OPROF
 CXXFLAGS_OPROF
 CPPFLAGS_OPROF
@@ -1143,6 +1144,7 @@ enable_glibcxx_debugging
 enable_glibcxx_debugging_cppunit
 enable_coverage
 with_methods
+enable_werror
 enable_static
 enable_shared
 with_pic
@@ -1937,6 +1939,7 @@ Optional Features:
   --enable-glibcxx-debugging-cppunit
                           Use GLIBCXX debugging flags for unit tests
   --enable-coverage       configure code coverage analysis tools
+  --enable-werror         Turn compilation warnings into errors
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -7600,11 +7603,14 @@ fi
   # be changed at a later stage
   RPATHFLAG="-Wl,-rpath,"
 
-  # Flag for profiling mode; can me modified at a later stage
+  # Flag for profiling mode; can be modified at a later stage
   PROFILING_FLAGS="-pg"
 
-  # Flag for assembly-output mode; can me modified at a later stage
+  # Flag for assembly-output mode; can be modified at a later stage
   ASSEMBLY_FLAGS="-S"
+
+  # Flag to turn warnings into errors; can be modified at a later stage
+  WERROR_FLAGS="-Werror"
 
   # The -g flag is necessary for OProfile to produce annotations
   # -fno-omit-frame-pointer flag turns off an optimization that
@@ -8312,6 +8318,75 @@ fi
 
 
 
+
+
+# By default we merely enable some warnings, but we can turn those
+# into errors (for library code only, not contrib or external code)
+# by configuring with --enable-werror
+# Check whether --enable-werror was given.
+if test "${enable_werror+set}" = set; then :
+  enableval=$enable_werror; case "${enableval}" in #(
+  yes) :
+    enablewerror=yes ;; #(
+  no) :
+    enablewerror=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-werror" "$LINENO" 5 ;;
+esac
+else
+  enablewerror=no
+fi
+
+
+ANY_WERROR_FLAG=$WERROR_FLAGS
+if test "x$enablewerror" != "xyes"; then :
+  ANY_WERROR_FLAG=''
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler warnings are just warnings >>>" >&5
+$as_echo "<<< Compiler warnings are just warnings >>>" >&6; }
+else
+  as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags__$WERROR_FLAGS" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $WERROR_FLAGS" >&5
+$as_echo_n "checking whether C++ compiler accepts $WERROR_FLAGS... " >&6; }
+if eval \${$as_CACHEVAR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CXXFLAGS
+  CXXFLAGS="$CXXFLAGS  $WERROR_FLAGS"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  eval "$as_CACHEVAR=yes"
+else
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CXXFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler warnings are now errors >>>" >&5
+$as_echo "<<< Compiler warnings are now errors >>>" >&6; }
+else
+  ANY_WERROR_FLAG=''
+           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler does not support $WERROR_FLAGS >>>" >&5
+$as_echo "<<< Compiler does not support $WERROR_FLAGS >>>" >&6; }
+           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler warnings are just warnings >>>" >&5
+$as_echo "<<< Compiler warnings are just warnings >>>" >&6; }
+fi
+
+fi
 
 
 # --------------------------------------------------------------
@@ -45626,6 +45701,7 @@ esac
 
           $as_echo
 done
+$as_echo "Any warnings-to-errors flags....... : $ANY_WERROR_FLAG"
 $as_echo "Install dir........................ : $prefix"
 $as_echo "Build user......................... : $USER"
 $as_echo "Build host......................... : $BUILD_HOST"
