@@ -79,13 +79,14 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   // point ids.
   std::unordered_map<dof_id_type,dof_id_type> node_map;
   std::unordered_map<dof_id_type,dof_id_type> elem_map;
+  std::map<dof_id_type,unsigned int> scalar_map;
 
   // First we tell the PetscSection about all of our points that have
   // dofs associated with them.
-  this->set_point_range_in_section(system, section, node_map, elem_map);
+  this->set_point_range_in_section(system, section, node_map, elem_map, scalar_map);
 
   // Now we can build up the dofs per "point" in the PetscSection
-  this->add_dofs_to_section(system, section, node_map, elem_map);
+  this->add_dofs_to_section(system, section, node_map, elem_map, scalar_map);
 
   // Final setup of PetscSection
   ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
@@ -96,7 +97,8 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
 void PetscDMWrapper::set_point_range_in_section (const System & system,
                                                  PetscSection & section,
                                                  std::unordered_map<dof_id_type,dof_id_type> & node_map,
-                                                 std::unordered_map<dof_id_type,dof_id_type> & elem_map)
+                                                 std::unordered_map<dof_id_type,dof_id_type> & elem_map,
+                                                 std::map<dof_id_type,unsigned int> & scalar_map)
 {
   // We're expecting this to be empty coming in
   libmesh_assert(node_map.empty());
@@ -186,6 +188,22 @@ void PetscDMWrapper::set_point_range_in_section (const System & system,
             }
         }
 
+      // SCALAR dofs live on the "last" processor, so only work there if there are any
+      if( dof_map.n_SCALAR_dofs() > 0 && (system.processor_id() == (system.n_processors()-1)) )
+        {
+          // Loop through all the variables and cache the scalar ones. We cache the
+          // SCALAR variable index along with the local point to make it easier when
+          // we have to register dofs with the PetscSection
+          for( unsigned int v = 0; v < system.n_vars(); v++ )
+            {
+              if( system.variable(v).type().family == SCALAR )
+                {
+                  scalar_map.insert(std::make_pair(pend,v));
+                  pend++;
+                }
+            }
+        }
+
     }
 
   PetscErrorCode ierr = PetscSectionSetChart(section, pstart, pend);
@@ -195,7 +213,8 @@ void PetscDMWrapper::set_point_range_in_section (const System & system,
 void PetscDMWrapper::add_dofs_to_section (const System & system,
                                           PetscSection & section,
                                           const std::unordered_map<dof_id_type,dof_id_type> & node_map,
-                                          const std::unordered_map<dof_id_type,dof_id_type> & elem_map)
+                                          const std::unordered_map<dof_id_type,dof_id_type> & elem_map,
+                                          const std::map<dof_id_type,unsigned int> & scalar_map)
 {
   const MeshBase & mesh = system.get_mesh();
 
@@ -270,6 +289,28 @@ void PetscDMWrapper::add_dofs_to_section (const System & system,
 
       ierr = PetscSectionSetDof( section, local_elem_id, total_n_dofs_at_elem );
       CHKERRABORT(system.comm().get(),ierr);
+    }
+
+  // Now add any SCALAR dofs to the PetscSection
+  // SCALAR dofs live on the "last" processor, so only work there if there are any
+  if (system.processor_id() == (system.n_processors()-1))
+    {
+      for (const auto & smap : scalar_map )
+        {
+          const dof_id_type local_id = smap.first;
+          const unsigned int scalar_var = smap.second;
+
+          // The number of SCALAR dofs comes from the variable order
+          const int n_dofs = system.variable(scalar_var).type().order.get_order();
+
+          ierr = PetscSectionSetFieldDof( section, local_id, scalar_var, n_dofs );
+          CHKERRABORT(system.comm().get(),ierr);
+
+          // In the SCALAR case, there are no other variables associate with the "point"
+          // the total number of dofs on the point is the same as that for the field
+          ierr = PetscSectionSetDof( section, local_id, n_dofs );
+          CHKERRABORT(system.comm().get(),ierr);
+        }
     }
 
 }

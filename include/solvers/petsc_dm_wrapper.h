@@ -25,6 +25,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <map>
 
 // PETSc includes
 #include <petsc.h>
@@ -115,7 +116,8 @@ private:
   void set_point_range_in_section( const System & system,
                                    PetscSection & section,
                                    std::unordered_map<dof_id_type,dof_id_type> & node_map,
-                                   std::unordered_map<dof_id_type,dof_id_type> & elem_map);
+                                   std::unordered_map<dof_id_type,dof_id_type> & elem_map,
+                                   std::map<dof_id_type,unsigned int> & scalar_map);
 
   //! Helper function for build_section.
   /**
@@ -124,7 +126,8 @@ private:
   void add_dofs_to_section (const System & system,
                             PetscSection & section,
                             const std::unordered_map<dof_id_type,dof_id_type> & node_map,
-                            const std::unordered_map<dof_id_type,dof_id_type> & elem_map);
+                            const std::unordered_map<dof_id_type,dof_id_type> & elem_map,
+                            const std::map<dof_id_type,unsigned int> & scalar_map);
 
 };
 
