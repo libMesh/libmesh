@@ -330,16 +330,16 @@ int main (int argc, char** argv)
  */
 void assemble_SchroedingerEquation(EquationSystems &es, const std::string &system_name)
 {
-#ifdef  LIBMESH_ENABLE_INFINITE_ELEMENTS
+#if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && defined(LIBMESH_HAVE_SLEPC)
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "EigenSE");
+
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
+
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
-
-#ifdef LIBMESH_HAVE_SLEPC
 
   // Get a reference to our system.
   EigenSystem & eigen_system = es.get_system<EigenSystem> (system_name);
@@ -512,17 +512,10 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
 
 #else
   // Avoid unused variable warnings when compiling without infinite
-  // elements enabled.
+  // elements and/or SLEPc enabled.
   libmesh_ignore(es);
   libmesh_ignore(system_name);
-#endif // LIBMESH_HAVE_SLEPC
-#else
-
-  // Avoid unused variable warnings when compiling without infinite
-  // elements enabled.
-  libmesh_ignore(es);
-  libmesh_ignore(system_name);
-#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS && LIBMESH_HAVE_SLEPC
 }
 
 #ifdef LIBMESH_HAVE_SLEPC
