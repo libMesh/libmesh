@@ -34,6 +34,7 @@ namespace libMesh
 {
   // Forward declarations
   class System;
+  class DofObject;
 
 /**
  * This class defines a wrapper around the PETSc DM infrastructure.
@@ -135,6 +136,12 @@ private:
    * sanity checking that in fact it only has n_local_dofs.
    */
   dof_id_type check_section_n_dofs( const System & system, PetscSection & section );
+
+  //! Helper function to reduce code duplication when setting dofs in section
+  void add_dofs_helper (const System & system,
+                        const DofObject & dof_object,
+                        dof_id_type local_id,
+                        PetscSection & section);
 
 };
 

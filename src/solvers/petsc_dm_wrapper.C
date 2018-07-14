@@ -238,26 +238,7 @@ void PetscDMWrapper::add_dofs_to_section (const System & system,
 
       const Node & node = mesh.node_ref(global_node_id);
 
-      unsigned int total_n_dofs_at_node = 0;
-
-      // We are assuming variables are also numbered 0 to n_vars()-1
-      for( unsigned int v = 0; v < system.n_vars(); v++ )
-        {
-          unsigned int n_dofs_at_node = node.n_dofs(system.number(), v);
-
-          if( n_dofs_at_node > 0 )
-            {
-              ierr = PetscSectionSetFieldDof( section, local_node_id, v, n_dofs_at_node );
-              CHKERRABORT(system.comm().get(),ierr);
-
-              total_n_dofs_at_node += n_dofs_at_node;
-            }
-        }
-
-      libmesh_assert_equal_to(total_n_dofs_at_node, node.n_dofs(system.number()));
-
-      ierr = PetscSectionSetDof( section, local_node_id, total_n_dofs_at_node );
-      CHKERRABORT(system.comm().get(),ierr);
+      this->add_dofs_helper(system,node,local_node_id,section);
     }
 
   // Some finite element types associate dofs with the element. So now we go through
@@ -272,26 +253,7 @@ void PetscDMWrapper::add_dofs_to_section (const System & system,
 
       const Elem & elem = mesh.elem_ref(global_elem_id);
 
-      unsigned int total_n_dofs_at_elem = 0;
-
-      // We are assuming variables are also numbered 0 to n_vars()-1
-      for( unsigned int v = 0; v < system.n_vars(); v++ )
-        {
-          unsigned int n_dofs_at_elem = elem.n_dofs(system.number(), v);
-
-          if( n_dofs_at_elem > 0 )
-            {
-              ierr = PetscSectionSetFieldDof( section, local_elem_id, v, n_dofs_at_elem );
-              CHKERRABORT(system.comm().get(),ierr);
-
-              total_n_dofs_at_elem += n_dofs_at_elem;
-            }
-        }
-
-      libmesh_assert_equal_to(total_n_dofs_at_elem, elem.n_dofs(system.number()));
-
-      ierr = PetscSectionSetDof( section, local_elem_id, total_n_dofs_at_elem );
-      CHKERRABORT(system.comm().get(),ierr);
+      this->add_dofs_helper(system,elem,local_elem_id,section);
     }
 
   // Now add any SCALAR dofs to the PetscSection
@@ -317,6 +279,40 @@ void PetscDMWrapper::add_dofs_to_section (const System & system,
     }
 
 }
+
+void PetscDMWrapper::add_dofs_helper (const System & system,
+                                      const DofObject & dof_object,
+                                      dof_id_type local_id,
+                                      PetscSection & section)
+{
+  unsigned int total_n_dofs_at_dofobject = 0;
+
+  PetscErrorCode ierr;
+
+  // We are assuming variables are also numbered 0 to n_vars()-1
+  for( unsigned int v = 0; v < system.n_vars(); v++ )
+    {
+      unsigned int n_dofs_at_dofobject = dof_object.n_dofs(system.number(), v);
+
+      if( n_dofs_at_dofobject > 0 )
+        {
+          PetscErrorCode ierr = PetscSectionSetFieldDof( section,
+                                                         local_id,
+                                                         v,
+                                                         n_dofs_at_dofobject );
+
+          CHKERRABORT(system.comm().get(),ierr);
+
+          total_n_dofs_at_dofobject += n_dofs_at_dofobject;
+        }
+    }
+
+  libmesh_assert_equal_to(total_n_dofs_at_dofobject, dof_object.n_dofs(system.number()));
+
+  ierr = PetscSectionSetDof( section, local_id, total_n_dofs_at_dofobject );
+  CHKERRABORT(system.comm().get(),ierr);
+}
+
 
 dof_id_type PetscDMWrapper::check_section_n_dofs( const System & system, PetscSection & section )
 {
