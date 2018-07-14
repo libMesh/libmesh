@@ -171,6 +171,7 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
 
   // Theres no need for these code paths while traversing the hierarchy
   mesh.allow_renumbering(false);
+  mesh.allow_remote_element_removal(false);
   mesh.partitioner() = NULL;
 
   // First walk over the active local elements and see how many maximum MG levels we can construct
