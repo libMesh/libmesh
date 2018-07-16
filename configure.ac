@@ -271,7 +271,7 @@ AS_IF([test "x$enableparanoid" != "xyes"],
          AC_MSG_RESULT(<<< Compiler warnings are just warnings >>>)],
         [old_CXXFLAGS="$CXXFLAGS"
          CXXFLAGS="$CXXFLAGS $WERROR_FLAGS $PARANOID_FLAGS"
-         AC_COMPILE_IFELSE(AC_LANG_PROGRAM(),
+         AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
           [AC_MSG_RESULT(<<< Enabled extra paranoid compiler warnings >>>)],
           [ANY_PARANOID_FLAGS=''
            AC_MSG_RESULT(<<< Compiler may not support all of $PARANOID_FLAGS >>>)
