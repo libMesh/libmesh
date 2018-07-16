@@ -50,6 +50,7 @@ for method in ${METHODS}; do
      AS_ECHO([])
 done
 AS_ECHO(["Any warnings-to-errors flags....... : $ANY_WERROR_FLAG"])
+AS_ECHO(["Any extra paranoid warning flags... : $ANY_PARANOID_FLAGS"])
 AS_ECHO(["Install dir........................ : $prefix"])
 AS_ECHO(["Build user......................... : $USER"])
 AS_ECHO(["Build host......................... : $BUILD_HOST"])
