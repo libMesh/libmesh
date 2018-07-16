@@ -313,6 +313,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 # PROFILING_FLAGS : flags to enable code profiling
 # ASSEMBLY_FLAGS  : flags to enable assembly language output
 # WERROR_FLAGS    : flags to turn compiler warnings into errors
+# PARANOID_FLAGS  : flags to turn on many more compiler warnings
 #
 # Usage: SET_CXX_FLAGS
 #
@@ -338,6 +339,13 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
   # Flag to turn warnings into errors; can be modified at a later stage
   WERROR_FLAGS="-Werror"
+
+  # Flags to add every additional warning we expect the library itself
+  # to not trigger
+  #
+  # These can be fairly compiler-specific so the default is blank: we
+  # only add warnings within specific compiler version tests.
+  PARANOID_FLAGS=""
 
   # The -g flag is necessary for OProfile to produce annotations
   # -fno-omit-frame-pointer flag turns off an optimization that
@@ -458,6 +466,17 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_DBG="-g -Wimplicit"
           ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
+          dnl Tested on gcc 4.8.5; hopefully the other 4.8.x and all
+          dnl later versions support these too:
+          PARANOID_FLAGS="-Wcast-align -Wchar-subscripts -Wcomment -Wdisabled-optimization -Wformat=2"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wimport"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Winit-self -Winvalid-pch -Wmissing-braces -Wmissing-field-initializers"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked -Wreturn-type -Wsequence-point"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wsign-compare -Wstack-protector -Wswitch -Wtrigraphs -Wuninitialized"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wunknown-pragmas -Wunreachable-code -Wunused-function -Wunused-label"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wunused-variable -Wvariadic-macros"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
+
           AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
                 [CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"])
 
@@ -501,6 +520,17 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
                           dnl The -g flag is all OProfile needs to produce annotations
                           OPROFILE_FLAGS="-g"
+
+                          dnl A dozen or so g++-supported warnings aren't supported on
+                          dnl all icpc versions
+                          PARANOID_FLAGS="-Wcomment -Wdisabled-optimization -Wformat=2"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-security"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Winit-self -Winvalid-pch -Wmissing-braces"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wreturn-type -Wsequence-point"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wsign-compare -Wswitch -Wtrigraphs -Wuninitialized"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wunknown-pragmas -Wunused-function"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-variable"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wwrite-strings"
 
                           dnl Disable some warning messages on Intel compilers:
                           dnl 161:  unrecognized pragma GCC diagnostic warning "-Wdeprecated-declarations"
@@ -574,6 +604,16 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                        CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
                        CXXFLAGS_DBG="$CXXFLAGS_DBG -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
                        NODEPRECATEDFLAG="-Wno-deprecated"
+
+                       dnl Tested on clang 3.4.2
+                       PARANOID_FLAGS="-Wcast-align -Wchar-subscripts -Wcomment -Wdisabled-optimization -Wformat=2"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wimport"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Winit-self -Winvalid-pch -Wmissing-braces -Wmissing-field-initializers"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked -Wreturn-type -Wsequence-point"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wsign-compare -Wstack-protector -Wswitch -Wtrigraphs -Wuninitialized"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunknown-pragmas -Wunreachable-code -Wunused-function -Wunused-label"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wunused-variable -Wvariadic-macros"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
 
                        CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
                        CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
