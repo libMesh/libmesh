@@ -468,13 +468,13 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
           dnl Tested on gcc 4.8.5; hopefully the other 4.8.x and all
           dnl later versions support these too:
-          PARANOID_FLAGS="-Wcast-align -Wchar-subscripts -Wcomment -Wdisabled-optimization -Wformat=2"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wimport"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Winit-self -Winvalid-pch -Wmissing-braces -Wmissing-field-initializers"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked -Wreturn-type -Wsequence-point"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wsign-compare -Wstack-protector -Wswitch -Wtrigraphs -Wuninitialized"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wunknown-pragmas -Wunreachable-code -Wunused-function -Wunused-label"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wunused-variable -Wvariadic-macros"
+          PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wdisabled-optimization -Wformat=2"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wmissing-field-initializers"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wstack-protector -Wtrigraphs"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wunreachable-code -Wunused-label"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wvariadic-macros"
           PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
 
           AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
@@ -523,13 +523,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
                           dnl A dozen or so g++-supported warnings aren't supported on
                           dnl all icpc versions
-                          PARANOID_FLAGS="-Wcomment -Wdisabled-optimization -Wformat=2"
+                          PARANOID_FLAGS="-Wall -Wextra -Wdisabled-optimization -Wformat=2"
                           PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-security"
-                          PARANOID_FLAGS="$PARANOID_FLAGS -Winit-self -Winvalid-pch -Wmissing-braces"
-                          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wreturn-type -Wsequence-point"
-                          PARANOID_FLAGS="$PARANOID_FLAGS -Wsign-compare -Wswitch -Wtrigraphs -Wuninitialized"
-                          PARANOID_FLAGS="$PARANOID_FLAGS -Wunknown-pragmas -Wunused-function"
-                          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-variable"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wtrigraphs"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter"
                           PARANOID_FLAGS="$PARANOID_FLAGS -Wwrite-strings"
 
                           dnl Disable some warning messages on Intel compilers:
@@ -606,13 +605,13 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                        NODEPRECATEDFLAG="-Wno-deprecated"
 
                        dnl Tested on clang 3.4.2
-                       PARANOID_FLAGS="-Wcast-align -Wchar-subscripts -Wcomment -Wdisabled-optimization -Wformat=2"
-                       PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wimport"
-                       PARANOID_FLAGS="$PARANOID_FLAGS -Winit-self -Winvalid-pch -Wmissing-braces -Wmissing-field-initializers"
-                       PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked -Wreturn-type -Wsequence-point"
-                       PARANOID_FLAGS="$PARANOID_FLAGS -Wsign-compare -Wstack-protector -Wswitch -Wtrigraphs -Wuninitialized"
-                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunknown-pragmas -Wunreachable-code -Wunused-function -Wunused-label"
-                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wunused-variable -Wvariadic-macros"
+                       PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wdisabled-optimization -Wformat=2"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wmissing-field-initializers"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wstack-protector -Wtrigraphs"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunreachable-code -Wunused-label"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wvariadic-macros"
                        PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
 
                        CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
