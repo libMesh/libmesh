@@ -73,9 +73,28 @@ class PeriodicBoundaries;
  * bother telling us so. We may have a PeriodicBoundary, a hanging
  * node constraint equation, or a user-defined constraint equation
  * which creates a dependency between two elements; if so then we
- * don't need the user to also tell us about that relation (although
- * a PeriodicBoundary use will cause the library to create its own
- * PeriodicGhostingFunctor for internal use).
+ * don't need the user to also tell us about that relation.  The
+ * DefaultCoupling functor will make both direct and periodic neighbor
+ * elements algebraically ghosted by default.
+ *
+ * However, note that geometric ghosting information needs to all be
+ * inferrable (e.g. with PeriodicBoundary objects already all
+ * attached) *before* a mesh is prepared for use; otherwise ghost
+ * elements may be prematurely deleted and become unrecoverable.
+ *
+ *
+ * For iterating over ghosted elements:
+ *
+ * MeshBase::active_elements_begin() gives the first iterator to all
+ * geometrically ghosted elements.  (this means all elements on any
+ * mesh which isn't distributed)
+ *
+ * MeshBase::evaluable_elements_begin() gives the first iterator to
+ * all algebraically evaluable elements, which is a superset of
+ * all algebraically ghosted elements.  (rarely a strict superset, but
+ * low order geometrically ghosted elements surrounded by enough
+ * algebraically ghosted elements may become evaluable "by accident")
+ *
  *
  * Users may only care about a subset of variables in distant
  * evaluable elements, so we could imagine defining E_v(K) for each
