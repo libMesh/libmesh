@@ -8,12 +8,12 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 AM_LDFLAGS   = $(libmesh_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 
-# We might have turned on -Werror
-CXXFLAGS_DBG += $(ANY_WERROR_FLAG)
-CXXFLAGS_DEVEL += $(ANY_WERROR_FLAG)
-CXXFLAGS_OPROF += $(ANY_WERROR_FLAG)
-CXXFLAGS_OPT += $(ANY_WERROR_FLAG)
-CXXFLAGS_PROF += $(ANY_WERROR_FLAG)
+# We might have turned on -Werror and/or paranoid warnings
+CXXFLAGS_DBG += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_DEVEL += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_OPROF += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_OPT += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_PROF += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
 
 unit_tests_sources = \
   driver.C \

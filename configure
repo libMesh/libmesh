@@ -968,6 +968,7 @@ HAVE_CXX11_RANGEFOR_FALSE
 HAVE_CXX11_RANGEFOR_TRUE
 HAVE_CXX11_AUTO_FALSE
 HAVE_CXX11_AUTO_TRUE
+ANY_PARANOID_FLAGS
 ANY_WERROR_FLAG
 CFLAGS_OPROF
 CXXFLAGS_OPROF
@@ -1145,6 +1146,7 @@ enable_glibcxx_debugging_cppunit
 enable_coverage
 with_methods
 enable_werror
+enable_paranoid_warnings
 enable_static
 enable_shared
 with_pic
@@ -1940,6 +1942,8 @@ Optional Features:
                           Use GLIBCXX debugging flags for unit tests
   --enable-coverage       configure code coverage analysis tools
   --enable-werror         Turn compilation warnings into errors
+  --enable-paranoid-warnings
+                          Turn on paranoid compiler warnings
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -7612,6 +7616,13 @@ fi
   # Flag to turn warnings into errors; can be modified at a later stage
   WERROR_FLAGS="-Werror"
 
+  # Flags to add every additional warning we expect the library itself
+  # to not trigger
+  #
+  # These can be fairly compiler-specific so the default is blank: we
+  # only add warnings within specific compiler version tests.
+  PARANOID_FLAGS=""
+
   # The -g flag is necessary for OProfile to produce annotations
   # -fno-omit-frame-pointer flag turns off an optimization that
   # interferes with OProfile callgraphs
@@ -7832,6 +7843,15 @@ fi
           CFLAGS_DBG="-g -Wimplicit"
           ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
+                              PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wdisabled-optimization -Wformat=2"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wmissing-field-initializers"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wstack-protector -Wtrigraphs"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wunreachable-code -Wunused-label"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wvariadic-macros"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
+
           if test "x$enableglibcxxdebugging" = "xyes"; then :
   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
 fi
@@ -7877,6 +7897,14 @@ else
                                                     ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
 
                                                     OPROFILE_FLAGS="-g"
+
+                                                                              PARANOID_FLAGS="-Wall -Wextra -Wdisabled-optimization -Wformat=2"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-security"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wtrigraphs"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter"
+                          PARANOID_FLAGS="$PARANOID_FLAGS -Wwrite-strings"
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         case "$GXX_VERSION" in #(
   intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x) :
@@ -7931,6 +7959,15 @@ fi
                                               CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
                        CXXFLAGS_DBG="$CXXFLAGS_DBG -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
                        NODEPRECATEDFLAG="-Wno-deprecated"
+
+                                              PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wdisabled-optimization -Wformat=2"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wmissing-field-initializers"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wstack-protector -Wtrigraphs"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunreachable-code -Wunused-label"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wvariadic-macros"
+                       PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
 
                        CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
                        CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
@@ -8386,6 +8423,59 @@ $as_echo "<<< Compiler does not support $WERROR_FLAGS >>>" >&6; }
 $as_echo "<<< Compiler warnings are just warnings >>>" >&6; }
 fi
 
+fi
+
+
+# By default we merely enable some of the most common compiler
+# warnings, but we can turn on as many warnings as we avoid triggering
+# (for library code only, not contrib or external code) by configuring
+# with --enable-paranoid-warnings
+# Check whether --enable-paranoid-warnings was given.
+if test "${enable_paranoid_warnings+set}" = set; then :
+  enableval=$enable_paranoid_warnings; case "${enableval}" in #(
+  yes) :
+    enableparanoid=yes ;; #(
+  no) :
+    enableparanoid=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-paranoid-warnings" "$LINENO" 5 ;;
+esac
+else
+  enableparanoid=no
+fi
+
+
+ANY_PARANOID_FLAGS=$PARANOID_FLAGS
+if test "x$enableparanoid" != "xyes"; then :
+  ANY_PARANOID_FLAGS=''
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler warnings are just warnings >>>" >&5
+$as_echo "<<< Compiler warnings are just warnings >>>" >&6; }
+else
+  old_CXXFLAGS="$CXXFLAGS"
+         CXXFLAGS="$CXXFLAGS $WERROR_FLAGS $PARANOID_FLAGS"
+         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Enabled extra paranoid compiler warnings >>>" >&5
+$as_echo "<<< Enabled extra paranoid compiler warnings >>>" >&6; }
+else
+  ANY_PARANOID_FLAGS=''
+           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler may not support all of $PARANOID_FLAGS >>>" >&5
+$as_echo "<<< Compiler may not support all of $PARANOID_FLAGS >>>" >&6; }
+           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling extra paranoid warnings >>>" >&5
+$as_echo "<<< Disabling extra paranoid warnings >>>" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+         CXXFLAGS="$old_CXXFLAGS"
 fi
 
 
@@ -45702,6 +45792,7 @@ esac
           $as_echo
 done
 $as_echo "Any warnings-to-errors flags....... : $ANY_WERROR_FLAG"
+$as_echo "Any extra paranoid warning flags... : $ANY_PARANOID_FLAGS"
 $as_echo "Install dir........................ : $prefix"
 $as_echo "Build user......................... : $USER"
 $as_echo "Build host......................... : $BUILD_HOST"

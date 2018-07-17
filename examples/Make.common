@@ -14,12 +14,12 @@ AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_LDFLAGS   = $(libmesh_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS)
 
-# We might have turned on -Werror
-CXXFLAGS_DBG += $(ANY_WERROR_FLAG)
-CXXFLAGS_DEVEL += $(ANY_WERROR_FLAG)
-CXXFLAGS_OPROF += $(ANY_WERROR_FLAG)
-CXXFLAGS_OPT += $(ANY_WERROR_FLAG)
-CXXFLAGS_PROF += $(ANY_WERROR_FLAG)
+# We might have turned on -Werror and/or paranoid warnings
+CXXFLAGS_DBG += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_DEVEL += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_OPROF += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_OPT += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
+CXXFLAGS_PROF += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
 
 examples_source_path  = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples

@@ -250,6 +250,35 @@ AS_IF([test "x$enablewerror" != "xyes"],
            AC_MSG_RESULT(<<< Compiler warnings are just warnings >>>)])])
 AC_SUBST(ANY_WERROR_FLAG)
 
+# By default we merely enable some of the most common compiler
+# warnings, but we can turn on as many warnings as we avoid triggering
+# (for library code only, not contrib or external code) by configuring
+# with --enable-paranoid-warnings
+AC_ARG_ENABLE(paranoid-warnings,
+              AC_HELP_STRING([--enable-paranoid-warnings],
+                             [Turn on paranoid compiler warnings]),
+              [AS_CASE("${enableval}",
+                       [yes], [enableparanoid=yes],
+                       [no],  [enableparanoid=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-paranoid-warnings)])],
+              [enableparanoid=no])
+
+dnl Test paranoid warning flags with -Werror on so we can detect if
+dnl some are unrecognized
+ANY_PARANOID_FLAGS=$PARANOID_FLAGS
+AS_IF([test "x$enableparanoid" != "xyes"],
+        [ANY_PARANOID_FLAGS=''
+         AC_MSG_RESULT(<<< Compiler warnings are just warnings >>>)],
+        [old_CXXFLAGS="$CXXFLAGS"
+         CXXFLAGS="$CXXFLAGS $WERROR_FLAGS $PARANOID_FLAGS"
+         AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+          [AC_MSG_RESULT(<<< Enabled extra paranoid compiler warnings >>>)],
+          [ANY_PARANOID_FLAGS=''
+           AC_MSG_RESULT(<<< Compiler may not support all of $PARANOID_FLAGS >>>)
+           AC_MSG_RESULT(<<< Disabling extra paranoid warnings >>>)])
+         CXXFLAGS="$old_CXXFLAGS"])
+AC_SUBST(ANY_PARANOID_FLAGS)
+
 # --------------------------------------------------------------
 # Test for mandatory C++11 features, those which libMesh now requires
 # for internal use.
