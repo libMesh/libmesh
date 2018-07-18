@@ -477,7 +477,7 @@ inline Tnew cast_ref(Told & oldvar)
       Tnew newvar = dynamic_cast<Tnew>(oldvar);
       return newvar;
     }
-  catch (std::bad_cast)
+  catch (std::bad_cast &)
     {
       libMesh::err << "Failed to convert " << typeid(Told).name()
                    << " reference to " << typeid(Tnew).name()
