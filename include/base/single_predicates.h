@@ -207,9 +207,9 @@ protected:
 template <typename T>
 struct bid : predicate<T>
 {
-  bid(boundary_id_type bid,
+  bid(boundary_id_type b_id,
       const BoundaryInfo & bndry_info) :
-    _bid(bid),
+    _bid(b_id),
     _bndry_info(bndry_info)
   {}
   virtual ~bid() {}

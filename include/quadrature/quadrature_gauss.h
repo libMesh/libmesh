@@ -49,11 +49,11 @@ public:
    * however if we called the function with INVALID_ELEM it would try
    * to be smart and return, thinking it had already done the work.
    */
-  QGauss (unsigned int _dim,
-          Order _order=INVALID_ORDER) :
-    QBase(_dim, _order)
+  QGauss (unsigned int dim,
+          Order order=INVALID_ORDER) :
+    QBase(dim, order)
   {
-    if (_dim == 1)
+    if (dim == 1)
       init(EDGE2);
   }
 

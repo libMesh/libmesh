@@ -2595,12 +2595,12 @@ GetPot::get_section_names() const
 
 
 inline STRING_VECTOR
-GetPot::get_subsection_names(const std::string & prefix) const
+GetPot::get_subsection_names(const std::string & sec_prefix) const
 {
   // GetPot functions should understand user-provided section names
   // either with or without a trailing slash.
   const std::string full_prefix =
-    *prefix.rbegin() == '/' ? prefix : prefix + '/';
+    *sec_prefix.rbegin() == '/' ? sec_prefix : sec_prefix + '/';
 
   const std::size_t full_prefix_len = full_prefix.size();
 
