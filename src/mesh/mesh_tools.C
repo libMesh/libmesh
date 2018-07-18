@@ -284,9 +284,12 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void MeshTools::find_boundary_nodes (const MeshBase & mesh,
                                      std::vector<bool> & on_boundary)
 {
+  libmesh_deprecated();
+
   // Resize the vector which holds boundary nodes and fill with false.
   on_boundary.resize(mesh.max_node_id());
   std::fill(on_boundary.begin(),
@@ -301,11 +304,53 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
         {
           std::unique_ptr<const Elem> side = elem->build_side_ptr(s);
 
-          for (auto & node : side->node_ref_range())
-            on_boundary[node.id()] = true;
+          auto nodes_on_side = elem->nodes_on_side(s);
+
+          for (auto & node_id : nodes_on_side)
+            on_boundary[node_id] = true;
         }
 }
+#endif
 
+std::unordered_set<dof_id_type>
+MeshTools::find_boundary_nodes(const MeshBase & mesh)
+{
+  std::unordered_set<dof_id_type> boundary_nodes;
+
+  // Loop over elements, find those on boundary, and
+  // mark them as true in on_boundary.
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) == nullptr) // on the boundary
+        {
+          auto nodes_on_side = elem->nodes_on_side(s);
+
+          for (auto & local_id : nodes_on_side)
+            boundary_nodes.insert(elem->node_ptr(local_id)->id());
+        }
+
+  return boundary_nodes;
+}
+
+std::unordered_set<dof_id_type>
+MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
+{
+  std::unordered_set<dof_id_type> block_boundary_nodes;
+
+  // Loop over elements, find those on boundary, and
+  // mark them as true in on_boundary.
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) && (elem->neighbor_ptr(s)->subdomain_id() != elem->subdomain_id()))
+        {
+          auto nodes_on_side = elem->nodes_on_side(s);
+
+          for (auto & local_id : nodes_on_side)
+            block_boundary_nodes.insert(elem->node_ptr(local_id)->id());
+        }
+
+  return block_boundary_nodes;
+}
 
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
