@@ -58,7 +58,9 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
     {
     case 0:
       {
-        for (std::size_t i=0; i<phi.size(); i++)
+        for (unsigned int i=0,
+             n_phi = cast_int<unsigned int>(phi.size());
+             i != n_phi; i++)
           {
             libmesh_assert_equal_to ( qp.size(), phi[i].size() );
             for (std::size_t p=0; p<phi[i].size(); p++)
@@ -68,7 +70,9 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
       }
     case 1:
       {
-        for (std::size_t i=0; i<phi.size(); i++)
+        for (unsigned int i=0,
+             n_phi = cast_int<unsigned int>(phi.size());
+             i != n_phi; i++)
           {
             libmesh_assert_equal_to ( qp.size(), phi[i].size() );
             for (std::size_t p=0; p<phi[i].size(); p++)
@@ -78,7 +82,9 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
       }
     case 2:
       {
-        for (std::size_t i=0; i<phi.size(); i++)
+        for (unsigned int i=0,
+             n_phi = cast_int<unsigned int>(phi.size());
+             i != n_phi; i++)
           {
             libmesh_assert_equal_to ( qp.size(), phi[i].size() );
             for (std::size_t p=0; p<phi[i].size(); p++)
@@ -88,7 +94,9 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
       }
     case 3:
       {
-        for (std::size_t i=0; i<phi.size(); i++)
+        for (unsigned int i=0,
+             n_phi = cast_int<unsigned int>(phi.size());
+             i != n_phi; i++)
           {
             libmesh_assert_equal_to ( qp.size(), phi[i].size() );
             for (std::size_t p=0; p<phi[i].size(); p++)

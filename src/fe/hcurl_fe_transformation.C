@@ -80,7 +80,9 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
 
            or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i */
 
-        for (std::size_t i=0; i<phi.size(); i++)
+        for (unsigned int i=0,
+             n_phi = cast_int<unsigned int>(phi.size());
+             i != n_phi; i++)
           for (std::size_t p=0; p<phi[i].size(); p++)
             {
               // Need to temporarily cache reference shape functions
@@ -123,7 +125,9 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
 
            or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i */
 
-        for (std::size_t i=0; i<phi.size(); i++)
+        for (unsigned int i=0,
+             n_phi = cast_int<unsigned int>(phi.size());
+             i != n_phi; i++)
           for (std::size_t p=0; p<phi[i].size(); p++)
             {
               // Need to temporarily cache reference shape functions
