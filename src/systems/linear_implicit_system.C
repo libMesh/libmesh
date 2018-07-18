@@ -215,7 +215,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
 
   void LinearImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
   {
-  const unsigned int Nq = this->qoi.size();
+  const unsigned int Nq = this->n_qois();
 
   // We currently don't support adjoint solves of shell matrices
   // FIXME - we should let shell matrices support
@@ -280,7 +280,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
   SensitivityData &       sensitivities)
   {
   const unsigned int Np = parameters.size();
-  const unsigned int Nq = this->qoi.size();
+  const unsigned int Nq = this->n_qois();
 
   // An introduction to the problem:
   //

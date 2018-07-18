@@ -1568,7 +1568,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
 
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices().size());
-  const std::size_t n_qoi = sys.qoi.size();
+  const unsigned int n_qoi = sys.n_qois();
 
   if (this->algebraic_type() != NONE &&
       this->algebraic_type() != DOFS_ONLY &&

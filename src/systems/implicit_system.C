@@ -392,7 +392,7 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
     this->get_linear_solve_parameters();
   std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
 
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
@@ -409,7 +409,7 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_adjoint_constraints_exactly
         (this->get_adjoint_solution(i), i);
@@ -442,7 +442,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
 
   // FIXME: The derivation here does not yet take adjoint boundary
   // conditions into account.
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       libmesh_assert(!this->get_dof_map().has_adjoint_dirichlet_boundaries(i));
 
@@ -452,8 +452,8 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   // We'll use temporary rhs vectors, because we haven't (yet) found
   // any good reasons why users might want to save these:
 
-  std::vector<std::unique_ptr<NumericVector<Number>>> temprhs(this->qoi.size());
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  std::vector<std::unique_ptr<NumericVector<Number>>> temprhs(this->n_qois());
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       temprhs[i] = this->rhs->zero_clone();
 
@@ -484,7 +484,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   this->assemble_qoi_derivative(qoi_indices,
                                 /* include_liftfunc = */ false,
                                 /* apply_constraints = */ true);
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       {
         this->get_adjoint_rhs(i).close();
@@ -504,7 +504,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   this->assemble_qoi_derivative(qoi_indices,
                                 /* include_liftfunc = */ false,
                                 /* apply_constraints = */ true);
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       {
         this->get_adjoint_rhs(i).close();
@@ -537,7 +537,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
     this->get_linear_solve_parameters();
   std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
 
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
@@ -554,7 +554,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
         (*this, &this->get_weighted_sensitivity_adjoint_solution(i),
@@ -702,8 +702,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  const unsigned int Nq = this->n_qois();
 
   // An introduction to the problem:
   //
@@ -813,8 +812,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  const unsigned int Nq = this->n_qois();
 
   // An introduction to the problem:
   //
@@ -846,7 +844,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
   // We don't need these to be closed() in this function, but libMesh
   // standard practice is to have them closed() by the time the
   // function exits
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       this->get_adjoint_rhs(i).close();
 
@@ -911,8 +909,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  const unsigned int Nq = this->n_qois();
 
   // For each quantity of interest q, the parameter sensitivity
   // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.
@@ -979,7 +976,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       this->assembly(true, false, true);
       this->rhs->close();
       std::vector<Number> partial2q_term = this->qoi;
-      std::vector<Number> partial2R_term(this->qoi.size());
+      std::vector<Number> partial2R_term(this->n_qois());
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
@@ -1120,8 +1117,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  const unsigned int Nq = this->n_qois();
 
   // For each quantity of interest q, the parameter sensitivity
   // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.
@@ -1182,7 +1178,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
           this->assembly(true, false, true);
           this->rhs->close();
           std::vector<Number> partial2q_term = this->qoi;
-          std::vector<Number> partial2R_term(this->qoi.size());
+          std::vector<Number> partial2R_term(this->n_qois());
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));

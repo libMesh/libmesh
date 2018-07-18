@@ -118,7 +118,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Dirichlet conditions, get the corresponding coarse lift
   // function(s)
   for (unsigned int j=0,
-       n_qois = cast_int<unsigned int>(system.qoi.size()); j != n_qois; j++)
+       n_qois = system.n_qois(); j != n_qois; j++)
     {
       // Skip this QoI if it is not in the QoI Set or if there are no
       // heterogeneous Dirichlet boundaries for it
@@ -252,7 +252,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Copy the projected coarse grid solutions, which will be
   // overwritten by solve()
   std::vector<std::unique_ptr<NumericVector<Number>>> coarse_adjoints;
-  for (std::size_t j=0; j != system.qoi.size(); j++)
+  for (unsigned int j=0; j != system.n_qois(); j++)
     {
       if (_qoi_set.has_index(j))
         {
@@ -300,12 +300,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // we first compute the global QoI error estimate
 
   // Resize the computed_global_QoI_errors vector to hold the error estimates for each QoI
-  computed_global_QoI_errors.resize(system.qoi.size());
+  computed_global_QoI_errors.resize(system.n_qois());
 
   // Loop over all the adjoint solutions and get the QoI error
   // contributions from all of them.  While we're looping anyway we'll
   // pull off the coarse adjoints
-  for (std::size_t j=0; j != system.qoi.size(); j++)
+  for (unsigned int j=0; j != system.n_qois(); j++)
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
@@ -351,7 +351,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // stabilized/non-stabilized formulations, except for the case where we not using a
   // heterogenous adjoint bc and have a stabilized formulation.
   // Then, R(u^h_s, z^h_s)  != 0 (no Galerkin orthogonality w.r.t the non-stabilized residual)
-  for (std::size_t j=0; j != system.qoi.size(); j++)
+  for (unsigned int j=0; j != system.n_qois(); j++)
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
@@ -484,7 +484,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // We will loop over each adjoint solution, localize that adjoint
   // solution and then loop over local elements
-  for (std::size_t i=0; i != system.qoi.size(); i++)
+  for (unsigned int i=0; i != system.n_qois(); i++)
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(i))
