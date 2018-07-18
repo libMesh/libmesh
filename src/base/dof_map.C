@@ -1580,9 +1580,9 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
               this->dof_indices (partner, di, vj);
 
               // Insert the remote DOF indices into the send list
-              for (std::size_t j=0; j != di.size(); ++j)
-                if (!this->local_index(di[j]))
-                  _send_list.push_back(di[j]);
+              for (auto d : di)
+                if (!this->local_index(d))
+                  _send_list.push_back(d);
             }
         }
       else
