@@ -400,13 +400,13 @@ void parallel_reduce (const Range & range, Body & body)
     bodies[i] = new Body(body, Threads::split());
 
   // Create the ranges for each thread
-  unsigned int range_size = range.size() / n_threads;
+  std::size_t range_size = range.size() / n_threads;
 
   typename Range::const_iterator current_beginning = range.begin();
 
   for (unsigned int i=0; i<n_threads; i++)
     {
-      unsigned int this_range_size = range_size;
+      std::size_t this_range_size = range_size;
 
       if (i+1 == n_threads)
         this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
