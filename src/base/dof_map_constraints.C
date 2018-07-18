@@ -3775,7 +3775,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
                   while (constrained >= _end_df[the_constrained_proc_id])
                     the_constrained_proc_id++;
 
-                  const dof_id_type elemproc = elem->processor_id();
+                  const processor_id_type elemproc = elem->processor_id();
                   if (elemproc != the_constrained_proc_id)
                     pushed_ids[elemproc].insert(constrained);
                 }
