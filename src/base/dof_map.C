@@ -2203,7 +2203,7 @@ void DofMap::_dof_indices (const Elem & elem,
         FEInterface::n_dofs_at_node_function(dim, fe_type);
 
       // Get the node-based DOF numbers
-      for (unsigned int n=0; n<n_nodes; n++)
+      for (std::size_t n=0; n<n_nodes; n++)
         {
           const Node * node      = nodes[n];
 

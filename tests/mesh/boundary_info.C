@@ -81,7 +81,7 @@ public:
     // On any mesh, we should see each id on *some* processor
     {
       const std::set<boundary_id_type> & bc_ids = bi.get_boundary_ids();
-      for (unsigned int i = 0 ; i != 4; ++i)
+      for (boundary_id_type i = 0 ; i != 4; ++i)
         {
           bool has_bcid = bc_ids.count(i);
           mesh.comm().max(has_bcid);
@@ -117,7 +117,7 @@ public:
     {
       const std::set<boundary_id_type> & bc_ids = bi.get_boundary_ids();
       CPPUNIT_ASSERT(!bc_ids.count(0));
-      for (unsigned int i = 1 ; i != 4; ++i)
+      for (boundary_id_type i = 1 ; i != 4; ++i)
         {
           bool has_bcid = bc_ids.count(i);
           mesh.comm().max(has_bcid);
@@ -200,10 +200,10 @@ public:
 
       for (const auto & elem : mesh.element_ptr_range())
         {
-          unsigned int side_max_x = 0, side_min_y = 0;
+          unsigned short side_max_x = 0, side_min_y = 0;
           bool found_side_max_x = false, found_side_min_y = false;
 
-          for (unsigned int side=0; side<elem->n_sides(); side++)
+          for (unsigned short side=0; side<elem->n_sides(); side++)
             {
               if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
                 {
@@ -222,7 +222,7 @@ public:
           // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
           // then let's set an edge boundary condition
           if (found_side_max_x && found_side_min_y)
-            for (unsigned int e=0; e<elem->n_edges(); e++)
+            for (unsigned short e=0; e<elem->n_edges(); e++)
               if (elem->is_edge_on_side(e, side_max_x) &&
                   elem->is_edge_on_side(e, side_min_y))
                 bi.add_edge(elem, e, EDGE_BOUNDARY_ID);
