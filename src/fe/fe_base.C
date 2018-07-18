@@ -931,10 +931,13 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
         FEInterface::dofs_on_edge(elem, dim, fe_type,
                                   e, new_side_dofs);
 
+        const unsigned int n_new_side_dofs =
+          cast_int<unsigned int>(new_side_dofs.size());
+
         // Some edge dofs are on nodes and already
         // fixed, others are free to calculate
         unsigned int free_dofs = 0;
-        for (std::size_t i=0; i != new_side_dofs.size(); ++i)
+        for (unsigned int i=0; i != n_new_side_dofs; ++i)
           if (!dof_is_fixed[new_side_dofs[i]])
             free_dof[free_dofs++] = i;
         Ke.resize (free_dofs, free_dofs); Ke.zero();
@@ -1003,13 +1006,13 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
                   }
 
                 // Form edge projection matrix
-                for (std::size_t sidei=0, freei=0; sidei != new_side_dofs.size(); ++sidei)
+                for (unsigned int sidei=0, freei=0; sidei != n_new_side_dofs; ++sidei)
                   {
                     unsigned int i = new_side_dofs[sidei];
                     // fixed DoFs aren't test functions
                     if (dof_is_fixed[i])
                       continue;
-                    for (std::size_t sidej=0, freej=0; sidej != new_side_dofs.size(); ++sidej)
+                    for (unsigned int sidej=0, freej=0; sidej != n_new_side_dofs; ++sidej)
                       {
                         unsigned int j =
                           new_side_dofs[sidej];
@@ -1068,10 +1071,13 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
         FEInterface::dofs_on_side(elem, dim, fe_type,
                                   s, new_side_dofs);
 
+        const unsigned int n_new_side_dofs =
+          cast_int<unsigned int>(new_side_dofs.size());
+
         // Some side dofs are on nodes/edges and already
         // fixed, others are free to calculate
         unsigned int free_dofs = 0;
-        for (std::size_t i=0; i != new_side_dofs.size(); ++i)
+        for (unsigned int i=0; i != n_new_side_dofs; ++i)
           if (!dof_is_fixed[new_side_dofs[i]])
             free_dof[free_dofs++] = i;
         Ke.resize (free_dofs, free_dofs); Ke.zero();
@@ -1140,13 +1146,13 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
                   }
 
                 // Form side projection matrix
-                for (std::size_t sidei=0, freei=0; sidei != new_side_dofs.size(); ++sidei)
+                for (unsigned int sidei=0, freei=0; sidei != n_new_side_dofs; ++sidei)
                   {
                     unsigned int i = new_side_dofs[sidei];
                     // fixed DoFs aren't test functions
                     if (dof_is_fixed[i])
                       continue;
-                    for (std::size_t sidej=0, freej=0; sidej != new_side_dofs.size(); ++sidej)
+                    for (unsigned int sidej=0, freej=0; sidej != n_new_side_dofs; ++sidej)
                       {
                         unsigned int j =
                           new_side_dofs[sidej];
