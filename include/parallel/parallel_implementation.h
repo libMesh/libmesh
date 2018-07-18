@@ -1145,7 +1145,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T, typename A1, typename A2>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                const std::vector<std::vector<T,A1>,A2> & send,
+                                const std::vector<std::vector<T,A1>,A2> & send_vecs,
                                 const DataType & type,
                                 Request & req,
                                 const MessageTag & tag) const
@@ -1166,7 +1166,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   int sendsize = packedsize;
 
-  const std::size_t n_vecs = send.size();
+  const std::size_t n_vecs = send_vecs.size();
 
   for (std::size_t i = 0; i != n_vecs; ++i)
     {
@@ -1181,7 +1181,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
       // The data for each inner buffer
       libmesh_call_mpi
-        (MPI_Pack_size (libMesh::cast_int<int>(send[i].size()), type,
+        (MPI_Pack_size (libMesh::cast_int<int>(send_vecs[i].size()), type,
                         this->get(), &packedsize));
 
       sendsize += packedsize;
@@ -1204,16 +1204,16 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   for (std::size_t i = 0; i != n_vecs; ++i)
     {
       // ... the size of the ith inner buffer
-      const int subvec_size = libMesh::cast_int<int>(send[i].size());
+      const int subvec_size = libMesh::cast_int<int>(send_vecs[i].size());
 
       libmesh_call_mpi
         (MPI_Pack (&subvec_size, 1, libMesh::Parallel::StandardType<unsigned int>(),
                    &(*sendbuf)[0], sendsize, &pos, this->get()));
 
       // ... the contents of the ith inner buffer
-      if (!send[i].empty())
+      if (!send_vecs[i].empty())
         libmesh_call_mpi
-          (MPI_Pack (const_cast<T*>(&send[i][0]),
+          (MPI_Pack (const_cast<T*>(&send_vecs[i][0]),
                      libMesh::cast_int<int>(subvec_size), type,
                      &(*sendbuf)[0], sendsize, &pos, this->get()));
     }
