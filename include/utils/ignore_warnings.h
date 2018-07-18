@@ -32,6 +32,10 @@
 #pragma clang diagnostic ignored "-Wnested-anon-types"
 #pragma clang diagnostic ignored "-Wsign-compare"
 #pragma clang diagnostic ignored "-Wunused-private-field"
+#pragma clang diagnostic ignored "-Wextra"
+#pragma clang diagnostic ignored "-Wredundant-decls"
+#pragma clang diagnostic ignored "-Wcast-qual"
+#pragma clang diagnostic ignored "-Wswitch-default"
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #if (__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ > 5)
 // This was introduced in 3.6
@@ -48,10 +52,18 @@
 #pragma GCC diagnostic ignored "-Wdeprecated"
 // But this is helpful with some MPI stacks
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-// And this is for cppunit
+// And these are for cppunit
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
-// And this is for Trilinos
+#pragma GCC diagnostic ignored "-Wundef"
+// And these are for Trilinos
 #pragma GCC diagnostic ignored "-Wextra"
+#pragma GCC diagnostic ignored "-Wshadow"
+// And these are for PETSc
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma GCC diagnostic ignored "-Wswitch-default"
+// And this for Eigen
+#pragma GCC diagnostic ignored "-Wconversion"
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #if (__GNUC__ > 5)

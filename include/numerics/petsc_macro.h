@@ -58,7 +58,10 @@
 #define EXTERN_C_FOR_PETSC_END
 
 // Petsc include files
+// Wrapped to avoid triggering our more paranoid warnings
+#include <libmesh/ignore_warnings.h>
 #include <petsc.h>
+#include <libmesh/restore_warnings.h>
 
 #if PETSC_RELEASE_LESS_THAN(3,1,1)
 typedef PetscTruth PetscBool;
