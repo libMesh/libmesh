@@ -710,10 +710,13 @@ private:
               FEInterface::dofs_on_edge(elem, dim, fe_type, e,
                                         side_dofs);
 
+              const unsigned int n_side_dofs =
+                cast_int<unsigned int>(side_dofs.size());
+
               // Some edge dofs are on nodes and already
               // fixed, others are free to calculate
               unsigned int free_dofs = 0;
-              for (std::size_t i=0; i != side_dofs.size(); ++i)
+              for (unsigned int i=0; i != n_side_dofs; ++i)
                 if (!dof_is_fixed[side_dofs[i]])
                   free_dof[free_dofs++] = i;
 
@@ -772,13 +775,13 @@ private:
                                       xyz_values[qp], time)(c);
 
                   // Form edge projection matrix
-                  for (std::size_t sidei=0, freei=0; sidei != side_dofs.size(); ++sidei)
+                  for (unsigned int sidei=0, freei=0; sidei != n_side_dofs; ++sidei)
                     {
                       unsigned int i = side_dofs[sidei];
                       // fixed DoFs aren't test functions
                       if (dof_is_fixed[i])
                         continue;
-                      for (std::size_t sidej=0, freej=0; sidej != side_dofs.size(); ++sidej)
+                      for (unsigned int sidej=0, freej=0; sidej != n_side_dofs; ++sidej)
                         {
                           unsigned int j = side_dofs[sidej];
                           if (dof_is_fixed[j])
@@ -830,10 +833,13 @@ private:
               FEInterface::dofs_on_side(elem, dim, fe_type, s,
                                         side_dofs);
 
+              const unsigned int n_side_dofs =
+                cast_int<unsigned int>(side_dofs.size());
+
               // Some side dofs are on nodes/edges and already
               // fixed, others are free to calculate
               unsigned int free_dofs = 0;
-              for (std::size_t i=0; i != side_dofs.size(); ++i)
+              for (unsigned int i=0; i != n_side_dofs; ++i)
                 if (!dof_is_fixed[side_dofs[i]])
                   free_dof[free_dofs++] = i;
 
@@ -892,13 +898,13 @@ private:
                                       xyz_values[qp], time)(c);
 
                   // Form side projection matrix
-                  for (std::size_t sidei=0, freei=0; sidei != side_dofs.size(); ++sidei)
+                  for (unsigned int sidei=0, freei=0; sidei != n_side_dofs; ++sidei)
                     {
                       unsigned int i = side_dofs[sidei];
                       // fixed DoFs aren't test functions
                       if (dof_is_fixed[i])
                         continue;
-                      for (std::size_t sidej=0, freej=0; sidej != side_dofs.size(); ++sidej)
+                      for (unsigned int sidej=0, freej=0; sidej != n_side_dofs; ++sidej)
                         {
                           unsigned int j = side_dofs[sidej];
                           if (dof_is_fixed[j])
@@ -948,13 +954,13 @@ private:
                 continue;
 
               // A shellface has the same dof indices as the element itself
-              std::vector<unsigned int> shellface_dofs(dof_indices.size());
+              std::vector<unsigned int> shellface_dofs(n_dofs);
               Utility::iota(shellface_dofs.begin(), shellface_dofs.end(), 0);
 
               // Some shellface dofs are on nodes/edges and already
               // fixed, others are free to calculate
               unsigned int free_dofs = 0;
-              for (std::size_t i=0; i != shellface_dofs.size(); ++i)
+              for (unsigned int i=0; i != n_dofs; ++i)
                 if (!dof_is_fixed[shellface_dofs[i]])
                   free_dof[free_dofs++] = i;
 
@@ -1013,15 +1019,15 @@ private:
                                       xyz_values[qp], time)(c);
 
                   // Form shellface projection matrix
-                  for (std::size_t shellfacei=0, freei=0;
-                       shellfacei != shellface_dofs.size(); ++shellfacei)
+                  for (unsigned int shellfacei=0, freei=0;
+                       shellfacei != n_dofs; ++shellfacei)
                     {
                       unsigned int i = shellface_dofs[shellfacei];
                       // fixed DoFs aren't test functions
                       if (dof_is_fixed[i])
                         continue;
-                      for (std::size_t shellfacej=0, freej=0;
-                           shellfacej != shellface_dofs.size(); ++shellfacej)
+                      for (unsigned int shellfacej=0, freej=0;
+                           shellfacej != n_dofs; ++shellfacej)
                         {
                           unsigned int j = shellface_dofs[shellfacej];
                           if (dof_is_fixed[j])
@@ -1308,9 +1314,9 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
          );
     }
 
-  for (std::size_t qoi_index = 0;
-       qoi_index != _adjoint_dirichlet_boundaries.size();
-       ++qoi_index)
+  for (unsigned int qoi_index = 0,
+       n_qois = cast_int<unsigned int>(_adjoint_dirichlet_boundaries.size());
+       qoi_index != n_qois; ++qoi_index)
     {
       for (DirichletBoundaries::iterator
              i = _adjoint_dirichlet_boundaries[qoi_index]->begin();
@@ -1496,9 +1502,9 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
       os << std::endl;
     }
 
-  for (std::size_t qoi_index = 0;
-       qoi_index != _adjoint_dirichlet_boundaries.size();
-       ++qoi_index)
+  for (unsigned int qoi_index = 0,
+       n_qois = cast_int<unsigned int>(_adjoint_dirichlet_boundaries.size());
+       qoi_index != n_qois; ++qoi_index)
     {
       os << "Adjoint " << qoi_index << " DoF rhs values:"
          << std::endl;
@@ -1562,7 +1568,9 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
       libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
 
 
-      for (std::size_t i=0; i<elem_dofs.size(); i++)
+      for (unsigned int i=0,
+           n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+           i != n_elem_dofs; i++)
         // If the DOF is constrained
         if (this->is_constrained_dof(elem_dofs[i]))
           {
@@ -1632,7 +1640,9 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
       libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
 
 
-      for (std::size_t i=0; i<elem_dofs.size(); i++)
+      for (unsigned int i=0,
+           n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+           i != n_elem_dofs; i++)
         if (this->is_constrained_dof(elem_dofs[i]))
           {
             for (unsigned int j=0; j<matrix.n(); j++)
@@ -1730,7 +1740,9 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
       libmesh_assert_equal_to (matrix.m(), elem_dofs.size());
       libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
 
-      for (std::size_t i=0; i<elem_dofs.size(); i++)
+      for (unsigned int i=0,
+           n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+           i != n_elem_dofs; i++)
         {
           const dof_id_type dof_id = elem_dofs[i];
 
@@ -1826,7 +1838,9 @@ void DofMap::heterogenously_constrain_element_vector (const DenseMatrix<Number> 
       F_minus_KH -= KH;
       C.vector_mult_transpose(rhs, F_minus_KH);
 
-      for (std::size_t i=0; i<elem_dofs.size(); i++)
+      for (unsigned int i=0,
+           n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+           i != n_elem_dofs; i++)
         {
           const dof_id_type dof_id = elem_dofs[i];
 
@@ -1909,7 +1923,9 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
       libmesh_assert_equal_to (matrix.n(), col_dofs.size());
 
 
-      for (std::size_t i=0; i<row_dofs.size(); i++)
+      for (unsigned int i=0,
+           n_row_dofs = cast_int<unsigned int>(row_dofs.size());
+           i != n_row_dofs; i++)
         if (this->is_constrained_dof(row_dofs[i]))
           {
             for (unsigned int j=0; j<matrix.n(); j++)
@@ -1969,7 +1985,9 @@ void DofMap::constrain_element_vector (DenseVector<Number> & rhs,
 
       libmesh_assert_equal_to (row_dofs.size(), rhs.size());
 
-      for (std::size_t i=0; i<row_dofs.size(); i++)
+      for (unsigned int i=0,
+           n_row_dofs = cast_int<unsigned int>(row_dofs.size());
+           i != n_row_dofs; i++)
         if (this->is_constrained_dof(row_dofs[i]))
           {
             // If the DOF is constrained
@@ -2018,7 +2036,9 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number> & v,
 
       /* Constrain only v, not w.  */
 
-      for (std::size_t i=0; i<row_dofs.size(); i++)
+      for (unsigned int i=0,
+           n_row_dofs = cast_int<unsigned int>(row_dofs.size());
+           i != n_row_dofs; i++)
         if (this->is_constrained_dof(row_dofs[i]))
           {
             // If the DOF is constrained
@@ -2396,7 +2416,9 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number> & C,
             //    libmesh_assert (!constraint_row.empty());
 
             for (const auto & item : constraint_row)
-              for (std::size_t j=0; j != elem_dofs.size(); j++)
+              for (unsigned int j=0,
+                   n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+                   j != n_elem_dofs; j++)
                 if (elem_dofs[j] == item.first)
                   C(i,j) = item.second;
           }
@@ -2518,7 +2540,9 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
             //    libmesh_assert (!constraint_row.empty());
 
             for (const auto & item : constraint_row)
-              for (std::size_t j=0; j != elem_dofs.size(); j++)
+              for (unsigned int j=0,
+                   n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+                   j != n_elem_dofs; j++)
                 if (elem_dofs[j] == item.first)
                   C(i,j) = item.second;
 

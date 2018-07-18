@@ -73,7 +73,8 @@ public:
   void attach_subfunction (const FunctionBase<Output> & f,
                            const std::vector<unsigned int> & index_map)
   {
-    const unsigned int subfunction_index = subfunctions.size();
+    const unsigned int subfunction_index =
+      cast_int<unsigned int>(subfunctions.size());
     libmesh_assert_equal_to(subfunctions.size(), index_maps.size());
 
     subfunctions.push_back(f.clone());
@@ -133,9 +134,9 @@ public:
     DenseVector<Output> temp;
     for (std::size_t i=0; i != subfunctions.size(); ++i)
       {
-        temp.resize(index_maps[i].size());
+        temp.resize(cast_int<unsigned int>(index_maps[i].size()));
         (*subfunctions[i])(p, time, temp);
-        for (std::size_t j=0; j != temp.size(); ++j)
+        for (unsigned int j=0; j != temp.size(); ++j)
           output(index_maps[i][j]) = temp(j);
       }
   }

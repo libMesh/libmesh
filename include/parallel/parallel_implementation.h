@@ -2419,7 +2419,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
   if (this->rank() == root_id)
     {
       libmesh_assert(data.size() % this->size() == 0);
-      recv_buffer_size = data.size() / this->size();
+      recv_buffer_size = cast_int<int>(data.size() / this->size());
     }
 
   this->broadcast(recv_buffer_size);
@@ -2517,7 +2517,7 @@ void Communicator::scatter(const std::vector<std::vector<T,A1>,A2> & data,
       for (std::size_t i=0; i < data.size(); ++i)
         {
           if (!identical_buffer_sizes)
-            counts[i] = data[i].size();
+            counts[i] = cast_int<int>(data[i].size());
 #ifndef NDEBUG
           else
             // Check that buffer sizes are indeed equal

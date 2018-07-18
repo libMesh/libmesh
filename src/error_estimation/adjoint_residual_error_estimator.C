@@ -121,7 +121,8 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
     }
 
   // Sum and weight the dual error estimate based on our QoISet
-  for (std::size_t i = 0; i != _system.qoi.size(); ++i)
+  for (unsigned int i = 0,
+       n_qois = cast_int<unsigned int>(_system.qoi.size()); i != n_qois; ++i)
     {
       if (_qoi_set.has_index(i))
         {

@@ -982,7 +982,9 @@ void FEMap::compute_edge_map(int dim,
     }
 
   // compute x, dxdxi at the quadrature points
-  for (std::size_t i=0; i<this->psi_map.size(); i++) // sum over the nodes
+  for (unsigned int i=0,
+       psi_map_size=cast_int<unsigned int>(psi_map.size());
+       i != psi_map_size; i++) // sum over the nodes
     {
       const Point & edge_point = edge->point(i);
 

@@ -117,7 +117,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Loop over all the adjoint problems and, if any have heterogenous
   // Dirichlet conditions, get the corresponding coarse lift
   // function(s)
-  for (std::size_t j=0; j != system.qoi.size(); j++)
+  for (unsigned int j=0,
+       n_qois = cast_int<unsigned int>(system.qoi.size()); j != n_qois; j++)
     {
       // Skip this QoI if it is not in the QoI Set or if there are no
       // heterogeneous Dirichlet boundaries for it
