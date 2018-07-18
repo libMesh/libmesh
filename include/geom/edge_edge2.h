@@ -64,7 +64,7 @@ public:
   virtual Point master_point (const unsigned int i) const override
   {
     libmesh_assert_less(i, this->n_nodes());
-    return Point(2.0f*i-1,0,0);
+    return Point(2.0f*Real(i)-1.0f,0,0);
   }
 
   /**

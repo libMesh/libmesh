@@ -3310,7 +3310,7 @@ GetPot::_DBE_expand(const std::string& expr)
       double x = _convert_to_type(a[0], 1e37);
 
       // last element is always the default argument
-      if (x == 1e37 || x < 0 || x >= a.size() - 1)
+      if (x == 1e37 || x < 0 || x >= double(a.size() - 1))
         return a[a.size()-1];
 
       // round x to closest integer
@@ -3346,13 +3346,13 @@ GetPot::_DBE_expand(const std::string& expr)
       double x = _convert_to_type(A[1], 1e37);
 
       // last element is always the default argument
-      if (x == 1e37 || x < 0 || x >= A[0].size() - 1)
+      if (x == 1e37 || x < 0 || x >= double(A[0].size() - 1))
         return "<<1st index out of range>>";
 
       if (A.size() > 2)
         {
           double y = _convert_to_type(A[2], 1e37);
-          if (y != 1e37 && y > 0 && y <= A[0].size() - 1 && y > x)
+          if (y != 1e37 && y > 0 && y <= double(A[0].size() - 1) && y > x)
             return A[0].substr(int(x+0.5), int(y+1.5) - int(x+0.5));
 
           else if (y == -1)
@@ -3385,7 +3385,7 @@ GetPot::_DBE_expand(const std::string& expr)
       double x = _convert_to_type(A[1], 1e37);
 
       // last element is always the default argument
-      if (x == 1e37 || x < 0 || x >= Var->value.size())
+      if (x == 1e37 || x < 0 || x >= double(Var->value.size()))
         return "<<1st index out of range>>";
 
       if (A.size() > 2)
@@ -3393,7 +3393,7 @@ GetPot::_DBE_expand(const std::string& expr)
           double y = _convert_to_type(A[2], 1e37);
           int    begin = int(x+0.5);
           int    end = 0;
-          if (y != 1e37 && y > 0 && y <= Var->value.size() && y > x)
+          if (y != 1e37 && y > 0 && y <= double(Var->value.size()) && y > x)
             end = int(y+1.5);
           else if (y == -1)
             end = int(Var->value.size());
