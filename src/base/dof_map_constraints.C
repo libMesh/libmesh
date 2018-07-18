@@ -1595,7 +1595,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
                 // libmesh_assert (!constraint_row.empty());
 
                 for (const auto & item : constraint_row)
-                  for (std::size_t j=0; j<elem_dofs.size(); j++)
+                  for (unsigned int j=0; j != n_elem_dofs; j++)
                     if (elem_dofs[j] == item.first)
                       matrix(i,j) = -item.second;
               }
@@ -1667,7 +1667,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
                 //    libmesh_assert (!constraint_row.empty());
 
                 for (const auto & item : constraint_row)
-                  for (std::size_t j=0; j<elem_dofs.size(); j++)
+                  for (unsigned int j=0; j != n_elem_dofs; j++)
                     if (elem_dofs[j] == item.first)
                       matrix(i,j) = -item.second;
               }
@@ -1767,7 +1767,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
                   const DofConstraintRow & constraint_row = pos->second;
 
                   for (const auto & item : constraint_row)
-                    for (std::size_t j=0; j<elem_dofs.size(); j++)
+                    for (unsigned int j=0; j != n_elem_dofs; j++)
                       if (elem_dofs[j] == item.first)
                         matrix(i,j) = -item.second;
 
@@ -1948,7 +1948,9 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
                 libmesh_assert (!constraint_row.empty());
 
                 for (const auto & item : constraint_row)
-                  for (std::size_t j=0; j<col_dofs.size(); j++)
+                  for (unsigned int j=0,
+                       n_col_dofs = cast_int<unsigned int>(col_dofs.size());
+                       j != n_col_dofs; j++)
                     if (col_dofs[j] == item.first)
                       matrix(i,j) = -item.second;
               }
