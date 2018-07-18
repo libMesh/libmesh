@@ -549,8 +549,8 @@ void Build::parallel_sync ()
     comm.receive(proc_id, in_dofs, dof_tag);
     comm.receive(proc_id, in_rows, row_tag);
 
-    const auto n_rows = in_dofs.size();
-    for (auto i = decltype(n_rows)(0); i != n_rows; ++i)
+    const std::size_t n_rows = in_dofs.size();
+    for (std::size_t i = 0; i != n_rows; ++i)
     {
       const auto r = in_dofs[i];
       const auto my_r = r - local_first_dof;
