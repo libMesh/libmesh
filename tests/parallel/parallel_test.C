@@ -181,13 +181,13 @@ public:
   {
     // Test Scalar scatter
     {
-      std::vector<unsigned int> src;
-      unsigned int dest;
+      std::vector<processor_id_type> src;
+      processor_id_type dest;
 
       if (TestCommWorld->rank() == 0)
         {
           src.resize(TestCommWorld->size());
-          for (std::size_t i=0; i<src.size(); i++)
+          for (processor_id_type i=0; i<src.size(); i++)
             src[i] = i;
         }
 
