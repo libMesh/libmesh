@@ -1235,12 +1235,12 @@ void FEMap::compute_affine_map(const unsigned int dim,
 
   // Determine the nodes contributing to element elem
   unsigned int n_nodes = elem->n_nodes();
-  elem_nodes.resize(elem->n_nodes());
+  _elem_nodes.resize(elem->n_nodes());
   for (unsigned int i=0; i<n_nodes; i++)
-    elem_nodes[i] = elem->node_ptr(i);
+    _elem_nodes[i] = elem->node_ptr(i);
 
   // Compute map at quadrature point 0
-  this->compute_single_point_map(dim, qw, elem, 0, elem_nodes, /*compute_second_derivatives=*/false);
+  this->compute_single_point_map(dim, qw, elem, 0, _elem_nodes, /*compute_second_derivatives=*/false);
 
   // Compute xyz at all other quadrature points
   if (calculate_xyz)
@@ -1248,7 +1248,7 @@ void FEMap::compute_affine_map(const unsigned int dim,
       {
         xyz[p].zero();
         for (std::size_t i=0; i<phi_map.size(); i++) // sum over the nodes
-          xyz[p].add_scaled        (*elem_nodes[i], phi_map[i][p]    );
+          xyz[p].add_scaled        (*_elem_nodes[i], phi_map[i][p]    );
       }
 
   // Copy other map data from quadrature point 0
