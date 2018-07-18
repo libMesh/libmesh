@@ -347,6 +347,10 @@ public:
     ZeroFunction<> zf;
     sys.boundary_project_solution(boundary_ids, variables, &zf);
 
+    // On a distributed mesh we may not have every node on every
+    // processor
+    TestCommWorld->set_union(projected_nodes_set);
+
     // We set the solution to be 1 everywhere and then zero on specific boundary
     // nodes, so the final l1 norm of the solution is the difference between the
     // number of nodes in the mesh and the number of nodes we zero on.
