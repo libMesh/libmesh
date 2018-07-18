@@ -1718,8 +1718,9 @@ GetPot::_internal_managed_copy(const std::string& Arg) const
     return *it;
 
   // Otherwise, create a new one
-  char* newcopy = new char[strlen(arg)+1];
-  strncpy(newcopy, arg, strlen(arg)+1);
+  const std::size_t bufsize = strlen(arg)+1;
+  char* newcopy = new char[bufsize];
+  strncpy(newcopy, arg, bufsize);
   _internal_string_container.insert(newcopy);
   return newcopy;
 }
