@@ -61,7 +61,7 @@ public:
   /**
    * \returns 1, the dimensionality of the object.
    */
-  virtual unsigned int dim () const override { return 1; }
+  virtual unsigned short dim () const override { return 1; }
 
   /**
    * \returns 2. Every edge is guaranteed to have at least 2 nodes.

@@ -425,7 +425,7 @@ JumpErrorEstimator::reinit_sides ()
 {
   fine_context->side_fe_reinit();
 
-  unsigned int dim = fine_context->get_elem().dim();
+  unsigned short dim = fine_context->get_elem().dim();
   libmesh_assert_equal_to(dim, coarse_context->get_elem().dim());
 
   FEBase * fe_fine = nullptr;
@@ -463,7 +463,7 @@ float JumpErrorEstimator::coarse_n_flux_faces_increment ()
 {
   // Keep track of the number of internal flux sides found on each
   // element
-  unsigned int dim = coarse_context->get_elem().dim();
+  unsigned short dim = coarse_context->get_elem().dim();
 
   const unsigned int divisor =
     1 << (dim-1)*(fine_context->get_elem().level() -

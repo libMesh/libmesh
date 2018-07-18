@@ -580,7 +580,7 @@ public:
   /**
    * \returns The dimensionality of the object.
    */
-  virtual unsigned int dim () const = 0;
+  virtual unsigned short dim () const = 0;
 
   /**
    * This array maps the integer representation of the \p ElemType enum

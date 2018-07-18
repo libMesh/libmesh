@@ -92,7 +92,7 @@ public:
   /**
    * \returns 2, the dimensionality of the object.
    */
-  virtual unsigned int dim() const override { return 2; }
+  virtual unsigned short dim() const override { return 2; }
 
   /**
    * \returns 3.  Infinite faces have one side less
