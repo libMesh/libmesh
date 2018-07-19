@@ -219,6 +219,10 @@ public:
       mesh.write(mesh_filename);
     }
 
+    // Make sure all processors are done writing before we try to
+    // start reading
+    TestCommWorld->barrier();
+
     Mesh mesh(*TestCommWorld);
     mesh.read(mesh_filename);
 
