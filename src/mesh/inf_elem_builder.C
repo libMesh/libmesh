@@ -489,7 +489,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
   // Likewise with our unique_ids
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  dof_id_type old_max_unique_id = _mesh.parallel_max_unique_id();
+  unique_id_type old_max_unique_id = _mesh.parallel_max_unique_id();
 #endif
 
   // for each boundary node, add an outer_node with
