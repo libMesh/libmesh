@@ -60,13 +60,13 @@ void Elem::refine (MeshRefinement & mesh_refinement)
           current_child->set_p_level(parent_p_level);
           current_child->set_p_refinement_flag(this->p_refinement_flag());
 
-          for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
+          for (unsigned int cnode=0; cnode != current_child->n_nodes(); ++cnode)
             {
               Node * node =
-                mesh_refinement.add_node(*this, c, nc,
+                mesh_refinement.add_node(*this, c, cnode,
                                          current_child->processor_id());
               node->set_n_systems (this->n_systems());
-              current_child->set_node(nc) = node;
+              current_child->set_node(cnode) = node;
             }
 
           mesh_refinement.add_elem (current_child);
@@ -120,7 +120,7 @@ void Elem::coarsen()
       Elem * mychild = this->child_ptr(c);
       if (mychild == remote_elem)
         continue;
-      for (unsigned int nc=0; nc != mychild->n_nodes(); nc++)
+      for (unsigned int cnode=0; cnode != mychild->n_nodes(); ++cnode)
         {
           Point new_pos;
           bool calculated_new_pos = false;
@@ -128,7 +128,7 @@ void Elem::coarsen()
           for (unsigned int n=0; n<this->n_nodes(); n++)
             {
               // The value from the embedding matrix
-              const float em_val = this->embedding_matrix(c,nc,n);
+              const float em_val = this->embedding_matrix(c,cnode,n);
 
               // The node location is somewhere between existing vertices
               if ((em_val != 0.) && (em_val != 1.))
@@ -143,7 +143,7 @@ void Elem::coarsen()
               //Move the existing node back into it's original location
               for (unsigned int i=0; i<LIBMESH_DIM; i++)
                 {
-                  Point & child_node = mychild->point(nc);
+                  Point & child_node = mychild->point(cnode);
                   child_node(i)=new_pos(i);
                 }
             }
