@@ -2589,26 +2589,6 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         int timestep,
                                         const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
-  // Construct a map from subdomain_id -> [element ids] for each of the elements
-  // we are responsible for. Note: we start by initializing the subdomain_map with
-  // the same (global) list of subdomain ids on all processors so that the processors
-  // execute the loop below in the same order.
-  std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map;
-  for (const auto & id : global_elem_blk_ids)
-    subdomain_map[id].clear();
-
-  for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
-    {
-      // Look up the elem id for exdous element i.
-      dof_id_type libmesh_elem_id = this->exodus_elem_num_to_libmesh[i];
-
-      // Get a pointer to that Elem from the Mesh.
-      const Elem * elem = mesh.elem_ptr(libmesh_elem_id);
-
-      // Add this elem id to the list of ids for this subdomain.
-      subdomain_map[elem->subdomain_id()].push_back(elem->id());
-    }
-
   // The total number of elements in the mesh. We need this for
   // indexing into parallel_soln.
   dof_id_type parallel_n_elem = mesh.parallel_n_elem();
@@ -2623,10 +2603,14 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
       // Get list of active subdomains for variable v
       const auto & active_subdomains = vars_active_subdomains[v];
 
-      for (const auto & pr : subdomain_map)
+      // Loop over all subdomain blocks, even ones for which we have
+      // no elements, so we localize in sync
+      for (const subdomain_id_type sbd_id : global_elem_blk_ids)
         {
-          subdomain_id_type sbd_id = pr.first;
-          const std::vector<dof_id_type> & elem_ids = pr.second;
+          auto it = subdomain_map.find(sbd_id);
+          const std::vector<dof_id_type> empty_vec;
+          const std::vector<dof_id_type> & elem_ids =
+            (it == subdomain_map.end()) ? empty_vec : it->second;
 
           // Possibly skip this (variable, subdomain) combination
           if (active_subdomains.empty() || active_subdomains.count(sbd_id))
