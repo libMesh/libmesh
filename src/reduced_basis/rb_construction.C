@@ -1068,6 +1068,18 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 
       update_system();
 
+      // Check if we've reached Nmax now. We do this before calling
+      // update_residual_terms() since we can skip that step if we've
+      // already reached Nmax.
+      if (get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
+      {
+        libMesh::out << "Maximum number of basis functions reached: Nmax = "
+                     << get_Nmax() << std::endl;
+        break;
+      }
+
+      update_residual_terms();
+
       // Increment counter
       count++;
     }
@@ -1241,10 +1253,6 @@ void RBConstruction::update_system()
 {
   libMesh::out << "Updating RB matrices" << std::endl;
   update_RB_system_matrices();
-
-  libMesh::out << "Updating RB residual terms" << std::endl;
-
-  update_residual_terms();
 }
 
 Real RBConstruction::get_RB_error_bound()
@@ -1429,6 +1437,8 @@ void RBConstruction::update_RB_system_matrices()
 void RBConstruction::update_residual_terms(bool compute_inner_products)
 {
   LOG_SCOPE("update_residual_terms()", "RBConstruction");
+
+  libMesh::out << "Updating RB residual terms" << std::endl;
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
