@@ -1005,7 +1005,7 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 
   get_rb_evaluation().greedy_param_list.clear();
 
-  Real training_greedy_error;
+  Real training_greedy_error = 0.;
 
 
   // If we are continuing from a previous training run,
