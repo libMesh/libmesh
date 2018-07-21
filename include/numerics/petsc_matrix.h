@@ -60,6 +60,10 @@ namespace libMesh
 // Forward Declarations
 template <typename T> class DenseMatrix;
 
+enum PetscMatrixType : int {
+                 AIJ=0,
+                 HYPRE};
+
 
 /**
  * This class provides a nice interface to the PETSc C-based data
@@ -108,6 +112,8 @@ public:
   PetscMatrix & operator= (const PetscMatrix &) = delete;
   PetscMatrix & operator= (PetscMatrix &&) = delete;
   virtual ~PetscMatrix ();
+
+  void set_matrix_type(PetscMatrixType mat_type);
 
   virtual void init (const numeric_index_type m,
                      const numeric_index_type n,
@@ -269,6 +275,8 @@ private:
    * constructor which takes a PETSc Mat object.
    */
   bool _destroy_mat_on_exit;
+
+  PetscMatrixType _mat_type;
 };
 
 } // namespace libMesh
