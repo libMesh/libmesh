@@ -1005,7 +1005,7 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 
   get_rb_evaluation().greedy_param_list.clear();
 
-  Real training_greedy_error;
+  Real training_greedy_error = 0.;
 
 
   // If we are continuing from a previous training run,
@@ -1068,12 +1068,73 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 
       update_system();
 
+      // Check if we've reached Nmax now. We do this before calling
+      // update_residual_terms() since we can skip that step if we've
+      // already reached Nmax.
+      if (get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
+      {
+        libMesh::out << "Maximum number of basis functions reached: Nmax = "
+                     << get_Nmax() << std::endl;
+        break;
+      }
+
+      update_residual_terms();
+
       // Increment counter
       count++;
     }
   this->update_greedy_param_list();
 
   return training_greedy_error;
+}
+
+void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
+{
+  LOG_SCOPE("enrich_basis_from_rhs_terms()", "RBConstruction");
+
+  // initialize rb_eval's parameters
+  get_rb_evaluation().initialize_parameters(*this);
+
+  // possibly resize data structures according to Nmax
+  if (resize_rb_eval_data)
+    {
+      get_rb_evaluation().resize_data_structures(get_Nmax());
+    }
+
+  libMesh::out << std::endl << "---- Enriching basis from rhs terms ----" << std::endl;
+
+  truth_assembly();
+
+  for (unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
+    {
+      libMesh::out << std::endl << "Performing truth solve with rhs from rhs term " << q_f << std::endl;
+
+      *rhs = *get_Fq(q_f);
+
+      // truth_assembly assembles into matrix and rhs, so use those for the solve
+      if (extra_linear_solver)
+        {
+          // If extra_linear_solver has been initialized, then we use it for the
+          // truth solves.
+          solve_for_matrix_and_rhs(*extra_linear_solver, *matrix, *rhs);
+
+          if (assert_convergence)
+            check_convergence(*extra_linear_solver);
+        }
+      else
+        {
+          solve_for_matrix_and_rhs(*get_linear_solver(), *matrix, *rhs);
+
+          if (assert_convergence)
+            check_convergence(*get_linear_solver());
+        }
+
+      // Add orthogonal part of the snapshot to the RB space
+      libMesh::out << "Enriching the RB space" << std::endl;
+      enrich_RB_space();
+
+      update_system();
+    }
 }
 
 bool RBConstruction::greedy_termination_test(Real abs_greedy_error,
@@ -1241,10 +1302,6 @@ void RBConstruction::update_system()
 {
   libMesh::out << "Updating RB matrices" << std::endl;
   update_RB_system_matrices();
-
-  libMesh::out << "Updating RB residual terms" << std::endl;
-
-  update_residual_terms();
 }
 
 Real RBConstruction::get_RB_error_bound()
@@ -1429,6 +1486,8 @@ void RBConstruction::update_RB_system_matrices()
 void RBConstruction::update_residual_terms(bool compute_inner_products)
 {
   LOG_SCOPE("update_residual_terms()", "RBConstruction");
+
+  libMesh::out << "Updating RB residual terms" << std::endl;
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 

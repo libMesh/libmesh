@@ -159,6 +159,13 @@ public:
   virtual Real train_reduced_basis(const bool resize_rb_eval_data=true);
 
   /**
+   * This function computes one basis function for each rhs term. This is
+   * useful in some cases since we can avoid doing a full greedy if we know
+   * that we do not have any "left-hand side" parameters, for example.
+   */
+  void enrich_basis_from_rhs_terms(const bool resize_rb_eval_data=true);
+
+  /**
    * (i) Compute the a posteriori error bound for each set of parameters
    * in the training set, (ii) set current_parameters to the parameters that
    * maximize the error bound, and (iii) return the maximum error bound.
