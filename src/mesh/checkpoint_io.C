@@ -127,7 +127,7 @@ void make_dir(const std::string & input_name, libMesh::processor_id_type n_procs
 namespace libMesh
 {
 
-std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits)
+std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, processor_id_type nsplits)
 {
   // There is currently an issue with DofObjects not being properly
   // reset if the mesh is not first repartitioned onto 1 processor
