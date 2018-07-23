@@ -1576,13 +1576,12 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
   libmesh_assert_equal_to (mesh.mesh_dimension(), 2);
 
   /*
-   * find the boundary nodes
+   * Create a quickly-searchable list of boundary nodes.
    */
-  std::vector<bool>  on_boundary;
-  MeshTools::find_boundary_nodes(mesh, on_boundary);
+  std::unordered_set<dof_id_type> boundary_node_ids =
+    MeshTools::find_boundary_nodes (mesh);
 
   for (unsigned int iter=0; iter<n_iterations; iter++)
-
     {
       /*
        * loop over the mesh refinement level
@@ -1689,7 +1688,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
              * finally reposition the vertex nodes
              */
             for (unsigned int nid=0; nid<mesh.n_nodes(); ++nid)
-              if (!on_boundary[nid] && weight[nid] > 0.)
+              if (!boundary_node_ids.count(nid) && weight[nid] > 0.)
                 mesh.node_ref(nid) = new_positions[nid]/weight[nid];
           }
 
