@@ -978,24 +978,24 @@ void ExodusII_IO_Helper::write_var_names_impl(const char * var_type, int & count
   ex_err = exII::ex_put_var_param(ex_id, var_type, count);
   EX_CHECK_ERR(ex_err, "Error setting number of vars.");
 
-  if (names.size() > 0)
+  if (count > 0)
     {
-      NamesData names_table(names.size(), MAX_STR_LENGTH);
+      NamesData names_table(count, MAX_STR_LENGTH);
 
       // Store the input names in the format required by Exodus.
-      for (std::size_t i=0; i<names.size(); ++i)
+      for (int i=0; i != count; ++i)
         names_table.push_back_entry(names[i]);
 
       if (verbose)
         {
           libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (std::size_t i=0; i<names.size(); ++i)
+          for (int i=0; i != count; ++i)
             libMesh::out << names_table.get_char_star(i) << std::endl;
         }
 
       ex_err = exII::ex_put_var_names(ex_id,
                                       var_type,
-                                      cast_int<int>(names.size()),
+                                      count,
                                       names_table.get_char_star_star()
                                       );
 
