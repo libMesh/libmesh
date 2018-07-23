@@ -855,7 +855,7 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   this->read_var_names(NODAL);
 
   // See if we can find the variable we are looking for
-  std::size_t var_index = 0;
+  unsigned int var_index = 0;
   bool found = false;
 
   // Do a linear search for nodal_var_name in nodal_var_names
@@ -1012,11 +1012,11 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
   this->read_var_names(ELEMENTAL);
 
   // See if we can find the variable we are looking for
-  std::size_t var_index = 0;
+  unsigned int var_index = 0;
   bool found = false;
 
   // Do a linear search for nodal_var_name in nodal_var_names
-  for (; var_index<elem_var_names.size(); ++var_index)
+  for (; var_index != elem_var_names.size(); ++var_index)
     if (elem_var_names[var_index] == elemental_var_name)
       {
         found = true;
@@ -1738,10 +1738,10 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
           if (it == block_ids.end())
             libmesh_error_msg("ExodusII_IO_Helper: block id " << block_id << " not found in block_ids.");
 
-          unsigned int block_index =
+          std::size_t block_index =
             std::distance(block_ids.begin(), it);
 
-          unsigned int truth_tab_index = block_index*num_elem_vars + var_num;
+          std::size_t truth_tab_index = block_index*num_elem_vars + var_num;
           truth_tab[truth_tab_index] = 1;
         }
     }

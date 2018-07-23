@@ -337,7 +337,7 @@ void ExodusII_IO::read (const std::string & fname)
 
         // Map the zero-based Exodus side numbering to the libmesh side numbering
         unsigned int raw_side_index = exio_helper->side_list[e]-1;
-        unsigned int side_index_offset = conv.get_shellface_index_offset();
+        std::size_t side_index_offset = conv.get_shellface_index_offset();
 
         if (raw_side_index < side_index_offset)
           {
@@ -571,7 +571,7 @@ void ExodusII_IO::read_global_variable(std::vector<std::string> global_var_names
                                        unsigned int timestep,
                                        std::vector<Real> & global_values)
 {
-  unsigned int size = global_var_names.size();
+  std::size_t size = global_var_names.size();
   if (size == 0)
     libmesh_error_msg("ERROR, empty list of global variables to read from the Exodus file.");
 
@@ -582,7 +582,7 @@ void ExodusII_IO::read_global_variable(std::vector<std::string> global_var_names
   std::vector<std::string> global_var_names_exodus = exio_helper->global_var_names;
 
   global_values.clear();
-  for (unsigned int i = 0; i < size; ++i)
+  for (std::size_t i = 0; i != size; ++i)
     {
       // for each global variable in global_var_names, look the corresponding one in global_var_names_from_exodus
       // and fill global_values accordingly
