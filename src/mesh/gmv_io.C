@@ -1348,7 +1348,7 @@ void GMVIO::write_binary (const std::string & fname,
         // because certain elements, like QUAD9 and HEX27 only support
         // being written out as lower-order elements (QUAD8 and HEX20,
         // respectively).
-        tempint = ed.node_map.size();
+        tempint = cast_int<unsigned int>(ed.node_map.size());
         out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
         // Write the element connectivity
@@ -2286,7 +2286,9 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
 
               // Loop over the stored vector's entries, inserting them into
               // the System's solution if appropriate.
-              for (std::size_t i=0; i<it->second.size(); ++i)
+              for (dof_id_type i=0,
+                   sz = cast_int<dof_id_type>(it->second.size());
+                   i != sz; ++i)
                 {
                   // Since this var came from a GMV file, the index i corresponds to
                   // the (single) DOF value of the current variable for node i.

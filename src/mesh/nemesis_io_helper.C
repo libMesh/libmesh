@@ -2372,7 +2372,8 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
           // possible. MeshBase::subdomain_name() will just return an
           // empty string if there is no name associated with the current
           // block.
-          names_table.push_back_entry(mesh.subdomain_name(this->global_elem_blk_ids[i]));
+          names_table.push_back_entry
+            (mesh.subdomain_name(cast_int<subdomain_id_type>(this->global_elem_blk_ids[i])));
 
           // Search for the current global block ID in the map
           std::map<int, std::vector<int>>::iterator it =
@@ -2497,7 +2498,8 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
       // Compute the (zero-based) index which determines which
       // variable this will be as far as Nemesis is concerned.  This
       // will be used below in the write_nodal_values() call.
-      auto variable_name_position = std::distance(output_names.begin(), pos);
+      int variable_name_position =
+        cast_int<int>(std::distance(output_names.begin(), pos));
 
       // Fill up a std::vector with the dofs for the current variable
       std::vector<numeric_index_type> required_indices(num_nodes);
@@ -2574,8 +2576,8 @@ Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
 
   // Write truth table to file.
   ex_err = exII::ex_put_elem_var_tab(ex_id,
-                                     global_elem_blk_ids.size(),
-                                     names.size(),
+                                     cast_int<int>(global_elem_blk_ids.size()),
+                                     cast_int<int>(names.size()),
                                      &truth_tab[0]);
   EX_CHECK_ERR(ex_err, "Error writing element truth table.");
 }

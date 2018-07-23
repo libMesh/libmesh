@@ -865,13 +865,13 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
   IS isrow, iscol;
 
   ierr = ISCreateLibMesh(this->comm().get(),
-                         rows.size(),
+                         cast_int<PetscInt>(rows.size()),
                          numeric_petsc_cast(&rows[0]),
                          PETSC_USE_POINTER,
                          &isrow); LIBMESH_CHKERR(ierr);
 
   ierr = ISCreateLibMesh(this->comm().get(),
-                         cols.size(),
+                         cast_int<PetscInt>(cols.size()),
                          numeric_petsc_cast(&cols[0]),
                          PETSC_USE_POINTER,
                          &iscol); LIBMESH_CHKERR(ierr);

@@ -213,7 +213,9 @@ void VTKIO::read (const std::string & name)
 
       // then reshuffle the nodes according to the connectivity, this
       // two-time-assign would evade the definition of the vtk_mapping
-      for (std::size_t j=0; j<conn.size(); ++j)
+      for (unsigned int j=0,
+           n_conn = cast_int<unsigned int>(conn.size());
+           j != n_conn; ++j)
         elem->set_node(j) = mesh.node_ptr(conn[j]);
 
       elem->set_id(i);
@@ -432,7 +434,9 @@ void VTKIO::cells_to_vtk()
       std::vector<dof_id_type> conn;
       elem->connectivity(0, VTK, conn);
 
-      for (std::size_t i=0; i<conn.size(); ++i)
+      for (unsigned int i=0,
+           n_conn = cast_int<unsigned int>(conn.size());
+           i != n_conn; ++i)
         {
           // If the node ID is not found in the _local_node_map, we'll
           // add it to the _vtk_grid.  NOTE[JWP]: none of the examples

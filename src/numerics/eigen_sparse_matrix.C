@@ -190,7 +190,7 @@ numeric_index_type EigenSparseMatrix<T>::m () const
 {
   libmesh_assert (this->initialized());
 
-  return _mat.rows();
+  return cast_int<numeric_index_type>(_mat.rows());
 }
 
 
@@ -200,7 +200,7 @@ numeric_index_type EigenSparseMatrix<T>::n () const
 {
   libmesh_assert (this->initialized());
 
-  return _mat.cols();
+  return cast_int<numeric_index_type>(_mat.cols());
 }
 
 

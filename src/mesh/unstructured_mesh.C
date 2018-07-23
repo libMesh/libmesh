@@ -354,7 +354,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
                 kvp.first         = key;
                 kvp.second.first  = element;
-                kvp.second.second = ms;
+                kvp.second.second = cast_int<unsigned char>(ms);
                 side_to_elem_map.insert (kvp);
               }
           }

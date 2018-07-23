@@ -257,7 +257,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
                     (fine_context->get_elem_solution().size(),
                      Uparent.size());
                   fine_context->get_elem_solution() = Uparent;
-                  fine_context->side = n_p;
+                  fine_context->side = cast_int<unsigned char>(n_p);
                   fine_context->side_fe_reinit();
 
                   // If we find a boundary flux for any variable,
@@ -295,7 +295,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
           if ((e->neighbor_ptr(n_e) != nullptr) ||
               integrate_boundary_sides)
             {
-              fine_context->side = n_e;
+              fine_context->side = cast_int<unsigned char>(n_e);
               fine_context->side_fe_reinit();
             }
 

@@ -911,7 +911,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                               key_type key = el->key(side_id);
                               val_type val;
                               val.first = el;
-                              val.second = side_id;
+                              val.second = cast_int<unsigned int>(side_id);
 
                               key_val_pair kvp;
                               kvp.first = key;

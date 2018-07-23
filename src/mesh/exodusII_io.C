@@ -488,7 +488,9 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
   const unsigned int var_num = system.variable_number(system_var_name);
 
-  for (std::size_t i=0; i<exio_helper->nodal_var_values.size(); ++i)
+  for (dof_id_type i=0,
+       n_nodal = cast_int<dof_id_type>(exio_helper->nodal_var_values.size());
+       i != n_nodal; ++i)
     {
       const Node * node = MeshInput<MeshBase>::mesh().query_node_ptr(i);
 
