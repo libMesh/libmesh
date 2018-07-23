@@ -1974,7 +1974,7 @@ struct SyncNodeSet
         Node * node = mesh.node_ptr(id);
 
         // Return if the node is in the set.
-        data[i] = node_set.count(node);
+        data[i] = (node_set.find(node) != node_set.end());
       }
   }
 
