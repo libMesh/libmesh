@@ -1380,6 +1380,8 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                                 K[1] = 1./3.;
                                 K[2] = 1;
                                 break;
+                              default:
+                                break;
                               }
 
                             switch (j)
@@ -1404,6 +1406,8 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                                 K[4] = 1./3.;
                                 K[5] = 1;
                                 break;
+                              default:
+                                break;
                               }
 
                             switch (k)
@@ -1427,6 +1431,8 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                                 K[6] = 0.5;
                                 K[7] = 1./3.;
                                 K[8] = 1;
+                                break;
+                              default:
                                 break;
                               }
 
@@ -1770,6 +1776,8 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                                 K[2] = 1;
                                 break;
 
+                              default:
+                                break;
                               }
                             switch (j)
                               {
@@ -1797,6 +1805,8 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                                 K[5] = 1;
                                 break;
 
+                              default:
+                                break;
                               }
                             switch (k)
                               {
@@ -1822,6 +1832,9 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                                 K[6] = 0.5;
                                 K[7] = 1./3.;
                                 K[8] = 1;
+                                break;
+
+                              default:
                                 break;
                               }
 
@@ -3190,6 +3203,9 @@ double VariationalMeshSmoother::localP(Array3D<double> & W,
                           K[1] = 1./3.;
                           K[2] = 1;
                           break;
+
+                        default:
+                          break;
                         }
 
                       switch (j)
@@ -3218,6 +3234,8 @@ double VariationalMeshSmoother::localP(Array3D<double> & W,
                           K[5] = 1;
                           break;
 
+                        default:
+                          break;
                         }
 
                       switch (k)
@@ -3246,6 +3264,8 @@ double VariationalMeshSmoother::localP(Array3D<double> & W,
                           K[8] = 1;
                           break;
 
+                        default:
+                          break;
                         }
 
                       if ((i==j) && (j==k))
