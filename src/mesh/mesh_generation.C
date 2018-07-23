@@ -220,13 +220,15 @@ public:
           Real float_index = (p(dir) - _mins[dir]) * _nelem[dir] / _widths[dir];
 
           // std::modf separates the fractional and integer parts of the index.
-          Real integer_part = 0;
-          Real fractional_part = std::modf(float_index, &integer_part);
+          Real integer_part_f = 0;
+          Real fractional_part = std::modf(float_index, &integer_part_f);
+
+          int integer_part = integer_part_f;
 
           // Vertex node?
           if (std::abs(fractional_part) < TOLERANCE || std::abs(fractional_part - 1.0) < TOLERANCE)
             {
-              int index = round(float_index);
+              int index = int(round(float_index));
 
               // Move node to the Gauss-Lobatto position.
               output(dir) = _mins[dir] + _widths[dir] * 0.5 * (1.0 - _cosines[dir][index]);

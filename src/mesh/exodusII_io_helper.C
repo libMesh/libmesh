@@ -1845,7 +1845,7 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
   if (_single_precision)
     {
-      float cast_time = time;
+      float cast_time = float(time);
       ex_err = exII::ex_put_time(ex_id, timestep, &cast_time);
     }
   else
