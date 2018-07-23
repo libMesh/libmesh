@@ -1183,11 +1183,11 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
   // Then we iterate over node_to_node_map and delete the
   // duplicate nodes that came from other_mesh.
 
-  // Container to catch boundary IDs passed back from BoundaryInfo.
-  std::vector<boundary_id_type> bc_ids;
-
   {
     LOG_SCOPE("stitch_meshes node updates", "ReplicatedMesh");
+
+    // Container to catch boundary IDs passed back from BoundaryInfo.
+    std::vector<boundary_id_type> bc_ids;
 
     for (const auto & pr : node_to_elems_map)
       {

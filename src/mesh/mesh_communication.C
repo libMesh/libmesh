@@ -931,7 +931,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
   // to all processors which own any of the coarsened-away-element's
   // siblings.
   typedef std::unordered_map<processor_id_type, std::vector<Elem *>> ghost_map;
-  ghost_map elements_to_ghost;
+  ghost_map coarsening_elements_to_ghost;
 
   const processor_id_type proc_id = mesh.processor_id();
   // Look for just-coarsened elements
@@ -947,7 +947,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
       // the parent's owner needs us to send them.
       const processor_id_type their_proc_id = elem->parent()->processor_id();
       if (their_proc_id != proc_id)
-        elements_to_ghost[their_proc_id].push_back(elem);
+        coarsening_elements_to_ghost[their_proc_id].push_back(elem);
     }
 
   const processor_id_type n_proc = mesh.n_processors();
@@ -976,8 +976,8 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
       std::set<const Node *> nodes_to_send;
 
       const ghost_map::const_iterator it =
-        elements_to_ghost.find(p);
-      if (it != elements_to_ghost.end())
+        coarsening_elements_to_ghost.find(p);
+      if (it != coarsening_elements_to_ghost.end())
         {
           const std::vector<Elem *> & elems = it->second;
           libmesh_assert(elems.size());

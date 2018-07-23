@@ -1178,11 +1178,11 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                         basisA(Q, 6, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
-                        for (int k=0; k<2; k++)
+                        for (int k2=0; k2<2; k2++)
                           for (int l=0; l<6; l++)
                             {
-                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
-                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                              a1[k2] += Q[k2][l]*R[cells[ii][l]][0];
+                              a2[k2] += Q[k2][l]*R[cells[ii][l]][1];
                             }
 
                         double det = jac2(a1[0],a1[1],a2[0],a2[1]);
@@ -1571,11 +1571,11 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                         basisA(Q, 6, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
-                        for (int k=0; k<2; k++)
+                        for (int k2=0; k2<2; k2++)
                           for (int l=0; l<6; l++)
                             {
-                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
-                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                              a1[k2] += Q[k2][l]*R[cells[ii][l]][0];
+                              a2[k2] += Q[k2][l]*R[cells[ii][l]][1];
                             }
 
                         double det = jac2(a1[0], a1[1], a2[0], a2[1]);
