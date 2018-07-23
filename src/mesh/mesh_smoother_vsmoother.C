@@ -275,9 +275,9 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
   libMesh::out << "Starting readgr" << std::endl;
   // add error messages where format can be inconsistent
 
-  // Find the boundary nodes
-  std::vector<bool> on_boundary;
-  MeshTools::find_boundary_nodes(_mesh, on_boundary);
+  // Create a quickly-searchable list of boundary nodes.
+  std::unordered_set<dof_id_type> boundary_node_ids =
+    MeshTools::find_boundary_nodes (_mesh);
 
   // Grab node coordinates and set mask
   {
@@ -299,7 +299,7 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
         // Internal nodes are 0
         // Immovable boundary nodes are 1
         // Movable boundary nodes are 2
-        if (on_boundary[i])
+        if (boundary_node_ids.count(i))
           {
             // Only look for sliding edge nodes in 2D
             if (_dim == 2)
@@ -346,8 +346,8 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                         // Find if the two neighbor nodes angles are 180 degrees (pi) off of each other (withing a tolerance)
                         // In order to make this a true movable boundary node... the two that forma  straight line with
                         // it must also be on the boundary
-                        if (on_boundary[neighbors[a]->id()] &&
-                            on_boundary[neighbors[b]->id()] &&
+                        if (boundary_node_ids.count(neighbors[a]->id()) &&
+                            boundary_node_ids.count(neighbors[b]->id()) &&
                             (
                              (std::abs(thetas[a] - (thetas[b] + (libMesh::pi))) < .001) ||
                              (std::abs(thetas[a] - (thetas[b] - (libMesh::pi))) < .001)
