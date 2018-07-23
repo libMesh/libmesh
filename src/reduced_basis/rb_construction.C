@@ -64,6 +64,7 @@ RBConstruction::RBConstruction (EquationSystems & es,
     inner_product_solver(LinearSolver<Number>::build(es.comm())),
     extra_linear_solver(nullptr),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
+    skip_residual_in_train_reduced_basis(false),
     exit_on_repeated_greedy_parameters(true),
     impose_internal_fluxes(false),
     compute_RB_inner_product(false),
@@ -1019,11 +1020,14 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
     }
 
 
-  // Compute the dual norms of the outputs if we haven't already done so
-  compute_output_dual_innerprods();
+  if(!skip_residual_in_train_reduced_basis)
+    {
+      // Compute the dual norms of the outputs if we haven't already done so.
+      compute_output_dual_innerprods();
 
-  // Compute the Fq Riesz representor dual norms if we haven't already done so
-  compute_Fq_representor_innerprods();
+      // Compute the Fq Riesz representor dual norms if we haven't already done so.
+      compute_Fq_representor_innerprods();
+    }
 
   libMesh::out << std::endl << "---- Performing Greedy basis enrichment ----" << std::endl;
   Real initial_greedy_error = 0.;
@@ -1078,7 +1082,10 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
         break;
       }
 
-      update_residual_terms();
+      if(!skip_residual_in_train_reduced_basis)
+        {
+          update_residual_terms();
+        }
 
       // Increment counter
       count++;

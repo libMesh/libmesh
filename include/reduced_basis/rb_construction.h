@@ -513,6 +513,15 @@ public:
   std::vector<Number> Fq_representor_innerprods;
 
   /**
+   * Boolean flag to indicate if we skip residual calculations
+   * in train_reduced_basis. This should only be used in
+   * special cases, e.g. when we know a priori that we want
+   * exactly one basis function and hence we do not need the
+   * residual based error indicator.
+   */
+  bool skip_residual_in_train_reduced_basis;
+
+  /**
    * Boolean flag to indicate whether we exit the greedy if
    * we select the same parameters twice in a row. In some
    * problems this indicates that the greedy has "saturated"
