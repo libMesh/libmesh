@@ -74,12 +74,11 @@ void MeshTools::Modification::distort (MeshBase & mesh,
 
   LOG_SCOPE("distort()", "MeshTools::Modification");
 
-  // First find nodes on the boundary and flag them
-  // so that we don't move them
-  // on_boundary holds false (not on boundary) and true (on boundary)
-  std::vector<bool> on_boundary (mesh.max_node_id(), false);
-
-  if (!perturb_boundary) MeshTools::find_boundary_nodes (mesh, on_boundary);
+  // If we are not perturbing boundary nodes, make a
+  // quickly-searchable list of node ids we can check against.
+  std::unordered_set<dof_id_type> boundary_node_ids;
+  if (!perturb_boundary)
+    boundary_node_ids = MeshTools::find_boundary_nodes (mesh);
 
   // Now calculate the minimum distance to
   // neighboring nodes for each node.
@@ -91,7 +90,6 @@ void MeshTools::Modification::distort (MeshBase & mesh,
     for (auto & n : elem->node_ref_range())
       hmin[n.id()] = std::min(hmin[n.id()],
                               static_cast<float>(elem->hmin()));
-
 
   // Now actually move the nodes
   {
@@ -109,18 +107,12 @@ void MeshTools::Modification::distort (MeshBase & mesh,
     // [Note: Testing for (in)equality might be wrong
     // (different types, namely float and double)]
     for (unsigned int n=0; n<mesh.max_node_id(); n++)
-      if (!on_boundary[n] && (hmin[n] < 1.e20) )
+      if ((perturb_boundary || !boundary_node_ids.count(n)) && hmin[n] < 1.e20)
         {
           // the direction, random but unit normalized
-
-          Point dir( static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
-                     (mesh.mesh_dimension() > 1) ?
-                     static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
-                     : 0.,
-                     ((mesh.mesh_dimension() == 3) ?
-                      static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
-                      : 0.)
-                     );
+          Point dir (static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
+                     (mesh.mesh_dimension() > 1) ? static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX) : 0.,
+                     ((mesh.mesh_dimension() == 3) ? static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX) : 0.));
 
           dir(0) = (dir(0)-.5)*2.;
           if (mesh.mesh_dimension() > 1)
