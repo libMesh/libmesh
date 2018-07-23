@@ -23,6 +23,7 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 #include <iomanip>
+#include <limits>
 
 // Local includes
 #include "libmesh/mesh_smoother_vsmoother.h"
@@ -515,7 +516,7 @@ int VariationalMeshSmoother::readmetr(std::string name,
 // Stolen from ErrorVector!
 float VariationalMeshSmoother::adapt_minimum() const
 {
-  float min = 1.e30;
+  float min = std::numeric_limits<float>::max();
 
   for (std::size_t i=0; i<_adapt_data->size(); i++)
     {
