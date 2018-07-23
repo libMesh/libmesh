@@ -334,7 +334,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
     // Nodes first -- all nodes, not just local ones
     {
       // Request sets to send to each processor
-      std::map<dof_id_type, std::vector<Parallel::DofObjectKey>>
+      std::map<processor_id_type, std::vector<Parallel::DofObjectKey>>
         requested_ids;
       // Results to gather from each processor - kept in a map so we
       // do only one loop over nodes after all receives are done.
@@ -451,7 +451,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
     // elements next -- all elements, not just local ones
     {
       // Request sets to send to each processor
-      std::map<dof_id_type, std::vector<Parallel::DofObjectKey>>
+      std::map<processor_id_type, std::vector<Parallel::DofObjectKey>>
         requested_ids;
       // Results to gather from each processor - kept in a map so we
       // do only one loop over elements after all receives are done.
