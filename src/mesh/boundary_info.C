@@ -1813,7 +1813,7 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
                                     std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2090,7 +2090,7 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
                                     std::vector<unsigned short int> & sl,
                                     std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2139,7 +2139,7 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
                                            std::vector<unsigned short int> & sl,
                                            std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2212,7 +2212,7 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type> & el,
                                     std::vector<unsigned short int> & sl,
                                     std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2258,7 +2258,7 @@ void BoundaryInfo::build_shellface_list (std::vector<dof_id_type> & el,
                                          std::vector<unsigned short int> & sl,
                                          std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
