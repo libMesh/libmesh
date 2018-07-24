@@ -71,8 +71,8 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationS
   }
 
   // Currently assuming all elements are the same!
-  DataTransferKit::DTK_ElementTopology element_topology = get_element_topology(mesh.elem(0));
-  unsigned int n_nodes_per_elem = mesh.elem(0)->n_nodes();
+  DataTransferKit::DTK_ElementTopology element_topology = get_element_topology(mesh.elem_ptr(0));
+  unsigned int n_nodes_per_elem = mesh.elem_ptr(0)->n_nodes();
 
   unsigned int n_local_elem = mesh.n_local_elem();
 
