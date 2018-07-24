@@ -598,17 +598,17 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
   switch (this->_eigen_solver_type)
     {
     case POWER:
-      ierr = EPSSetType (_eps, (char *) EPSPOWER);    LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, EPSPOWER);    LIBMESH_CHKERR(ierr); return;
     case SUBSPACE:
-      ierr = EPSSetType (_eps, (char *) EPSSUBSPACE); LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, EPSSUBSPACE); LIBMESH_CHKERR(ierr); return;
     case LAPACK:
-      ierr = EPSSetType (_eps, (char *) EPSLAPACK);   LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, EPSLAPACK);   LIBMESH_CHKERR(ierr); return;
     case ARNOLDI:
-      ierr = EPSSetType (_eps, (char *) EPSARNOLDI);  LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, EPSARNOLDI);  LIBMESH_CHKERR(ierr); return;
     case LANCZOS:
-      ierr = EPSSetType (_eps, (char *) EPSLANCZOS);  LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, EPSLANCZOS);  LIBMESH_CHKERR(ierr); return;
     case KRYLOVSCHUR:
-      ierr = EPSSetType (_eps, (char *) EPSKRYLOVSCHUR);  LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, EPSKRYLOVSCHUR);  LIBMESH_CHKERR(ierr); return;
       // case ARPACK:
       // ierr = EPSSetType (_eps, (char *) EPSARPACK);   LIBMESH_CHKERR(ierr); return;
 
