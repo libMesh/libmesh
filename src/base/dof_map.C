@@ -469,6 +469,12 @@ void DofMap::reinit(MeshBase & mesh)
   //
   // The user might have removed it from our coupling functors set,
   // but if so, who cares, this reconfiguration is cheap.
+
+  // Avoid calling set_dof_coupling() with an empty/non-nullptr
+  // _dof_coupling matrix which may happen when there are actually no
+  // variables on the system.
+  if (this->_dof_coupling && this->_dof_coupling->empty() && !this->n_variables())
+    this->_dof_coupling = nullptr;
   _default_coupling->set_dof_coupling(this->_dof_coupling);
 
   // By default we may want 0 or 1 levels of coupling
