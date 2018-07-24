@@ -1421,8 +1421,8 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   const T & n_elem = meta_data[0];
   const T & n_nodes = meta_data[1];
 
-  mesh.reserve_elem(n_elem);
-  mesh.reserve_nodes(n_nodes);
+  mesh.reserve_elem(cast_int<dof_id_type>(n_elem));
+  mesh.reserve_nodes(cast_int<dof_id_type>(n_nodes));
 
   // Our mesh is pre-partitioned as it's created
   this->set_n_partitions(this->n_processors());
@@ -1433,7 +1433,7 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
    * For now we will assume that "type size" is how the entire file will be encoded.
    */
   if (version_at_least_0_9_2())
-    _field_width = meta_data[2];
+    _field_width = cast_int<unsigned int>(meta_data[2]);
 }
 
 

@@ -455,8 +455,8 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
                                    local_size_sums.end(),
                                    indices[i]);
 
-      std::iterator_traits<iter_t>::difference_type on_proc
-        = std::distance(local_size_sums.begin(), ub);
+      processor_id_type on_proc = cast_int<processor_id_type>
+        (std::distance(local_size_sums.begin(), ub));
 
       requested_ids[on_proc].push_back(indices[i]);
       local_requested_ids[on_proc].push_back(i);

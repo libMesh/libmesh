@@ -89,8 +89,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
     for (const auto & oldn : other_mesh.node_ptr_range())
       {
-        processor_id_type added_pid =
-          wrap_proc_ids ? oldn->processor_id() % _n_parts : oldn->processor_id();
+        processor_id_type added_pid = cast_int<processor_id_type>
+          (wrap_proc_ids ? oldn->processor_id() % _n_parts : oldn->processor_id());
 
         // Add new nodes in old node Point locations
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -161,7 +161,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
             this->node_ptr(old->node_id(i) + node_id_offset);
 
         // And start it off with the same processor id (mod _n_parts).
-        el->processor_id() = (wrap_proc_ids ? old->processor_id() % _n_parts : old->processor_id());
+        el->processor_id() = cast_int<processor_id_type>
+          (wrap_proc_ids ? old->processor_id() % _n_parts : old->processor_id());
 
         // Give it the same element and unique ids
         el->set_id(old->id() + element_id_offset);

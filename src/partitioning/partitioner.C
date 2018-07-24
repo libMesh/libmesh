@@ -634,15 +634,16 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
       const PetscInt *indices;
       PetscCalloc1(rows.size(), &adj_i);
       PetscCalloc1(cols.size(), &adj_j);
-      rows_size = rows.size();
+      rows_size = cast_int<PetscInt>(rows.size());
       for (PetscInt ii=0; ii<rows_size; ii++)
         adj_i[ii] = rows[ii];
 
-      cols_size = cols.size();
+      cols_size = cast_int<PetscInt>(cols.size());
       for (PetscInt ii=0; ii<cols_size; ii++)
         adj_j[ii] = cols[ii];
 
-      MatCreateMPIAdj(PETSC_COMM_SELF, pmap.second.size(), pmap.second.size(), adj_i, adj_j,nullptr,&adj);
+      const PetscInt sz = cast_int<PetscInt>(pmap.second.size());
+      MatCreateMPIAdj(PETSC_COMM_SELF, sz, sz, adj_i, adj_j,nullptr,&adj);
       MatPartitioningCreate(PETSC_COMM_SELF,&part);
       MatPartitioningSetAdjacency(part,adj);
       MatPartitioningSetNParts(part,2);

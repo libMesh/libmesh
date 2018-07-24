@@ -98,7 +98,8 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
   libmesh_assert_greater (n, 0);
 
   // Compute target_size, the approximate number of elements on each processor.
-  const dof_id_type target_size = _elem_centroids.size() / n;
+  const dof_id_type target_size = cast_int<dof_id_type>
+    (_elem_centroids.size() / n);
 
   for (dof_id_type i=0; i<_elem_centroids.size(); i++)
     {

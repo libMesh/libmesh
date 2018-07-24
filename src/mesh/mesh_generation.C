@@ -1405,7 +1405,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               }
 
             // Add the new elements
-            for (std::size_t i=0; i<new_elements.size(); ++i)
+            for (dof_id_type i=0,
+                 n_new = cast_int<dof_id_type>(new_elements.size());
+                 i != n_new; ++i)
               {
                 new_elements[i]->set_id(i);
                 mesh.add_elem(new_elements[i]);
@@ -1553,7 +1555,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // mesh_dimension, since the original intent of this function was to
   // allow the geometric entity (line, circle, ball, sphere)
   // constructed to be determined by the mesh's dimension.
-  unsigned int orig_mesh_dimension = mesh.mesh_dimension();
+  unsigned char orig_mesh_dimension =
+    cast_int<unsigned char>(mesh.mesh_dimension());
   mesh.clear();
   mesh.set_mesh_dimension(orig_mesh_dimension);
 

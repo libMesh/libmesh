@@ -2050,7 +2050,8 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
       for (std::size_t i=0; i<this->global_nodeset_ids.size(); ++i)
         {
           const std::string & current_ns_name =
-            mesh.get_boundary_info().get_nodeset_name(global_nodeset_ids[i]);
+            mesh.get_boundary_info().get_nodeset_name
+              (cast_int<boundary_id_type>(global_nodeset_ids[i]));
 
           // Store this name in a data structure that will be used to
           // write sideset names to file.
@@ -2208,7 +2209,8 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
       for (std::size_t i=0; i<this->global_sideset_ids.size(); ++i)
         {
           const std::string & current_ss_name =
-            mesh.get_boundary_info().get_sideset_name(global_sideset_ids[i]);
+            mesh.get_boundary_info().get_sideset_name
+              (cast_int<boundary_id_type>(global_sideset_ids[i]));
 
           // Store this name in a data structure that will be used to
           // write sideset names to file.
@@ -2571,7 +2573,9 @@ Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
   std::vector<int> truth_tab(global_elem_blk_ids.size() * names.size());
   for (unsigned int blk=0; blk<global_elem_blk_ids.size(); ++blk)
     for (unsigned int var=0; var<names.size(); ++var)
-      if (vars_active_subdomains[var].empty() || vars_active_subdomains[var].count(global_elem_blk_ids[blk]))
+      if (vars_active_subdomains[var].empty() ||
+          vars_active_subdomains[var].count
+            (cast_int<subdomain_id_type>(global_elem_blk_ids[blk])))
         truth_tab[names.size()*blk + var] = 1;
 
   // Write truth table to file.
@@ -2607,8 +2611,10 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
 
       // Loop over all subdomain blocks, even ones for which we have
       // no elements, so we localize in sync
-      for (const subdomain_id_type sbd_id : global_elem_blk_ids)
+      for (const int sbd_id_int : global_elem_blk_ids)
         {
+          const subdomain_id_type sbd_id =
+            cast_int<subdomain_id_type>(sbd_id_int);
           auto it = subdomain_map.find(sbd_id);
           const std::vector<dof_id_type> empty_vec;
           const std::vector<dof_id_type> & elem_ids =

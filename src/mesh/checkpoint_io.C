@@ -71,8 +71,9 @@ void chunking(libMesh::processor_id_type size, libMesh::processor_id_type rank, 
     {
       nchunks = nsplits / size;
       // account for the case where nchunks is zero where we want max int
-      first_chunk = std::max((int)((nchunks + 1) * (nsplits % size) + nchunks * (rank - nsplits % size)),
-                             (1 - (int)nchunks) * std::numeric_limits<int>::max());
+      first_chunk = libMesh::cast_int<libMesh::processor_id_type>
+        (std::max((int)((nchunks + 1) * (nsplits % size) + nchunks * (rank - nsplits % size)),
+         (1 - (int)nchunks) * std::numeric_limits<int>::max()));
     }
 }
 
@@ -534,7 +535,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      uint16_t p_level = elem->p_level();
+      uint16_t p_level = cast_int<uint16_t>(elem->p_level());
       io.data(p_level, "# p_level");
 
       uint16_t rflag = elem->refinement_flag();
@@ -830,7 +831,7 @@ file_id_type CheckpointIO::read_header (const std::string & name)
 
   // broadcast data from processor 0, set values everywhere
   this->comm().broadcast(mesh_dimension);
-  mesh.set_mesh_dimension(mesh_dimension);
+  mesh.set_mesh_dimension(cast_int<unsigned char>(mesh_dimension));
 
   this->comm().broadcast(input_parallel);
 
