@@ -180,7 +180,7 @@ public:
         {
           _cosines[dir].resize(_nelem[dir]+1);
           for (std::size_t i=0; i<_cosines[dir].size(); ++i)
-            _cosines[dir][i] = std::cos(libMesh::pi * i / _nelem[dir]);
+            _cosines[dir][i] = std::cos(libMesh::pi * Real(i) / _nelem[dir]);
         }
   }
 
@@ -221,9 +221,9 @@ public:
 
           // std::modf separates the fractional and integer parts of the index.
           Real integer_part_f = 0;
-          Real fractional_part = std::modf(float_index, &integer_part_f);
+          const Real fractional_part = std::modf(float_index, &integer_part_f);
 
-          int integer_part = integer_part_f;
+          const int integer_part = int(integer_part_f);
 
           // Vertex node?
           if (std::abs(fractional_part) < TOLERANCE || std::abs(fractional_part - 1.0) < TOLERANCE)
