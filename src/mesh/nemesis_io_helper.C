@@ -1821,7 +1821,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       current_block_connectivity.clear();
       current_block_connectivity.resize(elem_ids_this_subdomain.size() * this->num_nodes_per_elem);
 
-      for (std::size_t i=0; i<elem_ids_this_subdomain.size(); i++)
+      for (unsigned int i=0; i<elem_ids_this_subdomain.size(); i++)
         {
           unsigned int elem_id = elem_ids_this_subdomain[i];
 
