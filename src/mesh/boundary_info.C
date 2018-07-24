@@ -1843,6 +1843,10 @@ BoundaryInfo::build_node_list() const
   for (const auto & pr : _boundary_node_id)
     bc_tuples.emplace_back(pr.first->id(), pr.second);
 
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_tuples.begin(), bc_tuples.end());
+
   return bc_tuples;
 }
 
@@ -2119,6 +2123,12 @@ BoundaryInfo::build_side_list() const
   for (const auto & pr : _boundary_side_id)
     bc_triples.emplace_back(pr.first->id(), pr.second.first, pr.second.second);
 
+  // bc_triples is currently in whatever order the Elem pointers in
+  // the _boundary_side_id multimap are in, and in particular might be
+  // in different orders on different processors. To avoid this
+  // inconsistency, we'll sort using the default operator< for tuples.
+  std::sort(bc_triples.begin(), bc_triples.end());
+
   return bc_triples;
 }
 
@@ -2189,6 +2199,10 @@ BoundaryInfo::build_active_side_list () const
         bc_triples.emplace_back(elem->id(), pr.second.first, pr.second.second);
     }
 
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_triples.begin(), bc_triples.end());
+
   return bc_triples;
 }
 
@@ -2231,6 +2245,10 @@ BoundaryInfo::build_edge_list() const
   for (const auto & pr : _boundary_edge_id)
     bc_triples.emplace_back(pr.first->id(), pr.second.first, pr.second.second);
 
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_triples.begin(), bc_triples.end());
+
   return bc_triples;
 }
 
@@ -2272,6 +2290,10 @@ BoundaryInfo::build_shellface_list() const
 
   for (const auto & pr : _boundary_shellface_id)
     bc_triples.emplace_back(pr.first->id(), pr.second.first, pr.second.second);
+
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_triples.begin(), bc_triples.end());
 
   return bc_triples;
 }
