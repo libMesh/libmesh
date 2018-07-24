@@ -215,8 +215,8 @@ void EpetraVector<T>::add_vector (const T * v,
 {
   libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
-  SumIntoGlobalValues (dof_indices.size(),
-                       (int *) &dof_indices[0],
+  SumIntoGlobalValues (cast_int<numeric_index_type>(dof_indices.size()),
+                       numeric_trilinos_cast(&dof_indices[0]),
                        const_cast<T *>(v));
 }
 
@@ -288,8 +288,8 @@ void EpetraVector<T>::insert (const T * v,
 {
   libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
-  ReplaceGlobalValues (dof_indices.size(),
-                       (int *) &dof_indices[0],
+  ReplaceGlobalValues (cast_int<numeric_index_type>(dof_indices.size()),
+                       numeric_trilinos_cast(&dof_indices[0]),
                        const_cast<T *>(v));
 }
 

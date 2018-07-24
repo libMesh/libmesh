@@ -825,6 +825,14 @@ void EpetraVector<T>::swap (NumericVector<T> & other)
   std::swap(ignoreNonLocalEntries_, v.ignoreNonLocalEntries_);
 }
 
+
+// Trilinos only got serious about const in version 10.4
+inline
+int * numeric_trilinos_cast(const numeric_index_type * p)
+{
+  return reinterpret_cast<int *>(const_cast<numeric_index_type *>(p));
+}
+
 } // namespace libMesh
 
 
