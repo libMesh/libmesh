@@ -685,6 +685,13 @@ public:
   bool all_semilocal_indices (const std::vector<dof_id_type> & dof_indices) const;
 
   /**
+   * \returns \p true if degree of freedom index \p dof_index
+   * is a local index.
+   */
+  bool local_index (dof_id_type dof_index) const
+  { return (dof_index >= this->first_dof()) && (dof_index < this->end_dof()); }
+
+  /**
    * \returns \p true iff our solutions can be locally evaluated on
    * \p obj (which should be an Elem or a Node) for variable number \p
    * var_num (for all variables, if \p var_num is invalid_uint)

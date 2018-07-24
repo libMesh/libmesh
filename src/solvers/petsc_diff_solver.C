@@ -226,6 +226,8 @@ void PetscDiffSolver::clear()
 
   int ierr = LibMeshSNESDestroy(&_snes);
   LIBMESH_CHKERR(ierr);
+
+  _dm_wrapper.clear();
 }
 
 
@@ -316,6 +318,9 @@ unsigned int PetscDiffSolver::solve()
                           __libmesh_petsc_diff_solver_jacobian, this);
   LIBMESH_CHKERR(ierr);
 
+  ierr = SNESSetFromOptions(_snes);
+  LIBMESH_CHKERR(ierr);
+
   ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
   LIBMESH_CHKERR(ierr);
 
@@ -346,18 +351,29 @@ void PetscDiffSolver::setup_petsc_data()
       LIBMESH_CHKERR(ierr);
     }
 
-  ierr = SNESSetFromOptions(_snes);
-  LIBMESH_CHKERR(ierr);
+  bool use_petsc_dm = libMesh::on_command_line("--use_petsc_dm");
 
-  KSP my_ksp;
-  ierr = SNESGetKSP(_snes, &my_ksp);
-  LIBMESH_CHKERR(ierr);
+  // This needs to be called before SNESSetFromOptions
+  if (use_petsc_dm)
+    this->_dm_wrapper.init_and_attach_petscdm(_system, _snes);
 
-  PC my_pc;
-  ierr = KSPGetPC(my_ksp, &my_pc);
-  LIBMESH_CHKERR(ierr);
+  // If we're not using PETSc DM, let's keep around
+  // the old style for fieldsplit
+  if (!use_petsc_dm)
+    {
+      ierr = SNESSetFromOptions(_snes);
+      LIBMESH_CHKERR(ierr);
 
-  petsc_auto_fieldsplit(my_pc, _system);
+      KSP my_ksp;
+      ierr = SNESGetKSP(_snes, &my_ksp);
+      LIBMESH_CHKERR(ierr);
+
+      PC my_pc;
+      ierr = KSPGetPC(my_ksp, &my_pc);
+      LIBMESH_CHKERR(ierr);
+
+      petsc_auto_fieldsplit(my_pc, _system);
+    }
 }
 
 } // namespace libMesh

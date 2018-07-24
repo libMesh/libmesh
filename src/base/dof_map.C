@@ -1098,8 +1098,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
               for(unsigned int i=0; i<n_comp; i++)
                 {
                   const dof_id_type index = node.dof_number(sys_num,var_num,i);
-                  libmesh_assert_greater_equal (index, this->first_dof());
-                  libmesh_assert_less (index, this->end_dof());
+                  libmesh_assert (this->local_index(index));
 
                   if (idx.empty() || index > idx.back())
                     idx.push_back(index);
@@ -1582,8 +1581,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
               // Insert the remote DOF indices into the send list
               for (std::size_t j=0; j != di.size(); ++j)
-                if (di[j] < this->first_dof() ||
-                    di[j] >= this->end_dof())
+                if (!this->local_index(di[j]))
                   _send_list.push_back(di[j]);
             }
         }
@@ -1594,8 +1592,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
           // Insert the remote DOF indices into the send list
           for (std::size_t j=0; j != di.size(); ++j)
-            if (di[j] < this->first_dof() ||
-                di[j] >= this->end_dof())
+            if (!this->local_index(di[j]))
               _send_list.push_back(di[j]);
         }
 
@@ -1622,8 +1619,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
       // Insert the remote DOF indices into the send list
       for (std::size_t j=0; j != di.size(); ++j)
-        if (di[j] < this->first_dof() ||
-            di[j] >= this->end_dof())
+        if (!this->local_index(di[j]))
           _send_list.push_back(di[j]);
     }
 }
@@ -2322,8 +2318,7 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
 bool DofMap::semilocal_index (dof_id_type dof_index) const
 {
   // If it's not in the local indices
-  if (dof_index < this->first_dof() ||
-      dof_index >= this->end_dof())
+  if (!this->local_index(dof_index))
     {
       // and if it's not in the ghost indices, then we're not
       // semilocal
@@ -2707,8 +2702,7 @@ std::string DofMap::get_info() const
     {
       // Only count local constraints, then sum later
       const dof_id_type constrained_dof = pr.first;
-      if (constrained_dof < this->first_dof() ||
-          constrained_dof >= this->end_dof())
+      if (!this->local_index(constrained_dof))
         continue;
 
       const DofConstraintRow & row = pr.second;

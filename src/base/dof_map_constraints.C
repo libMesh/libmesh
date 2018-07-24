@@ -1477,9 +1477,7 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
       const dof_id_type i = pr.first;
 
       // Skip non-local dofs if requested
-      if (!print_nonlocal &&
-          ((i < this->first_dof()) ||
-           (i >= this->end_dof())))
+      if (!print_nonlocal && !this->local_index(i))
         continue;
 
       const DofConstraintRow & row = pr.second;
@@ -1514,9 +1512,7 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
             const dof_id_type i = pr.first;
 
             // Skip non-local dofs if requested
-            if (!print_nonlocal &&
-                ((i < this->first_dof()) ||
-                 (i >= this->end_dof())))
+            if (!print_nonlocal && !this->local_index(i))
               continue;
 
             const Number rhs = pr.second;
@@ -2109,8 +2105,7 @@ void DofMap::enforce_constraints_exactly (const System & system,
   for (const auto & pr : _dof_constraints)
     {
       dof_id_type constrained_dof = pr.first;
-      if (constrained_dof < this->first_dof() ||
-          constrained_dof >= this->end_dof())
+      if (!this->local_index(constrained_dof))
         continue;
 
       const DofConstraintRow constraint_row = pr.second;
@@ -2205,8 +2200,7 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
   for (const auto & pr : _dof_constraints)
     {
       dof_id_type constrained_dof = pr.first;
-      if (constrained_dof < this->first_dof() ||
-          constrained_dof >= this->end_dof())
+      if (!this->local_index(constrained_dof))
         continue;
 
       const DofConstraintRow constraint_row = pr.second;
@@ -3888,9 +3882,8 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
           // constraint for it, then we need to check for one.
           if (pos == _dof_constraints.end())
             {
-              if (((unexpanded_dof < this->first_dof()) ||
-                   (unexpanded_dof >= this->end_dof())) &&
-                  !_dof_constraints.count(unexpanded_dof))
+              if (!this->local_index(unexpanded_dof) &&
+                  !_dof_constraints.count(unexpanded_dof) )
                 dof_request_set.insert(unexpanded_dof);
             }
           // If we were asked for a DoF and we already have a
@@ -3905,8 +3898,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
 
                   // If it's non-local and we haven't already got a
                   // constraint for it, we might need to ask for one
-                  if (((constraining_dof < this->first_dof()) ||
-                       (constraining_dof >= this->end_dof())) &&
+                  if (!this->local_index(constraining_dof) &&
                       !_dof_constraints.count(constraining_dof))
                     dof_request_set.insert(constraining_dof);
                 }
@@ -4155,8 +4147,7 @@ void DofMap::add_constraints_to_send_list()
       dof_id_type constrained_dof = i.first;
 
       // We only need the dependencies of our own constrained dofs
-      if (constrained_dof < this->first_dof() ||
-          constrained_dof >= this->end_dof())
+      if (!this->local_index(constrained_dof))
         continue;
 
       const DofConstraintRow & constraint_row = i.second;
@@ -4165,8 +4156,7 @@ void DofMap::add_constraints_to_send_list()
           dof_id_type constraint_dependency = j.first;
 
           // No point in adding one of our own dofs to the send_list
-          if (constraint_dependency >= this->first_dof() &&
-              constraint_dependency < this->end_dof())
+          if (this->local_index(constraint_dependency))
             continue;
 
           _send_list.push_back(constraint_dependency);
