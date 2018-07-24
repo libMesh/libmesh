@@ -29,7 +29,9 @@
 #include "libmesh/parallel_ghost_sync.h"
 
 #ifdef LIBMESH_HAVE_PETSC
+#include "libmesh/ignore_warnings.h"
 #include "petscmat.h"
+#include "libmesh/restore_warnings.h"
 #endif
 
 namespace libMesh

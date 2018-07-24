@@ -47,8 +47,10 @@
 // Need SLEPc to get the POD eigenvalues
 #if defined(LIBMESH_HAVE_SLEPC)
 // LAPACK include (via SLEPc)
+#include "libmesh/ignore_warnings.h"
 #include <petscsys.h>
 #include <slepcblaslapack.h>
+#include "libmesh/restore_warnings.h"
 #endif // LIBMESH_HAVE_SLEPC
 
 namespace libMesh

@@ -30,8 +30,10 @@
 
 // Trilinos include files.  AztecOO requires Epetra, so there's no
 // need to check for both.
+#include "libmesh/ignore_warnings.h"
 #include <Epetra_LinearProblem.h>
 #include <AztecOO.h>
+#include "libmesh/restore_warnings.h"
 
 // C++ includes
 #include <vector>

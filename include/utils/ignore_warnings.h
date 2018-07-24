@@ -64,6 +64,8 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 // And this for Eigen
 #pragma GCC diagnostic ignored "-Wconversion"
+// And this for VTK
+#pragma GCC diagnostic ignored "-Wlogical-op"
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #if (__GNUC__ > 5)

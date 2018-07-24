@@ -31,7 +31,9 @@
 #include "libmesh/enum_solver_type.h"
 
 // GMRES is an "unsupported" iterative solver in Eigen.
+#include "libmesh/ignore_warnings.h"
 #include <unsupported/Eigen/IterativeSolvers>
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {
