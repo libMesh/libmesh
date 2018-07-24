@@ -1813,7 +1813,10 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
                                     std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
+
+  // Call the non-deprecated version of this function.
+  auto bc_tuples = this->build_node_list();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -1821,14 +1824,13 @@ void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
   il.clear();
 
   // Reserve the size, then use push_back
-  nl.reserve (_boundary_node_id.size());
-  il.reserve (_boundary_node_id.size());
+  nl.reserve (bc_tuples.size());
+  il.reserve (bc_tuples.size());
 
-  boundary_node_iter pos = _boundary_node_id.begin();
-  for (; pos != _boundary_node_id.end(); ++pos)
+  for (const auto & t : bc_tuples)
     {
-      nl.push_back (pos->first->id());
-      il.push_back (pos->second);
+      nl.push_back(std::get<0>(t));
+      il.push_back(std::get<1>(t));
     }
 }
 #endif
@@ -1842,6 +1844,10 @@ BoundaryInfo::build_node_list() const
 
   for (const auto & pr : _boundary_node_id)
     bc_tuples.emplace_back(pr.first->id(), pr.second);
+
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_tuples.begin(), bc_tuples.end());
 
   return bc_tuples;
 }
@@ -2086,7 +2092,10 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
                                     std::vector<unsigned short int> & sl,
                                     std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
+
+  // Call the non-deprecated version of this function.
+  auto bc_tuples = this->build_side_list();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2095,16 +2104,15 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
   il.clear();
 
   // Reserve the size, then use push_back
-  el.reserve (_boundary_side_id.size());
-  sl.reserve (_boundary_side_id.size());
-  il.reserve (_boundary_side_id.size());
+  el.reserve (bc_tuples.size());
+  sl.reserve (bc_tuples.size());
+  il.reserve (bc_tuples.size());
 
-  boundary_side_iter pos = _boundary_side_id.begin();
-  for (; pos != _boundary_side_id.end(); ++pos)
+  for (const auto & t : bc_tuples)
     {
-      el.push_back (pos->first->id());
-      sl.push_back (pos->second.first);
-      il.push_back (pos->second.second);
+      el.push_back(std::get<0>(t));
+      sl.push_back(std::get<1>(t));
+      il.push_back(std::get<2>(t));
     }
 }
 #endif
@@ -2119,6 +2127,12 @@ BoundaryInfo::build_side_list() const
   for (const auto & pr : _boundary_side_id)
     bc_triples.emplace_back(pr.first->id(), pr.second.first, pr.second.second);
 
+  // bc_triples is currently in whatever order the Elem pointers in
+  // the _boundary_side_id multimap are in, and in particular might be
+  // in different orders on different processors. To avoid this
+  // inconsistency, we'll sort using the default operator< for tuples.
+  std::sort(bc_triples.begin(), bc_triples.end());
+
   return bc_triples;
 }
 
@@ -2129,7 +2143,10 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
                                            std::vector<unsigned short int> & sl,
                                            std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
+
+  // Call the non-deprecated version of this function.
+  auto bc_tuples = this->build_active_side_list();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2137,28 +2154,16 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
   sl.clear();
   il.clear();
 
-  boundary_side_iter pos = _boundary_side_id.begin();
-  for (; pos != _boundary_side_id.end(); ++pos)
+  // Reserve the size, then use push_back
+  el.reserve (bc_tuples.size());
+  sl.reserve (bc_tuples.size());
+  il.reserve (bc_tuples.size());
+
+  for (const auto & t : bc_tuples)
     {
-      // Don't add remote sides
-      if (pos->first->is_remote())
-        continue;
-
-      // Loop over the sides of possible children
-      std::vector<const Elem *> family;
-#ifdef LIBMESH_ENABLE_AMR
-      pos->first->active_family_tree_by_side(family, pos->second.first);
-#else
-      family.push_back(pos->first);
-#endif
-
-      // Populate the list items
-      for (const auto & elem : family)
-        {
-          el.push_back (elem->id());
-          sl.push_back (pos->second.first);
-          il.push_back (pos->second.second);
-        }
+      el.push_back(std::get<0>(t));
+      sl.push_back(std::get<1>(t));
+      il.push_back(std::get<2>(t));
     }
 }
 #endif
@@ -2189,6 +2194,10 @@ BoundaryInfo::build_active_side_list () const
         bc_triples.emplace_back(elem->id(), pr.second.first, pr.second.second);
     }
 
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_triples.begin(), bc_triples.end());
+
   return bc_triples;
 }
 
@@ -2198,7 +2207,10 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type> & el,
                                     std::vector<unsigned short int> & sl,
                                     std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
+
+  // Call the non-deprecated version of this function.
+  auto bc_tuples = this->build_edge_list();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2207,16 +2219,15 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type> & el,
   il.clear();
 
   // Reserve the size, then use push_back
-  el.reserve (_boundary_edge_id.size());
-  sl.reserve (_boundary_edge_id.size());
-  il.reserve (_boundary_edge_id.size());
+  el.reserve (bc_tuples.size());
+  sl.reserve (bc_tuples.size());
+  il.reserve (bc_tuples.size());
 
-  boundary_edge_iter pos = _boundary_edge_id.begin();
-  for (; pos != _boundary_edge_id.end(); ++pos)
+  for (const auto & t : bc_tuples)
     {
-      el.push_back (pos->first->id());
-      sl.push_back (pos->second.first);
-      il.push_back (pos->second.second);
+      el.push_back(std::get<0>(t));
+      sl.push_back(std::get<1>(t));
+      il.push_back(std::get<2>(t));
     }
 }
 #endif
@@ -2231,6 +2242,10 @@ BoundaryInfo::build_edge_list() const
   for (const auto & pr : _boundary_edge_id)
     bc_triples.emplace_back(pr.first->id(), pr.second.first, pr.second.second);
 
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_triples.begin(), bc_triples.end());
+
   return bc_triples;
 }
 
@@ -2240,7 +2255,10 @@ void BoundaryInfo::build_shellface_list (std::vector<dof_id_type> & el,
                                          std::vector<unsigned short int> & sl,
                                          std::vector<boundary_id_type> & il) const
 {
-  // libmesh_deprecated();
+  libmesh_deprecated();
+
+  // Call the non-deprecated version of this function.
+  auto bc_tuples = this->build_shellface_list();
 
   // Clear the input vectors, just in case they were used for
   // something else recently...
@@ -2249,16 +2267,15 @@ void BoundaryInfo::build_shellface_list (std::vector<dof_id_type> & el,
   il.clear();
 
   // Reserve the size, then use push_back
-  el.reserve (_boundary_shellface_id.size());
-  sl.reserve (_boundary_shellface_id.size());
-  il.reserve (_boundary_shellface_id.size());
+  el.reserve (bc_tuples.size());
+  sl.reserve (bc_tuples.size());
+  il.reserve (bc_tuples.size());
 
-  boundary_shellface_iter pos = _boundary_shellface_id.begin();
-  for (; pos != _boundary_shellface_id.end(); ++pos)
+  for (const auto & t : bc_tuples)
     {
-      el.push_back (pos->first->id());
-      sl.push_back (pos->second.first);
-      il.push_back (pos->second.second);
+      el.push_back(std::get<0>(t));
+      sl.push_back(std::get<1>(t));
+      il.push_back(std::get<2>(t));
     }
 }
 #endif
@@ -2272,6 +2289,10 @@ BoundaryInfo::build_shellface_list() const
 
   for (const auto & pr : _boundary_shellface_id)
     bc_triples.emplace_back(pr.first->id(), pr.second.first, pr.second.second);
+
+  // This list is currently in memory address (arbitrary) order, so
+  // sort to make it consistent on all procs.
+  std::sort(bc_triples.begin(), bc_triples.end());
 
   return bc_triples;
 }
