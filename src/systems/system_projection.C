@@ -527,10 +527,10 @@ eval_at_point(const FEMContext & c,
   DynamicSparseNumberArray<Real, dof_id_type> returnval;
   returnval.resize(n_dofs);
 
-  for (std::size_t i = 0; i != n_dofs; ++i)
+  for (std::size_t j = 0; j != n_dofs; ++j)
     {
-      returnval.raw_at(i) = phi[i][0];
-      returnval.raw_index(i) = dof_indices[i];
+      returnval.raw_at(j) = phi[j][0];
+      returnval.raw_index(j) = dof_indices[j];
     }
 
   return returnval;
@@ -574,12 +574,12 @@ eval_at_point(const FEMContext & c,
   for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
     returnval(d).resize(n_dofs);
 
-  for (std::size_t i = 0; i != n_dofs; ++i)
+  for (std::size_t j = 0; j != n_dofs; ++j)
     {
       for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
         {
-          returnval(d).raw_at(i) = dphi[i][0](d);
-          returnval(d).raw_index(i) = dof_indices[i];
+          returnval(d).raw_at(j) = dphi[j][0](d);
+          returnval(d).raw_index(j) = dof_indices[j];
         }
     }
 
@@ -707,8 +707,8 @@ public:
           if ((dof_i >= begin_dof) && (dof_i < end_dof))
             {
               const DynamicSparseNumberArray<ValIn,dof_id_type> & dnsa = Ue(i);
-              const std::size_t size = dnsa.size();
-              for (unsigned int j = 0; j != size; ++j)
+              const std::size_t dnsa_size = dnsa.size();
+              for (unsigned int j = 0; j != dnsa_size; ++j)
                 {
                   const dof_id_type dof_j = dnsa.raw_index(j);
                   const ValIn dof_val = dnsa.raw_at(j);

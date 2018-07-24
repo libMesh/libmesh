@@ -692,8 +692,8 @@ void System::read_parallel_data (Xdr & io,
                           std::vector<dof_id_type> SCALAR_dofs;
                           dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-                          for (std::size_t i=0; i<SCALAR_dofs.size(); i++)
-                            pos->second->set(SCALAR_dofs[i], io_buffer[cnt++]);
+                          for (std::size_t sd=0; sd<SCALAR_dofs.size(); sd++)
+                            pos->second->set(SCALAR_dofs[sd], io_buffer[cnt++]);
                         }
                     }
                 }

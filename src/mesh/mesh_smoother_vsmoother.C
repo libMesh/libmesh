@@ -2343,11 +2343,11 @@ double VariationalMeshSmoother::minJ(Array2D<double> & R,
     }
 
   nonzero = 0;
-  for (dof_id_type j=0; j<_n_nodes; j++)
+  for (dof_id_type j2=0; j2<_n_nodes; j2++)
     for (unsigned k=0; k<_dim; k++)
       {
-        R[j][k] = R[j][k] + T*P[j][k];
-        nonzero += T*P[j][k]*T*P[j][k];
+        R[j2][k] = R[j2][k] + T*P[j2][k];
+        nonzero += T*P[j2][k]*T*P[j2][k];
       }
 
   if (msglev >= 2)

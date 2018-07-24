@@ -282,16 +282,16 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
   // of its active ancestor.
   if (mesh.is_serial())
     {
-      for (auto & child : mesh.active_element_ptr_range())
+      for (auto & elem : mesh.active_element_ptr_range())
         {
           // First set descendents
           std::vector<const Elem *> subactive_family;
-          child->total_family_tree(subactive_family);
+          elem->total_family_tree(subactive_family);
           for (std::size_t i = 0; i != subactive_family.size(); ++i)
-            const_cast<Elem *>(subactive_family[i])->processor_id() = child->processor_id();
+            const_cast<Elem *>(subactive_family[i])->processor_id() = elem->processor_id();
 
           // Then set ancestors
-          Elem * parent = child->parent();
+          Elem * parent = elem->parent();
 
           while (parent)
             {
@@ -551,11 +551,11 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
                                     neighbors_order.begin(), neighbors_order.end(),
                                     std::back_inserter(common_nodes));
 
-              for (auto node : common_nodes)
-                if (visted_nodes.find(node) == visted_nodes.end())
+              for (auto c_node : common_nodes)
+                if (visted_nodes.find(c_node) == visted_nodes.end())
                   {
-                    nodes_queue.push(node);
-                    visted_nodes.insert(node);
+                    nodes_queue.push(c_node);
+                    visted_nodes.insert(c_node);
                     if (visted_nodes.size() >= n_own_nodes)
                       goto queue_done;
                   }
@@ -618,10 +618,10 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
                                 neighbors_order.begin(), neighbors_order.end(),
                                 std::back_inserter(common_nodes));
 
-          rows[i+1] = rows[i] +  common_nodes.size();
+          rows[i+1] = rows[i] + cast_int<dof_id_type>(common_nodes.size());
 
-          for (auto node : common_nodes)
-            cols.push_back(global_to_local[node]);
+          for (auto c_node : common_nodes)
+            cols.push_back(global_to_local[c_node]);
         }
 
       Mat adj;

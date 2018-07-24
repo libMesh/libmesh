@@ -195,8 +195,8 @@ public:
   /**
    * Get/set the boolean to indicate if we normalize the RB error in the greedy.
    */
-  void set_normalize_rb_bound_in_greedy(bool normalize_rb_bound_in_greedy)
-  {this->normalize_rb_bound_in_greedy = normalize_rb_bound_in_greedy; }
+  void set_normalize_rb_bound_in_greedy(bool normalize_rb_bound_in_greedy_in)
+  {this->normalize_rb_bound_in_greedy = normalize_rb_bound_in_greedy_in; }
   bool get_normalize_rb_bound_in_greedy() { return normalize_rb_bound_in_greedy; }
 
   /**

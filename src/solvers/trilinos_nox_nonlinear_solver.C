@@ -157,12 +157,12 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
 
   NonlinearImplicitSystem & sys = _solver->system();
 
-  EpetraMatrix<Number> Jac(&dynamic_cast<Epetra_FECrsMatrix &>(jac), sys.comm());
+  EpetraMatrix<Number> J(&dynamic_cast<Epetra_FECrsMatrix &>(jac), sys.comm());
   EpetraVector<Number> & X_sys = *cast_ptr<EpetraVector<Number> *>(sys.solution.get());
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm());
 
   // Set the dof maps
-  Jac.attach_dof_map(sys.get_dof_map());
+  J.attach_dof_map(sys.get_dof_map());
 
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
@@ -182,21 +182,21 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
     libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if (_solver->jacobian != nullptr)
-    _solver->jacobian(*sys.current_local_solution.get(), Jac, sys);
+    _solver->jacobian(*sys.current_local_solution.get(), J, sys);
 
   else if (_solver->jacobian_object != nullptr)
-    _solver->jacobian_object->jacobian(*sys.current_local_solution.get(), Jac, sys);
+    _solver->jacobian_object->jacobian(*sys.current_local_solution.get(), J, sys);
 
   else if (_solver->matvec != nullptr)
-    _solver->matvec(*sys.current_local_solution.get(), nullptr, &Jac, sys);
+    _solver->matvec(*sys.current_local_solution.get(), nullptr, &J, sys);
 
   else if (_solver->residual_and_jacobian_object != nullptr)
-    _solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), nullptr, &Jac, sys);
+    _solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), nullptr, &J, sys);
 
   else
     libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
-  Jac.close();
+  J.close();
   X_global.close();
 
   return true;
@@ -221,12 +221,12 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
   NonlinearImplicitSystem & sys = _solver->system();
   TrilinosPreconditioner<Number> & tpc = dynamic_cast<TrilinosPreconditioner<Number> &>(prec);
 
-  EpetraMatrix<Number> Jac(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()),sys.comm());
+  EpetraMatrix<Number> J(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()),sys.comm());
   EpetraVector<Number> & X_sys = *cast_ptr<EpetraVector<Number> *>(sys.solution.get());
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm());
 
   // Set the dof maps
-  Jac.attach_dof_map(sys.get_dof_map());
+  J.attach_dof_map(sys.get_dof_map());
 
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
@@ -246,21 +246,21 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
     libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if (_solver->jacobian != nullptr)
-    _solver->jacobian(*sys.current_local_solution.get(), Jac, sys);
+    _solver->jacobian(*sys.current_local_solution.get(), J, sys);
 
   else if (_solver->jacobian_object != nullptr)
-    _solver->jacobian_object->jacobian(*sys.current_local_solution.get(), Jac, sys);
+    _solver->jacobian_object->jacobian(*sys.current_local_solution.get(), J, sys);
 
   else if (_solver->matvec != nullptr)
-    _solver->matvec(*sys.current_local_solution.get(), nullptr, &Jac, sys);
+    _solver->matvec(*sys.current_local_solution.get(), nullptr, &J, sys);
 
   else if (_solver->residual_and_jacobian_object != nullptr)
-    _solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), nullptr, &Jac, sys);
+    _solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), nullptr, &J, sys);
 
   else
     libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
-  Jac.close();
+  J.close();
   X_global.close();
 
   tpc.compute();
