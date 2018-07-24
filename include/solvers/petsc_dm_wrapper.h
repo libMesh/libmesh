@@ -28,7 +28,9 @@
 #include <map>
 
 // PETSc includes
+#include "libmesh/ignore_warnings.h"
 #include <petsc.h>
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {

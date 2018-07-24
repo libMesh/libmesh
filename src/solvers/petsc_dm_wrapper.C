@@ -19,7 +19,9 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+#include "libmesh/ignore_warnings.h"
 #include <petscsf.h>
+#include "libmesh/restore_warnings.h"
 
 #include "libmesh/petsc_dm_wrapper.h"
 #include "libmesh/system.h"
