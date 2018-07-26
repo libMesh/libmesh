@@ -51,7 +51,7 @@ int main (int argc, char ** argv)
     libmesh_error_msg("Usage: ./prog -d DIM filename");
 
   // Variables to get us started
-  const unsigned int dim = atoi(argv[2]);
+  const unsigned char dim = cast_int<unsigned char>(atoi(argv[2]));
 
   std::string meshname  (argv[3]);
 
@@ -183,20 +183,20 @@ void assemble(EquationSystems & es,
       dof_map.dof_indices(elem, dof_indices_U, 0);
       dof_map.dof_indices(elem, dof_indices_V, 1);
 
+      const unsigned int n_phi = cast_int<unsigned int>(phi.size());
+
       // zero the element matrix and vector
-      Kuu.resize (phi.size(),
-                  phi.size());
+      Kuu.resize (n_phi, n_phi);
 
-      Kvv.resize (phi.size(),
-                  phi.size());
+      Kvv.resize (n_phi, n_phi);
 
-      Fu.resize (phi.size());
-      Fv.resize (phi.size());
+      Fu.resize (n_phi);
+      Fv.resize (n_phi);
 
       // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
         {
-          for (std::size_t i=0; i<phi.size(); ++i)
+          for (unsigned int i=0; i<n_phi; ++i)
             {
               // this is tricky.  ig is the _global_ dof index corresponding
               // to the _global_ vertex number elem->node_id(i).  Note that
@@ -214,7 +214,7 @@ void assemble(EquationSystems & es,
               Fu(i) += JxW[gp]*f*phi[i][gp];
               Fv(i) += JxW[gp]*f*phi[i][gp];
 
-              for (std::size_t j=0; j<phi.size(); ++j)
+              for (unsigned int j=0; j != n_phi; ++j)
                 {
 
                   Kuu(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]));
