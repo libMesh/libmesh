@@ -24,9 +24,14 @@
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
+
+// FIXME - having to do this with MetaPhysicL brings me shame - RHS
+#include "libmesh/ignore_warnings.h"
 // Template specialization declarations in here need to *precede* code
 // using them.
 #include "metaphysicl/dynamicsparsenumberarray_decl.h"
+#include "libmesh/restore_warnings.h"
+
 #include "libmesh/compare_types.h"
 
 using MetaPhysicL::DynamicSparseNumberArray;
@@ -76,8 +81,11 @@ struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
 
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
+// FIXME - wrapping MetaPhysicL is shameful - RHS
+#include "libmesh/ignore_warnings.h"
 // Include MetaPhysicL definitions finally
 #include "metaphysicl/dynamicsparsenumberarray.h"
+#include "libmesh/restore_warnings.h"
 
 // And make sure we instantiate the methods we'll need to use on them.
 #include "libmesh/dense_matrix_impl.h"
