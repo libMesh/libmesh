@@ -29,8 +29,11 @@
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
+#include "libmesh/ignore_warnings.h"
 #include "exodusII.h"
 #include "exodusII_int.h"
+#include "libmesh/restore_warnings.h"
+
 #include "libmesh/getpot.h"
 
 #define EXODUS_DIM 0x8

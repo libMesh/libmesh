@@ -186,7 +186,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           if (var > 0)
             {
               // We can't mix L_inf and L_2 norms
-              bool is_valid_norm_type =
+              bool is_valid_norm_combo =
                 ((error_estimator.error_norm.type(var) == L2 ||
                   error_estimator.error_norm.type(var) == H1_SEMINORM ||
                   error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
@@ -205,7 +205,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                  (error_estimator.error_norm.type(var-1) == L_INF ||
                   error_estimator.error_norm.type(var-1) == W1_INF_SEMINORM ||
                   error_estimator.error_norm.type(var-1) == W2_INF_SEMINORM));
-              libmesh_assert (is_valid_norm_type);
+              libmesh_assert (is_valid_norm_combo);
             }
 #endif // DEBUG
 

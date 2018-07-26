@@ -651,7 +651,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
 
   // If requested, write out lower-dimensional elements for
   // element-side-based boundary conditions.
-  unsigned int n_boundary_faces = 0;
+  std::size_t n_boundary_faces = 0;
   if (this->write_lower_dimensional_elements())
     n_boundary_faces = mesh.get_boundary_info().n_boundary_conds();
 

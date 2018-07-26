@@ -127,7 +127,7 @@ void make_dir(const std::string & input_name, libMesh::processor_id_type n_procs
 namespace libMesh
 {
 
-std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits)
+std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, processor_id_type nsplits)
 {
   // There is currently an issue with DofObjects not being properly
   // reset if the mesh is not first repartitioned onto 1 processor
@@ -195,8 +195,8 @@ processor_id_type CheckpointIO::select_split_config(const std::string & input_na
           {
             // otherwise fall back to a serial/single-split mesh
             header_name = header_file(input_name, 1);
-            std::ifstream in (header_name.c_str());
-            if (!in.good())
+            std::ifstream in2 (header_name.c_str());
+            if (!in2.good())
               {
                 libmesh_error_msg("ERROR: cannot locate header file for input '" << input_name << "'");
               }
@@ -248,7 +248,7 @@ void CheckpointIO::cleanup(const std::string & input_name, processor_id_type n_p
   for (processor_id_type i = 0; i < n_procs; i++)
     {
       auto split = split_file(input_name, n_procs, i);
-      auto ret = std::remove(split.c_str());
+      ret = std::remove(split.c_str());
       if (ret != 0)
         libmesh_warning("Failed to clean up checkpoint split file '" << split << "': " << std::strerror(ret));
     }

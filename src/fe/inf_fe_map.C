@@ -61,10 +61,11 @@ Point InfFE<Dim,T_radial,T_map>::map (const Elem * inf_elem,
     case 3:
       base_point = FE<2,LAGRANGE>::map (base_elem.get(), reference_point);
       break;
-#ifdef DEBUG
     default:
+#ifdef DEBUG
       libmesh_error_msg("Unknown Dim = " << Dim);
 #endif
+      break;
     }
 
 

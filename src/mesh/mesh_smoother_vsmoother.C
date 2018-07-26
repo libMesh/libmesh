@@ -23,6 +23,7 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 #include <iomanip>
+#include <limits>
 
 // Local includes
 #include "libmesh/mesh_smoother_vsmoother.h"
@@ -515,7 +516,7 @@ int VariationalMeshSmoother::readmetr(std::string name,
 // Stolen from ErrorVector!
 float VariationalMeshSmoother::adapt_minimum() const
 {
-  float min = 1.e30;
+  float min = std::numeric_limits<float>::max();
 
   for (std::size_t i=0; i<_adapt_data->size(); i++)
     {
@@ -1178,11 +1179,11 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                         basisA(Q, 6, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
-                        for (int k=0; k<2; k++)
+                        for (int k2=0; k2<2; k2++)
                           for (int l=0; l<6; l++)
                             {
-                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
-                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                              a1[k2] += Q[k2][l]*R[cells[ii][l]][0];
+                              a2[k2] += Q[k2][l]*R[cells[ii][l]][1];
                             }
 
                         double det = jac2(a1[0],a1[1],a2[0],a2[1]);
@@ -1379,6 +1380,8 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                                 K[1] = 1./3.;
                                 K[2] = 1;
                                 break;
+                              default:
+                                break;
                               }
 
                             switch (j)
@@ -1403,6 +1406,8 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                                 K[4] = 1./3.;
                                 K[5] = 1;
                                 break;
+                              default:
+                                break;
                               }
 
                             switch (k)
@@ -1426,6 +1431,8 @@ double VariationalMeshSmoother::maxE(Array2D<double> & R,
                                 K[6] = 0.5;
                                 K[7] = 1./3.;
                                 K[8] = 1;
+                                break;
+                              default:
                                 break;
                               }
 
@@ -1571,11 +1578,11 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                         basisA(Q, 6, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
-                        for (int k=0; k<2; k++)
+                        for (int k2=0; k2<2; k2++)
                           for (int l=0; l<6; l++)
                             {
-                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
-                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                              a1[k2] += Q[k2][l]*R[cells[ii][l]][0];
+                              a2[k2] += Q[k2][l]*R[cells[ii][l]][1];
                             }
 
                         double det = jac2(a1[0], a1[1], a2[0], a2[1]);
@@ -1769,6 +1776,8 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                                 K[2] = 1;
                                 break;
 
+                              default:
+                                break;
                               }
                             switch (j)
                               {
@@ -1796,6 +1805,8 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                                 K[5] = 1;
                                 break;
 
+                              default:
+                                break;
                               }
                             switch (k)
                               {
@@ -1821,6 +1832,9 @@ double VariationalMeshSmoother::minq(const Array2D<double> & R,
                                 K[6] = 0.5;
                                 K[7] = 1./3.;
                                 K[8] = 1;
+                                break;
+
+                              default:
                                 break;
                               }
 
@@ -2329,11 +2343,11 @@ double VariationalMeshSmoother::minJ(Array2D<double> & R,
     }
 
   nonzero = 0;
-  for (dof_id_type j=0; j<_n_nodes; j++)
+  for (dof_id_type j2=0; j2<_n_nodes; j2++)
     for (unsigned k=0; k<_dim; k++)
       {
-        R[j][k] = R[j][k] + T*P[j][k];
-        nonzero += T*P[j][k]*T*P[j][k];
+        R[j2][k] = R[j2][k] + T*P[j2][k];
+        nonzero += T*P[j2][k]*T*P[j2][k];
       }
 
   if (msglev >= 2)
@@ -3189,6 +3203,9 @@ double VariationalMeshSmoother::localP(Array3D<double> & W,
                           K[1] = 1./3.;
                           K[2] = 1;
                           break;
+
+                        default:
+                          break;
                         }
 
                       switch (j)
@@ -3217,6 +3234,8 @@ double VariationalMeshSmoother::localP(Array3D<double> & W,
                           K[5] = 1;
                           break;
 
+                        default:
+                          break;
                         }
 
                       switch (k)
@@ -3245,6 +3264,8 @@ double VariationalMeshSmoother::localP(Array3D<double> & W,
                           K[8] = 1;
                           break;
 
+                        default:
+                          break;
                         }
 
                       if ((i==j) && (j==k))

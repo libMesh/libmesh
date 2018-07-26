@@ -19,7 +19,9 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+#include "libmesh/ignore_warnings.h"
 #include <petscsf.h>
+#include "libmesh/restore_warnings.h"
 
 #include "libmesh/petsc_dm_wrapper.h"
 #include "libmesh/system.h"
@@ -410,8 +412,6 @@ void PetscDMWrapper::add_dofs_helper (const System & system,
 {
   unsigned int total_n_dofs_at_dofobject = 0;
 
-  PetscErrorCode ierr;
-
   // We are assuming variables are also numbered 0 to n_vars()-1
   for( unsigned int v = 0; v < system.n_vars(); v++ )
     {
@@ -432,7 +432,8 @@ void PetscDMWrapper::add_dofs_helper (const System & system,
 
   libmesh_assert_equal_to(total_n_dofs_at_dofobject, dof_object.n_dofs(system.number()));
 
-  ierr = PetscSectionSetDof( section, local_id, total_n_dofs_at_dofobject );
+  PetscErrorCode ierr =
+    PetscSectionSetDof( section, local_id, total_n_dofs_at_dofobject );
   CHKERRABORT(system.comm().get(),ierr);
 }
 

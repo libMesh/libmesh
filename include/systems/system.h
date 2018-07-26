@@ -1538,6 +1538,11 @@ public:
   Real time;
 
   /**
+   * Number of currently active quantities of interest.
+   */
+  unsigned int n_qois() const;
+
+  /**
    * Values of the quantities of interest.  This vector needs
    * to be both resized and filled by the user before any quantity of
    * interest assembly is done and before any sensitivities are
@@ -2261,6 +2266,12 @@ void System::assemble_residual_derivatives (const ParameterVector &)
 
 inline
 void System::disable_cache () { assemble_before_solve = true; }
+
+inline
+unsigned int System::n_qois() const
+{
+  return cast_int<unsigned int>(this->qoi.size());
+}
 
 inline
 std::pair<unsigned int, Real>

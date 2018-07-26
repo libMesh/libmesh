@@ -239,6 +239,8 @@ LinearConvergenceReason AztecLinearSolver<T>::get_converged_reason() const
       return CONVERGED_RTOL_NORMAL;
     case AZ_maxits :
       return DIVERGED_ITS;
+    default :
+      break;
     }
   return DIVERGED_NULL;
 }

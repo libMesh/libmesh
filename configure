@@ -7843,12 +7843,12 @@ fi
           CFLAGS_DBG="-g -Wimplicit"
           ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
-                              PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wdisabled-optimization -Wformat=2"
+                              PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2"
           PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wmissing-field-initializers"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wstack-protector -Wtrigraphs"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wunreachable-code -Wunused-label"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wlogical-op -Wmissing-field-initializers"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked -Wredundant-decls"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wshadow -Wstack-protector -Wstrict-aliasing -Wswitch-default"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wtrigraphs -Wunreachable-code -Wunused-label"
           PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wvariadic-macros"
           PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
 

@@ -1235,12 +1235,12 @@ void FEMap::compute_affine_map(const unsigned int dim,
 
   // Determine the nodes contributing to element elem
   unsigned int n_nodes = elem->n_nodes();
-  elem_nodes.resize(elem->n_nodes());
+  _elem_nodes.resize(elem->n_nodes());
   for (unsigned int i=0; i<n_nodes; i++)
-    elem_nodes[i] = elem->node_ptr(i);
+    _elem_nodes[i] = elem->node_ptr(i);
 
   // Compute map at quadrature point 0
-  this->compute_single_point_map(dim, qw, elem, 0, elem_nodes, /*compute_second_derivatives=*/false);
+  this->compute_single_point_map(dim, qw, elem, 0, _elem_nodes, /*compute_second_derivatives=*/false);
 
   // Compute xyz at all other quadrature points
   if (calculate_xyz)
@@ -1248,7 +1248,7 @@ void FEMap::compute_affine_map(const unsigned int dim,
       {
         xyz[p].zero();
         for (std::size_t i=0; i<phi_map.size(); i++) // sum over the nodes
-          xyz[p].add_scaled        (*elem_nodes[i], phi_map[i][p]    );
+          xyz[p].add_scaled        (*_elem_nodes[i], phi_map[i][p]    );
       }
 
   // Copy other map data from quadrature point 0
@@ -1403,25 +1403,24 @@ void FEMap::compute_map(const unsigned int dim,
   this->resize_quadrature_map_vectors(dim, n_qp);
 
   // Determine the nodes contributing to element elem
-  std::vector<const Node *> elem_nodes;
   if (elem->type() == TRI3SUBDIVISION)
     {
       // Subdivision surface FE require the 1-ring around elem
       libmesh_assert_equal_to (dim, 2);
       const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *>(elem);
-      MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+      MeshTools::Subdivision::find_one_ring(sd_elem, _elem_nodes);
     }
   else
     {
       // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), nullptr);
+      _elem_nodes.resize(elem->n_nodes(), nullptr);
       for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->node_ptr(i);
+        _elem_nodes[i] = elem->node_ptr(i);
     }
 
   // Compute map at all quadrature points
   for (unsigned int p=0; p!=n_qp; p++)
-    this->compute_single_point_map(dim, qw, elem, p, elem_nodes, calculate_d2phi);
+    this->compute_single_point_map(dim, qw, elem, p, _elem_nodes, calculate_d2phi);
 }
 
 

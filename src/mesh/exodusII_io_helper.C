@@ -978,24 +978,24 @@ void ExodusII_IO_Helper::write_var_names_impl(const char * var_type, int & count
   ex_err = exII::ex_put_var_param(ex_id, var_type, count);
   EX_CHECK_ERR(ex_err, "Error setting number of vars.");
 
-  if (names.size() > 0)
+  if (count > 0)
     {
-      NamesData names_table(names.size(), MAX_STR_LENGTH);
+      NamesData names_table(count, MAX_STR_LENGTH);
 
       // Store the input names in the format required by Exodus.
-      for (std::size_t i=0; i<names.size(); ++i)
+      for (int i=0; i != count; ++i)
         names_table.push_back_entry(names[i]);
 
       if (verbose)
         {
           libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (std::size_t i=0; i<names.size(); ++i)
+          for (int i=0; i != count; ++i)
             libMesh::out << names_table.get_char_star(i) << std::endl;
         }
 
       ex_err = exII::ex_put_var_names(ex_id,
                                       var_type,
-                                      cast_int<int>(names.size()),
+                                      count,
                                       names_table.get_char_star_star()
                                       );
 
@@ -1869,7 +1869,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
     return;
 
   // Loop over the element blocks and write the data one block at a time
-  std::map<unsigned int, std::vector<unsigned int>> subdomain_map;
+  std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
@@ -1891,7 +1891,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
   for (unsigned int i=0; i<static_cast<unsigned>(num_elem_vars); ++i)
     {
       // The size of the subdomain map is the number of blocks.
-      std::map<unsigned int, std::vector<unsigned int>>::iterator it = subdomain_map.begin();
+      std::map<subdomain_id_type, std::vector<unsigned int>>::iterator it = subdomain_map.begin();
 
       const std::set<subdomain_id_type> & active_subdomains = vars_active_subdomains[i];
       for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)

@@ -30,7 +30,9 @@
 
 // SLEPc include files.
 EXTERN_C_FOR_SLEPC_BEGIN
+# include "libmesh/ignore_warnings.h"
 # include <slepceps.h>
+# include "libmesh/restore_warnings.h"
 EXTERN_C_FOR_SLEPC_END
 
 namespace libMesh

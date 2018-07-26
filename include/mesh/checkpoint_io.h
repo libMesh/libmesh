@@ -44,7 +44,7 @@ class CheckpointIO;
  * equal to the number of chunks.  This function supports MPI parallelism and can be used with
  * several MPI procs to speed up splitting.
  */
-std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits);
+std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, processor_id_type nsplits);
 
 /**
  * The CheckpointIO class can be used to write simplified restart

@@ -71,11 +71,13 @@ enum ElemType : int;
 #endif
 
 
+#include <libmesh/ignore_warnings.h>
 namespace exII {
 extern "C" {
 #include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
 }
 }
+#include <libmesh/restore_warnings.h>
 
 namespace libMesh
 {
@@ -808,7 +810,7 @@ public:
   /**
    * \returns The shellface index offset.
    */
-  int get_shellface_index_offset() const { return shellface_index_offset; }
+  std::size_t get_shellface_index_offset() const { return shellface_index_offset; }
 
   /**
    * An invalid_id that can be returned to signal failure in case

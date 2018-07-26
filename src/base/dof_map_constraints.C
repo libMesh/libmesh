@@ -2692,12 +2692,12 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                 const DofConstraintValueMap & constraint_map =
                   adjoint_map_it->second;
 
-                DofConstraintValueMap::const_iterator rhsit =
+                DofConstraintValueMap::const_iterator adj_rhsit =
                   constraint_map.find(pushed_id);
 
                 rhs[q] =
-                  (rhsit == constraint_map.end()) ?
-                  0 : rhsit->second;
+                  (adj_rhsit == constraint_map.end()) ?
+                  0 : adj_rhsit->second;
               }
           }
       }
@@ -3775,7 +3775,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
                   while (constrained >= _end_df[the_constrained_proc_id])
                     the_constrained_proc_id++;
 
-                  const dof_id_type elemproc = elem->processor_id();
+                  const processor_id_type elemproc = elem->processor_id();
                   if (elemproc != the_constrained_proc_id)
                     pushed_ids[elemproc].insert(constrained);
                 }
@@ -4016,11 +4016,11 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                       const DofConstraintValueMap & constraint_map =
                         adjoint_map_it->second;
 
-                      DofConstraintValueMap::const_iterator rhsit =
+                      DofConstraintValueMap::const_iterator adj_rhsit =
                         constraint_map.find(constrained);
                       data[i].push_back
-                        ((rhsit == constraint_map.end()) ?
-                         0 : rhsit->second);
+                        ((adj_rhsit == constraint_map.end()) ?
+                         0 : adj_rhsit->second);
                     }
                 }
             }

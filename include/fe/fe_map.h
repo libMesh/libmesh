@@ -908,7 +908,7 @@ private:
   /**
    * Work vector for compute_affine_map()
    */
-  std::vector<const Node *> elem_nodes;
+  std::vector<const Node *> _elem_nodes;
 };
 
 }

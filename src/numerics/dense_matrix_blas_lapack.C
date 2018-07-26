@@ -23,7 +23,9 @@
 
 #if (LIBMESH_HAVE_PETSC)
 # include "libmesh/petsc_macro.h"
+# include "libmesh/ignore_warnings.h"
 # include <petscblaslapack.h>
+# include "libmesh/restore_warnings.h"
 #endif
 
 namespace libMesh

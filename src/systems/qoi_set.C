@@ -32,9 +32,9 @@ QoISet::QoISet(const System & sys) : _indices(sys.qoi.size(), true) {}
 
 
 
-unsigned int QoISet::size (const System & sys) const
+std::size_t QoISet::size (const System & sys) const
 {
-  unsigned int qoi_count = 0;
+  std::size_t qoi_count = 0;
   for (std::size_t i=0; i != sys.qoi.size(); ++i)
     if (this->has_index(i))
       qoi_count++;

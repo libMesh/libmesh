@@ -28,7 +28,9 @@
 #include "libmesh/eigen_core_support.h"
 
 #ifdef LIBMESH_HAVE_EIGEN
-#include <Eigen/Dense>
+# include "libmesh/ignore_warnings.h"
+# include <Eigen/Dense>
+# include "libmesh/restore_warnings.h"
 #endif
 
 

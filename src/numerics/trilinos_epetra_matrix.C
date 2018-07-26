@@ -251,7 +251,9 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
   libmesh_assert_equal_to (rows.size(), m);
   libmesh_assert_equal_to (cols.size(), n);
 
-  _mat->SumIntoGlobalValues(m, (int *)&rows[0], n, (int *)&cols[0], &dm.get_values()[0]);
+  _mat->SumIntoGlobalValues(m, numeric_trilinos_cast(&rows[0]),
+                            n, numeric_trilinos_cast(&cols[0]),
+                            &dm.get_values()[0]);
 }
 
 

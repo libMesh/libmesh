@@ -388,22 +388,22 @@ void FEMParameters::read(GetPot & input,
       libmesh_error();
     }
 
-  for (unsigned int i=0; i != n_dirichlet_conditions; ++i)
+  for (unsigned int dc=0; dc != n_dirichlet_conditions; ++dc)
     {
       const std::string func_type =
-        input("dirichlet_condition_types", zero_string, i);
+        input("dirichlet_condition_types", zero_string, dc);
 
       const std::string func_value =
-        input("dirichlet_condition_values", empty_string, i);
+        input("dirichlet_condition_values", empty_string, dc);
 
       const boundary_id_type func_boundary =
-        input("dirichlet_condition_boundaries", boundary_id_type(0), i);
+        input("dirichlet_condition_boundaries", boundary_id_type(0), dc);
 
       dirichlet_conditions[func_boundary] =
         (new_function_base(func_type, func_value).release());
 
       const std::string variable_set =
-        input("dirichlet_condition_variables", empty_string, i);
+        input("dirichlet_condition_variables", empty_string, dc);
 
       for (std::size_t i=0; i != variable_set.size(); ++i)
         {
@@ -459,22 +459,22 @@ void FEMParameters::read(GetPot & input,
       libmesh_error();
     }
 
-  for (unsigned int i=0; i != n_neumann_conditions; ++i)
+  for (unsigned int nc=0; nc != n_neumann_conditions; ++nc)
     {
       const std::string func_type =
-        input("neumann_condition_types", zero_string, i);
+        input("neumann_condition_types", zero_string, nc);
 
       const std::string func_value =
-        input("neumann_condition_values", empty_string, i);
+        input("neumann_condition_values", empty_string, nc);
 
       const boundary_id_type func_boundary =
-        input("neumann_condition_boundaries", boundary_id_type(0), i);
+        input("neumann_condition_boundaries", boundary_id_type(0), nc);
 
       neumann_conditions[func_boundary] =
         (new_function_base(func_type, func_value).release());
 
       const std::string variable_set =
-        input("neumann_condition_variables", empty_string, i);
+        input("neumann_condition_variables", empty_string, nc);
 
       for (std::size_t i=0; i != variable_set.size(); ++i)
         {

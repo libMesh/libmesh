@@ -468,12 +468,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
           dnl Tested on gcc 4.8.5; hopefully the other 4.8.x and all
           dnl later versions support these too:
-          PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wdisabled-optimization -Wformat=2"
+          PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2"
           PARANOID_FLAGS="$PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wmissing-field-initializers"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wstack-protector -Wtrigraphs"
-          PARANOID_FLAGS="$PARANOID_FLAGS -Wunreachable-code -Wunused-label"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Winvalid-pch -Wlogical-op -Wmissing-field-initializers"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wmissing-include-dirs -Wpacked -Wredundant-decls"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wshadow -Wstack-protector -Wstrict-aliasing -Wswitch-default"
+          PARANOID_FLAGS="$PARANOID_FLAGS -Wtrigraphs -Wunreachable-code -Wunused-label"
           PARANOID_FLAGS="$PARANOID_FLAGS -Wunused-parameter -Wunused-value -Wvariadic-macros"
           PARANOID_FLAGS="$PARANOID_FLAGS -Wvolatile-register-var -Wwrite-strings"
 
