@@ -642,7 +642,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   // Iterate over all the elements in the range
   for (const auto & elem : range)
     {
-      unsigned int dim = elem->dim();
+      unsigned char dim = cast_int<unsigned char>(elem->dim());
 
       context.pre_fe_reinit(system, elem);
 
@@ -951,7 +951,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       // Assume that other C_ONE elements have a single nodal
                       // value shape function and nodal gradient component
                       // shape functions
-                      libmesh_assert_equal_to (nc, 1 + dim);
+                      libmesh_assert_equal_to (nc, (unsigned int)(1 + dim));
                       Ue(current_dof) = f.eval_at_node(context,
                                                        var_component,
                                                        dim,
@@ -1027,7 +1027,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
               for (auto e : elem->edge_index_range())
                 {
-                  context.edge = e;
+                  context.edge = cast_int<unsigned char>(e);
 
 #ifdef LIBMESH_ENABLE_AMR
                   if (elem->refinement_flag() == Elem::JUST_COARSENED)
@@ -1066,15 +1066,19 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif // LIBMESH_ENABLE_AMR
                     context.edge_fe_reinit();
 
-                  const unsigned int n_qp = xyz_values.size();
+                  const unsigned int n_qp =
+                    cast_int<unsigned int>(xyz_values.size());
 
                   FEInterface::dofs_on_edge(elem, dim, base_fe_type,
                                             e, side_dofs);
 
+                  const unsigned int n_side_dofs =
+                    cast_int<unsigned int>(side_dofs.size());
+
                   // Some edge dofs are on nodes and already
                   // fixed, others are free to calculate
                   unsigned int free_dofs = 0;
-                  for (std::size_t i=0; i != side_dofs.size(); ++i)
+                  for (unsigned int i=0; i != n_side_dofs; ++i)
                     if (!dof_is_fixed[side_dofs[i]])
                       free_dof[free_dofs++] = i;
 
@@ -1104,15 +1108,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                                                     system.time);
 
                       // Form edge projection matrix
-                      for (std::size_t sidei=0, freei=0;
-                           sidei != side_dofs.size(); ++sidei)
+                      for (unsigned int sidei=0, freei=0;
+                           sidei != n_side_dofs; ++sidei)
                         {
                           unsigned int i = side_dofs[sidei];
                           // fixed DoFs aren't test functions
                           if (dof_is_fixed[i])
                             continue;
-                          for (std::size_t sidej=0, freej=0;
-                               sidej != side_dofs.size(); ++sidej)
+                          for (unsigned int sidej=0, freej=0;
+                               sidej != n_side_dofs; ++sidej)
                             {
                               unsigned int j = side_dofs[sidej];
                               if (dof_is_fixed[j])
@@ -1204,10 +1208,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   FEInterface::dofs_on_side(elem, dim, base_fe_type,
                                             s, side_dofs);
 
+                  unsigned int n_side_dofs =
+                    cast_int<unsigned int>(side_dofs.size());
+
                   // Some side dofs are on nodes/edges and already
                   // fixed, others are free to calculate
                   unsigned int free_dofs = 0;
-                  for (std::size_t i=0; i != side_dofs.size(); ++i)
+                  for (unsigned int i=0; i != n_side_dofs; ++i)
                     if (!dof_is_fixed[side_dofs[i]])
                       free_dof[free_dofs++] = i;
 
@@ -1220,7 +1227,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   // The new side coefficients
                   DenseVector<FValue> Uside(free_dofs);
 
-                  context.side = s;
+                  context.side = cast_int<unsigned char>(s);
 
 #ifdef LIBMESH_ENABLE_AMR
                   if (elem->refinement_flag() == Elem::JUST_COARSENED)
@@ -1259,7 +1266,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif // LIBMESH_ENABLE_AMR
                     context.side_fe_reinit();
 
-                  const unsigned int n_qp = xyz_values.size();
+                  const unsigned int n_qp =
+                    cast_int<unsigned int>(xyz_values.size());
 
                   // Loop over the quadrature points
                   for (unsigned int qp=0; qp<n_qp; qp++)
@@ -1278,15 +1286,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                                                     system.time);
 
                       // Form side projection matrix
-                      for (std::size_t sidei=0, freei=0;
-                           sidei != side_dofs.size(); ++sidei)
+                      for (unsigned int sidei=0, freei=0;
+                           sidei != n_side_dofs; ++sidei)
                         {
                           unsigned int i = side_dofs[sidei];
                           // fixed DoFs aren't test functions
                           if (dof_is_fixed[i])
                             continue;
-                          for (std::size_t sidej=0, freej=0;
-                               sidej != side_dofs.size(); ++sidej)
+                          for (unsigned int sidej=0, freej=0;
+                               sidej != n_side_dofs; ++sidej)
                             {
                               unsigned int j = side_dofs[sidej];
                               if (dof_is_fixed[j])
@@ -1394,7 +1402,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif // LIBMESH_ENABLE_AMR
                 context.elem_fe_reinit();
 
-              const unsigned int n_qp = xyz_values.size();
+              const unsigned int n_qp =
+                cast_int<unsigned int>(xyz_values.size());
 
               Ke.resize (free_dofs, free_dofs); Ke.zero();
               Fe.resize (free_dofs); Fe.zero();
