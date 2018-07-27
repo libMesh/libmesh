@@ -75,7 +75,8 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   const std::vector<std::vector<RealGradient>> & dphi = elem_fe->get_dphi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+  const unsigned int n_T_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(0).size());
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> & K = c.get_elem_jacobian(0, 0);
@@ -131,7 +132,8 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
   const std::vector<Point > & qside_point = side_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+  const unsigned int n_T_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(0).size());
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> & K = c.get_elem_jacobian(0, 0);

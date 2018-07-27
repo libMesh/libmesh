@@ -276,8 +276,10 @@ void write_output_solvedata(EquationSystems & es,
                             unsigned int tv_usec)
 {
   MeshBase & mesh = es.get_mesh();
-  unsigned int n_active_elem = mesh.n_active_elem();
-  unsigned int n_active_dofs = es.n_active_dofs();
+
+  // Query parallel_object_only() methods *outside* if(pid==0)
+  const std::size_t n_active_elem = mesh.n_active_elem();
+  const std::size_t n_active_dofs = es.n_active_dofs();
 
   if (mesh.processor_id() == 0)
     {
@@ -638,7 +640,7 @@ build_error_estimator_component_wise (FEMParameters & param,
   std::size_t size = primal_error_norm_type.size();
 
   libmesh_assert_equal_to (size, dual_error_norm_type.size());
-  for (std::size_t i = 0; i != size; ++i)
+  for (unsigned int i = 0; i != size; ++i)
     {
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(i, primal_error_norm_type[i]);
       adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(i, dual_error_norm_type[i]);
@@ -647,11 +649,11 @@ build_error_estimator_component_wise (FEMParameters & param,
   // Now we set the right weights for each term in the error estimate, using the user provided
   // term_weights matrix
   libmesh_assert_equal_to (size, term_weights.size());
-  for (std::size_t i = 0; i != term_weights.size(); ++i)
+  for (unsigned int i = 0; i != size; ++i)
     {
       libmesh_assert_equal_to (size, term_weights[i].size());
       adjoint_residual_estimator->error_norm.set_weight(i, term_weights[i][i]);
-      for (std::size_t j = 0; j != size; ++j)
+      for (unsigned int j = 0; j != size; ++j)
         if (i != j)
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
@@ -703,11 +705,11 @@ build_weighted_error_estimator_component_wise (FEMParameters & param,
   // Now we set the right weights for each term in the error estimate, using the user provided
   // term_weights matrix
   libmesh_assert_equal_to (size, term_weights.size());
-  for (std::size_t i = 0; i != term_weights.size(); ++i)
+  for (unsigned int i = 0; i != size; ++i)
     {
       libmesh_assert_equal_to (size, term_weights[i].size());
       adjoint_residual_estimator->error_norm.set_weight(i, term_weights[i][i]);
-      for (std::size_t j = 0; j != size; ++j)
+      for (unsigned int j = 0; j != size; ++j)
         if (i != j)
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
@@ -749,7 +751,7 @@ int main (int argc, char ** argv)
 
   // Create a mesh with the given dimension, distributed
   // across the default MPI communicator.
-  Mesh mesh(init.comm(), param.dimension);
+  Mesh mesh(init.comm(), cast_int<unsigned char>(param.dimension));
 
   // And an object to refine it
   std::unique_ptr<MeshRefinement> mesh_refinement =

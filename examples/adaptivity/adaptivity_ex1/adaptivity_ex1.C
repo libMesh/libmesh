@@ -260,7 +260,9 @@ void assemble_1D(EquationSystems & es,
       fe->reinit(elem);
 
       // Store the number of local degrees of freedom contained in this element
-      const int n_dofs = dof_indices.size();
+      const unsigned int n_dofs =
+        cast_int<unsigned int>(dof_indices.size());
+      libmesh_assert_equal_to (n_dofs, phi.size());
 
       // We resize and zero out Ke and Fe (resize() also clears the matrix and
       // vector). In this example, all elements in the mesh are EDGE3's, so
@@ -275,11 +277,11 @@ void assemble_1D(EquationSystems & es,
         {
           // Now build the element matrix and right-hand-side using loops to
           // integrate the test functions (i) against the trial functions (j).
-          for (std::size_t i=0; i<phi.size(); i++)
+          for (unsigned int i=0; i != n_dofs; i++)
             {
               Fe(i) += JxW[qp]*phi[i][qp];
 
-              for (std::size_t j=0; j<phi.size(); j++)
+              for (unsigned int j=0; j != n_dofs; j++)
                 {
                   Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] +
                                       phi[i][qp]*phi[j][qp]);
