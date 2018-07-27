@@ -68,7 +68,7 @@ public:
                            const Real,
                            DenseVector<Output> & output)
   {
-    for (std::size_t i = 0; i < output.size(); i++)
+    for (unsigned int i = 0; i < output.size(); i++)
       output(i) = _c;
   }
 
