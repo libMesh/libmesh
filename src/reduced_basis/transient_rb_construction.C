@@ -765,7 +765,7 @@ void TransientRBConstruction::enrich_RB_space()
   // With the "method of snapshots", the size of
   // the eigenproblem is determined by the number
   // of time-steps (rather than the number of spatial dofs).
-  PetscBLASInt eigen_size = temporal_data.size();
+  PetscBLASInt eigen_size = cast_int<PetscBLASInt>(temporal_data.size());
   PetscBLASInt LDA = eigen_size; // The leading order of correlation_matrix
   std::vector<Number> correlation_matrix(LDA*eigen_size);
 

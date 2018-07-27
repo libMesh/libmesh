@@ -482,7 +482,7 @@ void Partitioner::set_interface_node_processor_ids_linear(MeshBase & mesh)
 
   for (auto & pmap : processor_pair_to_nodes)
     {
-      unsigned int n_own_nodes = pmap.second.size()/2, i = 0;
+      std::size_t n_own_nodes = pmap.second.size()/2, i = 0;
 
       for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
         {
@@ -516,7 +516,7 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
 
   for (auto & pmap : processor_pair_to_nodes)
     {
-      unsigned int n_own_nodes = pmap.second.size()/2;
+      std::size_t n_own_nodes = pmap.second.size()/2;
 
       // Initialize node assignment
       for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)

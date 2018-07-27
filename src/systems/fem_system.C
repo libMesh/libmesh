@@ -496,6 +496,9 @@ public:
 
         _femcontext.pre_fe_reinit(_sys, el);
 
+        const unsigned int n_dofs =
+          cast_int<unsigned int>(_femcontext.get_dof_indices().size());
+
         // We might have some heterogenous dofs here; let's see for
         // certain
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -630,6 +633,9 @@ public:
         Elem * el = const_cast<Elem *>(elem);
 
         _femcontext.pre_fe_reinit(_sys, el);
+
+        const unsigned int n_dofs =
+          cast_int<unsigned int>(_femcontext.get_dof_indices().size());
 
         // We might have some heterogenous dofs here; let's see for
         // certain
@@ -1189,6 +1195,9 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
   Real numerical_point_h = 0.;
   if (_mesh_sys == this)
     numerical_point_h = numerical_jacobian_h * context.get_elem().hmin();
+
+  const unsigned int n_dofs =
+    cast_int<unsigned int>(context.get_dof_indices().size());
 
   for (unsigned int v = 0; v != context.n_vars(); ++v)
     {

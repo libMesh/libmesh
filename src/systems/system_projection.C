@@ -1534,6 +1534,9 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 FEInterface::dofs_on_edge(elem, dim, fe_type, e,
                                           side_dofs);
 
+                const unsigned int n_side_dofs =
+                  cast_int<unsigned int>(side_dofs.size());
+
                 // Some edge dofs are on nodes and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
@@ -1570,15 +1573,15 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                                               system.time);
 
                     // Form edge projection matrix
-                    for (std::size_t sidei=0, freei=0;
-                         sidei != side_dofs.size(); ++sidei)
+                    for (unsigned int sidei=0, freei=0;
+                         sidei != n_side_dofs; ++sidei)
                       {
                         unsigned int i = side_dofs[sidei];
                         // fixed DoFs aren't test functions
                         if (dof_is_fixed[i])
                           continue;
-                        for (std::size_t sidej=0, freej=0;
-                             sidej != side_dofs.size(); ++sidej)
+                        for (unsigned int sidej=0, freej=0;
+                             sidej != n_side_dofs; ++sidej)
                           {
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])
@@ -1632,6 +1635,9 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 FEInterface::dofs_on_side(elem, dim, fe_type, s,
                                           side_dofs);
 
+                const unsigned int n_side_dofs =
+                  cast_int<unsigned int>(side_dofs.size());
+
                 // Some side dofs are on nodes/edges and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
@@ -1668,15 +1674,15 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                                               system.time);
 
                     // Form side projection matrix
-                    for (std::size_t sidei=0, freei=0;
-                         sidei != side_dofs.size(); ++sidei)
+                    for (unsigned int sidei=0, freei=0;
+                         sidei != n_side_dofs; ++sidei)
                       {
                         unsigned int i = side_dofs[sidei];
                         // fixed DoFs aren't test functions
                         if (dof_is_fixed[i])
                           continue;
-                        for (std::size_t sidej=0, freej=0;
-                             sidej != side_dofs.size(); ++sidej)
+                        for (unsigned int sidej=0, freej=0;
+                             sidej != n_side_dofs; ++sidej)
                           {
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])

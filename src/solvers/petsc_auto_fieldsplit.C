@@ -42,7 +42,7 @@ void indices_to_fieldsplit (const Parallel::Communicator & comm,
     idx = reinterpret_cast<const PetscInt *>(&indices[0]);
 
   IS is;
-  int ierr = ISCreateLibMesh(comm.get(), indices.size(),
+  int ierr = ISCreateLibMesh(comm.get(), cast_int<PetscInt>(indices.size()),
                              idx, PETSC_COPY_VALUES, &is);
   CHKERRABORT(comm.get(), ierr);
 

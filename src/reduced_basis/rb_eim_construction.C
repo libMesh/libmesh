@@ -663,7 +663,8 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
               // some caching based on qp.
               for (std::size_t qp=0; qp<JxW_values[elem_id].size(); qp++)
                 {
-                  unsigned int n_var_dofs = phi_values[elem_id][qp].size();
+                  const unsigned int n_var_dofs =
+                    cast_int<unsigned int>(phi_values[elem_id][qp].size());
 
                   Number eval_result = parametrized_fn_vals[elem_id][qp][var];
                   for (unsigned int i=0; i != n_var_dofs; i++)
@@ -860,7 +861,7 @@ void RBEIMConstruction::init_dof_map_between_systems()
     {
       this->get_dof_map().dof_indices (elem, implicit_sys_dof_indices);
 
-      const unsigned int n_dofs = implicit_sys_dof_indices.size();
+      const std::size_t n_dofs = implicit_sys_dof_indices.size();
 
       for (unsigned int var=0; var<n_vars; var++)
         {
@@ -868,7 +869,7 @@ void RBEIMConstruction::init_dof_map_between_systems()
 
           libmesh_assert(explicit_sys_dof_indices.size() == n_dofs);
 
-          for (unsigned int i=0; i<n_dofs; i++)
+          for (std::size_t i=0; i<n_dofs; i++)
             {
               dof_id_type implicit_sys_dof_index = implicit_sys_dof_indices[i];
               dof_id_type explicit_sys_dof_index = explicit_sys_dof_indices[i];

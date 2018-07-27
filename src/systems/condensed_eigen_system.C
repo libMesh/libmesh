@@ -90,7 +90,8 @@ dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
     }
   else
     {
-      dof_id_type n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
+      dof_id_type n_global_non_condensed_dofs =
+        cast_int<dof_id_type>(local_non_condensed_dofs_vector.size());
       this->comm().sum(n_global_non_condensed_dofs);
 
       return n_global_non_condensed_dofs;
@@ -199,7 +200,8 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
   // This function assumes that condensed_solve has just been called.
   // If this is not the case, then we will trip an asset in get_eigenpair
   std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
-  dof_id_type n_local = local_non_condensed_dofs_vector.size();
+  const dof_id_type n_local =
+    cast_int<dof_id_type>(local_non_condensed_dofs_vector.size());
   dof_id_type n       = n_local;
   this->comm().sum(n);
 

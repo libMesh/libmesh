@@ -199,7 +199,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   // Add rows to the LP: corresponds to the auxiliary
   // variables that define the constraints at each
   // mu \in C_J_M
-  unsigned int n_rows = C_J.size();
+  unsigned int n_rows = cast_int<unsigned int>(C_J.size());
   glp_add_rows(lp, n_rows);
 
   // Now put current_parameters in saved_parameters
@@ -286,7 +286,7 @@ Real RBSCMEvaluation::get_SCM_UB()
   // Add rows to the LP: corresponds to the auxiliary
   // variables that define the constraints at each
   // mu \in C_J
-  unsigned int n_rows = C_J.size();
+  unsigned int n_rows = cast_int<unsigned int>(C_J.size());
 
   // For each mu, we just find the minimum of J_obj over
   // the subset of vectors in SCM_UB_vectors corresponding
@@ -394,7 +394,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J_length" << suffix;
       Xdr C_J_length_out(file_name.str(), mode);
 
-      unsigned int C_J_length = C_J.size();
+      std::size_t C_J_length = C_J.size();
       C_J_length_out << C_J_length;
       C_J_length_out.close();
 

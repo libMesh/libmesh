@@ -96,7 +96,7 @@ bool TreeNode<N>::insert (const Elem * elem)
 
 #endif
 
-      unsigned int element_count = elements.size();
+      unsigned int element_count = cast_int<unsigned int>(elements.size());
       if (!mesh.get_count_lower_dim_elems_in_point_locator())
         {
           const std::set<unsigned char> & elem_dimensions = mesh.elem_dimensions();

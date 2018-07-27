@@ -169,11 +169,10 @@ void PetscDMWrapper::build_sf( const System & system, PetscSF & star_forest )
   const std::vector<dof_id_type> & send_list = dof_map.get_send_list();
 
   // Number of ghost dofs that send information to this processor
-  PetscInt n_leaves = send_list.size();
+  const PetscInt n_leaves = cast_int<PetscInt>(send_list.size());
 
   // Number of local dofs, including ghosts dofs
-  PetscInt n_roots = dof_map.n_local_dofs();
-  n_roots += send_list.size();
+  const PetscInt n_roots = dof_map.n_local_dofs() + n_leaves;
 
   // This is the vector of dof indices coming from other processors
   // We need to give this to the PetscSF
@@ -192,7 +191,7 @@ void PetscDMWrapper::build_sf( const System & system, PetscSF & star_forest )
     {
       dof_id_type incoming_dof = send_list[i];
 
-      PetscInt rank = dof_map.dof_owner(incoming_dof);
+      const processor_id_type rank = dof_map.dof_owner(incoming_dof);
 
       // Dofs are sorted and continuous on the processor so local index
       // is counted up from the first dof on the processor.
