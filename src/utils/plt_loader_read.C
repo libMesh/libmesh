@@ -882,7 +882,7 @@ void PltLoader::read_block_data (std::istream & in, const unsigned int zone)
             in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
             for (std::size_t i=0; i<data.size(); i++)
-              data[i] = rb(ddata[i]);
+              data[i] = float(rb(ddata[i]));
 
             break;
           }
@@ -940,7 +940,7 @@ void PltLoader::read_point_data (std::istream & in, const unsigned int zone)
               std::memcpy  (&d, buf, LIBMESH_SIZEOF_DOUBLE);
               rb(d);
 
-              _data[zone][var].push_back(d);
+              _data[zone][var].push_back(float(d));
             }
           else
             libmesh_error_msg("ERROR: unsupported data type: " << this->var_type(var));
@@ -990,7 +990,7 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
             in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
             for (std::size_t i=0; i<data.size(); i++)
-              data[i] = rb(ddata[i]);
+              data[i] = float(rb(ddata[i]));
 
             break;
           }
@@ -1069,7 +1069,7 @@ void PltLoader::read_fepoint_data (std::istream & in, const unsigned int zone)
           std::memcpy  (&d, buf, LIBMESH_SIZEOF_DOUBLE);
           rb(d);
 
-          _data[zone][var].push_back(d);
+          _data[zone][var].push_back(float(d));
         }
       else
         libmesh_error_msg("ERROR: unsupported data type: " << this->var_type(var));

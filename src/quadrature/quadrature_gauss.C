@@ -215,7 +215,7 @@ void QGauss::dunavant_rule2(const Real * wts,
           {
             // The point has only a single permutation (the centroid!)
             // So we don't even need to look in the a or b arrays.
-            _points [offset  + 0] = Point(1.0L/3.0L, 1.0L/3.0L);
+            _points [offset  + 0] = Point(Real(1)/3, Real(1)/3);
             _weights[offset + 0] = wts[p];
 
             offset += 1;
@@ -227,8 +227,8 @@ void QGauss::dunavant_rule2(const Real * wts,
           {
             // For this type of rule, don't need to look in the b array.
             _points[offset + 0] = Point(a[p],         a[p]);         // (a,a)
-            _points[offset + 1] = Point(a[p],         1.L-2.L*a[p]); // (a,1-2a)
-            _points[offset + 2] = Point(1.L-2.L*a[p], a[p]);         // (1-2a,a)
+            _points[offset + 1] = Point(a[p],         1-2*a[p]); // (a,1-2a)
+            _points[offset + 2] = Point(1-2*a[p], a[p]);         // (1-2a,a)
 
             for (unsigned int j=0; j<3; ++j)
               _weights[offset + j] = wts[p];
@@ -242,10 +242,10 @@ void QGauss::dunavant_rule2(const Real * wts,
             // This type of point uses all 3 arrays...
             _points[offset + 0] = Point(a[p], b[p]);
             _points[offset + 1] = Point(b[p], a[p]);
-            _points[offset + 2] = Point(a[p], 1.L-a[p]-b[p]);
-            _points[offset + 3] = Point(1.L-a[p]-b[p], a[p]);
-            _points[offset + 4] = Point(b[p], 1.L-a[p]-b[p]);
-            _points[offset + 5] = Point(1.L-a[p]-b[p], b[p]);
+            _points[offset + 2] = Point(a[p], 1-a[p]-b[p]);
+            _points[offset + 3] = Point(1-a[p]-b[p], a[p]);
+            _points[offset + 4] = Point(b[p], 1-a[p]-b[p]);
+            _points[offset + 5] = Point(1-a[p]-b[p], b[p]);
 
             for (unsigned int j=0; j<6; ++j)
               _weights[offset + j] = wts[p];
