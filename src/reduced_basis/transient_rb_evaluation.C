@@ -22,11 +22,12 @@
 #include "libmesh/transient_rb_theta_expansion.h"
 
 // libMesh includes
-#include "libmesh/numeric_vector.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/xdr_cxx.h"
-#include "libmesh/parallel.h"
 #include "libmesh/getpot.h"
+#include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parallel.h"
+#include "libmesh/xdr_cxx.h"
 
 // C++ includes
 #include <fstream>
@@ -93,7 +94,7 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
 
   // Initialize the initial condition storage
   RB_initial_condition_all_N.resize(Nmax);
-  for (std::size_t i=0; i<RB_initial_condition_all_N.size(); i++)
+  for (auto i : IntRange<unsigned int>(0, RB_initial_condition_all_N.size()))
     {
       // The i^th row holds a vector of lenght i+1
       RB_initial_condition_all_N[i].resize(i+1);

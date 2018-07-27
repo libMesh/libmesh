@@ -510,7 +510,7 @@ public:
               {
                 if (have_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
                           (q, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
@@ -542,7 +542,7 @@ public:
               {
                 if (elem_has_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       this->qoi[q] -= _femcontext.get_elem_residual()(d) *
                         _sys.get_dof_map().has_heterogenous_adjoint_constraint(q, _femcontext.get_dof_indices()[d]);
 
@@ -648,7 +648,7 @@ public:
               {
                 if (have_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
                           (q, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
@@ -702,14 +702,14 @@ public:
               {
                 if (elem_has_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t i=0; i != _femcontext.get_dof_indices().size(); ++i)
+                    for (auto i : IntRange<unsigned int>(0, n_dofs))
                       {
                         Number liftfunc_val =
                           _sys.get_dof_map().has_heterogenous_adjoint_constraint(q, _femcontext.get_dof_indices()[i]);
 
                         if (liftfunc_val != Number(0))
                           {
-                            for (std::size_t j=0; j != _femcontext.get_dof_indices().size(); ++j)
+                            for (auto j : IntRange<unsigned int>(0, n_dofs))
                               _femcontext.get_qoi_derivatives()[q](j) -=
                                 _femcontext.get_elem_jacobian()(i,j) *
                                 liftfunc_val;
@@ -763,7 +763,7 @@ public:
                   {
 #ifndef NDEBUG
                     bool has_heterogenous_constraint = false;
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
                           (i, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
@@ -1207,7 +1207,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 
       if (!context.get_dof_indices(v).empty())
         {
-          for (std::size_t i = 0; i != context.get_dof_indices().size(); ++i)
+          for (auto i : IntRange<unsigned int>(0, n_dofs))
             if (context.get_dof_indices()[i] ==
                 context.get_dof_indices(v)[0])
               j_offset = i;
@@ -1215,7 +1215,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           libmesh_assert_not_equal_to(j_offset, libMesh::invalid_uint);
         }
 
-      for (std::size_t j = 0; j != context.get_dof_indices(v).size(); ++j)
+      for (auto j : IntRange<unsigned int>(0, context.get_dof_indices(v).size()))
         {
           const unsigned int total_j = j + j_offset;
 
@@ -1266,7 +1266,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           if (coord)
             {
               *coord = libmesh_real(context.get_elem_solution(v)(j));
-              for (std::size_t i = 0; i != context.get_dof_indices().size(); ++i)
+              for (auto i : IntRange<unsigned int>(0, n_dofs))
                 {
                   numeric_jacobian(i,total_j) =
                     (context.get_elem_residual()(i) - backwards_residual(i)) /
@@ -1275,7 +1275,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
             }
           else
             {
-              for (std::size_t i = 0; i != context.get_dof_indices().size(); ++i)
+              for (auto i : IntRange<unsigned int>(0, n_dofs))
                 {
                   numeric_jacobian(i,total_j) =
                     (context.get_elem_residual()(i) - backwards_residual(i)) /

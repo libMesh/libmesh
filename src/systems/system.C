@@ -24,6 +24,7 @@
 // Local includes
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
@@ -1200,7 +1201,7 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
   const VariableGroup & vg (_variable_groups.back());
 
   // Add each component of the group individually
-  for (std::size_t v=0; v<vars.size(); v++)
+  for (auto v : IntRange<unsigned int>(0, vars.size()))
     {
       _variables.push_back (vg(v));
       _variable_numbers[vars[v]] = cast_int<unsigned short>

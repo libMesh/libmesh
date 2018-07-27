@@ -807,7 +807,7 @@ void RBEIMConstruction::set_explicit_sys_subvector(NumericVector<Number> & dest,
   localized_source->init(this->n_dofs(), false, SERIAL);
   source.localize(*localized_source);
 
-  for (std::size_t i=0; i<_dof_map_between_systems[var].size(); i++)
+  for (auto i : IntRange<dof_id_type>(0, _dof_map_between_systems[var].size()))
     {
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];
@@ -827,7 +827,7 @@ void RBEIMConstruction::get_explicit_sys_subvector(NumericVector<Number> & dest,
 {
   LOG_SCOPE("get_explicit_sys_subvector()", "RBEIMConstruction");
 
-  for (std::size_t i=0; i<_dof_map_between_systems[var].size(); i++)
+  for (auto i : IntRange<dof_id_type>(0, _dof_map_between_systems[var].size()))
     {
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];

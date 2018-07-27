@@ -23,6 +23,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/implicit_system.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/mesh_base.h"
@@ -339,7 +340,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 
   // Solve the linear system.
   SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
-  for (std::size_t p=0; p != parameters.size(); ++p)
+  for (auto p : IntRange<unsigned int>(0, parameters.size()))
     {
       std::pair<unsigned int, Real> rval =
         linear_solver->solve (*matrix, pc,
@@ -354,7 +355,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (std::size_t p=0; p != parameters.size(); ++p)
+  for (auto p : IntRange<unsigned int>(0, parameters.size()))
     this->get_dof_map().enforce_constraints_exactly
       (*this, &this->get_sensitivity_solution(p),
        /* homogeneous = */ true);

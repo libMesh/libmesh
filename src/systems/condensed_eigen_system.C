@@ -22,10 +22,12 @@
 #if defined(LIBMESH_HAVE_SLEPC)
 
 #include "libmesh/condensed_eigen_system.h"
+
+#include "libmesh/dof_map.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/dof_map.h"
 #include "libmesh/parallel.h"
 
 namespace libMesh
@@ -211,9 +213,9 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 
   // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
   this->solution->zero();
-  for (std::size_t j=0; j<local_non_condensed_dofs_vector.size(); j++)
+  for (auto j : IntRange<dof_id_type>(0, n_local))
     {
-      dof_id_type index = local_non_condensed_dofs_vector[j];
+      const dof_id_type index = local_non_condensed_dofs_vector[j];
       solution->set(index,(*temp)(temp->first_local_index()+j));
     }
 

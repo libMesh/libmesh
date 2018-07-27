@@ -33,6 +33,7 @@
 #include "libmesh/restore_warnings.h"
 
 #include "libmesh/compare_types.h"
+#include "libmesh/int_range.h"
 
 using MetaPhysicL::DynamicSparseNumberArray;
 
@@ -535,7 +536,7 @@ eval_at_point(const FEMContext & c,
   DynamicSparseNumberArray<Real, dof_id_type> returnval;
   returnval.resize(n_dofs);
 
-  for (std::size_t j = 0; j != n_dofs; ++j)
+  for (auto j : IntRange<unsigned int>(0, n_dofs))
     {
       returnval.raw_at(j) = phi[j][0];
       returnval.raw_index(j) = dof_indices[j];
@@ -582,7 +583,7 @@ eval_at_point(const FEMContext & c,
   for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
     returnval(d).resize(n_dofs);
 
-  for (std::size_t j = 0; j != n_dofs; ++j)
+  for (auto j : IntRange<unsigned int>(0, n_dofs))
     {
       for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
         {
@@ -1540,7 +1541,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 // Some edge dofs are on nodes and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (std::size_t i=0; i != side_dofs.size(); ++i)
+                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 
@@ -1641,7 +1642,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 // Some side dofs are on nodes/edges and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (std::size_t i=0; i != side_dofs.size(); ++i)
+                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 
