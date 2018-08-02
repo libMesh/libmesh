@@ -250,8 +250,15 @@ public:
    *
    * \returns A reference to *this.
    */
-  template <typename Scalar>
-  const TypeTensor<T> & operator *= (const Scalar);
+  template <typename Scalar, typename boostcopy::enable_if_c<
+                               ScalarTraits<Scalar>::value, int>::type = 0>
+  const TypeTensor<T> & operator *= (const Scalar factor)
+    {
+      for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
+        _coords[i] *= factor;
+
+      return *this;
+    }
 
   /**
    * Divide each entry of this tensor by a scalar value.
@@ -279,6 +286,13 @@ public:
    */
   template <typename T2>
   TypeTensor<T> operator * (const TypeTensor<T2> &) const;
+
+  /**
+   * Multiply this tensor by a tensor value in place
+   *
+   * \returns A reference to *this
+   */
+  const TypeTensor<T> & operator *= (const TypeTensor<T> &);
 
   /**
    * Multiply 2 tensors together to return a scalar, i.e.
@@ -934,22 +948,6 @@ operator * (const Scalar factor,
   return t * factor;
 }
 
-
-
-template <typename T>
-template <typename Scalar>
-inline
-const TypeTensor<T> & TypeTensor<T>::operator *= (const Scalar factor)
-{
-  for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
-    _coords[i] *= factor;
-
-  return *this;
-}
-
-
-
-
 template <typename T>
 template <typename Scalar>
 inline
@@ -1164,6 +1162,19 @@ TypeTensor<T> TypeTensor<T>::operator * (const TypeTensor<T2> & p) const
   return returnval;
 }
 
+template <typename T>
+inline
+const TypeTensor<T> & TypeTensor<T>::operator *= (const TypeTensor<T> & p)
+{
+  TypeTensor<T> temp;
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
+      for (unsigned int k=0; k<LIBMESH_DIM; k++)
+        temp(i,j) += (*this)(i,k)*p(k,j);
+
+  this->assign(temp);
+  return *this;
+}
 
 
 /**
