@@ -292,7 +292,8 @@ public:
    *
    * \returns A reference to *this
    */
-  const TypeTensor<T> & operator *= (const TypeTensor<T> &);
+  template <typename T2>
+  const TypeTensor<T> & operator *= (const TypeTensor<T2> &);
 
   /**
    * Multiply 2 tensors together to return a scalar, i.e.
@@ -1163,8 +1164,9 @@ TypeTensor<T> TypeTensor<T>::operator * (const TypeTensor<T2> & p) const
 }
 
 template <typename T>
+template <typename T2>
 inline
-const TypeTensor<T> & TypeTensor<T>::operator *= (const TypeTensor<T> & p)
+const TypeTensor<T> & TypeTensor<T>::operator *= (const TypeTensor<T2> & p)
 {
   TypeTensor<T> temp;
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
