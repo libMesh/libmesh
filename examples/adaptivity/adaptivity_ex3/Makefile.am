@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/adaptivity/ex3
 data          = adaptivity_ex3.C adaptivity_ex3.in lshaped.xda lshaped3D.xda run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = lshaped.e *.m error_*.e
+CLEANFILES = lshaped.e *.m error_*.e error_*.n*
 
 # need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD

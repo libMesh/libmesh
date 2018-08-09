@@ -658,7 +658,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = lshaped.e *.m error_*.e $(am__append_1) \
+CLEANFILES = lshaped.e *.m error_*.e error_*.n* $(am__append_1) \
 	$(example_name).html stdout.log
 
 # need to link files for VPATH builds
