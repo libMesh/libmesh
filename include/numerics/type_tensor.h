@@ -38,9 +38,7 @@ template <unsigned int N, typename T> class TypeNTensor;
 
 /**
  * This class defines a tensor in \p LIBMESH_DIM dimensional space of
- * type T.  T may either be Real or Complex.  The default constructor
- * for this class is protected, suggesting that you should not
- * instantiate one of these directly.
+ * type T.  T may either be Real or Complex.
  *
  * \author Roy Stogner
  * \date 2004
@@ -51,14 +49,14 @@ class TypeTensor
   template <typename T2>
   friend class TypeTensor;
 
-protected:
-
+public:
   /**
    * Empty constructor. Gives the tensor 0 in \p LIBMESH_DIM
    * dimensions.
    */
   TypeTensor  ();
 
+protected:
   /**
    * Constructor-from-T.  By default sets higher dimensional entries
    * to 0.  This is a poor constructor for 2D tensors - if the default

@@ -40,9 +40,7 @@ template <typename T> class TensorValue;
 
 /**
  * This class defines a vector in \p LIBMESH_DIM dimensional space of
- * type T.  T may either be Real or Complex.  The default constructor
- * for this class is protected, suggesting that you should not
- * instantiate one of these directly.  Instead use one of the derived
+ * type T.  T may either be Real or Complex. Instead use one of the derived
  * types such as \p Point or \p Node.
  *
  * \author Benjamin S. Kirk
@@ -56,14 +54,14 @@ class TypeVector
 
   friend class TypeTensor<T>;
 
-protected:
-
+public:
   /**
    * Empty constructor.  Gives the vector 0 in \p LIBMESH_DIM
    * dimensions.
    */
   TypeVector  ();
 
+protected:
   /**
    * Constructor-from-T.  By default sets higher dimensional
    * entries to 0.
