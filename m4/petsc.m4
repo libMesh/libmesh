@@ -397,7 +397,7 @@ AC_DEFUN([CONFIGURE_PETSC],
           AC_SUBST(MPI_IMPL)
 
           AS_IF([test "x$PETSC_MPI" != x],
-                [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])])
+                [VERSION_MPI])
 
           AS_IF([test $petsc_have_hypre -gt 0],
                 [AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])])
