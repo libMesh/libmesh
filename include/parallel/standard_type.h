@@ -24,6 +24,7 @@
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <array>
@@ -216,9 +217,11 @@ void BuildStandardTypeVector<n_minus_i>::build
   typedef typename
     std::tuple_element<sizeof...(Types)-n_minus_i, std::tuple<Types...>>::type
     ith_type;
+
   out_vec.push_back
-    (new StandardType<ith_type>
-      (&std::get<sizeof...(Types)-n_minus_i>(example)));
+    (libmesh_make_unique<
+       StandardType<ith_type>
+     >(&std::get<sizeof...(Types)-n_minus_i>(example)));
 
   BuildStandardTypeVector<n_minus_i-1>::build(out_vec, example);
 }
@@ -251,7 +254,7 @@ void FillDisplacementArray<n_minus_i>::fill
   libmesh_call_mpi
     (MPI_Get_address
       (&std::get<sizeof...(Types)-n_minus_i>(example),
-       out_vec[sizeof...(Types)-n_minus_i]));
+       &out_vec[sizeof...(Types)-n_minus_i]));
 
   FillDisplacementArray<n_minus_i-1>::fill(out_vec, example);
 }
@@ -296,7 +299,7 @@ public:
     // create a prototype structure
     MPI_Datatype tmptype;
     libmesh_call_mpi
-      (MPI_Type_create_struct (tuplesize, blocklengths, displs, types,
+      (MPI_Type_create_struct (tuplesize, blocklengths.data(), displs.data(), types.data(),
                                &tmptype));
     libmesh_call_mpi
       (MPI_Type_commit (&tmptype));
