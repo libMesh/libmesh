@@ -23,6 +23,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/type_vector.h"
+#include "libmesh/tuple_of.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -47,6 +48,11 @@ template <unsigned int N, typename T>
 class TypeNTensor
 {
 public:
+  /**
+   * Helper typedef for generic index programming
+   */
+  typedef tuple_of<N, unsigned int> index_type;
+
   TypeNTensor () : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
   TypeNTensor (const T &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}

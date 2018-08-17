@@ -105,6 +105,11 @@ public:
   typedef T value_type;
 
   /**
+   * Helper typedef for generic index programming
+   */
+  typedef unsigned int index_type;
+
+  /**
    * Copy-constructor.
    */
   template <typename T2>
