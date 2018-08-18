@@ -163,6 +163,10 @@ public:
    */
   virtual Real volume () const override;
 
+  /**
+   * Builds a bounding box out of the nodal positions
+   */
+  virtual BoundingBox loose_bounding_box () const override;
 
 protected:
 

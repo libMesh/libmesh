@@ -239,4 +239,11 @@ Real Quad4::volume () const
   return vol;
 }
 
+BoundingBox
+Quad4::loose_bounding_box () const
+{
+  return Elem::loose_bounding_box();
+}
+
+
 } // namespace libMesh

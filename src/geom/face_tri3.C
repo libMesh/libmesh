@@ -246,4 +246,11 @@ bool Tri3::contains_point (const Point & p, Real tol) const
   return (u > -tol) && (v > -tol) && (u + v < 1 + tol);
 }
 
+BoundingBox
+Tri3::loose_bounding_box () const
+{
+  return Elem::loose_bounding_box();
+}
+
+
 } // namespace libMesh
