@@ -27,6 +27,7 @@
 #include <map>
 #include <type_traits>
 #include <vector>
+#include <list>
 
 
 namespace libMesh
@@ -64,7 +65,7 @@ template <typename MapToVectors,
 void push_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & data,
                                RequestContainer & reqs,
-                               ActionFunctor & act_on_data);
+                               const ActionFunctor & act_on_data);
 
 
 
@@ -87,7 +88,7 @@ template <typename MapToVectors,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & data,
-                               ActionFunctor & act_on_data);
+                               const ActionFunctor & act_on_data);
 
 
 /**
@@ -189,7 +190,7 @@ template <template <typename, typename, typename ...> class MapType,
 void push_parallel_vector_data(const Communicator & comm,
                                const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
                                RequestContainer & reqs,
-                               ActionFunctor & act_on_data);
+                               const ActionFunctor & act_on_data);
 
 
 
@@ -205,7 +206,7 @@ template <template <typename, typename, typename ...> class MapType,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
-                               ActionFunctor & act_on_data);
+                               const ActionFunctor & act_on_data);
 
 /*
  * A specialization for types that are harder to non-blocking receive.
@@ -239,34 +240,13 @@ template <typename MapToVectors,
 void push_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & data,
                                RequestContainer & reqs,
-                               ActionFunctor & act_on_data)
+                               const ActionFunctor & act_on_data)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(comm);
 
-  processor_id_type num_procs = comm.size();
-
-  // Size of vectors to send to each procesor
-  std::vector<std::size_t> will_send_to(num_procs, 0);
-  processor_id_type num_sends = 0;
-  for (auto & datapair : data)
-    {
-      // Don't try to send anywhere that doesn't exist
-      libmesh_assert_less(datapair.first, num_procs);
-
-      // Don't give us empty vectors to send
-      libmesh_assert_greater(datapair.second.size(), 0);
-
-      will_send_to[datapair.first] = datapair.second.size();
-      num_sends++;
-    }
-
-  // Tell everyone about where everyone will send to
-  comm.alltoall(will_send_to);
-
-  // will_send_to now represents who we'll receive from
-  // give it a good name
-  auto & will_receive_from = will_send_to;
+  // This function implements the "NBX" algorithm from
+  // https://htor.inf.ethz.ch/publications/img/hoefler-dsde-protocols.pdf
 
   // This function only works for "flat" data that we can pre-size
   // receive buffers for: a map to vectors-of-standard-types, not e.g.
@@ -284,7 +264,8 @@ void push_parallel_vector_data(const Communicator & comm,
   // complete normally." so we're cool.
   typedef decltype(data.begin()->second.front()) ref_type;
   typedef typename std::remove_reference<ref_type>::type nonref_type;
-  StandardType<typename std::remove_const<nonref_type>::type> datatype;
+  typedef typename std::remove_const<nonref_type>::type nonconst_nonref_type;
+  StandardType<nonconst_nonref_type> datatype;
 
   // We'll grab a tag so we can overlap request sends and receives
   // without confusing one for the other
@@ -292,11 +273,18 @@ void push_parallel_vector_data(const Communicator & comm,
 
   MapToVectors received_data;
 
-  // Post all of the sends, non-blocking
+  // Post all of the sends, non-blocking and synchronous
+
+  // Save off the old send_mode so we can restore it after this
+  auto old_send_mode = comm.send_mode();
+
+  // Set the sending to synchronous - this is so that we can know when
+  // the sends are complete
+  const_cast<Communicator &>(comm).send_mode(Communicator::SYNCHRONOUS);
+
   for (auto & datapair : data)
     {
       processor_id_type destid = datapair.first;
-      libmesh_assert_less(destid, num_procs);
       auto & datum = datapair.second;
 
       // Just act on data if the user requested a send-to-self
@@ -310,30 +298,95 @@ void push_parallel_vector_data(const Communicator & comm,
         }
     }
 
-  // Post all of the receives, non-blocking
-  std::vector<Request> receive_reqs;
-  std::vector<processor_id_type> receive_procids;
-  for (processor_id_type proc_id = 0; proc_id < num_procs; proc_id++)
-    if (will_receive_from[proc_id] && proc_id != comm.rank())
-      {
-        Request req;
-        auto & incoming_data = received_data[proc_id];
-        incoming_data.resize(will_receive_from[proc_id]);
-        comm.receive(proc_id, incoming_data, datatype, req, tag);
-        receive_reqs.push_back(req);
-        receive_procids.push_back(proc_id);
-      }
+  bool sends_complete = reqs.empty();
+  bool started_barrier = false;
+  Request barrier_request;
 
-  while(receive_reqs.size())
+  // Receive
+
+  // The pair of src_pid and requests
+  std::list<std::pair<unsigned int, std::shared_ptr<Request>>> receive_reqs;
+  auto current_request = std::make_shared<Request>();
+
+  std::map<processor_id_type, std::shared_ptr<std::vector<nonconst_nonref_type>>> incoming_data;
+  auto current_incoming_data = std::make_shared<std::vector<nonconst_nonref_type>>();
+
+  unsigned int current_src_proc = 0;
+
+  // Keep looking for receives
+  while (true)
+  {
+    // Look for data from anywhere
+    current_src_proc = Parallel::any_source;
+
+    // Check if there is a message and start receiving it
+    if (comm.possibly_receive(current_src_proc, *current_incoming_data, datatype, *current_request, tag))
     {
-      std::size_t completed = waitany(receive_reqs);
-      processor_id_type proc_id = receive_procids[completed];
-      receive_reqs.erase(receive_reqs.begin() + completed);
-      receive_procids.erase(receive_procids.begin() + completed);
+      receive_reqs.emplace_back(current_src_proc, current_request);
+      current_request = std::make_shared<Request>();
 
-      act_on_data(proc_id, received_data[proc_id]);
-      received_data.erase(proc_id);
+      // current_src_proc will now hold the src pid for this receive
+      incoming_data[current_src_proc] = current_incoming_data;
+      current_incoming_data = std::make_shared<std::vector<nonconst_nonref_type>>();
     }
+
+    // Clean up outstanding receive requests
+    receive_reqs.remove_if([&act_on_data, &incoming_data](std::pair<unsigned int, std::shared_ptr<Request>> & pid_req_pair)
+                           {
+                             auto & pid = pid_req_pair.first;
+                             auto & req = pid_req_pair.second;
+
+                             // If it's finished - let's act on it
+                             if (req->test())
+                             {
+                               // Do any post-wait work
+                               req->wait();
+
+                               act_on_data(pid, *incoming_data[pid]);
+
+                               // Don't need this data anymore
+                               incoming_data.erase(pid);
+
+                               // This removes it from the list
+                               return true;
+                             }
+
+                             // Not finished yet
+                             return false;
+                           });
+
+    // See if all of the sends are finished
+    if (!sends_complete)
+    {
+      for (auto & req : reqs)
+      {
+        sends_complete = req.test();
+
+        if (!sends_complete)
+          break;
+      }
+    }
+
+
+    // If they've all completed then we can start the barrier
+    if (sends_complete && !started_barrier)
+    {
+      // Need to wait on each send request to make sure post-wait work is done
+      for (auto & req : reqs)
+        req.wait();
+
+      started_barrier = true;
+      comm.nonblocking_barrier(barrier_request);
+    }
+
+    // See if all proessors have finished all sends (i.e. _done_!)
+    if (started_barrier)
+      if (barrier_request.test())
+        break; // Done!
+  }
+
+  // Reset the send mode
+  const_cast<Communicator &>(comm).send_mode(old_send_mode);
 }
 
 
@@ -348,7 +401,7 @@ template <template <typename, typename, typename ...> class MapType,
 void push_parallel_vector_data(const Communicator & comm,
                                const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
                                RequestContainer & reqs,
-                               ActionFunctor & act_on_data)
+                               const ActionFunctor & act_on_data)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(comm);
@@ -434,7 +487,7 @@ template <typename MapToVectors,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & data,
-                               ActionFunctor & act_on_data)
+                               const ActionFunctor & act_on_data)
 {
   std::vector<Request> requests;
 
@@ -453,7 +506,7 @@ template <template <typename, typename, typename ...> class MapType,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
-                               ActionFunctor & act_on_data)
+                               const ActionFunctor & act_on_data)
 {
   std::vector<Request> requests;
 
