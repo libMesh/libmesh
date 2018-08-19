@@ -215,6 +215,11 @@ public:
   void barrier () const;
 
   /**
+   * Start a barrier that doesn't block
+   */
+  void nonblocking_barrier (Request & req) const;
+
+  /**
    * Verify that a local variable has the same value on all processors.
    * Containers must have the same value in every entry.
    */
@@ -412,6 +417,36 @@ public:
                 const DataType & type,
                 Request & req,
                 const MessageTag & tag=any_tag) const;
+
+  /**
+   * Nonblocking-receive from one processor with user-defined type.
+   *
+   * Checks to see if a message can be received from the
+   * src_processor_id .  If so, it starts a non-blocking
+   * receive using the passed in request and returns true
+   *
+   * Otherwise - if there is no message to receive it returns false
+   *
+   * Note: The buf does NOT need to properly sized before this call
+   * this will resize the buffer automatically
+   *
+   * If \p T is a container, container-of-containers, etc., then
+   * \p type should be the DataType of the underlying fixed-size
+   * entries in the container(s).
+   *
+   * @param src_processor_id The pid to receive from or "any".
+   * will be set to the actual src being receieved from
+   * @param buf THe buffer to receive into
+   * @param type The intrinsic datatype to receive
+   * @param req The request to use
+   * @param tag The tag to use
+   */
+  template <typename T, typename A>
+  bool possibly_receive (unsigned int & src_processor_id,
+                         std::vector<T,A> & buf,
+                         const DataType & type,
+                         Request & req,
+                         const MessageTag & tag) const;
 
   /**
    * Blocking-send range-of-pointers to one processor.  This

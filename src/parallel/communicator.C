@@ -197,6 +197,19 @@ void Communicator::barrier () const
 void Communicator::barrier () const {}
 #endif
 
+#ifdef LIBMESH_HAVE_MPI
+void Communicator::nonblocking_barrier (Request & req) const
+{
+  if (this->size() > 1)
+    {
+      LOG_SCOPE("nonblocking_barrier()", "Parallel");
+      libmesh_call_mpi(MPI_Ibarrier (this->get(), req.get()));
+    }
+}
+#else
+void Communicator::barrier () const {}
+#endif
+
 
 MessageTag Communicator::get_unique_tag(int tagvalue) const
 {
