@@ -439,4 +439,10 @@ Real Prism6::volume () const
   return vol;
 }
 
+BoundingBox
+Prism6::loose_bounding_box () const
+{
+  return Elem::loose_bounding_box();
+}
+
 } // namespace libMesh

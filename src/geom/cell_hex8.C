@@ -368,4 +368,10 @@ Real Hex8::volume () const
     triple_product(q[2], q[4], q[5]) / 64.;
 }
 
+BoundingBox
+Hex8::loose_bounding_box () const
+{
+  return Elem::loose_bounding_box();
+}
+
 } // namespace libMesh

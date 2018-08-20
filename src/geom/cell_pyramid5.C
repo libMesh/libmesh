@@ -256,4 +256,10 @@ Real Pyramid5::volume () const
     triple_product(v02, v01, v03) / 12.;
 }
 
+BoundingBox
+Pyramid5::loose_bounding_box () const
+{
+  return Elem::loose_bounding_box();
+}
+
 } // namespace libMesh
