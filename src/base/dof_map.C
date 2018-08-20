@@ -344,7 +344,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
-  for (processor_id_type p=0; p != this->n_processors(); ++p)
+  for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
     if (p != this->processor_id() && ghost_objects_from_proc[p])
       requested_ids[p].reserve(ghost_objects_from_proc[p]);
 
@@ -355,7 +355,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         requested_ids[obj->processor_id()].push_back(obj->id());
     }
 #ifdef DEBUG
-  for (processor_id_type p=0; p != this->n_processors(); ++p)
+  for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
     {
       if (ghost_objects_from_proc[p])
         libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
