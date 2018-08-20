@@ -1,8 +1,0 @@
-## Build Instructions
-1. `cd` to location of MetaPhysicL clone or extracted tarball.
-2. `mkdir build`
-3. `cd build`
-4. `../configure --prefix=/path/to/metaphysicl/install`
-5. `make`
-6. `make check` (optional, runs the example programs and unit tests when possible)
-7. `make install`
