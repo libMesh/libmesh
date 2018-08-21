@@ -131,7 +131,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Point> & qpoint = fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  const unsigned int n_u_dofs = c.n_dof_indices(u_var);
 
   DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_var, u_var);
 

@@ -94,7 +94,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(T_var).size();
+  const unsigned int n_T_dofs = c.n_dof_indices(T_var);
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> & K = c.get_elem_jacobian(T_var, T_var);

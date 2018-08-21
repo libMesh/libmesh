@@ -125,11 +125,8 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   // Element basis functions
   const std::vector<std::vector<RealGradient>> & dphi = elem_fe->get_dphi();
 
-  // Workaround for weird FC6 bug
-  optassert(c.get_dof_indices().size() > 0);
-
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(0).size();
+  const unsigned int n_u_dofs = c.n_dof_indices(0);
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> & K = c.get_elem_jacobian(0, 0);

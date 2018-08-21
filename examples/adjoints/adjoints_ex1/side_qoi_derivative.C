@@ -37,8 +37,7 @@ void LaplaceSystem::side_qoi_derivative (DiffContext & context,
   const std::vector<Point> & face_normals = side_fe->get_normals();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs =
-    cast_int<unsigned int>(c.get_dof_indices(0).size());
+  const unsigned int n_T_dofs = c.n_dof_indices(0);
   unsigned int n_qpoints = c.get_side_qrule().n_points();
 
   // Fill the QoI RHS corresponding to this QoI. Since this is QoI 1
