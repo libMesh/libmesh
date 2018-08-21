@@ -219,7 +219,7 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_121 = fparser/libprof.la
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_122 = fparser/liboprof.la
 @LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_123 = nanoflann
-@LIBMESH_ENABLE_METAPHYSICL_TRUE@am__append_124 = metaphysicl/0.2.0
+@LIBMESH_ENABLE_METAPHYSICL_TRUE@am__append_124 = metaphysicl
 @LIBMESH_OPT_MODE_TRUE@am__append_125 = libcontrib_opt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_126 = libcontrib_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_127 = libcontrib_devel.la
@@ -424,7 +424,7 @@ DIST_SUBDIRS = capnproto boost/include eigen/eigen gmv gzstream \
 	netcdf/v3 netcdf/v4 exodusii/v5.09 exodusii/v5.22/exodus \
 	nemesis/v3.09 nemesis/v5.22/nemesis tecplot/tecio \
 	tecplot/binary triangle tetgen qhull/qhull libHilbert laspack \
-	metis parmetis sfcurves fparser nanoflann metaphysicl/0.2.0
+	metis parmetis sfcurves fparser nanoflann metaphysicl
 am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp README
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
