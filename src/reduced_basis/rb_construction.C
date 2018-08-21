@@ -657,9 +657,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       context.elem_fe_reinit();
       elem_assembly->interior_assembly(context);
 
-      for (context.side = 0;
-           context.side != context.get_elem().n_sides();
-           ++context.side )
+      const unsigned char n_sides = context.get_elem().n_sides();
+      for (context.side = 0; context.side != n_sides; ++context.side)
         {
           // May not need to apply fluxes on non-boundary elements
           if ((context.get_elem().neighbor_ptr(context.get_side()) != nullptr) && !impose_internal_fluxes)

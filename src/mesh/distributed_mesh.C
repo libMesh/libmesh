@@ -999,7 +999,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 
 #ifndef NDEBUG
   libmesh_assert(this->comm().verify(unpartitioned_objects));
-  for (processor_id_type p=0; p != this->n_processors(); ++p)
+  for (processor_id_type p=0, np=this->n_processors(); p != np; ++p)
     libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
 

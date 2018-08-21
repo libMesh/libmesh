@@ -344,7 +344,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
-  for (processor_id_type p=0; p != this->n_processors(); ++p)
+  for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
     if (p != this->processor_id() && ghost_objects_from_proc[p])
       requested_ids[p].reserve(ghost_objects_from_proc[p]);
 
@@ -355,7 +355,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         requested_ids[obj->processor_id()].push_back(obj->id());
     }
 #ifdef DEBUG
-  for (processor_id_type p=0; p != this->n_processors(); ++p)
+  for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
     {
       if (ghost_objects_from_proc[p])
         libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
@@ -1838,8 +1838,8 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
   libmesh_assert_equal_to (dof_indices_in.size(), Ue.size());
   bool has_constrained_dofs = false;
 
-  for (unsigned int il=0;
-       il != cast_int<unsigned int>(dof_indices_in.size()); il++)
+  const unsigned int n_original_dofs = dof_indices_in.size();
+  for (unsigned int il=0; il != n_original_dofs; ++il)
     {
       const dof_id_type ig = dof_indices_in[il];
 
@@ -1870,8 +1870,6 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
       Ue.zero();
 
       // compute Ue = C Ug, with proper mapping.
-      const unsigned int n_original_dofs =
-        cast_int<unsigned int>(dof_indices_in.size());
       for (unsigned int i=0; i != n_original_dofs; i++)
         {
           Ue.el(i) = H(i);
@@ -1896,9 +1894,6 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
 #else
 
   // Trivial mapping
-
-  const unsigned int n_original_dofs =
-    cast_int<unsigned int>(dof_indices_in.size());
 
   libmesh_assert_equal_to (n_original_dofs, Ue.size());
 

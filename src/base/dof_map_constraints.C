@@ -1425,10 +1425,10 @@ void DofMap::print_dof_constraints(std::ostream & os,
       os << "Processor 0:\n";
       os << local_constraints;
 
-      for (processor_id_type i=1; i<this->n_processors(); ++i)
+      for (processor_id_type p=1, np=this->n_processors(); p != np; ++p)
         {
-          this->comm().receive(i, local_constraints);
-          os << "Processor " << i << ":\n";
+          this->comm().receive(p, local_constraints);
+          os << "Processor " << p << ":\n";
           os << local_constraints;
         }
     }
