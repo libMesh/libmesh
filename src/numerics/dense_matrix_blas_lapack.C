@@ -622,9 +622,9 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // this value as the first entry of the WORK array, and no error
   // message related to LWORK is issued by XERBLA.
   //
-  // The factor of 1.5 is arbitrary and is used to satisfy the "should
+  // The factor of 3/2 is arbitrary and is used to satisfy the "should
   // generally be larger" clause.
-  PetscBLASInt LWORK = 1.5 * (3*min_MN + std::max(2*min_MN, std::max(max_MN, NRHS)));
+  PetscBLASInt LWORK = (3*min_MN + std::max(2*min_MN, std::max(max_MN, NRHS))) * 3/2;
 
   // WORK is double precision array, dimension (MAX(1,LWORK))
   // On exit, if INFO = 0, WORK(1) returns the optimal LWORK.

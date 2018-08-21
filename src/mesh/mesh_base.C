@@ -587,7 +587,7 @@ void MeshBase::cache_elem_dims()
   _elem_dims.clear();
 
   for (const auto & elem : this->active_element_ptr_range())
-    _elem_dims.insert(elem->dim());
+    _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
 
   // Some different dimension elements may only live on other processors
   this->comm().set_union(_elem_dims);

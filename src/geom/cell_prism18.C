@@ -408,12 +408,13 @@ void Prism18::connectivity(const unsigned int sc,
     case VTK:
       {
         // VTK now supports VTK_BIQUADRATIC_QUADRATIC_WEDGE directly
-        conn.resize(18);
+        const unsigned int conn_size = 18;
+        conn.resize(conn_size);
 
         // VTK's VTK_BIQUADRATIC_QUADRATIC_WEDGE first 9 (vertex) and
         // last 3 (mid-face) nodes match.  The middle and top layers
         // of mid-edge nodes are reversed from LibMesh's.
-        for (std::size_t i=0; i<conn.size(); ++i)
+        for (unsigned int i=0; i != conn_size; ++i)
           conn[i] = this->node_id(i);
 
         // top "ring" of mid-edge nodes
@@ -717,10 +718,10 @@ Real Prism18::volume () const
 
   // Parameters of the 2D rule
   static const Real
-    w1 = 1.1169079483900573284750350421656140e-01L,
-    w2 = 5.4975871827660933819163162450105264e-02L,
-    a1 = 4.4594849091596488631832925388305199e-01L,
-    a2 = 9.1576213509770743459571463402201508e-02L;
+    w1 = Real(1.1169079483900573284750350421656140e-01L),
+    w2 = Real(5.4975871827660933819163162450105264e-02L),
+    a1 = Real(4.4594849091596488631832925388305199e-01L),
+    a2 = Real(9.1576213509770743459571463402201508e-02L);
 
   // Points and weights of the 2D rule
   static const Real w2D[N2D] = {w1, w1, w1, w2, w2, w2};

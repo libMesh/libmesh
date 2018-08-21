@@ -51,28 +51,29 @@ namespace
 // chunking computes the number of chunks and first-chunk-offset when splitting a mesh
 // into nsplits pieces using size procs for the given MPI rank.  The number of chunks and offset
 // are stored in nchunks and first_chunk respectively.
-void chunking(libMesh::processor_id_type size, libMesh::processor_id_type rank, unsigned int nsplits,
+void chunking(libMesh::processor_id_type size, libMesh::processor_id_type rank, libMesh::processor_id_type nsplits,
               libMesh::processor_id_type & nchunks, libMesh::processor_id_type & first_chunk)
 {
   if (nsplits % size == 0) // the chunks divide evenly over the processors
     {
       nchunks = nsplits / size;
-      first_chunk = nchunks * rank;
+      first_chunk = libMesh::cast_int<libMesh::processor_id_type>(nchunks * rank);
       return;
     }
 
   int nextra = nsplits % size;
   if (rank < nextra) // leftover chunks cause an extra chunk to be added to this processor
     {
-      nchunks = nsplits / size + 1;
-      first_chunk = nchunks * rank;
+      nchunks = libMesh::cast_int<libMesh::processor_id_type>(nsplits / size + 1);
+      first_chunk = libMesh::cast_int<libMesh::processor_id_type>(nchunks * rank);
     }
   else // no extra chunks, but first chunk is offset by extras on earlier ranks
     {
       nchunks = nsplits / size;
       // account for the case where nchunks is zero where we want max int
-      first_chunk = std::max((int)((nchunks + 1) * (nsplits % size) + nchunks * (rank - nsplits % size)),
-                             (1 - (int)nchunks) * std::numeric_limits<int>::max());
+      first_chunk = libMesh::cast_int<libMesh::processor_id_type>
+        (std::max((int)((nchunks + 1) * (nsplits % size) + nchunks * (rank - nsplits % size)),
+         (1 - (int)nchunks) * std::numeric_limits<int>::max()));
     }
 }
 
@@ -143,7 +144,7 @@ std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, processor_id_type nspl
 
   auto cpr = libmesh_make_unique<CheckpointIO>(mesh);
   cpr->current_processor_ids().clear();
-  for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
+  for (processor_id_type i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
     cpr->current_processor_ids().push_back(i);
   cpr->current_n_processors() = nsplits;
   cpr->parallel() = true;
@@ -235,7 +236,7 @@ processor_id_type CheckpointIO::select_split_config(const std::string & input_na
 
   if (!input_n_procs)
     input_n_procs = 1;
-  return input_n_procs;
+  return cast_int<processor_id_type>(input_n_procs);
 }
 
 void CheckpointIO::cleanup(const std::string & input_name, processor_id_type n_procs)
@@ -298,7 +299,7 @@ void CheckpointIO::write (const std::string & name)
       // Write out the max mesh dimension for backwards compatibility
       // with code that sets it independently of element dimensions
       {
-        uint16_t mesh_dimension = mesh.mesh_dimension();
+        uint16_t mesh_dimension = cast_int<uint16_t>(mesh.mesh_dimension());
         io.data(mesh_dimension, "# dimensions");
       }
 
@@ -534,7 +535,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      uint16_t p_level = elem->p_level();
+      uint16_t p_level = cast_int<uint16_t>(elem->p_level());
       io.data(p_level, "# p_level");
 
       uint16_t rflag = elem->refinement_flag();
@@ -575,8 +576,9 @@ void CheckpointIO::write_remote_elem (Xdr & io,
 #ifdef LIBMESH_ENABLE_AMR
       if (elem->has_children())
         {
-          const unsigned int nc = elem->n_children();
-          for (unsigned int c = 0; c != nc; ++c)
+          for (unsigned short c = 0,
+               nc = cast_int<unsigned short>(elem->n_children());
+               c != nc; ++c)
             {
               const Elem * child = elem->child_ptr(c);
               if (child == remote_elem ||
@@ -712,7 +714,7 @@ void CheckpointIO::read (const std::string & input_name)
   libmesh_assert(!mesh.n_elem());
 
   header_id_type data_size;
-  largest_id_type input_n_procs = select_split_config(input_name, data_size);
+  processor_id_type input_n_procs = select_split_config(input_name, data_size);
   auto header_name = header_file(input_name, input_n_procs);
   bool input_parallel = input_n_procs > 0;
 
@@ -732,7 +734,8 @@ void CheckpointIO::read (const std::string & input_name)
         (input_parallel && !mesh.is_replicated()) ?
         mesh.n_processors() : 1;
 
-      for (processor_id_type proc_id = begin_proc_id; proc_id < input_n_procs; proc_id += stride)
+      for (processor_id_type proc_id = begin_proc_id; proc_id < input_n_procs;
+           proc_id = cast_int<processor_id_type>(proc_id + stride))
         {
           auto file_name = split_file(input_name, input_n_procs, proc_id);
 
@@ -828,7 +831,7 @@ file_id_type CheckpointIO::read_header (const std::string & name)
 
   // broadcast data from processor 0, set values everywhere
   this->comm().broadcast(mesh_dimension);
-  mesh.set_mesh_dimension(mesh_dimension);
+  mesh.set_mesh_dimension(cast_int<unsigned char>(mesh_dimension));
 
   this->comm().broadcast(input_parallel);
 
@@ -1028,7 +1031,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
       const dof_id_type parent_id          =
         cast_int<dof_id_type>      (elem_data[4]);
       const unsigned short int child_num   =
-        cast_int<dof_id_type>      (elem_data[5]);
+        cast_int<unsigned short>   (elem_data[5]);
 
       Elem * parent =
         (parent_id == DofObject::invalid_processor_id) ?
@@ -1058,7 +1061,9 @@ void CheckpointIO::read_connectivity (Xdr & io)
 
           libmesh_assert_equal_to(old_elem->n_nodes(), conn_data.size());
 
-          for (std::size_t n=0; n != conn_data.size(); ++n)
+          for (unsigned int n=0,
+               n_conn = cast_int<unsigned int>(conn_data.size());
+               n != n_conn; n++)
             libmesh_assert_equal_to
               (old_elem->node_id(n),
                cast_int<dof_id_type>(conn_data[n]));
@@ -1097,7 +1102,9 @@ void CheckpointIO::read_connectivity (Xdr & io)
           libmesh_assert(elem->n_nodes() == conn_data.size());
 
           // Connect all the nodes to this element
-          for (std::size_t n=0; n<conn_data.size(); n++)
+          for (unsigned int n=0,
+               n_conn = cast_int<unsigned int>(conn_data.size());
+               n != n_conn; n++)
             elem->set_node(n) =
               mesh.node_ptr(cast_int<dof_id_type>(conn_data[n]));
 
@@ -1183,7 +1190,7 @@ void CheckpointIO::read_bcs (Xdr & io)
   for (std::size_t i=0; i<element_id_list.size(); i++)
     boundary_info.add_side
       (cast_int<dof_id_type>(element_id_list[i]), side_list[i],
-       cast_int<dof_id_type>(bc_id_list[i]));
+       cast_int<boundary_id_type>(bc_id_list[i]));
 }
 
 

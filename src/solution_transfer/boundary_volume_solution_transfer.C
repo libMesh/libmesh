@@ -58,15 +58,15 @@ transfer_volume_boundary(const Variable & from_var, const Variable & to_var)
   const MeshBase & to_mesh = to_sys->get_mesh();
 
   // Get system number and variable numbers
-  const unsigned short int from_sys_number = from_sys->number();
-  const unsigned short int from_var_number = from_var.number();
+  const unsigned int from_sys_number = from_sys->number();
+  const unsigned int from_var_number = from_var.number();
 
-  const unsigned short int to_sys_number = to_sys->number();
-  const unsigned short int to_var_number = to_var.number();
+  const unsigned int to_sys_number = to_sys->number();
+  const unsigned int to_var_number = to_var.number();
 
   // Get a constant reference to variables, get their number of components
-  const unsigned short int from_n_comp = from_var.n_components();
-  const unsigned short int to_n_comp = to_var.n_components();
+  const unsigned int from_n_comp = from_var.n_components();
+  const unsigned int to_n_comp = to_var.n_components();
 
   // Sanity check that the variables have the same number of components
   libmesh_assert_equal_to(from_n_comp, to_n_comp);
@@ -164,10 +164,10 @@ transfer_boundary_volume(const Variable & from_var, const Variable & to_var)
   const DofMap & dof_map = from_sys->get_dof_map();
 
   // Get system number and variable numbers
-  const unsigned short int to_sys_number = to_sys->number();
-  const unsigned short int to_var_number = to_var.number();
-  const unsigned short int from_var_number = from_var.number();
-  const unsigned short int to_n_comp = to_var.n_components();
+  const unsigned int to_sys_number = to_sys->number();
+  const unsigned int to_var_number = to_var.number();
+  const unsigned int from_var_number = from_var.number();
+  const unsigned int to_n_comp = to_var.n_components();
 
   // In order to get solution vectors from BoundaryMesh
   std::vector<dof_id_type> from_dof_indices;

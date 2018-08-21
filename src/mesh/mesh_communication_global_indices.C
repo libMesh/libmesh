@@ -938,7 +938,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
     {
       std::vector<std::vector<dof_id_type>::const_iterator>
         next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
-      for (unsigned int pid=0; pid<communicator.size(); pid++)
+      for (processor_id_type pid=0; pid<communicator.size(); pid++)
         next_obj_on_proc.push_back(filled_request[pid].begin());
 
       unsigned int cnt=0;

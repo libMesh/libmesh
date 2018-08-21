@@ -70,7 +70,7 @@ public:
   /**
    * \returns 0, the dimensionality of the object.
    */
-  virtual unsigned int dim () const override { return 0; }
+  virtual unsigned short dim () const override { return 0; }
 
   /**
    * \returns 1.

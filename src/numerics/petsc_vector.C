@@ -387,7 +387,8 @@ void PetscVector<T>::insert (const T * v,
 
   PetscErrorCode ierr=0;
   PetscInt * idx_values = numeric_petsc_cast(&dof_indices[0]);
-  ierr = VecSetValues (_vec, dof_indices.size(), idx_values, v, INSERT_VALUES);
+  ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
+                       idx_values, v, INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
 
   this->_is_closed = false;
@@ -790,7 +791,7 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
 
   // Create a sequential destination Vec with the right number of entries on each proc.
   Vec dest;
-  ierr = VecCreateSeq(PETSC_COMM_SELF, indices.size(), &dest);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, cast_int<PetscInt>(indices.size()), &dest);
   LIBMESH_CHKERR(ierr);
 
   // Create an IS using the libmesh routine.  PETSc does not own the
@@ -799,7 +800,7 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   PetscInt * idxptr =
     indices.empty() ? nullptr : numeric_petsc_cast(&indices[0]);
   IS is;
-  ierr = ISCreateLibMesh(this->comm().get(), indices.size(), idxptr,
+  ierr = ISCreateLibMesh(this->comm().get(), cast_int<PetscInt>(indices.size()), idxptr,
                          PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
@@ -1299,14 +1300,14 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
 
   // Construct index sets
   ierr = ISCreateLibMesh(this->comm().get(),
-                         rows.size(),
+                         cast_int<PetscInt>(rows.size()),
                          numeric_petsc_cast(&rows[0]),
                          PETSC_USE_POINTER,
                          &parent_is);
   LIBMESH_CHKERR(ierr);
 
   ierr = ISCreateLibMesh(this->comm().get(),
-                         rows.size(),
+                         cast_int<PetscInt>(rows.size()),
                          &idx[0],
                          PETSC_USE_POINTER,
                          &subvector_is);

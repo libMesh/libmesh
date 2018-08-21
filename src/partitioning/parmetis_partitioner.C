@@ -359,10 +359,11 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
         libmesh_assert_less (global_index, subdomain_bounds.back());
 
         const unsigned int subdomain_id =
-          std::distance(subdomain_bounds.begin(),
-                        std::lower_bound(subdomain_bounds.begin(),
-                                         subdomain_bounds.end(),
-                                         global_index));
+          cast_int<unsigned int>
+          (std::distance(subdomain_bounds.begin(),
+                         std::lower_bound(subdomain_bounds.begin(),
+                                          subdomain_bounds.end(),
+                                          global_index)));
         libmesh_assert_less (subdomain_id, static_cast<unsigned int>(_pmetis->nparts));
         libmesh_assert_less (local_index, _pmetis->part.size());
 
@@ -387,7 +388,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   dof_id_type graph_size=0;
 
   for (auto & row: _dual_graph)
-   graph_size += row.size();
+   graph_size += cast_int<dof_id_type>(row.size());
 
   // Reserve space in the adjacency array
   _pmetis->xadj.clear();
@@ -397,14 +398,14 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
   for (auto & graph_row : _dual_graph)
     {
-      _pmetis->xadj.push_back(_pmetis->adjncy.size());
+      _pmetis->xadj.push_back(cast_int<int>(_pmetis->adjncy.size()));
       _pmetis->adjncy.insert(_pmetis->adjncy.end(),
                              graph_row.begin(),
                              graph_row.end());
     }
 
   // The end of the adjacency array for the last elem
-  _pmetis->xadj.push_back(_pmetis->adjncy.size());
+  _pmetis->xadj.push_back(cast_int<int>(_pmetis->adjncy.size()));
 
   libmesh_assert_equal_to (_pmetis->xadj.size(), n_active_local_elem+1);
   libmesh_assert_equal_to (_pmetis->adjncy.size(), graph_size);

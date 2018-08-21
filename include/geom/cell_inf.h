@@ -63,7 +63,7 @@ public:
   /**
    * \returns 3, the dimensionality of the object.
    */
-  virtual unsigned int dim () const override { return 3; }
+  virtual unsigned short dim () const override { return 3; }
 
   /**
    * \returns \p true.  All classes derived from \p InfCell

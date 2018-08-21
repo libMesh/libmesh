@@ -320,7 +320,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       libmesh_assert (solution_vectors->find(sys) !=
                       solution_vectors->end());
       const NumericVector<Number> * vec = solution_vectors->find(sys)->second;
-      for (std::size_t j=0; j != sys->qoi.size(); ++j)
+      for (unsigned int j=0; j != sys->n_qois(); ++j)
         {
           std::ostringstream adjoint_name;
           adjoint_name << "adjoint_solution" << j;
@@ -365,7 +365,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
               if (solve_adjoint)
                 {
                   bool found_vec = false;
-                  for (std::size_t j=0; j != sys->qoi.size(); ++j)
+                  for (unsigned int j=0; j != sys->n_qois(); ++j)
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
@@ -394,7 +394,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
                   libmesh_assert (solution_vectors->find(sys) !=
                                   solution_vectors->end());
                   const NumericVector<Number> * vec = solution_vectors->find(sys)->second;
-                  for (std::size_t j=0; j != sys->qoi.size(); ++j)
+                  for (unsigned int j=0, n_qois = sys->n_qois();
+                       j != n_qois; ++j)
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
@@ -450,7 +451,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
           if (solve_adjoint)
             {
               unsigned int adj = libMesh::invalid_uint;
-              for (std::size_t j=0; j != sys->qoi.size(); ++j)
+              for (unsigned int j=0, n_qois = sys->n_qois();
+                   j != n_qois; ++j)
                 {
                   std::ostringstream adjoint_name;
                   adjoint_name << "adjoint_solution" << j;

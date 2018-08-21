@@ -257,10 +257,10 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_subdomain_names(io);
 
       // write connectivity
-      this->write_serialized_connectivity (io, n_elem);
+      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem));
 
       // write the nodal locations
-      this->write_serialized_nodes (io, max_node_id);
+      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -280,10 +280,10 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_subdomain_names(io);
 
       // write connectivity
-      this->write_serialized_connectivity (io, n_elem);
+      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem));
 
       // write the nodal locations
-      this->write_serialized_nodes (io, max_node_id);
+      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -1296,7 +1296,7 @@ void XdrIO::read (const std::string & name)
    * For now we will assume that "type size" is how the entire file will be encoded.
    */
   if (version_at_least_0_9_2())
-    _field_width = meta_data[2];
+    _field_width = cast_int<unsigned int>(meta_data[2]);
 
   // On systems where uint64_t==unsigned long, we were previously
   // writing 64-bit unsigned integers via xdr_u_long(), a function
@@ -1318,10 +1318,10 @@ void XdrIO::read (const std::string & name)
       this->read_serialized_subdomain_names(io);
 
       // read connectivity
-      this->read_serialized_connectivity (io, n_elem, meta_data, type_size);
+      this->read_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), meta_data, type_size);
 
       // read the nodal locations
-      this->read_serialized_nodes (io, n_nodes);
+      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes));
 
       // read the side boundary conditions
       this->read_serialized_side_bcs (io, type_size);
@@ -1347,10 +1347,10 @@ void XdrIO::read (const std::string & name)
       this->read_serialized_subdomain_names(io);
 
       // read connectivity
-      this->read_serialized_connectivity (io, n_elem, meta_data, type_size);
+      this->read_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), meta_data, type_size);
 
       // read the nodal locations
-      this->read_serialized_nodes (io, n_nodes);
+      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes));
 
       // read the boundary conditions
       this->read_serialized_side_bcs (io, type_size);
@@ -1421,8 +1421,8 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   const T & n_elem = meta_data[0];
   const T & n_nodes = meta_data[1];
 
-  mesh.reserve_elem(n_elem);
-  mesh.reserve_nodes(n_nodes);
+  mesh.reserve_elem(cast_int<dof_id_type>(n_elem));
+  mesh.reserve_nodes(cast_int<dof_id_type>(n_nodes));
 
   // Our mesh is pre-partitioned as it's created
   this->set_n_partitions(this->n_processors());
@@ -1433,7 +1433,7 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
    * For now we will assume that "type size" is how the entire file will be encoded.
    */
   if (version_at_least_0_9_2())
-    _field_width = meta_data[2];
+    _field_width = cast_int<unsigned int>(meta_data[2]);
 }
 
 

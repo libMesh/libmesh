@@ -95,7 +95,7 @@ public:
    * larger than the old, empty ParameterPointer accessors fill the
    * new entries.
    */
-  void resize(unsigned int s);
+  void resize(std::size_t s);
 
   /**
    * Adds an additional parameter accessor to the end of the vector.
@@ -110,12 +110,12 @@ public:
    * Sets the number of parameters to be used.  This method is for
    * resizing a ParameterVector that owns its own parameter values
    */
-  void deep_resize(unsigned int s);
+  void deep_resize(std::size_t s);
 
   /**
    * \returns A smart-pointer to a parameter value
    */
-  const ParameterAccessor<Number> & operator[](unsigned int i) const;
+  const ParameterAccessor<Number> & operator[](std::size_t i) const;
 
   /**
    * \returns A reference to a smart-pointer to a parameter value,
@@ -123,7 +123,7 @@ public:
    * This method is deprecated and may not work with more
    * sophisticated ParameterAccessor subclasses.
    */
-  ParameterAccessor<Number> & operator[](unsigned int i);
+  ParameterAccessor<Number> & operator[](std::size_t i);
 
   /**
    * Multiplication operator; acts individually on each parameter.
@@ -192,7 +192,7 @@ void ParameterVector::push_back(std::unique_ptr<ParameterAccessor<Number>> new_a
 
 
 inline
-const ParameterAccessor<Number> & ParameterVector::operator[] (unsigned int i) const
+const ParameterAccessor<Number> & ParameterVector::operator[] (std::size_t i) const
 {
   libmesh_assert_greater (_params.size(), i);
 
@@ -202,7 +202,7 @@ const ParameterAccessor<Number> & ParameterVector::operator[] (unsigned int i) c
 
 
 inline
-ParameterAccessor<Number> & ParameterVector::operator[] (unsigned int i)
+ParameterAccessor<Number> & ParameterVector::operator[] (std::size_t i)
 {
   libmesh_assert_greater (_params.size(), i);
 

@@ -280,7 +280,9 @@ void MeshFunction::operator() (const Point & p,
 
 
         // loop over all vars
-        for (std::size_t index=0; index < this->_system_vars.size(); index++)
+        for (unsigned int index=0,
+             sz = cast_int<unsigned int>(this->_system_vars.size());
+             index != sz; ++index)
           {
             /*
              * the data for this variable
@@ -372,7 +374,9 @@ void MeshFunction::discontinuous_value (const Point & p,
 
 
       // loop over all vars
-      for (std::size_t index=0; index < this->_system_vars.size(); index++)
+      for (unsigned int index=0,
+           sz = cast_int<unsigned int>(this->_system_vars.size());
+           index != sz; ++index)
         {
           /*
            * the data for this variable
@@ -461,7 +465,9 @@ void MeshFunction::gradient (const Point & p,
         std::vector<Point> point_list (1, mapped_point);
 
         // loop over all vars
-        for (std::size_t index=0; index < this->_system_vars.size(); index++)
+        for (unsigned int index=0,
+             sz = cast_int<unsigned int>(this->_system_vars.size());
+             index != sz; ++index)
           {
             /*
              * the data for this variable
@@ -543,7 +549,9 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
       // loop over all vars
       std::vector<Point> point_list (1, mapped_point);
-      for (std::size_t index = 0 ; index < this->_system_vars.size(); ++index)
+      for (unsigned int index=0,
+           sz = cast_int<unsigned int>(this->_system_vars.size());
+           index != sz; ++index)
         {
           /*
            * the data for this variable
@@ -623,7 +631,9 @@ void MeshFunction::hessian (const Point & p,
         std::vector<Point> point_list (1, mapped_point);
 
         // loop over all vars
-        for (std::size_t index=0; index < this->_system_vars.size(); index++)
+        for (unsigned int index=0,
+             sz = cast_int<unsigned int>(this->_system_vars.size());
+             index != sz; ++index)
           {
             /*
              * the data for this variable

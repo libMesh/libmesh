@@ -1862,7 +1862,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
   //     << ", num_blks = "    << num_blks
   //     << std::endl;
 
-  dof_id_type written_length=0;                                   // The numer of values written.  This will be returned
+  std::size_t written_length=0;                                  // The numer of values written.  This will be returned
   std::vector<std::vector<dof_id_type>> xfer_ids(num_blks);      // The global IDs and # of components for the local objects in all blocks
   std::vector<std::vector<Number>>      send_vals(num_blks);     // The raw values for the local objects in all blocks
   std::vector<Parallel::Request>

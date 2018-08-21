@@ -230,8 +230,10 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   const std::vector<std::vector<Real>> & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  const unsigned int n_p_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(p_var).size());
+  const unsigned int n_u_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(u_var).size());
   libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices(v_var).size());
 
   // The subvectors and submatrices we need to fill:
@@ -353,8 +355,10 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
   const std::vector<std::vector<Real>> & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
-  const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+  const unsigned int n_u_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(u_var).size());
+  const unsigned int n_p_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(p_var).size());
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> & Kpu = c.get_elem_jacobian(p_var, u_var);

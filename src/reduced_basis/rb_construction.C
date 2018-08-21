@@ -33,6 +33,7 @@
 #include "libmesh/gmv_io.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/getpot.h"
+#include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"
 #include "libmesh/xdr_cxx.h"
@@ -238,7 +239,7 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
 
       unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
       std::vector<Real> vals_for_param(n_vals_for_param);
-      for (std::size_t j=0; j<vals_for_param.size(); j++)
+      for (auto j : IntRange<unsigned int>(0, vals_for_param.size()))
         vals_for_param[j] = infile(param_name, 0., j);
 
       discrete_parameter_values_in[param_name] = vals_for_param;
@@ -1765,7 +1766,7 @@ void RBConstruction::load_rb_solution()
                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
-  for (std::size_t i=0; i<get_rb_evaluation().RB_solution.size(); i++)
+  for (auto i : IntRange<unsigned int>(0, get_rb_evaluation().RB_solution.size()))
     solution->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
 
   update();

@@ -45,7 +45,7 @@ FEMContext::FEMContext (const System & sys)
     _custom_solution(nullptr),
     _boundary_info(sys.get_mesh().get_boundary_info()),
     _elem(nullptr),
-    _dim(sys.get_mesh().mesh_dimension()),
+    _dim(cast_int<unsigned char>(sys.get_mesh().mesh_dimension())),
     _elem_dim(0), /* This will be reset in set_elem(). */
     _elem_dims(sys.get_mesh().elem_dimensions()),
     _element_qrule(4),
@@ -66,7 +66,7 @@ FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
     _custom_solution(nullptr),
     _boundary_info(sys.get_mesh().get_boundary_info()),
     _elem(nullptr),
-    _dim(sys.get_mesh().mesh_dimension()),
+    _dim(cast_int<unsigned char>(sys.get_mesh().mesh_dimension())),
     _elem_dim(0), /* This will be reset in set_elem(). */
     _elem_dims(sys.get_mesh().elem_dimensions()),
     _element_qrule(4),
@@ -1568,7 +1568,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
 
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices().size());
-  const std::size_t n_qoi = sys.qoi.size();
+  const unsigned int n_qoi = sys.n_qois();
 
   if (this->algebraic_type() != NONE &&
       this->algebraic_type() != DOFS_ONLY &&
@@ -1755,7 +1755,8 @@ void FEMContext::set_elem( const Elem * e )
   this->_elem = e;
 
   // If e is nullptr, we assume it's SCALAR and set _elem_dim to 0.
-  this->_elem_dim = this->_elem ? this->_elem->dim() : 0;
+  this->_elem_dim =
+    cast_int<unsigned char>(this->_elem ? this->_elem->dim() : 0);
 }
 
 void FEMContext::_update_time_from_system(Real theta)

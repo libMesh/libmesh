@@ -873,7 +873,7 @@ int main (int argc, char ** argv)
             if (verbose)
               libMesh::out << " Mesh got refined, will write only _active_ elements." << std::endl;
 
-            Mesh new_mesh (init.comm(), mesh.mesh_dimension());
+            Mesh new_mesh (init.comm(), cast_int<unsigned char>(mesh.mesh_dimension()));
 
             construct_mesh_of_active_elements(new_mesh, mesh);
 

@@ -1965,7 +1965,8 @@ void DofMap::dof_indices (const Elem * const elem,
                 }
               else
                 _dof_indices(*elem, elem->p_level(), di, v,
-                             &elem_nodes[0], elem_nodes.size()
+                             &elem_nodes[0],
+                             cast_int<unsigned int>(elem_nodes.size())
 #ifdef DEBUG
                              , tot_size
 #endif
@@ -2042,7 +2043,7 @@ void DofMap::dof_indices (const Elem * const elem,
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
           _dof_indices(*elem, p_level, di, vn, &elem_nodes[0],
-                       elem_nodes.size()
+                       cast_int<unsigned int>(elem_nodes.size())
 #ifdef DEBUG
                        , tot_size
 #endif
@@ -2203,7 +2204,7 @@ void DofMap::_dof_indices (const Elem & elem,
         FEInterface::n_dofs_at_node_function(dim, fe_type);
 
       // Get the node-based DOF numbers
-      for (unsigned int n=0; n<n_nodes; n++)
+      for (unsigned int n=0; n != n_nodes; n++)
         {
           const Node * node      = nodes[n];
 
@@ -2410,7 +2411,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
       const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *>(elem);
       MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
       nodes_ptr = &elem_nodes[0];
-      n_nodes = elem_nodes.size();
+      n_nodes = cast_int<unsigned int>(elem_nodes.size());
     }
   else
     {
@@ -2463,7 +2464,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                 FEInterface::n_dofs_at_node_function(dim, fe_type);
 
               // Get the node-based DOF numbers
-              for (std::size_t n=0; n<n_nodes; n++)
+              for (unsigned int n=0; n<n_nodes; n++)
                 {
                   const Node * node = nodes_ptr[n];
 

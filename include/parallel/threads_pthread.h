@@ -213,8 +213,8 @@ private:
 template <typename Range>
 unsigned int num_pthreads(Range & range)
 {
-  unsigned int min = std::min((std::size_t)libMesh::n_threads(), range.size());
-  return min > 0 ? min : 1;
+  std::size_t min = std::min((std::size_t)libMesh::n_threads(), range.size());
+  return min > 0 ? cast_int<unsigned int>(min) : 1;
 }
 
 template <typename Range, typename Body>

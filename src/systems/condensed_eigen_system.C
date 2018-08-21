@@ -22,10 +22,12 @@
 #if defined(LIBMESH_HAVE_SLEPC)
 
 #include "libmesh/condensed_eigen_system.h"
+
+#include "libmesh/dof_map.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/dof_map.h"
 #include "libmesh/parallel.h"
 
 namespace libMesh
@@ -90,7 +92,8 @@ dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
     }
   else
     {
-      dof_id_type n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
+      dof_id_type n_global_non_condensed_dofs =
+        cast_int<dof_id_type>(local_non_condensed_dofs_vector.size());
       this->comm().sum(n_global_non_condensed_dofs);
 
       return n_global_non_condensed_dofs;
@@ -199,7 +202,8 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
   // This function assumes that condensed_solve has just been called.
   // If this is not the case, then we will trip an asset in get_eigenpair
   std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
-  dof_id_type n_local = local_non_condensed_dofs_vector.size();
+  const dof_id_type n_local =
+    cast_int<dof_id_type>(local_non_condensed_dofs_vector.size());
   dof_id_type n       = n_local;
   this->comm().sum(n);
 
@@ -209,9 +213,9 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 
   // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
   this->solution->zero();
-  for (std::size_t j=0; j<local_non_condensed_dofs_vector.size(); j++)
+  for (auto j : IntRange<dof_id_type>(0, n_local))
     {
-      dof_id_type index = local_non_condensed_dofs_vector[j];
+      const dof_id_type index = local_non_condensed_dofs_vector[j];
       solution->set(index,(*temp)(temp->first_local_index()+j));
     }
 

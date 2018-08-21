@@ -163,13 +163,13 @@ void Communicator::assign(const communicator & comm)
         (MPI_Comm_size(_communicator, &i));
 
       libmesh_assert_greater_equal (i, 0);
-      _size = static_cast<unsigned int>(i);
+      _size = cast_int<processor_id_type>(i);
 
       libmesh_call_mpi
         (MPI_Comm_rank(_communicator, &i));
 
       libmesh_assert_greater_equal (i, 0);
-      _rank = static_cast<unsigned int>(i);
+      _rank = cast_int<processor_id_type>(i);
     }
   else
     {

@@ -69,6 +69,8 @@
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #if (__GNUC__ > 5)
+// Ignore this for VTK
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 // Ignore warnings from code that does "if (foo) bar();"
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 // Ignore warnings from bad placement new use

@@ -483,7 +483,7 @@ public:
   {
     libmesh_assert_not_equal_to
       (_location, std::numeric_limits<std::size_t>::max());
-    return _location % _row._mat.size();
+    return cast_int<unsigned int>(_location % _row._mat.size());
   }
 
   ConstCouplingRowConstIterator & operator++ ()

@@ -166,9 +166,9 @@ public:
 
   Communicator & operator= (const communicator & comm);
 
-  unsigned int rank() const { return _rank; }
+  processor_id_type rank() const { return _rank; }
 
-  unsigned int size() const { return _size; }
+  processor_id_type size() const { return _size; }
 
   /**
    * Whether to use default or synchronous sends?
@@ -184,7 +184,7 @@ private:
   void assign(const communicator & comm);
 
   communicator  _communicator;
-  unsigned int  _rank, _size;
+  processor_id_type _rank, _size;
   SendMode _send_mode;
 
   // mutable used_tag_values - not thread-safe, but then Parallel::

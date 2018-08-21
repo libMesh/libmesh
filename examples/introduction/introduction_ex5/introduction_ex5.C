@@ -307,12 +307,16 @@ void assemble_poisson(EquationSystems & es,
     {
       dof_map.dof_indices (elem, dof_indices);
 
+      const unsigned int n_dofs =
+        cast_int<unsigned int>(dof_indices.size());
+
       fe->reinit (elem);
 
-      Ke.resize (dof_indices.size(),
-                 dof_indices.size());
+      libmesh_assert_equal_to (n_dofs, phi.size());
 
-      Fe.resize (dof_indices.size());
+      Ke.resize (n_dofs, n_dofs);
+
+      Fe.resize (n_dofs);
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.  Note the slightly different
@@ -320,8 +324,8 @@ void assemble_poisson(EquationSystems & es,
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
         {
           // Add the matrix contribution
-          for (std::size_t i=0; i<phi.size(); i++)
-            for (std::size_t j=0; j<phi.size(); j++)
+          for (unsigned int i=0; i != n_dofs; i++)
+            for (unsigned int j=0; j != n_dofs; j++)
               Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
           // fxy is the forcing function for the Poisson equation.
@@ -359,7 +363,7 @@ void assemble_poisson(EquationSystems & es,
 
 
           // Add the RHS contribution
-          for (std::size_t i=0; i<phi.size(); i++)
+          for (unsigned int i=0; i != n_dofs; i++)
             Fe(i) += JxW[qp]*fxy*phi[i][qp];
         }
 

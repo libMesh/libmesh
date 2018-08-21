@@ -112,8 +112,8 @@ public:
       exii.copy_elemental_solution(sys, "teste", "e");
 #endif
 
-      for (Real x = 1.L/6.L; x < 1; x += 1.L/3.L)
-        for (Real y = 1.L/6.L; y < 1; y += 1.L/3.L)
+      for (Real x = Real(1.L/6.L); x < 1; x += Real(1.L/3.L))
+        for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
           {
             Point p(x,y);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),

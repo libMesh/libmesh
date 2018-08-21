@@ -20,6 +20,8 @@
 #ifndef LIBMESH_INT_RANGE_H
 #define LIBMESH_INT_RANGE_H
 
+#include "libmesh/libmesh_common.h" // cast_int
+
 // C++ Includes   -----------------------------------
 #include <map>
 
@@ -34,6 +36,10 @@ namespace libMesh
  * function call, this allows range-based for loops to be easily
  * written which make only a single such call, rather than a new call
  * for each iteration.
+ *
+ * We perform a cast_int operation (no-op in opt mode, test+assert in
+ * debug) at construction time to make sure that the given range
+ * bounds are representable by the given range type.
  *
  * \author  Roy H. Stogner
  */
@@ -71,7 +77,11 @@ public:
     T _i;
   };
 
-  IntRange(T begin, T end) : _begin(begin), _end(end) {}
+  template <typename U, typename V>
+  IntRange(U begin, V end) :
+    _begin(cast_int<T>(begin)),
+    _end(cast_int<T>(end))
+  {}
 
   iterator begin() const { return _begin; }
 

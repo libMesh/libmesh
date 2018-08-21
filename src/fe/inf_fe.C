@@ -221,8 +221,8 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
             break;
           radial_pts.push_back(Point(radius));
         }
-      const unsigned int radial_pts_size = radial_pts.size();
-      const unsigned int base_pts_size = pts->size() / radial_pts_size;
+      const std::size_t radial_pts_size = radial_pts.size();
+      const std::size_t base_pts_size = pts->size() / radial_pts_size;
       // If we're a tensor product we should have no remainder
       libmesh_assert_equal_to
         (base_pts_size * radial_pts_size, pts->size());
@@ -318,7 +318,7 @@ init_radial_shape_functions(const Elem * libmesh_dbg_var(inf_elem),
   const Order radial_approx_order = fe_type.radial_order;
   const unsigned int n_radial_approx_shape_functions = Radial::n_dofs(radial_approx_order);
 
-  const unsigned int n_radial_qp =
+  const std::size_t n_radial_qp =
     radial_pts ? radial_pts->size() : radial_qrule->n_points();
   const std::vector<Point> & radial_qp =
     radial_pts ? *radial_pts : radial_qrule->get_points();
@@ -353,7 +353,7 @@ init_radial_shape_functions(const Elem * libmesh_dbg_var(inf_elem),
 
 
   // compute scalar values at radial quadrature points
-  for (unsigned int p=0; p<n_radial_qp; p++)
+  for (std::size_t p=0; p<n_radial_qp; p++)
     {
       som[p] = Radial::decay (radial_qp[p](0));
       dsomdv[p] = Radial::decay_deriv (radial_qp[p](0));
@@ -362,7 +362,7 @@ init_radial_shape_functions(const Elem * libmesh_dbg_var(inf_elem),
 
   // evaluate the mode shapes in radial direction at radial quadrature points
   for (unsigned int i=0; i<n_radial_approx_shape_functions; i++)
-    for (unsigned int p=0; p<n_radial_qp; p++)
+    for (std::size_t p=0; p<n_radial_qp; p++)
       {
         mode[i][p] = InfFE<Dim,T_radial,T_map>::eval (radial_qp[p](0), radial_approx_order, i);
         dmodedv[i][p] = InfFE<Dim,T_radial,T_map>::eval_deriv (radial_qp[p](0), radial_approx_order, i);
@@ -371,7 +371,7 @@ init_radial_shape_functions(const Elem * libmesh_dbg_var(inf_elem),
 
   // evaluate the mapping functions in radial direction at radial quadrature points
   for (unsigned int i=0; i<n_radial_mapping_shape_functions; i++)
-    for (unsigned int p=0; p<n_radial_qp; p++)
+    for (std::size_t p=0; p<n_radial_qp; p++)
       {
         radial_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval (radial_qp[p](0), radial_mapping_order, i);
         dradialdv_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (radial_qp[p](0), radial_mapping_order, i);
@@ -428,7 +428,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
 
 
   // The number of the base quadrature points.
-  const unsigned int n_base_qp = base_qp.size();
+  const unsigned int n_base_qp = cast_int<unsigned int>(base_qp.size());
 
   // The total number of quadrature points.
   const unsigned int n_total_qp = n_radial_qp * n_base_qp;
@@ -763,10 +763,10 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
         const std::vector<std::vector<Real>> & Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
         const std::vector<std::vector<Real>> & St_map = (base_fe->get_fe_map()).get_dphideta_map();
 
-        const unsigned int n_radial_qp = som.size();
+        const unsigned int n_radial_qp = cast_int<unsigned int>(som.size());
         if (radial_qrule)
           libmesh_assert_equal_to(n_radial_qp, radial_qrule->n_points());
-        const unsigned int n_base_qp = S_map[0].size();
+        const unsigned int n_base_qp = cast_int<unsigned int>(S_map[0].size());
         if (base_qrule)
           libmesh_assert_equal_to(n_base_qp, base_qrule->n_points());
 

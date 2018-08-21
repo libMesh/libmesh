@@ -578,16 +578,19 @@ void assemble_cd (EquationSystems & es,
       // (phi, dphi) for the current element.
       fe->reinit (elem);
 
+      const unsigned int n_dofs =
+        cast_int<unsigned int>(dof_indices.size());
+      libmesh_assert_equal_to (n_dofs, phi.size());
+
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
       // the number of degrees of freedom might have changed from
       // the last element.  Note that this will be the case if the
       // element type is different (i.e. the last element was a
       // triangle, now we are on a quadrilateral).
-      Ke.resize (dof_indices.size(),
-                 dof_indices.size());
+      Ke.resize (n_dofs, n_dofs);
 
-      Fe.resize (dof_indices.size());
+      Fe.resize (n_dofs);
 
       // Now we will build the element matrix and right-hand-side.
       // Constructing the RHS requires the solution and its
@@ -602,7 +605,7 @@ void assemble_cd (EquationSystems & es,
           Gradient grad_u_old;
 
           // Compute the old solution & its gradient.
-          for (std::size_t l=0; l<phi.size(); l++)
+          for (unsigned int l=0; l != n_dofs; l++)
             {
               u_old += phi[l][qp]*system.old_solution (dof_indices[l]);
 
@@ -613,7 +616,7 @@ void assemble_cd (EquationSystems & es,
             }
 
           // Now compute the element matrix and RHS contributions.
-          for (std::size_t i=0; i<phi.size(); i++)
+          for (unsigned int i=0; i != n_dofs; i++)
             {
               // The RHS contribution
               Fe(i) += JxW[qp]*(
@@ -629,7 +632,7 @@ void assemble_cd (EquationSystems & es,
                                         diffusivity*(grad_u_old*dphi[i][qp]))
                                 );
 
-              for (std::size_t j=0; j<phi.size(); j++)
+              for (unsigned int j=0; j != n_dofs; j++)
                 {
                   // The matrix contribution
                   Ke(i,j) += JxW[qp]*(
@@ -666,6 +669,8 @@ void assemble_cd (EquationSystems & es,
             {
               fe_face->reinit(elem, s);
 
+              libmesh_assert_equal_to (n_dofs, psi.size());
+
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
                   const Number value = exact_solution (qface_points[qp](0),
@@ -673,12 +678,12 @@ void assemble_cd (EquationSystems & es,
                                                        system.time);
 
                   // RHS contribution
-                  for (std::size_t i=0; i<psi.size(); i++)
+                  for (unsigned int i=0; i != n_dofs; i++)
                     Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
 
                   // Matrix contribution
-                  for (std::size_t i=0; i<psi.size(); i++)
-                    for (std::size_t j=0; j<psi.size(); j++)
+                  for (unsigned int i=0; i != n_dofs; i++)
+                    for (unsigned int j=0; j != n_dofs; j++)
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
             }

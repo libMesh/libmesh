@@ -180,7 +180,7 @@ public:
         {
           _cosines[dir].resize(_nelem[dir]+1);
           for (std::size_t i=0; i<_cosines[dir].size(); ++i)
-            _cosines[dir][i] = std::cos(libMesh::pi * i / _nelem[dir]);
+            _cosines[dir][i] = std::cos(libMesh::pi * Real(i) / _nelem[dir]);
         }
   }
 
@@ -220,13 +220,15 @@ public:
           Real float_index = (p(dir) - _mins[dir]) * _nelem[dir] / _widths[dir];
 
           // std::modf separates the fractional and integer parts of the index.
-          Real integer_part = 0;
-          Real fractional_part = std::modf(float_index, &integer_part);
+          Real integer_part_f = 0;
+          const Real fractional_part = std::modf(float_index, &integer_part_f);
+
+          const int integer_part = int(integer_part_f);
 
           // Vertex node?
           if (std::abs(fractional_part) < TOLERANCE || std::abs(fractional_part - 1.0) < TOLERANCE)
             {
-              int index = round(float_index);
+              int index = int(round(float_index));
 
               // Move node to the Gauss-Lobatto position.
               output(dir) = _mins[dir] + _widths[dir] * 0.5 * (1.0 - _cosines[dir][index]);
@@ -1403,7 +1405,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               }
 
             // Add the new elements
-            for (std::size_t i=0; i<new_elements.size(); ++i)
+            for (dof_id_type i=0,
+                 n_new = cast_int<dof_id_type>(new_elements.size());
+                 i != n_new; ++i)
               {
                 new_elements[i]->set_id(i);
                 mesh.add_elem(new_elements[i]);
@@ -1551,7 +1555,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // mesh_dimension, since the original intent of this function was to
   // allow the geometric entity (line, circle, ball, sphere)
   // constructed to be determined by the mesh's dimension.
-  unsigned int orig_mesh_dimension = mesh.mesh_dimension();
+  unsigned char orig_mesh_dimension =
+    cast_int<unsigned char>(mesh.mesh_dimension());
   mesh.clear();
   mesh.set_mesh_dimension(orig_mesh_dimension);
 

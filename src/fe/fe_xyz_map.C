@@ -58,7 +58,9 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
           }
 
         // compute x, dxdxi at the quadrature points
-        for (std::size_t i=0; i<this->psi_map.size(); i++) // sum over the nodes
+        for (unsigned int i=0,
+             n_psi_map = cast_int<unsigned int>(this->psi_map.size());
+             i != n_psi_map; i++) // sum over the nodes
           {
             const Point & side_point = side->point(i);
 
@@ -139,7 +141,9 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
           }
 
         // compute x, dxdxi at the quadrature points
-        for (std::size_t i=0; i<this->psi_map.size(); i++) // sum over the nodes
+        for (unsigned int i=0,
+             n_psi_map = cast_int<unsigned int>(this->psi_map.size());
+             i != n_psi_map; i++) // sum over the nodes
           {
             const Point & side_point = side->point(i);
 

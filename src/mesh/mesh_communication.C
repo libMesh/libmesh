@@ -1039,8 +1039,8 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
   std::vector<unsigned char> recv_from_proc(send_to_proc);
   mesh.comm().alltoall(recv_from_proc);
 
-  const processor_id_type n_receives =
-    std::count(recv_from_proc.begin(), recv_from_proc.end(), 1);
+  const processor_id_type n_receives = cast_int<processor_id_type>
+    (std::count(recv_from_proc.begin(), recv_from_proc.end(), 1));
 
   // Receive nodes first since elements will need to attach to them
   for (processor_id_type recv_i = 0; recv_i != n_receives; ++recv_i)
@@ -1369,7 +1369,7 @@ struct SyncPLevels
       {
         Elem & elem = mesh.elem_ref(ids[i]);
 
-        ids_out.push_back(elem.p_level());
+        ids_out.push_back(cast_int<unsigned char>(elem.p_level()));
       }
   }
 

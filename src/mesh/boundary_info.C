@@ -347,7 +347,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 
           if (centroid_distance < (tolerance * boundary_elem->hmin()))
             {
-              interior_parent_side_index = side;
+              interior_parent_side_index = cast_int<unsigned char>(side);
               found_matching_sides = true;
               break;
             }
@@ -1101,7 +1101,7 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem * const elem,
 {
   std::vector<boundary_id_type> ids;
   this->edge_boundary_ids(elem, edge, ids);
-  return ids.size();
+  return cast_int<unsigned int>(ids.size());
 }
 
 
@@ -1180,7 +1180,7 @@ unsigned int BoundaryInfo::n_shellface_boundary_ids (const Elem * const elem,
 {
   std::vector<boundary_id_type> ids;
   this->shellface_boundary_ids(elem, shellface, ids);
-  return ids.size();
+  return cast_int<unsigned int>(ids.size());
 }
 
 
@@ -1296,7 +1296,7 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem * const elem,
 {
   std::vector<boundary_id_type> ids;
   this->boundary_ids(elem, side, ids);
-  return ids.size();
+  return cast_int<unsigned int>(ids.size());
 }
 
 

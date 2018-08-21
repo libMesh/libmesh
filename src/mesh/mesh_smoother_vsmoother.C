@@ -2047,7 +2047,7 @@ double VariationalMeshSmoother::minJ(Array2D<double> & R,
 
       for (unsigned j=0; j<_dim; j++)
         {
-          int g_i = R[ind_i][j] - 0.5*(R[ind_j][j]+R[ind_k][j]);
+          int g_i = int(R[ind_i][j] - 0.5*(R[ind_j][j]+R[ind_k][j]));
           Jpr += g_i*g_i/(2*Tau_hn);
           b[ind_i + j*_n_nodes] -= g_i/Tau_hn;
           b[ind_j + j*_n_nodes] += 0.5*g_i/Tau_hn;
@@ -2258,7 +2258,7 @@ double VariationalMeshSmoother::minJ(Array2D<double> & R,
                   int ind_k = edges[2*ii+1];
                   for (unsigned jj=0; jj<_dim; jj++)
                     {
-                      int g_i = Rpr[ind_i][jj] - 0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
+                      int g_i = int(Rpr[ind_i][jj] - 0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]));
                       J += g_i*g_i/(2*Tau_hn);
                     }
                 }
@@ -2316,7 +2316,7 @@ double VariationalMeshSmoother::minJ(Array2D<double> & R,
 
                   for (unsigned jj=0; jj<_dim; jj++)
                     {
-                      int g_i = Rpr[ind_i][jj] - 0.5*(Rpr[ind_j][jj] + Rpr[ind_k][jj]);
+                      int g_i = int(Rpr[ind_i][jj] - 0.5*(Rpr[ind_j][jj] + Rpr[ind_k][jj]));
                       J += g_i*g_i/(2*Tau_hn);
                     }
                 }

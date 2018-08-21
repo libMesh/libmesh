@@ -140,7 +140,7 @@ void RBSCMConstruction::process_parameters_file(const std::string & parameters_f
 
       unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
       std::vector<Real> vals_for_param(n_vals_for_param);
-      for (std::size_t j=0; j<vals_for_param.size(); j++)
+      for (unsigned int j=0; j != n_vals_for_param; j++)
         vals_for_param[j] = infile(param_name, 0., j);
 
       discrete_parameter_values_in[param_name] = vals_for_param;
@@ -355,7 +355,7 @@ void RBSCMConstruction::evaluate_stability_constant()
   LOG_SCOPE("evaluate_stability_constant()", "RBSCMConstruction");
 
   // Get current index of C_J
-  const unsigned int j = rb_scm_eval->C_J.size()-1;
+  const unsigned int j = cast_int<unsigned int>(rb_scm_eval->C_J.size()-1);
 
   eigen_solver->set_position_of_spectrum(SMALLEST_REAL);
 

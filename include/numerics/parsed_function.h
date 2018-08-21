@@ -386,7 +386,7 @@ ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inl
       libmesh_assert_not_equal_to(assignment_i, std::string::npos);
 
       libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
-      for (unsigned int i = varname_i+1; i != assignment_i; ++i)
+      for (std::size_t i = varname_i+1; i != assignment_i; ++i)
         libmesh_assert_equal_to(subexpression[i], ' ');
 
       std::size_t end_assignment_i =
@@ -462,7 +462,7 @@ ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string & inl
       libmesh_assert_not_equal_to(assignment_i, std::string::npos);
 
       libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
-      for (unsigned int i = varname_i+1; i != assignment_i; ++i)
+      for (std::size_t i = varname_i+1; i != assignment_i; ++i)
         libmesh_assert_equal_to(subexpression[i], ' ');
 
       std::size_t end_assignment_i =

@@ -1991,7 +1991,7 @@ unsigned int Elem::as_parent_node (unsigned int child,
 
   if (child >= cached_parent_indices[em_vers].size())
     {
-      const unsigned int nn = this->n_nodes();
+      const signed char nn = cast_int<signed char>(this->n_nodes());
 
       cached_parent_indices[em_vers].resize(nc);
 
@@ -2001,7 +2001,7 @@ unsigned int Elem::as_parent_node (unsigned int child,
           cached_parent_indices[em_vers][c].resize(ncn);
           for (unsigned int cn = 0; cn != ncn; ++cn)
             {
-              for (unsigned int n = 0; n != nn; ++n)
+              for (signed char n = 0; n != nn; ++n)
                 {
                   const float em_val = this->embedding_matrix
                     (c, cn, n);

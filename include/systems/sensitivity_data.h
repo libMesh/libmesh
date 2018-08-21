@@ -172,8 +172,7 @@ void SensitivityData::allocate_data(const QoISet & qoi_indices,
                                     const ParameterVector & parameter_vector)
 {
   const std::size_t Np = parameter_vector.size();
-  const unsigned int Nq =
-    cast_int<unsigned int>(sys.qoi.size());
+  const unsigned int Nq = sys.n_qois();
 
   if (_grad_data.size() < Nq)
     _grad_data.resize(Nq);
@@ -194,8 +193,7 @@ void SensitivityData::allocate_hessian_data(const QoISet & qoi_indices,
                                             const ParameterVector & parameter_vector)
 {
   const std::size_t Np = parameter_vector.size();
-  const unsigned int Nq =
-    cast_int<unsigned int>(sys.qoi.size());
+  const unsigned int Nq = sys.n_qois();
 
   if (_hess_data.size() < Nq)
     _hess_data.resize(Nq);

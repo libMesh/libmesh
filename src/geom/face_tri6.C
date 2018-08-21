@@ -398,10 +398,10 @@ Real Tri6::volume () const
 
   // Parameters of the quadrature rule
   const static Real
-    w1 = Real(31)/480 + std::sqrt(15.0L)/2400,
-    w2 = Real(31)/480 - std::sqrt(15.0L)/2400,
-    q1 = Real(2)/7 + std::sqrt(15.0L)/21,
-    q2 = Real(2)/7 - std::sqrt(15.0L)/21;
+    w1 = Real(31)/480 + Real(std::sqrt(15.0L)/2400),
+    w2 = Real(31)/480 - Real(std::sqrt(15.0L)/2400),
+    q1 = Real(2)/7 + Real(std::sqrt(15.0L)/21),
+    q2 = Real(2)/7 - Real(std::sqrt(15.0L)/21);
 
   const static Real xi[N]  = {Real(1)/3,  q1, q1,     1-2*q1, q2, q2,     1-2*q2};
   const static Real eta[N] = {Real(1)/3,  q1, 1-2*q1, q1,     q2, 1-2*q2, q2};

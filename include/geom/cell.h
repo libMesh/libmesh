@@ -58,7 +58,7 @@ public:
   /**
    * \returns 3, the dimensionality of the object.
    */
-  virtual unsigned int dim () const override { return 3; }
+  virtual unsigned short dim () const override { return 3; }
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)

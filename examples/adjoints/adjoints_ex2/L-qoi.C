@@ -85,7 +85,8 @@ void LaplaceQoI::element_qoi_derivative (DiffContext & context,
   const std::vector<Point > & q_point = elem_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+  const unsigned int n_T_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(0).size());
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   // Fill the QoI RHS corresponding to this QoI. Since this is the 0th QoI

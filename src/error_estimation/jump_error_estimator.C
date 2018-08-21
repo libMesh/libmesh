@@ -257,7 +257,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
                     (fine_context->get_elem_solution().size(),
                      Uparent.size());
                   fine_context->get_elem_solution() = Uparent;
-                  fine_context->side = n_p;
+                  fine_context->side = cast_int<unsigned char>(n_p);
                   fine_context->side_fe_reinit();
 
                   // If we find a boundary flux for any variable,
@@ -295,7 +295,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
           if ((e->neighbor_ptr(n_e) != nullptr) ||
               integrate_boundary_sides)
             {
-              fine_context->side = n_e;
+              fine_context->side = cast_int<unsigned char>(n_e);
               fine_context->side_fe_reinit();
             }
 
@@ -425,7 +425,7 @@ JumpErrorEstimator::reinit_sides ()
 {
   fine_context->side_fe_reinit();
 
-  unsigned int dim = fine_context->get_elem().dim();
+  unsigned short dim = fine_context->get_elem().dim();
   libmesh_assert_equal_to(dim, coarse_context->get_elem().dim());
 
   FEBase * fe_fine = nullptr;
@@ -463,7 +463,7 @@ float JumpErrorEstimator::coarse_n_flux_faces_increment ()
 {
   // Keep track of the number of internal flux sides found on each
   // element
-  unsigned int dim = coarse_context->get_elem().dim();
+  unsigned short dim = coarse_context->get_elem().dim();
 
   const unsigned int divisor =
     1 << (dim-1)*(fine_context->get_elem().level() -

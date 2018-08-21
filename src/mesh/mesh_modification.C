@@ -1429,7 +1429,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                     // Make a sorted list of node ids for elem->side(sn)
                     std::unique_ptr<Elem> elem_side = elem->build_side_ptr(sn);
                     std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
-                    for (std::size_t esn=0; esn<elem_side_nodes.size(); ++esn)
+                    for (unsigned int esn=0,
+                         n_esn = cast_int<unsigned int>(elem_side_nodes.size());
+                         esn != n_esn; ++esn)
                       elem_side_nodes[esn] = elem_side->node_id(esn);
                     std::sort(elem_side_nodes.begin(), elem_side_nodes.end());
 
@@ -1447,7 +1449,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                               // a Hex20 or Prism15's QUAD8 face may be split into two Tri6 faces, and the
                               // original face will not contain the mid-edge node.
                               std::vector<dof_id_type> subside_nodes(subside_elem->n_vertices());
-                              for (std::size_t ssn=0; ssn<subside_nodes.size(); ++ssn)
+                              for (unsigned int ssn=0,
+                                   n_ssn = cast_int<unsigned int>(subside_nodes.size());
+                                   ssn != n_ssn; ++ssn)
                                 subside_nodes[ssn] = subside_elem->node_id(ssn);
                               std::sort(subside_nodes.begin(), subside_nodes.end());
 

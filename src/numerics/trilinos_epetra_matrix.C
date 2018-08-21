@@ -46,7 +46,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sp
   // big trouble if this fails!
   libmesh_assert(this->_dof_map);
 
-  const numeric_index_type n_rows = sparsity_pattern.size();
+  const numeric_index_type n_rows = cast_int<numeric_index_type>
+    (sparsity_pattern.size());
 
   const numeric_index_type m   = this->_dof_map->n_dofs();
   const numeric_index_type n   = m;
@@ -102,7 +103,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sp
   // to zero.
   for (numeric_index_type i=0; i<n_rows; i++)
     _graph->InsertGlobalIndices(_graph->GRID(i),
-                                sparsity_pattern[i].size(),
+                                cast_int<numeric_index_type>(sparsity_pattern[i].size()),
                                 const_cast<int *>((const int *)&sparsity_pattern[i][0]));
 
   _graph->FillComplete();

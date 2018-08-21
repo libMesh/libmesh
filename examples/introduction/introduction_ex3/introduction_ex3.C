@@ -282,11 +282,23 @@ void assemble_poisson(EquationSystems & es,
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
 
+      // Cache the number of degrees of freedom on this element, for
+      // use as a loop bound later.  We use cast_int to explicitly
+      // convert from size() (which may be 64-bit) to unsigned int
+      // (which may be 32-bit but which is definitely enough to count
+      // *local* degrees of freedom.
+      const unsigned int n_dofs =
+        cast_int<unsigned int>(dof_indices.size());
+
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
       // quadrature points (q_point) and the shape functions
       // (phi, dphi) for the current element.
       fe->reinit (elem);
+
+      // With one variable, we should have the same number of degrees
+      // of freedom as shape functions.
+      libmesh_assert_equal_to (n_dofs, phi.size());
 
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
@@ -297,10 +309,9 @@ void assemble_poisson(EquationSystems & es,
 
       // The  DenseMatrix::resize() and the  DenseVector::resize()
       // members will automatically zero out the matrix  and vector.
-      Ke.resize (dof_indices.size(),
-                 dof_indices.size());
+      Ke.resize (n_dofs, n_dofs);
 
-      Fe.resize (dof_indices.size());
+      Fe.resize (n_dofs);
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
@@ -310,8 +321,8 @@ void assemble_poisson(EquationSystems & es,
           // Now we will build the element matrix.  This involves
           // a double loop to integrate the test functions (i) against
           // the trial functions (j).
-          for (std::size_t i=0; i<phi.size(); i++)
-            for (std::size_t j=0; j<phi.size(); j++)
+          for (unsigned int i=0; i != n_dofs; i++)
+            for (unsigned int j=0; j != n_dofs; j++)
               {
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
               }
@@ -346,7 +357,7 @@ void assemble_poisson(EquationSystems & es,
                                exact_solution(x+eps, y) -
                                4.*exact_solution(x, y))/eps/eps;
 
-            for (std::size_t i=0; i<phi.size(); i++)
+            for (unsigned int i=0; i != n_dofs; i++)
               Fe(i) += JxW[qp]*fxy*phi[i][qp];
           }
         }
@@ -406,6 +417,11 @@ void assemble_poisson(EquationSystems & es,
               // face.
               fe_face->reinit(elem, side);
 
+              // Some shape functions will be 0 on the face, but for
+              // ease of indexing and generality of code we loop over
+              // them anyway
+              libmesh_assert_equal_to (n_dofs, phi_face.size());
+
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -422,13 +438,13 @@ void assemble_poisson(EquationSystems & es,
                   const Real value = exact_solution(xf, yf);
 
                   // Matrix contribution of the L2 projection.
-                  for (std::size_t i=0; i<phi_face.size(); i++)
-                    for (std::size_t j=0; j<phi_face.size(); j++)
+                  for (unsigned int i=0; i != n_dofs; i++)
+                    for (unsigned int j=0; j != n_dofs; j++)
                       Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
 
                   // Right-hand-side contribution of the L2
                   // projection.
-                  for (std::size_t i=0; i<phi_face.size(); i++)
+                  for (unsigned int i=0; i != n_dofs; i++)
                     Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
                 }
             }

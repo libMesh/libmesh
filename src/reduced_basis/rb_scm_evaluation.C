@@ -29,13 +29,14 @@
 #include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/sparse_matrix.h"
+#include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/getpot.h"
+#include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
-#include "libmesh/dof_map.h"
+#include "libmesh/sparse_matrix.h"
 #include "libmesh/xdr_cxx.h"
 
 // For creating a directory
@@ -199,7 +200,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   // Add rows to the LP: corresponds to the auxiliary
   // variables that define the constraints at each
   // mu \in C_J_M
-  unsigned int n_rows = C_J.size();
+  unsigned int n_rows = cast_int<unsigned int>(C_J.size());
   glp_add_rows(lp, n_rows);
 
   // Now put current_parameters in saved_parameters
@@ -286,7 +287,7 @@ Real RBSCMEvaluation::get_SCM_UB()
   // Add rows to the LP: corresponds to the auxiliary
   // variables that define the constraints at each
   // mu \in C_J
-  unsigned int n_rows = C_J.size();
+  unsigned int n_rows = cast_int<unsigned int>(C_J.size());
 
   // For each mu, we just find the minimum of J_obj over
   // the subset of vectors in SCM_UB_vectors corresponding
@@ -369,7 +370,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/B_min" << suffix;
       Xdr B_min_out(file_name.str(), mode);
 
-      for (std::size_t i=0; i<B_min.size(); i++)
+      for (auto i : IntRange<unsigned int>(0, B_min.size()))
         {
           Real B_min_i = get_B_min(i);
           B_min_out << B_min_i;
@@ -382,7 +383,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/B_max" << suffix;
       Xdr B_max_out(file_name.str(), mode);
 
-      for (std::size_t i=0; i<B_max.size(); i++)
+      for (auto i : IntRange<unsigned int>(0, B_max.size()))
         {
           Real B_max_i = get_B_max(i);
           B_max_out << B_max_i;
@@ -394,7 +395,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J_length" << suffix;
       Xdr C_J_length_out(file_name.str(), mode);
 
-      unsigned int C_J_length = C_J.size();
+      std::size_t C_J_length = C_J.size();
       C_J_length_out << C_J_length;
       C_J_length_out.close();
 
@@ -403,7 +404,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J_stability_vector" << suffix;
       Xdr C_J_stability_vector_out(file_name.str(), mode);
 
-      for (std::size_t i=0; i<C_J_stability_vector.size(); i++)
+      for (auto i : IntRange<unsigned int>(0, C_J_stability_vector.size()))
         {
           Real C_J_stability_constraint_i = get_C_J_stability_constraint(i);
           C_J_stability_vector_out << C_J_stability_constraint_i;
@@ -434,8 +435,8 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/SCM_UB_vectors" << suffix;
       Xdr SCM_UB_vectors_out(file_name.str(), mode);
 
-      for (std::size_t i=0; i<SCM_UB_vectors.size(); i++)
-        for (unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
+      for (auto i : IntRange<unsigned int>(0, SCM_UB_vectors.size()))
+        for (auto j : IntRange<unsigned int>(0, rb_theta_expansion->get_n_A_terms()))
           {
             Real SCM_UB_vector_ij = get_SCM_UB_vector(i,j);
             SCM_UB_vectors_out << SCM_UB_vector_ij;

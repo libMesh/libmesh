@@ -58,7 +58,7 @@ int main (int argc, char ** argv)
 
   std::string filename = libMesh::command_line_value("--mesh", std::string());
 
-  std::vector<int> all_n_procs;
+  std::vector<processor_id_type> all_n_procs;
   libMesh::command_line_vector("--n-procs", all_n_procs);
 
   unsigned int num_ghost_layers = libMesh::command_line_value("--num-ghost-layers", 1);

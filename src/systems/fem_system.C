@@ -457,14 +457,14 @@ public:
   QoIContributions(FEMSystem & sys,
                    DifferentiableQoI & diff_qoi,
                    const QoISet & qoi_indices) :
-    qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi),_qoi_indices(qoi_indices) {}
+    qoi(sys.n_qois(), 0.), _sys(sys), _diff_qoi(diff_qoi),_qoi_indices(qoi_indices) {}
 
   /**
    * splitting constructor
    */
   QoIContributions(const QoIContributions & other,
                    Threads::split) :
-    qoi(other._sys.qoi.size(), 0.), _sys(other._sys), _diff_qoi(other._diff_qoi) {}
+    qoi(other._sys.n_qois(), 0.), _sys(other._sys), _diff_qoi(other._diff_qoi) {}
 
   /**
    * operator() for use with Threads::parallel_reduce().
@@ -477,8 +477,8 @@ public:
 
     bool have_some_heterogenous_qoi_bc = false;
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-    std::vector<bool> have_heterogenous_qoi_bc(_sys.qoi.size(), false);
-    for (std::size_t q=0; q != _sys.qoi.size(); ++q)
+    std::vector<bool> have_heterogenous_qoi_bc(_sys.n_qois(), false);
+    for (unsigned int q=0; q != _sys.n_qois(); ++q)
       if (_qoi_indices.has_index(q) &&
           _sys.get_dof_map().has_heterogenous_adjoint_constraints(q))
         {
@@ -496,18 +496,21 @@ public:
 
         _femcontext.pre_fe_reinit(_sys, el);
 
+        const unsigned int n_dofs =
+          cast_int<unsigned int>(_femcontext.get_dof_indices().size());
+
         // We might have some heterogenous dofs here; let's see for
         // certain
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
         bool elem_has_some_heterogenous_qoi_bc = false;
-        std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.qoi.size(), false);
+        std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.n_qois(), false);
         if (have_some_heterogenous_qoi_bc)
           {
-            for (std::size_t q=0; q != _sys.qoi.size(); ++q)
+            for (unsigned int q=0; q != _sys.n_qois(); ++q)
               {
                 if (have_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
                           (q, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
@@ -535,11 +538,11 @@ public:
           {
             _sys.time_solver->element_residual(false, _femcontext);
 
-            for (std::size_t q=0; q != _sys.qoi.size(); ++q)
+            for (unsigned int q=0; q != _sys.n_qois(); ++q)
               {
                 if (elem_has_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       this->qoi[q] -= _femcontext.get_elem_residual()(d) *
                         _sys.get_dof_map().has_heterogenous_adjoint_constraint(q, _femcontext.get_dof_indices()[d]);
 
@@ -611,9 +614,9 @@ public:
 
     bool have_some_heterogenous_qoi_bc = false;
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-    std::vector<bool> have_heterogenous_qoi_bc(_sys.qoi.size(), false);
+    std::vector<bool> have_heterogenous_qoi_bc(_sys.n_qois(), false);
     if (_include_liftfunc || _apply_constraints)
-      for (std::size_t q=0; q != _sys.qoi.size(); ++q)
+      for (unsigned int q=0; q != _sys.n_qois(); ++q)
         if (_qoi_indices.has_index(q) &&
             _sys.get_dof_map().has_heterogenous_adjoint_constraints(q))
           {
@@ -631,18 +634,21 @@ public:
 
         _femcontext.pre_fe_reinit(_sys, el);
 
+        const unsigned int n_dofs =
+          cast_int<unsigned int>(_femcontext.get_dof_indices().size());
+
         // We might have some heterogenous dofs here; let's see for
         // certain
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
         bool elem_has_some_heterogenous_qoi_bc = false;
-        std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.qoi.size(), false);
+        std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.n_qois(), false);
         if (have_some_heterogenous_qoi_bc)
           {
-            for (std::size_t q=0; q != _sys.qoi.size(); ++q)
+            for (unsigned int q=0; q != _sys.n_qois(); ++q)
               {
                 if (have_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
                           (q, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
@@ -692,18 +698,18 @@ public:
         // may handle integrating
         if (_include_liftfunc && elem_has_some_heterogenous_qoi_bc)
           {
-            for (std::size_t q=0; q != _sys.qoi.size(); ++q)
+            for (unsigned int q=0; q != _sys.n_qois(); ++q)
               {
                 if (elem_has_heterogenous_qoi_bc[q])
                   {
-                    for (std::size_t i=0; i != _femcontext.get_dof_indices().size(); ++i)
+                    for (auto i : IntRange<unsigned int>(0, n_dofs))
                       {
                         Number liftfunc_val =
                           _sys.get_dof_map().has_heterogenous_adjoint_constraint(q, _femcontext.get_dof_indices()[i]);
 
                         if (liftfunc_val != Number(0))
                           {
-                            for (std::size_t j=0; j != _femcontext.get_dof_indices().size(); ++j)
+                            for (auto j : IntRange<unsigned int>(0, n_dofs))
                               _femcontext.get_qoi_derivatives()[q](j) -=
                                 _femcontext.get_elem_jacobian()(i,j) *
                                 liftfunc_val;
@@ -749,7 +755,7 @@ public:
             _sys.get_dof_map().constrain_nothing(_femcontext.get_dof_indices());
 #endif
 
-          for (std::size_t i=0; i != _sys.qoi.size(); ++i)
+          for (unsigned int i=0; i != _sys.n_qois(); ++i)
             if (_qoi_indices.has_index(i))
               {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -757,7 +763,7 @@ public:
                   {
 #ifndef NDEBUG
                     bool has_heterogenous_constraint = false;
-                    for (std::size_t d=0; d != _femcontext.get_dof_indices().size(); ++d)
+                    for (auto d : IntRange<unsigned int>(0, n_dofs))
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
                           (i, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
@@ -1120,7 +1126,7 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
 
   this->update();
 
-  const unsigned int Nq = cast_int<unsigned int>(qoi.size());
+  const unsigned int Nq = this->n_qois();
 
   // the quantity of interest is assumed to be a sum of element and
   // side terms
@@ -1154,7 +1160,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
 
   // The quantity of interest derivative assembly accumulates on
   // initially zero vectors
-  for (std::size_t i=0; i != qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       this->add_adjoint_rhs(i).zero();
 
@@ -1166,7 +1172,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
                                                     include_liftfunc,
                                                     apply_constraints));
 
-  for (std::size_t i=0; i != qoi.size(); ++i)
+  for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       this->diff_qoi->finalize_derivative(this->get_adjoint_rhs(i),i);
 }
@@ -1190,6 +1196,9 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
   if (_mesh_sys == this)
     numerical_point_h = numerical_jacobian_h * context.get_elem().hmin();
 
+  const unsigned int n_dofs =
+    cast_int<unsigned int>(context.get_dof_indices().size());
+
   for (unsigned int v = 0; v != context.n_vars(); ++v)
     {
       const Real my_h = this->numerical_jacobian_h_for_var(v);
@@ -1198,7 +1207,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 
       if (!context.get_dof_indices(v).empty())
         {
-          for (std::size_t i = 0; i != context.get_dof_indices().size(); ++i)
+          for (auto i : IntRange<unsigned int>(0, n_dofs))
             if (context.get_dof_indices()[i] ==
                 context.get_dof_indices(v)[0])
               j_offset = i;
@@ -1206,7 +1215,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           libmesh_assert_not_equal_to(j_offset, libMesh::invalid_uint);
         }
 
-      for (std::size_t j = 0; j != context.get_dof_indices(v).size(); ++j)
+      for (auto j : IntRange<unsigned int>(0, context.get_dof_indices(v).size()))
         {
           const unsigned int total_j = j + j_offset;
 
@@ -1257,7 +1266,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           if (coord)
             {
               *coord = libmesh_real(context.get_elem_solution(v)(j));
-              for (std::size_t i = 0; i != context.get_dof_indices().size(); ++i)
+              for (auto i : IntRange<unsigned int>(0, n_dofs))
                 {
                   numeric_jacobian(i,total_j) =
                     (context.get_elem_residual()(i) - backwards_residual(i)) /
@@ -1266,7 +1275,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
             }
           else
             {
-              for (std::size_t i = 0; i != context.get_dof_indices().size(); ++i)
+              for (auto i : IntRange<unsigned int>(0, n_dofs))
                 {
                   numeric_jacobian(i,total_j) =
                     (context.get_elem_residual()(i) - backwards_residual(i)) /

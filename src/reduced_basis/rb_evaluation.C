@@ -1000,8 +1000,8 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 {
   LOG_SCOPE("read_in_vectors_from_multiple_files()", "RBEvaluation");
 
-  unsigned int n_files = multiple_vectors.size();
-  unsigned int n_directories = multiple_directory_names.size();
+  std::size_t n_files = multiple_vectors.size();
+  std::size_t n_directories = multiple_directory_names.size();
   libmesh_assert((n_files == n_directories) && (n_files == multiple_data_names.size()));
 
   if (n_files == 0)
@@ -1018,7 +1018,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
   // all the vectors that we read in.
   MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
 
-  for (unsigned int data_index=0; data_index<n_directories; data_index++)
+  for (std::size_t data_index=0; data_index<n_directories; data_index++)
     {
       std::vector<std::unique_ptr<NumericVector<Number>>> & vectors = *multiple_vectors[data_index];
 

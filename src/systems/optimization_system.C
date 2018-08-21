@@ -90,11 +90,12 @@ void OptimizationSystem::reinit ()
 void OptimizationSystem::
 initialize_equality_constraints_storage(const std::vector<std::set<numeric_index_type>> & constraint_jac_sparsity)
 {
-  unsigned int n_eq_constraints = constraint_jac_sparsity.size();
+  numeric_index_type n_eq_constraints =
+    cast_int<numeric_index_type>(constraint_jac_sparsity.size());
 
   // Assign rows to each processor as evenly as possible
   unsigned int n_procs = comm().size();
-  unsigned int n_local_rows = n_eq_constraints / n_procs;
+  numeric_index_type n_local_rows = n_eq_constraints / n_procs;
   if (comm().rank() < (n_eq_constraints % n_procs))
     n_local_rows++;
 
@@ -102,10 +103,11 @@ initialize_equality_constraints_storage(const std::vector<std::set<numeric_index
   lambda_eq->init(n_eq_constraints, n_local_rows, false, PARALLEL);
 
   // Get the maximum number of non-zeros per row
-  unsigned int max_nnz = 0;
-  for (unsigned int i=0; i<n_eq_constraints; i++)
+  numeric_index_type max_nnz = 0;
+  for (numeric_index_type i=0; i<n_eq_constraints; i++)
     {
-      unsigned int nnz = constraint_jac_sparsity[i].size();
+      numeric_index_type nnz =
+        cast_int<numeric_index_type>(constraint_jac_sparsity[i].size());
       if (nnz > max_nnz)
         max_nnz = nnz;
     }
@@ -124,11 +126,12 @@ initialize_equality_constraints_storage(const std::vector<std::set<numeric_index
 void OptimizationSystem::
 initialize_inequality_constraints_storage(const std::vector<std::set<numeric_index_type>> & constraint_jac_sparsity)
 {
-  unsigned int n_ineq_constraints = constraint_jac_sparsity.size();
+  numeric_index_type n_ineq_constraints =
+    cast_int<numeric_index_type>(constraint_jac_sparsity.size());
 
   // Assign rows to each processor as evenly as possible
   unsigned int n_procs = comm().size();
-  unsigned int n_local_rows = n_ineq_constraints / n_procs;
+  numeric_index_type n_local_rows = n_ineq_constraints / n_procs;
   if (comm().rank() < (n_ineq_constraints % n_procs))
     n_local_rows++;
 
@@ -136,10 +139,11 @@ initialize_inequality_constraints_storage(const std::vector<std::set<numeric_ind
   lambda_ineq->init(n_ineq_constraints, n_local_rows, false, PARALLEL);
 
   // Get the maximum number of non-zeros per row
-  unsigned int max_nnz = 0;
-  for (unsigned int i=0; i<n_ineq_constraints; i++)
+  numeric_index_type max_nnz = 0;
+  for (numeric_index_type i=0; i<n_ineq_constraints; i++)
     {
-      unsigned int nnz = constraint_jac_sparsity[i].size();
+      numeric_index_type nnz =
+        cast_int<numeric_index_type>(constraint_jac_sparsity[i].size());
       if (nnz > max_nnz)
         max_nnz = nnz;
     }

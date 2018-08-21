@@ -64,7 +64,7 @@ public:
     // try to partition a DistributedMesh into more parts than we have
     // processors, though.
     const unsigned int n_procs = using_distmesh ?
-      std::min(static_cast<unsigned int>(2), TestCommWorld->size()) :
+      std::min(static_cast<processor_id_type>(2), TestCommWorld->size()) :
       2;
 
     // The number of elements in the original mesh.  For verification

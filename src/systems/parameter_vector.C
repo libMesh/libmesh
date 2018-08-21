@@ -37,12 +37,11 @@ ParameterVector::ParameterVector(const std::vector<Number *> &params)
 
 void ParameterVector::deep_copy(ParameterVector & target) const
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
+  const std::size_t Np = this->_params.size();
   target.clear();
   target._params.resize(Np);
   target._my_data.resize(Np);
-  for (unsigned int i=0; i != Np; ++i)
+  for (std::size_t i=0; i != Np; ++i)
     {
       target._params[i] =
         new ParameterPointer<Number>(&target._my_data[i]);
@@ -63,17 +62,16 @@ void ParameterVector::shallow_copy(ParameterVector & target) const
 
 void ParameterVector::value_copy(ParameterVector & target) const
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
+  const std::size_t Np = this->_params.size();
   libmesh_assert_equal_to (target._params.size(), Np);
 
-  for (unsigned int i=0; i != Np; ++i)
+  for (std::size_t i=0; i != Np; ++i)
     *target[i] = *(*this)[i];
 }
 
 
 
-void ParameterVector::resize(unsigned int s)
+void ParameterVector::resize(std::size_t s)
 {
   libmesh_assert(!_is_shallow_copy);
 
@@ -82,25 +80,25 @@ void ParameterVector::resize(unsigned int s)
   // If we're shrinking the vector, we don't want to leak memory.
   // Note that we're using < in these for loops, not !=
   // We don't know a priori if we're shrinking or growing
-  for (unsigned int i=s; i < old_size; ++i)
+  for (std::size_t i=s; i < old_size; ++i)
     delete _params[i];
 
   this->_params.resize(s);
 
-  for (unsigned int i=old_size; i < s; ++i)
+  for (std::size_t i=old_size; i < s; ++i)
     this->_params[i] =
       new ParameterPointer<Number>(nullptr);
 }
 
 
 
-void ParameterVector::deep_resize(unsigned int s)
+void ParameterVector::deep_resize(std::size_t s)
 {
   libmesh_assert(!_is_shallow_copy);
 
   this->_params.resize(s);
   this->_my_data.resize(s);
-  for (unsigned int i=0; i != s; ++i)
+  for (std::size_t i=0; i != s; ++i)
     this->_params[i] =
       new ParameterPointer<Number>(&this->_my_data[i]);
 }
@@ -109,9 +107,8 @@ void ParameterVector::deep_resize(unsigned int s)
 
 ParameterVector & ParameterVector::operator *= (const Number a)
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
-  for (unsigned int i=0; i != Np; ++i)
+  const std::size_t Np = this->_params.size();
+  for (std::size_t i=0; i != Np; ++i)
     *(*this)[i] *= a;
   return *this;
 }
@@ -120,10 +117,9 @@ ParameterVector & ParameterVector::operator *= (const Number a)
 
 ParameterVector & ParameterVector::operator += (const ParameterVector & a)
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
+  const std::size_t Np = this->_params.size();
   libmesh_assert_equal_to (a._params.size(), Np);
-  for (unsigned int i=0; i != Np; ++i)
+  for (std::size_t i=0; i != Np; ++i)
     *(*this)[i] += *a[i];
   return *this;
 }

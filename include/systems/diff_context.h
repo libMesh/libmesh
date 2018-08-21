@@ -341,7 +341,7 @@ public:
    * Const accessor for QoI derivative of a particular qoi and variable corresponding
    * to the index arguments.
    */
-  const DenseSubVector<Number> & get_qoi_derivatives( unsigned int qoi, unsigned int var ) const
+  const DenseSubVector<Number> & get_qoi_derivatives( std::size_t qoi, unsigned int var ) const
   {
     libmesh_assert_greater(_elem_qoi_subderivatives.size(), qoi);
     libmesh_assert_greater(_elem_qoi_subderivatives[qoi].size(), var);
@@ -353,7 +353,7 @@ public:
    * Non-const accessor for QoI derivative of a particular qoi and variable corresponding
    * to the index arguments.
    */
-  DenseSubVector<Number> & get_qoi_derivatives( unsigned int qoi, unsigned int var )
+  DenseSubVector<Number> & get_qoi_derivatives( std::size_t qoi, unsigned int var )
   {
     libmesh_assert_greater(_elem_qoi_subderivatives.size(), qoi);
     libmesh_assert_greater(_elem_qoi_subderivatives[qoi].size(), var);

@@ -855,7 +855,7 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   this->read_var_names(NODAL);
 
   // See if we can find the variable we are looking for
-  std::size_t var_index = 0;
+  unsigned int var_index = 0;
   bool found = false;
 
   // Do a linear search for nodal_var_name in nodal_var_names
@@ -1012,11 +1012,11 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
   this->read_var_names(ELEMENTAL);
 
   // See if we can find the variable we are looking for
-  std::size_t var_index = 0;
+  unsigned int var_index = 0;
   bool found = false;
 
   // Do a linear search for nodal_var_name in nodal_var_names
-  for (; var_index<elem_var_names.size(); ++var_index)
+  for (; var_index != elem_var_names.size(); ++var_index)
     if (elem_var_names[var_index] == elemental_var_name)
       {
         found = true;
@@ -1382,7 +1382,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
       elem_blk_id.push_back(pr.first);
       elem_type_table.push_back_entry(conv.exodus_elem_type().c_str());
-      num_elem_this_blk_vec.push_back(tmp_vec.size());
+      num_elem_this_blk_vec.push_back(cast_int<int>(tmp_vec.size()));
       num_nodes_per_elem_vec.push_back(num_nodes_per_elem);
       num_attr_vec.push_back(0); // we don't currently use elem block attributes.
       ++counter;
@@ -1463,7 +1463,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
           for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
             {
-              unsigned connect_index   = (i*num_nodes_per_elem)+j;
+              unsigned int connect_index   = cast_int<unsigned int>((i*num_nodes_per_elem)+j);
               unsigned elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
               if (verbose)
                 {
@@ -1727,7 +1727,7 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
       std::set<subdomain_id_type> current_set;
       if (vars_active_subdomains[var_num].empty())
         for (auto block_id : block_ids)
-          current_set.insert(block_id);
+          current_set.insert(cast_int<subdomain_id_type>(block_id));
       else
         current_set = vars_active_subdomains[var_num];
 
@@ -1738,10 +1738,10 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
           if (it == block_ids.end())
             libmesh_error_msg("ExodusII_IO_Helper: block id " << block_id << " not found in block_ids.");
 
-          unsigned int block_index =
+          std::size_t block_index =
             std::distance(block_ids.begin(), it);
 
-          unsigned int truth_tab_index = block_index*num_elem_vars + var_num;
+          std::size_t truth_tab_index = block_index*num_elem_vars + var_num;
           truth_tab[truth_tab_index] = 1;
         }
     }
@@ -1845,7 +1845,7 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
   if (_single_precision)
     {
-      float cast_time = time;
+      float cast_time = float(time);
       ex_err = exII::ex_put_time(ex_id, timestep, &cast_time);
     }
   else

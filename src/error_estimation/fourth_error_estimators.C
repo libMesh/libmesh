@@ -95,7 +95,7 @@ LaplacianErrorEstimator::internal_side_integration ()
   const DenseVector<Number> & Ucoarse = coarse_context->get_elem_solution();
   const DenseVector<Number> & Ufine   = fine_context->get_elem_solution();
 
-  unsigned int dim = fine_elem.dim();
+  unsigned short dim = fine_elem.dim();
 
   FEBase * fe_fine = nullptr;
   fine_context->get_side_fe( var, fe_fine, dim );

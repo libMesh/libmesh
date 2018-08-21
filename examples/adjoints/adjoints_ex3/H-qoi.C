@@ -30,7 +30,8 @@ void CoupledSystemQoI::side_qoi_derivative (DiffContext & context,
   const std::vector<Point > & q_point = side_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(1).size();
+  const unsigned int n_u_dofs =
+    cast_int<unsigned int>(c.get_dof_indices(1).size());
 
   DenseSubVector<Number> & Qu = c.get_qoi_derivatives(0, 0);
   DenseSubVector<Number> & QC = c.get_qoi_derivatives(0, 3);

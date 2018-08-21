@@ -371,8 +371,7 @@ template <typename T>
 void NumericVector<T>::add_vector (const T * v,
                                    const std::vector<numeric_index_type> & dof_indices)
 {
-  int n = dof_indices.size();
-  for (int i=0; i<n; i++)
+  for (std::size_t i=0, n = dof_indices.size(); i != n; i++)
     this->add (dof_indices[i], v[i]);
 }
 
@@ -382,9 +381,9 @@ template <typename T>
 void NumericVector<T>::add_vector (const NumericVector<T> & v,
                                    const std::vector<numeric_index_type> & dof_indices)
 {
-  int n = dof_indices.size();
-  libmesh_assert_equal_to(v.size(), static_cast<unsigned>(n));
-  for (int i=0; i<n; i++)
+  const std::size_t n = dof_indices.size();
+  libmesh_assert_equal_to(v.size(), n);
+  for (numeric_index_type i=0; i != n; i++)
     this->add (dof_indices[i], v(i));
 }
 

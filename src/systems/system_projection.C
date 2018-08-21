@@ -24,10 +24,16 @@
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
+
+// FIXME - having to do this with MetaPhysicL brings me shame - RHS
+#include "libmesh/ignore_warnings.h"
 // Template specialization declarations in here need to *precede* code
 // using them.
 #include "metaphysicl/dynamicsparsenumberarray_decl.h"
+#include "libmesh/restore_warnings.h"
+
 #include "libmesh/compare_types.h"
+#include "libmesh/int_range.h"
 
 using MetaPhysicL::DynamicSparseNumberArray;
 
@@ -76,8 +82,11 @@ struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
 
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
+// FIXME - wrapping MetaPhysicL is shameful - RHS
+#include "libmesh/ignore_warnings.h"
 // Include MetaPhysicL definitions finally
 #include "metaphysicl/dynamicsparsenumberarray.h"
+#include "libmesh/restore_warnings.h"
 
 // And make sure we instantiate the methods we'll need to use on them.
 #include "libmesh/dense_matrix_impl.h"
@@ -527,7 +536,7 @@ eval_at_point(const FEMContext & c,
   DynamicSparseNumberArray<Real, dof_id_type> returnval;
   returnval.resize(n_dofs);
 
-  for (std::size_t j = 0; j != n_dofs; ++j)
+  for (auto j : IntRange<unsigned int>(0, n_dofs))
     {
       returnval.raw_at(j) = phi[j][0];
       returnval.raw_index(j) = dof_indices[j];
@@ -574,7 +583,7 @@ eval_at_point(const FEMContext & c,
   for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
     returnval(d).resize(n_dofs);
 
-  for (std::size_t j = 0; j != n_dofs; ++j)
+  for (auto j : IntRange<unsigned int>(0, n_dofs))
     {
       for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
         {
@@ -1526,10 +1535,13 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 FEInterface::dofs_on_edge(elem, dim, fe_type, e,
                                           side_dofs);
 
+                const unsigned int n_side_dofs =
+                  cast_int<unsigned int>(side_dofs.size());
+
                 // Some edge dofs are on nodes and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (std::size_t i=0; i != side_dofs.size(); ++i)
+                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 
@@ -1562,15 +1574,15 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                                               system.time);
 
                     // Form edge projection matrix
-                    for (std::size_t sidei=0, freei=0;
-                         sidei != side_dofs.size(); ++sidei)
+                    for (unsigned int sidei=0, freei=0;
+                         sidei != n_side_dofs; ++sidei)
                       {
                         unsigned int i = side_dofs[sidei];
                         // fixed DoFs aren't test functions
                         if (dof_is_fixed[i])
                           continue;
-                        for (std::size_t sidej=0, freej=0;
-                             sidej != side_dofs.size(); ++sidej)
+                        for (unsigned int sidej=0, freej=0;
+                             sidej != n_side_dofs; ++sidej)
                           {
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])
@@ -1624,10 +1636,13 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 FEInterface::dofs_on_side(elem, dim, fe_type, s,
                                           side_dofs);
 
+                const unsigned int n_side_dofs =
+                  cast_int<unsigned int>(side_dofs.size());
+
                 // Some side dofs are on nodes/edges and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (std::size_t i=0; i != side_dofs.size(); ++i)
+                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 
@@ -1660,15 +1675,15 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                                               system.time);
 
                     // Form side projection matrix
-                    for (std::size_t sidei=0, freei=0;
-                         sidei != side_dofs.size(); ++sidei)
+                    for (unsigned int sidei=0, freei=0;
+                         sidei != n_side_dofs; ++sidei)
                       {
                         unsigned int i = side_dofs[sidei];
                         // fixed DoFs aren't test functions
                         if (dof_is_fixed[i])
                           continue;
-                        for (std::size_t sidej=0, freej=0;
-                             sidej != side_dofs.size(); ++sidej)
+                        for (unsigned int sidej=0, freej=0;
+                             sidej != n_side_dofs; ++sidej)
                           {
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])

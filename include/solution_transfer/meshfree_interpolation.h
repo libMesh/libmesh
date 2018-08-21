@@ -27,7 +27,9 @@
 #include "libmesh/point.h"
 #include "libmesh/parallel_object.h"
 #ifdef LIBMESH_HAVE_NANOFLANN
+#  include "libmesh/ignore_warnings.h"
 #  include "libmesh/nanoflann.hpp"
+#  include "libmesh/restore_warnings.h"
 #endif
 
 // C++ includes

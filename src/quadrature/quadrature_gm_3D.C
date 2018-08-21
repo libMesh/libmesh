@@ -60,11 +60,11 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
               _points.resize(1);
               _weights.resize(1);
 
-              _points[0](0) = 1.L/4.L;
-              _points[0](1) = 1.L/4.L;
-              _points[0](2) = 1.L/4.L;
+              _points[0](0) = Real(1)/4;
+              _points[0](1) = Real(1)/4;
+              _points[0](2) = Real(1)/4;
 
-              _weights[0] = 1.L/6.L;
+              _weights[0] = Real(1)/6;
               return;
             }
 
@@ -74,11 +74,11 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
               _points.resize(5);
               _weights.resize(5);
 
-              _points[0](0) = 1.L/6.L;  _points[0](1) = 1.L/6.L;  _points[0](2) = 1.L/2.L;  _weights[0] =  3.L/40.L;
-              _points[1](0) = 1.L/6.L;  _points[1](1) = 1.L/6.L;  _points[1](2) = 1.L/6.L;  _weights[1] =  3.L/40.L;
-              _points[2](0) = 1.L/4.L;  _points[2](1) = 1.L/4.L;  _points[2](2) = 1.L/4.L;  _weights[2] = -2.L/15.L;
-              _points[3](0) = 1.L/2.L;  _points[3](1) = 1.L/6.L;  _points[3](2) = 1.L/6.L;  _weights[3] =  3.L/40.L;
-              _points[4](0) = 1.L/6.L;  _points[4](1) = 1.L/2.L;  _points[4](2) = 1.L/6.L;  _weights[4] =  3.L/40.L;
+              _points[0](0) = Real(1)/6;  _points[0](1) = Real(1)/6;  _points[0](2) = Real(1)/2;  _weights[0] =  Real(3)/40;
+              _points[1](0) = Real(1)/6;  _points[1](1) = Real(1)/6;  _points[1](2) = Real(1)/6;  _weights[1] =  Real(3)/40;
+              _points[2](0) = Real(1)/4;  _points[2](1) = Real(1)/4;  _points[2](2) = Real(1)/4;  _weights[2] = -Real(2)/15;
+              _points[3](0) = Real(1)/2;  _points[3](1) = Real(1)/6;  _points[3](2) = Real(1)/6;  _weights[3] =  Real(3)/40;
+              _points[4](0) = Real(1)/6;  _points[4](1) = Real(1)/2;  _points[4](2) = Real(1)/6;  _weights[4] =  Real(3)/40;
               return;
             }
 
@@ -88,21 +88,21 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
               _points.resize(15);
               _weights.resize(15);
 
-              _points[ 0](0) = 1.L/8.L;  _points[ 0](1) = 3.L/8.L;  _points[ 0](2) = 1.L/8.L;  _weights[ 0] =  16.L/315.L;
-              _points[ 1](0) = 1.L/8.L;  _points[ 1](1) = 1.L/8.L;  _points[ 1](2) = 5.L/8.L;  _weights[ 1] =  16.L/315.L;
-              _points[ 2](0) = 3.L/8.L;  _points[ 2](1) = 1.L/8.L;  _points[ 2](2) = 1.L/8.L;  _weights[ 2] =  16.L/315.L;
-              _points[ 3](0) = 1.L/6.L;  _points[ 3](1) = 1.L/2.L;  _points[ 3](2) = 1.L/6.L;  _weights[ 3] = -27.L/280.L;
-              _points[ 4](0) = 3.L/8.L;  _points[ 4](1) = 1.L/8.L;  _points[ 4](2) = 3.L/8.L;  _weights[ 4] =  16.L/315.L;
-              _points[ 5](0) = 1.L/8.L;  _points[ 5](1) = 3.L/8.L;  _points[ 5](2) = 3.L/8.L;  _weights[ 5] =  16.L/315.L;
-              _points[ 6](0) = 1.L/6.L;  _points[ 6](1) = 1.L/6.L;  _points[ 6](2) = 1.L/6.L;  _weights[ 6] = -27.L/280.L;
-              _points[ 7](0) = 1.L/6.L;  _points[ 7](1) = 1.L/6.L;  _points[ 7](2) = 1.L/2.L;  _weights[ 7] = -27.L/280.L;
-              _points[ 8](0) = 1.L/8.L;  _points[ 8](1) = 1.L/8.L;  _points[ 8](2) = 1.L/8.L;  _weights[ 8] =  16.L/315.L;
-              _points[ 9](0) = 1.L/4.L;  _points[ 9](1) = 1.L/4.L;  _points[ 9](2) = 1.L/4.L;  _weights[ 9] =    2.L/45.L;
-              _points[10](0) = 1.L/8.L;  _points[10](1) = 5.L/8.L;  _points[10](2) = 1.L/8.L;  _weights[10] =  16.L/315.L;
-              _points[11](0) = 1.L/2.L;  _points[11](1) = 1.L/6.L;  _points[11](2) = 1.L/6.L;  _weights[11] = -27.L/280.L;
-              _points[12](0) = 1.L/8.L;  _points[12](1) = 1.L/8.L;  _points[12](2) = 3.L/8.L;  _weights[12] =  16.L/315.L;
-              _points[13](0) = 5.L/8.L;  _points[13](1) = 1.L/8.L;  _points[13](2) = 1.L/8.L;  _weights[13] =  16.L/315.L;
-              _points[14](0) = 3.L/8.L;  _points[14](1) = 3.L/8.L;  _points[14](2) = 1.L/8.L;  _weights[14] =  16.L/315.L;
+              _points[ 0](0) = Real(1)/8;  _points[ 0](1) = Real(3)/8;  _points[ 0](2) = Real(1)/8;  _weights[ 0] =  Real(16)/315;
+              _points[ 1](0) = Real(1)/8;  _points[ 1](1) = Real(1)/8;  _points[ 1](2) = Real(5)/8;  _weights[ 1] =  Real(16)/315;
+              _points[ 2](0) = Real(3)/8;  _points[ 2](1) = Real(1)/8;  _points[ 2](2) = Real(1)/8;  _weights[ 2] =  Real(16)/315;
+              _points[ 3](0) = Real(1)/6;  _points[ 3](1) = Real(1)/2;  _points[ 3](2) = Real(1)/6;  _weights[ 3] = -Real(27)/280;
+              _points[ 4](0) = Real(3)/8;  _points[ 4](1) = Real(1)/8;  _points[ 4](2) = Real(3)/8;  _weights[ 4] =  Real(16)/315;
+              _points[ 5](0) = Real(1)/8;  _points[ 5](1) = Real(3)/8;  _points[ 5](2) = Real(3)/8;  _weights[ 5] =  Real(16)/315;
+              _points[ 6](0) = Real(1)/6;  _points[ 6](1) = Real(1)/6;  _points[ 6](2) = Real(1)/6;  _weights[ 6] = -Real(27)/280;
+              _points[ 7](0) = Real(1)/6;  _points[ 7](1) = Real(1)/6;  _points[ 7](2) = Real(1)/2;  _weights[ 7] = -Real(27)/280;
+              _points[ 8](0) = Real(1)/8;  _points[ 8](1) = Real(1)/8;  _points[ 8](2) = Real(1)/8;  _weights[ 8] =  Real(16)/315;
+              _points[ 9](0) = Real(1)/4;  _points[ 9](1) = Real(1)/4;  _points[ 9](2) = Real(1)/4;  _weights[ 9] =    Real(2)/45;
+              _points[10](0) = Real(1)/8;  _points[10](1) = Real(5)/8;  _points[10](2) = Real(1)/8;  _weights[10] =  Real(16)/315;
+              _points[11](0) = Real(1)/2;  _points[11](1) = Real(1)/6;  _points[11](2) = Real(1)/6;  _weights[11] = -Real(27)/280;
+              _points[12](0) = Real(1)/8;  _points[12](1) = Real(1)/8;  _points[12](2) = Real(3)/8;  _weights[12] =  Real(16)/315;
+              _points[13](0) = Real(5)/8;  _points[13](1) = Real(1)/8;  _points[13](2) = Real(1)/8;  _weights[13] =  Real(16)/315;
+              _points[14](0) = Real(3)/8;  _points[14](1) = Real(3)/8;  _points[14](2) = Real(1)/8;  _weights[14] =  Real(16)/315;
               return;
             }
 
@@ -112,41 +112,41 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
               _points.resize(35);
               _weights.resize(35);
 
-              _points[ 0](0) = 3.L/10.L;  _points[ 0](1) = 1.L/10.L;  _points[ 0](2) = 3.L/10.L;  _weights[ 0] = 3125.L/72576.L;
-              _points[ 1](0) =  1.L/6.L;  _points[ 1](1) =  1.L/2.L;  _points[ 1](2) =  1.L/6.L;  _weights[ 1] =   243.L/4480.L;
-              _points[ 2](0) =  1.L/6.L;  _points[ 2](1) =  1.L/6.L;  _points[ 2](2) =  1.L/2.L;  _weights[ 2] =   243.L/4480.L;
-              _points[ 3](0) =  1.L/2.L;  _points[ 3](1) = 1.L/10.L;  _points[ 3](2) = 1.L/10.L;  _weights[ 3] = 3125.L/72576.L;
-              _points[ 4](0) = 3.L/10.L;  _points[ 4](1) = 1.L/10.L;  _points[ 4](2) = 1.L/10.L;  _weights[ 4] = 3125.L/72576.L;
-              _points[ 5](0) = 3.L/10.L;  _points[ 5](1) = 3.L/10.L;  _points[ 5](2) = 1.L/10.L;  _weights[ 5] = 3125.L/72576.L;
-              _points[ 6](0) =  1.L/2.L;  _points[ 6](1) =  1.L/6.L;  _points[ 6](2) =  1.L/6.L;  _weights[ 6] =   243.L/4480.L;
-              _points[ 7](0) = 3.L/10.L;  _points[ 7](1) = 1.L/10.L;  _points[ 7](2) =  1.L/2.L;  _weights[ 7] = 3125.L/72576.L;
-              _points[ 8](0) = 7.L/10.L;  _points[ 8](1) = 1.L/10.L;  _points[ 8](2) = 1.L/10.L;  _weights[ 8] = 3125.L/72576.L;
-              _points[ 9](0) =  3.L/8.L;  _points[ 9](1) =  1.L/8.L;  _points[ 9](2) =  1.L/8.L;  _weights[ 9] =  -256.L/2835.L;
-              _points[10](0) = 3.L/10.L;  _points[10](1) = 3.L/10.L;  _points[10](2) = 3.L/10.L;  _weights[10] = 3125.L/72576.L;
-              _points[11](0) = 1.L/10.L;  _points[11](1) =  1.L/2.L;  _points[11](2) = 3.L/10.L;  _weights[11] = 3125.L/72576.L;
-              _points[12](0) = 1.L/10.L;  _points[12](1) = 1.L/10.L;  _points[12](2) = 7.L/10.L;  _weights[12] = 3125.L/72576.L;
-              _points[13](0) =  1.L/2.L;  _points[13](1) = 1.L/10.L;  _points[13](2) = 3.L/10.L;  _weights[13] = 3125.L/72576.L;
-              _points[14](0) = 1.L/10.L;  _points[14](1) = 7.L/10.L;  _points[14](2) = 1.L/10.L;  _weights[14] = 3125.L/72576.L;
-              _points[15](0) = 1.L/10.L;  _points[15](1) =  1.L/2.L;  _points[15](2) = 1.L/10.L;  _weights[15] = 3125.L/72576.L;
-              _points[16](0) =  1.L/6.L;  _points[16](1) =  1.L/6.L;  _points[16](2) =  1.L/6.L;  _weights[16] =   243.L/4480.L;
-              _points[17](0) =  3.L/8.L;  _points[17](1) =  1.L/8.L;  _points[17](2) =  3.L/8.L;  _weights[17] =  -256.L/2835.L;
-              _points[18](0) =  1.L/8.L;  _points[18](1) =  1.L/8.L;  _points[18](2) =  5.L/8.L;  _weights[18] =  -256.L/2835.L;
-              _points[19](0) = 1.L/10.L;  _points[19](1) = 1.L/10.L;  _points[19](2) = 3.L/10.L;  _weights[19] = 3125.L/72576.L;
-              _points[20](0) =  1.L/8.L;  _points[20](1) =  3.L/8.L;  _points[20](2) =  3.L/8.L;  _weights[20] =  -256.L/2835.L;
-              _points[21](0) =  5.L/8.L;  _points[21](1) =  1.L/8.L;  _points[21](2) =  1.L/8.L;  _weights[21] =  -256.L/2835.L;
-              _points[22](0) =  1.L/8.L;  _points[22](1) =  5.L/8.L;  _points[22](2) =  1.L/8.L;  _weights[22] =  -256.L/2835.L;
-              _points[23](0) = 1.L/10.L;  _points[23](1) = 3.L/10.L;  _points[23](2) = 1.L/10.L;  _weights[23] = 3125.L/72576.L;
-              _points[24](0) =  1.L/4.L;  _points[24](1) =  1.L/4.L;  _points[24](2) =  1.L/4.L;  _weights[24] =     -8.L/945.L;
-              _points[25](0) =  1.L/8.L;  _points[25](1) =  1.L/8.L;  _points[25](2) =  3.L/8.L;  _weights[25] =  -256.L/2835.L;
-              _points[26](0) =  3.L/8.L;  _points[26](1) =  3.L/8.L;  _points[26](2) =  1.L/8.L;  _weights[26] =  -256.L/2835.L;
-              _points[27](0) =  1.L/8.L;  _points[27](1) =  3.L/8.L;  _points[27](2) =  1.L/8.L;  _weights[27] =  -256.L/2835.L;
-              _points[28](0) = 1.L/10.L;  _points[28](1) = 3.L/10.L;  _points[28](2) =  1.L/2.L;  _weights[28] = 3125.L/72576.L;
-              _points[29](0) = 3.L/10.L;  _points[29](1) =  1.L/2.L;  _points[29](2) = 1.L/10.L;  _weights[29] = 3125.L/72576.L;
-              _points[30](0) = 1.L/10.L;  _points[30](1) = 1.L/10.L;  _points[30](2) =  1.L/2.L;  _weights[30] = 3125.L/72576.L;
-              _points[31](0) =  1.L/2.L;  _points[31](1) = 3.L/10.L;  _points[31](2) = 1.L/10.L;  _weights[31] = 3125.L/72576.L;
-              _points[32](0) =  1.L/8.L;  _points[32](1) =  1.L/8.L;  _points[32](2) =  1.L/8.L;  _weights[32] =  -256.L/2835.L;
-              _points[33](0) = 1.L/10.L;  _points[33](1) = 3.L/10.L;  _points[33](2) = 3.L/10.L;  _weights[33] = 3125.L/72576.L;
-              _points[34](0) = 1.L/10.L;  _points[34](1) = 1.L/10.L;  _points[34](2) = 1.L/10.L;  _weights[34] = 3125.L/72576.L;
+              _points[ 0](0) = Real(3)/10;  _points[ 0](1) = Real(1)/10;  _points[ 0](2) = Real(3)/10;  _weights[ 0] = Real(3125)/72576;
+              _points[ 1](0) =  Real(1)/6;  _points[ 1](1) =  Real(1)/2;  _points[ 1](2) =  Real(1)/6;  _weights[ 1] =   Real(243)/4480;
+              _points[ 2](0) =  Real(1)/6;  _points[ 2](1) =  Real(1)/6;  _points[ 2](2) =  Real(1)/2;  _weights[ 2] =   Real(243)/4480;
+              _points[ 3](0) =  Real(1)/2;  _points[ 3](1) = Real(1)/10;  _points[ 3](2) = Real(1)/10;  _weights[ 3] = Real(3125)/72576;
+              _points[ 4](0) = Real(3)/10;  _points[ 4](1) = Real(1)/10;  _points[ 4](2) = Real(1)/10;  _weights[ 4] = Real(3125)/72576;
+              _points[ 5](0) = Real(3)/10;  _points[ 5](1) = Real(3)/10;  _points[ 5](2) = Real(1)/10;  _weights[ 5] = Real(3125)/72576;
+              _points[ 6](0) =  Real(1)/2;  _points[ 6](1) =  Real(1)/6;  _points[ 6](2) =  Real(1)/6;  _weights[ 6] =   Real(243)/4480;
+              _points[ 7](0) = Real(3)/10;  _points[ 7](1) = Real(1)/10;  _points[ 7](2) =  Real(1)/2;  _weights[ 7] = Real(3125)/72576;
+              _points[ 8](0) = Real(7)/10;  _points[ 8](1) = Real(1)/10;  _points[ 8](2) = Real(1)/10;  _weights[ 8] = Real(3125)/72576;
+              _points[ 9](0) =  Real(3)/8;  _points[ 9](1) =  Real(1)/8;  _points[ 9](2) =  Real(1)/8;  _weights[ 9] =  -Real(256)/2835;
+              _points[10](0) = Real(3)/10;  _points[10](1) = Real(3)/10;  _points[10](2) = Real(3)/10;  _weights[10] = Real(3125)/72576;
+              _points[11](0) = Real(1)/10;  _points[11](1) =  Real(1)/2;  _points[11](2) = Real(3)/10;  _weights[11] = Real(3125)/72576;
+              _points[12](0) = Real(1)/10;  _points[12](1) = Real(1)/10;  _points[12](2) = Real(7)/10;  _weights[12] = Real(3125)/72576;
+              _points[13](0) =  Real(1)/2;  _points[13](1) = Real(1)/10;  _points[13](2) = Real(3)/10;  _weights[13] = Real(3125)/72576;
+              _points[14](0) = Real(1)/10;  _points[14](1) = Real(7)/10;  _points[14](2) = Real(1)/10;  _weights[14] = Real(3125)/72576;
+              _points[15](0) = Real(1)/10;  _points[15](1) =  Real(1)/2;  _points[15](2) = Real(1)/10;  _weights[15] = Real(3125)/72576;
+              _points[16](0) =  Real(1)/6;  _points[16](1) =  Real(1)/6;  _points[16](2) =  Real(1)/6;  _weights[16] =   Real(243)/4480;
+              _points[17](0) =  Real(3)/8;  _points[17](1) =  Real(1)/8;  _points[17](2) =  Real(3)/8;  _weights[17] =  -Real(256)/2835;
+              _points[18](0) =  Real(1)/8;  _points[18](1) =  Real(1)/8;  _points[18](2) =  Real(5)/8;  _weights[18] =  -Real(256)/2835;
+              _points[19](0) = Real(1)/10;  _points[19](1) = Real(1)/10;  _points[19](2) = Real(3)/10;  _weights[19] = Real(3125)/72576;
+              _points[20](0) =  Real(1)/8;  _points[20](1) =  Real(3)/8;  _points[20](2) =  Real(3)/8;  _weights[20] =  -Real(256)/2835;
+              _points[21](0) =  Real(5)/8;  _points[21](1) =  Real(1)/8;  _points[21](2) =  Real(1)/8;  _weights[21] =  -Real(256)/2835;
+              _points[22](0) =  Real(1)/8;  _points[22](1) =  Real(5)/8;  _points[22](2) =  Real(1)/8;  _weights[22] =  -Real(256)/2835;
+              _points[23](0) = Real(1)/10;  _points[23](1) = Real(3)/10;  _points[23](2) = Real(1)/10;  _weights[23] = Real(3125)/72576;
+              _points[24](0) =  Real(1)/4;  _points[24](1) =  Real(1)/4;  _points[24](2) =  Real(1)/4;  _weights[24] =     -Real(8)/945;
+              _points[25](0) =  Real(1)/8;  _points[25](1) =  Real(1)/8;  _points[25](2) =  Real(3)/8;  _weights[25] =  -Real(256)/2835;
+              _points[26](0) =  Real(3)/8;  _points[26](1) =  Real(3)/8;  _points[26](2) =  Real(1)/8;  _weights[26] =  -Real(256)/2835;
+              _points[27](0) =  Real(1)/8;  _points[27](1) =  Real(3)/8;  _points[27](2) =  Real(1)/8;  _weights[27] =  -Real(256)/2835;
+              _points[28](0) = Real(1)/10;  _points[28](1) = Real(3)/10;  _points[28](2) =  Real(1)/2;  _weights[28] = Real(3125)/72576;
+              _points[29](0) = Real(3)/10;  _points[29](1) =  Real(1)/2;  _points[29](2) = Real(1)/10;  _weights[29] = Real(3125)/72576;
+              _points[30](0) = Real(1)/10;  _points[30](1) = Real(1)/10;  _points[30](2) =  Real(1)/2;  _weights[30] = Real(3125)/72576;
+              _points[31](0) =  Real(1)/2;  _points[31](1) = Real(3)/10;  _points[31](2) = Real(1)/10;  _weights[31] = Real(3125)/72576;
+              _points[32](0) =  Real(1)/8;  _points[32](1) =  Real(1)/8;  _points[32](2) =  Real(1)/8;  _weights[32] =  -Real(256)/2835;
+              _points[33](0) = Real(1)/10;  _points[33](1) = Real(3)/10;  _points[33](2) = Real(3)/10;  _weights[33] = Real(3125)/72576;
+              _points[34](0) = Real(1)/10;  _points[34](1) = Real(1)/10;  _points[34](2) = Real(1)/10;  _weights[34] = Real(3125)/72576;
               return;
             }
 

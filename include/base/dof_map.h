@@ -604,7 +604,7 @@ public:
   { std::vector<dof_id_type>::const_iterator ub =
       std::upper_bound(_end_df.begin(), _end_df.end(), dof);
     libmesh_assert (ub != _end_df.end());
-    return (ub - _end_df.begin());
+    return cast_int<processor_id_type>(ub - _end_df.begin());
   }
 
 #ifdef LIBMESH_ENABLE_AMR

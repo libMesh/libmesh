@@ -1163,7 +1163,7 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
             // Fill io_buffer if we are writing.
             if (mode == ENCODE)
               for (unsigned int i=0, cnt=0; i<len; i++)
-                io_buffer[cnt++] = val[i];
+                io_buffer[cnt++] = double(val[i]);
 
             xdr_vector(xdrs.get(),
                        (char *) &io_buffer[0],

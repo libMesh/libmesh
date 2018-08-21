@@ -195,7 +195,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
 
   std::vector<Real> bin_bounds(n_bins+1);
   for (std::size_t i=0; i<bin_bounds.size(); i++)
-    bin_bounds[i] = min + i * bin_size;
+    bin_bounds[i] = min + Real(i) * bin_size;
 
   // Give the last bin boundary a little wiggle room: we don't want
   // it to be just barely less than the max, otherwise our bin test below
@@ -293,7 +293,7 @@ void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
       out_stream << "x=[";
       for (std::size_t i=0; i<bin_members.size(); ++i)
         {
-          out_stream << min + (i+0.5)*bin_size << " ";
+          out_stream << min + (Real(i)+0.5)*bin_size << " ";
         }
       out_stream << "];\n";
 

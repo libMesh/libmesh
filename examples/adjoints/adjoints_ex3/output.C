@@ -26,7 +26,7 @@ void start_output(unsigned int timesteps,
         infile.getline(buf, 1024);
       if (!infile.good())
         libmesh_error_msg("Error reading line from file " << filename);
-      unsigned int length = infile.tellg();
+      unsigned int length = cast_int<unsigned int>(infile.tellg());
       infile.close();
 
       // Then throw away the rest

@@ -87,7 +87,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
   LOG_SCOPE("partition_range()", "MetisPartitioner");
 
-  const dof_id_type n_range_elem = std::distance(beg, end);
+  const dof_id_type n_range_elem = cast_int<dof_id_type>(std::distance(beg, end));
 
   // Metis will only consider the elements in the range.
   // We need to map the range element ids into a
@@ -287,14 +287,15 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                 std::set<const Elem *> neighbor_set;
                 elem->find_interior_neighbors(neighbor_set);
 
-                num_neighbors += neighbor_set.size();
+                num_neighbors += cast_int<unsigned int>(neighbor_set.size());
               }
 
             // Check for any boundary neighbors
             typedef map_type::iterator map_it_type;
             std::pair<map_it_type, map_it_type>
               bounds = interior_to_boundary_map.equal_range(elem);
-            num_neighbors += std::distance(bounds.first, bounds.second);
+            num_neighbors += cast_int<unsigned int>
+              (std::distance(bounds.first, bounds.second));
 
             csr_graph.prep_n_nonzeros(elem_global_index, num_neighbors);
 #ifndef NDEBUG
