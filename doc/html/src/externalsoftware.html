@@ -1,7 +1,17 @@
 <h1>External Packages</h1>
 <code>libMesh</code> interfaces to a number of high-quality software packages to provide certain functionality.  This page provides a list of packages and a description of their use in the library.
 
-<h2>MPI</h2> The <a href="http://www-unix.mcs.anl.gov/mpi">Message Passing Interface</a> is a standard for parallel programming using the message passing model. PETSc requires MPI for its functionality.  <code>libMesh</code> makes use of MPI to when running in parallel for certain operations, including its <code>ParallelMesh</code> distributed-memory, fully unstructured mesh implementation.
+<h2>MPI</h2> The <a href="http://www-unix.mcs.anl.gov/mpi">Message
+    Passing Interface</a> is a standard for parallel programming using
+the message passing model. PETSc and Trilinos require MPI for
+distributed-memory parallel functionality.
+<code>libMesh</code> can make use of MPI for certain operations on
+distributed-memory (as well as shared-memory and hybrid) parallel
+computers, enabling its <code>DistributedMesh</code>
+distributed-memory, fully unstructured mesh implementation.
+
+<code>libMesh</code> currently only supports MPI implementations
+compatible with the MPI-2 and later MPI standards.
 
 <h2>TBB</h2> Since February 2008 <code>libMesh</code> can be configured to use the <a href="http://threadingbuildingblocks.org/">Threading Building Blocks</a> for thread-based parallelism on shared memory machines.  Several key algorithms in the library have been refactored to be multithreaded, and this effort will continue as additional profiling reveals additional serial bottlenecks.  It is envisioned that for certain classes of problems multilevel parallelism (e.g. message passing between nodes and threading within nodes) will prove more scalable than message passing alone, especially with the introduction of commodity multi-core processors.  The reality is that for implicit problems this can only be achieved with a parallel linear algebra library that also uses multilevel parallelism.
 

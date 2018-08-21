@@ -27,60 +27,31 @@ in the top-level directory. You can then submit the file <code>patch</code>.
 
 <a id="compilers"></a><h2>Compilers</h2>
 
-<code>libMesh</code> makes extensive use of the standard C++ library,
-so you will need a decent, standards-compliant compiler. We have tried
-very hard to make the code completely compiler-agnostic by avoiding
-questionable (but legal) constructs. If you have a compiler that won't
-build the code please let us know. You will also need a decent C compiler
+<code>libMesh</code> makes extensive use of the standard C++ library
+and increasing use of C++11 standard language and library features,
+so you will need a recent, standards-compliant compiler.  We have tried
+very hard to make the code compiler-agnostic by avoiding questionable
+constructs. If you have a C++11-supporting compiler that won't
+build libMesh code please let us know. You will also need a decent C compiler
 if you want to build some of the contributed packages that add functionality
 to the library.
-
-The library is continuously tested with the following compilers:
+<br>
 
 <br>
-<ul>
-  <li>GNU GCC
-    <ul>
-      <li><code>gcc</code> 3.4</li>
-      <li><code>gcc</code> 4.2</li>
-      <li><code>gcc</code> 4.4</li>
-      <li><code>gcc</code> 4.5</li>
-      <li><code>gcc</code> 4.6</li>
-      <li><code>gcc</code> 4.7</li>
-      <li><code>gcc</code> 4.8</li>
-    </ul>
-  </li>
-  <li>Intel ICC
-    <ul>
-      <li><code>icc</code> 11.1</li>
-      <li><code>icc</code> 12.0</li>
-      <li><code>icc</code> 12.1</li>
-      <li><code>icc</code> 13.0</li>
-    </ul>
-  </li>
-  <li>Clang
-    <ul>
-      <li><code>clang++</code> 2.9</li>
-      <li><code>clang++</code> 3.0</li>
-      <li><code>clang++</code> 3.1</li>
-      <li><code>clang++</code> 3.2</li>
-    </ul>
-  </li>
-  <li>Sun Studio/Oracle
-    <ul>
-      <li><code>CC</code> 12.3</li>
-    </ul>
-    <code>$ ./configure --disable-fparser CXXFLAGS=-library=stlport4 --disable-unordered-containers</code>
-  </li>
-  <li> Portland Group
-    <ul>
-      <li><code>pgi</code> 11.7</li>
-      <li><code>pgi</code> 12.9</li>
-      <li><code>pgi</code> 13.4</li>
-    </ul>
-    <code>$ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</code>
-  </li>
-</ul>
+<code>libMesh</code> Continuous Integration testing of all library
+modifications currently is done with gcc 6.2 and gcc 7.3.  Less
+frequent testing is done with clang, Intel, and older gcc compilers.
+
+<a id="external"></a><h2>External Software</h2>
+
+<code>libMesh</code> has many features which are enabled via
+integration with <a href="externalsoftware.html">various third-party
+libraries</a>, a few of which are redistributed in our contrib
+directory, others of which may be separately installed on your system.
+The libMesh configure script attempts to autodetect these libraries
+when possible.  Some of the supported libraries have occasionally
+changing (or even frequently changing) APIs.  We attempt to provide a
+range of backwards compatibility for old versions of third-party APIs.
 
 
 <a id="conf"></a><h2>Configuration</h2>
