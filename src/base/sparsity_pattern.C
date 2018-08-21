@@ -327,7 +327,7 @@ void Build::operator()(const ConstElemRange & range)
       // Get the row of the sparsity pattern
       SparsityPattern::Row & row = sparsity_pattern[i];
 
-      for (auto & df : row)
+      for (const auto & df : row)
         if ((df < first_dof_on_proc) || (df >= end_dof_on_proc))
           n_oz[i]++;
         else
@@ -385,7 +385,7 @@ void Build::join (const SparsityPattern::Build & other)
           // fix the number of on and off-processor nonzeros in this row
           n_nz[r] = n_oz[r] = 0;
 
-          for (auto & df : my_row)
+          for (const auto & df : my_row)
             if ((df < first_dof_on_proc) || (df >= end_dof_on_proc))
               n_oz[r]++;
             else
@@ -402,7 +402,7 @@ void Build::join (const SparsityPattern::Build & other)
 
   // Move nonlocal row information to ourselves; the other thread
   // won't need it in the map after that.
-  for (auto & p : other.nonlocal_pattern)
+  for (const auto & p : other.nonlocal_pattern)
     {
 #ifndef NDEBUG
       const dof_id_type dof_id = p.first;
@@ -586,7 +586,7 @@ void Build::parallel_sync ()
         // fix the number of on and off-processor nonzeros in this row
         n_nz[my_r] = n_oz[my_r] = 0;
 
-        for (auto & df : my_row)
+        for (const auto & df : my_row)
           if ((df < local_first_dof) || (df >= local_end_dof))
             n_oz[my_r]++;
           else
@@ -594,7 +594,7 @@ void Build::parallel_sync ()
       }
       else
       {
-        for (auto & df : their_row)
+        for (const auto & df : their_row)
           if ((df < local_first_dof) || (df >= local_end_dof))
             n_oz[my_r]++;
           else
