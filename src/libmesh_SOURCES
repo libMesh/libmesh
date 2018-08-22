@@ -120,6 +120,7 @@ libmesh_SOURCES =  \
         src/fe/inf_fe_map.C \
         src/fe/inf_fe_map_eval.C \
         src/fe/inf_fe_static.C \
+        src/geom/bounding_box.C \
         src/geom/cell.C \
         src/geom/cell_hex.C \
         src/geom/cell_hex20.C \
@@ -180,7 +181,6 @@ libmesh_SOURCES =  \
         src/mesh/abaqus_io.C \
         src/mesh/boundary_info.C \
         src/mesh/boundary_mesh.C \
-        src/mesh/bounding_box.C \
         src/mesh/checkpoint_io.C \
         src/mesh/distributed_mesh.C \
         src/mesh/ensight_io.C \
