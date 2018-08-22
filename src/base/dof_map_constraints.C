@@ -3990,7 +3990,12 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                       // We should never have a 0 constraint
                       // coefficient; that's implicit via sparse
                       // constraint storage
-                      libmesh_assert(j.second);
+                      //
+                      // But we can't easily control how users add
+                      // constraints, so we can't safely assert that
+                      // we're being efficient here.
+                      //
+                      // libmesh_assert(j.second);
                     }
                 }
               else
