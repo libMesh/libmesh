@@ -1703,6 +1703,7 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
     if (this->is_constrained_dof(dof_number))
       libmesh_error_msg("ERROR: DOF " << dof_number << " was already constrained!");
 
+  // We don't allow nonsensical constraints
   libmesh_assert_less(dof_number, this->n_dofs());
 
   // There is an implied "1" on the diagonal of the constraint row, and the user
@@ -1715,6 +1716,9 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
   for (const auto & pr : constraint_row)
     libmesh_assert_less(pr.first, this->n_dofs());
 #endif
+
+  // We don't allow constraints-against-ourselves
+  libmesh_assert(!constraint_row.count(dof_number));
 
   // We don't get insert_or_assign until C++17 so we make do.
   std::pair<DofConstraints::iterator, bool> it =
