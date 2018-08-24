@@ -90,9 +90,26 @@ public:
 
   /*
    * \returns \p true if the other bounding box has a non-empty
-   * intersection with this bounding box.
+   * intersection with this bounding box. Exact floating point <=
+   * comparisons are performed.
    */
   bool intersects (const BoundingBox &) const;
+
+  /*
+   * \returns \p true if the other bounding box has a non-empty
+   * intersection with this bounding box. abstol is an absolute
+   * tolerance used to make "fuzzy" comparisons. abstol must be
+   * strictly > 0.0, and both BBoxes being compared are "inflated" by
+   * abstol in each direction, i.e.
+   * (xmin, ymin, zmin) -> (xmin - abstol, ymin - abstol, zmin - abstol)
+   * (xmax, ymax, zmax) -> (xmax + abstol, ymax + abstol, zmax + abstol)
+   * before the intersection comparisons are made. This approach can
+   * be helpful for detecting intersections between two degenerate
+   * (planar) bounding boxes that lie in nearly (to within abstol) the
+   * same plane and in certain situations should be considered
+   * intersecting.
+   */
+  bool intersects (const BoundingBox &, Real abstol) const;
 
   /**
    * \returns \p true if the other bounding box has a non-empty
