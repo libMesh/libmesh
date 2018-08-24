@@ -587,7 +587,7 @@ public:
 
     system.solve();
 
-    // We set the solution to be 1 everywhere, so the final l1 norm of the 
+    // We set the solution to be 1 everywhere, so the final l1 norm of the
     // solution is the product of the number of variables and number of nodes.
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * system.n_vars());
 
