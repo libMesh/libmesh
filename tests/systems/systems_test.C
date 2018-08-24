@@ -568,15 +568,15 @@ public:
     ExplicitSystem& system =
       equation_systems.add_system<LinearImplicitSystem> ("test");
 
-    unsigned int u_var = system.add_variable ("u", libMesh::FIRST);
-    unsigned int v_var = system.add_variable ("v", libMesh::FIRST);
-    unsigned int w_var = system.add_variable ("w", libMesh::FIRST);
+    system.add_variable ("u", libMesh::FIRST);
+    system.add_variable ("v", libMesh::FIRST);
+    system.add_variable ("w", libMesh::FIRST);
 
     std::set<subdomain_id_type> theta_subdomains;
     theta_subdomains.insert(10);
-    unsigned int theta_x_var = system.add_variable ("theta_x", libMesh::FIRST, &theta_subdomains);
-    unsigned int theta_y_var = system.add_variable ("theta_y", libMesh::FIRST, &theta_subdomains);
-    unsigned int theta_z_var = system.add_variable ("theta_z", libMesh::FIRST, &theta_subdomains);
+    system.add_variable ("theta_x", libMesh::FIRST, &theta_subdomains);
+    system.add_variable ("theta_y", libMesh::FIRST, &theta_subdomains);
+    system.add_variable ("theta_z", libMesh::FIRST, &theta_subdomains);
 
     system.attach_assemble_function (assemble_matrix_and_rhs);
 
