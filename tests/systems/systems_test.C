@@ -158,32 +158,16 @@ void assemble_matrix_and_rhs(EquationSystems& es,
   {
     const Node & node_1 = mesh.node_ref(1);
     const Node & node_2 = mesh.node_ref(2);
-    dof_indices.resize(12);
+    dof_indices.resize(4);
     dof_indices[0] =
       node_1.dof_number(system.number(), system.variable_number("u"), 0);
     dof_indices[1] =
-      node_1.dof_number(system.number(), system.variable_number("v"), 0);
-    dof_indices[2] =
-      node_1.dof_number(system.number(), system.variable_number("w"), 0);
-    dof_indices[3] =
       node_1.dof_number(system.number(), system.variable_number("theta_x"), 0);
-    dof_indices[4] =
-      node_1.dof_number(system.number(), system.variable_number("theta_y"), 0);
-    dof_indices[5] =
-      node_1.dof_number(system.number(), system.variable_number("theta_z"), 0);
 
-    dof_indices[6] =
+    dof_indices[2] =
       node_2.dof_number(system.number(), system.variable_number("u"), 0);
-    dof_indices[7] =
-      node_2.dof_number(system.number(), system.variable_number("v"), 0);
-    dof_indices[8] =
-      node_2.dof_number(system.number(), system.variable_number("w"), 0);
-    dof_indices[9] =
+    dof_indices[3] =
       node_2.dof_number(system.number(), system.variable_number("theta_x"), 0);
-    dof_indices[10] =
-      node_2.dof_number(system.number(), system.variable_number("theta_y"), 0);
-    dof_indices[11] =
-      node_2.dof_number(system.number(), system.variable_number("theta_z"), 0);
 
     const unsigned int n_dofs = dof_indices.size();
     Ke.resize (n_dofs, n_dofs);
@@ -569,14 +553,10 @@ public:
       equation_systems.add_system<LinearImplicitSystem> ("test");
 
     system.add_variable ("u", libMesh::FIRST);
-    system.add_variable ("v", libMesh::FIRST);
-    system.add_variable ("w", libMesh::FIRST);
 
     std::set<subdomain_id_type> theta_subdomains;
     theta_subdomains.insert(10);
     system.add_variable ("theta_x", libMesh::FIRST, &theta_subdomains);
-    system.add_variable ("theta_y", libMesh::FIRST, &theta_subdomains);
-    system.add_variable ("theta_z", libMesh::FIRST, &theta_subdomains);
 
     system.attach_assemble_function (assemble_matrix_and_rhs);
 
