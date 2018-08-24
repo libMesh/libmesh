@@ -118,26 +118,8 @@ void assemble_matrix_and_rhs(EquationSystems& es,
                              const std::string& system_name)
 {
   const MeshBase& mesh = es.get_mesh();
-
-  const unsigned int dim = mesh.mesh_dimension();
-
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("test");
-
-  const unsigned int u_var = system.variable_number ("u");
-
   const DofMap& dof_map = system.get_dof_map();
-  FEType fe_type = dof_map.variable_type(0);
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
-  QGauss qrule (dim, fe_type.default_quadrature_order());
-  fe->attach_quadrature_rule (&qrule);
-
-  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-  QGauss qface(dim-1, fe_type.default_quadrature_order());
-  fe_face->attach_quadrature_rule (&qface);
-
-  const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
@@ -158,8 +140,6 @@ void assemble_matrix_and_rhs(EquationSystems& es,
 
       dof_map.dof_indices (elem, dof_indices);
       const unsigned int n_dofs = dof_indices.size();
-
-      fe->reinit (elem);
 
       Ke.resize (n_dofs, n_dofs);
       Fe.resize (n_dofs);
