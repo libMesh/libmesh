@@ -537,6 +537,14 @@ public:
   bool impose_internal_fluxes;
 
   /**
+   * In some cases meshes are intentionally created with degenerate sides
+   * as a way to represent, say, triangles using a hex-only mesh. In this
+   * situation we should detect and skip any degenerate sides in order to
+   * prevent zero or negative element Jacobian errors.
+   */
+  bool skip_degenerate_sides;
+
+  /**
    * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
    * This is false by default in RBConstruction since (in the default implementation)
    * the RB inner-product matrix will just be the identity. But we may need the
