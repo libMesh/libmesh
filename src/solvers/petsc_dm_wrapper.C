@@ -200,7 +200,12 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
       n_levels = usr_requested_mg_lvls;
     }
   else
-    libmesh_error_msg("ERROR: -pc_mg_levels not specified");
+    {
+      // if -pc_mg_levels is not specified we just construct fieldsplit related
+      // structures on the finest mesh.
+      n_levels = 1;
+    }
+
 
   // Init data structures: data[0] ~ coarse grid, data[n_levels-1] ~ fine grid
   this->init_dm_data(n_levels, system.comm());
@@ -273,55 +278,65 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // Now fill the corresponding internal PetscDMContext for each created DM
   for( unsigned int i=1; i <= n_levels; i++ )
     {
-      // Set pointers to surrounding dm levels to help PETSc refine/coarsen
-      if ( i == 1 ) // were at the coarsest mesh
+      if (n_levels > 1 )
         {
-          (*_ctx_vec[i-1]).coarser_dm = NULL;
-          (*_ctx_vec[i-1]).finer_dm   = _dms[1].get();
-        }
-      else if( i == n_levels ) // were at the finest mesh
-        {
-          (*_ctx_vec[i-1]).coarser_dm = _dms[_dms.size() - 2].get();
-          (*_ctx_vec[i-1]).finer_dm   = NULL;
-        }
-      else // were in the middle of the heirarchy
-        {
-          (*_ctx_vec[i-1]).coarser_dm = _dms[i-2].get();
-          (*_ctx_vec[i-1]).finer_dm   = _dms[i].get();
-        }
+          // Set pointers to surrounding dm levels to help PETSc refine/coarsen
+          if ( i == 1 ) // were at the coarsest mesh
+            {
+              (*_ctx_vec[i-1]).coarser_dm = NULL;
+              (*_ctx_vec[i-1]).finer_dm   = _dms[1].get();
+            }
+          else if( i == n_levels ) // were at the finest mesh
+            {
+              (*_ctx_vec[i-1]).coarser_dm = _dms[_dms.size() - 2].get();
+              (*_ctx_vec[i-1]).finer_dm   = NULL;
+            }
+          else // were in the middle of the hierarchy
+            {
+              (*_ctx_vec[i-1]).coarser_dm = _dms[i-2].get();
+              (*_ctx_vec[i-1]).finer_dm   = _dms[i].get();
+            }
 
       // Create and attach a sized vector to the current ctx
       _vec_vec[i-1]->init( _mesh_dof_sizes[i-1] );
       _ctx_vec[i-1]->current_vec = _vec_vec[i-1].get();
+        }
 
     } // End context creation
 
   // Attach a vector and context to each DM
-  for ( unsigned int i = 1; i <= n_levels ; ++i)
+  if (n_levels > 1 )
     {
-      DM & dm = this->get_dm(i-1);
 
-      ierr = DMShellSetGlobalVector( dm, (*_ctx_vec[ i-1 ]).current_vec->vec() );
-      CHKERRABORT(system.comm().get(), ierr);
+      for ( unsigned int i = 1; i <= n_levels ; ++i)
+        {
+          DM & dm = this->get_dm(i-1);
 
-      ierr = DMShellSetContext( dm, _ctx_vec[ i-1 ].get() );
-      CHKERRABORT(system.comm().get(), ierr);
+          ierr = DMShellSetGlobalVector( dm, (*_ctx_vec[ i-1 ]).current_vec->vec() );
+          CHKERRABORT(system.comm().get(), ierr);
+
+          ierr = DMShellSetContext( dm, _ctx_vec[ i-1 ].get() );
+          CHKERRABORT(system.comm().get(), ierr);
+        }
     }
 
-  // DM structures created, now we need projection matrixes.
+  // DM structures created, now we need projection matrixes if GMG is requested.
   // To prepare for projection creation go to second coarsest mesh so we can utilize
   // old_dof_indices information in the projection creation.
-  START_LOG ("PDM_refine", "PetscDMWrapper");
-  mesh_refinement.uniformly_refine(1);
-  STOP_LOG  ("PDM_refine", "PetscDMWrapper");
+  if (n_levels > 1 )
+    {
+      START_LOG ("PDM_refine", "PetscDMWrapper");
+      mesh_refinement.uniformly_refine(1);
+      STOP_LOG  ("PDM_refine", "PetscDMWrapper");
 
-  START_LOG ("PDM_dist_dof", "PetscDMWrapper");
-  system.get_dof_map().distribute_dofs(mesh);
-  STOP_LOG  ("PDM_dist_dof", "PetscDMWrapper");
+      START_LOG ("PDM_dist_dof", "PetscDMWrapper");
+      system.get_dof_map().distribute_dofs(mesh);
+      STOP_LOG  ("PDM_dist_dof", "PetscDMWrapper");
 
-  START_LOG ("PDM_cnstrnts", "PetscDMWrapper");
-  system.reinit_constraints();
-  STOP_LOG ("PDM_cnstrnts", "PetscDMWrapper");
+      START_LOG ("PDM_cnstrnts", "PetscDMWrapper");
+      system.reinit_constraints();
+      STOP_LOG ("PDM_cnstrnts", "PetscDMWrapper");
+    }
 
   // Create the Interpolation Matrices between adjacent mesh levels
   for ( unsigned int i = 1 ; i < n_levels ; ++i )
@@ -334,10 +349,10 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           // Create the Interpolation matrix and set its pointer
           _ctx_vec[i-1]->K_interp_ptr = _pmtx_vec[i-1].get();
 
-          unsigned int ndofs_local = system.get_dof_map().n_dofs_on_processor(system.processor_id());
+          unsigned int ndofs_local     = system.get_dof_map().n_dofs_on_processor(system.processor_id());
           unsigned int ndofs_old_first = system.get_dof_map().first_old_dof(system.processor_id());
           unsigned int ndofs_old_end   = system.get_dof_map().end_old_dof(system.processor_id());
-          unsigned int ndofs_old_size   = ndofs_old_end - ndofs_old_first;
+          unsigned int ndofs_old_size  = ndofs_old_end - ndofs_old_first;
 
           // Init and zero the matrix
           _ctx_vec[i-1]->K_interp_ptr->init(ndofs_f, ndofs_c, ndofs_local, ndofs_old_size);
