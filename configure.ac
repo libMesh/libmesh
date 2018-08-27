@@ -268,14 +268,14 @@ dnl some are unrecognized
 ANY_PARANOID_FLAGS=$PARANOID_FLAGS
 AS_IF([test "x$enableparanoid" != "xyes"],
         [ANY_PARANOID_FLAGS=''
-         AC_MSG_RESULT(<<< Compiler warnings are just warnings >>>)],
+         AC_MSG_RESULT(<<< Disabling extra paranoid compiler warnings >>>)],
         [old_CXXFLAGS="$CXXFLAGS"
          CXXFLAGS="$CXXFLAGS $WERROR_FLAGS $PARANOID_FLAGS"
          AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
           [AC_MSG_RESULT(<<< Enabled extra paranoid compiler warnings >>>)],
           [ANY_PARANOID_FLAGS=''
            AC_MSG_RESULT(<<< Compiler may not support all of $PARANOID_FLAGS >>>)
-           AC_MSG_RESULT(<<< Disabling extra paranoid warnings >>>)])
+           AC_MSG_RESULT(<<< Disabling extra paranoid compiler warnings >>>)])
          CXXFLAGS="$old_CXXFLAGS"])
 AC_SUBST(ANY_PARANOID_FLAGS)
 
