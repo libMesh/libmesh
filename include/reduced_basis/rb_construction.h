@@ -207,20 +207,6 @@ public:
   virtual void set_Nmax(unsigned int Nmax);
 
   /**
-   * Set the quiet_mode flag. If quiet == false then
-   * we print out a lot of extra information
-   * during the Offline stage.
-   */
-  void set_quiet_mode(bool quiet_mode_in)
-  { this->quiet_mode = quiet_mode_in; }
-
-  /**
-   * Is the system in quiet mode?
-   */
-  bool is_quiet() const
-  { return this->quiet_mode; }
-
-  /**
    * Load the i^th RB function into the RBConstruction
    * solution vector.
    */
@@ -745,12 +731,6 @@ protected:
    * This defaults to 1 in the steady case.
    */
   unsigned int delta_N;
-
-  /**
-   * Flag to indicate whether we print out extra information during
-   * the Offline stage.
-   */
-  bool quiet_mode;
 
   /**
    * A boolean flag to indicate whether or not the output dual norms
