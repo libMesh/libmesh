@@ -32865,7 +32865,8 @@ fi
 if test "${enable_petsc_hypre_required+set}" = set; then :
   enableval=$enable_petsc_hypre_required; case "${enableval}" in #(
   yes) :
-    petschyprerequired=yes ;; #(
+    petschyprerequired=yes
+                                 petscrequired=yes ;; #(
   no) :
     petschyprerequired=no ;; #(
   *) :

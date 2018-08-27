@@ -38,7 +38,8 @@ AC_DEFUN([CONFIGURE_PETSC],
                 AC_HELP_STRING([--enable-petsc-hypre-required],
                                [Error if a PETSc with Hypre is not detected by configure]),
                 [AS_CASE("${enableval}",
-                         [yes], [petschyprerequired=yes],
+                         [yes], [petschyprerequired=yes
+                                 petscrequired=yes],
                          [no],  [petschyprerequired=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-hypre-required)])],
                      [petschyprerequired=no])
