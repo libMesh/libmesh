@@ -8448,8 +8448,8 @@ fi
 ANY_PARANOID_FLAGS=$PARANOID_FLAGS
 if test "x$enableparanoid" != "xyes"; then :
   ANY_PARANOID_FLAGS=''
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler warnings are just warnings >>>" >&5
-$as_echo "<<< Compiler warnings are just warnings >>>" >&6; }
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling extra paranoid compiler warnings >>>" >&5
+$as_echo "<<< Disabling extra paranoid compiler warnings >>>" >&6; }
 else
   old_CXXFLAGS="$CXXFLAGS"
          CXXFLAGS="$CXXFLAGS $WERROR_FLAGS $PARANOID_FLAGS"
@@ -8471,8 +8471,8 @@ else
   ANY_PARANOID_FLAGS=''
            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiler may not support all of $PARANOID_FLAGS >>>" >&5
 $as_echo "<<< Compiler may not support all of $PARANOID_FLAGS >>>" >&6; }
-           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling extra paranoid warnings >>>" >&5
-$as_echo "<<< Disabling extra paranoid warnings >>>" >&6; }
+           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling extra paranoid compiler warnings >>>" >&5
+$as_echo "<<< Disabling extra paranoid compiler warnings >>>" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
          CXXFLAGS="$old_CXXFLAGS"
