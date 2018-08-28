@@ -1811,6 +1811,30 @@ inline void Communicator::nonblocking_receive_packed_range (const unsigned int s
     (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t>>(buffer));
 }
 
+// template <typename Context, typename OutputIter, typename T>
+// inline void Communicator::nonblocking_receive_packed_range (const unsigned int src_processor_id,
+//                                                             Context * context,
+//                                                             OutputIter out,
+//                                                             const T * /* output_type */,
+//                                                             Request & req,
+//                                                             Status & stat,
+//                                                             const MessageTag & tag,
+//                                                             std::vector<typename Parallel::Packing<T>::buffer_type> & buffer) const
+// {
+//   libmesh_experimental();
+
+//   // Receive serialized variable size objects as a sequence of
+//   // buffer_t.
+//   // Allocate a buffer on the heap so we don't have to free it until
+//   // after the Request::wait()
+//   buffer.resize(stat.size());
+//   this->receive(src_processor_id, buffer, req, tag);
+
+//   // Make the Request::wait() handle unpacking the buffer
+//   req.add_post_wait_work
+//     (new Parallel::PostWaitUnpackBuffer<std::vector<typename Parallel::Packing<T>::buffer_type>, Context, OutputIter, T>(*buffer, context, out));
+// }
+
 
 
 template <typename T1, typename T2, typename A1, typename A2>
