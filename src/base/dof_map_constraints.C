@@ -418,21 +418,6 @@ private:
         if (!variable.active_on_subdomain(elem->subdomain_id()))
           continue;
 
-        // There's a chicken-and-egg problem with FEMFunction-based
-        // Dirichlet constraints: we can't evaluate the FEMFunction
-        // until we have an initialized local solution vector, we
-        // can't initialize local solution vectors until we have a
-        // send list, and we can't generate a send list until we know
-        // all our constraints
-        //
-        // We don't generate constraints on uninitialized systems;
-        // currently user code will have to reinit() before any
-        // FEMFunction-based constraints will be correct.  This should
-        // be fine, since user code would want to reinit() after
-        // setting initial conditions anyway.
-        if (f_system && context.get())
-          context->pre_fe_reinit(*f_system, elem);
-
         const unsigned short n_sides = elem->n_sides();
         const unsigned short n_edges = elem->n_edges();
         const unsigned short n_nodes = elem->n_nodes();
@@ -446,6 +431,10 @@ private:
 
         // We also maintain a separate list of nodeset-based boundary nodes
         std::vector<bool> is_boundary_nodeset(n_nodes, false);
+
+        // Update has_dirichlet_constraint below, and if it remains false then
+        // we can skip this element since there are not constraints to impose.
+        bool has_dirichlet_constraint = false;
 
         // Container to catch boundary ids handed back for sides,
         // nodes, and edges in the loops below.
@@ -467,14 +456,19 @@ private:
               continue;
 
             is_boundary_side[s] = true;
+            has_dirichlet_constraint = true;
 
             // Then see what nodes and what edges are on it
             for (unsigned int n = 0; n != n_nodes; ++n)
               if (elem->is_node_on_side(n,s))
-                is_boundary_node[n] = true;
+                {
+                  is_boundary_node[n] = true;
+                }
             for (unsigned int e = 0; e != n_edges; ++e)
               if (elem->is_edge_on_side(e,s))
-                is_boundary_edge[e] = true;
+                {
+                  is_boundary_edge[e] = true;
+                }
           }
 
         // We can also impose Dirichlet boundary conditions on nodes, so we should
@@ -488,6 +482,7 @@ private:
                 {
                   is_boundary_node[n] = true;
                   is_boundary_nodeset[n] = true;
+                  has_dirichlet_constraint = true;
                 }
           }
 
@@ -499,7 +494,10 @@ private:
 
             for (const auto & bc_id : ids_vec)
               if (b.count(bc_id))
-                is_boundary_edge[e] = true;
+                {
+                  is_boundary_edge[e] = true;
+                  has_dirichlet_constraint = true;
+                }
           }
 
         // We can also impose Dirichlet boundary conditions on shellfaces, so we should
@@ -510,8 +508,31 @@ private:
 
             for (const auto & bc_id : ids_vec)
               if (b.count(bc_id))
-                is_boundary_shellface[shellface] = true;
+                {
+                  is_boundary_shellface[shellface] = true;
+                  has_dirichlet_constraint = true;
+                }
           }
+
+        if(!has_dirichlet_constraint)
+          {
+            continue;
+          }
+
+        // There's a chicken-and-egg problem with FEMFunction-based
+        // Dirichlet constraints: we can't evaluate the FEMFunction
+        // until we have an initialized local solution vector, we
+        // can't initialize local solution vectors until we have a
+        // send list, and we can't generate a send list until we know
+        // all our constraints
+        //
+        // We don't generate constraints on uninitialized systems;
+        // currently user code will have to reinit() before any
+        // FEMFunction-based constraints will be correct.  This should
+        // be fine, since user code would want to reinit() after
+        // setting initial conditions anyway.
+        if (f_system && context.get())
+          context->pre_fe_reinit(*f_system, elem);
 
         // Update the DOF indices for this element based on
         // the current mesh
