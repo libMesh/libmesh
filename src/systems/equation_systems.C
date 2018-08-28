@@ -1143,6 +1143,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
                         }
                       }
                     }
+                    else
+                      nn += elem->n_nodes();
                   }
               }
           }
