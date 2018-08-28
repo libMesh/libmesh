@@ -461,14 +461,10 @@ private:
             // Then see what nodes and what edges are on it
             for (unsigned int n = 0; n != n_nodes; ++n)
               if (elem->is_node_on_side(n,s))
-                {
-                  is_boundary_node[n] = true;
-                }
+                is_boundary_node[n] = true;
             for (unsigned int e = 0; e != n_edges; ++e)
               if (elem->is_edge_on_side(e,s))
-                {
-                  is_boundary_edge[e] = true;
-                }
+                is_boundary_edge[e] = true;
           }
 
         // We can also impose Dirichlet boundary conditions on nodes, so we should
