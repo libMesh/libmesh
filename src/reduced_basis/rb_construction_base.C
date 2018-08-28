@@ -47,6 +47,7 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems & es,
                                               const std::string & name_in,
                                               const unsigned int number_in)
   : Base(es, name_in, number_in),
+    quiet_mode(true),
     serial_training_set(false),
     training_parameters_initialized(false),
     training_parameters_random_seed(-1) // by default, use std::time to seed RNG
@@ -181,24 +182,26 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
                                                               std::map<std::string,bool> log_param_scale,
                                                               bool deterministic)
 {
-  // Print out some info about the training set initialization
-  libMesh::out << "Initializing training parameters with "
-               << (deterministic ? "deterministic " : "random " )
-               << "training set..." << std::endl;
+  if(!is_quiet())
+    {
+      // Print out some info about the training set initialization
+      libMesh::out << "Initializing training parameters with "
+                  << (deterministic ? "deterministic " : "random " )
+                  << "training set..." << std::endl;
 
-  {
-    std::map<std::string,bool>::iterator it           = log_param_scale.begin();
-    std::map<std::string,bool>::const_iterator it_end = log_param_scale.end();
-    for (; it != it_end; ++it)
-      {
-        libMesh::out << "Parameter "
-                     << it->first
-                     << ": log scaling = "
-                     << it->second
-                     << std::endl;
-      }
-  }
-  libMesh::out << std::endl;
+      std::map<std::string,bool>::iterator it           = log_param_scale.begin();
+      std::map<std::string,bool>::const_iterator it_end = log_param_scale.end();
+      for (; it != it_end; ++it)
+        {
+          libMesh::out << "Parameter "
+                      << it->first
+                      << ": log scaling = "
+                      << it->second
+                      << std::endl;
+        }
+
+      libMesh::out << std::endl;
+    }
 
   if (deterministic)
     {

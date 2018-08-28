@@ -85,6 +85,20 @@ public:
   virtual void clear ();
 
   /**
+   * Set the quiet_mode flag. If quiet == false then
+   * we print out a lot of extra information
+   * during the Offline stage.
+   */
+  void set_quiet_mode(bool quiet_mode_in)
+  { this->quiet_mode = quiet_mode_in; }
+
+  /**
+   * Is the system in quiet mode?
+   */
+  bool is_quiet() const
+  { return this->quiet_mode; }
+
+  /**
    * Get the total number of training samples.
    */
   numeric_index_type get_n_training_samples() const;
@@ -217,6 +231,12 @@ protected:
 
 
   //----------- PROTECTED DATA MEMBERS -----------//
+
+  /**
+   * Flag to indicate whether we print out extra information during
+   * the Offline stage.
+   */
+  bool quiet_mode;
 
   /**
    * This boolean flag indicates whether or not the training set should
