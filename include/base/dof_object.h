@@ -287,6 +287,15 @@ public:
                          const unsigned int comp) const;
 
   /**
+   * \returns A pair consisting of the variable group number and the
+   * offset index from the start of that group for variable \p var on
+   * system \p s associated with this \p DofObject
+   */
+  std::pair<unsigned int, unsigned int>
+  var_to_vg_and_offset(const unsigned int s,
+                       const unsigned int var) const;
+
+  /**
    * Sets the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
    */
@@ -846,6 +855,33 @@ dof_id_type DofObject::dof_number(const unsigned int s,
       // << comp << '\n';
 
       return cast_int<dof_id_type>(base_idx + vig*ncg + comp);
+    }
+}
+
+
+
+inline
+std::pair<unsigned int, unsigned int>
+DofObject::var_to_vg_and_offset(const unsigned int s,
+                                const unsigned int var) const
+{
+  std::pair<unsigned int, unsigned int> returnval(0,0);
+
+  unsigned int & vg = returnval.first;
+  unsigned int & offset = returnval.second;
+
+  unsigned int vg_start = 0;
+  for (; ; vg++)
+    {
+      libmesh_assert_less(vg, this->n_var_groups(s));
+
+      const unsigned int vg_end = vg_start + this->n_vars(s,vg);
+      if (var < vg_end)
+        {
+          offset = var - vg_start;
+          return returnval;
+        }
+      vg_start = vg_end;
     }
 }
 
