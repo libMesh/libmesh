@@ -17,6 +17,10 @@
 #include "libmesh/string_to_enum.h"
 #include <libmesh/cell_tet4.h>
 #include <libmesh/zero_function.h>
+#include <libmesh/linear_implicit_system.h>
+#include <libmesh/quadrature_gauss.h>
+#include <libmesh/node_elem.h>
+#include "libmesh/edge_edge2.h"
 
 #include "test_comm.h"
 
@@ -31,6 +35,161 @@
 #include <libmesh/ignore_warnings.h>
 
 using namespace libMesh;
+
+// Sparsity pattern augmentation class used in testDofCouplingWithVarGroups
+class AugmentSparsityOnNodes : public GhostingFunctor
+{
+private:
+
+  /**
+   * The Mesh we're calculating on
+   */
+  MeshBase & _mesh;
+
+public:
+
+  /**
+   * Constructor.
+   */
+  AugmentSparsityOnNodes(MeshBase & mesh)
+  :
+  _mesh(mesh)
+  {}
+
+  /**
+   * User-defined function to augment the sparsity pattern.
+   */
+  virtual void operator() (const MeshBase::const_element_iterator & range_begin,
+                           const MeshBase::const_element_iterator & range_end,
+                           processor_id_type p,
+                           map_type & coupled_elements) override
+  {
+    dof_id_type node_elem_id_1 = 2;
+    dof_id_type node_elem_id_2 = 3;
+
+    const CouplingMatrix * const null_mat = nullptr;
+
+    for (const auto & elem : as_range(range_begin, range_end))
+      {
+        if (elem->id() == node_elem_id_1)
+          {
+            if (elem->processor_id() != p)
+              {
+                coupled_elements.insert (std::make_pair(elem, null_mat));
+
+                const Elem * neighbor = _mesh.elem_ptr(node_elem_id_2);
+                if (neighbor->processor_id() != p)
+                  coupled_elements.insert (std::make_pair(neighbor, null_mat));
+              }
+          }
+        if (elem->id() == node_elem_id_2)
+          {
+            if (elem->processor_id() != p)
+              {
+                coupled_elements.insert (std::make_pair(elem, null_mat));
+
+                const Elem * neighbor = _mesh.elem_ptr(node_elem_id_1);
+                if (neighbor->processor_id() != p)
+                  coupled_elements.insert (std::make_pair(neighbor, null_mat));
+              }
+          }
+      }
+  }
+
+  /**
+   * Rebuild the cached _lower_to_upper map whenever our Mesh has
+   * changed.
+   */
+  virtual void mesh_reinit () override
+  {
+  }
+
+  /**
+   * Update the cached _lower_to_upper map whenever our Mesh has been
+   * redistributed.  We'll be lazy and just recalculate from scratch.
+   */
+  virtual void redistribute () override
+  { this->mesh_reinit(); }
+
+};
+
+// Assembly function used in testDofCouplingWithVarGroups
+void assemble_matrix_and_rhs(EquationSystems& es,
+                             const std::string& system_name)
+{
+  const MeshBase& mesh = es.get_mesh();
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("test");
+  const DofMap& dof_map = system.get_dof_map();
+
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe;
+
+  std::vector<dof_id_type> dof_indices;
+
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
+
+      if(elem->type() == NODEELEM)
+      {
+        continue;
+      }
+
+      dof_map.dof_indices (elem, dof_indices);
+      const unsigned int n_dofs = dof_indices.size();
+
+      Ke.resize (n_dofs, n_dofs);
+      Fe.resize (n_dofs);
+
+      for(unsigned int i=0; i<n_dofs; i++)
+      {
+        Ke(i,i) = 1.;
+        Fe(i) = 1.;
+      }
+
+      system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
+    }
+
+  // Add matrix for extra coupled dofs
+  {
+    const Node & node_1 = mesh.node_ref(1);
+    const Node & node_2 = mesh.node_ref(2);
+    dof_indices.resize(6);
+    dof_indices[0] =
+      node_1.dof_number(system.number(), system.variable_number("u"), 0);
+    dof_indices[1] =
+      node_1.dof_number(system.number(), system.variable_number("v"), 0);
+    dof_indices[2] =
+      node_1.dof_number(system.number(), system.variable_number("w"), 0);
+
+    dof_indices[3] =
+      node_2.dof_number(system.number(), system.variable_number("u"), 0);
+    dof_indices[4] =
+      node_2.dof_number(system.number(), system.variable_number("v"), 0);
+    dof_indices[5] =
+      node_2.dof_number(system.number(), system.variable_number("w"), 0);
+
+    const unsigned int n_dofs = dof_indices.size();
+    Ke.resize (n_dofs, n_dofs);
+    Fe.resize (n_dofs);
+
+    for(unsigned int i=0; i<n_dofs; i++)
+    {
+      Ke(i,i) = 1.;
+      Fe(i) = 1.;
+    }
+
+    system.matrix->add_matrix (Ke, dof_indices);
+    system.rhs->add_vector    (Fe, dof_indices);
+  }
+
+  system.rhs->close();
+  system.matrix->close();
+}
 
 Number cubic_test (const Point& p,
                    const Parameters&,
@@ -55,6 +214,7 @@ public:
   CPPUNIT_TEST( testProjectHierarchicHex27 );
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
+  CPPUNIT_TEST( testDofCouplingWithVarGroups );
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -357,6 +517,69 @@ public:
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes()) - static_cast<Real>(projected_nodes_set.size());
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(sys.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+  }
+
+  void testDofCouplingWithVarGroups()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_cube (mesh,
+                                      1,
+                                      0,
+                                      0,
+                                      0., 1.,
+                                      0., 0.,
+                                      0., 0.,
+                                      EDGE2);
+
+    Point new_point_a(2.);
+    Point new_point_b(3.);
+    Node* new_node_a = mesh.add_point( new_point_a );
+    Node* new_node_b = mesh.add_point( new_point_b );
+    Elem* new_edge_elem = mesh.add_elem (new Edge2);
+    new_edge_elem->set_node(0) = new_node_a;
+    new_edge_elem->set_node(1) = new_node_b;
+
+    mesh.elem_ref(0).subdomain_id() = 10;
+    mesh.elem_ref(1).subdomain_id() = 10;
+
+    // Add NodeElems for coupling purposes
+    Elem* node_elem_1 = mesh.add_elem (new NodeElem);
+    node_elem_1->set_node(0) = mesh.elem_ref(0).node_ptr(1);
+    Elem* node_elem_2 = mesh.add_elem (new NodeElem);
+    node_elem_2->set_node(0) = new_node_a;
+
+    mesh.prepare_for_use();
+
+    // Create an equation systems object.
+    EquationSystems equation_systems (mesh);
+    ExplicitSystem& system =
+      equation_systems.add_system<LinearImplicitSystem> ("test");
+
+    system.add_variable ("u", libMesh::FIRST);
+    system.add_variable ("v", libMesh::FIRST);
+    system.add_variable ("w", libMesh::FIRST);
+
+    std::set<subdomain_id_type> theta_subdomains;
+    theta_subdomains.insert(10);
+    system.add_variable ("theta_x", libMesh::FIRST, &theta_subdomains);
+    system.add_variable ("theta_y", libMesh::FIRST, &theta_subdomains);
+    system.add_variable ("theta_z", libMesh::FIRST, &theta_subdomains);
+
+    system.attach_assemble_function (assemble_matrix_and_rhs);
+
+    AugmentSparsityOnNodes augment_sparsity(mesh);
+    system.get_dof_map().add_coupling_functor(augment_sparsity);
+
+    equation_systems.init ();
+
+    system.solve();
+
+    // We set the solution to be 1 everywhere, so the final l1 norm of the
+    // solution is the product of the number of variables and number of nodes.
+    Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * system.n_vars());
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
   }
 
 #ifdef LIBMESH_ENABLE_AMR
