@@ -2203,6 +2203,14 @@ void DofMap::_dof_indices (const Elem & elem,
         {
           const Node * node      = nodes[n];
 
+          // Cache the intermediate lookups that are common to every
+          // component
+          const std::pair<unsigned int, unsigned int>
+            vg_and_offset = node->var_to_vg_and_offset(sys_num,v);
+          const unsigned int & vg = vg_and_offset.first;
+          const unsigned int & vig = vg_and_offset.second;
+          const unsigned int n_comp = node->n_comp_group(sys_num,vg);
+
           // There is a potential problem with h refinement.  Imagine a
           // quad9 that has a linear FE on it.  Then, on the hanging side,
           // it can falsely identify a DOF at the mid-edge node. This is why
@@ -2220,7 +2228,7 @@ void DofMap::_dof_indices (const Elem & elem,
           // simplify p refinement)
           if (extra_hanging_dofs && !elem.is_vertex(n))
             {
-              const int dof_offset = node->n_comp(sys_num,v) - nc;
+              const int dof_offset = n_comp - nc;
 
               // We should never have fewer dofs than necessary on a
               // node unless we're getting indices on a parent element,
@@ -2231,11 +2239,12 @@ void DofMap::_dof_indices (const Elem & elem,
                   di.resize(di.size() + nc, DofObject::invalid_id);
                 }
               else
-                for (int i=node->n_comp(sys_num,v)-1; i>=dof_offset; i--)
+                for (int i=n_comp-1; i>=dof_offset; i--)
                   {
-                    libmesh_assert_not_equal_to (node->dof_number(sys_num,v,i),
-                                                 DofObject::invalid_id);
-                    di.push_back(node->dof_number(sys_num,v,i));
+                    const dof_id_type d =
+                      node->dof_number(sys_num, vg, vig, i, n_comp);
+                    libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+                    di.push_back(d);
                   }
             }
           // If this is a vertex or an element without extra hanging
@@ -2244,9 +2253,10 @@ void DofMap::_dof_indices (const Elem & elem,
           else
             for (unsigned int i=0; i<nc; i++)
               {
-                libmesh_assert_not_equal_to (node->dof_number(sys_num,v,i),
-                                             DofObject::invalid_id);
-                di.push_back(node->dof_number(sys_num,v,i));
+                const dof_id_type d =
+                  node->dof_number(sys_num, vg, vig, i, n_comp);
+                libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+                di.push_back(d);
               }
         }
 
