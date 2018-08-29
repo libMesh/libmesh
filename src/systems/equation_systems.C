@@ -1108,37 +1108,43 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
             for (unsigned int var=0; var<nv_sys; var++)
               {
                 const FEType & fe_type    = system.variable_type(var);
+                const Variable & var_description = system.variable(var);
 
                 unsigned int nn=0;
 
                 for (auto & elem : _mesh.active_element_ptr_range())
                   {
-                    system.get_dof_map().dof_indices (elem, dof_indices, var);
+                    if (var_description.active_on_subdomain(elem->subdomain_id()))
+                    {
+                      system.get_dof_map().dof_indices (elem, dof_indices, var);
 
-                    elem_soln.resize(dof_indices.size());
+                      elem_soln.resize(dof_indices.size());
 
-                    for (std::size_t i=0; i<dof_indices.size(); i++)
-                      elem_soln[i] = sys_soln[dof_indices[i]];
+                      for (std::size_t i=0; i<dof_indices.size(); i++)
+                        elem_soln[i] = sys_soln[dof_indices[i]];
 
-                    FEInterface::nodal_soln (dim,
-                                             fe_type,
-                                             elem,
-                                             elem_soln,
-                                             nodal_soln);
+                      FEInterface::nodal_soln (dim,
+                                               fe_type,
+                                               elem,
+                                               elem_soln,
+                                               nodal_soln);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                    // infinite elements should be skipped...
-                    if (!elem->infinite())
+                      // infinite elements should be skipped...
+                      if (!elem->infinite())
 #endif
                       {
                         libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
                         for (unsigned int n=0; n<elem->n_nodes(); n++)
-                          {
-                            soln[nv*(nn++) + (var + var_num)] +=
-                              nodal_soln[n];
-                          }
+                        {
+                          soln[nv*(nn++) + (var + var_num)] +=
+                            nodal_soln[n];
+                        }
                       }
+                    }
+                    else
+                      nn += elem->n_nodes();
                   }
               }
           }
