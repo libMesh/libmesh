@@ -2112,28 +2112,37 @@ void DofMap::dof_indices (const Node * const node,
   // Clear the DOF indices vector
   di.clear();
 
-  const unsigned int n_vars  = this->n_variables();
+  const unsigned int n_var_groups  = this->n_variable_groups();
   const unsigned int sys_num = this->sys_number();
 
   // Get the dof numbers
-  for (unsigned int v=0; v<n_vars; v++)
+  for (unsigned int vg=0; vg<n_var_groups; vg++)
     {
-      const Variable & var = this->variable(v);
+      const VariableGroup & var = this->variable_group(vg);
+      const unsigned int vars_in_group = var.n_variables();
+
       if (var.type().family == SCALAR)
         {
-          std::vector<dof_id_type> di_new;
-          this->SCALAR_dof_indices(di_new,v);
-          di.insert( di.end(), di_new.begin(), di_new.end());
+          for (unsigned int vig=0; vig != vars_in_group; ++vig)
+            {
+              std::vector<dof_id_type> di_new;
+              this->SCALAR_dof_indices(di_new,var.number(vig));
+              di.insert( di.end(), di_new.begin(), di_new.end());
+            }
         }
       else
         {
-          const int n_comp = node->n_comp(sys_num,v);
-          for (int i=0; i != n_comp; ++i)
+          const int n_comp = node->n_comp_group(sys_num,vg);
+          for (unsigned int vig=0; vig != vars_in_group; ++vig)
             {
-              libmesh_assert_not_equal_to
-                (node->dof_number(sys_num,v,i),
-                 DofObject::invalid_id);
-              di.push_back(node->dof_number(sys_num,v,i));
+              for (int i=0; i != n_comp; ++i)
+                {
+                  const dof_id_type d =
+                    node->dof_number(sys_num, vg, vig, i, n_comp);
+                  libmesh_assert_not_equal_to
+                    (d, DofObject::invalid_id);
+                  di.push_back(d);
+                }
             }
         }
     }
