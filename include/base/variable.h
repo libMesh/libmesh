@@ -258,6 +258,9 @@ public:
     return _number + v;
   }
 
+  // Don't let number(uint) hide number()
+  using Variable::number;
+
   /**
    * \returns The index of the first scalar component of this variable in the
    * system.
