@@ -132,6 +132,7 @@ DofMap::DofMap(const unsigned int number,
   _error_on_cyclic_constraint(false),
   _variables(),
   _variable_groups(),
+  _variable_group_numbers(),
   _sys_number(number),
   _mesh(mesh),
   _matrices(),
@@ -241,12 +242,17 @@ void DofMap::set_error_on_cyclic_constraint(bool error_on_cyclic_constraint)
 
 void DofMap::add_variable_group (const VariableGroup & var_group)
 {
+  const unsigned int vg = cast_int<unsigned int>(_variable_groups.size());
+
   _variable_groups.push_back(var_group);
 
   VariableGroup & new_var_group = _variable_groups.back();
 
   for (unsigned int var=0; var<new_var_group.n_variables(); var++)
-    _variables.push_back (new_var_group(var));
+    {
+      _variables.push_back (new_var_group(var));
+      _variable_group_numbers.push_back (vg);
+    }
 }
 
 
@@ -865,6 +871,7 @@ void DofMap::clear()
 
   _variables.clear();
   _variable_groups.clear();
+  _variable_group_numbers.clear();
   _first_df.clear();
   _end_df.clear();
   _first_scalar_df.clear();
@@ -1925,7 +1932,7 @@ void DofMap::dof_indices (const Elem * const elem,
   // Clear the DOF indices vector
   di.clear();
 
-  const unsigned int n_vars  = this->n_variables();
+  const unsigned int n_var_groups  = this->n_variable_groups();
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
@@ -1945,27 +1952,35 @@ void DofMap::dof_indices (const Elem * const elem,
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
           // Get the dof numbers
-          for (unsigned int v=0; v<n_vars; v++)
+          for (unsigned int vg=0; vg<n_var_groups; vg++)
             {
-              const Variable & var = this->variable(v);
+              const VariableGroup & var = this->variable_group(vg);
+              const unsigned int vars_in_group = var.n_variables();
+
               if (var.type().family == SCALAR &&
                   var.active_on_subdomain(elem->subdomain_id()))
                 {
+                  for (unsigned int vig=0; vig != vars_in_group; ++vig)
+                    {
 #ifdef DEBUG
-                  tot_size += this->variable(v).type().order;
+                      tot_size += var.type().order;
 #endif
-                  std::vector<dof_id_type> di_new;
-                  this->SCALAR_dof_indices(di_new,v);
-                  di.insert( di.end(), di_new.begin(), di_new.end());
+                      std::vector<dof_id_type> di_new;
+                      this->SCALAR_dof_indices(di_new,var.number(vig));
+                      di.insert( di.end(), di_new.begin(), di_new.end());
+                    }
                 }
               else
-                _dof_indices(*elem, elem->p_level(), di, v,
-                             &elem_nodes[0],
-                             cast_int<unsigned int>(elem_nodes.size())
+                for (unsigned int vig=0; vig != vars_in_group; ++vig)
+                  {
+                    _dof_indices(*elem, elem->p_level(), di, vg, vig,
+                                 &elem_nodes[0],
+                                 cast_int<unsigned int>(elem_nodes.size())
 #ifdef DEBUG
-                             , tot_size
+                                 , var.number(vig), tot_size
 #endif
-                             );
+                                 );
+                  }
             }
         }
 
@@ -1974,27 +1989,35 @@ void DofMap::dof_indices (const Elem * const elem,
 
   // Get the dof numbers for each variable
   const unsigned int n_nodes = elem ? elem->n_nodes() : 0;
-  for (unsigned int v=0; v<n_vars; v++)
+  for (unsigned int vg=0; vg<n_var_groups; vg++)
     {
-      const Variable & var = this->variable(v);
+      const VariableGroup & var = this->variable_group(vg);
+      const unsigned int vars_in_group = var.n_variables();
+
       if (var.type().family == SCALAR &&
           (!elem ||
            var.active_on_subdomain(elem->subdomain_id())))
         {
+          for (unsigned int vig=0; vig != vars_in_group; ++vig)
+            {
 #ifdef DEBUG
-          tot_size += var.type().order;
+              tot_size += var.type().order;
 #endif
-          std::vector<dof_id_type> di_new;
-          this->SCALAR_dof_indices(di_new,v);
-          di.insert( di.end(), di_new.begin(), di_new.end());
+              std::vector<dof_id_type> di_new;
+              this->SCALAR_dof_indices(di_new,var.number(vig));
+              di.insert( di.end(), di_new.begin(), di_new.end());
+            }
         }
       else if (elem)
-        _dof_indices(*elem, elem->p_level(), di, v, elem->get_nodes(),
-                     n_nodes
+        for (unsigned int vig=0; vig != vars_in_group; ++vig)
+          {
+            _dof_indices(*elem, elem->p_level(), di, vg, vig,
+                         elem->get_nodes(), n_nodes
 #ifdef DEBUG
-                     , tot_size
+                         , var.number(vig), tot_size
 #endif
                      );
+          }
     }
 
 #ifdef DEBUG
@@ -2020,6 +2043,10 @@ void DofMap::dof_indices (const Elem * const elem,
   if (p_level == -12345)
     p_level = elem ? elem->p_level() : 0;
 
+  const unsigned int vg = this->_variable_group_numbers[vn];
+  const VariableGroup & var = this->variable_group(vg);
+  const unsigned int vig = vn - var.number();
+
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
   std::size_t tot_size = 0;
@@ -2037,18 +2064,16 @@ void DofMap::dof_indices (const Elem * const elem,
           std::vector<const Node *> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
-          _dof_indices(*elem, p_level, di, vn, &elem_nodes[0],
+          _dof_indices(*elem, p_level, di, vg, vig, &elem_nodes[0],
                        cast_int<unsigned int>(elem_nodes.size())
 #ifdef DEBUG
-                       , tot_size
+                       , vn, tot_size
 #endif
                        );
         }
 
       return;
     }
-
-  const Variable & var = this->variable(vn);
 
   // Get the dof numbers
   if (var.type().family == SCALAR &&
@@ -2063,10 +2088,10 @@ void DofMap::dof_indices (const Elem * const elem,
       di.insert( di.end(), di_new.begin(), di_new.end());
     }
   else if (elem)
-    _dof_indices(*elem, p_level, di, vn, elem->get_nodes(),
+    _dof_indices(*elem, p_level, di, vg, vig, elem->get_nodes(),
                  elem->n_nodes()
 #ifdef DEBUG
-                 , tot_size
+                 , vn, tot_size
 #endif
                  );
 
@@ -2160,16 +2185,18 @@ void DofMap::dof_indices (const Node * const node,
 void DofMap::_dof_indices (const Elem & elem,
                            int p_level,
                            std::vector<dof_id_type> & di,
-                           const unsigned int v,
+                           const unsigned int vg,
+                           const unsigned int vig,
                            const Node * const * nodes,
                            unsigned int       n_nodes
 #ifdef DEBUG
                            ,
+                           const unsigned int v,
                            std::size_t & tot_size
 #endif
                            ) const
 {
-  const Variable & var = this->variable(v);
+  const VariableGroup & var = this->variable_group(vg);
 
   if (var.active_on_subdomain(elem.subdomain_id()))
     {
@@ -2205,10 +2232,12 @@ void DofMap::_dof_indices (const Elem & elem,
 
           // Cache the intermediate lookups that are common to every
           // component
+#ifdef DEBUG
           const std::pair<unsigned int, unsigned int>
             vg_and_offset = node->var_to_vg_and_offset(sys_num,v);
-          const unsigned int & vg = vg_and_offset.first;
-          const unsigned int & vig = vg_and_offset.second;
+          libmesh_assert_equal_to (vg, vg_and_offset.first);
+          libmesh_assert_equal_to (vig, vg_and_offset.second);
+#endif
           const unsigned int n_comp = node->n_comp_group(sys_num,vg);
 
           // There is a potential problem with h refinement.  Imagine a
@@ -2269,15 +2298,16 @@ void DofMap::_dof_indices (const Elem & elem,
       // and we should never need those indices
       if (nc != 0)
         {
-          if (elem.n_systems() > sys_num &&
-              nc <= elem.n_comp(sys_num,v))
+          const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
+          if (elem.n_systems() > sys_num && nc <= n_comp)
             {
               for (unsigned int i=0; i<nc; i++)
                 {
-                  libmesh_assert_not_equal_to (elem.dof_number(sys_num,v,i),
-                                               DofObject::invalid_id);
+                  const dof_id_type d =
+                    elem.dof_number(sys_num, vg, vig, i, n_comp);
+                  libmesh_assert_not_equal_to (d, DofObject::invalid_id);
 
-                  di.push_back(elem.dof_number(sys_num,v,i));
+                  di.push_back(d);
                 }
             }
           else
