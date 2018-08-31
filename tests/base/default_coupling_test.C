@@ -90,40 +90,67 @@ public:
     es.init();
     sys.project_solution(cubic_default_coupling_test, nullptr, es.parameters);
 
+    std::set<dof_id_type> evaluable_elements;
+
     for (const auto & elem : mesh.active_local_element_ptr_range())
-      for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)
-        {
-          const Elem * n1 = elem->neighbor_ptr(s1);
-          if (!n1)
-            continue;
+      {
+        CPPUNIT_ASSERT(sys.get_dof_map().is_evaluable(*elem));
+        evaluable_elements.insert(elem->id());
 
-          // Let's speed up this test by only checking the ghosted
-          // elements which are most likely to break.
-          if (n1->processor_id() == mesh.processor_id())
-            continue;
+        for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)
+          {
+            const Elem * n1 = elem->neighbor_ptr(s1);
+            // Let's speed up this test by only checking the ghosted
+            // elements which are most likely to break.
+            if (!n1 ||
+                n1->processor_id() == mesh.processor_id())
+              continue;
 
-          for (unsigned int s2=0; s2 != elem->n_neighbors(); ++s2)
-            {
-              const Elem * n2 = elem->neighbor_ptr(s2);
-              if (!n2 ||
-                  n2->processor_id() == mesh.processor_id())
-                continue;
+            if (!evaluable_elements.count(n1->id()))
+              {
+                CPPUNIT_ASSERT(sys.get_dof_map().is_evaluable(*n1));
+                evaluable_elements.insert(n1->id());
+              }
 
-              for (unsigned int s3=0; s3 != elem->n_neighbors(); ++s3)
-                {
-                  const Elem * n3 = elem->neighbor_ptr(s3);
-                  if (!n3 ||
-                      n3->processor_id() == mesh.processor_id())
-                    continue;
+            for (unsigned int s2=0; s2 != elem->n_neighbors(); ++s2)
+              {
+                const Elem * n2 = n1->neighbor_ptr(s2);
+                if (!n2 ||
+                    n2->processor_id() == mesh.processor_id())
+                  continue;
 
-                  Point p = n3->centroid();
+                if (!evaluable_elements.count(n2->id()))
+                  {
+                    CPPUNIT_ASSERT(sys.get_dof_map().is_evaluable(*n2));
+                    evaluable_elements.insert(n2->id());
+                  }
 
-                  CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
-                                               libmesh_real(cubic_default_coupling_test(p,es.parameters,"","")),
-                                               TOLERANCE*TOLERANCE);
-                }
-            }
-        }
+                for (unsigned int s3=0; s3 != elem->n_neighbors(); ++s3)
+                  {
+                    const Elem * n3 = n2->neighbor_ptr(s3);
+                    if (!n3 ||
+                        n3->processor_id() == mesh.processor_id() ||
+                        evaluable_elements.count(n3->id()))
+                      continue;
+
+                    CPPUNIT_ASSERT(sys.get_dof_map().is_evaluable(*n3));
+                    evaluable_elements.insert(n3->id());
+
+                    Point p = n3->centroid();
+
+                    CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
+                                                 libmesh_real(cubic_default_coupling_test(p,es.parameters,"","")),
+                                                 TOLERANCE*TOLERANCE);
+                  }
+              }
+          }
+      }
+
+    const std::size_t n_evaluable =
+      std::distance(mesh.evaluable_elements_begin(sys.get_dof_map()),
+                    mesh.evaluable_elements_end(sys.get_dof_map()));
+
+    CPPUNIT_ASSERT_EQUAL(evaluable_elements.size(), n_evaluable);
   }
 
 
