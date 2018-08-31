@@ -61,7 +61,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
                                                const bool skip_find_neighbors,
                                                dof_id_type element_id_offset,
                                                dof_id_type node_id_offset,
-                                               unique_id_type unique_id_offset)
+                                               unique_id_type
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+                                                 unique_id_offset
+#endif
+                                               )
 {
   LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
 
