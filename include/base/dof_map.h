@@ -1279,19 +1279,24 @@ private:
 
   /**
    * Helper function that gets the dof indices on the current element
-   * for a non-SCALAR type variable.
+   * for a non-SCALAR type variable, where the variable is identified
+   * by its variable group number \p vg and its offset \p vig from the
+   * first variable in that group.
    *
    * In DEBUG mode, the tot_size parameter will add up the total
-   * number of dof indices that should have been added to di.
+   * number of dof indices that should have been added to di, and v
+   * will be the variable number corresponding to vg and vig.
    */
   void _dof_indices (const Elem & elem,
                      int p_level,
                      std::vector<dof_id_type> & di,
-                     const unsigned int v,
+                     const unsigned int vg,
+                     const unsigned int vig,
                      const Node * const * nodes,
                      unsigned int       n_nodes
 #ifdef DEBUG
                      ,
+                     const unsigned int v,
                      std::size_t & tot_size
 #endif
                      ) const;
@@ -1445,9 +1450,14 @@ private:
   std::vector<Variable> _variables;
 
   /**
-   * The finite element type for each variable.
+   * The finite element type for each variable group.
    */
   std::vector<VariableGroup> _variable_groups;
+
+  /**
+   * The variable group number for each variable.
+   */
+  std::vector<unsigned int> _variable_group_numbers;
 
   /**
    * The number of the system we manage DOFs for.

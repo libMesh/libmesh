@@ -1134,14 +1134,20 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
               if (old_dofs)
                 {
                   const unsigned int sysnum = system.number();
-                  const unsigned int nv = old_dofs->n_vars(sysnum);
-                  for (unsigned int v=0; v != nv; ++v)
+                  const unsigned int nvg = old_dofs->n_var_groups(sysnum);
+
+                  for (unsigned int vg=0; vg != nvg; ++vg)
                     {
-                      const unsigned int nc =
-                        old_dofs->n_comp(sysnum, v);
-                      for (unsigned int c=0; c != nc; ++c)
-                        di.push_back
-                          (old_dofs->dof_number(sysnum, v, c));
+                      const unsigned int nvig =
+                        old_dofs->n_vars(sysnum, vg);
+                      for (unsigned int vig=0; vig != nvig; ++vig)
+                        {
+                          const unsigned int n_comp =
+                            old_dofs->n_comp_group(sysnum, vg);
+                          for (unsigned int c=0; c != n_comp; ++c)
+                            di.push_back
+                              (old_dofs->dof_number(sysnum, vg, vig, c, n_comp));
+                        }
                     }
                 }
             }

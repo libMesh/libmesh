@@ -28,7 +28,6 @@
 #pragma clang diagnostic ignored "-Wextra-semi"
 #pragma clang diagnostic ignored "-Wvariadic-macros"
 #pragma clang diagnostic ignored "-Wc++11-extensions"
-#pragma clang diagnostic ignored "-Wmacro-redefined"
 #pragma clang diagnostic ignored "-Wnested-anon-types"
 #pragma clang diagnostic ignored "-Wsign-compare"
 #pragma clang diagnostic ignored "-Wunused-private-field"
@@ -37,6 +36,11 @@
 #pragma clang diagnostic ignored "-Wcast-qual"
 #pragma clang diagnostic ignored "-Wswitch-default"
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+// This isn't supported in 3.4.2 at least
+#if (__clang_major__ > 3)
+#pragma clang diagnostic ignored "-Wmacro-redefined"
+#endif
 #if (__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ > 5)
 // This was introduced in 3.6
 #pragma clang diagnostic ignored "-Winconsistent-missing-override"

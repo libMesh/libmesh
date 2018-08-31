@@ -287,6 +287,29 @@ public:
                          const unsigned int comp) const;
 
   /**
+   * \returns The global degree of freedom number for variable group
+   * \p vg, variable index \p vig within the group, component \p comp
+   * out of \p n_comp, for system \p s on this \p DofObject
+   *
+   * Even users who need to call dof_number from user code probably
+   * don't want to call this overload.
+   */
+  dof_id_type dof_number(const unsigned int s,
+                         const unsigned int vg,
+                         const unsigned int vig,
+                         const unsigned int comp,
+                         const unsigned int n_comp) const;
+
+  /**
+   * \returns A pair consisting of the variable group number and the
+   * offset index from the start of that group for variable \p var on
+   * system \p s associated with this \p DofObject
+   */
+  std::pair<unsigned int, unsigned int>
+  var_to_vg_and_offset(const unsigned int s,
+                       const unsigned int var) const;
+
+  /**
    * Sets the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
    */
@@ -815,8 +838,30 @@ dof_id_type DofObject::dof_number(const unsigned int s,
   libmesh_assert_less (var,  this->n_vars(s));
   libmesh_assert_less (comp, this->n_comp(s,var));
 
+  const std::pair<unsigned int, unsigned int>
+    vg_vig = this->var_to_vg_and_offset(s,var);
+
   const unsigned int
-    vg            = this->var_to_vg(s,var),
+    n_comp = this->n_comp_group(s,vg_vig.first);
+
+  return this->dof_number(s, vg_vig.first, vg_vig.second,
+                          comp, n_comp);
+}
+
+
+
+inline
+dof_id_type DofObject::dof_number(const unsigned int s,
+                                  const unsigned int vg,
+                                  const unsigned int vig,
+                                  const unsigned int comp,
+                                  const unsigned int n_comp) const
+{
+  libmesh_assert_less (s,   this->n_systems());
+  libmesh_assert_less (vg,  this->n_var_groups(s));
+  libmesh_assert_less (vig, this->n_vars(s,vg));
+
+  const unsigned int
     start_idx_sys = this->start_idx(s);
 
   libmesh_assert_less ((start_idx_sys + 2*vg + 1), _idx_buf.size());
@@ -832,20 +877,33 @@ dof_id_type DofObject::dof_number(const unsigned int s,
   // otherwise the index is the first component
   // index augmented by the component number
   else
+    return cast_int<dof_id_type>(base_idx + vig*n_comp + comp);
+}
+
+
+
+inline
+std::pair<unsigned int, unsigned int>
+DofObject::var_to_vg_and_offset(const unsigned int s,
+                                const unsigned int var) const
+{
+  std::pair<unsigned int, unsigned int> returnval(0,0);
+
+  unsigned int & vg = returnval.first;
+  unsigned int & offset = returnval.second;
+
+  unsigned int vg_start = 0;
+  for (; ; vg++)
     {
-      const unsigned int
-        ncg = this->n_comp_group(s,vg),
-        vig = this->system_var_to_vg_var(s,vg,var);
+      libmesh_assert_less(vg, this->n_var_groups(s));
 
-      // std::cout << "base_idx, var, vg, vig, ncg, comp="
-      // << base_idx << " "
-      // << var << " "
-      // << vg << " "
-      // << vig << " "
-      // << ncg << " "
-      // << comp << '\n';
-
-      return cast_int<dof_id_type>(base_idx + vig*ncg + comp);
+      const unsigned int vg_end = vg_start + this->n_vars(s,vg);
+      if (var < vg_end)
+        {
+          offset = var - vg_start;
+          return returnval;
+        }
+      vg_start = vg_end;
     }
 }
 
