@@ -116,6 +116,20 @@ class Elem;
  * returned CouplingMatrix CM has CM(i,j)==true for any i, then
  * variable j will be evaluable on the algebraically ghosted element.
  *
+ * After a GhostingFunctor has been created, a reference to it can be
+ * passed to MeshBase::add_ghosting_functor to expand geometric
+ * ghosting, or to DofMap::add_algebraic_ghosting_functor to expand
+ * both algebraic and geometric ghosting, or to
+ * DofMap::add_coupling_functor to expand coupling along with both
+ * types of ghosting.
+ *
+ * Note that when an element is specified in algebraic ghosting or
+ * coupling queries, only degrees of freedom for the variables
+ * supported on that element are thereby ghosted and/or coupled.
+ * Any unsupported variable dofs associated with the element's nodes
+ * (e.g. subdomain-restricted variables on a neighboring subdomain)
+ * will be unaffected.
+ *
  * \author Roy H. Stogner
  * \date 2016
  */

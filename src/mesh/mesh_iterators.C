@@ -156,7 +156,7 @@ INSTANTIATE_ELEM_ACCESSORS(active_pid_elements,             ActivePID,          
 INSTANTIATE_ELEM_ACCESSORS(active_subdomain_elements,       ActiveSubdomain,      subdomain_id_type subdomain_id, subdomain_id)
 INSTANTIATE_ELEM_ACCESSORS(active_subdomain_set_elements,   ActiveSubdomainSet,   std::set<subdomain_id_type> ss, ss)
 INSTANTIATE_ELEM_ACCESSORS(ghost_elements,                  Ghost,                EMPTY,                          this->processor_id())
-INSTANTIATE_ELEM_ACCESSORS(evaluable_elements,              Evaluable,            const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, this->processor_id(), dof_map, var_num)
+INSTANTIATE_ELEM_ACCESSORS(evaluable_elements,              Evaluable,            const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, dof_map, var_num)
 INSTANTIATE_ELEM_ACCESSORS(unpartitioned_elements,          PID,                  EMPTY,                          DofObject::invalid_processor_id)
 INSTANTIATE_ELEM_ACCESSORS(active_unpartitioned_elements,   ActivePID,            EMPTY,                          DofObject::invalid_processor_id)
 
@@ -176,6 +176,6 @@ INSTANTIATE_NODE_ACCESSORS(local_nodes,  Local,   EMPTY,                        
 INSTANTIATE_NODE_ACCESSORS(pid_nodes,    PID,     processor_id_type proc_id,           proc_id)
 INSTANTIATE_NODE_ACCESSORS(bnd_nodes,    BND,     EMPTY,                               this->get_boundary_info())
 INSTANTIATE_NODE_ACCESSORS(bid_nodes,    BID,     boundary_id_type bndry_id, bndry_id, this->get_boundary_info())
-INSTANTIATE_NODE_ACCESSORS(evaluable_nodes, Evaluable, const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, this->processor_id(), dof_map, var_num)
+INSTANTIATE_NODE_ACCESSORS(evaluable_nodes, Evaluable, const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, dof_map, var_num)
 
 } // namespace libMesh
