@@ -321,7 +321,7 @@ int main (int argc, char ** argv)
 
   // Create a mesh with the given dimension, distributed
   // across the default MPI communicator.
-  Mesh mesh(init.comm(), param.dimension);
+  Mesh mesh(init.comm(), cast_int<unsigned char>(param.dimension));
 
   // And an object to refine it
   auto mesh_refinement = libmesh_make_unique<MeshRefinement>(mesh);

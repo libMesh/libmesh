@@ -185,7 +185,7 @@ int main(int argc, char ** argv)
   libmesh_example_requires(dim <= LIBMESH_DIM, "3D support");
 
   // Create a mesh distributed across the default MPI communicator.
-  Mesh mesh(init.comm(), dim);
+  Mesh mesh(init.comm(), cast_int<unsigned char>(dim));
 
   EquationSystems systems(mesh);
 
