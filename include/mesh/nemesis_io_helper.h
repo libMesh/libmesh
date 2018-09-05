@@ -425,7 +425,7 @@ public:
   /**
    * Map of subdomains to element numbers.
    */
-  std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
+  std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map;
 
   /**
    * This is the block connectivity, i.e. for each subdomain (block) there

@@ -1751,8 +1751,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
 
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
-      this->subdomain_map[cur_subdomain].push_back
-        (cast_int<unsigned>(elem->id()));
+      this->subdomain_map[cur_subdomain].push_back(elem->id());
     }
 
   // Set num_nodes which is used by exodusII_io_helper
@@ -1797,7 +1796,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       block_ids.push_back(pr.first);
 
       // Vector of element IDs for this subdomain
-      std::vector<unsigned int> & elem_ids_this_subdomain = pr.second;
+      std::vector<dof_id_type> & elem_ids_this_subdomain = pr.second;
 
       // The code below assumes this subdomain block is not empty, make sure that's the case!
       if (elem_ids_this_subdomain.size() == 0)
@@ -1823,7 +1822,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
 
       for (unsigned int i=0; i<elem_ids_this_subdomain.size(); i++)
         {
-          unsigned int elem_id = elem_ids_this_subdomain[i];
+          auto elem_id = elem_ids_this_subdomain[i];
 
           // Set the number map for elements
           this->exodus_elem_num_to_libmesh.push_back(elem_id);
@@ -2400,7 +2399,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
               subdomain_id_type block =
                 cast_int<subdomain_id_type>(it->first);
               std::vector<int> & this_block_connectivity = it->second;
-              std::vector<unsigned int> & elements_in_this_block = subdomain_map[block];
+              std::vector<dof_id_type> & elements_in_this_block = subdomain_map[block];
 
               ExodusII_IO_Helper::ElementMaps em;
 
