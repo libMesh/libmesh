@@ -1714,6 +1714,10 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
             elem->parent()->set_refinement_flag(Elem::COARSEN_INACTIVE);
         }
 
+      // Some elements may be uncoarsenable (in this particular step)
+      // because their sibling elements have children; unmark them.
+      this->make_coarsening_compatible();
+
       // On a distributed mesh, we may have parent elements with
       // remote active children.  To keep flags consistent, we'll need
       // a communication step.
