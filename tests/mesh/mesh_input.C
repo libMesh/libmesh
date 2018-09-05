@@ -136,7 +136,7 @@ public:
 
     // Make sure mesh2 now has the 9 elements.
     CPPUNIT_ASSERT_EQUAL(mesh2.n_elem(),
-                         static_cast<unsigned int>(9));
+                         static_cast<dof_id_type>(9));
 
     // Verify that the moved-from mesh's Partitioner and BoundaryInfo
     // objects were successfully stolen.  Note: moved-from unique_ptrs
