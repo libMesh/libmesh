@@ -513,51 +513,84 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
       n_nodes_per_elem = 2;
       elems_of_dimension[1] = true;
     }
-  else if (upper.find("CPE4") != std::string::npos ||
-           upper.find("S4") != std::string::npos)
+  else if (upper.find("B32") != std::string::npos)
     {
-      elem_type = QUAD4;
-      n_nodes_per_elem = 4;
-      elems_of_dimension[2] = true;
+      elem_type = EDGE3;
+      n_nodes_per_elem = 3;
+      elems_of_dimension[1] = true;
     }
-  else if (upper.find("CPS3") != std::string::npos ||
-           upper.find("S3") != std::string::npos)
+  else if (upper.find("S3") != std::string::npos ||
+           upper.find("CPE3") != std::string::npos ||
+           upper.find("2D3") != std::string::npos)
     {
       elem_type = TRI3;
       n_nodes_per_elem = 3;
       elems_of_dimension[2] = true;
     }
-  else if (upper.find("C3D8") != std::string::npos)
+  else if (upper.find("CPE4") != std::string::npos ||
+           upper.find("S4") != std::string::npos ||
+           upper.find("CPEG4") != std::string::npos ||
+           upper.find("2D4") != std::string::npos)
+    {
+      elem_type = QUAD4;
+      n_nodes_per_elem = 4;
+      elems_of_dimension[2] = true;
+    }
+  else if (upper.find("CPE6") != std::string::npos ||
+           upper.find("S6") != std::string::npos ||
+           upper.find("CPEG6") != std::string::npos ||
+           upper.find("2D6") != std::string::npos)
+    {
+      elem_type = TRI6;
+      n_nodes_per_elem = 6;
+      elems_of_dimension[2] = true;
+    }
+  else if (upper.find("CPE8") != std::string::npos ||
+           upper.find("S8") != std::string::npos ||
+           upper.find("CPEG8") != std::string::npos ||
+           upper.find("2D8") != std::string::npos)
+    {
+      elem_type = QUAD8;
+      n_nodes_per_elem = 8;
+      elems_of_dimension[2] = true;
+    }
+  else if (upper.find("3D8") != std::string::npos)
     {
       elem_type = HEX8;
       n_nodes_per_elem = 8;
       elems_of_dimension[3] = true;
     }
-  else if (upper.find("C3D4") != std::string::npos)
+  else if (upper.find("3D4") != std::string::npos)
     {
       elem_type = TET4;
       n_nodes_per_elem = 4;
       elems_of_dimension[3] = true;
     }
-  else if (upper.find("C3D20") != std::string::npos)
+  else if (upper.find("3D20") != std::string::npos)
     {
       elem_type = HEX20;
       n_nodes_per_elem = 20;
       elems_of_dimension[3] = true;
     }
-  else if (upper.find("C3D6") != std::string::npos)
+  else if (upper.find("3D27") != std::string::npos)
+    {
+      elem_type = HEX27;
+      n_nodes_per_elem = 27;
+      elems_of_dimension[3] = true;
+    }
+  else if (upper.find("3D6") != std::string::npos)
     {
       elem_type = PRISM6;
       n_nodes_per_elem = 6;
       elems_of_dimension[3] = true;
     }
-  else if (upper.find("C3D15") != std::string::npos)
+  else if (upper.find("3D15") != std::string::npos)
     {
       elem_type = PRISM15;
       n_nodes_per_elem = 15;
       elems_of_dimension[3] = true;
     }
-  else if (upper.find("C3D10") != std::string::npos)
+  else if (upper.find("3D10") != std::string::npos)
     {
       elem_type = TET10;
       n_nodes_per_elem = 10;
