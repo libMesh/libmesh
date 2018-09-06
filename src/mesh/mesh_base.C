@@ -283,9 +283,6 @@ void MeshBase::clear ()
 
 void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
-  // We should only be trying to remove ghosting functors we actually
-  // have
-  libmesh_assert(_ghosting_functors.count(&ghosting_functor));
   _ghosting_functors.erase(&ghosting_functor);
 }
 
