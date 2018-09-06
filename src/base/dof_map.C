@@ -1809,7 +1809,6 @@ DofMap::add_coupling_functor(GhostingFunctor & coupling_functor)
 void
 DofMap::remove_coupling_functor(GhostingFunctor & coupling_functor)
 {
-  libmesh_assert(_coupling_functors.count(&coupling_functor));
   _coupling_functors.erase(&coupling_functor);
   _mesh.remove_ghosting_functor(coupling_functor);
 }
