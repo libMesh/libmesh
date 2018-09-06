@@ -41595,6 +41595,16 @@ else
 fi
 
 
+    if test "x$enablemetaphysicl" = "xyes" && test -r $top_srcdir/contrib/metaphysicl/README; then :
+  enablemetaphysicl=yes
+else
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<" >&5
+$as_echo ">>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<" >&6; }
+          enablemetaphysicl=no
+
+fi
+
         if test "x$enablemetaphysicl" = "xyes"; then :
 
           METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
@@ -45870,6 +45880,7 @@ fi
         $as_echo "  hdf5............................. : $enablehdf5"
         $as_echo "  laspack.......................... : $enablelaspack"
         $as_echo "  libhilbert....................... : $enablelibhilbert"
+        $as_echo "  metaphysicl...................... : $enablemetaphysicl"
         $as_echo "  metis............................ : $enablemetis"
         $as_echo "  mpi.............................. : $enablempi"
         $as_echo "  nanoflann........................ : $enablenanoflann"
