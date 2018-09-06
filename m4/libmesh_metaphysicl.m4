@@ -12,6 +12,14 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-metaphysicl)])],
                 [enablemetaphysicl=$enablenested])
 
+  dnl Check for existence of a file that should always be in metaphysicl
+  AS_IF([test "x$enablemetaphysicl" = "xyes" && test -r $top_srcdir/contrib/metaphysicl/README],
+        [enablemetaphysicl=yes],
+        [
+          AC_MSG_RESULT([>>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<])
+          enablemetaphysicl=no
+        ])
+
   dnl The MetaPhysicL API is distributed with libmesh, so we don't have
   dnl to guess where it might be installed.  This needs to be replaced
   dnl someday with an option to include an external version instead.

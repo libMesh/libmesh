@@ -121,6 +121,7 @@ AS_IF([test "x$enableoptional" = "xyes"],
         AS_ECHO(["  hdf5............................. : $enablehdf5"])
         AS_ECHO(["  laspack.......................... : $enablelaspack"])
         AS_ECHO(["  libhilbert....................... : $enablelibhilbert"])
+        AS_ECHO(["  metaphysicl...................... : $enablemetaphysicl"])
         AS_ECHO(["  metis............................ : $enablemetis"])
         AS_ECHO(["  mpi.............................. : $enablempi"])
         AS_ECHO(["  nanoflann........................ : $enablenanoflann"])
