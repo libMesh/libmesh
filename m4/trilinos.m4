@@ -489,6 +489,15 @@ AC_DEFUN([CONFIGURE_TRILINOS],
                                  [AC_MSG_ERROR(bad value ${enableval} for --enable-trilinos)])],
                                [enabletrilinos=$enableoptional])
 
+  dnl Our Trilinos interfaces currently only support 32-bit dof/numeric
+  dnl indices, so effectively --disable-trilinos when libmesh is configured
+  dnl with 64-bit indices.
+  AS_IF([test "$enabletrilinos" = yes && test "$dof_bytes" != "4"],
+        [
+          enabletrilinos=no
+          AC_MSG_RESULT([<<< Trilinos disabled, requires --with-dof-id-bytes=4 >>>])
+        ])
+
   AS_IF([test "x$enabletrilinos" = xyes],
         [
           dnl Trump --enable-trilinos with --disable-mpi
