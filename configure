@@ -35718,6 +35718,14 @@ else
 fi
 
 
+        if test "$enabletrilinos" = yes && test "$dof_bytes" != "4"; then :
+
+          enabletrilinos=no
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Trilinos disabled, requires --with-dof-id-bytes=4 >>>" >&5
+$as_echo "<<< Trilinos disabled, requires --with-dof-id-bytes=4 >>>" >&6; }
+
+fi
+
   if test "x$enabletrilinos" = xyes; then :
 
                     { $as_echo "$as_me:${as_lineno-$LINENO}: checking Whether MPI is available for Trilinos" >&5
