@@ -1300,7 +1300,7 @@ HDF5_DIR
 YACC
 YFLAGS'
 ac_subdirs_all='contrib/netcdf/v4
-contrib/metaphysicl/0.2.0'
+contrib/metaphysicl'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -41603,15 +41603,25 @@ else
 fi
 
 
+    if test "x$enablemetaphysicl" = "xyes" && test -r $top_srcdir/contrib/metaphysicl/README; then :
+  enablemetaphysicl=yes
+else
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<" >&5
+$as_echo ">>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<" >&6; }
+          enablemetaphysicl=no
+
+fi
+
         if test "x$enablemetaphysicl" = "xyes"; then :
 
-          METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/utilities/include"
+          METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
 
 $as_echo "#define HAVE_METAPHYSICL 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with MetaPhysicL support >>>" >&5
 $as_echo "<<< Configuring library with MetaPhysicL support >>>" >&6; }
-          subdirs="$subdirs contrib/metaphysicl/0.2.0"
+          subdirs="$subdirs contrib/metaphysicl"
 
 
 else
@@ -45878,6 +45888,7 @@ fi
         $as_echo "  hdf5............................. : $enablehdf5"
         $as_echo "  laspack.......................... : $enablelaspack"
         $as_echo "  libhilbert....................... : $enablelibhilbert"
+        $as_echo "  metaphysicl...................... : $enablemetaphysicl"
         $as_echo "  metis............................ : $enablemetis"
         $as_echo "  mpi.............................. : $enablempi"
         $as_echo "  nanoflann........................ : $enablenanoflann"

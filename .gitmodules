@@ -1,0 +1,3 @@
+[submodule "contrib/metaphysicl"]
+	path = contrib/metaphysicl
+	url = ../../roystgnr/MetaPhysicL

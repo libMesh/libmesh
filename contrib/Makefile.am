@@ -226,7 +226,7 @@ if LIBMESH_ENABLE_NANOFLANN
 endif
 
 if LIBMESH_ENABLE_METAPHYSICL
-  SUBDIRS += metaphysicl/0.2.0
+  SUBDIRS += metaphysicl
   # header-only library for the parts we use - no library dependencies
 endif
 
