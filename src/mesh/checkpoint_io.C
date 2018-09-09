@@ -375,10 +375,22 @@ void CheckpointIO::write (const std::string & name)
       // lists.
       else
         {
-          query_ghosting_functors(mesh, my_pid, false, elements);
-          query_ghosting_functors(mesh, DofObject::invalid_processor_id, false, elements);
-          connect_children(mesh, my_pid, elements);
-          connect_children(mesh, DofObject::invalid_processor_id, elements);
+          query_ghosting_functors
+            (mesh, my_pid,
+             mesh.active_pid_elements_begin(my_pid),
+             mesh.active_pid_elements_end(my_pid),
+             elements);
+          query_ghosting_functors
+            (mesh, DofObject::invalid_processor_id,
+             mesh.active_pid_elements_begin(DofObject::invalid_processor_id),
+             mesh.active_pid_elements_end(DofObject::invalid_processor_id),
+             elements);
+          connect_children(mesh, mesh.pid_elements_begin(my_pid),
+                           mesh.pid_elements_end(my_pid), elements);
+          connect_children(mesh,
+                           mesh.pid_elements_begin(DofObject::invalid_processor_id),
+                           mesh.pid_elements_end(DofObject::invalid_processor_id),
+                           elements);
           connect_families(elements);
         }
 
