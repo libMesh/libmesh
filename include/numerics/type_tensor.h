@@ -238,10 +238,10 @@ public:
    * \returns A copy of the result, this tensor is unchanged.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  auto
+  operator * (const Scalar scalar) const -> typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
-  operator * (const Scalar) const;
+    TypeTensor<decltype(this->operator()(0, 0) * scalar)>>::type;
 
   /**
    * Multiply this tensor by a scalar value in place.
@@ -902,12 +902,12 @@ TypeTensor<T> TypeTensor<T>::operator - () const
 template <typename T>
 template <typename Scalar>
 inline
-typename boostcopy::enable_if_c<
+auto
+TypeTensor<T>::operator * (const Scalar factor) const -> typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
-TypeTensor<T>::operator * (const Scalar factor) const
+  TypeTensor<decltype(this->operator()(0, 0) * factor)>>::type
 {
-  typedef typename CompareTypes<T, Scalar>::supertype TS;
+  typedef decltype((*this)(0, 0) * factor) TS;
 
 
 #if LIBMESH_DIM == 1
