@@ -27,6 +27,7 @@
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
+#include <tuple>
 
 namespace libMesh
 {
@@ -113,6 +114,11 @@ public:
    * Helper typedef for C++98 generic programming.
    */
   typedef T value_type;
+
+  /**
+   * Helper typedef for generic index programming
+   */
+  typedef std::tuple<unsigned int, unsigned int> index_type;
 
   /**
    * Copy-constructor.

@@ -833,6 +833,7 @@ include_HEADERS = \
         numerics/trilinos_epetra_matrix.h \
         numerics/trilinos_epetra_vector.h \
         numerics/trilinos_preconditioner.h \
+        numerics/tuple_of.h \
         numerics/type_n_tensor.h \
         numerics/type_tensor.h \
         numerics/type_vector.h \
