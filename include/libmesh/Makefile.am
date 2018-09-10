@@ -249,6 +249,7 @@ BUILT_SOURCES = \
         trilinos_epetra_matrix.h \
         trilinos_epetra_vector.h \
         trilinos_preconditioner.h \
+        tuple_of.h \
         type_n_tensor.h \
         type_tensor.h \
         type_vector.h \
@@ -1271,6 +1272,9 @@ trilinos_epetra_vector.h: $(top_srcdir)/include/numerics/trilinos_epetra_vector.
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 trilinos_preconditioner.h: $(top_srcdir)/include/numerics/trilinos_preconditioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+tuple_of.h: $(top_srcdir)/include/numerics/tuple_of.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 type_n_tensor.h: $(top_srcdir)/include/numerics/type_n_tensor.h
