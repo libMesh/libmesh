@@ -3,26 +3,44 @@ dnl check for the required MPI library
 dnl ---------------------------------------------------------------------------
 AC_DEFUN([ACX_MPI], [
 
-dnl if MPIHOME is empty, set it to /usr
-AS_IF([test "x$MPIHOME" = "x"], [
-      dnl also check $MPI_HOME; it is a common name as well.
-      AS_IF([test "x$MPI_HOME" = "x"],
-      [
-      MPIHOME="/usr"
-      ],
-      [MPIHOME=$MPI_HOME])
-    ])
+dnl if MPIHOME is empty, set it to an invalid directory and try to find the correct location.
+AS_IF([test "x$MPIHOME" = "x"], [MPIHOME="/.."])
 
 AC_ARG_WITH([mpi],
             AS_HELP_STRING([--with-mpi=PATH],
                            [Prefix where MPI is installed (MPIHOME)]),
             [MPI="$withval"],
             [
-              AS_ECHO(["note: MPI library path not given... trying prefix=$MPIHOME"])
+              AS_ECHO(["note: MPI library path not given... trying to find it myself"])
               MPI=$MPIHOME
             ])
 
-AS_IF([test -z "$MPI"], [MPI="/usr"])
+AS_IF([test -z "$MPI"], [MPI="/.."])
+
+dnl if MPI is not set in the config, search it via the $INCLUDE and $LIBRARY_PATH variables;
+dnl     with this we can hope to get a configure that is consistent with the environment.
+AS_IF([test "$MPI" == "/.."],
+ [
+    for i in $(echo $LIBRARY_PATH | tr ':' '\n')
+    do
+       AS_IF([ test -e $i/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so ],
+       [MPI=$(dirname $i)
+       break])
+    done
+ ])
+AS_IF([test "$MPI" == "/.."],
+ [
+    AS_ECHO(["searching LIBRARY_PATH for MPI"])
+    for i in $(echo $INCLUDE | tr ':' '\n')
+    do
+       AS_IF([ test -e $i/mpi.h ],
+       [MPI=$(dirname $i)
+       break ])
+    done
+ ])
+
+dnl if we don't find it, default to standard-values and proceed as before:
+AS_IF([test "$MPI" = "/.."], [MPI="/usr"])
 
 MPI_LIBS_PATH="$MPI/lib"
 MPI_INCLUDES_PATH="$MPI/include"
@@ -173,8 +191,7 @@ AS_IF([test "x$MPI_IMPL" != x],
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 AC_CHECK_HEADER([mpi.h],
                                 [AC_MSG_RESULT([MPI-headers are working as expected.])],
-                                [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no] )
-                MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+                                [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no] ) MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
                 AC_LANG_RESTORE
                 CPPFLAGS=$tmpCPPFLAGS
               ],
@@ -194,7 +211,16 @@ AS_IF([test "x$MPI_IMPL" != x],
                     ],
                     [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no])
       ])
-      VERSION_MPI
+     dnl Save variables...
+     AC_SUBST(MPI)
+     AC_SUBST(MPI_IMPL)
+     AC_SUBST(MPI_LIBS)
+     AC_SUBST(MPI_LIBS_PATH)
+     AC_SUBST(MPI_LIBS_PATHS)
+     AC_SUBST(MPI_INCLUDES_PATH)
+     AC_SUBST(MPI_INCLUDES_PATHS)
+
+     VERSION_MPI
 ])
 
 
@@ -202,9 +228,10 @@ AC_DEFUN([VERSION_MPI], [
 
   AS_IF([test "x$enablempi" != xno],
   [
-                CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
         dnl check that MPI_VERSION and MPI_SUBVERSION are defined.
-        AC_TRY_LINK([@%:@include <mpi.h>],  dnl better now?
+        AC_LANG_SAVE
+        AC_LANG_CPLUSPLUS
+        AC_TRY_LINK([@%:@include <mpi.h>],
                     [#ifndef MPI_VERSION
                      #error "MPI-Version undefined."
                     #endif
@@ -216,7 +243,7 @@ AC_DEFUN([VERSION_MPI], [
                                 #if MPI_VERSION == 1
                                 #error "Bad MPI-version"
                                 #endif
-                                int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
+                                int np; MPI_Comm_size (MPI_COMM_WORLD, &np)
                                 ],
                                 [ dnl it gives true if MPI_VERSION !=1...
                                  dnl check that MPI_VERSION is not 2; else through a warning
@@ -225,7 +252,7 @@ AC_DEFUN([VERSION_MPI], [
                                              #if MPI_VERSION == 2
                                              #error "deprecated MPI-version"
                                              #endif
-                                             int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
+                                             int np; MPI_Comm_size (MPI_COMM_WORLD, &np)
                                              ],
                                              [
                                                dnl MPI_VERSION >2: Be happy and configure with MPI.
@@ -238,21 +265,12 @@ AC_DEFUN([VERSION_MPI], [
                                 AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
                                 ],
                                 [
-                                 AC_MSG_RESULT(["ERROR: MPI-version is 1.X. Currently we support only MPI version >= 2.0.  Disable MPI now..."]); enablempi=no
-                                 mpi_major=`grep "MPI_VERSION" $MPI_INCLUDES_PATH/mpi.h`
-                                 dnl AS_ECHO([" FOO: $mpi_major"])
+                                 AC_MSG_WARN(["ERROR: MPI-version is 1.X. Currently we support only MPI version >= 2.0.  Disable MPI now..."]); enablempi=no
                                 ])
                     ],
                     [ dnl MPI_VERSION is not defined.
-                     AC_MSG_ERROR(["ERROR: MPI-version seems to be too low: MPI < 1.5. Disable MPI now..."]); enablempi=no
+                     AC_MSG_WARN(["ERROR: MPI-version seems to be too low: MPI < 1.5. Disable MPI now..."]); enablempi=no
                     ])
+        AC_LANG_RESTORE
   ])
-dnl Save variables...
-AC_SUBST(MPI)
-AC_SUBST(MPI_IMPL)
-AC_SUBST(MPI_LIBS)
-AC_SUBST(MPI_LIBS_PATH)
-AC_SUBST(MPI_LIBS_PATHS)
-AC_SUBST(MPI_INCLUDES_PATH)
-AC_SUBST(MPI_INCLUDES_PATHS)
 ])
