@@ -192,13 +192,16 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
           LIBMESH_CHKERR(ierr);
           break;
 
-#if !PETSC_VERSION_LESS_THAN(3,9,4)
         case HYPRE:
+#if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
           ierr = MatSetType(_mat, MATHYPRE);
+          LIBMESH_CHKERR(ierr);
           ierr = MatHYPRESetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
           LIBMESH_CHKERR(ierr);
-          break;
+#else
+          libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
 #endif
+          break;
 
         default: libmesh_error_msg("Unsupported petsc matrix type");
       }
@@ -310,17 +313,20 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
                                             numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
           break;
 
-#if !PETSC_VERSION_LESS_THAN(3,9,4)
         case HYPRE:
+#if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
           ierr = MatSetType(_mat, MATHYPRE);
+          LIBMESH_CHKERR(ierr);
           ierr = MatHYPRESetPreallocation (_mat,
                                             0,
                                             numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
                                             0,
                                             numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
           LIBMESH_CHKERR(ierr);
-          break;
+#else
+          libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
 #endif
+          break;
 
         default: libmesh_error_msg("Unsupported petsc matrix type");
       }
@@ -429,17 +435,20 @@ void PetscMatrix<T>::init ()
                                             numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
           break;
 
-#if !PETSC_VERSION_LESS_THAN(3,9,4)
         case HYPRE:
+#if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
           ierr = MatSetType(_mat, MATHYPRE);
+          LIBMESH_CHKERR(ierr);
           ierr = MatHYPRESetPreallocation (_mat,
                                             0,
                                             numeric_petsc_cast(n_nz.empty() ? nullptr : &n_nz[0]),
                                             0,
                                             numeric_petsc_cast(n_oz.empty() ? nullptr : &n_oz[0]));
           LIBMESH_CHKERR(ierr);
-          break;
+#else
+          libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
 #endif
+          break;
 
         default: libmesh_error_msg("Unsupported petsc matrix type");
       }
