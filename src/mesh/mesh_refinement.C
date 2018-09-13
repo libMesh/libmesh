@@ -1700,70 +1700,9 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
       // because their sibling elements have children; unmark them.
       this->make_coarsening_compatible();
 
-      // On a distributed mesh, we may have parent elements with
-      // remote active children.  To keep flags consistent, we'll need
-      // a communication step.
-      if (!_mesh.is_replicated())
-        {
-          const processor_id_type n_proc = _mesh.n_processors();
-          const processor_id_type my_proc_id = _mesh.processor_id();
-
-          std::vector<std::vector<dof_id_type>>
-            parents_to_coarsen(n_proc);
-
-          for (const auto & elem : as_range(_mesh.ancestor_elements_begin(), _mesh.ancestor_elements_end()))
-            if (elem->processor_id() != my_proc_id &&
-                elem->refinement_flag() == Elem::COARSEN_INACTIVE)
-              parents_to_coarsen[elem->processor_id()].push_back(elem->id());
-
-          Parallel::MessageTag
-            coarsen_tag = this->comm().get_unique_tag(271);
-          std::vector<Parallel::Request> coarsen_push_requests(n_proc-1);
-
-          for (processor_id_type p = 0; p != n_proc; ++p)
-            {
-              if (p == my_proc_id)
-                continue;
-
-              Parallel::Request &request =
-                coarsen_push_requests[p - (p > my_proc_id)];
-
-              _mesh.comm().send
-                (p, parents_to_coarsen[p], request, coarsen_tag);
-            }
-
-          for (processor_id_type p = 1; p != n_proc; ++p)
-            {
-              std::vector<dof_id_type> my_parents_to_coarsen;
-              _mesh.comm().receive
-                (Parallel::any_source, my_parents_to_coarsen,
-                 coarsen_tag);
-
-              for (const auto & id : my_parents_to_coarsen)
-                {
-                  Elem & elem = _mesh.elem_ref(id);
-                  libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||
-                                 elem.refinement_flag() == Elem::COARSEN_INACTIVE);
-                  elem.set_refinement_flag(Elem::COARSEN_INACTIVE);
-                }
-            }
-
-          Parallel::wait(coarsen_push_requests);
-
-          SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
-                                    &Elem::set_refinement_flag);
-          sync_dofobject_data_by_id
-            (this->comm(), _mesh.not_local_elements_begin(),
-             _mesh.not_local_elements_end(),
-             // We'd like a smaller sync, but this leads to bugs?
-             // SyncCoarsenInactive(),
-             hsync);
-        }
-
       // Coarsen all the elements we just flagged.
       this->_coarsen_elements();
     }
-
 
   // Finally, the new mesh probably needs to be prepared for use
   if (n > 0)
