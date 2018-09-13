@@ -458,7 +458,7 @@ extern bool warned_about_auto_ptr;
 // A function template for ignoring unused variables.  This is a way
 // to shut up unused variable compiler warnings on a case by case
 // basis.
-template<class T> inline void libmesh_ignore( const T & ) { }
+template<class ...Args> inline void libmesh_ignore( const Args&... ) { }
 
 
 // cast_ref and cast_ptr do a dynamic cast and assert
