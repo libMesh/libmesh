@@ -179,10 +179,8 @@ public:
 
   StandardType(const StandardType<std::pair<T1, T2>> & t)
   {
-#ifdef LIBMESH_HAVE_MPI
     libmesh_call_mpi
       (MPI_Type_dup (t._datatype, &_datatype));
-#endif
   }
 
   ~StandardType() { this->free(); }
@@ -227,7 +225,6 @@ void BuildStandardTypeVector<n_minus_i>::build
 }
 
 
-#ifdef LIBMESH_HAVE_MPI
 template<std::size_t n_minus_i>
 struct FillDisplacementArray
 {
@@ -258,7 +255,6 @@ void FillDisplacementArray<n_minus_i>::fill
 
   FillDisplacementArray<n_minus_i-1>::fill(out_vec, example);
 }
-#endif // LIBMESH_HAVE_MPI
 
 
 template<typename... Types>
@@ -320,10 +316,8 @@ public:
 
   StandardType(const StandardType<std::tuple<Types...>> & t)
   {
-#ifdef LIBMESH_HAVE_MPI
     libmesh_call_mpi
       (MPI_Type_dup (t._datatype, &_datatype));
-#endif
   }
 
   ~StandardType() { this->free(); }
