@@ -171,10 +171,7 @@ void connect_children(const MeshBase & mesh,
                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
   // None of these parameters are used when !LIBMESH_ENABLE_AMR.
-  libmesh_ignore(mesh);
-  libmesh_ignore(elem_it);
-  libmesh_ignore(elem_end);
-  libmesh_ignore(connected_elements);
+  libmesh_ignore(mesh, elem_it, elem_end, connected_elements);
 
 #ifdef LIBMESH_ENABLE_AMR
   // Our XdrIO output needs inactive local elements to not have any

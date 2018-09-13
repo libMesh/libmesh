@@ -1822,8 +1822,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
       libmesh_assert_equal_to (orig_id, added_elem->id());
 
       // Avoid compiler warnings in opt mode.
-      libmesh_ignore(added_elem);
-      libmesh_ignore(orig_id);
+      libmesh_ignore(added_elem, orig_id);
     }
 
   // Finally, also add back the saved boundary information
