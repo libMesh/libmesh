@@ -51,17 +51,18 @@ class StandardType<Hilbert::HilbertIndices> : public DataType
 public:
   explicit
   StandardType(const Hilbert::HilbertIndices * =nullptr) {
-    // _static_type never gets freed, but it only gets committed once
-    // so it's not a *huge* memory leak...
-    static DataType _static_type;
-    static bool _is_initialized = false;
-    if (!_is_initialized)
-      {
-        _static_type = DataType(Parallel::StandardType<Hilbert::inttype>(), 3);
-        _is_initialized = true;
-      }
-    _datatype = _static_type;
+    _datatype = DataType(Parallel::StandardType<Hilbert::inttype>(), 3);
   }
+
+  StandardType(const StandardType<Hilbert::HilbertIndices> & t)
+  {
+#ifdef LIBMESH_HAVE_MPI
+    libmesh_call_mpi
+      (MPI_Type_dup (t._datatype, &_datatype));
+#endif
+  }
+
+  ~StandardType() { this->free(); }
 };
 
 #endif // LIBMESH_HAVE_MPI
