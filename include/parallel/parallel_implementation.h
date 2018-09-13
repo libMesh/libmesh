@@ -183,10 +183,8 @@ inline bool Communicator::verify(const T & r) const
       return verified;
     }
 
-#ifdef LIBMESH_HAVE_CXX11
   static_assert(Attributes<T>::has_min_max,
                 "Tried to verify an unverifiable type");
-#endif
 
   return true;
 }
@@ -223,10 +221,8 @@ inline bool Communicator::semiverify(const T * r) const
       return !invalid;
     }
 
-#ifdef LIBMESH_HAVE_CXX11
   static_assert(Attributes<T>::has_min_max,
                 "Tried to semiverify an unverifiable type");
-#endif
 
   return true;
 }
@@ -281,10 +277,8 @@ inline bool Communicator::semiverify(const std::vector<T,A> * r) const
       return !invalid;
     }
 
-#ifdef LIBMESH_HAVE_CXX11
   static_assert(Attributes<T>::has_min_max,
                 "Tried to semiverify a vector of an unverifiable type");
-#endif
 
   return true;
 }
