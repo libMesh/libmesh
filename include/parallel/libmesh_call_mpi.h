@@ -71,6 +71,12 @@
   while (0)
 #endif
 
+#else // LIBMESH_HAVE_MPI
+
+#define libmesh_call_mpi(mpi_call)              \
+  do {}                                         \
+  while (0)
+
 #endif // LIBMESH_HAVE_MPI
 
 
