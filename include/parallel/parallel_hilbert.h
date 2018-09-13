@@ -55,9 +55,9 @@ public:
   }
 
   StandardType(const StandardType<Hilbert::HilbertIndices> & t)
+    : DataType()
   {
-    libmesh_call_mpi
-      (MPI_Type_dup (t._datatype, &_datatype));
+    libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
   }
 
   ~StandardType() { this->free(); }
