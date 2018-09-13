@@ -35,6 +35,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/sync_refinement_flags.h"
@@ -1056,12 +1057,10 @@ bool MeshRefinement::make_coarsening_compatible()
   // flag *from* the parents.
 
   // uncoarsenable_parents[p] live on processor id p
-  const processor_id_type n_proc     = _mesh.n_processors();
-  const processor_id_type my_proc_id = _mesh.processor_id();
   const bool distributed_mesh = !_mesh.is_replicated();
 
-  std::vector<std::vector<dof_id_type>>
-    uncoarsenable_parents(n_proc);
+  std::unordered_map<processor_id_type, std::vector<dof_id_type>>
+    uncoarsenable_parents;
 
   for (auto & elem : as_range(_mesh.ancestor_elements_begin(), _mesh.ancestor_elements_end()))
     {
@@ -1098,29 +1097,11 @@ bool MeshRefinement::make_coarsening_compatible()
       // We'd better still be in sync here
       parallel_object_only();
 
-      Parallel::MessageTag
-        uncoarsenable_tag = this->comm().get_unique_tag(2718);
-      std::vector<Parallel::Request> uncoarsenable_push_requests(n_proc-1);
-
-      for (processor_id_type p = 0; p != n_proc; ++p)
+      auto uncoarsenable_action_functor =
+        [this]
+        (processor_id_type,
+         const std::vector<dof_id_type> & my_uncoarsenable_parents)
         {
-          if (p == my_proc_id)
-            continue;
-
-          Parallel::Request &request =
-            uncoarsenable_push_requests[p - (p > my_proc_id)];
-
-          _mesh.comm().send
-            (p, uncoarsenable_parents[p], request, uncoarsenable_tag);
-        }
-
-      for (processor_id_type p = 1; p != n_proc; ++p)
-        {
-          std::vector<dof_id_type> my_uncoarsenable_parents;
-          _mesh.comm().receive
-            (Parallel::any_source, my_uncoarsenable_parents,
-             uncoarsenable_tag);
-
           for (const auto & id : my_uncoarsenable_parents)
             {
               Elem & elem = _mesh.elem_ref(id);
@@ -1128,9 +1109,10 @@ bool MeshRefinement::make_coarsening_compatible()
                              elem.refinement_flag() == Elem::COARSEN_INACTIVE);
               elem.set_refinement_flag(Elem::INACTIVE);
             }
-        }
+        };
 
-      Parallel::wait(uncoarsenable_push_requests);
+      Parallel::push_parallel_vector_data
+        (_mesh.comm(), uncoarsenable_parents, uncoarsenable_action_functor);
 
       SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
                                 &Elem::set_refinement_flag);
