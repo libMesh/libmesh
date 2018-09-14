@@ -339,8 +339,16 @@ void CheckpointIO::write (const std::string & name)
   if (_parallel)
     {
       ids_to_write = _my_processor_ids;
+      for (processor_id_type p : ids_to_write)
+        elements_on_pid[p].clear();
+      auto eop_end = elements_on_pid.end();
       for (auto & elem : mesh.element_ptr_range())
-        elements_on_pid[elem->processor_id()].push_back(elem);
+        {
+          const processor_id_type p = elem->processor_id();
+          auto eop_it = elements_on_pid.find(p);
+          if (eop_it != eop_end)
+            eop_it->second.push_back(elem);
+        }
     }
   else if (mesh.is_serial())
     {
