@@ -355,6 +355,27 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   std::vector<Parallel::Request>
     node_send_requests, element_send_requests;
 
+  // We're going to sort elements-to-send by pid in one pass, to avoid
+  // sending predicated iterators through the whole mesh N_p times
+  std::unordered_map<processor_id_type, std::vector<Elem *>> send_to_pid;
+
+  const MeshBase::const_element_iterator send_elems_begin =
+#ifdef LIBMESH_ENABLE_AMR
+    newly_coarsened_only ?
+      mesh.flagged_elements_begin(Elem::JUST_COARSENED) :
+#endif
+      mesh.active_elements_begin();
+
+  const MeshBase::const_element_iterator send_elems_end =
+#ifdef LIBMESH_ENABLE_AMR
+    newly_coarsened_only ?
+      mesh.flagged_elements_end(Elem::JUST_COARSENED) :
+#endif
+      mesh.active_elements_end();
+
+  for (auto & elem : as_range(send_elems_begin, send_elems_end))
+    send_to_pid[elem->processor_id()].push_back(elem);
+
   for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
     if (pid != mesh.processor_id()) // don't send to ourselves!!
       {
@@ -364,7 +385,19 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
         // to be ghosted and any nodes which are used by any of the
         // above.
 
-        std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
+        const auto elements_vec_it = send_to_pid.find(pid);
+
+        // If we don't have any just-coarsened elements to send to
+        // pid, then there won't be any nodes or any elements pulled
+        // in by ghosting either, and we're done with this pid.
+        if (elements_vec_it == send_to_pid.end())
+          continue;
+
+        const auto & p_elements = elements_vec_it->second;
+        libmesh_assert(!p_elements.empty());
+
+        Elem * const * elempp = p_elements.data();
+        Elem * const * elemend = elempp + p_elements.size();
 
 #ifndef LIBMESH_ENABLE_AMR
         // This parameter is not used when !LIBMESH_ENABLE_AMR.
@@ -373,24 +406,14 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 #endif
 
         MeshBase::const_element_iterator elem_it =
-#ifdef LIBMESH_ENABLE_AMR
-          newly_coarsened_only ?
-            mesh.flagged_pid_elements_begin(Elem::JUST_COARSENED, pid) :
-#endif
-            mesh.active_pid_elements_begin(pid);
+          MeshBase::const_element_iterator
+            (elempp, elemend, Predicates::NotNull<Elem * const *>());
 
         const MeshBase::const_element_iterator elem_end =
-#ifdef LIBMESH_ENABLE_AMR
-          newly_coarsened_only ?
-            mesh.flagged_pid_elements_end(Elem::JUST_COARSENED, pid) :
-#endif
-            mesh.active_pid_elements_end(pid);
+          MeshBase::const_element_iterator
+            (elemend, elemend, Predicates::NotNull<Elem * const *>());
 
-        // If we don't have any just-coarsened elements to send to
-        // pid, then there won't be any nodes or any elements pulled
-        // in by ghosting either, and we're done with this pid.
-        if (elem_it == elem_end)
-          continue;
+        std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 
         // See which to-be-ghosted elements we need to send
         query_ghosting_functors (mesh, pid, elem_it, elem_end,
@@ -414,7 +437,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
           cast_int<dof_id_type>(connected_nodes.size());
 
         // send any nodes off to the destination processor
-        libmesh_assert (!connected_nodes.empty())
+        libmesh_assert (!connected_nodes.empty());
         node_send_requests.push_back(Parallel::request());
 
         mesh.comm().send_packed_range (pid, &mesh,
@@ -428,7 +451,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
           cast_int<dof_id_type>(elements_to_send.size());
 
         // send the elements off to the destination processor
-        libmesh_assert (!elements_to_send.empty())
+        libmesh_assert (!elements_to_send.empty());
         element_send_requests.push_back(Parallel::request());
 
         mesh.comm().send_packed_range (pid, &mesh,
