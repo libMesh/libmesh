@@ -968,8 +968,8 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   // Start by figuring out how many
   dof_id_type unpartitioned_objects = 0;
 
-  std::vector<dof_id_type>
-    ghost_objects_from_proc(this->n_processors(), 0);
+  std::unordered_map<processor_id_type, dof_id_type>
+    ghost_objects_from_proc;
 
   object_iterator it  = objects.begin();
   object_iterator end = objects.end();
@@ -994,13 +994,18 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
     }
 
   std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
-  this->comm().allgather(ghost_objects_from_proc[this->processor_id()],
-                         objects_on_proc);
+  auto this_it = ghost_objects_from_proc.find(this->processor_id());
+  this->comm().allgather
+    ((this_it == ghost_objects_from_proc.end()) ? 0 : this_it->second,
+     objects_on_proc);
 
 #ifndef NDEBUG
   libmesh_assert(this->comm().verify(unpartitioned_objects));
   for (processor_id_type p=0, np=this->n_processors(); p != np; ++p)
-    libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
+    if (ghost_objects_from_proc.count(p))
+      libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
+    else
+      libmesh_assert_less_equal (0, objects_on_proc[p]);
 #endif
 
   // We'll renumber objects in blocks by processor id
@@ -1023,10 +1028,13 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 
   // We know how many objects live on each processor, so reserve() space for
   // each.
+  auto ghost_end = ghost_objects_from_proc.end();
   for (processor_id_type p=0; p != this->n_processors(); ++p)
-    if (p != this->processor_id() && ghost_objects_from_proc[p])
+    if (p != this->processor_id())
       {
-        requested_ids[p].reserve(ghost_objects_from_proc[p]);
+        const auto p_it = ghost_objects_from_proc.find(p);
+        if (p_it != ghost_end)
+          requested_ids[p].reserve(p_it->second);
       }
 
   end = objects.end();
