@@ -46,6 +46,7 @@
 #include <set>
 #include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
 #include <sstream>
+#include <unordered_map>
 
 namespace libMesh
 {
@@ -326,8 +327,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
   // First, iterate over local objects to find out how many
   // are on each processor
-  std::vector<dof_id_type>
-    ghost_objects_from_proc(this->n_processors(), 0);
+  std::unordered_map<processor_id_type, dof_id_type> ghost_objects_from_proc;
 
   iterator_type it  = objects_begin;
 
@@ -350,9 +350,14 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
+  auto ghost_end = ghost_objects_from_proc.end();
   for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
-    if (p != this->processor_id() && ghost_objects_from_proc[p])
-      requested_ids[p].reserve(ghost_objects_from_proc[p]);
+    if (p != this->processor_id())
+      {
+        auto ghost_it = ghost_objects_from_proc.find(p);
+        if (ghost_it != ghost_end)
+          requested_ids[p].reserve(ghost_it->second);
+      }
 
   for (it = objects_begin; it != objects_end; ++it)
     {
@@ -363,7 +368,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 #ifdef DEBUG
   for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
     {
-      if (ghost_objects_from_proc[p])
+      if (ghost_objects_from_proc.count(p))
         libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
       else
         libmesh_assert(!requested_ids.count(p));
