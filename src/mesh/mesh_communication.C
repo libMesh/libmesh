@@ -386,6 +386,12 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 #endif
             mesh.active_pid_elements_end(pid);
 
+        // If we don't have any just-coarsened elements to send to
+        // pid, then there won't be any nodes or any elements pulled
+        // in by ghosting either, and we're done with this pid.
+        if (elem_it == elem_end)
+          continue;
+
         // See which to-be-ghosted elements we need to send
         query_ghosting_functors (mesh, pid, elem_it, elem_end,
                                  elements_to_send);
@@ -408,34 +414,28 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
           cast_int<dof_id_type>(connected_nodes.size());
 
         // send any nodes off to the destination processor
-        if (!connected_nodes.empty())
-          {
-            node_send_requests.push_back(Parallel::request());
+        libmesh_assert (!connected_nodes.empty())
+        node_send_requests.push_back(Parallel::request());
 
-            mesh.comm().send_packed_range (pid,
-                                           &mesh,
-                                           connected_nodes.begin(),
-                                           connected_nodes.end(),
-                                           node_send_requests.back(),
-                                           nodestag);
-          }
+        mesh.comm().send_packed_range (pid, &mesh,
+                                       connected_nodes.begin(),
+                                       connected_nodes.end(),
+                                       node_send_requests.back(),
+                                       nodestag);
 
         // the number of elements we will send to this processor
         send_n_nodes_and_elem_per_proc[2*pid+1] =
           cast_int<dof_id_type>(elements_to_send.size());
 
-        if (!elements_to_send.empty())
-          {
-            // send the elements off to the destination processor
-            element_send_requests.push_back(Parallel::request());
+        // send the elements off to the destination processor
+        libmesh_assert (!elements_to_send.empty())
+        element_send_requests.push_back(Parallel::request());
 
-            mesh.comm().send_packed_range (pid,
-                                           &mesh,
-                                           elements_to_send.begin(),
-                                           elements_to_send.end(),
-                                           element_send_requests.back(),
-                                           elemstag);
-          }
+        mesh.comm().send_packed_range (pid, &mesh,
+                                       elements_to_send.begin(),
+                                       elements_to_send.end(),
+                                       element_send_requests.back(),
+                                       elemstag);
       }
 
   std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
