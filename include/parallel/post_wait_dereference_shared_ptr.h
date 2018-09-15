@@ -26,6 +26,9 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
 
+// System Includes
+#include <memory>
+
 namespace libMesh
 {
 
