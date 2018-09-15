@@ -470,6 +470,24 @@ public:
                                       Request & req,
                                       const MessageTag & tag=no_tag) const;
 
+
+  /**
+   * Similar to the above Nonblocking send_packed_range with a few important differences:
+   *
+   * 1. The total size of the packed buffer MUST be less than std::numeric_limits<int>::max()
+   * 2. Only _one_ message is generated
+   * 3. On the receiving end the message should be tested for using Communicator::packed_range_probe()
+   * 4. The message must be received by Communicator::nonblocking_receive_packed_range()
+   */
+  template <typename Context, typename Iter>
+  void nonblocking_send_packed_range (const unsigned int dest_processor_id,
+                                      const Context * context,
+                                      Iter range_begin,
+                                      const Iter range_end,
+                                      Request & req,
+                                      std::shared_ptr<std::vector<typename Parallel::Packing<typename std::iterator_traits<Iter>::value_type>::buffer_type>> & buffer,
+                                      const MessageTag & tag=no_tag) const;
+
   /**
    * Blocking-receive range-of-pointers from one processor.  This
    * function does not receive raw pointers, but rather constructs new

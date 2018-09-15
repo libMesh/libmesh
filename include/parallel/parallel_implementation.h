@@ -35,6 +35,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <type_traits>
 
 namespace libMesh {
 namespace Parallel {
@@ -1392,6 +1393,51 @@ inline void Communicator::nonblocking_send_packed_range (const unsigned int dest
 }
 
 
+template <typename Context, typename Iter>
+inline void Communicator::nonblocking_send_packed_range (const unsigned int dest_processor_id,
+                                                         const Context * context,
+                                                         Iter range_begin,
+                                                         const Iter range_end,
+                                                         Request & req,
+                                                         std::shared_ptr<std::vector<typename Parallel::Packing<typename std::iterator_traits<Iter>::value_type>::buffer_type>> & buffer,
+                                                         const MessageTag & tag) const
+{
+  libmesh_experimental();
+
+  // Allocate a buffer on the heap so we don't have to free it until
+  // after the Request::wait()
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
+
+  if (range_begin != range_end)
+    {
+//      if (buffer == nullptr)
+        buffer = std::make_shared<std::vector<buffer_t>>();
+//      else
+//        buffer->clear();
+
+      range_begin =
+        Parallel::pack_range(context,
+                             range_begin,
+                             range_end,
+                             *buffer,
+                             // MPI-2 can only use integers for size
+                             std::numeric_limits<int>::max());
+
+      if (range_begin != range_end)
+        libmesh_error_msg("Non-blocking packed range sends cannot exceed " << std::numeric_limits<int>::max() << "in size");
+
+      // Make it dereference the shared pointer (possibly freeing the buffer)
+      req.add_post_wait_work
+        (new Parallel::PostWaitDereferenceSharedPtr<std::vector<buffer_t>>(buffer));
+
+      // Non-blocking send of the buffer
+      this->send(dest_processor_id, *buffer, req, tag);
+    }
+}
+
+
+
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
                                      std::basic_string<T> & buf,
@@ -1815,7 +1861,7 @@ template <typename Context, typename OutputIter, typename T>
 inline void Communicator::nonblocking_receive_packed_range (const unsigned int src_processor_id,
                                                             Context * context,
                                                             OutputIter out,
-                                                            const T * output_type,
+                                                            const T * /*output_type*/,
                                                             Request & req,
                                                             Status & stat,
                                                             std::shared_ptr<std::vector<typename Parallel::Packing<T>::buffer_type>> & buffer,
@@ -1826,6 +1872,8 @@ inline void Communicator::nonblocking_receive_packed_range (const unsigned int s
   // If they didn't pass in a buffer - let's make one
   if (buffer == nullptr)
     buffer = std::make_shared<std::vector<typename Parallel::Packing<T>::buffer_type>>();
+  else
+    buffer->clear();
 
   // Receive serialized variable size objects as a sequence of
   // buffer_t.
