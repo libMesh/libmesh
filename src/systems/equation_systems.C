@@ -484,6 +484,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)
           continue;
+        if (pos->second->hide_output())
+          continue;
 
         for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
           {
@@ -518,6 +520,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
       if (!use_current_system)
         use_current_system = system_names->count(pos->first);
       if (!use_current_system)
+        continue;
+      if (pos->second->hide_output())
         continue;
 
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
@@ -612,6 +616,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)
           continue;
+        if (pos->second->hide_output())
+          continue;
 
         for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
           {
@@ -676,6 +682,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         use_current_system = system_names->count(pos->first);
       if (!use_current_system)
         continue;
+      if (pos->second->hide_output())
+          continue;
 
       const System & system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
@@ -1054,6 +1062,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)
           continue;
+        if (pos->second->hide_output())
+          continue;
 
         const System & system  = *(pos->second);
         nv += system.n_vars();
@@ -1092,6 +1102,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
         if (!use_current_system)
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)
+          continue;
+        if (pos->second->hide_output())
           continue;
 
         const System & system  = *(pos->second);
