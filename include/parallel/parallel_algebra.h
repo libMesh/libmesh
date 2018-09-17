@@ -216,6 +216,9 @@ public:
 
     libmesh_call_mpi
       (MPI_Type_commit (&_datatype));
+
+    libmesh_call_mpi
+      (MPI_Type_free(&tmptype));
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
