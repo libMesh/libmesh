@@ -21,6 +21,7 @@
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/node_elem.h>
 #include "libmesh/edge_edge2.h"
+#include "libmesh/edge_edge3.h"
 
 #include "test_comm.h"
 
@@ -215,6 +216,7 @@ public:
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
   CPPUNIT_TEST( testDofCouplingWithVarGroups );
+  CPPUNIT_TEST( testSubdomainVariableOrder );
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -578,6 +580,51 @@ public:
     // We set the solution to be 1 everywhere, so the final l1 norm of the
     // solution is the product of the number of variables and number of nodes.
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * system.n_vars());
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+  }
+
+  void testSubdomainVariableOrder()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_cube (mesh,
+                                       3,
+                                       0,
+                                       0,
+                                       0., 1.,
+                                       0., 0.,
+                                       0., 0.,
+                                       EDGE3);
+
+    mesh.elem_ref(0).subdomain_id() = 10;
+    mesh.elem_ref(1).subdomain_id() = 10;
+    mesh.elem_ref(2).subdomain_id() = 20;
+
+    // Create an equation systems object.
+    EquationSystems equation_systems (mesh);
+    ExplicitSystem& system =
+      equation_systems.add_system<LinearImplicitSystem> ("test");
+
+    system.add_variable ("u", libMesh::FIRST);
+    system.add_variable ("v", libMesh::FIRST);
+    system.add_variable ("w", libMesh::FIRST);
+
+    std::map<subdomain_id_type, unsigned char> theta_subdomain_orders;
+    theta_subdomain_orders[10] = 1; // Increase the order by 1 on subdomain 10
+    system.add_variable ("theta_x", libMesh::FIRST, nullptr, &theta_subdomain_orders);
+    system.add_variable ("theta_y", libMesh::FIRST, nullptr, &theta_subdomain_orders);
+    system.add_variable ("theta_z", libMesh::FIRST, nullptr, &theta_subdomain_orders);
+
+    system.attach_assemble_function (assemble_matrix_and_rhs);
+
+    equation_systems.init ();
+
+    system.solve ();
+
+    // We set the solution to be 1 everywhere, so the final l1 norm of the
+    // solution is equal to the number of dofs in the system.
+    Real ref_l1_norm = static_cast<Real>(system.n_dofs());
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
   }

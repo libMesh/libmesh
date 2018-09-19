@@ -87,6 +87,44 @@ public:
   {}
 
   /**
+   * Constructor.  Takes a map which specifies variable orders on subdomains.
+   */
+  Variable (System * sys,
+            const std::string & var_name,
+            const unsigned int var_number,
+            const unsigned int first_scalar_num,
+            const FEType & var_type,
+            const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders) :
+    _sys(sys),
+    _name(var_name),
+    _subdomain_var_orders(subdomain_var_orders),
+    _number(var_number),
+    _first_scalar_number(first_scalar_num),
+    _type(var_type)
+  {}
+
+  /**
+   * Constructor.  Takes a set which contains the subdomain
+   * indices for which this variable is active, and a map
+   * which specifies variable orders on subdomains.
+   */
+  Variable (System * sys,
+            const std::string & var_name,
+            const unsigned int var_number,
+            const unsigned int first_scalar_num,
+            const FEType & var_type,
+            const std::set<subdomain_id_type> & var_active_subdomains,
+            const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders) :
+    _sys(sys),
+    _name(var_name),
+    _active_subdomains(var_active_subdomains),
+    _subdomain_var_orders(subdomain_var_orders),
+    _number(var_number),
+    _first_scalar_number(first_scalar_num),
+    _type(var_type)
+  {}
+
+  /**
    * \returns A pointer to the System this Variable is part of.
    */
   System * system() const
@@ -150,10 +188,25 @@ public:
   const std::set<subdomain_id_type> & active_subdomains() const
   { return _active_subdomains; }
 
+  /**
+   * \returns \p true if this variable has the same order on all
+   * subdomains because it has no specified subdomain-variable-order
+   * map.
+   */
+  bool implicitly_same_order () const
+  { return _subdomain_var_orders.empty(); }
+
+  /**
+   * \returns The map of variable orders on subdomains for this variable.
+   */
+  const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders() const
+  { return _subdomain_var_orders; }
+
 protected:
   System *                _sys;
   std::string             _name;
   std::set<subdomain_id_type> _active_subdomains;
+  std::map<subdomain_id_type, unsigned char> _subdomain_var_orders;
   unsigned int            _number;
   unsigned int            _first_scalar_number;
   FEType                  _type;
@@ -212,6 +265,50 @@ public:
   {}
 
   /**
+   * Constructor.  Takes a set which contains the subdomain
+   * indices for which this variable is active, and a map which
+   * contains the variable orders on subdomains.
+   */
+  VariableGroup (System * sys,
+                 const std::vector<std::string> & var_names,
+                 const unsigned int var_number,
+                 const unsigned int first_scalar_num,
+                 const FEType & var_type,
+                 const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders) :
+
+    Variable (sys,
+              "var_group",
+              var_number,
+              first_scalar_num,
+              var_type,
+              subdomain_var_orders),
+    _names(var_names)
+  {}
+
+  /**
+   * Constructor.  Takes a set which contains the subdomain
+   * indices for which this variable is active, and a map which
+   * contains the variable orders on subdomains.
+   */
+  VariableGroup (System * sys,
+                 const std::vector<std::string> & var_names,
+                 const unsigned int var_number,
+                 const unsigned int first_scalar_num,
+                 const FEType & var_type,
+                 const std::set<subdomain_id_type> & var_active_subdomains,
+                 const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders) :
+
+    Variable (sys,
+              "var_group",
+              var_number,
+              first_scalar_num,
+              var_type,
+              var_active_subdomains,
+              subdomain_var_orders),
+    _names(var_names)
+  {}
+
+  /**
    * \returns The number of variables in this \p VariableGroup
    */
   unsigned int n_variables () const
@@ -229,7 +326,8 @@ public:
                      this->number(v),
                      this->first_scalar_number(v),
                      this->type(),
-                     this->active_subdomains());
+                     this->active_subdomains(),
+                     this->subdomain_var_orders());
   }
 
   /**

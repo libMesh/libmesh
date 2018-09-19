@@ -603,13 +603,24 @@ void DofMap::reinit(MeshBase & mesh)
 
           FEType fe_type = base_fe_type;
 
+          unsigned char extra_order_on_subdomain = 0;
+            {
+              const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders = vg_description.subdomain_var_orders();
+              auto var_order_it = subdomain_var_orders.find(elem->subdomain_id());
+              if (var_order_it != subdomain_var_orders.end())
+                {
+                  extra_order_on_subdomain = var_order_it->second;
+                }
+            }
+          int base_order = base_fe_type.order.get_order() + extra_order_on_subdomain;
+
 #ifdef LIBMESH_ENABLE_AMR
           // Make sure we haven't done more p refinement than we can
           // handle
           if (elem->p_level() + base_fe_type.order >
               FEInterface::max_order(base_fe_type, type))
             {
-              libmesh_assert_less_msg(static_cast<unsigned int>(base_fe_type.order.get_order()),
+              libmesh_assert_less_msg(static_cast<unsigned int>(base_order),
                                       FEInterface::max_order(base_fe_type,type),
                                       "ERROR: Finite element "
                                       << Utility::enum_to_string(base_fe_type.family)
@@ -618,7 +629,7 @@ void DofMap::reinit(MeshBase & mesh)
                                       << "\nonly supports FEInterface::max_order = "
                                       << FEInterface::max_order(base_fe_type,type)
                                       << ", not fe_type.order = "
-                                      << base_fe_type.order);
+                                      << base_order);
 
 #  ifdef DEBUG
               libMesh::err << "WARNING: Finite element "
@@ -634,7 +645,7 @@ void DofMap::reinit(MeshBase & mesh)
             }
 #endif
 
-          fe_type.order = static_cast<Order>(fe_type.order +
+          fe_type.order = static_cast<Order>(base_order +
                                              elem->p_level());
 
           // Allocate the vertex DOFs
@@ -691,7 +702,19 @@ void DofMap::reinit(MeshBase & mesh)
           const unsigned int dim = elem->dim();
 
           FEType fe_type = base_fe_type;
-          fe_type.order = static_cast<Order>(fe_type.order +
+
+          unsigned char extra_order_on_subdomain = 0;
+            {
+              const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders = vg_description.subdomain_var_orders();
+              auto var_order_it = subdomain_var_orders.find(elem->subdomain_id());
+              if (var_order_it != subdomain_var_orders.end())
+                {
+                  extra_order_on_subdomain = var_order_it->second;
+                }
+            }
+          int base_order = base_fe_type.order.get_order() + extra_order_on_subdomain;
+
+          fe_type.order = static_cast<Order>(base_order +
                                              elem->p_level());
 
           // Allocate the edge and face DOFs
@@ -2221,7 +2244,18 @@ void DofMap::_dof_indices (const Elem & elem,
 
       // Increase the polynomial order on p refined elements
       FEType fe_type = var.type();
-      fe_type.order = static_cast<Order>(fe_type.order + p_level);
+
+      unsigned char extra_order_on_subdomain = 0;
+        {
+          const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders = var.subdomain_var_orders();
+          auto var_order_it = subdomain_var_orders.find(elem.subdomain_id());
+          if (var_order_it != subdomain_var_orders.end())
+            {
+              extra_order_on_subdomain = var_order_it->second;
+            }
+        }
+      int base_order = fe_type.order.get_order() + extra_order_on_subdomain;
+      fe_type.order = static_cast<Order>(base_order + p_level);
 
       const bool extra_hanging_dofs =
         FEInterface::extra_hanging_dofs(fe_type);
@@ -2506,7 +2540,19 @@ void DofMap::old_dof_indices (const Elem * const elem,
                         p_adjustment = 1;
                       }
                     FEType fe_type = var.type();
-                    fe_type.order = static_cast<Order>(fe_type.order +
+
+                    unsigned char extra_order_on_subdomain = 0;
+                      {
+                        const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders = var.subdomain_var_orders();
+                        auto var_order_it = subdomain_var_orders.find(elem->subdomain_id());
+                        if (var_order_it != subdomain_var_orders.end())
+                          {
+                            extra_order_on_subdomain = var_order_it->second;
+                          }
+                      }
+                    int base_order = fe_type.order.get_order() + extra_order_on_subdomain;
+
+                    fe_type.order = static_cast<Order>(base_order +
                                                        elem->p_level() +
                                                        p_adjustment);
 
