@@ -332,9 +332,23 @@ void CheckpointIO::write (const std::string & name)
   // processor.
   std::vector<processor_id_type> ids_to_write;
 
+  // We're going to sort elements by pid in one pass, to avoid sending
+  // predicated iterators through the whole mesh N_p times
+  std::unordered_map<processor_id_type, std::vector<Elem *>> elements_on_pid;
+
   if (_parallel)
     {
       ids_to_write = _my_processor_ids;
+      for (processor_id_type p : ids_to_write)
+        elements_on_pid[p].clear();
+      auto eop_end = elements_on_pid.end();
+      for (auto & elem : mesh.element_ptr_range())
+        {
+          const processor_id_type p = elem->processor_id();
+          auto eop_it = elements_on_pid.find(p);
+          if (eop_it != eop_end)
+            eop_it->second.push_back(elem);
+        }
     }
   else if (mesh.is_serial())
     {
@@ -375,11 +389,33 @@ void CheckpointIO::write (const std::string & name)
       // lists.
       else
         {
-          query_ghosting_functors(mesh, my_pid, false, elements);
-          query_ghosting_functors(mesh, DofObject::invalid_processor_id, false, elements);
-          connect_children(mesh, my_pid, elements);
-          connect_children(mesh, DofObject::invalid_processor_id, elements);
-          connect_families(elements);
+          for (processor_id_type p : {my_pid, DofObject::invalid_processor_id})
+            {
+              const auto elements_vec_it = elements_on_pid.find(p);
+              if (elements_vec_it != elements_on_pid.end())
+                {
+                  const auto & p_elements = elements_vec_it->second;
+                  Elem * const * elempp = p_elements.data();
+                  Elem * const * elemend = elempp + p_elements.size();
+
+                  const MeshBase::const_element_iterator
+                    pid_elements_begin = MeshBase::const_element_iterator
+                      (elempp, elemend, Predicates::NotNull<Elem * const *>()),
+                    pid_elements_end = MeshBase::const_element_iterator
+                      (elemend, elemend, Predicates::NotNull<Elem * const *>()),
+                    active_pid_elements_begin = MeshBase::const_element_iterator
+                      (elempp, elemend, Predicates::Active<Elem * const *>()),
+                    active_pid_elements_end = MeshBase::const_element_iterator
+                      (elemend, elemend, Predicates::Active<Elem * const *>());
+
+                  query_ghosting_functors
+                    (mesh, p, active_pid_elements_begin,
+                     active_pid_elements_end, elements);
+                  connect_children(mesh, pid_elements_begin,
+                                   pid_elements_end, elements);
+                }
+              connect_families(elements);
+            }
         }
 
       std::set<const Node *> connected_nodes;

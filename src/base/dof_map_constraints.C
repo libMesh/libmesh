@@ -2999,8 +2999,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         requested_node_ids;
 
       // And the sizes of each
-      std::vector<dof_id_type>
-        node_ids_on_proc(this->n_processors(), 0);
+      std::map<processor_id_type, dof_id_type> node_ids_on_proc;
 
       // Fill (and thereby sort and uniq!) the main request sets
       for (const auto & i : unexpanded_nodes)
@@ -3032,7 +3031,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         }
 
       for (processor_id_type p = 0; p != this->n_processors(); ++p)
-        if (node_ids_on_proc[p])
+        if (node_ids_on_proc.count(p))
           requested_node_ids[p].reserve(node_ids_on_proc[p]);
 
       // Prepare each processor's request set

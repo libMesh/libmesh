@@ -136,28 +136,10 @@ namespace libMesh
 
 void query_ghosting_functors(const MeshBase & mesh,
                              processor_id_type pid,
-                             bool newly_coarsened_only,
+                             MeshBase::const_element_iterator elem_it,
+                             MeshBase::const_element_iterator elem_end,
                              std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
-  // This parameter is not used when !LIBMESH_ENABLE_AMR.
-  libmesh_ignore(newly_coarsened_only);
-
-#ifndef LIBMESH_ENABLE_AMR
-  libmesh_assert(!newly_coarsened_only);
-#endif
-
-  MeshBase::const_element_iterator elem_it =
-#ifdef LIBMESH_ENABLE_AMR
-    newly_coarsened_only ? mesh.flagged_pid_elements_begin(Elem::JUST_COARSENED, pid) :
-#endif
-    mesh.active_pid_elements_begin(pid);
-
-  const MeshBase::const_element_iterator elem_end =
-#ifdef LIBMESH_ENABLE_AMR
-    newly_coarsened_only ? mesh.flagged_pid_elements_end(Elem::JUST_COARSENED, pid) :
-#endif
-    mesh.active_pid_elements_end(pid);
-
   for (auto & gf :
          as_range(mesh.ghosting_functors_begin(),
                   mesh.ghosting_functors_end()))
@@ -184,21 +166,21 @@ void query_ghosting_functors(const MeshBase & mesh,
 
 
 void connect_children(const MeshBase & mesh,
-                      processor_id_type pid,
+                      MeshBase::const_element_iterator elem_it,
+                      MeshBase::const_element_iterator elem_end,
                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
   // None of these parameters are used when !LIBMESH_ENABLE_AMR.
   libmesh_ignore(mesh);
-  libmesh_ignore(pid);
+  libmesh_ignore(elem_it);
+  libmesh_ignore(elem_end);
   libmesh_ignore(connected_elements);
 
 #ifdef LIBMESH_ENABLE_AMR
   // Our XdrIO output needs inactive local elements to not have any
   // remote_elem children.  Let's make sure that doesn't happen.
   //
-  for (const auto & elem :
-         as_range(mesh.pid_elements_begin(pid),
-                  mesh.pid_elements_end(pid)))
+  for (const auto & elem : as_range(elem_it, elem_end))
     {
       if (elem->has_children())
         for (auto & child : elem->child_ref_range())
@@ -373,6 +355,27 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   std::vector<Parallel::Request>
     node_send_requests, element_send_requests;
 
+  // We're going to sort elements-to-send by pid in one pass, to avoid
+  // sending predicated iterators through the whole mesh N_p times
+  std::unordered_map<processor_id_type, std::vector<Elem *>> send_to_pid;
+
+  const MeshBase::const_element_iterator send_elems_begin =
+#ifdef LIBMESH_ENABLE_AMR
+    newly_coarsened_only ?
+      mesh.flagged_elements_begin(Elem::JUST_COARSENED) :
+#endif
+      mesh.active_elements_begin();
+
+  const MeshBase::const_element_iterator send_elems_end =
+#ifdef LIBMESH_ENABLE_AMR
+    newly_coarsened_only ?
+      mesh.flagged_elements_end(Elem::JUST_COARSENED) :
+#endif
+      mesh.active_elements_end();
+
+  for (auto & elem : as_range(send_elems_begin, send_elems_end))
+    send_to_pid[elem->processor_id()].push_back(elem);
+
   for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
     if (pid != mesh.processor_id()) // don't send to ourselves!!
       {
@@ -382,14 +385,45 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
         // to be ghosted and any nodes which are used by any of the
         // above.
 
+        const auto elements_vec_it = send_to_pid.find(pid);
+
+        // If we don't have any just-coarsened elements to send to
+        // pid, then there won't be any nodes or any elements pulled
+        // in by ghosting either, and we're done with this pid.
+        if (elements_vec_it == send_to_pid.end())
+          continue;
+
+        const auto & p_elements = elements_vec_it->second;
+        libmesh_assert(!p_elements.empty());
+
+        Elem * const * elempp = p_elements.data();
+        Elem * const * elemend = elempp + p_elements.size();
+
+#ifndef LIBMESH_ENABLE_AMR
+        // This parameter is not used when !LIBMESH_ENABLE_AMR.
+        libmesh_ignore(newly_coarsened_only);
+        libmesh_assert(!newly_coarsened_only);
+#endif
+
+        MeshBase::const_element_iterator elem_it =
+          MeshBase::const_element_iterator
+            (elempp, elemend, Predicates::NotNull<Elem * const *>());
+
+        const MeshBase::const_element_iterator elem_end =
+          MeshBase::const_element_iterator
+            (elemend, elemend, Predicates::NotNull<Elem * const *>());
+
         std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 
         // See which to-be-ghosted elements we need to send
-        query_ghosting_functors(mesh, pid, newly_coarsened_only, elements_to_send);
+        query_ghosting_functors (mesh, pid, elem_it, elem_end,
+                                 elements_to_send);
 
         // The inactive elements we need to send should have their
         // immediate children present.
-        connect_children(mesh, pid, elements_to_send);
+        connect_children(mesh, mesh.pid_elements_begin(pid),
+                         mesh.pid_elements_end(pid),
+                         elements_to_send);
 
         // The elements we need should have their ancestors and their
         // subactive children present too.
@@ -403,34 +437,28 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
           cast_int<dof_id_type>(connected_nodes.size());
 
         // send any nodes off to the destination processor
-        if (!connected_nodes.empty())
-          {
-            node_send_requests.push_back(Parallel::request());
+        libmesh_assert (!connected_nodes.empty());
+        node_send_requests.push_back(Parallel::request());
 
-            mesh.comm().send_packed_range (pid,
-                                           &mesh,
-                                           connected_nodes.begin(),
-                                           connected_nodes.end(),
-                                           node_send_requests.back(),
-                                           nodestag);
-          }
+        mesh.comm().send_packed_range (pid, &mesh,
+                                       connected_nodes.begin(),
+                                       connected_nodes.end(),
+                                       node_send_requests.back(),
+                                       nodestag);
 
         // the number of elements we will send to this processor
         send_n_nodes_and_elem_per_proc[2*pid+1] =
           cast_int<dof_id_type>(elements_to_send.size());
 
-        if (!elements_to_send.empty())
-          {
-            // send the elements off to the destination processor
-            element_send_requests.push_back(Parallel::request());
+        // send the elements off to the destination processor
+        libmesh_assert (!elements_to_send.empty());
+        element_send_requests.push_back(Parallel::request());
 
-            mesh.comm().send_packed_range (pid,
-                                           &mesh,
-                                           elements_to_send.begin(),
-                                           elements_to_send.end(),
-                                           element_send_requests.back(),
-                                           elemstag);
-          }
+        mesh.comm().send_packed_range (pid, &mesh,
+                                       elements_to_send.begin(),
+                                       elements_to_send.end(),
+                                       element_send_requests.back(),
+                                       elemstag);
       }
 
   std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
@@ -1861,15 +1889,26 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 
   // See which elements we still need to keep ghosted, given that
   // we're keeping local and unpartitioned elements.
-  query_ghosting_functors(mesh, mesh.processor_id(),
-                          false, elements_to_keep);
-  query_ghosting_functors(mesh, DofObject::invalid_processor_id,
-                          false, elements_to_keep);
+  query_ghosting_functors
+    (mesh, mesh.processor_id(),
+     mesh.active_pid_elements_begin(mesh.processor_id()),
+     mesh.active_pid_elements_end(mesh.processor_id()),
+     elements_to_keep);
+  query_ghosting_functors
+    (mesh, DofObject::invalid_processor_id,
+     mesh.active_pid_elements_begin(DofObject::invalid_processor_id),
+     mesh.active_pid_elements_end(DofObject::invalid_processor_id),
+     elements_to_keep);
 
   // The inactive elements we need to send should have their
   // immediate children present.
-  connect_children(mesh, mesh.processor_id(), elements_to_keep);
-  connect_children(mesh, DofObject::invalid_processor_id, elements_to_keep);
+  connect_children(mesh, mesh.pid_elements_begin(mesh.processor_id()),
+                   mesh.pid_elements_end(mesh.processor_id()),
+                   elements_to_keep);
+  connect_children(mesh,
+                   mesh.pid_elements_begin(DofObject::invalid_processor_id),
+                   mesh.pid_elements_end(DofObject::invalid_processor_id),
+                   elements_to_keep);
 
   // The elements we need should have their ancestors and their
   // subactive children present too.
