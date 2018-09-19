@@ -27,6 +27,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace libMesh
 {
