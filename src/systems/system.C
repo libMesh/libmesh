@@ -1119,45 +1119,45 @@ unsigned int System::add_variable (const std::string & var,
       if (vg.type() != type)
         should_be_in_vg = false;
 
-        {
-          // get a pointer to their subdomain restriction, if any.
-          const std::set<subdomain_id_type> * const
-            their_active_subdomains (vg.implicitly_active() ?
-                                     nullptr : &vg.active_subdomains());
+      {
+        // get a pointer to their subdomain restriction, if any.
+        const std::set<subdomain_id_type> * const
+          their_active_subdomains (vg.implicitly_active() ?
+                                    nullptr : &vg.active_subdomains());
 
-          // they are restricted, we aren't?
-          if (their_active_subdomains && !active_subdomains)
+        // they are restricted, we aren't?
+        if (their_active_subdomains && !active_subdomains)
+          should_be_in_vg = false;
+
+        // they aren't restricted, we are?
+        if (!their_active_subdomains && active_subdomains)
+          should_be_in_vg = false;
+
+        if (their_active_subdomains && active_subdomains)
+          // restricted to different sets?
+          if (*their_active_subdomains != *active_subdomains)
             should_be_in_vg = false;
+      }
 
-          // they aren't restricted, we are?
-          if (!their_active_subdomains && active_subdomains)
+      {
+        // get a pointer to their sudomain variable order, if any.
+        const std::map<subdomain_id_type, unsigned char> * const
+          their_subdomain_var_orders (vg.implicitly_same_order() ?
+                                      nullptr : &vg.subdomain_var_orders());
+
+        // they have subdomain variable orders, we aren't?
+        if (their_subdomain_var_orders && !subdomain_var_orders)
+          should_be_in_vg = false;
+
+        // they don't have subdomain variable orders, we do?
+        if (!their_subdomain_var_orders && subdomain_var_orders)
+          should_be_in_vg = false;
+
+        if (their_subdomain_var_orders && subdomain_var_orders)
+          // subdomain variable orders don't match
+          if (*their_subdomain_var_orders != *subdomain_var_orders)
             should_be_in_vg = false;
-
-          if (their_active_subdomains && active_subdomains)
-            // restricted to different sets?
-            if (*their_active_subdomains != *active_subdomains)
-              should_be_in_vg = false;
-        }
-
-        {
-          // get a pointer to their sudomain variable order, if any.
-          const std::map<subdomain_id_type, unsigned char> * const
-            their_subdomain_var_orders (vg.implicitly_same_order() ?
-                                        nullptr : &vg.subdomain_var_orders());
-
-          // they have subdomain variable orders, we aren't?
-          if (their_subdomain_var_orders && !subdomain_var_orders)
-            should_be_in_vg = false;
-
-          // they don't have subdomain variable orders, we do?
-          if (!their_subdomain_var_orders && subdomain_var_orders)
-            should_be_in_vg = false;
-
-          if (their_subdomain_var_orders && subdomain_var_orders)
-            // subdomain variable orders don't match
-            if (*their_subdomain_var_orders != *subdomain_var_orders)
-              should_be_in_vg = false;
-        }
+      }
 
       // OK, after all that, append the variable to the vg if none of the conditions
       // were violated
