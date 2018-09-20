@@ -153,10 +153,30 @@ public:
   { return _first_scalar_number; }
 
   /**
-   * \returns The \p FEType for this variable.
+   * \returns The "base" \p FEType for this variable. The variable order
+   * may change depending on subdomain, so to access the per-subdomain
+   * type, use the overloaded Variable::type(subdomain_id_type) method.
    */
   const FEType & type() const
   { return _type; }
+
+  /**
+   * \returns The \p FEType for this variable for subdomain \p sbd_id.
+   */
+  FEType type(subdomain_id_type sbd_id) const
+  {
+    auto it = _subdomain_var_orders.find(sbd_id);
+    if(it == _subdomain_var_orders.end())
+    {
+      return _type;
+    }
+    else
+    {
+      FEType type_with_modified_order = _type;
+      type_with_modified_order.order = it->second;
+      return type_with_modified_order;
+    }
+  }
 
   /**
    * \returns The number of components of this variable.
@@ -202,6 +222,20 @@ public:
    */
   const std::map<subdomain_id_type, unsigned char> & subdomain_var_orders() const
   { return _subdomain_var_orders; }
+
+  /**
+   * \returns a set of all orders on all subdomains for this variable.
+   */
+  std::set<unsigned char> get_all_variable_orders() const
+  {
+    std::set<unsigned char> all_orders;
+    all_orders.insert(_type.order);
+    for (auto it : _subdomain_var_orders)
+      {
+        all_orders.insert(it.second);
+      }
+    return all_orders;
+  }
 
 protected:
   System *                _sys;

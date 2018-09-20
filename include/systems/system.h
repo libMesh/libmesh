@@ -1180,12 +1180,18 @@ public:
 
 
   /**
-   * \returns The finite element type variable number \p i.
+   * \returns The "base" finite element type variable number \p i.
+   * If you want the subdomain-dependent variable type, which has
+   * order that may change depending on the subdomain, then use
+   * variable(i).type(sbdid) instead.
    */
   const FEType & variable_type (const unsigned int i) const;
 
   /**
    * \returns The finite element type for variable \p var.
+  * If you want the subdomain-dependent variable type, which has
+   * order that may change depending on the subdomain, then use
+   * variable(var).type(sbdid) instead.
    */
   const FEType & variable_type (const std::string & var) const;
 
