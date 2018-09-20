@@ -691,7 +691,6 @@ void DofMap::reinit(MeshBase & mesh)
           const unsigned int dim = elem->dim();
 
           FEType fe_type = vg_description.type(elem->subdomain_id());
-
           fe_type.order = static_cast<Order>(fe_type.order +
                                              elem->p_level());
 
