@@ -1084,7 +1084,8 @@ public:
    */
   unsigned int add_variable (const std::string & var,
                              const FEType & type,
-                             const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+                             const std::set<subdomain_id_type> * const active_subdomains = nullptr,
+                             const std::map<subdomain_id_type, unsigned char> * const subdomain_var_orders = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1094,7 +1095,8 @@ public:
   unsigned int add_variable (const std::string & var,
                              const Order order = FIRST,
                              const FEFamily = LAGRANGE,
-                             const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+                             const std::set<subdomain_id_type> * const active_subdomains = nullptr,
+                             const std::map<subdomain_id_type, unsigned char> * const subdomain_var_orders = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1104,7 +1106,8 @@ public:
    */
   unsigned int add_variables (const std::vector<std::string> & vars,
                               const FEType & type,
-                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+                              const std::set<subdomain_id_type> * const active_subdomains = nullptr,
+                              const std::map<subdomain_id_type, unsigned char> * const subdomain_var_orders = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1114,7 +1117,8 @@ public:
   unsigned int add_variables (const std::vector<std::string> & vars,
                               const Order order = FIRST,
                               const FEFamily = LAGRANGE,
-                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+                              const std::set<subdomain_id_type> * const active_subdomains = nullptr,
+                              const std::map<subdomain_id_type, unsigned char> * const subdomain_var_orders = nullptr);
 
   /**
    * Return a constant reference to \p Variable \p var.
@@ -1176,12 +1180,18 @@ public:
 
 
   /**
-   * \returns The finite element type variable number \p i.
+   * \returns The "base" finite element type variable number \p i.
+   * If you want the subdomain-dependent variable type, which has
+   * order that may change depending on the subdomain, then use
+   * variable(i).type(sbdid) instead.
    */
   const FEType & variable_type (const unsigned int i) const;
 
   /**
    * \returns The finite element type for variable \p var.
+  * If you want the subdomain-dependent variable type, which has
+   * order that may change depending on the subdomain, then use
+   * variable(var).type(sbdid) instead.
    */
   const FEType & variable_type (const std::string & var) const;
 

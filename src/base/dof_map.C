@@ -579,7 +579,7 @@ void DofMap::reinit(MeshBase & mesh)
       const VariableGroup & vg_description = this->variable_group(vg);
 
       const unsigned int n_var_in_group = vg_description.n_variables();
-      const FEType & base_fe_type        = vg_description.type();
+      const FEType & base_fe_type       = vg_description.type();
 
       // Don't need to loop over elements for a SCALAR variable
       // Just increment _n_SCALAR_dofs
@@ -606,36 +606,36 @@ void DofMap::reinit(MeshBase & mesh)
           const ElemType type = elem->type();
           const unsigned int dim = elem->dim();
 
-          FEType fe_type = base_fe_type;
+          FEType fe_type = vg_description.type(elem->subdomain_id());
 
 #ifdef LIBMESH_ENABLE_AMR
           // Make sure we haven't done more p refinement than we can
           // handle
-          if (elem->p_level() + base_fe_type.order >
-              FEInterface::max_order(base_fe_type, type))
+          if (elem->p_level() + fe_type.order >
+              FEInterface::max_order(fe_type, type))
             {
-              libmesh_assert_less_msg(static_cast<unsigned int>(base_fe_type.order.get_order()),
-                                      FEInterface::max_order(base_fe_type,type),
+              libmesh_assert_less_msg(static_cast<unsigned int>(fe_type.order.get_order()),
+                                      FEInterface::max_order(fe_type,type),
                                       "ERROR: Finite element "
-                                      << Utility::enum_to_string(base_fe_type.family)
+                                      << Utility::enum_to_string(fe_type.family)
                                       << " on geometric element "
                                       << Utility::enum_to_string(type)
                                       << "\nonly supports FEInterface::max_order = "
-                                      << FEInterface::max_order(base_fe_type,type)
+                                      << FEInterface::max_order(fe_type,type)
                                       << ", not fe_type.order = "
-                                      << base_fe_type.order);
+                                      << fe_type.order);
 
 #  ifdef DEBUG
               libMesh::err << "WARNING: Finite element "
-                           << Utility::enum_to_string(base_fe_type.family)
+                           << Utility::enum_to_string(fe_type.family)
                            << " on geometric element "
                            << Utility::enum_to_string(type) << std::endl
                            << "could not be p refined past FEInterface::max_order = "
-                           << FEInterface::max_order(base_fe_type,type)
+                           << FEInterface::max_order(fe_type,type)
                            << std::endl;
 #  endif
-              elem->set_p_level(FEInterface::max_order(base_fe_type,type)
-                                - base_fe_type.order);
+              elem->set_p_level(FEInterface::max_order(fe_type,type)
+                                - fe_type.order);
             }
 #endif
 
@@ -695,7 +695,7 @@ void DofMap::reinit(MeshBase & mesh)
           const ElemType type = elem->type();
           const unsigned int dim = elem->dim();
 
-          FEType fe_type = base_fe_type;
+          FEType fe_type = vg_description.type(elem->subdomain_id());
           fe_type.order = static_cast<Order>(fe_type.order +
                                              elem->p_level());
 
@@ -2225,7 +2225,7 @@ void DofMap::_dof_indices (const Elem & elem,
 #endif
 
       // Increase the polynomial order on p refined elements
-      FEType fe_type = var.type();
+      FEType fe_type = var.type(elem.subdomain_id());
       fe_type.order = static_cast<Order>(fe_type.order + p_level);
 
       const bool extra_hanging_dofs =
@@ -2510,7 +2510,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       {
                         p_adjustment = 1;
                       }
-                    FEType fe_type = var.type();
+                    FEType fe_type = var.type(elem->subdomain_id());
                     fe_type.order = static_cast<Order>(fe_type.order +
                                                        elem->p_level() +
                                                        p_adjustment);
