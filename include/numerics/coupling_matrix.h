@@ -96,6 +96,10 @@ public:
    */
   bool empty() const;
 
+  void print(std::ostream & os) const;
+
+  std::vector<std::pair<std::size_t, std::size_t>> & coupled_pairs();
+
   CouplingMatrix & operator&= (const CouplingMatrix & other);
 
 private:
@@ -119,6 +123,8 @@ private:
   typedef std::pair<std::size_t, std::size_t> range_type;
   typedef std::vector<range_type> rc_type;
   rc_type _ranges;
+
+  rc_type _coupled_pairs;
 
   /**
    * The size of the matrix.
@@ -615,6 +621,7 @@ void CouplingMatrix::resize(const unsigned int n)
   _size = n;
 
   _ranges.clear();
+  _coupled_pairs.clear();
 }
 
 
@@ -633,6 +640,33 @@ bool CouplingMatrix::empty() const
   return (_size == 0);
 }
 
+inline
+void CouplingMatrix::print(std::ostream & os) const
+{
+  for (auto range: _ranges)
+    os<<"("<<range.first<<", "<<range.second<<")"<<std::endl;
+}
+
+inline
+std::vector<std::pair<std::size_t, std::size_t>> & CouplingMatrix::coupled_pairs()
+{
+  if (!empty() && !_coupled_pairs.size())
+  {
+    std::size_t n_nonzeros = 0;
+    for (auto range: _ranges)
+      n_nonzeros += range.second-range.first+1;
+
+    _coupled_pairs.reserve(n_nonzeros);
+    for (auto range: _ranges)
+      for (std::size_t location = range.first; location<=range.second; location++)
+      _coupled_pairs.push_back(std::make_pair(location/_size, location%_size));
+  } else if (empty())
+  {
+    _coupled_pairs.clear();
+  }
+
+  return _coupled_pairs;
+}
 
 } // namespace libMesh
 
