@@ -1832,7 +1832,6 @@ DofMap::add_algebraic_ghosting_functor(GhostingFunctor & algebraic_ghosting_func
 void
 DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & algebraic_ghosting_functor)
 {
-  libmesh_assert(_algebraic_ghosting_functors.count(&algebraic_ghosting_functor));
   _algebraic_ghosting_functors.erase(&algebraic_ghosting_functor);
   _mesh.remove_ghosting_functor(algebraic_ghosting_functor);
 }
