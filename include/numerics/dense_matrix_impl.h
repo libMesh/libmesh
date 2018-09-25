@@ -568,21 +568,6 @@ void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m,
 
 
 template<typename T>
-void DenseMatrix<T>::outer_product (const DenseVector<T> & a,
-                                    const DenseVector<T> & b)
-{
-  const unsigned int m = a.size();
-  const unsigned int n = b.size();
-
-  this->resize(m, n);
-  for (unsigned int i = 0; i < m; ++i)
-    for (unsigned int j = 0; j < n; ++j)
-      (*this)(i,j) = a(i) * libmesh_conj(b(j));
-}
-
-
-
-template<typename T>
 void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m, DenseMatrix<T> & dest) const
 {
   get_principal_submatrix(sub_m, sub_m, dest);
@@ -808,6 +793,34 @@ void DenseMatrix<T>::svd (DenseVector<Real> & sigma,
   _svd_lapack(sigma, U, VT);
 }
 
+template<typename T>
+void DenseMatrix<T>::svdinv (DenseMatrix<Number> & Inverse)
+
+{
+
+  // We use the LAPACK svd implementation
+  DenseMatrix<Number> U;
+  DenseVector<Real> sigma;
+  DenseMatrix<Number> VT;
+  _svd_lapack(sigma, U, VT);
+
+Inverse.resize(VT.n(),U.m());
+
+for (unsigned i =0; i<VT.n(); ++i)
+{
+  for (unsigned j = 0; j<U.m(); ++j)
+  {
+    for (unsigned k = 0; k<VT.m(); ++k)
+    {
+      Inverse(i,j) += VT(k,i)*U(j,k)/sigma(k);
+    }
+  }
+}
+
+
+
+}
+
 
 
 template<typename T>
@@ -836,7 +849,7 @@ void DenseMatrix<T>::evd_left(DenseVector<T> & lambda_real,
                               DenseMatrix<T> & VL)
 {
   // We use the LAPACK eigenvalue problem implementation
-  _evd_lapack(lambda_real, lambda_imag, &VL, nullptr);
+  _evd_lapack(lambda_real, lambda_imag, &VL, libmesh_nullptr);
 }
 
 
@@ -847,7 +860,7 @@ void DenseMatrix<T>::evd_right(DenseVector<T> & lambda_real,
                                DenseMatrix<T> & VR)
 {
   // We use the LAPACK eigenvalue problem implementation
-  _evd_lapack(lambda_real, lambda_imag, nullptr, &VR);
+  _evd_lapack(lambda_real, lambda_imag, libmesh_nullptr, &VR);
 }
 
 

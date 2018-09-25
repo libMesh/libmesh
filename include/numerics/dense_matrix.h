@@ -62,16 +62,12 @@ public:
               const unsigned int new_n=0);
 
   /**
-   * The 5 special functions can be defaulted for this class, as it
-   * does not manage any memory itself.
+   * Destructor.  Empty.
    */
-  DenseMatrix (DenseMatrix &&) = default;
-  DenseMatrix (const DenseMatrix &) = default;
-  DenseMatrix & operator= (const DenseMatrix &) = default;
-  DenseMatrix & operator= (DenseMatrix &&) = default;
-  virtual ~DenseMatrix() = default;
+  virtual ~DenseMatrix() {}
 
-  virtual void zero() override;
+
+  virtual void zero() libmesh_override;
 
   /**
    * \returns The \p (i,j) element of the matrix.
@@ -86,14 +82,14 @@ public:
                   const unsigned int j);
 
   virtual T el(const unsigned int i,
-               const unsigned int j) const override
+               const unsigned int j) const libmesh_override
   { return (*this)(i,j); }
 
   virtual T & el(const unsigned int i,
-                 const unsigned int j) override
+                 const unsigned int j) libmesh_override
   { return (*this)(i,j); }
 
-  virtual void left_multiply (const DenseMatrixBase<T> & M2) override;
+  virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
    * Left multiplies by the matrix \p M2 of different type
@@ -101,7 +97,7 @@ public:
   template <typename T2>
   void left_multiply (const DenseMatrixBase<T2> & M2);
 
-  virtual void right_multiply (const DenseMatrixBase<T> & M2) override;
+  virtual void right_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
    * Right multiplies by the matrix \p M2 of different type
@@ -170,23 +166,11 @@ public:
   void get_principal_submatrix (unsigned int sub_m, DenseMatrix<T> & dest) const;
 
   /**
-   * Computes the outer (dyadic) product of two vectors and stores in (*this).
+   * Assignment operator.
    *
-   * The outer product of two real-valued vectors $\mathbf{a}$ and $\mathbf{b}$ is
-   * \f[
-   *   (\mathbf{a}\mathbf{b}^T)_{i,j} = \mathbf{a}_i \mathbf{b}_j .
-   * \f]
-   * The outer product of two complex-valued vectors $\mathbf{a}$ and $\mathbf{b}$ is
-   * \f[
-   *   (\mathbf{a}\mathbf{b}^H)_{i,j} = \mathbf{a}_i \mathbf{b}^*_j ,
-   * \f]
-   * where \f$H\f$ denotes the conjugate transpose of the vector and \f$*\f$
-   * denotes the complex conjugate.
-   *
-   * \param[in] a   Vector whose entries correspond to rows in the product matrix.
-   * \param[in] b   Vector whose entries correspond to columns in the product matrix.
+   * \returns A reference to *this.
    */
-  void outer_product(const DenseVector<T> & a, const DenseVector<T> & b);
+  DenseMatrix<T> & operator = (const DenseMatrix<T> & other_matrix);
 
   /**
    * Assignment-from-other-matrix-type operator.
@@ -422,6 +406,16 @@ public:
    * Requires PETSc >= 3.1 since this was the first version to provide
    * the LAPACKgelss_ wrapper.
    */
+
+   void svdinv(DenseMatrix<Number> & Inverse);
+  /**
+   * Find the inverse of a matrix using svd
+  */
+
+
+
+
+
   void svd_solve(const DenseVector<T> & rhs,
                  DenseVector<T> & x,
                  Real rcond=std::numeric_limits<Real>::epsilon()) const;
@@ -648,7 +642,7 @@ private:
 
   /**
    * Computes the eigenvalues of the matrix using the Lapack routine
-   * "DGEEV".  If VR and/or VL are not nullptr, then the matrix of right
+   * "DGEEV".  If VR and/or VL are non-NULL, then the matrix of right
    * and/or left eigenvectors is also computed and returned by this
    * function.
    *
@@ -656,8 +650,8 @@ private:
    */
   void _evd_lapack(DenseVector<T> & lambda_real,
                    DenseVector<T> & lambda_imag,
-                   DenseMatrix<T> * VL = nullptr,
-                   DenseMatrix<T> * VR = nullptr);
+                   DenseMatrix<T> * VL = libmesh_nullptr,
+                   DenseMatrix<T> * VR = libmesh_nullptr);
 
   /**
    * Array used to store pivot indices.  May be used by whatever
@@ -810,6 +804,21 @@ void DenseMatrix<T>::zero()
   _decomposition_type = NONE;
 
   std::fill (_val.begin(), _val.end(), static_cast<T>(0));
+}
+
+
+
+template<typename T>
+inline
+DenseMatrix<T> & DenseMatrix<T>::operator = (const DenseMatrix<T> & other_matrix)
+{
+  this->_m = other_matrix._m;
+  this->_n = other_matrix._n;
+
+  _val                = other_matrix._val;
+  _decomposition_type = other_matrix._decomposition_type;
+
+  return *this;
 }
 
 
