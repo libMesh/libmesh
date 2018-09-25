@@ -1,21 +1,67 @@
-Authors, with various user IDs used over the years:
+This is the output of "git shortlog -s | sort -nr", updated periodically.
 
-Benjamin S. Kirk = benkirk
-Bill Barth       = bbarth
-Cody Permann     = permcody
-Daniel Dreyer    = ddreyer
-David Andrs      = andrsd
-David Knezevic   = knezed01
-Derek Gaston     = friedmud
-Dmitry Karpeev   = karpeev
-Florian Prill    = fprill
-Jason Hales      = jasondhales
-John W. Peterson = jwpeterson
-Paul T. Bauman   = pbauman
-Roy H. Stogner   = roystgnr
-Steffen Petersen = spetersen
-Sylvain Vallaghe = svallagh
-Tim Kroeger      = sheep_tk
-Truman Ellis     = trumanellis
-Wout Ruijter     = woutruijter
-
+  6471	Roy H. Stogner
+  5418	John W. Peterson
+  2730	Benjamin S. Kirk
+   757	David Knezevic
+   370	Paul T. Bauman
+   271	Derek Gaston
+   145	Cody Permann
+   118	Daniel Dreyer
+   111	Steffen Petersen
+    98	Daniel Schwen
+    71	Truman Ellis
+    51	Alexander Lindsay
+    38	David Andrs
+    29	Hubert Weissmann
+    27	Vikram Garg
+    26	Sylvain Vallaghe
+    24	Dmitry Karpeev
+    16	Fande Kong
+    12	Robert Weidlich
+     9	Jason Hales
+     8	Tim Kroeger
+     8	Robert Carlsen
+     8	Christopher Haynes
+     8	Andrew E Slaughter
+     7	Sebastian Schunert
+     7	Boris Boutkov
+     6	Wout Ruijter
+     6	Brian Alger
+     5	Hannah Rittich
+     5	Dana Christen
+     5	Damon McDougall
+     4	Tim Adowski
+     4	Manav Bhatia
+     3	Ron Rahaman
+     3	Florian Prill
+     2	Yaqi Wang
+     2	Roger Pawlowski
+     2	Miguel Salazar De Troya
+     2	Kevin J. Dugan
+     2	Junchao Zhang
+     2	Julian Andrej
+     2	Jesse Carter
+     2	Jed Brown
+     2	Fabio Cesar Canesin
+     2	Cormac Garvey
+     2	Bill Barth
+     2	Benjamin Spencer
+     2	Antonio Cervone
+     1	Vincent Laboure
+     1	Vasileios Vavourakis
+     1	Sterling Harper
+     1	Robert Blake
+     1	Nick Thompson
+     1	Martin Luethi
+     1	Martin Lesueur
+     1	Markus Elfring
+     1	Kevin Dugan
+     1	Joshua Hansel
+     1	Hailong Chen
+     1	Francesco Ballarin
+     1	Corey M Bryant
+     1	Boyce Griffith
+     1	Ata Mesgarnejad
+     1	Andrew Bauer
+     1	Andreas Buhr
