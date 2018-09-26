@@ -17,11 +17,11 @@ AC_ARG_WITH([mpi],
 
 AS_IF([test -z "$MPI"], [MPI="/.."])
 
-dnl if MPI is not set in the config, search it via the $INCLUDE and $LIBRARY_PATH variables;
+dnl if MPI is not set in the config, search it via the $INCLUDE and $LD_LIBRARY_PATH variables;
 dnl     with this we can hope to get a configure that is consistent with the environment.
 AS_IF([test "$MPI" = "/.."],
  [
-    for i in $(echo $LIBRARY_PATH | tr ':' '\n')
+    for i in $(echo $LD_LIBRARY_PATH | tr ':' '\n')
     do
        AS_IF([ test -e $i/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so ],
        [MPI=$(dirname $i)
@@ -30,7 +30,6 @@ AS_IF([test "$MPI" = "/.."],
  ])
 AS_IF([test "$MPI" = "/.."],
  [
-    AS_ECHO(["searching LIBRARY_PATH for MPI"])
     for i in $(echo $INCLUDE | tr ':' '\n')
     do
        AS_IF([ test -e $i/mpi.h ],
@@ -232,38 +231,42 @@ AC_DEFUN([VERSION_MPI], [
         dnl check that MPI_VERSION and MPI_SUBVERSION are defined.
         AC_LANG_SAVE
         AC_LANG_CPLUSPLUS
-        dnl first catch undefined and unreasonably high values.
+        dnl first catch undefined (evaluated to 0) and 1.X cases
         AC_TRY_LINK([@%:@include <mpi.h>],
                     [
-                     @%:@ifndef MPI_VERSION
-                     @%:@error "MPI-version seems to be < 1.5."
-                     @%:@endif
-                     @%:@if MPI_VERSION > 3
-                     @%:@error "MPI-version too high. There is some error."
-                     @%:@endif
                      @%:@if MPI_VERSION < 2
                      @%:@error "MPI-version 1.X is not supported."
                      @%:@endif
                     ],
                     [ dnl true: Check which version it is:
-                     dnl if MPI_VERSION is 2, through a warning
                      AC_TRY_LINK([@%:@include <mpi.h>],
-                                 [@%:@if MPI_VERSION == 2
-                                 @%:@error "deprecated MPI-version"
-                                 @%:@endif
-                                 int np; MPI_Comm_size (MPI_COMM_WORLD, &np)
-                                 ],
-                                 [
-                                    AC_MSG_RESULT([ The MPI found has version >= 3.0. ]);
-                                 ],
-                                 [
-                                    AC_MSG_WARN([MPI-version is 2.X. This feature is deprecated. ]);
-                                 ])
-                    dnl set necessary variables etc: Here, all enablempi-cases are in one place.
-                    AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                                  [ @%:@if MPI_VERSION > 4
+                                  @%:@error "MPI-version too high. There is some error."
+                                  @%:@endif
+                                  ],
+                                  [
+                                   dnl if MPI_VERSION is 2, through a warning
+                                   AC_TRY_LINK([@%:@include <mpi.h>],
+                                               [@%:@if MPI_VERSION == 2
+                                               @%:@error "deprecated MPI-version"
+                                               @%:@endif
+                                               int np; MPI_Comm_size (MPI_COMM_WORLD, &np)
+                                               ],
+                                               [
+                                                  AC_MSG_RESULT([ MPI was found with version >= 3.0. ]);
+                                               ],
+                                               [
+                                                  AC_MSG_WARN([MPI-version is 2.X. This feature is deprecated. ]);
+                                               ])
+                                  dnl set necessary variables etc: Here, all enablempi-cases are in one place.
+                                  AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                                  ],
+                                  [
+                                  AC_MSG_WARN(["ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now..."]); enablempi=no
+                                  ])
                     ],
                     [ dnl MPI_VERSION is not defined or has unexpected value.
-                     AC_MSG_WARN(["ERROR: MPI-version seems to be too low: Need MPI 2.X or 3.X. Disable MPI now..."]); enablempi=no
+                     AC_MSG_WARN(["ERROR: MPI-version seems to be too low: Need MPI 2.X or compatible. Disable MPI now..."]); enablempi=no
                     ])
         AC_LANG_RESTORE
   ])
