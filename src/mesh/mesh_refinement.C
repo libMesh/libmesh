@@ -891,14 +891,22 @@ bool MeshRefinement::make_coarsening_compatible()
                                   break;
                                 }
                             }
-                          else // I have a neighbor and it is not active. That means it has children.
-                            {  // While it _may_ be possible to coarsen us if all the children of
-                              // that element want to be coarsened, it is impossible to know at this
-                              // stage.  Forget about it for the moment...  This can be handled in
-                              // two steps.
-                              elem->set_refinement_flag(Elem::DO_NOTHING);
-                              my_flag_changed = true;
-                              break;
+                          else // I have an inactive neighbor, so it has children.
+                            {  // It will only be possible to coarsen
+                               // us if all the children of that
+                               // element have no children themselves
+                               // *and* want to be coarsened.
+                              for (auto & subneighbor : neighbor->child_ref_range())
+                                if (&subneighbor != remote_elem &&
+                                    (!subneighbor.active() ||
+                                    subneighbor.refinement_flag() != Elem::COARSEN))
+                                  {
+                                    elem->set_refinement_flag(Elem::DO_NOTHING);
+                                    my_flag_changed = true;
+                                    break;
+                                  }
+                              if (my_flag_changed)
+                                break;
                             }
                         }
                     }
