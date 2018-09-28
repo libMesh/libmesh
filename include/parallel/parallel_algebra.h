@@ -97,12 +97,10 @@ public:
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
-  StandardType(const StandardType<TypeVector<T>> & t)
+  StandardType(const StandardType<TypeVector<T>> & libmesh_mpi_var(t))
     : DataType()
   {
-#ifdef LIBMESH_HAVE_MPI
     libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
-#endif
   }
 
   ~StandardType() { this->free(); }
@@ -232,12 +230,10 @@ public:
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
-  StandardType(const StandardType<Point> & t)
+  StandardType(const StandardType<Point> & libmesh_mpi_var(t))
     : DataType()
   {
-#ifdef LIBMESH_HAVE_MPI
     libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
-#endif
   }
 
   ~StandardType() { this->free(); }
