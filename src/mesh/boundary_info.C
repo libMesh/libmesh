@@ -68,56 +68,24 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
    */
 
   // Copy node boundary info
-  {
-    boundary_node_iter it = other_boundary_info._boundary_node_id.begin();
-    const boundary_node_iter end = other_boundary_info._boundary_node_id.end();
-
-    for (; it != end; ++it)
-      {
-        const Node * other_node = it->first;
-        _boundary_node_id.insert(std::make_pair(_mesh.node_ptr(other_node->id()),
-                                                it->second));
-      }
-  }
+  for (const auto & pr : other_boundary_info._boundary_node_id)
+    _boundary_node_id.insert(std::make_pair(_mesh.node_ptr(pr.first->id()),
+                                            pr.second));
 
   // Copy edge boundary info
-  {
-    boundary_edge_iter it = other_boundary_info._boundary_edge_id.begin();
-    const boundary_edge_iter end = other_boundary_info._boundary_edge_id.end();
-
-    for (; it != end; ++it)
-      {
-        const Elem * other_elem = it->first;
-        _boundary_edge_id.insert(std::make_pair(_mesh.elem_ptr(other_elem->id()),
-                                                it->second));
-      }
-  }
+  for (const auto & pr : other_boundary_info._boundary_edge_id)
+    _boundary_edge_id.insert(std::make_pair(_mesh.elem_ptr(pr.first->id()),
+                                            pr.second));
 
   // Copy shellface boundary info
-  {
-    boundary_shellface_iter it = other_boundary_info._boundary_shellface_id.begin();
-    const boundary_shellface_iter end = other_boundary_info._boundary_shellface_id.end();
-
-    for (; it != end; ++it)
-      {
-        const Elem * other_elem = it->first;
-        _boundary_shellface_id.insert(std::make_pair(_mesh.elem_ptr(other_elem->id()),
-                                                     it->second));
-      }
-  }
+  for (const auto & pr : other_boundary_info._boundary_shellface_id)
+    _boundary_shellface_id.insert(std::make_pair(_mesh.elem_ptr(pr.first->id()),
+                                                 pr.second));
 
   // Copy side boundary info
-  {
-    boundary_side_iter it = other_boundary_info._boundary_side_id.begin();
-    const boundary_side_iter end = other_boundary_info._boundary_side_id.end();
-
-    for (; it != end; ++it)
-      {
-        const Elem * other_elem = it->first;
-        _boundary_side_id.insert(std::make_pair(_mesh.elem_ptr(other_elem->id()),
-                                                it->second));
-      }
-  }
+  for (const auto & pr : other_boundary_info._boundary_side_id)
+    _boundary_side_id.insert(std::make_pair(_mesh.elem_ptr(pr.first->id()),
+                                            pr.second));
 
   _boundary_ids = other_boundary_info._boundary_ids;
   _side_boundary_ids = other_boundary_info._side_boundary_ids;
@@ -161,38 +129,30 @@ void BoundaryInfo::regenerate_id_sets()
   _shellface_boundary_ids.clear();
 
   // Loop over id maps to regenerate each set.
-  for (boundary_node_iter it = _boundary_node_id.begin(),
-         end = _boundary_node_id.end();
-       it != end; ++it)
+  for (const auto & pr : _boundary_node_id)
     {
-      const boundary_id_type id = it->second;
+      const boundary_id_type id = pr.second;
       _boundary_ids.insert(id);
       _node_boundary_ids.insert(id);
     }
 
-  for (boundary_edge_iter it = _boundary_edge_id.begin(),
-         end = _boundary_edge_id.end();
-       it != end; ++it)
+  for (const auto & pr : _boundary_edge_id)
     {
-      const boundary_id_type id = it->second.second;
+      const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _edge_boundary_ids.insert(id);
     }
 
-  for (boundary_side_iter it = _boundary_side_id.begin(),
-         end = _boundary_side_id.end();
-       it != end; ++it)
+  for (const auto & pr : _boundary_side_id)
     {
-      const boundary_id_type id = it->second.second;
+      const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id);
     }
 
-  for (boundary_shellface_iter it = _boundary_shellface_id.begin(),
-         end = _boundary_shellface_id.end();
-       it != end; ++it)
+  for (const auto & pr : _boundary_shellface_id)
     {
-      const boundary_id_type id = it->second.second;
+      const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _shellface_boundary_ids.insert(id);
     }
@@ -274,11 +234,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
           // Copy over all the node's boundary IDs to boundary_mesh
           std::vector<boundary_id_type> node_boundary_ids;
           this->boundary_ids(node, node_boundary_ids);
-          for (std::size_t index=0; index<node_boundary_ids.size(); index++)
-            {
-              boundary_mesh.get_boundary_info().add_node(node_id_map[node_id],
-                                                         node_boundary_ids[index]);
-            }
+          for (const auto & node_bid : node_boundary_ids)
+            boundary_mesh.get_boundary_info().add_node(node_id_map[node_id], node_bid);
         }
     }
 
@@ -428,8 +385,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       const Elem * top_parent = elem->top_parent();
 
       // Find all the boundary side ids for this Elem.
-      const std::pair<boundary_side_iter, boundary_side_iter>
-        bounds = _boundary_side_id.equal_range(top_parent);
+      auto bounds = _boundary_side_id.equal_range(top_parent);
 
       for (auto s : elem->side_index_range())
         {
@@ -660,7 +616,7 @@ void BoundaryInfo::add_node(const Node * node,
   libmesh_assert(node);
 
   // Don't add the same ID twice
-  std::pair<boundary_node_iter, boundary_node_iter> bounds = _boundary_node_id.equal_range(node);
+  auto bounds = _boundary_node_id.equal_range(node);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -672,11 +628,8 @@ void BoundaryInfo::add_node(const Node * node,
   std::vector<boundary_id_type>::iterator new_end =
     std::unique(unique_ids.begin(), unique_ids.end());
 
-  std::vector<boundary_id_type>::iterator it = unique_ids.begin();
-  for (; it != new_end; ++it)
+  for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      boundary_id_type id = *it;
-
       if (id == invalid_id)
         libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
                           << invalid_id                                 \
@@ -754,7 +707,7 @@ void BoundaryInfo::add_edge(const Elem * elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Don't add the same ID twice
-  std::pair<boundary_edge_iter, boundary_edge_iter> bounds = _boundary_edge_id.equal_range(elem);
+  auto bounds = _boundary_edge_id.equal_range(elem);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -766,11 +719,8 @@ void BoundaryInfo::add_edge(const Elem * elem,
   std::vector<boundary_id_type>::iterator new_end =
     std::unique(unique_ids.begin(), unique_ids.end());
 
-  std::vector<boundary_id_type>::iterator it = unique_ids.begin();
-  for (; it != new_end; ++it)
+  for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      boundary_id_type id = *it;
-
       if (id == invalid_id)
         libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
                           << invalid_id                                \
@@ -850,7 +800,7 @@ void BoundaryInfo::add_shellface(const Elem * elem,
   libmesh_assert_less(shellface, 2);
 
   // Don't add the same ID twice
-  std::pair<boundary_shellface_iter, boundary_shellface_iter> bounds = _boundary_shellface_id.equal_range(elem);
+  auto bounds = _boundary_shellface_id.equal_range(elem);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -862,11 +812,8 @@ void BoundaryInfo::add_shellface(const Elem * elem,
   std::vector<boundary_id_type>::iterator new_end =
     std::unique(unique_ids.begin(), unique_ids.end());
 
-  std::vector<boundary_id_type>::iterator it = unique_ids.begin();
-  for (; it != new_end; ++it)
+  for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      boundary_id_type id = *it;
-
       if (id == invalid_id)
         libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
                           << invalid_id                                \
@@ -939,7 +886,7 @@ void BoundaryInfo::add_side(const Elem * elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Don't add the same ID twice
-  std::pair<boundary_side_iter, boundary_side_iter> bounds = _boundary_side_id.equal_range(elem);
+  auto bounds = _boundary_side_id.equal_range(elem);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -951,11 +898,8 @@ void BoundaryInfo::add_side(const Elem * elem,
   std::vector<boundary_id_type>::iterator new_end =
     std::unique(unique_ids.begin(), unique_ids.end());
 
-  std::vector<boundary_id_type>::const_iterator it = unique_ids.begin();
-  for (; it != new_end; ++it)
+  for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      boundary_id_type id = *it;
-
       if (id == invalid_id)
         libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
                           << invalid_id                                 \
@@ -1018,8 +962,7 @@ void BoundaryInfo::boundary_ids (const Node * node,
 
 unsigned int BoundaryInfo::n_boundary_ids(const Node * node) const
 {
-  std::pair<boundary_node_iter, boundary_node_iter> pos = _boundary_node_id.equal_range(node);
-
+  auto pos = _boundary_node_id.equal_range(node);
   return cast_int<unsigned int>(std::distance(pos.first, pos.second));
 }
 
@@ -1399,8 +1342,7 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
-  std::pair<erase_iter, erase_iter>
-    e = _boundary_edge_id.equal_range(elem);
+  auto e = _boundary_edge_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
@@ -1431,8 +1373,7 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
-  std::pair<erase_iter, erase_iter>
-    e = _boundary_edge_id.equal_range(elem);
+  auto e = _boundary_edge_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
@@ -1465,8 +1406,7 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
-  std::pair<erase_iter, erase_iter>
-    e = _boundary_shellface_id.equal_range(elem);
+  auto e = _boundary_shellface_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
@@ -1500,8 +1440,7 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
-  std::pair<erase_iter, erase_iter>
-    e = _boundary_shellface_id.equal_range(elem);
+  auto e = _boundary_shellface_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
@@ -1530,8 +1469,7 @@ void BoundaryInfo::remove_side (const Elem * elem,
 
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
-  std::pair<erase_iter, erase_iter>
-    e = _boundary_side_id.equal_range(elem);
+  auto e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
@@ -1558,8 +1496,7 @@ void BoundaryInfo::remove_side (const Elem * elem,
 
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
-  std::pair<erase_iter, erase_iter>
-    e = _boundary_side_id.equal_range(elem);
+  auto e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
@@ -1591,7 +1528,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   _ns_id_to_name.erase(id);
 
   // Erase pointers to geometric entities with this id.
-  for (boundary_node_erase_iter it = _boundary_node_id.begin(); it != _boundary_node_id.end(); /*below*/)
+  for (auto it = _boundary_node_id.begin(); it != _boundary_node_id.end(); /*below*/)
     {
       if (it->second == id)
         _boundary_node_id.erase(it++);
@@ -1599,7 +1536,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
         ++it;
     }
 
-  for (erase_iter it = _boundary_edge_id.begin(); it != _boundary_edge_id.end(); /*below*/)
+  for (auto it = _boundary_edge_id.begin(); it != _boundary_edge_id.end(); /*below*/)
     {
       if (it->second.second == id)
         _boundary_edge_id.erase(it++);
@@ -1607,7 +1544,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
         ++it;
     }
 
-  for (erase_iter it = _boundary_shellface_id.begin(); it != _boundary_shellface_id.end(); /*below*/)
+  for (auto it = _boundary_shellface_id.begin(); it != _boundary_shellface_id.end(); /*below*/)
     {
       if (it->second.second == id)
         _boundary_shellface_id.erase(it++);
@@ -1615,7 +1552,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
         ++it;
     }
 
-  for (erase_iter it = _boundary_side_id.begin(); it != _boundary_side_id.end(); /*below*/)
+  for (auto it = _boundary_side_id.begin(); it != _boundary_side_id.end(); /*below*/)
     {
       if (it->second.second == id)
         _boundary_side_id.erase(it++);
@@ -1677,10 +1614,9 @@ BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> & b_ids) con
 {
   b_ids.clear();
 
-  boundary_node_iter pos = _boundary_node_id.begin();
-  for (; pos != _boundary_node_id.end(); ++pos)
+  for (const auto & pr : _boundary_node_id)
     {
-      boundary_id_type id = pos->second;
+      boundary_id_type id = pr.second;
 
       if (std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
         b_ids.push_back(id);
@@ -1692,10 +1628,9 @@ BoundaryInfo::build_side_boundary_ids(std::vector<boundary_id_type> & b_ids) con
 {
   b_ids.clear();
 
-  boundary_side_iter pos = _boundary_side_id.begin();
-  for (; pos != _boundary_side_id.end(); ++pos)
+  for (const auto & pr : _boundary_side_id)
     {
-      boundary_id_type id = pos->second.second;
+      boundary_id_type id = pr.second.second;
 
       if (std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
         b_ids.push_back(id);
@@ -1707,10 +1642,9 @@ BoundaryInfo::build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids
 {
   b_ids.clear();
 
-  boundary_side_iter pos = _boundary_shellface_id.begin();
-  for (; pos != _boundary_shellface_id.end(); ++pos)
+  for (const auto & pr :_boundary_shellface_id)
     {
-      boundary_id_type id = pos->second.second;
+      boundary_id_type id = pr.second.second;
 
       if (std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
         b_ids.push_back(id);
@@ -1729,9 +1663,8 @@ std::size_t BoundaryInfo::n_boundary_conds () const
 
   std::size_t nbcs=0;
 
-  boundary_side_iter pos = _boundary_side_id.begin();
-  for (; pos != _boundary_side_id.end(); ++pos)
-    if (pos->first->processor_id() == this->processor_id())
+  for (const auto & pr : _boundary_side_id)
+    if (pr.first->processor_id() == this->processor_id())
       nbcs++;
 
   this->comm().sum (nbcs);
@@ -1751,9 +1684,8 @@ std::size_t BoundaryInfo::n_edge_conds () const
 
   std::size_t n_edge_bcs=0;
 
-  boundary_edge_iter pos = _boundary_edge_id.begin();
-  for (; pos != _boundary_edge_id.end(); ++pos)
-    if (pos->first->processor_id() == this->processor_id())
+  for (const auto & pr : _boundary_edge_id)
+    if (pr.first->processor_id() == this->processor_id())
       n_edge_bcs++;
 
   this->comm().sum (n_edge_bcs);
@@ -1774,9 +1706,8 @@ std::size_t BoundaryInfo::n_shellface_conds () const
 
   std::size_t n_shellface_bcs=0;
 
-  boundary_shellface_iter pos = _boundary_shellface_id.begin();
-  for (; pos != _boundary_shellface_id.end(); ++pos)
-    if (pos->first->processor_id() == this->processor_id())
+  for (const auto & pr : _boundary_shellface_id)
+    if (pr.first->processor_id() == this->processor_id())
       n_shellface_bcs++;
 
   this->comm().sum (n_shellface_bcs);
@@ -1797,9 +1728,8 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 
   std::size_t n_nodesets=0;
 
-  boundary_node_iter pos = _boundary_node_id.begin();
-  for (; pos != _boundary_node_id.end(); ++pos)
-    if (pos->first->processor_id() == this->processor_id())
+  for (const auto & pr : _boundary_node_id)
+    if (pr.first->processor_id() == this->processor_id())
       n_nodesets++;
 
   this->comm().sum (n_nodesets);
@@ -1869,31 +1799,28 @@ BoundaryInfo::build_node_list_from_side_list()
   std::vector<set_type> nodes_to_push(n_proc);
 
   // Loop over the side list
-  boundary_side_iter pos = _boundary_side_id.begin();
-  for (; pos != _boundary_side_id.end(); ++pos)
+  for (const auto & pr : _boundary_side_id)
     {
       // Don't add remote sides
-      if (pos->first->is_remote())
+      if (pr.first->is_remote())
         continue;
 
       // Need to loop over the sides of any possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      pos->first->active_family_tree_by_side (family, pos->second.first);
+      pr.first->active_family_tree_by_side (family, pr.second.first);
 #else
-      family.push_back(pos->first);
+      family.push_back(pr.first);
 #endif
 
-      for (std::size_t elem_it=0; elem_it < family.size(); elem_it++)
+      for (const auto & cur_elem : family)
         {
-          const Elem * cur_elem = family[elem_it];
-
-          std::unique_ptr<const Elem> side = cur_elem->build_side_ptr(pos->second.first);
+          std::unique_ptr<const Elem> side = cur_elem->build_side_ptr(pr.second.first);
 
           // Add each node node on the side with the side's boundary id
           for (auto i : side->node_index_range())
             {
-              const boundary_id_type bcid = pos->second.second;
+              const boundary_id_type bcid = pr.second.second;
               this->add_node(side->node_ptr(i), bcid);
               if (!mesh_is_serial)
                 {
@@ -2051,35 +1978,29 @@ void BoundaryInfo::build_side_list_from_node_list()
       {
         std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
 
-        const unsigned short n_nodes = side_elem->n_nodes();
-
         // map from nodeset_id to count for that ID
         std::map<boundary_id_type, unsigned> nodesets_node_count;
-        for (unsigned node_num=0; node_num < n_nodes; ++node_num)
-          {
-            const Node * node = side_elem->node_ptr(node_num);
 
-            // For each nodeset that this node is a member of, increment the associated
-            // nodeset ID count
-            for (const auto & pr : as_range(_boundary_node_id.equal_range(node)))
-              nodesets_node_count[pr.second]++;
-          }
+        // For each nodeset that this node is a member of, increment the associated
+        // nodeset ID count
+        for (const auto & node : side_elem->node_ref_range())
+          for (const auto & pr : as_range(_boundary_node_id.equal_range(&node)))
+            nodesets_node_count[pr.second]++;
 
         // Now check to see what nodeset_counts have the correct
         // number of nodes in them.  For any that do, add this side to
         // the sideset, making sure the sideset inherits the
         // nodeset's name, if there is one.
-        std::map<boundary_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
-        for (; nodesets != nodesets_node_count.end(); ++nodesets)
-          if (nodesets->second == n_nodes)
+        for (const auto & pr : nodesets_node_count)
+          if (pr.second == side_elem->n_nodes())
             {
-              add_side(elem, side, nodesets->first);
+              add_side(elem, side, pr.first);
 
               // Let the sideset inherit any non-empty name from the nodeset
-              std::string & nset_name = nodeset_name(nodesets->first);
+              std::string & nset_name = nodeset_name(pr.first);
 
               if (nset_name != "")
-                sideset_name(nodesets->first) = nset_name;
+                sideset_name(pr.first) = nset_name;
             }
       } // end for side
 }
@@ -2307,12 +2228,9 @@ void BoundaryInfo::print_info(std::ostream & out_stream) const
                  << "--------------------------" << std::endl
                  << "  (Node No., ID)               " << std::endl;
 
-      boundary_node_iter it        = _boundary_node_id.begin();
-      const boundary_node_iter end = _boundary_node_id.end();
-
-      for (; it != end; ++it)
-        out_stream << "  (" << (*it).first->id()
-                   << ", "  << (*it).second
+      for (const auto & pr : _boundary_node_id)
+        out_stream << "  (" << pr.first->id()
+                   << ", "  << pr.second
                    << ")"  << std::endl;
     }
 
@@ -2324,13 +2242,10 @@ void BoundaryInfo::print_info(std::ostream & out_stream) const
                  << "-------------------------" << std::endl
                  << "  (Elem No., Edge No., ID)      " << std::endl;
 
-      boundary_edge_iter it = _boundary_edge_id.begin();
-      const boundary_edge_iter end = _boundary_edge_id.end();
-
-      for (; it != end; ++it)
-        out_stream << "  (" << (*it).first->id()
-                   << ", "  << (*it).second.first
-                   << ", "  << (*it).second.second
+      for (const auto & pr : _boundary_edge_id)
+        out_stream << "  (" << pr.first->id()
+                   << ", "  << pr.second.first
+                   << ", "  << pr.second.second
                    << ")"   << std::endl;
     }
 
@@ -2342,13 +2257,10 @@ void BoundaryInfo::print_info(std::ostream & out_stream) const
                  << "-------------------------" << std::endl
                  << "  (Elem No., Shell-face No., ID)      " << std::endl;
 
-      boundary_shellface_iter it = _boundary_shellface_id.begin();
-      const boundary_shellface_iter end = _boundary_shellface_id.end();
-
-      for (; it != end; ++it)
-        out_stream << "  (" << (*it).first->id()
-                   << ", "  << (*it).second.first
-                   << ", "  << (*it).second.second
+      for (const auto & pr : _boundary_shellface_id)
+        out_stream << "  (" << pr.first->id()
+                   << ", "  << pr.second.first
+                   << ", "  << pr.second.second
                    << ")"   << std::endl;
     }
 
@@ -2360,13 +2272,10 @@ void BoundaryInfo::print_info(std::ostream & out_stream) const
                  << "-------------------------" << std::endl
                  << "  (Elem No., Side No., ID)      " << std::endl;
 
-      boundary_side_iter it = _boundary_side_id.begin();
-      const boundary_side_iter end = _boundary_side_id.end();
-
-      for (; it != end; ++it)
-        out_stream << "  (" << (*it).first->id()
-                   << ", "  << (*it).second.first
-                   << ", "  << (*it).second.second
+      for (const auto & pr : _boundary_side_id)
+        out_stream << "  (" << pr.first->id()
+                   << ", "  << pr.second.first
+                   << ", "  << pr.second.second
                    << ")"   << std::endl;
     }
 }
@@ -2384,18 +2293,12 @@ void BoundaryInfo::print_summary(std::ostream & out_stream) const
 
       std::map<boundary_id_type, std::size_t> ID_counts;
 
-      boundary_node_iter it        = _boundary_node_id.begin();
-      const boundary_node_iter end = _boundary_node_id.end();
+      for (const auto & pr : _boundary_node_id)
+        ID_counts[pr.second]++;
 
-      for (; it != end; ++it)
-        ID_counts[(*it).second]++;
-
-      std::map<boundary_id_type, std::size_t>::const_iterator ID_it        = ID_counts.begin();
-      const std::map<boundary_id_type, std::size_t>::const_iterator ID_end = ID_counts.end();
-
-      for (; ID_it != ID_end; ++ID_it)
-        out_stream << "  (" << (*ID_it).first
-                   << ", "  << (*ID_it).second
+      for (const auto & pr : ID_counts)
+        out_stream << "  (" << pr.first
+                   << ", "  << pr.second
                    << ")"  << std::endl;
     }
 
@@ -2409,18 +2312,12 @@ void BoundaryInfo::print_summary(std::ostream & out_stream) const
 
       std::map<boundary_id_type, std::size_t> ID_counts;
 
-      boundary_edge_iter it = _boundary_edge_id.begin();
-      const boundary_edge_iter end = _boundary_edge_id.end();
+      for (const auto & pr : _boundary_edge_id)
+        ID_counts[pr.second.second]++;
 
-      for (; it != end; ++it)
-        ID_counts[(*it).second.second]++;
-
-      std::map<boundary_id_type, std::size_t>::const_iterator ID_it        = ID_counts.begin();
-      const std::map<boundary_id_type, std::size_t>::const_iterator ID_end = ID_counts.end();
-
-      for (; ID_it != ID_end; ++ID_it)
-        out_stream << "  (" << (*ID_it).first
-                   << ", "  << (*ID_it).second
+      for (const auto & pr : ID_counts)
+        out_stream << "  (" << pr.first
+                   << ", "  << pr.second
                    << ")"  << std::endl;
     }
 
@@ -2435,18 +2332,12 @@ void BoundaryInfo::print_summary(std::ostream & out_stream) const
 
       std::map<boundary_id_type, std::size_t> ID_counts;
 
-      boundary_shellface_iter it = _boundary_shellface_id.begin();
-      const boundary_shellface_iter end = _boundary_shellface_id.end();
+      for (const auto & pr : _boundary_shellface_id)
+        ID_counts[pr.second.second]++;
 
-      for (; it != end; ++it)
-        ID_counts[(*it).second.second]++;
-
-      std::map<boundary_id_type, std::size_t>::const_iterator ID_it        = ID_counts.begin();
-      const std::map<boundary_id_type, std::size_t>::const_iterator ID_end = ID_counts.end();
-
-      for (; ID_it != ID_end; ++ID_it)
-        out_stream << "  (" << (*ID_it).first
-                   << ", "  << (*ID_it).second
+      for (const auto & pr : ID_counts)
+        out_stream << "  (" << pr.first
+                   << ", "  << pr.second
                    << ")"  << std::endl;
     }
 
@@ -2460,18 +2351,12 @@ void BoundaryInfo::print_summary(std::ostream & out_stream) const
 
       std::map<boundary_id_type, std::size_t> ID_counts;
 
-      boundary_side_iter it = _boundary_side_id.begin();
-      const boundary_side_iter end = _boundary_side_id.end();
+      for (const auto & pr : _boundary_side_id)
+        ID_counts[pr.second.second]++;
 
-      for (; it != end; ++it)
-        ID_counts[(*it).second.second]++;
-
-      std::map<boundary_id_type, std::size_t>::const_iterator ID_it        = ID_counts.begin();
-      const std::map<boundary_id_type, std::size_t>::const_iterator ID_end = ID_counts.end();
-
-      for (; ID_it != ID_end; ++ID_it)
-        out_stream << "  (" << (*ID_it).first
-                   << ", "  << (*ID_it).second
+      for (const auto & pr : ID_counts)
+        out_stream << "  (" << pr.first
+                   << ", "  << pr.second
                    << ")"  << std::endl;
     }
 }
@@ -2513,20 +2398,14 @@ std::string & BoundaryInfo::nodeset_name(boundary_id_type id)
 boundary_id_type BoundaryInfo::get_id_by_name(const std::string & name) const
 {
   // Search sidesets
-  std::map<boundary_id_type, std::string>::const_iterator
-    iter = _ss_id_to_name.begin(),
-    end_iter = _ss_id_to_name.end();
-
-  for (; iter != end_iter; ++iter)
-    if (iter->second == name)
-      return iter->first;
+  for (const auto & pr : _ss_id_to_name)
+    if (pr.second == name)
+      return pr.first;
 
   // Search nodesets
-  iter = _ns_id_to_name.begin();
-  end_iter = _ns_id_to_name.end();
-  for (; iter != end_iter; ++iter)
-    if (iter->second == name)
-      return iter->first;
+  for (const auto & pr : _ns_id_to_name)
+    if (pr.second == name)
+      return pr.first;
 
   // If we made it here without returning, we don't have a sideset or
   // nodeset by the requested name, so return invalid_id
@@ -2605,8 +2484,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
       const Elem * top_parent = elem->top_parent();
 
       // Find all the boundary side ids for this Elem.
-      const std::pair<boundary_side_iter, boundary_side_iter>
-        bounds = _boundary_side_id.equal_range(top_parent);
+      auto bounds = _boundary_side_id.equal_range(top_parent);
 
       for (auto s : elem->side_index_range())
         {
