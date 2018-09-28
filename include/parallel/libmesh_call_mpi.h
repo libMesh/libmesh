@@ -25,6 +25,11 @@
 #ifdef LIBMESH_HAVE_MPI
 
 /**
+ * Macro to use arguments only when MPI is in use
+ */
+#define libmesh_mpi_var(var) var
+
+/**
  * Macros to test MPI return values
  */
 #ifndef NDEBUG
@@ -72,6 +77,8 @@
 #endif
 
 #else // LIBMESH_HAVE_MPI
+
+#define libmesh_mpi_var(var)
 
 #define libmesh_call_mpi(mpi_call)              \
   do {}                                         \
