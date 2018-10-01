@@ -284,6 +284,30 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 
+void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
+                                         std::unordered_map<dof_id_type, std::vector<dof_id_type>> & nodes_to_elem_map)
+{
+  nodes_to_elem_map.clear();
+
+  for (const auto & elem : mesh.element_ptr_range())
+    for (auto & node : elem->node_ref_range())
+      nodes_to_elem_map[node.id()].push_back(elem->id());
+}
+
+
+
+void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
+                                         std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map)
+{
+  nodes_to_elem_map.clear();
+
+  for (const auto & elem : mesh.element_ptr_range())
+    for (auto & node : elem->node_ref_range())
+      nodes_to_elem_map[node.id()].push_back(elem);
+}
+
+
+
 #ifdef LIBMESH_ENABLE_DEPRECATED
 void MeshTools::find_boundary_nodes (const MeshBase & mesh,
                                      std::vector<bool> & on_boundary)
