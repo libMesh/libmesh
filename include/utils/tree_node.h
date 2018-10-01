@@ -27,8 +27,9 @@
 
 // C++ includes
 #include <cstddef>
-#include <vector>
 #include <set>
+#include <unordered_map>
+#include <vector>
 
 namespace libMesh
 {
@@ -140,6 +141,11 @@ public:
    * Transforms node numbers to element pointers.
    */
   void transform_nodes_to_elements (std::vector<std::vector<const Elem *>> & nodes_to_elem);
+
+  /**
+   * Transforms node numbers to element pointers.
+   */
+  void transform_nodes_to_elements (std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem);
 
   /**
    * \returns The number of active bins below
