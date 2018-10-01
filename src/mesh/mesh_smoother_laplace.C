@@ -52,17 +52,11 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   // is probably not something we want!
   auto on_boundary = MeshTools::find_boundary_nodes(_mesh);
 
-  std::cout << "Num boundary nodes: " << on_boundary.size() << std::endl;
-
   // Also: don't smooth block bondary nodes
   auto on_block_boundary = MeshTools::find_block_boundary_nodes(_mesh);
 
-  std::cout << "Num block boundary nodes: " << on_block_boundary.size() << std::endl;
-
   // Merge them
   on_boundary.insert(on_block_boundary.begin(), on_block_boundary.end());
-
-  std::cout << "Num merged nodes: " << on_boundary.size() << std::endl;
 
   // We can only update the nodes after all new positions were
   // determined. We store the new positions here
