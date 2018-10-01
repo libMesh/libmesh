@@ -262,7 +262,7 @@ Real Quad::quality (const ElemQuality q) const
           return 0.;
 
         // Compute and return the shape metric. These only use the
-        // digonal entries of the T_k.
+        // diagonal entries of the T_k.
         Real den = 0.;
         if (q == SHAPE)
           {
