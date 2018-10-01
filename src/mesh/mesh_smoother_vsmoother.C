@@ -18,19 +18,19 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_VSMOOTHER
 
-// C++ includes
-#include <time.h> // for clock_t, clock()
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>
-#include <iomanip>
-#include <limits>
-
 // Local includes
 #include "libmesh/mesh_smoother_vsmoother.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/elem.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h"
+
+// C++ includes
+#include <time.h> // for clock_t, clock()
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>
+#include <iomanip>
+#include <limits>
 
 namespace libMesh
 {
@@ -283,7 +283,7 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
   // Grab node coordinates and set mask
   {
     // Only compute the node to elem map once
-    std::vector<std::vector<const Elem *>> nodes_to_elem_map;
+    std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
     MeshTools::build_nodes_to_elem_map(_mesh, nodes_to_elem_map);
 
     int i = 0;
