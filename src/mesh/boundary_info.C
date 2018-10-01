@@ -29,6 +29,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
@@ -1784,11 +1785,11 @@ BoundaryInfo::build_node_list_from_side_list()
   // might have a boundary side.
   const bool mesh_is_serial = _mesh.is_serial();
 
-  typedef std::set<std::pair<dof_id_type, boundary_id_type>> set_type;
-
-  const processor_id_type n_proc     = this->n_processors();
   const processor_id_type my_proc_id = this->processor_id();
-  std::vector<set_type> nodes_to_push(n_proc);
+
+  typedef std::pair<dof_id_type, boundary_id_type> pair_type;
+  typedef std::set<pair_type> set_type;
+  std::map<processor_id_type, set_type> node_sets;
 
   // Pull objects out of the loop to reduce heap operations
   std::unique_ptr<const Elem> side;
@@ -1822,7 +1823,7 @@ BoundaryInfo::build_node_list_from_side_list()
                   const processor_id_type proc_id =
                     side->node_ptr(i)->processor_id();
                   if (proc_id != my_proc_id)
-                    nodes_to_push[proc_id].insert
+                    node_sets[proc_id].insert
                       (std::make_pair(side->node_id(i), bcid));
                 }
             }
@@ -1833,44 +1834,33 @@ BoundaryInfo::build_node_list_from_side_list()
   if (mesh_is_serial)
     return;
 
-  // Otherwise we need to push ghost node bcids to their owners, then
-  // pull ghost node bcids from their owners.
-  Parallel::MessageTag
-    node_pushes_tag = this->comm().get_unique_tag(31337),
-    node_pulls_tag = this->comm().get_unique_tag(31338),
-    node_responses_tag = this->comm().get_unique_tag(31339);
+  std::map<processor_id_type, std::vector<pair_type>> nodes_to_push;
 
-  std::vector<Parallel::Request> node_push_requests(n_proc-1);
+  for (const auto & pid_set : node_sets)
+  {
+    auto & set = pid_set.second;
+    auto & vec = nodes_to_push[pid_set.first];
+    vec.insert(vec.end(), set.begin(), set.end());
+  }
 
-  for (processor_id_type p = 0; p != n_proc; ++p)
+  auto node_push_action_functor =
+    [this]
+    (processor_id_type,
+     const std::vector<pair_type> & received_nodes)
     {
-      if (p == my_proc_id)
-        continue;
-
-      Parallel::Request &request =
-        node_push_requests[p - (p > my_proc_id)];
-
-      this->comm().send
-        (p, nodes_to_push[p], request, node_pushes_tag);
-    }
-
-  for (processor_id_type p = 1; p != n_proc; ++p)
-    {
-      set_type received_nodes;
-
-      this->comm().receive
-        (Parallel::any_source, received_nodes, node_pushes_tag);
-
       for (const auto & pr : received_nodes)
         this->add_node(_mesh.node_ptr(pr.first), pr.second);
-    }
+    };
+
+  // Otherwise we need to push ghost node bcids to their owners, then
+  // pull ghost node bcids from their owners.
+  Parallel::push_parallel_vector_data
+    (this->comm(), nodes_to_push, node_push_action_functor);
 
   // At this point we should know all the BCs for our own nodes; now
   // we need BCs for ghost nodes.
-  //
-  // FIXME - parallel_ghost_sync.h doesn't work here because it
-  // assumes a fixed size datum on each node.
-  std::vector<std::vector<dof_id_type>> node_ids_requested(n_proc);
+
+  std::map<processor_id_type, std::vector<dof_id_type>> node_ids_requested;
 
   // Determine what nodes we need to request
   for (const auto & node : _mesh.node_ptr_range())
@@ -1880,77 +1870,41 @@ BoundaryInfo::build_node_list_from_side_list()
         node_ids_requested[pid].push_back(node->id());
     }
 
-  typedef std::vector<std::pair<dof_id_type, boundary_id_type>> vec_type;
+  typedef std::vector<boundary_id_type> response_type;
 
-  std::vector<Parallel::Request>
-    node_pull_requests(n_proc-1),
-    node_response_requests(n_proc-1);
-
-  // Make all requests
-  for (processor_id_type p = 0; p != n_proc; ++p)
+  auto node_gather_functor =
+    [this]
+    (processor_id_type,
+     const std::vector<dof_id_type> & requested_nodes,
+     std::vector<response_type> & response)
     {
-      if (p == my_proc_id)
-        continue;
-
-      Parallel::Request &request =
-        node_pull_requests[p - (p > my_proc_id)];
-
-      this->comm().send
-        (p, node_ids_requested[p], request, node_pulls_tag);
-    }
-
-  // Process all incoming requests
-  std::vector<vec_type> responses(n_proc-1);
-
-  for (processor_id_type p = 1; p != n_proc; ++p)
-    {
-      std::vector<dof_id_type> requested_nodes;
-
-      Parallel::Status
-        status(this->comm().probe (Parallel::any_source, node_pulls_tag));
-      const processor_id_type
-        source_pid = cast_int<processor_id_type>(status.source());
-
-      this->comm().receive
-        (source_pid, requested_nodes, node_pulls_tag);
-
-      Parallel::Request &request =
-        node_response_requests[p-1];
-
-      std::vector<boundary_id_type> bcids;
-
-      for (const auto & id : requested_nodes)
+      const std::size_t query_size = requested_nodes.size();
+      response.resize(query_size);
+      for (std::size_t i=0; i != query_size; ++i)
         {
-          this->boundary_ids(_mesh.node_ptr(id), bcids);
-
-          for (const auto & b : bcids)
-            responses[p-1].push_back(std::make_pair(id, b));
+          const dof_id_type id = requested_nodes[i];
+          this->boundary_ids(_mesh.node_ptr(id), response[i]);
         }
+     };
 
-      this->comm().send
-        (source_pid, responses[p-1], request, node_responses_tag);
-    }
-
-  // Process all incoming responses
-  for (processor_id_type p = 1; p != n_proc; ++p)
+  auto node_action_functor =
+    [this]
+    (processor_id_type,
+     const std::vector<dof_id_type> & requested_nodes,
+     const std::vector<response_type> & response)
     {
-      Parallel::Status
-        status(this->comm().probe (Parallel::any_source, node_responses_tag));
-      const processor_id_type
-        source_pid = cast_int<processor_id_type>(status.source());
+      const std::size_t query_size = requested_nodes.size();
+      for (std::size_t i=0; i != query_size; ++i)
+        {
+          const dof_id_type id = requested_nodes[i];
+          this->add_node(_mesh.node_ptr(id), response[i]);
+        }
+    };
 
-      vec_type response;
-
-      this->comm().receive
-        (source_pid, response, node_responses_tag);
-
-      for (const auto & pr : response)
-        this->add_node(_mesh.node_ptr(pr.first), pr.second);
-    }
-
-  Parallel::wait (node_push_requests);
-  Parallel::wait (node_pull_requests);
-  Parallel::wait (node_response_requests);
+  response_type * ex = nullptr;
+      Parallel::pull_parallel_vector_data
+        (this->comm(), node_ids_requested, node_gather_functor,
+         node_action_functor, ex);
 }
 
 
