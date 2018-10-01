@@ -36,9 +36,10 @@
 #include "libmesh/mesh_tools.h" // For n_levels
 #include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
-
-// For most I/O
 #include "libmesh/namebased_io.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/mesh_communication.h"
 
 
 
