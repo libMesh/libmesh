@@ -16,15 +16,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ Includes
-#include <set>
-#include <utility> // std::make_pair
-
 // Local Includes
 #include "libmesh/ghost_point_neighbors.h"
 
 #include "libmesh/elem.h"
 #include "libmesh/remote_elem.h"
+
+// C++ Includes
+#include <unordered_set>
+#include <utility> // std::make_pair
 
 namespace libMesh
 {
@@ -39,11 +39,11 @@ void GhostPointNeighbors::operator()
   // us correct results even in corner cases, such as where two
   // elements meet only at a corner.  ;-)
 
-  std::set<const Node *> connected_nodes;
+  std::unordered_set<const Node *> connected_nodes;
 
   // Links between boundary and interior elements on mixed
   // dimensional meshes also give us correct ghosting in this way.
-  std::set<const Elem *> interior_parents;
+  std::unordered_set<const Elem *> interior_parents;
 
   // We also preserve neighbors and their neighboring children for
   // active local elements - in most cases this is redundant with the
@@ -108,7 +108,7 @@ void GhostPointNeighbors::operator()
   // Connect any interior_parents who are really in our mesh
   for (const auto & elem : _mesh.element_ptr_range())
     {
-      std::set<const Elem *>::iterator ip_it =
+      std::unordered_set<const Elem *>::iterator ip_it =
         interior_parents.find(elem);
 
       if (ip_it != interior_parents.end())
