@@ -215,6 +215,7 @@ public:
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
   CPPUNIT_TEST( testDofCouplingWithVarGroups );
+  CPPUNIT_TEST( testBlockRestrictedVarNDofs );
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -580,6 +581,67 @@ public:
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * system.n_vars());
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+  }
+
+  void testBlockRestrictedVarNDofs()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_cube (mesh,
+                                      4,
+                                      4,
+                                      0,
+                                      0., 1.,
+                                      0., 1.,
+                                      0., 0.,
+                                      QUAD4);
+
+    auto el_beg = mesh.elements_begin();
+    auto el_end = mesh.elements_end();
+    auto el = mesh.elements_begin();
+    for (; el != el_end; ++el)
+      if ((*el)->centroid()(0) <= 0.5 && (*el)->centroid()(1) <= 0.5)
+        (*el)->subdomain_id() = 0;
+      else
+        (*el)->subdomain_id() = 1;
+
+    mesh.prepare_for_use();
+
+    // Create an equation systems object.
+    EquationSystems equation_systems (mesh);
+    ExplicitSystem& system =
+      equation_systems.add_system<LinearImplicitSystem> ("test");
+
+    std::set<subdomain_id_type> block0;
+    std::set<subdomain_id_type> block1;
+    block0.insert(0);
+    block1.insert(1);
+    auto u0 = system.add_variable ("u0", libMesh::FIRST, &block0);
+    auto u1 = system.add_variable ("u1", libMesh::FIRST, &block1);
+    equation_systems.init();
+
+    std::vector<dof_id_type> u0_dofs;
+    system.get_dof_map().local_variable_indices(u0_dofs, mesh, u0);
+    std::vector<dof_id_type> u1_dofs;
+    system.get_dof_map().local_variable_indices(u1_dofs, mesh, u1);
+
+    std::set<dof_id_type> sys_u0_dofs;
+    system.local_dof_indices(u0, sys_u0_dofs);
+    std::set<dof_id_type> sys_u1_dofs;
+    system.local_dof_indices(u1, sys_u1_dofs);
+
+    // Get local indices from other processors too
+    mesh.comm().allgather(u0_dofs);
+    mesh.comm().allgather(u1_dofs);
+    mesh.comm().set_union(sys_u0_dofs);
+    mesh.comm().set_union(sys_u1_dofs);
+
+    const std::size_t c9 = 9;
+    const std::size_t c21 = 21;
+    CPPUNIT_ASSERT_EQUAL(c9, u0_dofs.size());
+    CPPUNIT_ASSERT_EQUAL(c21, u1_dofs.size());
+    CPPUNIT_ASSERT_EQUAL(c9, sys_u0_dofs.size());
+    CPPUNIT_ASSERT_EQUAL(c21, sys_u1_dofs.size());
   }
 
 #ifdef LIBMESH_ENABLE_AMR
