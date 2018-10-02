@@ -1300,6 +1300,21 @@ void System::local_dof_indices(const unsigned int var,
             var_indices.insert(dof_indices[i]);
         }
     }
+
+  // we may have missed assigning DOFs to nodes that we own
+  // but to which we have no connected elements matching our
+  // variable restriction criterion.  this will happen, for example,
+  // if variable V is restricted to subdomain S.  We may not own
+  // any elements which live in S, but we may own nodes which are
+  // *connected* to elements which do.
+  for (const auto & node : this->get_mesh().local_node_ptr_range())
+    {
+      libmesh_assert(node);
+      this->get_dof_map().dof_indices (node, dof_indices, var);
+      for (auto dof : dof_indices)
+        if (first_local <= dof && dof < end_local)
+          var_indices.insert(dof);
+    }
 }
 
 
