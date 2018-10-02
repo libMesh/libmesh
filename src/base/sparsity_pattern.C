@@ -491,7 +491,7 @@ void Build::parallel_sync ()
     proc_data.second.emplace_back(std::move(row));
 
     // Might as well remove it since it's invalidated anyway
-    nonlocal_pattern.erase(it++);
+    it = nonlocal_pattern.erase(it);
   }
 
   // Tell everyone about where everyone will send to
