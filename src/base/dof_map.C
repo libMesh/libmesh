@@ -1092,14 +1092,23 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
                                     const MeshBase & mesh,
                                     unsigned int var_num) const
 {
+  // Count dofs in the *exact* order that distribute_dofs numbered
+  // them, so that we can assume ascending indices and use push_back
+  // instead of find+insert.
+
   const unsigned int sys_num       = this->sys_number();
 
   // If this isn't a SCALAR variable, we need to find all its field
   // dofs on the mesh
   if (this->variable_type(var_num).family != SCALAR)
     {
+      const Variable & var(this->variable(var_num));
+
       for (auto & elem : mesh.active_local_element_ptr_range())
         {
+          if (!var.active_on_subdomain(elem->subdomain_id()))
+            continue;
+
           // Only count dofs connected to active
           // elements on this processor.
           const unsigned int n_nodes = elem->n_nodes();
@@ -1171,6 +1180,9 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
 {
   const unsigned int sys_num       = this->sys_number();
   const unsigned int n_var_groups  = this->n_variable_groups();
+
+  // Our numbering here must be kept consistent with the numbering
+  // scheme assumed by DofMap::local_variable_indices!
 
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
@@ -1307,6 +1319,9 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
 {
   const unsigned int sys_num      = this->sys_number();
   const unsigned int n_var_groups = this->n_variable_groups();
+
+  // Our numbering here must be kept consistent with the numbering
+  // scheme assumed by DofMap::local_variable_indices!
 
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
