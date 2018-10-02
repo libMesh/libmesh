@@ -1,18 +1,24 @@
 
-// We only need to bother with most of these specializations if we're
-// actually in parallel.
-#ifdef LIBMESH_HAVE_MPI
+// This file is only for use within communicator.h
+#ifdef LIBMESH_COMMUNICATOR_H
+
+// Some of these specializations are defined in an MPI-independent way
+
     bool verify(const std::string & r) const;
+
+    bool verify(const bool & r) const;
 
     template <typename T, typename A>
     bool semiverify(const std::vector<T,A> * r) const;
 
     bool semiverify(const std::string * r) const;
 
-    template <typename T, typename A>
-    void min(std::vector<T,A> &r) const;
+    bool semiverify(const bool * r) const;
 
     void min(bool &r) const;
+
+    template <typename T, typename A>
+    void min(std::vector<T,A> &r) const;
 
     template <typename A>
     void min(std::vector<bool,A> &r) const;
@@ -24,10 +30,10 @@
     void minloc(std::vector<bool,A1> &r,
                 std::vector<unsigned int,A2> &min_id) const;
 
+    void max(bool &r) const;
+
     template <typename T, typename A>
     void max(std::vector<T,A> &r) const;
-
-    void max(bool &r) const;
 
     template <typename A>
     void max(std::vector<bool,A> &r) const;
@@ -54,7 +60,7 @@
 
     template <typename T, typename C, typename A>
     void set_union(std::set<T,C,A> &data) const;
- 
+
     template <typename T1, typename T2, typename C, typename A>
     void set_union(std::map<T1,T2,C,A> &data,
                    const unsigned int root_id) const;
@@ -62,6 +68,9 @@
     template <typename T1, typename T2, typename C, typename A>
     void set_union(std::map<T1,T2,C,A> &data) const;
 
+// We only need to bother with many of these specializations if we're
+// actually in parallel.
+#ifdef LIBMESH_HAVE_MPI
     template<typename T>
     void send (const unsigned int dest_processor_id,
                const std::basic_string<T> & buf,
@@ -298,3 +307,5 @@
                       const MessageTag &send_tag = no_tag,
                       const MessageTag &recv_tag = any_tag) const;
 #endif // LIBMESH_HAVE_MPI
+
+#endif // LIBMESH_COMMUNICATOR_H

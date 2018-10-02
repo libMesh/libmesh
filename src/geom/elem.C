@@ -2923,8 +2923,7 @@ bool Elem::is_vertex_on_parent(unsigned int c,
 #else
 
   // No AMR?
-  libmesh_ignore(c);
-  libmesh_ignore(n);
+  libmesh_ignore(c,n);
   libmesh_error_msg("ERROR: AMR disabled, how did we get here?");
   return true;
 

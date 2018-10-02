@@ -123,6 +123,6 @@ void dofobjectkey_min_op (libMesh::Parallel::DofObjectKey * in,
       *inout = *in;
 }
 
-#endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI
+#endif // LIBMESH_HAVE_LIBHILBERT
 
 #endif // LIBMESH_PARALLEL_HILBERT_H

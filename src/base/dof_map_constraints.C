@@ -135,22 +135,16 @@ class ComputeNodeConstraints
 {
 public:
   ComputeNodeConstraints (NodeConstraints & node_constraints,
-                          DofMap & dof_map,
 #ifdef LIBMESH_ENABLE_PERIODIC
                           PeriodicBoundaries & periodic_boundaries,
 #endif
                           const MeshBase & mesh) :
     _node_constraints(node_constraints),
-    _dof_map(dof_map),
 #ifdef LIBMESH_ENABLE_PERIODIC
     _periodic_boundaries(periodic_boundaries),
 #endif
     _mesh(mesh)
-  {
-    // Clang detects that _dof_map is not used for anything (other
-    // than being initialized) so let's prevent that warning.
-    libmesh_ignore(_dof_map);
-  }
+  {}
 
   void operator()(const ConstElemRange & range) const
   {
@@ -182,7 +176,6 @@ public:
 
 private:
   NodeConstraints & _node_constraints;
-  DofMap & _dof_map;
 #ifdef LIBMESH_ENABLE_PERIODIC
   PeriodicBoundaries & _periodic_boundaries;
 #endif
@@ -1288,7 +1281,6 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
   Threads::parallel_for (range,
                          ComputeNodeConstraints (_node_constraints,
-                                                 *this,
 #ifdef LIBMESH_ENABLE_PERIODIC
                                                  *_periodic_boundaries,
 #endif

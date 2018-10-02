@@ -149,10 +149,10 @@ inline int Status::tag () const
 #endif
 }
 
-#ifdef LIBMESH_HAVE_MPI
 inline unsigned int Status::size (const data_type & type) const
 {
-  int msg_size;
+  libmesh_ignore(type); // We don't use this ifndef LIBMESH_HAVE_MPI
+  int msg_size = 1;
   libmesh_call_mpi
     (MPI_Get_count (const_cast<MPI_Status*>(&_status), type,
                     &msg_size));
@@ -160,13 +160,6 @@ inline unsigned int Status::size (const data_type & type) const
   libmesh_assert_greater_equal (msg_size, 0);
   return msg_size;
 }
-#else
-inline unsigned int Status::size (const data_type &) const
-{
-  libmesh_not_implemented();
-  return 0;
-}
-#endif
 
 inline unsigned int Status::size () const
 { return this->size (this->datatype()); }

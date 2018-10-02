@@ -73,19 +73,14 @@ public:
     _datatype(type)
   {}
 
-#ifdef LIBMESH_HAVE_MPI
   DataType (const DataType & other, unsigned int count)
   {
     // FIXME - if we nest an inner type here will we run into bug
     // https://github.com/libMesh/libmesh/issues/631 again?
-    MPI_Type_contiguous(count, other._datatype, &_datatype);
+    libmesh_call_mpi(MPI_Type_contiguous(count, other._datatype, &_datatype));
+    libmesh_ignore(other, count); // ifndef LIBMESH_HAVE_MPI
     this->commit();
   }
-#else
-  DataType (const DataType &, unsigned int)
-  {
-  }
-#endif
 
   DataType & operator = (const DataType & other)
   { _datatype = other._datatype; return *this; }
@@ -107,18 +102,14 @@ public:
 
   void commit ()
   {
-#ifdef LIBMESH_HAVE_MPI
     libmesh_call_mpi
       (MPI_Type_commit (&_datatype));
-#endif
   }
 
   void free ()
   {
-#ifdef LIBMESH_HAVE_MPI
     libmesh_call_mpi
       (MPI_Type_free (&_datatype));
-#endif
   }
 
 protected:
