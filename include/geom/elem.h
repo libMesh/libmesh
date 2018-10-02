@@ -594,6 +594,12 @@ public:
   virtual unsigned int n_nodes () const = 0;
 
   /**
+   * The maximum number of nodes *any* element can contain.
+   * This is useful for replacing heap vectors with stack arrays.
+   */
+  static const unsigned int max_n_nodes = 27;
+
+  /**
    * \returns An integer range from 0 up to (but not including)
    * the number of nodes this element contains.
    */
@@ -1777,6 +1783,9 @@ Elem::Elem(const unsigned int nn,
 #endif
 {
   this->processor_id() = DofObject::invalid_processor_id;
+
+  // If this ever legitimately fails we need to increase max_n_nodes
+  libmesh_assert_less_equal(nn, max_n_nodes);
 
   // Initialize the nodes data structure
   if (_nodes)
