@@ -492,7 +492,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = LibMeshVecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -546,7 +546,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
@@ -759,7 +759,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -813,7 +813,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
@@ -1044,7 +1044,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -1087,7 +1087,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
@@ -1315,7 +1315,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -1364,7 +1364,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
