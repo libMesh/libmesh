@@ -680,7 +680,7 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   ierr = ISCreateLibMesh(this->comm().get(), n, &idx[0], PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = VecScatterCreate(_vec,          is,
+  ierr = LibMeshVecScatterCreate(_vec,          is,
                           v_local->_vec, is,
                           &scatter);
   LIBMESH_CHKERR(ierr);
@@ -753,7 +753,7 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
                          idxptr, PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = VecScatterCreate(_vec,          is,
+  ierr = LibMeshVecScatterCreate(_vec,          is,
                           v_local->_vec, is,
                           &scatter);
   LIBMESH_CHKERR(ierr);
@@ -806,7 +806,7 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
 
   // Create the VecScatter object. "PETSC_NULL" means "use the identity IS".
   VecScatter scatter;
-  ierr = VecScatterCreate(_vec,
+  ierr = LibMeshVecScatterCreate(_vec,
                           /*src is=*/is,
                           /*dest vec=*/dest,
                           /*dest is=*/PETSC_NULL,
@@ -892,7 +892,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
                            my_local_size ? &idx[0] : nullptr, PETSC_USE_POINTER, &is);
     LIBMESH_CHKERR(ierr);
 
-    ierr = VecScatterCreate(_vec,              is,
+    ierr = LibMeshVecScatterCreate(_vec,              is,
                             parallel_vec._vec, is,
                             &scatter);
     LIBMESH_CHKERR(ierr);
@@ -1314,7 +1314,7 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
   LIBMESH_CHKERR(ierr);
 
   // Construct the scatter object
-  ierr = VecScatterCreate(this->_vec,
+  ierr = LibMeshVecScatterCreate(this->_vec,
                           parent_is,
                           petsc_subvector->_vec,
                           subvector_is,
