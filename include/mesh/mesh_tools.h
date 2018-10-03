@@ -36,10 +36,11 @@ enum ElemType : int;
 #endif
 
 // C++ Includes
-#include <vector>
-#include <set>
 #include <limits>
+#include <set>
 #include <unordered_set>
+#include <unordered_map>
+#include <vector>
 
 namespace libMesh
 {
@@ -126,6 +127,21 @@ void build_nodes_to_elem_map (const MeshBase & mesh,
  */
 void build_nodes_to_elem_map (const MeshBase & mesh,
                               std::vector<std::vector<const Elem *>> & nodes_to_elem_map);
+
+/**
+ * After calling this function the input map \p nodes_to_elem_map
+ * will contain the node to element connectivity.  That is to say
+ * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
+ * element connected to node \p i.
+ */
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::unordered_map<dof_id_type, std::vector<dof_id_type>> & nodes_to_elem_map);
+
+/**
+ * The same, except element pointers are returned instead of indices.
+ */
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map);
 
 
 //   /**
@@ -379,7 +395,6 @@ dof_id_type n_nodes (const MeshBase::const_node_iterator & begin,
  */
 unsigned int max_level (const MeshBase & mesh);
 
-
 /**
  * Given a mesh and a node in the mesh, the vector will be filled with
  * every node directly attached to the given one.
@@ -387,6 +402,15 @@ unsigned int max_level (const MeshBase & mesh);
 void find_nodal_neighbors(const MeshBase & mesh,
                           const Node & n,
                           const std::vector<std::vector<const Elem *>> & nodes_to_elem_map,
+                          std::vector<const Node *> & neighbors);
+
+/**
+ * Given a mesh and a node in the mesh, the vector will be filled with
+ * every node directly attached to the given one.
+ */
+void find_nodal_neighbors(const MeshBase & mesh,
+                          const Node & n,
+                          const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
                           std::vector<const Node *> & neighbors);
 
 /**

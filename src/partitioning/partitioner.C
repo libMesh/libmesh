@@ -504,7 +504,7 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
 
   processor_pairs_to_interface_nodes(mesh, processor_pair_to_nodes);
 
-  std::vector<std::vector<const Elem *>> nodes_to_elem_map;
+  std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
 
   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
