@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <algorithm> // for std::sort
+#include <array>
 #include <iterator>  // for std::ostream_iterator
 #include <sstream>
 #include <limits>    // for std::numeric_limits<>
@@ -87,6 +88,8 @@ Threads::spin_mutex parent_bracketing_nodes_mutex;
 const subdomain_id_type Elem::invalid_subdomain_id = std::numeric_limits<subdomain_id_type>::max();
 
 // Initialize static member variables
+const unsigned int Elem::max_n_nodes;
+
 const unsigned int Elem::type_to_n_nodes_map [] =
   {
     2,  // EDGE2
@@ -399,16 +402,16 @@ dof_id_type Elem::key () const
 {
   const unsigned short n_n = this->n_nodes();
 
-  std::vector<dof_id_type> node_ids(n_n);
+  std::array<dof_id_type, Elem::max_n_nodes> node_ids;
 
   for (unsigned short n=0; n != n_n; ++n)
     node_ids[n] = this->node_id(n);
 
   // Always sort, so that different local node numberings hash to the
   // same value.
-  std::sort (node_ids.begin(), node_ids.end());
+  std::sort (node_ids.begin(), node_ids.begin()+n_n);
 
-  return Utility::hashword(node_ids);
+  return Utility::hashword(node_ids.data(), n_n);
 }
 
 
@@ -422,11 +425,9 @@ bool Elem::operator == (const Elem & rhs) const
   const unsigned short n_n = this->n_nodes();
   libmesh_assert_equal_to(n_n, rhs.n_nodes());
 
-  // Make two sorted vectors of global node ids and compare them for
+  // Make two sorted arrays of global node ids and compare them for
   // equality.
-  std::vector<dof_id_type>
-    this_ids(n_n),
-    rhs_ids(n_n);
+  std::array<dof_id_type, Elem::max_n_nodes> this_ids, rhs_ids;
 
   for (unsigned short n = 0; n != n_n; n++)
     {
@@ -435,11 +436,14 @@ bool Elem::operator == (const Elem & rhs) const
     }
 
   // Sort the vectors to rule out different local node numberings.
-  std::sort(this_ids.begin(), this_ids.end());
-  std::sort(rhs_ids.begin(), rhs_ids.end());
+  std::sort(this_ids.begin(), this_ids.begin()+n_n);
+  std::sort(rhs_ids.begin(), rhs_ids.begin()+n_n);
 
   // If the node ids match, the elements are equal!
-  return this_ids == rhs_ids;
+  for (unsigned short n = 0; n != n_n; ++n)
+    if (this_ids[n] != rhs_ids[n])
+      return false;
+  return true;
 }
 
 
