@@ -21,6 +21,7 @@
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/node_elem.h>
 #include "libmesh/edge_edge2.h"
+#include "libmesh/dg_fem_context.h"
 
 #include "test_comm.h"
 
@@ -191,6 +192,150 @@ void assemble_matrix_and_rhs(EquationSystems& es,
   system.matrix->close();
 }
 
+// Assembly function that uses a DGFEMContext
+void assembly_with_dg_fem_context(EquationSystems& es,
+                                  const std::string& /*system_name*/)
+{
+  const MeshBase& mesh = es.get_mesh();
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("test");
+  const DofMap& dof_map = system.get_dof_map();
+
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe;
+
+  std::vector<dof_id_type> dof_indices;
+
+  DGFEMContext context(system);
+  {
+    // For efficiency, we should prerequest all
+    // the data we will need to build the
+    // linear system before doing an element loop.
+    FEBase* elem_fe = NULL;
+    context.get_element_fe(0, elem_fe);
+    elem_fe->get_JxW();
+    elem_fe->get_phi();
+    elem_fe->get_dphi();
+
+    FEBase* side_fe = NULL;
+    context.get_side_fe( 0, side_fe );
+    side_fe->get_JxW();
+    side_fe->get_phi();
+  }
+
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    {
+      context.pre_fe_reinit(system, elem);
+      context.elem_fe_reinit();
+
+      // Element interior assembly
+      {
+        FEBase* elem_fe = NULL;
+        context.get_element_fe(0, elem_fe);
+
+        const std::vector<Real> &JxW = elem_fe->get_JxW();
+        const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+        const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
+
+        unsigned int n_dofs = context.get_dof_indices(0).size();
+        unsigned int n_qpoints = context.get_element_qrule().n_points();
+
+        for (unsigned int qp=0; qp != n_qpoints; qp++)
+          for (unsigned int i=0; i != n_dofs; i++)
+            for (unsigned int j=0; j != n_dofs; j++)
+              context.get_elem_jacobian()(i,j) += JxW[qp] * dphi[i][qp]*dphi[j][qp];
+
+        for (unsigned int qp=0; qp != n_qpoints; qp++)
+          for (unsigned int i=0; i != n_dofs; i++)
+            context.get_elem_residual()(i) += JxW[qp] * phi[i][qp];
+      }
+
+      system.matrix->add_matrix (context.get_elem_jacobian(), context.get_dof_indices());
+      system.rhs->add_vector (context.get_elem_residual(), context.get_dof_indices());
+
+      // Element side assembly
+      for (context.side = 0; context.side != elem->n_sides(); ++context.side)
+        {
+          // If there is a neighbor, then we proceed with assembly
+          // that involves elem and neighbor
+          const Elem* neighbor = elem->neighbor_ptr(context.get_side());
+          if(neighbor)
+            {
+              context.side_fe_reinit();
+              context.set_neighbor(*neighbor);
+
+              // This call initializes neighbor data, and also sets
+              // context.dg_terms_are_active() to true
+              context.neighbor_side_fe_reinit();
+
+              FEBase* side_fe = NULL;
+              context.get_side_fe(0, side_fe);
+
+              const std::vector<Real> &JxW_face = side_fe->get_JxW();
+              const std::vector<std::vector<Real> >& phi_face = side_fe->get_phi();
+
+              FEBase* neighbor_side_fe = NULL;
+              context.get_neighbor_side_fe(0, neighbor_side_fe);
+
+              // These shape functions have been evaluated on the quadrature points
+              // for elem->side on the neighbor element
+              const std::vector<std::vector<Real> >& phi_neighbor_face =
+                neighbor_side_fe->get_phi();
+
+              const unsigned int n_dofs = context.get_dof_indices(0).size();
+              const unsigned int n_neighbor_dofs = context.get_neighbor_dof_indices(0).size();
+              unsigned int n_sidepoints = context.get_side_qrule().n_points();
+
+              for (unsigned int qp=0; qp<n_sidepoints; qp++)
+                {
+                  for (unsigned int i=0; i<n_dofs; i++)
+                    for (unsigned int j=0; j<n_dofs; j++)
+                      {
+                        context.get_elem_elem_jacobian()(i,j) +=
+                          JxW_face[qp] * phi_face[i][qp] * phi_face[j][qp];
+                      }
+
+                  for (unsigned int i=0; i<n_dofs; i++)
+                    for (unsigned int j=0; j<n_neighbor_dofs; j++)
+                      {
+                        context.get_elem_neighbor_jacobian()(i,j) +=
+                          JxW_face[qp] * phi_face[i][qp] * phi_neighbor_face[j][qp];
+                      }
+
+                  for (unsigned int i=0; i<n_neighbor_dofs; i++)
+                    for (unsigned int j=0; j<n_neighbor_dofs; j++)
+                      {
+                        context.get_neighbor_neighbor_jacobian()(i,j) +=
+                          JxW_face[qp] * phi_neighbor_face[i][qp] * phi_neighbor_face[j][qp];
+                      }
+
+                  for (unsigned int i=0; i<n_neighbor_dofs; i++)
+                    for (unsigned int j=0; j<n_dofs; j++)
+                      {
+                        context.get_neighbor_elem_jacobian()(i,j) +=
+                          JxW_face[qp] * phi_neighbor_face[i][qp] * phi_face[j][qp];
+                      }
+                }
+
+              system.matrix->add_matrix (context.get_elem_elem_jacobian(),
+                                         context.get_dof_indices(),
+                                         context.get_dof_indices());
+
+              system.matrix->add_matrix (context.get_elem_neighbor_jacobian(),
+                                         context.get_dof_indices(),
+                                         context.get_neighbor_dof_indices());
+
+              system.matrix->add_matrix (context.get_neighbor_elem_jacobian(),
+                                         context.get_neighbor_dof_indices(),
+                                         context.get_dof_indices());
+
+              system.matrix->add_matrix (context.get_neighbor_neighbor_jacobian(),
+                                         context.get_neighbor_dof_indices(),
+                                         context.get_neighbor_dof_indices());
+            }
+        }
+      }
+}
+
 Number cubic_test (const Point& p,
                    const Parameters&,
                    const std::string&,
@@ -215,6 +360,7 @@ public:
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
   CPPUNIT_TEST( testDofCouplingWithVarGroups );
+  CPPUNIT_TEST( testAssemblyWithDgFemContext );
   CPPUNIT_TEST( testBlockRestrictedVarNDofs );
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -581,6 +727,30 @@ public:
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * system.n_vars());
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+  }
+
+  void testAssemblyWithDgFemContext()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    EquationSystems es(mesh);
+    System &sys = es.add_system<LinearImplicitSystem> ("test");
+
+    // We must use a discontinuous variable type in this test or
+    // else the sparsity pattern will not be correct
+    sys.add_variable("u", FIRST, L2_LAGRANGE);
+
+    MeshTools::Generation::build_cube (mesh,
+                                       5, 5, 5,
+                                       0., 1., 0., 1., 0., 1.,
+                                       HEX8);
+
+    es.init();
+    sys.attach_assemble_function (assembly_with_dg_fem_context);
+    sys.solve();
+
+    // We don't actually assert anything in this test. We just want to check that
+    // the assembly and solve do not encounter any errors.
   }
 
   void testBlockRestrictedVarNDofs()
