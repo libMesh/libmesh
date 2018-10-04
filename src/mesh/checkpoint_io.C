@@ -17,17 +17,6 @@
 
 #include "libmesh/checkpoint_io.h"
 
-// C++ includes
-#include <iostream>
-#include <iomanip>
-#include <cstdio>
-#include <unistd.h>
-#include <vector>
-#include <string>
-#include <cstring>
-#include <fstream>
-#include <sstream> // for ostringstream
-
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/distributed_mesh.h"
@@ -45,6 +34,19 @@
 #include "libmesh/xdr_io.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/utility.h"
+
+// C++ includes
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <unistd.h>
+#include <vector>
+#include <string>
+#include <cstring>
+#include <fstream>
+#include <sstream> // for ostringstream
+#include <unordered_map>
+#include <unordered_set>
 
 namespace
 {
@@ -659,8 +661,12 @@ void CheckpointIO::write_bcs (Xdr & io,
   side_list.reserve(bc_size);
   bc_id_list.reserve(bc_size);
 
+  std::unordered_set<dof_id_type> elems;
+  for (auto & e : elements)
+    elems.insert(e->id());
+
   for (const auto & t : bc_triples)
-    if (elements.count(mesh.elem_ptr(std::get<0>(t))))
+    if (elems.count(std::get<0>(t)))
       {
         element_id_list.push_back(std::get<0>(t));
         side_list.push_back(std::get<1>(t));
