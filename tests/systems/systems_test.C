@@ -198,7 +198,6 @@ void assembly_with_dg_fem_context(EquationSystems& es,
 {
   const MeshBase& mesh = es.get_mesh();
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("test");
-  const DofMap& dof_map = system.get_dof_map();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
