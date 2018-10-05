@@ -1343,10 +1343,10 @@ inline void Communicator::nonblocking_send_packed_range (const unsigned int dest
 
   if (range_begin != range_end)
     {
-//      if (buffer == nullptr)
+      if (buffer == nullptr)
         buffer = std::make_shared<std::vector<buffer_t>>();
-//      else
-//        buffer->clear();
+      else
+        buffer->clear();
 
       range_begin =
         Parallel::pack_range(context,
