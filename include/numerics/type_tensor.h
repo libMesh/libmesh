@@ -247,7 +247,7 @@ public:
   auto
   operator * (const Scalar scalar) const -> typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeTensor<decltype(this->operator()(0, 0) * scalar)>>::type;
+    TypeTensor<decltype(T() * scalar)>>::type;
 
   /**
    * Multiply this tensor by a scalar value in place.
@@ -911,7 +911,7 @@ inline
 auto
 TypeTensor<T>::operator * (const Scalar factor) const -> typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeTensor<decltype(this->operator()(0, 0) * factor)>>::type
+  TypeTensor<decltype(T() * factor)>>::type
 {
   typedef decltype((*this)(0, 0) * factor) TS;
 
