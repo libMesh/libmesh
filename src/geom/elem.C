@@ -682,13 +682,12 @@ void Elem::find_edge_neighbors(const Point & p1,
 
   while (it != end)
     {
-      std::set<const Elem *>::iterator current = it++;
-
-      const Elem * elem = *current;
-      // This won't invalidate iterator it, because it is already
-      // pointing to the next element
-      if (!elem->contains_point(p2))
-        neighbor_set.erase(current);
+      // As of C++11, set::erase returns an iterator to the element
+      // following the erased element, or end.
+      if (!(*it)->contains_point(p2))
+        it = neighbor_set.erase(it);
+      else
+        ++it;
     }
 }
 
