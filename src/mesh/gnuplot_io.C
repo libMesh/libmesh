@@ -166,38 +166,28 @@ void GnuPlotIO::write_solution(const std::string & fname,
         libmesh_error_msg("ERROR: opening output data file " << data_file_name);
 
       // get ordered nodal data using a map
-      typedef std::pair<Real, std::vector<Number>> key_value_pair;
-      typedef std::map<Real, std::vector<Number>> map_type;
-      typedef map_type::iterator map_iterator;
-
-      map_type node_map;
+      std::map<Real, std::vector<Number>> node_map;
 
       for (const auto & elem : the_mesh.active_element_ptr_range())
-        for (unsigned int i=0; i<elem->n_nodes(); i++)
+        for (const auto & node : elem->node_ref_range())
           {
+            dof_id_type global_id = node.id();
+
             std::vector<Number> values;
-
-            // Get the global id of the node
-            dof_id_type global_id = elem->node_id(i);
-
             for (unsigned int c=0; c<n_vars; c++)
-              values.push_back( (*soln)[global_id*n_vars + c] );
+              values.push_back((*soln)[global_id*n_vars + c]);
 
-            node_map[ the_mesh.point(global_id)(0) ] = values;
+            node_map[the_mesh.point(global_id)(0)] = values;
           }
 
-      map_iterator map_it = node_map.begin();
-      const map_iterator end_map_it = node_map.end();
-
-      for ( ; map_it != end_map_it; ++map_it)
+      for (const auto & pr : node_map)
         {
-          key_value_pair kvp = *map_it;
-          std::vector<Number> values = kvp.second;
+          const std::vector<Number> & values = pr.second;
 
-          data << kvp.first << "\t";
+          data << pr.first << "\t";
 
-          for (std::size_t i=0; i<values.size(); i++)
-            data << values[i] << "\t";
+          for (const auto & val : values)
+            data << val << "\t";
 
           data << "\n";
         }
