@@ -1255,9 +1255,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                       if (el->neighbor_ptr(s) == nullptr)
                         {
                           key_type key = el->key(s);
-                          typedef map_type::iterator key_val_it_type;
-                          std::pair<key_val_it_type, key_val_it_type>
-                            bounds = side_to_elem_map.equal_range(key);
+                          auto bounds = side_to_elem_map.equal_range(key);
 
                           if (bounds.first != bounds.second)
                             {
