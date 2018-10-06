@@ -153,8 +153,7 @@ private:
   std::vector<Real> _time_steps;
 
   // mapping from system names to variable names+descriptions
-  typedef std::map <std::string, SystemVars> system_vars_map_t;
-  system_vars_map_t _system_vars_map;
+  std::map <std::string, SystemVars> _system_vars_map;
 
   // Reference to the EquationSystems we were constructed with
   const EquationSystems & _equation_systems;

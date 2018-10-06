@@ -189,14 +189,10 @@ void EnsightIO::write_geometry_ascii()
   mesh_stream << "coordinates\n";
 
   // mapping between nodal index and your coordinates
-  typedef std::map<int, Point> mesh_nodes_map_t;
-  typedef mesh_nodes_map_t::iterator mesh_nodes_iterator;
-  mesh_nodes_map_t mesh_nodes_map;
+  std::map<int, Point> mesh_nodes_map;
 
   // Map for grouping elements of the same type
-  typedef std::map<ElemType, std::vector<const Elem *>> ensight_parts_map_t;
-  typedef ensight_parts_map_t::iterator ensight_parts_iterator;
-  ensight_parts_map_t ensight_parts_map;
+  std::map<ElemType, std::vector<const Elem *>> ensight_parts_map;
 
   const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
@@ -215,72 +211,60 @@ void EnsightIO::write_geometry_ascii()
   // write x, y, and z node positions, build mapping between
   // ensight and libmesh node numbers.
   std::map <int, int> ensight_node_index;
-  {
-    mesh_nodes_iterator no_it = mesh_nodes_map.begin();
-    const mesh_nodes_iterator no_end_it = mesh_nodes_map.end();
-
-    for (unsigned direction=0; direction<3; ++direction)
-      {
-        for (int i = 1; no_it != no_end_it; ++no_it, i++)
-          {
-            mesh_stream << std::setw(12)
-                        << std::setprecision(5)
-                        << std::scientific
-                        << no_it->second(direction)
-                        << "\n";
-            ensight_node_index[no_it->first] = i;
-          }
-
-        // Reset iterator to the beginning of the map
-        no_it = mesh_nodes_map.begin();
-      }
-  }
+  for (unsigned direction=0; direction<3; ++direction)
+    {
+      int i = 1;
+      for (const auto & pr : mesh_nodes_map)
+        {
+          mesh_stream << std::setw(12)
+                      << std::setprecision(5)
+                      << std::scientific
+                      << pr.second(direction)
+                      << "\n";
+          ensight_node_index[pr.first] = i++;
+        }
+    }
 
   // Write parts
-  {
-    ensight_parts_iterator parts_it  =  ensight_parts_map.begin();
-    const ensight_parts_iterator end_parts_it  =  ensight_parts_map.end();
+  for (const auto & pr : ensight_parts_map)
+    {
+      // Look up this ElemType in the map, error if not present.
+      auto name_it = _element_map.find(pr.first);
+      if (name_it == _element_map.end())
+        libmesh_error_msg("Error: Unsupported ElemType " << pr.first << " for EnsightIO.");
 
-    for (; parts_it != end_parts_it; ++parts_it)
-      {
-        // Look up this ElemType in the map, error if not present.
-        std::map<ElemType, std::string>::iterator name_it = _element_map.find(parts_it->first);
-        if (name_it == _element_map.end())
-          libmesh_error_msg("Error: Unsupported ElemType " << parts_it->first << " for EnsightIO.");
+      // Write element type
+      mesh_stream << "\n" << name_it->second << "\n";
 
-        // Write element type
-        mesh_stream << "\n" << name_it->second << "\n";
+      const std::vector<const Elem *> & elem_ref = pr.second;
 
-        std::vector<const Elem *> elem_ref  = parts_it->second;
+      // Write number of element
+      mesh_stream << std::setw(10) << elem_ref.size() << "\n";
 
-        // Write number of element
-        mesh_stream << std::setw(10) << elem_ref.size() << "\n";
+      // Write element id
+      for (std::size_t i = 0; i < elem_ref.size(); i++)
+        mesh_stream << std::setw(10) << elem_ref[i]->id() << "\n";
 
-        // Write element id
-        for (std::size_t i = 0; i < elem_ref.size(); i++)
-          mesh_stream << std::setw(10) << elem_ref[i]->id() << "\n";
+      // Write connectivity
+      for (std::size_t i = 0; i < elem_ref.size(); i++)
+        {
+          for (const auto & node : elem_ref[i]->node_ref_range())
+            {
+              // tests!
+              if (pr.first == QUAD9 && i==4)
+                continue;
 
-        // Write connectivity
-        for (std::size_t i = 0; i < elem_ref.size(); i++)
-          {
-            for (unsigned int j = 0; j < elem_ref[i]->n_nodes(); j++)
-              {
-                // tests!
-                if (parts_it->first == QUAD9 && i==4)
-                  continue;
+              // tests!
+              if (pr.first == HEX27 &&
+                  (i==4    || i ==10 || i == 12 ||
+                   i == 13 || i ==14 || i == 16 || i == 22))
+                continue;
 
-                // tests!
-                if (parts_it->first == HEX27 &&
-                    (i==4    || i ==10 || i == 12 ||
-                     i == 13 || i ==14 || i == 16 || i == 22))
-                  continue;
-
-                mesh_stream << std::setw(10) << ensight_node_index[elem_ref[i]->node_id(j)];
-              }
-            mesh_stream << "\n";
-          }
-      }
-  }
+              mesh_stream << std::setw(10) << ensight_node_index[node.id()];
+            }
+          mesh_stream << "\n";
+        }
+    }
 }
 
 
@@ -300,30 +284,21 @@ void EnsightIO::write_case()
   case_stream << "GEOMETRY\n";
   case_stream << "model:            1     " << _ensight_file_name << ".geo" << "***\n";
 
-  system_vars_map_t::iterator sys_it = _system_vars_map.begin();
-  const system_vars_map_t::iterator sys_end  = _system_vars_map.end();
-
   // Write Variable per node section
-  if (sys_it != sys_end)
+  if (!_system_vars_map.empty())
     case_stream << "\n\nVARIABLE\n";
 
-  for (; sys_it != sys_end; ++sys_it)
+  for (const auto & pr : _system_vars_map)
     {
-      for (std::size_t i=0; i < sys_it->second.EnsightScalars.size(); i++)
-        {
-          Scalars scalar = sys_it->second.EnsightScalars[i];
-          case_stream << "scalar per node:   1  "
-                      << scalar.description << " "
-                      << _ensight_file_name << "_" << scalar.scalar_name << ".scl***\n";
-        }
+      for (const auto & scalar : pr.second.EnsightScalars)
+        case_stream << "scalar per node:   1  "
+                    << scalar.description << " "
+                    << _ensight_file_name << "_" << scalar.scalar_name << ".scl***\n";
 
-      for (std::size_t i=0; i < sys_it->second.EnsightVectors.size(); i++)
-        {
-          Vectors vec = sys_it->second.EnsightVectors[i];
-          case_stream << "vector per node:      1    "
-                      << vec.description << " "
-                      << _ensight_file_name << "_" << vec.description << ".vec***\n";
-        }
+      for (const auto & vec : pr.second.EnsightVectors)
+        case_stream << "vector per node:      1    "
+                    << vec.description << " "
+                    << _ensight_file_name << "_" << vec.description << ".vec***\n";
 
       // Write time step section
       if (_time_steps.size() != 0)
@@ -344,19 +319,16 @@ void EnsightIO::write_case()
 // Write scalar and vector solution
 void EnsightIO::write_solution_ascii()
 {
-  system_vars_map_t::iterator sys_it = _system_vars_map.begin();
-  const system_vars_map_t::iterator sys_end = _system_vars_map.end();
-
-  for (; sys_it != sys_end; ++sys_it)
+  for (const auto & pr : _system_vars_map)
     {
-      for (std::size_t i = 0; i < sys_it->second.EnsightScalars.size(); i++)
-        this->write_scalar_ascii(sys_it->first,
-                                 sys_it->second.EnsightScalars[i].scalar_name);
+      for (const auto & scalar : pr.second.EnsightScalars)
+        this->write_scalar_ascii(pr.first,
+                                 scalar.scalar_name);
 
-      for (std::size_t i = 0; i < sys_it->second.EnsightVectors.size(); i++)
-        this->write_vector_ascii(sys_it->first,
-                                 sys_it->second.EnsightVectors[i].components,
-                                 sys_it->second.EnsightVectors[i].description);
+      for (const auto & vec : pr.second.EnsightVectors)
+        this->write_vector_ascii(pr.first,
+                                 vec.components,
+                                 vec.description);
     }
 }
 
@@ -394,9 +366,7 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
   // Map from node id -> solution value.  We end up just writing this
   // map out in order, not sure what would happen if there were holes
   // in the numbering...
-  typedef std::map<int, Real> map_local_soln;
-  typedef map_local_soln::iterator local_soln_iterator;
-  map_local_soln local_soln;
+  std::map<int, Real> local_soln;
 
   std::vector<Number> elem_soln;
   std::vector<Number> nodal_soln;
@@ -425,16 +395,12 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
         local_soln[elem->node_id(n)] = libmesh_real(nodal_soln[n]);
     }
 
-  {
-    local_soln_iterator it = local_soln.begin();
-    const local_soln_iterator it_end = local_soln.end();
-    for ( ; it != it_end; ++it)
-      scl_stream << std::setw(12)
-                 << std::setprecision(5)
-                 << std::scientific
-                 << it->second
-                 << "\n";
-  }
+  for (const auto & pr : local_soln)
+    scl_stream << std::setw(12)
+               << std::setprecision(5)
+               << std::scientific
+               << pr.second
+               << "\n";
 }
 
 
@@ -482,9 +448,7 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
   // Map from node id -> solution value.  We end up just writing this
   // map out in order, not sure what would happen if there were holes
   // in the numbering...
-  typedef std::map<int,std::vector<Real>> map_local_soln;
-  typedef map_local_soln::iterator  local_soln_iterator;
-  map_local_soln local_soln;
+  std::map<int,std::vector<Real>> local_soln;
 
   // Now we will loop over all the elements in the mesh.
   for (const auto & elem : the_mesh.active_local_element_ptr_range())
@@ -529,7 +493,7 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
       libmesh_error_msg("Complex-valued Ensight output not yet supported");
 #endif
 
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      for (const auto & n : elem->node_index_range())
         {
           std::vector<Real> node_vec(3);
           node_vec[0] = libmesh_real(nodal_soln_u[n]);
@@ -541,23 +505,15 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
         }
     }
 
-  {
-    local_soln_iterator it = local_soln.begin();
-    const local_soln_iterator it_end = local_soln.end();
-
-    for (unsigned dir=0; dir<3; ++dir)
-      {
-        for (; it != it_end; ++it)
-          vec_stream << std::setw(12)
-                     << std::scientific
-                     << std::setprecision(5)
-                     << it->second[dir]
-                     << "\n";
-
-        // Reset the iterator to the beginning of the map
-        it = local_soln.begin();
-      }
-  }
+  for (unsigned dir=0; dir<3; ++dir)
+    {
+      for (const auto & pr : local_soln)
+        vec_stream << std::setw(12)
+                   << std::scientific
+                   << std::setprecision(5)
+                   << pr.second[dir]
+                   << "\n";
+    }
 }
 
 } // namespace libMesh
