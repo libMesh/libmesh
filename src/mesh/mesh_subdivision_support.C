@@ -379,11 +379,8 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
 
   // add the missing ghost elements (connecting new ghost nodes)
   std::vector<Tri3Subdivision *> missing_ghost_elems;
-  std::vector<Tri3Subdivision *>::iterator       ghost_el     = ghost_elems.begin();
-  const std::vector<Tri3Subdivision *>::iterator end_ghost_el = ghost_elems.end();
-  for (; ghost_el != end_ghost_el; ++ghost_el)
+  for (auto & elem : ghost_elems)
     {
-      Tri3Subdivision * elem = *ghost_el;
       libmesh_assert(elem->is_ghost());
 
       for (auto i : elem->side_index_range())
@@ -480,10 +477,8 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
     } // end ghost element loop
 
   // add the missing ghost elements to the mesh
-  std::vector<Tri3Subdivision *>::iterator       missing_el     = missing_ghost_elems.begin();
-  const std::vector<Tri3Subdivision *>::iterator end_missing_el = missing_ghost_elems.end();
-  for (; missing_el != end_missing_el; ++missing_el)
-    mesh.add_elem(*missing_el);
+  for (auto & elem : missing_ghost_elems)
+    mesh.add_elem(elem);
 }
 
 } // namespace libMesh
