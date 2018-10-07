@@ -837,11 +837,8 @@ void DofMap::clear()
 
   // Reset ghosting functor statuses
   {
-    std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
-    const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
-    for (; gf_it != gf_end; ++gf_it)
+    for (const auto & gf : _coupling_functors)
       {
-        GhostingFunctor * gf = *gf_it;
         libmesh_assert(gf);
         _mesh.remove_ghosting_functor(*gf);
       }
@@ -857,11 +854,8 @@ void DofMap::clear()
 
 
   {
-    std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
-    const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
-    for (; gf_it != gf_end; ++gf_it)
+    for (const auto & gf : _algebraic_ghosting_functors)
       {
-        GhostingFunctor * gf = *gf_it;
         libmesh_assert(gf);
         _mesh.remove_ghosting_functor(*gf);
       }
@@ -1054,27 +1048,17 @@ void DofMap::distribute_dofs (MeshBase & mesh)
       }
 
   // Allow our GhostingFunctor objects to reinit if necessary
-  {
-    std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
-    const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
-    for (; gf_it != gf_end; ++gf_it)
-      {
-        GhostingFunctor * gf = *gf_it;
-        libmesh_assert(gf);
-        gf->dofmap_reinit();
-      }
-  }
+  for (const auto & gf : _algebraic_ghosting_functors)
+    {
+      libmesh_assert(gf);
+      gf->dofmap_reinit();
+    }
 
-  {
-    std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
-    const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
-    for (; gf_it != gf_end; ++gf_it)
-      {
-        GhostingFunctor * gf = *gf_it;
-        libmesh_assert(gf);
-        gf->dofmap_reinit();
-      }
-  }
+  for (const auto & gf : _coupling_functors)
+    {
+      libmesh_assert(gf);
+      gf->dofmap_reinit();
+    }
 
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
@@ -1452,28 +1436,24 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                             const MeshBase::const_element_iterator & elems_end,
                             processor_id_type p)
 {
-  std::set<GhostingFunctor *>::iterator gf_it = gf_begin;
-  for (; gf_it != gf_end; ++gf_it)
+  for (const auto & gf : as_range(gf_begin, gf_end))
     {
       GhostingFunctor::map_type more_elements_to_ghost;
 
-      GhostingFunctor * gf = *gf_it;
       libmesh_assert(gf);
       (*gf)(elems_begin, elems_end, p, more_elements_to_ghost);
 
-      GhostingFunctor::map_type::iterator        metg_it = more_elements_to_ghost.begin();
-      const GhostingFunctor::map_type::iterator metg_end = more_elements_to_ghost.end();
-      for (; metg_it != metg_end; ++metg_it)
+      for (const auto & pr : more_elements_to_ghost)
         {
           GhostingFunctor::map_type::iterator existing_it =
-            elements_to_ghost.find (metg_it->first);
+            elements_to_ghost.find (pr.first);
           if (existing_it == elements_to_ghost.end())
-            elements_to_ghost.insert(*metg_it);
+            elements_to_ghost.insert(pr);
           else
             {
               if (existing_it->second)
                 {
-                  if (metg_it->second)
+                  if (pr.second)
                     {
                       // If this isn't already a temporary
                       // then we need to make one so we'll
@@ -1485,7 +1465,7 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                           temporary_coupling_matrices.insert(cm);
                           existing_it->second = cm;
                         }
-                      const_cast<CouplingMatrix &>(*existing_it->second) &= *metg_it->second;
+                      const_cast<CouplingMatrix &>(*existing_it->second) &= *pr.second;
                     }
                   else
                     {
@@ -1552,17 +1532,15 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
   std::map<const CouplingMatrix *, std::vector<unsigned int>>
     column_variable_lists;
 
-  GhostingFunctor::map_type::iterator        etg_it = elements_to_send.begin();
-  const GhostingFunctor::map_type::iterator etg_end = elements_to_send.end();
-  for (; etg_it != etg_end; ++etg_it)
+  for (auto & pr : elements_to_send)
     {
-      const Elem * const partner = etg_it->first;
+      const Elem * const partner = pr.first;
 
       // We asked ghosting functors not to give us local elements
       libmesh_assert_not_equal_to
         (partner->processor_id(), this->processor_id());
 
-      const CouplingMatrix * ghost_coupling = etg_it->second;
+      const CouplingMatrix * ghost_coupling = pr.second;
 
       // Loop over any present coupling matrix column variables if we
       // have a coupling matrix, or just add all variables to
