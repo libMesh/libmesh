@@ -3855,18 +3855,16 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   // Each ghost-coupled element's owner should get a request for its dofs
   std::set<dof_id_type> requested_dofs;
 
-  GhostingFunctor::map_type::iterator        etg_it = elements_to_couple.begin();
-  const GhostingFunctor::map_type::iterator etg_end = elements_to_couple.end();
-  for (; etg_it != etg_end; ++etg_it)
+  for (const auto & pr : elements_to_couple)
     {
-      const Elem *elem = etg_it->first;
+      const Elem * elem = pr.first;
 
       // FIXME - optimize for the non-fully-coupled case?
       std::vector<dof_id_type> element_dofs;
       this->dof_indices(elem, element_dofs);
 
-      for (std::size_t i=0; i != element_dofs.size(); ++i)
-        requested_dofs.insert(element_dofs[i]);
+      for (auto dof : element_dofs)
+        requested_dofs.insert(dof);
     }
 
   this->gather_constraints(mesh, requested_dofs, false);
