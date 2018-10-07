@@ -4324,19 +4324,13 @@ DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
 void DofMap::remove_dirichlet_boundary (const DirichletBoundary & boundary_to_remove)
 {
   // Find a boundary condition matching the one to be removed
-  std::vector<DirichletBoundary *>::iterator it = _dirichlet_boundaries->begin();
-  std::vector<DirichletBoundary *>::iterator end = _dirichlet_boundaries->end();
-  for (; it != end; ++it)
-    {
-      DirichletBoundary * bdy = *it;
+  auto lam = [&boundary_to_remove](const DirichletBoundary * bdy)
+    {return bdy->b == boundary_to_remove.b && bdy->variables == boundary_to_remove.variables;};
 
-      if ((bdy->b == boundary_to_remove.b) &&
-          bdy->variables == boundary_to_remove.variables)
-        break;
-    }
+  auto it = std::find_if(_dirichlet_boundaries->begin(), _dirichlet_boundaries->end(), lam);
 
   // Delete it and remove it
-  libmesh_assert (it != end);
+  libmesh_assert (it != _dirichlet_boundaries->end());
   delete *it;
   _dirichlet_boundaries->erase(it);
 }
@@ -4348,22 +4342,15 @@ void DofMap::remove_adjoint_dirichlet_boundary (const DirichletBoundary & bounda
   libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),
                          qoi_index);
 
-  // Find a boundary condition matching the one to be removed
-  std::vector<DirichletBoundary *>::iterator it =
-    _adjoint_dirichlet_boundaries[qoi_index]->begin();
-  std::vector<DirichletBoundary *>::iterator end =
-    _adjoint_dirichlet_boundaries[qoi_index]->end();
-  for (; it != end; ++it)
-    {
-      DirichletBoundary * bdy = *it;
+  auto lam = [&boundary_to_remove](const DirichletBoundary * bdy)
+    {return bdy->b == boundary_to_remove.b && bdy->variables == boundary_to_remove.variables;};
 
-      if ((bdy->b == boundary_to_remove.b) &&
-          bdy->variables == boundary_to_remove.variables)
-        break;
-    }
+  auto it = std::find_if(_adjoint_dirichlet_boundaries[qoi_index]->begin(),
+                         _adjoint_dirichlet_boundaries[qoi_index]->end(),
+                         lam);
 
   // Delete it and remove it
-  libmesh_assert (it != end);
+  libmesh_assert (it != _adjoint_dirichlet_boundaries[qoi_index]->end());
   delete *it;
   _adjoint_dirichlet_boundaries[qoi_index]->erase(it);
 }
