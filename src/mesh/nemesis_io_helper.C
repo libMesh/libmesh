@@ -972,31 +972,23 @@ void Nemesis_IO_Helper::compute_element_maps()
 
   {
     unsigned cnt = 0;
-    std::set<unsigned>::iterator
-      it = this->internal_elem_ids.begin(),
-      end = this->internal_elem_ids.end();
-
-    for (; it != end; ++it, ++cnt)
+    for (const auto & id : this->internal_elem_ids)
       {
-        std::map<int, int>::iterator elem_it = libmesh_elem_num_to_exodus.find(*it);
+        std::map<int, int>::iterator elem_it = libmesh_elem_num_to_exodus.find(id);
         if (elem_it == libmesh_elem_num_to_exodus.end())
-          libmesh_error_msg("Elem number " << *it << " not found in libmesh_elem_num_to_exodus map.");
-        this->elem_mapi[cnt] = elem_it->second;
+          libmesh_error_msg("Elem number " << id << " not found in libmesh_elem_num_to_exodus map.");
+        this->elem_mapi[cnt++] = elem_it->second;
       }
   }
 
   {
     unsigned cnt = 0;
-    std::set<unsigned>::iterator
-      it = this->border_elem_ids.begin(),
-      end = this->border_elem_ids.end();
-
-    for (; it != end; ++it, ++cnt)
+    for (const auto & id : this->border_elem_ids)
       {
-        std::map<int, int>::iterator elem_it = libmesh_elem_num_to_exodus.find(*it);
+        std::map<int, int>::iterator elem_it = libmesh_elem_num_to_exodus.find(id);
         if (elem_it == libmesh_elem_num_to_exodus.end())
-          libmesh_error_msg("Elem number " << *it << " not found in libmesh_elem_num_to_exodus map.");
-        this->elem_mapb[cnt] = elem_it->second;
+          libmesh_error_msg("Elem number " << id << " not found in libmesh_elem_num_to_exodus map.");
+        this->elem_mapb[cnt++] = elem_it->second;
       }
   }
 }
@@ -1072,31 +1064,23 @@ void Nemesis_IO_Helper::compute_node_maps()
   // Copy set contents into vectors
   {
     unsigned cnt = 0;
-    std::set<unsigned>::iterator
-      it = this->internal_node_ids.begin(),
-      end = this->internal_node_ids.end();
-
-    for (; it != end; ++it, ++cnt)
+    for (const auto & id : this->internal_node_ids)
       {
-        std::map<int, int>::iterator node_it = libmesh_node_num_to_exodus.find(*it);
+        std::map<int, int>::iterator node_it = libmesh_node_num_to_exodus.find(id);
         if (node_it == libmesh_node_num_to_exodus.end())
-          libmesh_error_msg("Node number " << *it << " not found in libmesh_node_num_to_exodus map.");
-        this->node_mapi[cnt] = node_it->second;
+          libmesh_error_msg("Node number " << id << " not found in libmesh_node_num_to_exodus map.");
+        this->node_mapi[cnt++] = node_it->second;
       }
   }
 
   {
     unsigned cnt=0;
-    std::set<unsigned>::iterator
-      it = this->border_node_ids.begin(),
-      end = this->border_node_ids.end();
-
-    for (; it != end; ++it, ++cnt)
+    for (const auto & id : this->border_node_ids)
       {
-        std::map<int, int>::iterator node_it = libmesh_node_num_to_exodus.find(*it);
+        std::map<int, int>::iterator node_it = libmesh_node_num_to_exodus.find(id);
         if (node_it == libmesh_node_num_to_exodus.end())
-          libmesh_error_msg("Node number " << *it << " not found in libmesh_node_num_to_exodus map.");
-        this->node_mapb[cnt] = node_it->second;
+          libmesh_error_msg("Node number " << id << " not found in libmesh_node_num_to_exodus map.");
+        this->node_mapb[cnt++] = node_it->second;
       }
   }
 }
@@ -1985,7 +1969,6 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
   // Store a map of vectors for boundary node IDs on this processor.
   // Use a vector of int here so it can be passed directly to Exodus.
   std::map<boundary_id_type, std::vector<int>> local_node_boundary_id_lists;
-  typedef std::map<boundary_id_type, std::vector<int>>::iterator local_node_boundary_id_lists_iterator;
 
   // FIXME: We should build this list only one time!!  We already built it above, but we
   // did not have the libmesh to exodus node mapping at that time... for now we'll just
@@ -2075,7 +2058,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
           */
 
           // Try to find this boundary ID in the local list we created
-          local_node_boundary_id_lists_iterator it =
+          auto it =
             local_node_boundary_id_lists.find (cast_int<boundary_id_type>(this->global_nodeset_ids[i]));
 
           // No nodes found for this boundary ID on this processor
@@ -2140,7 +2123,6 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
   // Use a vector of int here so it can be passed directly to Exodus.
   std::map<boundary_id_type, std::vector<int>> local_elem_boundary_id_lists;
   std::map<boundary_id_type, std::vector<int>> local_elem_boundary_id_side_lists;
-  typedef std::map<boundary_id_type, std::vector<int>>::iterator local_elem_boundary_id_lists_iterator;
 
   ExodusII_IO_Helper::ElementMaps em;
 
@@ -2234,7 +2216,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
           */
 
           // Try to find this boundary ID in the local list we created
-          local_elem_boundary_id_lists_iterator it =
+          auto it =
             local_elem_boundary_id_lists.find (cast_int<boundary_id_type>(this->global_sideset_ids[i]));
 
           // No sides found for this boundary ID on this processor
@@ -2256,7 +2238,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
           else // Boundary ID *was* found in list
             {
               // Get iterator to sides vector as well
-              local_elem_boundary_id_lists_iterator it_sides =
+              auto it_sides =
                 local_elem_boundary_id_side_lists.find (cast_int<boundary_id_type>(this->global_sideset_ids[i]));
 
               libmesh_assert (it_sides != local_elem_boundary_id_side_lists.end());
