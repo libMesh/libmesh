@@ -173,15 +173,8 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
 
               // copy the Jacobian data to the gradient array
               for (numeric_index_type i=0; i<m; i++)
-                {
-                  std::set<numeric_index_type>::iterator it = sys.eq_constraint_jac_sparsity[i].begin();
-                  std::set<numeric_index_type>::iterator it_end = sys.eq_constraint_jac_sparsity[i].end();
-                  for ( ; it != it_end; ++it)
-                    {
-                      numeric_index_type dof_index = *it;
-                      gradient[n*i+dof_index] = (*sys.C_eq_jac)(i,dof_index);
-                    }
-                }
+                for (const auto & dof_index : sys.eq_constraint_jac_sparsity[i])
+                  gradient[n*i+dof_index] = (*sys.C_eq_jac)(i,dof_index);
             }
           else
             libmesh_error_msg("Jacobian function not defined in __libmesh_nlopt_equality_constraints");
@@ -260,15 +253,8 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
 
               // copy the Jacobian data to the gradient array
               for (numeric_index_type i=0; i<m; i++)
-                {
-                  std::set<numeric_index_type>::iterator it = sys.ineq_constraint_jac_sparsity[i].begin();
-                  std::set<numeric_index_type>::iterator it_end = sys.ineq_constraint_jac_sparsity[i].end();
-                  for ( ; it != it_end; ++it)
-                    {
-                      numeric_index_type dof_index = *it;
-                      gradient[n*i+dof_index] = (*sys.C_ineq_jac)(i,dof_index);
-                    }
-                }
+                for (const auto & dof_index : sys.ineq_constraint_jac_sparsity[i])
+                  gradient[n*i+dof_index] = (*sys.C_ineq_jac)(i,dof_index);
             }
           else
             libmesh_error_msg("Jacobian function not defined in __libmesh_nlopt_inequality_constraints");
@@ -335,8 +321,7 @@ void NloptOptimizationSolver<T>::init ()
                                                            nlopt_algorithm_name);
 
       // Convert string to an nlopt algorithm type
-      std::map<std::string, nlopt_algorithm>::iterator it =
-        _nlopt_algorithms.find(nlopt_algorithm_name);
+      auto it = _nlopt_algorithms.find(nlopt_algorithm_name);
 
       if (it == _nlopt_algorithms.end())
         libmesh_error_msg("Invalid nlopt algorithm requested on command line: " \
