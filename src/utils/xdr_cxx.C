@@ -534,9 +534,8 @@ bool xdr_translate(XDR * x, std::vector<std::complex<T>> & a)
   unsigned int length = cast_int<unsigned int>(a.size());
   bool b = xdr_u_int(x, &length);
   a.resize(length);
-  typename std::vector<std::complex<T>>::iterator iter = a.begin();
-  for (; iter != a.end(); ++iter)
-    if (!xdr_translate(x, *iter))
+  for (auto & val : a)
+    if (!xdr_translate(x, val))
       b = false;
   return b;
 }
@@ -547,9 +546,8 @@ bool xdr_translate(XDR * x, std::vector<std::string> & s)
   unsigned int length = cast_int<unsigned int>(s.size());
   bool b = xdr_u_int(x, &length);
   s.resize(length);
-  std::vector<std::string>::iterator iter = s.begin();
-  for (; iter != s.end(); ++iter)
-    if (!xdr_translate(x, *iter))
+  for (auto & val : s)
+    if (!xdr_translate(x, val))
       b = false;
   return b;
 }
