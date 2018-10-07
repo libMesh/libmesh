@@ -288,8 +288,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 const unsigned int key = element->key(ms);
 
                 // Look for elements that have an identical side key
-                std::pair <map_type::iterator, map_type::iterator>
-                  bounds = side_to_elem_map.equal_range(key);
+                auto bounds = side_to_elem_map.equal_range(key);
 
                 // May be multiple keys, check all the possible
                 // elements which _might_ be neighbors.
@@ -1152,10 +1151,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
                     adjacent_vertices_ids.end());
 
 
-          // does this set of vertices already has a mid-node added?
-          std::pair<std::map<std::vector<dof_id_type>, Node *>::iterator,
-                    std::map<std::vector<dof_id_type>, Node *>::iterator>
-            pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
+          // does this set of vertices already have a mid-node added?
+          auto pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
 
           // no, not added yet
           if (pos.first == pos.second)
