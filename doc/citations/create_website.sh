@@ -32,11 +32,11 @@ do
 done
 
 # Declare array of year names and numbers.  Zero-based indexing!
-year_names=( libmesh preprints theses eighteen seventeen sixteen fifteen fourteen thirteen twelve eleven ten nine eight seven six five four )
-year_numbers=( 'Please use the following citation to reference libMesh' 'Preprints' 'Dissertations & Theses' 2018 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 )
+year_names=( libmesh preprints theses nineteen eighteen seventeen sixteen fifteen fourteen thirteen twelve eleven ten nine eight seven six five four )
+year_numbers=( 'Please use the following citation to reference libMesh' 'Preprints' 'Dissertations & Theses' 2019 2018 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 )
 link_names=( 'skip me' 'Preprints' 'Dissertations' 'Articles' )
 # The short_numbers are used for making Python strings of the years.
-short_numbers=( 'na' 'na' \'T\' \'\\\'18\' \'\\\'17\' \'\\\'16\' \'\\\'15\' \'\\\'14\' \'\\\'13\' \'\\\'12\' \'\\\'11\' \'\\\'10\' \'\\\'09\' \'\\\'08\' \'\\\'07\' \'\\\'06\' \'\\\'05\' \'\\\'04\')
+short_numbers=( 'na' 'na' \'T\' \'\\\'19\' \'\\\'18\' \'\\\'17\' \'\\\'16\' \'\\\'15\' \'\\\'14\' \'\\\'13\' \'\\\'12\' \'\\\'11\' \'\\\'10\' \'\\\'09\' \'\\\'08\' \'\\\'07\' \'\\\'06\' \'\\\'05\' \'\\\'04\')
 
 # Stores strings to be output in reverse
 output_strings=()
