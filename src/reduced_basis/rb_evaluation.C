@@ -622,18 +622,14 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
         file_name << directory_name << "/greedy_params" << suffix;
         Xdr greedy_params_out(file_name.str(), mode);
 
-        for (std::size_t i=0; i<greedy_param_list.size(); i++)
-          {
-            RBParameters::const_iterator it     = greedy_param_list[i].begin();
-            RBParameters::const_iterator it_end = greedy_param_list[i].end();
-            for ( ; it != it_end; ++it)
-              {
-                // Need to make a copy of the value so that it's not const
-                // Xdr is not templated on const's
-                Real param_value = it->second;
-                greedy_params_out << param_value;
-              }
-          }
+        for (const auto & param : greedy_param_list)
+          for (const auto & pr : param)
+            {
+              // Need to make a copy of the value so that it's not const
+              // Xdr is not templated on const's
+              Real param_value = pr.second;
+              greedy_params_out << param_value;
+            }
         greedy_params_out.close();
       }
 
