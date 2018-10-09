@@ -704,17 +704,12 @@ const Elem * MeshFunction::find_element(const Point & p,
       std::set<const Elem *> point_neighbors;
       element->find_point_neighbors(p, point_neighbors);
       element = nullptr;
-      std::set<const Elem *>::const_iterator       it  = point_neighbors.begin();
-      const std::set<const Elem *>::const_iterator end = point_neighbors.end();
-      for (; it != end; ++it)
-        {
-          const Elem * elem = *it;
+      for (const auto & elem : point_neighbors)
           if (elem->processor_id() == this->processor_id())
             {
               element = elem;
               break;
             }
-        }
     }
 
   return element;
