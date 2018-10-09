@@ -373,14 +373,11 @@ void UCDIO::write_soln(std::ostream & out_stream,
 
   // Now write out variable names and units. Since we don't store units
   // We just write out dummy.
-  {
-    std::vector<std::string>::const_iterator var = names.begin();
-    for (; var != names.end(); ++var)
-      {
-        libmesh_assert (out_stream.good());
-        out_stream << *var << ", dummy" << std::endl;
-      }
-  }
+  for (const auto & name : names)
+    {
+      libmesh_assert (out_stream.good());
+      out_stream << name << ", dummy" << std::endl;
+    }
 
   // Now, for each node, write out the solution variables.
   // We use a 1-based node numbering for UCD.
