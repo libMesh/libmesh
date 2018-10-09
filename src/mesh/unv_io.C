@@ -1293,8 +1293,7 @@ void UNVIO::read_dataset(std::string file_name)
                 } // end loop data_cnt
 
               // Get a pointer to the Node associated with the UNV node id.
-              std::map<dof_id_type, Node *>::const_iterator it =
-                _unv_node_id_to_libmesh_node_ptr.find(f_n_id);
+              auto it = _unv_node_id_to_libmesh_node_ptr.find(f_n_id);
 
               if (it == _unv_node_id_to_libmesh_node_ptr.end())
                 libmesh_error_msg("UNV node id " << f_n_id << " was not found.");
@@ -1314,8 +1313,7 @@ void UNVIO::read_dataset(std::string file_name)
 const std::vector<Number> *
 UNVIO::get_data (Node * node) const
 {
-  std::map<Node *, std::vector<Number>>::const_iterator
-    it = _node_data.find(node);
+  auto it = _node_data.find(node);
 
   if (it == _node_data.end())
     return nullptr;
