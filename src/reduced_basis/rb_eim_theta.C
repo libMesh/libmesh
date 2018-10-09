@@ -39,11 +39,9 @@ Number RBEIMTheta::evaluate(const RBParameters & mu)
       // the parameters from the associated RB problem, hence we need to "pull out"
       // the parameters related to the EIM
       RBParameters mu_eim;
-      RBParameters::const_iterator it     = rb_eim_eval.get_parameters().begin();
-      RBParameters::const_iterator it_end = rb_eim_eval.get_parameters().end();
-      for ( ; it != it_end; ++it)
+      for (const auto & pr : rb_eim_eval.get_parameters())
         {
-          std::string param_name = it->first;
+          const std::string & param_name = pr.first;
           mu_eim.set_value(param_name, mu.get_value(param_name));
         }
       rb_eim_eval.set_parameters(mu_eim);
