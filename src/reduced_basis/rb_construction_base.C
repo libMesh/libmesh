@@ -141,13 +141,10 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
                   (index < this->get_last_local_training_index()) );
 
   RBParameters params;
-  std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it     = training_parameters.begin();
-  std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters.end();
-  for ( ; it != it_end; ++it)
+  for (const auto & pr : training_parameters)
     {
-      const std::string & param_name = it->first;
-      Real param_value = libmesh_real( ( *(it->second) )(index) );
-
+      const std::string & param_name = pr.first;
+      Real param_value = libmesh_real((*(pr.second))(index));
       params.set_value(param_name, param_value);
     }
 
@@ -352,12 +349,9 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
     }
 
   // initialize training_parameters_in
-  {
-    RBParameters::const_iterator it     = min_parameters.begin();
-    RBParameters::const_iterator it_end = min_parameters.end();
-    for ( ; it != it_end; ++it)
+    for (const auto & pr : min_parameters)
       {
-        std::string param_name = it->first;
+        const std::string & param_name = pr.first;
         training_parameters_in[param_name] = NumericVector<Number>::build(communicator);
 
         if (!serial_training_set)
@@ -378,7 +372,6 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
             training_parameters_in[param_name]->init(n_training_samples_in, false, SERIAL);
           }
       }
-  }
 
   // finally, set the values
   for (auto & pr : training_parameters_in)
@@ -517,13 +510,11 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       // make a matrix to store all the parameters, put them in vector form afterwards
       std::vector<std::vector<Real>> training_parameters_matrix(num_params);
 
-      RBParameters::const_iterator it     = min_parameters.begin();
-      RBParameters::const_iterator it_end = min_parameters.end();
       unsigned int i = 0;
-      for ( ; it != it_end; ++it)
+      for (const auto & pr : min_parameters)
         {
-          const std::string & param_name = it->first;
-          Real min_param         = it->second;
+          const std::string & param_name = pr.first;
+          Real min_param = pr.second;
           bool use_log_scaling = log_param_scale[param_name];
           Real max_param = max_parameters.get_value(param_name);
 
@@ -611,23 +602,17 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
   // copy current_parameters to current_parameters_vector in order to broadcast
   std::vector<Real> current_parameters_vector;
 
-  RBParameters::const_iterator it           = current_parameters.begin();
-  RBParameters::const_iterator it_end = current_parameters.end();
-
-  for ( ; it != it_end; ++it)
-    {
-      current_parameters_vector.push_back(it->second);
-    }
+  for (const auto & pr : current_parameters)
+    current_parameters_vector.push_back(pr.second);
 
   // do the broadcast
   this->comm().broadcast(current_parameters_vector, proc_id);
 
   // update the copy of the RBParameters object
-  it = current_parameters.begin();
   unsigned int count = 0;
-  for ( ; it != it_end; ++it)
+  for (const auto & pr : current_parameters)
     {
-      const std::string & param_name = it->first;
+      const std::string & param_name = pr.first;
       current_parameters.set_value(param_name, current_parameters_vector[count]);
       count++;
     }
