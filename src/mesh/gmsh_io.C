@@ -497,7 +497,7 @@ void GmshIO::read_mesh(std::istream & in)
                   // Extract data
                   int phys_id = pr.first;
                   unsigned phys_dim = pr.second.first;
-                  std::string phys_name = pr.second.second;
+                  const std::string & phys_name = pr.second.second;
 
                   // If the physical's dimension matches the largest
                   // dimension we've seen, it's a subdomain name.

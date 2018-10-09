@@ -145,7 +145,7 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
   std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters.end();
   for ( ; it != it_end; ++it)
     {
-      std::string param_name = it->first;
+      const std::string & param_name = it->first;
       Real param_value = libmesh_real( ( *(it->second) )(index) );
 
       params.set_value(param_name, param_value);
@@ -228,7 +228,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
     {
       for (const auto & pr : training_parameters)
         {
-          std::string param_name = pr.first;
+          const std::string & param_name = pr.first;
           if (is_discrete_parameter(param_name))
             {
               std::vector<Real> discrete_values =
@@ -281,7 +281,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
 
   for (auto & pr : training_parameters)
     {
-      std::string param_name = pr.first;
+      const std::string & param_name = pr.first;
       NumericVector<Number> * training_vector = pr.second.get();
 
       numeric_index_type first_index = training_vector->first_local_index();
@@ -383,7 +383,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
   // finally, set the values
   for (auto & pr : training_parameters_in)
     {
-      std::string param_name = pr.first;
+      const std::string & param_name = pr.first;
       NumericVector<Number> * training_vector = pr.second.get();
 
       numeric_index_type first_index = training_vector->first_local_index();
@@ -439,7 +439,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
   // Initialize training_parameters_in
     for (const auto & pr : min_parameters)
       {
-        std::string param_name = pr.first;
+        const std::string & param_name = pr.first;
         training_parameters_in[param_name] = NumericVector<Number>::build(communicator);
 
         if (!serial_training_set)
@@ -522,7 +522,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       unsigned int i = 0;
       for ( ; it != it_end; ++it)
         {
-          std::string param_name = it->first;
+          const std::string & param_name = it->first;
           Real min_param         = it->second;
           bool use_log_scaling = log_param_scale[param_name];
           Real max_param = max_parameters.get_value(param_name);
@@ -627,7 +627,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
   unsigned int count = 0;
   for ( ; it != it_end; ++it)
     {
-      std::string param_name = it->first;
+      const std::string & param_name = it->first;
       current_parameters.set_value(param_name, current_parameters_vector[count]);
       count++;
     }

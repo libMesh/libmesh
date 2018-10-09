@@ -1044,8 +1044,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
               // Find the unique index for elem->subdomain_id(), print that to file
               auto map_iter = sbdid_map.find(elem->subdomain_id());
 
-              if (map_iter == sbdid_map.end())
-                libmesh_error_msg("Entry for subdomain " << elem->subdomain_id() << " not found.");
+              libmesh_assert_msg(map_iter != sbdid_map.end(), "Entry for subdomain " << elem->subdomain_id() << " not found.");
 
               unsigned gmv_mat_number = (*map_iter).second;
 
@@ -2157,7 +2156,6 @@ ElemType GMVIO::gmv_elem_to_libmesh_elem(std::string elemname)
   // Look up the string in our string->ElemType name.
   auto it = _reading_element_map.find(elemname);
 
-  // Look up the string in our string->ElemType name.
   if (it == _reading_element_map.end())
     libmesh_error_msg("Unknown/unsupported element: " << elemname << " was read.");
 
@@ -2199,7 +2197,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
       // that var in the system
       for (const auto & pr : _nodal_data)
         {
-          std::string var_name = pr.first;
+          const std::string & var_name = pr.first;
 
           if (system.has_variable(var_name))
             {
