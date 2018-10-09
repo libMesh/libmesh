@@ -310,9 +310,6 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                 std::vector<const Node *> neighbors;
                 MeshTools::find_nodal_neighbors(_mesh, node_ref, nodes_to_elem_map, neighbors);
 
-                std::vector<const Node *>::const_iterator ne = neighbors.begin();
-                std::vector<const Node *>::const_iterator ne_end = neighbors.end();
-
                 // Grab the x,y coordinates
                 Real x = node_ref(0);
                 Real y = node_ref(1);
@@ -323,13 +320,11 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                 std::vector<Real> thetas;
 
                 // Calculate the thetas
-                for (; ne != ne_end; ne++)
+                for (const auto & neighbor : neighbors)
                   {
-                    const Node & neighbor = *(*ne);
-
                     // Note that the x and y values of this node are subtracted off
                     // this centers the system around this node
-                    theta = atan2(neighbor(1)-y, neighbor(0)-x);
+                    theta = atan2((*neighbor)(1)-y, (*neighbor)(0)-x);
 
                     // Save it for later
                     thetas.push_back(theta);
