@@ -329,14 +329,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           //------------------------------------------------------
           // Loop over each element in the patch and compute their
           // contribution to the patch gradient projection.
-          Patch::const_iterator        patch_it  = patch.begin();
-          const Patch::const_iterator  patch_end = patch.end();
-
-          for (; patch_it != patch_end; ++patch_it)
+          for (const auto & e_p : patch)
             {
-              // The pth element in the patch
-              const Elem * e_p = *patch_it;
-
               // Reinitialize the finite element data for this element
               fe->reinit (e_p);
 
