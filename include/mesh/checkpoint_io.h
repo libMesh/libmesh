@@ -214,13 +214,15 @@ private:
    * Write the side boundary conditions for part of a mesh
    */
   void write_bcs (Xdr & io,
-                  const std::set<const Elem *, CompareElemIdsByLevel> & elements) const;
+                  const std::set<const Elem *, CompareElemIdsByLevel> & elements,
+                  const std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> & bc_triples) const;
 
   /**
    * Write the nodal boundary conditions for part of a mesh
    */
   void write_nodesets (Xdr & io,
-                       const std::set<const Node *> & nodeset) const;
+                       const std::set<const Node *> & nodeset,
+                       const std::vector<std::tuple<dof_id_type, boundary_id_type>> & bc_tuples) const;
 
   /**
    * Write boundary names information (sideset and nodeset)
