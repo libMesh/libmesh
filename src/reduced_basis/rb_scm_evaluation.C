@@ -417,17 +417,13 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       Xdr C_J_out(file_name.str(), mode);
 
       for (std::size_t i=0; i<C_J.size(); i++)
-        {
-          RBParameters::const_iterator it     = C_J[i].begin();
-          RBParameters::const_iterator it_end = C_J[i].end();
-          for ( ; it != it_end; ++it)
-            {
-              // Need to make a copy of the value so that it's not const
-              // Xdr is not templated on const's
-              Real param_value = it->second;
-              C_J_out << param_value;
-            }
-        }
+        for (const auto & pr : C_J[i])
+          {
+            // Need to make a copy of the value so that it's not const
+            // Xdr is not templated on const's
+            Real param_value = pr.second;
+            C_J_out << param_value;
+          }
       C_J_out.close();
 
       // Write out SCM_UB_vectors get_SCM_UB_vector
@@ -534,17 +530,13 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
   // Resize C_J based on C_J_stability_vector and Q_a
   C_J.resize( C_J_length );
   for (std::size_t i=0; i<C_J.size(); i++)
-    {
-      RBParameters::const_iterator it     = get_parameters().begin();
-      RBParameters::const_iterator it_end = get_parameters().end();
-      for ( ; it != it_end; ++it)
-        {
-          std::string param_name = it->first;
-          Real param_value;
-          C_J_in >> param_value;
-          C_J[i].set_value(param_name, param_value);
-        }
-    }
+    for (const auto & pr : get_parameters())
+      {
+        std::string param_name = pr.first;
+        Real param_value;
+        C_J_in >> param_value;
+        C_J[i].set_value(param_name, param_value);
+      }
   C_J_in.close();
 
 
