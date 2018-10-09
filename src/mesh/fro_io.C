@@ -192,8 +192,8 @@ void FroIO::write (const std::string & fname)
 
             out_stream << ++bc_id << " " << node_list.size() << '\n';
 
-            for (const auto & id : node_list)
-              out_stream << id + 1 << " \t0\n";
+            for (const auto & node_id : node_list)
+              out_stream << node_id + 1 << " \t0\n";
           }
       }
     }
