@@ -454,15 +454,9 @@ bool Elem::is_semilocal(const processor_id_type my_pid) const
 
   this->find_point_neighbors(point_neighbors);
 
-  std::set<const Elem *>::const_iterator       it  = point_neighbors.begin();
-  const std::set<const Elem *>::const_iterator end = point_neighbors.end();
-
-  for (; it != end; ++it)
-    {
-      const Elem * elem = *it;
-      if (elem->processor_id() == my_pid)
-        return true;
-    }
+  for (const auto & elem : point_neighbors)
+    if (elem->processor_id() == my_pid)
+      return true;
 
   return false;
 }
@@ -517,13 +511,7 @@ void Elem::find_point_neighbors(const Point & p,
     {
       // Loop over all the elements in the patch that haven't already
       // been tested
-      std::set<const Elem *>::const_iterator       it  = untested_set.begin();
-      const std::set<const Elem *>::const_iterator end = untested_set.end();
-
-      for (; it != end; ++it)
-        {
-          const Elem * elem = *it;
-
+      for (const auto & elem : untested_set)
           for (auto current_neighbor : elem->neighbor_ptr_range())
             {
               if (current_neighbor &&
@@ -550,13 +538,7 @@ void Elem::find_point_neighbors(const Point & p,
                       current_neighbor->active_family_tree_by_neighbor
                         (active_neighbor_children, elem);
 
-                      std::vector<const Elem *>::const_iterator
-                        child_it = active_neighbor_children.begin();
-                      const std::vector<const Elem *>::const_iterator
-                        child_end = active_neighbor_children.end();
-                      for (; child_it != child_end; ++child_it)
-                        {
-                          const Elem * current_child = *child_it;
+                      for (const auto & current_child : active_neighbor_children)
                           if (current_child->contains_point(p))
                             {
                               // Make sure we'll test it
@@ -565,12 +547,10 @@ void Elem::find_point_neighbors(const Point & p,
 
                               neighbor_set.insert (current_child);
                             }
-                        }
                     }
 #endif // #ifdef LIBMESH_ENABLE_AMR
                 }
             }
-        }
       untested_set.swap(next_untested_set);
       next_untested_set.clear();
     }
@@ -603,13 +583,7 @@ void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set,
     {
       // Loop over all the elements in the patch that haven't already
       // been tested
-      std::set<const Elem *>::const_iterator       it  = untested_set.begin();
-      const std::set<const Elem *>::const_iterator end = untested_set.end();
-
-      for (; it != end; ++it)
-        {
-          const Elem * elem = *it;
-
+      for (const auto & elem : untested_set)
           for (auto current_neighbor : elem->neighbor_ptr_range())
             {
               if (current_neighbor &&
@@ -637,13 +611,8 @@ void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set,
                       current_neighbor->active_family_tree_by_neighbor
                         (active_neighbor_children, elem);
 
-                      std::vector<const Elem *>::const_iterator
-                        child_it = active_neighbor_children.begin();
-                      const std::vector<const Elem *>::const_iterator
-                        child_end = active_neighbor_children.end();
-                      for (; child_it != child_end; ++child_it)
+                      for (const auto & current_child : active_neighbor_children)
                         {
-                          const Elem * current_child = *child_it;
                           if (this->contains_vertex_of(current_child) ||
                               (current_child)->contains_vertex_of(this))
                             {
@@ -658,7 +627,6 @@ void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set,
 #endif // #ifdef LIBMESH_ENABLE_AMR
                 }
             }
-        }
       untested_set.swap(next_untested_set);
       next_untested_set.clear();
     }
