@@ -55,31 +55,15 @@ CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & gl
       local_non_condensed_dofs_set.insert(i);
 
   // Now erase the condensed dofs
-  std::set<dof_id_type>::iterator iter     = global_dirichlet_dofs_set.begin();
-  std::set<dof_id_type>::iterator iter_end = global_dirichlet_dofs_set.end();
-
-  for ( ; iter != iter_end ; ++iter)
-    {
-      dof_id_type condensed_dof_index = *iter;
-      if ( (this->get_dof_map().first_dof() <= condensed_dof_index) &&
-           (condensed_dof_index < this->get_dof_map().end_dof()) )
-        {
-          local_non_condensed_dofs_set.erase(condensed_dof_index);
-        }
-    }
+  for (const auto & dof : global_dirichlet_dofs_set)
+    if ((this->get_dof_map().first_dof() <= dof) && (dof < this->get_dof_map().end_dof()))
+      local_non_condensed_dofs_set.erase(dof);
 
   // Finally, move local_non_condensed_dofs_set over to a vector for convenience in solve()
-  iter     = local_non_condensed_dofs_set.begin();
-  iter_end = local_non_condensed_dofs_set.end();
-
   this->local_non_condensed_dofs_vector.clear();
 
-  for ( ; iter != iter_end; ++iter)
-    {
-      dof_id_type non_condensed_dof_index = *iter;
-
-      this->local_non_condensed_dofs_vector.push_back(non_condensed_dof_index);
-    }
+  for (const auto & dof : local_non_condensed_dofs_set)
+    this->local_non_condensed_dofs_vector.push_back(dof);
 
   condensed_dofs_initialized = true;
 }

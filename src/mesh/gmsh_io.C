@@ -364,7 +364,7 @@ void GmshIO::read_mesh(std::istream & in)
                     }
 
                   // Consult the import element table to determine which element to build
-                  std::map<unsigned int, GmshIO::ElementDefinition>::iterator eletypes_it = _element_maps.in.find(type);
+                  auto eletypes_it = _element_maps.in.find(type);
 
                   // Make sure we actually found something
                   if (eletypes_it == _element_maps.in.end())
@@ -492,27 +492,24 @@ void GmshIO::read_mesh(std::istream & in)
               // Now that we know the maximum element dimension seen,
               // we know whether the physical names are subdomain
               // names or sideset names.
-              {
-                std::map<int, GmshPhysical>::iterator it = gmsh_physicals.begin();
-                for (; it != gmsh_physicals.end(); ++it)
-                  {
-                    // Extract data
-                    int phys_id = it->first;
-                    unsigned phys_dim = it->second.first;
-                    std::string phys_name = it->second.second;
+              for (const auto & pr : gmsh_physicals)
+                {
+                  // Extract data
+                  int phys_id = pr.first;
+                  unsigned phys_dim = pr.second.first;
+                  const std::string & phys_name = pr.second.second;
 
-                    // If the physical's dimension matches the largest
-                    // dimension we've seen, it's a subdomain name.
-                    if (phys_dim == max_elem_dimension_seen)
-                      mesh.subdomain_name(cast_int<subdomain_id_type>(phys_id)) = phys_name;
+                  // If the physical's dimension matches the largest
+                  // dimension we've seen, it's a subdomain name.
+                  if (phys_dim == max_elem_dimension_seen)
+                    mesh.subdomain_name(cast_int<subdomain_id_type>(phys_id)) = phys_name;
 
-                    // Otherwise, if it's not a lower-dimensional
-                    // block, it's a sideset name.
-                    else if (phys_dim < max_elem_dimension_seen &&
-                             !lower_dimensional_blocks.count(cast_int<boundary_id_type>(phys_id)))
-                      mesh.get_boundary_info().sideset_name(cast_int<boundary_id_type>(phys_id)) = phys_name;
-                  }
-              }
+                  // Otherwise, if it's not a lower-dimensional
+                  // block, it's a sideset name.
+                  else if (phys_dim < max_elem_dimension_seen &&
+                           !lower_dimensional_blocks.count(cast_int<boundary_id_type>(phys_id)))
+                    mesh.get_boundary_info().sideset_name(cast_int<boundary_id_type>(phys_id)) = phys_name;
+                }
 
               if (n_dims_seen > 1)
                 {
@@ -686,8 +683,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
         libmesh_assert (_element_maps.out.count(elem->type()));
 
         // consult the export element table
-        std::map<ElemType, ElementDefinition>::iterator def_it =
-          _element_maps.out.find(elem->type());
+        auto def_it = _element_maps.out.find(elem->type());
 
         // Assert that we found it
         if (def_it == _element_maps.out.end())
@@ -751,8 +747,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
             std::unique_ptr<const Elem> side = elem.build_side_ptr(std::get<1>(t));
 
             // Map from libmesh elem type to gmsh elem type.
-            std::map<ElemType, ElementDefinition>::iterator def_it =
-              _element_maps.out.find(side->type());
+            auto def_it = _element_maps.out.find(side->type());
 
             // If we didn't find it, that's an error
             if (def_it == _element_maps.out.end())

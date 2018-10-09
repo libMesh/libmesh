@@ -167,8 +167,7 @@ void FroIO::write (const std::string & fname)
 
                 // look for front_pair in the backward_edges list
                 {
-                  std::map<dof_id_type, dof_id_type>::iterator
-                    pos = backward_edges.find(front_node);
+                  auto pos = backward_edges.find(front_node);
 
                   if (pos != backward_edges.end())
                     {
@@ -180,8 +179,7 @@ void FroIO::write (const std::string & fname)
 
                 // look for back_pair in the forward_edges list
                 {
-                  std::map<dof_id_type, dof_id_type>::iterator
-                    pos = forward_edges.find(back_node);
+                  auto pos = forward_edges.find(back_node);
 
                   if (pos != forward_edges.end())
                     {
@@ -190,17 +188,12 @@ void FroIO::write (const std::string & fname)
                       forward_edges.erase(pos);
                     }
                 }
-
-                // libMesh::out << "node_list.size()=" << node_list.size()
-                //       << ", n_edges+1=" << n_edges+1 << std::endl;
               }
-
 
             out_stream << ++bc_id << " " << node_list.size() << '\n';
 
-            std::deque<dof_id_type>::iterator pos = node_list.begin();
-            for ( ; pos != node_list.end(); ++pos)
-              out_stream << *pos+1 << " \t0\n";
+            for (const auto & node_id : node_list)
+              out_stream << node_id + 1 << " \t0\n";
           }
       }
     }

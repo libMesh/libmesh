@@ -3855,18 +3855,16 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   // Each ghost-coupled element's owner should get a request for its dofs
   std::set<dof_id_type> requested_dofs;
 
-  GhostingFunctor::map_type::iterator        etg_it = elements_to_couple.begin();
-  const GhostingFunctor::map_type::iterator etg_end = elements_to_couple.end();
-  for (; etg_it != etg_end; ++etg_it)
+  for (const auto & pr : elements_to_couple)
     {
-      const Elem *elem = etg_it->first;
+      const Elem * elem = pr.first;
 
       // FIXME - optimize for the non-fully-coupled case?
       std::vector<dof_id_type> element_dofs;
       this->dof_indices(elem, element_dofs);
 
-      for (std::size_t i=0; i != element_dofs.size(); ++i)
-        requested_dofs.insert(element_dofs[i]);
+      for (auto dof : element_dofs)
+        requested_dofs.insert(dof);
     }
 
   this->gather_constraints(mesh, requested_dofs, false);
@@ -4326,19 +4324,13 @@ DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
 void DofMap::remove_dirichlet_boundary (const DirichletBoundary & boundary_to_remove)
 {
   // Find a boundary condition matching the one to be removed
-  std::vector<DirichletBoundary *>::iterator it = _dirichlet_boundaries->begin();
-  std::vector<DirichletBoundary *>::iterator end = _dirichlet_boundaries->end();
-  for (; it != end; ++it)
-    {
-      DirichletBoundary * bdy = *it;
+  auto lam = [&boundary_to_remove](const DirichletBoundary * bdy)
+    {return bdy->b == boundary_to_remove.b && bdy->variables == boundary_to_remove.variables;};
 
-      if ((bdy->b == boundary_to_remove.b) &&
-          bdy->variables == boundary_to_remove.variables)
-        break;
-    }
+  auto it = std::find_if(_dirichlet_boundaries->begin(), _dirichlet_boundaries->end(), lam);
 
   // Delete it and remove it
-  libmesh_assert (it != end);
+  libmesh_assert (it != _dirichlet_boundaries->end());
   delete *it;
   _dirichlet_boundaries->erase(it);
 }
@@ -4350,22 +4342,15 @@ void DofMap::remove_adjoint_dirichlet_boundary (const DirichletBoundary & bounda
   libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),
                          qoi_index);
 
-  // Find a boundary condition matching the one to be removed
-  std::vector<DirichletBoundary *>::iterator it =
-    _adjoint_dirichlet_boundaries[qoi_index]->begin();
-  std::vector<DirichletBoundary *>::iterator end =
-    _adjoint_dirichlet_boundaries[qoi_index]->end();
-  for (; it != end; ++it)
-    {
-      DirichletBoundary * bdy = *it;
+  auto lam = [&boundary_to_remove](const DirichletBoundary * bdy)
+    {return bdy->b == boundary_to_remove.b && bdy->variables == boundary_to_remove.variables;};
 
-      if ((bdy->b == boundary_to_remove.b) &&
-          bdy->variables == boundary_to_remove.variables)
-        break;
-    }
+  auto it = std::find_if(_adjoint_dirichlet_boundaries[qoi_index]->begin(),
+                         _adjoint_dirichlet_boundaries[qoi_index]->end(),
+                         lam);
 
   // Delete it and remove it
-  libmesh_assert (it != end);
+  libmesh_assert (it != _adjoint_dirichlet_boundaries[qoi_index]->end());
   delete *it;
   _adjoint_dirichlet_boundaries[qoi_index]->erase(it);
 }

@@ -257,49 +257,45 @@ void Build::operator()(const ConstElemRange & range)
           this->sorted_connected_dofs(elem, element_dofs_i[vi], vi);
 
         for (unsigned int vi=0; vi<n_var; vi++)
-          {
-            GhostingFunctor::map_type::iterator        etg_it = elements_to_couple.begin();
-            const GhostingFunctor::map_type::iterator etg_end = elements_to_couple.end();
-            for (; etg_it != etg_end; ++etg_it)
-              {
-                const Elem * const partner = etg_it->first;
-                const CouplingMatrix * ghost_coupling = etg_it->second;
+          for (const auto & pr : elements_to_couple)
+            {
+              const Elem * const partner = pr.first;
+              const CouplingMatrix * ghost_coupling = pr.second;
 
-                // Loop over coupling matrix row variables if we have a
-                // coupling matrix, or all variables if not.
-                if (ghost_coupling)
-                  {
-                    libmesh_assert_equal_to (ghost_coupling->size(), n_var);
-                    ConstCouplingRow ccr(vi, *ghost_coupling);
+              // Loop over coupling matrix row variables if we have a
+              // coupling matrix, or all variables if not.
+              if (ghost_coupling)
+                {
+                  libmesh_assert_equal_to (ghost_coupling->size(), n_var);
+                  ConstCouplingRow ccr(vi, *ghost_coupling);
 
-                    for (const auto & idx : ccr)
-                      {
-                        if (partner == elem)
-                          this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[idx]);
-                        else
-                          {
-                            std::vector<dof_id_type> partner_dofs;
-                            this->sorted_connected_dofs(partner, partner_dofs, idx);
-                            this->handle_vi_vj(element_dofs_i[vi], partner_dofs);
-                          }
-                      }
-                  }
-                else
-                  {
-                    for (unsigned int vj = 0; vj != n_var; ++vj)
-                      {
-                        if (partner == elem)
-                          this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[vj]);
-                        else
-                          {
-                            std::vector<dof_id_type> partner_dofs;
-                            this->sorted_connected_dofs(partner, partner_dofs, vj);
-                            this->handle_vi_vj(element_dofs_i[vi], partner_dofs);
-                          }
-                      }
-                  }
-              } // End ghosted element loop
-          } // End vi loop
+                  for (const auto & idx : ccr)
+                    {
+                      if (partner == elem)
+                        this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[idx]);
+                      else
+                        {
+                          std::vector<dof_id_type> partner_dofs;
+                          this->sorted_connected_dofs(partner, partner_dofs, idx);
+                          this->handle_vi_vj(element_dofs_i[vi], partner_dofs);
+                        }
+                    }
+                }
+              else
+                {
+                  for (unsigned int vj = 0; vj != n_var; ++vj)
+                    {
+                      if (partner == elem)
+                        this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[vj]);
+                      else
+                        {
+                          std::vector<dof_id_type> partner_dofs;
+                          this->sorted_connected_dofs(partner, partner_dofs, vj);
+                          this->handle_vi_vj(element_dofs_i[vi], partner_dofs);
+                        }
+                    }
+                }
+            } // End ghosted element loop
 
         for (auto & mat : temporary_coupling_matrices)
           delete mat;

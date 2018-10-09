@@ -969,9 +969,8 @@ void Partitioner::build_graph (const MeshBase & mesh)
       std::set<const Elem *> neighbor_set;
       elem->find_interior_neighbors(neighbor_set);
 
-      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-      for (; n_it != neighbor_set.end(); ++n_it)
-        interior_to_boundary_map.insert(std::make_pair(*n_it, elem));
+      for (const auto & neighbor : neighbor_set)
+        interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
     }
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -1086,13 +1085,8 @@ void Partitioner::build_graph (const MeshBase & mesh)
           std::set<const Elem *> neighbor_set;
           elem->find_interior_neighbors(neighbor_set);
 
-          std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-          for (; n_it != neighbor_set.end(); ++n_it)
+          for (const auto & neighbor : neighbor_set)
             {
-              // FIXME - non-const versions of the Elem set methods
-              // would be nice
-              Elem * neighbor = const_cast<Elem *>(*n_it);
-
               const dof_id_type neighbor_global_index_by_pid =
                 _global_index_by_pid_map[neighbor->id()];
 

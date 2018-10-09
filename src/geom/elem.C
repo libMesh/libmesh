@@ -682,13 +682,12 @@ void Elem::find_edge_neighbors(const Point & p1,
 
   while (it != end)
     {
-      std::set<const Elem *>::iterator current = it++;
-
-      const Elem * elem = *current;
-      // This won't invalidate iterator it, because it is already
-      // pointing to the next element
-      if (!elem->contains_point(p2))
-        neighbor_set.erase(current);
+      // As of C++11, set::erase returns an iterator to the element
+      // following the erased element, or end.
+      if (!(*it)->contains_point(p2))
+        it = neighbor_set.erase(it);
+      else
+        ++it;
     }
 }
 
@@ -706,13 +705,8 @@ void Elem::find_edge_neighbors(std::set<const Elem *> & neighbor_set) const
     {
       // Loop over all the elements in the patch that haven't already
       // been tested
-      std::set<const Elem *>::const_iterator       it  = untested_set.begin();
-      const std::set<const Elem *>::const_iterator end = untested_set.end();
-
-      for (; it != end; ++it)
+      for (const auto & elem : untested_set)
         {
-          const Elem * elem = *it;
-
           for (auto current_neighbor : elem->neighbor_ptr_range())
             {
               if (current_neighbor &&
@@ -740,23 +734,15 @@ void Elem::find_edge_neighbors(std::set<const Elem *> & neighbor_set) const
                       current_neighbor->active_family_tree_by_neighbor
                         (active_neighbor_children, elem);
 
-                      std::vector<const Elem *>::const_iterator
-                        child_it = active_neighbor_children.begin();
-                      const std::vector<const Elem *>::const_iterator
-                        child_end = active_neighbor_children.end();
-                      for (; child_it != child_end; ++child_it)
-                        {
-                          const Elem * current_child = *child_it;
-                          if (this->contains_edge_of(*child_it) ||
-                              (*child_it)->contains_edge_of(this))
-                            {
-                              // Make sure we'll test it
-                              if (!neighbor_set.count(current_child))
-                                next_untested_set.insert (current_child);
+                      for (const auto & current_child : active_neighbor_children)
+                        if (this->contains_edge_of(current_child) || current_child->contains_edge_of(this))
+                          {
+                            // Make sure we'll test it
+                            if (!neighbor_set.count(current_child))
+                              next_untested_set.insert (current_child);
 
-                              neighbor_set.insert (current_child);
-                            }
-                        }
+                            neighbor_set.insert (current_child);
+                          }
                     }
 #endif // #ifdef LIBMESH_ENABLE_AMR
                 }

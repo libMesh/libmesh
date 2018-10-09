@@ -242,13 +242,8 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
   // really did get inserted.  I screwed this up the first time
   // by caching rend, and I can easily imagine screwing it up in
   // the future by changing containers.
-  std::set<const Elem *, CompareElemIdsByLevel>::iterator
-    elem_it  = connected_elements.begin(),
-    elem_end = connected_elements.end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (const auto & elem : connected_elements)
     {
-      const Elem * elem = *elem_it;
       libmesh_assert(elem);
       const Elem * parent = elem->parent();
       if (parent)
@@ -267,17 +262,9 @@ void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & conn
   // let's reuse it for nodes of the elements we've decided on.
   connected_nodes.clear();
 
-  std::set<const Elem *, CompareElemIdsByLevel>::iterator
-    elem_it  = connected_elements.begin(),
-    elem_end = connected_elements.end();
-
-  for (; elem_it!=elem_end; ++elem_it)
-    {
-      const Elem * elem = *elem_it;
-
-      for (auto & n : elem->node_ref_range())
-        connected_nodes.insert(&n);
-    }
+  for (const auto & elem : connected_elements)
+    for (auto & n : elem->node_ref_range())
+      connected_nodes.insert(&n);
 }
 
 
@@ -541,14 +528,8 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   // We now have all elements and nodes redistributed; our ghosting
   // functors should be ready to redistribute and/or recompute any
   // cached data they use too.
-  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
-  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
-  for (; gf_it != gf_end; ++gf_it)
-    {
-      GhostingFunctor * gf = *gf_it;
-      gf->redistribute();
-    }
-
+  for (auto & gf : as_range(mesh.ghosting_functors_begin(), mesh.ghosting_functors_end()))
+    gf->redistribute();
 }
 #endif // LIBMESH_HAVE_MPI
 
@@ -1956,13 +1937,8 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // We now have all remote elements and nodes deleted; our ghosting
   // functors should be ready to delete any now-redundant cached data
   // they use too.
-  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
-  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
-  for (; gf_it != gf_end; ++gf_it)
-    {
-      GhostingFunctor *gf = *gf_it;
-      gf->delete_remote_elements();
-    }
+  for (auto & gf : as_range(mesh.ghosting_functors_begin(), mesh.ghosting_functors_end()))
+    gf->delete_remote_elements();
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);

@@ -486,9 +486,7 @@ void UNVIO::groups_in (std::istream & in_file)
                            << std::endl;
 
             // Try to find this ID in the map from UNV element ids to libmesh ids.
-            std::map<unsigned, unsigned>::iterator it =
-              _unv_elem_id_to_libmesh_elem_id.find(entity_tag);
-
+            auto it = _unv_elem_id_to_libmesh_elem_id.find(entity_tag);
             if (it != _unv_elem_id_to_libmesh_elem_id.end())
               {
                 unsigned libmesh_elem_id = it->second;
@@ -832,9 +830,7 @@ void UNVIO::elements_in (std::istream & in_file)
       for (dof_id_type j=1; j<=n_nodes; j++)
         {
           // Map the UNV node ID to the libmesh node ID
-          std::map<dof_id_type, Node *>::iterator it =
-            _unv_node_id_to_libmesh_node_ptr.find(node_labels[j]);
-
+          auto it = _unv_node_id_to_libmesh_node_ptr.find(node_labels[j]);
           if (it != _unv_node_id_to_libmesh_node_ptr.end())
             elem->set_node(assign_elem_nodes[j]) = it->second;
           else

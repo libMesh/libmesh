@@ -573,11 +573,8 @@ bool MeshRefinement::enforce_mismatch_limit_prior_to_refinement(Elem * elem,
         libmesh_error_msg("Unrecognized NeighborType: " << nt);
 
       // Loop over the neighbors of element e
-      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-      for (; n_it != neighbor_set.end(); ++n_it)
+      for (const auto & neighbor : neighbor_set)
         {
-          const Elem * neighbor = *n_it;
-
           if ((elem->level() + 1 - max_mismatch) > neighbor->level())
             {
               elem->set_refinement_flag(Elem::DO_NOTHING);

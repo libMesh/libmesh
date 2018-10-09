@@ -462,15 +462,12 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
   // optionally write cell-centered data
   if (!(this->_cell_centered_data.empty()))
     {
-      std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
-      const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
-
-      for (; it != end; ++it)
+      for (auto & pr : this->_cell_centered_data)
         {
           // write out the variable name, followed by a zero.
-          out_stream << (*it).first << " 0\n";
+          out_stream << pr.first << " 0\n";
 
-          const std::vector<Real> * the_array = (*it).second;
+          const std::vector<Real> * the_array = pr.second;
 
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
@@ -1022,7 +1019,6 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           // user-selected subdomain ID a unique, contiguous unsigned value
           // which we can write to file.
           std::map<subdomain_id_type, unsigned> sbdid_map;
-          typedef std::map<subdomain_id_type, unsigned>::iterator sbdid_map_iter;
 
           // Try to insert with dummy value
           for (const auto & elem : mesh.active_element_ptr_range())
@@ -1046,7 +1042,10 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           for (const auto & elem : mesh.active_element_ptr_range())
             {
               // Find the unique index for elem->subdomain_id(), print that to file
-              sbdid_map_iter map_iter = sbdid_map.find( elem->subdomain_id() );
+              auto map_iter = sbdid_map.find(elem->subdomain_id());
+
+              libmesh_assert_msg(map_iter != sbdid_map.end(), "Entry for subdomain " << elem->subdomain_id() << " not found.");
+
               unsigned gmv_mat_number = (*map_iter).second;
 
               if (this->subdivide_second_order())
@@ -1121,15 +1120,12 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
   // optionally write cell-centered data
   if (!(this->_cell_centered_data.empty()))
     {
-      std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
-      const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
-
-      for (; it != end; ++it)
+      for (const auto & pr : this->_cell_centered_data)
         {
           // write out the variable name, followed by a zero.
-          out_stream << (*it).first << " 0\n";
+          out_stream << pr.first << " 0\n";
 
-          const std::vector<Real> * the_array = (*it).second;
+          const std::vector<Real> * the_array = pr.second;
 
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
@@ -1138,7 +1134,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
             {
               // Use the element's ID to find the value...
               libmesh_assert_less (elem->id(), the_array->size());
-              const Real the_value = the_array->operator[](elem->id());
+              const Real the_value = (*the_array)[elem->id()];
 
               if (this->subdivide_second_order())
                 for (unsigned int se=0; se < elem->n_sub_elem(); se++)
@@ -1336,9 +1332,6 @@ void GMVIO::write_binary (const std::string & fname,
         // Append whitespaces until the string is exactly 8 characters long.
         while (buffer.size() < 8)
           buffer.insert(buffer.end(), ' ');
-
-        // Debugging:
-        // libMesh::out << "Writing element with name = '" << buffer << "'" << std::endl;
 
         // Finally, write the 8 character stream to file.
         out_stream.write(buffer.c_str(), buffer.size());
@@ -1945,8 +1938,6 @@ void GMVIO::read (const std::string & name)
         {
         case NODES:
           {
-            //libMesh::out << "Reading nodes." << std::endl;
-
             if (GMVLib::gmv_data.num2 == NODES)
               this->_read_nodes();
 
@@ -1959,7 +1950,6 @@ void GMVIO::read (const std::string & name)
         case CELLS:
           {
             // Read 1 cell at a time
-            // libMesh::out << "\nReading one cell." << std::endl;
             this->_read_one_cell();
             break;
           }
@@ -1981,14 +1971,11 @@ void GMVIO::read (const std::string & name)
             // Check to see if we're done reading variables and break out.
             if (GMVLib::gmv_data.datatype == ENDKEYWORD)
               {
-                // libMesh::out << "Done reading GMV variables." << std::endl;
                 break;
               }
 
             if (GMVLib::gmv_data.datatype == NODE)
               {
-                // libMesh::out << "Reading node field data for variable "
-                //   << GMVLib::gmv_data.name1 << std::endl;
                 this->_read_var();
                 break;
               }
@@ -2061,35 +2048,16 @@ void GMVIO::_read_materials()
   // LibMesh assigns materials on a per-cell basis
   libmesh_assert_equal_to (GMVLib::gmv_data.datatype, CELL);
 
-  //   // Material names: LibMesh has no use for these currently...
-  //   libMesh::out << "Number of material names="
-  //     << GMVLib::gmv_data.num
-  //     << std::endl;
-
-  //   for (int i = 0; i < GMVLib::gmv_data.num; i++)
-  //     {
-  //       // Build a 32-char string from the appropriate entries
-  //       std::string mat_string(&GMVLib::gmv_data.chardata1[i*33], 32);
-
-  //       libMesh::out << "Material name " << i << ": " << mat_string << std::endl;
-  //     }
-
-  //   // Material labels: These correspond to (1-based) CPU IDs, and
-  //   // there should be 1 of these for each element.
-  //   libMesh::out << "Number of material labels = "
-  //     << GMVLib::gmv_data.nlongdata1
-  //     << std::endl;
+  // Material names: LibMesh has no use for these currently...
+  // for (int i = 0; i < GMVLib::gmv_data.num; i++)
+  //   {
+  //     // Build a 32-char string from the appropriate entries
+  //     std::string mat_string(&GMVLib::gmv_data.chardata1[i*33], 32);
+  //   }
 
   for (int i = 0; i < GMVLib::gmv_data.nlongdata1; i++)
-    {
-      // Debugging Info
-      // libMesh::out << "Material ID " << i << ": "
-      // << GMVLib::gmv_data.longdata1[i]
-      // << std::endl;
-
-      MeshInput<MeshBase>::mesh().elem_ref(i).processor_id() =
-        cast_int<processor_id_type>(GMVLib::gmv_data.longdata1[i]-1);
-    }
+    MeshInput<MeshBase>::mesh().elem_ref(i).processor_id() =
+      cast_int<processor_id_type>(GMVLib::gmv_data.longdata1[i]-1);
 
 #endif
 }
@@ -2100,9 +2068,6 @@ void GMVIO::_read_materials()
 void GMVIO::_read_nodes()
 {
 #ifdef LIBMESH_HAVE_GMV
-  // Debugging
-  // libMesh::out << "gmv_data.datatype = " << GMVLib::gmv_data.datatype << std::endl;
-
   // LibMesh writes UNSTRUCT=100 node data
   libmesh_assert_equal_to (GMVLib::gmv_data.datatype, UNSTRUCT);
 
@@ -2110,15 +2075,6 @@ void GMVIO::_read_nodes()
   // and is nnodes long
   for (int i = 0; i < GMVLib::gmv_data.num; i++)
     {
-      // Debugging
-      // libMesh::out << "(x,y,z)="
-      //              << "("
-      //              << GMVLib::gmv_data.doubledata1[i] << ","
-      //              << GMVLib::gmv_data.doubledata2[i] << ","
-      //              << GMVLib::gmv_data.doubledata3[i]
-      //              << ")"
-      //              << std::endl;
-
       // Add the point to the Mesh
       MeshInput<MeshBase>::mesh().add_point(Point(GMVLib::gmv_data.doubledata1[i],
                                                   GMVLib::gmv_data.doubledata2[i],
@@ -2131,9 +2087,6 @@ void GMVIO::_read_nodes()
 void GMVIO::_read_one_cell()
 {
 #ifdef LIBMESH_HAVE_GMV
-  // Debugging
-  // libMesh::out << "gmv_data.datatype=" << GMVLib::gmv_data.datatype << std::endl;
-
   // This is either a REGULAR=111 cell or
   // the ENDKEYWORD=207 of the cells
 #ifndef NDEBUG
@@ -2147,10 +2100,6 @@ void GMVIO::_read_one_cell()
 
   if (GMVLib::gmv_data.datatype == REGULAR)
     {
-      // Debugging
-      // libMesh::out << "Name of the cell is: " << GMVLib::gmv_data.name1 << std::endl;
-      // libMesh::out << "Cell has " << GMVLib::gmv_data.num2 << " vertices." << std::endl;
-
       // We need a mapping from GMV element types to LibMesh
       // ElemTypes.  Basically the reverse of the eletypes
       // std::map above.
@@ -2174,9 +2123,6 @@ void GMVIO::_read_one_cell()
       // this cell.
       for (int i=0; i<GMVLib::gmv_data.num2; i++)
         {
-          // Debugging
-          // libMesh::out << "Vertex " << i << " is node " << GMVLib::gmv_data.longdata1[i] << std::endl;
-
           // Map index i to GMV's numbering scheme
           unsigned mapped_i = eledef.node_map[i];
 
@@ -2208,7 +2154,7 @@ ElemType GMVIO::gmv_elem_to_libmesh_elem(std::string elemname)
   elemname.erase(std::remove_if(elemname.begin(), elemname.end(), isspace), elemname.end());
 
   // Look up the string in our string->ElemType name.
-  std::map<std::string, ElemType>::iterator it = _reading_element_map.find(elemname);
+  auto it = _reading_element_map.find(elemname);
 
   if (it == _reading_element_map.end())
     libmesh_error_msg("Unknown/unsupported element: " << elemname << " was read.");
@@ -2247,31 +2193,19 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
       // Get a generic reference to the current System
       System & system = es.get_system(sys);
 
-      // And a reference to that system's dof_map
-      // const DofMap & dof_map = system.get_dof_map();
-
       // For each var entry in the _nodal_data map, try to find
       // that var in the system
-      std::map<std::string, std::vector<Number>>::iterator it = _nodal_data.begin();
-      const std::map<std::string, std::vector<Number>>::iterator end = _nodal_data.end();
-      for (; it != end; ++it)
+      for (const auto & pr : _nodal_data)
         {
-          std::string var_name = it->first;
-          // libMesh::out << "Searching for var " << var_name << " in system " << sys << std::endl;
+          const std::string & var_name = pr.first;
 
           if (system.has_variable(var_name))
             {
               // Check if there are as many nodes in the mesh as there are entries
               // in the stored nodal data vector
-              libmesh_assert_equal_to ( it->second.size(), MeshInput<MeshBase>::mesh().n_nodes() );
+              libmesh_assert_equal_to (pr.second.size(), MeshInput<MeshBase>::mesh().n_nodes());
 
               const unsigned int var_num = system.variable_number(var_name);
-
-              // libMesh::out << "Variable "
-              // << var_name
-              // << " is variable "
-              // << var_num
-              // << " in system " << sys << std::endl;
 
               // The only type of nodal data we can read in from GMV is for
               // linear LAGRANGE type elements.
@@ -2287,7 +2221,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
               // Loop over the stored vector's entries, inserting them into
               // the System's solution if appropriate.
               for (dof_id_type i=0,
-                   sz = cast_int<dof_id_type>(it->second.size());
+                   sz = cast_int<dof_id_type>(pr.second.size());
                    i != sz; ++i)
                 {
                   // Since this var came from a GMV file, the index i corresponds to
@@ -2297,15 +2231,10 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
                                                                         var_num,  // var #
                                                                         0);       // component #, always zero for LAGRANGE
 
-                  // libMesh::out << "Value " << i << ": "
-                  //     << it->second [i]
-                  //     << ", dof index="
-                  //     << dof_index << std::endl;
-
                   // If the dof_index is local to this processor, set the value
                   if ((dof_index >= system.solution->first_local_index()) &&
                       (dof_index <  system.solution->last_local_index()))
-                    system.solution->set (dof_index, it->second [i]);
+                    system.solution->set (dof_index, pr.second [i]);
                 } // end loop over my GMVIO's copy of the solution
 
               // Add the most recently copied var to the set of copied vars
@@ -2316,28 +2245,17 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
       // Communicate parallel values before going to the next system.
       system.solution->close();
       system.update();
-
     } // end loop over all systems
 
 
 
   // Warn the user if any GMV variables were not successfully copied over to the EquationSystems object
-  {
-    std::map<std::string, std::vector<Number>>::iterator it = _nodal_data.begin();
-    const std::map<std::string, std::vector<Number>>::iterator end = _nodal_data.end();
-
-    for (; it != end; ++it)
-      {
-        if (vars_copied.find( it->first ) == vars_copied.end())
-          {
-            libMesh::err << "Warning: Variable "
-                         << it->first
-                         << " was not copied to the EquationSystems object."
-                         << std::endl;
-          }
-      }
-  }
-
+  for (const auto & pr : _nodal_data)
+    if (vars_copied.find(pr.first) == vars_copied.end())
+      libMesh::err << "Warning: Variable "
+                   << pr.first
+                   << " was not copied to the EquationSystems object."
+                   << std::endl;
 }
 
 } // namespace libMesh

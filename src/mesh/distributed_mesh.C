@@ -1299,26 +1299,14 @@ void DistributedMesh::fix_broken_node_and_element_numbering ()
   mapvector<Elem *,dof_id_type>::maptype & elems = this->_elements;
 
   // Nodes first
-  {
-    mapvector<Node *,dof_id_type>::maptype::iterator
-      it  = nodes.begin(),
-      end = nodes.end();
-
-    for (; it != end; ++it)
-      if (it->second != nullptr)
-        it->second->set_id() = it->first;
-  }
+  for (auto & pr : nodes)
+    if (pr.second != nullptr)
+      pr.second->set_id() = pr.first;
 
   // Elements next
-  {
-    mapvector<Elem *,dof_id_type>::maptype::iterator
-      it  = elems.begin(),
-      end = elems.end();
-
-    for (; it != end; ++it)
-      if (it->second != nullptr)
-        it->second->set_id() = it->first;
-  }
+  for (const auto & pr : elems)
+    if (pr.second != nullptr)
+      pr.second->set_id() = pr.first;
 }
 
 

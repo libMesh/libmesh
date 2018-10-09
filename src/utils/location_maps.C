@@ -128,12 +128,10 @@ T * LocationMap<T>::find(const Point & p,
         {
           for (int zoffset = -1; zoffset != 2; ++zoffset)
             {
-              std::pair<typename map_type::iterator,
-                        typename map_type::iterator>
-                key_pos = _map.equal_range(pointkey +
-                                           xoffset*chunkmax*chunkmax +
-                                           yoffset*chunkmax +
-                                           zoffset);
+              auto key_pos = _map.equal_range(pointkey +
+                                              xoffset*chunkmax*chunkmax +
+                                              yoffset*chunkmax +
+                                              zoffset);
               for (const auto & pr : as_range(key_pos))
                 if (p.absolute_fuzzy_equals(this->point_of(*(pr.second)), tol))
                   return pr.second;

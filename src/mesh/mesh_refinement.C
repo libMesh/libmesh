@@ -210,28 +210,7 @@ Node * MeshRefinement::add_node(Elem & parent,
 Elem * MeshRefinement::add_elem (Elem * elem)
 {
   libmesh_assert(elem);
-
-
-  //   // If the unused_elements has any iterators from
-  //   // old elements, take the first one
-  //   if (!_unused_elements.empty())
-  //     {
-  //       std::vector<Elem *>::iterator it = _unused_elements.front();
-
-  //       *it = elem;
-
-  //       _unused_elements.pop_front();
-  //     }
-
-  //   // Otherwise, use the conventional add method
-  //   else
-  //     {
-  //       _mesh.add_elem (elem);
-  //     }
-
-  // The _unused_elements optimization has been turned off.
   _mesh.add_elem (elem);
-
   return elem;
 }
 

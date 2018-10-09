@@ -966,11 +966,8 @@ void Nemesis_IO::read (const std::string & base_filename)
       if (nemhelper->num_side_sets > 0)
         {
           libMesh::out << "Sideset names are: ";
-          std::map<int, std::string>::iterator
-            it = nemhelper->id_to_ss_names.begin(),
-            end = nemhelper->id_to_ss_names.end();
-          for (; it != end; ++it)
-            libMesh::out << "(" << it->first << "," << it->second << ") ";
+          for (const auto & pr : nemhelper->id_to_ss_names)
+            libMesh::out << "(" << pr.first << "," << pr.second << ") ";
           libMesh::out << std::endl;
         }
     }
@@ -1090,11 +1087,8 @@ void Nemesis_IO::read (const std::string & base_filename)
       if (nemhelper->num_node_sets > 0)
         {
           libMesh::out << "Nodeset names are: ";
-          std::map<int, std::string>::iterator
-            it = nemhelper->id_to_ns_names.begin(),
-            end = nemhelper->id_to_ns_names.end();
-          for (; it != end; ++it)
-            libMesh::out << "(" << it->first << "," << it->second << ") ";
+          for (const auto & pr : nemhelper->id_to_ns_names)
+            libMesh::out << "(" << pr.first << "," << pr.second << ") ";
           libMesh::out << std::endl;
         }
     }

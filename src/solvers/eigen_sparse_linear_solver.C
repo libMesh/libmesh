@@ -144,8 +144,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         // solver.
         if (this->_solver_configuration)
           {
-            std::map<std::string, int>::iterator it =
-              this->_solver_configuration->int_valued_data.find("gmres_restart");
+            auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
 
             if (it != this->_solver_configuration->int_valued_data.end())
               solver.set_restart(it->second);
@@ -318,8 +317,7 @@ void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
 template <typename T>
 LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
 {
-  std::map<Eigen::ComputationInfo, LinearConvergenceReason>::iterator it =
-    _convergence_reasons.find(_comp_info);
+  auto it = _convergence_reasons.find(_comp_info);
 
   // If later versions of Eigen start returning new enumerations,
   // we'll need to add them to the map...

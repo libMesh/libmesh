@@ -171,13 +171,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // We'll want to back up all coarse grid vectors
   std::map<std::string, std::unique_ptr<NumericVector<Number>>> coarse_vectors;
-  for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-         system.vectors_end(); ++vec)
+  for (const auto & pr : as_range(system.vectors_begin(), system.vectors_end()))
     {
       // The (string) name of this vector
-      const std::string & var_name = vec->first;
+      const std::string & var_name = pr.first;
 
-      coarse_vectors[var_name] = vec->second->clone();
+      coarse_vectors[var_name] = pr.second->clone();
     }
 
   // Back up the coarse solution and coarse local solution
@@ -420,16 +419,9 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
             // A vector to hold the coarse grid parents neighbors
             std::vector<dof_id_type> coarse_grid_neighbors;
 
-            // Iterators over the fine grid neighbors set
-            std::set<const Elem *>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
-            const std::set<const Elem *>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
-
             // Loop over all the fine neighbors of this node
-            for (; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
+            for (const auto & fine_elem : fine_grid_neighbor_set)
               {
-                // Pointer to the current fine neighbor element
-                const Elem * fine_elem = *fine_neighbor_it;
-
                 // Find the element id for the corresponding coarse grid element
                 const Elem * coarse_elem = fine_elem;
                 for (unsigned int j = 0; j != number_h_refinements; ++j)
@@ -581,16 +573,14 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   *system.solution = *coarse_solution;
   *system.current_local_solution = *coarse_local_solution;
 
-  for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-         system.vectors_end(); ++vec)
+  for (const auto & pr : as_range(system.vectors_begin(), system.vectors_end()))
     {
       // The (string) name of this vector
-      const std::string & var_name = vec->first;
+      const std::string & var_name = pr.first;
 
       // If it's a vector we already had (and not a newly created
       // vector like an adjoint rhs), we need to restore it.
-      std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator it =
-        coarse_vectors.find(var_name);
+      auto it = coarse_vectors.find(var_name);
       if (it != coarse_vectors.end())
         {
           NumericVector<Number> * coarsevec = it->second.get();
