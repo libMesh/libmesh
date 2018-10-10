@@ -613,6 +613,7 @@ include_HEADERS = \
         base/libmesh_logging.h \
         base/libmesh_singleton.h \
         base/libmesh_version.h \
+        base/map_point_neighbor_coupling.h \
         base/multi_predicates.h \
         base/periodic_boundaries.h \
         base/periodic_boundary.h \
