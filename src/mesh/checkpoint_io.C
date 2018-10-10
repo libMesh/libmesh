@@ -365,6 +365,14 @@ void CheckpointIO::write (const std::string & name)
       libmesh_error_msg("Cannot write serial checkpoint from distributed mesh");
     }
 
+  // Call build_side_list() and build_node_list() just *once* to avoid
+  // redundant expensive sorts during mesh splitting.
+  const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+    bc_triples = boundary_info.build_side_list();
+  std::vector<std::tuple<dof_id_type, boundary_id_type>>
+    bc_tuples = boundary_info.build_node_list();
+
   for (const auto & my_pid : ids_to_write)
     {
       auto file_name = split_file(name, use_n_procs, my_pid);
@@ -433,10 +441,10 @@ void CheckpointIO::write (const std::string & name)
       this->write_remote_elem (io, elements);
 
       // write the boundary condition information
-      this->write_bcs (io, elements);
+      this->write_bcs (io, elements, bc_triples);
 
       // write the nodeset information
-      this->write_nodesets (io, connected_nodes);
+      this->write_nodesets (io, connected_nodes, bc_tuples);
 
       // close it up
       io.close();
@@ -639,18 +647,12 @@ void CheckpointIO::write_remote_elem (Xdr & io,
 
 
 void CheckpointIO::write_bcs (Xdr & io,
-                              const std::set<const Elem *, CompareElemIdsByLevel> & elements) const
+                              const std::set<const Elem *, CompareElemIdsByLevel> & elements,
+                              const std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> & bc_triples) const
 {
   libmesh_assert (io.writing());
 
-  // convenient reference to our mesh
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
-  // and our boundary info object
-  const BoundaryInfo & boundary_info = mesh.get_boundary_info();
-
   // Build a list of (elem, side, bc) tuples.
-  auto bc_triples = boundary_info.build_side_list();
   std::size_t bc_size = bc_triples.size();
 
   std::vector<largest_id_type> element_id_list;
@@ -682,18 +684,15 @@ void CheckpointIO::write_bcs (Xdr & io,
 
 
 void CheckpointIO::write_nodesets (Xdr & io,
-                                   const std::set<const Node *> & nodeset) const
+                                   const std::set<const Node *> & nodeset,
+                                   const std::vector<std::tuple<dof_id_type, boundary_id_type>> & bc_tuples) const
 {
   libmesh_assert (io.writing());
 
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // and our boundary info object
-  const BoundaryInfo & boundary_info = mesh.get_boundary_info();
-
   // Build a list of (node, bc) tuples
-  auto bc_tuples = boundary_info.build_node_list();
   std::size_t nodeset_size = bc_tuples.size();
 
   std::vector<largest_id_type> node_id_list;
