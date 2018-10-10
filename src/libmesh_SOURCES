@@ -11,6 +11,7 @@ libmesh_SOURCES =  \
         src/base/libmesh_isnan.c \
         src/base/libmesh_singleton.C \
         src/base/libmesh_version.C \
+        src/base/map_point_neighbor_coupling.C \
         src/base/periodic_boundaries.C \
         src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
