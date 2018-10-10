@@ -478,7 +478,7 @@ void CheckpointIO::write (const std::string & name)
             }
         }
 
-      std::set<const Node *> connected_nodes;
+      std::unordered_set<const Node *> connected_nodes;
       reconnect_nodes(elements, connected_nodes);
 
       // write the nodal locations
@@ -538,7 +538,7 @@ void CheckpointIO::write_subdomain_names(Xdr & io) const
 
 
 void CheckpointIO::write_nodes (Xdr & io,
-                                const std::set<const Node *> & nodeset) const
+                                const std::unordered_set<const Node *> & nodeset) const
 {
   largest_id_type n_nodes_here = nodeset.size();
 
@@ -749,7 +749,7 @@ void CheckpointIO::write_bcs (Xdr & io,
 
 
 void CheckpointIO::write_nodesets (Xdr & io,
-                                   const std::set<const Node *> & nodeset,
+                                   const std::unordered_set<const Node *> & nodeset,
                                    const std::vector<std::tuple<dof_id_type, boundary_id_type>> & bc_tuples) const
 {
   libmesh_assert (io.writing());

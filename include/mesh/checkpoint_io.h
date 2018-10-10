@@ -28,7 +28,9 @@
 #include "libmesh/parallel_object.h"
 
 // C++ includes
+#include <set>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 namespace libMesh
@@ -217,7 +219,7 @@ private:
    * Write the nodal locations for part of a mesh
    */
   void write_nodes (Xdr & io,
-                    const std::set<const Node *> & nodeset) const;
+                    const std::unordered_set<const Node *> & nodeset) const;
 
   /**
    * Write the side boundary conditions for part of a mesh
@@ -230,7 +232,7 @@ private:
    * Write the nodal boundary conditions for part of a mesh
    */
   void write_nodesets (Xdr & io,
-                       const std::set<const Node *> & nodeset,
+                       const std::unordered_set<const Node *> & nodeset,
                        const std::vector<std::tuple<dof_id_type, boundary_id_type>> & bc_tuples) const;
 
   /**

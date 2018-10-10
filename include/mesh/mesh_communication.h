@@ -26,7 +26,10 @@
 #include "libmesh/mesh_tools.h"
 
 // C++ Includes
+#include <set>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace libMesh
 {
@@ -273,7 +276,7 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
 
 // Take a set of elements and create a set of connected nodes.
 void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
-                      std::set<const Node *> & connected_nodes);
+                      std::unordered_set<const Node *> & connected_nodes);
 
 
 
