@@ -353,6 +353,10 @@ LIBMESH_TEST_CXX11_BEGIN_END
 AS_IF([test "x$have_cxx11_begin_end" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 std::begin/end support])])
 
+LIBMESH_TEST_CXX11_CONTAINER_ERASE
+AS_IF([test "x$have_cxx11_container_erase" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std container erase() functions returning iterators])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
