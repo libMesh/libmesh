@@ -41621,6 +41621,10 @@ else
 fi
 
 
+        if test "x$enablemetaphysicl" = "xno" && test "x$metaphysiclrequired" = "xyes"; then :
+  enablemetaphysicl=yes
+fi
+
     if test "x$enablemetaphysicl" = "xyes" && test -r $top_srcdir/contrib/metaphysicl/README; then :
   enablemetaphysicl=yes
 else
