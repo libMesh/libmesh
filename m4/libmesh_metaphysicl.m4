@@ -28,6 +28,12 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-metaphysicl-required)])],
                      [metaphysiclrequired=no])
 
+  dnl Let --enable-metaphysicl-required override the value of $enablenested. Also, if the user
+  dnl provides the nonsensical combination "--disable-metaphysicl --enable-metaphysicl-required"
+  dnl we'll set $enablemetaphysicl to yes instead.
+  AS_IF([test "x$enablemetaphysicl" = "xno" && test "x$metaphysiclrequired" = "xyes"],
+        [enablemetaphysicl=yes])
+
   dnl Check for existence of a file that should always be in metaphysicl
   AS_IF([test "x$enablemetaphysicl" = "xyes" && test -r $top_srcdir/contrib/metaphysicl/README],
         [enablemetaphysicl=yes],
