@@ -1264,6 +1264,7 @@ with_cppunit_prefix
 with_cppunit_exec_prefix
 enable_nanoflann
 enable_metaphysicl
+enable_metaphysicl_required
 enable_curl
 with_curl_include
 with_curl_lib
@@ -2054,6 +2055,8 @@ Optional Features:
   --disable-cppunit       Build without cppunit C++ unit testing support
   --disable-nanoflann     build without nanoflann KD-tree support
   --disable-metaphysicl   build without MetaPhysicL suppport
+  --enable-metaphysicl-required
+                          Error if MetaPhysicL is not detected by configure
   --enable-curl           link against libcurl, for using the cURL API
 
 Optional Packages:
@@ -41603,6 +41606,25 @@ else
 fi
 
 
+                # Check whether --enable-metaphysicl-required was given.
+if test "${enable_metaphysicl_required+set}" = set; then :
+  enableval=$enable_metaphysicl_required; case "${enableval}" in #(
+  yes) :
+    metaphysiclrequired=yes ;; #(
+  no) :
+    metaphysiclrequired=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-metaphysicl-required" "$LINENO" 5 ;;
+esac
+else
+  metaphysiclrequired=no
+fi
+
+
+        if test "x$enablemetaphysicl" = "xno" && test "x$metaphysiclrequired" = "xyes"; then :
+  enablemetaphysicl=yes
+fi
+
     if test "x$enablemetaphysicl" = "xyes" && test -r $top_srcdir/contrib/metaphysicl/README; then :
   enablemetaphysicl=yes
 else
@@ -41611,6 +41633,10 @@ else
 $as_echo ">>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<" >&6; }
           enablemetaphysicl=no
 
+fi
+
+            if test "x$enablemetaphysicl" = "xno" && test "x$metaphysiclrequired" = "xyes"; then :
+  as_fn_error 5 "*** MetaPhysicL was not found, but --enable-metaphysicl-required was specified." "$LINENO" 5
 fi
 
         if test "x$enablemetaphysicl" = "xyes"; then :
