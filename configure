@@ -30069,6 +30069,7 @@ main ()
   m.insert(std::make_pair(1, 2));
   m.insert(std::make_pair(1, 3));
   if (m.size() != 2) return 1;
+  std::unordered_multimap<int, int>::iterator it = m.erase(m.begin());
 
   ;
   return 0;
@@ -30130,6 +30131,7 @@ main ()
 
   std::unordered_map<int, int> m;
   m.insert(std::make_pair(1, 2));
+  std::unordered_map<int, int>::iterator it = m.erase(m.begin());
 
   ;
   return 0;
@@ -30193,6 +30195,7 @@ main ()
   s.insert(1);
   s.insert(1);
   if (s.size() != 2) return 1;
+  std::unordered_multiset<int>::iterator it = s.erase(s.begin());
 
   ;
   return 0;
@@ -30252,9 +30255,10 @@ int
 main ()
 {
 
-  std::unordered_set<int> m;
-  m.insert(1);
-  m.insert(2);
+  std::unordered_set<int> s;
+  s.insert(1);
+  s.insert(2);
+  std::unordered_set<int>::iterator it = s.erase(s.begin());
 
   ;
   return 0;
