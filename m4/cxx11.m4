@@ -3,6 +3,53 @@ dnl Tests for various C++11 features.  These will probably only work
 dnl if they are run after the autoconf test that sets -std=c++11.
 dnl ----------------------------------------------------------------
 
+dnl Test C++11 std::map,set,multimap,multiset iterator-returning erase() APIs.
+AC_DEFUN([LIBMESH_TEST_CXX11_CONTAINER_ERASE],
+  [
+    have_cxx11_container_erase=no
+
+    AC_MSG_CHECKING(for C++11 std container erase() functions returning iterators)
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <map>
+    @%:@include <set>
+    ]], [[
+    {
+      std::map<int, int> m;
+      m.insert(std::make_pair(1,2));
+      std::map<int, int>::iterator it = m.erase(m.begin());
+    }
+    {
+      std::set<int> s;
+      s.insert(1);
+      std::set<int>::iterator it = s.erase(s.begin());
+    }
+    {
+      std::multimap<int, int> m;
+      m.insert(std::make_pair(1,2));
+      std::multimap<int, int>::iterator it = m.erase(m.begin());
+    }
+    {
+      std::multiset<int> s;
+      s.insert(1);
+      std::multiset<int>::iterator it = s.erase(s.begin());
+    }
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx11_container_erase=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+  ])
+
 dnl Test C++11 std::tuple and several related helper functions.
 AC_DEFUN([LIBMESH_TEST_CXX11_BEGIN_END],
   [
