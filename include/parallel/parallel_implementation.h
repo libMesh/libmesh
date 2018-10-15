@@ -2921,6 +2921,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
                            T & recv,
                            const unsigned int root_id) const
 {
+  libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
   libmesh_assert_less (root_id, this->size());
 
   // Do not allow the root_id to scatter a nullptr vector.
