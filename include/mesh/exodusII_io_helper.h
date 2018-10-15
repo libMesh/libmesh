@@ -745,6 +745,7 @@ public:
    */
   int get_node_map(int i) const
   {
+    libmesh_ignore(node_map_size);
     libmesh_assert_less (static_cast<size_t>(i), node_map_size);
     return node_map[i];
   }
@@ -761,6 +762,7 @@ public:
    */
   int get_inverse_node_map(int i) const
   {
+    libmesh_ignore(inverse_node_map_size);
     libmesh_assert_less (static_cast<size_t>(i), inverse_node_map_size);
     return inverse_node_map[i];
   }
@@ -781,6 +783,7 @@ public:
    */
   int get_inverse_side_map(int i) const
   {
+    libmesh_ignore(inverse_side_map_size);
     libmesh_assert_less (static_cast<size_t>(i), inverse_side_map_size);
     return inverse_side_map[i];
   }
@@ -790,6 +793,9 @@ public:
    */
   int get_inverse_shellface_map(int i) const
   {
+    libmesh_ignore(shellface_map);
+    libmesh_ignore(shellface_map_size);
+    libmesh_ignore(inverse_shellface_map_size);
     libmesh_assert_less (static_cast<size_t>(i), inverse_shellface_map_size);
     return inverse_shellface_map[i];
   }
@@ -825,7 +831,9 @@ private:
   const int * node_map;
 
   /**
-   * The size of the node map array, this helps with bounds checking...
+   * The size of the node map array, this helps with bounds checking
+   * and is only used in asserts so we also libmesh_ignore() to avoid
+   * compiler warnings.
    */
   size_t node_map_size;
 
@@ -837,7 +845,9 @@ private:
   const int * inverse_node_map;
 
   /**
-   * The size of the inverse node map array, this helps with bounds checking...
+   * The size of the inverse node map array, this helps with bounds
+   * checking and is only used in asserts so we also libmesh_ignore()
+   * to avoid compiler warnings.
    */
   size_t inverse_node_map_size;
 
@@ -857,17 +867,22 @@ private:
   const int * inverse_side_map;
 
   /**
-   * The size of the inverse side map array, this helps with bounds checking...
+   * The size of the inverse side map array, this helps with bounds
+   * checking and is only used in asserts so we also libmesh_ignore()
+   * to avoid compiler warnings.
    */
   size_t inverse_side_map_size;
 
   /**
-   * Pointer to the shellface map for this element.
+   * Pointer to the shellface map for this element. Only the inverse
+   * is actually used currently, this one is provided for completeness
+   * and libmesh_ingore()d to avoid warnings.
    */
   const int * shellface_map;
 
   /**
-   * The size of the shellface map array, this helps with bounds checking...
+   * The size of the shellface map array, this helps with bounds
+   * checking, but is not currently used by anything.
    */
   size_t shellface_map_size;
 
@@ -877,7 +892,9 @@ private:
   const int * inverse_shellface_map;
 
   /**
-   * The size of the inverse shellface map array, this helps with bounds checking...
+   * The size of the inverse shellface map array, this helps with
+   * bounds checking and is only used in asserts so we also
+   * libmesh_ignore() to avoid compiler warnings.
    */
   size_t inverse_shellface_map_size;
 
