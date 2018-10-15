@@ -3021,7 +3021,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   LOG_SCOPE("scatter()", "Parallel");
 
   // Scatter the buffer sizes to size remote buffers
-  int recv_buffer_size;
+  int recv_buffer_size = 0;
   this->scatter(counts, recv_buffer_size, root_id);
   recv.resize(recv_buffer_size);
 
