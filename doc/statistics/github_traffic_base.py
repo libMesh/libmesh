@@ -171,7 +171,7 @@ class PlotData(object):
 
     # Place an x-axis tick mark every x_step months.  As we get more data,
     # we'll have to increase x_step.
-    x_step = 4
+    x_step = 8
     x_axis_ticks = range(0, len(x_axis), x_step)
 
     # Set tick labels and positions
