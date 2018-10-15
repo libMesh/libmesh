@@ -270,7 +270,7 @@ int main (int argc, char ** argv)
 
         // Broadcast the ID of the closest node, so every processor can
         // see for certain whether they have it or not.
-        dof_id_type nearest_node_id;
+        dof_id_type nearest_node_id = 0;
         if (system.processor_id() == minrank)
           nearest_node_id = node_C->id();
         system.comm().broadcast(nearest_node_id, minrank);
