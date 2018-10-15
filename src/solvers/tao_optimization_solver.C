@@ -594,6 +594,12 @@ void TaoOptimizationSolver<T>::solve ()
   ierr = TaoSolve(_tao);
   LIBMESH_CHKERR(ierr);
 
+  // Enforce constraints exactly now that the solve is done.  We have
+  // been enforcing them on the current_local_solution during the
+  // solve, but now need to be sure they are enforced on the parallel
+  // solution vector as well.
+  this->system().get_dof_map().enforce_constraints_exactly(this->system());
+
   // Store the convergence/divergence reason
   ierr = TaoGetConvergedReason(_tao, &_reason);
   LIBMESH_CHKERR(ierr);
