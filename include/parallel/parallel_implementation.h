@@ -3099,6 +3099,7 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
   // using MPI_Alltoallv
   const int size_per_proc =
     cast_int<int>(buf.size()/this->size());
+  libmesh_ignore(size_per_proc);
 
   libmesh_assert_equal_to (buf.size()%this->size(), 0);
 
