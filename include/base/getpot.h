@@ -1072,8 +1072,9 @@ GetPot::operator=(const GetPot& Other)
   for (; it != end; ++it)
     {
       const char* otherstr = *it;
-      char* newcopy = new char[strlen(otherstr)+1];
-      strncpy(newcopy, otherstr, strlen(otherstr)+1);
+      const std::size_t bufsize = strlen(otherstr)+1;
+      char* newcopy = new char[bufsize];
+      strncpy(newcopy, otherstr, bufsize);
       this->_internal_string_container.insert(newcopy);
     }
 
