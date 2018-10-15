@@ -2168,12 +2168,11 @@ inline void Communicator::minloc(T & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
-      DataPlusInt<T> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&data_in, &data_out, 1, dataplusint_type<T>(),
+        (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1, dataplusint_type<T>(),
                         OpFunction<T>::max_location(), this->get()));
-      r = data_out.val;
-      min_id = data_out.rank;
+      r = data_in.val;
+      min_id = data_in.rank;
     }
   else
     min_id = this->rank();
@@ -2362,14 +2361,13 @@ inline void Communicator::maxloc(T & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
-      DataPlusInt<T> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&data_in, &data_out, 1,
+        (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1,
                         dataplusint_type<T>(),
                         OpFunction<T>::max_location(),
                         this->get()));
-      r = data_out.val;
-      max_id = data_out.rank;
+      r = data_in.val;
+      max_id = data_in.rank;
     }
   else
     max_id = this->rank();
