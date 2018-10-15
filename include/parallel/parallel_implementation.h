@@ -3117,6 +3117,7 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
 template <typename T>
 inline void Communicator::broadcast (T & libmesh_mpi_var(data), const unsigned int root_id) const
 {
+  libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
   if (this->size() == 1)
     {
       libmesh_assert (!this->rank());
