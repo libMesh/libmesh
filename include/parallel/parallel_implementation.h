@@ -2170,7 +2170,7 @@ inline void Communicator::minloc(T & r,
       data_in.rank = this->rank();
       libmesh_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1, dataplusint_type<T>(),
-                        OpFunction<T>::max_location(), this->get()));
+                        OpFunction<T>::min_location(), this->get()));
       r = data_in.val;
       min_id = data_in.rank;
     }
