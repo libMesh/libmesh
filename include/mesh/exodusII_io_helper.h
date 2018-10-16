@@ -738,11 +738,11 @@ public:
   {
     // libmesh_ignore variables that are only used in asserts to avoid
     // compiler warnings.
-    libmesh_ignore(node_map_size);
-    libmesh_ignore(inverse_node_map_size);
-    libmesh_ignore(inverse_side_map_size);
-    libmesh_ignore(shellface_map_size);
-    libmesh_ignore(inverse_shellface_map_size);
+    libmesh_ignore(node_map_size,
+                   inverse_node_map_size,
+                   inverse_side_map_size,
+                   shellface_map_size,
+                   inverse_shellface_map_size);
   }
 
   /**
