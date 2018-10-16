@@ -211,12 +211,22 @@ public:
     sys(sys_in),
     old_context(sys_in)
   {
+    // We'll be queried for components but we'll typically be looking
+    // up data by variables, and those indices don't always match
+    for (auto v : IntRange<unsigned int>(0, sys.n_vars()))
+      {
+        const unsigned int vcomp = sys.variable_scalar_number(v,0);
+        if (vcomp >= component_to_var.size())
+          component_to_var.resize(vcomp+1, static_cast<unsigned int>(-1));
+        component_to_var[vcomp] = v;
+      }
   }
 
   OldSolutionBase(const OldSolutionBase & in) :
     last_elem(nullptr),
     sys(in.sys),
-    old_context(sys)
+    old_context(sys),
+    component_to_var(in.component_to_var)
   {
   }
 
@@ -350,6 +360,7 @@ protected:
   const Elem * last_elem;
   const System & sys;
   FEMContext old_context;
+  std::vector<unsigned int> component_to_var;
 
   static const Real out_of_elem_tol;
 };
@@ -405,8 +416,12 @@ public:
     if (!this->check_old_context(c, p))
       return 0;
 
+    // Handle offset from non-scalar components in previous variables
+    libmesh_assert_less(i, this->component_to_var.size());
+    unsigned int var = this->component_to_var[i];
+
     Output n;
-    (this->old_context.*point_output)(i, p, n, this->out_of_elem_tol);
+    (this->old_context.*point_output)(var, p, n, this->out_of_elem_tol);
     return n;
   }
 
@@ -477,6 +492,10 @@ eval_at_node(const FEMContext & c,
 {
   LOG_SCOPE ("Number eval_at_node()", "OldSolutionValue");
 
+  // Handle offset from non-scalar components in previous variables
+  libmesh_assert_less(i, this->component_to_var.size());
+  unsigned int var = this->component_to_var[i];
+
   // Optimize for the common case, where this node was part of the
   // old solution.
   //
@@ -486,10 +505,10 @@ eval_at_node(const FEMContext & c,
   // exceeding FE order)
   if (n.old_dof_object &&
       n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), i))
+      n.old_dof_object->n_comp(sys.number(), var))
     {
       const dof_id_type old_id =
-        n.old_dof_object->dof_number(sys.number(), i, 0);
+        n.old_dof_object->dof_number(sys.number(), var, 0);
       return old_solution(old_id);
     }
 
@@ -510,6 +529,10 @@ eval_at_node(const FEMContext & c,
 {
   LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionValue");
 
+  // Handle offset from non-scalar components in previous variables
+  libmesh_assert_less(i, this->component_to_var.size());
+  unsigned int var = this->component_to_var[i];
+
   // Optimize for the common case, where this node was part of the
   // old solution.
   //
@@ -519,13 +542,13 @@ eval_at_node(const FEMContext & c,
   // exceeding FE order)
   if (n.old_dof_object &&
       n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), i))
+      n.old_dof_object->n_comp(sys.number(), var))
     {
       Gradient g;
       for (unsigned int d = 0; d != elem_dim; ++d)
         {
           const dof_id_type old_id =
-            n.old_dof_object->dof_number(sys.number(), i, d+1);
+            n.old_dof_object->dof_number(sys.number(), var, d+1);
           g(d) = old_solution(old_id);
         }
       return g;
