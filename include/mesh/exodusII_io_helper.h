@@ -679,7 +679,7 @@ public:
              const int * inm,      // inverse_node_map
              size_t libmesh_dbg_var(inm_size),
              const int * sm,       // side_map
-             size_t sm_size,
+             size_t libmesh_dbg_var(sm_size),
              const int * ism,      // inverse_side_map
              size_t libmesh_dbg_var(ism_size),
              const ElemType ct,   // "canonical" aka libmesh element type
@@ -693,13 +693,17 @@ public:
       inverse_node_map_size(inm_size),
 #endif
       side_map(sm),
+#ifndef NDEBUG
       side_map_size(sm_size),
+#endif
       inverse_side_map(ism),
 #ifndef NDEBUG
       inverse_side_map_size(ism_size),
 #endif
       shellface_map(nullptr),
+#ifndef NDEBUG
       shellface_map_size(0),
+#endif
       inverse_shellface_map(nullptr),
 #ifndef NDEBUG
       inverse_shellface_map_size(0),
@@ -722,7 +726,7 @@ public:
              const int * ism,      // inverse_side_map
              size_t libmesh_dbg_var(ism_size),
              const int * sfm,      // shellface_map
-             size_t sfm_size,
+             size_t libmesh_dbg_var(sfm_size),
              const int * isfm,     // inverse_shellface_map
              size_t libmesh_dbg_var(isfm_size),
              size_t sfi_offset,
@@ -743,7 +747,9 @@ public:
       inverse_side_map_size(ism_size),
 #endif
       shellface_map(sfm),
+#ifndef NDEBUG
       shellface_map_size(sfm_size),
+#endif
       inverse_shellface_map(isfm),
 #ifndef NDEBUG
       inverse_shellface_map_size(isfm_size),
@@ -803,11 +809,19 @@ public:
 
   /**
    * \returns The ith component of the shellface map for this element.
+   * \note Nothing is currently using this.
+   */
+  int get_shellface_map(int i) const
+  {
+    libmesh_assert_less (static_cast<size_t>(i), shellface_map_size);
+    return shellface_map[i];
+  }
+
+  /**
+   * \returns The ith component of the inverse shellface map for this element.
    */
   int get_inverse_shellface_map(int i) const
   {
-    libmesh_ignore(shellface_map);
-    libmesh_ignore(shellface_map_size);
     libmesh_assert_less (static_cast<size_t>(i), inverse_shellface_map_size);
     return inverse_shellface_map[i];
   }
