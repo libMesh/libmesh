@@ -735,7 +735,15 @@ public:
       shellface_index_offset(sfi_offset),
       canonical_type(ct),
       exodus_type(ex_type)
-  {}
+  {
+    // libmesh_ignore variables that are only used in asserts to avoid
+    // compiler warnings.
+    libmesh_ignore(node_map_size,
+                   inverse_node_map_size,
+                   inverse_side_map_size,
+                   shellface_map_size,
+                   inverse_shellface_map_size);
+  }
 
   /**
    * \returns The ith component of the node map for this element.
@@ -787,6 +795,16 @@ public:
 
   /**
    * \returns The ith component of the shellface map for this element.
+   * \note Nothing is currently using this.
+   */
+  int get_shellface_map(int i) const
+  {
+    libmesh_assert_less (static_cast<size_t>(i), shellface_map_size);
+    return shellface_map[i];
+  }
+
+  /**
+   * \returns The ith component of the inverse shellface map for this element.
    */
   int get_inverse_shellface_map(int i) const
   {
@@ -825,7 +843,8 @@ private:
   const int * node_map;
 
   /**
-   * The size of the node map array, this helps with bounds checking...
+   * The size of the node map array, this helps with bounds checking
+   * and is only used in asserts.
    */
   size_t node_map_size;
 
@@ -837,7 +856,8 @@ private:
   const int * inverse_node_map;
 
   /**
-   * The size of the inverse node map array, this helps with bounds checking...
+   * The size of the inverse node map array, this helps with bounds
+   * checking and is only used in asserts.
    */
   size_t inverse_node_map_size;
 
@@ -857,17 +877,21 @@ private:
   const int * inverse_side_map;
 
   /**
-   * The size of the inverse side map array, this helps with bounds checking...
+   * The size of the inverse side map array, this helps with bounds
+   * checking and is only used in asserts.
    */
   size_t inverse_side_map_size;
 
   /**
-   * Pointer to the shellface map for this element.
+   * Pointer to the shellface map for this element. Only the inverse
+   * is actually used currently, this one is provided for completeness
+   * and libmesh_ingore()d to avoid warnings.
    */
   const int * shellface_map;
 
   /**
-   * The size of the shellface map array, this helps with bounds checking...
+   * The size of the shellface map array, this helps with bounds
+   * checking and is only used in asserts.
    */
   size_t shellface_map_size;
 
@@ -877,7 +901,8 @@ private:
   const int * inverse_shellface_map;
 
   /**
-   * The size of the inverse shellface map array, this helps with bounds checking...
+   * The size of the inverse shellface map array, this helps with
+   * bounds checking and is only used in asserts.
    */
   size_t inverse_shellface_map_size;
 
