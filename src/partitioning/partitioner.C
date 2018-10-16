@@ -574,6 +574,8 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
 
 void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & mesh)
 {
+  libmesh_ignore(mesh); // Only used if LIBMESH_HAVE_PETSC
+
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 

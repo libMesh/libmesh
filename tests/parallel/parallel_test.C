@@ -36,6 +36,8 @@ public:
   CPPUNIT_TEST( testBarrier );
   CPPUNIT_TEST( testMin );
   CPPUNIT_TEST( testMax );
+  CPPUNIT_TEST( testMinloc );
+  CPPUNIT_TEST( testMaxloc );
   CPPUNIT_TEST( testInfinityMin );
   CPPUNIT_TEST( testInfinityMax );
   CPPUNIT_TEST( testIsendRecv );
@@ -294,6 +296,33 @@ public:
 
     CPPUNIT_ASSERT_EQUAL (cast_int<processor_id_type>(max+1),
                           cast_int<processor_id_type>(TestCommWorld->size()));
+  }
+
+
+
+  void testMinloc ()
+  {
+    int min = (TestCommWorld->rank() + 1) % TestCommWorld->size();
+    unsigned int minid = 0;
+
+    TestCommWorld->minloc(min, minid);
+
+    CPPUNIT_ASSERT_EQUAL (min, static_cast<int>(0));
+    CPPUNIT_ASSERT_EQUAL (minid, static_cast<unsigned int>(TestCommWorld->size()-1));
+  }
+
+
+
+  void testMaxloc ()
+  {
+    int max = TestCommWorld->rank();
+    unsigned int maxid = 0;
+
+    TestCommWorld->maxloc(max, maxid);
+
+    CPPUNIT_ASSERT_EQUAL (max+1,
+                          cast_int<int>(TestCommWorld->size()));
+    CPPUNIT_ASSERT_EQUAL (maxid, static_cast<unsigned int>(TestCommWorld->size()-1));
   }
 
 

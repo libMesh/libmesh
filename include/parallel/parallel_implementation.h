@@ -1872,16 +1872,17 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
 template <typename Context1, typename RangeIter,
           typename Context2, typename OutputIter, typename T>
 inline void
-Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
-                                         const Context1 * context1,
-                                         RangeIter send_begin,
-                                         const RangeIter send_end,
-                                         const unsigned int source_processor_id,
-                                         Context2 * context2,
-                                         OutputIter out_iter,
-                                         const T * output_type,
-                                         const MessageTag &,
-                                         const MessageTag &) const
+Communicator::send_receive_packed_range
+  (const unsigned int libmesh_dbg_var(dest_processor_id),
+   const Context1 * context1,
+   RangeIter send_begin,
+   const RangeIter send_end,
+   const unsigned int libmesh_dbg_var(source_processor_id),
+   Context2 * context2,
+   OutputIter out_iter,
+   const T * output_type,
+   const MessageTag &,
+   const MessageTag &) const
 {
   // This makes no sense on one processor unless we're deliberately
   // sending to ourself.
@@ -2168,12 +2169,11 @@ inline void Communicator::minloc(T & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
-      DataPlusInt<T> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&data_in, &data_out, 1, dataplusint_type<T>(),
-                        OpFunction<T>::max_location(), this->get()));
-      r = data_out.val;
-      min_id = data_out.rank;
+        (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1, dataplusint_type<T>(),
+                        OpFunction<T>::min_location(), this->get()));
+      r = data_in.val;
+      min_id = data_in.rank;
     }
   else
     min_id = this->rank();
@@ -2362,14 +2362,13 @@ inline void Communicator::maxloc(T & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
-      DataPlusInt<T> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&data_in, &data_out, 1,
+        (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1,
                         dataplusint_type<T>(),
                         OpFunction<T>::max_location(),
                         this->get()));
-      r = data_out.val;
-      max_id = data_out.rank;
+      r = data_in.val;
+      max_id = data_in.rank;
     }
   else
     max_id = this->rank();
@@ -2513,7 +2512,7 @@ inline void Communicator::sum(std::vector<T,A> & r) const
 // We still do function overloading for complex sums - in a perfect
 // world we'd have a StandardSumOp to go along with StandardType...
 template <typename T>
-inline void Communicator::sum(std::complex<T> & r) const
+inline void Communicator::sum(std::complex<T> & libmesh_mpi_var(r)) const
 {
   if (this->size() > 1)
     {
@@ -2923,6 +2922,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
                            T & recv,
                            const unsigned int root_id) const
 {
+  libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
   libmesh_assert_less (root_id, this->size());
 
   // Do not allow the root_id to scatter a nullptr vector.
@@ -3023,7 +3023,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   LOG_SCOPE("scatter()", "Parallel");
 
   // Scatter the buffer sizes to size remote buffers
-  int recv_buffer_size;
+  int recv_buffer_size = 0;
   this->scatter(counts, recv_buffer_size, root_id);
   recv.resize(recv_buffer_size);
 
@@ -3101,6 +3101,7 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
   // using MPI_Alltoallv
   const int size_per_proc =
     cast_int<int>(buf.size()/this->size());
+  libmesh_ignore(size_per_proc);
 
   libmesh_assert_equal_to (buf.size()%this->size(), 0);
 
@@ -3118,6 +3119,7 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
 template <typename T>
 inline void Communicator::broadcast (T & libmesh_mpi_var(data), const unsigned int root_id) const
 {
+  libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
   if (this->size() == 1)
     {
       libmesh_assert (!this->rank());
