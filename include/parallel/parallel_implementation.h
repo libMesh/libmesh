@@ -2512,7 +2512,7 @@ inline void Communicator::sum(std::vector<T,A> & r) const
 // We still do function overloading for complex sums - in a perfect
 // world we'd have a StandardSumOp to go along with StandardType...
 template <typename T>
-inline void Communicator::sum(std::complex<T> & r) const
+inline void Communicator::sum(std::complex<T> & libmesh_mpi_var(r)) const
 {
   if (this->size() > 1)
     {
