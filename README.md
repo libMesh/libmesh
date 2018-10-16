@@ -1,6 +1,7 @@
 ## Build Instructions
 The default is to build libmesh "out of tree," i.e. within a separate `build` directory, rather than in the source tree itself. This simplifies the process of having multiple, independently-configured builds.
 1. `cd` to location of libmesh clone or extracted tarball.
+1. (Only if using a git clone) `git submodule update --init`
 1. `mkdir build`
 1. `cd build`
 1. `../configure --prefix=/path/to/libmesh/install`
