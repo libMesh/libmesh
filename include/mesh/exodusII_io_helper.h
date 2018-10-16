@@ -675,39 +675,27 @@ public:
    * variables.
    */
   Conversion(const int * nm,       // node_map
-             size_t libmesh_dbg_var(nm_size),
+             size_t nm_size,
              const int * inm,      // inverse_node_map
-             size_t libmesh_dbg_var(inm_size),
+             size_t inm_size,
              const int * sm,       // side_map
-             size_t libmesh_dbg_var(sm_size),
+             size_t sm_size,
              const int * ism,      // inverse_side_map
-             size_t libmesh_dbg_var(ism_size),
+             size_t ism_size,
              const ElemType ct,   // "canonical" aka libmesh element type
              std::string ex_type) // string representing the Exodus element type
     : node_map(nm),
-#ifndef NDEBUG
       node_map_size(nm_size),
-#endif
       inverse_node_map(inm),
-#ifndef NDEBUG
       inverse_node_map_size(inm_size),
-#endif
       side_map(sm),
-#ifndef NDEBUG
       side_map_size(sm_size),
-#endif
       inverse_side_map(ism),
-#ifndef NDEBUG
       inverse_side_map_size(ism_size),
-#endif
       shellface_map(nullptr),
-#ifndef NDEBUG
       shellface_map_size(0),
-#endif
       inverse_shellface_map(nullptr),
-#ifndef NDEBUG
       inverse_shellface_map_size(0),
-#endif
       shellface_index_offset(0),
       canonical_type(ct),
       exodus_type(ex_type)
@@ -718,46 +706,44 @@ public:
    * variables.  In this case we also initialize shellface data.
    */
   Conversion(const int * nm,       // node_map
-             size_t libmesh_dbg_var(nm_size),
+             size_t nm_size,
              const int * inm,      // inverse_node_map
-             size_t libmesh_dbg_var(inm_size),
+             size_t inm_size,
              const int * sm,       // side_map
              size_t sm_size,
              const int * ism,      // inverse_side_map
-             size_t libmesh_dbg_var(ism_size),
+             size_t ism_size,
              const int * sfm,      // shellface_map
-             size_t libmesh_dbg_var(sfm_size),
+             size_t sfm_size,
              const int * isfm,     // inverse_shellface_map
-             size_t libmesh_dbg_var(isfm_size),
+             size_t isfm_size,
              size_t sfi_offset,
              const ElemType ct,   // "canonical" aka libmesh element type
              std::string ex_type) // string representing the Exodus element type
     : node_map(nm),
-#ifndef NDEBUG
       node_map_size(nm_size),
-#endif
       inverse_node_map(inm),
-#ifndef NDEBUG
       inverse_node_map_size(inm_size),
-#endif
       side_map(sm),
       side_map_size(sm_size),
       inverse_side_map(ism),
-#ifndef NDEBUG
       inverse_side_map_size(ism_size),
-#endif
       shellface_map(sfm),
-#ifndef NDEBUG
       shellface_map_size(sfm_size),
-#endif
       inverse_shellface_map(isfm),
-#ifndef NDEBUG
       inverse_shellface_map_size(isfm_size),
-#endif
       shellface_index_offset(sfi_offset),
       canonical_type(ct),
       exodus_type(ex_type)
-  {}
+  {
+    // libmesh_ignore variables that are only used in asserts to avoid
+    // compiler warnings.
+    libmesh_ignore(node_map_size);
+    libmesh_ignore(inverse_node_map_size);
+    libmesh_ignore(inverse_side_map_size);
+    libmesh_ignore(shellface_map_size);
+    libmesh_ignore(inverse_shellface_map_size);
+  }
 
   /**
    * \returns The ith component of the node map for this element.
@@ -860,9 +846,7 @@ private:
    * The size of the node map array, this helps with bounds checking
    * and is only used in asserts.
    */
-#ifndef NDEBUG
   size_t node_map_size;
-#endif
 
   /**
    * Pointer to the inverse node map for this element.
@@ -875,9 +859,7 @@ private:
    * The size of the inverse node map array, this helps with bounds
    * checking and is only used in asserts.
    */
-#ifndef NDEBUG
   size_t inverse_node_map_size;
-#endif
 
   /**
    * Pointer to the side map for this element.
@@ -898,9 +880,7 @@ private:
    * The size of the inverse side map array, this helps with bounds
    * checking and is only used in asserts.
    */
-#ifndef NDEBUG
   size_t inverse_side_map_size;
-#endif
 
   /**
    * Pointer to the shellface map for this element. Only the inverse
@@ -911,7 +891,7 @@ private:
 
   /**
    * The size of the shellface map array, this helps with bounds
-   * checking, but is not currently used by anything.
+   * checking and is only used in asserts.
    */
   size_t shellface_map_size;
 
@@ -924,9 +904,7 @@ private:
    * The size of the inverse shellface map array, this helps with
    * bounds checking and is only used in asserts.
    */
-#ifndef NDEBUG
   size_t inverse_shellface_map_size;
-#endif
 
   /**
    * The shellface index offset defines the offset due to a difference between libMesh
