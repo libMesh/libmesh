@@ -123,6 +123,20 @@ public:
   virtual void reinit ();
 
   /**
+   * Enable or disable default ghosting functors on the Mesh and on
+   * all Systems.  Standard ghosting is enabled by default.  If
+   * disabled, default ghosting will also be disabled on any later
+   * added systems.
+   *
+   * Unless other equivalent ghosting functors have been added,
+   * removing the default coupling functor is only safe for explicit
+   * solves, and removing the default algebraic ghosting functor is
+   * only safe for codes where no evaluations on neighbor cells (e.g.
+   * no jump error estimators) are done.
+   */
+  virtual void enable_default_ghosting (bool enable);
+
+  /**
    * Updates local values for all the systems
    */
   void update ();
@@ -557,6 +571,12 @@ protected:
    */
   bool _refine_in_reinit;
 
+  /**
+   * Flag for whether to enable default ghosting on newly added Systems.
+   * Default value: true
+   */
+  bool _enable_default_ghosting;
+
 private:
 
   /**
@@ -586,6 +606,12 @@ private:
    * is to avoid coupling this header file to mesh.h, and elem.h.
    */
   void _add_system_to_nodes_and_elems();
+
+  /**
+   * This just calls DofMap::remove_default_ghosting() but using a
+   * shim lets us forward-declare DofMap.
+   */
+  void _remove_default_ghosting(unsigned int sys_num);
 };
 
 
@@ -624,9 +650,13 @@ T_sys & EquationSystems::add_system (const std::string & name)
 
   if (!_systems.count(name))
     {
-      ptr = new T_sys(*this, name, this->n_systems());
+      const unsigned int sys_num = this->n_systems();
+      ptr = new T_sys(*this, name, sys_num);
 
       _systems.insert (std::make_pair(name, ptr));
+
+      if (!_enable_default_ghosting)
+        this->_remove_default_ghosting(sys_num);
 
       // Tell all the \p DofObject entities to add a system.
       this->_add_system_to_nodes_and_elems();

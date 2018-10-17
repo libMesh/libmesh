@@ -20,6 +20,7 @@
 #include <sstream>
 
 // Local Includes
+#include "libmesh/default_coupling.h" // For downconversion
 #include "libmesh/explicit_system.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/frequency_system.h"
@@ -53,12 +54,13 @@ namespace libMesh
 // EquationSystems class implementation
 EquationSystems::EquationSystems (MeshBase & m) :
   ParallelObject (m),
-  _mesh          (m)
+  _mesh          (m),
+  _refine_in_reinit(true),
+  _enable_default_ghosting(true)
 {
   // Set default parameters
   this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
   this->parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
-  this->_refine_in_reinit = true; // default value
 }
 
 
@@ -315,6 +317,27 @@ void EquationSystems::allgather ()
     }
 }
 
+
+
+void EquationSystems::enable_default_ghosting (bool enable)
+{
+  _enable_default_ghosting = enable;
+  MeshBase &mesh = this->get_mesh();
+
+  if (enable)
+    mesh.add_ghosting_functor(mesh.default_ghosting());
+  else
+    mesh.remove_ghosting_functor(mesh.default_ghosting());
+
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    {
+      DofMap & dof_map = this->get_system(i).get_dof_map();
+      if (enable)
+        dof_map.add_default_ghosting();
+      else
+        dof_map.remove_default_ghosting();
+    }
+}
 
 
 
@@ -1324,6 +1347,11 @@ void EquationSystems::_add_system_to_nodes_and_elems()
   // All the elements
   for (auto & elem : _mesh.element_ptr_range())
     elem->add_system();
+}
+
+void EquationSystems::_remove_default_ghosting(unsigned int sys_num)
+{
+  this->get_system(sys_num).get_dof_map().remove_default_ghosting();
 }
 
 } // namespace libMesh
