@@ -266,10 +266,16 @@ public:
    * for codes where no evaluations on neighbor cells (e.g. no jump
    * error estimators) are done.
    *
-   * Default ghosting can be restored manually, or is restored
+   * Defaults can be restored manually via add_default_ghosting(), or
    * automatically if clear() returns the DofMap to a default state.
    */
   void remove_default_ghosting();
+
+  /**
+   * Add the default functor(s) for coupling and algebraic ghosting.
+   * User-added ghosting functors will be unaffected.
+   */
+  void add_default_ghosting();
 
   /**
    * Adds a functor which can specify coupling requirements for

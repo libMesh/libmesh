@@ -1803,6 +1803,14 @@ void DofMap::remove_default_ghosting()
 
 
 
+void DofMap::add_default_ghosting()
+{
+  this->add_coupling_functor(this->default_coupling());
+  this->add_algebraic_ghosting_functor(this->default_algebraic_ghosting());
+}
+
+
+
 void
 DofMap::add_coupling_functor(GhostingFunctor & coupling_functor)
 {
