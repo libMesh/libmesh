@@ -1262,7 +1262,8 @@ public:
   void reinit (MeshBase & mesh);
 
   /**
-   * Free all memory associated with the object, but keep the mesh pointer.
+   * Free all new memory associated with the object, but restore its
+   * original state, with the mesh pointer and any default ghosting.
    */
   void clear ();
 
