@@ -1795,6 +1795,14 @@ void DofMap::clear_sparsity()
 
 
 
+void DofMap::remove_default_ghosting()
+{
+  this->remove_coupling_functor(this->default_coupling());
+  this->remove_algebraic_ghosting_functor(this->default_algebraic_ghosting());
+}
+
+
+
 void
 DofMap::add_coupling_functor(GhostingFunctor & coupling_functor)
 {

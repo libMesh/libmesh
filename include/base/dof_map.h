@@ -257,6 +257,21 @@ public:
   void clear_sparsity();
 
   /**
+   * Remove any default ghosting functor(s).  User-added ghosting
+   * functors will be unaffected.
+   *
+   * Unless user-added equivalent ghosting functors exist, removing
+   * the default coupling functor is only safe for explicit solves,
+   * and removing the default algebraic ghosting functor is only safe
+   * for codes where no evaluations on neighbor cells (e.g. no jump
+   * error estimators) are done.
+   *
+   * Default ghosting can be restored manually, or is restored
+   * automatically if clear() returns the DofMap to a default state.
+   */
+  void remove_default_ghosting();
+
+  /**
    * Adds a functor which can specify coupling requirements for
    * creation of sparse matrices.
    * Degree of freedom pairs which match the elements and variables
