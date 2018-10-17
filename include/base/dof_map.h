@@ -306,7 +306,8 @@ public:
 
   /**
    * Removes a functor which was previously added to the set of
-   * coupling functors.
+   * coupling functors, from both this DofMap and from the underlying
+   * mesh.
    */
   void remove_coupling_functor(GhostingFunctor & coupling_functor);
 
@@ -355,7 +356,8 @@ public:
 
   /**
    * Removes a functor which was previously added to the set of
-   * algebraic ghosting functors.
+   * algebraic ghosting functors, from both this DofMap and from the
+   * underlying mesh.
    */
   void remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor);
 
