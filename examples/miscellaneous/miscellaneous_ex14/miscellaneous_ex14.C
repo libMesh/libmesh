@@ -56,6 +56,7 @@
 #include "libmesh/point_locator_tree.h"
 
 // for the SlepcSolverConfiguration
+#include "libmesh/petsc_solver_exception.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/enum_eigen_solver_type.h"
@@ -522,15 +523,13 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
 //define the functions needed for the @ SlepcSolverConfiguration.
 void SlepcSolverConfiguration::configure_solver()
 {
-  PetscErrorCode ierr = 0;
-
   // if a spectral transformation was requested
   if (_st!=INVALID_ST)
     {
       // initialise the st with the default values and change the spectral transformation value.
       ST st;
-      ierr = EPSGetST(_slepc_solver.eps(), &st);
-      libmesh_assert(ierr == 0);
+      PetscErrorCode ierr = EPSGetST(_slepc_solver.eps(), &st);
+      LIBMESH_CHKERR(ierr);
 
       // Set it to the desired type of spectral transformation.
       // The value of the respective shift is chosen to be the target
@@ -555,12 +554,11 @@ void SlepcSolverConfiguration::configure_solver()
           // print a warning but do nothing more.
           break;
         }
+      LIBMESH_CHKERR(ierr);
 
       // since st is a reference to the particular object used by \p _slepc_solver,
       // we don't need to hand back the manipulated object. It will be applied before
       // solving the system automatically.
-
-      libmesh_assert(ierr == 0);
     }
 }
 #endif // LIBMESH_HAVE_SLEPC
