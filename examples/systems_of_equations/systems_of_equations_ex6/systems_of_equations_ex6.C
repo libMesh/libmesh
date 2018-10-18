@@ -99,10 +99,10 @@ public:
   {
     PetscErrorCode ierr = 0;
     ierr = KSPSetType (_petsc_linear_solver.ksp(), const_cast<KSPType>(KSPCG));
-    libmesh_assert(ierr == 0);
+    LIBMESH_CHKERR(ierr);
 
     ierr = PCSetType (_petsc_linear_solver.pc(), const_cast<PCType>(PCBJACOBI));
-    libmesh_assert(ierr == 0);
+    LIBMESH_CHKERR(ierr);
   }
 
   // The linear solver object that we are configuring
