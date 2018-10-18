@@ -247,6 +247,27 @@ void TypeNTensor<N, T>::add_scaled (const TypeNTensor<N, T2> & p, const T & fact
     _coords[i] += factor*p._coords[i];
 }
 
+template <unsigned int N, typename T, typename Scalar>
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  TypeNTensor<N,typename CompareTypes<Scalar, T>::supertype>>::type
+operator * (const Scalar &, const TypeNTensor<N, T> &)
+{
+  libmesh_not_implemented();
+  return TypeNTensor<N,typename CompareTypes<Scalar, T>::supertype>();
+}
+
+template <unsigned int N, typename T, typename Scalar>
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  TypeNTensor<N,typename CompareTypes<Scalar, T>::supertype>>::type
+operator / (const Scalar &, const TypeNTensor<N, T> &)
+{
+  libmesh_not_implemented();
+  return TypeNTensor<N,typename CompareTypes<Scalar, T>::supertype>();
+}
+
+
 } // namespace libMesh
 
 
