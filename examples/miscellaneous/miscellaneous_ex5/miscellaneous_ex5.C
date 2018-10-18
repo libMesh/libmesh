@@ -241,7 +241,8 @@ void assemble_ellipticdg(EquationSystems & es,
       // matrix and right-hand-side this element will
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
-      const unsigned int n_dofs = dof_indices.size();
+      const unsigned int n_dofs =
+        cast_int<unsigned int>(dof_indices.size());
 
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
@@ -377,7 +378,8 @@ void assemble_ellipticdg(EquationSystems & es,
                   // matrix this neighbor will contribute to.
                   std::vector<dof_id_type> neighbor_dof_indices;
                   dof_map.dof_indices (neighbor, neighbor_dof_indices);
-                  const unsigned int n_neighbor_dofs = neighbor_dof_indices.size();
+                  const unsigned int n_neighbor_dofs =
+                    cast_int<unsigned int>(neighbor_dof_indices.size());
 
                   // Zero the element and neighbor side matrix before
                   // summing them.  We use the resize member here because

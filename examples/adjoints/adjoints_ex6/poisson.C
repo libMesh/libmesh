@@ -143,7 +143,7 @@ bool PoissonSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Point > & q_point = elem_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+  const unsigned int n_T_dofs = c.n_dof_indices(0);
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> & K = c.get_elem_jacobian(0,0);

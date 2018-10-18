@@ -394,6 +394,22 @@ public:
   }
 
   /**
+   * Total number of dof indices on the element
+   */
+  unsigned int n_dof_indices() const
+  { return cast_int<unsigned int>(_dof_indices.size()); }
+
+  /**
+   * Total number of dof indices of the particular variable
+   * corresponding to the index argument
+   */
+  unsigned int n_dof_indices( unsigned int var ) const
+  {
+    libmesh_assert_greater(_dof_indices_var.size(), var);
+    return cast_int<unsigned int>(_dof_indices_var[var].size());
+  }
+
+  /**
    * Accessor for the time variable stored in the system class.
    */
   Real get_system_time() const

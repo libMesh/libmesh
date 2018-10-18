@@ -80,7 +80,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  const unsigned int dim = c.get_elem().dim();
+  const unsigned short dim = c.get_elem().dim();
   FEBase * fe = nullptr;
   c.get_element_fe(T_var, fe, dim);
 
@@ -94,7 +94,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(T_var).size();
+  const unsigned int n_T_dofs = c.n_dof_indices(T_var);
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> & K = c.get_elem_jacobian(T_var, T_var);

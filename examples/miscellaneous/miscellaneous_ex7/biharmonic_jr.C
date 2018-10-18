@@ -263,6 +263,9 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
 
+      const unsigned int n_dofs =
+        cast_int<unsigned int>(dof_indices.size());
+
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
       // quadrature points (q_point) and the shape function
@@ -272,12 +275,12 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
       // Zero the element matrix, the right-hand side and the Laplacian matrix
       // before summing them.
       if (J)
-        Je.resize(dof_indices.size(), dof_indices.size());
+        Je.resize(n_dofs, n_dofs);
 
       if (R)
-        Re.resize(dof_indices.size());
+        Re.resize(n_dofs);
 
-      Laplacian_phi_qp.resize(dof_indices.size());
+      Laplacian_phi_qp.resize(n_dofs);
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
         {
@@ -302,7 +305,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
             M_prime_qp = 0.0,
             M_prime_old_qp = 0.0;
 
-          for (std::size_t i=0; i<phi.size(); i++)
+          for (unsigned int i=0; i<n_dofs; i++)
             {
               Laplacian_phi_qp[i] = d2phi[i][qp](0, 0);
               grad_u_qp(0) += u(dof_indices[i])*dphi[i][qp](0);
@@ -335,7 +338,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
             }
 
           // ELEMENT RESIDUAL AND JACOBIAN
-          for (std::size_t i=0; i<phi.size(); i++)
+          for (unsigned int i=0; i<n_dofs; i++)
             {
               // RESIDUAL
               if (R)
@@ -395,7 +398,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
                 {
                   Number M_prime_prime_qp = 0.0;
                   if (_biharmonic._degenerate) M_prime_prime_qp = -2.0;
-                  for (std::size_t j=0; j<phi.size(); j++)
+                  for (unsigned int j=0; j<n_dofs; j++)
                     {
                       Number ri_j = 0.0;
                       ri_j -= Laplacian_phi_qp[i]*M_qp*_biharmonic._kappa*Laplacian_phi_qp[j];
@@ -522,9 +525,12 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
       // and define where in the global vector this element will.
       dof_map.dof_indices (elem, dof_indices);
 
+      const unsigned int n_dofs =
+        cast_int<unsigned int>(dof_indices.size());
+
       // Resize the local bounds vectors (zeroing them out in the process).
-      XLe.resize(dof_indices.size());
-      XUe.resize(dof_indices.size());
+      XLe.resize(n_dofs);
+      XUe.resize(n_dofs);
 
       // Extract the element node coordinates in the reference frame
       std::vector<Point> nodes;
@@ -544,12 +550,12 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
       // Auxiliary variables will need to be introduced to reduce this to a "box" constraint.
       // Additional complications will arise since m might be singular (as is the case for Hermite,
       // which, however, is easily handled by inspection).
-      for (std::size_t i=0; i<phi.size(); ++i)
+      for (unsigned int i=0; i<n_dofs; ++i)
         {
           // FIXME: should be able to define INF and pass it to the solve
           Real infinity = 1.0e20;
           Real bound = infinity;
-          for (std::size_t j = 0; j < nodes.size(); ++j)
+          for (unsigned int j = 0; j < nodes.size(); ++j)
             {
               if (phi[i][j])
                 {

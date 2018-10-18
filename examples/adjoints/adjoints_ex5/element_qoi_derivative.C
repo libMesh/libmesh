@@ -50,7 +50,7 @@ void HeatSystem::element_qoi_derivative (DiffContext & context,
   const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+  const unsigned int n_T_dofs = c.n_dof_indices(0);
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   // Fill the QoI RHS corresponding to this QoI. Since this is the 0th QoI

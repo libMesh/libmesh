@@ -102,7 +102,7 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
   c.get_element_fe(_u_var, u_elem_fe);
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
+  const unsigned int n_u_dofs = c.n_dof_indices(_u_var);
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
@@ -218,7 +218,7 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
       c.get_side_fe(_u_var, u_side_fe);
 
       // The number of local degrees of freedom in each variable
-      const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
+      const unsigned int n_u_dofs = c.n_dof_indices(_u_var);
 
       DenseSubVector<Number> & Fu = c.get_elem_residual(u_dot_var);
       DenseSubVector<Number> & Fv = c.get_elem_residual(v_dot_var);
@@ -271,7 +271,7 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
   c.get_element_fe(u_dot_var, u_elem_fe);
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(u_dot_var).size();
+  const unsigned int n_u_dofs = c.n_dof_indices(u_dot_var);
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();

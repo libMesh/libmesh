@@ -235,9 +235,9 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Point> & qpoint = u_elem_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
-  libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices(v_var).size());
+  const unsigned int n_p_dofs = c.n_dof_indices(p_var);
+  const unsigned int n_u_dofs = c.n_dof_indices(u_var);
+  libmesh_assert_equal_to (n_u_dofs, c.n_dof_indices(v_var));
 
   // The subvectors and submatrices we need to fill:
   const unsigned int dim = this->get_mesh().mesh_dimension();
@@ -413,8 +413,8 @@ bool NavierSystem::element_constraint (bool request_jacobian,
   const std::vector<std::vector<Real>> & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
-  const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+  const unsigned int n_u_dofs = c.n_dof_indices(u_var);
+  const unsigned int n_p_dofs = c.n_dof_indices(p_var);
 
   // The subvectors and submatrices we need to fill:
   const unsigned int dim = this->get_mesh().mesh_dimension();
@@ -485,7 +485,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
 
       DenseSubMatrix<Number> & Kpp = c.get_elem_jacobian(p_var, p_var);
       DenseSubVector<Number> & Fp = c.get_elem_residual(p_var);
-      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+      const unsigned int n_p_dofs = c.n_dof_indices(p_var);
 
       Number p;
       c.point_value(p_var, zero, p);
@@ -553,7 +553,7 @@ bool NavierSystem::mass_residual (bool request_jacobian,
   DenseSubMatrix<Number> & Kww = c.get_elem_jacobian(w_var, w_var);
 
   // The number of local degrees of freedom in velocity
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  const unsigned int n_u_dofs = c.n_dof_indices(u_var);
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
