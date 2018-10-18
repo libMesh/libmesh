@@ -842,6 +842,11 @@ public:
   { return _ghosting_functors.end(); }
 
   /**
+   * Default ghosting functor
+   */
+  GhostingFunctor & default_ghosting() { return *_default_ghosting; }
+
+  /**
    * Constructs a list of all subdomain identifiers in the global mesh.
    * Subdomains correspond to separate subsets of the mesh which could correspond
    * e.g. to different materials in a solid mechanics application,

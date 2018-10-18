@@ -1795,11 +1795,29 @@ void DofMap::clear_sparsity()
 
 
 
+void DofMap::remove_default_ghosting()
+{
+  this->remove_coupling_functor(this->default_coupling());
+  this->remove_algebraic_ghosting_functor(this->default_algebraic_ghosting());
+}
+
+
+
+void DofMap::add_default_ghosting()
+{
+  this->add_coupling_functor(this->default_coupling());
+  this->add_algebraic_ghosting_functor(this->default_algebraic_ghosting());
+}
+
+
+
 void
-DofMap::add_coupling_functor(GhostingFunctor & coupling_functor)
+DofMap::add_coupling_functor(GhostingFunctor & coupling_functor,
+                             bool to_mesh)
 {
   _coupling_functors.insert(&coupling_functor);
-  _mesh.add_ghosting_functor(coupling_functor);
+  if (to_mesh)
+    _mesh.add_ghosting_functor(coupling_functor);
 }
 
 
@@ -1814,19 +1832,21 @@ DofMap::remove_coupling_functor(GhostingFunctor & coupling_functor)
 
 
 void
-DofMap::add_algebraic_ghosting_functor(GhostingFunctor & algebraic_ghosting_functor)
+DofMap::add_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor,
+                                       bool to_mesh)
 {
-  _algebraic_ghosting_functors.insert(&algebraic_ghosting_functor);
-  _mesh.add_ghosting_functor(algebraic_ghosting_functor);
+  _algebraic_ghosting_functors.insert(&evaluable_functor);
+  if (to_mesh)
+    _mesh.add_ghosting_functor(evaluable_functor);
 }
 
 
 
 void
-DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & algebraic_ghosting_functor)
+DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor)
 {
-  _algebraic_ghosting_functors.erase(&algebraic_ghosting_functor);
-  _mesh.remove_ghosting_functor(algebraic_ghosting_functor);
+  _algebraic_ghosting_functors.erase(&evaluable_functor);
+  _mesh.remove_ghosting_functor(evaluable_functor);
 }
 
 

@@ -257,6 +257,27 @@ public:
   void clear_sparsity();
 
   /**
+   * Remove any default ghosting functor(s).  User-added ghosting
+   * functors will be unaffected.
+   *
+   * Unless user-added equivalent ghosting functors exist, removing
+   * the default coupling functor is only safe for explicit solves,
+   * and removing the default algebraic ghosting functor is only safe
+   * for codes where no evaluations on neighbor cells (e.g. no jump
+   * error estimators) are done.
+   *
+   * Defaults can be restored manually via add_default_ghosting(), or
+   * automatically if clear() returns the DofMap to a default state.
+   */
+  void remove_default_ghosting();
+
+  /**
+   * Add the default functor(s) for coupling and algebraic ghosting.
+   * User-added ghosting functors will be unaffected.
+   */
+  void add_default_ghosting();
+
+  /**
    * Adds a functor which can specify coupling requirements for
    * creation of sparse matrices.
    * Degree of freedom pairs which match the elements and variables
@@ -269,12 +290,24 @@ public:
    * GhostingFunctor memory must be managed by the code which calls
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the DofMap is destructed.
+   *
+   * When \p to_mesh is true, the \p coupling_functor is also added to
+   * our associated mesh, to ensure that coupled elements do not get
+   * lost during mesh distribution.  (if coupled elements were
+   * *already* lost there's no getting them back after the fact,
+   * sorry)
+   *
+   * If \p to_mesh is false, no change to mesh ghosting is made;
+   * the Mesh must already have ghosting functor(s) specifying a
+   * superset of \p coupling_functor or this is a horrible bug.
    */
-  void add_coupling_functor(GhostingFunctor & coupling_functor);
+  void add_coupling_functor(GhostingFunctor & coupling_functor,
+                            bool to_mesh = true);
 
   /**
    * Removes a functor which was previously added to the set of
-   * coupling functors.
+   * coupling functors, from both this DofMap and from the underlying
+   * mesh.
    */
   void remove_coupling_functor(GhostingFunctor & coupling_functor);
 
@@ -300,19 +333,33 @@ public:
    * for use with distributed vectors.  Degrees of freedom on other
    * processors which match the elements and variables returned by
    * these functors will be added to the send_list, and the elements
-   * on other processors will be ghosted on a distributed mesh.
+   * on other processors will be ghosted on a distributed mesh, so
+   * that the elements can always be found and the solutions on them
+   * will always be evaluable.
    *
    * GhostingFunctor memory must be managed by the code which calls
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the DofMap is destructed.
+   *
+   * When \p to_mesh is true, the \p coupling_functor is also added to
+   * our associated mesh, to ensure that evaluable elements do not get
+   * lost during mesh distribution.  (if evaluable elements were
+   * *already* lost there's no getting them back after the fact,
+   * sorry)
+   *
+   * If \p to_mesh is false, no change to mesh ghosting is made;
+   * the Mesh must already have ghosting functor(s) specifying a
+   * superset of \p evaluable_functor or this is a horrible bug.
    */
-  void add_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor);
+  void add_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor,
+                                      bool to_mesh = true);
 
   /**
    * Removes a functor which was previously added to the set of
-   * algebraic ghosting functors.
+   * algebraic ghosting functors, from both this DofMap and from the
+   * underlying mesh.
    */
-  void remove_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor);
+  void remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor);
 
   /**
    * Beginning of range of algebraic ghosting functors
@@ -1241,7 +1288,8 @@ public:
   void reinit (MeshBase & mesh);
 
   /**
-   * Free all memory associated with the object, but keep the mesh pointer.
+   * Free all new memory associated with the object, but restore its
+   * original state, with the mesh pointer and any default ghosting.
    */
   void clear ();
 

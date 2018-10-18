@@ -4,8 +4,10 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
+#include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
+#include <libmesh/ghost_point_neighbors.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
@@ -55,6 +57,8 @@ public:
   CPPUNIT_TEST( testReinitWithNodeElem );
   CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
   CPPUNIT_TEST( testRepartitionThenReinit );
+  CPPUNIT_TEST( testRepartitionThenReinit );
+  CPPUNIT_TEST( testDisableDefaultGhosting );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -219,6 +223,91 @@ public:
                                        libmesh_real(bilinear_test(p,es.parameters,"","")),
                                        TOLERANCE*TOLERANCE);
         }
+  }
+
+  void testDisableDefaultGhosting()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+
+    auto n_ghosts = [&mesh]() {
+      return int(std::distance(mesh.ghosting_functors_begin(),
+                               mesh.ghosting_functors_end()));
+    };
+
+    auto n_evaluables = [](System &sys) {
+      return int(std::distance(sys.get_dof_map().algebraic_ghosting_functors_begin(),
+                               sys.get_dof_map().algebraic_ghosting_functors_end()));
+    };
+
+    auto n_couplings = [](System &sys) {
+      return int(std::distance(sys.get_dof_map().coupling_functors_begin(),
+                               sys.get_dof_map().coupling_functors_end()));
+    };
+
+    // One default ghosting functor on the mesh
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 1);
+
+    // Add another functor, making two
+    GhostPointNeighbors gpn(mesh);
+    mesh.add_ghosting_functor(gpn);
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 2);
+
+    // Remove the default, leaving just the user functor
+    es.enable_default_ghosting(false);
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 1);
+
+    // Which can be removed too
+    mesh.remove_ghosting_functor(gpn);
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 0);
+
+    // Adding a new system shouldn't add any default ghosting if the
+    // EquationSystems disabled it
+    System & sys1 = es.add_system<System>("System1");
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 0);
+    CPPUNIT_ASSERT_EQUAL(n_evaluables(sys1), 0);
+    CPPUNIT_ASSERT_EQUAL(n_couplings(sys1), 0);
+
+    // But if we reenable it then now we should have three functors,
+    // with the default algebraic and coupling functors from sys1.
+    //
+    // We currently iterate over coupling functors manually even when
+    // using them for evaluability... this test will need to change
+    // eventually, when that does.
+    es.enable_default_ghosting(true);
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 3);
+    CPPUNIT_ASSERT_EQUAL(n_evaluables(sys1), 1);
+    CPPUNIT_ASSERT_EQUAL(n_couplings(sys1), 1);
+
+    // Adding a second system with default ghosting reenabled should
+    // give us 2 more functors.
+    System & sys2 = es.add_system<System>("System2");
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 5);
+    CPPUNIT_ASSERT_EQUAL(n_evaluables(sys2), 1);
+    CPPUNIT_ASSERT_EQUAL(n_couplings(sys2), 1);
+
+    // Adding a user functor to evaluables and couplings should add it
+    // to the mesh
+    GhostPointNeighbors gpn2(mesh), gpn3(mesh);
+    sys1.get_dof_map().add_algebraic_ghosting_functor(gpn2);
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 6);
+    CPPUNIT_ASSERT_EQUAL(n_evaluables(sys1), 2);
+    CPPUNIT_ASSERT_EQUAL(n_couplings(sys1), 1);
+
+    // Unless we say not to.
+    sys1.get_dof_map().add_coupling_functor(gpn3, /*to_mesh=*/false);
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 6);
+    CPPUNIT_ASSERT_EQUAL(n_evaluables(sys1), 2);
+    CPPUNIT_ASSERT_EQUAL(n_couplings(sys1), 2);
+
+    // Turning off default coupling again should get rid of everything
+    // except the user functors.
+    es.enable_default_ghosting(false);
+    CPPUNIT_ASSERT_EQUAL(n_ghosts(), 1);
+    CPPUNIT_ASSERT_EQUAL(n_evaluables(sys1), 1);
+    CPPUNIT_ASSERT_EQUAL(n_couplings(sys1), 1);
+    CPPUNIT_ASSERT_EQUAL(n_evaluables(sys2), 0);
+    CPPUNIT_ASSERT_EQUAL(n_couplings(sys2), 0);
   }
 
 
