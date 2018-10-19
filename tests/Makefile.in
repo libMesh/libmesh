@@ -212,6 +212,14 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
 	parallel/packed_range_test.C parallel/parallel_sort_test.C \
 	parallel/parallel_test.C parallel/parallel_point_test.C \
+	partitioning/partitioner_test.h \
+	partitioning/centroid_partitioner_test.C \
+	partitioning/hilbert_sfc_partitioner_test.C \
+	partitioning/linear_partitioner_test.C \
+	partitioning/metis_partitioner_test.C \
+	partitioning/morton_sfc_partitioner_test.C \
+	partitioning/parmetis_partitioner_test.C \
+	partitioning/sfc_partitioner_test.C \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
@@ -270,6 +278,13 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_point_test.$(OBJEXT) \
+	partitioning/unit_tests_dbg-centroid_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_dbg-linear_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_dbg-metis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_dbg-morton_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_dbg-parmetis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_dbg-sfc_partitioner_test.$(OBJEXT) \
 	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT) \
 	solvers/unit_tests_dbg-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_dbg-second_order_unsteady_solver_test.$(OBJEXT) \
@@ -318,6 +333,14 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
 	parallel/packed_range_test.C parallel/parallel_sort_test.C \
 	parallel/parallel_test.C parallel/parallel_point_test.C \
+	partitioning/partitioner_test.h \
+	partitioning/centroid_partitioner_test.C \
+	partitioning/hilbert_sfc_partitioner_test.C \
+	partitioning/linear_partitioner_test.C \
+	partitioning/metis_partitioner_test.C \
+	partitioning/morton_sfc_partitioner_test.C \
+	partitioning/parmetis_partitioner_test.C \
+	partitioning/sfc_partitioner_test.C \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
@@ -375,6 +398,13 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_point_test.$(OBJEXT) \
+	partitioning/unit_tests_devel-centroid_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_devel-linear_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_devel-metis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_devel-morton_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_devel-parmetis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_devel-sfc_partitioner_test.$(OBJEXT) \
 	quadrature/unit_tests_devel-quadrature_test.$(OBJEXT) \
 	solvers/unit_tests_devel-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_devel-second_order_unsteady_solver_test.$(OBJEXT) \
@@ -420,6 +450,14 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
 	parallel/packed_range_test.C parallel/parallel_sort_test.C \
 	parallel/parallel_test.C parallel/parallel_point_test.C \
+	partitioning/partitioner_test.h \
+	partitioning/centroid_partitioner_test.C \
+	partitioning/hilbert_sfc_partitioner_test.C \
+	partitioning/linear_partitioner_test.C \
+	partitioning/metis_partitioner_test.C \
+	partitioning/morton_sfc_partitioner_test.C \
+	partitioning/parmetis_partitioner_test.C \
+	partitioning/sfc_partitioner_test.C \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
@@ -477,6 +515,13 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_point_test.$(OBJEXT) \
+	partitioning/unit_tests_oprof-centroid_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_oprof-linear_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_oprof-metis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_oprof-morton_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_oprof-parmetis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_oprof-sfc_partitioner_test.$(OBJEXT) \
 	quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT) \
 	solvers/unit_tests_oprof-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_oprof-second_order_unsteady_solver_test.$(OBJEXT) \
@@ -522,6 +567,14 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
 	parallel/packed_range_test.C parallel/parallel_sort_test.C \
 	parallel/parallel_test.C parallel/parallel_point_test.C \
+	partitioning/partitioner_test.h \
+	partitioning/centroid_partitioner_test.C \
+	partitioning/hilbert_sfc_partitioner_test.C \
+	partitioning/linear_partitioner_test.C \
+	partitioning/metis_partitioner_test.C \
+	partitioning/morton_sfc_partitioner_test.C \
+	partitioning/parmetis_partitioner_test.C \
+	partitioning/sfc_partitioner_test.C \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
@@ -579,6 +632,13 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_point_test.$(OBJEXT) \
+	partitioning/unit_tests_opt-centroid_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_opt-linear_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_opt-metis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_opt-morton_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_opt-parmetis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_opt-sfc_partitioner_test.$(OBJEXT) \
 	quadrature/unit_tests_opt-quadrature_test.$(OBJEXT) \
 	solvers/unit_tests_opt-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_opt-second_order_unsteady_solver_test.$(OBJEXT) \
@@ -623,6 +683,14 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
 	parallel/packed_range_test.C parallel/parallel_sort_test.C \
 	parallel/parallel_test.C parallel/parallel_point_test.C \
+	partitioning/partitioner_test.h \
+	partitioning/centroid_partitioner_test.C \
+	partitioning/hilbert_sfc_partitioner_test.C \
+	partitioning/linear_partitioner_test.C \
+	partitioning/metis_partitioner_test.C \
+	partitioning/morton_sfc_partitioner_test.C \
+	partitioning/parmetis_partitioner_test.C \
+	partitioning/sfc_partitioner_test.C \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
@@ -680,6 +748,13 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_sort_test.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_test.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_point_test.$(OBJEXT) \
+	partitioning/unit_tests_prof-centroid_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_prof-linear_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_prof-metis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_prof-morton_sfc_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_prof-parmetis_partitioner_test.$(OBJEXT) \
+	partitioning/unit_tests_prof-sfc_partitioner_test.$(OBJEXT) \
 	quadrature/unit_tests_prof-quadrature_test.$(OBJEXT) \
 	solvers/unit_tests_prof-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_prof-second_order_unsteady_solver_test.$(OBJEXT) \
@@ -1151,6 +1226,14 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 	numerics/type_tensor_test.C numerics/dense_matrix_test.C \
 	parallel/packed_range_test.C parallel/parallel_sort_test.C \
 	parallel/parallel_test.C parallel/parallel_point_test.C \
+	partitioning/partitioner_test.h \
+	partitioning/centroid_partitioner_test.C \
+	partitioning/hilbert_sfc_partitioner_test.C \
+	partitioning/linear_partitioner_test.C \
+	partitioning/metis_partitioner_test.C \
+	partitioning/morton_sfc_partitioner_test.C \
+	partitioning/parmetis_partitioner_test.C \
+	partitioning/sfc_partitioner_test.C \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
@@ -1367,6 +1450,33 @@ parallel/unit_tests_dbg-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_dbg-parallel_point_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+partitioning/$(am__dirstamp):
+	@$(MKDIR_P) partitioning
+	@: > partitioning/$(am__dirstamp)
+partitioning/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) partitioning/$(DEPDIR)
+	@: > partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_dbg-centroid_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_dbg-linear_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_dbg-metis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_dbg-morton_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_dbg-parmetis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_dbg-sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
 quadrature/$(am__dirstamp):
 	@$(MKDIR_P) quadrature
 	@: > quadrature/$(am__dirstamp)
@@ -1516,6 +1626,27 @@ parallel/unit_tests_devel-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_devel-parallel_point_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_devel-centroid_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_devel-linear_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_devel-metis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_devel-morton_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_devel-parmetis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_devel-sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_devel-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -1635,6 +1766,27 @@ parallel/unit_tests_oprof-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_oprof-parallel_point_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_oprof-centroid_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_oprof-linear_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_oprof-metis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_oprof-morton_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_oprof-parmetis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_oprof-sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -1754,6 +1906,27 @@ parallel/unit_tests_opt-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_opt-parallel_point_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_opt-centroid_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_opt-linear_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_opt-metis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_opt-morton_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_opt-parmetis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_opt-sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_opt-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -1873,6 +2046,27 @@ parallel/unit_tests_prof-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_prof-parallel_point_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_prof-centroid_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_prof-linear_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_prof-metis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_prof-morton_sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_prof-parmetis_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
+partitioning/unit_tests_prof-sfc_partitioner_test.$(OBJEXT):  \
+	partitioning/$(am__dirstamp) \
+	partitioning/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_prof-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -1904,6 +2098,7 @@ mostlyclean-compile:
 	-rm -f mesh/*.$(OBJEXT)
 	-rm -f numerics/*.$(OBJEXT)
 	-rm -f parallel/*.$(OBJEXT)
+	-rm -f partitioning/*.$(OBJEXT)
 	-rm -f quadrature/*.$(OBJEXT)
 	-rm -f solvers/*.$(OBJEXT)
 	-rm -f systems/*.$(OBJEXT)
@@ -2167,6 +2362,41 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_sort_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_dbg-centroid_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_dbg-hilbert_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_dbg-linear_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_dbg-metis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_dbg-morton_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_dbg-parmetis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_dbg-sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_devel-centroid_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_devel-hilbert_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_devel-linear_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_devel-metis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_devel-morton_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_devel-parmetis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_devel-sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_oprof-centroid_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_oprof-hilbert_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_oprof-linear_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_oprof-metis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_oprof-morton_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_oprof-parmetis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_oprof-sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_opt-centroid_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_opt-hilbert_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_opt-linear_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_opt-metis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_opt-morton_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_opt-parmetis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_opt-sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_prof-centroid_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_prof-hilbert_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_prof-linear_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_prof-metis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_prof-morton_sfc_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_prof-parmetis_partitioner_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@partitioning/$(DEPDIR)/unit_tests_prof-sfc_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_dbg-quadrature_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Po@am__quote@
@@ -2926,6 +3156,104 @@ parallel/unit_tests_dbg-parallel_point_test.obj: parallel/parallel_point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_dbg-parallel_point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_dbg-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+
+partitioning/unit_tests_dbg-centroid_partitioner_test.o: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-centroid_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_dbg-centroid_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+
+partitioning/unit_tests_dbg-centroid_partitioner_test.obj: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-centroid_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_dbg-centroid_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+
+partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.o: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+
+partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.obj: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_dbg-linear_partitioner_test.o: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-linear_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_dbg-linear_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+
+partitioning/unit_tests_dbg-linear_partitioner_test.obj: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-linear_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_dbg-linear_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+
+partitioning/unit_tests_dbg-metis_partitioner_test.o: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-metis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_dbg-metis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+
+partitioning/unit_tests_dbg-metis_partitioner_test.obj: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-metis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_dbg-metis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_dbg-morton_sfc_partitioner_test.o: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-morton_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_dbg-morton_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+
+partitioning/unit_tests_dbg-morton_sfc_partitioner_test.obj: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-morton_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_dbg-morton_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_dbg-parmetis_partitioner_test.o: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-parmetis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_dbg-parmetis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+
+partitioning/unit_tests_dbg-parmetis_partitioner_test.obj: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-parmetis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_dbg-parmetis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_dbg-sfc_partitioner_test.o: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_dbg-sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+
+partitioning/unit_tests_dbg-sfc_partitioner_test.obj: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_dbg-sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_dbg-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_dbg-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_dbg-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_dbg-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_dbg-sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_dbg-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
 
 quadrature/unit_tests_dbg-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_dbg-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_dbg-quadrature_test.Tpo -c -o quadrature/unit_tests_dbg-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
@@ -3739,6 +4067,104 @@ parallel/unit_tests_devel-parallel_point_test.obj: parallel/parallel_point_test.
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
 
+partitioning/unit_tests_devel-centroid_partitioner_test.o: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-centroid_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_devel-centroid_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+
+partitioning/unit_tests_devel-centroid_partitioner_test.obj: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-centroid_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_devel-centroid_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+
+partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.o: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+
+partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.obj: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_devel-linear_partitioner_test.o: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-linear_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_devel-linear_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+
+partitioning/unit_tests_devel-linear_partitioner_test.obj: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-linear_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_devel-linear_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+
+partitioning/unit_tests_devel-metis_partitioner_test.o: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-metis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_devel-metis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+
+partitioning/unit_tests_devel-metis_partitioner_test.obj: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-metis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_devel-metis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_devel-morton_sfc_partitioner_test.o: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-morton_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_devel-morton_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+
+partitioning/unit_tests_devel-morton_sfc_partitioner_test.obj: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-morton_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_devel-morton_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_devel-parmetis_partitioner_test.o: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-parmetis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_devel-parmetis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+
+partitioning/unit_tests_devel-parmetis_partitioner_test.obj: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-parmetis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_devel-parmetis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_devel-sfc_partitioner_test.o: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_devel-sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+
+partitioning/unit_tests_devel-sfc_partitioner_test.obj: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_devel-sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_devel-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_devel-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_devel-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_devel-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_devel-sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_devel-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+
 quadrature/unit_tests_devel-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_devel-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo -c -o quadrature/unit_tests_devel-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po
@@ -4550,6 +4976,104 @@ parallel/unit_tests_oprof-parallel_point_test.obj: parallel/parallel_point_test.
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_oprof-parallel_point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+
+partitioning/unit_tests_oprof-centroid_partitioner_test.o: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-centroid_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_oprof-centroid_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+
+partitioning/unit_tests_oprof-centroid_partitioner_test.obj: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-centroid_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_oprof-centroid_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+
+partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.o: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+
+partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.obj: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_oprof-linear_partitioner_test.o: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-linear_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_oprof-linear_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+
+partitioning/unit_tests_oprof-linear_partitioner_test.obj: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-linear_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_oprof-linear_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+
+partitioning/unit_tests_oprof-metis_partitioner_test.o: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-metis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_oprof-metis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+
+partitioning/unit_tests_oprof-metis_partitioner_test.obj: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-metis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_oprof-metis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_oprof-morton_sfc_partitioner_test.o: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-morton_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_oprof-morton_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+
+partitioning/unit_tests_oprof-morton_sfc_partitioner_test.obj: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-morton_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_oprof-morton_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_oprof-parmetis_partitioner_test.o: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-parmetis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_oprof-parmetis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+
+partitioning/unit_tests_oprof-parmetis_partitioner_test.obj: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-parmetis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_oprof-parmetis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_oprof-sfc_partitioner_test.o: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_oprof-sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+
+partitioning/unit_tests_oprof-sfc_partitioner_test.obj: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_oprof-sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_oprof-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_oprof-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_oprof-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_oprof-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_oprof-sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_oprof-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
 
 quadrature/unit_tests_oprof-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_oprof-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Tpo -c -o quadrature/unit_tests_oprof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
@@ -5363,6 +5887,104 @@ parallel/unit_tests_opt-parallel_point_test.obj: parallel/parallel_point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
 
+partitioning/unit_tests_opt-centroid_partitioner_test.o: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-centroid_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_opt-centroid_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+
+partitioning/unit_tests_opt-centroid_partitioner_test.obj: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-centroid_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_opt-centroid_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+
+partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.o: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+
+partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.obj: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_opt-linear_partitioner_test.o: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-linear_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_opt-linear_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+
+partitioning/unit_tests_opt-linear_partitioner_test.obj: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-linear_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_opt-linear_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+
+partitioning/unit_tests_opt-metis_partitioner_test.o: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-metis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_opt-metis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+
+partitioning/unit_tests_opt-metis_partitioner_test.obj: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-metis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_opt-metis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_opt-morton_sfc_partitioner_test.o: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-morton_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_opt-morton_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+
+partitioning/unit_tests_opt-morton_sfc_partitioner_test.obj: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-morton_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_opt-morton_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_opt-parmetis_partitioner_test.o: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-parmetis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_opt-parmetis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+
+partitioning/unit_tests_opt-parmetis_partitioner_test.obj: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-parmetis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_opt-parmetis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_opt-sfc_partitioner_test.o: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_opt-sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+
+partitioning/unit_tests_opt-sfc_partitioner_test.obj: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_opt-sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_opt-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_opt-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_opt-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_opt-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_opt-sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_opt-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+
 quadrature/unit_tests_opt-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_opt-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo -c -o quadrature/unit_tests_opt-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Po
@@ -6175,6 +6797,104 @@ parallel/unit_tests_prof-parallel_point_test.obj: parallel/parallel_point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
 
+partitioning/unit_tests_prof-centroid_partitioner_test.o: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-centroid_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_prof-centroid_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-centroid_partitioner_test.o `test -f 'partitioning/centroid_partitioner_test.C' || echo '$(srcdir)/'`partitioning/centroid_partitioner_test.C
+
+partitioning/unit_tests_prof-centroid_partitioner_test.obj: partitioning/centroid_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-centroid_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-centroid_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-centroid_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-centroid_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/centroid_partitioner_test.C' object='partitioning/unit_tests_prof-centroid_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-centroid_partitioner_test.obj `if test -f 'partitioning/centroid_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/centroid_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/centroid_partitioner_test.C'; fi`
+
+partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.o: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.o `test -f 'partitioning/hilbert_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/hilbert_sfc_partitioner_test.C
+
+partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.obj: partitioning/hilbert_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-hilbert_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-hilbert_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-hilbert_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/hilbert_sfc_partitioner_test.C' object='partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-hilbert_sfc_partitioner_test.obj `if test -f 'partitioning/hilbert_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/hilbert_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/hilbert_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_prof-linear_partitioner_test.o: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-linear_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_prof-linear_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-linear_partitioner_test.o `test -f 'partitioning/linear_partitioner_test.C' || echo '$(srcdir)/'`partitioning/linear_partitioner_test.C
+
+partitioning/unit_tests_prof-linear_partitioner_test.obj: partitioning/linear_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-linear_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-linear_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-linear_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-linear_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/linear_partitioner_test.C' object='partitioning/unit_tests_prof-linear_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-linear_partitioner_test.obj `if test -f 'partitioning/linear_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/linear_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/linear_partitioner_test.C'; fi`
+
+partitioning/unit_tests_prof-metis_partitioner_test.o: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-metis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_prof-metis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-metis_partitioner_test.o `test -f 'partitioning/metis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/metis_partitioner_test.C
+
+partitioning/unit_tests_prof-metis_partitioner_test.obj: partitioning/metis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-metis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-metis_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-metis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-metis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/metis_partitioner_test.C' object='partitioning/unit_tests_prof-metis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-metis_partitioner_test.obj `if test -f 'partitioning/metis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/metis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/metis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_prof-morton_sfc_partitioner_test.o: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-morton_sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_prof-morton_sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-morton_sfc_partitioner_test.o `test -f 'partitioning/morton_sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/morton_sfc_partitioner_test.C
+
+partitioning/unit_tests_prof-morton_sfc_partitioner_test.obj: partitioning/morton_sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-morton_sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-morton_sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-morton_sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-morton_sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/morton_sfc_partitioner_test.C' object='partitioning/unit_tests_prof-morton_sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-morton_sfc_partitioner_test.obj `if test -f 'partitioning/morton_sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/morton_sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/morton_sfc_partitioner_test.C'; fi`
+
+partitioning/unit_tests_prof-parmetis_partitioner_test.o: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-parmetis_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_prof-parmetis_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-parmetis_partitioner_test.o `test -f 'partitioning/parmetis_partitioner_test.C' || echo '$(srcdir)/'`partitioning/parmetis_partitioner_test.C
+
+partitioning/unit_tests_prof-parmetis_partitioner_test.obj: partitioning/parmetis_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-parmetis_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-parmetis_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-parmetis_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-parmetis_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/parmetis_partitioner_test.C' object='partitioning/unit_tests_prof-parmetis_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-parmetis_partitioner_test.obj `if test -f 'partitioning/parmetis_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/parmetis_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/parmetis_partitioner_test.C'; fi`
+
+partitioning/unit_tests_prof-sfc_partitioner_test.o: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-sfc_partitioner_test.o -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_prof-sfc_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-sfc_partitioner_test.o `test -f 'partitioning/sfc_partitioner_test.C' || echo '$(srcdir)/'`partitioning/sfc_partitioner_test.C
+
+partitioning/unit_tests_prof-sfc_partitioner_test.obj: partitioning/sfc_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT partitioning/unit_tests_prof-sfc_partitioner_test.obj -MD -MP -MF partitioning/$(DEPDIR)/unit_tests_prof-sfc_partitioner_test.Tpo -c -o partitioning/unit_tests_prof-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) partitioning/$(DEPDIR)/unit_tests_prof-sfc_partitioner_test.Tpo partitioning/$(DEPDIR)/unit_tests_prof-sfc_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='partitioning/sfc_partitioner_test.C' object='partitioning/unit_tests_prof-sfc_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o partitioning/unit_tests_prof-sfc_partitioner_test.obj `if test -f 'partitioning/sfc_partitioner_test.C'; then $(CYGPATH_W) 'partitioning/sfc_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/partitioning/sfc_partitioner_test.C'; fi`
+
 quadrature/unit_tests_prof-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_prof-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Tpo -c -o quadrature/unit_tests_prof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Po
@@ -6515,6 +7235,8 @@ distclean-generic:
 	-rm -f numerics/$(am__dirstamp)
 	-rm -f parallel/$(DEPDIR)/$(am__dirstamp)
 	-rm -f parallel/$(am__dirstamp)
+	-rm -f partitioning/$(DEPDIR)/$(am__dirstamp)
+	-rm -f partitioning/$(am__dirstamp)
 	-rm -f quadrature/$(DEPDIR)/$(am__dirstamp)
 	-rm -f quadrature/$(am__dirstamp)
 	-rm -f solvers/$(DEPDIR)/$(am__dirstamp)
@@ -6533,7 +7255,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool clean-local \
 	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fe/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fe/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) partitioning/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -6579,7 +7301,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fe/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fe/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) partitioning/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
