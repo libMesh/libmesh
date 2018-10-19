@@ -552,7 +552,8 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _current_nonlinear_iteration_number(0),
   _zero_out_residual(true),
   _zero_out_jacobian(true),
-  _default_monitor(true)
+  _default_monitor(true),
+  _snesmf_reuse_base(true)
 {
 }
 
@@ -908,9 +909,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LIBMESH_CHKERR(ierr);
   ierr = MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this);
   LIBMESH_CHKERR(ierr);
-#if !PETSC_RELEASE_LESS_THAN(3, 8, 4)
+#if !PETSC_VERSION_LESS_THAN(3, 8, 4)
   // Resue the residual vector from SNES
-  ierr = MatSNESMFSetReuseBase(J, PETSC_TRUE);
+  ierr = MatSNESMFSetReuseBase(J, static_cast<PetscBool>(_snesmf_reuse_base));
   LIBMESH_CHKERR(ierr);
 #endif
 #endif

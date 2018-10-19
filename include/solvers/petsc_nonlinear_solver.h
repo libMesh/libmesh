@@ -180,6 +180,11 @@ public:
   void use_default_monitor(bool state) { _default_monitor = state; }
 
   /**
+   * Set to true to let PETSc reuse the base vector
+   */
+  void set_snesmf_reuse_base(bool state) { _snesmf_reuse_base = state; }
+
+  /**
    * Abstract base class to be used to implement a custom line-search algorithm
    */
   class ComputeLineSearchObject
@@ -238,6 +243,13 @@ protected:
    * true if we want the default monitor to be set, false for no monitor (i.e. user code can use their own)
    */
   bool _default_monitor;
+
+  /**
+   * True, If we want the base vector to be used for differencing even if the function provided to SNESSetFunction()
+   * is not the same as that provided to MatMFFDSetFunction().
+   * https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/MatSNESMFSetReuseBase.html
+   */
+  bool _snesmf_reuse_base;
 
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
