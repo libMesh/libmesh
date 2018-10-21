@@ -30,6 +30,10 @@
 # include <petscsys.h>
 #endif
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+#include "metaphysicl/dualnumber.h"
+#endif
+
 // C++ includes
 #include <vector>
 #include <algorithm>
@@ -701,9 +705,39 @@ private:
                     bool trans=false) const;
 };
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+/**
+ * Partial specialization for dual numbers
+ * We don't do anything for these at this point. This is provided for compilation purposes
+ */
+template<typename T, typename D>
+class DenseMatrix<MetaPhysicL::DualNumber<T, D>> : public DenseMatrixBase<MetaPhysicL::DualNumber<T, D>>
+{
+  virtual void zero() override { libmesh_not_implemented(); }
+
+  virtual MetaPhysicL::DualNumber<T, D> el(const unsigned int, const unsigned int) const override
+    {
+      libmesh_not_implemented();
+      return MetaPhysicL::DualNumber<T, D>{};
+    }
+
+  virtual MetaPhysicL::DualNumber<T, D> & el(const unsigned int, const unsigned int) override
+    {
+      libmesh_not_implemented();
+      return _dummy;
+    }
+
+  virtual void left_multiply (const DenseMatrixBase<MetaPhysicL::DualNumber<T, D>> &) override
+    { libmesh_not_implemented(); }
+
+  virtual void right_multiply (const DenseMatrixBase<MetaPhysicL::DualNumber<T, D>> &) override
+    { libmesh_not_implemented(); }
 
 
-
+private:
+  MetaPhysicL::DualNumber<T, D> _dummy;
+};
+#endif
 
 // ------------------------------------------------------------
 /**

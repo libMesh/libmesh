@@ -38,11 +38,21 @@ public:
   CPPUNIT_TEST(testEVDreal);
   CPPUNIT_TEST(testEVDcomplex);
   CPPUNIT_TEST(testComplexSVD);
+#ifdef LIBMESH_HAVE_METAPHYSICL
+  CPPUNIT_TEST(testDualNumberInstantiation);
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
 
 private:
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+  void testDualNumberInstantiation()
+  {
+    DenseMatrix<MetaPhysicL::DualNumber<Real>> test;
+  }
+#endif
 
   void testOuterProduct()
   {
