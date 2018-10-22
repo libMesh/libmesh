@@ -776,6 +776,11 @@ void assemble_shell (EquationSystems & es,
                   full_local_KIJ.block<5,5>(0,0)=local_KIJ;
 
                   // Drilling dof stiffness contribution
+                  // Note that in the original book, there is a coefficient of
+                  // alpha between 1e-4 and 1e-7 to make the fictitious 
+                  // drilling stiffness small while preventing the stiffness 
+                  // matrix from being singular. For this problem, we can use 
+                  // alpha = 1 to also get a good result.
                   full_local_KIJ(5,5) = Hf(0,0)*JxW[qp]*BdI.transpose()*BdJ;
 
                   // Transform the stiffness matrix to global coordinates
