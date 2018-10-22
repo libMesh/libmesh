@@ -1104,7 +1104,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
 
 
 template <typename T>
-void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
+void PetscMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 {
   libmesh_assert (this->initialized());
 
@@ -1114,7 +1114,7 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
   libmesh_assert_equal_to (this->n(), X_in.n());
 
   PetscScalar a = static_cast<PetscScalar>      (a_in);
-  PetscMatrix<T> * X = cast_ptr<PetscMatrix<T> *> (&X_in);
+  const PetscMatrix<T> * X = cast_ptr<const PetscMatrix<T> *> (&X_in);
 
   libmesh_assert (X);
 
