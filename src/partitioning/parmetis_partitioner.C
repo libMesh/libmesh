@@ -130,7 +130,11 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
       mesh.allgather();
 
       MetisPartitioner mp;
-      mp.partition (mesh, n_sbdmns);
+      // Don't just call partition() here; that would end up calling
+      // post-element-partitioning work redundantly (and at the moment
+      // incorrectly)
+      mp.partition_range (mesh, mesh.active_elements_begin(),
+                          mesh.active_elements_end(), n_sbdmns);
       return;
     }
 
