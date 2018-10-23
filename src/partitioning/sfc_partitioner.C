@@ -43,14 +43,17 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
                                      MeshBase::element_iterator end,
                                      unsigned int n)
 {
-  libmesh_assert_greater (n, 0);
+  // Check for easy returns
+  if (beg == end)
+    return;
 
-  // Check for an easy return
   if (n == 1)
     {
       this->single_partition_range (beg, end);
       return;
     }
+
+  libmesh_assert_greater (n, 0);
 
   // What to do if the sfcurves library IS NOT present
 #ifndef LIBMESH_HAVE_SFCURVES
