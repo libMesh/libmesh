@@ -72,7 +72,10 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
   // We don't yet support distributed meshes with this Partitioner
   if (!mesh.is_serial())
-    libmesh_not_implemented();
+    {
+      libMesh::out << "WARNING: Forced to gather a distributed mesh for METIS" << std::endl;
+      mesh.allgather();
+    }
 
   // What to do if the Metis library IS NOT present
 #ifndef LIBMESH_HAVE_METIS
