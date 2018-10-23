@@ -378,14 +378,15 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
 
 
 template <typename T>
-void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
+void LaspackMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  LaspackMatrix<T> * X = cast_ptr<LaspackMatrix<T> *> (&X_in);
-  _LPNumber         a = static_cast<_LPNumber>          (a_in);
+  const LaspackMatrix<T> * X =
+    cast_ptr<const LaspackMatrix<T> *> (&X_in);
+  _LPNumber a = static_cast<_LPNumber> (a_in);
 
   libmesh_assert(X);
 

@@ -159,7 +159,7 @@ public:
    * \note \p X will be closed, if not already done, before performing
    * any work.
    */
-  virtual void add (const T a, SparseMatrix<T> & X) override;
+  virtual void add (const T a, const SparseMatrix<T> & X) override;
 
   virtual T operator () (const numeric_index_type i,
                          const numeric_index_type j) const override;

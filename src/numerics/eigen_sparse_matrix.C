@@ -259,13 +259,14 @@ void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
 
 
 template <typename T>
-void EigenSparseMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
+void EigenSparseMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  EigenSparseMatrix<T> & X = cast_ref<EigenSparseMatrix<T> &> (X_in);
+  const EigenSparseMatrix<T> & X =
+    cast_ref<const EigenSparseMatrix<T> &> (X_in);
 
   _mat += X._mat*a_in;
 }

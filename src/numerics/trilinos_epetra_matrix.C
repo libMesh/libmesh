@@ -426,7 +426,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
 
 
 template <typename T>
-void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
+void EpetraMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 {
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRAEXT
   libmesh_assert (this->initialized());
@@ -436,7 +436,8 @@ void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  EpetraMatrix<T> * X = cast_ptr<EpetraMatrix<T> *> (&X_in);
+  const EpetraMatrix<T> * X =
+    cast_ptr<const EpetraMatrix<T> *> (&X_in);
 
   EpetraExt::MatrixMatrix::Add (*X->_mat, false, a_in, *_mat, 1.);
 #else

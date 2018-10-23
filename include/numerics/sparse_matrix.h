@@ -257,7 +257,7 @@ public:
   /**
    * Compute \f$ A \leftarrow A + a*X \f$ for scalar \p a, matrix \p X.
    */
-  virtual void add (const T a, SparseMatrix<T> & X) = 0;
+  virtual void add (const T a, const SparseMatrix<T> & X) = 0;
 
   /**
    * \returns A copy of matrix entry \p (i,j).
