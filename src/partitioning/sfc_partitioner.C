@@ -58,10 +58,10 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
   // What to do if the sfcurves library IS NOT present
 #ifndef LIBMESH_HAVE_SFCURVES
 
-  libmesh_here();
-  libMesh::err << "ERROR: The library has been built without"    << std::endl
-               << "Space Filling Curve support.  Using a linear" << std::endl
-               << "partitioner instead!" << std::endl;
+  libmesh_do_once(
+    libMesh::out << "ERROR: The library has been built without"    << std::endl
+                 << "Space Filling Curve support.  Using a linear" << std::endl
+                 << "partitioner instead!" << std::endl;);
 
   LinearPartitioner lp;
   lp.partition_range (mesh, beg, end, n);
@@ -129,13 +129,12 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
 
   else
     {
-      libmesh_here();
-      libMesh::err << "ERROR: Unknown type: " << _sfc_type << std::endl
+      libMesh::out << "ERROR: Unknown type: " << _sfc_type << std::endl
                    << " Valid types are"                   << std::endl
                    << "  \"Hilbert\""                      << std::endl
                    << "  \"Morton\""                       << std::endl
                    << " "                                  << std::endl
-                   << "Proceeding with a Hilbert curve."   << std::endl;
+                   << "Partitioning with a Hilbert curve." << std::endl;
 
       Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
     }
