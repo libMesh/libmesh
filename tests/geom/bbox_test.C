@@ -26,6 +26,7 @@ public:
   CPPUNIT_TEST( test_one_degenerate );
   CPPUNIT_TEST( test_two_degenerate );
   CPPUNIT_TEST( test_no_degenerate );
+  CPPUNIT_TEST( test_signed_distance );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -220,6 +221,36 @@ public:
         std::rotate(mins.rbegin(), mins.rbegin()+1, mins.rend());
         std::rotate(maxs.rbegin(), maxs.rbegin()+1, maxs.rend());
       }
+  }
+
+  void test_signed_distance()
+  {
+    // Simple tests which we can compare with known values.
+    BoundingBox unit(Point(0.,0.,0.), Point(1.,1.,1.));
+
+    // Test points inside the box
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.5, 0.5, 0.5)), -0.5, TOLERANCE * TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.5, 0.6, 0.5)), -0.4, TOLERANCE * TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.4, 0.5, 0.5)), -0.4, TOLERANCE * TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.1, 0.1, 0.1)), -0.1, TOLERANCE * TOLERANCE);
+
+    // Test points on the box
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(1.0, 0.5, 0.5)), 0., TOLERANCE * TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(1.0, 0., 0.)), 0., TOLERANCE * TOLERANCE);
+
+    // Test points outside the box
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(1.5, 0.5, 0.5)), 0.5, TOLERANCE * TOLERANCE);  // right
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(-0.5, 0.5, 0.5)), 0.5, TOLERANCE * TOLERANCE); // left
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.5, 0.5, 1.5)), 0.5, TOLERANCE * TOLERANCE);  // above
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.5, 0.5, -0.5)), 0.5, TOLERANCE * TOLERANCE); // below
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.5, -0.5, 0.5)), 0.5, TOLERANCE * TOLERANCE); // front
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(0.5, 1.5, 0.5)), 0.5, TOLERANCE * TOLERANCE);  // back
+
+    // Outside the box, closest to a corner.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(2., 2., 2.)), std::sqrt(3.), TOLERANCE * TOLERANCE);    // Point along line (0,0,0) -> (1,1,1)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(-1., -1., -1.)), std::sqrt(3.), TOLERANCE * TOLERANCE); // Point along line (0,0,0) -> (1,1,1)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(1.5, 1.5, -0.5)), std::sqrt(3.)/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,1,0)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(1.5, -0.5, -0.5)), std::sqrt(3.)/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,0,0)
   }
 };
 
