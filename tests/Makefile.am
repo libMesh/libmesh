@@ -73,6 +73,14 @@ unit_tests_sources = \
   parallel/parallel_sort_test.C \
   parallel/parallel_test.C \
   parallel/parallel_point_test.C \
+  partitioning/partitioner_test.h \
+  partitioning/centroid_partitioner_test.C \
+  partitioning/hilbert_sfc_partitioner_test.C \
+  partitioning/linear_partitioner_test.C \
+  partitioning/metis_partitioner_test.C \
+  partitioning/morton_sfc_partitioner_test.C \
+  partitioning/parmetis_partitioner_test.C \
+  partitioning/sfc_partitioner_test.C \
   quadrature/quadrature_test.C \
   solvers/time_solver_test_common.h \
   solvers/first_order_unsteady_solver_test.C \

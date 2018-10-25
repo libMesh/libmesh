@@ -31,12 +31,19 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
                                           MeshBase::element_iterator end,
                                           unsigned int n)
 {
-  // Check for an easy return
+  // Check for easy returns
+  if (it == end)
+    return;
+
   if (n == 1)
     {
       this->single_partition_range (it, end);
       return;
     }
+
+  // Make sure the user has not handed us an
+  // invalid number of partitions.
+  libmesh_assert_greater (n, 0);
 
   // We don't yet support distributed meshes with this Partitioner
   if (!mesh.is_serial())
@@ -92,10 +99,6 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
     default:
       libmesh_error_msg("Unknown sort method: " << this->sort_method());
     }
-
-  // Make sure the user has not handed us an
-  // invalid number of partitions.
-  libmesh_assert_greater (n, 0);
 
   // Compute target_size, the approximate number of elements on each processor.
   const dof_id_type target_size = cast_int<dof_id_type>

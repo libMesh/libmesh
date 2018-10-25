@@ -93,29 +93,36 @@ void ParmetisPartitioner::_do_partition (MeshBase & mesh,
 void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
                                            const unsigned int n_sbdmns)
 {
-  libmesh_assert_greater (n_sbdmns, 0);
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
 
-  // Check for an easy return
+  // Check for easy returns
+  if (!mesh.n_elem())
+    return;
+
   if (n_sbdmns == 1)
     {
       this->single_partition(mesh);
       return;
     }
 
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  libmesh_assert_greater (n_sbdmns, 0);
 
   // What to do if the Parmetis library IS NOT present
 #ifndef LIBMESH_HAVE_PARMETIS
 
-  libmesh_here();
-  libMesh::err << "ERROR: The library has been built without" << std::endl
+  libmesh_do_once(
+  libMesh::out << "ERROR: The library has been built without" << std::endl
                << "Parmetis support.  Using a Metis"          << std::endl
-               << "partitioner instead!"                      << std::endl;
+               << "partitioner instead!"                      << std::endl;);
 
   MetisPartitioner mp;
 
-  mp.partition (mesh, n_sbdmns);
+  // Don't just call partition() here; that would end up calling
+  // post-element-partitioning work redundantly (and at the moment
+  // incorrectly)
+  mp.partition_range (mesh, mesh.active_elements_begin(),
+                      mesh.active_elements_end(), n_sbdmns);
 
   // What to do if the Parmetis library IS present
 #else
@@ -127,7 +134,11 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
       mesh.allgather();
 
       MetisPartitioner mp;
-      mp.partition (mesh, n_sbdmns);
+      // Don't just call partition() here; that would end up calling
+      // post-element-partitioning work redundantly (and at the moment
+      // incorrectly)
+      mp.partition_range (mesh, mesh.active_elements_begin(),
+                          mesh.active_elements_end(), n_sbdmns);
       return;
     }
 

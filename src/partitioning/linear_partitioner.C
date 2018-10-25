@@ -30,14 +30,17 @@ void LinearPartitioner::partition_range(MeshBase & mesh,
                                         MeshBase::element_iterator end,
                                         const unsigned int n)
 {
-  libmesh_assert_greater (n, 0);
+  // Check for easy returns
+  if (it == end)
+    return;
 
-  // Check for an easy return
   if (n == 1)
     {
       this->single_partition_range (it, end);
       return;
     }
+
+  libmesh_assert_greater (n, 0);
 
   // Create a simple linear partitioning
   LOG_SCOPE ("partition_range()", "LinearPartitioner");

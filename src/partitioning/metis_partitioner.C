@@ -58,26 +58,32 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                                        MeshBase::element_iterator end,
                                        unsigned int n_pieces)
 {
-  libmesh_assert_greater (n_pieces, 0);
+  // Check for easy returns
+  if (beg == end)
+    return;
 
-  // We don't yet support distributed meshes with this Partitioner
-  if (!mesh.is_serial())
-    libmesh_not_implemented();
-
-  // Check for an easy return
   if (n_pieces == 1)
     {
       this->single_partition_range (beg, end);
       return;
     }
 
+  libmesh_assert_greater (n_pieces, 0);
+
+  // We don't yet support distributed meshes with this Partitioner
+  if (!mesh.is_serial())
+    {
+      libMesh::out << "WARNING: Forced to gather a distributed mesh for METIS" << std::endl;
+      mesh.allgather();
+    }
+
   // What to do if the Metis library IS NOT present
 #ifndef LIBMESH_HAVE_METIS
 
-  libmesh_here();
-  libMesh::err << "ERROR: The library has been built without"    << std::endl
+  libmesh_do_once(
+  libMesh::out << "ERROR: The library has been built without"    << std::endl
                << "Metis support.  Using a space-filling curve"  << std::endl
-               << "partitioner instead!"                         << std::endl;
+               << "partitioner instead!"                         << std::endl;);
 
   SFCPartitioner sfcp;
   sfcp.partition_range (mesh, beg, end, n_pieces);
