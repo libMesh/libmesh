@@ -20,7 +20,9 @@
 // Local includes
 #include "libmesh/bounding_box.h"
 
-
+// C++ includes
+#include <algorithm> // std::min_element
+#include <array>
 
 namespace libMesh
 {
@@ -194,5 +196,41 @@ void BoundingBox::union_with (const BoundingBox & other_box)
 }
 
 
+
+Real BoundingBox::signed_distance(const Point & p) const
+{
+  if (contains_point(p))
+    {
+      // Sign convention: if Point is inside the bbox, the distance is
+      // negative. We then find the smallest distance to the different
+      // sides of the box and return that.
+      Real min_dist = std::numeric_limits<Real>::max();
+
+      for (unsigned int dir=0; dir<LIBMESH_DIM; ++dir)
+        {
+          min_dist = std::min(min_dist, std::abs(p(dir) - second(dir)));
+          min_dist = std::min(min_dist, std::abs(p(dir) - first(dir)));
+        }
+
+      return -min_dist;
+    }
+  else // p is outside the box
+    {
+      Real dx[3] = {0., 0., 0.};
+
+      // Compute distance "above"/"below" the box in each
+      // direction. If the point is somewhere in between the (min,
+      // max) values of the box, dx is 0.
+      for (unsigned int dir=0; dir<LIBMESH_DIM; ++dir)
+        {
+          if (p(dir) > second(dir))
+            dx[dir] = p(dir) - second(dir);
+          else if (p(dir) < first(dir))
+            dx[dir] = p(dir) - first(dir);
+        }
+
+      return std::sqrt(dx[0]*dx[0] + dx[1]*dx[1] + dx[2]*dx[2]);
+    }
+}
 
 } // namespace libMesh
