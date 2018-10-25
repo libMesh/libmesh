@@ -204,11 +204,15 @@ Real BoundingBox::signed_distance(const Point & p) const
       // Sign convention: if Point is inside the bbox, the distance is
       // negative. We then find the smallest distance to the different
       // sides of the box and return that.
-      std::array<Real, 6> dists = {std::abs(p(0) - second(0)), std::abs(p(0) - first(0)),
-                                   std::abs(p(1) - second(1)), std::abs(p(1) - first(1)),
-                                   std::abs(p(2) - second(2)), std::abs(p(2) - first(2))};
+      Real min_dist = std::numeric_limits<Real>::max();
 
-      return -1. * (*std::min_element(dists.begin(), dists.end()));
+      for (unsigned int dir=0; dir<LIBMESH_DIM; ++dir)
+        {
+          min_dist = std::min(min_dist, std::abs(p(dir) - second(dir)));
+          min_dist = std::min(min_dist, std::abs(p(dir) - first(dir)));
+        }
+
+      return -min_dist;
     }
   else // p is outside the box
     {
