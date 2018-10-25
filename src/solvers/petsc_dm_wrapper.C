@@ -452,7 +452,7 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   // Final setup of PetscSection
   // Until Matt Knepley finishes implementing the commented out function
   // below, the PetscSection will be assuming node-major ordering
-  // so let's throw and error if the user tries to use this without
+  // so let's throw an error if the user tries to use this without
   // node-major order
   if (!libMesh::on_command_line("--node-major-dofs"))
     libmesh_error_msg("ERROR: Must use --node-major-dofs with PetscSection!");
