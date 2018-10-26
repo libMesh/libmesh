@@ -25,11 +25,22 @@ using namespace libMesh;
 
 #define MACROCOMMA ,
 
+#if LIBMESH_DIM > 2
 #define TEST_ONE_ORDER(qtype, order, maxorder)                          \
   CPPUNIT_TEST( testBuild<qtype MACROCOMMA order> );                    \
   CPPUNIT_TEST( test1DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> ); \
   CPPUNIT_TEST( test2DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> ); \
   CPPUNIT_TEST( test3DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> );
+#elif LIBMESH_DIM > 1
+#define TEST_ONE_ORDER(qtype, order, maxorder)                          \
+  CPPUNIT_TEST( testBuild<qtype MACROCOMMA order> );                    \
+  CPPUNIT_TEST( test1DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> ); \
+  CPPUNIT_TEST( test2DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> );
+#else
+#define TEST_ONE_ORDER(qtype, order, maxorder)                          \
+  CPPUNIT_TEST( testBuild<qtype MACROCOMMA order> );                    \
+  CPPUNIT_TEST( test1DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> );
+#endif
 
 // std::min isn't constexpr, and C++03 lacks constexpr anyway
 #define mymin(a, b) (a < b ? a : b)
@@ -94,10 +105,14 @@ public:
   CPPUNIT_TEST( testMonomialQuadrature );
 
   // Test quadrature rules on Triangles
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testTriQuadrature );
+#endif
 
   // Test quadrature rules on Tetrahedra
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testTetQuadrature );
+#endif
 
   // Test Jacobi quadrature rules with special weighting function
   CPPUNIT_TEST( testJacobi );
@@ -121,7 +136,7 @@ public:
     ElemType elem_type[2] = {QUAD4, HEX8};
     int dims[2]           = {2, 3};
 
-    for (int i=0; i<2; ++i)
+    for (int i=0; i<(LIBMESH_DIM-1); ++i)
       {
         // std::cout << "\nChecking monomial quadrature on element type " << elem_type[i] << std::endl;
 
@@ -135,32 +150,35 @@ public:
             // In 3D, max(z_power)==order, in 2D max(z_power)==0
             int max_z_power = dims[i]==2 ? 0 : order;
 
-            for (int x_power=0; x_power<=order; ++x_power)
-              for (int y_power=0; y_power<=order; ++y_power)
-                for (int z_power=0; z_power<=max_z_power; ++z_power)
+            int xyz_power[3];
+            for (xyz_power[0]=0; xyz_power[0]<=order; ++xyz_power[0])
+              for (xyz_power[1]=0; xyz_power[1]<=order; ++xyz_power[1])
+                for (xyz_power[2]=0; xyz_power[2]<=max_z_power; ++xyz_power[2])
                   {
                     // Only try to integrate polynomials we can integrate exactly
-                    if (x_power + y_power + z_power > order)
+                    if (xyz_power[0] + xyz_power[1] + xyz_power[2] > order)
                       continue;
 
                     // Compute the integral via quadrature.  Note that
                     // std::pow(0,0) returns 1 in the 2D case.
                     Real sumq = 0.;
                     for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-                      sumq += qrule->w(qp)
-                        * std::pow(qrule->qp(qp)(0), x_power)
-                        * std::pow(qrule->qp(qp)(1), y_power)
-                        * std::pow(qrule->qp(qp)(2), z_power);
+                      {
+                        Real term = qrule->w(qp);
+                        for (unsigned int d=0; d != LIBMESH_DIM; ++d)
+                          term *= std::pow(qrule->qp(qp)(d), xyz_power[d]);
+                        sumq += term;
+                      }
 
-                    // std::cout << "Quadrature of x^" << x_power
-                    //           << " y^" << y_power
-                    //           << " z^" << z_power
+                    // std::cout << "Quadrature of x^" << xyz_power[0]
+                    //           << " y^" << xyz_power[1]
+                    //           << " z^" << xyz_power[2]
                     //           << " = " << sumq << std::endl;
 
                     // Copy-pasted code from test3DWeights()
-                    Real exact_x = (x_power % 2) ? 0 : (Real(2.0) / (x_power+1));
-                    Real exact_y = (y_power % 2) ? 0 : (Real(2.0) / (y_power+1));
-                    Real exact_z = (z_power % 2) ? 0 : (Real(2.0) / (z_power+1));
+                    Real exact_x = (xyz_power[0] % 2) ? 0 : (Real(2.0) / (xyz_power[0]+1));
+                    Real exact_y = (xyz_power[1] % 2) ? 0 : (Real(2.0) / (xyz_power[1]+1));
+                    Real exact_z = (xyz_power[2] % 2) ? 0 : (Real(2.0) / (xyz_power[2]+1));
 
                     // Handle 2D
                     if (dims[i]==2)

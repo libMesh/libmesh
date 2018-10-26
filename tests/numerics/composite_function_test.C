@@ -34,7 +34,9 @@ public:
   CPPUNIT_TEST_SUITE(CompositeFunctionTest);
 
   CPPUNIT_TEST(testRemap);
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST(testTimeDependence);
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

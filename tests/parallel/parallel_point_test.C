@@ -25,9 +25,12 @@ class ParallelPointTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( ParallelPointTest );
 
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testAllGatherPoint );
   CPPUNIT_TEST( testAllGatherPairPointPoint );
   CPPUNIT_TEST( testAllGatherPairRealPoint );
+#endif
+
   CPPUNIT_TEST( testBroadcastVectorValueInt );
   CPPUNIT_TEST( testBroadcastVectorValueReal );
   CPPUNIT_TEST( testBroadcastPoint );

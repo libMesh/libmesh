@@ -39,10 +39,12 @@ public:
 
   CPPUNIT_TEST_SUITE(ParsedFunctionTest);
 
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST(testValues);
   CPPUNIT_TEST(testInlineGetter);
   CPPUNIT_TEST(testInlineSetter);
   CPPUNIT_TEST(testTimeDependence);
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

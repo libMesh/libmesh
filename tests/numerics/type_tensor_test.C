@@ -28,7 +28,9 @@ public:
 
   CPPUNIT_TEST_SUITE(TypeTensorTest);
 
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST(testInverse);
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

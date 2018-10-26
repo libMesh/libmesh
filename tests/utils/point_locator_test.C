@@ -30,9 +30,13 @@ public:
   CPPUNIT_TEST_SUITE( PointLocatorTest );
 
   CPPUNIT_TEST( testLocatorOnEdge3 );
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testLocatorOnQuad9 );
   CPPUNIT_TEST( testLocatorOnTri6 );
+#endif
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testLocatorOnHex27 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -103,10 +107,12 @@ public:
                   {
                     CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(0), i*h,
                                                  TOLERANCE*TOLERANCE);
-                    CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(1), j*h,
-                                                 TOLERANCE*TOLERANCE);
-                    CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(2), k*h,
-                                                 TOLERANCE*TOLERANCE);
+                    if (LIBMESH_DIM > 1)
+                      CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(1), j*h,
+                                                   TOLERANCE*TOLERANCE);
+                    if (LIBMESH_DIM > 2)
+                      CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(2), k*h,
+                                                   TOLERANCE*TOLERANCE);
                   }
               }
           }

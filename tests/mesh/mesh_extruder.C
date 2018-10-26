@@ -34,7 +34,9 @@ class MeshExtruderTest : public CppUnit::TestCase
 public:
   CPPUNIT_TEST_SUITE( MeshExtruderTest );
 
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testExtruder );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

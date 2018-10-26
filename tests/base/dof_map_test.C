@@ -60,11 +60,15 @@ public:
   CPPUNIT_TEST_SUITE( DofMapTest );
 
   CPPUNIT_TEST( testDofOwnerOnEdge3 );
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testDofOwnerOnQuad9 );
   CPPUNIT_TEST( testDofOwnerOnTri6 );
+#endif
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testDofOwnerOnHex27 );
+#endif
 
-#if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS)
+#if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS) && LIBMESH_DIM > 1
   CPPUNIT_TEST( testCyclicConstraintDetection );
 #endif
 

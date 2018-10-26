@@ -35,6 +35,7 @@ class ParsedFEMFunctionTest : public CppUnit::TestCase
 {
 public:
   void setUp() {
+#if LIBMESH_DIM > 2
     mesh.reset(new Mesh(*TestCommWorld));
     MeshTools::Generation::build_cube(*mesh, 1, 1, 1);
     es.reset(new EquationSystems(*mesh));
@@ -107,6 +108,7 @@ public:
         s->side = 3;
         s->side_fe_reinit();
       }
+#endif
   }
 
   void tearDown() {
@@ -118,12 +120,14 @@ public:
 
   CPPUNIT_TEST_SUITE(ParsedFEMFunctionTest);
 
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST(testValues);
   CPPUNIT_TEST(testGradients);
   CPPUNIT_TEST(testHessians);
   CPPUNIT_TEST(testInlineGetter);
   CPPUNIT_TEST(testInlineSetter);
   CPPUNIT_TEST(testNormals);
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

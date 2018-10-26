@@ -15,11 +15,15 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
+#if LIBMESH_DIM > 2
 #define PARTITIONERTEST                         \
   CPPUNIT_TEST( testPartitionEmpty );           \
   CPPUNIT_TEST( testPartition1 );               \
   CPPUNIT_TEST( testPartition2 );               \
-  CPPUNIT_TEST( testPartitionNProc );           \
+  CPPUNIT_TEST( testPartitionNProc );
+#else
+#define PARTITIONERTEST
+#endif
 
 using namespace libMesh;
 

@@ -36,14 +36,18 @@ public:
   CPPUNIT_TEST_SUITE( AllTriTest );
 
   // 2D tests
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testAllTriTri );
   CPPUNIT_TEST( testAllTriQuad );
   CPPUNIT_TEST( testAllTriQuad8 );
   CPPUNIT_TEST( testAllTriQuad9 );
+#endif
 
   // 3D tests
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testAllTriPrism6 );
   CPPUNIT_TEST( testAllTriPrism18 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

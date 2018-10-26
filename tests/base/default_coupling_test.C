@@ -34,8 +34,8 @@ Number cubic_default_coupling_test (const Point& p,
                                     const std::string&)
 {
   const Real & x = p(0);
-  const Real & y = p(1);
-  const Real & z = p(2);
+  const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
+  const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
 
   return x*(1-x)*(1-x) + x*x*(1-y) + x*(1-y)*(1-z) + y*(1-y)*z + z*(1-z)*(1-z);
 }
@@ -46,10 +46,14 @@ class DefaultCouplingTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( DefaultCouplingTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testCouplingOnEdge3 );
+#endif
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testCouplingOnQuad9 );
   CPPUNIT_TEST( testCouplingOnTri6 );
   CPPUNIT_TEST( testCouplingOnHex27 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

@@ -23,10 +23,12 @@ class BBoxTest : public CppUnit::TestCase {
 
 public:
   CPPUNIT_TEST_SUITE( BBoxTest );
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( test_one_degenerate );
   CPPUNIT_TEST( test_two_degenerate );
   CPPUNIT_TEST( test_no_degenerate );
   CPPUNIT_TEST( test_signed_distance );
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -225,9 +227,6 @@ public:
 
   void test_signed_distance()
   {
-    // If libMesh is compiled with LIBMESH_DIM!=3, this code should
-    // still compile but all the distances will be different.
-#if LIBMESH_DIM == 3
     // A "unit" size bounding box for making distance comparisons.
     BoundingBox unit(Point(0.,0.,0.), Point(1.,1.,1.));
 
@@ -254,7 +253,6 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(-1., -1., -1.)), std::sqrt(3.), TOLERANCE * TOLERANCE); // Point along line (0,0,0) -> (1,1,1)
     CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(1.5, 1.5, -0.5)), std::sqrt(3.)/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,1,0)
     CPPUNIT_ASSERT_DOUBLES_EQUAL(unit.signed_distance(Point(1.5, -0.5, -0.5)), std::sqrt(3.)/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,0,0)
-#endif
   }
 };
 
