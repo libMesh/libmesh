@@ -353,23 +353,31 @@ public:
   CPPUNIT_TEST_SUITE( SystemsTest );
 
   CPPUNIT_TEST( testProjectHierarchicEdge3 );
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testProjectHierarchicQuad9 );
   CPPUNIT_TEST( testProjectHierarchicTri6 );
+  CPPUNIT_TEST( testBlockRestrictedVarNDofs );
+#endif // LIBMESH_DIM > 1
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testProjectHierarchicHex27 );
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
-  CPPUNIT_TEST( testDofCouplingWithVarGroups );
   CPPUNIT_TEST( testAssemblyWithDgFemContext );
-  CPPUNIT_TEST( testBlockRestrictedVarNDofs );
+#endif // LIBMESH_DIM > 2
+  CPPUNIT_TEST( testDofCouplingWithVarGroups );
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #ifdef LIBMESH_HAVE_PETSC
   CPPUNIT_TEST( testProjectMatrixEdge2 );
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testProjectMatrixQuad4 );
   CPPUNIT_TEST( testProjectMatrixTri3 );
+#endif // LIBMESH_DIM > 1
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testProjectMatrixHex8 );
   CPPUNIT_TEST( testProjectMatrixTet4 );
+#endif // LIBMESH_DIM > 2
 #endif // LIBMESH_HAVE_PETSC
 #endif // LIBMESH_HAVE_METAPHYSICL
 #endif // LIBMESH_ENABLE_AMR

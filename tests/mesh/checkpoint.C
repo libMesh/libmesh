@@ -31,6 +31,7 @@ class CheckpointIOTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( CheckpointIOTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testAsciiDistRepSplitter );
   CPPUNIT_TEST( testBinaryDistRepSplitter );
   CPPUNIT_TEST( testAsciiRepDistSplitter );
@@ -39,6 +40,7 @@ public:
   CPPUNIT_TEST( testBinaryRepRepSplitter );
   CPPUNIT_TEST( testAsciiDistDistSplitter );
   CPPUNIT_TEST( testBinaryDistDistSplitter );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

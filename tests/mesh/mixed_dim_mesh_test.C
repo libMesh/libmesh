@@ -38,9 +38,11 @@ class MixedDimensionMeshTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( MixedDimensionMeshTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
   CPPUNIT_TEST( testPointLocatorTree );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -107,7 +109,9 @@ protected:
 public:
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
+#endif
   }
 
   void tearDown()
@@ -216,8 +220,10 @@ class MixedDimensionRefinedMeshTest : public MixedDimensionMeshTest {
 public:
   CPPUNIT_TEST_SUITE( MixedDimensionRefinedMeshTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -239,10 +245,12 @@ public:
     // |       |       |
     // |   7   |   8   |
     // 4-------11------5
+#if LIBMESH_DIM > 1
     this->build_mesh();
 
 #ifdef LIBMESH_ENABLE_AMR
     MeshRefinement(*_mesh).uniformly_refine(1);
+#endif
 #endif
   }
 
@@ -353,8 +361,10 @@ class MixedDimensionNonUniformRefinement : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -491,12 +501,16 @@ protected:
 public:
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
+#endif
   }
 
   void tearDown()
   {
+#if LIBMESH_DIM > 1
     delete _mesh;
+#endif
   }
 
   void testMesh()
@@ -605,8 +619,10 @@ class MixedDimensionNonUniformRefinementTriangle : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinementTriangle );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -712,12 +728,16 @@ protected:
 public:
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
+#endif
   }
 
   void tearDown()
   {
+#if LIBMESH_DIM > 1
     delete _mesh;
+#endif
   }
 
   void testMesh()
@@ -860,8 +880,10 @@ class MixedDimensionNonUniformRefinement3D : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement3D );
 
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -934,12 +956,16 @@ protected:
 public:
   void setUp()
   {
+#if LIBMESH_DIM > 2
     this->build_mesh();
+#endif
   }
 
   void tearDown()
   {
+#if LIBMESH_DIM > 2
     delete _mesh;
+#endif
   }
 
   void testMesh()

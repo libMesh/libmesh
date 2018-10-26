@@ -66,8 +66,18 @@ private:
 public:
   virtual void setUp()
   {
-    m_1_1_1 = new DerivedClass(1,1,1);
-    m_n1_1_n1 = new DerivedClass(-1,1,-1);
+    m_1_1_1 = new DerivedClass(1);
+    m_n1_1_n1 = new DerivedClass(-1);
+
+#if LIBMESH_DIM > 1
+    (*m_1_1_1)(1) = 1;
+    (*m_n1_1_n1)(1) = 1;
+#endif
+#if LIBMESH_DIM > 2
+    (*m_1_1_1)(2) = 1;
+    (*m_n1_1_n1)(2) = -1;
+#endif
+
 
     basem_1_1_1 = m_1_1_1;
     basem_n1_1_n1 = m_n1_1_n1;
@@ -82,160 +92,176 @@ public:
   void testValue()
   {
     CPPUNIT_ASSERT_EQUAL( T(1), (*m_1_1_1)(0));
-    CPPUNIT_ASSERT_EQUAL( T(1), (*m_1_1_1)(1));
-    CPPUNIT_ASSERT_EQUAL( T(1), (*m_1_1_1)(2));
-
     CPPUNIT_ASSERT_EQUAL( T(-1), (*m_n1_1_n1)(0));
+
+#if LIBMESH_DIM > 1
+    CPPUNIT_ASSERT_EQUAL( T(1), (*m_1_1_1)(1));
     CPPUNIT_ASSERT_EQUAL( T(1) , (*m_n1_1_n1)(1));
+#endif
+
+#if LIBMESH_DIM > 2
+    CPPUNIT_ASSERT_EQUAL( T(1), (*m_1_1_1)(2));
     CPPUNIT_ASSERT_EQUAL( T(-1), (*m_n1_1_n1)(2));
+#endif
   }
 
   void testZero()
   {
+#if LIBMESH_DIM > 2
     DerivedClass avector(1,1,1);
+#elif LIBMESH_DIM > 1
+    DerivedClass avector(1,1);
+#else
+    DerivedClass avector(1);
+#endif
     avector.zero();
 
-    CPPUNIT_ASSERT_EQUAL( T(0), avector(0));
-    CPPUNIT_ASSERT_EQUAL( T(0), avector(1));
-    CPPUNIT_ASSERT_EQUAL( T(0), avector(2));
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_EQUAL( T(0), avector(i));
   }
 
   void testNorm()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , m_1_1_1->norm() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(Real(LIBMESH_DIM)) , m_1_1_1->norm() , TOLERANCE*TOLERANCE );
   }
 
   void testNormSq()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 3.0 , m_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( Real(LIBMESH_DIM) , m_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
   }
 
   void testEquality()
   {
     CPPUNIT_ASSERT( (*m_1_1_1) == (*m_1_1_1) );
+#if LIBMESH_DIM > 1
     CPPUNIT_ASSERT( !((*m_1_1_1) == (*m_n1_1_n1)) );
+#endif
   }
 
   void testInEquality()
   {
     CPPUNIT_ASSERT( !((*m_1_1_1) != (*m_1_1_1)) );
+#if LIBMESH_DIM > 1
     CPPUNIT_ASSERT( (*m_1_1_1) != (*m_n1_1_n1) );
+#endif
   }
 
   void testAssignment()
   {
     DerivedClass avector = (*m_1_1_1);
 
-    CPPUNIT_ASSERT_EQUAL( T(1), (avector)(0) );
-    CPPUNIT_ASSERT_EQUAL( T(1), (avector)(1) );
-    CPPUNIT_ASSERT_EQUAL( T(1), (avector)(2) );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_EQUAL( T(1), (avector)(i) );
   }
 
   void testScalarInit()  // Not valid for all derived classes!
   {
     DerivedClass avector = 0;
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
 
     DerivedClass bvector = 2.0;
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(bvector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(bvector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(bvector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 1; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(bvector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMult()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*m_1_1_1)*5.0)(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*m_1_1_1)*5.0)(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*m_1_1_1)*5.0)(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*m_1_1_1)*5.0)(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDiv()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*m_1_1_1)/5.0)(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*m_1_1_1)/5.0)(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*m_1_1_1)/5.0)(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*m_1_1_1)/5.0)(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssign()
   {
-    DerivedClass avector(1,1,1);
+    DerivedClass avector = (*m_1_1_1);
     avector*=5.0;
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivAssign()
   {
-    DerivedClass avector(1.0,1.0,1.0);
+    DerivedClass avector = (*m_1_1_1);
     avector/=5.0;
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAdd()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 1)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddScaled()
   {
-    DerivedClass avector(1,1,1);
+    DerivedClass avector = (*m_1_1_1);
     avector.add_scaled((*m_1_1_1),0.5);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSub()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 1)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorMult()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( -1.0 , libmesh_real((*m_1_1_1)*(*m_n1_1_n1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM == 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real((*m_1_1_1)*(*m_n1_1_n1)) , TOLERANCE*TOLERANCE );
+    else
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( -1.0 , libmesh_real((*m_1_1_1)*(*m_n1_1_n1)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddAssign()
   {
-    DerivedClass avector(1,1,1);
+    DerivedClass avector = (*m_1_1_1);
     avector+=(*m_1_1_1);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubAssign()
   {
-    DerivedClass avector(1,1,1);
+    DerivedClass avector = (*m_1_1_1);
     avector-=(*m_n1_1_n1);
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 1)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
   }
 
   void testValueBase()
   {
-    CPPUNIT_ASSERT_EQUAL( T(1), (*basem_1_1_1)(0));
-    CPPUNIT_ASSERT_EQUAL( T(1), (*basem_1_1_1)(1));
-    CPPUNIT_ASSERT_EQUAL( T(1), (*basem_1_1_1)(2));
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_EQUAL( T(1), (*basem_1_1_1)(i));
 
     CPPUNIT_ASSERT_EQUAL( T(-1), (*basem_n1_1_n1)(0));
-    CPPUNIT_ASSERT_EQUAL( T(1 ), (*basem_n1_1_n1)(1));
-    CPPUNIT_ASSERT_EQUAL( T(-1), (*basem_n1_1_n1)(2));
+    if (LIBMESH_DIM > 1)
+      CPPUNIT_ASSERT_EQUAL( T(1 ), (*basem_n1_1_n1)(1));
+    if (LIBMESH_DIM > 2)
+      CPPUNIT_ASSERT_EQUAL( T(-1), (*basem_n1_1_n1)(2));
   }
 
   void testZeroBase()
@@ -243,19 +269,18 @@ public:
     TypeVector<T> avector((*basem_1_1_1));
     avector.zero();
 
-    CPPUNIT_ASSERT_EQUAL( T(0), avector(0));
-    CPPUNIT_ASSERT_EQUAL( T(0), avector(1));
-    CPPUNIT_ASSERT_EQUAL( T(0), avector(2));
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_EQUAL( T(0), avector(i));
   }
 
   void testNormBase()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , basem_1_1_1->norm() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(Real(LIBMESH_DIM)) , basem_1_1_1->norm() , TOLERANCE*TOLERANCE );
   }
 
   void testNormSqBase()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 3.0 , basem_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( Real(LIBMESH_DIM) , basem_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
   }
 
   void testEqualityBase()
@@ -274,23 +299,20 @@ public:
   {
     TypeVector<T> avector = (*m_1_1_1);
 
-    CPPUNIT_ASSERT_EQUAL( T(1), (avector)(0) );
-    CPPUNIT_ASSERT_EQUAL( T(1), (avector)(1) );
-    CPPUNIT_ASSERT_EQUAL( T(1), (avector)(2) );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_EQUAL( T(1), (avector)(i) );
   }
 
   void testScalarMultBase()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*basem_1_1_1)*5.0)(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*basem_1_1_1)*5.0)(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*basem_1_1_1)*5.0)(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*basem_1_1_1)*5.0)(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivBase()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*basem_1_1_1)/5.0)(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*basem_1_1_1)/5.0)(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*basem_1_1_1)/5.0)(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(((*basem_1_1_1)/5.0)(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssignBase()
@@ -298,9 +320,8 @@ public:
     TypeVector<T> avector(*m_1_1_1);
     avector*=5.0;
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivAssignBase()
@@ -308,16 +329,17 @@ public:
     TypeVector<T> avector(*m_1_1_1);
     avector/=5.0;
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddBase()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 1)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddScaledBase()
@@ -325,21 +347,25 @@ public:
     TypeVector<T> avector(*m_1_1_1);
     avector.add_scaled((*basem_1_1_1),0.5);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubBase()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 1)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorMultBase()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( -1.0 , libmesh_real((*basem_1_1_1)*(*basem_n1_1_n1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM == 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(  0.0 , libmesh_real((*basem_1_1_1)*(*basem_n1_1_n1)) , TOLERANCE*TOLERANCE );
+    else
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( -1.0 , libmesh_real((*basem_1_1_1)*(*basem_n1_1_n1)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddAssignBase()
@@ -347,9 +373,8 @@ public:
     TypeVector<T> avector(*m_1_1_1);
     avector+=(*basem_1_1_1);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    for (int i = 0; i != LIBMESH_DIM; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubAssignBase()
@@ -358,8 +383,10 @@ public:
     avector-=(*basem_n1_1_n1);
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 1)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
+    if (LIBMESH_DIM > 2)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
   }
 };
 

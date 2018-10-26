@@ -27,10 +27,12 @@ class WhichNodeAmITest : public CppUnit::TestCase
 
 public:
   CPPUNIT_TEST_SUITE( WhichNodeAmITest );
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testPyramids );
   CPPUNIT_TEST( testPrisms );
   CPPUNIT_TEST( testTets );
   CPPUNIT_TEST( testHexes );
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:

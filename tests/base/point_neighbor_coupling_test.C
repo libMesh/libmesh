@@ -48,9 +48,13 @@ public:
   CPPUNIT_TEST_SUITE( PointNeighborCouplingTest );
 
   CPPUNIT_TEST( testCouplingOnEdge3 );
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testCouplingOnQuad9 );
   CPPUNIT_TEST( testCouplingOnTri6 );
+#endif
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testCouplingOnHex27 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

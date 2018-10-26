@@ -32,8 +32,12 @@ class MeshSpatialDimensionTest : public CppUnit::TestCase
 public:
   CPPUNIT_TEST_SUITE( MeshSpatialDimensionTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( test1D );
+#endif
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( test2D );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

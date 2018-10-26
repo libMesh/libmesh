@@ -35,9 +35,13 @@ class BoundaryInfoTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( BoundaryInfoTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
-  CPPUNIT_TEST( testEdgeBoundaryConditions );
   CPPUNIT_TEST( testShellFaceConstraints );
+#endif
+#if LIBMESH_DIM > 2
+  CPPUNIT_TEST( testEdgeBoundaryConditions );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -250,7 +254,7 @@ public:
   void testShellFaceConstraints()
   {
     // Make a simple two element mesh that we can use to test constraints
-    Mesh mesh(*TestCommWorld, 3);
+    Mesh mesh(*TestCommWorld);
 
     //  (0,1)           (1,1)
     //  x---------------x

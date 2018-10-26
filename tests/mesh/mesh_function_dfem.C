@@ -62,11 +62,13 @@ class MeshfunctionDFEM : public CppUnit::TestCase
 public:
   CPPUNIT_TEST_SUITE( MeshfunctionDFEM );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( test_point_locator_dfem );
 
   CPPUNIT_TEST( test_mesh_function_dfem );
 
   CPPUNIT_TEST( test_mesh_function_dfem_grad );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -129,12 +131,16 @@ protected:
 public:
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
+#endif
   }
 
   void tearDown()
   {
+#if LIBMESH_DIM > 1
     delete _mesh;
+#endif
   }
 
   // test that point locator works correctly

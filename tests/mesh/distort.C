@@ -39,10 +39,14 @@ public:
   CPPUNIT_TEST_SUITE( DistortTest );
 
   // 2D tests
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testDistortQuad );
+#endif
 
   // 3D tests
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testDistortHex );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

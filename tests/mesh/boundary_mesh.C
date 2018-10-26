@@ -32,7 +32,9 @@ class BoundaryMeshTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( BoundaryMeshTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -151,7 +153,9 @@ protected:
 public:
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
+#endif
   }
 
   void testMesh()
@@ -197,7 +201,7 @@ public:
     // Sanity check all the elements
     for (const auto & elem : _mesh->active_element_ptr_range())
       {
-        const Elem * pip = elem->interior_parent();
+        const Elem * pip = elem->dim() < 2 ? elem->interior_parent() : nullptr;
 
         // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
@@ -298,7 +302,9 @@ class BoundaryRefinedMeshTest : public BoundaryMeshTest {
 public:
   CPPUNIT_TEST_SUITE( BoundaryRefinedMeshTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -307,6 +313,7 @@ public:
 
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
 
     // Need to refine interior mesh before separate boundary meshes,
@@ -314,6 +321,7 @@ public:
     MeshRefinement(*_mesh).uniformly_refine(1);
     MeshRefinement(*_left_boundary_mesh).uniformly_refine(1);
     MeshRefinement(*_all_boundary_mesh).uniformly_refine(1);
+#endif
   }
 
   void testMesh()

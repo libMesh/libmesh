@@ -55,9 +55,10 @@ public:
   CPPUNIT_TEST( testPostInitAddSystem );
   CPPUNIT_TEST( testPostInitAddElem );
   CPPUNIT_TEST( testReinitWithNodeElem );
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
   CPPUNIT_TEST( testRepartitionThenReinit );
-  CPPUNIT_TEST( testRepartitionThenReinit );
+#endif
   CPPUNIT_TEST( testDisableDefaultGhosting );
 
   CPPUNIT_TEST_SUITE_END();

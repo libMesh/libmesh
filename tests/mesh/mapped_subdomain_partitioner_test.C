@@ -34,7 +34,9 @@ class MappedSubdomainPartitionerTest : public CppUnit::TestCase
 public:
   CPPUNIT_TEST_SUITE( MappedSubdomainPartitionerTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMappedSubdomainPartitioner );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

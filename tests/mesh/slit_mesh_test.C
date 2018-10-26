@@ -80,7 +80,9 @@ class SlitMeshTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( SlitMeshTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -165,7 +167,9 @@ protected:
 public:
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
+#endif
   }
 
   void tearDown()
@@ -210,7 +214,9 @@ class SlitMeshRefinedMeshTest : public SlitMeshTest {
 public:
   CPPUNIT_TEST_SUITE( SlitMeshRefinedMeshTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -219,10 +225,12 @@ public:
 
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
 
 #ifdef LIBMESH_ENABLE_AMR
     MeshRefinement(*_mesh).uniformly_refine(1);
+#endif
 #endif
   }
 
@@ -248,12 +256,14 @@ class SlitMeshRefinedSystemTest : public SlitMeshTest {
 public:
   CPPUNIT_TEST_SUITE( SlitMeshRefinedSystemTest );
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
 
   CPPUNIT_TEST( testSystem );
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   CPPUNIT_TEST( testRestart );
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -267,6 +277,7 @@ public:
 
   void setUp()
   {
+#if LIBMESH_DIM > 1
     this->build_mesh();
 
     // libMesh *should* renumber now, or a DistributedMesh might not
@@ -286,6 +297,7 @@ public:
     _es->reinit();
     MeshRefinement(*_mesh).uniformly_refine(1);
     _es->reinit();
+#endif
 #endif
   }
 

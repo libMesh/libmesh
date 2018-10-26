@@ -39,7 +39,9 @@ class WriteVecAndScalar : public CppUnit::TestCase
 public:
   CPPUNIT_TEST_SUITE(WriteVecAndScalar);
 
+#if LIBMESH_DIM > 1
   CPPUNIT_TEST(testWrite);
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

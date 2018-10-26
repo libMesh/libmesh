@@ -31,9 +31,10 @@ class ContainsPointTest : public CppUnit::TestCase
 public:
   CPPUNIT_TEST_SUITE( ContainsPointTest );
 
+#if LIBMESH_DIM > 2
   CPPUNIT_TEST( testContainsPointTri3 );
-
   CPPUNIT_TEST( testContainsPointTet4 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 

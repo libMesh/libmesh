@@ -42,11 +42,14 @@ class MeshInputTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( MeshInputTest );
 
+#if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
   CPPUNIT_TEST( testExodusCopyElementSolution );
 #endif
 
   CPPUNIT_TEST( testMeshMoveConstructor );
+#endif // LIBMESH_DIM > 1
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
