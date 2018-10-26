@@ -1055,13 +1055,14 @@ T triple_product(const TypeVector<T> & a,
                  const TypeVector<T> & b,
                  const TypeVector<T> & c)
 {
-  // We only support cross products when LIBMESH_DIM==3, same goes for this.
-  libmesh_assert_equal_to (LIBMESH_DIM, 3);
-
+#if LIBMESH_DIM == 3
   return
     a(0)*(b(1)*c(2) - b(2)*c(1)) -
     a(1)*(b(0)*c(2) - b(2)*c(0)) +
     a(2)*(b(0)*c(1) - b(1)*c(0));
+#else
+  return 0;
+#endif
 }
 
 
@@ -1075,14 +1076,15 @@ inline
 T cross_norm_sq(const TypeVector<T> & b,
                 const TypeVector<T> & c)
 {
-  // We only support cross products when LIBMESH_DIM==3, same goes for this.
-  libmesh_assert_equal_to (LIBMESH_DIM, 3);
+  T z = b(0)*c(1) - b(1)*c(0);
 
+#if LIBMESH_DIM == 3
   T x = b(1)*c(2) - b(2)*c(1),
-    y = b(0)*c(2) - b(2)*c(0),
-    z = b(0)*c(1) - b(1)*c(0);
-
+    y = b(0)*c(2) - b(2)*c(0);
   return x*x + y*y + z*z;
+#else
+  return z*z;
+#endif
 }
 
 
@@ -1095,9 +1097,6 @@ inline
 T cross_norm(const TypeVector<T> & b,
              const TypeVector<T> & c)
 {
-  // We only support cross products when LIBMESH_DIM==3, same goes for this.
-  libmesh_assert_equal_to (LIBMESH_DIM, 3);
-
   return std::sqrt(cross_norm_sq(b,c));
 }
 
