@@ -830,6 +830,11 @@ public:
   void remove_ghosting_functor(GhostingFunctor & ghosting_functor);
 
   /**
+   * Clear all ghosting functors
+   */
+  void clear_ghosting_functors() { _ghosting_functors.clear(); }
+
+  /**
    * Beginning of range of ghosting functors
    */
   std::set<GhostingFunctor *>::const_iterator ghosting_functors_begin() const

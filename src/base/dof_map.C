@@ -1851,6 +1851,17 @@ DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor)
 
 
 
+void
+DofMap::clear_ghosting_functors()
+{
+  _coupling_functors.clear();
+  _algebraic_ghosting_functors.clear();
+
+  _mesh.clear_ghosting_functors();
+}
+
+
+
 void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
                                    const std::vector<dof_id_type> & dof_indices_in,
                                    DenseVectorBase<Number> & Ue) const

@@ -362,6 +362,11 @@ public:
   void remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor);
 
   /**
+   * Clears all ghosting functors (both algebraic and geometric)
+   */
+  void clear_ghosting_functors();
+
+  /**
    * Beginning of range of algebraic ghosting functors
    */
   std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_begin() const

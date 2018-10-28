@@ -26,6 +26,7 @@ BUILT_SOURCES = \
         libmesh_logging.h \
         libmesh_singleton.h \
         libmesh_version.h \
+        map_point_neighbor_coupling.h \
         multi_predicates.h \
         periodic_boundaries.h \
         periodic_boundary.h \
@@ -604,6 +605,9 @@ libmesh_singleton.h: $(top_srcdir)/include/base/libmesh_singleton.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_version.h: $(top_srcdir)/include/base/libmesh_version.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+map_point_neighbor_coupling.h: $(top_srcdir)/include/base/map_point_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 multi_predicates.h: $(top_srcdir)/include/base/multi_predicates.h
