@@ -1345,6 +1345,7 @@ template <typename T>
 void PetscVector<T>::_get_array(bool read_only) const
 {
   libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
 
 #ifdef LIBMESH_HAVE_CXX11_THREAD
   std::atomic_thread_fence(std::memory_order_acquire);
