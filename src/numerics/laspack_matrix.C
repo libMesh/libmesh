@@ -384,8 +384,14 @@ void LaspackMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  const LaspackMatrix<T> * X =
+  const LaspackMatrix<T> * const_X =
     cast_ptr<const LaspackMatrix<T> *> (&X_in);
+
+  // The Laspack APIs expect non-const pointers; I don't think
+  // X_in should actually be changed by any of the code below.
+  LaspackMatrix<T> * X =
+    const_cast<LaspackMatrix<T> *>(const_X);
+
   _LPNumber a = static_cast<_LPNumber> (a_in);
 
   libmesh_assert(X);
