@@ -60,15 +60,15 @@ void Q_Constr(QMatrix *Q, const char *Name, size_t Dim, _LPBoolean Symmetry,
               ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData);
 void Q_Destr(QMatrix *Q);
 void Q_SetName(QMatrix *Q, const char *Name);
-const char *Q_GetName(QMatrix *Q);
-size_t Q_GetDim(QMatrix *Q);
-_LPBoolean Q_GetSymmetry(QMatrix *Q);
-ElOrderType Q_GetElOrder(QMatrix *Q);
+const char *Q_GetName(const QMatrix *Q);
+size_t Q_GetDim(const QMatrix *Q);
+_LPBoolean Q_GetSymmetry(const QMatrix *Q);
+ElOrderType Q_GetElOrder(const QMatrix *Q);
 void Q_SetLen(QMatrix *Q, size_t RoC, size_t Len);
-size_t Q_GetLen(QMatrix *Q, size_t RoC);
+size_t Q_GetLen(const QMatrix *Q, size_t RoC);
 void Q_SetEntry(QMatrix *Q, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val);
-size_t Q_GetPos(QMatrix *Q, size_t RoC, size_t Entry);
-_LPNumber Q_GetVal(QMatrix *Q, size_t RoC, size_t Entry);
+size_t Q_GetPos(const QMatrix *Q, size_t RoC, size_t Entry);
+_LPNumber Q_GetVal(const QMatrix *Q, size_t RoC, size_t Entry);
 void Q_AddVal(QMatrix *Q, size_t RoC, size_t Entry, _LPNumber Val);
 
 /* macros for fast access */

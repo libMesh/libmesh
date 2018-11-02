@@ -42,8 +42,8 @@ void V_Constr(QVector *V, const char *Name, size_t Dim, InstanceType Instance,
 	      _LPBoolean OwnData);
 void V_Destr(QVector *V);
 void V_SetName(QVector *V, const char *Name);
-const char *V_GetName(QVector *V);
-size_t V_GetDim(QVector *V);
+const char *V_GetName(const QVector *V);
+size_t V_GetDim(const QVector *V);
 void V_SetCmp(QVector *V, size_t Ind, _LPNumber Val);
 void V_SetAllCmp(QVector *V, _LPNumber Val);
 void V_SetRndCmp(QVector *V);

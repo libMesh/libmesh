@@ -177,7 +177,7 @@ void Q_SetName(QMatrix *Q, const char *Name)
     }
 }
 
-const char *Q_GetName(QMatrix *Q)
+const char *Q_GetName(const QMatrix *Q)
 /* returns the name of the matrix Q */
 {
     if (LASResult() == LASOK)
@@ -186,7 +186,7 @@ const char *Q_GetName(QMatrix *Q)
         return("");
 }
 
-size_t Q_GetDim(QMatrix *Q)
+size_t Q_GetDim(const QMatrix *Q)
 /* returns the dimension of the matrix Q */
 {
     size_t Dim;
@@ -198,7 +198,7 @@ size_t Q_GetDim(QMatrix *Q)
     return(Dim);
 }
 
-_LPBoolean Q_GetSymmetry(QMatrix *Q)
+_LPBoolean Q_GetSymmetry(const QMatrix *Q)
 /* returns _LPTrue if Q is symmetric otherwise _LPFalse */
 {
     _LPBoolean Symmetry;
@@ -211,7 +211,7 @@ _LPBoolean Q_GetSymmetry(QMatrix *Q)
     return(Symmetry);
 }
 
-ElOrderType Q_GetElOrder(QMatrix *Q)
+ElOrderType Q_GetElOrder(const QMatrix *Q)
 /* returns element order of the matrix Q */
 {
     ElOrderType ElOrder;
@@ -265,7 +265,7 @@ void Q_SetLen(QMatrix *Q, size_t RoC, size_t Len)
     }
 }
 
-size_t Q_GetLen(QMatrix *Q, size_t RoC)
+size_t Q_GetLen(const QMatrix *Q, size_t RoC)
 /* returns the lenght of a row or column of the matrix Q */
 {
     size_t Len;
@@ -297,7 +297,7 @@ void Q_SetEntry(QMatrix *Q, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val)
     }
 }
 
-size_t Q_GetPos(QMatrix *Q, size_t RoC, size_t Entry)
+size_t Q_GetPos(const QMatrix *Q, size_t RoC, size_t Entry)
 /* returns the position of a matrix element */
 {
     size_t Pos;
@@ -314,7 +314,7 @@ size_t Q_GetPos(QMatrix *Q, size_t RoC, size_t Entry)
     return(Pos);
 }
 
-_LPNumber Q_GetVal(QMatrix *Q, size_t RoC, size_t Entry)
+_LPNumber Q_GetVal(const QMatrix *Q, size_t RoC, size_t Entry)
 /* returns the value of a matrix element */
 {
     _LPNumber Val;

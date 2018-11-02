@@ -75,7 +75,7 @@ void V_SetName(QVector *V, const char *Name)
     }
 }
 
-const char *V_GetName(QVector *V)
+const char *V_GetName(const QVector *V)
 /* returns the name of the vector V */
 {
     if (LASResult() == LASOK)
@@ -84,7 +84,7 @@ const char *V_GetName(QVector *V)
         return("");
 }
 
-size_t V_GetDim(QVector *V)
+size_t V_GetDim(const QVector *V)
 /* returns dimension of the vector V */
 {
     size_t Dim;
