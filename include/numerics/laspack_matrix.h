@@ -107,7 +107,7 @@ public:
 
   virtual void zero () override;
 
-  virtual void close () override { this->_closed = true; }
+  virtual void close () override;
 
   virtual numeric_index_type m () const override;
 

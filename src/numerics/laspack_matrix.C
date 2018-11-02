@@ -289,6 +289,8 @@ void LaspackMatrix<T>::zero ()
           Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
         }
     }
+
+  this->close();
 }
 
 
@@ -466,6 +468,26 @@ numeric_index_type LaspackMatrix<T>::pos (const numeric_index_type i,
 
   // Return the position in the compressed row
   return std::distance (_row_start[i], p.first);
+}
+
+
+
+template <typename T>
+void LaspackMatrix<T>::close()
+{
+  libmesh_assert(this->initialized());
+
+  this->_closed = true;
+
+  // We've probably changed some entries so we need to tell LASPACK
+  // that cached data is now invalid.
+  *_QMat.DiagElAlloc = _LPFalse;
+  *_QMat.ElSorted = _LPFalse;
+  if (*_QMat.ILUExists)
+    {
+      *_QMat.ILUExists = _LPFalse;
+      Q_Destr(_QMat.ILU);
+    }
 }
 
 
