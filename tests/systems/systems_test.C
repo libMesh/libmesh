@@ -20,8 +20,11 @@
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/node_elem.h>
-#include "libmesh/edge_edge2.h"
-#include "libmesh/dg_fem_context.h"
+#include <libmesh/edge_edge2.h>
+#include <libmesh/dg_fem_context.h>
+#include <libmesh/enum_solver_type.h>
+#include <libmesh/enum_preconditioner_type.h>
+#include <libmesh/linear_solver.h>
 
 #include "test_comm.h"
 
@@ -707,7 +710,7 @@ public:
 
     // Create an equation systems object.
     EquationSystems equation_systems (mesh);
-    ExplicitSystem& system =
+    LinearImplicitSystem & system =
       equation_systems.add_system<LinearImplicitSystem> ("test");
 
     system.add_variable ("u", libMesh::FIRST);
@@ -724,6 +727,11 @@ public:
 
     AugmentSparsityOnNodes augment_sparsity(mesh);
     system.get_dof_map().add_coupling_functor(augment_sparsity);
+
+    // LASPACK GMRES + ILU defaults don't like this problem, but it's
+    // small enough to just use a simpler iteration.
+    system.get_linear_solver()->set_solver_type(JACOBI);
+    system.get_linear_solver()->set_preconditioner_type(IDENTITY_PRECOND);
 
     equation_systems.init ();
 

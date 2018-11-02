@@ -1,5 +1,8 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/fem_system.h>
+#include <libmesh/newton_solver.h>
+#include <libmesh/enum_solver_type.h>
+#include <libmesh/enum_preconditioner_type.h>
 
 using namespace libMesh;
 
@@ -30,6 +33,13 @@ protected:
     solver.relative_step_tolerance = std::numeric_limits<Real>::epsilon()*10;
     solver.relative_residual_tolerance = std::numeric_limits<Real>::epsilon()*10;
     solver.absolute_residual_tolerance = std::numeric_limits<Real>::epsilon()*10;
+
+    NewtonSolver & newton = cast_ref<NewtonSolver &>(solver);
+
+    // LASPACK GMRES + ILU defaults don't like these problems, so
+    // we'll use a sophisticated "just divide the scalars" solver instead.
+    newton.get_linear_solver().set_solver_type(JACOBI);
+    newton.get_linear_solver().set_preconditioner_type(IDENTITY_PRECOND);
 
     system.deltat = deltat;
 
