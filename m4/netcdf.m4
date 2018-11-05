@@ -51,6 +51,10 @@ AC_DEFUN([CONFIGURE_NETCDF],
   dnl allow opt-out for nested subpackages
   AS_IF([test "x$enablenested" = "xyes"],
         [
+          dnl ensure that the configuration is consistent
+          AS_IF([test "x$enablecurl" = "xyes"],
+                [libmesh_subpackage_arguments="$libmesh_subpackage_arguments --enable-dap" ],
+                [libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-dap --disable-curl"])
           dnl pass --disable-testsets to the netcdf subpackage to disable the most rigorous tests
           libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-testsets"
           AC_CONFIG_SUBDIRS([contrib/netcdf/v4])
