@@ -40595,6 +40595,11 @@ esac
 
     if test "x$enablenested" = "xyes"; then :
 
+                    if test "x$enablecurl" = "xyes"; then :
+  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --enable-dap"
+else
+  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-dap --disable-curl"
+fi
                     libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-testsets"
           subdirs="$subdirs contrib/netcdf/v4"
 
