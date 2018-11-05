@@ -73,6 +73,15 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   // We're calculating now!
   this->determine_calculations();
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    {
+      //This mainly requires to change the FE<>-calls
+      // to FEInterface in this function.
+      libmesh_not_implemented();
+    }
+#endif
+
   // The number of quadrature points.
   const std::size_t n_qp = qp.size();
 
