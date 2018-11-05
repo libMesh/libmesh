@@ -2514,10 +2514,17 @@ std::string Elem::get_info () const
         oss << "nullptr\n";
     }
 
-  oss << "   hmin()=" << this->hmin()
-      << ", hmax()=" << this->hmax()                               << '\n'
-      << "   volume()=" << this->volume()                          << '\n'
-      << "   active()=" << this->active()
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (!this->infinite())
+    {
+#endif
+    oss << "   hmin()=" << this->hmin()
+        << ", hmax()=" << this->hmax()                             << '\n'
+        << "   volume()=" << this->volume()                        << '\n';
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    }
+#endif
+    oss << "   active()=" << this->active()
       << ", ancestor()=" << this->ancestor()
       << ", subactive()=" << this->subactive()
       << ", has_children()=" << this->has_children()               << '\n'
