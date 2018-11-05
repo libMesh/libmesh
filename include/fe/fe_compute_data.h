@@ -79,21 +79,17 @@ public:
   std::vector<Number> shape;
 
 
-#if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /**
    * Storage for the computed phase lag
    */
   Real phase;
-#endif
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /**
    * The wave speed.
    */
   Real speed;
-#endif
 
-#if defined LIBMESH_ENABLE_INFINITE_ELEMENTS && defined(LIBMESH_USE_COMPLEX_NUMBERS)
   /**
    * The frequency to evaluate shape functions
    * including the wave number depending terms.

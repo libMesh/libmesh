@@ -302,22 +302,30 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
     }
 
 
+  const Real speed = data.speed;
+
+  //TODO: I find it inconvenient to have a quantity phase which is phase/speed.
+  //    But it might be better than redefining a quantities meaning.
+  data.phase = interpolated_dist                                                      /* together with next line:  */
+    * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1)/speed;          /* phase(s,t,v)/c            */
+
+  // We assume time-harmonic behavior in this function!
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-  // assumption on time-harmonic behavior
-  Number sign_i (0,1.);
-
   // the wave number
-  const Number wavenumber = 2. * libMesh::pi * data.frequency / data.speed;
+  const Number wavenumber = 2. * libMesh::pi * data.frequency / speed;
 
   // the exponent for time-harmonic behavior
-  const Number exponent = sign_i                                                      /* imaginary unit             */
+  // \note: this form is much less general than the implementation of dphase, which can be easily extended to
+  //     other forms than e^{i kr}.
+  const Number exponent = imaginary                                                   /* imaginary unit            */
     * wavenumber                                                                      /* k  (can be complex)       */
-    * interpolated_dist                                                               /* together with next line:  */
-    * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1);                /* phase(s,t,v)              */
+    * data.phase*speed;
 
-  const Number time_harmonic = exp(exponent);                                         /* e^(sign*i*k*phase(s,t,v)) */
+  const Number time_harmonic = exp(exponent);                                         /* e^(i*k*phase(s,t,v))      */
+#else
+  const Number time_harmonic = 1;
+#endif //LIBMESH_USE_COMPLEX_NUMBERS
 
   /*
    * compute \p shape for all dof in the element
@@ -336,46 +344,12 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
                            *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
                            * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
-            * time_harmonic;                                                          /* e^(sign*i*k*phase(s,t,v) */
+                           * time_harmonic;                                             /* e^(i*k*phase(s,t,v)      */
         }
     }
+
   else
     libmesh_error_msg("compute_data() for 1-dimensional InfFE not implemented.");
-
-#else
-
-  const Real speed = data.speed;
-
-  /*
-   * This is quite weird: the phase is actually
-   * a measure how advanced the pressure is that
-   * we compute.  In other words: the further away
-   * the node \p data.p is, the further we look into
-   * the future...
-   */
-  data.phase = interpolated_dist                                                       /* phase(s,t,v)/c  */
-    * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1) / speed;
-
-  if (Dim > 1)
-    {
-      const unsigned int n_dof = n_dofs (fet, inf_elem->type());
-      data.shape.resize(n_dof);
-
-      for (unsigned int i=0; i<n_dof; i++)
-        {
-          // compute base and radial shape indices
-          unsigned int i_base, i_radial;
-          compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
-
-          data.shape[i] = InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D */
-            *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)        */
-            * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial);    /* L_n(v)          */
-        }
-    }
-  else
-    libmesh_error_msg("compute_data() for 1-dimensional InfFE not implemented.");
-
-#endif
 }
 
 
