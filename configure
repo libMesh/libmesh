@@ -33126,7 +33126,7 @@ $as_echo "<<< PETSc did not define MPIEXEC.  Will try configuring MPI now... >>>
 
 
 if test "x$MPIHOME" = "x"; then :
-  MPIHOME="/usr"
+  MPIHOME="/.."
 fi
 
 
@@ -33135,13 +33135,40 @@ if test "${with_mpi+set}" = set; then :
   withval=$with_mpi; MPI="$withval"
 else
 
-              $as_echo "note: MPI library path not given... trying prefix=$MPIHOME"
+              $as_echo "note: MPI library path not given... trying to find it myself"
               MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then :
+  MPI="/.."
+fi
+
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $LD_LIBRARY_PATH | tr ':' '\n')
+    do
+       if  test -e $i/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $INCLUDE | tr ':' '\n')
+    do
+       if  test -e $i/mpi.h ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+
+if test "$MPI" = "/.."; then :
   MPI="/usr"
 fi
 
@@ -33532,9 +33559,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
@@ -33565,16 +33591,14 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
-
-                MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+ MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
                 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -33610,9 +33634,6 @@ if ac_fn_cxx_try_link "$LINENO"; then :
                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
-
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
@@ -33628,6 +33649,159 @@ fi
 
 
 
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Checking Version of MPI now:" >&5
+$as_echo "Checking Version of MPI now:" >&6; }
+  if test "x$enablempi" != xno; then :
+
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPI_VERSION < 2
+                     #error "MPI-version 1.X is not supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+                        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION > 4
+                                  #error "MPI-version too high. There is some error."
+                                  #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION == 2
+                                               #error "deprecated MPI-version"
+                                               #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: result:  MPI was found with version >= 3.0. " >&5
+$as_echo " MPI was found with version >= 3.0. " >&6; };
+
+else
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MPI-version is 2.X. This feature is deprecated. " >&5
+$as_echo "$as_me: WARNING: MPI-version is 2.X. This feature is deprecated. " >&2;};
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&2;}; enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+                                                               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                 #if MPI_VERSION == 0
+                                 #error "MPI-version 1.X is not supported."
+                                 #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                              #if MPI_VERSION == 1
+                                              #error "MPI-version 1.X is not supported."
+                                              #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                              { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&2;}
+
+else
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                                          enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
 
 
 
@@ -33828,7 +34002,7 @@ $as_echo "<<< PETSc disabled.  Will try configuring MPI now... >>>" >&6; }
 
 
 if test "x$MPIHOME" = "x"; then :
-  MPIHOME="/usr"
+  MPIHOME="/.."
 fi
 
 
@@ -33837,13 +34011,40 @@ if test "${with_mpi+set}" = set; then :
   withval=$with_mpi; MPI="$withval"
 else
 
-              $as_echo "note: MPI library path not given... trying prefix=$MPIHOME"
+              $as_echo "note: MPI library path not given... trying to find it myself"
               MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then :
+  MPI="/.."
+fi
+
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $LD_LIBRARY_PATH | tr ':' '\n')
+    do
+       if  test -e $i/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $INCLUDE | tr ':' '\n')
+    do
+       if  test -e $i/mpi.h ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+
+if test "$MPI" = "/.."; then :
   MPI="/usr"
 fi
 
@@ -34234,9 +34435,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
@@ -34267,16 +34467,14 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
-
-                MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+ MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
                 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -34312,9 +34510,6 @@ if ac_fn_cxx_try_link "$LINENO"; then :
                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
-
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
@@ -34330,6 +34525,159 @@ fi
 
 
 
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Checking Version of MPI now:" >&5
+$as_echo "Checking Version of MPI now:" >&6; }
+  if test "x$enablempi" != xno; then :
+
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPI_VERSION < 2
+                     #error "MPI-version 1.X is not supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+                        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION > 4
+                                  #error "MPI-version too high. There is some error."
+                                  #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION == 2
+                                               #error "deprecated MPI-version"
+                                               #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: result:  MPI was found with version >= 3.0. " >&5
+$as_echo " MPI was found with version >= 3.0. " >&6; };
+
+else
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MPI-version is 2.X. This feature is deprecated. " >&5
+$as_echo "$as_me: WARNING: MPI-version is 2.X. This feature is deprecated. " >&2;};
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&2;}; enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+                                                               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                 #if MPI_VERSION == 0
+                                 #error "MPI-version 1.X is not supported."
+                                 #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                              #if MPI_VERSION == 1
+                                              #error "MPI-version 1.X is not supported."
+                                              #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                              { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&2;}
+
+else
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                                          enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
 
 
 
@@ -34344,7 +34692,7 @@ $as_echo "<<< PETSc disabled.  Will try configuring MPI now... >>>" >&6; }
 
 
 if test "x$MPIHOME" = "x"; then :
-  MPIHOME="/usr"
+  MPIHOME="/.."
 fi
 
 
@@ -34353,13 +34701,40 @@ if test "${with_mpi+set}" = set; then :
   withval=$with_mpi; MPI="$withval"
 else
 
-              $as_echo "note: MPI library path not given... trying prefix=$MPIHOME"
+              $as_echo "note: MPI library path not given... trying to find it myself"
               MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then :
+  MPI="/.."
+fi
+
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $LD_LIBRARY_PATH | tr ':' '\n')
+    do
+       if  test -e $i/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $INCLUDE | tr ':' '\n')
+    do
+       if  test -e $i/mpi.h ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+
+if test "$MPI" = "/.."; then :
   MPI="/usr"
 fi
 
@@ -34750,9 +35125,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
@@ -34783,16 +35157,14 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
-
-                MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+ MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
                 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -34828,9 +35200,6 @@ if ac_fn_cxx_try_link "$LINENO"; then :
                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
-
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
@@ -34846,6 +35215,159 @@ fi
 
 
 
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Checking Version of MPI now:" >&5
+$as_echo "Checking Version of MPI now:" >&6; }
+  if test "x$enablempi" != xno; then :
+
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPI_VERSION < 2
+                     #error "MPI-version 1.X is not supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+                        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION > 4
+                                  #error "MPI-version too high. There is some error."
+                                  #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION == 2
+                                               #error "deprecated MPI-version"
+                                               #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: result:  MPI was found with version >= 3.0. " >&5
+$as_echo " MPI was found with version >= 3.0. " >&6; };
+
+else
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MPI-version is 2.X. This feature is deprecated. " >&5
+$as_echo "$as_me: WARNING: MPI-version is 2.X. This feature is deprecated. " >&2;};
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&2;}; enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+                                                               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                 #if MPI_VERSION == 0
+                                 #error "MPI-version 1.X is not supported."
+                                 #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                              #if MPI_VERSION == 1
+                                              #error "MPI-version 1.X is not supported."
+                                              #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                              { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&2;}
+
+else
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                                          enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
 
 
 
@@ -34859,7 +35381,7 @@ else
 
 
 if test "x$MPIHOME" = "x"; then :
-  MPIHOME="/usr"
+  MPIHOME="/.."
 fi
 
 
@@ -34868,13 +35390,40 @@ if test "${with_mpi+set}" = set; then :
   withval=$with_mpi; MPI="$withval"
 else
 
-              $as_echo "note: MPI library path not given... trying prefix=$MPIHOME"
+              $as_echo "note: MPI library path not given... trying to find it myself"
               MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then :
+  MPI="/.."
+fi
+
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $LD_LIBRARY_PATH | tr ':' '\n')
+    do
+       if  test -e $i/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+if test "$MPI" = "/.."; then :
+
+    for i in $(echo $INCLUDE | tr ':' '\n')
+    do
+       if  test -e $i/mpi.h ; then :
+  MPI=$(dirname $i)
+       break
+fi
+    done
+
+fi
+
+if test "$MPI" = "/.."; then :
   MPI="/usr"
 fi
 
@@ -35265,9 +35814,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
@@ -35298,16 +35846,14 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI-headers are working as expected." >&5
+$as_echo "MPI-headers are working as expected." >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
 $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
-
-                MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+ MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
                 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -35343,9 +35889,6 @@ if ac_fn_cxx_try_link "$LINENO"; then :
                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
-
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
@@ -35361,6 +35904,159 @@ fi
 
 
 
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Checking Version of MPI now:" >&5
+$as_echo "Checking Version of MPI now:" >&6; }
+  if test "x$enablempi" != xno; then :
+
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPI_VERSION < 2
+                     #error "MPI-version 1.X is not supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+                        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION > 4
+                                  #error "MPI-version too high. There is some error."
+                                  #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION == 2
+                                               #error "deprecated MPI-version"
+                                               #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: result:  MPI was found with version >= 3.0. " >&5
+$as_echo " MPI was found with version >= 3.0. " >&6; };
+
+else
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MPI-version is 2.X. This feature is deprecated. " >&5
+$as_echo "$as_me: WARNING: MPI-version is 2.X. This feature is deprecated. " >&2;};
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&2;}; enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+                                                               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                 #if MPI_VERSION == 0
+                                 #error "MPI-version 1.X is not supported."
+                                 #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                              #if MPI_VERSION == 1
+                                              #error "MPI-version 1.X is not supported."
+                                              #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                              { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&2;}
+
+else
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                                          enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
 
 
 fi
@@ -35466,23 +36162,181 @@ fi
 
           if test "x$PETSC_MPI" != x; then :
 
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Checking Version of MPI now:" >&5
+$as_echo "Checking Version of MPI now:" >&6; }
+  if test "x$enablempi" != xno; then :
+
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPI_VERSION < 2
+                     #error "MPI-version 1.X is not supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+                        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION > 4
+                                  #error "MPI-version too high. There is some error."
+                                  #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+#if MPI_VERSION == 2
+                                               #error "deprecated MPI-version"
+                                               #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: result:  MPI was found with version >= 3.0. " >&5
+$as_echo " MPI was found with version >= 3.0. " >&6; };
+
+else
+
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MPI-version is 2.X. This feature is deprecated. " >&5
+$as_echo "$as_me: WARNING: MPI-version is 2.X. This feature is deprecated. " >&2;};
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version seems to be unreasonably high. Please check your library. Disable MPI now...\"" >&2;}; enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+                                                               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                 #if MPI_VERSION == 0
+                                 #error "MPI-version 1.X is not supported."
+                                 #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                                                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                              #if MPI_VERSION == 1
+                                              #error "MPI-version 1.X is not supported."
+                                              #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                                              { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI-version is 1.X. Only MPI 2.X or compatible is supported. Disable MPI now...\"" >&2;}
+
+else
+                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+else
+
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                                          enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
 
 fi
 
-          if test $petsc_have_hypre -gt 0; then :
+                 if test "x$enablempi" = xno; then :
+
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MPI is disabled. Disable PETSc as well." >&5
+$as_echo "$as_me: WARNING: MPI is disabled. Disable PETSc as well." >&2;}
+                       enablepetsc=no
+fi
+
+fi
+          if test "x$enablepetsc" != xno; then :
+
+                 if test $petsc_have_hypre -gt 0; then :
 
 $as_echo "#define HAVE_PETSC_HYPRE 1" >>confdefs.h
 
 fi
 
-
 $as_echo "#define HAVE_PETSC 1" >>confdefs.h
 
-
-          if test $petsc_have_tao != no; then :
+                 if test $petsc_have_tao != no; then :
 
 $as_echo "#define HAVE_PETSC_TAO 1" >>confdefs.h
+
+fi
 
 fi
 
