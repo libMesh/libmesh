@@ -54,7 +54,6 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
   _is_prepared   (false),
-  _point_locator (),
   _count_lower_dim_elems_in_point_locator(true),
   _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -80,7 +79,6 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
   _is_prepared   (other_mesh._is_prepared),
-  _point_locator (),
   _count_lower_dim_elems_in_point_locator(other_mesh._count_lower_dim_elems_in_point_locator),
   _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -478,45 +476,70 @@ unsigned int MeshBase::recalculate_n_partitions()
 #ifdef LIBMESH_ENABLE_DEPRECATED
 const PointLocatorBase & MeshBase::point_locator () const
 {
-  libmesh_deprecated();
+  auto point_locator_ptr = _point_locator->load(std::memory_order_acquire);
 
-  if (_point_locator.get() == nullptr)
+  // If there's no master point locator, then we need one.
+  if (point_locator_ptr == nullptr)
     {
-      // PointLocator construction may not be safe within threads
-      libmesh_assert(!Threads::in_threads);
+      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-      _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
+      if (point_locator_ptr == nullptr)
+        {
+          // And it may require parallel communication
+          parallel_object_only();
+
+          point_locator_ptr = PointLocatorBase::build(TREE_ELEMENTS, *this).release();
+
+          _point_locator->store(point_locator_ptr, std::memory_order_release);
+        }
     }
 
-  return *_point_locator;
+  return *_point_locator->load(std::memory_order_relaxed);
 }
 #endif
 
 
 std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
+  auto point_locator_ptr = _point_locator->load(std::memory_order_acquire);
+
   // If there's no master point locator, then we need one.
-  if (_point_locator.get() == nullptr)
+  if (point_locator_ptr == nullptr)
     {
-      // PointLocator construction may not be safe within threads
-      libmesh_assert(!Threads::in_threads);
+      std::lock_guard<std::mutex> lock(*_point_locator_mutex);
 
-      // And it may require parallel communication
-      parallel_object_only();
+      point_locator_ptr = _point_locator->load(std::memory_order_relaxed);
 
-      _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
+      if (point_locator_ptr == nullptr)
+        {
+          // And it may require parallel communication
+          parallel_object_only();
+
+          // We know that we're not in threads because we have a lock
+          // Let's just clear that up for now and reset it afterward
+          auto tmp = Threads::in_threads;
+          Threads::in_threads = false;
+
+          point_locator_ptr = PointLocatorBase::build(TREE_ELEMENTS, *this).release();
+
+          // Reset the value
+          Threads::in_threads = tmp;
+
+          _point_locator->store(point_locator_ptr, std::memory_order_release);
+        }
     }
 
   // Otherwise there was a master point locator, and we can grab a
   // sub-locator easily.
-  return PointLocatorBase::build(TREE_ELEMENTS, *this, _point_locator.get());
+  return PointLocatorBase::build(TREE_ELEMENTS, *this, point_locator_ptr);
 }
 
 
 
 void MeshBase::clear_point_locator ()
 {
-  _point_locator.reset(nullptr);
+  auto point_locator_ptr = _point_locator->exchange(nullptr);
+  delete point_locator_ptr;
 }
 
 

@@ -1394,8 +1394,28 @@ protected:
    * our \p point_locator() method to be \p const (yet do the dynamic allocating)
    * this needs to be mutable.  Since the PointLocatorBase::build() member is used,
    * and it operates on a constant reference to the mesh, this is OK.
+   *
+   * Ok - I know this thing is funky - but it's like that on purpose
+   * The std::atomic can't be a class member directly because it will cause
+   * the implicit move constructors to be deleted from MeshBase
+   * which would suck.
+   *
+   * By wrapping it in a std::unique_ptr we get away from that.
+   * The unique_ptr will _always_ have a pointer in it - and it shouldn't be
+   * removed (until this object is destroyed - then it will be automatically removed)
+   * If anyone has a better idea let me know
+   *
+   * Also: Note that this cannot be a std::atomic<std::unique_ptr> because
+   * std::atomic<std::unique_ptr> doesn't work - sigh.
    */
-  mutable std::unique_ptr<PointLocatorBase> _point_locator;
+  std::unique_ptr<std::atomic<PointLocatorBase *>> _point_locator{ new std::atomic<PointLocatorBase *>(nullptr) };
+
+  /**
+   * Just here to help with the doubly checked lock for _point_locator
+   *
+   * It's wrapped in a std::unique_ptr for the same reason as above
+   */
+  std::unique_ptr<std::mutex> _point_locator_mutex{ new std::mutex };
 
   /**
    * Do we count lower dimensional elements in point locator refinement?
