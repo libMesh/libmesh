@@ -46,15 +46,15 @@ void M_Constr(Matrix *M, const char *Name, size_t RowDim, size_t ClmDim,
               ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData);
 void M_Destr(Matrix *M);
 void M_SetName(Matrix *M, const char *Name);
-const char *M_GetName(Matrix *M);
-size_t M_GetRowDim(Matrix *M);
-size_t M_GetClmDim(Matrix *M);
-ElOrderType M_GetElOrder(Matrix *M);
+const char *M_GetName(const Matrix *M);
+size_t M_GetRowDim(const Matrix *M);
+size_t M_GetClmDim(const Matrix *M);
+ElOrderType M_GetElOrder(const Matrix *M);
 void M_SetLen(Matrix *M, size_t RoC, size_t Len);
-size_t M_GetLen(Matrix *M, size_t RoC);
+size_t M_GetLen(const Matrix *M, size_t RoC);
 void M_SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val);
-size_t M_GetPos(Matrix *M, size_t RoC, size_t Entry);
-_LPNumber M_GetVal(Matrix *M, size_t RoC, size_t Entry);
+size_t M_GetPos(const Matrix *M, size_t RoC, size_t Entry);
+_LPNumber M_GetVal(const Matrix *M, size_t RoC, size_t Entry);
 void M_AddVal(Matrix *M, size_t RoC, size_t Entry, _LPNumber Val);
 
 /* macros for fast access */

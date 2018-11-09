@@ -118,7 +118,7 @@ void M_SetName(Matrix *M, const char *Name)
     }
 }
 
-const char *M_GetName(Matrix *M)
+const char *M_GetName(const Matrix *M)
 /* returns the name of the matrix M */
 {
     if (LASResult() == LASOK)
@@ -127,7 +127,7 @@ const char *M_GetName(Matrix *M)
         return("");
 }
 
-size_t M_GetRowDim(Matrix *M)
+size_t M_GetRowDim(const Matrix *M)
 /* returns the row dimension of the matrix M */
 {
     size_t Dim;
@@ -139,7 +139,7 @@ size_t M_GetRowDim(Matrix *M)
     return(Dim);
 }
 
-size_t M_GetClmDim(Matrix *M)
+size_t M_GetClmDim(const Matrix *M)
 /* returns the column dimension of the matrix M */
 {
     size_t Dim;
@@ -151,7 +151,7 @@ size_t M_GetClmDim(Matrix *M)
     return(Dim);
 }
 
-ElOrderType M_GetElOrder(Matrix *M)
+ElOrderType M_GetElOrder(const Matrix *M)
 /* returns the element order */
 {
     ElOrderType ElOrder;
@@ -207,7 +207,7 @@ void M_SetLen(Matrix *M, size_t RoC, size_t Len)
     }
 }
 
-size_t M_GetLen(Matrix *M, size_t RoC)
+size_t M_GetLen(const Matrix *M, size_t RoC)
 /* returns the length of a row or column of the matrix M */
 {
     size_t Len;
@@ -241,7 +241,7 @@ void M_SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val)
     }
 }
 
-size_t M_GetPos(Matrix *M, size_t RoC, size_t Entry)
+size_t M_GetPos(const Matrix *M, size_t RoC, size_t Entry)
 /* returns the position of a matrix entry */
 {
     size_t Pos;

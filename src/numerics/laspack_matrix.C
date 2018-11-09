@@ -289,6 +289,8 @@ void LaspackMatrix<T>::zero ()
           Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
         }
     }
+
+  this->close();
 }
 
 
@@ -384,13 +386,8 @@ void LaspackMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  const LaspackMatrix<T> * const_X =
+  const LaspackMatrix<T> * X =
     cast_ptr<const LaspackMatrix<T> *> (&X_in);
-
-  // The Laspack APIs expect non-const pointers; I don't think
-  // X_in should actually be changed by any of the code below.
-  LaspackMatrix<T> * X =
-    const_cast<LaspackMatrix<T> *>(const_X);
 
   _LPNumber a = static_cast<_LPNumber> (a_in);
 
@@ -466,6 +463,26 @@ numeric_index_type LaspackMatrix<T>::pos (const numeric_index_type i,
 
   // Return the position in the compressed row
   return std::distance (_row_start[i], p.first);
+}
+
+
+
+template <typename T>
+void LaspackMatrix<T>::close()
+{
+  libmesh_assert(this->initialized());
+
+  this->_closed = true;
+
+  // We've probably changed some entries so we need to tell LASPACK
+  // that cached data is now invalid.
+  *_QMat.DiagElAlloc = _LPFalse;
+  *_QMat.ElSorted = _LPFalse;
+  if (*_QMat.ILUExists)
+    {
+      *_QMat.ILUExists = _LPFalse;
+      Q_Destr(_QMat.ILU);
+    }
 }
 
 
