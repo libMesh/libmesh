@@ -124,11 +124,7 @@ public:
       }
   }
 
-  const Point & min() const { return _bbox.min(); }
-
   Point & min() { return _bbox.min(); }
-
-  const Point & max() const { return _bbox.max(); }
 
   Point & max() { return _bbox.max(); }
 
@@ -140,11 +136,6 @@ public:
     _bbox.union_with(other._bbox);
   }
 #endif
-
-  const libMesh::BoundingBox & bbox () const
-  {
-    return _bbox;
-  }
 
   libMesh::BoundingBox & bbox ()
   {
