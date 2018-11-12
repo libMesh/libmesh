@@ -57,6 +57,42 @@ struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
   MetaPhysicL::DynamicSparseNumberArray
   <typename CompareTypes<T,T2>::supertype,I> supertype;
 };
+
+template <typename T> struct TypeToSend;
+
+template <typename T, typename I>
+struct TypeToSend<MetaPhysicL::DynamicSparseNumberArray<T,I>> {
+  typedef std::vector<std::pair<I,T>> type;
+};
+
+template <typename T, typename I>
+const std::vector<std::pair<I,T>>
+convert_to_send(MetaPhysicL::DynamicSparseNumberArray<T,I> & in)
+{
+  const std::size_t in_size = in.size();
+  std::vector<std::pair<I,T>> returnval(in_size);
+
+  for (std::size_t i=0; i != in_size; ++i)
+    {
+      returnval[i].first = in.raw_index(i);
+      returnval[i].second = in.raw_at(i);
+    }
+  return returnval;
+}
+
+template <typename SendT, typename T, typename I>
+void convert_from_receive (SendT & received,
+                           MetaPhysicL::DynamicSparseNumberArray<T,I> & converted)
+{
+  const std::size_t received_size = received.size();
+  converted.resize(received_size);
+  for (std::size_t i=0; i != received_size; ++i)
+    {
+      converted.raw_index(i) = received[i].first;
+      converted.raw_at(i) = received[i].second;
+    }
+}
+
 }
 
 
@@ -682,6 +718,23 @@ private:
 public:
   MatrixFillAction(SparseMatrix<ValOut> & target_mat) :
     target_matrix(target_mat) {}
+
+  void insert(dof_id_type id,
+              const DynamicSparseNumberArray<ValIn, dof_id_type> & val)
+  {
+    // Lock the target matrix since it is shared among threads.
+    {
+      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+      const std::size_t dnsa_size = val.size();
+      for (unsigned int j = 0; j != dnsa_size; ++j)
+        {
+          const dof_id_type dof_j = val.raw_index(j);
+          const ValIn dof_val = val.raw_at(j);
+          target_matrix.set(id, dof_j, dof_val);
+        }
+    }
+  }
 
   void insert(const FEMContext & c,
               unsigned int var_num,
