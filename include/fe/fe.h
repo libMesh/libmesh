@@ -837,6 +837,7 @@ public:
   /**
    * Explicitly call base class method.  This prevents some
    * compilers being confused by partially overriding this virtual function.
+   * \note: pts need to be in reference space coordinates, not physical ones.
    */
   virtual void reinit (const Elem * elem,
                        const std::vector<Point> * const pts = nullptr,

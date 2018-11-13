@@ -217,6 +217,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       for (std::size_t p=0; p != pts->size(); ++p)
         {
           Real radius = (*pts)[p](Dim-1);
+          //IMHO this is a dangerous check:
+          // 1) it is not guaranteed that two points have numerically equal radii
+          // 2) if there several radii but not sorted/regular, this breaks
           if (radial_pts.size() && radial_pts[0](0) == radius)
             break;
           radial_pts.push_back(Point(radius));
@@ -226,6 +229,19 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // If we're a tensor product we should have no remainder
       libmesh_assert_equal_to
         (base_pts_size * radial_pts_size, pts->size());
+
+      if (pts->size() > 1)
+        {
+           // lets inform the user about our assumptions.
+           // If this warning appears very often, this should be taken as a reason
+           // for rewriting this.
+           libmesh_experimental();
+           libmesh_warning("We assume that the "<<pts->size()
+                           <<" points are of tensor-product type with "
+                           <<radial_pts_size<<" radial points and "
+                           <<base_pts_size<< " angular points.");
+        }
+
 
       std::vector<Point> base_pts;
       base_pts.reserve(base_pts_size);

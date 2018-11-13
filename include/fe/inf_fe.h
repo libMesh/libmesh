@@ -399,6 +399,7 @@ public:
    * new element in the mesh.  Reinitializes all the physical
    * element-dependent data based on the current element
    * \p elem.
+   * \note: pts need to be in reference space coordinates, not physical ones.
    */
   virtual void reinit (const Elem * elem,
                        const std::vector<Point> * const pts = nullptr,
