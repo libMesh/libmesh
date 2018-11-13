@@ -47,7 +47,6 @@
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
-#include "libmesh/utility.h" // Utility::iota()
 
 // C++ Includes
 #include <set>
@@ -55,7 +54,7 @@
 #include <sstream>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
-
+#include <numeric>
 
 // Anonymous namespace to hold helper classes
 namespace {
@@ -965,7 +964,7 @@ private:
 
               // A shellface has the same dof indices as the element itself
               std::vector<unsigned int> shellface_dofs(n_dofs);
-              Utility::iota(shellface_dofs.begin(), shellface_dofs.end(), 0);
+              std::iota(shellface_dofs.begin(), shellface_dofs.end(), 0);
 
               // Some shellface dofs are on nodes/edges and already
               // fixed, others are free to calculate
