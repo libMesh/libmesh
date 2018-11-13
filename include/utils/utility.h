@@ -56,6 +56,9 @@ std::string system_info();
 template <typename ForwardIter, typename T>
 void iota (ForwardIter first, ForwardIter last, T value)
 {
+  // Use std::iota instead!
+  libmesh_deprecated();
+
   while (first != last)
     {
       *first = value++;
