@@ -51,37 +51,37 @@
 
 
 // Anonymous namespace for helper functions
-namespace {
-
-using namespace libMesh;
-
-struct SyncCoarsenInactive
-{
-  bool operator() (const Elem * elem) const {
-    // If we're not an ancestor, there's no chance our coarsening
-    // settings need to be changed.
-    if (!elem->ancestor())
-      return false;
-
-    // If we don't have any remote children, we already know enough to
-    // determine the correct refinement flag ourselves.
-    //
-    // If we know we have a child that isn't being coarsened, that
-    // also forces a specific flag.
-    //
-    // Either way there's nothing we need to communicate.
-    bool found_remote_child = false;
-    for (auto & child : elem->child_ref_range())
-      {
-        if (child.refinement_flag() != Elem::COARSEN)
-          return false;
-        if (&child == remote_elem)
-          found_remote_child = true;
-      }
-    return found_remote_child;
-  }
-};
-}
+// namespace {
+//
+// using namespace libMesh;
+//
+// struct SyncCoarsenInactive
+// {
+//   bool operator() (const Elem * elem) const {
+//     // If we're not an ancestor, there's no chance our coarsening
+//     // settings need to be changed.
+//     if (!elem->ancestor())
+//       return false;
+//
+//     // If we don't have any remote children, we already know enough to
+//     // determine the correct refinement flag ourselves.
+//     //
+//     // If we know we have a child that isn't being coarsened, that
+//     // also forces a specific flag.
+//     //
+//     // Either way there's nothing we need to communicate.
+//     bool found_remote_child = false;
+//     for (auto & child : elem->child_ref_range())
+//       {
+//         if (child.refinement_flag() != Elem::COARSEN)
+//           return false;
+//         if (&child == remote_elem)
+//           found_remote_child = true;
+//       }
+//     return found_remote_child;
+//   }
+// };
+// }
 
 
 
