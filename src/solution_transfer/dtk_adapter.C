@@ -21,20 +21,23 @@
 
 #ifdef LIBMESH_TRILINOS_HAVE_DTK
 
+// libMesh includes
 #include "libmesh/dtk_adapter.h"
-
 #include "libmesh/dtk_evaluator.h"
 #include "libmesh/mesh.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
 
+// Trilinos includes
 #include "libmesh/ignore_warnings.h"
 #include <DTK_MeshTypes.hpp>
 #include <Teuchos_Comm.hpp>
 #include "libmesh/restore_warnings.h"
 
+// C++ includes
 #include <vector>
+#include <numeric>
 
 namespace libMesh
 {
@@ -96,8 +99,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationS
   }
 
   Teuchos::ArrayRCP<int> permutation_list(n_nodes_per_elem);
-  for (unsigned int i = 0; i < n_nodes_per_elem; ++i )
-    permutation_list[i] = i;
+  std::iota(permutation_list.begin(), permutation_list.end(), 0);
 
   /*
     if (this->processor_id() == 1)

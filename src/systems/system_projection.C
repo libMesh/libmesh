@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <vector>
+#include <numeric> // std::iota
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -328,8 +329,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
   if (n_variables)
     {
       std::vector<unsigned int> vars(n_variables);
-      for (unsigned int i=0; i != n_variables; ++i)
-        vars[i] = i;
+      std::iota(vars.begin(), vars.end(), 0);
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
       typedef
@@ -748,8 +748,7 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
          this->get_mesh().active_local_elements_end());
 
       std::vector<unsigned int> vars(n_variables);
-      for (unsigned int i=0; i != n_variables; ++i)
-        vars[i] = i;
+      std::iota(vars.begin(), vars.end(), 0);
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
       typedef OldSolutionCoefs<Real, &FEMContext::point_value> OldSolutionValueCoefs;
@@ -901,8 +900,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
   const unsigned int n_variables = this->n_vars();
 
   std::vector<unsigned int> vars(n_variables);
-  for (unsigned int i=0; i != n_variables; ++i)
-    vars[i] = i;
+  std::iota(vars.begin(), vars.end(), 0);
 
   // Use a typedef to make the calling sequence for parallel_for() a bit more readable
   typedef
