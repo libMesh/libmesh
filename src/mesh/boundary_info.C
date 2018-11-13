@@ -579,10 +579,17 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
 
 
-void BoundaryInfo::add_node(const dof_id_type node,
+void BoundaryInfo::add_node(const dof_id_type node_id,
                             const boundary_id_type id)
 {
-  this->add_node (_mesh.node_ptr(node), id);
+  const Node * node_ptr = _mesh.query_node_ptr(node_id);
+
+  // The user could easily ask for an invalid node id, so let's warn
+  // them (but not die) when this happens.
+  if (!node_ptr)
+    libmesh_warning("BoundaryInfo::add_node(): Could not retrieve pointer for node " << node_id << ", no boundary id was added.");
+  else
+    this->add_node (node_ptr, id);
 }
 
 
