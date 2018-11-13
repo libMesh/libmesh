@@ -24,6 +24,7 @@
 #include "libmesh/face_tri6.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -253,7 +254,7 @@ std::unique_ptr<Elem> Prism18::build_side_ptr (const unsigned int i,
       face->subdomain_id() = this->subdomain_id();
 
       // Set the nodes
-      for (unsigned n=0; n<face->n_nodes(); ++n)
+      for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Prism18::side_nodes_map[i][n]);
 
       return face;
@@ -457,7 +458,7 @@ void Prism18::connectivity(const unsigned int sc,
         // VTK's VTK_BIQUADRATIC_QUADRATIC_WEDGE first 9 (vertex) and
         // last 3 (mid-face) nodes match.  The middle and top layers
         // of mid-edge nodes are reversed from LibMesh's.
-        for (unsigned int i=0; i != conn_size; ++i)
+        for (auto i : IntRange<int>(0, conn_size))
           conn[i] = this->node_id(i);
 
         // top "ring" of mid-edge nodes
@@ -471,112 +472,6 @@ void Prism18::connectivity(const unsigned int sc,
         conn[14] = this->node_id(11);
 
         return;
-
-        /*
-          conn.resize(6);
-          switch (sc)
-          {
-
-          case 0:
-          {
-          conn[0] = this->node_id(0);
-          conn[1] = this->node_id(6);
-          conn[2] = this->node_id(8);
-          conn[3] = this->node_id(9);
-          conn[4] = this->node_id(15);
-          conn[5] = this->node_id(17);
-
-          return;
-          }
-
-          case 1:
-          {
-          conn[0] = this->node_id(6);
-          conn[1] = this->node_id(1);
-          conn[2] = this->node_id(7);
-          conn[3] = this->node_id(15);
-          conn[4] = this->node_id(10);
-          conn[5] = this->node_id(16);
-
-          return;
-          }
-
-          case 2:
-          {
-          conn[0] = this->node_id(8);
-          conn[1] = this->node_id(7);
-          conn[2] = this->node_id(2);
-          conn[3] = this->node_id(17);
-          conn[4] = this->node_id(16);
-          conn[5] = this->node_id(11);
-
-          return;
-          }
-
-          case 3:
-          {
-          conn[0] = this->node_id(6);
-          conn[1] = this->node_id(7);
-          conn[2] = this->node_id(8);
-          conn[3] = this->node_id(15);
-          conn[4] = this->node_id(16);
-          conn[5] = this->node_id(17);
-
-          return;
-          }
-
-          case 4:
-          {
-          conn[0] = this->node_id(9);
-          conn[1] = this->node_id(15);
-          conn[2] = this->node_id(17);
-          conn[3] = this->node_id(3);
-          conn[4] = this->node_id(12);
-          conn[5] = this->node_id(14);
-
-          return;
-          }
-
-          case 5:
-          {
-          conn[0] = this->node_id(15);
-          conn[1] = this->node_id(10);
-          conn[2] = this->node_id(16);
-          conn[3] = this->node_id(12);
-          conn[4] = this->node_id(4);
-          conn[5] = this->node_id(13);
-
-          return;
-          }
-
-          case 6:
-          {
-          conn[0] = this->node_id(17);
-          conn[1] = this->node_id(16);
-          conn[2] = this->node_id(11);
-          conn[3] = this->node_id(14);
-          conn[4] = this->node_id(13);
-          conn[5] = this->node_id(5);
-
-          return;
-          }
-
-          case 7:
-          {
-          conn[0] = this->node_id(15);
-          conn[1] = this->node_id(16);
-          conn[2] = this->node_id(17);
-          conn[3] = this->node_id(12);
-          conn[4] = this->node_id(13);
-          conn[5] = this->node_id(14);
-
-          return;
-          }
-
-          default:
-          libmesh_error_msg("Invalid sc = " << sc);
-          }
-        */
       }
 
     default:

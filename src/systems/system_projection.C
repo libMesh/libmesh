@@ -360,10 +360,8 @@ void System::project_vector (const NumericVector<Number> & old_v,
                 const unsigned int new_n_dofs =
                   cast_int<unsigned int>(new_SCALAR_indices.size());
 
-                for (unsigned int i=0; i<new_n_dofs; i++)
-                  {
-                    new_vector.set( new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]) );
-                  }
+                for (auto i : IntRange<int>(0, new_n_dofs))
+                  new_vector.set(new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]));
               }
         }
     }
@@ -491,7 +489,7 @@ public:
     std::size_t size = values.size();
     libmesh_assert_equal_to (old_dof_indices.size(), size);
 
-    for (unsigned int i=0; i != size; ++i)
+    for (auto i : IntRange<std::size_t>(0, size))
       {
         values[i].resize(1);
         values[i].raw_at(0) = 1;
@@ -536,7 +534,7 @@ eval_at_point(const FEMContext & c,
   DynamicSparseNumberArray<Real, dof_id_type> returnval;
   returnval.resize(n_dofs);
 
-  for (auto j : IntRange<unsigned int>(0, n_dofs))
+  for (auto j : IntRange<std::size_t>(0, n_dofs))
     {
       returnval.raw_at(j) = phi[j][0];
       returnval.raw_index(j) = dof_indices[j];
@@ -583,14 +581,12 @@ eval_at_point(const FEMContext & c,
   for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
     returnval(d).resize(n_dofs);
 
-  for (auto j : IntRange<unsigned int>(0, n_dofs))
-    {
-      for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
-        {
-          returnval(d).raw_at(j) = dphi[j][0](d);
-          returnval(d).raw_index(j) = dof_indices[j];
-        }
-    }
+  for (auto j : IntRange<std::size_t>(0, n_dofs))
+    for (auto d : IntRange<int>(0, LIBMESH_DIM))
+      {
+        returnval(d).raw_at(j) = dphi[j][0](d);
+        returnval(d).raw_index(j) = dof_indices[j];
+      }
 
   return returnval;
 }
@@ -1545,7 +1541,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 // Some edge dofs are on nodes and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
+                for (auto i : IntRange<std::size_t>(0, n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 
@@ -1646,7 +1642,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 // Some side dofs are on nodes/edges and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
+                for (auto i : IntRange<std::size_t>(0, n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 
