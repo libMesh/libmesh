@@ -1357,10 +1357,7 @@ void BoundaryInfo::remove_edge (const Elem * elem,
       // if this is true we found the requested edge
       // of the element and want to erase the id
       if (e.first->second.first == edge)
-        {
-          // (postfix++ - increment the iterator before it's invalid)
-          _boundary_edge_id.erase(e.first++);
-        }
+        e.first = _boundary_edge_id.erase(e.first);
       else
         ++e.first;
     }
@@ -1387,12 +1384,8 @@ void BoundaryInfo::remove_edge (const Elem * elem,
     {
       // if this is true we found the requested edge
       // of the element and want to erase the requested id
-      if (e.first->second.first == edge &&
-          e.first->second.second == id)
-        {
-          // (postfix++ - increment the iterator before it's invalid)
-          _boundary_edge_id.erase(e.first++);
-        }
+      if (e.first->second.first == edge && e.first->second.second == id)
+        e.first = _boundary_edge_id.erase(e.first);
       else
         ++e.first;
     }
@@ -1421,10 +1414,7 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
       // if this is true we found the requested shellface
       // of the element and want to erase the id
       if (e.first->second.first == shellface)
-        {
-          // (postfix++ - increment the iterator before it's invalid)
-          _boundary_shellface_id.erase(e.first++);
-        }
+        e.first = _boundary_shellface_id.erase(e.first);
       else
         ++e.first;
     }
@@ -1458,7 +1448,7 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
           e.first->second.second == id)
         {
           // (postfix++ - increment the iterator before it's invalid)
-          _boundary_shellface_id.erase(e.first++);
+          e.first = _boundary_shellface_id.erase(e.first);
         }
       else
         ++e.first;
@@ -1484,10 +1474,7 @@ void BoundaryInfo::remove_side (const Elem * elem,
       // if this is true we found the requested side
       // of the element and want to erase the id
       if (e.first->second.first == side)
-        {
-          // (postfix++ - increment the iterator before it's invalid)
-          _boundary_side_id.erase(e.first++);
-        }
+        e.first = _boundary_side_id.erase(e.first);
       else
         ++e.first;
     }
@@ -1510,12 +1497,8 @@ void BoundaryInfo::remove_side (const Elem * elem,
     {
       // if this is true we found the requested side
       // of the element and want to erase the requested id
-      if (e.first->second.first == side &&
-          e.first->second.second == id)
-        {
-          // (postfix++ - increment the iterator before it's invalid)
-          _boundary_side_id.erase(e.first++);
-        }
+      if (e.first->second.first == side && e.first->second.second == id)
+        e.first = _boundary_side_id.erase(e.first);
       else
         ++e.first;
     }
@@ -1538,7 +1521,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   for (auto it = _boundary_node_id.begin(); it != _boundary_node_id.end(); /*below*/)
     {
       if (it->second == id)
-        _boundary_node_id.erase(it++);
+        it = _boundary_node_id.erase(it);
       else
         ++it;
     }
@@ -1546,7 +1529,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   for (auto it = _boundary_edge_id.begin(); it != _boundary_edge_id.end(); /*below*/)
     {
       if (it->second.second == id)
-        _boundary_edge_id.erase(it++);
+        it = _boundary_edge_id.erase(it);
       else
         ++it;
     }
@@ -1554,7 +1537,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   for (auto it = _boundary_shellface_id.begin(); it != _boundary_shellface_id.end(); /*below*/)
     {
       if (it->second.second == id)
-        _boundary_shellface_id.erase(it++);
+        it = _boundary_shellface_id.erase(it);
       else
         ++it;
     }
@@ -1562,7 +1545,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   for (auto it = _boundary_side_id.begin(); it != _boundary_side_id.end(); /*below*/)
     {
       if (it->second.second == id)
-        _boundary_side_id.erase(it++);
+        it = _boundary_side_id.erase(it);
       else
         ++it;
     }
