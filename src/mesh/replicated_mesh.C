@@ -1308,6 +1308,13 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                                         {
                                           neighbor->set_neighbor(ns,el);
                                         }
+                                      // It's OK to invalidate the
+                                      // bounds.first iterator here,
+                                      // as we are immediately going
+                                      // to break out of this while
+                                      // loop. bounds.first will
+                                      // therefore not be used for
+                                      // anything else.
                                       side_to_elem_map.erase (bounds.first);
                                       break;
                                     }
