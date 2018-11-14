@@ -18,6 +18,7 @@
 
 
 // C++ includes
+#include <numeric> // std::iota
 
 // Local Includes
 #include "libmesh/petsc_vector.h"
@@ -29,7 +30,6 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/parallel.h"
 #include "libmesh/petsc_macro.h"
-#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -674,7 +674,8 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   VecScatter scatter;
 
   // Create idx, idx[i] = i;
-  std::vector<PetscInt> idx(n); Utility::iota (idx.begin(), idx.end(), 0);
+  std::vector<PetscInt> idx(n);
+  std::iota (idx.begin(), idx.end(), 0);
 
   // Create the index set & scatter object
   ierr = ISCreateLibMesh(this->comm().get(), n, &idx[0], PETSC_USE_POINTER, &is);
@@ -885,7 +886,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 
     // Create idx, idx[i] = i+first_local_idx;
     std::vector<PetscInt> idx(my_local_size);
-    Utility::iota (idx.begin(), idx.end(), first_local_idx);
+    std::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
     ierr = ISCreateLibMesh(this->comm().get(), my_local_size,
@@ -1296,7 +1297,7 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
 
   // Use iota to fill an array with entries [0,1,2,3,4,...rows.size()]
   std::vector<PetscInt> idx(rows.size());
-  Utility::iota (idx.begin(), idx.end(), 0);
+  std::iota (idx.begin(), idx.end(), 0);
 
   // Construct index sets
   ierr = ISCreateLibMesh(this->comm().get(),

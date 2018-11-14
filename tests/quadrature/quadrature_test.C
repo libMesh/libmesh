@@ -10,6 +10,7 @@
 #include <libmesh/enum_quadrature_type.h>
 
 #include <iomanip>
+#include <numeric> // std::iota
 
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
@@ -250,9 +251,9 @@ public:
                       denominator(3 + sorted_powers[0] + sorted_powers[1]);
 
                     // Fill up the vectors with sequences starting at the right values.
-                    Utility::iota(numerator_1.begin(), numerator_1.end(), 2);
-                    Utility::iota(numerator_2.begin(), numerator_2.end(), 2);
-                    Utility::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
+                    std::iota(numerator_1.begin(), numerator_1.end(), 2);
+                    std::iota(numerator_2.begin(), numerator_2.end(), 2);
+                    std::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
 
                     // The denominator is guaranteed to have the most terms...
                     for (std::size_t i=0; i<denominator.size(); ++i)
@@ -328,8 +329,8 @@ public:
                     denominator(2+smaller_power);
 
                   // Fill up the vectors with sequences starting at the right values.
-                  Utility::iota(numerator.begin(), numerator.end(), 2);
-                  Utility::iota(denominator.begin(), denominator.end(), larger_power+1);
+                  std::iota(numerator.begin(), numerator.end(), 2);
+                  std::iota(denominator.begin(), denominator.end(), larger_power+1);
 
                   // The denominator is guaranteed to have more terms...
                   for (std::size_t i=0; i<denominator.size(); ++i)
