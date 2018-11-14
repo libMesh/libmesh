@@ -974,14 +974,13 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   object_iterator it  = objects.begin();
   object_iterator end = objects.end();
 
-  for (; it != end;)
+  while (it != end)
     {
       T * obj = *it;
 
-      // Remove any nullptr container entries while we're here,
-      // being careful not to invalidate our iterator
-      if (!*it)
-        objects.erase(it++);
+      // Remove any nullptr container entries while we're here.
+      if (!obj)
+        it = objects.erase(it);
       else
         {
           processor_id_type obj_procid = obj->processor_id();
@@ -989,6 +988,8 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
             unpartitioned_objects++;
           else
             ghost_objects_from_proc[obj_procid]++;
+
+          // Finally, increment the iterator
           ++it;
         }
     }
@@ -1165,8 +1166,9 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 
   // Finally shuffle around objects so that container indices
   // match ids
+  it = objects.begin();
   end = objects.end();
-  for (it = objects.begin(); it != end;)
+  while (it != end)
     {
       T * obj = *it;
       if (obj) // don't try shuffling already-nullptr entries
@@ -1193,10 +1195,10 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
               objects[obj->id()] = obj;
             }
         }
-      // Remove any container entries that were left as nullptr,
-      // being careful not to invalidate our iterator
-      if (!*it)
-        objects.erase(it++);
+
+      // Remove any container entries that were left as nullptr.
+      if (!obj)
+        it = objects.erase(it);
       else
         ++it;
     }
@@ -1231,11 +1233,11 @@ void DistributedMesh::renumber_nodes_and_elements ()
     node_iterator_imp  it = _nodes.begin();
     node_iterator_imp end = _nodes.end();
 
-    for (; it != end;)
+    while (it != end)
       {
         Node * nd = *it;
         if (!nd)
-          _nodes.erase(it++);
+          it = _nodes.erase(it);
         else if (!used_nodes.count(nd->id()))
           {
             // remove any boundary information associated with
@@ -1245,7 +1247,7 @@ void DistributedMesh::renumber_nodes_and_elements ()
             // delete the node
             delete nd;
 
-            _nodes.erase(it++);
+            it = _nodes.erase(it);
           }
         else
           ++it;
@@ -1364,17 +1366,17 @@ void DistributedMesh::delete_remote_elements()
   // any newly-created nullptr voids out of the element array
   mapvector<Elem *,dof_id_type>::veclike_iterator e_it        = _elements.begin();
   const mapvector<Elem *,dof_id_type>::veclike_iterator e_end = _elements.end();
-  for (; e_it != e_end;)
+  while (e_it != e_end)
     if (!*e_it)
-      _elements.erase(e_it++);
+      e_it = _elements.erase(e_it);
     else
       ++e_it;
 
   mapvector<Node *,dof_id_type>::veclike_iterator n_it        = _nodes.begin();
   const mapvector<Node *,dof_id_type>::veclike_iterator n_end = _nodes.end();
-  for (; n_it != n_end;)
+  while (n_it != n_end)
     if (!*n_it)
-      _nodes.erase(n_it++);
+      n_it = _nodes.erase(n_it);
     else
       ++n_it;
 
