@@ -123,6 +123,11 @@ public:
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
 
   /**
+   * Rebuilds a primitive (3-noded) triangle for face i.
+   */
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+
+  /**
    * \returns A quantitative assessment of element quality based on
    * the quality metric \p q specified by the user.
    */

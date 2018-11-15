@@ -42,6 +42,24 @@ std::unique_ptr<Elem> Edge::side_ptr (const unsigned int i)
 }
 
 
+void Edge::side_ptr (std::unique_ptr<Elem> & side,
+                           const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  if (!side.get() || side->type() != NODEELEM)
+    side = this->build_side_ptr(i, false);
+  else
+    {
+      side->subdomain_id() = this->subdomain_id();
+
+      side->set_node(0) = this->node_ptr(i);
+    }
+}
+
+
+
+
 std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
 {
   libmesh_assert_less (i, 2);
@@ -49,6 +67,15 @@ std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
   nodeelem->set_node(0) = this->node_ptr(i);
   return nodeelem;
 }
+
+
+void Edge::build_side_ptr (std::unique_ptr<Elem> & side,
+                           const unsigned int i)
+{
+  this->side_ptr(side, i);
+}
+
+
 
 
 bool Edge::is_child_on_side(const unsigned int c,

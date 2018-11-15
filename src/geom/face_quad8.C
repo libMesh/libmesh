@@ -237,6 +237,24 @@ std::unique_ptr<Elem> Quad8::build_side_ptr (const unsigned int i,
 
 
 
+void Quad8::build_side_ptr (std::unique_ptr<Elem> & side,
+                            const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  if (!side.get() || side->type() != EDGE3)
+    side = this->build_side_ptr(i, false);
+  else
+    {
+      side->subdomain_id() = this->subdomain_id();
+
+      for (auto n : side->node_index_range())
+        side->set_node(n) = this->node_ptr(Quad8::side_nodes_map[i][n]);
+    }
+}
+
+
+
 
 
 

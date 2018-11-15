@@ -167,9 +167,17 @@ public:
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int) override
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
+  virtual void side_ptr (std::unique_ptr<Elem> &,
+                         const unsigned int) override
+  { libmesh_not_implemented(); }
+
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int,
                                                 bool) override
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
+
+  virtual void build_side_ptr (std::unique_ptr<Elem> &,
+                               const unsigned int) override
+  { libmesh_not_implemented(); }
 
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) override
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }

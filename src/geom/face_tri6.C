@@ -220,6 +220,25 @@ std::unique_ptr<Elem> Tri6::build_side_ptr (const unsigned int i,
 }
 
 
+
+void Tri6::build_side_ptr (std::unique_ptr<Elem> & side,
+                           const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  if (!side.get() || side->type() != EDGE3)
+    side = this->build_side_ptr(i, false);
+  else
+    {
+      side->subdomain_id() = this->subdomain_id();
+
+      for (auto n : side->node_index_range())
+        side->set_node(n) = this->node_ptr(Tri6::side_nodes_map[i][n]);
+    }
+}
+
+
+
 void Tri6::connectivity(const unsigned int sf,
                         const IOPackage iop,
                         std::vector<dof_id_type> & conn) const

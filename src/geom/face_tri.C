@@ -92,6 +92,14 @@ std::unique_ptr<Elem> Tri::side_ptr (const unsigned int i)
 
 
 
+void Tri::side_ptr (std::unique_ptr<Elem> & side,
+                    const unsigned int i)
+{
+  this->simple_build_side_ptr<Tri3>(side, i, EDGE2);
+}
+
+
+
 bool Tri::is_child_on_side(const unsigned int c,
                            const unsigned int s) const
 {

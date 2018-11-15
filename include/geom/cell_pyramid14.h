@@ -174,6 +174,12 @@ public:
                                                 bool proxy) override;
 
   /**
+   * Rebuilds a \p QUAD9 or \p TRI6 built coincident with face i.
+   */
+  virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
+                               const unsigned int i) override;
+
+  /**
    * Builds a \p EDGE3 coincident with edge i.
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */

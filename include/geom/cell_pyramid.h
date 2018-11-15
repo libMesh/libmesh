@@ -134,11 +134,14 @@ public:
                                        unsigned int side_node) const override;
 
   /**
-   * \returns A primitive triangle or quad for
-   * face i.
+   * \returns A primitive triangle or quad for face i.
    */
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
 
+  /**
+   * Rebuilds a primitive triangle or quad for face i.
+   */
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
 
 protected:
 

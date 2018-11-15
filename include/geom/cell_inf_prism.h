@@ -146,6 +146,12 @@ public:
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
 
   /**
+   * Rebuilds a primitive (3-noded) tri or (4-noded) infquad for face
+   * i.
+   */
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+
+  /**
    * @returns \p true when this element contains the point
    * \p p.  Customized for infinite elements, since knowledge
    * about the envelope can be helpful.

@@ -131,6 +131,13 @@ public:
                                                 bool proxy) override;
 
   /**
+   * Rebuilds a \p QUAD4 built coincident with face 0, or an \p INFQUAD4
+   * built coincident with faces 1 to 4.
+   */
+  virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
+                               const unsigned int i) override;
+
+  /**
    * \returns An \p EDGE2 built coincident with edges 0 to 3, or an \p INFEDGE2
    * built coincident with edges 4 to 7.
    *

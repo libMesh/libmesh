@@ -228,6 +228,52 @@ std::unique_ptr<Elem> InfHex18::build_side_ptr (const unsigned int i,
 
 
 
+void InfHex18::build_side_ptr (std::unique_ptr<Elem> & side,
+                               const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
+  switch (i)
+    {
+      // the base face
+    case 0:
+      {
+        if (!side.get() || side->type() != QUAD9)
+          {
+            side = this->build_side_ptr(i, false);
+            return;
+          }
+        break;
+      }
+
+      // connecting to another infinite element
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      {
+        if (!side.get() || side->type() != INFQUAD6)
+          {
+            side = this->build_side_ptr(i, false);
+            return;
+          }
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid side i = " << i);
+    }
+
+  side->subdomain_id() = this->subdomain_id();
+
+  // Set the nodes
+  for (auto n : side->node_index_range())
+    side->set_node(n) = this->node_ptr(InfHex18::side_nodes_map[i][n]);
+}
+
+
+
 std::unique_ptr<Elem> InfHex18::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());

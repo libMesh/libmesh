@@ -144,6 +144,12 @@ public:
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
 
   /**
+   * Rebuilds an EDGE2 coincident with face i.
+   */
+  virtual void side_ptr (std::unique_ptr<Elem> & elem,
+                         const unsigned int i) override;
+
+  /**
    * \returns A quantitative assessment of element quality based on
    * the quality metric \p q specified by the user.
    */

@@ -133,6 +133,49 @@ std::unique_ptr<Elem> Pyramid::side_ptr (const unsigned int i)
 
 
 
+void Pyramid::side_ptr (std::unique_ptr<Elem> & side,
+                        const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  switch (i)
+    {
+    case 0: // triangular face 1
+    case 1: // triangular face 2
+    case 2: // triangular face 3
+    case 3: // triangular face 4
+      {
+        if (!side.get() || side->type() != TRI3)
+          {
+            side = this->side_ptr(i);
+            return;
+          }
+        break;
+      }
+
+    case 4:  // the quad face at z=0
+      {
+        if (!side.get() || side->type() != QUAD4)
+          {
+            side = this->side_ptr(i);
+            return;
+          }
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid side i = " << i);
+    }
+
+  side->subdomain_id() = this->subdomain_id();
+
+  // Set the nodes
+  for (auto n : side->node_index_range())
+    side->set_node(n) = this->node_ptr(Pyramid5::side_nodes_map[i][n]);
+}
+
+
+
 bool Pyramid::is_child_on_side(const unsigned int c,
                                const unsigned int s) const
 {
