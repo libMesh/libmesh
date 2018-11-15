@@ -559,9 +559,10 @@ Node * DistributedMesh::add_point (const Point & p,
                                    const dof_id_type id,
                                    const processor_id_type proc_id)
 {
-  if (_nodes.count(id))
+  auto n_it = _nodes.find(id);
+  if (n_it != _nodes.end().it)
     {
-      Node * n = _nodes[id];
+      Node * n = n_it->second;
       libmesh_assert (n);
       libmesh_assert_equal_to (n->id(), id);
 
