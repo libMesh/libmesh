@@ -619,6 +619,9 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   {
     std::set<dof_id_type> my_interface_node_set;
 
+    // Pull objects out of the loop to reduce heap operations
+    std::unique_ptr<const Elem> side;
+
     // since parent nodes are a subset of children nodes, this should be sufficient
     for (const auto & elem : mesh.active_local_element_ptr_range())
       {
@@ -631,7 +634,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             for (auto s : elem->side_index_range())
               if (elem->neighbor_ptr(s) == nullptr)
                 {
-                  std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
+                  elem->build_side_ptr(side, s);
 
                   for (unsigned int n=0; n<side->n_vertices(); n++)
                     my_interface_node_set.insert (side->node_id(n));

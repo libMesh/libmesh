@@ -835,7 +835,9 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
   // We currently always use LAGRANGE mappings for geometry
   const FEType fe_type(elem->default_order(), LAGRANGE);
 
+  // Pull objects out of the loop to reduce heap operations
   std::vector<const Node *> my_nodes, parent_nodes;
+  std::unique_ptr<const Elem> my_side, parent_side;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -853,8 +855,8 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
           // level than their neighbors!
           libmesh_assert(parent);
 
-          const std::unique_ptr<const Elem> my_side     (elem->build_side_ptr(s));
-          const std::unique_ptr<const Elem> parent_side (parent->build_side_ptr(s));
+          elem->build_side_ptr(my_side, s);
+          parent->build_side_ptr(parent_side, s);
 
           const unsigned int n_side_nodes = my_side->n_nodes();
 
@@ -981,7 +983,9 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
   // We currently always use LAGRANGE mappings for geometry
   const FEType fe_type(elem->default_order(), LAGRANGE);
 
+  // Pull objects out of the loop to reduce heap operations
   std::vector<const Node *> my_nodes, neigh_nodes;
+  std::unique_ptr<const Elem> my_side, neigh_side;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -1016,8 +1020,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                   libmesh_assert(neigh->active());
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-                  const std::unique_ptr<const Elem> my_side    (elem->build_side_ptr(s));
-                  const std::unique_ptr<const Elem> neigh_side (neigh->build_side_ptr(s_neigh));
+                  elem->build_side_ptr(my_side, s);
+                  neigh->build_side_ptr(neigh_side, s_neigh);
 
                   const unsigned int n_side_nodes = my_side->n_nodes();
 

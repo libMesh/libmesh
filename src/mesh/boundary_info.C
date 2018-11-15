@@ -289,6 +289,9 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
   node_id_map.clear();
   side_id_map.clear();
 
+  // Pull objects out of the loop to reduce heap operations
+  std::unique_ptr<const Elem> interior_parent_side;
+
   for (const auto & boundary_elem : boundary_mesh.active_element_ptr_range())
     {
       const Elem * interior_parent = boundary_elem->interior_parent();
@@ -299,7 +302,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       bool found_matching_sides = false;
       for (auto side : interior_parent->side_index_range())
         {
-          std::unique_ptr<const Elem> interior_parent_side = interior_parent->build_side_ptr(side);
+          interior_parent->build_side_ptr(interior_parent_side, side);
           Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
 
           if (centroid_distance < (tolerance * boundary_elem->hmin()))
@@ -315,7 +318,6 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 
       side_id_map[boundary_elem->id()] = interior_parent_side_index;
 
-      std::unique_ptr<const Elem> interior_parent_side = interior_parent->build_side_ptr(interior_parent_side_index);
       for (auto local_node_index : boundary_elem->node_index_range())
         {
           dof_id_type boundary_node_id = boundary_elem->node_id(local_node_index);
@@ -1798,6 +1800,9 @@ BoundaryInfo::build_node_list_from_side_list()
   const processor_id_type my_proc_id = this->processor_id();
   std::vector<set_type> nodes_to_push(n_proc);
 
+  // Pull objects out of the loop to reduce heap operations
+  std::unique_ptr<const Elem> side;
+
   // Loop over the side list
   for (const auto & pr : _boundary_side_id)
     {
@@ -1815,7 +1820,7 @@ BoundaryInfo::build_node_list_from_side_list()
 
       for (const auto & cur_elem : family)
         {
-          std::unique_ptr<const Elem> side = cur_elem->build_side_ptr(pr.second.first);
+          cur_elem->build_side_ptr(side, pr.second.first);
 
           // Add each node node on the side with the side's boundary id
           for (auto i : side->node_index_range())
@@ -1973,10 +1978,13 @@ void BoundaryInfo::build_side_list_from_node_list()
       return;
     }
 
+  // Pull objects out of the loop to reduce heap operations
+  std::unique_ptr<const Elem> side_elem;
+
   for (const auto & elem : _mesh.active_element_ptr_range())
     for (auto side : elem->side_index_range())
       {
-        std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
+        elem->build_side_ptr(side_elem, side);
 
         // map from nodeset_id to count for that ID
         std::map<boundary_id_type, unsigned> nodesets_node_count;
@@ -2427,6 +2435,9 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
     next_node_id = first_free_node_id + this->processor_id(),
     next_elem_id = first_free_elem_id + this->processor_id();
 
+  // Pull objects out of the loop to reduce heap operations
+  std::unique_ptr<const Elem> side;
+
   // We'll pass through the mesh once first to build
   // the maps and count boundary nodes and elements.
   // To find local boundary nodes, we have to examine all elements
@@ -2531,8 +2542,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                   next_elem_id += this->n_processors() + 1;
                 }
 
-              // Use a proxy element for the side to query nodes
-              std::unique_ptr<const Elem> side (elem->build_side_ptr(s));
+              elem->build_side_ptr(side, s);
               for (auto n : side->node_index_range())
                 {
                   const Node & node = side->node_ref(n);
