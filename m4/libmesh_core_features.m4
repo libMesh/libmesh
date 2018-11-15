@@ -226,7 +226,7 @@ AC_ARG_WITH([processor_id_bytes],
             AS_HELP_STRING([--with-processor-id-bytes=<1|2|4|8>],
                            [bytes used for processor id [4]]),
             [processor_bytes="$withval"],
-            [processor_bytes=2])
+            [processor_bytes=4])
 
 AS_CASE("$processor_bytes",
         [1], [AC_DEFINE(PROCESSOR_ID_BYTES, 1, [size of processor_id])],
@@ -234,9 +234,9 @@ AS_CASE("$processor_bytes",
         [4], [AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id])],
         [8], [AC_DEFINE(PROCESSOR_ID_BYTES, 8, [size of processor_id])],
         [
-          AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...2])
-          AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
-          processor_bytes=2
+          AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...4])
+          AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id])
+          processor_bytes=4
         ])
 
 AC_MSG_RESULT([configuring size of processor_id... $processor_bytes])
