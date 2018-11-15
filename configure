@@ -31375,7 +31375,7 @@ $as_echo "configuring size of dof_id... $dof_bytes" >&6; }
 if test "${with_processor_id_bytes+set}" = set; then :
   withval=$with_processor_id_bytes; processor_bytes="$withval"
 else
-  processor_bytes=2
+  processor_bytes=4
 fi
 
 
@@ -31398,12 +31398,12 @@ $as_echo "#define PROCESSOR_ID_BYTES 8" >>confdefs.h
  ;; #(
   *) :
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized processor_id size: $processor_bytes - configuring size...2" >&5
-$as_echo ">>> unrecognized processor_id size: $processor_bytes - configuring size...2" >&6; }
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized processor_id size: $processor_bytes - configuring size...4" >&5
+$as_echo ">>> unrecognized processor_id size: $processor_bytes - configuring size...4" >&6; }
 
-$as_echo "#define PROCESSOR_ID_BYTES 2" >>confdefs.h
+$as_echo "#define PROCESSOR_ID_BYTES 4" >>confdefs.h
 
-          processor_bytes=2
+          processor_bytes=4
          ;;
 esac
 
