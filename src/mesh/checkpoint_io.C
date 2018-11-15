@@ -63,7 +63,7 @@ void chunking(libMesh::processor_id_type size, libMesh::processor_id_type rank, 
       return;
     }
 
-  int nextra = nsplits % size;
+  libMesh::processor_id_type nextra = nsplits % size;
   if (rank < nextra) // leftover chunks cause an extra chunk to be added to this processor
     {
       nchunks = libMesh::cast_int<libMesh::processor_id_type>(nsplits / size + 1);
