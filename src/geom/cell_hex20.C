@@ -185,17 +185,7 @@ std::unique_ptr<Elem> Hex20::build_side_ptr (const unsigned int i,
 void Hex20::build_side_ptr (std::unique_ptr<Elem> & side,
                             const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (!side.get() || side->type() != QUAD8)
-    side = this->build_side_ptr(i, false);
-  else
-    {
-      side->subdomain_id() = this->subdomain_id();
-
-      for (auto n : side->node_index_range())
-        side->set_node(n) = this->node_ptr(Hex20::side_nodes_map[i][n]);
-    }
+  this->simple_build_side_ptr<Hex20>(side, i, QUAD8);
 }
 
 
