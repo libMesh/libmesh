@@ -1030,6 +1030,11 @@ void CheckpointIO::read_connectivity (Xdr & io)
   // Keep track of the highest dimensional element we've added to the mesh
   unsigned int highest_elem_dim = 1;
 
+  // RHS: Originally we used invalid_processor_id as a "no parent" tag
+  // number, because I'm an idiot.  Let's try to support broken files
+  // as much as possible.
+  bool file_is_broken = false;
+
   for (unsigned int i=0; i<n_elems_here; i++)
     {
       // id type pid subdomain_id parent_id
@@ -1069,13 +1074,22 @@ void CheckpointIO::read_connectivity (Xdr & io)
         (elem_data[2] % mesh.n_processors());
       const subdomain_id_type subdomain_id =
         cast_int<subdomain_id_type>(elem_data[3]);
-      const dof_id_type parent_id          =
-        cast_int<dof_id_type>      (elem_data[4]);
+
+      // Old broken files used processsor_id_type(-1)...
+      // But we *know* our first element will be level 0
+      if (i == 0 && elem_data[4] == 65535)
+        file_is_broken = true;
+
+      // On a broken file we can't tell whether a parent of 65535 is a
+      // null parent or an actual parent of 65535.  Assuming the
+      // former will cause less breakage.
       Elem * parent =
-        (elem_data[4] == static_cast<largest_id_type>(-1)) ?
-        nullptr : mesh.elem_ptr(cast_int<dof_id_type>(parent_id));
+        (elem_data[4] == static_cast<largest_id_type>(-1) ||
+         (file_is_broken && elem_data[4] == 65535)) ?
+        nullptr : mesh.elem_ptr(cast_int<dof_id_type>(elem_data[4]));
       const unsigned short int child_num   =
-        (elem_data[5] == static_cast<largest_id_type>(-1)) ?
+        (elem_data[5] == static_cast<largest_id_type>(-1) ||
+         (file_is_broken && elem_data[5] == 65535)) ?
         static_cast<unsigned short>(-1) :
         cast_int<unsigned short>(elem_data[5]);
 
