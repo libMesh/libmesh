@@ -306,7 +306,8 @@ void Nemesis_IO::read (const std::string & base_filename)
 
       // In all the samples I have seen, node_cmap_ids[cmap] is the processor
       // rank of the remote processor...
-      const int adjcnt_pid_idx = nemhelper->node_cmap_ids[cmap];
+      const processor_id_type adjcnt_pid_idx =
+        cast_int<processor_id_type>(nemhelper->node_cmap_ids[cmap]);
 
       libmesh_assert_less (adjcnt_pid_idx, this->n_processors());
       libmesh_assert_not_equal_to (adjcnt_pid_idx, this->processor_id());
@@ -320,7 +321,9 @@ void Nemesis_IO::read (const std::string & base_filename)
       for (unsigned int idx=0; idx<to_uint(nemhelper->node_cmap_node_cnts[cmap]); idx++)
         {
           //  Are the node_cmap_ids and node_cmap_proc_ids really redundant?
-          libmesh_assert_equal_to (adjcnt_pid_idx, nemhelper->node_cmap_proc_ids[cmap][idx]);
+          libmesh_assert_equal_to
+            (adjcnt_pid_idx,
+             cast_int<processor_id_type>(nemhelper->node_cmap_proc_ids[cmap][idx]));
 
           // we are expecting the exodus node numbering to be 1-based...
           const unsigned int local_node_idx = nemhelper->node_cmap_node_ids[cmap][idx]-1;
@@ -330,8 +333,7 @@ void Nemesis_IO::read (const std::string & base_filename)
           // if the adjacent processor is lower rank than the current
           // owner for this node, then it will get the node...
           node_ownership[local_node_idx] =
-            std::min(node_ownership[local_node_idx],
-                     cast_int<processor_id_type>(adjcnt_pid_idx));
+            std::min(node_ownership[local_node_idx], adjcnt_pid_idx);
         }
     } // We now should have established proper node ownership.
 
