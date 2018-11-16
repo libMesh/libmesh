@@ -23,6 +23,10 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h"
+#ifdef LIBMESH_HAVE_METAPHYSICL
+#include "metaphysicl/dualnumber.h"
+#include "metaphysicl/dynamicsparsenumberbase.h"
+#endif
 
 namespace libMesh
 {
@@ -73,14 +77,21 @@ template<typename T>
 inline
 T norm_sq(std::complex<T> a) { return std::norm(a); }
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+template<typename T, typename D>
+inline
+auto norm_sq(const MetaPhysicL::DualNumber<T, D> & a) -> decltype(std::norm(a))
+{ return std::norm(a); }
+#endif
+
 template <typename T>
 inline
-Real norm_sq(const TypeVector<T> & a)
+auto norm_sq(const TypeVector<T> & a) -> decltype(std::norm(T()))
 {return a.norm_sq();}
 
 template <typename T>
 inline
-Real norm_sq(const VectorValue<T> & a)
+auto norm_sq(const VectorValue<T> & a) -> decltype(std::norm(T()))
 {return a.norm_sq();}
 
 // Any tensor-rank-independent code will need to include

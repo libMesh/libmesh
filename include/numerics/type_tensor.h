@@ -347,14 +347,14 @@ public:
    * \deprecated Use the norm() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  Real size() const;
+  auto size() const -> decltype(std::norm(T()));
 #endif
 
   /**
    * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    */
-  Real norm() const;
+  auto norm() const -> decltype(std::norm(T()));
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. sum of the
@@ -363,14 +363,14 @@ public:
    * \deprecated Use the norm_sq() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  Real size_sq() const;
+  auto size_sq() const -> decltype(std::norm(T()));
 #endif
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. sum of the
    * element magnitudes squared.
    */
-  Real norm_sq() const;
+  auto norm_sq() const -> decltype(std::norm(T()));
 
   /**
    * \returns The determinant of the tensor.
@@ -1214,7 +1214,7 @@ TypeTensor<T>::contract (const TypeTensor<T2> & t) const
 #ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
-Real TypeTensor<T>::size() const
+auto TypeTensor<T>::size() const -> decltype(std::norm(T()))
 {
   libmesh_deprecated();
   return this->norm();
@@ -1225,7 +1225,7 @@ Real TypeTensor<T>::size() const
 
 template <typename T>
 inline
-Real TypeTensor<T>::norm() const
+auto TypeTensor<T>::norm() const -> decltype(std::norm(T()))
 {
   return std::sqrt(this->norm_sq());
 }
@@ -1285,7 +1285,7 @@ void TypeTensor<T>::zero()
 #ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
-Real TypeTensor<T>::size_sq () const
+auto TypeTensor<T>::size_sq () const -> decltype(std::norm(T()))
 {
   libmesh_deprecated();
   return this->norm_sq();
@@ -1296,7 +1296,7 @@ Real TypeTensor<T>::size_sq () const
 
 template <typename T>
 inline
-Real TypeTensor<T>::norm_sq () const
+auto TypeTensor<T>::norm_sq () const -> decltype(std::norm(T()))
 {
   Real sum = 0.;
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
