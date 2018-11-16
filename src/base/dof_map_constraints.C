@@ -3314,7 +3314,7 @@ void DofMap::process_constraints (MeshBase & mesh)
           }
 
         if (constraints_to_expand.empty())
-          unexpanded_set.erase(i++);
+          i = unexpanded_set.erase(i);
         else
           ++i;
       }
@@ -3417,7 +3417,7 @@ void DofMap::check_for_cyclic_constraints()
         //   }
 
         if (constraints_to_expand.empty())
-          unexpanded_set.erase(i++);
+          i = unexpanded_set.erase(i);
         else
           ++i;
       }

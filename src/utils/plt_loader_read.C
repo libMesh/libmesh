@@ -70,8 +70,7 @@ void PltLoader::read_header (std::istream & in)
   {
     in.read (buf, 8);
 
-    // Using erase for GCC 2.95.3
-    this->version().erase();
+    this->version().clear();
 
     for (unsigned int i=0; i<8; i++)
       this->version() += buf[i];
@@ -117,8 +116,7 @@ void PltLoader::read_header (std::istream & in)
       {
         int i=0;
 
-        // Using erase for GCC 2.95.3
-        this->title().erase();
+        this->title().clear();
 
         do
           {
@@ -148,8 +146,7 @@ void PltLoader::read_header (std::istream & in)
         {
           int i=0;
 
-          // Using erase for GCC 2.95.3
-          this->var_name(v).erase();
+          this->var_name(v).clear();
 
           do
             {
@@ -320,8 +317,7 @@ void PltLoader::read_header (std::istream & in)
       {
         int i=0;
 
-        // Using erase() for GCC 2.95.3
-        this->title().erase();
+        this->title().clear();
         do
           {
             in.read (buf, LIBMESH_SIZEOF_INT);
@@ -350,8 +346,7 @@ void PltLoader::read_header (std::istream & in)
         {
           int i=0;
 
-          // Using erase() for GCC 2.95.3
-          this->var_name(v).erase();
+          this->var_name(v).clear();
 
           do
             {

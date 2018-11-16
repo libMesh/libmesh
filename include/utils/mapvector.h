@@ -118,8 +118,8 @@ public:
     maptype::erase(i);
   }
 
-  void erase(const veclike_iterator & pos) {
-    maptype::erase(pos.it);
+  veclike_iterator erase(const veclike_iterator & pos) {
+    return veclike_iterator(maptype::erase(pos.it));
   }
 
   veclike_iterator begin() {

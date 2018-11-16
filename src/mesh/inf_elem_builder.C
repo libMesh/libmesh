@@ -411,12 +411,11 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
 
   {
-    std::set<std::pair<dof_id_type,unsigned int>>::iterator face_it = faces.begin();
+    auto face_it = faces.begin();
+    auto face_end = faces.end();
     unsigned int facesfound=0;
-    while (face_it != faces.end()) {
-
-      std::pair<dof_id_type, unsigned int> p;
-      p = *face_it;
+    while (face_it != face_end) {
+      std::pair<dof_id_type, unsigned int> p = *face_it;
 
       // This has to be a full-ordered side element,
       // since we need the correct n_nodes,
@@ -430,7 +429,6 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
             break;
           }
 
-
       // If a new oface is found, include its nodes in onodes
       if (found)
         {
@@ -438,14 +436,13 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
             onodes.insert(side->node_id(sn));
 
           ofaces.insert(p);
-          ++face_it; // iteration is done here
-          faces.erase(p);
+          face_it = faces.erase(face_it); // increment is done here
 
           facesfound++;
         }
 
       else
-        ++face_it; // iteration is done here
+        ++face_it; // increment is done here
 
       // If at least one new oface was found in this cycle,
       // do another search cycle.
@@ -454,7 +451,6 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           facesfound = 0;
           face_it    = faces.begin();
         }
-
     }
   }
 
