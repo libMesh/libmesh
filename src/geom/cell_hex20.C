@@ -182,6 +182,14 @@ std::unique_ptr<Elem> Hex20::build_side_ptr (const unsigned int i,
 
 
 
+void Hex20::build_side_ptr (std::unique_ptr<Elem> & side,
+                            const unsigned int i)
+{
+  this->simple_build_side_ptr<Hex20>(side, i, QUAD8);
+}
+
+
+
 unsigned int Hex20::which_node_am_i(unsigned int side,
                                     unsigned int side_node) const
 {

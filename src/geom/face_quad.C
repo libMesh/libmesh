@@ -97,6 +97,14 @@ std::unique_ptr<Elem> Quad::side_ptr (const unsigned int i)
 
 
 
+void Quad::side_ptr (std::unique_ptr<Elem> & side,
+                     const unsigned int i)
+{
+  this->simple_build_side_ptr<Quad4>(side, i, EDGE2);
+}
+
+
+
 bool Quad::is_child_on_side(const unsigned int c,
                             const unsigned int s) const
 {

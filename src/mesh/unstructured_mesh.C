@@ -271,7 +271,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     // A map from side keys to corresponding elements & side numbers
     map_type side_to_elem_map;
 
-
+    // Pull objects out of the loop to reduce heap operations
+    std::unique_ptr<Elem> my_side, their_side;
 
     for (const auto & element : this->element_ptr_range())
       {
@@ -295,7 +296,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 if (bounds.first != bounds.second)
                   {
                     // Get the side for this element
-                    const std::unique_ptr<Elem> my_side(element->side_ptr(ms));
+                    element->side_ptr(my_side, ms);
 
                     // Look at all the entries with an equivalent key
                     while (bounds.first != bounds.second)
@@ -305,7 +306,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
                         // Get the side for the neighboring element
                         const unsigned int ns = bounds.first->second.second;
-                        const std::unique_ptr<Elem> their_side(neighbor->side_ptr(ns));
+                        neighbor->side_ptr(their_side, ns);
                         //libmesh_assert(my_side.get());
                         //libmesh_assert(their_side.get());
 

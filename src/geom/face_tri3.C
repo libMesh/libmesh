@@ -144,6 +144,15 @@ std::unique_ptr<Elem> Tri3::build_side_ptr (const unsigned int i,
 }
 
 
+
+void Tri3::build_side_ptr (std::unique_ptr<Elem> & side,
+                           const unsigned int i)
+{
+  this->simple_build_side_ptr<Tri3>(side, i, EDGE2);
+}
+
+
+
 void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
                         const IOPackage iop,
                         std::vector<dof_id_type> & conn) const

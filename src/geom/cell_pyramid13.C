@@ -209,6 +209,47 @@ std::unique_ptr<Elem> Pyramid13::build_side_ptr (const unsigned int i, bool prox
 
 
 
+void Pyramid13::build_side_ptr (std::unique_ptr<Elem> & side,
+                                const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  switch (i)
+    {
+    case 0: // triangular face 1
+    case 1: // triangular face 2
+    case 2: // triangular face 3
+    case 3: // triangular face 4
+      {
+        if (!side.get() || side->type() != TRI6)
+          {
+            side = this->build_side_ptr(i, false);
+            return;
+          }
+        break;
+      }
+    case 4:  // the quad face at z=0
+      {
+        if (!side.get() || side->type() != QUAD8)
+          {
+            side = this->build_side_ptr(i, false);
+            return;
+          }
+        break;
+      }
+    default:
+      libmesh_error_msg("Invalid side i = " << i);
+    }
+
+  side->subdomain_id() = this->subdomain_id();
+
+  // Set the nodes
+  for (auto n : side->node_index_range())
+    side->set_node(n) = this->node_ptr(Pyramid13::side_nodes_map[i][n]);
+}
+
+
+
 std::unique_ptr<Elem> Pyramid13::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());

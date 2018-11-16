@@ -184,6 +184,14 @@ std::unique_ptr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
 
 
 
+void Pyramid5::build_side_ptr (std::unique_ptr<Elem> & side,
+                               const unsigned int i)
+{
+  this->side_ptr(side, i);
+}
+
+
+
 std::unique_ptr<Elem> Pyramid5::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());

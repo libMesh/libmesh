@@ -687,7 +687,9 @@ void lagrange_compute_constraints (DofConstraints & constraints,
   FEType fe_type = dof_map.variable_type(variable_number);
   fe_type.order = static_cast<Order>(fe_type.order + elem->p_level());
 
+  // Pull objects out of the loop to reduce heap operations
   std::vector<dof_id_type> my_dof_indices, parent_dof_indices;
+  std::unique_ptr<const Elem> my_side, parent_side;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -705,8 +707,8 @@ void lagrange_compute_constraints (DofConstraints & constraints,
           // level than their neighbors!
           libmesh_assert(parent);
 
-          const std::unique_ptr<const Elem> my_side     (elem->build_side_ptr(s));
-          const std::unique_ptr<const Elem> parent_side (parent->build_side_ptr(s));
+          elem->build_side_ptr(my_side, s);
+          parent->build_side_ptr(parent_side, s);
 
           // This function gets called element-by-element, so there
           // will be a lot of memory allocation going on.  We can

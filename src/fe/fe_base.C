@@ -58,6 +58,9 @@ const Elem * primary_boundary_point_neighbor(const Elem * elem,
   // Container to catch boundary IDs passed back by BoundaryInfo.
   std::vector<boundary_id_type> bc_ids;
 
+  // Pull object out of the loop to reduce heap operations
+  std::unique_ptr<const Elem> periodic_side;
+
   std::set<const Elem *> point_neighbors;
   elem->find_point_neighbors(p, point_neighbors);
   for (const auto & pt_neighbor : point_neighbors)
@@ -87,7 +90,8 @@ const Elem * primary_boundary_point_neighbor(const Elem * elem,
           if (!on_relevant_boundary)
             continue;
 
-          if (!pt_neighbor->build_side_ptr(ns)->contains_point(p))
+          pt_neighbor->build_side_ptr(periodic_side, ns);
+          if (!periodic_side->contains_point(p))
             continue;
 
           vertex_on_periodic_side = true;
@@ -118,6 +122,9 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
   // Container to catch boundary IDs handed back by BoundaryInfo
   std::vector<boundary_id_type> bc_ids;
 
+  // Pull object out of the loop to reduce heap operations
+  std::unique_ptr<const Elem> periodic_side;
+
   for (const auto & e_neighbor : edge_neighbors)
     {
       // If this edge neighbor isn't at least
@@ -145,7 +152,7 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
           if (!on_relevant_boundary)
             continue;
 
-          std::unique_ptr<const Elem> periodic_side = e_neighbor->build_side_ptr(ns);
+          e_neighbor->build_side_ptr(periodic_side, ns);
           if (!(periodic_side->contains_point(p1) &&
                 periodic_side->contains_point(p2)))
             continue;

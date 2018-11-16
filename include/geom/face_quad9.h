@@ -156,6 +156,12 @@ public:
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
                                                 bool proxy) override;
 
+  /**
+   * Rebuilds an EDGE3 coincident with face i.
+   */
+  virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
+                               const unsigned int i) override;
+
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,
                             std::vector<dof_id_type> & conn) const override;

@@ -180,6 +180,13 @@ std::unique_ptr<Elem> InfPrism6::build_side_ptr (const unsigned int i,
 }
 
 
+void InfPrism6::build_side_ptr (std::unique_ptr<Elem> & side,
+                                const unsigned int i)
+{
+  this->side_ptr(side, i);
+}
+
+
 std::unique_ptr<Elem> InfPrism6::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, n_edges());

@@ -776,6 +776,25 @@ public:
   std::unique_ptr<const Elem> side_ptr (unsigned int i) const;
 
   /**
+   * Resets the loose element \p side, which may currently point to a
+   * different side than \p i or even a different element than \p
+   * this, to point to side \p i on \p this.  If \p side is currently
+   * an element of the wrong type, it will be freed and a new element
+   * allocated; otherwise no memory allocation will occur.
+   *
+   * This should not be called with proxy Side elements.  This will
+   * cause \p side to be a minimum-ordered element, even if it is
+   * handed a higher-ordered element that must be replaced.
+   *
+   * The const version of this function is non-virtual; it simply
+   * calls the virtual non-const version and const_casts the return
+   * type.
+   */
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) = 0;
+  void side_ptr (std::unique_ptr<const Elem> & side, const unsigned int i) const;
+
+
+  /**
    * \returns A proxy element coincident with side \p i.
    *
    * \deprecated This method will eventually be removed since it
@@ -810,6 +829,24 @@ public:
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
   std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
+
+  /**
+   * Resets the loose element \p side, which may currently point to a
+   * different side than \p i or even a different element than \p
+   * this, to point to side \p i on \p this.  If \p side is currently
+   * an element of the wrong type, it will be freed and a new element
+   * allocated; otherwise no memory allocation will occur.
+   *
+   * This should not be called with proxy Side elements.  This will
+   * cause \p side to be a full-ordered element, even if it is handed
+   * a lower-ordered element that must be replaced.
+   *
+   * The const version of this function is non-virtual; it simply
+   * calls the virtual non-const version and const_casts the return
+   * type.
+   */
+  virtual void build_side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) = 0;
+  void build_side_ptr (std::unique_ptr<const Elem> & side, const unsigned int i) const;
 
   /**
    * \returns A proxy element coincident with side \p i.
@@ -1602,6 +1639,13 @@ protected:
                                   dof_id_type n2,
                                   dof_id_type n3);
 
+  /**
+   * An implementation for simple (all sides equal) elements
+   */
+  template <typename Subclass>
+  void simple_build_side_ptr(std::unique_ptr<Elem> & side,
+                             const unsigned int i,
+                             ElemType sidetype);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -2139,6 +2183,20 @@ std::unique_ptr<const Elem> Elem::side_ptr (unsigned int i) const
 
 
 
+inline
+void
+Elem::side_ptr (std::unique_ptr<const Elem> & elem,
+                const unsigned int i) const
+{
+  // Hand off to the non-const version of this function
+  Elem * me = const_cast<Elem *>(this);
+  std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
+  me->side_ptr(e, i);
+  elem.reset(e.release());
+}
+
+
+
 #ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 std::unique_ptr<Elem> Elem::side (const unsigned int i) const
@@ -2165,6 +2223,20 @@ Elem::build_side_ptr (const unsigned int i, bool proxy) const
 
 
 
+inline
+void
+Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
+                      const unsigned int i) const
+{
+  // Hand off to the non-const version of this function
+  Elem * me = const_cast<Elem *>(this);
+  std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
+  me->build_side_ptr(e, i);
+  elem.reset(e.release());
+}
+
+
+
 #ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 std::unique_ptr<Elem>
@@ -2176,6 +2248,28 @@ Elem::build_side (const unsigned int i, bool proxy) const
   return std::unique_ptr<Elem>(s);
 }
 #endif
+
+
+
+template <typename Subclass>
+inline
+void
+Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
+                             const unsigned int i,
+                             ElemType sidetype)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  if (!side.get() || side->type() != sidetype)
+    side = this->build_side_ptr(i, false);
+  else
+    {
+      side->subdomain_id() = this->subdomain_id();
+
+      for (auto n : side->node_index_range())
+        side->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+    }
+}
 
 
 

@@ -219,6 +219,49 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
 
 
 
+void InfQuad6::build_side_ptr (std::unique_ptr<Elem> & side,
+                               const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
+  switch (i)
+    {
+      // the base face
+    case 0:
+      {
+        if (!side.get() || side->type() != EDGE3)
+          {
+            side = this->build_side_ptr(i, false);
+            return;
+          }
+        break;
+      }
+
+      // connecting to another infinite element
+    case 1:
+    case 2:
+      {
+        if (!side.get() || side->type() != INFEDGE2)
+          {
+            side = this->build_side_ptr(i, false);
+            return;
+          }
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid side i = " << i);
+    }
+
+  side->subdomain_id() = this->subdomain_id();
+
+  // Set the nodes
+  for (auto n : side->node_index_range())
+    side->set_node(n) = this->node_ptr(InfQuad6::side_nodes_map[i][n]);
+}
+
+
 
 void InfQuad6::connectivity(const unsigned int sf,
                             const IOPackage iop,

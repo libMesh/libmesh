@@ -242,11 +242,19 @@ std::unique_ptr<Elem> Hex27::build_side_ptr (const unsigned int i,
       std::unique_ptr<Elem> face = libmesh_make_unique<Quad9>();
       face->subdomain_id() = this->subdomain_id();
 
-      for (unsigned n=0; n<face->n_nodes(); ++n)
+      for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Hex27::side_nodes_map[i][n]);
 
       return face;
     }
+}
+
+
+
+void Hex27::build_side_ptr (std::unique_ptr<Elem> & side,
+                            const unsigned int i)
+{
+  this->simple_build_side_ptr<Hex27>(side, i, QUAD9);
 }
 
 

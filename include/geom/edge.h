@@ -145,10 +145,21 @@ public:
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
 
   /**
+   * Rebuilds a pointer to a NodeElem for the specified node.
+   */
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+
+  /**
    * \returns A pointer to a NodeElem for the specified node.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
                                                 bool proxy) override;
+
+  /**
+   * Rebuilds a NODEELEM for the specified node.
+   */
+  virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
+                               const unsigned int i) override;
 
   /**
    * The \p Elem::build_edge_ptr() member makes no sense for edges.

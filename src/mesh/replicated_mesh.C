@@ -851,6 +851,10 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
       // Loop below fills in these sets for the two meshes.
       std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
+
+      // Pull objects out of the loop to reduce heap operations
+      std::unique_ptr<Elem> side;
+
       {
         // Make temporary fixed-size arrays for loop
         boundary_id_type id_array[2]         = {this_mesh_boundary_id, other_mesh_boundary_id};
@@ -898,7 +902,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
                       if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                         {
-                          std::unique_ptr<Elem> side (el->build_side_ptr(side_id));
+                          el->build_side_ptr(side, side_id);
                           for (auto & n : side->node_ref_range())
                             set_array[i]->insert(n.id());
 
@@ -1239,6 +1243,9 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
     {
       LOG_SCOPE("stitch_meshes neighbor fixes", "ReplicatedMesh");
 
+      // Pull objects out of the loop to reduce heap operations
+      std::unique_ptr<Elem> my_side, their_side;
+
       std::set<dof_id_type> fixed_elems;
       for (const auto & pr : node_to_elems_map)
         {
@@ -1260,7 +1267,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                           if (bounds.first != bounds.second)
                             {
                               // Get the side for this element
-                              const std::unique_ptr<Elem> my_side(el->side_ptr(s));
+                              el->side_ptr(my_side, s);
 
                               // Look at all the entries with an equivalent key
                               while (bounds.first != bounds.second)
@@ -1270,7 +1277,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
-                                  const std::unique_ptr<Elem> their_side(neighbor->side_ptr(ns));
+                                  neighbor->side_ptr(their_side, ns);
                                   //libmesh_assert(my_side.get());
                                   //libmesh_assert(their_side.get());
 
