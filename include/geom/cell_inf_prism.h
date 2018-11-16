@@ -149,7 +149,7 @@ public:
    * Rebuilds a primitive (3-noded) tri or (4-noded) infquad for face
    * i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
 
   /**
    * @returns \p true when this element contains the point

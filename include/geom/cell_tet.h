@@ -125,7 +125,7 @@ public:
   /**
    * Rebuilds a primitive (3-noded) triangle for face i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
 
   /**
    * \returns A quantitative assessment of element quality based on

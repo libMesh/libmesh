@@ -136,7 +136,7 @@ public:
   /**
    * Rebuilds a primitive triangle or quad for face i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
 
 protected:
 

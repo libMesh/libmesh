@@ -161,7 +161,7 @@ public:
   /**
    * Rebuilds a primitive (2-noded) edge or infedge for edge \p i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
 
   /**
    * build_edge_ptr() and build_side_ptr() are identical in 2D.

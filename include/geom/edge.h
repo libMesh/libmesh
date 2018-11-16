@@ -147,7 +147,7 @@ public:
   /**
    * Rebuilds a pointer to a NodeElem for the specified node.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i);
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
 
   /**
    * \returns A pointer to a NodeElem for the specified node.
