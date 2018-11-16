@@ -561,8 +561,8 @@ void CheckpointIO::write_connectivity (Xdr & io,
       else
 #endif
         {
-          elem_data[4] = DofObject::invalid_processor_id;
-          elem_data[5] = DofObject::invalid_processor_id;
+          elem_data[4] = static_cast<largest_id_type>(-1);
+          elem_data[5] = static_cast<largest_id_type>(-1);
         }
 
       conn_data.resize(n_nodes);
@@ -1071,16 +1071,17 @@ void CheckpointIO::read_connectivity (Xdr & io)
         cast_int<subdomain_id_type>(elem_data[3]);
       const dof_id_type parent_id          =
         cast_int<dof_id_type>      (elem_data[4]);
-      const unsigned short int child_num   =
-        cast_int<unsigned short>   (elem_data[5]);
-
       Elem * parent =
-        (parent_id == DofObject::invalid_processor_id) ?
-        nullptr : mesh.elem_ptr(parent_id);
+        (elem_data[4] == static_cast<largest_id_type>(-1)) ?
+        nullptr : mesh.elem_ptr(cast_int<dof_id_type>(parent_id));
+      const unsigned short int child_num   =
+        (elem_data[5] == static_cast<largest_id_type>(-1)) ?
+        static_cast<unsigned short>(-1) :
+        cast_int<unsigned short>(elem_data[5]);
 
       if (!parent)
         libmesh_assert_equal_to
-          (child_num, DofObject::invalid_processor_id);
+          (child_num, static_cast<unsigned short>(-1));
 
       Elem * old_elem = mesh.query_elem_ptr(id);
 
