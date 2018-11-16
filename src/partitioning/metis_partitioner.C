@@ -443,9 +443,9 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
       if (n_pieces <= 8)
         Metis::METIS_PartGraphRecursive(&n,
                                         &ncon,
-                                        &csr_graph.offsets[0],
-                                        &csr_graph.vals[0],
-                                        &vwgt[0],
+                                        csr_graph.offsets.data(),
+                                        csr_graph.vals.data(),
+                                        vwgt.data(),
                                         nullptr,
                                         nullptr,
                                         &nparts,
@@ -453,15 +453,15 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                                         nullptr,
                                         nullptr,
                                         &edgecut,
-                                        &part[0]);
+                                        part.data());
 
       // Otherwise  use kway
       else
         Metis::METIS_PartGraphKway(&n,
                                    &ncon,
-                                   &csr_graph.offsets[0],
-                                   &csr_graph.vals[0],
-                                   &vwgt[0],
+                                   csr_graph.offsets.data(),
+                                   csr_graph.vals.data(),
+                                   vwgt.data(),
                                    nullptr,
                                    nullptr,
                                    &nparts,
@@ -469,7 +469,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                                    nullptr,
                                    nullptr,
                                    &edgecut,
-                                   &part[0]);
+                                   part.data());
 
     } // end processor 0 part
 

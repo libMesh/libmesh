@@ -1276,7 +1276,7 @@ void GMVIO::write_binary (const std::string & fname,
     std::vector<float> temp(mesh.n_nodes());
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       temp[v] = static_cast<float>(mesh.point(v)(0));
-    out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
+    out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
     // write the y coordinate
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
@@ -1287,7 +1287,7 @@ void GMVIO::write_binary (const std::string & fname,
         temp[v] = 0.;
 #endif
       }
-    out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
+    out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
     // write the z coordinate
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
@@ -1298,7 +1298,7 @@ void GMVIO::write_binary (const std::string & fname,
         temp[v] = 0.;
 #endif
       }
-    out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
+    out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
   }
 
 
@@ -1391,7 +1391,7 @@ void GMVIO::write_binary (const std::string & fname,
           for (const auto & elem : mesh.active_element_ptr_range())
             proc_id[n++] = elem->processor_id() + 1;
 
-          out_stream.write(reinterpret_cast<char *>(&proc_id[0]),
+          out_stream.write(reinterpret_cast<char *>(proc_id.data()),
                            sizeof(unsigned int)*proc_id.size());
         }
     }
@@ -1440,7 +1440,7 @@ void GMVIO::write_binary (const std::string & fname,
         for (unsigned int se=0; se<elem->n_sub_elem(); se++)
           temp[n++] = static_cast<float>( elem->p_level() );
 
-      out_stream.write(reinterpret_cast<char *>(&temp[0]),
+      out_stream.write(reinterpret_cast<char *>(temp.data()),
                        sizeof(float)*n_floats);
     }
 
@@ -1481,7 +1481,7 @@ void GMVIO::write_binary (const std::string & fname,
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>( (*vec)[n*n_vars + c].real() );
 
-          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
+          out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
 
           // imaginary part
@@ -1496,7 +1496,7 @@ void GMVIO::write_binary (const std::string & fname,
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>( (*vec)[n*n_vars + c].imag() );
 
-          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
+          out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
           // magnitude
           buffer = "a_";
@@ -1509,7 +1509,7 @@ void GMVIO::write_binary (const std::string & fname,
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>(std::abs((*vec)[n*n_vars + c]));
 
-          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
+          out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
 #else
 
@@ -1522,7 +1522,7 @@ void GMVIO::write_binary (const std::string & fname,
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>((*vec)[n*n_vars + c]);
 
-          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
+          out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
 #endif
         }

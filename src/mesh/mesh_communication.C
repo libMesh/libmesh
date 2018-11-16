@@ -993,7 +993,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
 
           // Make some fake element iterators defining this vector of
           // elements
-          Elem * const * elempp = const_cast<Elem * const *>(&elems[0]);
+          Elem * const * elempp = const_cast<Elem * const *>(elems.data());
           Elem * const * elemend = elempp+elems.size();
           const MeshBase::const_element_iterator elem_it =
             MeshBase::const_element_iterator(elempp, elemend, Predicates::NotNull<Elem * const *>());

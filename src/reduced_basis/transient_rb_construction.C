@@ -820,9 +820,9 @@ void TransientRBConstruction::enrich_RB_space()
 #ifdef LIBMESH_USE_REAL_NUMBERS // Use real numbers
   // Call the eigensolver for symmetric eigenvalue problems.
   // NOTE: evals in W are in ascending order
-  LAPACKsyevr_(&JOBZ, &RANGE, &UPLO, &eigen_size, &correlation_matrix[0],
-               &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, &W[0], &Z[0], &LDZ,
-               &ISUPPZ[0], &WORK[0], &LWORK, &IWORK[0], &LIWORK, &INFO );
+  LAPACKsyevr_(&JOBZ, &RANGE, &UPLO, &eigen_size, correlation_matrix.data(),
+               &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, W.data(), Z.data(), &LDZ,
+               ISUPPZ.data(), WORK.data(), &LWORK, IWORK.data(), &LIWORK, &INFO );
 #elif LIBMESH_USE_COMPLEX_NUMBERS // Use complex numbers
   // Need some extra data in the complex case
 
@@ -832,9 +832,9 @@ void TransientRBConstruction::enrich_RB_space()
 
   // Call the eigensolver for symmetric eigenvalue problems.
   // NOTE: evals in W are in ascending order
-  LAPACKsyevr_(&JOBZ, &RANGE, &UPLO, &eigen_size, &correlation_matrix[0],
-               &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, &W[0], &Z[0], &LDZ,
-               &ISUPPZ[0], &WORK[0], &LWORK, &RWORK[0], &LRWORK, &IWORK[0],
+  LAPACKsyevr_(&JOBZ, &RANGE, &UPLO, &eigen_size, correlation_matrix.data(),
+               &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, W.data(), Z.data(), &LDZ,
+               ISUPPZ.data(), WORK.data(), &LWORK, RWORK.data(), &LRWORK, IWORK.data(),
                &LIWORK, &INFO );
 #else
 #error libMesh does not yet support quaternions!

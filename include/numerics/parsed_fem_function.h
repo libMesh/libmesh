@@ -804,7 +804,7 @@ ParsedFEMFunction<Output>::eval (FunctionParserBase<Output> & parser,
                                  unsigned int libmesh_dbg_var(component_idx)) const
 {
 #ifndef NDEBUG
-  Output result = parser.Eval(&_spacetime[0]);
+  Output result = parser.Eval(_spacetime.data());
   int error_code = parser.EvalError();
   if (error_code)
     {
@@ -846,7 +846,7 @@ ParsedFEMFunction<Output>::eval (FunctionParserBase<Output> & parser,
 
   return result;
 #else
-  return parser.Eval(&_spacetime[0]);
+  return parser.Eval(_spacetime.data());
 #endif
 }
 #else // LIBMESH_HAVE_FPARSER

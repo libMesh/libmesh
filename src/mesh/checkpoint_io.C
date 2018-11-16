@@ -505,7 +505,7 @@ void CheckpointIO::write_nodes (Xdr & io,
       id_pid[0] = node->id();
       id_pid[1] = node->processor_id();
 
-      io.data_stream(&id_pid[0], 2, 2);
+      io.data_stream(id_pid.data(), 2, 2);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       largest_id_type unique_id = node->unique_id();
@@ -523,7 +523,7 @@ void CheckpointIO::write_nodes (Xdr & io,
       coords[2] = (*node)(2);
 #endif
 
-      io.data_stream(&coords[0], LIBMESH_DIM, 3);
+      io.data_stream(coords.data(), LIBMESH_DIM, 3);
     }
 }
 
@@ -570,7 +570,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
       for (unsigned int i=0; i<n_nodes; i++)
         conn_data[i] = elem->node_id(i);
 
-      io.data_stream(&elem_data[0],
+      io.data_stream(elem_data.data(),
                      cast_int<unsigned int>(elem_data.size()),
                      cast_int<unsigned int>(elem_data.size()));
 
@@ -590,7 +590,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
       uint16_t pflag = elem->p_refinement_flag();
       io.data(pflag, "# pflag");
 #endif
-      io.data_stream(&conn_data[0],
+      io.data_stream(conn_data.data(),
                      cast_int<unsigned int>(conn_data.size()),
                      cast_int<unsigned int>(conn_data.size()));
     }
@@ -962,14 +962,14 @@ void CheckpointIO::read_nodes (Xdr & io)
 
   for (unsigned int i=0; i<n_nodes_here; i++)
     {
-      io.data_stream(&id_pid[0], 2, 2);
+      io.data_stream(id_pid.data(), 2, 2);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       file_id_type unique_id = 0;
       io.data(unique_id, "# unique id");
 #endif
 
-      io.data_stream(&coords[0], LIBMESH_DIM, LIBMESH_DIM);
+      io.data_stream(coords.data(), LIBMESH_DIM, LIBMESH_DIM);
 
       Point p;
       p(0) = coords[0];
@@ -1040,7 +1040,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
       // id type pid subdomain_id parent_id
       std::vector<file_id_type> elem_data(6);
       io.data_stream
-        (&elem_data[0], cast_int<unsigned int>(elem_data.size()),
+        (elem_data.data(), cast_int<unsigned int>(elem_data.size()),
          cast_int<unsigned int>(elem_data.size()));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -1062,7 +1062,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
       // Snag the node ids this element was connected to
       std::vector<file_id_type> conn_data(n_nodes);
       io.data_stream
-        (&conn_data[0], cast_int<unsigned int>(conn_data.size()),
+        (conn_data.data(), cast_int<unsigned int>(conn_data.size()),
          cast_int<unsigned int>(conn_data.size()));
 
       const dof_id_type id                 =

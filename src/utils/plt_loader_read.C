@@ -851,7 +851,7 @@ void PltLoader::read_block_data (std::istream & in, const unsigned int zone)
                          this->jmax(zone)*
                          this->kmax(zone));
 
-            in.read ((char *) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
+            in.read (reinterpret_cast<char *>(data.data()), LIBMESH_SIZEOF_FLOAT*data.size());
 
             for (std::size_t i=0; i<data.size(); i++)
               rb(data[i]);
@@ -874,7 +874,7 @@ void PltLoader::read_block_data (std::istream & in, const unsigned int zone)
                           this->jmax(zone)*
                           this->kmax(zone));
 
-            in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
+            in.read (reinterpret_cast<char *>(ddata.data()), LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
             for (std::size_t i=0; i<data.size(); i++)
               data[i] = float(rb(ddata[i]));
@@ -964,7 +964,7 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
             data.clear();
             data.resize (this->imax(zone));
 
-            in.read ((char *) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
+            in.read (reinterpret_cast<char *>(data.data()), LIBMESH_SIZEOF_FLOAT*data.size());
 
             for (std::size_t i=0; i<data.size(); i++)
               rb(data[i]);
@@ -982,7 +982,7 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
             data.resize (this->imax(zone));
             ddata.resize (this->imax(zone));
 
-            in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
+            in.read (reinterpret_cast<char *>(ddata.data()), LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
             for (std::size_t i=0; i<data.size(); i++)
               data[i] = float(rb(ddata[i]));
@@ -1013,7 +1013,7 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
 
         _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
-        in.read ((char *) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
+        in.read (reinterpret_cast<char *>(_conn[zone].data()), LIBMESH_SIZEOF_INT*_conn[zone].size());
 
         for (std::size_t i=0; i<_conn[zone].size(); i++)
           rb(_conn[zone][i]);
@@ -1088,7 +1088,7 @@ void PltLoader::read_fepoint_data (std::istream & in, const unsigned int zone)
 
         _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
-        in.read ((char *) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
+        in.read (reinterpret_cast<char *>(_conn[zone].data()), LIBMESH_SIZEOF_INT*_conn[zone].size());
 
         for (std::size_t i=0; i<_conn[zone].size(); i++)
           rb(_conn[zone][i]);

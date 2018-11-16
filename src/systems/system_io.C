@@ -100,7 +100,7 @@ public:
   void operator()()
   {
     if (_data.empty()) return;
-    _io.data_stream (&_data[0], cast_int<unsigned int>(_data.size()));
+    _io.data_stream (_data.data(), cast_int<unsigned int>(_data.size()));
   }
 };
 }
@@ -1128,9 +1128,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
   const unsigned int n_SCALAR_dofs = this->variable(var).type().order.get_order();
   std::vector<Number> input_buffer(n_SCALAR_dofs);
   if (this->processor_id() == 0)
-    {
-      io.data_stream(&input_buffer[0], n_SCALAR_dofs);
-    }
+    io.data_stream(input_buffer.data(), n_SCALAR_dofs);
 
 #ifdef LIBMESH_HAVE_MPI
   if (this->n_processors() > 1)
@@ -2146,7 +2144,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> & vec,
     {
       const unsigned int vals_size =
         cast_int<unsigned int>(vals.size());
-      io.data_stream (&vals[0], vals_size);
+      io.data_stream (vals.data(), vals_size);
       written_length += vals_size;
     }
 

@@ -39,7 +39,7 @@ void indices_to_fieldsplit (const Parallel::Communicator & comm,
 {
   const PetscInt * idx = PETSC_NULL;
   if (!indices.empty())
-    idx = reinterpret_cast<const PetscInt *>(&indices[0]);
+    idx = reinterpret_cast<const PetscInt *>(indices.data());
 
   IS is;
   int ierr = ISCreateLibMesh(comm.get(), cast_int<PetscInt>(indices.size()),

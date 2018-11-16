@@ -122,10 +122,18 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
 
   // build the space-filling curve
   if (_sfc_type == "Hilbert")
-    Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
+    Sfc::hilbert (x.data(),
+                  y.data(),
+                  z.data(),
+                  &size,
+                  table.data());
 
   else if (_sfc_type == "Morton")
-    Sfc::morton  (&x[0], &y[0], &z[0], &size, &table[0]);
+    Sfc::morton  (x.data(),
+                  y.data(),
+                  z.data(),
+                  &size,
+                  table.data());
 
   else
     {
@@ -136,7 +144,11 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
                    << " "                                  << std::endl
                    << "Partitioning with a Hilbert curve." << std::endl;
 
-      Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
+      Sfc::hilbert (x.data(),
+                    y.data(),
+                    z.data(),
+                    &size,
+                    table.data());
     }
 
 

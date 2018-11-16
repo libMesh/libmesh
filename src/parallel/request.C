@@ -241,7 +241,7 @@ std::size_t waitany (std::vector<Request> & r)
     {
 #ifdef LIBMESH_HAVE_MPI
       libmesh_call_mpi
-        (MPI_Waitany(r_size, &raw[0], &index, MPI_STATUS_IGNORE));
+        (MPI_Waitany(r_size, raw.data(), &index, MPI_STATUS_IGNORE));
 #endif
 
       Request * completed = &r[index];

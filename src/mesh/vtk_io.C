@@ -474,7 +474,7 @@ void VTKIO::cells_to_vtk()
       ++active_element_counter;
     } // end loop over active elements
 
-  _vtk_grid->SetCells(&types[0], cells);
+  _vtk_grid->SetCells(types.data(), cells);
   _vtk_grid->GetCellData()->AddArray(elem_id);
   _vtk_grid->GetCellData()->AddArray(subdomain_id);
   _vtk_grid->GetCellData()->AddArray(elem_proc_id);

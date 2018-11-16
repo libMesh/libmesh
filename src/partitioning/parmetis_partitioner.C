@@ -181,22 +181,22 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
   // Call the ParMETIS adaptive repartitioning method.  This respects the
   // original partitioning when computing the new partitioning so as to
   // minimize the required data redistribution.
-  Parmetis::ParMETIS_V3_AdaptiveRepart(_pmetis->vtxdist.empty() ? nullptr : &_pmetis->vtxdist[0],
-                                       _pmetis->xadj.empty()    ? nullptr : &_pmetis->xadj[0],
-                                       _pmetis->adjncy.empty()  ? nullptr : &_pmetis->adjncy[0],
-                                       _pmetis->vwgt.empty()    ? nullptr : &_pmetis->vwgt[0],
-                                       vsize.empty()            ? nullptr : &vsize[0],
+  Parmetis::ParMETIS_V3_AdaptiveRepart(_pmetis->vtxdist.empty() ? nullptr : _pmetis->vtxdist.data(),
+                                       _pmetis->xadj.empty()    ? nullptr : _pmetis->xadj.data(),
+                                       _pmetis->adjncy.empty()  ? nullptr : _pmetis->adjncy.data(),
+                                       _pmetis->vwgt.empty()    ? nullptr : _pmetis->vwgt.data(),
+                                       vsize.empty()            ? nullptr : vsize.data(),
                                        nullptr,
                                        &_pmetis->wgtflag,
                                        &_pmetis->numflag,
                                        &_pmetis->ncon,
                                        &_pmetis->nparts,
-                                       _pmetis->tpwgts.empty()  ? nullptr : &_pmetis->tpwgts[0],
-                                       _pmetis->ubvec.empty()   ? nullptr : &_pmetis->ubvec[0],
+                                       _pmetis->tpwgts.empty()  ? nullptr : _pmetis->tpwgts.data(),
+                                       _pmetis->ubvec.empty()   ? nullptr : _pmetis->ubvec.data(),
                                        &itr,
-                                       &_pmetis->options[0],
+                                       _pmetis->options.data(),
                                        &_pmetis->edgecut,
-                                       _pmetis->part.empty()    ? nullptr : reinterpret_cast<Parmetis::idx_t *>(&_pmetis->part[0]),
+                                       _pmetis->part.empty()    ? nullptr : reinterpret_cast<Parmetis::idx_t *>(_pmetis->part.data()),
                                        &mpi_comm);
 
   // Assign the returned processor ids
