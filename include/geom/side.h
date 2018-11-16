@@ -82,17 +82,6 @@ public:
     return this->parent()->set_node (ParentType::side_nodes_map[_side_number][i]);
   }
 
-  /**
-   * Sides do not have sides.
-   */
-  virtual unsigned int n_sides () const override
-  { return 0; }
-
-  virtual bool is_child_on_side(const unsigned int,
-                                const unsigned int) const override
-  { libmesh_not_implemented(); return false; }
-
-
 private:
 
   /**
@@ -143,11 +132,6 @@ public:
     libmesh_assert_less (i, this->n_nodes());
     return this->parent()->set_node (ParentType::edge_nodes_map[_edge_number][i]);
   }
-
-  /**
-   * \returns 0. Edges do not have sides, so don't even ask!
-   */
-  virtual unsigned int n_sides () const override { return 0; }
 
 private:
 

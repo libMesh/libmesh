@@ -59,7 +59,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const override
+  virtual Point master_point (const unsigned int i) const override final
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -76,39 +76,39 @@ public:
   /**
    * \returns 5.
    */
-  virtual unsigned int n_sides() const override { return 5; }
+  virtual unsigned int n_sides() const override final { return 5; }
 
   /**
    * \returns 6.  All prisms have 6 vertices.
    */
-  virtual unsigned int n_vertices() const override { return 6; }
+  virtual unsigned int n_vertices() const override final { return 6; }
 
   /**
    * \returns 9.  All prisms have 9 edges.
    */
-  virtual unsigned int n_edges() const override { return 9; }
+  virtual unsigned int n_edges() const override final { return 9; }
 
   /**
    * \returns 5.  All prisms have 5 faces.
    */
-  virtual unsigned int n_faces() const override { return 5; }
+  virtual unsigned int n_faces() const override final { return 5; }
 
   /**
    * \returns 8.
    */
-  virtual unsigned int n_children() const override { return 8; }
+  virtual unsigned int n_children() const override final { return 8; }
 
   /**
    * \returns \p true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const override;
+                                const unsigned int s) const override final;
 
   /**
    * \returns \p true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const override;
+                               const unsigned int s) const override final;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -131,12 +131,12 @@ public:
   /**
    * \returns A primitive triangle or quad for face i.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
 
   /**
    * Rebuilds a primitive triangle or quad for face i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override final;
 
 protected:
 

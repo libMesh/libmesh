@@ -61,7 +61,7 @@ public:
   /**
    * \returns 1, the dimensionality of the object.
    */
-  virtual unsigned short dim () const override { return 1; }
+  virtual unsigned short dim () const override final { return 1; }
 
   /**
    * \returns 2. Every edge is guaranteed to have at least 2 nodes.
@@ -71,46 +71,46 @@ public:
   /**
    * \returns 2.
    */
-  virtual unsigned int n_sides() const override { return 2; }
+  virtual unsigned int n_sides() const override final { return 2; }
 
   /**
    * \returns 2.  Every edge has exactly two vertices.
    */
-  virtual unsigned int n_vertices() const override { return 2; }
+  virtual unsigned int n_vertices() const override final { return 2; }
 
   /**
    * \returns 0.  All 1D elements have no edges.
    */
-  virtual unsigned int n_edges() const override { return 0; }
+  virtual unsigned int n_edges() const override final { return 0; }
 
   /**
    * \returns 0.  All 1D elements have no faces.
    */
-  virtual unsigned int n_faces() const override { return 0; }
+  virtual unsigned int n_faces() const override final { return 0; }
 
   /**
    * \returns 2.
    */
-  virtual unsigned int n_children() const override { return 2; }
+  virtual unsigned int n_children() const override final { return 2; }
 
   /**
    * \returns \p true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const override;
+                                const unsigned int s) const override final;
 
   /**
    * \returns \p true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int,
-                               const unsigned int) const override
+                               const unsigned int) const override final
   { return false; }
 
   /**
    * \returns The side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
    */
-  virtual unsigned int opposite_side(const unsigned int s) const override;
+  virtual unsigned int opposite_side(const unsigned int s) const override final;
 
   /**
    * \returns The local node number for the node opposite to node n
@@ -118,7 +118,7 @@ public:
    * throws an error otherwise.
    */
   virtual unsigned int opposite_node(const unsigned int n,
-                                     const unsigned int s) const override;
+                                     const unsigned int s) const override final;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -130,41 +130,41 @@ public:
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  virtual dof_id_type key (const unsigned int s) const override
+  virtual dof_id_type key (const unsigned int s) const override final
   { return this->compute_key(this->node_id(s)); }
 
   /**
    * \returns \p side after doing some range checking. \p side_node is ignored.
    */
   virtual unsigned int which_node_am_i(unsigned int side,
-                                       unsigned int /*side_node*/) const override;
+                                       unsigned int /*side_node*/) const override final;
 
   /**
    * \returns A pointer to a NodeElem for the specified node.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
 
   /**
    * Rebuilds a pointer to a NodeElem for the specified node.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override final;
 
   /**
    * \returns A pointer to a NodeElem for the specified node.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy) override;
+                                                bool proxy) override final;
 
   /**
    * Rebuilds a NODEELEM for the specified node.
    */
   virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
-                               const unsigned int i) override;
+                               const unsigned int i) override final;
 
   /**
    * The \p Elem::build_edge_ptr() member makes no sense for edges.
    */
-  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) override
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) override final
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
