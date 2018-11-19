@@ -69,7 +69,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const override
+  virtual Point master_point (const unsigned int i) const override final
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -82,49 +82,49 @@ public:
    * than their conventional counterparts, since one
    * side is supposed to be located at infinity.
    */
-  virtual unsigned int n_sides() const override { return 5; }
+  virtual unsigned int n_sides() const override final { return 5; }
 
   /**
    * \returns 8.  All infinite hexahedra (in our
    * setting) have 8 vertices.
    */
-  virtual unsigned int n_vertices() const override { return 8; }
+  virtual unsigned int n_vertices() const override final { return 8; }
 
   /**
    * \returns \p true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */
   virtual bool is_mid_infinite_edge_node(const unsigned int i) const
-    override { return (i > 3 && i < 8); }
+    override final { return (i > 3 && i < 8); }
 
   /**
    * \returns 8.  All infinite hexahedra have 8 edges,
    * 4 lying in the base, and 4 perpendicular to the base.
    */
-  virtual unsigned int n_edges() const override { return 8; }
+  virtual unsigned int n_edges() const override final { return 8; }
 
   /**
    * \returns 5.  All infinite hexahedra have 5 faces.
    */
-  virtual unsigned int n_faces() const override { return 5; }
+  virtual unsigned int n_faces() const override final { return 5; }
 
   /**
    * \returns 4.
    */
-  virtual unsigned int n_children() const override { return 4; }
+  virtual unsigned int n_children() const override final { return 4; }
 
   /**
    * \returns \p true if the specified child is on the
    * specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const override;
+                                const unsigned int s) const override final;
 
   /**
    * \returns \p true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const override;
+                               const unsigned int s) const override final;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -147,12 +147,12 @@ public:
   /**
    * \returns A primitive (4-noded) quad or infquad for face i.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
 
   /**
    * Rebuilds a primitive (4-noded) quad or infquad for face i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override final;
 
   /**
    * \returns A quantitative assessment of element quality based on

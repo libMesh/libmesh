@@ -72,7 +72,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const override
+  virtual Point master_point (const unsigned int i) const override final
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -89,29 +89,29 @@ public:
   /**
    * \returns 3.
    */
-  virtual unsigned int n_sides() const override { return 3; }
+  virtual unsigned int n_sides() const override final { return 3; }
 
   /**
    * \returns 3.  All triangles have 3 vertices.
    */
-  virtual unsigned int n_vertices() const override { return 3; }
+  virtual unsigned int n_vertices() const override final { return 3; }
 
   /**
    * \returns 3.  All triangles have 3 edges.
    */
-  virtual unsigned int n_edges() const override { return 3; }
+  virtual unsigned int n_edges() const override final { return 3; }
 
   /**
    * \returns 4.
    */
-  virtual unsigned int n_children() const override { return 4; }
+  virtual unsigned int n_children() const override final { return 4; }
 
   /**
    * \returns \p true if the specified child is on the
    * specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const override;
+                                const unsigned int s) const override final;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -130,7 +130,7 @@ public:
    * element.  The id is not necessarily unique, but should be
    * close.
    */
-  virtual dof_id_type key () const override;
+  virtual dof_id_type key () const override final;
 
   /**
    * \returns \p Tri3::side_nodes_map[side][side_node] after doing some range checking.
@@ -141,13 +141,13 @@ public:
   /**
    * \returns A primitive (2-noded) edge for edge i.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
 
   /**
    * Rebuilds an EDGE2 coincident with face i.
    */
   virtual void side_ptr (std::unique_ptr<Elem> & elem,
-                         const unsigned int i) override;
+                         const unsigned int i) override final;
 
   /**
    * \returns A quantitative assessment of element quality based on

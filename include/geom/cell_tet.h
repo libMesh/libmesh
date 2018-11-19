@@ -60,7 +60,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const override
+  virtual Point master_point (const unsigned int i) const override final
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -71,33 +71,33 @@ public:
   /**
    * \returns 4.
    */
-  virtual unsigned int n_sides() const override { return 4; }
+  virtual unsigned int n_sides() const override final { return 4; }
 
   /**
    * \returns 4.  All tetrahedra have 4 vertices.
    */
-  virtual unsigned int n_vertices() const override { return 4; }
+  virtual unsigned int n_vertices() const override final { return 4; }
 
   /**
    * \returns 6.  All tetrahedra have 6 edges.
    */
-  virtual unsigned int n_edges() const override { return 6; }
+  virtual unsigned int n_edges() const override final { return 6; }
 
   /**
    * \returns 4.  All tetrahedra have 4 faces.
    */
-  virtual unsigned int n_faces() const override { return 4; }
+  virtual unsigned int n_faces() const override final { return 4; }
 
   /**
    * \returns 8.
    */
-  virtual unsigned int n_children() const override { return 8; }
+  virtual unsigned int n_children() const override final { return 8; }
 
   /**
    * \returns \p true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const override;
+                               const unsigned int s) const override final;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -120,12 +120,12 @@ public:
   /**
    * \returns A primitive (3-noded) triangle for face i.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
 
   /**
    * Rebuilds a primitive (3-noded) triangle for face i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override final;
 
   /**
    * \returns A quantitative assessment of element quality based on
@@ -176,7 +176,7 @@ public:
    * But we want to cache topology data based on that matrix.  So we return a
    * "version number" based on the diagonal selection.
    */
-  virtual unsigned int embedding_matrix_version () const override
+  virtual unsigned int embedding_matrix_version () const override final
   {
     this->choose_diagonal();
     return this->diagonal_selection();

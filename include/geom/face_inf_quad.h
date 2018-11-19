@@ -81,7 +81,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const override
+  virtual Point master_point (const unsigned int i) const override final
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -92,48 +92,48 @@ public:
   /**
    * \returns 2, the dimensionality of the object.
    */
-  virtual unsigned short dim() const override { return 2; }
+  virtual unsigned short dim() const override final { return 2; }
 
   /**
    * \returns 3.  Infinite faces have one side less
    * than their conventional counterparts, since one
    * side is supposed to be located at infinity.
    */
-  virtual unsigned int n_sides() const override { return 3; }
+  virtual unsigned int n_sides() const override final { return 3; }
 
   /**
    * \returns 4.  All infinite quads (in our setting) have 4 vertices.
    */
-  virtual unsigned int n_vertices() const override { return 4; }
+  virtual unsigned int n_vertices() const override final { return 4; }
 
   /**
    * \returns 3.  All infinite quads have 1 edge in the
    * base, and 2 perpendicular to the base.
    */
-  virtual unsigned int n_edges() const override { return 3; }
+  virtual unsigned int n_edges() const override final { return 3; }
 
   /**
    * \returns 0.  All 2D elements have no faces, just edges.
    */
-  virtual unsigned int n_faces() const override { return 0; }
+  virtual unsigned int n_faces() const override final { return 0; }
 
   /**
    * \returns 2.
    */
-  virtual unsigned int n_children() const override { return 2; }
+  virtual unsigned int n_children() const override final { return 2; }
 
   /**
    * \returns \p true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */
   virtual bool is_mid_infinite_edge_node(const unsigned int i) const
-    override { return (i > 2 && i < 4); }
+    override final { return (i > 2 && i < 4); }
 
   /**
    * \returns \p true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const override;
+                                const unsigned int s) const override final;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -156,24 +156,24 @@ public:
   /**
    * \returns A primitive (2-noded) edge or infedge for edge \p i.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
 
   /**
    * Rebuilds a primitive (2-noded) edge or infedge for edge \p i.
    */
-  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
+  virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override final;
 
   /**
    * build_edge_ptr() and build_side_ptr() are identical in 2D.
    */
-  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override final
   { return build_side_ptr(i); }
 
   /**
    * is_edge_on_side is trivial in 2D.
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const override
+                               const unsigned int s) const override final
   { return (e == s); }
 
   /**
@@ -193,12 +193,12 @@ public:
    * \returns \p true.  All classes derived from \p InfQuad
    * are infinite elements.
    */
-  virtual bool infinite () const override { return true; }
+  virtual bool infinite () const override final { return true; }
 
   /**
    * \returns The origin of this infinite element.
    */
-  virtual Point origin () const override
+  virtual Point origin () const override final
   {
     return ( this->point(0)*2 - this->point(this->n_vertices()/2) );
   }
