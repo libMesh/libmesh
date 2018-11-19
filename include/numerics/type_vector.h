@@ -30,14 +30,23 @@
 #include <cmath>
 #include <complex>
 
+
 namespace libMesh
 {
-
 // Forward declarations
 template <typename T> class TypeTensor;
 template <typename T> class VectorValue;
 template <typename T> class TensorValue;
+}
 
+namespace std
+{
+template <typename T>
+auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()));
+}
+
+namespace libMesh
+{
 /**
  * This class defines a vector in \p LIBMESH_DIM dimensional space of
  * type T.  T may either be Real or Complex. Instead use one of the derived
@@ -1126,5 +1135,14 @@ TypeVector<T> TypeVector<T>::unit() const
 
 }
 } // namespace libMesh
+
+namespace std
+{
+template <typename T>
+auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()))
+{
+  return vector.norm();
+}
+} // namespace std
 
 #endif // LIBMESH_TYPE_VECTOR_H
