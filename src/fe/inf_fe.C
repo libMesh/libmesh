@@ -85,8 +85,9 @@ void InfFE<Dim,T_radial,T_map>::attach_quadrature_rule (QBase * q)
   // in radial direction, always use Gauss quadrature
   radial_qrule.reset(new QGauss(1, radial_int_order));
 
-  // currently not used. But maybe helpful to store the QBase *
-  // with which we initialized our own quadrature rules
+  // Maybe helpful to store the QBase *
+  // with which we initialized our own quadrature rules.
+  // Used e.g. in \p InfFE::reinit(elem,side)
   qrule = q;
 }
 

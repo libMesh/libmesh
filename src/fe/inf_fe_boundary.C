@@ -54,6 +54,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   // Don't do this for the base
   libmesh_assert_not_equal_to (s, 0);
 
+
   // Build the side of interest
   const std::unique_ptr<const Elem> side(inf_elem->build_side_ptr(s));
 

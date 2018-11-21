@@ -26,7 +26,7 @@ namespace libMesh
 {
 
 void QGauss::init_3D(const ElemType type_in,
-                     unsigned int p)
+                     unsigned int p_level)
 {
 #if LIBMESH_DIM == 3
 
@@ -43,7 +43,7 @@ void QGauss::init_3D(const ElemType type_in,
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QGauss q1D(1,_order);
-        q1D.init(EDGE2,p);
+        q1D.init(EDGE2,p_level);
 
         tensor_product_hex( q1D );
 
@@ -57,7 +57,7 @@ void QGauss::init_3D(const ElemType type_in,
     case TET4:
     case TET10:
       {
-        switch(_order + 2*p)
+        switch(_order + 2*p_level)
           {
             // Taken from pg. 222 of "The finite element method," vol. 1
             // ed. 5 by Zienkiewicz & Taylor
@@ -169,7 +169,7 @@ void QGauss::init_3D(const ElemType type_in,
                   // product rule is third-order accurate and has less points than
                   // the next-available positive-weight rule at FIFTH order.
                   QConical conical_rule(3, _order);
-                  conical_rule.init(type_in, p);
+                  conical_rule.init(type_in, p_level);
 
                   // Swap points and weights with the about-to-be destroyed rule.
                   _points.swap (conical_rule.get_points() );
@@ -459,7 +459,7 @@ void QGauss::init_3D(const ElemType type_in,
             // Fall back on Grundmann-Moller or Conical Product rules at high orders.
           default:
             {
-              if ((allow_rules_with_negative_weights) && (_order + 2*p < 34))
+              if ((allow_rules_with_negative_weights) && (_order + 2*p_level < 34))
                 {
                   // The Grundmann-Moller rules are defined to arbitrary order and
                   // can have significantly fewer evaluation points than conical product
@@ -469,7 +469,7 @@ void QGauss::init_3D(const ElemType type_in,
                   // to round-off error.  Safest is to disallow rules with negative
                   // weights, but this decision should be made on a case-by-case basis.
                   QGrundmann_Moller gm_rule(3, _order);
-                  gm_rule.init(type_in, p);
+                  gm_rule.init(type_in, p_level);
 
                   // Swap points and weights with the about-to-be destroyed rule.
                   _points.swap (gm_rule.get_points() );
@@ -487,7 +487,7 @@ void QGauss::init_3D(const ElemType type_in,
                   // automatically generate using a 1D Gauss rule on
                   // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
                   QConical conical_rule(3, _order);
-                  conical_rule.init(type_in, p);
+                  conical_rule.init(type_in, p_level);
 
                   // Swap points and weights with the about-to-be destroyed rule.
                   _points.swap (conical_rule.get_points() );
@@ -515,8 +515,8 @@ void QGauss::init_3D(const ElemType type_in,
         QGauss q2D(2,_order);
 
         // Initialize
-        q1D.init(EDGE2,p);
-        q2D.init(TRI3,p);
+        q1D.init(EDGE2,p_level);
+        q2D.init(TRI3,p_level);
 
         tensor_product_prism(q1D, q2D);
 
@@ -537,7 +537,7 @@ void QGauss::init_3D(const ElemType type_in,
         // from: Stroud, A.H. "Approximate Calculation of Multiple
         // Integrals."
         QConical conical_rule(3, _order);
-        conical_rule.init(type_in, p);
+        conical_rule.init(type_in, p_level);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (conical_rule.get_points() );

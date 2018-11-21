@@ -297,6 +297,8 @@ public:
    * how close is "good enough."  The map inversion iteration
    * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
    * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
+   * The parameter secure (always assumed false in non-debug mode)
+   * switches on integrity-checks on the mapped points.
    */
   static Point inverse_map (const Elem * elem,
                             const Point & p,
@@ -312,6 +314,8 @@ public:
    * close is "good enough."  The map inversion iteration computes the
    * sequence \f$ \{ p_n \} \f$, and the iteration is terminated when
    * \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
+   * The parameter secure (always assumed false in non-debug mode)
+   * switches on integrity-checks on the mapped points.
    */
   static void inverse_map (const Elem * elem,
                            const std::vector<Point> & physical_points,
