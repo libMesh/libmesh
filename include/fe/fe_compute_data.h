@@ -21,6 +21,7 @@
 
 // Local includes
 #include "libmesh/libmesh.h"
+#include "libmesh/fe_base.h" // required for the type OutputGradient.
 
 // C++ includes
 #include <vector>
@@ -57,7 +58,8 @@ public:
   FEComputeData (const EquationSystems & es,
                  const Point & pin) :
     equation_systems(es),
-    p(pin)
+    p(pin),
+    _need_dshape(false)
   {
     this->clear();
   }
@@ -78,6 +80,20 @@ public:
    */
   std::vector<Number> shape;
 
+  /**
+   * Storage for the computed shape derivative values.
+   */
+  std::vector<Gradient> dshape;
+
+  /**
+   * Storage for local to global mapping at \p p.
+   * This is needed when the gradient in physical
+   * coordinates is of interest.
+   * FIXME: What kind of type should one use for it?
+   *  The matrix-class don't look as if they were made for it
+   *  and neither are the TensorTool-members.
+   */
+  std::vector<std::vector<Real>> local_transform;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /**
@@ -108,6 +124,33 @@ public:
    * the fields are correctly resized.
    */
   void init ();
+
+  /**
+   * Enable the computation of shape gradients (dshape).
+   */
+  void enable_derivative ();
+
+  /**
+   * Disable the computation of shape gradients (dshape).
+   * Default is disabled.
+   */
+  void disable_derivative ()
+  {_need_dshape=false; }
+
+  /**
+   * Check whether derivatives should be computed or not.
+   */
+  bool need_derivative ()
+  {return _need_dshape; }
+
+private:
+  /**
+   * variable indicating whether the shape-derivative should be computed or not.
+   * Default is false to save time and be compatible with elements where derivatives
+   * are not implemented/ cannot be computed.
+   */
+  bool _need_dshape;
+
 };
 
 

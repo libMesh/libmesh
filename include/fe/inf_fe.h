@@ -281,6 +281,42 @@ public:
                     const Point & p);
 
   /**
+   * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at point \p p. This method lets you specify the relevant
+   * data directly, and is therefore allowed to be static.
+   *
+   * \note This class member is not as efficient as its counterpart in
+   * \p FE<Dim,T>, and is not employed in the \p reinit() cycle.
+   *
+   * \note This method does not return physically correct shape gradients,
+   * instead use \p compute_data().  The \p shape_deriv() methods should
+   * only be used for mapping.
+   */
+  static Real shape_deriv (const FEType & fet,
+                           const Elem * inf_elem,
+                           const unsigned int i,
+                           const unsigned int j,
+                           const Point & p);
+
+  /**
+   * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at point \p p. This method lets you specify the relevant
+   * data directly, and is therefore allowed to be static.
+   *
+   * \note This class member is not as efficient as its counterpart in
+   * \p FE<Dim,T>, and is not employed in the \p reinit() cycle.
+   *
+   * \note This method does not return physically correct shape gradients,
+   * instead use \p compute_data().  The \p shape_deriv() methods should
+   * only be used for mapping.
+   */
+  static Real shape_deriv (const FEType & fet,
+                           const ElemType inf_elem_type,
+                           const unsigned int i,
+                           const unsigned int j,
+                           const Point & p);
+
+  /**
    * Generalized version of \p shape(), takes an \p Elem *.  The \p data
    * contains both input and output parameters.  For frequency domain
    * simulations, the complex-valued shape is returned.  In time domain
@@ -806,6 +842,7 @@ private:
    */
   static bool _warned_for_nodal_soln;
   static bool _warned_for_shape;
+  static bool _warned_for_dshape;
 
 #endif
 

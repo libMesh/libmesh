@@ -29,6 +29,69 @@ namespace libMesh
 {
 
 
+#define inf_fe_family_mapping_switch(dim, func_and_args, prefix, suffix) \
+  do {                                                                  \
+    switch (fe_t.radial_family)                                         \
+      {                                                                 \
+      case INFINITE_MAP:                                                \
+        switch(fe_t.inf_map)                                            \
+          {                                                             \
+          case CARTESIAN:                                               \
+            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+          case SPHERICAL:                                               \
+          case ELLIPSOIDAL:                                             \
+            libmesh_not_implemented();                                  \
+          default:                                                      \
+            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
+          }                                                             \
+      case JACOBI_20_00:                                                \
+        switch(fe_t.inf_map)                                            \
+          {                                                             \
+          case CARTESIAN:                                               \
+            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+          case SPHERICAL:                                               \
+          case ELLIPSOIDAL:                                             \
+            libmesh_not_implemented();                                  \
+          default:                                                      \
+            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
+          }                                                             \
+      case JACOBI_30_00:                                                \
+        switch(fe_t.inf_map)                                            \
+          {                                                             \
+          case CARTESIAN:                                               \
+            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+          case SPHERICAL:                                               \
+          case ELLIPSOIDAL:                                             \
+            libmesh_not_implemented();                                  \
+          default:                                                      \
+            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
+          }                                                             \
+      case LEGENDRE:                                                    \
+        switch(fe_t.inf_map)                                            \
+          {                                                             \
+          case CARTESIAN:                                               \
+            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+          case SPHERICAL:                                               \
+          case ELLIPSOIDAL:                                             \
+            libmesh_not_implemented();                                  \
+          default:                                                      \
+            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
+          }                                                             \
+      case LAGRANGE:                                                    \
+        switch(fe_t.inf_map)                                            \
+          {                                                             \
+          case CARTESIAN:                                               \
+            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+          case SPHERICAL:                                               \
+          case ELLIPSOIDAL:                                             \
+            libmesh_not_implemented();                                  \
+          default:                                                      \
+            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
+          }                                                             \
+      default:                                                          \
+        libmesh_error_msg("Invalid radial family = " << fe_t.radial_family); \
+      }                                                                 \
+  } while (0)
 
 
 //------------------------------------------------------------
@@ -802,7 +865,54 @@ Real FEInterface::ifem_shape(const unsigned int dim,
     }
 }
 
+Real FEInterface::ifem_shape_deriv (const unsigned int dim,
+                                    const FEType & fe_t,
+                                    const Elem * elem,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p)
+{
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      inf_fe_family_mapping_switch(1, shape_deriv(fe_t, elem, i, j, p), return, ;);
+      // 2D
+    case 2:
+      inf_fe_family_mapping_switch(2, shape_deriv(fe_t, elem, i, j, p), return, ;);
+      // 3D
+    case 3:
+      inf_fe_family_mapping_switch(3, shape_deriv(fe_t, elem, i, j, p), return, ;);
 
+    default:
+      libmesh_error_msg("Invalid dim = " << dim);
+    }
+}
+
+
+Real FEInterface::ifem_shape_deriv(const unsigned int dim,
+                                   const FEType & fe_t,
+                                   const ElemType t,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point & p)
+{
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      inf_fe_family_mapping_switch(1, shape_deriv(fe_t, t, i, j, p), return, ;);
+      // 2D
+    case 2:
+      inf_fe_family_mapping_switch(2, shape_deriv(fe_t, t, i, j, p), return, ;);
+      // 3D
+    case 3:
+      inf_fe_family_mapping_switch(3, shape_deriv(fe_t, t, i, j, p), return, ;);
+
+    default:
+      libmesh_error_msg("Invalid dim = " << dim);
+    }
+}
 
 
 void FEInterface::ifem_compute_data(const unsigned int dim,

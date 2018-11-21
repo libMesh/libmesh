@@ -217,7 +217,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // right now, and it will generalize a bit, and it won't break
       // the assumptions elsewhere in InfFE.
       std::vector<Point> radial_pts;
-      for (auto p : index_range(*pts))
+      for (std::size_t p=1; p < pts->size(); ++p)
         {
           Real radius = (*pts)[p](Dim-1);
           //IMHO this is a dangerous check:

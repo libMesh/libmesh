@@ -297,6 +297,41 @@ public:
                     OutputType & phi);
 
   /**
+   * \returns The \f$ j^{th} \f$ coordinate of the gradient of
+   * the \f$ i^{th} \f$ shape function at point \p p.
+   * This method allows you to specify the dimension,
+   * element type, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
+   */
+  static Real shape_deriv(const unsigned int dim,
+                          const FEType & fe_t,
+                          const ElemType t,
+                          const unsigned int i,
+                          const unsigned int j,
+                          const Point & p);
+
+  /**
+   * \returns The \f$ j^{th} \f$ coordinate of the gradient of
+   * the \f$ i^{th} \f$ shape function at point \p p.
+   * This method allows you to specify the dimension,
+   * element type, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
+   */
+  static Real shape_deriv (const unsigned int dim,
+                           const FEType & fe_t,
+                           const Elem *elem,
+                           const unsigned int i,
+                           const unsigned int j,
+                           const Point & p);
+
+
+  /**
    * Lets the appropriate child of \p FEBase compute the requested
    * data for the input specified in \p data, and sets the values in
    * \p data.  See this as a generalization of \p shape().  With
@@ -447,6 +482,21 @@ private:
                          const Elem * elem,
                          const unsigned int i,
                          const Point & p);
+
+
+  static Real ifem_shape_deriv(const unsigned int dim,
+                               const FEType & fe_t,
+                               const ElemType t,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point & p);
+
+  static Real ifem_shape_deriv(const unsigned int dim,
+                               const FEType & fe_t,
+                               const Elem * elem,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point & p);
 
   static void ifem_compute_data(const unsigned int dim,
                                 const FEType & fe_t,

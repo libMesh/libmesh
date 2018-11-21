@@ -44,6 +44,9 @@ bool InfFE<Dim,T_radial,T_map>::_warned_for_nodal_soln = false;
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 bool InfFE<Dim,T_radial,T_map>::_warned_for_shape      = false;
 
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+bool InfFE<Dim,T_radial,T_map>::_warned_for_dshape     = false;
+
 #endif
 
 
@@ -232,6 +235,98 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
 }
 
 
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
+                                             const ElemType inf_elem_type,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p)
+{
+  libmesh_assert_not_equal_to (Dim, 0);
+  libmesh_assert_greater (Dim,j);
+#ifdef DEBUG
+  // this makes only sense when used for mapping
+  if ((T_radial != INFINITE_MAP) && !_warned_for_dshape)
+    {
+      libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape_deriv(...) does _not_" << std::endl
+                   << " return the correct trial function gradients!  Use " << std::endl
+                   << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
+                   << std::endl;
+      _warned_for_dshape = true;
+    }
+#endif
+
+  const ElemType     base_et  (Base::get_elem_type(inf_elem_type));
+  const Order o_radial (fe_t.radial_order);
+  const Real v (p(Dim-1));
+
+  unsigned int i_base, i_radial;
+  compute_shape_indices(fe_t, inf_elem_type, i, i_base, i_radial);
+
+  if (j== Dim -1)
+    {
+      Real RadialDeriv = InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial)
+        * InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+        + InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+        * InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v);
+
+      return FEInterface::shape(Dim-1, fe_t, base_et, i_base, p)*RadialDeriv;
+    }
+
+  return FEInterface::shape_deriv(Dim-1, fe_t, base_et, i_base, j, p)
+    * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+    * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+}
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
+                                             const Elem * inf_elem,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p)
+{
+  libmesh_assert_not_equal_to (Dim, 0);
+  libmesh_assert_greater (Dim,j);
+#ifdef DEBUG
+  // this makes only sense when used for mapping
+  if ((T_radial != INFINITE_MAP) && !_warned_for_dshape)
+    {
+      libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape_deriv(...) does _not_" << std::endl
+                   << " return the correct trial function gradients!  Use " << std::endl
+                   << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
+                   << std::endl;
+      _warned_for_dshape = true;
+    }
+#endif
+  const Order o_radial (fe_t.radial_order);
+  const Real v (p(Dim-1));
+
+  std::unique_ptr<const Elem> base_el (inf_elem->build_side_ptr(0));
+
+  unsigned int i_base, i_radial;
+
+  if ((-1. > v ) || (v  > 1.))
+    {
+      //TODO: This is for debugging. We should never come here.
+      //   Therefore we can do very useless things then:
+      i_base=0;
+    }
+  compute_shape_indices(fe_t, inf_elem->type(), i, i_base, i_radial);
+
+  if (j== Dim -1)
+    {
+      Real RadialDeriv = InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial)
+        * InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+        + InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+        * InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v);
+
+      return FEInterface::shape(Dim-1, fe_t, base_el.get(), i_base, p)*RadialDeriv;
+    }
+  return FEInterface::shape_deriv(Dim-1, fe_t, base_el.get(), i_base, j, p)
+    * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+    * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+}
 
 
 
@@ -334,6 +429,37 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
     {
       const unsigned int n_dof = n_dofs (fet, inf_elem->type());
       data.shape.resize(n_dof);
+      if (data.need_derivative())
+        {
+          data.dshape.resize(n_dof);
+          data.local_transform.resize(Dim);
+
+          for (unsigned int d=0; d<Dim; d++)
+            data.local_transform[d].resize(Dim);
+
+          // compute the reference->physical map at the point \p p.
+          // Use another fe_map to avoid interference with \p this->_fe_map
+          // which is initialized at the quadrature points...
+          UniquePtr<FEBase> fe (FEBase::build_InfFE(Dim, fet));
+          std::vector<Point> pt(1);
+          pt[0]=p;
+          fe->get_dphideta(); // to compute the map
+          fe->reinit(inf_elem, &pt);
+
+          // compute the reference->physical map.
+          data.local_transform[0][0] = fe->get_dxidx()[0];
+          data.local_transform[1][0] = fe->get_detadx()[0];
+          data.local_transform[1][1] = fe->get_detady()[0];
+          data.local_transform[0][1] = fe->get_dxidy()[0];
+          if (Dim > 2)
+            {
+              data.local_transform[2][0] = fe->get_dzetadx()[0];
+              data.local_transform[2][1] = fe->get_dzetady()[0];
+              data.local_transform[2][2] = fe->get_dzetadz()[0];
+              data.local_transform[1][2] = fe->get_detadz()[0];
+              data.local_transform[0][2] = fe->get_dxidz()[0];
+            }
+        } // endif data.need_derivative()
 
       for (unsigned int i=0; i<n_dof; i++)
         {
@@ -344,7 +470,48 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
                            *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
                            * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
-                           * time_harmonic;                                             /* e^(i*k*phase(s,t,v)      */
+            * time_harmonic;                                             /* e^(i*k*phase(s,t,v)      */
+
+          // use differentiation of the above equation
+          if (data.need_derivative())
+            {
+              data.dshape[i](0)     = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+                                       * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 0, p)
+                                       * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
+                                       * time_harmonic;
+              if (Dim > 2)
+
+                if (Dim > 2)
+                  {
+                    data.dshape[i](1)   = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+                                           * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 1, p)
+                                           * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
+                                           * time_harmonic;
+
+                  }
+              data.dshape[i](Dim-1)  = (InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v)
+                                        * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
+                                        * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
+                                        * time_harmonic;
+
+              data.dshape[i](Dim-1) += (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+                                        * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
+                                        * InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial))
+                                        * time_harmonic;
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+              // derivative of time_harmonic (works for harmonic behavior only):
+              data.dshape[i](Dim-1)+= data.shape[i]*imaginary*wavenumber;
+
+#else
+            /*
+             * The gradient in infinite elements is dominated by the contribution due to the oscillating phase.
+             * Since this term is imaginary, I think there is no means to look at it without having complex numbers.
+             */
+            libmesh_not_implemented();
+            // Maybe we can solve it with a warning as well, but I think one really should not do this...
+#endif
+            }
         }
     }
 
@@ -934,6 +1101,12 @@ INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const Elem *, 
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));

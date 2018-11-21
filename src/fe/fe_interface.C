@@ -803,6 +803,76 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
   return;
 }
 
+Real FEInterface::shape_deriv(const unsigned int dim,
+                              const FEType & fe_t,
+                              const ElemType t,
+                              const unsigned int i,
+                              const unsigned int j,
+                              const Point & p)
+{
+  libmesh_assert_greater (dim,j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (is_InfFE_elem(t)){
+    return ifem_shape_deriv(dim, fe_t, t, i, j, p);
+  }
+
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_deriv(t, o, i, j, p), return , ;);
+    case 1:
+      fe_family_switch (1, shape_deriv(t, o, i, j, p), return , ;);
+    case 2:
+      fe_family_switch (2, shape_deriv(t, o, i, j, p), return  , ;);
+    case 3:
+      fe_family_switch (3, shape_deriv(t, o, i, j, p), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+  return 0;
+}
+
+
+Real FEInterface::shape_deriv(const unsigned int dim,
+                              const FEType & fe_t,
+                              const Elem * elem,
+                              const unsigned int i,
+                              const unsigned int j,
+                              const Point & p)
+{
+  libmesh_assert_greater (dim,j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (elem->infinite()){
+    return ifem_shape_deriv(dim, fe_t, elem, i, j, p);
+  }
+
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_deriv(elem, o, i, j, p), return , ;);
+    case 1:
+      fe_family_switch (1, shape_deriv(elem, o, i, j, p), return , ;);
+    case 2:
+      fe_family_switch (2, shape_deriv(elem, o, i, j, p), return , ;);
+    case 3:
+      fe_family_switch (3, shape_deriv(elem, o, i, j, p), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+  return 0;
+}
+
+
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const FEType & fe_t,
@@ -857,11 +927,50 @@ void FEInterface::compute_data(const unsigned int dim,
   const Point &       p     = data.p;
   data.shape.resize(n_dof);
 
+  if (data.need_derivative())
+    {
+      data.dshape.resize(n_dof);
+      data.local_transform.resize(dim);
+
+      for (unsigned int d=0; d<dim; d++)
+        data.local_transform[d].resize(dim);
+
+      UniquePtr<FEBase> fe (FEBase::build(dim, fe_t));
+      std::vector<Point> pt(1);
+      pt[0]=p;
+      fe->get_dphideta(); // to compute the map
+      fe->reinit(elem, &pt);
+
+      // compute the reference->physical map.
+      data.local_transform[0][0] = fe->get_dxidx()[0];
+      if (dim > 1)
+        {
+          data.local_transform[1][0] = fe->get_detadx()[0];
+          data.local_transform[1][1] = fe->get_detady()[0];
+          data.local_transform[0][1] = fe->get_dxidy()[0];
+          if (dim > 2)
+            {
+              data.local_transform[2][0] = fe->get_dzetadx()[0];
+              data.local_transform[2][1] = fe->get_dzetady()[0];
+              data.local_transform[2][2] = fe->get_dzetadz()[0];
+              data.local_transform[1][2] = fe->get_detadz()[0];
+              data.local_transform[0][2] = fe->get_dxidz()[0];
+            }
+        }
+    }
+
   // set default values for all the output fields
   data.init();
 
   for (unsigned int n=0; n<n_dof; n++)
-    data.shape[n] = shape(dim, p_refined, elem, n, p);
+    {
+      data.shape[n] = shape(dim, p_refined, elem, n, p);
+      if (data.need_derivative())
+        {
+          for (unsigned int j=0; j<dim; j++)
+            data.dshape[n](j) = shape_deriv(dim, p_refined, elem, n, j, p);
+        }
+    }
 
   return;
 }

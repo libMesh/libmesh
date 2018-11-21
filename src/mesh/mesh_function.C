@@ -31,6 +31,7 @@
 #include "libmesh/point.h"
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
+#include "libmesh/fe_map.h"
 
 namespace libMesh
 {
@@ -432,6 +433,7 @@ void MeshFunction::gradient (const Point & p,
   if (!element)
     {
       output.resize(0);
+      return;
     }
   else
     {
@@ -474,20 +476,52 @@ void MeshFunction::gradient (const Point & p,
 
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
-            std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
-            const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
-            point_fe->reinit(element, &point_list);
-
             // where the solution values for the var-th variable are stored
             std::vector<dof_id_type> dof_indices;
             this->_dof_map.dof_indices (element, dof_indices, var);
 
             // interpolate the solution
             Gradient grad(0.);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+            //The other algorithm works in case of finite elements as well,
+            //but this one is faster.
+            if (!element->infinite())
+              {
+#endif
+                std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
+                const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
+                point_fe->reinit(element, &point_list);
 
-            for (auto i : index_range(dof_indices))
-              grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
+                for (auto i : index_range(dof_indices))
+                  grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+              }
+            else
+              {
+                /**
+                 * Build an FEComputeData that contains both input and output data
+                 * for the specific compute_data method.
+                 */
+                FEComputeData data (this->_eqn_systems, mapped_point);
+                data.enable_derivative();
+                FEInterface::compute_data (dim, fe_type, element, data);
+                //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
+                // sum over all indices
+                for (std::size_t i=0; i<dof_indices.size(); i++)
+                  {
+                    // local coordinates
+                    for (std::size_t v=0; v<dim; v++)
+                      for (std::size_t xyz=0; xyz<dim; xyz++)
+                        {
+                          // FIXME: this needs better syntax: It is matrix-vector multiplication.
+                          grad(xyz) += data.local_transform[v][xyz]
+                            * data.dshape[i](v)
+                            * this->_vector(dof_indices[i]);
+                        }
+                  }
+              }
+#endif
             output[index] = grad;
           }
       }
@@ -556,19 +590,55 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
           const FEType & fe_type = this->_dof_map.variable_type(var);
 
-          std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
-          const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
-          point_fe->reinit(element, &point_list);
-
           // where the solution values for the var-th variable are stored
           std::vector<dof_id_type> dof_indices;
           this->_dof_map.dof_indices (element, dof_indices, var);
 
           Gradient grad(0.);
 
-          for (auto i : index_range(dof_indices))
-            grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
+          // for performance-reasons, we use different algorithms now.
+          // TODO: Check that both give the same result for finite elements.
+          // Otherwive it is wrong...
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+          if (!element->infinite())
+            {
+#endif
+              std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
+              const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
+              point_fe->reinit(element, & point_list);
 
+              temp_output[index] = grad;
+              for (auto i : index_range(dof_indices))
+                grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+            }
+          else
+            {
+              /**
+               * Build an FEComputeData that contains both input and output data
+               * for the specific compute_data method.
+               */
+              //TODO: enable this for a vector of points as well...
+              FEComputeData data (this->_eqn_systems, mapped_point);
+              data.enable_derivative();
+              FEInterface::compute_data (dim, fe_type, element, data);
+
+              //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
+              // sum over all indices
+              for (auto i : index_range(dof_indices))
+                {
+                  // local coordinates
+                  for (std::size_t v=0; v<dim; v++)
+                    for (std::size_t xyz=0; xyz<dim; xyz++)
+                      {
+                        // FIXME: this needs better syntax: It is matrix-vector multiplication.
+                        grad(xyz) += data.local_transform[v][xyz]
+                          * data.dshape[i](v)
+                          * this->_vector(dof_indices[i]);
+                      }
+                }
+            }
+#endif
           temp_output[index] = grad;
 
           // next variable
@@ -597,6 +667,13 @@ void MeshFunction::hessian (const Point & p,
     }
   else
     {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      if(element->infinite())
+        libmesh_warning("Warning: Requested the Hessian of an Infinit element."
+                        << "Second derivatives for Infinite elements"
+                        << " are not yet implemented!"
+                        << std::endl);
+#endif
       // resize the output vector to the number of output values
       // that the user told us
       output.resize (this->_system_vars.size());
