@@ -54,42 +54,14 @@ namespace Parallel {
  * All receives and actions are completed before this function
  * returns.
  *
- * Not all sends may have yet completed.  The supplied container of
- * Request objects, \p req, has more requests inserted, one for each
- * of the data sends.  These requests must be waited on before the \p
- * data map is deleted.
- */
-template <typename MapToVectors,
-          typename RequestContainer,
-          typename ActionFunctor>
-void push_parallel_vector_data(const Communicator & comm,
-                               const MapToVectors & data,
-                               RequestContainer & reqs,
-                               const ActionFunctor & act_on_data);
-
-
-
-/**
- * Send and receive and act on vectors of data.
- *
- * The \p data map is indexed by processor ids as keys, and for each
- * processor id in the map there should be a vector of data to send.
- *
- * Data which is received from other processors will be operated on by
- * act_on_data(processor_id_type pid, const std::vector<datum> & data);
- *
- * No guarantee about operation ordering is made - this function will
- * attempt to act on data in the order in which it is received.
- *
- * All communication and actions are complete when this function
- * returns.
+ * Note: it is very important that the message tag be completely
+ * unique to each invocation
  */
 template <typename MapToVectors,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & data,
                                const ActionFunctor & act_on_data);
-
 
 /**
  * Send query vectors, receive and answer them with vectors of data,
@@ -117,50 +89,6 @@ void push_parallel_vector_data(const Communicator & comm,
  *
  * All receives and actions are completed before this function
  * returns.
- *
- * Not all sends may have yet completed.  The supplied container of
- * Request objects, \p req, has more requests inserted, one for each
- * of the data sends.  These requests must be waited on before the \p
- * data map is deleted.
- */
-template <typename datum,
-          typename MapToVectors,
-          typename RequestContainer,
-          typename GatherFunctor,
-          typename ActionFunctor>
-void pull_parallel_vector_data(const Communicator & comm,
-                               const MapToVectors & queries,
-                               RequestContainer & reqs,
-                               GatherFunctor & gather_data,
-                               ActionFunctor & act_on_data,
-                               const datum * example);
-
-/**
- * Send query vectors, receive and answer them with vectors of data,
- * then act on those answers.
- *
- * The \p data map is indexed by processor ids as keys, and for each
- * processor id in the map there should be a vector of query ids to send.
- *
- * Query data which is received from other processors will be operated
- * on by
- * gather_data(processor_id_type pid, const std::vector<id> & ids,
- *             std::vector<datum> & data)
- *
- * Answer data which is received from other processors will be operated on by
- * act_on_data(processor_id_type pid, const std::vector<id> & ids,
- *             const std::vector<datum> & data);
- *
- * The example pointer may be null; it merely needs to be of the
- * correct type.  It's just here because function overloading in C++
- * is easy, whereas SFINAE is hard and partial template specialization
- * of functions is impossible.
- *
- * No guarantee about operation ordering is made - this function will
- * attempt to act on data in the order in which it is received.
- *
- * All communication and actions are complete when this function
- * returns.
  */
 template <typename datum,
           typename MapToVectors,
@@ -185,24 +113,6 @@ template <template <typename, typename, typename ...> class MapType,
           typename A1,
           typename A2,
           typename ... ExtraTypes,
-          typename RequestContainer,
-          typename ActionFunctor>
-void push_parallel_vector_data(const Communicator & comm,
-                               const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
-                               RequestContainer & reqs,
-                               const ActionFunctor & act_on_data);
-
-
-
-/*
- * A specialization for types that are harder to non-blocking receive.
- */
-template <template <typename, typename, typename ...> class MapType,
-          typename KeyType,
-          typename ValueType,
-          typename A1,
-          typename A2,
-          typename ... ExtraTypes,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
@@ -214,16 +124,13 @@ void push_parallel_vector_data(const Communicator & comm,
 template <typename datum,
           typename A,
           typename MapToVectors,
-          typename RequestContainer,
           typename GatherFunctor,
           typename ActionFunctor>
 void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
-                               RequestContainer & reqs,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
                                const std::vector<datum,A> * example);
-
 
 
 
@@ -235,11 +142,9 @@ void pull_parallel_vector_data(const Communicator & comm,
 //
 
 template <typename MapToVectors,
-          typename RequestContainer,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & data,
-                               RequestContainer & reqs,
                                const ActionFunctor & act_on_data)
 {
   // This function must be run on all processors at once
@@ -269,7 +174,7 @@ void push_parallel_vector_data(const Communicator & comm,
 
   // We'll grab a tag so we can overlap request sends and receives
   // without confusing one for the other
-  MessageTag tag = comm.get_unique_tag(1225);
+  auto tag = comm.get_unique_tag();
 
   MapToVectors received_data;
 
@@ -282,6 +187,9 @@ void push_parallel_vector_data(const Communicator & comm,
   // the sends are complete
   const_cast<Communicator &>(comm).send_mode(Communicator::SYNCHRONOUS);
 
+  // The send requests
+  std::list<Request> reqs;
+
   for (auto & datapair : data)
     {
       processor_id_type destid = datapair.first;
@@ -293,8 +201,8 @@ void push_parallel_vector_data(const Communicator & comm,
       else
         {
           Request sendreq;
-          comm.send(destid, datum, datatype, sendreq, tag);
-          reqs.insert(reqs.end(), sendreq);
+          comm.send(destid, datum,/* datatype,*/ sendreq, tag);
+          reqs.push_back(sendreq);
         }
     }
 
@@ -355,34 +263,38 @@ void push_parallel_vector_data(const Communicator & comm,
                              return false;
                            });
 
+    reqs.remove_if([](Request & req)
+                   {
+                     if (req.test())
+                     {
+                       // Do Post-Wait work
+                       req.wait();
+
+                       return true;
+                     }
+
+                     // Not finished yet
+                     return false;
+                   });
+
+
     // See if all of the sends are finished
-    if (!sends_complete)
-    {
-      for (auto & req : reqs)
-      {
-        sends_complete = req.test();
-
-        if (!sends_complete)
-          break;
-      }
-    }
-
+    if (reqs.empty())
+      sends_complete = true;
 
     // If they've all completed then we can start the barrier
     if (sends_complete && !started_barrier)
     {
-      // Need to wait on each send request to make sure post-wait work is done
-      for (auto & req : reqs)
-        req.wait();
-
       started_barrier = true;
       comm.nonblocking_barrier(barrier_request);
     }
 
-    // See if all proessors have finished all sends (i.e. _done_!)
-    if (started_barrier)
-      if (barrier_request.test())
-        break; // Done!
+    // Must fully receive everything before being allowed to move on!
+    if (receive_reqs.empty())
+      // See if all proessors have finished all sends (i.e. _done_!)
+      if (started_barrier)
+        if (barrier_request.test())
+          break; // Done!
   }
 
   // Reset the send mode
@@ -390,17 +302,14 @@ void push_parallel_vector_data(const Communicator & comm,
 }
 
 
-
 template <template <typename, typename, typename ...> class MapType,
           typename ValueType,
           typename A1,
           typename A2,
           typename ... ExtraTypes,
-          typename RequestContainer,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
                                const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
-                               RequestContainer & reqs,
                                const ActionFunctor & act_on_data)
 {
   // This function must be run on all processors at once
@@ -440,7 +349,10 @@ void push_parallel_vector_data(const Communicator & comm,
 
   // We'll grab a tag so we can overlap request sends and receives
   // without confusing one for the other
-  MessageTag tag = comm.get_unique_tag(1225);
+  MessageTag tag = comm.get_unique_tag();
+
+  // The send requests
+  std::list<Request> reqs;
 
   // Post all of the sends, non-blocking
   for (auto & datapair : data)
@@ -459,7 +371,7 @@ void push_parallel_vector_data(const Communicator & comm,
         {
           Request sendreq;
           comm.send(destid, datum, datatype, sendreq, tag);
-          reqs.insert(reqs.end(), sendreq);
+          reqs.push_back(sendreq);
         }
     }
 
@@ -479,52 +391,19 @@ void push_parallel_vector_data(const Communicator & comm,
       comm.receive(proc_id, received_data, datatype, tag);
       act_on_data(proc_id, received_data);
     }
+
+  // Wat on all the sends to complete
+  for (auto & req : reqs)
+    req.wait();
 }
-
-
-
-template <typename MapToVectors,
-          typename ActionFunctor>
-void push_parallel_vector_data(const Communicator & comm,
-                               const MapToVectors & data,
-                               const ActionFunctor & act_on_data)
-{
-  std::vector<Request> requests;
-
-  push_parallel_vector_data(comm, data, requests, act_on_data);
-
-  wait(requests);
-}
-
-
-
-template <template <typename, typename, typename ...> class MapType,
-          typename ValueType,
-          typename A1,
-          typename A2,
-          typename ... ExtraTypes,
-          typename ActionFunctor>
-void push_parallel_vector_data(const Communicator & comm,
-                               const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
-                               const ActionFunctor & act_on_data)
-{
-  std::vector<Request> requests;
-
-  push_parallel_vector_data(comm, data, requests, act_on_data);
-
-  wait(requests);
-}
-
 
 
 template <typename datum,
           typename MapToVectors,
-          typename RequestContainer,
           typename GatherFunctor,
           typename ActionFunctor>
 void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
-                               RequestContainer & reqs,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
                                const datum *)
@@ -533,106 +412,39 @@ void pull_parallel_vector_data(const Communicator & comm,
 
   std::map<processor_id_type, std::vector<datum> >
     response_data, received_data;
-  std::vector<Request> response_reqs;
 
   StandardType<datum> datatype;
 
-  // We'll grab a tag so we can overlap request sends and receives
-  // without confusing one for the other
-  MessageTag tag = comm.get_unique_tag(105);
-
   auto gather_functor =
-    [&comm, &gather_data, &response_data, &response_reqs, &datatype, &tag]
+    [&gather_data, &response_data]
     (processor_id_type pid, query_type query)
     {
       gather_data(pid, query, response_data[pid]);
       libmesh_assert_equal_to(query.size(), response_data[pid].size());
-
-      // Just act on data later if the user requested a send-to-self
-      if (pid != comm.rank())
-        {
-          Request sendreq;
-          comm.send(pid, response_data[pid], datatype, sendreq, tag);
-          response_reqs.push_back(sendreq);
-        }
     };
 
-  push_parallel_vector_data (comm, queries, reqs, gather_functor);
+  push_parallel_vector_data (comm, queries, gather_functor);
 
-  // Every outgoing query should now have an incoming response.
-  // Post all of the receives, non-blocking
-  std::vector<Request> receive_reqs;
-  std::vector<processor_id_type> receive_procids;
-  for (auto & querypair : queries)
+  auto action_functor =
+    [&act_on_data, &queries]
+    (processor_id_type pid, const std::vector<datum> & data)
     {
-      processor_id_type proc_id = querypair.first;
-      libmesh_assert_less(proc_id, comm.size());
+      act_on_data(pid, queries.at(pid), data);
+    };
 
-      if (proc_id == comm.rank())
-        {
-          libmesh_assert(queries.count(proc_id));
-          libmesh_assert_equal_to(queries.at(proc_id).size(),
-                                  response_data.at(proc_id).size());
-          act_on_data(proc_id, queries.at(proc_id), response_data.at(proc_id));
-        }
-      else
-        {
-          auto & querydata = querypair.second;
-          Request req;
-          auto & incoming_data = received_data[proc_id];
-          incoming_data.resize(querydata.size());
-          comm.receive(proc_id, incoming_data, datatype, req, tag);
-          receive_reqs.push_back(req);
-          receive_procids.push_back(proc_id);
-        }
-    }
-
-  while(receive_reqs.size())
-    {
-      std::size_t completed = waitany(receive_reqs);
-      processor_id_type proc_id = receive_procids[completed];
-      receive_reqs.erase(receive_reqs.begin() + completed);
-      receive_procids.erase(receive_procids.begin() + completed);
-
-      libmesh_assert(queries.count(proc_id));
-      libmesh_assert_equal_to(queries.at(proc_id).size(),
-                              received_data[proc_id].size());
-      act_on_data(proc_id, queries.at(proc_id), received_data[proc_id]);
-      received_data.erase(proc_id);
-    }
-
-  wait(response_reqs);
+  push_parallel_vector_data (comm, response_data, action_functor);
 }
 
 
-template <typename datum,
-          typename MapToVectors,
-          typename GatherFunctor,
-          typename ActionFunctor>
-void pull_parallel_vector_data(const Communicator & comm,
-                               const MapToVectors & queries,
-                               GatherFunctor & gather_data,
-                               ActionFunctor & act_on_data,
-                               const datum * example)
-{
-  std::vector<Request> requests;
-
-  pull_parallel_vector_data(comm, queries, requests, gather_data,
-                            act_on_data, example);
-
-  wait(requests);
-}
 
 
 template <typename datum,
           typename A,
           typename MapToVectors,
-          typename RequestContainer,
           typename GatherFunctor,
           typename ActionFunctor>
 void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
-                               RequestContainer & reqs,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
                                const std::vector<datum,A> *)
@@ -645,7 +457,7 @@ void pull_parallel_vector_data(const Communicator & comm,
 
   // We'll grab a tag so we can overlap request sends and receives
   // without confusing one for the other
-  MessageTag tag = comm.get_unique_tag(105);
+  MessageTag tag = comm.get_unique_tag();
 
   auto gather_functor =
     [&comm, &gather_data, &act_on_data,
@@ -669,7 +481,7 @@ void pull_parallel_vector_data(const Communicator & comm,
         }
     };
 
-  push_parallel_vector_data (comm, queries, reqs, gather_functor);
+  push_parallel_vector_data (comm, queries, gather_functor);
 
   // Every outgoing query should now have an incoming response.
   //
