@@ -406,12 +406,12 @@ public:
                        const std::vector<Real> * const weights = nullptr) override;
 
   /**
-   * Not implemented yet.  Reinitializes all the physical
+   * Reinitializes all the physical
    * element-dependent data based on the \p side of an infinite
    * element.
    */
-  virtual void reinit (const Elem * elem,
-                       const unsigned int side,
+  virtual void reinit (const Elem * inf_elem,
+                       const unsigned int s,
                        const Real tolerance = TOLERANCE,
                        const std::vector<Point> * const pts = nullptr,
                        const std::vector<Real> * const weights = nullptr) override;
@@ -538,11 +538,11 @@ protected:
                             const Elem * inf_elem);
 
   /**
-   * Not implemented yet.  Initialize all the data fields like \p weight,
+   * Initialize all the data fields like \p weight,
    * \p phi, etc for the side \p s.
    */
-  void init_face_shape_functions (const std::vector<Point> & qp,
-                                  const Elem * side);
+  void init_face_shape_functions (const std::vector<Point> &,
+                                  const Elem * inf_side);
 
   /**
    * Combines the shape functions, which were formed in

@@ -26,7 +26,7 @@ namespace libMesh
 
 
 void QGauss::init_2D(const ElemType type_in,
-                     unsigned int p)
+                     unsigned int p_level)
 {
 #if LIBMESH_DIM > 1
 
@@ -60,7 +60,7 @@ void QGauss::init_2D(const ElemType type_in,
         //    yx^2   xy^2
         //       x^2y^2
         QGauss q1D(1,_order);
-        q1D.init(EDGE2,p);
+        q1D.init(EDGE2,p_level);
         tensor_product_quad( q1D );
         return;
       }
@@ -73,7 +73,7 @@ void QGauss::init_2D(const ElemType type_in,
     case TRI3SUBDIVISION:
     case TRI6:
       {
-        switch(_order + 2*p)
+        switch(_order + 2*p_level)
           {
           case CONSTANT:
           case FIRST:
@@ -1277,7 +1277,7 @@ void QGauss::init_2D(const ElemType type_in,
               // automatically generate using a 1D Gauss rule on
               // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
               QConical conical_rule(2, _order);
-              conical_rule.init(type_in, p);
+              conical_rule.init(type_in, p_level);
 
               // Swap points and weights with the about-to-be destroyed rule.
               _points.swap (conical_rule.get_points() );

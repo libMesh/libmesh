@@ -227,25 +227,25 @@ public:
   {}
 
   /**
-   * The approximation order in radial direction of the infinite element.
+   * The approximation order in the base of the infinite element.
    */
   OrderWrapper order;
 
   /**
-   * The approximation order in the base of the infinite element.
+   * The approximation order in radial direction of the infinite element.
    */
   OrderWrapper radial_order;
-
-  /**
-   * The type of approximation in radial direction.  Valid types are
-   * \p JACOBI_20_00, \p JACOBI_30_00, etc...
-   */
-  FEFamily family;
 
   /**
    * For InfFE, \p family contains the radial shape family, while
    * \p base_family contains the approximation type in circumferential
    * direction.  Valid types are \p LAGRANGE, \p HIERARCHIC, etc...
+   */
+  FEFamily family;
+
+  /**
+   * The type of approximation in radial direction.  Valid types are
+   * \p JACOBI_20_00, \p JACOBI_30_00, etc...
    */
   FEFamily radial_family;
 
