@@ -148,8 +148,11 @@ public:
    * \note If people are also using magic numbers or copying
    * communicators around then we can't guarantee the tag is unique to
    * this MPI_Comm.
+   *
+   * \note tagvalue is simply there for backwards compatibility
+   * it is not at all needed and is not used.
    */
-  MessageTag get_unique_tag(int tagvalue) const;
+  MessageTag get_unique_tag(int tagvalue = 0) const;
 
   /**
    * Reference an already-acquired tag, so that we know it will
@@ -191,9 +194,14 @@ private:
   processor_id_type _rank, _size;
   SendMode _send_mode;
 
-  // mutable used_tag_values - not thread-safe, but then Parallel::
+  // mutable tag queue - not thread-safe, but then Parallel::
   // isn't thread-safe in general.
   mutable std::map<int, unsigned int> used_tag_values;
+  mutable int _next_tag;
+
+  // The maximum allowed tag
+  int _max_tag;
+
   bool          _I_duped_it;
 
   // Communication operations:

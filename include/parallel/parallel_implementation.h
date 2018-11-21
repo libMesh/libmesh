@@ -1828,6 +1828,16 @@ inline void Communicator::send (const unsigned int,
                                 const MessageTag &) const
 { libmesh_not_implemented(); }
 
+template <typename T, typename A>
+inline bool Communicator::possibly_receive (unsigned int &,
+                                            std::vector<T,A> &,
+                                            const DataType &,
+                                            Request &,
+                                            const MessageTag &) const
+{
+  return false;
+}
+
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range(const unsigned int,
                                             const Context *,
