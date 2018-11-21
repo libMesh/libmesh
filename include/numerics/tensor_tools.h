@@ -23,10 +23,6 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h"
-#ifdef LIBMESH_HAVE_METAPHYSICL
-#include "metaphysicl/dualnumber.h"
-#include "metaphysicl/dynamicsparsenumberbase.h"
-#endif
 
 namespace libMesh
 {
@@ -71,18 +67,12 @@ inner_product(const TypeNTensor<N,T> & a, const TypeNTensor<N,T2> & b)
 
 template<typename T>
 inline
-T norm_sq(T a) { return a*a; }
+T norm_sq(std::complex<T> a) { return std::norm(a); }
 
 template<typename T>
 inline
-T norm_sq(std::complex<T> a) { return std::norm(a); }
-
-#ifdef LIBMESH_HAVE_METAPHYSICL
-template<typename T, typename D>
-inline
-auto norm_sq(const MetaPhysicL::DualNumber<T, D> & a) -> decltype(std::norm(a))
+auto norm_sq(const T & a) -> decltype(std::norm(a))
 { return std::norm(a); }
-#endif
 
 template <typename T>
 inline
