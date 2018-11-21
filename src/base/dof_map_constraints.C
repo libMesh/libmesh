@@ -3642,7 +3642,6 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       pushed_keys_vals_to_me[pid] = data;
     };
 
-  // Trade pushed dof constraint rows
   Parallel::push_parallel_vector_data
     (this->comm(), pushed_ids_rhss, ids_rhss_action_functor);
   Parallel::push_parallel_vector_data
