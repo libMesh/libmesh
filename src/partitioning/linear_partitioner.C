@@ -30,8 +30,10 @@ void LinearPartitioner::partition_range(MeshBase & mesh,
                                         MeshBase::element_iterator end,
                                         const unsigned int n)
 {
+  const bool mesh_is_serial = mesh.is_serial();
+
   // Check for easy returns
-  if (it == end)
+  if (it == end && mesh_is_serial)
     return;
 
   if (n == 1)
@@ -44,8 +46,6 @@ void LinearPartitioner::partition_range(MeshBase & mesh,
 
   // Create a simple linear partitioning
   LOG_SCOPE ("partition_range()", "LinearPartitioner");
-
-  const bool mesh_is_serial = mesh.is_serial();
 
   // This has to be an ordered set
   std::set<dof_id_type> element_ids;
