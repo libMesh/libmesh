@@ -1420,7 +1420,7 @@ inline void Communicator::allgather(const std::basic_string<T> & sendval,
   libmesh_call_mpi
     (MPI_Allgatherv (const_cast<T*>(mysize ? sendval.data() : nullptr),
                      mysize, StandardType<T>(),
-                     r.data(), sendlengths.data(), displacements.data(),
+                     &r[0], sendlengths.data(), displacements.data(),
                      StandardType<T>(), this->get()));
 
   // slice receive buffer up
@@ -2727,7 +2727,7 @@ inline void Communicator::gather(const unsigned int root_id,
       libmesh_call_mpi
         (MPI_Gatherv (const_cast<T*>(sendval.data()),
                       mysize, StandardType<T>(),
-                      this->rank() == root_id ? r.data() : nullptr,
+                      this->rank() == root_id ? &r[0] : nullptr,
                       sendlengths.data(), displacements.data(),
                       StandardType<T>(), root_id, this->get()));
 
