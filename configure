@@ -33782,8 +33782,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
 else
-
-                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+                                     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
 $as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
 
 fi
@@ -33791,6 +33790,78 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
                                           enablempi=no
 
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPICH
+                     #error "MPICH is undefined"
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is defined.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not defined.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext,
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPICH_NAME == 3
+                     #error "MPICH-version is 3."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not version 3.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is version 3.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPI_T_ERR_INVALID
+                     #error "this variable belongs to MPI 3.1 and should be supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is supported.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is not supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is not supported.\"" >&2;}
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -34658,8 +34729,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
 else
-
-                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+                                     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
 $as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
 
 fi
@@ -34667,6 +34737,78 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
                                           enablempi=no
 
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPICH
+                     #error "MPICH is undefined"
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is defined.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not defined.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext,
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPICH_NAME == 3
+                     #error "MPICH-version is 3."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not version 3.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is version 3.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPI_T_ERR_INVALID
+                     #error "this variable belongs to MPI 3.1 and should be supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is supported.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is not supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is not supported.\"" >&2;}
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -35348,8 +35490,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
 else
-
-                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+                                     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
 $as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
 
 fi
@@ -35357,6 +35498,78 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
                                           enablempi=no
 
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPICH
+                     #error "MPICH is undefined"
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is defined.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not defined.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext,
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPICH_NAME == 3
+                     #error "MPICH-version is 3."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not version 3.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is version 3.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPI_T_ERR_INVALID
+                     #error "this variable belongs to MPI 3.1 and should be supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is supported.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is not supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is not supported.\"" >&2;}
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -36037,8 +36250,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
 else
-
-                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+                                     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
 $as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
 
 fi
@@ -36046,6 +36258,78 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
                                           enablempi=no
 
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPICH
+                     #error "MPICH is undefined"
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is defined.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not defined.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext,
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPICH_NAME == 3
+                     #error "MPICH-version is 3."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not version 3.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is version 3.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPI_T_ERR_INVALID
+                     #error "this variable belongs to MPI 3.1 and should be supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is supported.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is not supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is not supported.\"" >&2;}
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -36293,8 +36577,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
 else
-
-                                  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
+                                     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&5
 $as_echo "$as_me: WARNING: \"ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now...\"" >&2;}
 
 fi
@@ -36302,6 +36585,78 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
                                           enablempi=no
 
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPICH
+                     #error "MPICH is undefined"
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is defined.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not defined.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not defined.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext,
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #if MPICH_NAME == 3
+                     #error "MPICH-version is 3."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is not version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is not version 3.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPICH is version 3.\"" >&5
+$as_echo "$as_me: WARNING: \"MPICH is version 3.\"" >&2;}
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                     #ifndef MPI_T_ERR_INVALID
+                     #error "this variable belongs to MPI 3.1 and should be supported."
+                     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is supported.\"" >&2;}
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI 3 is not supported.\"" >&5
+$as_echo "$as_me: WARNING: \"MPI 3 is not supported.\"" >&2;}
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext

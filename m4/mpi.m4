@@ -238,7 +238,7 @@ AC_DEFUN([VERSION_MPI], [
                      @%:@error "MPI-version 1.X is not supported."
                      @%:@endif
                     ],
-                    [ dnl true: Check which version it is:
+                    [ dnl true (MPI_VERSION >= 2): Check which version it is:
                      AC_TRY_LINK([@%:@include <mpi.h>],
                                   [@%:@if MPI_VERSION > 4
                                   @%:@error "MPI-version too high. There is some error."
@@ -288,12 +288,37 @@ AC_DEFUN([VERSION_MPI], [
                                               AC_MSG_WARN(["ERROR: The MPI_VERSION-string has a weird value. Please check your library. Disable MPI now..."])
                                              ])
                                  ],
-                                 [
+                                 [ dnl MPI_VERSION is 0.
                                   AC_MSG_WARN(["ERROR: MPI_VERSION is not defined: You seem to have MPI< 1.5 but need MPI 2.X or compatible. Disable MPI now..."])
                                  ])
                      dnl in any case, we need to disable MPI now.
                      enablempi=no
                     ])
+        dnl this is just for understanding the Civet-problem:
+        AC_TRY_LINK([@%:@include <mpi.h>],
+                    [
+                     @%:@ifndef MPICH
+                     @%:@error "MPICH is undefined"
+                     @%:@endif
+                     ],
+                     [AC_MSG_WARN(["MPICH is defined."])],
+                     [AC_MSG_WARN(["MPICH is not defined."])]),
+        AC_TRY_LINK([@%:@include <mpi.h>],
+                    [
+                     @%:@if MPICH_NAME == 3
+                     @%:@error "MPICH-version is 3."
+                     @%:@endif
+                     ],
+                     [AC_MSG_WARN(["MPICH is not version 3."])],
+                     [AC_MSG_WARN(["MPICH is version 3."])])
+        AC_TRY_LINK([@%:@include <mpi.h>],
+                    [
+                     @%:@ifndef MPI_T_ERR_INVALID
+                     @%:@error "this variable belongs to MPI 3.1 and should be supported."
+                     @%:@endif
+                     ],
+                     [AC_MSG_WARN(["MPI 3 is supported."])],
+                     [AC_MSG_WARN(["MPI 3 is not supported."])])
         AC_LANG_RESTORE
   ])
 ])
