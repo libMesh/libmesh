@@ -564,13 +564,21 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
         continue;
 
       const processor_id_type proc_id = elem->processor_id();
-      if (proc_id == comm.rank() ||
-          proc_id == DofObject::invalid_processor_id)
+
+      bool i_have_elem =
+        (proc_id == comm.rank() ||
+         proc_id == DofObject::invalid_processor_id);
+
+      if (elem->active() && i_have_elem)
         continue;
 
       for (auto n : elem->node_index_range())
         {
           if (!node_check(elem, n))
+            continue;
+
+          if (i_have_elem &&
+              elem->node_ref(n).processor_id() == comm.rank())
             continue;
 
           ghost_objects_from_proc[proc_id]++;
@@ -604,8 +612,12 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
         continue;
 
       const processor_id_type proc_id = elem->processor_id();
-      if (proc_id == comm.rank() ||
-          proc_id == DofObject::invalid_processor_id)
+
+      bool i_have_elem =
+        (proc_id == comm.rank() ||
+         proc_id == DofObject::invalid_processor_id);
+
+      if (elem->active() && i_have_elem)
         continue;
 
       const dof_id_type elem_id = elem->id();
@@ -616,13 +628,29 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
             continue;
 
           const Node & node = elem->node_ref(n);
+          const processor_id_type node_pid = node.processor_id();
+
+          if (i_have_elem && (node_pid == comm.rank()))
+            continue;
+
           const dof_id_type node_id = node.id();
 
-          requested_objs_elem_id_node_num[proc_id].push_back
-            (std::make_pair
-             (elem_id,
-              cast_int<unsigned char>(n)));
-          requested_objs_id[proc_id].push_back(node_id);
+          if (i_have_elem)
+            {
+              requested_objs_elem_id_node_num[node_pid].push_back
+                (std::make_pair
+                 (elem_id,
+                  cast_int<unsigned char>(n)));
+              requested_objs_id[node_pid].push_back(node_id);
+            }
+          else
+            {
+              requested_objs_elem_id_node_num[proc_id].push_back
+                (std::make_pair
+                 (elem_id,
+                  cast_int<unsigned char>(n)));
+              requested_objs_id[proc_id].push_back(node_id);
+            }
         }
     }
 
@@ -637,18 +665,26 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
       std::vector<dof_id_type> query_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
         {
-          const Elem & elem = mesh.elem_ref(elem_id_node_num[i].first);
+          // We might now get queries about remote elements, in which
+          // case we'll have to ignore them and wait for the query
+          // answer to filter to the querier via another source.
+          const Elem * elem = mesh.query_elem_ptr(elem_id_node_num[i].first);
 
-          const unsigned int n = elem_id_node_num[i].second;
-          libmesh_assert_less (n, elem.n_nodes());
+          if (elem)
+            {
+              const unsigned int n = elem_id_node_num[i].second;
+              libmesh_assert_less (n, elem->n_nodes());
 
-          const Node & node = elem.node_ref(n);
+              const Node & node = elem->node_ref(n);
 
-          // This isn't a safe assertion in the case where we're
-          // syncing processor ids
-          // libmesh_assert_equal_to (node->processor_id(), comm.rank());
+              // This isn't a safe assertion in the case where we're
+              // syncing processor ids
+              // libmesh_assert_equal_to (node->processor_id(), comm.rank());
 
-          query_id[i] = node.id();
+              query_id[i] = node.id();
+            }
+          else
+            query_id[i] = DofObject::invalid_id;
         }
 
       // Gather whatever data the user wants

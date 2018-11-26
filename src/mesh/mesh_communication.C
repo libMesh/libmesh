@@ -1299,9 +1299,9 @@ struct SyncNodeIds
     for (std::size_t i = 0; i != ids.size(); ++i)
       {
         const dof_id_type id = ids[i];
-        const Node * node = mesh.node_ptr(id);
-        if (node->processor_id() == mesh.processor_id() ||
-            definitive_ids.count(id))
+        const Node * node = mesh.query_node_ptr(id);
+        if (node && (node->processor_id() == mesh.processor_id() ||
+                     definitive_ids.count(id)))
           ids_out[i] = id;
       }
   }
@@ -1558,11 +1558,15 @@ struct SyncProcIds
     for (std::size_t i=0; i != ids.size(); ++i)
       {
         // Look for this point in the mesh
-        // We'd better find every node we're asked for
-        Node & node = mesh.node_ref(ids[i]);
+        if (ids[i] != DofObject::invalid_id)
+          {
+            Node & node = mesh.node_ref(ids[i]);
 
-        // Return the node's correct processor id,
-        data[i] = node.processor_id();
+            // Return the node's correct processor id,
+            data[i] = node.processor_id();
+          }
+        else
+          data[i] = DofObject::invalid_processor_id;
       }
   }
 
