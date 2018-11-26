@@ -361,6 +361,10 @@ LIBMESH_TEST_CXX11_IOTA
 AS_IF([test "x$have_cxx11_iota" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 support for std::iota])])
 
+LIBMESH_TEST_CXX11_VECTOR_DATA
+AS_IF([test "x$have_cxx11_vector_data" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::vector::data()])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
