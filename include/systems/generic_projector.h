@@ -739,7 +739,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             {
               LOG_SCOPE ("copy_dofs", "GenericProjector");
 
-              f.eval_old_dofs(context, var_component, Ue.get_values());
+              f.eval_old_dofs(context, var, Ue.get_values());
 
               action.insert(context, var, Ue);
 
