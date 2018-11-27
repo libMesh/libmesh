@@ -406,8 +406,9 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
       pack_element (xfer_conn, elem);
 #ifdef LIBMESH_ENABLE_AMR
       parent_id_map[elem->id()] = std::make_pair(this->processor_id(),
-                                                 my_next_elem++);
+                                                 my_next_elem);
 #endif
+      ++my_next_elem;
     }
   xfer_conn.push_back(my_next_elem); // toss in the number of elements transferred.
 
