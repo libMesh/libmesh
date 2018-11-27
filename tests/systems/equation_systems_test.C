@@ -57,7 +57,9 @@ public:
   CPPUNIT_TEST( testReinitWithNodeElem );
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
+#ifdef LIBMESH_ENABLE_AMR // needs project_solution, even for reordering
   CPPUNIT_TEST( testRepartitionThenReinit );
+#endif
 #endif
   CPPUNIT_TEST( testDisableDefaultGhosting );
 
