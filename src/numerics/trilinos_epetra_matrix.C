@@ -97,14 +97,14 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sp
   if (m==0)
     return;
 
-  _graph = new Epetra_CrsGraph(Copy, *_map, &n_nz_tot[0]);
+  _graph = new Epetra_CrsGraph(Copy, *_map, n_nz_tot.data());
 
   // Tell the matrix about its structure.  Initialize it
   // to zero.
   for (numeric_index_type i=0; i<n_rows; i++)
     _graph->InsertGlobalIndices(_graph->GRID(i),
                                 cast_int<numeric_index_type>(sparsity_pattern[i].size()),
-                                const_cast<int *>((const int *)&sparsity_pattern[i][0]));
+                                const_cast<int *>(sparsity_pattern[i].data()));
 
   _graph->FillComplete();
 
@@ -252,9 +252,9 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
   libmesh_assert_equal_to (rows.size(), m);
   libmesh_assert_equal_to (cols.size(), n);
 
-  _mat->SumIntoGlobalValues(m, numeric_trilinos_cast(&rows[0]),
-                            n, numeric_trilinos_cast(&cols[0]),
-                            &dm.get_values()[0]);
+  _mat->SumIntoGlobalValues(m, numeric_trilinos_cast(rows.data()),
+                            n, numeric_trilinos_cast(cols.data()),
+                            dm.get_values().data());
 }
 
 

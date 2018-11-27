@@ -655,7 +655,7 @@ ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & pars
                                              unsigned int libmesh_dbg_var(component_idx)) const
 {
 #ifndef NDEBUG
-  Output result = parser.Eval(&_spacetime[0]);
+  Output result = parser.Eval(_spacetime.data());
   int error_code = parser.EvalError();
   if (error_code)
     {
@@ -697,7 +697,7 @@ ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & pars
 
   return result;
 #else
-  return parser.Eval(&_spacetime[0]);
+  return parser.Eval(_spacetime.data());
 #endif
 }
 

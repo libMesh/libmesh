@@ -1990,7 +1990,7 @@ void DofMap::dof_indices (const Elem * const elem,
                 for (unsigned int vig=0; vig != vars_in_group; ++vig)
                   {
                     _dof_indices(*elem, elem->p_level(), di, vg, vig,
-                                 &elem_nodes[0],
+                                 elem_nodes.data(),
                                  cast_int<unsigned int>(elem_nodes.size())
 #ifdef DEBUG
                                  , var.number(vig), tot_size
@@ -2080,7 +2080,7 @@ void DofMap::dof_indices (const Elem * const elem,
           std::vector<const Node *> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
-          _dof_indices(*elem, p_level, di, vg, vig, &elem_nodes[0],
+          _dof_indices(*elem, p_level, di, vg, vig, elem_nodes.data(),
                        cast_int<unsigned int>(elem_nodes.size())
 #ifdef DEBUG
                        , vn, tot_size
@@ -2474,7 +2474,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
       // Subdivision surface FE require the 1-ring around elem
       const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *>(elem);
       MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
-      nodes_ptr = &elem_nodes[0];
+      nodes_ptr = elem_nodes.data();
       n_nodes = cast_int<unsigned int>(elem_nodes.size());
     }
   else

@@ -3,6 +3,34 @@ dnl Tests for various C++11 features.  These will probably only work
 dnl if they are run after the autoconf test that sets -std=c++11.
 dnl ----------------------------------------------------------------
 
+dnl Test C++11 std::vector::data()
+AC_DEFUN([LIBMESH_TEST_CXX11_VECTOR_DATA],
+  [
+    have_cxx11_vector_data=no
+
+    AC_MSG_CHECKING(for C++11 std::vector::data() API)
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <vector>
+    ]], [[
+    std::vector<int> v(10);
+    int * begin = v.data();
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx11_vector_data=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+  ])
+
 dnl Test C++11 std::iota
 AC_DEFUN([LIBMESH_TEST_CXX11_IOTA],
   [

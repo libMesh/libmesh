@@ -492,7 +492,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
                   output_buffer.push_back(*recv_conn_iter);
 
                 io.data_stream
-                  (&output_buffer[0],
+                  (output_buffer.data(),
                    cast_int<unsigned int>(output_buffer.size()),
                    cast_int<unsigned int>(output_buffer.size()));
               }
@@ -623,7 +623,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
                       output_buffer.push_back(*recv_conn_iter);
 
                     io.data_stream
-                      (&output_buffer[0],
+                      (output_buffer.data(),
                        cast_int<unsigned int>(output_buffer.size()),
                        cast_int<unsigned int>(output_buffer.size()));
                   }
@@ -850,7 +850,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
                 n_written++;
               }
 
-          io.data_stream (coords.empty() ? nullptr : &coords[0],
+          io.data_stream (coords.empty() ? nullptr : coords.data(),
                           cast_int<unsigned int>(coords.size()), 3);
         }
     }
@@ -976,7 +976,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
                 n_written++;
               }
 
-          io.data_stream (unique_ids.empty() ? nullptr : &unique_ids[0],
+          io.data_stream (unique_ids.empty() ? nullptr : unique_ids.data(),
                           cast_int<unsigned int>(unique_ids.size()), 1);
         }
     }
@@ -1099,7 +1099,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
           for (std::size_t idx=0; idx<recv_bcs.size(); idx += 3, n_bcs_out++)
             recv_bcs[idx+0] += elem_offset;
 
-          io.data_stream (recv_bcs.empty() ? nullptr : &recv_bcs[0],
+          io.data_stream (recv_bcs.empty() ? nullptr : recv_bcs.data(),
                           cast_int<unsigned int>(recv_bcs.size()), 3);
           elem_offset += my_n_local_level_0_elem;
         }
@@ -1194,7 +1194,7 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const new_header_id_type n_node
           for (std::size_t idx=0; idx<recv_bcs.size(); idx += 2, n_nodesets_out++)
             recv_bcs[idx+0] += node_offset;
 
-          io.data_stream (recv_bcs.empty() ? nullptr : &recv_bcs[0],
+          io.data_stream (recv_bcs.empty() ? nullptr : recv_bcs.data(),
                           cast_int<unsigned int>(recv_bcs.size()), 2);
           node_offset += my_n_node;
         }
@@ -1733,7 +1733,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
       coords.resize(3*(last_node - first_node));
 
       if (this->processor_id() == 0)
-        io.data_stream (coords.empty() ? nullptr : &coords[0],
+        io.data_stream (coords.empty() ? nullptr : coords.data(),
                         cast_int<unsigned int>(coords.size()));
 
       // For large numbers of processors the majority of processors at any given
@@ -1798,10 +1798,10 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
           if (this->processor_id() == 0)
             {
               if (_field_width == 8)
-                io.data_stream (unique_64.empty() ? nullptr : &unique_64[0],
+                io.data_stream (unique_64.empty() ? nullptr : unique_64.data(),
                                 cast_int<unsigned int>(unique_64.size()));
               else
-                io.data_stream (unique_32.empty() ? nullptr : &unique_32[0],
+                io.data_stream (unique_32.empty() ? nullptr : unique_32.data(),
                                 cast_int<unsigned int>(unique_32.size()));
             }
 
@@ -1877,7 +1877,7 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
       input_buffer.resize (3*(last_bc - first_bc));
 
       if (this->processor_id() == 0)
-        io.data_stream (input_buffer.empty() ? nullptr : &input_buffer[0],
+        io.data_stream (input_buffer.empty() ? nullptr : input_buffer.data(),
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
@@ -2011,7 +2011,7 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       input_buffer.resize (2*(last_bc - first_bc));
 
       if (this->processor_id() == 0)
-        io.data_stream (input_buffer.empty() ? nullptr : &input_buffer[0],
+        io.data_stream (input_buffer.empty() ? nullptr : input_buffer.data(),
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);

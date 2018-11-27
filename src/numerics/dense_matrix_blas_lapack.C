@@ -167,7 +167,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T> & other,
   std::vector<T> result (result_size);
 
   // Finally ready to call the BLAS
-  BLASgemm_(transa, transb, &M, &N, &K, &alpha, &(A->_val[0]), &LDA, &(B->_val[0]), &LDB, &beta, &result[0], &LDC);
+  BLASgemm_(transa, transb, &M, &N, &K, &alpha, A->get_values().data(), &LDA, B->get_values().data(), &LDB, &beta, result.data(), &LDC);
 
   // Update the relevant dimension for this matrix.
   switch (flag)
@@ -227,7 +227,6 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   //   On entry, the M-by-N matrix to be factored.
   //   On exit, the factors L and U from the factorization
   //   A = P*L*U; the unit diagonal elements of L are not stored.
-  // Here, we pass &(_val[0]).
 
   // LDA (input)
   //     The leading dimension of the array A.  LDA >= max(1,M).
@@ -236,7 +235,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   // ipiv (output) integer array, dimension (min(m,n))
   //      The pivot indices; for 1 <= i <= min(m,n), row i of the
   //      matrix was interchanged with row IPIV(i).
-  // Here, we pass &(_pivots[0]), a private class member used to store pivots
+  // Here, we pass _pivots.data(), a private class member used to store pivots
   this->_pivots.resize( std::min(M,N) );
 
   // info (output)
@@ -249,7 +248,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   PetscBLASInt INFO = 0;
 
   // Ready to call the actual factorization routine through PETSc's interface
-  LAPACKgetrf_(&M, &N, &(this->_val[0]), &LDA, &(_pivots[0]), &INFO);
+  LAPACKgetrf_(&M, &N, this->_val.data(), &LDA, _pivots.data(), &INFO);
 
   // Check return value for errors
   if (INFO != 0)
@@ -410,7 +409,6 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   //                   rows of V**T (the right singular vectors,
   //                   stored rowwise);
   //   if JOBU != 'O' and JOBVT != 'O', the contents of A are destroyed.
-  // Here, we pass &(_val[0]).
 
   // LDA (input)
   //     The leading dimension of the array A.  LDA >= max(1,M).
@@ -485,8 +483,8 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   // Ready to call the actual factorization routine through PETSc's interface.
 #ifdef LIBMESH_USE_REAL_NUMBERS
   // Note that the call to LAPACKgesvd_ may modify _val
-  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(_val[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
-               &LDU, &(VT_val[0]), &LDVT, &(WORK[0]), &LWORK, &INFO);
+  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, _val.data(), &LDA, sigma_val.data(), U_val.data(),
+               &LDU, VT_val.data(), &LDVT, WORK.data(), &LWORK, &INFO);
 #else
   // When we have LIBMESH_USE_COMPLEX_NUMBERS then we must pass an array of Complex
   // numbers to LAPACKgesvd_, but _val may contain Reals so we copy to Number below to
@@ -496,8 +494,8 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
     val_copy[i] = _val[i];
 
   std::vector<Real> RWORK(5 * min_MN);
-  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(val_copy[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
-               &LDU, &(VT_val[0]), &LDVT, &(WORK[0]), &LWORK, &(RWORK[0]), &INFO);
+  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, val_copy.data(), &LDA, sigma_val.data(), U_val.data(),
+               &LDU, VT_val.data(), &LDVT, WORK.data(), &LWORK, RWORK.data(), &INFO);
 #endif
 
   // Check return value for errors
@@ -651,7 +649,7 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   //              PetscScalar *,        // WORK
   //              const PetscBLASInt *, // LWORK
   //              PetscBLASInt *);      // INFO
-  LAPACKgelss_(&M, &N, &NRHS, &A_trans_vals[0], &LDA, &B[0], &LDB, &S[0], &RCOND, &RANK, &WORK[0], &LWORK, &INFO);
+  LAPACKgelss_(&M, &N, &NRHS, A_trans_vals.data(), &LDA, B.data(), &LDB, S.data(), &RCOND, &RANK, WORK.data(), &LWORK, &INFO);
 
   // Check for errors in the Lapack call
   if (INFO < 0)
@@ -759,7 +757,6 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   // A (input/output) DOUBLE PRECISION array, dimension (LDA,N)
   //   On entry, the N-by-N matrix A.
   //   On exit, A has been overwritten.
-  // Here, we pass &(_val[0]).
 
   // LDA (input)
   //     The leading dimension of the array A.  LDA >= max(1,N).
@@ -842,29 +839,29 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   if (VR)
     {
       VR->resize(N, N);
-      VR_ptr = &(VR->get_values()[0]);
+      VR_ptr = VR->get_values().data();
     }
 
   T * VL_ptr = nullptr;
   if (VL)
     {
       VL->resize(N, N);
-      VL_ptr = &(VL->get_values()[0]);
+      VL_ptr = VL->get_values().data();
     }
 
   // Ready to call the Lapack routine through PETSc's interface
   LAPACKgeev_(&JOBVL,
               &JOBVR,
               &N,
-              &(_val[0]),
+              _val.data(),
               &LDA,
-              &lambda_real_val[0],
-              &lambda_imag_val[0],
+              lambda_real_val.data(),
+              lambda_imag_val.data(),
               VL_ptr,
               &LDVL,
               VR_ptr,
               &LDVR,
-              &WORK[0],
+              WORK.data(),
               &LWORK,
               &INFO);
 
@@ -935,7 +932,6 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
   // A (input) double precision array, dimension (LDA,N)
   //   The factors L and U from the factorization A = P*L*U
   //   as computed by dgetrf.
-  // Here, we pass &(_val[0])
 
   // LDA (input)
   //     The leading dimension of the array A.  LDA >= max(1,N).
@@ -944,7 +940,7 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
   // ipiv (input) int array, dimension (N)
   //      The pivot indices from DGETRF; for 1<=i<=N, row i of the
   //      matrix was interchanged with row IPIV(i).
-  // Here, we pass &(_pivots[0]) which was computed in _lu_decompose_lapack
+  // Here, we pass _pivots.data() which was computed in _lu_decompose_lapack
 
   // B (input/output) double precision array, dimension (LDB,NRHS)
   //   On entry, the right hand side matrix B.
@@ -969,7 +965,7 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
   PetscBLASInt INFO = 0;
 
   // Finally, ready to call the Lapack getrs function
-  LAPACKgetrs_(TRANS, &N, &NRHS, &(_val[0]), &LDA, &(_pivots[0]), &(x_vec[0]), &LDB, &INFO);
+  LAPACKgetrs_(TRANS, &N, &NRHS, _val.data(), &LDA, _pivots.data(), x_vec.data(), &LDB, &INFO);
 
   // Check return value for errors
   if (INFO != 0)
@@ -1104,7 +1100,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
   PetscBLASInt INCY = 1;
 
   // Finally, ready to call the BLAS function
-  BLASgemv_(TRANS, &M, &N, &alpha, &(a[0]), &LDA, &(x[0]), &INCX, &beta, &(y[0]), &INCY);
+  BLASgemv_(TRANS, &M, &N, &alpha, a.data(), &LDA, x.data(), &INCX, &beta, y.data(), &INCY);
 }
 
 

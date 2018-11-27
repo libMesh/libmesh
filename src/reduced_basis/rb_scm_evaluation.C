@@ -238,7 +238,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   // in order to set the coefficients of the objective function
   reload_current_parameters();
 
-  glp_load_matrix(lp, matrix_size, &ia[0], &ja[0], &ar[0]);
+  glp_load_matrix(lp, matrix_size, ia.data(), ja.data(), ar.data());
 
   for (unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
     {

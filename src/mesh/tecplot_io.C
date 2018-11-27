@@ -595,9 +595,9 @@ void TecplotIO::write_binary (const std::string & fname,
                           &tot_num_face_nodes,
                           &num_connect_boundary_faces,
                           &tot_num_boundary_connect,
-                          &passive_var_list[0],
+                          passive_var_list.data(),
                           nullptr, // = all are node centered
-                          (firstzone) ? nullptr : &share_var_from_zone[0],
+                          (firstzone) ? nullptr : share_var_from_zone.data(),
                           &share_connect_from_zone);
 
         if (ierr)
@@ -615,7 +615,7 @@ void TecplotIO::write_binary (const std::string & fname,
 
 
             ierr = TECDAT112 (&total,
-                              &tm.nodalData[0],
+                              tm.nodalData.data(),
                               &is_double);
 
             if (ierr)
@@ -623,7 +623,7 @@ void TecplotIO::write_binary (const std::string & fname,
           }
 
         // Write the connectivity
-        ierr = TECNOD112 (&tm.connData[0]);
+        ierr = TECNOD112 (tm.connData.data());
 
         if (ierr)
           libmesh_file_error(fname);
@@ -796,13 +796,13 @@ void TecplotIO::write_binary (const std::string & fname,
 
 
     ierr = TECDAT (&total,
-                   &tm.nodalData[0],
+                   tm.nodalData.data(),
                    &is_double);
 
     if (ierr)
       libmesh_file_error(fname);
 
-    ierr = TECNOD (&tm.connData[0]);
+    ierr = TECNOD (tm.connData.data());
 
     if (ierr)
       libmesh_file_error(fname);

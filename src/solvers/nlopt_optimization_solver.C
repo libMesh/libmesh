@@ -368,8 +368,8 @@ void NloptOptimizationSolver<T>::solve ()
           nlopt_ub[i] = this->system().get_vector("upper_bounds")(i);
         }
 
-      nlopt_set_lower_bounds(_opt, &nlopt_lb[0]);
-      nlopt_set_upper_bounds(_opt, &nlopt_ub[0]);
+      nlopt_set_lower_bounds(_opt, nlopt_lb.data());
+      nlopt_set_upper_bounds(_opt, nlopt_ub.data());
     }
 
   // If we have an equality constraints object, tell NLopt about it.
@@ -389,7 +389,7 @@ void NloptOptimizationSolver<T>::solve ()
                                        equality_constraints_tolerances.size(),
                                        __libmesh_nlopt_equality_constraints,
                                        this,
-                                       &equality_constraints_tolerances[0]);
+                                       equality_constraints_tolerances.data());
 
       if (ierr < 0)
         libmesh_error_msg("NLopt failed to add equality constraint: " << ierr);
@@ -406,7 +406,7 @@ void NloptOptimizationSolver<T>::solve ()
                                        inequality_constraints_tolerances.size(),
                                        __libmesh_nlopt_inequality_constraints,
                                        this,
-                                       &inequality_constraints_tolerances[0]);
+                                       inequality_constraints_tolerances.data());
     }
 
   // Set a relative tolerance on the optimization parameters
@@ -421,7 +421,7 @@ void NloptOptimizationSolver<T>::solve ()
   // Perform the optimization
   std::vector<Real> x(nlopt_size);
   Real min_val = 0.;
-  _result = nlopt_optimize(_opt, &x[0], &min_val);
+  _result = nlopt_optimize(_opt, x.data(), &min_val);
 
   if (_result < 0)
     libMesh::out << "NLopt failed!" << std::endl;

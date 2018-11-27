@@ -819,7 +819,7 @@ void NumericVector<T>::get(const std::vector<numeric_index_type> & index,
   if (!num)
     return;
 
-  this->get(index, &values[0]);
+  this->get(index, values.data());
 }
 
 
@@ -831,7 +831,7 @@ void NumericVector<T>::add_vector(const std::vector<T> & v,
 {
   libmesh_assert(v.size() == dof_indices.size());
   if (!v.empty())
-    this->add_vector(&v[0], dof_indices);
+    this->add_vector(v.data(), dof_indices);
 }
 
 
@@ -855,7 +855,7 @@ void NumericVector<T>::insert(const std::vector<T> & v,
 {
   libmesh_assert(v.size() == dof_indices.size());
   if (!v.empty())
-    this->insert(&v[0], dof_indices);
+    this->insert(v.data(), dof_indices);
 }
 
 

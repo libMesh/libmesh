@@ -94,12 +94,12 @@ namespace libMesh
 //     libmesh_assert_equal_to (static_cast<unsigned int>(len), 3*this->n_zones());
 
 //     idata_ (&gunit, &nb, &one);
-//     idata_ (&gunit, &ints[0], &len);
+//     idata_ (&gunit, ints.data(), &len);
 
 //     if (!gridonly)
 //       {
 // idata_ (&qunit, &nb, &one);
-// idata_ (&qunit, &ints[0], &len);
+// idata_ (&qunit, ints.data(), &len);
 //       }
 //   }
 
@@ -204,7 +204,7 @@ namespace libMesh
 //   libmesh_assert_equal_to (static_cast<unsigned int>(len),
 //   3*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
 
-//   fdata_ (&gunit, &coords[0], &len);
+//   fdata_ (&gunit, coords.data(), &len);
 // }
 //       }
 
@@ -252,7 +252,7 @@ namespace libMesh
 //   {
 //     int len = conds.size();
 
-//     fdata_ (&qunit, &conds[0], &len);
+//     fdata_ (&qunit, conds.data(), &len);
 //   }
 
 //   // Write to the solution file
@@ -261,7 +261,7 @@ namespace libMesh
 //     libmesh_assert_equal_to (static_cast<unsigned int>(len),
 //     write_vars.size()*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
 
-//     fdata_ (&qunit, &data[0], &len);
+//     fdata_ (&qunit, data.data(), &len);
 //   }
 // }
 //     }
@@ -341,7 +341,7 @@ namespace libMesh
 // ints.push_back(n_scalar);
 
 //     int len = ints.size();
-//     idata_ (&gunit, &ints[0], &len);
+//     idata_ (&gunit, ints.data(), &len);
 //   }
 
 //   // Write the nodal values.
@@ -360,7 +360,7 @@ namespace libMesh
 
 
 //     int len = coords.size();
-//     fdata_ (&gunit, &coords[0], &len);
+//     fdata_ (&gunit, coords.data(), &len);
 //   }
 
 //   // Write the connectivity
@@ -382,7 +382,7 @@ namespace libMesh
 
 //     int len = conn.size();
 //     libmesh_assert_equal_to (static_cast<unsigned int>(len), 3*n_tri);
-//     idata_ (&gunit, &conn[0], &len);
+//     idata_ (&gunit, conn.data(), &len);
 //   }
 
 
@@ -396,7 +396,7 @@ namespace libMesh
 
 //     int len = comp.size();
 //     libmesh_assert_equal_to (static_cast<unsigned int>(len), n_tri);
-//     idata_ (&gunit, &comp[0], &len);
+//     idata_ (&gunit, comp.data(), &len);
 //   }
 
 
@@ -427,7 +427,7 @@ namespace libMesh
 // int len = data.size();
 // libmesh_assert_equal_to (static_cast<unsigned int>(len),
 // n_nodes*(this->n_vars()-3));
-// fdata_ (&gunit, &data[0], &len);
+// fdata_ (&gunit, data.data(), &len);
 //       }
 
 

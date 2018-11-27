@@ -830,7 +830,7 @@ void Nemesis_IO::read (const std::string & base_filename)
         cast_int<subdomain_id_type>(nemhelper->block_ids[i]);
 
       // Create a type string (this uses the null-terminated string ctor).
-      const std::string type_str ( &(nemhelper->elem_type[0]) );
+      const std::string type_str ( nemhelper->elem_type.data() );
 
       // Set any relevant node/edge maps for this element
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str);

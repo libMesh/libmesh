@@ -521,7 +521,7 @@ bool xdr_translate(XDR * x, std::vector<T> & a)
   if (length > 0)
     {
       a.resize(length);
-      return xdr_vector(x, (char *) &a[0], length, sizeof(T),
+      return xdr_vector(x, reinterpret_cast<char *>(a.data()), length, sizeof(T),
                         xdr_translator<T>());
     }
   else
@@ -1166,7 +1166,7 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
                 io_buffer[cnt++] = double(val[i]);
 
             xdr_vector(xdrs.get(),
-                       (char *) &io_buffer[0],
+                       reinterpret_cast<char *>(io_buffer.data()),
                        len,
                        sizeof(double),
                        (xdrproc_t) xdr_double);
@@ -1286,7 +1286,7 @@ void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const
                 }
 
             xdr_vector(xdrs.get(),
-                       (char *) &io_buffer[0],
+                       reinterpret_cast<char *>(io_buffer.data()),
                        2*len,
                        sizeof(double),
                        (xdrproc_t) xdr_double);
@@ -1415,7 +1415,7 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
                 }
 
             xdr_vector(xdrs.get(),
-                       (char *) &io_buffer[0],
+                       reinterpret_cast<char *>(io_buffer.data()),
                        2*len,
                        sizeof(double),
                        (xdrproc_t) xdr_double);

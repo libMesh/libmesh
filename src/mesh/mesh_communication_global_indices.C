@@ -878,7 +878,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
               std::vector<CBigBitVec> output(3);
 
               // Call the indexToCoords function
-              Hilbert::indexToCoords(&output[0], 8*sizeof(Hilbert::inttype), 3, input);
+              Hilbert::indexToCoords(output.data(), 8*sizeof(Hilbert::inttype), 3, input);
 
               // The entries in the output racks are integers in the
               // range [0, Hilbert::inttype::max] which can be
