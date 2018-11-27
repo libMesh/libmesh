@@ -1855,13 +1855,14 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
                                    const std::vector<dof_id_type> & dof_indices_in,
                                    DenseVectorBase<Number> & Ue) const
 {
+  const unsigned int n_original_dofs = dof_indices_in.size();
+
 #ifdef LIBMESH_ENABLE_AMR
 
   // Trivial mapping
   libmesh_assert_equal_to (dof_indices_in.size(), Ue.size());
   bool has_constrained_dofs = false;
 
-  const unsigned int n_original_dofs = dof_indices_in.size();
   for (unsigned int il=0; il != n_original_dofs; ++il)
     {
       const dof_id_type ig = dof_indices_in[il];
