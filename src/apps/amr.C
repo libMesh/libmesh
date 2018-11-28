@@ -235,7 +235,7 @@ void assemble(EquationSystems & es,
               {
                 fe_face->reinit (elem, side);
 
-                for (auto gp : IntRange<std::size_t>(0, JxW_face.size()))
+                for (auto gp : index_range(JxW_face))
                   area += JxW_face[gp];
               }
         }

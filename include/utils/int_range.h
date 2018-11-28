@@ -91,6 +91,19 @@ private:
   iterator _begin, _end;
 };
 
+
+
+/**
+ * Helper function that returns an IntRange<std::size_t> representing
+ * all the indices of the passed-in vector.
+ */
+template <typename T>
+IntRange<std::size_t> index_range(const std::vector<T> & vec)
+{
+  return IntRange<std::size_t>(0, vec.size());
+}
+
+
 } // namespace libMesh
 
 #endif // LIBMESH_INT_RANGE_H
