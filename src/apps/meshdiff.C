@@ -80,7 +80,7 @@ int main(int argc, char ** argv)
     libMesh::out << "No systems found in fine or coarse solution!"
                  << std::endl;
 
-  for (auto i : IntRange<std::size_t>(0, sysnames.size()))
+  for (auto i : index_range(sysnames))
     {
       const std::string sysname = sysnames[i];
       const System & coarse_sys = coarse_es.get_system(sysname);
@@ -135,7 +135,7 @@ int main(int argc, char ** argv)
     {
       libMesh::out << "Writing diff solution " << argv[5] << std::endl;
 
-      for (auto i : IntRange<std::size_t>(0, sysnames.size()))
+      for (auto i : index_range(sysnames))
         {
           const std::string sysname = sysnames[i];
           const System & coarse_sys = coarse_es.get_system(sysname);

@@ -77,7 +77,7 @@ int main (int argc, char ** argv)
 
   mesh.read(filename);
 
-  for (std::size_t i = 0; i < all_n_procs.size(); i++)
+  for (auto i : index_range(all_n_procs))
     {
       processor_id_type n_procs = all_n_procs[i];
       libMesh::out << "splitting " << n_procs << " ways..." << std::endl;

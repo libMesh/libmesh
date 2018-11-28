@@ -19,11 +19,11 @@
 
 // Local Includes
 #include "libmesh/default_coupling.h"
-
 #include "libmesh/coupling_matrix.h"
 #include "libmesh/elem.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/int_range.h"
 
 // C++ Includes
 #include <unordered_set>
@@ -160,7 +160,7 @@ void DefaultCoupling::operator()
               active_neighbors.push_back(neigh);
 #endif
 
-              for (std::size_t a=0; a != active_neighbors.size(); ++a)
+              for (auto a : index_range(active_neighbors))
                 {
                   const Elem * neighbor = active_neighbors[a];
 
