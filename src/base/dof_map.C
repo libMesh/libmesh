@@ -41,6 +41,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/threads.h"
 #include "libmesh/mesh_subdivision_support.h"
+#include "libmesh/int_range.h"
 
 // C++ Includes
 #include <set>
@@ -424,7 +425,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         n_var_groups = this->n_variable_groups();
 
       // Copy the id changes we've now been informed of
-      for (std::size_t i=0, n_ids = ids.size(); i != n_ids; ++i)
+      for (auto i : index_range(ids))
         {
           DofObject * requested = (this->*objects)(mesh, ids[i]);
           libmesh_assert(requested);
