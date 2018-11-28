@@ -2497,8 +2497,8 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
   if (!we_have_constraints)
     return;
 
-  for (std::size_t i=0; i != elem_dofs.size(); ++i)
-    dof_set.erase (elem_dofs[i]);
+  for (const auto & dof : elem_dofs)
+    dof_set.erase (dof);
 
   // If we added any DOFS then we need to do this recursively.
   // It is possible that we just added a DOF that is also
