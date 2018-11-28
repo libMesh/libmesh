@@ -17,6 +17,7 @@
 
 #include "libmesh/hcurl_fe_transformation.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -70,20 +71,17 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
         const std::vector<Real> & detady_map = fe.get_fe_map().get_detady();
 
         // FIXME: Need to update for 2D elements in 3D space
-        /* phi = (dx/dxi)^-T * \hat{phi}
-           In 2D:
-           (dx/dxi)^{-1} = [  dxi/dx   dxi/dy
-           deta/dx  deta/dy ]
-
-           so: dxi/dx^{-T} * \hat{phi} = [ dxi/dx  deta/dx   [ \hat{phi}_xi
-           dxi/dy  deta/dy ]   \hat{phi}_eta ]
-
-           or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i */
-
-        for (unsigned int i=0,
-             n_phi = cast_int<unsigned int>(phi.size());
-             i != n_phi; i++)
-          for (std::size_t p=0; p<phi[i].size(); p++)
+        // phi = (dx/dxi)^-T * \hat{phi}
+        // In 2D:
+        // (dx/dxi)^{-1} = [  dxi/dx   dxi/dy
+        // deta/dx  deta/dy ]
+        //
+        // so: dxi/dx^{-T} * \hat{phi} = [ dxi/dx  deta/dx   [ \hat{phi}_xi
+        // dxi/dy  deta/dy ]   \hat{phi}_eta ]
+        //
+        // or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i
+        for (auto i : index_range(phi))
+          for (auto p : index_range(phi[i]))
             {
               // Need to temporarily cache reference shape functions
               // TODO: PB: Might be worth trying to build phi_ref separately to see
@@ -113,22 +111,19 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
         const std::vector<Real> & dzetady_map = fe.get_fe_map().get_dzetady();
         const std::vector<Real> & dzetadz_map = fe.get_fe_map().get_dzetadz();
 
-        /* phi = (dx/dxi)^-T * \hat{phi}
-           In 3D:
-           dx/dxi^-1 = [  dxi/dx    dxi/dy    dxi/dz
-           deta/dx   deta/dy   deta/dz
-           dzeta/dx  dzeta/dy  dzeta/dz]
-
-           so: dxi/dx^-T * \hat{phi} = [ dxi/dx  deta/dx  dzeta/dx   [ \hat{phi}_xi
-           dxi/dy  deta/dy  dzeta/dy     \hat{phi}_eta
-           dxi/dz  deta/dz  dzeta/dz ]   \hat{phi}_zeta ]
-
-           or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i */
-
-        for (unsigned int i=0,
-             n_phi = cast_int<unsigned int>(phi.size());
-             i != n_phi; i++)
-          for (std::size_t p=0; p<phi[i].size(); p++)
+        // phi = (dx/dxi)^-T * \hat{phi}
+        // In 3D:
+        // dx/dxi^-1 = [  dxi/dx    dxi/dy    dxi/dz
+        // deta/dx   deta/dy   deta/dz
+        // dzeta/dx  dzeta/dy  dzeta/dz]
+        //
+        // so: dxi/dx^-T * \hat{phi} = [ dxi/dx  deta/dx  dzeta/dx   [ \hat{phi}_xi
+        // dxi/dy  deta/dy  dzeta/dy     \hat{phi}_eta
+        // dxi/dz  deta/dz  dzeta/dz ]   \hat{phi}_zeta ]
+        //
+        // or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i
+        for (auto i : index_range(phi))
+          for (auto p : index_range(phi[i]))
             {
               // Need to temporarily cache reference shape functions
               // TODO: PB: Might be worth trying to build phi_ref separately to see
@@ -174,12 +169,11 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
         const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
 
         // FIXME: I don't think this is valid for 2D elements in 3D space
-        /* In 2D: curl(phi) = J^{-1} * curl(\hat{phi}) */
-        for (std::size_t i=0; i<curl_phi.size(); i++)
-          for (std::size_t p=0; p<curl_phi[i].size(); p++)
+        // In 2D: curl(phi) = J^{-1} * curl(\hat{phi})
+        for (auto i : index_range(curl_phi))
+          for (auto p : index_range(curl_phi[i]))
             {
               curl_phi[i][p].slice(0) = curl_phi[i][p].slice(1) = 0.0;
-
               curl_phi[i][p].slice(2) = ( dphi_dxi[i][p].slice(1) - dphi_deta[i][p].slice(0) )/J[p];
             }
 
@@ -198,8 +192,8 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
 
         const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
 
-        for (std::size_t i=0; i<curl_phi.size(); i++)
-          for (std::size_t p=0; p<curl_phi[i].size(); p++)
+        for (auto i : index_range(curl_phi))
+          for (auto p : index_range(curl_phi[i]))
             {
               Real dx_dxi   = dxyz_dxi[p](0);
               Real dx_deta  = dxyz_deta[p](0);
