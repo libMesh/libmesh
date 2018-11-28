@@ -1923,11 +1923,8 @@ BoundaryInfo::build_node_list_from_side_list()
         {
           this->boundary_ids(_mesh.node_ptr(id), bcids);
 
-          for (std::size_t i=0; i != bcids.size(); ++i)
-            {
-              const boundary_id_type b = bcids[i];
-              responses[p-1].push_back(std::make_pair(id, b));
-            }
+          for (const auto & b : bcids)
+            responses[p-1].push_back(std::make_pair(id, b));
         }
 
       this->comm().send
