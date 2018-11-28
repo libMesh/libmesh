@@ -1092,7 +1092,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
      const std::vector<dof_id_type> & data)
     {
       // Copy the id changes we've now been informed of
-      for (std::size_t i=0, ids_size = ids.size(); i != ids_size; ++i)
+      for (auto i : index_range(ids))
         {
           T * obj = objects[ids[i]];
           libmesh_assert (obj);
@@ -1138,7 +1138,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
      const std::vector<dof_id_type> & ids,
      const std::vector<unique_id_type> & data)
     {
-      for (std::size_t i=0, ids_size = ids.size(); i != ids_size; ++i)
+      for (auto i : index_range(ids))
         {
           T * obj = objects[ids[i]];
           libmesh_assert (obj);
