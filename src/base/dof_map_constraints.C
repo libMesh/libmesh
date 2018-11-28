@@ -47,6 +47,7 @@
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/int_range.h"
 
 // C++ Includes
 #include <set>
@@ -1121,10 +1122,8 @@ public:
      */
 
     // Loop over all the variables we've been requested to project
-    for (std::size_t v=0; v!=dirichlet.variables.size(); v++)
+    for (const auto & var : dirichlet.variables)
       {
-        const unsigned int var = dirichlet.variables[v];
-
         const Variable & variable = dof_map.variable(var);
 
         const FEType & fe_type = variable.type();
@@ -2386,8 +2385,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number> & C,
   if (!we_have_constraints)
     return;
 
-  for (std::size_t i=0; i != elem_dofs.size(); ++i)
-    dof_set.erase (elem_dofs[i]);
+  for (const auto & dof : elem_dofs)
+    dof_set.erase (dof);
 
   // If we added any DOFS then we need to do this recursively.
   // It is possible that we just added a DOF that is also
@@ -2859,7 +2858,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         libmesh_assert_equal_to (pushed_ids_to_me.size(),
                                  pushed_rhss_to_me.size());
 
-        for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
+        for (auto i : index_range(pushed_ids_to_me))
           {
             dof_id_type constrained = pushed_ids_to_me[i];
 
@@ -2924,7 +2923,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         libmesh_assert_equal_to (pushed_node_ids_to_me.size(),
                                  pushed_offsets_to_me.size());
 
-        for (std::size_t i = 0; i != pushed_node_ids_to_me.size(); ++i)
+        for (auto i : index_range(pushed_node_ids_to_me))
           {
             dof_id_type constrained_id = pushed_node_ids_to_me[i];
 
@@ -3580,7 +3579,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
             (ids_rhss.size(), keys_vals.size());
 
           // Add the dof constraints that I've been sent
-          for (std::size_t i = 0, size = ids_rhss.size(); i != size; ++i)
+          for (auto i : index_range(ids_rhss))
             {
               dof_id_type constrained = ids_rhss[i].first;
 
@@ -3730,7 +3729,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
            (Node**)nullptr, range_tag);
 
       // Add the node constraints that I've been sent
-      for (std::size_t i = 0, size = ids_offsets.size(); i != size; ++i)
+      for (auto i : index_range(ids_offsets))
         {
           dof_id_type constrained_id = ids_offsets[i].first;
 
@@ -3796,10 +3795,9 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       std::vector<dof_id_type> my_dof_indices;
       this->dof_indices (elem, my_dof_indices);
 
-      for (std::size_t i=0; i != my_dof_indices.size(); ++i)
+      for (const auto & dof : my_dof_indices)
         {
-          DofConstrainsMap::const_iterator dcmi =
-            dof_id_constrains.find(my_dof_indices[i]);
+          DofConstrainsMap::const_iterator dcmi = dof_id_constrains.find(dof);
           if (dcmi != dof_id_constrains.end())
             {
               for (const auto & constrained : dcmi->second)
