@@ -19,11 +19,13 @@
 
 // Local includes
 #include "libmesh/libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "libmesh/inf_fe.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -214,7 +216,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // right now, and it will generalize a bit, and it won't break
       // the assumptions elsewhere in InfFE.
       std::vector<Point> radial_pts;
-      for (std::size_t p=0; p != pts->size(); ++p)
+      for (auto p : index_range(*pts))
         {
           Real radius = (*pts)[p](Dim-1);
           //IMHO this is a dangerous check:
@@ -916,7 +918,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem *,
         const std::vector<Real> & dzetadz_map = this->_fe_map->get_dzetadz();
 
         // These are _all_ shape functions of this infinite element
-        for (std::size_t i=0; i<phi.size(); i++)
+        for (auto i : index_range(phi))
           for (unsigned int p=0; p<n_total_qp; p++)
             {
               // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
