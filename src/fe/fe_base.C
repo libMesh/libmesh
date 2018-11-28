@@ -706,8 +706,8 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
 template <typename OutputType>
 void FEGenericBase<OutputType>::print_phi(std::ostream & os) const
 {
-  for (std::size_t i=0; i<phi.size(); ++i)
-    for (std::size_t j=0; j<phi[i].size(); ++j)
+  for (auto i : index_range(phi))
+    for (auto j : index_range(phi[i]))
       os << " phi[" << i << "][" << j << "]=" << phi[i][j] << std::endl;
 }
 
@@ -717,8 +717,8 @@ void FEGenericBase<OutputType>::print_phi(std::ostream & os) const
 template <typename OutputType>
 void FEGenericBase<OutputType>::print_dphi(std::ostream & os) const
 {
-  for (std::size_t i=0; i<dphi.size(); ++i)
-    for (std::size_t j=0; j<dphi[i].size(); ++j)
+  for (auto i : index_range(dphi))
+    for (auto j : index_range(dphi[i]))
       os << " dphi[" << i << "][" << j << "]=" << dphi[i][j];
 }
 
@@ -775,8 +775,8 @@ void FEGenericBase<OutputType>::determine_calculations()
 template <typename OutputType>
 void FEGenericBase<OutputType>::print_d2phi(std::ostream & os) const
 {
-  for (std::size_t i=0; i<dphi.size(); ++i)
-    for (std::size_t j=0; j<dphi[i].size(); ++j)
+  for (auto i : index_range(dphi))
+    for (auto j : index_range(dphi[i]))
       os << " d2phi[" << i << "][" << j << "]=" << d2phi[i][j];
 }
 
@@ -1813,7 +1813,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                   // Translate the quadrature points over to the
                   // neighbor's boundary
                   std::vector<Point> neigh_point(q_point.size());
-                  for (std::size_t i=0; i != neigh_point.size(); ++i)
+                  for (auto i : index_range(neigh_point))
                     neigh_point[i] = periodic->get_corresponding_pos(q_point[i]);
 
                   FEInterface::inverse_map (Dim, base_fe_type, neigh,
