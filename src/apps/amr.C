@@ -235,8 +235,8 @@ void assemble(EquationSystems & es,
               {
                 fe_face->reinit (elem, side);
 
-                for (auto gp : index_range(JxW_face))
-                  area += JxW_face[gp];
+                for (const auto & val : JxW_face)
+                  area += val;
               }
         }
 

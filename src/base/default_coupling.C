@@ -160,10 +160,8 @@ void DefaultCoupling::operator()
               active_neighbors.push_back(neigh);
 #endif
 
-              for (auto a : index_range(active_neighbors))
+              for (const auto & neighbor : active_neighbors)
                 {
-                  const Elem * neighbor = active_neighbors[a];
-
                   if (!elements_checked.count(neighbor))
                     next_elements_to_check.insert(neighbor);
 
