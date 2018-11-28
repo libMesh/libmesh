@@ -45,7 +45,7 @@
 #include "libmesh/adjoint_refinement_estimator.h"
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
-
+#include "libmesh/utility.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -507,11 +507,9 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
               // We will have to manually do the dot products.
               Number local_contribution = 0.;
 
-              for (std::size_t j=0; j != dof_indices.size(); j++)
-                {
-                  // The contribution to the error indicator for this element from the current QoI
-                  local_contribution += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[j]);
-                }
+              // Sum the contribution to the error indicator for each element from the current QoI
+              for (const auto & dof : dof_indices)
+                local_contribution += Utility::pow<2>((*localized_projected_residual)(dof));
 
               // Multiply by the error weight for this QoI
               local_contribution *= error_weight;
