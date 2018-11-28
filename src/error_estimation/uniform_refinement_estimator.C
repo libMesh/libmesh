@@ -414,7 +414,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
               // Put the adjoint_solution into solution for
               // comparisons
-              for (std::size_t i=0; i != system_list.size(); ++i)
+              for (auto i : index_range(system_list))
                 {
                   system_list[i]->get_adjoint_solution(adjs[i]).swap(*system_list[i]->solution);
                   system_list[i]->update();
@@ -691,9 +691,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
       // Compute the square-root of each component.
       LOG_SCOPE("std::sqrt()", "UniformRefinementEstimator");
-      for (std::size_t i=0; i<error_per_cell->size(); i++)
-        if ((*error_per_cell)[i] != 0.)
-          (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
+      for (auto & val : *error_per_cell)
+        if (val != 0.)
+          val = std::sqrt(val);
     }
   else
     {
