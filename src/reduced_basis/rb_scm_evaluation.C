@@ -532,7 +532,7 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
   for (std::size_t i=0; i<C_J.size(); i++)
     for (const auto & pr : get_parameters())
       {
-        std::string param_name = pr.first;
+        const std::string & param_name = pr.first;
         Real param_value;
         C_J_in >> param_value;
         C_J[i].set_value(param_name, param_value);
