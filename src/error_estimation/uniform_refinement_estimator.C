@@ -40,6 +40,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/int_range.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -231,7 +232,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   const bool old_renumbering_setting = mesh.allow_renumbering();
   mesh.allow_renumbering(false);
 
-  for (std::size_t i=0; i != system_list.size(); ++i)
+  for (auto i : index_range(system_list))
     {
       System & system = *system_list[i];
 
@@ -300,7 +301,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       es.reinit();
     }
 
-  for (std::size_t i=0; i != system_list.size(); ++i)
+  for (auto i : index_range(system_list))
     {
       System & system = *system_list[i];
 
@@ -356,9 +357,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
                          !solution_vectors->find(system_list[0])->second);
 
 #ifdef DEBUG
-          for (std::size_t i=0; i != system_list.size(); ++i)
+          for (const auto & sys : system_list)
             {
-              System * sys = system_list[i];
               libmesh_assert (solution_vectors->find(sys) !=
                               solution_vectors->end());
               const NumericVector<Number> * vec = solution_vectors->find(sys)->second;
@@ -388,7 +388,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
               std::vector<unsigned int> adjs(system_list.size(),
                                              libMesh::invalid_uint);
               // Set up proper initial guesses
-              for (std::size_t i=0; i != system_list.size(); ++i)
+              for (auto i : index_range(system_list))
                 {
                   System * sys = system_list[i];
                   libmesh_assert (solution_vectors->find(sys) !=
@@ -407,8 +407,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
                         }
                     }
                   libmesh_assert_not_equal_to (adjs[i], libMesh::invalid_uint);
-                  system_list[i]->get_adjoint_solution(adjs[i]) =
-                    *system_list[i]->solution;
+                  sys->get_adjoint_solution(adjs[i]) = *sys->solution;
                 }
 
               es.adjoint_solve();
@@ -479,8 +478,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
     }
 
   // Get the error in the uniformly refined solution(s).
-
-  for (std::size_t sysnum=0; sysnum != system_list.size(); ++sysnum)
+  for (auto sysnum : index_range(system_list))
     {
       System & system = *system_list[sysnum];
 
@@ -714,7 +712,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
     }
 
   // Restore old solutions and clean up the heap
-  for (std::size_t i=0; i != system_list.size(); ++i)
+  for (auto i : index_range(system_list))
     {
       System & system = *system_list[i];
 
