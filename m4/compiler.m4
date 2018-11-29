@@ -225,6 +225,8 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
                 [
                   GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
                   AS_CASE("$GXX_VERSION_STRING",
+                  [*19.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 19 >>>)
+                            GXX_VERSION=intel_icc_v19.x],
                   [*18.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 18 >>>)
                             GXX_VERSION=intel_icc_v18.x],
                   [*17.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 17 >>>)
