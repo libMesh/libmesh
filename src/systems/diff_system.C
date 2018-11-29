@@ -239,23 +239,21 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
       // We need to cache the DBCs to be added so that we add them
       // after looping over the existing DBCs. Otherwise, we're polluting
       // the thing we're looping over.
-      std::vector<DirichletBoundary*> new_dbcs;
+      std::vector<DirichletBoundary *> new_dbcs;
 
-      DirichletBoundaries::const_iterator dbc_it = all_dbcs->begin();
-      for ( ; dbc_it != all_dbcs->end(); ++dbc_it )
+      for (const auto & dbc : *all_dbcs)
         {
-          libmesh_assert(*dbc_it);
-          DirichletBoundary & dbc = *(*dbc_it);
+          libmesh_assert(dbc);
 
           // Look for second order variable in the current
           // DirichletBoundary object
           std::vector<unsigned int>::const_iterator dbc_var_it =
-            std::find( dbc.variables.begin(), dbc.variables.end(), var_idx );
+            std::find( dbc->variables.begin(), dbc->variables.end(), var_idx );
 
           // If we found it, then we also need to add it's corresponding
           // "dot" variable to a DirichletBoundary
           std::vector<unsigned int> vars_to_add;
-          if (dbc_var_it != dbc.variables.end())
+          if (dbc_var_it != dbc->variables.end())
             vars_to_add.push_back(dot_var_idx);
 
           if (!vars_to_add.empty())
@@ -267,9 +265,9 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
               // "velocity" boundary condition, so we error. Otherwise,
               // the "velocity boundary condition will just be zero.
               bool is_time_evolving_bc = false;
-              if (dbc.f)
-                is_time_evolving_bc = dbc.f->is_time_dependent();
-              else if (dbc.f_fem)
+              if (dbc->f)
+                is_time_evolving_bc = dbc->f->is_time_dependent();
+              else if (dbc->f_fem)
                 // We it's a FEMFunctionBase object, it will be implicitly
                 // time-dependent since it is assumed to depend on the solution.
                 is_time_evolving_bc = true;
@@ -282,11 +280,11 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
 
               DirichletBoundary * new_dbc;
 
-              if (dbc.f)
+              if (dbc->f)
                 {
                   ZeroFunction<Number> zf;
 
-                  new_dbc = new DirichletBoundary(dbc.b, vars_to_add, zf);
+                  new_dbc = new DirichletBoundary(dbc->b, vars_to_add, zf);
                 }
               else
                 libmesh_error();
@@ -295,15 +293,11 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
             }
         }
 
-      // Now add the new DBCs for the "dot" vars to the DofMap
-      std::vector<DirichletBoundary*>::iterator new_dbc_it =
-        new_dbcs.begin();
-
-      for ( ; new_dbc_it != new_dbcs.end(); ++new_dbc_it )
+      // Let the DofMap make its own deep copy of the DirichletBC objects and delete our copy.
+      for (const auto & dbc : new_dbcs)
         {
-          const DirichletBoundary & dbc = *(*new_dbc_it);
-          this->get_dof_map().add_dirichlet_boundary(dbc);
-          delete *new_dbc_it;
+          this->get_dof_map().add_dirichlet_boundary(*dbc);
+          delete dbc;
         }
 
     } // if (all_dbcs)

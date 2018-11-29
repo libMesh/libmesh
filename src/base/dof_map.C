@@ -1742,20 +1742,15 @@ void DofMap::compute_sparsity(const MeshBase & mesh)
   _sp = this->build_sparsity(mesh);
 
   // It is possible that some \p SparseMatrix implementations want to
-  // see it.  Let them see it before we throw it away.
-  std::vector<SparseMatrix<Number> *>::const_iterator
-    pos = _matrices.begin(),
-    end = _matrices.end();
-
-  // If we need the full sparsity pattern, then we share a view of its
-  // arrays, and we pass it in to the matrices.
+  // see the sparsity pattern before we throw it away.  If so, we
+  // share a view of its arrays, and we pass it in to the matrices.
   if (need_full_sparsity_pattern)
     {
       _n_nz = &_sp->n_nz;
       _n_oz = &_sp->n_oz;
 
-      for (; pos != end; ++pos)
-        (*pos)->update_sparsity_pattern (_sp->sparsity_pattern);
+      for (const auto & mat : _matrices)
+        mat->update_sparsity_pattern (_sp->sparsity_pattern);
     }
   // If we don't need the full sparsity pattern anymore, steal the
   // arrays we do need and free the rest of the memory
@@ -2668,17 +2663,13 @@ void DofMap::find_connected_dofs (std::vector<dof_id_type> & elem_dofs) const
         // rows - we should optimize those DoFs away in the future.  [RHS]
         //libmesh_assert (!constraint_row.empty());
 
-        DofConstraintRow::const_iterator it     = constraint_row.begin();
-        DofConstraintRow::const_iterator it_end = constraint_row.end();
-
-
         // Add the DOFs this dof is constrained in terms of.
         // note that these dofs might also be constrained, so
         // we will need to call this function recursively.
-        for ( ; it != it_end; ++it)
-          if (!dof_set.count (it->first))
+        for (const auto & pr : constraint_row)
+          if (!dof_set.count (pr.first))
             {
-              dof_set.insert (it->first);
+              dof_set.insert (pr.first);
               done = false;
             }
       }
@@ -2724,12 +2715,8 @@ std::string DofMap::get_info() const
 
   // If we calculated the exact sparsity pattern, then we can report
   // exact bandwidth figures:
-  std::vector<SparseMatrix<Number> *>::const_iterator
-    pos = _matrices.begin(),
-    end = _matrices.end();
-
-  for (; pos != end; ++pos)
-    if ((*pos)->need_full_sparsity_pattern())
+  for (const auto & mat : _matrices)
+    if (mat->need_full_sparsity_pattern())
       may_equal = " = ";
 
   dof_id_type max_n_nz = 0, max_n_oz = 0;

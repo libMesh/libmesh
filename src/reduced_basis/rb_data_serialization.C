@@ -706,14 +706,11 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
         auto cj_parameters_inner =
           cj_parameters_outer.init(i, rb_scm_eval.C_J[i].n_parameters());
 
-        RBParameters::const_iterator it     = rb_scm_eval.C_J[i].begin();
-        RBParameters::const_iterator it_end = rb_scm_eval.C_J[i].end();
-
         unsigned int count = 0;
-        for ( ; it != it_end; ++it)
+        for (const auto & pr : rb_scm_eval.C_J[i])
           {
-            cj_parameters_inner[count].setName( it->first );
-            cj_parameters_inner[count].setValue( it->second );
+            cj_parameters_inner[count].setName( pr.first );
+            cj_parameters_inner[count].setValue( pr.second );
             count++;
           }
 

@@ -1050,8 +1050,7 @@ void AbaqusIO::assign_sideset_ids()
     // because the lower-dimensional elements can belong to more than
     // 1 sideset, and multiple lower-dimensional elements can hash to
     // the same value, but this is very rare.
-    typedef std::unordered_multimap<dof_id_type, std::pair<Elem *, boundary_id_type>> provide_bcs_t;
-    provide_bcs_t provide_bcs;
+    std::unordered_multimap<dof_id_type, std::pair<Elem *, boundary_id_type>> provide_bcs;
 
     // The elemset_id counter assigns a logical numbering to the
     // _elemset_ids keys.  We are going to use these ids as boundary
@@ -1108,9 +1107,7 @@ void AbaqusIO::assign_sideset_ids()
             // information for it.  Note that we have not yet called
             // find_neighbors(), so we can't use elem->neighbor(sn) in
             // this algorithm...
-            std::pair<provide_bcs_t::const_iterator,
-                      provide_bcs_t::const_iterator>
-              bounds = provide_bcs.equal_range (elem->key(sn));
+            auto bounds = provide_bcs.equal_range (elem->key(sn));
 
             // Add boundary information for each side in the range.
             for (const auto & pr : as_range(bounds))

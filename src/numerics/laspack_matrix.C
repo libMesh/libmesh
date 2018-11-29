@@ -92,8 +92,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & s
   // to zero.
   for (numeric_index_type i=0; i<n_rows; i++)
     {
-      const std::vector<numeric_index_type>::const_iterator
-        rs = _row_start[i];
+      auto rs = _row_start[i];
 
       const numeric_index_type length = _row_start[i+1] - rs;
 
@@ -271,8 +270,7 @@ void LaspackMatrix<T>::zero ()
 
   for (numeric_index_type row=0; row<n_rows; row++)
     {
-      const std::vector<numeric_index_type>::const_iterator
-        r_start = _row_start[row];
+      auto r_start = _row_start[row];
 
       const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
 
@@ -399,8 +397,7 @@ void LaspackMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 
   for (numeric_index_type row=0; row<n_rows; row++)
     {
-      const std::vector<numeric_index_type>::const_iterator
-        r_start = _row_start[row];
+      auto r_start = _row_start[row];
 
       const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
 
@@ -448,12 +445,8 @@ numeric_index_type LaspackMatrix<T>::pos (const numeric_index_type i,
   libmesh_assert_less (i+1, _row_start.size());
   libmesh_assert (_row_start.back() == _csr.end());
 
-  // note this requires the _csr to be
-  std::pair<std::vector<numeric_index_type>::const_iterator,
-            std::vector<numeric_index_type>::const_iterator> p =
-    std::equal_range (_row_start[i],
-                      _row_start[i+1],
-                      j);
+  // note this requires the _csr to be sorted
+  auto p = std::equal_range (_row_start[i], _row_start[i+1], j);
 
   // Make sure the row contains the element j
   libmesh_assert (p.first != p.second);

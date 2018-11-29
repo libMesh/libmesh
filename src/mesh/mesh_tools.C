@@ -750,21 +750,13 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
   // user in a std::vector.
   std::set<const Node *> neighbor_set;
 
-  // Iterators to iterate through the elements that include this node
-  std::vector<const Elem *>::const_iterator
-    el = nodes_to_elem_map[global_id].begin(),
-    end_el = nodes_to_elem_map[global_id].end();
-
   // Look through the elements that contain this node
   // find the local node id... then find the side that
   // node lives on in the element
   // next, look for the _other_ node on that side
   // That other node is a "nodal_neighbor"... save it
-  for (; el != end_el; ++el)
+  for (const auto & elem : nodes_to_elem_map[global_id])
     {
-      // Grab an Elem pointer to use in the subsequent loop
-      const Elem * elem = *el;
-
       // We only care about active elements...
       if (elem->active())
         {

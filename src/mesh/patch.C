@@ -37,12 +37,7 @@ namespace libMesh
 void Patch::find_face_neighbors(std::set<const Elem *> & new_neighbors)
 {
   // Loop over all the elements in the patch
-  std::set<const Elem *>::const_iterator       it  = this->begin();
-  const std::set<const Elem *>::const_iterator end_it = this->end();
-
-  for (; it != end_it; ++it)
-    {
-      const Elem * elem = *it;
+  for (const auto & elem : *this)
       for (auto neighbor : elem->neighbor_ptr_range())
         if (neighbor != nullptr)        // we have a neighbor on this side
           {
@@ -55,18 +50,13 @@ void Patch::find_face_neighbors(std::set<const Elem *> & new_neighbors)
                 neighbor->active_family_tree_by_neighbor
                   (active_neighbor_children, elem);
 
-                std::vector<const Elem *>::const_iterator
-                  child_it  = active_neighbor_children.begin();
-                const std::vector<const Elem *>::const_iterator
-                  child_end = active_neighbor_children.end();
-                for (; child_it != child_end; ++child_it)
-                  new_neighbors.insert(*child_it);
+                for (const auto & child : active_neighbor_children)
+                  new_neighbors.insert(child);
               }
             else
 #endif // #ifdef LIBMESH_ENABLE_AMR
               new_neighbors.insert (neighbor); // add active neighbors
           }
-    }
 }
 
 
@@ -88,16 +78,10 @@ void Patch::add_local_face_neighbors()
 
   this->find_face_neighbors(new_neighbors);
 
-  std::set<const Elem *>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem *>::const_iterator end_it = new_neighbors.end();
-
-  for (; it != end_it; ++it)
-    {
-      const Elem * neighbor = *it;
-      if (neighbor->processor_id() ==
-          _my_procid) // ... if the neighbor belongs to this processor
-        this->insert (neighbor);   // ... then add it to the patch
-    }
+  // if neighbor belongs to this processor then add it to the patch
+  for (const auto & neighbor : new_neighbors)
+    if (neighbor->processor_id() == _my_procid)
+      this->insert (neighbor);
 }
 
 
@@ -108,15 +92,9 @@ void Patch::add_semilocal_face_neighbors()
 
   this->find_face_neighbors(new_neighbors);
 
-  std::set<const Elem *>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem *>::const_iterator end_it = new_neighbors.end();
-
-  for (; it != end_it; ++it)
-    {
-      const Elem * neighbor = *it;
-      if (neighbor->is_semilocal(_my_procid))
-        this->insert (neighbor);
-    }
+  for (const auto & neighbor : new_neighbors)
+    if (neighbor->is_semilocal(_my_procid))
+      this->insert (neighbor);
 }
 
 
@@ -124,14 +102,10 @@ void Patch::add_semilocal_face_neighbors()
 void Patch::find_point_neighbors(std::set<const Elem *> & new_neighbors)
 {
   // Loop over all the elements in the patch
-  std::set<const Elem *>::const_iterator       it  = this->begin();
-  const std::set<const Elem *>::const_iterator end_it = this->end();
-
-  for (; it != end_it; ++it)
+  for (const auto & elem : *this)
     {
       std::set<const Elem *> elem_point_neighbors;
 
-      const Elem * elem = *it;
       elem->find_point_neighbors(elem_point_neighbors);
 
       new_neighbors.insert(elem_point_neighbors.begin(),
@@ -158,16 +132,10 @@ void Patch::add_local_point_neighbors()
 
   this->find_point_neighbors(new_neighbors);
 
-  std::set<const Elem *>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem *>::const_iterator end_it = new_neighbors.end();
-
-  for (; it != end_it; ++it)
-    {
-      const Elem * neighbor = *it;
-      if (neighbor->processor_id() ==
-          _my_procid) // ... if the neighbor belongs to this processor
-        this->insert (neighbor);   // ... then add it to the patch
-    }
+  // if neighbor belongs to this processor then add it to the patch
+  for (const auto & neighbor : new_neighbors)
+    if (neighbor->processor_id() == _my_procid)
+      this->insert (neighbor);
 }
 
 
@@ -178,15 +146,9 @@ void Patch::add_semilocal_point_neighbors()
 
   this->find_point_neighbors(new_neighbors);
 
-  std::set<const Elem *>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem *>::const_iterator end_it = new_neighbors.end();
-
-  for (; it != end_it; ++it)
-    {
-      const Elem * neighbor = *it;
-      if (neighbor->is_semilocal(_my_procid))
-        this->insert (neighbor);
-    }
+  for (const auto & neighbor : new_neighbors)
+    if (neighbor->is_semilocal(_my_procid))
+      this->insert (neighbor);
 }
 
 
@@ -240,21 +202,13 @@ void Patch::build_around_element (const Elem * e0,
   // make sure all the elements in the patch are active and local
   // if we are in debug mode
 #ifdef DEBUG
-  {
-    std::set<const Elem *>::const_iterator       it  = this->begin();
-    const std::set<const Elem *>::const_iterator end_it = this->end();
-
-    for (; it != end_it; ++it)
+    for (const auto & elem : *this)
       {
-        // Convenience.  Keep the syntax simple.
-        const Elem * elem = *it;
-
         libmesh_assert (elem->active());
         if ((patchtype == &Patch::add_local_face_neighbors ||
              patchtype == &Patch::add_local_point_neighbors))
           libmesh_assert_equal_to (elem->processor_id(), _my_procid);
       }
-  }
 #endif
 
 }

@@ -150,14 +150,11 @@ void RBSCMConstruction::process_parameters_file(const std::string & parameters_f
 
   std::map<std::string,bool> log_scaling;
   const RBParameters & mu = get_parameters();
-  RBParameters::const_iterator it     = mu.begin();
-  RBParameters::const_iterator it_end = mu.end();
   unsigned int i=0;
-  for ( ; it != it_end; ++it)
+  for (const auto & pr : mu)
     {
-      std::string param_name = it->first;
-      log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
-      i++;
+      const std::string & param_name = pr.first;
+      log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i++));
     }
 
   initialize_training_parameters(this->get_parameters_min(),
@@ -182,11 +179,9 @@ void RBSCMConstruction::print_info()
       libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
     }
   libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
-  RBParameters::const_iterator it     = get_parameters().begin();
-  RBParameters::const_iterator it_end = get_parameters().end();
-  for ( ; it != it_end; ++it)
+  for (const auto & pr : get_parameters())
     {
-      std::string param_name = it->first;
+      const std::string & param_name = pr.first;
       libMesh::out <<   "Parameter " << param_name
                    << ": Min = " << get_parameter_min(param_name)
                    << ", Max = " << get_parameter_max(param_name) << std::endl;
@@ -467,15 +462,15 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
 
   libMesh::out << std::endl << "SCM: Added mu = (";
 
-  RBParameters::const_iterator it     = get_parameters().begin();
-  RBParameters::const_iterator it_end = get_parameters().end();
-  for ( ; it != it_end; ++it)
+  bool first = true;
+  for (const auto & pr : get_parameters())
     {
-      if (it != get_parameters().begin())
+      if (!first)
         libMesh::out << ",";
-      std::string param_name = it->first;
+      const std::string & param_name = pr.first;
       RBParameters C_J_params = rb_scm_eval->C_J[rb_scm_eval->C_J.size()-1];
       libMesh::out << C_J_params.get_value(param_name);
+      first = false;
     }
   libMesh::out << ")" << std::endl;
 

@@ -312,13 +312,10 @@ Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indi
 {
   const NumericVector<T> & v = *this;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
-
   Real norm = 0;
 
-  for (; it!=it_end; ++it)
-    norm += std::abs(v(*it));
+  for (const auto & index : indices)
+    norm += std::abs(v(index));
 
   this->comm().sum(norm);
 
@@ -330,13 +327,10 @@ Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indi
 {
   const NumericVector<T> & v = *this;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
-
   Real norm = 0;
 
-  for (; it!=it_end; ++it)
-    norm += TensorTools::norm_sq(v(*it));
+  for (const auto & index : indices)
+    norm += TensorTools::norm_sq(v(index));
 
   this->comm().sum(norm);
 
@@ -348,14 +342,11 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
 {
   const NumericVector<T> & v = *this;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
-
   Real norm = 0;
 
-  for (; it!=it_end; ++it)
+  for (const auto & index : indices)
     {
-      Real value = std::abs(v(*it));
+      Real value = std::abs(v(index));
       if (value > norm)
         norm = value;
     }
