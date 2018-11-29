@@ -5575,6 +5575,10 @@ fi
 
                   GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
                   case "$GXX_VERSION_STRING" in #(
+  *19.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 19 >>>" >&5
+$as_echo "<<< C++ compiler is Intel(R) icc 19 >>>" >&6; }
+                            GXX_VERSION=intel_icc_v19.x ;; #(
   *18.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 18 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 18 >>>" >&6; }
