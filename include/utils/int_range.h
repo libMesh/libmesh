@@ -24,6 +24,7 @@
 
 // C++ Includes   -----------------------------------
 #include <map>
+#include <vector>
 
 namespace libMesh
 {
