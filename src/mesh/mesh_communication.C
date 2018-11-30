@@ -1275,8 +1275,8 @@ struct SyncNodeIds
 
   // We only know a Node id() is definitive if we own the Node or if
   // we're told it's definitive.  We keep track of the latter cases by
-  // putting ghost node definitive ids into this set.
-  typedef std::unordered_set<dof_id_type> uset_type;
+  // putting definitively id'd ghost nodes into this set.
+  typedef std::unordered_set<const Node *> uset_type;
   uset_type definitive_ids;
 
   // We should never be told two different definitive ids for the same
@@ -1299,9 +1299,9 @@ struct SyncNodeIds
     for (std::size_t i = 0; i != ids.size(); ++i)
       {
         const dof_id_type id = ids[i];
-        const Node * node = mesh.node_ptr(id);
-        if (node->processor_id() == mesh.processor_id() ||
-            definitive_ids.count(id))
+        const Node * node = mesh.query_node_ptr(id);
+        if (node && (node->processor_id() == mesh.processor_id() ||
+                     definitive_ids.count(node)))
           ids_out[i] = id;
       }
   }
@@ -1314,33 +1314,38 @@ struct SyncNodeIds
       {
         const dof_id_type new_id = new_ids[i];
 
+        const dof_id_type old_id = old_ids[i];
+
+        Node * node = mesh.query_node_ptr(old_id);
+
+        // If we can't find the node we were asking about, another
+        // processor must have already given us the definitive id
+        // for it
+        if (!node)
+          {
+            // But let's check anyway in debug mode
+#ifdef DEBUG
+            libmesh_assert
+              (definitive_renumbering.count(old_id));
+            libmesh_assert_equal_to
+              (new_id, definitive_renumbering[old_id]);
+#endif
+            continue;
+          }
+
         // If we asked for an id but there's no definitive id ready
         // for us yet, then we can't quit trying to sync yet.
         if (new_id == DofObject::invalid_id)
-          data_changed = true;
+          {
+            // But we might have gotten a definitive id from a
+            // different request
+            if (!definitive_ids.count(mesh.node_ptr(old_id)))
+              data_changed = true;
+          }
         else
           {
-            const dof_id_type old_id = old_ids[i];
-
-            Node * node = mesh.query_node_ptr(old_id);
-
-            // If we can't find the node we were asking about, another
-            // processor must have already given us the definitive id
-            // for it
-            if (!node)
-              {
-                // But let's check anyway in debug mode
-#ifdef DEBUG
-                libmesh_assert
-                  (definitive_renumbering.count(old_id));
-                libmesh_assert_equal_to
-                  (new_id, definitive_renumbering[old_id]);
-#endif
-                continue;
-              }
-
             if (node->processor_id() != mesh.processor_id())
-              definitive_ids.insert(new_id);
+              definitive_ids.insert(node);
             if (old_id != new_id)
               {
 #ifdef DEBUG
@@ -1558,11 +1563,15 @@ struct SyncProcIds
     for (std::size_t i=0; i != ids.size(); ++i)
       {
         // Look for this point in the mesh
-        // We'd better find every node we're asked for
-        Node & node = mesh.node_ref(ids[i]);
+        if (ids[i] != DofObject::invalid_id)
+          {
+            Node & node = mesh.node_ref(ids[i]);
 
-        // Return the node's correct processor id,
-        data[i] = node.processor_id();
+            // Return the node's correct processor id,
+            data[i] = node.processor_id();
+          }
+        else
+          data[i] = DofObject::invalid_processor_id;
       }
   }
 

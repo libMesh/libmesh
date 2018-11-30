@@ -564,8 +564,12 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
         continue;
 
       const processor_id_type proc_id = elem->processor_id();
-      if (proc_id == comm.rank() ||
-          proc_id == DofObject::invalid_processor_id)
+
+      bool i_have_elem =
+        (proc_id == comm.rank() ||
+         proc_id == DofObject::invalid_processor_id);
+
+      if (elem->active() && i_have_elem)
         continue;
 
       for (auto n : elem->node_index_range())
@@ -573,7 +577,25 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
           if (!node_check(elem, n))
             continue;
 
-          ghost_objects_from_proc[proc_id]++;
+          const processor_id_type node_pid =
+            elem->node_ref(n).processor_id();
+
+          if (i_have_elem && (node_pid == comm.rank()))
+            continue;
+
+          if (i_have_elem)
+            {
+              libmesh_assert_not_equal_to
+                (node_pid, DofObject::invalid_processor_id);
+              ghost_objects_from_proc[node_pid]++;
+            }
+          else
+            {
+              const processor_id_type request_pid =
+                (node_pid == DofObject::invalid_processor_id) ?
+                 proc_id : node_pid;
+              ghost_objects_from_proc[request_pid]++;
+            }
         }
     }
 
@@ -583,17 +605,12 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   std::map<processor_id_type, std::vector<std::pair<dof_id_type, unsigned char>>>
     requested_objs_elem_id_node_num;
 
-  // Keep track of current local ids for each too
-  std::map<processor_id_type, std::vector<dof_id_type>>
-    requested_objs_id;
-
   // We know how many objects live on each processor, so reserve()
   // space for each.
   for (processor_id_type p=0; p != comm.size(); ++p)
     if (p != comm.rank() && ghost_objects_from_proc[p])
       {
         requested_objs_elem_id_node_num[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
       }
 
   for (const auto & elem : as_range(range_begin, range_end))
@@ -604,8 +621,12 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
         continue;
 
       const processor_id_type proc_id = elem->processor_id();
-      if (proc_id == comm.rank() ||
-          proc_id == DofObject::invalid_processor_id)
+
+      bool i_have_elem =
+        (proc_id == comm.rank() ||
+         proc_id == DofObject::invalid_processor_id);
+
+      if (elem->active() && i_have_elem)
         continue;
 
       const dof_id_type elem_id = elem->id();
@@ -616,13 +637,30 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
             continue;
 
           const Node & node = elem->node_ref(n);
-          const dof_id_type node_id = node.id();
+          const processor_id_type node_pid = node.processor_id();
 
-          requested_objs_elem_id_node_num[proc_id].push_back
-            (std::make_pair
-             (elem_id,
-              cast_int<unsigned char>(n)));
-          requested_objs_id[proc_id].push_back(node_id);
+          if (i_have_elem && (node_pid == comm.rank()))
+            continue;
+
+          if (i_have_elem)
+            {
+              libmesh_assert_not_equal_to
+                (node_pid, DofObject::invalid_processor_id);
+              requested_objs_elem_id_node_num[node_pid].push_back
+                (std::make_pair
+                 (elem_id,
+                  cast_int<unsigned char>(n)));
+            }
+          else
+            {
+              const processor_id_type request_pid =
+                (node_pid == DofObject::invalid_processor_id) ?
+                 proc_id : node_pid;
+              requested_objs_elem_id_node_num[request_pid].push_back
+                (std::make_pair
+                 (elem_id,
+                  cast_int<unsigned char>(n)));
+            }
         }
     }
 
@@ -637,18 +675,26 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
       std::vector<dof_id_type> query_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
         {
-          const Elem & elem = mesh.elem_ref(elem_id_node_num[i].first);
+          // We might now get queries about remote elements, in which
+          // case we'll have to ignore them and wait for the query
+          // answer to filter to the querier via another source.
+          const Elem * elem = mesh.query_elem_ptr(elem_id_node_num[i].first);
 
-          const unsigned int n = elem_id_node_num[i].second;
-          libmesh_assert_less (n, elem.n_nodes());
+          if (elem)
+            {
+              const unsigned int n = elem_id_node_num[i].second;
+              libmesh_assert_less (n, elem->n_nodes());
 
-          const Node & node = elem.node_ref(n);
+              const Node & node = elem->node_ref(n);
 
-          // This isn't a safe assertion in the case where we're
-          // syncing processor ids
-          // libmesh_assert_equal_to (node->processor_id(), comm.rank());
+              // This isn't a safe assertion in the case where we're
+              // syncing processor ids
+              // libmesh_assert_equal_to (node->processor_id(), comm.rank());
 
-          query_id[i] = node.id();
+              query_id[i] = node.id();
+            }
+          else
+            query_id[i] = DofObject::invalid_id;
         }
 
       // Gather whatever data the user wants
@@ -658,16 +704,32 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   bool data_changed = false;
 
   auto action_functor =
-    [&sync, &requested_objs_id, &data_changed]
+    [&sync, &mesh, &requested_objs_elem_id_node_num, &data_changed]
     (processor_id_type pid,
      const std::vector<std::pair<dof_id_type, unsigned char>> &,
      const std::vector<typename SyncFunctor::datum> & data)
     {
+      const auto & elem_id_node_num =
+        requested_objs_elem_id_node_num[pid];
+
+      const std::size_t data_size = data.size();
+
+      libmesh_assert_equal_to(elem_id_node_num.size(), data_size);
+
+      std::vector<dof_id_type> requested_objs_id(data.size());
+
+      for (auto i : IntRange<std::size_t>(0,data_size))
+        {
+          const Elem & elem = mesh.elem_ref(elem_id_node_num[i].first);
+          const Node & node = elem.node_ref(elem_id_node_num[i].second);
+          requested_objs_id[i] = node.id();
+        }
+
       // Let the user process the results.  If any of the results
       // were different than what the user expected, then we may
       // need to sync again just in case this processor has to
       // pass on the changes to yet another processor.
-      if (sync.act_on_data(requested_objs_id[pid], data))
+      if (sync.act_on_data(requested_objs_id, data))
         data_changed = true;
     };
 
