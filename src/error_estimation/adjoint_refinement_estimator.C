@@ -509,7 +509,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
               // Sum the contribution to the error indicator for each element from the current QoI
               for (const auto & dof : dof_indices)
-                local_contribution += Utility::pow<2>((*localized_projected_residual)(dof));
+                local_contribution += (*localized_projected_residual)(dof) * (*localized_adjoint_solution)(dof);
 
               // Multiply by the error weight for this QoI
               local_contribution *= error_weight;
