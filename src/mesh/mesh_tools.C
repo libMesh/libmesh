@@ -31,6 +31,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/int_range.h"
 
 #ifdef DEBUG
 #  include "libmesh/remote_elem.h"
@@ -2150,7 +2151,7 @@ struct SyncNodeSet
     // Find whether each requested node belongs in the set
     data.resize(ids.size());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         const dof_id_type id = ids[i];
 
@@ -2169,7 +2170,7 @@ struct SyncNodeSet
     bool data_changed = false;
 
     // Add nodes we've been informed of to our own set
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         if (in_set[i])
           {
@@ -2222,7 +2223,7 @@ struct SyncProcIdsFromMap
     // Find the new processor id of each requested node
     data.resize(ids.size());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         const dof_id_type id = ids[i];
         const proc_id_map_type::const_iterator it = new_proc_ids.find(id);
@@ -2245,7 +2246,7 @@ struct SyncProcIdsFromMap
                     const std::vector<datum> proc_ids)
   {
     // Set the node processor ids we've now been informed of
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         Node & node = mesh.node_ref(ids[i]);
         node.processor_id() = proc_ids[i];

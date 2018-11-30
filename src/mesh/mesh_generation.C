@@ -52,6 +52,7 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/function_base.h"
 #include "libmesh/enum_order.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -179,7 +180,7 @@ public:
       if (_nelem[dir] != 0)
         {
           _cosines[dir].resize(_nelem[dir]+1);
-          for (std::size_t i=0; i<_cosines[dir].size(); ++i)
+          for (auto i : index_range(_cosines[dir]))
             _cosines[dir][i] = std::cos(libMesh::pi * Real(i) / _nelem[dir]);
         }
   }

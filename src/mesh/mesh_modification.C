@@ -1044,12 +1044,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
   // Now, iterate over the new elements vector, and add them each to
   // the Mesh.
-  {
-    std::vector<Elem *>::iterator el        = new_elements.begin();
-    const std::vector<Elem *>::iterator end = new_elements.end();
-    for (; el != end; ++el)
-      mesh.add_elem(*el);
-  }
+  for (auto & elem : new_elements)
+    mesh.add_elem(elem);
 
   if (mesh_has_boundary_data)
     {
@@ -1076,7 +1072,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
       libmesh_assert_equal_to (new_bndry_sides.size(), new_bndry_ids.size());
 
       // Add the new boundary info to the mesh
-      for (std::size_t s=0; s<new_bndry_elements.size(); ++s)
+      for (auto s : index_range(new_bndry_elements))
         mesh.get_boundary_info().add_side(new_bndry_elements[s],
                                           new_bndry_sides[s],
                                           new_bndry_ids[s]);
@@ -1359,7 +1355,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
     }
 
   // Finally, also add back the saved boundary information
-  for (std::size_t e=0; e<saved_boundary_elements.size(); ++e)
+  for (auto e : index_range(saved_boundary_elements))
     mesh.get_boundary_info().add_side(saved_boundary_elements[e],
                                       saved_bc_sides[e],
                                       saved_bc_ids[e]);
