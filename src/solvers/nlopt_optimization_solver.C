@@ -49,8 +49,7 @@ double __libmesh_nlopt_objective(unsigned n,
 
   // We'll use current_local_solution below, so let's ensure that it's consistent
   // with the vector x that was passed in.
-  for (auto i : IntRange<dof_id_type>(sys.solution->first_local_index(),
-                                      sys.solution->last_local_index()))
+  for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
 
   // Make sure the solution vector is parallel-consistent
@@ -127,8 +126,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
   if (sys.solution->size() != n)
     libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
 
-  for (auto i : IntRange<dof_id_type>(sys.solution->first_local_index(),
-                                      sys.solution->last_local_index()))
+  for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
   sys.solution->close();
 
@@ -208,8 +206,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
   if (sys.solution->size() != n)
     libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
 
-  for (auto i : IntRange<dof_id_type>(sys.solution->first_local_index(),
-                                      sys.solution->last_local_index())
+  for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
   sys.solution->close();
 
