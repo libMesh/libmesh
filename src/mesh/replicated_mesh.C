@@ -761,12 +761,12 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
 void ReplicatedMesh::fix_broken_node_and_element_numbering ()
 {
   // Nodes first
-  for (std::size_t n=0; n<this->_nodes.size(); n++)
+  for (auto n : index_range(_nodes))
     if (this->_nodes[n] != nullptr)
       this->_nodes[n]->set_id() = cast_int<dof_id_type>(n);
 
   // Elements next
-  for (std::size_t e=0; e<this->_elements.size(); e++)
+  for (auto e : index_range(_elements))
     if (this->_elements[e] != nullptr)
       this->_elements[e]->set_id() = cast_int<dof_id_type>(e);
 }
@@ -1007,10 +1007,10 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           }
 
           // Build up the node_to_node_map and node_to_elems_map using the sorted vectors of Points.
-          for (std::size_t i=0; i<this_sorted_bndry_nodes.size(); ++i)
+          for (const auto & pr : this_sorted_bndry_nodes)
             {
               // Current point we're working on
-              Point this_point = this_sorted_bndry_nodes[i].first;
+              Point this_point = pr.first;
 
               // FuzzyPointCompare does a fuzzy equality comparison internally to handle
               // slight differences between the list of nodes on each mesh.
@@ -1036,12 +1036,11 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
                   // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
                   dof_id_type
-                    this_node_id = this_sorted_bndry_nodes[i].second,
+                    this_node_id = pr.second,
                     other_node_id = other_iter->second;
                   node_to_node_map[this_node_id] = other_node_id;
                   other_to_this_node_map[other_node_id] = this_node_id;
                 }
-
             }
         }
       else

@@ -29,6 +29,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/gmsh_io.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -455,7 +456,7 @@ void GmshIO::read_mesh(std::istream & in)
                 max_elem_dimension_seen=1,
                 min_elem_dimension_seen=3;
 
-              for (std::size_t i=0; i<elem_dimensions_seen.size(); ++i)
+              for (auto i : index_range(elem_dimensions_seen))
                 if (elem_dimensions_seen[i])
                   {
                     // Debugging

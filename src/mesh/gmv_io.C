@@ -32,6 +32,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/int_range.h"
 
 // Wrap everything in a GMVLib namespace and
 // use extern "C" to avoid name mangling.
@@ -375,7 +376,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
         libmesh_assert_less_equal (ele.node_map.size(), elem->n_nodes());
 
         out_stream << ele.label << "\n";
-        for (std::size_t i=0; i < ele.node_map.size(); i++)
+        for (auto i : index_range(ele.node_map))
           out_stream << elem->node_id(ele.node_map[i])+1 << " ";
         out_stream << "\n";
       }
@@ -452,7 +453,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
           // than are present in the current element!
           libmesh_assert_less_equal (ele.node_map.size(), elem->n_nodes());
 
-          for (std::size_t i=0; i < ele.node_map.size(); i++)
+          for (auto i : index_range(ele.node_map))
             out_stream << elem->p_level() << " ";
         }
       out_stream << "\n\n";
@@ -673,8 +674,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                   {
                     out_stream << "line 2\n";
                     elem->connectivity(se, TECPLOT, conn);
-                    for (std::size_t i=0; i<conn.size(); i++)
-                      out_stream << conn[i] << " ";
+                    for (const auto & idx : conn)
+                      out_stream << idx << " ";
 
                     out_stream << '\n';
                   }
@@ -690,8 +691,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                         lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                     }
-                  for (std::size_t i=0; i<conn.size(); i++)
-                    out_stream << conn[i] << " ";
+                  for (const auto & idx : conn)
+                    out_stream << idx << " ";
 
                   out_stream << '\n';
                 }
@@ -718,8 +719,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       {
                         out_stream << "quad 4\n";
                         elem->connectivity(se, TECPLOT, conn);
-                        for (std::size_t i=0; i<conn.size(); i++)
-                          out_stream << conn[i] << " ";
+                        for (const auto & idx : conn)
+                          out_stream << idx << " ";
                       }
 
                     // Triangle elements
@@ -745,8 +746,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       elem->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
-                      for (std::size_t i=0; i<conn.size(); i++)
-                        out_stream << conn[i] << " ";
+                      for (const auto & idx : conn)
+                        out_stream << idx << " ";
                     }
                   else if ((elem->type() == QUAD8) ||
                            (elem->type() == QUAD9)
@@ -760,8 +761,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                         lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
-                      for (std::size_t i=0; i<conn.size(); i++)
-                        out_stream << conn[i] << " ";
+                      for (const auto & idx : conn)
+                        out_stream << idx << " ";
                     }
                   else if (elem->type() == TRI3)
                     {
@@ -799,8 +800,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       {
                         out_stream << "phex8 8\n";
                         elem->connectivity(se, TECPLOT, conn);
-                        for (std::size_t i=0; i<conn.size(); i++)
-                          out_stream << conn[i] << " ";
+                        for (const auto & idx : conn)
+                          out_stream << idx << " ";
                       }
 
                     else if (elem->type() == HEX20)
@@ -894,8 +895,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       {
                         out_stream << "phex8 8\n";
                         elem->connectivity(se, TECPLOT, conn);
-                        for (std::size_t i=0; i<conn.size(); i++)
-                          out_stream << conn[i] << " ";
+                        for (const auto & idx : conn)
+                          out_stream << idx << " ";
                       }
 #endif
 
@@ -931,8 +932,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                         // degenerated phex8's.
                         out_stream << "phex8 8\n";
                         elem->connectivity(se, TECPLOT, conn);
-                        for (std::size_t i=0; i<conn.size(); i++)
-                          out_stream << conn[i] << " ";
+                        for (const auto & idx : conn)
+                          out_stream << idx << " ";
                       }
 
                     else
@@ -956,8 +957,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       out_stream << "phex8 8\n";
                       lo_elem->connectivity(0, TECPLOT, conn);
-                      for (std::size_t i=0; i<conn.size(); i++)
-                        out_stream << conn[i] << " ";
+                      for (const auto & idx : conn)
+                        out_stream << idx << " ";
                     }
 
                   else if (lo_elem->type() == TET4)
@@ -979,8 +980,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       // degenerated phex8's.
                       out_stream << "phex8 8\n";
                       lo_elem->connectivity(0, TECPLOT, conn);
-                      for (std::size_t i=0; i<conn.size(); i++)
-                        out_stream << conn[i] << " ";
+                      for (const auto & idx : conn)
+                        out_stream << idx << " ";
                     }
 
                   else
@@ -1036,7 +1037,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                      << sbdid_map.size()
                      << " 0\n";
 
-          for (std::size_t sbdid=0; sbdid<sbdid_map.size(); sbdid++)
+          for (auto sbdid : IntRange<std::size_t>(0, sbdid_map.size()))
             out_stream << "proc_" << sbdid << "\n";
 
           for (const auto & elem : mesh.active_element_ptr_range())
@@ -1345,9 +1346,9 @@ void GMVIO::write_binary (const std::string & fname,
         out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
         // Write the element connectivity
-        for (std::size_t i=0; i<ed.node_map.size(); i++)
+        for (const auto & ed_id : ed.node_map)
           {
-            dof_id_type id = elem->node_id(ed.node_map[i]) + 1;
+            dof_id_type id = elem->node_id(ed_id) + 1;
             out_stream.write(reinterpret_cast<char *>(&id), sizeof(dof_id_type));
           }
       }
