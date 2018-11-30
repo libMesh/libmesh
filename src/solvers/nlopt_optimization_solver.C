@@ -86,7 +86,7 @@ double __libmesh_nlopt_objective(unsigned n,
 
           std::vector<double> grad;
           sys.rhs->localize_to_one(grad);
-          for (auto i : IntRange<dof_id_type>(0, n))
+          for (unsigned int i = 0; i < n; ++i)
             gradient[i] = grad[i];
         }
       else
@@ -152,7 +152,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
       // TODO: Even better would be if we could use 'result' directly
       // as the storage of eq_constraints.  Perhaps a serial-only
       // NumericVector variant which supports this option?
-      for (auto i : IntRange<dof_id_type>(0, m))
+      for (unsigned int i = 0; i < m; ++i)
         result[i] = (*sys.C_eq)(i);
 
       // If gradient != nullptr, then the Jacobian matrix of the equality
@@ -233,7 +233,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
       // TODO: Even better would be if we could use 'result' directly
       // as the storage of ineq_constraints.  Perhaps a serial-only
       // NumericVector variant which supports this option?
-      for (auto i : IntRange<dof_id_type>(0, m))
+      for (unsigned int i = 0; i < m; ++i)
         result[i] = (*sys.C_ineq)(i);
 
       // If gradient != nullptr, then the Jacobian matrix of the equality
@@ -370,7 +370,7 @@ void NloptOptimizationSolver<T>::solve ()
 
       std::vector<Real> nlopt_lb(nlopt_size);
       std::vector<Real> nlopt_ub(nlopt_size);
-      for (auto i : IntRange<dof_id_type>(0, nlopt_size))
+      for (unsigned int i = 0; i < nlopt_size; ++i)
         {
           nlopt_lb[i] = this->system().get_vector("lower_bounds")(i);
           nlopt_ub[i] = this->system().get_vector("upper_bounds")(i);
