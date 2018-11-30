@@ -39884,6 +39884,13 @@ else
 fi
 
 
+    if test "x$enablenlopt" = "xyes" && test "$dof_bytes" != "4"; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< nlopt can only be enabled if libmesh is configured with --with-dof-id-bytes=4. >>>" >&5
+$as_echo "<<< nlopt can only be enabled if libmesh is configured with --with-dof-id-bytes=4. >>>" >&6; }
+            enablenlopt=no
+
+fi
 
   if test "x$enablenlopt" = "xyes"; then :
 
