@@ -281,6 +281,13 @@ NloptOptimizationSolver<T>::NloptOptimizationSolver (OptimizationSystem & system
   _iteration_count(0),
   _constraints_tolerance(1.e-8)
 {
+  // The nlopt interfaces all use unsigned int as their index type, so
+  // don't risk using the NloptOptimizationSolver with a libmesh that
+  // is configured to use 64-bit indices. We can detect this at
+  // configure time, so it should not be possible to actually reach
+  // this error message... it's here just in case.
+  if (sizeof(dof_id_type) != sizeof(unsigned int))
+    libmesh_error_msg("The NloptOptimizationSolver should not be used with dof_id_type != unsigned int.");
 }
 
 
