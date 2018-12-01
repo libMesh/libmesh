@@ -52,32 +52,32 @@ public:
    * Constructor-from-T.  By default sets higher dimensional
    * entries to 0.
    */
-  explicit TensorValue  (const T xx,
-                         const T xy=0,
-                         const T xz=0,
-                         const T yx=0,
-                         const T yy=0,
-                         const T yz=0,
-                         const T zx=0,
-                         const T zy=0,
-                         const T zz=0);
+  explicit TensorValue  (const T & xx,
+                         const T & xy=0,
+                         const T & xz=0,
+                         const T & yx=0,
+                         const T & yy=0,
+                         const T & yz=0,
+                         const T & zx=0,
+                         const T & zy=0,
+                         const T & zz=0);
 
   /**
    * Constructor-from-scalars.  By default sets higher dimensional
    * entries to 0.
    */
   template <typename Scalar>
-  explicit TensorValue  (const Scalar xx,
-                         const Scalar xy=0,
-                         const Scalar xz=0,
-                         const Scalar yx=0,
-                         const Scalar yy=0,
-                         const Scalar yz=0,
-                         const Scalar zx=0,
-                         const Scalar zy=0,
+  explicit TensorValue  (const Scalar & xx,
+                         const Scalar & xy=0,
+                         const Scalar & xz=0,
+                         const Scalar & yx=0,
+                         const Scalar & yy=0,
+                         const Scalar & yz=0,
+                         const Scalar & zx=0,
+                         const Scalar & zy=0,
                          typename
                          boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                         const Scalar>::type zz=0);
+                         const Scalar>::type & zz=0);
 
   /**
    * Constructor.  Takes 1 row vector for LIBMESH_DIM=1
@@ -162,15 +162,15 @@ TensorValue<T>::TensorValue () :
 
 template <typename T>
 inline
-TensorValue<T>::TensorValue (const T xx,
-                             const T xy,
-                             const T xz,
-                             const T yx,
-                             const T yy,
-                             const T yz,
-                             const T zx,
-                             const T zy,
-                             const T zz) :
+TensorValue<T>::TensorValue (const T & xx,
+                             const T & xy,
+                             const T & xz,
+                             const T & yx,
+                             const T & yy,
+                             const T & yz,
+                             const T & zx,
+                             const T & zy,
+                             const T & zz) :
   TypeTensor<T> (xx,xy,xz,yx,yy,yz,zx,zy,zz)
 {
 }
@@ -179,17 +179,17 @@ TensorValue<T>::TensorValue (const T xx,
 template <typename T>
 template <typename Scalar>
 inline
-TensorValue<T>::TensorValue (const Scalar xx,
-                             const Scalar xy,
-                             const Scalar xz,
-                             const Scalar yx,
-                             const Scalar yy,
-                             const Scalar yz,
-                             const Scalar zx,
-                             const Scalar zy,
+TensorValue<T>::TensorValue (const Scalar & xx,
+                             const Scalar & xy,
+                             const Scalar & xz,
+                             const Scalar & yx,
+                             const Scalar & yy,
+                             const Scalar & yz,
+                             const Scalar & zx,
+                             const Scalar & zy,
                              typename
                              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                             const Scalar>::type zz) :
+                             const Scalar>::type & zz) :
   TypeTensor<T> (xx,xy,xz,yx,yy,yz,zx,zy,zz)
 {
 }

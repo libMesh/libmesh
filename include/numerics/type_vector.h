@@ -66,9 +66,9 @@ protected:
    * Constructor-from-T.  By default sets higher dimensional
    * entries to 0.
    */
-  TypeVector (const T x,
-              const T y=0,
-              const T z=0);
+  TypeVector (const T & x,
+              const T & y=0,
+              const T & z=0);
 
   /**
    * Constructor-from-scalars.  By default sets higher dimensional
@@ -77,13 +77,13 @@ protected:
   template <typename Scalar1, typename Scalar2, typename Scalar3>
   TypeVector (typename
               boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
-              const Scalar1>::type x,
+              const Scalar1>::type & x,
               typename
               boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
-              const Scalar2>::type y=0,
+              const Scalar2>::type & y=0,
               typename
               boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
-              const Scalar3>::type z=0);
+              const Scalar3>::type & z=0);
 
   /**
    * Constructor-from-scalar.  Sets higher dimensional entries to 0.
@@ -92,7 +92,7 @@ protected:
    * TypeVector<Complex> v = 0;
    */
   template <typename Scalar>
-  TypeVector (const Scalar x,
+  TypeVector (const Scalar & x,
               typename
               boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
               const Scalar>::type * sfinae = nullptr);
@@ -175,7 +175,7 @@ public:
    * Add a scaled value to this vector without creating a temporary.
    */
   template <typename T2>
-  void add_scaled (const TypeVector<T2> &, const T);
+  void add_scaled (const TypeVector<T2> &, const T &);
 
   /**
    * Subtract from this vector.
@@ -205,7 +205,7 @@ public:
    * temporary.
    */
   template <typename T2>
-  void subtract_scaled (const TypeVector<T2> &, const T);
+  void subtract_scaled (const TypeVector<T2> &, const T &);
 
   /**
    * \returns The negative of this vector in a separate copy.
@@ -221,14 +221,14 @@ public:
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
     TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
-  operator * (const Scalar) const;
+  operator * (const Scalar &) const;
 
   /**
    * Multiply this vector by a scalar value.
    *
    * \returns A reference to *this.
    */
-  const TypeVector<T> & operator *= (const T);
+  const TypeVector<T> & operator *= (const T &);
 
   /**
    * Divide each entry of this vector by scalar value.
@@ -239,14 +239,14 @@ public:
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
     TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
-  operator / (const Scalar) const;
+  operator / (const Scalar &) const;
 
   /**
    * Divide each entry of this vector by scalar value.
    *
    * \returns A reference to *this.
    */
-  const TypeVector<T> & operator /= (const T);
+  const TypeVector<T> & operator /= (const T &);
 
   /**
    * \returns The dot-product of this vector with another vector.
@@ -435,9 +435,9 @@ TypeVector<T>::TypeVector ()
 
 template <typename T>
 inline
-TypeVector<T>::TypeVector (const T x,
-                           const T y,
-                           const T z)
+TypeVector<T>::TypeVector (const T & x,
+                           const T & y,
+                           const T & z)
 {
   _coords[0] = x;
 
@@ -460,13 +460,13 @@ template <typename Scalar1, typename Scalar2, typename Scalar3>
 inline
 TypeVector<T>::TypeVector (typename
                            boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
-                           const Scalar1>::type x,
+                           const Scalar1>::type & x,
                            typename
                            boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
-                           const Scalar2>::type y,
+                           const Scalar2>::type & y,
                            typename
                            boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
-                           const Scalar3>::type z)
+                           const Scalar3>::type & z)
 {
   _coords[0] = x;
 
@@ -488,7 +488,7 @@ TypeVector<T>::TypeVector (typename
 template <typename T>
 template <typename Scalar>
 inline
-TypeVector<T>::TypeVector (const Scalar x,
+TypeVector<T>::TypeVector (const Scalar & x,
                            typename
                            boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                            const Scalar>::type * /*sfinae*/)
@@ -624,7 +624,7 @@ void TypeVector<T>::add (const TypeVector<T2> & p)
 template <typename T>
 template <typename T2>
 inline
-void TypeVector<T>::add_scaled (const TypeVector<T2> & p, const T factor)
+void TypeVector<T>::add_scaled (const TypeVector<T2> & p, const T & factor)
 {
 #if LIBMESH_DIM == 1
   _coords[0] += factor*p(0);
@@ -698,7 +698,7 @@ void TypeVector<T>::subtract (const TypeVector<T2> & p)
 template <typename T>
 template <typename T2>
 inline
-void TypeVector<T>::subtract_scaled (const TypeVector<T2> & p, const T factor)
+void TypeVector<T>::subtract_scaled (const TypeVector<T2> & p, const T & factor)
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] -= factor*p(i);
@@ -736,7 +736,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
-TypeVector<T>::operator * (const Scalar factor) const
+TypeVector<T>::operator * (const Scalar & factor) const
 {
   typedef typename CompareTypes<T, Scalar>::supertype SuperType;
 
@@ -763,7 +763,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
-operator * (const Scalar factor,
+operator * (const Scalar & factor,
             const TypeVector<T> & v)
 {
   return v * factor;
@@ -773,7 +773,7 @@ operator * (const Scalar factor,
 
 template <typename T>
 inline
-const TypeVector<T> & TypeVector<T>::operator *= (const T factor)
+const TypeVector<T> & TypeVector<T>::operator *= (const T & factor)
 {
 #if LIBMESH_DIM == 1
   _coords[0] *= factor;
@@ -801,7 +801,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
-TypeVector<T>::operator / (const Scalar factor) const
+TypeVector<T>::operator / (const Scalar & factor) const
 {
   libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
@@ -830,7 +830,7 @@ TypeVector<T>::operator / (const Scalar factor) const
 template <typename T>
 inline
 const TypeVector<T> &
-TypeVector<T>::operator /= (const T factor)
+TypeVector<T>::operator /= (const T & factor)
 {
   libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
