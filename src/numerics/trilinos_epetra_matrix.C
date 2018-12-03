@@ -104,7 +104,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sp
   for (numeric_index_type i=0; i<n_rows; i++)
     _graph->InsertGlobalIndices(_graph->GRID(i),
                                 cast_int<numeric_index_type>(sparsity_pattern[i].size()),
-                                const_cast<int *>(sparsity_pattern[i].data()));
+                                const_cast<int *>(reinterpret_cast<const int *>(sparsity_pattern[i].data())));
 
   _graph->FillComplete();
 
