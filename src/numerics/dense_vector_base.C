@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/dense_vector_base.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -33,7 +34,7 @@ void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision
   std::ios_base::fmtflags os_flags = os.flags();
 
   // Print the vector entries.
-  for (unsigned int i=0; i<this->size(); i++)
+  for (auto i : IntRange<int>(0, this->size()))
     os << std::setw(10)
        << std::scientific
        << std::setprecision(precision)
@@ -49,7 +50,7 @@ void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision
 template<typename T>
 void DenseVectorBase<T>::print (std::ostream & os) const
 {
-  for (unsigned int i=0; i<this->size(); i++)
+  for (auto i : IntRange<int>(0, this->size()))
     os << std::setw(8)
        << this->el(i)
        << std::endl;

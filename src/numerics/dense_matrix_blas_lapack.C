@@ -19,7 +19,7 @@
 // Local Includes
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
-
+#include "libmesh/int_range.h"
 
 #if (LIBMESH_HAVE_PETSC)
 # include "libmesh/petsc_macro.h"
@@ -307,9 +307,8 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma)
 
   // Copy the singular values into sigma, ignore U_val and VT_val
   sigma.resize(cast_int<unsigned int>(sigma_val.size()));
-  for (unsigned int i=0; i<sigma.size(); i++)
+  for (auto i : IntRange<int>(0, sigma.size()))
     sigma(i) = sigma_val[i];
-
 }
 
 template<typename T>
@@ -372,7 +371,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma,
 
   // Copy the singular values into sigma.
   sigma.resize(cast_int<unsigned int>(sigma_val.size()));
-  for (unsigned int i=0; i<sigma.size(); i++)
+  for (auto i : IntRange<int>(0, sigma.size()))
     sigma(i) = sigma_val[i];
 }
 
@@ -584,7 +583,7 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // now.  x needs to be long enough to hold both the (Nx1) solution
   // vector or the (Mx1) rhs, so size it to the max of those.
   x.resize(max_MN);
-  for (unsigned i=0; i<rhs.size(); ++i)
+  for (auto i : IntRange<int>(0, rhs.size()))
     x(i) = rhs(i);
 
   // Make the syntax below simpler by grabbing a reference to this array.
@@ -719,8 +718,8 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   // the same.
   if (VL || VR)
     {
-      for (unsigned int i=0; i<this->_m; ++i)
-        for (unsigned int j=0; j<i; ++j)
+      for (auto i : IntRange<int>(0, this->_m))
+        for (auto j : IntRange<int>(0, i))
           std::swap((*this)(i,j), (*this)(j,i));
     }
 
@@ -876,15 +875,15 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   // transpose it in place before handing it back.
   if (VR)
     {
-      for (unsigned int i=0; i<static_cast<unsigned int>(N); ++i)
-        for (unsigned int j=0; j<i; ++j)
+      for (auto i : IntRange<int>(0, N))
+        for (auto j : IntRange<int>(0, i))
           std::swap((*VR)(i,j), (*VR)(j,i));
     }
 
   if (VL)
     {
-      for (unsigned int i=0; i<static_cast<unsigned int>(N); ++i)
-        for (unsigned int j=0; j<i; ++j)
+      for (auto i : IntRange<int>(0, N))
+        for (auto j : IntRange<int>(0, i))
           std::swap((*VL)(i,j), (*VL)(j,i));
     }
 }

@@ -35,6 +35,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -457,7 +458,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 #endif
 
         // compute x, dx, d2x at the quadrature point
-        for (std::size_t i=0; i<elem_nodes.size(); i++) // sum over the nodes
+        for (auto i : index_range(elem_nodes)) // sum over the nodes
           {
             // Reference to the point, helps eliminate
             // excessive temporaries in the inner loop
@@ -696,7 +697,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
 
         // compute (x,y) at the quadrature points, derivatives once
-        for (std::size_t i=0; i<elem_nodes.size(); i++) // sum over the nodes
+        for (auto i : index_range(elem_nodes)) // sum over the nodes
           {
             // Reference to the point, helps eliminate
             // excessive temporaries in the inner loop
@@ -1018,7 +1019,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         // dxdxi,   dydxi,   dzdxi,
         // dxdeta,  dydeta,  dzdeta,
         // dxdzeta, dydzeta, dzdzeta  all once
-        for (std::size_t i=0; i<elem_nodes.size(); i++) // sum over the nodes
+        for (auto i : index_range(elem_nodes)) // sum over the nodes
           {
             // Reference to the point, helps eliminate
             // excessive temporaries in the inner loop
@@ -1169,7 +1170,7 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
 
       // Inverse map second derivatives
       d2xidxyz2_map.resize(n_qp);
-      for (std::size_t i=0; i<d2xidxyz2_map.size(); ++i)
+      for (auto i : index_range(d2xidxyz2_map))
         d2xidxyz2_map[i].assign(6, 0.);
     }
 #endif
@@ -1190,7 +1191,7 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
 
           // Inverse map second derivatives
           d2etadxyz2_map.resize(n_qp);
-          for (std::size_t i=0; i<d2etadxyz2_map.size(); ++i)
+          for (auto i : index_range(d2etadxyz2_map))
             d2etadxyz2_map[i].assign(6, 0.);
         }
 #endif
@@ -1212,7 +1213,7 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
 
               // Inverse map second derivatives
               d2zetadxyz2_map.resize(n_qp);
-              for (std::size_t i=0; i<d2zetadxyz2_map.size(); ++i)
+              for (auto i : index_range(d2zetadxyz2_map))
                 d2zetadxyz2_map[i].assign(6, 0.);
             }
 #endif
@@ -1256,8 +1257,8 @@ void FEMap::compute_affine_map(const unsigned int dim,
     for (unsigned int p=1; p<n_qp; p++)
       {
         xyz[p].zero();
-        for (std::size_t i=0; i<phi_map.size(); i++) // sum over the nodes
-          xyz[p].add_scaled        (*_elem_nodes[i], phi_map[i][p]    );
+        for (auto i : index_range(phi_map)) // sum over the nodes
+          xyz[p].add_scaled (*_elem_nodes[i], phi_map[i][p]);
       }
 
   // Copy other map data from quadrature point 0
@@ -1436,15 +1437,15 @@ void FEMap::compute_map(const unsigned int dim,
 
 void FEMap::print_JxW(std::ostream & os) const
 {
-  for (std::size_t i=0; i<JxW.size(); ++i)
-    os << " [" << i << "]: " <<  JxW[i] << std::endl;
+  for (auto i : index_range(JxW))
+    os << " [" << i << "]: " << JxW[i] << std::endl;
 }
 
 
 
 void FEMap::print_xyz(std::ostream & os) const
 {
-  for (std::size_t i=0; i<xyz.size(); ++i)
+  for (auto i : index_range(xyz))
     os << " [" << i << "]: " << xyz[i];
 }
 

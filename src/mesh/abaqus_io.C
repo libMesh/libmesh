@@ -906,10 +906,10 @@ void AbaqusIO::assign_subdomain_ids()
         std::vector<dof_id_type> & id_vector = it->second;
 
         // Loop over this vector
-        for (std::size_t i=0; i<id_vector.size(); ++i)
+        for (const auto & id : id_vector)
           {
-            // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
-            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
+            // Map the id'th element ID (Abaqus numbering) to LibMesh numbering
+            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[id];
 
             // Get reference to that element
             Elem & elem = the_mesh.elem_ref(libmesh_elem_id);
@@ -960,10 +960,10 @@ void AbaqusIO::assign_boundary_node_ids()
       // Get a reference to the current vector of nodeset ID values
       std::vector<dof_id_type> & nodeset_ids = it->second;
 
-      for (std::size_t i=0; i<nodeset_ids.size(); ++i)
+      for (const auto & id : nodeset_ids)
         {
           // Map the Abaqus global node ID to the libmesh node ID
-          dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[nodeset_ids[i]];
+          dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[id];
 
           // Get node pointer from the mesh
           Node * node = the_mesh.node_ptr(libmesh_global_node_id);
@@ -1000,12 +1000,12 @@ void AbaqusIO::assign_sideset_ids()
         // Get a reference to the current vector of nodeset ID values
         std::vector<std::pair<dof_id_type,unsigned>> & sideset_ids = it->second;
 
-        for (std::size_t i=0; i<sideset_ids.size(); ++i)
+        for (const auto & id : sideset_ids)
           {
             // sideset_ids is a vector of pairs (elem id, side id).  Pull them out
             // now to make the code below more readable.
-            dof_id_type  abaqus_elem_id = sideset_ids[i].first;
-            unsigned abaqus_side_number = sideset_ids[i].second;
+            dof_id_type  abaqus_elem_id = id.first;
+            unsigned abaqus_side_number = id.second;
 
             // Map the Abaqus element ID to LibMesh numbering
             dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
@@ -1062,10 +1062,10 @@ void AbaqusIO::assign_sideset_ids()
         std::vector<dof_id_type> & id_vector = it->second;
 
         // Loop over this vector
-        for (std::size_t i=0; i<id_vector.size(); ++i)
+        for (const auto & id : id_vector)
           {
             // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
-            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
+            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[id];
 
             // Get a reference to that element
             Elem & elem = the_mesh.elem_ref(libmesh_elem_id);

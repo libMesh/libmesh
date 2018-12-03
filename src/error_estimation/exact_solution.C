@@ -501,17 +501,17 @@ void ExactSolution::_compute_error(const std::string & sys_name,
     }
 
   // Initialize any functors we're going to use
-  for (std::size_t i=0; i != _exact_values.size(); ++i)
-    if (_exact_values[i])
-      _exact_values[i]->init();
+  for (auto & ev : _exact_values)
+    if (ev)
+      ev->init();
 
-  for (std::size_t i=0; i != _exact_derivs.size(); ++i)
-    if (_exact_derivs[i])
-      _exact_derivs[i]->init();
+  for (auto & ed : _exact_derivs)
+    if (ed)
+      ed->init();
 
-  for (std::size_t i=0; i != _exact_hessians.size(); ++i)
-    if (_exact_hessians[i])
-      _exact_hessians[i]->init();
+  for (auto & eh : _exact_hessians)
+    if (eh)
+      eh->init();
 
   // Get a reference to the dofmap and mesh for that system
   const DofMap & computed_dof_map = computed_system.get_dof_map();

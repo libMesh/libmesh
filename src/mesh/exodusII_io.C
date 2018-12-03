@@ -318,7 +318,7 @@ void ExodusII_IO::read (const std::string & fname)
             = sideset_name;
       }
 
-    for (std::size_t e=0; e<exio_helper->elem_list.size(); e++)
+    for (auto e : index_range(exio_helper->elem_list))
       {
         // The numbers in the Exodus file sidesets should be thought
         // of as (1-based) indices into the elem_num_map array.  So,
@@ -391,12 +391,12 @@ void ExodusII_IO::read (const std::string & fname)
 
         exio_helper->read_nodeset(nodeset);
 
-        for (std::size_t node=0; node<exio_helper->node_list.size(); node++)
+        for (const auto & exodus_id : exio_helper->node_list)
           {
             // As before, the entries in 'node_list' are 1-based
             // indices into the node_num_map array, so we have to map
             // them.  See comment above.
-            int libmesh_node_id = exio_helper->node_num_map[exio_helper->node_list[node] - 1] - 1;
+            int libmesh_node_id = exio_helper->node_num_map[exodus_id - 1] - 1;
             mesh.get_boundary_info().add_node(cast_int<dof_id_type>(libmesh_node_id),
                                               nodeset_id);
           }

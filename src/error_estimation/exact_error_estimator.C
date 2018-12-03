@@ -376,7 +376,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
   // Compute the square-root of each component.
   {
     LOG_SCOPE("std::sqrt()", "ExactErrorEstimator");
-    for (auto & val : error_per_cell) // std::size_t i=0; i<error_per_cell.size(); i++)
+    for (auto & val : error_per_cell)
       if (val != 0.)
         {
           libmesh_assert_greater (val, 0.);

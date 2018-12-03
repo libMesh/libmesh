@@ -26,6 +26,7 @@
 #include "libmesh/system_norm.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 #include <iostream>
@@ -249,7 +250,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
 
   // Weight the primal error by the dual error using the system norm object
   // FIXME: we ought to thread this
-  for (std::size_t i=0; i != error_per_cell.size(); ++i)
+  for (auto i : index_range(error_per_cell))
     {
       // Have we been asked to weight the variable error contributions in any specific manner
       if (!error_norm_is_identity) // If we do

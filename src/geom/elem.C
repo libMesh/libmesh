@@ -1110,9 +1110,12 @@ void Elem::make_links_to_me_local(unsigned int n)
     neigh_family.push_back(neigh);
 
   // And point them to elem
-  for (std::size_t i = 0; i != neigh_family.size(); ++i)
+  for (auto & const_elem : neigh_family)
     {
-      Elem * neigh_family_member = const_cast<Elem *>(neigh_family[i]);
+      // This const_cast is necessary until we have a version of
+      // family_tree_by_side that returns a vector of non-constant
+      // pointers when called on a non-constant Elem.
+      Elem * neigh_family_member = const_cast<Elem *>(const_elem);
 
       // Only subactive elements point to other subactive elements
       if (this->subactive() && !neigh_family_member->subactive())
@@ -1175,9 +1178,9 @@ void Elem::make_links_to_me_remote()
               // FIXME - There's a lot of ugly const_casts here; we
               // may want to make remote_elem non-const and create
               // non-const versions of the family_tree methods
-              for (std::size_t i=0; i != family.size(); ++i)
+              for (auto & const_elem : family)
                 {
-                  Elem * n = const_cast<Elem *>(family[i]);
+                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
                   if (n == remote_elem)
                     continue;
@@ -1221,9 +1224,9 @@ void Elem::make_links_to_me_remote()
               // FIXME - There's a lot of ugly const_casts here; we
               // may want to make remote_elem non-const and create
               // non-const versions of the family_tree methods
-              for (std::size_t i=0; i != family.size(); ++i)
+              for (auto & const_elem : family)
                 {
-                  Elem * n = const_cast<Elem *>(family[i]);
+                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
                   if (n == remote_elem)
                     continue;
@@ -1284,9 +1287,9 @@ void Elem::remove_links_to_me()
               // FIXME - There's a lot of ugly const_casts here; we
               // may want to make remote_elem non-const and create
               // non-const versions of the family_tree methods
-              for (std::size_t i=0; i != family.size(); ++i)
+              for (auto & const_elem : family)
                 {
-                  Elem * n = const_cast<Elem *>(family[i]);
+                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
                   if (n == remote_elem)
                     continue;
@@ -1330,9 +1333,9 @@ void Elem::remove_links_to_me()
               // FIXME - There's a lot of ugly const_casts here; we
               // may want to make remote_elem non-const and create
               // non-const versions of the family_tree methods
-              for (std::size_t i=0; i != family.size(); ++i)
+              for (auto & const_elem : family)
                 {
-                  Elem * n = const_cast<Elem *>(family[i]);
+                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
                   if (n == remote_elem)
                     continue;
@@ -2208,12 +2211,12 @@ Elem::bracketing_nodes(unsigned int child,
   const std::vector<std::pair<unsigned char, unsigned char>> & pbc =
     this->parent_bracketing_nodes(child,child_node);
 
-  for (std::size_t i = 0; i != pbc.size(); ++i)
+  for (const auto & pb : pbc)
     {
       const unsigned short n_n = this->n_nodes();
-      if (pbc[i].first < n_n && pbc[i].second < n_n)
-        returnval.push_back(std::make_pair(this->node_id(pbc[i].first),
-                                           this->node_id(pbc[i].second)));
+      if (pb.first < n_n && pb.second < n_n)
+        returnval.push_back(std::make_pair(this->node_id(pb.first),
+                                           this->node_id(pb.second)));
       else
         {
           // We must be on a non-full-order higher order element...
@@ -2246,7 +2249,7 @@ Elem::bracketing_nodes(unsigned int child,
                 if (c == child && n == child_node)
                   break;
 
-                if (pbc[i].first == full_elem->as_parent_node(c,n))
+                if (pb.first == full_elem->as_parent_node(c,n))
                   {
                     // We should be consistent
                     if (pt1 != DofObject::invalid_id)
@@ -2255,7 +2258,7 @@ Elem::bracketing_nodes(unsigned int child,
                     pt1 = this->child_ptr(c)->node_id(n);
                   }
 
-                if (pbc[i].second == full_elem->as_parent_node(c,n))
+                if (pb.second == full_elem->as_parent_node(c,n))
                   {
                     // We should be consistent
                     if (pt2 != DofObject::invalid_id)

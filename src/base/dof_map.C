@@ -41,6 +41,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/threads.h"
 #include "libmesh/mesh_subdivision_support.h"
+#include "libmesh/int_range.h"
 
 // C++ Includes
 #include <set>
@@ -207,8 +208,8 @@ DofMap::~DofMap()
   _mesh.remove_ghosting_functor(*_default_evaluating);
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  for (std::size_t q = 0; q != _adjoint_dirichlet_boundaries.size(); ++q)
-    delete _adjoint_dirichlet_boundaries[q];
+  for (auto & bnd : _adjoint_dirichlet_boundaries)
+    delete bnd;
 #endif
 }
 
@@ -424,7 +425,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         n_var_groups = this->n_variable_groups();
 
       // Copy the id changes we've now been informed of
-      for (std::size_t i=0, n_ids = ids.size(); i != n_ids; ++i)
+      for (auto i : index_range(ids))
         {
           DofObject * requested = (this->*objects)(mesh, ids[i]);
           libmesh_assert(requested);
@@ -1583,10 +1584,8 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
           const std::vector<unsigned int> & variable_list =
             column_variable_list->second;
 
-          for (std::size_t j=0; j != variable_list.size(); ++j)
+          for (const auto & vj : variable_list)
             {
-              const unsigned int vj=variable_list[j];
-
               std::vector<dof_id_type> di;
               this->dof_indices (partner, di, vj);
 
@@ -1602,9 +1601,9 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
           this->dof_indices (partner, di);
 
           // Insert the remote DOF indices into the send list
-          for (std::size_t j=0; j != di.size(); ++j)
-            if (!this->local_index(di[j]))
-              _send_list.push_back(di[j]);
+          for (const auto & dof : di)
+            if (!this->local_index(dof))
+              _send_list.push_back(dof);
         }
 
     }
@@ -1629,9 +1628,9 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
       this->dof_indices (elem, di);
 
       // Insert the remote DOF indices into the send list
-      for (std::size_t j=0; j != di.size(); ++j)
-        if (!this->local_index(di[j]))
-          _send_list.push_back(di[j]);
+      for (const auto & dof : di)
+        if (!this->local_index(dof))
+          _send_list.push_back(dof);
     }
 }
 
@@ -2401,12 +2400,9 @@ bool DofMap::semilocal_index (dof_id_type dof_index) const
 bool DofMap::all_semilocal_indices (const std::vector<dof_id_type> & dof_indices_in) const
 {
   // We're all semilocal unless we find a counterexample
-  for (std::size_t i=0; i != dof_indices_in.size(); ++i)
-    {
-      const dof_id_type di = dof_indices_in[i];
-      if (!this->semilocal_index(di))
-        return false;
-    }
+  for (const auto & di : dof_indices_in)
+    if (!this->semilocal_index(di))
+      return false;
 
   return true;
 }
@@ -2648,12 +2644,12 @@ void DofMap::find_connected_dofs (std::vector<dof_id_type> & elem_dofs) const
   // in turn depend on others.  So, we need to repeat this process
   // in that case until the system depends only on unconstrained
   // degrees of freedom.
-  for (std::size_t i=0; i<elem_dofs.size(); i++)
-    if (this->is_constrained_dof(elem_dofs[i]))
+  for (const auto & dof : elem_dofs)
+    if (this->is_constrained_dof(dof))
       {
         // If the DOF is constrained
         DofConstraints::const_iterator
-          pos = _dof_constraints.find(elem_dofs[i]);
+          pos = _dof_constraints.find(dof);
 
         libmesh_assert (pos != _dof_constraints.end());
 
@@ -2724,10 +2720,10 @@ std::string DofMap::get_info() const
 
   if (_n_nz)
     {
-      for (std::size_t i = 0; i != _n_nz->size(); ++i)
+      for (const auto & val : *_n_nz)
         {
-          max_n_nz = std::max(max_n_nz, (*_n_nz)[i]);
-          avg_n_nz += (*_n_nz)[i];
+          max_n_nz = std::max(max_n_nz, val);
+          avg_n_nz += val;
         }
 
       std::size_t n_nz_size = _n_nz->size();
@@ -2740,10 +2736,10 @@ std::string DofMap::get_info() const
 
       libmesh_assert(_n_oz);
 
-      for (std::size_t i = 0; i != (*_n_oz).size(); ++i)
+      for (const auto & val : *_n_oz)
         {
-          max_n_oz = std::max(max_n_oz, (*_n_oz)[i]);
-          avg_n_oz += (*_n_oz)[i];
+          max_n_oz = std::max(max_n_oz, val);
+          avg_n_oz += val;
         }
 
       std::size_t n_oz_size = _n_oz->size();

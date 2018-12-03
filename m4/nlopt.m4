@@ -16,6 +16,12 @@ AC_DEFUN([CONFIGURE_NLOPT],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-nlopt)])],
                 [enablenlopt=$enableoptional])
 
+  dnl Do not enable nlopt if libmesh is configured with dof_bytes != 4.
+  AS_IF([test "x$enablenlopt" = "xyes" && test "$dof_bytes" != "4"],
+        [
+            AC_MSG_RESULT([<<< nlopt can only be enabled if libmesh is configured with --with-dof-id-bytes=4. >>>])
+            enablenlopt=no
+        ])
 
   AS_IF([test "x$enablenlopt" = "xyes"],
         [

@@ -23,6 +23,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -727,16 +728,13 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
     case 1:
       {
         if (this->calculate_phi)
-          for (unsigned int i=0,
-               n_phi = cast_int<unsigned int>(this->phi.size());
-               i != n_phi; i++)
-            for (std::size_t p=0; p<this->phi[i].size(); p++)
+          for (auto i : index_range(this->phi))
+            for (auto p : index_range(this->phi[i]))
               this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
+
         if (this->calculate_dphi)
-          for (unsigned int i=0,
-               n_dphi = cast_int<unsigned int>(this->dphi.size());
-               i != n_dphi; i++)
-            for (std::size_t p=0; p<this->dphi[i].size(); p++)
+          for (auto i : index_range(this->dphi))
+            for (auto p : index_range(this->dphi[i]))
               {
                 this->dphi[i][p](0) =
                   this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
@@ -746,10 +744,8 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
               }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (this->calculate_d2phi)
-          for (unsigned int i=0,
-               n_d2phi = cast_int<unsigned int>(this->d2phi.size());
-               i != n_d2phi; i++)
-            for (std::size_t p=0; p<this->d2phi[i].size(); p++)
+          for (auto i : index_range(this->d2phi))
+            for (auto p : index_range(this->d2phi[i]))
               {
                 this->d2phi[i][p](0,0) =
                   this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
@@ -776,16 +772,13 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
     case 2:
       {
         if (this->calculate_phi)
-          for (unsigned int i=0,
-               n_phi = cast_int<unsigned int>(this->phi.size());
-               i != n_phi; i++)
-            for (std::size_t p=0; p<this->phi[i].size(); p++)
+          for (auto i : index_range(this->phi))
+            for (auto p : index_range(this->phi[i]))
               this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
+
         if (this->calculate_dphi)
-          for (unsigned int i=0,
-               n_dphi = cast_int<unsigned int>(this->dphi.size());
-               i != n_dphi; i++)
-            for (std::size_t p=0; p<this->dphi[i].size(); p++)
+          for (auto i : index_range(this->dphi))
+            for (auto p : index_range(this->dphi[i]))
               {
                 this->dphi[i][p](0) =
                   this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
@@ -800,10 +793,8 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
               }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (this->calculate_d2phi)
-          for (unsigned int i=0,
-               n_d2phi = cast_int<unsigned int>(this->d2phi.size());
-               i != n_d2phi; i++)
-            for (std::size_t p=0; p<this->d2phi[i].size(); p++)
+          for (auto i : index_range(this->d2phi))
+            for (auto p : index_range(this->d2phi[i]))
               {
                 this->d2phi[i][p](0,0) =
                   this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
@@ -829,17 +820,13 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
     case 3:
       {
         if (this->calculate_phi)
-          for (unsigned int i=0,
-               n_phi = cast_int<unsigned int>(this->phi.size());
-               i != n_phi; i++)
-            for (std::size_t p=0; p<this->phi[i].size(); p++)
+          for (auto i : index_range(this->phi))
+            for (auto p : index_range(this->phi[i]))
               this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
 
         if (this->calculate_dphi)
-          for (unsigned int i=0,
-               n_dphi = cast_int<unsigned int>(this->dphi.size());
-               i != n_dphi; i++)
-            for (std::size_t p=0; p<this->dphi[i].size(); p++)
+          for (auto i : index_range(this->dphi))
+            for (auto p : index_range(this->dphi[i]))
               {
                 this->dphi[i][p](0) =
                   this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
@@ -852,10 +839,8 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
               }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (this->calculate_d2phi)
-          for (unsigned int i=0,
-               n_d2phi = cast_int<unsigned int>(this->d2phi.size());
-               i != n_d2phi; i++)
-            for (std::size_t p=0; p<this->d2phi[i].size(); p++)
+          for (auto i : index_range(this->d2phi))
+            for (auto p : index_range(this->d2phi[i]))
               {
                 this->d2phi[i][p](0,0) =
                   this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);

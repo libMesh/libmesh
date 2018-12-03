@@ -106,12 +106,8 @@ void HPCoarsenTest::add_projection(const System & system,
             system.current_solution(dof_num);
           if (cont == C_ZERO || cont == C_ONE)
             grad.add_scaled((*dphi)[i][qp],system.current_solution(dof_num));
-          // grad += (*dphi)[i][qp] *
-          //  system.current_solution(dof_num);
           if (cont == C_ONE)
             hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
-          // hess += (*d2phi)[i][qp] *
-          //  system.current_solution(dof_num);
         }
 
       // The projection matrix and vector
@@ -125,8 +121,6 @@ void HPCoarsenTest::add_projection(const System & system,
           if (cont == C_ONE)
             Fe(i) += (*JxW)[qp] *
               hess.contract((*d2phi_coarse)[i][qp]);
-          // Fe(i) += (*JxW)[qp] *
-          //  (*d2phi_coarse)[i][qp].contract(hess);
 
           for (unsigned int j=0; j != Fe.size(); ++j)
             {
@@ -341,12 +335,8 @@ void HPCoarsenTest::select_refinement (System & system)
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
                         grad.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
-                      // grad += (*dphi)[i][qp] *
-                      //  system.current_solution(dof_num);
                       if (cont == C_ONE)
                         hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
-                      // hess += (*d2phi)[i][qp] *
-                      //  system.current_solution(dof_num);
                     }
 
                   // The projection matrix and vector
@@ -392,12 +382,8 @@ void HPCoarsenTest::select_refinement (System & system)
                     system.current_solution(dof_num);
                   if (cont == C_ZERO || cont == C_ONE)
                     grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
-                  // grad_error += (*dphi)[i][qp] *
-                  //  system.current_solution(dof_num);
                   if (cont == C_ONE)
                     hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
-                  // hessian_error += (*d2phi)[i][qp] *
-                  //    system.current_solution(dof_num);
                 }
               if (elem->p_level() == 0)
                 {
@@ -410,10 +396,8 @@ void HPCoarsenTest::select_refinement (System & system)
                       value_error -= (*phi_coarse)[i][qp] * Up(i);
                       if (cont == C_ZERO || cont == C_ONE)
                         grad_error.subtract_scaled((*dphi_coarse)[i][qp], Up(i));
-                      // grad_error -= (*dphi_coarse)[i][qp] * Up(i);
                       if (cont == C_ONE)
                         hessian_error.subtract_scaled((*d2phi_coarse)[i][qp], Up(i));
-                      // hessian_error -= (*d2phi_coarse)[i][qp] * Up(i);
                     }
                 }
 
@@ -470,23 +454,17 @@ void HPCoarsenTest::select_refinement (System & system)
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
                         grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
-                      // grad_error += (*dphi)[i][qp] *
-                      //  system.current_solution(dof_num);
                       if (cont == C_ONE)
                         hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
-                      // hessian_error += (*d2phi)[i][qp] *
-                      //  system.current_solution(dof_num);
                     }
 
                   for (unsigned int i=0; i != n_coarse_dofs; ++i)
                     {
                       value_error -= (*phi_coarse)[i][qp] * Uc(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        // grad_error -= (*dphi_coarse)[i][qp] * Uc(i);
                         grad_error.subtract_scaled((*dphi_coarse)[i][qp], Uc(i));
                       if (cont == C_ONE)
                         hessian_error.subtract_scaled((*d2phi_coarse)[i][qp], Uc(i));
-                      // hessian_error -= (*d2phi_coarse)[i][qp] * Uc(i);
                     }
 
                   h_error_per_cell[e_id] += static_cast<ErrorVectorReal>

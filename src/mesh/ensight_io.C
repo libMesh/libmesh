@@ -26,6 +26,7 @@
 #include "libmesh/system.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 #include <sstream>
@@ -242,11 +243,11 @@ void EnsightIO::write_geometry_ascii()
       mesh_stream << std::setw(10) << elem_ref.size() << "\n";
 
       // Write element id
-      for (std::size_t i = 0; i < elem_ref.size(); i++)
-        mesh_stream << std::setw(10) << elem_ref[i]->id() << "\n";
+      for (const auto & elem : elem_ref)
+        mesh_stream << std::setw(10) << elem->id() << "\n";
 
       // Write connectivity
-      for (std::size_t i = 0; i < elem_ref.size(); i++)
+      for (auto i : index_range(elem_ref))
         {
           for (const auto & node : elem_ref[i]->node_ref_range())
             {
@@ -309,8 +310,8 @@ void EnsightIO::write_case()
           case_stream << "filename start number:   " << std::setw(10) << 0 << "\n";
           case_stream << "filename increment:  " << std::setw(10) << 1 << "\n";
           case_stream << "time values:\n";
-          for (std::size_t i = 0; i < _time_steps.size(); i++)
-            case_stream << std::setw(12) << std::setprecision(5) << std::scientific << _time_steps[i] << "\n";
+          for (const auto & time : _time_steps)
+            case_stream << std::setw(12) << std::setprecision(5) << std::scientific << time << "\n";
         }
     }
 }
@@ -380,7 +381,7 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
 
       elem_soln.resize(dof_indices_scl.size());
 
-      for (std::size_t i = 0; i < dof_indices_scl.size(); i++)
+      for (auto i : index_range(dof_indices_scl))
         elem_soln[i] = system.current_solution(dof_indices_scl[i]);
 
       FEInterface::nodal_soln (dim, fe_type, elem, elem_soln, nodal_soln);
@@ -473,7 +474,7 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
       if (dim == 3)
         elem_soln_w.resize(dof_indices_w.size());
 
-      for (std::size_t i = 0; i < dof_indices_u.size(); i++)
+      for (auto i : index_range(dof_indices_u))
         {
           elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
           elem_soln_v[i] = system.current_solution(dof_indices_v[i]);

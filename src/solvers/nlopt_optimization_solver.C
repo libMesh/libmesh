@@ -29,6 +29,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/nlopt_optimization_solver.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -48,8 +49,7 @@ double __libmesh_nlopt_objective(unsigned n,
 
   // We'll use current_local_solution below, so let's ensure that it's consistent
   // with the vector x that was passed in.
-  for (unsigned int i=sys.solution->first_local_index();
-       i<sys.solution->last_local_index(); i++)
+  for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
 
   // Make sure the solution vector is parallel-consistent
@@ -65,8 +65,7 @@ double __libmesh_nlopt_objective(unsigned n,
   if (solver->objective_object != nullptr)
     {
       objective =
-        solver->objective_object->objective(
-                                            *(sys.current_local_solution), sys);
+        solver->objective_object->objective(*(sys.current_local_solution), sys);
     }
   else
     {
@@ -78,8 +77,7 @@ double __libmesh_nlopt_objective(unsigned n,
     {
       if (solver->gradient_object != nullptr)
         {
-          solver->gradient_object->gradient(
-                                            *(sys.current_local_solution), *(sys.rhs), sys);
+          solver->gradient_object->gradient(*(sys.current_local_solution), *(sys.rhs), sys);
 
           // we've filled up sys.rhs with the gradient data, now copy it
           // to the nlopt data structure
@@ -87,7 +85,7 @@ double __libmesh_nlopt_objective(unsigned n,
 
           std::vector<double> grad;
           sys.rhs->localize_to_one(grad);
-          for (unsigned i=0; i<n; ++i)
+          for (unsigned int i = 0; i < n; ++i)
             gradient[i] = grad[i];
         }
       else
@@ -128,7 +126,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
   if (sys.solution->size() != n)
     libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
 
-  for (unsigned int i=sys.solution->first_local_index(); i<sys.solution->last_local_index(); i++)
+  for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
   sys.solution->close();
 
@@ -152,7 +150,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
       // TODO: Even better would be if we could use 'result' directly
       // as the storage of eq_constraints.  Perhaps a serial-only
       // NumericVector variant which supports this option?
-      for (unsigned i=0; i<m; ++i)
+      for (unsigned int i = 0; i < m; ++i)
         result[i] = (*sys.C_eq)(i);
 
       // If gradient != nullptr, then the Jacobian matrix of the equality
@@ -208,7 +206,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
   if (sys.solution->size() != n)
     libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
 
-  for (unsigned int i=sys.solution->first_local_index(); i<sys.solution->last_local_index(); i++)
+  for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
   sys.solution->close();
 
@@ -232,7 +230,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
       // TODO: Even better would be if we could use 'result' directly
       // as the storage of ineq_constraints.  Perhaps a serial-only
       // NumericVector variant which supports this option?
-      for (unsigned i=0; i<m; ++i)
+      for (unsigned int i = 0; i < m; ++i)
         result[i] = (*sys.C_ineq)(i);
 
       // If gradient != nullptr, then the Jacobian matrix of the equality
@@ -280,6 +278,13 @@ NloptOptimizationSolver<T>::NloptOptimizationSolver (OptimizationSystem & system
   _iteration_count(0),
   _constraints_tolerance(1.e-8)
 {
+  // The nlopt interfaces all use unsigned int as their index type, so
+  // don't risk using the NloptOptimizationSolver with a libmesh that
+  // is configured to use 64-bit indices. We can detect this at
+  // configure time, so it should not be possible to actually reach
+  // this error message... it's here just in case.
+  if (sizeof(dof_id_type) != sizeof(unsigned int))
+    libmesh_error_msg("The NloptOptimizationSolver should not be used with dof_id_type != unsigned int.");
 }
 
 
@@ -362,7 +367,7 @@ void NloptOptimizationSolver<T>::solve ()
 
       std::vector<Real> nlopt_lb(nlopt_size);
       std::vector<Real> nlopt_ub(nlopt_size);
-      for (unsigned int i=0; i<nlopt_size; i++)
+      for (unsigned int i = 0; i < nlopt_size; ++i)
         {
           nlopt_lb[i] = this->system().get_vector("lower_bounds")(i);
           nlopt_ub[i] = this->system().get_vector("upper_bounds")(i);

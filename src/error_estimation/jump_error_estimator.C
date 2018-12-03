@@ -35,9 +35,9 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/system.h"
-
 #include "libmesh/dense_vector.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -379,7 +379,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
   this->reduce_error(error_per_cell, system.comm());
 
   // Compute the square-root of each component.
-  for (std::size_t i=0; i<error_per_cell.size(); i++)
+  for (auto i : index_range(error_per_cell))
     if (error_per_cell[i] != 0.)
       error_per_cell[i] = std::sqrt(error_per_cell[i]);
 
@@ -392,17 +392,16 @@ void JumpErrorEstimator::estimate_error (const System & system,
       // Sanity check: Make sure the number of flux faces is
       // always an integer value
 #ifdef DEBUG
-      for (std::size_t i=0; i<n_flux_faces.size(); ++i)
-        libmesh_assert_equal_to (n_flux_faces[i], static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
+      for (const auto & val : n_flux_faces)
+        libmesh_assert_equal_to (val, static_cast<float>(static_cast<unsigned int>(val)));
 #endif
 
       // Scale the error by the number of flux faces for each element
-      for (std::size_t i=0; i<n_flux_faces.size(); ++i)
+      for (auto i : index_range(n_flux_faces))
         {
           if (n_flux_faces[i] == 0.0) // inactive or non-local element
             continue;
 
-          //libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
           error_per_cell[i] /= static_cast<ErrorVectorReal>(n_flux_faces[i]);
         }
     }

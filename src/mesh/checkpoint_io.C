@@ -34,6 +34,7 @@
 #include "libmesh/xdr_io.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/utility.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 #include <iostream>
@@ -937,7 +938,7 @@ void CheckpointIO::read_subdomain_names(Xdr & io)
       io.data(subdomain_ids);
       io.data(subdomain_names);
 
-      for (std::size_t i=0; i<subdomain_ids.size(); i++)
+      for (auto i : index_range(subdomain_ids))
         subdomain_map[cast_int<subdomain_id_type>(subdomain_ids[i])] =
           subdomain_names[i];
     }
@@ -1187,7 +1188,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
 
   libmesh_assert_equal_to(elem_ids.size(), elem_sides.size());
 
-  for (std::size_t i=0; i != elem_ids.size(); ++i)
+  for (auto i : index_range(elem_ids))
     {
       Elem & elem = mesh.elem_ref(cast_int<dof_id_type>(elem_ids[i]));
       if (!elem.neighbor_ptr(elem_sides[i]))
@@ -1205,7 +1206,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
   io.data(child_numbers, "# remote child_numbers");
 
 #ifdef LIBMESH_ENABLE_AMR
-  for (std::size_t i=0; i != parent_ids.size(); ++i)
+  for (auto i : index_range(parent_ids))
     {
       Elem & elem = mesh.elem_ref(cast_int<dof_id_type>(parent_ids[i]));
 
@@ -1243,7 +1244,7 @@ void CheckpointIO::read_bcs (Xdr & io)
   io.data(side_list, "# sides of elements for bcs");
   io.data(bc_id_list, "# bc ids");
 
-  for (std::size_t i=0; i<element_id_list.size(); i++)
+  for (auto i : index_range(element_id_list))
     boundary_info.add_side
       (cast_int<dof_id_type>(element_id_list[i]), side_list[i],
        cast_int<boundary_id_type>(bc_id_list[i]));
@@ -1266,7 +1267,7 @@ void CheckpointIO::read_nodesets (Xdr & io)
   io.data(node_id_list, "# node id list");
   io.data(bc_id_list, "# nodeset bc id list");
 
-  for (std::size_t i=0; i<node_id_list.size(); i++)
+  for (auto i : index_range(node_id_list))
     boundary_info.add_node
       (cast_int<dof_id_type>(node_id_list[i]),
        cast_int<boundary_id_type>(bc_id_list[i]));
@@ -1297,7 +1298,7 @@ void CheckpointIO::read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
     }
 
   // Add them back into the map
-  for (std::size_t i=0; i<boundary_ids.size(); i++)
+  for (auto i : index_range(boundary_ids))
     boundary_map[cast_int<boundary_id_type>(boundary_ids[i])] =
       boundary_names[i];
 }

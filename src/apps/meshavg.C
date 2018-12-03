@@ -18,13 +18,12 @@
 
 // Open the solution files named on standard input, take the average
 // of their fields' values, and output to a new solution file.
-
 #include "libmesh/libmesh.h"
-
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"
 #include "libmesh/namebased_io.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/int_range.h"
 
 using namespace libMesh;
 
@@ -73,7 +72,7 @@ int main(int argc, char ** argv)
                EquationSystems::READ_BASIC_ONLY);
       libMesh::out << "Loaded next solution " << argv[i] << std::endl;
 
-      for (unsigned int s = 0; s != sysnames.size(); ++s)
+      for (auto s : index_range(sysnames))
         {
           if (!es2.has_system(sysnames[s]))
             libmesh_error_msg("EquationSystems object does not have " << sysnames[s]);
@@ -84,7 +83,7 @@ int main(int argc, char ** argv)
 
   int n_solutions = argc - 3;
 
-  for (unsigned int s = 0; s != sysnames.size(); ++s)
+  for (auto s : index_range(sysnames))
     {
       (*summed_solutions[s]) /= n_solutions;
       es1.get_system(s).solution->swap(*summed_solutions[s]);

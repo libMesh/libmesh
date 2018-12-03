@@ -29,6 +29,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/int_range.h"
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
@@ -267,12 +268,12 @@ void Nemesis_IO_Helper::get_elem_map()
   if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] elem_mapi[i] = ";
-      for (unsigned int i=0; i<static_cast<unsigned int>(num_internal_elems-1); ++i)
+      for (auto i : IntRange<int>(0, num_internal_elems-1))
         libMesh::out << elem_mapi[i] << ", ";
       libMesh::out << "... " << elem_mapi.back() << std::endl;
 
       libMesh::out << "[" << this->processor_id() << "] elem_mapb[i] = ";
-      for (unsigned int i=0; i<static_cast<unsigned int>(std::min(10, num_border_elems-1)); ++i)
+      for (auto i : IntRange<int>(0, std::min(10, num_border_elems-1)))
         libMesh::out << elem_mapb[i] << ", ";
       libMesh::out << "... " << elem_mapb.back() << std::endl;
     }
@@ -1285,10 +1286,8 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
       // border_elem_ids and the entries which go into proc_border_elem_sets.
       // The latter is for communication purposes, ie determining which elements
       // should be shared between processors.
-      for (unsigned int node=0; node<elem->n_nodes(); ++node)
-        {
-          this->nodes_attached_to_local_elems.insert(elem->node_id(node));
-        } // end loop over element's nodes
+      for (auto node : elem->node_index_range())
+        this->nodes_attached_to_local_elems.insert(elem->node_id(node));
 
       // Loop over element's neighbors, see if it has a neighbor which is off-processor
       for (auto n : elem->side_index_range())
@@ -1733,7 +1732,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
   for (const auto & elem : pmesh.active_local_element_ptr_range())
     {
       // Grab the nodes while we're here.
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+      for (auto n : elem->node_index_range())
         this->nodes_attached_to_local_elems.insert( elem->node_id(n) );
 
       subdomain_id_type cur_subdomain = elem->subdomain_id();
@@ -1807,7 +1806,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       current_block_connectivity.clear();
       current_block_connectivity.resize(elem_ids_this_subdomain.size() * this->num_nodes_per_elem);
 
-      for (unsigned int i=0; i<elem_ids_this_subdomain.size(); i++)
+      for (auto i : index_range(elem_ids_this_subdomain))
         {
           auto elem_id = elem_ids_this_subdomain[i];
 
@@ -1825,7 +1824,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
           // the same block...
           libmesh_assert_equal_to (elem.n_nodes(), Elem::build(conv.get_canonical_type(), nullptr)->n_nodes());
 
-          for (unsigned int j=0; j < static_cast<unsigned int>(this->num_nodes_per_elem); j++)
+          for (auto j : IntRange<int>(0, this->num_nodes_per_elem))
             {
               const unsigned int connect_index   = (i*this->num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_node_map(j);
@@ -1868,7 +1867,7 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
         std::set<unsigned> & set_p = proc_nodes_touched[ elem->processor_id() ];
 
         // Insert all nodes touched by this element into the set
-        for (unsigned int node=0; node<elem->n_nodes(); ++node)
+        for (auto node : elem->node_index_range())
           set_p.insert(elem->node_id(node));
       }
 
@@ -2285,18 +2284,14 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 
 void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*use_discontinuous*/)
 {
-  // Make sure that the reference passed in is really a DistributedMesh
-  // const DistributedMesh & pmesh = cast_ref<const DistributedMesh &>(mesh);
-
-  unsigned local_num_nodes =
-    cast_int<unsigned int>(this->exodus_node_num_to_libmesh.size());
+  auto local_num_nodes = this->exodus_node_num_to_libmesh.size();
 
   x.resize(local_num_nodes);
   y.resize(local_num_nodes);
   z.resize(local_num_nodes);
 
   // Just loop over our list outputting the nodes the way we built the map
-  for (unsigned int i=0; i<local_num_nodes; ++i)
+  for (auto i : IntRange<int>(0, local_num_nodes))
     {
       const Point & pt = mesh.point(this->exodus_node_num_to_libmesh[i]);
       x[i]=pt(0);
@@ -2357,7 +2352,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
 
       // Loop over all blocks, even if we don't have elements in each block.
       // If we don't have elements we need to write out a 0 for that block...
-      for (unsigned int i=0; i<static_cast<unsigned>(this->num_elem_blks_global); ++i)
+      for (auto i : IntRange<int>(0, this->num_elem_blks_global))
         {
           // Even if there are no elements for this block on the current
           // processor, we still want to write its name to file, if

@@ -23,8 +23,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/parallel.h"
 #include "libmesh/enum_error_estimator_type.h"
-
-
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -74,7 +73,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
       if (s)
         {
           libmesh_assert_equal_to (error_per_cell.size(), system_error_per_cell.size());
-          for (std::size_t i=0; i != error_per_cell.size(); ++i)
+          for (auto i : index_range(error_per_cell))
             error_per_cell[i] += system_error_per_cell[i];
         }
       else
