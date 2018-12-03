@@ -513,11 +513,11 @@ float VariationalMeshSmoother::adapt_minimum() const
 {
   float min = std::numeric_limits<float>::max();
 
-  for (std::size_t i=0; i<_adapt_data->size(); i++)
+  for (const auto & val : *_adapt_data)
     {
       // Only positive (or zero) values in the error vector
-      libmesh_assert_greater_equal ((*_adapt_data)[i], 0.);
-      min = std::min (min, (*_adapt_data)[i]);
+      libmesh_assert_greater_equal (val, 0.);
+      min = std::min (min, val);
     }
 
   // ErrorVectors are for positive values
