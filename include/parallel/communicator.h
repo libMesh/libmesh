@@ -146,10 +146,15 @@ public:
    * Get a tag that is unique to this Communicator.
    *
    * \note If people are also using magic numbers or copying
-   * communicators around then we can't guarantee the tag is unique to
-   * this MPI_Comm.
+   * raw communicators around then we can't guarantee the tag is
+   * unique to this MPI_Comm.
+   *
+   * \note Leaving \p tagvalue unspecified is recommended.
+   * Manually selecting tag values is dangerous, as tag values may be
+   * freed and reselected earlier than expected in asynchronous
+   * communication algorithms.
    */
-  MessageTag get_unique_tag(int tagvalue) const;
+  MessageTag get_unique_tag(int tagvalue = MessageTag::invalid_tag) const;
 
   /**
    * Reference an already-acquired tag, so that we know it will
@@ -191,10 +196,15 @@ private:
   processor_id_type _rank, _size;
   SendMode _send_mode;
 
-  // mutable used_tag_values - not thread-safe, but then Parallel::
-  // isn't thread-safe in general.
+  // mutable used_tag_values and tag_queue - not thread-safe, but then
+  // Parallel:: isn't thread-safe in general.
   mutable std::map<int, unsigned int> used_tag_values;
-  bool          _I_duped_it;
+  mutable int _next_tag;
+
+  int _max_tag;
+
+  // Keep track of duplicate/split operations so we know when to free
+  bool _I_duped_it;
 
   // Communication operations:
 public:
