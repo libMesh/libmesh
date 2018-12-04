@@ -1836,9 +1836,9 @@ BoundaryInfo::build_node_list_from_side_list()
   // Otherwise we need to push ghost node bcids to their owners, then
   // pull ghost node bcids from their owners.
   Parallel::MessageTag
-    node_pushes_tag = this->comm().get_unique_tag(31337),
-    node_pulls_tag = this->comm().get_unique_tag(31338),
-    node_responses_tag = this->comm().get_unique_tag(31339);
+    node_pushes_tag = this->comm().get_unique_tag(),
+    node_pulls_tag = this->comm().get_unique_tag(),
+    node_responses_tag = this->comm().get_unique_tag();
 
   std::vector<Parallel::Request> node_push_requests(n_proc-1);
 

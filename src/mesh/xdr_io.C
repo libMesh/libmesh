@@ -770,8 +770,8 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
         coord_request_handles(this->n_processors()-1);
 
       Parallel::MessageTag
-        id_tag    = mesh.comm().get_unique_tag(1234),
-        coord_tag = mesh.comm().get_unique_tag(1235);
+        id_tag    = mesh.comm().get_unique_tag(),
+        coord_tag = mesh.comm().get_unique_tag();
 
       // Post the receives -- do this on processor 0 only.
       if (this->processor_id() == 0)
@@ -909,8 +909,8 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
         id_request_handles(this->n_processors()-1);
 
       Parallel::MessageTag
-        unique_id_tag = mesh.comm().get_unique_tag(1236),
-        id_tag    = mesh.comm().get_unique_tag(1237);
+        unique_id_tag = mesh.comm().get_unique_tag(),
+        id_tag    = mesh.comm().get_unique_tag();
 
       // Post the receives -- do this on processor 0 only.
       if (this->processor_id() == 0)

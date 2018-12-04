@@ -3060,7 +3060,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
   // We may be receiving packed_range sends out of order with
   // parallel_sync tags, so make sure they're received correctly.
-  Parallel::MessageTag range_tag = this->comm().get_unique_tag(14142);
+  Parallel::MessageTag range_tag = this->comm().get_unique_tag();
 
   while (unexpanded_set_nonempty)
     {
@@ -3541,7 +3541,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
   // We may be receiving packed_range sends out of order with
   // parallel_sync tags, so make sure they're received correctly.
-  Parallel::MessageTag range_tag = this->comm().get_unique_tag(1414);
+  Parallel::MessageTag range_tag = this->comm().get_unique_tag();
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   std::map<processor_id_type, std::set<dof_id_type>> pushed_node_ids;
