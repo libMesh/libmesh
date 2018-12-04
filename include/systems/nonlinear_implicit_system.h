@@ -35,16 +35,24 @@ template<typename T> class NonlinearSolver;
 
 
 /**
+ * \brief Manages consistently variables, degrees of freedom, coefficient
+ * vectors, matrices and non-linear solvers for implicit systems.
+ *
  * This class provides a specific system class.  It aims
- * at implicit systems, offering nothing more than just
- * the essentials needed to solve a system.
+ * at non-linear implicit systems.
+ *
+ * An implicit system is a system that requires the solution of a
+ * system. This class has the ability to create and use a non-linear solver
+ * to solve the system.
+ *
+ * The matrix NonlinearImplicitSystem::matrix and the vector
+ * NonlinearImplicitSystem::rhs should be filled during assembly.
  *
  * \note Additional vectors/matrices can be added via parent class
  * interfaces.
  *
  * \author Benjamin S. Kirk
  * \date 2005
- * \brief Used for solving nonlinear implicit systems of equations.
  */
 class NonlinearImplicitSystem : public ImplicitSystem
 {
