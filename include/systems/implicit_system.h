@@ -34,16 +34,24 @@ template <typename T> class LinearSolver;
 template <typename T> class SparseMatrix;
 
 /**
- * This class provides a specific system class.  It aims
- * at implicit systems, offering nothing more than just
- * the essentials needed to solve a system.
+ * \brief Manages consistently variables, degrees of freedom, coefficient
+ * vectors, and matrices for implicit systems.
+ *
+ * Implicit systems are characterized by the need to solve the (non-)linear
+ * system Ax=b. This class provides, in addition to the ExplicitSystem class,
+ * storage for sparse matrices. Hence this System provides means to manage a
+ * right hand side vector and a sparse matrix. In addition, further matrices
+ * can be managed using the ImplicitSystem::add_matrix method.
+ *
+ * This class provieds *no* means to solve the implicit system. This
+ * functionality is provided, e.g., by the LinearImplicitSystem or the
+ * NonlinearImplicitSystem class.
  *
  * \note Additional vectors/matrices can be added via parent class
  * interfaces.
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \brief Used for solving implicit systems of equations.
  */
 class ImplicitSystem : public ExplicitSystem
 {
@@ -167,6 +175,14 @@ public:
    * Can be overridden in derived classes.
    */
   virtual void assemble_residual_derivatives (const ParameterVector & parameters) override;
+
+  /**
+   * For explicit systems, just assemble and solve the system A*x=b.
+   * Should be overridden in derrived systems to provide a solver for the
+   * system.
+   */
+  virtual void solve () override
+  { libmesh_not_implemented(); }
 
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_p = -dR/dp, for

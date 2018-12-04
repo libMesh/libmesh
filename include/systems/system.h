@@ -72,12 +72,19 @@ class FEType;
 class SystemNorm;
 
 /**
- * This is the base class for classes which contain
- * information related to any physical process that might be simulated.
- * Such information may range from the actual solution values to
- * algorithmic flags that may be used to control the numerical methods
- * employed.  In general, use an \p EqnSystems<T_sys> object to handle
- * one or more of the children of this class.
+ * \brief Manages consistently variables, degrees of freedom, and coefficient
+ * vectors.
+ *
+ * This is the base class for classes which contain information related to any
+ * physical process that might be simulated. Such information may range from
+ * the actual solution values to algorithmic flags that may be used to control
+ * the numerical methods employed. In general, use an EquationSystems
+ * object to handle one or more of the children of this class.
+ *
+ * Especially, this class manages the variables of the differential equation,
+ * the coefficient vectors and the \p DofMap, and ensures that these are
+ * consistent. It provides storage for the solution.  Furthermore, (de-)
+ * serialization functionality is provided.
  *
  * \author Benjamin S. Kirk
  * \date 2003-2004

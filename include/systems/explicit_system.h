@@ -27,15 +27,23 @@ namespace libMesh
 {
 
 /**
+ * \brief Manages consistently variables, degrees of freedom, and coefficient
+ * vectors for explicit systems.
+ *
  * The ExplicitSystem provides only "right hand side" storage, which
- * should be sufficient for solving most types of explicit problems.
+ * should be sufficient for solving most types of explicit problems, i.e.,
+ * problems that do not need to store a sparse matrix.
+ *
+ * The ExplicitSystem class is meant for problems where a given right hand
+ * side is directly applied to the (differential) operator. In this case the
+ * assembly routine can directly compute the product A*x without constructing
+ * a sparse matrix first.
  *
  * \note Additional vectors/matrices can be added via parent class
  * interfaces.
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \brief Used for solving explicit systems of equations.
  */
 class ExplicitSystem : public System
 {
@@ -87,7 +95,8 @@ public:
                                         bool apply_constraints = true) override;
 
   /**
-   * Assembles & solves the linear system Ax=b.
+   * For explicit systems, just assemble the system which should directly
+   * compute A*x.
    */
   virtual void solve () override;
 

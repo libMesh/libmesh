@@ -9,6 +9,7 @@
 *-opt.exe
 *-devel.exe
 *~
+*.swp
 *.pyc
 contrib/bin/xda2mgf
 contrib/bin/libmesh-config
