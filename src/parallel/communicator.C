@@ -226,7 +226,15 @@ void Communicator::nonblocking_barrier (Request & /*req*/) const {}
 MessageTag Communicator::get_unique_tag(int tagvalue) const
 {
   if (tagvalue == MessageTag::invalid_tag)
-    tagvalue = _next_tag++;
+    {
+#ifndef NDEBUG
+      // Automatic tag values have to be requested in sync
+      int maxval = _next_tag;
+      this->max(maxval);
+      libmesh_assert_equal_to(_next_tag, maxval);
+#endif
+      tagvalue = _next_tag++;
+    }
 
   if (used_tag_values.count(tagvalue))
     {

@@ -143,14 +143,18 @@ public:
   const communicator & get() const { return _communicator; }
 
   /**
-   * Get a tag that is unique to this Communicator.
+   * Get a tag that is unique to this Communicator.  A requested tag
+   * value may be provided.  If no request is made then an automatic
+   * unique tag value will be generated; such usage of
+   * get_unique_tag() must be done on every processor in a consistent
+   * order.
    *
    * \note If people are also using magic numbers or copying
    * raw communicators around then we can't guarantee the tag is
    * unique to this MPI_Comm.
    *
-   * \note Leaving \p tagvalue unspecified is recommended.
-   * Manually selecting tag values is dangerous, as tag values may be
+   * \note Leaving \p tagvalue unspecified is recommended in most
+   * cases.  Manually selecting tag values is dangerous, as tag values may be
    * freed and reselected earlier than expected in asynchronous
    * communication algorithms.
    */
