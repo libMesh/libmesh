@@ -83,7 +83,7 @@ class SystemNorm;
  *
  * Especially, this class manages the variables of the differential equation,
  * the coefficient vectors and the \p DofMap, and ensures that these are
- * consistend. It provides storage for the solution.  Furthermore, (de-)
+ * consistent. It provides storage for the solution.  Furthermore, (de-)
  * serialization functionality is provided.
  *
  * \author Benjamin S. Kirk

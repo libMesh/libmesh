@@ -37,11 +37,9 @@ template <typename T> class SparseMatrix;
  * \brief Manages consistently variables, degrees of freedom, coefficient
  * vectors, and matrices for implicit systems.
  *
- * This class provides a specific system class. It aims at implicit systems.
- *
  * Implicit systems are characterized by the need to solve the (non-)linear
  * system Ax=b. This class provides, in addition to the ExplicitSystem class,
- * storage for sparse matrices. Hence this matrix provides means to manage a
+ * storage for sparse matrices. Hence this System provides means to manage a
  * right hand side vector and a sparse matrix. In addition, further matrices
  * can be managed using the ImplicitSystem::add_matrix method.
  *

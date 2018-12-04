@@ -39,7 +39,7 @@ class EigenSystem;
  * \brief Manages storage and variables for transient systems.
  *
  * This class is a specialized system for solving transient systems,
- * e.g., systems with a time dependency. It provides apropriate storage,
+ * e.g., systems with a time dependency. It provides appropriate storage,
  * manages variables and ensures consistency for these systems.
  *
  * This template class adds the functionality to manage, in addition to the

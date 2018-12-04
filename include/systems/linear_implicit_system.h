@@ -39,12 +39,9 @@ template <typename T> class ShellMatrix;
  * \brief Manages consistently variables, degrees of freedom, coefficient
  * vectors, matrices and linear solvers for implicit systems.
  *
- * This class provides a specific system class. It aims
- * at linear implicit systems.
- *
  * An implicit system is a system that requires the solution of a
- * system. This class has the ability to create and use a linear solver
- * to solve the system.
+ * system of equations. This class has the ability to create and use a
+ * linear solver to solve the system.
  *
  * The matrix LinearImplicitSystem::matrix and the vector
  * LinearImplicitSystem::rhs should be filled during assembly.
