@@ -395,7 +395,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J_length" << suffix;
       Xdr C_J_length_out(file_name.str(), mode);
 
-      std::size_t C_J_length = C_J.size();
+      unsigned int C_J_length = cast_int<unsigned int>(C_J.size());
       C_J_length_out << C_J_length;
       C_J_length_out.close();
 
