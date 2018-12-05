@@ -497,7 +497,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
           {
             jac[p] = dxyzdxi_map[p].norm();
 
-            if (jac[p] <= 0.)
+            if (jac[p] <= -TOLERANCE * TOLERANCE)
               {
                 // Don't call print_info() recursively if we're already
                 // failing.  print_info() calls Elem::volume() which may
@@ -742,7 +742,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
             // jac = dx/dxi*dy/deta - dx/deta*dy/dxi
             jac[p] = (dx_dxi*dy_deta - dx_deta*dy_dxi);
 
-            if (jac[p] <= 0.)
+            if (jac[p] <= -TOLERANCE * TOLERANCE)
               {
                 // Don't call print_info() recursively if we're already
                 // failing.  print_info() calls Elem::volume() which may
@@ -1075,7 +1075,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                       dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
                       dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
 
-            if (jac[p] <= 0.)
+            if (jac[p] <= -TOLERANCE * TOLERANCE)
               {
                 // Don't call print_info() recursively if we're already
                 // failing.  print_info() calls Elem::volume() which may
