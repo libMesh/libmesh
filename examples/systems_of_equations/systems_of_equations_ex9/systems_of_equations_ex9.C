@@ -349,6 +349,11 @@ int main (int argc, char ** argv)
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
+#ifndef LIBMESH_HAVE_EXODUS_API
+  // example requires ExodusII to load the mesh
+  libmesh_example_requires(false, "--enable-exodus");
+#endif
+
   // Initialize the cantilever mesh
   const unsigned int dim = 3;
 
