@@ -198,8 +198,8 @@ void RBSCMConstruction::resize_SCM_vectors()
   rb_scm_eval->B_max.clear();
   rb_scm_eval->C_J.clear();
   rb_scm_eval->C_J_stability_vector.clear();
-  for (std::size_t i=0; i<rb_scm_eval->SCM_UB_vectors.size(); i++)
-    rb_scm_eval->SCM_UB_vectors[i].clear();
+  for (auto & vec : rb_scm_eval->SCM_UB_vectors)
+    vec.clear();
   rb_scm_eval->SCM_UB_vectors.clear();
 
   // Resize the bounding box vectors

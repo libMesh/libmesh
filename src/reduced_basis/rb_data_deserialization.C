@@ -757,8 +757,8 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
       rb_scm_evaluation_reader.getCJStabilityVector();
 
     rb_scm_eval.C_J_stability_vector.clear();
-    for (unsigned int i=0; i<cJ_stability_vector.size(); i++)
-      rb_scm_eval.C_J_stability_vector.push_back( cJ_stability_vector[i] );
+    for (const auto & val : cJ_stability_vector)
+      rb_scm_eval.C_J_stability_vector.push_back(val);
   }
 
   {
@@ -766,12 +766,12 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
       rb_scm_evaluation_reader.getCJ();
 
     rb_scm_eval.C_J.resize(cJ_parameters_outer.size());
-    for (unsigned int i=0; i<cJ_parameters_outer.size(); i++)
+    for (auto i : index_range(cJ_parameters_outer))
       {
         auto cJ_parameters_inner =
           cJ_parameters_outer[i];
 
-        for (unsigned int j=0; j<cJ_parameters_inner.size(); j++)
+        for (auto j : index_range(cJ_parameters_inner))
           {
             std::string param_name = cJ_parameters_inner[j].getName();
             Real param_value = cJ_parameters_inner[j].getValue();

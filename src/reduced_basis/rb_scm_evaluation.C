@@ -416,12 +416,12 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J" << suffix;
       Xdr C_J_out(file_name.str(), mode);
 
-      for (std::size_t i=0; i<C_J.size(); i++)
-        for (const auto & pr : C_J[i])
+      for (auto & param : C_J)
+        for (const auto & item : param)
           {
             // Need to make a copy of the value so that it's not const
             // Xdr is not templated on const's
-            Real param_value = pr.second;
+            Real param_value = item.second;
             C_J_out << param_value;
           }
       C_J_out.close();
@@ -529,7 +529,7 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   // Resize C_J based on C_J_stability_vector and Q_a
   C_J.resize( C_J_length );
-  for (std::size_t i=0; i<C_J.size(); i++)
+  for (auto i : index_range(C_J))
     for (const auto & pr : get_parameters())
       {
         const std::string & param_name = pr.first;
@@ -547,7 +547,7 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   // Resize SCM_UB_vectors based on C_J_stability_vector and Q_a
   SCM_UB_vectors.resize( C_J_stability_vector.size() );
-  for (std::size_t i=0; i<SCM_UB_vectors.size(); i++)
+  for (auto i : index_range(SCM_UB_vectors))
     {
       SCM_UB_vectors[i].resize( rb_theta_expansion->get_n_A_terms() );
       for (unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
