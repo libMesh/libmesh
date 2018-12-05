@@ -261,11 +261,8 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                         // Get all the neighbor's children that
                         // live on that side and are thus connected
                         // to us
-                        for (std::size_t nc=0; nc<neighbors_offspring.size(); nc++)
+                        for (const auto & child : neighbors_offspring)
                           {
-                            const Elem * child =
-                              neighbors_offspring[nc];
-
                             // Skip neighbor offspring which are not in the range of elements being partitioned.
                             if (!global_index_map.count(child->id()))
                               continue;
@@ -356,11 +353,8 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                         // Get all the neighbor's children that
                         // live on that side and are thus connected
                         // to us
-                        for (std::size_t nc=0; nc<neighbors_offspring.size(); nc++)
+                        for (const auto & child : neighbors_offspring)
                           {
-                            const Elem * child =
-                              neighbors_offspring[nc];
-
                             // Skip neighbor offspring which are not in the range of elements being partitioned.
                             if (!global_index_map.count(child->id()))
                               continue;
