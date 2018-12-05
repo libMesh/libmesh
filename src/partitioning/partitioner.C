@@ -288,10 +288,10 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
       for (auto & elem : mesh.active_element_ptr_range())
         {
           // First set descendents
-          std::vector<const Elem *> subactive_family;
+          std::vector<Elem *> subactive_family;
           elem->total_family_tree(subactive_family);
           for (const auto & f : subactive_family)
-            const_cast<Elem *>(f)->processor_id() = elem->processor_id();
+            f->processor_id() = elem->processor_id();
 
           // Then set ancestors
           Elem * parent = elem->parent();
@@ -325,10 +325,10 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
       // Loop over all the active elements in the mesh
       for (auto & child : mesh.active_element_ptr_range())
         {
-          std::vector<const Elem *> subactive_family;
+          std::vector<Elem *> subactive_family;
           child->total_family_tree(subactive_family);
           for (const auto & f : subactive_family)
-            const_cast<Elem *>(f)->processor_id() = child->processor_id();
+            f->processor_id() = child->processor_id();
         }
 
       // When the mesh is parallel we cannot guarantee that parents have access to

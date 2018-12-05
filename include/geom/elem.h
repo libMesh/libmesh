@@ -71,6 +71,16 @@ class PointLocatorBase;
 #endif
 
 /**
+ * Implementation for both const and non-const Elem::total_family_tree() overloads.
+ * TODO: Put this in some namespace that makes it harder to call by accident.
+ */
+template<class T>
+void
+internal_total_family_tree(T elem,
+                           std::vector<T> & family,
+                           bool reset = true);
+
+/**
  * This is the base class from which all geometric element types are
  * derived.  The \p Elem class provides standard information such as
  * the number of nodes, edges, faces, vertices, children, and
@@ -480,6 +490,7 @@ public:
    * at any point.
    */
   void find_point_neighbors(std::set<const Elem *> & neighbor_set) const;
+  void find_point_neighbors(std::set<Elem *> & neighbor_set);
 
   /**
    * This function finds all active elements (including this one) in
@@ -1311,8 +1322,20 @@ public:
    * Same as the \p family_tree() member, but also adds any subactive
    * descendants.
    */
-  void total_family_tree (std::vector<const Elem *> & active_family,
-                          const bool reset=true) const;
+  void total_family_tree (std::vector<const Elem *> & family,
+                          const bool reset=true) const
+  {
+    internal_total_family_tree(this, family, reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void total_family_tree (std::vector<Elem *> & family,
+                          const bool reset=true)
+  {
+    internal_total_family_tree(this, family, reset);
+  }
 
   /**
    * Same as the \p family_tree() member, but only adds the active
@@ -1330,6 +1353,12 @@ public:
   void family_tree_by_side (std::vector<const Elem *> & family,
                             const unsigned int side,
                             const bool reset=true) const;
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void family_tree_by_side (std::vector<Elem *> & family,
+                            unsigned int side,
+                            bool reset=true);
 
   /**
    * Same as the \p active_family_tree() member, but only adds elements
@@ -1354,6 +1383,13 @@ public:
   void total_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                       const Elem * neighbor,
                                       const bool reset=true) const;
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void total_family_tree_by_neighbor (std::vector<Elem *> & family,
+                                      Elem * neighbor,
+                                      bool reset=true);
 
   /**
    * Same as the \p family_tree() member, but only adds elements
@@ -1382,6 +1418,12 @@ public:
   void active_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                        const Elem * neighbor,
                                        const bool reset=true) const;
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void active_family_tree_by_neighbor (std::vector<Elem *> & family,
+                                       Elem * neighbor,
+                                       bool reset=true);
 
   /**
    * Same as the \p active_family_tree_by_neighbor() member, but the
@@ -3034,6 +3076,31 @@ SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
 }
 
 
+/**
+ * Implementation for both const and non-const Elem::total_family_tree() overloads.
+ * TODO: Put this in some namespace that makes it harder to call by accident.
+ */
+template<class T>
+void
+internal_total_family_tree(T elem,
+                           std::vector<T> & family,
+                           bool reset)
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // Add this element to the family tree.
+  family.push_back(elem);
+
+  // Recurse into the elements children, if it has them.
+  // Do not clear the vector any more.
+  if (elem->has_children())
+    for (auto & c : elem->child_ref_range())
+      if (!c.is_remote())
+        internal_total_family_tree (&c, family, false);
+}
+
 } // namespace libMesh
 
 
@@ -3055,6 +3122,10 @@ SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
     static std::vector<std::vector<std::vector<signed char>>> c;        \
     return c;                                                           \
   }
+
+
+
+
 
 
 #endif // LIBMESH_ELEM_H

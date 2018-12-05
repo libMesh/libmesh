@@ -565,6 +565,22 @@ void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set) const
 
 
 
+void Elem::find_point_neighbors(std::set<Elem *> & neighbor_set)
+{
+  // start with a const-ptr version of neighbor_set.
+  std::set<const Elem *> const_set(neighbor_set.begin(), neighbor_set.end());
+
+  // Call the const version of this function.
+  this->find_point_neighbors(const_set);
+
+  // Cast result.
+  neighbor_set.clear();
+  for (const auto & elem : const_set)
+    neighbor_set.insert(const_cast<Elem *>(elem));
+}
+
+
+
 void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set,
                                 const Elem * start_elem) const
 {
@@ -1101,7 +1117,7 @@ void Elem::make_links_to_me_local(unsigned int n)
   libmesh_assert_less (nn, neigh->n_sides());
 
   // Find any elements that ought to point to elem
-  std::vector<const Elem *> neigh_family;
+  std::vector<Elem *> neigh_family;
 #ifdef LIBMESH_ENABLE_AMR
   if (this->active())
     neigh->family_tree_by_side(neigh_family, nn);
@@ -1110,13 +1126,8 @@ void Elem::make_links_to_me_local(unsigned int n)
     neigh_family.push_back(neigh);
 
   // And point them to elem
-  for (auto & const_elem : neigh_family)
+  for (auto & neigh_family_member : neigh_family)
     {
-      // This const_cast is necessary until we have a version of
-      // family_tree_by_side that returns a vector of non-constant
-      // pointers when called on a non-constant Elem.
-      Elem * neigh_family_member = const_cast<Elem *>(const_elem);
-
       // Only subactive elements point to other subactive elements
       if (this->subactive() && !neigh_family_member->subactive())
         continue;
@@ -1172,15 +1183,13 @@ void Elem::make_links_to_me_remote()
 #ifdef LIBMESH_ENABLE_AMR
               // My neighbor may have descendants which also consider me a
               // neighbor
-              std::vector<const Elem *> family;
+              std::vector<Elem *> family;
               neigh->total_family_tree_by_neighbor (family, this);
 
               // FIXME - There's a lot of ugly const_casts here; we
-              // may want to make remote_elem non-const and create
-              // non-const versions of the family_tree methods
-              for (auto & const_elem : family)
+              // may want to make remote_elem non-const
+              for (auto & n : family)
                 {
-                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
                   if (n == remote_elem)
                     continue;
@@ -1281,15 +1290,13 @@ void Elem::remove_links_to_me()
 #ifdef LIBMESH_ENABLE_AMR
               // My neighbor may have descendants which also consider me a
               // neighbor
-              std::vector<const Elem *> family;
+              std::vector<Elem *> family;
               neigh->total_family_tree_by_neighbor (family, this);
 
               // FIXME - There's a lot of ugly const_casts here; we
-              // may want to make remote_elem non-const and create
-              // non-const versions of the family_tree methods
-              for (auto & const_elem : family)
+              // may want to make remote_elem non-const.
+              for (auto & n : family)
                 {
-                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
                   if (n == remote_elem)
                     continue;
@@ -1554,23 +1561,38 @@ void Elem::family_tree (std::vector<const Elem *> & family,
 
 
 
-void Elem::total_family_tree (std::vector<const Elem *> & family,
-                              const bool reset) const
-{
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
+// void Elem::total_family_tree (std::vector<const Elem *> & family,
+//                               const bool reset) const
+// {
+//   // Clear the vector if the flag reset tells us to.
+//   if (reset)
+//     family.clear();
+//
+//   // Add this element to the family tree.
+//   family.push_back(this);
+//
+//   // Recurse into the elements children, if it has them.
+//   // Do not clear the vector any more.
+//   if (this->has_children())
+//     for (auto & c : this->child_ref_range())
+//       if (!c.is_remote())
+//         c.total_family_tree (family, false);
+// }
 
-  // Add this element to the family tree.
-  family.push_back(this);
-
-  // Recurse into the elements children, if it has them.
-  // Do not clear the vector any more.
-  if (this->has_children())
-    for (auto & c : this->child_ref_range())
-      if (!c.is_remote())
-        c.total_family_tree (family, false);
-}
+// void Elem::total_family_tree (std::vector<Elem *> & family,
+//                               const bool reset)
+// {
+//   // In case we are not resetting, start with a const-ptr version of family.
+//   std::vector<const Elem *> const_family(family.begin(), family.end());
+//
+//   // Call const version of this function
+//   this->total_family_tree(const_family, reset);
+//
+//   // Cast result.
+//   family.clear();
+//   for (const auto & cf : const_family)
+//     family.push_back(const_cast<Elem *>(cf));
+// }
 
 
 
@@ -1623,6 +1645,24 @@ void Elem::family_tree_by_side (std::vector<const Elem *> & family,
         if (!this->child_ptr(c)->is_remote() && this->is_child_on_side(c, s))
           this->child_ptr(c)->family_tree_by_side (family, s, false);
     }
+}
+
+
+
+void Elem::family_tree_by_side (std::vector<Elem *> & family,
+                                unsigned int side,
+                                bool reset)
+{
+  // In case we are not resetting, start with a const-ptr version of family.
+  std::vector<const Elem *> const_family(family.begin(), family.end());
+
+  // Call the const version of this function.
+  this->family_tree_by_side(const_family, side, reset);
+
+  // Cast result.
+  family.clear();
+  for (const auto & cf : const_family)
+    family.push_back(const_cast<Elem *>(cf));
 }
 
 
@@ -1705,6 +1745,24 @@ void Elem::total_family_tree_by_neighbor (std::vector<const Elem *> & family,
     for (auto & c : this->child_ref_range())
       if (&c != remote_elem && c.has_neighbor(neighbor_in))
         c.total_family_tree_by_neighbor (family, neighbor_in, false);
+}
+
+
+
+void Elem::total_family_tree_by_neighbor (std::vector<Elem *> & family,
+                                          Elem * neighbor,
+                                          bool reset)
+{
+  // In case we are not resetting, start with a const-ptr version of family.
+  std::vector<const Elem *> const_family(family.begin(), family.end());
+
+  // Call const version of this function
+  this->total_family_tree_by_neighbor(const_family, neighbor, reset);
+
+  // Cast result.
+  family.clear();
+  for (const auto & cf : const_family)
+    family.push_back(const_cast<Elem *>(cf));
 }
 
 
@@ -1865,6 +1923,23 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem *> & family,
         c.active_family_tree_by_neighbor (family, neighbor_in, false);
 }
 
+
+
+void Elem::active_family_tree_by_neighbor (std::vector<Elem *> & family,
+                                           Elem * neighbor_in,
+                                           bool reset)
+{
+  // In case we are not resetting, start with a const-ptr version of family.
+  std::vector<const Elem *> const_family(family.begin(), family.end());
+
+  // Call the const version of this function.
+  this->active_family_tree_by_neighbor(const_family, neighbor_in, reset);
+
+  // Cast result.
+  family.clear();
+  for (const auto & cf : const_family)
+    family.push_back(const_cast<Elem *>(cf));
+}
 
 
 unsigned int Elem::min_p_level_by_neighbor(const Elem * neighbor_in,

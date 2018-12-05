@@ -116,7 +116,7 @@ protected:
   /**
    * The coarse element on which a solution projection is cached
    */
-  const Elem * coarse;
+  Elem * coarse;
 
   /**
    * Global DOF indices for fine elements

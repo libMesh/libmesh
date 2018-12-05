@@ -236,7 +236,7 @@ void HPCoarsenTest::select_refinement (System & system)
 
       // Iterate over all the active elements in the mesh
       // that live on this processor.
-      for (const auto & elem : mesh.active_local_element_ptr_range())
+      for (auto & elem : mesh.active_local_element_ptr_range())
         {
           // We're only checking elements that are already flagged for h
           // refinement
@@ -257,11 +257,11 @@ void HPCoarsenTest::select_refinement (System & system)
               cached_coarse_p_level = elem->p_level();
 
               unsigned int old_parent_level = coarse->p_level();
-              (const_cast<Elem *>(coarse))->hack_p_level(elem->p_level());
+              coarse->hack_p_level(elem->p_level());
 
               this->add_projection(system, coarse, var);
 
-              (const_cast<Elem *>(coarse))->hack_p_level(old_parent_level);
+              coarse->hack_p_level(old_parent_level);
 
               // Solve the h-coarsening projection problem
               Ke.cholesky_solve(Fe, Uc);
@@ -306,14 +306,14 @@ void HPCoarsenTest::select_refinement (System & system)
           else
             {
               unsigned int old_elem_level = elem->p_level();
-              (const_cast<Elem *>(elem))->hack_p_level(old_elem_level - 1);
+              elem->hack_p_level(old_elem_level - 1);
 
               fe_coarse->reinit(elem, &(qrule->get_points()));
 
               const unsigned int n_coarse_dofs =
                 cast_int<unsigned int>(phi_coarse->size());
 
-              (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
+              elem->hack_p_level(old_elem_level);
 
               Ke.resize(n_coarse_dofs, n_coarse_dofs);
               Ke.zero();
@@ -429,11 +429,11 @@ void HPCoarsenTest::select_refinement (System & system)
                                         *xyz_values, coarse_qpoints);
 
               unsigned int old_parent_level = coarse->p_level();
-              (const_cast<Elem *>(coarse))->hack_p_level(elem->p_level());
+              coarse->hack_p_level(elem->p_level());
 
               fe_coarse->reinit(coarse, &coarse_qpoints);
 
-              (const_cast<Elem *>(coarse))->hack_p_level(old_parent_level);
+              coarse->hack_p_level(old_parent_level);
 
               // The number of DOFS on the coarse element
               unsigned int n_coarse_dofs =
