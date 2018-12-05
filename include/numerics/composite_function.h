@@ -33,8 +33,12 @@ namespace libMesh
 {
 
 /**
- * Function which is a function of another function.  All overridden
- * virtual functions are documented in function_base.h.
+ * \brief A function that returns a vector whose components are defined by
+ * multiple functions.
+ *
+ * A function which is defined by composing the result of different functions
+ * into a single vector.  All overridden virtual functions are documented in
+ * function_base.h.
  *
  * \author Roy Stogner
  * \date 2012
@@ -67,8 +71,12 @@ public:
 
   /**
    * Attach a new subfunction, along with a map from the indices of
-   * that subfunction to the indices of the global function.
-   * (*this)(index_map[i]) will return f(i).
+   * the attached subfunction to the indices of the composed function.
+   *
+   * The composed function will return vector whose value at index
+   * \p index_map[i] is the value of the attached function at index i,
+   * i.e.,
+   * (*this)(x, t)(index_map[i]) will return f(x, t)(i).
    */
   void attach_subfunction (const FunctionBase<Output> & f,
                            const std::vector<unsigned int> & index_map)

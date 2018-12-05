@@ -36,16 +36,17 @@ namespace libMesh
 class Point;
 
 /**
- * This is the base class for functor-like classes.  These entities
- * are functions (in the mathematical sense) of time and space, \f$
- * f(\mathbf{x},t) = \mbox{\texttt{v}} \f$, where \p v may be either a
- * \p Number or a \p DenseVector<Number>.  Children of this base class
- * implement different styles of data retrieval for these functions.
- * Use the constructors of the derived classes for creating new
- * objects. The required input of each derived class thwarts the
- * effective use of the commonly used \p build() member.  But
- * afterward the virtual members allow the convenient and
- * libMesh-common usage through a \p FunctionBase *.
+ * \brief Base class for functors that can be evaluated at a point and
+ * (optionally) time.
+ *
+ * Instances of FunctionBase represent functions (in the mathematical sense)
+ * of time and space, \f$ f(\mathbf{x},t) = \mbox{\texttt{v}} \f$, where \p v
+ * may be either a \p Number or a \p DenseVector<Number>.  Children of this
+ * base class implement different styles of data retrieval for these
+ * functions. Use the constructors of the derived classes for creating new
+ * objects. The required input of each derived class thwarts the effective use
+ * of the commonly used \p build() member.  But afterward the virtual members
+ * allow the convenient and libMesh-common usage through a \p FunctionBase *.
  *
  * \note For functor objects for vector-valued variables, it is
  * assumed each component is indexed contiguously; i.e. if u_var is

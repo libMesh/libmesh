@@ -51,7 +51,7 @@ support.html: src/$@ src/simple_header.html src/simple_footer.html
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html: doxygen
 doxygen:
-	@cd $(top_builddir)/include/libmesh && $(MAKE)
+	@$(MAKE) -C $(top_builddir)/include/libmesh
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 
 #  need to link files for VPATH builds
@@ -75,3 +75,8 @@ clean-local:
 	-rm -rf doxygen
 
 endif
+
+# Mark doxygen as a phony target to build the documentation even when the
+# doxygen directory already exists.
+.PHONY: doxygen
+

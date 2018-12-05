@@ -37,6 +37,8 @@
 namespace libMesh
 {
 /**
+ * \brief An object whose state is distributed along a set of processors.
+ *
  * This class forms the base class for all other classes
  * that are expected to be implemented in parallel. Each
  * \p ParallelObject *requires* a \p Parallel::Communicator object

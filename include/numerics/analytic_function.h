@@ -34,10 +34,12 @@ template <typename T>
 class DenseVector;
 
 /**
+ * \brief Wraps a function pointer into a FunctionBase object.
+ *
  * This class provides function-like objects for which an analytical
- * expression can be provided.  The user may either provide
- * vector-return or number-return functions.  All overridden virtual
- * functions are documented in function_base.h.
+ * expression can be provided.  The user may either provide a function pointer
+ * that returns a vector or a number.  All overridden virtual functions are
+ * documented in function_base.h.
  *
  * \author Daniel Dreyer
  * \date 2003
@@ -47,20 +49,22 @@ class AnalyticFunction : public FunctionBase<Output>
 {
 public:
 
+  /** Scalar return value function pointer type. */
+  typedef Output (*OutputFunction)(const Point & p, const Real time);
+
   /**
    * Constructor.  Takes a function pointer for scalar
    * return values.
    */
-  typedef Output (*OutputFunction)(const Point & p, const Real time);
   AnalyticFunction (OutputFunction fptr);
 
-  /**
-   * Constructor.  Takes a function pointer for
-   * vector valued functions.
-   */
+  /** Vector return value function pointer type. */
   typedef void (*OutputVectorFunction)(DenseVector<Output> & output,
                                        const Point & p,
                                        const Real time);
+  /**
+   * Constructor.  Takes a function pointer for vector valued functions.
+   */
   AnalyticFunction (OutputVectorFunction fptr);
 
   /**
