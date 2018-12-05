@@ -21,6 +21,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/parallel_implementation.h" // for inline max(int)
 
 namespace libMesh
 {
