@@ -990,48 +990,6 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 }
 
 
-template <typename T, typename A>
-inline bool Communicator::possibly_receive (unsigned int & src_processor_id,
-                                            std::vector<T,A> & buf,
-                                            const DataType & type,
-                                            Request & req,
-                                            const MessageTag & tag) const
-{
-  LOG_SCOPE("possibly_receive()", "Parallel");
-
-  Status stat(type);
-
-  int int_flag;
-
-  libmesh_call_mpi(MPI_Iprobe(src_processor_id,
-                              tag.value(),
-                              this->get(),
-                              &int_flag,
-                              stat.get()));
-
-  if (int_flag)
-  {
-    buf.resize(stat.size());
-
-    src_processor_id = stat.source();
-
-    libmesh_call_mpi
-      (MPI_Irecv (buf.data(),
-                  cast_int<int>(buf.size()),
-                  type,
-                  src_processor_id,
-                  tag.value(),
-                  this->get(),
-                  req.get()));
-
-    // The MessageTag should stay registered for the Request lifetime
-    req.add_post_wait_work
-      (new Parallel::PostWaitDereferenceTag(tag));
-  }
-
-  return int_flag;
-}
-
 
 template <typename T, typename A1, typename A2>
 inline Status Communicator::receive (const unsigned int src_processor_id,
@@ -3245,6 +3203,50 @@ inline void Communicator::allgather_packed_range(Context * context,
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);
     }
+}
+
+
+
+template <typename T, typename A>
+inline bool Communicator::possibly_receive (unsigned int & src_processor_id,
+                                            std::vector<T,A> & buf,
+                                            const DataType & type,
+                                            Request & req,
+                                            const MessageTag & tag) const
+{
+  LOG_SCOPE("possibly_receive()", "Parallel");
+
+  Status stat(type);
+
+  int int_flag = 0;
+
+  libmesh_call_mpi(MPI_Iprobe(src_processor_id,
+                              tag.value(),
+                              this->get(),
+                              &int_flag,
+                              stat.get()));
+
+  if (int_flag)
+  {
+    buf.resize(stat.size());
+
+    src_processor_id = stat.source();
+
+    libmesh_call_mpi
+      (MPI_Irecv (buf.data(),
+                  cast_int<int>(buf.size()),
+                  type,
+                  src_processor_id,
+                  tag.value(),
+                  this->get(),
+                  req.get()));
+
+    // The MessageTag should stay registered for the Request lifetime
+    req.add_post_wait_work
+      (new Parallel::PostWaitDereferenceTag(tag));
+  }
+
+  return int_flag;
 }
 
 
