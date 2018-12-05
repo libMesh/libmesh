@@ -16,11 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/elem.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -111,7 +110,7 @@ void QBase::scale(std::pair<Real, Real> old_range,
   Real scfact = h_new/h_old;
 
   // We're mapping from old_range -> new_range
-  for (std::size_t i=0; i<_points.size(); i++)
+  for (auto i : index_range(_points))
     {
       _points[i](0) = new_range.first +
         (_points[i](0) - old_range.first) * scfact;
