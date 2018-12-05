@@ -31,6 +31,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_sync.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -51,8 +52,8 @@ T DistributedVector<T>::sum () const
 
   T local_sum = 0.;
 
-  for (numeric_index_type i=0; i<local_size(); i++)
-    local_sum += _values[i];
+  for (auto & val : _values)
+    local_sum += val;
 
   this->comm().sum(local_sum);
 
@@ -71,10 +72,10 @@ Real DistributedVector<T>::l1_norm () const
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  double local_l1 = 0.;
+  Real local_l1 = 0.;
 
-  for (numeric_index_type i=0; i<local_size(); i++)
-    local_l1 += std::abs(_values[i]);
+  for (auto & val : _values)
+    local_l1 += std::abs(val);
 
   this->comm().sum(local_l1);
 
@@ -93,10 +94,10 @@ Real DistributedVector<T>::l2_norm () const
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  double local_l2 = 0.;
+  Real local_l2 = 0.;
 
-  for (numeric_index_type i=0; i<local_size(); i++)
-    local_l2 += TensorTools::norm_sq(_values[i]);
+  for (auto & val : _values)
+    local_l2 += TensorTools::norm_sq(val);
 
   this->comm().sum(local_l2);
 
@@ -117,9 +118,9 @@ Real DistributedVector<T>::linfty_norm () const
 
   Real local_linfty = 0.;
 
-  for (numeric_index_type i=0; i<local_size(); i++)
+  for (auto & val : _values)
     local_linfty  = std::max(local_linfty,
-                             static_cast<Real>(std::abs(_values[i]))
+                             static_cast<Real>(std::abs(val))
                              ); // Note we static_cast so that both
                                 // types are the same, as required
                                 // by std::max
@@ -168,10 +169,8 @@ NumericVector<T> & DistributedVector<T>::operator /= (const NumericVector<T> & v
 
   const DistributedVector<T> & v_vec = cast_ref<const DistributedVector<T> &>(v);
 
-  std::size_t val_size = _values.size();
-
-  for (std::size_t i=0; i<val_size; i++)
-    _values[i] = _values[i] / v_vec._values[i];
+  for (auto i : index_range(_values))
+    _values[i] /= v_vec._values[i];
 
   return *this;
 }
@@ -182,12 +181,12 @@ NumericVector<T> & DistributedVector<T>::operator /= (const NumericVector<T> & v
 template <typename T>
 void DistributedVector<T>::reciprocal()
 {
-  for (numeric_index_type i=0; i<local_size(); i++)
+  for (auto & val : _values)
     {
       // Don't divide by zero
-      libmesh_assert_not_equal_to (_values[i], T(0));
+      libmesh_assert_not_equal_to (val, T(0));
 
-      _values[i] = 1. / _values[i];
+      val = 1. / val;
     }
 }
 
@@ -197,11 +196,9 @@ void DistributedVector<T>::reciprocal()
 template <typename T>
 void DistributedVector<T>::conjugate()
 {
-  for (numeric_index_type i=0; i<local_size(); i++)
-    {
-      // Replace values by complex conjugate
-      _values[i] = libmesh_conj(_values[i]);
-    }
+  // Replace values by complex conjugate
+  for (auto & val : _values)
+    val = libmesh_conj(val);
 }
 
 
@@ -215,8 +212,8 @@ void DistributedVector<T>::add (const T v)
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (numeric_index_type i=0; i<local_size(); i++)
-    _values[i] += v;
+  for (auto & val : _values)
+    val += v;
 }
 
 
@@ -252,8 +249,8 @@ void DistributedVector<T>::scale (const T factor)
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<local_size(); i++)
-    _values[i] *= factor;
+  for (auto & val : _values)
+    val *= factor;
 }
 
 template <typename T>
@@ -262,8 +259,8 @@ void DistributedVector<T>::abs()
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (numeric_index_type i=0; i<local_size(); i++)
-    this->set(i,std::abs(_values[i]));
+  for (auto & val : _values)
+    val = std::abs(val);
 }
 
 
@@ -286,7 +283,7 @@ T DistributedVector<T>::dot (const NumericVector<T> & V) const
   // The result of dotting together the local parts of the vector.
   T local_dot = 0;
 
-  for (std::size_t i=0; i<this->local_size(); i++)
+  for (auto i : index_range(_values))
     local_dot += this->_values[i] * v->_values[i];
 
   // The local dot products are now summed via MPI
@@ -305,8 +302,8 @@ DistributedVector<T>::operator = (const T s)
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<local_size(); i++)
-    _values[i] = s;
+  for (auto & val : _values)
+    val = s;
 
   return *this;
 }
@@ -433,7 +430,7 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
   // Make a vector of partial sums of local sizes
   std::vector<numeric_index_type> local_size_sums(this->n_processors());
   local_size_sums[0] = local_sizes[0];
-  for (numeric_index_type i=1; i<local_sizes.size(); i++)
+  for (auto i : IntRange<numeric_index_type>(1, local_sizes.size()))
     local_size_sums[i] = local_size_sums[i-1] + local_sizes[i];
 
   // We now fill in 'requested_ids' based on the indices.  Also keep
@@ -449,7 +446,7 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
   // This is an O(N*log(p)) algorithm that uses std::upper_bound().
   // Note: upper_bound() returns an iterator to the first entry which is
   // greater than the given value.
-  for (numeric_index_type i=0; i<indices.size(); i++)
+  for (auto i : index_range(indices))
     {
       iter_t ub = std::upper_bound(local_size_sums.begin(),
                                    local_size_sums.end(),
@@ -489,7 +486,7 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
      const std::vector<T> & values)
     {
       // Now write the received values to the appropriate place(s) in v_local
-      for (std::size_t i=0, vsize = values.size(); i != vsize; i++)
+      for (auto i : index_range(values))
         {
           libmesh_assert(local_requested_ids.count(pid));
           libmesh_assert_less(i, local_requested_ids[pid].size());
