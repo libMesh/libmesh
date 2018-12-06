@@ -5,4 +5,7 @@
 // heedless of configuration
 #include <libmesh/hilbert_sfc_partitioner.h>
 
-INSTANTIATE_PARTITIONER_TEST(HilbertSFCPartitioner,ReplicatedMesh);
+// This test is temporarily disabled since it fails sporadically on
+// macOS. For more information, see:
+// https://github.com/libMesh/libmesh/issues/1967
+// INSTANTIATE_PARTITIONER_TEST(HilbertSFCPartitioner,ReplicatedMesh);
