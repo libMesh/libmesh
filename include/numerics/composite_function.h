@@ -73,7 +73,7 @@ public:
    * Attach a new subfunction, along with a map from the indices of
    * the attached subfunction to the indices of the composed function.
    *
-   * The composed function will return vector whose value at index
+   * The composed function will return a vector whose value at index
    * \p index_map[i] is the value of the attached function at index i,
    * i.e.,
    * (*this)(x, t)(index_map[i]) will return f(x, t)(i).
