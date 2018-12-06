@@ -300,7 +300,7 @@ public:
 
   /**
    * Add a node to the mesh.  The node should be node n of child c of
-   * parent Elem parent.  The processor id \proc_id is used if
+   * parent Elem parent.  The processor id \p proc_id is used if
    * necessary to help determine numbering of newly created nodes, but
    * newly created nodes are left unpartitioned until a node
    * partitionining sweep is done later.
