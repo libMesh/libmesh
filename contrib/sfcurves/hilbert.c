@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
+#include <stdio.h>
 #include "sfcurves_internal.h"
 
 
@@ -25,7 +26,7 @@ void hsfc3d(
 
   unsigned i ;
   unsigned char axis[3+3] ;
-  
+
   /* GRAY coding */
 
   if ( ! init ) {
@@ -65,10 +66,18 @@ void hsfc3d(
       const unsigned which = off / MaxBits ;           /* Which word */
       const unsigned shift = MaxBits - off % MaxBits ; /* Which bits */
 
-      if ( MaxBits == shift ) { /* Word boundary */
+      /* if ( MaxBits == shift ) { /\* Word boundary *\/ */
+      if (which > 2) {
         key[ which - 1 ] |= bit ;
       }
       else {
+        /* Don't write past the end of key!
+        if (which==3)
+          {
+            printf("Accessed past end of key!\n");
+            exit(1);
+          }
+        */
         key[ which ] |= bit << shift ;
       }
     }
@@ -134,7 +143,7 @@ void fhsfc3d(
   unsigned * nkey ,    /* IN: Word length of key */
   unsigned   key[] )   /* OUT: space-filling curve key */
 {
-  const double imax = ~(0u);
+  const double imax = UINT_MAX; /* ~(0u); */
   unsigned c[3] ;
   c[0] = (unsigned) (coord[0] * imax) ;
   c[1] = (unsigned) (coord[1] * imax) ;
@@ -152,21 +161,45 @@ void hilbert(double *x, double *y, double *z, int *N, int *table)
   double extry[2];
   double extrz[2];
   struct m_str *s;
-    
+
   int i;
 
   double temp[3]={0.0, 0.0, 0.0};
   unsigned leng=3;
 
-  
+  /* debugging print statements */
+  printf("\n");
+  printf("In hilbert, N=%d\n", *N);
+
+  printf("In hilbert, x=");
+  for (i=0; i<*N; i++)
+    printf("%f ", x[i]);
+  printf("\n");
+
+  printf("In hilbert, y=");
+  for (i=0; i<*N; i++)
+    printf("%f ", y[i]);
+  printf("\n");
+
+  printf("In hilbert, z=");
+  for (i=0; i<*N; i++)
+    printf("%f ", z[i]);
+  printf("\n");
+
+  printf("In hilbert, table=");
+  for (i=0; i<*N; i++)
+    printf("%d ", table[i]);
+  printf("\n");
+
   s=malloc((*N)*sizeof(struct m_str ));
-      
+
   extrx[0]=extrx[1]=x[0];
   extry[0]=extry[1]=y[0];
   extrz[0]=extrz[1]=z[0];
   table[0]=1;
 
-  for(i=1;i<*N;i++) { 
+  printf("In hilbert, starting for loop from 1 to N.\n");
+  for(i=1;i<*N;i++) {
     extrx[0]=MIN(extrx[0],x[i]);
     extrx[1]=MAX(extrx[1],x[i]);
     extry[0]=MIN(extry[0],y[i]);
@@ -176,14 +209,18 @@ void hilbert(double *x, double *y, double *z, int *N, int *table)
     table[i]=i+1;
   }
 
-    
+
+  printf("In hilbert, starting for loop from 0 to N.\n");
   for(i=0;i<*N;i++) {
+    printf("i=%d\n", i);
     temp[0]=(x[i]-extrx[0])/(extrx[1]-extrx[0]);
     temp[1]=(y[i]-extry[0])/(extry[1]-extry[0]);
     temp[2]=(z[i]-extrz[0])/(extrz[1]-extrz[0]);
 
+    /* debugging - if you comment out this function, the code does not abort, so the
+       error must be in this function somewhere! */
     fhsfc3d(temp,&leng,index);
-    
+
     s[i].x=x[i];
     s[i].y=y[i];
     s[i].z=z[i];
@@ -194,19 +231,41 @@ void hilbert(double *x, double *y, double *z, int *N, int *table)
 
   }
 
-  
+
+  printf("In hilbert, calling qsort.\n");
   qsort(s,*N,sizeof(struct m_str), cmp_indx);
 
+  printf("In hilbert, final loop from 0 to N.\n");
   for(i=0;i<*N;i++) {
-    
+
     x[i]=s[i].x;
     y[i]=s[i].y;
     z[i]=s[i].z;
     table[i]=s[i].table;
-    
+
   }
 
+  printf("In hilbert, before free(s).\n");
   free(s);
+  printf("In hilbert, after free(s).\n");
+
+  printf("In hilbert, x=");
+  for (i=0; i<*N; i++)
+    printf("%f ", x[i]);
+  printf("\n");
+
+  printf("In hilbert, y=");
+  for (i=0; i<*N; i++)
+    printf("%f ", y[i]);
+  printf("\n");
+
+  printf("In hilbert, z=");
+  for (i=0; i<*N; i++)
+    printf("%f ", z[i]);
+  printf("\n");
+
+  printf("In hilbert, table=");
+  for (i=0; i<*N; i++)
+    printf("%d ", table[i]);
+  printf("\n");
 }
-
-

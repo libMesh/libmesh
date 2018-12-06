@@ -151,6 +151,7 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
                     table.data());
     }
 
+  libMesh::out << "In SFCPartitioner::partition_range() after calling Sfc::hilbert" << std::endl;
 
   // Assign the partitioning to the range elements
   {
