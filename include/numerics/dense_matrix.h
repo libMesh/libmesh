@@ -172,11 +172,11 @@ public:
   /**
    * Computes the outer (dyadic) product of two vectors and stores in (*this).
    *
-   * The outer product of two real-valued vectors $\mathbf{a}$ and $\mathbf{b}$ is
+   * The outer product of two real-valued vectors \f$\mathbf{a}\f$ and \f$\mathbf{b}\f$ is
    * \f[
    *   (\mathbf{a}\mathbf{b}^T)_{i,j} = \mathbf{a}_i \mathbf{b}_j .
    * \f]
-   * The outer product of two complex-valued vectors $\mathbf{a}$ and $\mathbf{b}$ is
+   * The outer product of two complex-valued vectors \f$\mathbf{a}\f$ and \f$\mathbf{b}\f$ is
    * \f[
    *   (\mathbf{a}\mathbf{b}^H)_{i,j} = \mathbf{a}_i \mathbf{b}^*_j ,
    * \f]

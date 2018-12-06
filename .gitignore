@@ -25,6 +25,7 @@ Makefile
 include/Makefile
 include/libmesh/Makefile
 *.la
+tags
 
 contrib/*.la
 contrib/*.lo

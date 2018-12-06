@@ -35,6 +35,8 @@ namespace libMesh
 {
 
 /**
+ * \brief Wrap a libMesh-style function pointer into a FunctionBase object.
+ *
  * This class provides a wrapper with which to evaluate a
  * (libMesh-style) function pointer in a FunctionBase-compatible
  * interface. All overridden virtual functions are documented in
@@ -42,6 +44,7 @@ namespace libMesh
  *
  * \author Roy Stogner
  * \date 2012
+ * \note To wrap an ordinary function pointer use the AnalyticFunction class.
  */
 template <typename Output=Number>
 class WrappedFunction : public FunctionBase<Output>

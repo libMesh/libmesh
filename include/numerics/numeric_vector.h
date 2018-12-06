@@ -58,9 +58,15 @@ template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
 
 /**
- * Numeric vector. Provides a uniform interface
- * to vector storage schemes for different linear
- * algebra libraries.
+ * \brief Provides a uniform interface to vector storage schemes for different
+ * linear algebra libraries.
+ *
+ * \note This class is the abstract base class for different implementations
+ * of numeric vectors.  Most of the time you should use a System object to
+ * create numeric vectors.  If this is not desired, you can instantiate one of
+ * the derived classes (PetscVector, EigenSparseVector, etc.) or use the
+ * NumericVector::build method. When creating the vector yourself, make sure
+ * that you initialize the vector properly (NumericVector::init).
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -191,36 +197,36 @@ public:
   virtual std::unique_ptr<NumericVector<T>> clone () const = 0;
 
   /**
-   * Change the dimension of the vector to \p N. The reserved memory
-   * for this vector remains unchanged if possible.  If \p N==0, all
+   * Change the dimension of the vector to \p n. The reserved memory
+   * for this vector remains unchanged if possible.  If \p n==0, all
    * memory is freed. Therefore, if you want to resize the vector and
    * release the memory not needed, you have to first call \p init(0)
-   * and then \p init(N). This behaviour is analogous to that of the
+   * and then \p init(n). This behaviour is analogous to that of the
    * STL containers.
    *
    * On \p fast==false, the vector is filled by zeros.
    */
-  virtual void init (const numeric_index_type,
-                     const numeric_index_type,
-                     const bool = false,
-                     const ParallelType = AUTOMATIC) = 0;
+  virtual void init (const numeric_index_type n,
+                     const numeric_index_type n_local,
+                     const bool fast = false,
+                     const ParallelType ptype = AUTOMATIC) = 0;
 
   /**
    * Call \p init() with n_local = N.
    */
-  virtual void init (const numeric_index_type,
-                     const bool = false,
-                     const ParallelType = AUTOMATIC) = 0;
+  virtual void init (const numeric_index_type n,
+                     const bool fast = false,
+                     const ParallelType ptype = AUTOMATIC) = 0;
 
   /**
    * Create a vector that holds tha local indices plus those specified
    * in the \p ghost argument.
    */
-  virtual void init (const numeric_index_type /*N*/,
-                     const numeric_index_type /*n_local*/,
-                     const std::vector<numeric_index_type> & /*ghost*/,
-                     const bool /*fast*/ = false,
-                     const ParallelType = AUTOMATIC) = 0;
+  virtual void init (const numeric_index_type n,
+                     const numeric_index_type n_local,
+                     const std::vector<numeric_index_type> & ghost,
+                     const bool fast = false,
+                     const ParallelType ptype = AUTOMATIC) = 0;
 
   /**
    * Creates a vector that has the same dimension and storage type as

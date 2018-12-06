@@ -105,7 +105,7 @@ public:
 #endif
 
   /**
-   * \returns A \p Node copied from \p p with id == \id and wrapped in a smart pointer.
+   * \returns A \p Node copied from \p p with id == \p id and wrapped in a smart pointer.
    */
   static std::unique_ptr<Node> build (const Point & p,
                                       const dof_id_type id);
