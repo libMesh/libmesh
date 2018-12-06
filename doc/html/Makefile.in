@@ -777,7 +777,7 @@ support.html: src/$@ src/simple_header.html src/simple_footer.html
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html: doxygen
 doxygen:
-	@cd $(top_builddir)/include/libmesh && $(MAKE)
+	@$(MAKE) -C $(top_builddir)/include/libmesh
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -rf examples              && cp -r $(srcdir)/examples . && chmod -R u+rw examples
@@ -791,6 +791,10 @@ doxygen:
 
 @LIBMESH_VPATH_BUILD_FALSE@clean-local:
 @LIBMESH_VPATH_BUILD_FALSE@	-rm -rf doxygen
+
+# Mark doxygen as a phony target to build the documentation even when the
+# doxygen directory already exists.
+.PHONY: doxygen
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
