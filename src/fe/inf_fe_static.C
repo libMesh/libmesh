@@ -327,7 +327,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
         * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
         * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
 }
- 
+
 
 
 

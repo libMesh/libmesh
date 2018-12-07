@@ -523,7 +523,7 @@ void MeshFunction::gradient (const Point & p,
                     for (std::size_t v=0; v<dim; v++)
                     for (std::size_t xyz=0; xyz<dim; xyz++)
                       {
-                       // FIXME: this needs better syntax: It is matrix-vector multiplication. 
+                       // FIXME: this needs better syntax: It is matrix-vector multiplication.
                         grad(xyz) += data.local_transform[v][xyz]
                                    * data.dshape[i](v)
                                    * this->_vector(dof_indices[i]);
@@ -642,7 +642,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
                  for (std::size_t v=0; v<dim; v++)
                  for (std::size_t xyz=0; xyz<dim; xyz++)
                    {
-                     // FIXME: this needs better syntax: It is matrix-vector multiplication. 
+                     // FIXME: this needs better syntax: It is matrix-vector multiplication.
                      grad(xyz) += data.local_transform[v][xyz]
                                 * data.dshape[i](v)
                                 * this->_vector(dof_indices[i]);
@@ -684,7 +684,7 @@ void MeshFunction::hessian (const Point & p,
                      << "Second derivatives for Infinite elements"
                      << " are not yet implemented!"
                      << std::endl);
-#endif 
+#endif
       // resize the output vector to the number of output values
       // that the user told us
       output.resize (this->_system_vars.size());

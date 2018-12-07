@@ -70,11 +70,11 @@ void FEComputeData::init ()
 #endif //LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 }
-  
-  
+
+
 void FEComputeData::enable_derivative ()
 {
-  _need_dshape=true; 
+  _need_dshape=true;
   if (!(this->dshape.empty()))
     std::fill (this->dshape.begin(),   this->dshape.end(),  0);
 }
