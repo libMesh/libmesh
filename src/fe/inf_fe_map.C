@@ -94,6 +94,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 {
   libmesh_assert(inf_elem);
   libmesh_assert_greater_equal (tolerance, 0.);
+  libmesh_assert(Dim > 0);
 
   // Start logging the map inversion.
   LOG_SCOPE("inverse_map()", "InfFE");
@@ -109,7 +110,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   std::unique_ptr<Elem> base_elem (Base::build_elem (inf_elem));
 
   // The point on the reference element (which we are looking for).
+  // start with an invalid guess:
   Point p;
+  p(Dim-1)=-2.;
 
   // 2.)
   // Now find the intersection of a plane represented by the base
@@ -179,7 +182,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
         // inf_elem. In this case, any point that is not in the
         // element is a valid answer.
         if (libmesh_isinf(c_factor))
-          return o;
+          return p;
 
         // The intersection should always be between the origin and the physical point.
         // It can become positive close to the border, but should
@@ -187,7 +190,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
         //  So as in the case above, we can be sufficiently sure here
         // that \p fp is not in this element:
         if (c_factor > 0.01)
-          return o;
+          return p;
 
         // Compute the intersection with
         // {intersection} = {fp} + c*({fp}-{o}).
@@ -207,7 +210,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   p= FE<Dim-1,LAGRANGE>::inverse_map(base_elem.get(), intersection, tolerance, secure);
 
   // 4.
-  //
   // Now that we have the local coordinates in the base,
   // we compute the radial distance with Newton iteration.
 
@@ -219,45 +221,40 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   const Real a_dist = Point(o-intersection).norm();
 
   // element coordinate in radial direction
-  Real v = 0;
-
-  // Physical_point is not in this element (return the best approximation)
-  if (fp_o_dist < a_dist)
-    {
-      v=-1;
-    }
 
   // fp_o_dist is at infinity.
   if (libmesh_isinf(fp_o_dist))
     {
-      v=1;
+      p(Dim-1)=1;
+      return p;
     }
 
   // when we are somewhere in this element:
-  if (v==0)
-    {
-      // We know the analytic answer for CARTESIAN,
-      // other schemes do not yet have a better guess.
-      if (T_map == CARTESIAN)
-        v = 1.-2.*a_dist/fp_o_dist;
-      else
-        libmesh_not_implemented();
+  Real v = 0;
 
-      // after the tests above, this should never be reached,
-      // but lets be safe and ensure a valid result.
-      if (v <= -1.-1e-5)
-        v=-1.;
-      if (v >= 1.)
-        v=1.-1e-5;
-    }
+  if (T_map == CARTESIAN)
+    v = 1.-2.*a_dist/fp_o_dist;
+  else
+    libmesh_not_implemented();
+
+  // do not put the point back into the element, otherwise the contains_point-function
+  // gives false positives!
+  //if (v <= -1.-1e-5)
+  //  v=-1.;
+  //if (v >= 1.)
+  //  v=1.-1e-5;
 
   p(Dim-1)=v;
 #ifdef DEBUG
-  const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
-  const Point diff  = physical_point - check;
+  // first check whether we are in the reference-element:
+  if (-1.-1.e-5 < v && v < 1.)
+    {
+      const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
+      const Point diff  = physical_point - check;
 
-  if (diff.norm() > tolerance)
-    libmesh_warning("WARNING:  diff is " << diff.norm());
+      if (diff.norm() > tolerance)
+        libmesh_warning("WARNING:  diff is " << diff.norm());
+    }
 #endif
 
   return p;
