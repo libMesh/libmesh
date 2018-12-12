@@ -283,11 +283,11 @@ void ElemCutter::cut_2D (const Elem & elem,
   _inside_elem.clear();
   _outside_elem.clear();
 
-  for (const auto & elem : _inside_mesh_2D->element_ptr_range())
-    _inside_elem.push_back (elem);
+  for (const auto & el : _inside_mesh_2D->element_ptr_range())
+    _inside_elem.push_back (el);
 
-  for (const auto & elem : _outside_mesh_2D->element_ptr_range())
-    _outside_elem.push_back (elem);
+  for (const auto & el : _outside_mesh_2D->element_ptr_range())
+    _outside_elem.push_back (el);
 
 #endif
 }
@@ -364,13 +364,13 @@ void ElemCutter::cut_3D (const Elem & elem,
   _inside_elem.clear();
   _outside_elem.clear();
 
-  for (const auto & elem : _inside_mesh_3D->element_ptr_range())
-    if (elem->volume() > std::numeric_limits<Real>::epsilon())
-      _inside_elem.push_back (elem);
+  for (const auto & el : _inside_mesh_3D->element_ptr_range())
+    if (el->volume() > std::numeric_limits<Real>::epsilon())
+      _inside_elem.push_back (el);
 
-  for (const auto & elem : _outside_mesh_3D->element_ptr_range())
-    if (elem->volume() > std::numeric_limits<Real>::epsilon())
-      _outside_elem.push_back (elem);
+  for (const auto & el : _outside_mesh_3D->element_ptr_range())
+    if (el->volume() > std::numeric_limits<Real>::epsilon())
+      _outside_elem.push_back (el);
 
 #endif
 }

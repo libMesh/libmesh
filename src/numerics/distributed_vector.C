@@ -231,13 +231,19 @@ void DistributedVector<T>::add (const NumericVector<T> & v)
 
 
 template <typename T>
-void DistributedVector<T>::add (const T a, const NumericVector<T> & v)
+void DistributedVector<T>::add (const T a, const NumericVector<T> & v_in)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  add(a, v);
+  // Make sure the NumericVector passed in is really a DistributedVector
+  const DistributedVector<T> * v = cast_ptr<const DistributedVector<T> *>(&v_in);
+  if (!v)
+    libmesh_error_msg("Cannot add different types of NumericVectors.");
+
+  for (auto i : index_range(_values))
+    _values[i] += a * v->_values[i];
 }
 
 

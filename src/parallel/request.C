@@ -212,8 +212,8 @@ void Request::add_post_wait_work(PostWaitWork * work)
 
 void wait (std::vector<Request> & r)
 {
-  for (auto & request : r)
-    request.wait();
+  for (auto & req : r)
+    req.wait();
 }
 
 std::size_t waitany (std::vector<Request> & r)

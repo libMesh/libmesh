@@ -289,10 +289,10 @@ void RBEIMConstruction::load_rb_solution()
                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
-  RBEvaluation & rb_eval = get_rb_evaluation();
-  for (auto i : IntRange<unsigned int>(0, rb_eval.RB_solution.size()))
-    get_explicit_system().solution->add(rb_eval.RB_solution(i),
-                                        rb_eval.get_basis_function(i));
+  RBEvaluation & rbe = get_rb_evaluation();
+  for (auto i : IntRange<unsigned int>(0, rbe.RB_solution.size()))
+    get_explicit_system().solution->add(rbe.RB_solution(i),
+                                        rbe.get_basis_function(i));
 
   get_explicit_system().update();
 }

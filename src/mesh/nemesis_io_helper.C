@@ -1666,8 +1666,8 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase & pmesh)
   if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] global_elem_blk_cnts = ";
-      for (const auto & cnt : this->global_elem_blk_cnts)
-        libMesh::out << cnt << ", ";
+      for (const auto & bc : this->global_elem_blk_cnts)
+        libMesh::out << bc << ", ";
       libMesh::out << std::endl;
     }
 

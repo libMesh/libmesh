@@ -717,8 +717,9 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
           mesh.comm().receive (source_pid_idx,
                                common_interface_node_list,
                                element_neighbors_tag);
-          const std::size_t
-            their_interface_node_list_size = common_interface_node_list.size();
+
+          // const std::size_t
+          //   their_interface_node_list_size = common_interface_node_list.size();
 
           // we now have the interface node list from processor source_pid_idx.
           // now we can find all of our elements which touch any of these nodes
@@ -735,13 +736,13 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                                     common_interface_node_list.begin()),
              common_interface_node_list.end());
 
-          if (false)
-            libMesh::out << "[" << mesh.processor_id() << "] "
-                         << "my_interface_node_list.size()="       << my_interface_node_list.size()
-                         << ", [" << source_pid_idx << "] "
-                         << "their_interface_node_list.size()="    << their_interface_node_list_size
-                         << ", common_interface_node_list.size()=" << common_interface_node_list.size()
-                         << std::endl;
+          // if (false)
+          //   libMesh::out << "[" << mesh.processor_id() << "] "
+          //                << "my_interface_node_list.size()="       << my_interface_node_list.size()
+          //                << ", [" << source_pid_idx << "] "
+          //                << "their_interface_node_list.size()="    << their_interface_node_list_size
+          //                << ", common_interface_node_list.size()=" << common_interface_node_list.size()
+          //                << std::endl;
 
           // Now we need to see which of our elements touch the nodes in the list.
           // We will certainly send all the active elements which intersect source_pid_idx,
