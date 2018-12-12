@@ -907,7 +907,7 @@ protected:
   /**
    * The Jacobian tolerance used for determining when the mapping fails. The mapping is
    * determined to fail if jac <= jacobian_tolerance. If not set by the user, this number
-   * defaults to -TOLERANCE*TOLERANCE (-1e-12 for double precision calculations)
+   * defaults to 0
    */
   Real jacobian_tolerance;
 

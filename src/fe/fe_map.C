@@ -46,7 +46,7 @@ FEMap::FEMap() :
   calculate_xyz(false),
   calculate_dxyz(false),
   calculate_d2xyz(false),
-  jacobian_tolerance(-TOLERANCE * TOLERANCE)
+  jacobian_tolerance(0)
 {}
 
 
