@@ -35,6 +35,7 @@
 #include "libmesh/simple_range.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/hashword.h" // Used in compute_key() functions
+#include "libmesh/elem_internal.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -70,15 +71,6 @@ class PeriodicBoundaries;
 class PointLocatorBase;
 #endif
 
-/**
- * Implementation for both const and non-const Elem::total_family_tree() overloads.
- * TODO: Put this in some namespace that makes it harder to call by accident.
- */
-template<class T>
-void
-internal_total_family_tree(T elem,
-                           std::vector<T> & family,
-                           bool reset = true);
 
 /**
  * This is the base class from which all geometric element types are
@@ -490,7 +482,6 @@ public:
    * at any point.
    */
   void find_point_neighbors(std::set<const Elem *> & neighbor_set) const;
-  void find_point_neighbors(std::set<Elem *> & neighbor_set);
 
   /**
    * This function finds all active elements (including this one) in
@@ -498,7 +489,19 @@ public:
    * touch this element) which touch this element at any point.
    */
   void find_point_neighbors(std::set<const Elem *> & neighbor_set,
-                            const Elem * start_elem) const;
+                            const Elem * start_elem) const
+  {
+    ElemInternal::find_point_neighbors(this, neighbor_set, start_elem);
+  }
+
+  /**
+   * Non-const version of function above. Fills a set of non-const Elem pointers.
+   */
+  void find_point_neighbors(std::set<Elem *> & neighbor_set,
+                            Elem * start_elem)
+  {
+    ElemInternal::find_point_neighbors(this, neighbor_set, start_elem);
+  }
 
   /**
    * This function finds all active elements in the same manifold as
@@ -524,7 +527,20 @@ public:
    * one) in the parent manifold of this element whose intersection
    * with this element has non-zero measure.
    */
-  void find_interior_neighbors(std::set<const Elem *> & neighbor_set) const;
+  void find_interior_neighbors(std::set<const Elem *> & neighbor_set) const
+  {
+    ElemInternal::find_interior_neighbors(this, neighbor_set);
+  }
+
+  /**
+   * TODO: Add this once there is a templated version of Elem::find_point_neighbors().
+   * Non-const version of function above that fills up a vector of
+   * non-const Elem pointers instead.
+   */
+  void find_interior_neighbors(std::set<Elem *> & neighbor_set)
+  {
+    ElemInternal::find_interior_neighbors(this, neighbor_set);
+  }
 
   /**
    * Resets this element's neighbors' appropriate neighbor pointers
@@ -1316,25 +1332,37 @@ public:
    * include subactive elements as well, use total_family_tree().
    */
   void family_tree (std::vector<const Elem *> & family,
-                    const bool reset=true) const;
+                    bool reset = true) const
+  {
+    ElemInternal::family_tree(this, family, reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void family_tree (std::vector<Elem *> & family,
+                    bool reset = true)
+  {
+    ElemInternal::family_tree(this, family, reset);
+  }
 
   /**
    * Same as the \p family_tree() member, but also adds any subactive
    * descendants.
    */
   void total_family_tree (std::vector<const Elem *> & family,
-                          const bool reset=true) const
+                          bool reset = true) const
   {
-    internal_total_family_tree(this, family, reset);
+    ElemInternal::total_family_tree(this, family, reset);
   }
 
   /**
    * Non-const version of function above; fills a vector of non-const pointers.
    */
   void total_family_tree (std::vector<Elem *> & family,
-                          const bool reset=true)
+                          bool reset = true)
   {
-    internal_total_family_tree(this, family, reset);
+    ElemInternal::total_family_tree(this, family, reset);
   }
 
   /**
@@ -1344,29 +1372,61 @@ public:
    * implemented more efficiently.
    */
   void active_family_tree (std::vector<const Elem *> & active_family,
-                           const bool reset=true) const;
+                           bool reset = true) const
+  {
+    ElemInternal::active_family_tree(this, active_family, reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void active_family_tree (std::vector<Elem *> & active_family,
+                           bool reset = true)
+  {
+    ElemInternal::active_family_tree(this, active_family, reset);
+  }
 
   /**
    * Same as the \p family_tree() member, but only adds elements
    * which are next to \p side.
    */
   void family_tree_by_side (std::vector<const Elem *> & family,
-                            const unsigned int side,
-                            const bool reset=true) const;
+                            unsigned int side,
+                            bool reset=true) const
+  {
+    ElemInternal::family_tree_by_side(this, family, side, reset);
+  }
+
   /**
    * Non-const version of function above; fills a vector of non-const pointers.
    */
   void family_tree_by_side (std::vector<Elem *> & family,
                             unsigned int side,
-                            bool reset=true);
+                            bool reset=true)
+  {
+    ElemInternal::family_tree_by_side(this, family, side, reset);
+  }
 
   /**
    * Same as the \p active_family_tree() member, but only adds elements
    * which are next to \p side.
    */
   void active_family_tree_by_side (std::vector<const Elem *> & family,
-                                   const unsigned int side,
-                                   const bool reset=true) const;
+                                   unsigned int side,
+                                   bool reset = true) const
+  {
+    ElemInternal::active_family_tree_by_side(this, family, side, reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void active_family_tree_by_side (std::vector<Elem *> & family,
+                                   unsigned int side,
+                                   bool reset = true)
+  {
+    ElemInternal::active_family_tree_by_side(this, family, side, reset);
+  }
 
   /**
    * Same as the \p family_tree() member, but only adds elements
@@ -1374,7 +1434,20 @@ public:
    */
   void family_tree_by_neighbor (std::vector<const Elem *> & family,
                                 const Elem * neighbor,
-                                const bool reset=true) const;
+                                bool reset = true) const
+  {
+    ElemInternal::family_tree_by_neighbor(this, family, neighbor, reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void family_tree_by_neighbor (std::vector<Elem *> & family,
+                                Elem * neighbor,
+                                bool reset = true)
+  {
+    ElemInternal::family_tree_by_neighbor(this, family, neighbor, reset);
+  }
 
   /**
    * Same as the \p family_tree_by_neighbor() member, but also adds
@@ -1382,14 +1455,20 @@ public:
    */
   void total_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                       const Elem * neighbor,
-                                      const bool reset=true) const;
+                                      bool reset = true) const
+  {
+    ElemInternal::total_family_tree_by_neighbor(this, family, neighbor, reset);
+  }
 
   /**
    * Non-const version of function above; fills a vector of non-const pointers.
    */
   void total_family_tree_by_neighbor (std::vector<Elem *> & family,
                                       Elem * neighbor,
-                                      bool reset=true);
+                                      bool reset = true)
+  {
+    ElemInternal::total_family_tree_by_neighbor(this, family, neighbor, reset);
+  }
 
   /**
    * Same as the \p family_tree() member, but only adds elements
@@ -1400,7 +1479,21 @@ public:
   void family_tree_by_subneighbor (std::vector<const Elem *> & family,
                                    const Elem * neighbor,
                                    const Elem * subneighbor,
-                                   const bool reset=true) const;
+                                   bool reset = true) const
+  {
+    ElemInternal::family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void family_tree_by_subneighbor (std::vector<Elem *> & family,
+                                   Elem * neighbor,
+                                   Elem * subneighbor,
+                                   bool reset = true)
+  {
+    ElemInternal::family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+  }
 
   /**
    * Same as the \p family_tree_by_subneighbor() member, but also adds
@@ -1409,7 +1502,21 @@ public:
   void total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
                                          const Elem * neighbor,
                                          const Elem * subneighbor,
-                                         const bool reset=true) const;
+                                         bool reset = true) const
+  {
+    ElemInternal::total_family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void total_family_tree_by_subneighbor (std::vector<Elem *> & family,
+                                         Elem * neighbor,
+                                         Elem * subneighbor,
+                                         bool reset = true)
+  {
+    ElemInternal::total_family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+  }
 
   /**
    * Same as the \p active_family_tree() member, but only adds elements
@@ -1417,13 +1524,20 @@ public:
    */
   void active_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                        const Elem * neighbor,
-                                       const bool reset=true) const;
+                                       bool reset = true) const
+  {
+    ElemInternal::active_family_tree_by_neighbor(this, family, neighbor, reset);
+  }
+
   /**
    * Non-const version of function above; fills a vector of non-const pointers.
    */
   void active_family_tree_by_neighbor (std::vector<Elem *> & family,
                                        Elem * neighbor,
-                                       bool reset=true);
+                                       bool reset = true)
+  {
+    ElemInternal::active_family_tree_by_neighbor(this, family, neighbor, reset);
+  }
 
   /**
    * Same as the \p active_family_tree_by_neighbor() member, but the
@@ -1435,7 +1549,27 @@ public:
                                                    const MeshBase & mesh,
                                                    const PointLocatorBase & point_locator,
                                                    const PeriodicBoundaries * pb,
-                                                   const bool reset=true) const;
+                                                   bool reset = true) const
+  {
+    ElemInternal::active_family_tree_by_topological_neighbor(this, family, neighbor,
+                                                             mesh, point_locator, pb,
+                                                             reset);
+  }
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void active_family_tree_by_topological_neighbor (std::vector<Elem *> & family,
+                                                   Elem * neighbor,
+                                                   const MeshBase & mesh,
+                                                   const PointLocatorBase & point_locator,
+                                                   const PeriodicBoundaries * pb,
+                                                   bool reset = true)
+  {
+    ElemInternal::active_family_tree_by_topological_neighbor(this, family, neighbor,
+                                                             mesh, point_locator, pb,
+                                                             reset);
+  }
 
   /**
    * \returns The value of the refinement flag for the element.
@@ -3073,32 +3207,6 @@ inline
 SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
 {
   return {_elemlinks+1, _elemlinks + 1 + this->n_neighbors()};
-}
-
-
-/**
- * Implementation for both const and non-const Elem::total_family_tree() overloads.
- * TODO: Put this in some namespace that makes it harder to call by accident.
- */
-template<class T>
-void
-internal_total_family_tree(T elem,
-                           std::vector<T> & family,
-                           bool reset)
-{
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
-
-  // Add this element to the family tree.
-  family.push_back(elem);
-
-  // Recurse into the elements children, if it has them.
-  // Do not clear the vector any more.
-  if (elem->has_children())
-    for (auto & c : elem->child_ref_range())
-      if (!c.is_remote())
-        internal_total_family_tree (&c, family, false);
 }
 
 } // namespace libMesh
