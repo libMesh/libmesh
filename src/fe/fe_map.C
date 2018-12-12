@@ -41,12 +41,12 @@ namespace libMesh
 {
 
 // Constructor
-FEMap::FEMap() :
+FEMap::FEMap(Real jtol) :
   calculations_started(false),
   calculate_xyz(false),
   calculate_dxyz(false),
   calculate_d2xyz(false),
-  jacobian_tolerance(0)
+  jacobian_tolerance(jtol)
 {}
 
 

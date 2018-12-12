@@ -49,7 +49,7 @@ class FEMap
 {
 public:
 
-  FEMap();
+  FEMap(Real jtol = 0);
   virtual ~FEMap(){}
 
   static std::unique_ptr<FEMap> build(FEType fe_type);
