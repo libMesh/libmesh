@@ -2269,7 +2269,10 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
   libmesh_assert_less (i, this->n_sides());
 
   if (!side.get() || side->type() != sidetype)
-    side = this->build_side_ptr(i, false);
+    {
+      Subclass & real_me = cast_ref<Subclass&>(*this);
+      side = real_me.Subclass::build_side_ptr(i, false);
+    }
   else
     {
       side->subdomain_id() = this->subdomain_id();
