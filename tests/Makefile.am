@@ -39,6 +39,7 @@ unit_tests_sources = \
   geom/elem_test.C \
   geom/point_test.C \
   geom/point_test.h \
+  geom/side_test.C \
   geom/which_node_am_i_test.C \
   mesh/all_tri.C \
   mesh/distort.C \
