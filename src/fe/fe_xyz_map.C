@@ -39,10 +39,12 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
         {
           this->xyz.resize(n_qp);
           this->dxyzdxi_map.resize(n_qp);
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
           this->d2xyzdxi2_map.resize(n_qp);
+          this->curvatures.resize(n_qp);
+#endif
           this->tangents.resize(n_qp);
           this->normals.resize(n_qp);
-          this->curvatures.resize(n_qp);
 
           this->JxW.resize(n_qp);
         }
@@ -54,7 +56,9 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
             this->xyz[p].zero();
             this->dxyzdxi_map[p].zero();
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
             this->d2xyzdxi2_map[p].zero();
+#endif
           }
 
         // compute x, dxdxi at the quadrature points
@@ -68,7 +72,9 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
               {
                 this->xyz[p].add_scaled          (side_point, this->psi_map[i][p]);
                 this->dxyzdxi_map[p].add_scaled  (side_point, this->dpsidxi_map[i][p]);
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2xyzdxi2_map[p].add_scaled(side_point, this->d2psidxi2_map[i][p]);
+#endif
               }
           }
 
@@ -81,7 +87,8 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             this->tangents[p][0] = this->dxyzdxi_map[p].unit();
 #if LIBMESH_DIM == 3  // Only good in 3D space
             this->tangents[p][1] = this->dxyzdxi_map[p].cross(n).unit();
-#endif
+
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
             // The curvature is computed via the familiar Frenet formula:
             // curvature = [d^2(x) / d (xi)^2] dot [normal]
             // For a reference, see:
@@ -95,6 +102,8 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             const Real denominator = this->dxyzdxi_map[p].norm_sq();
             libmesh_assert_not_equal_to (denominator, 0);
             this->curvatures[p] = numerator / denominator;
+#endif
+#endif
           }
 
         // compute the jacobian at the quadrature points
@@ -118,12 +127,14 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
           this->xyz.resize(n_qp);
           this->dxyzdxi_map.resize(n_qp);
           this->dxyzdeta_map.resize(n_qp);
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
           this->d2xyzdxi2_map.resize(n_qp);
           this->d2xyzdxideta_map.resize(n_qp);
           this->d2xyzdeta2_map.resize(n_qp);
+          this->curvatures.resize(n_qp);
+#endif
           this->tangents.resize(n_qp);
           this->normals.resize(n_qp);
-          this->curvatures.resize(n_qp);
 
           this->JxW.resize(n_qp);
         }
@@ -135,9 +146,11 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             this->xyz[p].zero();
             this->dxyzdxi_map[p].zero();
             this->dxyzdeta_map[p].zero();
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
             this->d2xyzdxi2_map[p].zero();
             this->d2xyzdxideta_map[p].zero();
             this->d2xyzdeta2_map[p].zero();
+#endif
           }
 
         // compute x, dxdxi at the quadrature points
@@ -152,9 +165,11 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
                 this->xyz[p].add_scaled             (side_point, this->psi_map[i][p]);
                 this->dxyzdxi_map[p].add_scaled     (side_point, this->dpsidxi_map[i][p]);
                 this->dxyzdeta_map[p].add_scaled    (side_point, this->dpsideta_map[i][p]);
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2xyzdxi2_map[p].add_scaled   (side_point, this->d2psidxi2_map[i][p]);
                 this->d2xyzdxideta_map[p].add_scaled(side_point, this->d2psidxideta_map[i][p]);
                 this->d2xyzdeta2_map[p].add_scaled  (side_point, this->d2psideta2_map[i][p]);
+#endif
               }
           }
 
@@ -166,6 +181,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             this->tangents[p][0] = this->dxyzdxi_map[p].unit();
             this->tangents[p][1] = n.cross(this->dxyzdxi_map[p]).unit();
 
+#ifdef  LIBMESH_ENABLE_SECOND_DERIVATIVES
             // Compute curvature using the typical nomenclature
             // of the first and second fundamental forms.
             // For reference, see:
@@ -183,6 +199,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             const Real denominator = E*G - F*F;
             libmesh_assert_not_equal_to (denominator, 0.);
             this->curvatures[p] = 0.5*numerator/denominator;
+#endif
           }
 
         // compute the jacobian at the quadrature points, see

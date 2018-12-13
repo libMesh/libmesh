@@ -193,42 +193,53 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
           libmesh_assert_less (_base_node_index[n], n_base_mapping_shape_functions);
           libmesh_assert_less (_radial_node_index[n], n_radial_mapping_sf);
         }
-
     }
 
     // resize map data fields
     {
       std::vector<std::vector<Real>> & psi_map = this->_fe_map->get_psi();
       std::vector<std::vector<Real>> & dpsidxi_map = this->_fe_map->get_dpsidxi();
-      std::vector<std::vector<Real>> & d2psidxi2_map = this->_fe_map->get_d2psidxi2();
       psi_map.resize          (n_total_mapping_shape_functions);
       dpsidxi_map.resize      (n_total_mapping_shape_functions);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      std::vector<std::vector<Real>> & d2psidxi2_map = this->_fe_map->get_d2psidxi2();
+
       d2psidxi2_map.resize    (n_total_mapping_shape_functions);
+#endif
 
       //  if (Dim == 3)
       {
         std::vector<std::vector<Real>> & dpsideta_map = this->_fe_map->get_dpsideta();
+        dpsideta_map.resize     (n_total_mapping_shape_functions);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         std::vector<std::vector<Real>> & d2psidxideta_map = this->_fe_map->get_d2psidxideta();
         std::vector<std::vector<Real>> & d2psideta2_map = this->_fe_map->get_d2psideta2();
-        dpsideta_map.resize     (n_total_mapping_shape_functions);
         d2psidxideta_map.resize (n_total_mapping_shape_functions);
         d2psideta2_map.resize   (n_total_mapping_shape_functions);
+#endif
       }
 
       for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
         {
           psi_map[i].resize         (n_total_qp);
           dpsidxi_map[i].resize     (n_total_qp);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           d2psidxi2_map[i].resize   (n_total_qp);
+#endif
 
           // if (Dim == 3)
           {
             std::vector<std::vector<Real>> & dpsideta_map = this->_fe_map->get_dpsideta();
+            dpsideta_map[i].resize     (n_total_qp);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
             std::vector<std::vector<Real>> & d2psidxideta_map = this->_fe_map->get_d2psidxideta();
             std::vector<std::vector<Real>> & d2psideta2_map = this->_fe_map->get_d2psideta2();
-            dpsideta_map[i].resize     (n_total_qp);
             d2psidxideta_map[i].resize (n_total_qp);
             d2psideta2_map[i].resize   (n_total_qp);
+#endif
           }
         }
     }

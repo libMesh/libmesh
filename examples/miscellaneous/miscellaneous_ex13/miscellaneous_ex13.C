@@ -331,7 +331,7 @@ void assemble_shell (EquationSystems & es,
 {
   // This example requires Eigen to actually work, but we should still
   // let it compile and throw a runtime error if you don't.
-#ifdef LIBMESH_HAVE_EIGEN
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Shell");
@@ -765,5 +765,5 @@ void assemble_shell (EquationSystems & es,
   // Avoid compiler warnings
   libmesh_ignore(es);
   libmesh_ignore(system_name);
-#endif // LIBMESH_HAVE_EIGEN
+#endif // defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
 }

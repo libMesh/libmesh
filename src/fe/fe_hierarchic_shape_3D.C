@@ -765,6 +765,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem * elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
@@ -855,5 +856,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem * elem,
           FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm))
     / 2. / eps;
 }
+
+#endif
 
 } // namespace libMesh

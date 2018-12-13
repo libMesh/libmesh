@@ -266,6 +266,8 @@ public:
   const std::vector<RealGradient> & get_dxyzdzeta() const
   { return _fe_map->get_dxyzdzeta(); }
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
   /**
    * \returns The second partial derivatives in xi.
    */
@@ -278,23 +280,17 @@ public:
   const std::vector<RealGradient> & get_d2xyzdeta2() const
   { return this->_fe_map->get_d2xyzdeta2(); }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
   /**
    * \returns The second partial derivatives in zeta.
    */
   const std::vector<RealGradient> & get_d2xyzdzeta2() const
   { return this->_fe_map->get_d2xyzdzeta2(); }
 
-#endif
-
   /**
    * \returns The second partial derivatives in xi-eta.
    */
   const std::vector<RealGradient> & get_d2xyzdxideta() const
   { return this->_fe_map->get_d2xyzdxideta(); }
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * \returns The second partial derivatives in xi-zeta.
@@ -385,11 +381,14 @@ public:
   const std::vector<Point> & get_normals() const
   { return this->_fe_map->get_normals(); }
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The curvatures for use in face integration.
    */
   const std::vector<Real> & get_curvatures() const
   { return this->_fe_map->get_curvatures();}
+
+#endif
 
   /**
    * Provides the class with the quadrature rule.  Implement
@@ -546,10 +545,16 @@ protected:
    */
   mutable bool calculate_dphi;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Should we calculate shape function hessians?
    */
   mutable bool calculate_d2phi;
+#else
+  // Otherwise several interfaces need to be redone.
+  const bool calculate_d2phi=false;
+
+#endif
 
   /**
    * Should we calculate shape function curls?

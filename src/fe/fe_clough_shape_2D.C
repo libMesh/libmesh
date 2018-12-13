@@ -52,9 +52,13 @@ static Real N01x, N01y, N10x, N10y;
 static Real N02x, N02y, N20x, N20y;
 static Real N21x, N21y, N12x, N12y;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
                                    const Point & p);
+#endif
+
 Real clough_raw_shape_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
                             const Point & p);
@@ -571,6 +575,8 @@ unsigned char subtriangle_lookup(const Point & p)
   return 1;
 }
 
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 // Return shape function second derivatives on the unit right
 // triangle
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
@@ -1122,6 +1128,8 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                         deriv_type);
     }
 }
+
+#endif
 
 
 
@@ -2184,6 +2192,8 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem * elem,
 
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 template <>
 Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
                                       const Order order,
@@ -2358,5 +2368,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
     }
 }
+
+#endif
 
 } // namespace libMesh

@@ -438,19 +438,23 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
     {
       if (calculate_dxyz)
         this->dpsidxi_map.resize    (n_mapping_shape_functions);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (calculate_d2xyz)
         this->d2psidxi2_map.resize  (n_mapping_shape_functions);
+#endif
     }
 
   if (Dim == 3)
     {
       if (calculate_dxyz)
         this->dpsideta_map.resize     (n_mapping_shape_functions);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (calculate_d2xyz)
         {
           this->d2psidxideta_map.resize (n_mapping_shape_functions);
           this->d2psideta2_map.resize   (n_mapping_shape_functions);
         }
+#endif
     }
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
@@ -463,18 +467,22 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
         {
           if (calculate_dxyz)
             this->dpsidxi_map[i].resize    (n_qp);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
             this->d2psidxi2_map[i].resize  (n_qp);
+#endif
         }
       if (Dim == 3)
         {
           if (calculate_dxyz)
             this->dpsideta_map[i].resize     (n_qp);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
             {
               this->d2psidxideta_map[i].resize (n_qp);
               this->d2psideta2_map[i].resize   (n_qp);
             }
+#endif
         }
 
       // Compute the value of shape function i, and its first and
@@ -488,8 +496,10 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
             {
               if (calculate_dxyz)
                 this->dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (calculate_d2xyz)
                 this->d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+#endif
             }
           // libMesh::out << "this->d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
 
@@ -500,11 +510,13 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
             {
               if (calculate_dxyz)
                 this->dpsideta_map[i][p]     = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 1, qp[p]);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (calculate_d2xyz)
                 {
                   this->d2psidxideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 1, qp[p]);
                   this->d2psideta2_map[i][p]   = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 2, qp[p]);
                 }
+#endif
             }
         }
     }
@@ -540,8 +552,10 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
     this->psi_map.resize        (n_mapping_shape_functions);
   if (calculate_dxyz)
     this->dpsidxi_map.resize    (n_mapping_shape_functions);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (calculate_d2xyz)
     this->d2psidxi2_map.resize  (n_mapping_shape_functions);
+#endif
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
@@ -551,8 +565,10 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
         this->psi_map[i].resize        (n_qp);
       if (calculate_dxyz)
         this->dpsidxi_map[i].resize    (n_qp);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (calculate_d2xyz)
         this->d2psidxi2_map[i].resize  (n_qp);
+#endif
 
       // Compute the value of shape function i, and its first and
       // second derivatives at quadrature point p
@@ -563,8 +579,10 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
             this->psi_map[i][p]        = FE<1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
           if (calculate_dxyz)
             this->dpsidxi_map[i][p]    = FE<1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
             this->d2psidxi2_map[i][p]  = FE<1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+#endif
         }
     }
 }
@@ -664,11 +682,13 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
               this->JxW.resize(n_qp);
             }
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
             {
               this->d2xyzdxi2_map.resize(n_qp);
               this->curvatures.resize(n_qp);
             }
+#endif
         }
 
         // Clear the entities that will be summed
@@ -682,8 +702,10 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                 this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
                 this->dxyzdxi_map[p].zero();
               }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
             if (calculate_d2xyz)
               this->d2xyzdxi2_map[p].zero();
+#endif
           }
 
         const unsigned int n_mapping_shape_functions =
@@ -701,8 +723,10 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                   this->xyz[p].add_scaled          (side_point, this->psi_map[i][p]);
                 if (calculate_dxyz)
                   this->dxyzdxi_map[p].add_scaled  (side_point, this->dpsidxi_map[i][p]);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   this->d2xyzdxi2_map[p].add_scaled(side_point, this->d2psidxi2_map[i][p]);
+#endif
               }
           }
 
@@ -742,6 +766,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
 #endif
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 // The curvature is computed via the familiar Frenet formula:
                 // curvature = [d^2(x) / d (xi)^2] dot [normal]
                 // For a reference, see:
@@ -758,6 +783,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                     libmesh_assert_not_equal_to (denominator, 0);
                     curvatures[p] = numerator / denominator;
                   }
+#endif
               }
 
             // compute the jacobian at the quadrature points
@@ -792,6 +818,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
               this->normals.resize(n_qp);
               this->JxW.resize(n_qp);
             }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
             {
               this->d2xyzdxi2_map.resize(n_qp);
@@ -799,6 +826,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
               this->d2xyzdeta2_map.resize(n_qp);
               this->curvatures.resize(n_qp);
             }
+#endif
         }
 
         // Clear the entities that will be summed
@@ -812,12 +840,14 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                 this->dxyzdxi_map[p].zero();
                 this->dxyzdeta_map[p].zero();
               }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
             if (calculate_d2xyz)
               {
                 this->d2xyzdxi2_map[p].zero();
                 this->d2xyzdxideta_map[p].zero();
                 this->d2xyzdeta2_map[p].zero();
               }
+#endif
           }
 
         const unsigned int n_mapping_shape_functions =
@@ -838,12 +868,14 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                     this->dxyzdxi_map[p].add_scaled (side_point, this->dpsidxi_map[i][p]);
                     this->dxyzdeta_map[p].add_scaled(side_point, this->dpsideta_map[i][p]);
                   }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   {
                     this->d2xyzdxi2_map[p].add_scaled   (side_point, this->d2psidxi2_map[i][p]);
                     this->d2xyzdxideta_map[p].add_scaled(side_point, this->d2psidxideta_map[i][p]);
                     this->d2xyzdeta2_map[p].add_scaled  (side_point, this->d2psideta2_map[i][p]);
                   }
+#endif
               }
           }
 
@@ -857,6 +889,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                 this->tangents[p][0] = this->dxyzdxi_map[p].unit();
                 this->tangents[p][1] = n.cross(this->dxyzdxi_map[p]).unit();
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   {
                     // Compute curvature using the typical nomenclature
@@ -877,6 +910,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                     libmesh_assert_not_equal_to (denominator, 0.);
                     curvatures[p] = 0.5*numerator/denominator;
                   }
+#endif
               }
 
             // compute the jacobian at the quadrature points, see
@@ -955,6 +989,7 @@ void FEMap::compute_edge_map(int dim,
       this->normals.resize(n_qp);
       this->JxW.resize(n_qp);
     }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (calculate_d2xyz)
     {
       this->d2xyzdxi2_map.resize(n_qp);
@@ -962,6 +997,7 @@ void FEMap::compute_edge_map(int dim,
       this->d2xyzdeta2_map.resize(n_qp);
       this->curvatures.resize(n_qp);
     }
+#endif
 
   // Clear the entities that will be summed
   for (unsigned int p=0; p<n_qp; p++)
@@ -974,12 +1010,14 @@ void FEMap::compute_edge_map(int dim,
           this->dxyzdxi_map[p].zero();
           this->dxyzdeta_map[p].zero();
         }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (calculate_d2xyz)
         {
           this->d2xyzdxi2_map[p].zero();
           this->d2xyzdxideta_map[p].zero();
           this->d2xyzdeta2_map[p].zero();
         }
+#endif
     }
 
   // compute x, dxdxi at the quadrature points
@@ -995,8 +1033,10 @@ void FEMap::compute_edge_map(int dim,
             this->xyz[p].add_scaled             (edge_point, this->psi_map[i][p]);
           if (calculate_dxyz)
             this->dxyzdxi_map[p].add_scaled     (edge_point, this->dpsidxi_map[i][p]);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
             this->d2xyzdxi2_map[p].add_scaled   (edge_point, this->d2psidxi2_map[i][p]);
+#endif
         }
     }
 

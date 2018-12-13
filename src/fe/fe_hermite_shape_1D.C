@@ -69,6 +69,7 @@ void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
 namespace libMesh
 {
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template<>
 Real FEHermite<1>::hermite_raw_shape_second_deriv (const unsigned int i, const Real xi)
@@ -105,6 +106,7 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv (const unsigned int i, const R
     }
 }
 
+#endif
 
 
 template<>
@@ -296,6 +298,7 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
@@ -345,5 +348,7 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 }
+
+#endif
 
 } // namespace libMesh

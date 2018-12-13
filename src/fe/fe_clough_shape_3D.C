@@ -82,6 +82,8 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem * libmesh_dbg_var(elem),
 
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 template <>
 Real FE<3,CLOUGH>::shape_second_deriv(const Elem * libmesh_dbg_var(elem),
                                       const Order,
@@ -93,5 +95,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem * libmesh_dbg_var(elem),
   libmesh_not_implemented();
   return 0.;
 }
+
+#endif
 
 } // namespace libMesh

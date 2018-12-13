@@ -64,6 +64,7 @@ Real FE<2,SCALAR>::shape_deriv(const Elem *,
   return 0.;
 }
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<2,SCALAR>::shape_second_deriv(const ElemType,
@@ -84,5 +85,7 @@ Real FE<2,SCALAR>::shape_second_deriv(const Elem *,
 {
   return 0.;
 }
+
+#endif
 
 } // namespace libMesh

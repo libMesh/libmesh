@@ -314,6 +314,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const Elem * elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
@@ -547,5 +548,6 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const Elem * elem,
   return FE<2,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
+#endif
 
 } // namespace libMesh
