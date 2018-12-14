@@ -90,7 +90,7 @@ std::unique_ptr<Elem> Tet::side_ptr (const unsigned int i)
 void Tet::side_ptr (std::unique_ptr<Elem> & side,
                     const unsigned int i)
 {
-  this->simple_build_side_ptr<Tet4>(side, i, TRI3);
+  this->simple_side_ptr<Tet,Tet4>(side, i, TRI3);
 }
 
 

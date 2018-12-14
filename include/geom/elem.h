@@ -1647,6 +1647,14 @@ protected:
                              const unsigned int i,
                              ElemType sidetype);
 
+  /**
+   * An implementation for simple (all sides equal) elements
+   */
+  template <typename Subclass, typename Mapclass>
+  void simple_side_ptr(std::unique_ptr<Elem> & side,
+                       const unsigned int i,
+                       ElemType sidetype);
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -2261,13 +2269,41 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
   libmesh_assert_less (i, this->n_sides());
 
   if (!side.get() || side->type() != sidetype)
-    side = this->build_side_ptr(i, false);
+    {
+      Subclass & real_me = cast_ref<Subclass&>(*this);
+      side = real_me.Subclass::build_side_ptr(i, false);
+    }
   else
     {
       side->subdomain_id() = this->subdomain_id();
 
       for (auto n : side->node_index_range())
         side->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+    }
+}
+
+
+
+template <typename Subclass, typename Mapclass>
+inline
+void
+Elem::simple_side_ptr (std::unique_ptr<Elem> & side,
+                       const unsigned int i,
+                       ElemType sidetype)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  if (!side.get() || side->type() != sidetype)
+    {
+      Subclass & real_me = cast_ref<Subclass&>(*this);
+      side = real_me.Subclass::side_ptr(i);
+    }
+  else
+    {
+      side->subdomain_id() = this->subdomain_id();
+
+      for (auto n : side->node_index_range())
+        side->set_node(n) = this->node_ptr(Mapclass::side_nodes_map[i][n]);
     }
 }
 
