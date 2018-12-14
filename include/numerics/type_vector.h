@@ -1100,6 +1100,31 @@ T cross_norm(const TypeVector<T> & b,
   return std::sqrt(cross_norm_sq(b,c));
 }
 
+template <typename T>
+inline
+TypeVector<T> TypeVector<T>::unit() const
+{
+
+  auto && length = norm();
+
+  libmesh_assert_not_equal_to (length, static_cast<Real>(0.));
+
+#if LIBMESH_DIM == 1
+  return TypeVector<T>(_coords[0]/length);
+#endif
+
+#if LIBMESH_DIM == 2
+  return TypeVector<T>(_coords[0]/length,
+                       _coords[1]/length);
+#endif
+
+#if LIBMESH_DIM == 3
+  return TypeVector<T>(_coords[0]/length,
+                       _coords[1]/length,
+                       _coords[2]/length);
+#endif
+
+}
 } // namespace libMesh
 
 #endif // LIBMESH_TYPE_VECTOR_H
