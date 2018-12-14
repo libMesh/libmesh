@@ -111,7 +111,7 @@ std::unique_ptr<Elem> Hex::side_ptr (const unsigned int i)
 void Hex::side_ptr (std::unique_ptr<Elem> & side,
                     const unsigned int i)
 {
-  this->simple_build_side_ptr<Hex8>(side, i, QUAD4);
+  this->simple_side_ptr<Hex,Hex8>(side, i, QUAD4);
 }
 
 

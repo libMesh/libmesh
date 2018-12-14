@@ -100,7 +100,7 @@ std::unique_ptr<Elem> Quad::side_ptr (const unsigned int i)
 void Quad::side_ptr (std::unique_ptr<Elem> & side,
                      const unsigned int i)
 {
-  this->simple_build_side_ptr<Quad4>(side, i, EDGE2);
+  this->simple_side_ptr<Quad,Quad4>(side, i, EDGE2);
 }
 
 
