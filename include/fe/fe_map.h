@@ -409,10 +409,18 @@ public:
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dpsidxi_map; }
 
+  const std::vector<std::vector<Real>> & get_dpsidxi() const
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dpsidxi_map; }
+
   /**
    * \returns The reference to physical map derivative for the side/edge
    */
   std::vector<std::vector<Real>> & get_dpsideta()
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dpsideta_map; }
+
+  const std::vector<std::vector<Real>> & get_dpsideta() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dpsideta_map; }
 
