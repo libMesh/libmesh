@@ -2585,6 +2585,8 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
 {
   switch (et)
     {
+    case NODEELEM:
+      return NODEELEM;
     case EDGE2:
     case EDGE3:
     case EDGE4:
@@ -2619,6 +2621,8 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
+    case INFEDGE2:
+      return INFEDGE2;
     case INFQUAD4:
     case INFQUAD6:
       return INFQUAD4;
@@ -2643,13 +2647,10 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
 ElemType Elem::second_order_equivalent_type (const ElemType et,
                                              const bool full_ordered)
 {
-  /* for second-order elements, always return \p INVALID_ELEM
-   * since second-order elements should not be converted
-   * into something else.  Only linear elements should
-   * return something sensible here
-   */
   switch (et)
     {
+    case NODEELEM:
+      return NODEELEM;
     case EDGE2:
     case EDGE3:
       {
@@ -2754,7 +2755,7 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
       // infinite elements
     case INFEDGE2:
       {
-        return INVALID_ELEM;
+        return INFEDGE2;
       }
 
     case INFQUAD4:
