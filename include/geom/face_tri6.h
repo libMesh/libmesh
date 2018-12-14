@@ -151,7 +151,7 @@ public:
                                        unsigned int side_node) const override;
 
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy) override;
+                                                bool proxy=true) override;
 
   /**
    * Rebuilds an EDGE2 coincident with face i.
