@@ -49,7 +49,7 @@ class FEMap
 {
 public:
 
-  FEMap();
+  FEMap(Real jtol = 0);
   virtual ~FEMap(){}
 
   static std::unique_ptr<FEMap> build(FEType fe_type);
@@ -527,6 +527,12 @@ public:
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return JxW; }
 
+  /**
+   * Set the Jacobian tolerance used for determining when the mapping fails. The mapping is
+   * determined to fail if jac <= jacobian_tolerance.
+   */
+  void set_jacobian_tolerance(Real tol) { jacobian_tolerance = tol; }
+
 protected:
 
   /**
@@ -905,6 +911,13 @@ protected:
    */
   template <unsigned int Dim, FEFamily T>
   friend class FE;
+
+  /**
+   * The Jacobian tolerance used for determining when the mapping fails. The mapping is
+   * determined to fail if jac <= jacobian_tolerance. If not set by the user, this number
+   * defaults to 0
+   */
+  Real jacobian_tolerance;
 
 private:
   /**
