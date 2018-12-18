@@ -37,6 +37,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -827,7 +828,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           coords.resize (3*tot_id_size, std::numeric_limits<Real>::quiet_NaN());
 
           for (unsigned int pid=0; pid<this->n_processors(); pid++)
-            for (std::size_t idx=0; idx<recv_ids[pid].size(); idx++)
+            for (auto idx : index_range(recv_ids[pid]))
               {
                 libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
                 const std::size_t local_idx = recv_ids[pid][idx] - first_node;
@@ -966,7 +967,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           unique_ids.resize(tot_id_size, unique_id_type(-1));
 
           for (unsigned int pid=0; pid<this->n_processors(); pid++)
-            for (std::size_t idx=0; idx<recv_ids[pid].size(); idx++)
+            for (auto idx : index_range(recv_ids[pid]))
               {
                 libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
                 const std::size_t local_idx = recv_ids[pid][idx] - first_node;

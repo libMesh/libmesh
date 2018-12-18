@@ -20,7 +20,6 @@
 // C++ includes
 #include <algorithm> // for std::copy, std::sort
 
-
 // Local includes
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_tools.h"
@@ -29,6 +28,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h" // sync_dofobject_data_by_id()
 #include "libmesh/parallel_algebra.h" // StandardType<Point>
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -78,14 +78,14 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
             {
               Point avg_position(0.,0.,0.);
 
-              for (std::size_t j=0; j<_graph[node->id()].size(); ++j)
+              for (const auto & connected_id : _graph[node->id()])
                 {
                   // Will these nodal positions always be available
                   // or will they refer to remote nodes?  This will
                   // fail an assertion in the latter case, which
                   // shouldn't occur if DistributedMesh is working
                   // correctly.
-                  const Point & connected_node = _mesh.point(_graph[node->id()][j]);
+                  const Point & connected_node = _mesh.point(connected_id);
 
                   avg_position.add( connected_node );
                 } // end for (j)
@@ -231,12 +231,12 @@ void LaplaceMeshSmoother::init()
   // now have duplicate entries and we need to remove them so
   // they don't foul up the averaging algorithm employed by the
   // Laplace smoother.
-  for (std::size_t i=0; i<_graph.size(); ++i)
+  for (auto & id_vec : _graph)
     {
       // The std::unique algorithm removes duplicate *consecutive* elements from a range,
       // so it only makes sense to call it on a sorted range...
-      std::sort(_graph[i].begin(), _graph[i].end());
-      _graph[i].erase(std::unique(_graph[i].begin(), _graph[i].end()), _graph[i].end());
+      std::sort(id_vec.begin(), id_vec.end());
+      id_vec.erase(std::unique(id_vec.begin(), id_vec.end()), id_vec.end());
     }
 
 } // init()
@@ -246,7 +246,7 @@ void LaplaceMeshSmoother::init()
 
 void LaplaceMeshSmoother::print_graph(std::ostream & out_stream) const
 {
-  for (std::size_t i=0; i<_graph.size(); ++i)
+  for (auto i : index_range(_graph))
     {
       out_stream << i << ": ";
       std::copy(_graph[i].begin(),
@@ -271,14 +271,14 @@ void LaplaceMeshSmoother::allgather_graph()
   // Reserve at least enough space for each node to have zero entries
   flat_graph.reserve(_graph.size());
 
-  for (std::size_t i=0; i<_graph.size(); ++i)
+  for (const auto & id_vec : _graph)
     {
       // First push back the number of entries for this node
-      flat_graph.push_back (cast_int<dof_id_type>(_graph[i].size()));
+      flat_graph.push_back (cast_int<dof_id_type>(id_vec.size()));
 
       // Then push back all the IDs
-      for (std::size_t j=0; j<_graph[i].size(); ++j)
-        flat_graph.push_back(_graph[i][j]);
+      for (const auto & dof : id_vec)
+        flat_graph.push_back(dof);
     }
 
   // // A copy of the flat graph (for printing only, delete me later)
@@ -315,32 +315,31 @@ void LaplaceMeshSmoother::allgather_graph()
           _graph[node_ctr].push_back(flat_graph[cursor++]);
       }
 
-
-  //    // Print local graph to uniquely named file (debugging)
-  //    {
-  //      // Generate unique filename for this processor
-  //      std::ostringstream oss;
-  //      oss << "graph_filename_" << _mesh.processor_id() << ".txt";
-  //      std::ofstream graph_stream(oss.str().c_str());
+  // // Print local graph to uniquely named file (debugging)
+  // {
+  //   // Generate unique filename for this processor
+  //   std::ostringstream oss;
+  //   oss << "graph_filename_" << _mesh.processor_id() << ".txt";
+  //   std::ofstream graph_stream(oss.str().c_str());
   //
-  //      // Print the local non-flat graph
-  //      std::swap(_graph, copy_of_graph);
-  //      print_graph(graph_stream);
+  //   // Print the local non-flat graph
+  //   std::swap(_graph, copy_of_graph);
+  //   print_graph(graph_stream);
   //
-  //      // Print the (local) flat graph for verification
-  //      for (std::size_t i=0; i<copy_of_flat_graph.size(); ++i)
-  //graph_stream << copy_of_flat_graph[i] << " ";
-  //      graph_stream << "\n";
+  //   // Print the (local) flat graph for verification
+  //   for (const auto & dof : copy_of_flat_graph)
+  //     graph_stream << dof << " ";
+  //   graph_stream << "\n";
   //
-  //      // Print the allgather'd grap for verification
-  //      for (std::size_t i=0; i<flat_graph.size(); ++i)
-  //graph_stream << flat_graph[i] << " ";
-  //      graph_stream << "\n";
+  //   // Print the allgather'd grap for verification
+  //   for (const auto & dof : flat_graph)
+  //     graph_stream << dof << " ";
+  //   graph_stream << "\n";
   //
-  //      // Print the global non-flat graph
-  //      std::swap(_graph, copy_of_graph);
-  //      print_graph(graph_stream);
-  //    }
+  //   // Print the global non-flat graph
+  //   std::swap(_graph, copy_of_graph);
+  //   print_graph(graph_stream);
+  // }
 } // allgather_graph()
 
 } // namespace libMesh

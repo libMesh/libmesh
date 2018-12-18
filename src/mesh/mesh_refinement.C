@@ -38,6 +38,7 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/sync_refinement_flags.h"
+#include "libmesh/int_range.h"
 
 #ifdef DEBUG
 // Some extra validation for DistributedMesh
@@ -226,12 +227,12 @@ void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_ce
 
   // Make sure the input error vector is valid
 #ifdef DEBUG
-  for (std::size_t i=0; i != error_per_cell.size(); ++i)
+  for (const auto & val : error_per_cell)
     {
-      libmesh_assert_greater_equal (error_per_cell[i], 0);
+      libmesh_assert_greater_equal (val, 0);
       // isnan() isn't standard C++ yet
 #ifdef isnan
-      libmesh_assert(!isnan(error_per_cell[i]));
+      libmesh_assert(!isnan(val));
 #endif
     }
 
@@ -308,7 +309,7 @@ void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_ce
   parent_error_min = std::numeric_limits<double>::max();
   parent_error_max = 0.;
 
-  for (std::size_t i = 0; i != error_per_parent.size(); ++i)
+  for (auto i : index_range(error_per_parent))
     {
       // If this element isn't a coarsenable parent with error, we
       // have nothing to do.  Just flag it as -1 and move on
@@ -1545,9 +1546,8 @@ bool MeshRefinement::_refine_elements ()
   // Now iterate over the local copies and refine each one.
   // This may resize the mesh's internal container and invalidate
   // any existing iterators.
-
-  for (std::size_t e = 0; e != local_copy_of_elements.size(); ++e)
-    local_copy_of_elements[e]->refine(*this);
+  for (auto & elem : local_copy_of_elements)
+    elem->refine(*this);
 
   // The mesh changed if there were elements h refined
   bool mesh_changed = !local_copy_of_elements.empty();

@@ -30,6 +30,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/parallel.h"
 #include "libmesh/enum_io_package.h"
+#include "libmesh/int_range.h"
 
 #ifdef LIBMESH_HAVE_TECPLOT_API
 extern "C" {
@@ -258,19 +259,19 @@ void TecplotIO::write_ascii (const std::string & fname,
     out_stream << "Variables=x,y,z";
 
     if (solution_names != nullptr)
-      for (std::size_t n=0; n<solution_names->size(); n++)
+      for (const auto & val : *solution_names)
         {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
           // Write variable names for real variables
-          out_stream << "," << (*solution_names)[n];
+          out_stream << "," << val;
 
 #else
 
           // Write variable names for complex variables
-          out_stream << "," << "r_"   << (*solution_names)[n]
-                     << "," << "i_"   << (*solution_names)[n]
-                     << "," << "a_"   << (*solution_names)[n];
+          out_stream << "," << "r_" << val
+                     << "," << "i_" << val
+                     << "," << "a_" << val;
 
 #endif
         }
@@ -416,24 +417,24 @@ void TecplotIO::write_binary (const std::string & fname,
 
     if (solution_names != nullptr)
       {
-        for (std::size_t name=0; name<solution_names->size(); name++)
+        for (const auto & val : *solution_names)
           {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
             tecplot_variable_names += ", ";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
 
 #else
 
             tecplot_variable_names += ", ";
             tecplot_variable_names += "r_";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
             tecplot_variable_names += ", ";
             tecplot_variable_names += "i_";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
             tecplot_variable_names += ", ";
             tecplot_variable_names += "a_";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
 
 #endif
           }
@@ -525,7 +526,7 @@ void TecplotIO::write_binary (const std::string & fname,
               {
                 elem->connectivity(se, TECPLOT, conn);
 
-                for (std::size_t node=0; node<conn.size(); node++)
+                for (auto node : index_range(conn))
                   tm.cd(node,te) = conn[node];
 
                 te++;
@@ -668,24 +669,24 @@ void TecplotIO::write_binary (const std::string & fname,
 
     if (solution_names != nullptr)
       {
-        for (std::size_t name=0; name<solution_names->size(); name++)
+        for (const auto & val : *solution_names)
           {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
             tecplot_variable_names += ", ";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
 
 #else
 
             tecplot_variable_names += ", ";
             tecplot_variable_names += "r_";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
             tecplot_variable_names += ", ";
             tecplot_variable_names += "i_";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
             tecplot_variable_names += ", ";
             tecplot_variable_names += "a_";
-            tecplot_variable_names += (*solution_names)[name];
+            tecplot_variable_names += val;
 
 #endif
           }
@@ -749,7 +750,7 @@ void TecplotIO::write_binary (const std::string & fname,
           {
             elem->connectivity(se, TECPLOT, conn);
 
-            for (std::size_t node=0; node<conn.size(); node++)
+            for (auto node : index_range(conn))
               tm.cd(node,te) = conn[node];
 
             te++;

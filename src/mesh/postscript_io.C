@@ -25,6 +25,7 @@
 #include "libmesh/postscript_io.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/elem.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -252,7 +253,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem * elem)
       this->_compute_edge_bezier_coeffs(side.get());
 
       // Print curveto path to file
-      for (std::size_t i=0; i<_bezier_coeffs.size(); ++i)
+      for (auto i : index_range(_bezier_coeffs))
         _out << _bezier_coeffs[i](0) << " " << _bezier_coeffs[i](1) << " ";
       _out << " cs\n";
     }

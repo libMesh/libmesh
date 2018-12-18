@@ -489,7 +489,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   // numbers to LAPACKgesvd_, but _val may contain Reals so we copy to Number below to
   // handle both the real-valued and complex-valued cases.
   std::vector<Number> val_copy(_val.size());
-  for (std::size_t i=0; i<_val.size(); i++)
+  for (auto i : IntRange<int>(0, _val.size()))
     val_copy[i] = _val[i];
 
   std::vector<Real> RWORK(5 * min_MN);
@@ -659,7 +659,7 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // Debugging: print singular values and information about condition number:
   // libMesh::err << "RCOND=" << RCOND << std::endl;
   // libMesh::err << "Singular values: " << std::endl;
-  // for (std::size_t i=0; i<S.size(); ++i)
+  // for (auto i : index_range(S))
   //   libMesh::err << S[i] << std::endl;
   // libMesh::err << "The condition number of A is approximately: " << S[0]/S.back() << std::endl;
 

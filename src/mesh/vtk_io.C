@@ -521,7 +521,7 @@ void VTKIO::cells_to_vtk()
 //           libmesh_assert_equal_to (it->second.size(), es.get_mesh().n_nodes());
 //           data->SetNumberOfValues(it->second.size());
 //
-//           for (std::size_t i=0; i<it->second.size(); ++i)
+//           for (auto i : index_range(it->second))
 //             {
 // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 //               libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"

@@ -17,6 +17,7 @@
 
 
 #include "libmesh/diff_qoi.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -32,7 +33,7 @@ void DifferentiableQoI::thread_join( std::vector<Number> & qoi,
                                      const std::vector<Number> & other_qoi,
                                      const QoISet &)
 {
-  for (std::size_t i=0; i != qoi.size(); ++i)
+  for (auto i : index_range(qoi))
     qoi[i] += other_qoi[i];
 }
 

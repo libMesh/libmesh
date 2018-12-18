@@ -305,7 +305,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
 
   // create_parent_error_vector sets values for non-parents and
   // non-coarsenable parents to -1.  Get rid of them.
-  for (std::size_t i=0; i != error_per_parent.size(); ++i)
+  for (auto i : index_range(error_per_parent))
     if (error_per_parent[i] != -1)
       sorted_parent_error.push_back(std::make_pair(error_per_parent[i], i));
 
@@ -356,9 +356,9 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   {
     std::vector<bool> is_refinable(max_elem_id, false);
 
-    for (std::size_t i=0; i != sorted_error.size(); ++i)
+    for (const auto & pr : sorted_error)
       {
-        dof_id_type eid = sorted_error[i].second;
+        dof_id_type eid = pr.second;
         Elem * elem = _mesh.query_elem_ptr(eid);
         if (elem && elem->level() < _max_h_level)
           is_refinable[eid] = true;
@@ -367,12 +367,12 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
 
     if (refine_count > max_elem_refine)
       refine_count = max_elem_refine;
-    for (std::size_t i=0; i != sorted_error.size(); ++i)
+    for (const auto & pr : sorted_error)
       {
         if (successful_refine_count >= refine_count)
           break;
 
-        dof_id_type eid = sorted_error[i].second;
+        dof_id_type eid = pr.second;
         Elem * elem = _mesh.query_elem_ptr(eid);
         if (is_refinable[eid])
           {
@@ -396,12 +396,12 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   dof_id_type successful_coarsen_count = 0;
   if (coarsen_count)
     {
-      for (std::size_t i=0; i != sorted_parent_error.size(); ++i)
+      for (const auto & pr : sorted_parent_error)
         {
           if (successful_coarsen_count >= coarsen_count * twotodim)
             break;
 
-          dof_id_type parent_id = sorted_parent_error[i].second;
+          dof_id_type parent_id = pr.second;
           Elem * parent = _mesh.query_elem_ptr(parent_id);
 
           // On a DistributedMesh we skip remote elements

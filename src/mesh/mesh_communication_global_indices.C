@@ -212,15 +212,9 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       //           {
       //             CFixBitVec icoords[3], jcoords[3];
       //             get_hilbert_coords(**nodej, bbox, jcoords);
-      //             libMesh::err <<
-      //               "node " << (*nodej)->id() << ", " <<
-      //               *(Point *)(*nodej) << " has HilbertIndices " <<
-      //               node_keys[j] << std::endl;
+      //             libMesh::err << "node " << (*nodej)->id() << ", " << static_cast<Point &>(**nodej) << " has HilbertIndices " << node_keys[j] << std::endl;
       //             get_hilbert_coords(**nodei, bbox, icoords);
-      //             libMesh::err <<
-      //               "node " << (*nodei)->id() << ", " <<
-      //               *(Point *)(*nodei) << " has HilbertIndices " <<
-      //               node_keys[i] << std::endl;
+      //             libMesh::err << "node " << (*nodei)->id() << ", " << static_cast<Point &>(**nodei) << " has HilbertIndices " << node_keys[i] << std::endl;
       //             libmesh_error_msg("Error: nodes with duplicate Hilbert keys!");
       //           }
       //       }
@@ -246,24 +240,22 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       //         if ((elem_keys[i] == elem_keys[j]) &&
       //             ((*elemi)->level() == (*elemj)->level()))
       //           {
-      //             libMesh::err <<
-      //               "level " << (*elemj)->level() << " elem\n" <<
-      //               (**elemj) << " centroid " <<
-      //               (*elemj)->centroid() << " has HilbertIndices " <<
-      //               elem_keys[j] << " or " <<
-      //               get_dofobject_key((*elemj), bbox) <<
-      //               std::endl;
-      //             libMesh::err <<
-      //               "level " << (*elemi)->level() << " elem\n" <<
-      //               (**elemi) << " centroid " <<
-      //               (*elemi)->centroid() << " has HilbertIndices " <<
-      //               elem_keys[i] << " or " <<
-      //               get_dofobject_key((*elemi), bbox) <<
-      //               std::endl;
+      //             libMesh::err << "level " << (*elemj)->level()
+      //                          << " elem\n" << (**elemj)
+      //                          << " centroid " << (*elemj)->centroid()
+      //                          << " has HilbertIndices " << elem_keys[j]
+      //                          << " or " << get_dofobject_key((*elemj), bbox)
+      //                          << std::endl;
+      //             libMesh::err << "level " << (*elemi)->level()
+      //                          << " elem\n" << (**elemi)
+      //                          << " centroid " << (*elemi)->centroid()
+      //                          << " has HilbertIndices " << elem_keys[i]
+      //                          << " or " << get_dofobject_key((*elemi), bbox)
+      //                          << std::endl;
       //             libmesh_error_msg("Error: level " << (*elemi)->level() << " elements with duplicate Hilbert keys!");
       //           }
       //       }
-      //   }
+      //  }
     }
   } // done computing Hilbert keys
 

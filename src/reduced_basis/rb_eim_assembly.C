@@ -27,6 +27,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -106,7 +107,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
   for (unsigned int qp=0; qp<n_qpoints; qp++)
     {
       values[qp] = 0.;
-      for (std::size_t i=0; i<dof_indices_var.size(); i++)
+      for (auto i : index_range(dof_indices_var))
         values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
     }
 }

@@ -46,6 +46,7 @@
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/utility.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 #include <sys/types.h>
@@ -972,20 +973,20 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 
   int count = 0;
 
-  // initialize rb_eval's parameters
-  get_rb_evaluation().initialize_parameters(*this);
+  RBEvaluation & rbe = get_rb_evaluation();
+
+  // initialize rbe's parameters
+  rbe.initialize_parameters(*this);
 
   // possibly resize data structures according to Nmax
   if (resize_rb_eval_data)
-    {
-      get_rb_evaluation().resize_data_structures(get_Nmax());
-    }
+    rbe.resize_data_structures(get_Nmax());
 
   // Clear the Greedy param list
-  for (std::size_t i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
-    get_rb_evaluation().greedy_param_list[i].clear();
+  for (auto & plist : rbe.greedy_param_list)
+    plist.clear();
 
-  get_rb_evaluation().greedy_param_list.clear();
+  rbe.greedy_param_list.clear();
 
   Real training_greedy_error = 0.;
 
@@ -993,7 +994,7 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
   // If we are continuing from a previous training run,
   // we might already be at the max number of basis functions.
   // If so, we can just return.
-  if (get_rb_evaluation().get_n_basis_functions() >= get_Nmax())
+  if (rbe.get_n_basis_functions() >= get_Nmax())
     {
       libMesh::out << "Maximum number of basis functions reached: Nmax = "
                    << get_Nmax() << std::endl;
@@ -1016,7 +1017,7 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
   while (true)
     {
       libMesh::out << std::endl << "---- Basis dimension: "
-                   << get_rb_evaluation().get_n_basis_functions() << " ----" << std::endl;
+                   << rbe.get_n_basis_functions() << " ----" << std::endl;
 
       if (count > 0 || (count==0 && use_empty_rb_solve_in_greedy))
         {
@@ -1056,7 +1057,7 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
       // Check if we've reached Nmax now. We do this before calling
       // update_residual_terms() since we can skip that step if we've
       // already reached Nmax.
-      if (get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
+      if (rbe.get_n_basis_functions() >= this->get_Nmax())
       {
         libMesh::out << "Maximum number of basis functions reached: Nmax = "
                      << get_Nmax() << std::endl;
@@ -1142,7 +1143,9 @@ bool RBConstruction::greedy_termination_test(Real abs_greedy_error,
       return true;
     }
 
-  if (get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
+  RBEvaluation & rbe = get_rb_evaluation();
+
+  if (rbe.get_n_basis_functions() >= this->get_Nmax())
     {
       libMesh::out << "Maximum number of basis functions reached: Nmax = "
                    << get_Nmax() << std::endl;
@@ -1150,18 +1153,12 @@ bool RBConstruction::greedy_termination_test(Real abs_greedy_error,
     }
 
   if (exit_on_repeated_greedy_parameters)
-    {
-      for (std::size_t i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
+    for (auto & plist : rbe.greedy_param_list)
+      if (plist == get_parameters())
         {
-          RBParameters & previous_parameters = get_rb_evaluation().greedy_param_list[i];
-          if (previous_parameters == get_parameters())
-            {
-              libMesh::out << "Exiting greedy because the same parameters were selected twice"
-                           << std::endl;
-              return true;
-            }
+          libMesh::out << "Exiting greedy because the same parameters were selected twice" << std::endl;
+          return true;
         }
-    }
 
   return false;
 }
@@ -1998,7 +1995,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
     if ( Utility::mkdir(riesz_representors_dir.c_str()) != 0)
       libMesh::out << "Skipping creating residual_representors directory: " << strerror(errno) << std::endl;
 
-  for (std::size_t i=0; i<Fq_representor.size(); ++i)
+  for (auto i : index_range(Fq_representor))
     {
       if (Fq_representor[i])
         {
@@ -2051,7 +2048,9 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
 
   const unsigned int jstop  = get_rb_evaluation().get_n_basis_functions();
   const unsigned int jstart = jstop-get_delta_N();
-  for (std::size_t i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
+
+  RBEvaluation & rbe = get_rb_evaluation();
+  for (auto i : index_range(rbe.Aq_representor))
     for (unsigned int j=jstart; j<jstop; ++j)
       {
         libMesh::out << "Writing out Aq_representor[" << i << "][" << j << "]..." << std::endl;
@@ -2064,7 +2063,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
         {
           // No need to copy! Use swap instead.
           // *solution = *(Aq_representor[i][j]);
-          get_rb_evaluation().Aq_representor[i][j]->swap(*solution);
+          rbe.Aq_representor[i][j]->swap(*solution);
 
           Xdr aqr_data(file_name.str(),
                        write_binary_residual_representors ? ENCODE : WRITE);
@@ -2075,7 +2074,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
           this->comm().barrier();
 
           // Swap back.
-          get_rb_evaluation().Aq_representor[i][j]->swap(*solution);
+          rbe.Aq_representor[i][j]->swap(*solution);
 
           // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
           // for the system call, be sure to do it only on one processor, etc.
@@ -2098,13 +2097,11 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
 
   // Read in the Fq_representors.  There should be Q_f of these.  FIXME:
   // should we be worried about leaks here?
-  for (std::size_t i=0; i<Fq_representor.size(); ++i)
-    {
-      if (Fq_representor[i])
-        libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
-    }
+  for (const auto & rep : Fq_representor)
+    if (rep)
+      libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
 
-  for (std::size_t i=0; i<Fq_representor.size(); i++)
+  for (auto i : index_range(Fq_representor))
     {
       file_name.str(""); // reset filename
       file_name << riesz_representors_dir
@@ -2142,16 +2139,15 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   // Read in the Aq representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
   // read in [Q_a][get_rb_evaluation().get_n_basis_functions()].  FIXME:
   // should we be worried about leaks in the locations where we're about to fill entries?
-  for (std::size_t i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
-    for (std::size_t j=0; j<get_rb_evaluation().Aq_representor[i].size(); ++j)
-      {
-        if (get_rb_evaluation().Aq_representor[i][j] != nullptr)
-          libmesh_error_msg("Error, must delete existing Aq_representor before reading in from file.");
-      }
+  RBEvaluation & rbe = get_rb_evaluation();
+  for (const auto & row : rbe.Aq_representor)
+    for (const auto & rep : row)
+      if (rep)
+        libmesh_error_msg("Error, must delete existing Aq_representor before reading in from file.");
 
   // Now ready to read them in from file!
-  for (std::size_t i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
-    for (unsigned int j=0; j<get_rb_evaluation().get_n_basis_functions(); ++j)
+  for (auto i : index_range(rbe.Aq_representor))
+    for (unsigned int j=0; j<rbe.get_n_basis_functions(); ++j)
       {
         file_name.str(""); // reset filename
         file_name << riesz_representors_dir
@@ -2170,13 +2166,12 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
 
         read_serialized_data(aqr_data, false);
 
-        get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(this->comm());
-        get_rb_evaluation().Aq_representor[i][j]->init (n_dofs(), n_local_dofs(),
-                                                        false, PARALLEL);
+        rbe.Aq_representor[i][j] = NumericVector<Number>::build(this->comm());
+        rbe.Aq_representor[i][j]->init (n_dofs(), n_local_dofs(),
+                                            false, PARALLEL);
 
         // No need to copy, just swap
-        //*Aq_representor[i][j] = *solution;
-        get_rb_evaluation().Aq_representor[i][j]->swap(*solution);
+        rbe.Aq_representor[i][j]->swap(*solution);
       }
 }
 

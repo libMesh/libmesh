@@ -68,8 +68,8 @@ void RBEvaluation::clear()
   clear_riesz_representors();
 
   // Clear the Greedy param list
-  for (std::size_t i=0; i<greedy_param_list.size(); i++)
-    greedy_param_list[i].clear();
+  for (auto & plist : greedy_param_list)
+    plist.clear();
   greedy_param_list.clear();
 }
 
@@ -937,8 +937,8 @@ void RBEvaluation::write_out_vectors(System & sys,
     for (const auto & vec : vectors)
       bf_out.push_back(vec);
 
-    // for (std::size_t i=0; i<vectors.size(); i++)
-    //   bf_out.push_back(vectors[i]);
+    // for (auto & val : vectors)
+    //   bf_out.push_back(val);
     sys.write_serialized_vectors (bf_data, bf_out);
   }
 
@@ -1019,19 +1019,19 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
       std::vector<std::unique_ptr<NumericVector<Number>>> & vectors = *multiple_vectors[data_index];
 
       // Allocate storage for each vector
-      for (std::size_t i=0; i<vectors.size(); i++)
+      for (auto & vec : vectors)
         {
           // vectors should all be nullptr, otherwise we get a memory leak when
           // we create the new vectors in RBEvaluation::read_in_vectors.
-          if (vectors[i])
+          if (vec)
             libmesh_error_msg("Non-nullptr vector passed to read_in_vectors_from_multiple_files");
 
-          vectors[i] = NumericVector<Number>::build(sys.comm());
+          vec = NumericVector<Number>::build(sys.comm());
 
-          vectors[i]->init (sys.n_dofs(),
-                            sys.n_local_dofs(),
-                            false,
-                            PARALLEL);
+          vec->init (sys.n_dofs(),
+                     sys.n_local_dofs(),
+                     false,
+                     PARALLEL);
         }
 
       file_name.str("");

@@ -362,13 +362,8 @@ void RBParametrized::read_discrete_parameter_values_from_file(const std::string 
           discrete_parameter_values_in >> n_discrete_values;
 
           std::vector<Real> discrete_values(n_discrete_values);
-          for (std::size_t j=0; j<discrete_values.size(); j++)
-            {
-              Real param_value;
-              discrete_parameter_values_in >> param_value;
-
-              discrete_values[j] = param_value;
-            }
+          for (auto & val : discrete_values)
+            discrete_parameter_values_in >> val;
 
           discrete_parameter_values[param_name] = discrete_values;
         }
@@ -398,8 +393,8 @@ void RBParametrized::print_discrete_parameter_values() const
       libMesh::out << "Discrete parameter " << pr.first << ", values: ";
 
       const std::vector<Real> & values = pr.second;
-      for (std::size_t i=0; i<values.size(); i++)
-        libMesh::out << values[i] << " ";
+      for (const auto & value : values)
+        libMesh::out << value << " ";
       libMesh::out << std::endl;
     }
 }

@@ -152,8 +152,8 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
   // per partition.
   {
     bool all_have_enough_elements = true;
-    for (std::size_t pid=0; pid<_n_active_elem_on_proc.size(); pid++)
-      if (_n_active_elem_on_proc[pid] < MIN_ELEM_PER_PROC)
+    for (const auto & nelem : _n_active_elem_on_proc)
+      if (nelem < MIN_ELEM_PER_PROC)
         all_have_enough_elements = false;
 
     // Parmetis will not work unless each processor has some

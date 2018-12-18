@@ -40,7 +40,9 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/elem.h"
+#include "libmesh/int_range.h"
 
+// rbOOmit includes
 #include "libmesh/rb_eim_construction.h"
 #include "libmesh/rb_eim_evaluation.h"
 
@@ -287,9 +289,10 @@ void RBEIMConstruction::load_rb_solution()
                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
-  for (unsigned int i=0; i<get_rb_evaluation().RB_solution.size(); i++)
-    get_explicit_system().solution->add(get_rb_evaluation().RB_solution(i),
-                                        get_rb_evaluation().get_basis_function(i));
+  RBEvaluation & rbe = get_rb_evaluation();
+  for (auto i : IntRange<unsigned int>(0, rbe.RB_solution.size()))
+    get_explicit_system().solution->add(rbe.RB_solution(i),
+                                        rbe.get_basis_function(i));
 
   get_explicit_system().update();
 }
@@ -483,7 +486,7 @@ void RBEIMConstruction::plot_parametrized_functions_in_training_set(const std::s
 
   libmesh_assert(_parametrized_functions_in_training_set_initialized);
 
-  for (std::size_t i=0; i<_parametrized_functions_in_training_set.size(); i++)
+  for (auto i : index_range(_parametrized_functions_in_training_set))
     {
 #ifdef LIBMESH_HAVE_EXODUS_API
       *get_explicit_system().solution = *_parametrized_functions_in_training_set[i];
@@ -661,7 +664,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
               // Loop over qp before var because parametrized functions often use
               // some caching based on qp.
-              for (std::size_t qp=0; qp<JxW_values[elem_id].size(); qp++)
+              for (auto qp : index_range(JxW_values[elem_id]))
                 {
                   const unsigned int n_var_dofs =
                     cast_int<unsigned int>(phi_values[elem_id][qp].size());

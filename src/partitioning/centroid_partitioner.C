@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/centroid_partitioner.h"
 #include "libmesh/elem.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -104,7 +105,7 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
   const dof_id_type target_size = cast_int<dof_id_type>
     (_elem_centroids.size() / n);
 
-  for (dof_id_type i=0; i<_elem_centroids.size(); i++)
+  for (auto i : index_range(_elem_centroids))
     {
       Elem * elem = _elem_centroids[i].second;
 

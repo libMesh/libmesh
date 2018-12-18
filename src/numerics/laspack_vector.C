@@ -26,7 +26,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/laspack_vector.h"
 #include "libmesh/laspack_matrix.h"
-
+#include "libmesh/int_range.h"
 
 #ifdef LIBMESH_HAVE_LASPACK
 
@@ -189,7 +189,7 @@ void LaspackVector<T>::add (const T a, const NumericVector<T> & v_in)
   libmesh_assert(v);
   libmesh_assert_equal_to (this->size(), v->size());
 
-  for (numeric_index_type i=0; i<v->size(); i++)
+  for (auto i : IntRange<numeric_index_type>(0, v->size()))
     this->add (i, a*(*v)(i));
 
 #ifndef NDEBUG
@@ -321,7 +321,7 @@ LaspackVector<T>::operator = (const std::vector<T> & v)
    * The global vector.  Only add the local components.
    */
   if (this->size() == v.size())
-    for (numeric_index_type i=0; i<v.size(); i++)
+    for (auto i : index_range(v))
       this->set (i, v[i]);
 
   else
@@ -368,7 +368,7 @@ void LaspackVector<T>::localize (std::vector<T> & v_local,
   // LaspackVectors are serial, so we can just copy values
   v_local.resize(indices.size());
 
-  for (numeric_index_type i=0; i<v_local.size(); i++)
+  for (auto i : index_range(v_local))
     v_local[i] = (*this)(indices[i]);
 }
 
@@ -397,7 +397,7 @@ void LaspackVector<T>::localize (std::vector<T> & v_local) const
 {
   v_local.resize(this->size());
 
-  for (numeric_index_type i=0; i<v_local.size(); i++)
+  for (auto i : index_range(v_local))
     v_local[i] = (*this)(i);
 }
 

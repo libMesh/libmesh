@@ -17,9 +17,6 @@
 
 
 
-// C++ includes
-
-
 // Local Includes
 #include "libmesh/mesh_function.h"
 #include "libmesh/dense_vector.h"
@@ -33,6 +30,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/point.h"
 #include "libmesh/elem.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -278,11 +276,8 @@ void MeshFunction::operator() (const Point & p,
                                                             element,
                                                             p));
 
-
         // loop over all vars
-        for (unsigned int index=0,
-             sz = cast_int<unsigned int>(this->_system_vars.size());
-             index != sz; ++index)
+        for (auto index : index_range(this->_system_vars))
           {
             /*
              * the data for this variable
@@ -316,7 +311,7 @@ void MeshFunction::operator() (const Point & p,
               {
                 Number value = 0.;
 
-                for (std::size_t i=0; i<dof_indices.size(); i++)
+                for (auto i : index_range(dof_indices))
                   value += this->_vector(dof_indices[i]) * data.shape[i];
 
                 output(index) = value;
@@ -372,11 +367,8 @@ void MeshFunction::discontinuous_value (const Point & p,
                                                           element,
                                                           p));
 
-
       // loop over all vars
-      for (unsigned int index=0,
-           sz = cast_int<unsigned int>(this->_system_vars.size());
-           index != sz; ++index)
+      for (auto index : index_range(this->_system_vars))
         {
           /*
            * the data for this variable
@@ -410,7 +402,7 @@ void MeshFunction::discontinuous_value (const Point & p,
             {
               Number value = 0.;
 
-              for (std::size_t i=0; i<dof_indices.size(); i++)
+              for (auto i : index_range(dof_indices))
                 value += this->_vector(dof_indices[i]) * data.shape[i];
 
               temp_output(index) = value;
@@ -465,9 +457,7 @@ void MeshFunction::gradient (const Point & p,
         std::vector<Point> point_list (1, mapped_point);
 
         // loop over all vars
-        for (unsigned int index=0,
-             sz = cast_int<unsigned int>(this->_system_vars.size());
-             index != sz; ++index)
+        for (auto index : index_range(this->_system_vars))
           {
             /*
              * the data for this variable
@@ -495,7 +485,7 @@ void MeshFunction::gradient (const Point & p,
             // interpolate the solution
             Gradient grad(0.);
 
-            for (std::size_t i=0; i<dof_indices.size(); i++)
+            for (auto i : index_range(dof_indices))
               grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
 
             output[index] = grad;
@@ -549,9 +539,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
       // loop over all vars
       std::vector<Point> point_list (1, mapped_point);
-      for (unsigned int index=0,
-           sz = cast_int<unsigned int>(this->_system_vars.size());
-           index != sz; ++index)
+      for (auto index : index_range(this->_system_vars))
         {
           /*
            * the data for this variable
@@ -578,7 +566,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
           Gradient grad(0.);
 
-          for (std::size_t i = 0; i < dof_indices.size(); ++i)
+          for (auto i : index_range(dof_indices))
             grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
 
           temp_output[index] = grad;
@@ -631,9 +619,7 @@ void MeshFunction::hessian (const Point & p,
         std::vector<Point> point_list (1, mapped_point);
 
         // loop over all vars
-        for (unsigned int index=0,
-             sz = cast_int<unsigned int>(this->_system_vars.size());
-             index != sz; ++index)
+        for (auto index : index_range(this->_system_vars))
           {
             /*
              * the data for this variable
@@ -661,7 +647,7 @@ void MeshFunction::hessian (const Point & p,
             // interpolate the solution
             Tensor hess;
 
-            for (std::size_t i=0; i<dof_indices.size(); i++)
+            for (auto i : index_range(dof_indices))
               hess.add_scaled(d2phi[i][0], this->_vector(dof_indices[i]));
 
             output[index] = hess;

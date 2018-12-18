@@ -299,10 +299,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
   std::map<dof_id_type, dof_id_type> node_id_map;
 
   unsigned int new_node_id = 0;
-  for (std::size_t i=0; i<interpolation_points_elem.size(); i++)
-    {
-      Elem * old_elem = interpolation_points_elem[i];
-
+  for (const auto & old_elem : interpolation_points_elem)
       for (unsigned int n=0; n<old_elem->n_nodes(); n++)
         {
           Node & node_ref = old_elem->node_ref(n);
@@ -320,14 +317,13 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
               new_node_id++;
             }
         }
-    }
 
   // Maintain a map of elem IDs to make sure we don't insert
   // the same elem into _interpolation_points_mesh more than once
   std::map<dof_id_type,dof_id_type> elem_id_map;
   std::vector<dof_id_type> interpolation_elem_ids(interpolation_points_elem.size());
   dof_id_type new_elem_id = 0;
-  for (std::size_t i=0; i<interpolation_elem_ids.size(); i++)
+  for (auto i : index_range(interpolation_elem_ids))
     {
       Elem * old_elem = interpolation_points_elem[i];
 
@@ -381,8 +377,8 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
       std::ofstream interpolation_elem_ids_out
         ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ofstream::out);
 
-      for (std::size_t i=0; i<interpolation_elem_ids.size(); i++)
-        interpolation_elem_ids_out << interpolation_elem_ids[i] << std::endl;
+      for (const auto & id : interpolation_elem_ids)
+        interpolation_elem_ids_out << id << std::endl;
 
       interpolation_elem_ids_out.close();
     }

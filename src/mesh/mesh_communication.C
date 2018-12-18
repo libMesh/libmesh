@@ -35,6 +35,7 @@
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/utility.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/int_range.h"
 
 // C++ Includes
 #include <numeric>
@@ -65,7 +66,7 @@ struct SyncNeighbors
   {
     neighbors.resize(ids.size());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         // Look for this element in the mesh
         // We'd better find every element we're asked for
@@ -91,7 +92,7 @@ struct SyncNeighbors
   void act_on_data (const std::vector<dof_id_type> & ids,
                     const std::vector<datum> & neighbors) const
   {
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         Elem & elem = mesh.elem_ref(ids[i]);
 
@@ -229,10 +230,10 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
         {
           std::vector<const Elem *> subactive_family;
           elem->total_family_tree(subactive_family);
-          for (std::size_t i=0; i != subactive_family.size(); ++i)
+          for (const auto & f : subactive_family)
             {
-              libmesh_assert(subactive_family[i] != remote_elem);
-              connected_elements.insert(subactive_family[i]);
+              libmesh_assert(f != remote_elem);
+              connected_elements.insert(f);
             }
         }
     }
@@ -716,8 +717,9 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
           mesh.comm().receive (source_pid_idx,
                                common_interface_node_list,
                                element_neighbors_tag);
-          const std::size_t
-            their_interface_node_list_size = common_interface_node_list.size();
+
+          // const std::size_t
+          //   their_interface_node_list_size = common_interface_node_list.size();
 
           // we now have the interface node list from processor source_pid_idx.
           // now we can find all of our elements which touch any of these nodes
@@ -734,13 +736,13 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                                     common_interface_node_list.begin()),
              common_interface_node_list.end());
 
-          if (false)
-            libMesh::out << "[" << mesh.processor_id() << "] "
-                         << "my_interface_node_list.size()="       << my_interface_node_list.size()
-                         << ", [" << source_pid_idx << "] "
-                         << "their_interface_node_list.size()="    << their_interface_node_list_size
-                         << ", common_interface_node_list.size()=" << common_interface_node_list.size()
-                         << std::endl;
+          // if (false)
+          //   libMesh::out << "[" << mesh.processor_id() << "] "
+          //                << "my_interface_node_list.size()="       << my_interface_node_list.size()
+          //                << ", [" << source_pid_idx << "] "
+          //                << "their_interface_node_list.size()="    << their_interface_node_list_size
+          //                << ", common_interface_node_list.size()=" << common_interface_node_list.size()
+          //                << std::endl;
 
           // Now we need to see which of our elements touch the nodes in the list.
           // We will certainly send all the active elements which intersect source_pid_idx,
@@ -785,9 +787,9 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
 
           std::vector<const Elem *> family_tree;
 
-          for (std::size_t e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
+          for (auto & elem : my_interface_elements)
             {
-              const Elem * elem = my_interface_elements[e];
+              std::size_t n_shared_nodes = 0;
 
               for (unsigned int n=0; n<elem->n_vertices(); n++)
                 if (std::binary_search (common_interface_node_list.begin(),
@@ -816,9 +818,9 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                       family_tree.clear();
                       family_tree.push_back(elem);
 #endif
-                      for (std::size_t leaf=0; leaf<family_tree.size(); leaf++)
+                      for (const auto & f : family_tree)
                         {
-                          elem = family_tree[leaf];
+                          elem = f;
                           elements_to_send.insert (elem);
 
                           for (auto & n : elem->node_ref_range())
@@ -1257,7 +1259,7 @@ struct SyncIds
   void act_on_data (const std::vector<dof_id_type> & old_ids,
                     const std::vector<datum> & new_ids) const
   {
-    for (std::size_t i=0; i != old_ids.size(); ++i)
+    for (auto i : index_range(old_ids))
       if (old_ids[i] != new_ids[i])
         (mesh.*renumber)(old_ids[i], new_ids[i]);
   }
@@ -1296,7 +1298,7 @@ struct SyncNodeIds
     ids_out.clear();
     ids_out.resize(ids.size(), DofObject::invalid_id);
 
-    for (std::size_t i = 0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         const dof_id_type id = ids[i];
         const Node * node = mesh.query_node_ptr(id);
@@ -1310,7 +1312,7 @@ struct SyncNodeIds
                     const std::vector<datum> & new_ids)
   {
     bool data_changed = false;
-    for (std::size_t i=0; i != old_ids.size(); ++i)
+    for (auto i : index_range(old_ids))
       {
         const dof_id_type new_id = new_ids[i];
 
@@ -1379,10 +1381,9 @@ struct SyncPLevels
   {
     ids_out.reserve(ids.size());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (const auto & id : ids)
       {
-        Elem & elem = mesh.elem_ref(ids[i]);
-
+        Elem & elem = mesh.elem_ref(id);
         ids_out.push_back(cast_int<unsigned char>(elem.p_level()));
       }
   }
@@ -1390,10 +1391,9 @@ struct SyncPLevels
   void act_on_data (const std::vector<dof_id_type> & old_ids,
                     const std::vector<datum> & new_p_levels) const
   {
-    for (std::size_t i=0; i != old_ids.size(); ++i)
+    for (auto i : index_range(old_ids))
       {
         Elem & elem = mesh.elem_ref(old_ids[i]);
-
         elem.set_p_level(new_p_levels[i]);
       }
   }
@@ -1412,33 +1412,31 @@ struct SyncUniqueIds
     mesh(_mesh),
     query(_querier) {}
 
-  MeshBase &mesh;
+  MeshBase & mesh;
   query_obj query;
 
   // Find the id of each requested DofObject -
   // Parallel::sync_* already did the work for us
-  void gather_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& ids_out) const
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & ids_out) const
   {
     ids_out.reserve(ids.size());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (const auto & id : ids)
       {
-        DofObjSubclass *d = (mesh.*query)(ids[i]);
+        DofObjSubclass * d = (mesh.*query)(id);
         libmesh_assert(d);
-
         ids_out.push_back(d->unique_id());
       }
   }
 
-  void act_on_data (const std::vector<dof_id_type>& ids,
-                    const std::vector<datum>& unique_ids) const
+  void act_on_data (const std::vector<dof_id_type> & ids,
+                    const std::vector<datum> & unique_ids) const
   {
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
-        DofObjSubclass *d = (mesh.*query)(ids[i]);
+        DofObjSubclass * d = (mesh.*query)(ids[i]);
         libmesh_assert(d);
-
         d->set_unique_id() = unique_ids[i];
       }
   }
@@ -1560,7 +1558,7 @@ struct SyncProcIds
     // Find the processor id of each requested node
     data.resize(ids.size());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         // Look for this point in the mesh
         if (ids[i] != DofObject::invalid_id)
@@ -1582,7 +1580,7 @@ struct SyncProcIds
     bool data_changed = false;
 
     // Set the ghost node processor ids we've now been informed of
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         Node & node = mesh.node_ref(ids[i]);
 
@@ -1873,8 +1871,8 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 #endif
         active_family.push_back(elem);
 
-      for (std::size_t i=0; i != active_family.size(); ++i)
-        elements_to_keep.insert(active_family[i]);
+      for (const auto & f : active_family)
+        elements_to_keep.insert(f);
     }
 
   // See which elements we still need to keep ghosted, given that
