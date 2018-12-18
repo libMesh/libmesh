@@ -64,32 +64,32 @@ protected:
    * arguments are to be overridden it requires that the "xz = 0."
    * etc. arguments also be given explicitly.
    */
-  explicit TypeTensor  (const T xx,
-                        const T xy=0,
-                        const T xz=0,
-                        const T yx=0,
-                        const T yy=0,
-                        const T yz=0,
-                        const T zx=0,
-                        const T zy=0,
-                        const T zz=0);
+  explicit TypeTensor  (const T & xx,
+                        const T & xy=0,
+                        const T & xz=0,
+                        const T & yx=0,
+                        const T & yy=0,
+                        const T & yz=0,
+                        const T & zx=0,
+                        const T & zy=0,
+                        const T & zz=0);
 
 
   /**
    * Constructor-from-Scalar.
    */
   template <typename Scalar>
-  explicit TypeTensor  (const Scalar xx,
-                        const Scalar xy=0,
-                        const Scalar xz=0,
-                        const Scalar yx=0,
-                        const Scalar yy=0,
-                        const Scalar yz=0,
-                        const Scalar zx=0,
-                        const Scalar zy=0,
+  explicit TypeTensor  (const Scalar & xx,
+                        const Scalar & xy=0,
+                        const Scalar & xz=0,
+                        const Scalar & yx=0,
+                        const Scalar & yy=0,
+                        const Scalar & yz=0,
+                        const Scalar & zx=0,
+                        const Scalar & zy=0,
                         typename
                         boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                        const Scalar>::type zz=0);
+                        const Scalar>::type & zz=0);
 
   /**
    * Constructor.  Assigns each vector to a different row of the
@@ -201,7 +201,7 @@ public:
    * Add a scaled tensor to this tensor without creating a temporary.
    */
   template <typename T2>
-  void add_scaled (const TypeTensor<T2> &, const T);
+  void add_scaled (const TypeTensor<T2> &, const T &);
 
   /**
    * Subtract a tensor from this tensor.
@@ -231,7 +231,7 @@ public:
    * temporary.
    */
   template <typename T2>
-  void subtract_scaled (const TypeTensor<T2> &, const T);
+  void subtract_scaled (const TypeTensor<T2> &, const T &);
 
   /**
    * \returns The negative of this tensor in a separate copy.
@@ -245,7 +245,7 @@ public:
    */
   template <typename Scalar>
   auto
-  operator * (const Scalar scalar) const -> typename boostcopy::enable_if_c<
+  operator * (const Scalar & scalar) const -> typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
     TypeTensor<decltype(T() * scalar)>>::type;
 
@@ -256,7 +256,7 @@ public:
    */
   template <typename Scalar, typename boostcopy::enable_if_c<
                                ScalarTraits<Scalar>::value, int>::type = 0>
-  const TypeTensor<T> & operator *= (const Scalar factor)
+  const TypeTensor<T> & operator *= (const Scalar & factor)
     {
       for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
         _coords[i] *= factor;
@@ -273,14 +273,14 @@ public:
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
     TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
-  operator / (const Scalar) const;
+  operator / (const Scalar &) const;
 
   /**
    * Divide each entry of this tensor by a scalar value.
    *
    * \returns A reference to *this.
    */
-  const TypeTensor<T> & operator /= (const T);
+  const TypeTensor<T> & operator /= (const T &);
 
   /**
    * Multiply 2 tensors together, i.e. matrix-matrix product.
@@ -524,15 +524,15 @@ TypeTensor<T>::TypeTensor ()
 
 template <typename T>
 inline
-TypeTensor<T>::TypeTensor (const T xx,
-                           const T xy,
-                           const T xz,
-                           const T yx,
-                           const T yy,
-                           const T yz,
-                           const T zx,
-                           const T zy,
-                           const T zz)
+TypeTensor<T>::TypeTensor (const T & xx,
+                           const T & xy,
+                           const T & xz,
+                           const T & yx,
+                           const T & yy,
+                           const T & yz,
+                           const T & zx,
+                           const T & zy,
+                           const T & zz)
 {
   _coords[0] = xx;
 
@@ -568,17 +568,17 @@ TypeTensor<T>::TypeTensor (const T xx,
 template <typename T>
 template <typename Scalar>
 inline
-TypeTensor<T>::TypeTensor (const Scalar xx,
-                           const Scalar xy,
-                           const Scalar xz,
-                           const Scalar yx,
-                           const Scalar yy,
-                           const Scalar yz,
-                           const Scalar zx,
-                           const Scalar zy,
+TypeTensor<T>::TypeTensor (const Scalar & xx,
+                           const Scalar & xy,
+                           const Scalar & xz,
+                           const Scalar & yx,
+                           const Scalar & yy,
+                           const Scalar & yz,
+                           const Scalar & zx,
+                           const Scalar & zy,
                            typename
                            boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                           const Scalar>::type zz)
+                           const Scalar>::type & zz)
 {
   _coords[0] = xx;
 
@@ -805,7 +805,7 @@ void TypeTensor<T>::add (const TypeTensor<T2> & p)
 template <typename T>
 template <typename T2>
 inline
-void TypeTensor<T>::add_scaled (const TypeTensor<T2> & p, const T factor)
+void TypeTensor<T>::add_scaled (const TypeTensor<T2> & p, const T & factor)
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
     _coords[i] += factor*p._coords[i];
@@ -875,7 +875,7 @@ void TypeTensor<T>::subtract (const TypeTensor<T2> & p)
 template <typename T>
 template <typename T2>
 inline
-void TypeTensor<T>::subtract_scaled (const TypeTensor<T2> & p, const T factor)
+void TypeTensor<T>::subtract_scaled (const TypeTensor<T2> & p, const T & factor)
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
     _coords[i] -= factor*p._coords[i];
@@ -919,7 +919,7 @@ template <typename T>
 template <typename Scalar>
 inline
 auto
-TypeTensor<T>::operator * (const Scalar factor) const -> typename boostcopy::enable_if_c<
+TypeTensor<T>::operator * (const Scalar & factor) const -> typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
   TypeTensor<decltype(T() * factor)>>::type
 {
@@ -957,7 +957,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
   TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
-operator * (const Scalar factor,
+operator * (const Scalar & factor,
             const TypeTensor<T> & t)
 {
   return t * factor;
@@ -969,7 +969,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
   TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
-TypeTensor<T>::operator / (const Scalar factor) const
+TypeTensor<T>::operator / (const Scalar & factor) const
 {
   libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
@@ -1134,7 +1134,7 @@ void TypeTensor<T>::solve(const TypeVector<T> & b, TypeVector<T> & x) const
 
 template <typename T>
 inline
-const TypeTensor<T> & TypeTensor<T>::operator /= (const T factor)
+const TypeTensor<T> & TypeTensor<T>::operator /= (const T & factor)
 {
   libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 

@@ -52,9 +52,9 @@ public:
    * Constructor-from-T.  By default sets higher dimensional
    * entries to 0.
    */
-  VectorValue (const T x,
-               const T y=0,
-               const T z=0);
+  VectorValue (const T & x,
+               const T & y=0,
+               const T & z=0);
 
   /**
    * Constructor-from-scalars.  By default sets higher dimensional
@@ -63,13 +63,13 @@ public:
   template <typename Scalar1, typename Scalar2, typename Scalar3>
   VectorValue (typename
                boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
-               const Scalar1>::type x,
+               const Scalar1>::type & x,
                typename
                boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
-               const Scalar2>::type y = 0,
+               const Scalar2>::type & y = 0,
                typename
                boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
-               const Scalar3>::type z = 0);
+               const Scalar3>::type & z = 0);
 
 
   /**
@@ -79,7 +79,7 @@ public:
    * VectorValue<Complex> v = 0;
    */
   template <typename Scalar>
-  VectorValue (const Scalar x,
+  VectorValue (const Scalar & x,
                typename
                boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                const Scalar>::type * sfinae = nullptr);
@@ -144,9 +144,9 @@ VectorValue<T>::VectorValue () :
 
 template <typename T>
 inline
-VectorValue<T>::VectorValue (const T x,
-                             const T y,
-                             const T z) :
+VectorValue<T>::VectorValue (const T & x,
+                             const T & y,
+                             const T & z) :
   TypeVector<T> (x,y,z)
 {
 }
@@ -158,13 +158,13 @@ template <typename Scalar1, typename Scalar2, typename Scalar3>
 inline
 VectorValue<T>::VectorValue (typename
                              boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
-                             const Scalar1>::type x,
+                             const Scalar1>::type & x,
                              typename
                              boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
-                             const Scalar2>::type y,
+                             const Scalar2>::type & y,
                              typename
                              boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
-                             const Scalar3>::type z) :
+                             const Scalar3>::type & z) :
   TypeVector<T> (x,y,z)
 {
 }
@@ -173,7 +173,7 @@ VectorValue<T>::VectorValue (typename
 template <typename T>
 template <typename Scalar>
 inline
-VectorValue<T>::VectorValue (const Scalar x,
+VectorValue<T>::VectorValue (const Scalar & x,
                              typename
                              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                              const Scalar>::type * /*sfinae*/) :
