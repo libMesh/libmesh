@@ -432,6 +432,13 @@ public:
     calculate_d2xyz = true; return d2psidxi2_map; }
 
   /**
+   * \returns const reference to physical map 2nd derivative for the side/edge
+   */
+  const std::vector<std::vector<Real>> & get_d2psidxi2() const
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2psidxi2_map; }
+
+  /**
    * \returns The reference to physical map 2nd derivative for the side/edge
    */
   std::vector<std::vector<Real>> & get_d2psidxideta()
@@ -439,9 +446,23 @@ public:
     calculate_d2xyz = true; return d2psidxideta_map; }
 
   /**
+   * \returns const reference to physical map 2nd derivative for the side/edge
+   */
+  const std::vector<std::vector<Real>> & get_d2psidxideta() const
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2psidxideta_map; }
+
+  /**
    * \returns The reference to physical map 2nd derivative for the side/edge
    */
   std::vector<std::vector<Real>> & get_d2psideta2()
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2psideta2_map; }
+
+  /**
+   * \returns const reference to physical map 2nd derivative for the side/edge
+   */
+  const std::vector<std::vector<Real>> & get_d2psideta2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2psideta2_map; }
 
