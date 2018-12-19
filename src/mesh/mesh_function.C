@@ -607,7 +607,6 @@ void MeshFunction::discontinuous_gradient (const Point & p,
               const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
               point_fe->reinit(element, & point_list);
 
-              temp_output[index] = grad;
               for (auto i : index_range(dof_indices))
                 grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -669,7 +668,7 @@ void MeshFunction::hessian (const Point & p,
     {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       if(element->infinite())
-        libmesh_warning("Warning: Requested the Hessian of an Infinit element."
+        libmesh_warning("Warning: Requested the Hessian of an Infinite element."
                         << "Second derivatives for Infinite elements"
                         << " are not yet implemented!"
                         << std::endl);
