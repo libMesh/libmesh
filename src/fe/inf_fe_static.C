@@ -468,9 +468,9 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
 
           data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
-                           *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
+                           * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)   /* S_n(s,t)                 */
                            * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
-            * time_harmonic;                                             /* e^(i*k*phase(s,t,v)      */
+                           * time_harmonic;                                             /* e^(i*k*phase(s,t,v)      */
 
           // use differentiation of the above equation
           if (data.need_derivative())
@@ -479,29 +479,23 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
                                        * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 0, p)
                                        * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
                                        * time_harmonic;
+
               if (Dim > 2)
+                {
+                  data.dshape[i](1)   = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+                                         * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 1, p)
+                                         * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
+                                         * time_harmonic;
 
-                if (Dim > 2)
-                  {
-                    data.dshape[i](1)   = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
-                                           * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 1, p)
-                                           * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
-                                           * time_harmonic;
-
-                  }
-              data.dshape[i](Dim-1)  = (InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v)
-                                        * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
-                                        * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
-                                        * time_harmonic;
-
-              data.dshape[i](Dim-1) += (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
-                                        * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
-                                        * InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial))
-                                        * time_harmonic;
+                }
+              data.dshape[i](Dim-1)  = (InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v) * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+                                        +InfFE<Dim,T_radial,T_map>::Radial::decay(v) * InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial))
+                                        * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p) * time_harmonic;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
               // derivative of time_harmonic (works for harmonic behavior only):
-              data.dshape[i](Dim-1)+= data.shape[i]*imaginary*wavenumber;
+              data.dshape[i](Dim-1)+= data.shape[i]*imaginary*wavenumber
+                                      *interpolated_dist*InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv(v, radial_mapping_order, 1);
 
 #else
             /*

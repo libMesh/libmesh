@@ -48,7 +48,7 @@ namespace libMesh
         switch(fe_t.inf_map)                                            \
           {                                                             \
           case CARTESIAN:                                               \
-            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+            prefix InfFE<dim,JACOBI_20_00,CARTESIAN>::func_and_args suffix \
           case SPHERICAL:                                               \
           case ELLIPSOIDAL:                                             \
             libmesh_not_implemented();                                  \
@@ -59,7 +59,7 @@ namespace libMesh
         switch(fe_t.inf_map)                                            \
           {                                                             \
           case CARTESIAN:                                               \
-            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+            prefix InfFE<dim,JACOBI_30_00,CARTESIAN>::func_and_args suffix \
           case SPHERICAL:                                               \
           case ELLIPSOIDAL:                                             \
             libmesh_not_implemented();                                  \
@@ -70,7 +70,7 @@ namespace libMesh
         switch(fe_t.inf_map)                                            \
           {                                                             \
           case CARTESIAN:                                               \
-            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+            prefix InfFE<dim,LEGENDRE,CARTESIAN>::func_and_args suffix \
           case SPHERICAL:                                               \
           case ELLIPSOIDAL:                                             \
             libmesh_not_implemented();                                  \
@@ -81,7 +81,7 @@ namespace libMesh
         switch(fe_t.inf_map)                                            \
           {                                                             \
           case CARTESIAN:                                               \
-            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
+            prefix InfFE<dim,LAGRANGE,CARTESIAN>::func_and_args suffix \
           case SPHERICAL:                                               \
           case ELLIPSOIDAL:                                             \
             libmesh_not_implemented();                                  \
