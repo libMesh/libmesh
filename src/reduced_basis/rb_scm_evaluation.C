@@ -529,13 +529,13 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   // Resize C_J based on C_J_stability_vector and Q_a
   C_J.resize( C_J_length );
-  for (auto i : index_range(C_J))
+  for (auto & params : C_J)
     for (const auto & pr : get_parameters())
       {
         const std::string & param_name = pr.first;
         Real param_value;
         C_J_in >> param_value;
-        C_J[i].set_value(param_name, param_value);
+        params.set_value(param_name, param_value);
       }
   C_J_in.close();
 
