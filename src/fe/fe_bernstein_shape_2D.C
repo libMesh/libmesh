@@ -559,6 +559,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
 
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
 Real FE<2,BERNSTEIN>::shape_second_deriv(const ElemType,
                                          const Order,
@@ -596,6 +597,8 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem *,
   warning_given = true;
   return 0.;
 }
+
+#endif
 
 } // namespace libMesh
 

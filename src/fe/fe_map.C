@@ -45,7 +45,9 @@ FEMap::FEMap(Real jtol) :
   calculations_started(false),
   calculate_xyz(false),
   calculate_dxyz(false),
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   calculate_d2xyz(false),
+#endif
   jacobian_tolerance(jtol)
 {}
 
@@ -419,6 +421,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 {
   libmesh_assert(elem);
   libmesh_assert(calculations_started);
+#ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  libmesh_assert(!compute_second_derivatives);
+#endif
 
   if (calculate_xyz)
     libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
@@ -658,7 +663,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
             // xi_{z z}
             d2xidxyz2_map[p][5] = -numer * dxidz_map[p]*dxidz_map[p] / denom;
-#endif
+#endif //LIBMESH_DIM == 3
           } // calculate_d2xyz
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -796,9 +801,10 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
             dxidz_map[p] = detadz_map[p] = 0.;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
             if (compute_second_derivatives)
               this->compute_inverse_map_second_derivs(p);
-
+#endif
 #else // LIBMESH_DIM == 3
 
             const Real dz_dxi = dzdxi_map(p),
@@ -1135,9 +1141,10 @@ void FEMap::compute_single_point_map(const unsigned int dim,
             dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
           }
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (compute_second_derivatives)
           this->compute_inverse_map_second_derivs(p);
-
+#endif
         // done computing the map
         break;
       }
@@ -1402,6 +1409,9 @@ void FEMap::compute_map(const unsigned int dim,
       compute_affine_map(dim, qw, elem);
       return;
     }
+#ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    libmesh_assert(!calculate_d2phi);
+#endif
 
   // Start logging the map computation.
   LOG_SCOPE("compute_map()", "FEMap");

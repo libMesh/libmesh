@@ -1924,6 +1924,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const Elem * elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
@@ -3653,5 +3654,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const Elem * elem,
   // call the orientation-independent shape function derivatives
   return FE<3,LAGRANGE>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
 }
+
+#endif
 
 } // namespace libMesh

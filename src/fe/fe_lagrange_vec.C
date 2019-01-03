@@ -548,6 +548,9 @@ template <> RealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
   Real value = FE<0,LAGRANGE>::shape_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -555,6 +558,7 @@ template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
   Real value = FE<0,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
 }
+#endif
 
 // 1-D
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
@@ -570,6 +574,7 @@ template <> RealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
   Real value = FE<1,LAGRANGE>::shape_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
 }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -577,6 +582,8 @@ template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
   Real value = FE<1,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
 }
+
+#endif
 
 // 2-D
 template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
@@ -620,6 +627,8 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
   //dummy
   return libMesh::RealGradient();
 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -641,6 +650,8 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
   //dummy
   return libMesh::RealGradient();
 }
+
+#endif
 
 
 // 3-D
@@ -691,6 +702,9 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
   //dummy
   return libMesh::RealGradient();
 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -716,6 +730,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
   return libMesh::RealGradient();
 }
 
+#endif
 
 
 // 0-D
@@ -732,6 +747,9 @@ template <> RealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const Elem * elem, cons
   Real value = FE<0,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -739,6 +757,8 @@ template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
   Real value = FE<0,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
+
+#endif
 
 // 1-D
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
@@ -754,6 +774,8 @@ template <> RealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const Elem * elem, cons
   Real value = FE<1,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -761,6 +783,8 @@ template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
   Real value = FE<1,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
+
+#endif
 
 // 2-D
 template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
@@ -804,6 +828,8 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const Elem * elem, cons
   //dummy
   return libMesh::RealGradient();
 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -825,6 +851,8 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
   //dummy
   return libMesh::RealGradient();
 }
+
+#endif
 
 // 3-D
 template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
@@ -874,6 +902,9 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const Elem * elem, cons
   //dummy
   return libMesh::RealGradient();
 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
@@ -898,6 +929,8 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
   //dummy
   return libMesh::RealGradient();
 }
+
+#endif
 
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.

@@ -79,6 +79,7 @@ Real FE<0,LAGRANGE>::shape_deriv(const Elem *,
 
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
 Real FE<0,LAGRANGE>::shape_second_deriv(const ElemType,
                                         const Order,
@@ -102,5 +103,7 @@ Real FE<0,LAGRANGE>::shape_second_deriv(const Elem *,
   libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;
 }
+
+#endif
 
 } // namespace libMesh

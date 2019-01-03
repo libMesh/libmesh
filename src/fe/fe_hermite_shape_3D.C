@@ -536,6 +536,7 @@ Real FE<3,HERMITE>::shape_deriv(const Elem * elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
@@ -632,5 +633,7 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported polynomial order " << totalorder);
     }
 }
+
+#endif
 
 } // namespace libMesh

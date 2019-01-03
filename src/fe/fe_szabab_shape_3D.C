@@ -76,6 +76,7 @@ Real FE<3,SZABAB>::shape_deriv(const Elem *,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<3,SZABAB>::shape_second_deriv(const ElemType,
@@ -100,6 +101,8 @@ Real FE<3,SZABAB>::shape_second_deriv(const Elem *,
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;
 }
+
+#endif
 
 } // namespace libMesh
 

@@ -329,7 +329,10 @@ void assemble_shell (EquationSystems & es,
 {
   // This example requires Eigen to actually work, but we should still
   // let it compile and throw a runtime error if you don't.
-#ifdef LIBMESH_HAVE_EIGEN
+
+  // The same holds for second derivatives,
+  // since they are class-members only depending on the config.
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Shell");
@@ -386,6 +389,7 @@ void assemble_shell (EquationSystems & es,
   // quadrature points.
   const std::vector<RealGradient> & dxyzdxi = fe->get_dxyzdxi();
   const std::vector<RealGradient> & dxyzdeta = fe->get_dxyzdeta();
+
   const std::vector<RealGradient> & d2xyzdxi2 = fe->get_d2xyzdxi2();
   const std::vector<RealGradient> & d2xyzdeta2 = fe->get_d2xyzdeta2();
   const std::vector<RealGradient> & d2xyzdxideta = fe->get_d2xyzdxideta();
@@ -548,6 +552,7 @@ void assemble_shell (EquationSystems & es,
           Eigen::Vector3d d2Xdxi2(d2xyzdxi2[qp](0), d2xyzdxi2[qp](1), d2xyzdxi2[qp](2));
           Eigen::Vector3d d2Xdeta2(d2xyzdeta2[qp](0), d2xyzdeta2[qp](1), d2xyzdeta2[qp](2));
           Eigen::Vector3d d2Xdxideta(d2xyzdxideta[qp](0), d2xyzdxideta[qp](1), d2xyzdxideta[qp](2));
+
 
           Eigen::Matrix2d b;
           b <<
@@ -849,5 +854,5 @@ void assemble_shell (EquationSystems & es,
   // Avoid compiler warnings
   libmesh_ignore(es);
   libmesh_ignore(system_name);
-#endif // LIBMESH_HAVE_EIGEN
+#endif // defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
 }

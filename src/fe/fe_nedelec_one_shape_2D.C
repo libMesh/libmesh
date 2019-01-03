@@ -325,6 +325,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
 
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
@@ -394,5 +395,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   return RealGradient();
 #endif
 }
+
+#endif
 
 } // namespace libMesh

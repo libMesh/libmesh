@@ -1395,6 +1395,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<2,SZABAB>::shape_second_deriv(const ElemType,
@@ -1434,7 +1435,8 @@ Real FE<2,SZABAB>::shape_second_deriv(const Elem *,
   return 0.;
 }
 
-} // namespace libMesh
+#endif
 
+} // namespace libMesh
 
 #endif// LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
