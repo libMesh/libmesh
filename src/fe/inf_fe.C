@@ -85,8 +85,9 @@ void InfFE<Dim,T_radial,T_map>::attach_quadrature_rule (QBase * q)
   // in radial direction, always use Gauss quadrature
   radial_qrule.reset(new QGauss(1, radial_int_order));
 
-  // currently not used. But maybe helpful to store the QBase *
-  // with which we initialized our own quadrature rules
+  // Maybe helpful to store the QBase *
+  // with which we initialized our own quadrature rules.
+  // Used e.g. in \p InfFE::reinit(elem,side)
   qrule = q;
 }
 
@@ -216,33 +217,46 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // right now, and it will generalize a bit, and it won't break
       // the assumptions elsewhere in InfFE.
       std::vector<Point> radial_pts;
-      for (auto p : index_range(*pts))
+      if (pts->size() > 0)
         {
-          Real radius = (*pts)[p](Dim-1);
-          //IMHO this is a dangerous check:
-          // 1) it is not guaranteed that two points have numerically equal radii
-          // 2) if there several radii but not sorted/regular, this breaks
-          if (radial_pts.size() && radial_pts[0](0) == radius)
-            break;
+          Real radius = (*pts)[0](Dim-1);
           radial_pts.push_back(Point(radius));
+          unsigned int n_radial_pts=1;
+          unsigned int n_angular_pts=1;
+          for (std::size_t p=1; p < pts->size(); ++p)
+            {
+              radius = (*pts)[p](Dim-1);
+              // check for repetition of radius: The max. allowed distance is somewhat arbitrary
+              // but the given value should not produce false positives...
+              if (abs(radial_pts[p-n_radial_pts*n_angular_pts](0) - radius)< 1e-4)
+                {
+                  // should the next one be in the next segment?
+                  if (p+1 == n_radial_pts*(n_angular_pts+1))
+                     n_angular_pts++;
+                }
+              // if none yet repeated:
+              else if (n_angular_pts == 1)
+                radial_pts.push_back(Point(radius));
+              // if there was repetition but this does not, the assumed
+              // format does not work:
+              else
+                {
+                  libmesh_error_msg("We assumed that the "<<pts->size()
+                                  <<" points are of tensor-product type with "
+                                  <<n_radial_pts<<" radial points and "
+                                  <<n_angular_pts<< " angular points."<<std::endl
+                                  <<"But apparently point "<<p
+                                  <<" does not fit that scheme: Its radius is "
+                                  <<radius <<"but should have "
+                                  <<radial_pts[p-n_radial_pts*n_angular_pts]<<".");
+                }
+            }
         }
       const std::size_t radial_pts_size = radial_pts.size();
       const std::size_t base_pts_size = pts->size() / radial_pts_size;
       // If we're a tensor product we should have no remainder
       libmesh_assert_equal_to
         (base_pts_size * radial_pts_size, pts->size());
-
-      if (pts->size() > 1)
-        {
-           // lets inform the user about our assumptions.
-           // If this warning appears very often, this should be taken as a reason
-           // for rewriting this.
-           libmesh_experimental();
-           libmesh_warning("We assume that the "<<pts->size()
-                           <<" points are of tensor-product type with "
-                           <<radial_pts_size<<" radial points and "
-                           <<base_pts_size<< " angular points.");
-        }
 
 
       std::vector<Point> base_pts;
