@@ -57,11 +57,11 @@ void SubdomainPartitioner::_do_partition (MeshBase & mesh,
 
   // For each chunk, construct an iterator range for the set of
   // subdomains in question, and pass it to the internal Partitioner.
-  for (auto c : index_range(chunks))
+  for (const auto & id_set : chunks)
     _internal_partitioner->
       partition_range(mesh,
-                      mesh.active_subdomain_set_elements_begin(chunks[c]),
-                      mesh.active_subdomain_set_elements_end(chunks[c]),
+                      mesh.active_subdomain_set_elements_begin(id_set),
+                      mesh.active_subdomain_set_elements_end(id_set),
                       n);
 }
 
