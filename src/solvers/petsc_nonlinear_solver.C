@@ -181,6 +181,8 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
+    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
+
     R.close();
 
     return rc.ierr;
@@ -216,6 +218,8 @@ extern "C"
 
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
+
+    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
 
     R.close();
 
@@ -254,6 +258,8 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
                         "Jacobian-vector products!");
+
+    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
 
     R.close();
 
@@ -366,6 +372,8 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
+    sys.get_dof_map().enforce_constraints_on_jacobian(sys, &PC);
+
     PC.close();
     Jac.close();
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
@@ -453,9 +461,8 @@ extern "C"
     // It's also possible that we don't need to do anything at all, in
     // that case return early...
     NonlinearImplicitSystem & sys = solver->system();
-    DofMap & dof_map = sys.get_dof_map();
 
-    if (!dof_map.n_constrained_dofs() && !solver->postcheck && !solver->postcheck_object)
+    if (!solver->postcheck && !solver->postcheck_object)
       return ierr;
 
     // We definitely need to wrap at least "w"
@@ -495,25 +502,6 @@ extern "C"
 
     if (changed_new_soln)
       *changed_w = PETSC_TRUE;
-
-    if (dof_map.n_constrained_dofs())
-      {
-        PetscVector<Number> & system_soln = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-
-        // ... and swap it in before enforcing the constraints.
-        petsc_w.swap(system_soln);
-
-        dof_map.enforce_constraints_exactly(sys);
-
-        // If we have constraints, we'll assume that we did change the
-        // solution w (hopefully slightly).  Enforcing constraints
-        // does not change the search direction, y, but the user may
-        // have, so we leave it alone.
-        *changed_w = PETSC_TRUE;
-
-        // Swap back
-        petsc_w.swap(system_soln);
-      }
 
     return ierr;
   }
@@ -940,12 +928,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 
   ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
   LIBMESH_CHKERR(ierr);
-
-  // Enforce constraints exactly now that the solve is done.  We have
-  // been enforcing them on the current_local_solution during the
-  // solve, but now need to be sure they are enforced on the parallel
-  // solution vector as well.
-  this->system().get_dof_map().enforce_constraints_exactly(this->system());
 
   // SNESGetFunction has been around forever and should work on all
   // versions of PETSc.  This is also now the recommended approach

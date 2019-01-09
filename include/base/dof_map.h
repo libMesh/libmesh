@@ -68,6 +68,7 @@ class MeshBase;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
 class System;
+class NonlinearImplicitSystem;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -1155,6 +1156,12 @@ public:
    */
   void enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
                                             unsigned int q) const;
+
+  void enforce_constraints_on_residual (const NonlinearImplicitSystem & system,
+                                        NumericVector<Number> * rhs,
+                                        NumericVector<Number> const * solution) const;
+  void enforce_constraints_on_jacobian (const NonlinearImplicitSystem & system,
+                                        SparseMatrix<Number> * jac) const;
 
 
 
