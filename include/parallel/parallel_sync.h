@@ -190,9 +190,13 @@ void push_parallel_vector_data(const Communicator & comm,
   // The send requests
   std::list<Request> reqs;
 
+  processor_id_type num_procs = comm.size();
+
   for (auto & datapair : data)
     {
-      processor_id_type destid = datapair.first;
+      // In the case of data partitioned into more processors than we
+      // have ranks, we "wrap around"
+      processor_id_type destid = datapair.first % num_procs;
       auto & datum = datapair.second;
 
       // Just act on data if the user requested a send-to-self
@@ -317,32 +321,30 @@ void push_parallel_vector_data(const Communicator & comm,
 
   processor_id_type num_procs = comm.size();
 
-  // Size of vectors to send to each procesor
+  // Number of vectors to send to each procesor
   std::vector<std::size_t> will_send_to(num_procs, 0);
-  processor_id_type num_sends = 0;
   for (auto & datapair : data)
     {
-      // Don't try to send anywhere that doesn't exist
-      libmesh_assert_less(datapair.first, num_procs);
+      // In the case of data partitioned into more processors than we
+      // have ranks, we "wrap around"
+      processor_id_type destid = datapair.first % num_procs;
 
       // Don't give us empty vectors to send
       libmesh_assert_greater(datapair.second.size(), 0);
 
-      will_send_to[datapair.first] = datapair.second.size();
-      num_sends++;
+      will_send_to[destid]++;
     }
 
   // Tell everyone about where everyone will send to
   comm.alltoall(will_send_to);
 
-  // will_send_to now represents who we'll receive from
-  // give it a good name
+  // will_send_to now represents how many vectors we'll receive from
+  // each processor; give it a better name.
   auto & will_receive_from = will_send_to;
 
   processor_id_type n_receives = 0;
   for (processor_id_type proc_id = 0; proc_id < num_procs; proc_id++)
-    if (will_receive_from[proc_id])
-      n_receives++;
+    n_receives += will_receive_from[proc_id];
 
   // We'll construct a datatype once for repeated use
   StandardType<ValueType> datatype;
@@ -357,8 +359,7 @@ void push_parallel_vector_data(const Communicator & comm,
   // Post all of the sends, non-blocking
   for (auto & datapair : data)
     {
-      processor_id_type destid = datapair.first;
-      libmesh_assert_less(destid, num_procs);
+      processor_id_type destid = datapair.first % num_procs;
       auto & datum = datapair.second;
 
       // Just act on data if the user requested a send-to-self
