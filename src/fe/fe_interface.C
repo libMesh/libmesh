@@ -920,11 +920,16 @@ void FEInterface::compute_data(const unsigned int dim,
 
 #endif
 
-  FEType p_refined = fe_t;
-  p_refined.order = static_cast<Order>(p_refined.order + elem->p_level());
+  // We need to "trick" the FEInterface::n_dofs() function into giving
+  // us the number of dofs for a potentially p-refined Elem, but we
+  // should _not_ use this temporary FEType object for the shape() or
+  // shape_deriv() calls below because they already take into account
+  // potentially elevated p-levels internally.
+  FEType p_refined_fe_t = fe_t;
+  p_refined_fe_t.order = static_cast<Order>(p_refined_fe_t.order + elem->p_level());
 
-  const unsigned int n_dof = n_dofs (dim, p_refined, elem->type());
-  const Point &       p     = data.p;
+  const unsigned int n_dof = n_dofs (dim, p_refined_fe_t, elem->type());
+  const Point & p = data.p;
   data.shape.resize(n_dof);
 
   if (data.need_derivative())
@@ -964,15 +969,18 @@ void FEInterface::compute_data(const unsigned int dim,
 
   for (unsigned int n=0; n<n_dof; n++)
     {
-      data.shape[n] = shape(dim, p_refined, elem, n, p);
+      // Here we pass the original fe_t object. Additional p-levels
+      // (if any) are handled internally by the shape() and
+      // shape_deriv() functions since they have access to the elem
+      // pointer. Note that we are already using the n_dof value
+      // appropriate to the elevated p-level.
+      data.shape[n] = shape(dim, fe_t, elem, n, p);
       if (data.need_derivative())
         {
           for (unsigned int j=0; j<dim; j++)
-            data.dshape[n](j) = shape_deriv(dim, p_refined, elem, n, j, p);
+            data.dshape[n](j) = shape_deriv(dim, fe_t, elem, n, j, p);
         }
     }
-
-  return;
 }
 
 
