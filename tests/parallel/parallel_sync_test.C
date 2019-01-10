@@ -26,13 +26,19 @@ class ParallelSyncTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( ParallelSyncTest );
 
+  // Our sync functions are most typically used with a map of
+  // processor ids that *only* includes ranks currently running.
   CPPUNIT_TEST( testPush );
-
-//  CPPUNIT_TEST( testPushOversized );
-
   CPPUNIT_TEST( testPull );
+  CPPUNIT_TEST( testPushVecVec );
 
+  // Our sync functions need to support sending to ranks that don't
+  // exist!  If we're on N processors but working on a mesh
+  // partitioned into M parts with M > N, then subpartition p belongs
+  // to processor p%N.  Let's make M > N for these tests.
+//  CPPUNIT_TEST( testPushOversized );
 //  CPPUNIT_TEST( testPullOversized );
+//  CPPUNIT_TEST( testPushVecVecOversized );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -100,27 +106,13 @@ public:
 
   void testPush()
   {
-    const int size = TestCommWorld->size();
-
-    // Our sync functions are most typically used with a map of
-    // processor ids that *only* includes ranks currently running.
-    const int M = size;
-
-    testPushImpl(M);
+    testPushImpl(TestCommWorld->size());
   }
 
 
   void testPushOversized()
   {
-    const int size = TestCommWorld->size();
-
-    // Our sync functions need to support sending to ranks that don't
-    // exist!  If we're on N processors but working on a mesh
-    // partitioned into M parts with M > N, then subpartition p
-    // belongs to processor p%N.  Let's make M > N here.
-    const int M = (size + 4) * 2;
-
-    testPushImpl(M);
+    testPushImpl((TestCommWorld->size() + 4) * 2);
   }
 
 
@@ -203,29 +195,89 @@ public:
 
   void testPull()
   {
-    const int size = TestCommWorld->size();
-
-    // Our sync functions are most typically used with a map of
-    // processor ids that *only* includes ranks currently running.
-    const int M = size;
-
-    testPullImpl(M);
+    testPullImpl(TestCommWorld->size());
   }
 
 
   void testPullOversized()
   {
-    const int size = TestCommWorld->size();
-
-    // Our sync functions need to support sending to ranks that don't
-    // exist!  If we're on N processors but working on a mesh
-    // partitioned into M parts with M > N, then subpartition p
-    // belongs to processor p%N.  Let's make M > N here.
-    const int M = (size + 4) * 2;
-
-    testPullImpl(M);
+    testPullImpl((TestCommWorld->size() + 4) * 2);
   }
 
+
+  void testPushVecVecImpl(int M)
+  {
+    const int size = TestCommWorld->size(),
+              rank = TestCommWorld->rank();
+
+    // Data to send/recieve with each processor rank.  For this test,
+    // processor p will send to destination d the integer d, in two
+    // subvectors with sqrt(c) and 1 copies, iff c := |p-d| is a
+    // square number.
+    std::map<processor_id_type, std::vector<std::vector<unsigned int>>> data, received_data;
+
+    for (int d=0; d != M; ++d)
+      {
+        int diffsize = std::abs(d-rank);
+        int diffsqrt = std::sqrt(diffsize);
+        if (diffsqrt*diffsqrt == diffsize)
+          {
+            data[d].resize(2);
+            for (int i=-1; i != diffsqrt; ++i)
+              data[d][0].push_back(d);
+            data[d][1].push_back(d);
+          }
+      }
+
+    auto collect_data =
+      [&received_data]
+      (processor_id_type pid,
+       const std::vector<std::vector<unsigned int>> & data)
+      {
+        received_data[pid] = data;
+      };
+
+    // Do the push
+    Parallel::push_parallel_vector_data(*TestCommWorld, data, collect_data);
+
+    // Test the received results, for each processor id p we're in
+    // charge of.
+    std::vector<std::size_t> checked_sizes(size, 0);
+    for (int p=rank; p != M; p += size)
+      for (int srcp=0; srcp != size; ++srcp)
+        {
+          int diffsize = std::abs(srcp-p);
+          int diffsqrt = std::sqrt(diffsize);
+          if (diffsqrt*diffsqrt != diffsize)
+            {
+              CPPUNIT_ASSERT_EQUAL(received_data.count(srcp), std::size_t(0));
+              continue;
+            }
+
+          CPPUNIT_ASSERT_EQUAL(received_data.count(srcp), std::size_t(1));
+          CPPUNIT_ASSERT_EQUAL(received_data[srcp].size(), std::size_t(2));
+          const std::vector<unsigned int> & datum = received_data[srcp][0];
+          CPPUNIT_ASSERT_EQUAL(std::count(datum.begin(), datum.end(), p), std::ptrdiff_t(diffsqrt+1));
+          checked_sizes[srcp] += diffsqrt+1;
+          CPPUNIT_ASSERT_EQUAL(received_data[srcp][1].size(), std::size_t(1));
+          CPPUNIT_ASSERT_EQUAL(int(received_data[srcp][1][0]), p);
+        }
+
+    for (int srcp=0; srcp != size; ++srcp)
+      CPPUNIT_ASSERT_EQUAL(checked_sizes[srcp], received_data[srcp].size());
+  }
+
+
+  void testPushVecVec()
+  {
+    testPushVecVecImpl(TestCommWorld->size());
+  }
+
+
+  void testPushVecVecOversized()
+  {
+    testPushVecVecImpl((TestCommWorld->size() + 4) * 2);
+  }
 
 };
 
