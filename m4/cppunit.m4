@@ -4,11 +4,19 @@ dnl
 AC_DEFUN([AM_PATH_CPPUNIT],
 [
 
-AC_ARG_WITH(cppunit-prefix,[  --with-cppunit-prefix=PFX   Prefix where CppUnit is installed (optional)],
-            cppunit_config_prefix="$withval", cppunit_config_prefix="")
-AC_ARG_WITH(cppunit-exec-prefix,[  --with-cppunit-exec-prefix=PFX  Exec prefix where CppUnit is installed (optional)],
-            cppunit_config_exec_prefix="$withval", cppunit_config_exec_prefix="")
+dnl Support --with-cppunit-prefix
+AC_ARG_WITH(cppunit-prefix,
+            [--with-cppunit-prefix=PFX   Prefix where CppUnit is installed (optional)],
+            cppunit_config_prefix="$withval",
+            cppunit_config_prefix="")
 
+dnl Support --with-cppunit-exec-prefix
+AC_ARG_WITH(cppunit-exec-prefix,
+            [--with-cppunit-exec-prefix=PFX  Exec prefix where CppUnit is installed (optional)],
+            cppunit_config_exec_prefix="$withval",
+            cppunit_config_exec_prefix="")
+
+dnl Try to find cppunit-config
   if test x$cppunit_config_exec_prefix != x ; then
      cppunit_config_args="$cppunit_config_args --exec-prefix=$cppunit_config_exec_prefix"
      if test x${CPPUNIT_CONFIG+set} != xset ; then
@@ -27,6 +35,12 @@ AC_ARG_WITH(cppunit-exec-prefix,[  --with-cppunit-exec-prefix=PFX  Exec prefix w
 
   AC_MSG_CHECKING(for Cppunit - version >= $cppunit_version_min)
   no_cppunit=""
+
+dnl If cppunit-config was found then use it to get flags, version, etc. otherwise
+dnl disable features which require cppunit. Note: cppunit-config was removed from
+dnl upstream a few years ago and pkg-config seems to be unreliable, so we are just
+dnl going to do the old-fashioned thing and try linking a test program that uses
+dnl cppunit headers...
   if test "$CPPUNIT_CONFIG" = "no" ; then
     AC_MSG_RESULT(no)
     no_cppunit=yes
