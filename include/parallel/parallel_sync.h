@@ -220,7 +220,7 @@ void push_parallel_vector_data(const Communicator & comm,
   std::list<std::pair<unsigned int, std::shared_ptr<Request>>> receive_reqs;
   auto current_request = std::make_shared<Request>();
 
-  std::map<processor_id_type, std::shared_ptr<std::vector<nonconst_nonref_type>>> incoming_data;
+  std::multimap<processor_id_type, std::shared_ptr<std::vector<nonconst_nonref_type>>> incoming_data;
   auto current_incoming_data = std::make_shared<std::vector<nonconst_nonref_type>>();
 
   unsigned int current_src_proc = 0;
@@ -238,7 +238,7 @@ void push_parallel_vector_data(const Communicator & comm,
       current_request = std::make_shared<Request>();
 
       // current_src_proc will now hold the src pid for this receive
-      incoming_data[current_src_proc] = current_incoming_data;
+      incoming_data.emplace(current_src_proc, current_incoming_data);
       current_incoming_data = std::make_shared<std::vector<nonconst_nonref_type>>();
     }
 
@@ -254,10 +254,13 @@ void push_parallel_vector_data(const Communicator & comm,
                                // Do any post-wait work
                                req->wait();
 
-                               act_on_data(pid, *incoming_data[pid]);
+                               auto it = incoming_data.find(pid);
+                               libmesh_assert(it != incoming_data.end());
+
+                               act_on_data(pid, *it->second);
 
                                // Don't need this data anymore
-                               incoming_data.erase(pid);
+                               incoming_data.erase(it);
 
                                // This removes it from the list
                                return true;
