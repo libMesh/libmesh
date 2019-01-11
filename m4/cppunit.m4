@@ -5,6 +5,20 @@ AC_DEFUN([AM_PATH_CPPUNIT],
   CPPUNIT_CFLAGS=
   CPPUNIT_LIBS=-lcppunit
 
+  dnl User can specify --with-cppunit-include to specify path to cppunit headers.
+  AC_ARG_WITH(cppunit-include,
+              AS_HELP_STRING([--with-cppunit-include=PATH],
+                             [Specify a path for cppunit header files]),
+              CPPUNIT_CFLAGS="-I$withval",
+              CPPUNIT_CFLAGS="")
+
+  dnl User can specify --with-cppunit-lib to specify path to cppunit libs.
+  AC_ARG_WITH(cppunit-lib,
+              AS_HELP_STRING([--with-cppunit-lib=PATH],
+                             [Specify a path for cppunit libs]),
+              CPPUNIT_LIBS="-L$withval -lcppunit",
+              CPPUNIT_LIBS="-lcppunit")
+
   AC_MSG_CHECKING(whether we can build a trivial CppUnit program)
   AC_LANG_PUSH([C++])
   saveCXXFLAGS="$CXXFLAGS"
