@@ -5,19 +5,27 @@ AC_DEFUN([AM_PATH_CPPUNIT],
   CPPUNIT_CFLAGS=
   CPPUNIT_LIBS=-lcppunit
 
-  dnl User can specify --with-cppunit-include to specify path to cppunit headers.
+  dnl Check for the cppunit-config program, and if it exists, use it
+  dnl to set compiler and linker flags.
+  AC_CHECK_PROG(CPPUNIT_CONFIG, cppunit-config, cppunit-config, none, $PATH)
+  AS_IF([test "x$CPPUNIT_CONFIG" = "xcppunit-config"],
+        [
+          CPPUNIT_CFLAGS=`$CPPUNIT_CONFIG --cflags`
+          CPPUNIT_LIBS=`$CPPUNIT_CONFIG --libs`
+        ])
+
+  dnl User can override cppunit-config values with explicit values for:
+  dnl --with-cppunit-include
+  dnl --with-cppunit-lib
   AC_ARG_WITH(cppunit-include,
               AS_HELP_STRING([--with-cppunit-include=PATH],
                              [Specify a path for cppunit header files]),
-              CPPUNIT_CFLAGS="-I$withval",
-              CPPUNIT_CFLAGS="")
+              CPPUNIT_CFLAGS="-I$withval")
 
-  dnl User can specify --with-cppunit-lib to specify path to cppunit libs.
   AC_ARG_WITH(cppunit-lib,
               AS_HELP_STRING([--with-cppunit-lib=PATH],
                              [Specify a path for cppunit libs]),
-              CPPUNIT_LIBS="-L$withval -lcppunit",
-              CPPUNIT_LIBS="-lcppunit")
+              CPPUNIT_LIBS="-L$withval -lcppunit")
 
   AC_MSG_CHECKING(whether we can build a trivial CppUnit program)
   AC_LANG_PUSH([C++])
