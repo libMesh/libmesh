@@ -2180,6 +2180,24 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
   if (!solution)
     solution = system.solution.get();
 
+  NumericVector<Number> const * solution_local  = nullptr; // will be initialized below
+  std::unique_ptr<NumericVector<Number>> solution_built;
+  if (solution->type() == SERIAL || solution->type() == GHOSTED)
+      solution_local = solution;
+  else if (solution->type() == PARALLEL)
+    {
+      solution_built = NumericVector<Number>::build(this->comm());
+      solution_built->init (solution->size(), solution->size(), true, SERIAL);
+      solution->localize(*solution_built);
+      solution_built->close();
+      solution_local = solution_built.get();
+    }
+  else // unknown solution->type()
+    libmesh_error_msg("ERROR: Unknown solution->type() == " << solution->type());
+
+  // We should never hit these asserts because we should error-out in
+  // else clause above.  Just to be sure we don't try to use solution_local
+  libmesh_assert(solution_local);
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
   for (const auto & pr : _dof_constraints)
@@ -2192,8 +2210,8 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
 
       Number exact_value = 0;
       for (const auto & j : constraint_row)
-        exact_value += j.second * (*solution)(j.first);
-      exact_value -= (*solution)(constrained_dof);
+        exact_value += j.second * (*solution_local)(j.first);
+      exact_value -= (*solution_local)(constrained_dof);
 
       rhs->set(constrained_dof, exact_value);
     }
