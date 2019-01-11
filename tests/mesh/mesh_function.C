@@ -114,11 +114,10 @@ public:
 
     // Make sure the MeshFunction's values interpolate the projected solution
     // at the nodes
-    for (unsigned int i = 0; i<mesh.n_nodes(); ++i)
+    for (const auto & node : mesh.local_node_ptr_range())
       {
-        const Point & pt = mesh.point(i);
-        (*mesh_function)(pt, /*time=*/ 0., vec_values);
-        Real mesh_function_value = projection_function(pt,
+        (*mesh_function)(*node, /*time=*/ 0., vec_values);
+        Real mesh_function_value = projection_function(*node,
                                                        es.parameters,
                                                        dummy,
                                                        dummy);
