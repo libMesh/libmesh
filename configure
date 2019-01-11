@@ -1260,8 +1260,8 @@ enable_fparser
 with_fparser
 enable_fparser_debugging
 enable_cppunit
-with_cppunit_prefix
-with_cppunit_exec_prefix
+with_cppunit_include
+with_cppunit_lib
 enable_nanoflann
 enable_metaphysicl
 enable_metaphysicl_required
@@ -2136,8 +2136,9 @@ Optional Packages:
   --with-fparser=<release|none|devel>
                           Determine which version of the C++ function parser
                           to use
-  --with-cppunit-prefix=PFX   Prefix where CppUnit is installed (optional)
-  --with-cppunit-exec-prefix=PFX  Exec prefix where CppUnit is installed (optional)
+  --with-cppunit-include=PATH
+                          Specify a path for cppunit header files
+  --with-cppunit-lib=PATH Specify a path for cppunit libs
   --with-curl-include=PATH
                           Specify the path for CURL header files
   --with-curl-lib=PATH    Specify the path for CURL libs
@@ -41504,57 +41505,27 @@ fi
 
 if test "$enablecppunit" = yes; then :
 
+      CPPUNIT_CFLAGS=
+  CPPUNIT_LIBS=-lcppunit
 
-
-# Check whether --with-cppunit-prefix was given.
-if test "${with_cppunit_prefix+set}" = set; then :
-  withval=$with_cppunit_prefix; cppunit_config_prefix="$withval"
-else
-  cppunit_config_prefix=""
-fi
-
-
-# Check whether --with-cppunit-exec-prefix was given.
-if test "${with_cppunit_exec_prefix+set}" = set; then :
-  withval=$with_cppunit_exec_prefix; cppunit_config_exec_prefix="$withval"
-else
-  cppunit_config_exec_prefix=""
-fi
-
-
-  if test x$cppunit_config_exec_prefix != x ; then
-     cppunit_config_args="$cppunit_config_args --exec-prefix=$cppunit_config_exec_prefix"
-     if test x${CPPUNIT_CONFIG+set} != xset ; then
-        CPPUNIT_CONFIG=$cppunit_config_exec_prefix/bin/cppunit-config
-     fi
-  fi
-  if test x$cppunit_config_prefix != x ; then
-     cppunit_config_args="$cppunit_config_args --prefix=$cppunit_config_prefix"
-     if test x${CPPUNIT_CONFIG+set} != xset ; then
-        CPPUNIT_CONFIG=$cppunit_config_prefix/bin/cppunit-config
-     fi
-  fi
-
-  # Extract the first word of "cppunit-config", so it can be a program name with args.
+      # Extract the first word of "cppunit-config", so it can be a program name with args.
 set dummy cppunit-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_CPPUNIT_CONFIG+:} false; then :
+if ${ac_cv_prog_CPPUNIT_CONFIG+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  case $CPPUNIT_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_CPPUNIT_CONFIG="$CPPUNIT_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+  if test -n "$CPPUNIT_CONFIG"; then
+  ac_cv_prog_CPPUNIT_CONFIG="$CPPUNIT_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_CPPUNIT_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_prog_CPPUNIT_CONFIG="cppunit-config"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -41562,11 +41533,10 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_path_CPPUNIT_CONFIG" && ac_cv_path_CPPUNIT_CONFIG="no"
-  ;;
-esac
+  test -z "$ac_cv_prog_CPPUNIT_CONFIG" && ac_cv_prog_CPPUNIT_CONFIG="none"
 fi
-CPPUNIT_CONFIG=$ac_cv_path_CPPUNIT_CONFIG
+fi
+CPPUNIT_CONFIG=$ac_cv_prog_CPPUNIT_CONFIG
 if test -n "$CPPUNIT_CONFIG"; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CPPUNIT_CONFIG" >&5
 $as_echo "$CPPUNIT_CONFIG" >&6; }
@@ -41576,155 +41546,80 @@ $as_echo "no" >&6; }
 fi
 
 
-  cppunit_version_min=1.10.0
+  if test "x$CPPUNIT_CONFIG" = "xcppunit-config"; then :
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Cppunit - version >= $cppunit_version_min" >&5
-$as_echo_n "checking for Cppunit - version >= $cppunit_version_min... " >&6; }
-  no_cppunit=""
-  if test "$CPPUNIT_CONFIG" = "no" ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    no_cppunit=yes
-  else
-    CPPUNIT_CFLAGS=`$CPPUNIT_CONFIG --cflags`
-    CPPUNIT_LIBS=`$CPPUNIT_CONFIG --libs`
-    cppunit_version=`$CPPUNIT_CONFIG --version`
+          CPPUNIT_CFLAGS=`$CPPUNIT_CONFIG --cflags`
+          CPPUNIT_LIBS=`$CPPUNIT_CONFIG --libs`
 
-    cppunit_major_version=`echo $cppunit_version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-    cppunit_minor_version=`echo $cppunit_version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-    cppunit_micro_version=`echo $cppunit_version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-
-    cppunit_major_min=`echo $cppunit_version_min | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-    if test "x${cppunit_major_min}" = "x" ; then
-       cppunit_major_min=0
-    fi
-
-    cppunit_minor_min=`echo $cppunit_version_min | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-    if test "x${cppunit_minor_min}" = "x" ; then
-       cppunit_minor_min=0
-    fi
-
-    cppunit_micro_min=`echo $cppunit_version_min | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-    if test "x${cppunit_micro_min}" = "x" ; then
-       cppunit_micro_min=0
-    fi
-
-    cppunit_version_proper=`expr \
-        $cppunit_major_version \> $cppunit_major_min \| \
-        $cppunit_major_version \= $cppunit_major_min \& \
-        $cppunit_minor_version \> $cppunit_minor_min \| \
-        $cppunit_major_version \= $cppunit_major_min \& \
-        $cppunit_minor_version \= $cppunit_minor_min \& \
-        $cppunit_micro_version \>= $cppunit_micro_min `
-
-    if test "$cppunit_version_proper" = "1" ; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cppunit_major_version.$cppunit_minor_version.$cppunit_micro_version" >&5
-$as_echo "$cppunit_major_version.$cppunit_minor_version.$cppunit_micro_version" >&6; }
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-      no_cppunit=yes
-    fi
-
-    if test "x$no_cppunit" = x ; then
-      saveCXXFLAGS="$CXXFLAGS"
-      CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
-      ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-      ac_fn_cxx_check_header_mongrel "$LINENO" "cppunit/TestCase.h" "ac_cv_header_cppunit_TestCase_h" "$ac_includes_default"
-if test "x$ac_cv_header_cppunit_TestCase_h" = xyes; then :
-
-else
-  no_cppunit=no
 fi
 
 
-      ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+# Check whether --with-cppunit-include was given.
+if test "${with_cppunit_include+set}" = set; then :
+  withval=$with_cppunit_include; CPPUNIT_CFLAGS="-I$withval"
+fi
 
-      CXXFLAGS="$saveCXXFLAGS"
-    fi
 
-    # CppUnit uses lots of C++ features, linking of which might be
-    # broken by the C++11 ABI changes, so let's make sure we can link
-    # with it.
-    if test "x$no_cppunit" = x ; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can build a trivial CppUnit program" >&5
+
+# Check whether --with-cppunit-lib was given.
+if test "${with_cppunit_lib+set}" = set; then :
+  withval=$with_cppunit_lib; CPPUNIT_LIBS="-L$withval -lcppunit"
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can build a trivial CppUnit program" >&5
 $as_echo_n "checking whether we can build a trivial CppUnit program... " >&6; }
-      ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-      saveCXXFLAGS="$CXXFLAGS"
-      CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
-      saveLIBS="$LIBS"
-      LIBS="$CPPUNIT_LIBS $saveLIBS"
+  saveCXXFLAGS="$CXXFLAGS"
+  CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
+  saveLIBS="$LIBS"
+  LIBS="$CPPUNIT_LIBS $saveLIBS"
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-      #include <cppunit/ui/text/TestRunner.h>
-      int main( int argc, char **argv)
-      {
-        CppUnit::TextUi::TestRunner runner;
+  #include <cppunit/ui/text/TestRunner.h>
+  int main(int argc, char **argv)
+  {
+    CppUnit::TextUi::TestRunner runner;
 
-	// We don't actually run this, but we should try to link to a
-        // CppUnit method.
-        if (runner.run())
-          return 0;
+    if (runner.run())
+      return 0;
 
-        return 1;
-      }
+    return 1;
+  }
 
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-        no_cppunit=yes
+    CPPUNIT_CFLAGS=
+    CPPUNIT_LIBS=
+    enablecppunit=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
-      ac_ext=c
+  ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-      LIBS="$saveLIBS"
-      CXXFLAGS="$saveCXXFLAGS"
-    fi
-  fi
-
-  if test "x$no_cppunit" = x ; then
-     enablecppunit=yes
-  else
-     CPPUNIT_CFLAGS=""
-     CPPUNIT_LIBS=""
-     enablecppunit=no
-  fi
+  LIBS="$saveLIBS"
+  CXXFLAGS="$saveCXXFLAGS"
 
 
 

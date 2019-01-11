@@ -652,7 +652,7 @@ AC_ARG_ENABLE(cppunit,
                        [AC_MSG_ERROR(bad value ${enableval} for --enable-cppunit)])],
               [enablecppunit=yes])
 AS_IF([test "$enablecppunit" = yes],
-      [AM_PATH_CPPUNIT([1.10.0],[enablecppunit=yes],[enablecppunit=no])])
+      [AM_PATH_CPPUNIT])
 
 AM_CONDITIONAL(LIBMESH_ENABLE_CPPUNIT, test x$enablecppunit = xyes)
 # -------------------------------------------------------------
