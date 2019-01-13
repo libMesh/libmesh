@@ -1064,21 +1064,18 @@ void Elem::make_links_to_me_remote()
 
               // My neighbor may have descendants which consider me a
               // neighbor
-              std::vector<const Elem *> family;
+              std::vector<Elem *> family;
               neigh->total_family_tree_by_subneighbor (family, my_ancestor, this);
 
-              // FIXME - There's a lot of ugly const_casts here; we
-              // may want to make remote_elem non-const and create
-              // non-const versions of the family_tree methods
-              for (auto & const_elem : family)
+              for (auto & n : family)
                 {
-                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
-                  if (n == remote_elem)
+                  if (n->is_remote())
                     continue;
                   unsigned int my_s = n->which_neighbor_am_i(this);
                   libmesh_assert_less (my_s, n->n_neighbors());
                   libmesh_assert_equal_to (n->neighbor_ptr(my_s), this);
+                  // TODO: we may want to make remote_elem non-const.
                   n->set_neighbor(my_s, const_cast<RemoteElem *>(remote_elem));
                 }
             }
@@ -1130,12 +1127,10 @@ void Elem::remove_links_to_me()
               std::vector<Elem *> family;
               neigh->total_family_tree_by_neighbor (family, this);
 
-              // FIXME - There's a lot of ugly const_casts here; we
-              // may want to make remote_elem non-const.
               for (auto & n : family)
                 {
                   libmesh_assert (n);
-                  if (n == remote_elem)
+                  if (n->is_remote())
                     continue;
                   unsigned int my_s = n->which_neighbor_am_i(this);
                   libmesh_assert_less (my_s, n->n_neighbors());
@@ -1171,17 +1166,13 @@ void Elem::remove_links_to_me()
 
               // My neighbor may have descendants which consider me a
               // neighbor
-              std::vector<const Elem *> family;
+              std::vector<Elem *> family;
               neigh->total_family_tree_by_subneighbor (family, my_ancestor, this);
 
-              // FIXME - There's a lot of ugly const_casts here; we
-              // may want to make remote_elem non-const and create
-              // non-const versions of the family_tree methods
-              for (auto & const_elem : family)
+              for (auto & n : family)
                 {
-                  Elem * n = const_cast<Elem *>(const_elem);
                   libmesh_assert (n);
-                  if (n == remote_elem)
+                  if (n->is_remote())
                     continue;
                   unsigned int my_s = n->which_neighbor_am_i(this);
                   libmesh_assert_less (my_s, n->n_neighbors());

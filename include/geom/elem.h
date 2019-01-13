@@ -533,7 +533,6 @@ public:
   }
 
   /**
-   * TODO: Add this once there is a templated version of Elem::find_point_neighbors().
    * Non-const version of function above that fills up a vector of
    * non-const Elem pointers instead.
    */
@@ -1392,7 +1391,7 @@ public:
    */
   void family_tree_by_side (std::vector<const Elem *> & family,
                             unsigned int side,
-                            bool reset=true) const
+                            bool reset = true) const
   {
     ElemInternal::family_tree_by_side(this, family, side, reset);
   }
@@ -1402,7 +1401,7 @@ public:
    */
   void family_tree_by_side (std::vector<Elem *> & family,
                             unsigned int side,
-                            bool reset=true)
+                            bool reset = true)
   {
     ElemInternal::family_tree_by_side(this, family, side, reset);
   }
