@@ -72,6 +72,7 @@
 #include "libmesh/enum_elem_quality.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
+#include "libmesh/elem_internal.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 #include "libmesh/mesh.h"
@@ -565,6 +566,22 @@ void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set) const
 
 
 
+void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set,
+                                const Elem * start_elem) const
+{
+  ElemInternal::find_point_neighbors(this, neighbor_set, start_elem);
+}
+
+
+
+void Elem::find_point_neighbors(std::set<Elem *> & neighbor_set,
+                                Elem * start_elem)
+{
+  ElemInternal::find_point_neighbors(this, neighbor_set, start_elem);
+}
+
+
+
 void Elem::find_edge_neighbors(const Point & p1,
                                const Point & p2,
                                std::set<const Elem *> & neighbor_set) const
@@ -650,6 +667,20 @@ void Elem::find_edge_neighbors(std::set<const Elem *> & neighbor_set) const
       untested_set.swap(next_untested_set);
       next_untested_set.clear();
     }
+}
+
+
+
+void Elem::find_interior_neighbors(std::set<const Elem *> & neighbor_set) const
+{
+  ElemInternal::find_interior_neighbors(this, neighbor_set);
+}
+
+
+
+void Elem::find_interior_neighbors(std::set<Elem *> & neighbor_set)
+{
+  ElemInternal::find_interior_neighbors(this, neighbor_set);
 }
 
 
@@ -1348,6 +1379,211 @@ void Elem::replace_child (Elem * elem, unsigned int c)
   this->set_child(c, elem);
 }
 
+
+
+void Elem::family_tree (std::vector<const Elem *> & family,
+                          bool reset) const
+{
+  ElemInternal::family_tree(this, family, reset);
+}
+
+
+
+void Elem::family_tree (std::vector<Elem *> & family,
+                        bool reset)
+{
+  ElemInternal::family_tree(this, family, reset);
+}
+
+
+
+void Elem::total_family_tree (std::vector<const Elem *> & family,
+                              bool reset) const
+{
+  ElemInternal::total_family_tree(this, family, reset);
+}
+
+
+
+void Elem::total_family_tree (std::vector<Elem *> & family,
+                              bool reset)
+{
+  ElemInternal::total_family_tree(this, family, reset);
+}
+
+
+
+void Elem::active_family_tree (std::vector<const Elem *> & active_family,
+                               bool reset) const
+{
+  ElemInternal::active_family_tree(this, active_family, reset);
+}
+
+
+
+void Elem::active_family_tree (std::vector<Elem *> & active_family,
+                               bool reset)
+{
+  ElemInternal::active_family_tree(this, active_family, reset);
+}
+
+
+
+void Elem::family_tree_by_side (std::vector<const Elem *> & family,
+                                unsigned int side,
+                                bool reset) const
+{
+  ElemInternal::family_tree_by_side(this, family, side, reset);
+}
+
+
+
+void Elem:: family_tree_by_side (std::vector<Elem *> & family,
+                                 unsigned int side,
+                                 bool reset)
+{
+  ElemInternal::family_tree_by_side(this, family, side, reset);
+}
+
+
+
+void Elem::active_family_tree_by_side (std::vector<const Elem *> & family,
+                                       unsigned int side,
+                                       bool reset) const
+{
+  ElemInternal::active_family_tree_by_side(this, family, side, reset);
+}
+
+
+
+void Elem::active_family_tree_by_side (std::vector<Elem *> & family,
+                                       unsigned int side,
+                                       bool reset)
+{
+  ElemInternal::active_family_tree_by_side(this, family, side, reset);
+}
+
+
+
+void Elem::family_tree_by_neighbor (std::vector<const Elem *> & family,
+                                    const Elem * neighbor,
+                                    bool reset) const
+{
+  ElemInternal::family_tree_by_neighbor(this, family, neighbor, reset);
+}
+
+
+
+void Elem::family_tree_by_neighbor (std::vector<Elem *> & family,
+                                    Elem * neighbor,
+                                    bool reset)
+{
+  ElemInternal::family_tree_by_neighbor(this, family, neighbor, reset);
+}
+
+
+
+void Elem::total_family_tree_by_neighbor (std::vector<const Elem *> & family,
+                                          const Elem * neighbor,
+                                          bool reset) const
+{
+  ElemInternal::total_family_tree_by_neighbor(this, family, neighbor, reset);
+}
+
+
+
+void Elem::total_family_tree_by_neighbor (std::vector<Elem *> & family,
+                                          Elem * neighbor,
+                                          bool reset)
+{
+  ElemInternal::total_family_tree_by_neighbor(this, family, neighbor, reset);
+}
+
+
+
+void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
+                                       const Elem * neighbor,
+                                       const Elem * subneighbor,
+                                       bool reset) const
+{
+  ElemInternal::family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+}
+
+
+
+void Elem::family_tree_by_subneighbor (std::vector<Elem *> & family,
+                                       Elem * neighbor,
+                                       Elem * subneighbor,
+                                       bool reset)
+{
+  ElemInternal::family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+}
+
+
+
+void Elem::total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
+                                             const Elem * neighbor,
+                                             const Elem * subneighbor,
+                                             bool reset) const
+{
+  ElemInternal::total_family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+}
+
+
+
+void Elem::total_family_tree_by_subneighbor (std::vector<Elem *> & family,
+                                             Elem * neighbor,
+                                             Elem * subneighbor,
+                                             bool reset)
+{
+  ElemInternal::total_family_tree_by_subneighbor(this, family, neighbor, subneighbor, reset);
+}
+
+
+
+void Elem::active_family_tree_by_neighbor (std::vector<const Elem *> & family,
+                                           const Elem * neighbor,
+                                           bool reset) const
+{
+  ElemInternal::active_family_tree_by_neighbor(this, family, neighbor, reset);
+}
+
+
+
+void Elem::active_family_tree_by_neighbor (std::vector<Elem *> & family,
+                                           Elem * neighbor,
+                                           bool reset)
+{
+  ElemInternal::active_family_tree_by_neighbor(this, family, neighbor, reset);
+}
+
+
+
+void Elem::active_family_tree_by_topological_neighbor (std::vector<const Elem *> & family,
+                                                       const Elem * neighbor,
+                                                       const MeshBase & mesh,
+                                                       const PointLocatorBase & point_locator,
+                                                       const PeriodicBoundaries * pb,
+                                                       bool reset) const
+{
+  ElemInternal::active_family_tree_by_topological_neighbor(this, family, neighbor,
+                                                           mesh, point_locator, pb,
+                                                           reset);
+}
+
+
+
+void Elem::active_family_tree_by_topological_neighbor (std::vector<Elem *> & family,
+                                                       Elem * neighbor,
+                                                       const MeshBase & mesh,
+                                                       const PointLocatorBase & point_locator,
+                                                       const PeriodicBoundaries * pb,
+                                                       bool reset)
+{
+  ElemInternal::active_family_tree_by_topological_neighbor(this, family, neighbor,
+                                                           mesh, point_locator, pb,
+                                                           reset);
+}
 
 
 bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
