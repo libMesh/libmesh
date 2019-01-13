@@ -18,9 +18,8 @@
 #ifndef LIBMESH_ELEM_INTERNAL_H
 #define LIBMESH_ELEM_INTERNAL_H
 
-// C++ includes
-#include <vector>
-#include <set>
+// libMesh includes
+#include "libmesh/elem.h"
 
 namespace libMesh
 {
