@@ -30,6 +30,20 @@
 #include <cmath>
 #include <complex>
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename, typename>
+class DualNumber;
+}
+namespace std
+{
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> norm(const MetaPhysicL::DualNumber<T, D> & in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> norm(MetaPhysicL::DualNumber<T, D> && in);
+}
+#endif
 
 namespace libMesh
 {
