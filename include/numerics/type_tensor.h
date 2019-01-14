@@ -767,11 +767,11 @@ TypeTensor<T>::operator + (const TypeTensor<T2> & p) const
 {
 
 #if LIBMESH_DIM == 1
-  return TypeTensor(_coords[0] + p._coords[0]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] + p._coords[0]);
 #endif
 
 #if LIBMESH_DIM == 2
-  return TypeTensor(_coords[0] + p._coords[0],
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] + p._coords[0],
                     _coords[1] + p._coords[1],
                     0.,
                     _coords[2] + p._coords[2],
@@ -779,15 +779,15 @@ TypeTensor<T>::operator + (const TypeTensor<T2> & p) const
 #endif
 
 #if LIBMESH_DIM == 3
-  return TypeTensor(_coords[0] + p._coords[0],
-                    _coords[1] + p._coords[1],
-                    _coords[2] + p._coords[2],
-                    _coords[3] + p._coords[3],
-                    _coords[4] + p._coords[4],
-                    _coords[5] + p._coords[5],
-                    _coords[6] + p._coords[6],
-                    _coords[7] + p._coords[7],
-                    _coords[8] + p._coords[8]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] + p._coords[0],
+                                                             _coords[1] + p._coords[1],
+                                                             _coords[2] + p._coords[2],
+                                                             _coords[3] + p._coords[3],
+                                                             _coords[4] + p._coords[4],
+                                                             _coords[5] + p._coords[5],
+                                                             _coords[6] + p._coords[6],
+                                                             _coords[7] + p._coords[7],
+                                                             _coords[8] + p._coords[8]);
 #endif
 
 }
