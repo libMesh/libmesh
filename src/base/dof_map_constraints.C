@@ -2168,7 +2168,8 @@ void DofMap::enforce_constraints_exactly (const System & system,
 
 void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & system,
                                               NumericVector<Number> * rhs,
-                                              NumericVector<Number> const * solution) const
+                                              NumericVector<Number> const * solution,
+                                              bool homogeneous) const
 {
   parallel_object_only();
 
@@ -2212,6 +2213,13 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
       for (const auto & j : constraint_row)
         exact_value += j.second * (*solution_local)(j.first);
       exact_value -= (*solution_local)(constrained_dof);
+      if (!homogeneous)
+        {
+          DofConstraintValueMap::const_iterator rhsit =
+            _primal_constraint_values.find(constrained_dof);
+          if (rhsit != _primal_constraint_values.end())
+            exact_value += rhsit->second;
+        }
 
       rhs->set(constrained_dof, exact_value);
     }

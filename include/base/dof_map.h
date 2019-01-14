@@ -1159,7 +1159,8 @@ public:
 
   void enforce_constraints_on_residual (const NonlinearImplicitSystem & system,
                                         NumericVector<Number> * rhs,
-                                        NumericVector<Number> const * solution) const;
+                                        NumericVector<Number> const * solution,
+                                        bool homogeneous = true) const;
   void enforce_constraints_on_jacobian (const NonlinearImplicitSystem & system,
                                         SparseMatrix<Number> * jac) const;
 
