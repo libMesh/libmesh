@@ -587,12 +587,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
               // We'll need an index into the error vector for this element
               const dof_id_type e_p_id = e_p->id();
 
-              // Get a pointer to the element, we need it to initialize
-              // the FEMContext
-              Elem * e_p_cast = const_cast<Elem *>(*patch_re_it);
-
               // Initialize the FEMContext
-              femcontext.pre_fe_reinit(system, e_p_cast);
+              femcontext.pre_fe_reinit(system, e_p);
 
               // We will update the new_error_per_cell vector with element_error if the
               // error_per_cell[e_p_id] entry is non-zero, otherwise update it

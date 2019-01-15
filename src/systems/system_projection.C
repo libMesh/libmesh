@@ -929,8 +929,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
             // FIXME: We reinit with an arbitrary element in case the user
             //        doesn't override FEMFunctionBase::component. Is there
             //        any use case we're missing? [PB]
-            Elem * el = const_cast<Elem *>(*(this->get_mesh().active_local_elements_begin()));
-            context.pre_fe_reinit(*this, el);
+            context.pre_fe_reinit(*this, *(this->get_mesh().active_local_elements_begin()));
 
             std::vector<dof_id_type> SCALAR_indices;
             dof_map.SCALAR_dof_indices (SCALAR_indices, var);

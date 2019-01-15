@@ -373,9 +373,7 @@ public:
 
     for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(elem);
-
-        _femcontext.pre_fe_reinit(_sys, el);
+        _femcontext.pre_fe_reinit(_sys, elem);
         _femcontext.elem_fe_reinit();
 
         assemble_unconstrained_element_system
@@ -414,8 +412,7 @@ public:
 
     for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(elem);
-        _femcontext.pre_fe_reinit(_sys, el);
+        _femcontext.pre_fe_reinit(_sys, elem);
 
         // Optionally initialize all the interior FE objects on elem.
         if (_sys.fe_reinit_during_postprocess)
@@ -492,9 +489,7 @@ public:
 
     for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(elem);
-
-        _femcontext.pre_fe_reinit(_sys, el);
+        _femcontext.pre_fe_reinit(_sys, elem);
 
         const unsigned int n_dofs =
           cast_int<unsigned int>(_femcontext.get_dof_indices().size());
@@ -630,9 +625,7 @@ public:
 
     for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(elem);
-
-        _femcontext.pre_fe_reinit(_sys, el);
+        _femcontext.pre_fe_reinit(_sys, elem);
 
         const unsigned int n_dofs =
           cast_int<unsigned int>(_femcontext.get_dof_indices().size());

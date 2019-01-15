@@ -710,6 +710,7 @@ include_HEADERS = \
         geom/elem.h \
         geom/elem_cutter.h \
         geom/elem_hash.h \
+        geom/elem_internal.h \
         geom/elem_quality.h \
         geom/elem_range.h \
         geom/face.h \

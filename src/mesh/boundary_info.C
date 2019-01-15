@@ -496,7 +496,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
         }
 #endif
 
-      new_elem->set_interior_parent (const_cast<Elem *>(elem));
+      new_elem->set_interior_parent (elem);
 
       // On non-local elements on DistributedMesh we might have
       // RemoteElem neighbor links to construct

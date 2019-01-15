@@ -136,26 +136,11 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
         continue;
 
       // get all relevant interior elements
-      std::set<const Elem *> neighbor_set;
+      std::set<Elem *> neighbor_set;
       elem->find_interior_neighbors(neighbor_set);
 
-      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-      for (; n_it != neighbor_set.end(); ++n_it)
-        {
-          // FIXME - non-const versions of the std::set<const Elem
-          // *> returning methods would be nice
-          Elem * neighbor = const_cast<Elem *>(*n_it);
-
-#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) ||         \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MULTIMAP) ||       \
-  defined(LIBMESH_HAVE_HASH_MULTIMAP) ||                \
-  defined(LIBMESH_HAVE_EXT_HASH_MULTIMAP)
-          interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
-#else
-          interior_to_boundary_map.insert(interior_to_boundary_map.begin(),
-                                          std::make_pair(neighbor, elem));
-#endif
-        }
+      for (auto & neighbor : neighbor_set)
+        interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
     }
 
   // Data structure that Metis will fill up on processor 0 and broadcast.
