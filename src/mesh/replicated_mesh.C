@@ -959,12 +959,12 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           std::vector<Real> ret_dist_sqr(1);
 
           // Loop over other mesh. For each node, find its nearest neighbor in this mesh, and fill in the maps.
-          for (std::set<dof_id_type>::iterator current_node = other_boundary_node_ids.begin(); current_node != other_boundary_node_ids.end(); ++current_node)
+          for (auto node : other_boundary_node_ids)
           {
-            const Real query_pt[] = {other_mesh->point(*current_node)(0), other_mesh->point(*current_node)(1), other_mesh->point(*current_node)(2)};
+            const Real query_pt[] = {other_mesh->point(node)(0), other_mesh->point(node)(1), other_mesh->point(node)(2)};
             this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index[0], &ret_dist_sqr[0]);
-            node_to_node_map[this_mesh_nodes[ret_index[0]].second] = *current_node;
-            other_to_this_node_map[*current_node] = this_mesh_nodes[ret_index[0]].second;
+            node_to_node_map[this_mesh_nodes[ret_index[0]].second] = node;
+            other_to_this_node_map[node] = this_mesh_nodes[ret_index[0]].second;
           }
 
           // If the 2 maps don't have the same size, it means we have overwritten a value in node_to_node_map
