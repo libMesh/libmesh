@@ -45,6 +45,7 @@
 #include "libmesh/raw_accessor.h"
 #include "libmesh/sparse_matrix.h" // needed to constrain adjoint rhs
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
+#include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/int_range.h"
@@ -2165,6 +2166,91 @@ void DofMap::enforce_constraints_exactly (const System & system,
   v->close();
 }
 
+void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & system,
+                                              NumericVector<Number> * rhs,
+                                              NumericVector<Number> const * solution,
+                                              bool homogeneous) const
+{
+  parallel_object_only();
+
+  if (!this->n_constrained_dofs())
+    return;
+
+  if (!rhs)
+    rhs = system.rhs;
+  if (!solution)
+    solution = system.solution.get();
+
+  NumericVector<Number> const * solution_local  = nullptr; // will be initialized below
+  std::unique_ptr<NumericVector<Number>> solution_built;
+  if (solution->type() == SERIAL || solution->type() == GHOSTED)
+      solution_local = solution;
+  else if (solution->type() == PARALLEL)
+    {
+      solution_built = NumericVector<Number>::build(this->comm());
+      solution_built->init (solution->size(), solution->size(), true, SERIAL);
+      solution->localize(*solution_built);
+      solution_built->close();
+      solution_local = solution_built.get();
+    }
+  else // unknown solution->type()
+    libmesh_error_msg("ERROR: Unknown solution->type() == " << solution->type());
+
+  // We should never hit these asserts because we should error-out in
+  // else clause above.  Just to be sure we don't try to use solution_local
+  libmesh_assert(solution_local);
+  libmesh_assert_equal_to (this, &(system.get_dof_map()));
+
+  for (const auto & pr : _dof_constraints)
+    {
+      dof_id_type constrained_dof = pr.first;
+      if (!this->local_index(constrained_dof))
+        continue;
+
+      const DofConstraintRow constraint_row = pr.second;
+
+      Number exact_value = 0;
+      for (const auto & j : constraint_row)
+        exact_value += j.second * (*solution_local)(j.first);
+      exact_value -= (*solution_local)(constrained_dof);
+      if (!homogeneous)
+        {
+          DofConstraintValueMap::const_iterator rhsit =
+            _primal_constraint_values.find(constrained_dof);
+          if (rhsit != _primal_constraint_values.end())
+            exact_value += rhsit->second;
+        }
+
+      rhs->set(constrained_dof, exact_value);
+    }
+}
+
+void DofMap::enforce_constraints_on_jacobian (const NonlinearImplicitSystem & system,
+                                              SparseMatrix<Number> * jac) const
+{
+  parallel_object_only();
+
+  if (!this->n_constrained_dofs())
+    return;
+
+  if (!jac)
+    jac = system.matrix;
+
+  libmesh_assert_equal_to (this, &(system.get_dof_map()));
+
+  for (const auto & pr : _dof_constraints)
+    {
+      dof_id_type constrained_dof = pr.first;
+      if (!this->local_index(constrained_dof))
+        continue;
+
+      const DofConstraintRow constraint_row = pr.second;
+
+      for (const auto & j : constraint_row)
+        jac->set(constrained_dof, j.first, j.second);
+      jac->set(constrained_dof, constrained_dof, -1);
+    }
+}
 
 
 void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
