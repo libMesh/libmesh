@@ -177,4 +177,70 @@ SUPERTYPE(double, long double);
 
 } // namespace libMesh
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+
+namespace MetaPhysicL
+{
+template <typename, typename>
+class DualNumber;
+} // namespace MetaPhysicL
+
+namespace libMesh
+{
+template <typename T, typename T2, typename D>
+struct CompareTypes<T, MetaPhysicL::DualNumber<T2, D>>
+{
+  typedef MetaPhysicL::DualNumber<typename CompareTypes<T, T2>::supertype,
+                     typename D::template rebind<typename CompareTypes<T, T2>::supertype>::other>
+      supertype;
+};
+template <typename T, typename D, typename T2>
+struct CompareTypes<MetaPhysicL::DualNumber<T, D>, T2>
+{
+  typedef MetaPhysicL::DualNumber<typename CompareTypes<T, T2>::supertype,
+                     typename D::template rebind<typename CompareTypes<T, T2>::supertype>::other>
+      supertype;
+};
+template <typename T, typename D, typename T2, typename D2>
+struct CompareTypes<MetaPhysicL::DualNumber<T, D>, MetaPhysicL::DualNumber<T2, D2>>
+{
+  typedef MetaPhysicL::DualNumber<typename CompareTypes<T, T2>::supertype,
+                     typename D::template rebind<typename CompareTypes<T, T2>::supertype>::other>
+      supertype;
+};
+template <typename T, typename D>
+struct CompareTypes<MetaPhysicL::DualNumber<T, D>, MetaPhysicL::DualNumber<T, D>>
+{
+  typedef MetaPhysicL::DualNumber<T, D> supertype;
+};
+template <typename T, typename T2>
+struct CompareTypes<T, MetaPhysicL::DualNumber<T2, T2>>
+{
+  typedef MetaPhysicL::DualNumber<typename CompareTypes<T, T2>::supertype,
+                     typename CompareTypes<T, T2>::supertype>
+      supertype;
+};
+template <typename T, typename T2>
+struct CompareTypes<MetaPhysicL::DualNumber<T, T>, T2>
+{
+  typedef MetaPhysicL::DualNumber<typename CompareTypes<T, T2>::supertype,
+                     typename CompareTypes<T, T2>::supertype>
+      supertype;
+};
+template <typename T, typename T2>
+struct CompareTypes<MetaPhysicL::DualNumber<T, T>, MetaPhysicL::DualNumber<T2, T2>>
+{
+  typedef MetaPhysicL::DualNumber<typename CompareTypes<T, T2>::supertype,
+                     typename CompareTypes<T, T2>::supertype>
+      supertype;
+};
+template <typename T, typename D>
+struct ScalarTraits<MetaPhysicL::DualNumber<T, D>>
+{
+  static const bool value = ScalarTraits<T>::value;
+};
+} // namespace libMesh
+
+#endif // LIBMESH_HAVE_METAPHYSICL
+
 #endif // LIBMESH_COMPARE_TYPES_H
