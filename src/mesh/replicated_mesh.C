@@ -78,9 +78,6 @@ public:
 };
 
 
-//namespace libMesh
-//{
-
 // ------------------------------------------------------------
 // ReplicatedMesh class member functions
 ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
@@ -954,7 +951,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           kd_tree_t this_kd_tree(3, vec_nodes_adaptor, 10);
           this_kd_tree.buildIndex();
 
-          // Storage for neerest neighbor in the loop below
+          // Storage for nearest neighbor in the loop below
           std::vector<size_t> ret_index(1);
           std::vector<Real> ret_dist_sqr(1);
 
@@ -968,7 +965,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           }
 
           // If the 2 maps don't have the same size, it means we have overwritten a value in node_to_node_map
-          // It means one node in this mesh is the neerest neighbor of several nodes in other mesh.
+          // It means one node in this mesh is the nearest neighbor of several nodes in other mesh.
           // Not possible !
           if (node_to_node_map.size() != other_to_this_node_map.size())
             libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
