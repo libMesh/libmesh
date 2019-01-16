@@ -30,14 +30,37 @@
 #include <cmath>
 #include <complex>
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename, typename>
+class DualNumber;
+}
+namespace std
+{
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> norm(const MetaPhysicL::DualNumber<T, D> & in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> norm(MetaPhysicL::DualNumber<T, D> && in);
+}
+#endif
+
 namespace libMesh
 {
-
 // Forward declarations
 template <typename T> class TypeTensor;
 template <typename T> class VectorValue;
 template <typename T> class TensorValue;
+}
 
+namespace std
+{
+template <typename T>
+auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()));
+}
+
+namespace libMesh
+{
 /**
  * This class defines a vector in \p LIBMESH_DIM dimensional space of
  * type T.  T may either be Real or Complex. Instead use one of the derived
@@ -284,14 +307,14 @@ public:
    * \deprecated Use the norm() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  Real size() const;
+  auto size() const -> decltype(std::norm(T()));
 #endif
 
   /**
    * \returns The magnitude of the vector, i.e. the square-root of the
    * sum of the elements squared.
    */
-  Real norm() const;
+  auto norm() const -> decltype(std::norm(T()));
 
   /**
    * \returns The magnitude of the vector squared, i.e. the sum of the
@@ -300,14 +323,14 @@ public:
    * \deprecated Use the norm_sq() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  Real size_sq() const;
+  auto size_sq() const -> decltype(std::norm(T()));
 #endif
 
   /**
    * \returns The magnitude of the vector squared, i.e. the sum of the
    * element magnitudes squared.
    */
-  Real norm_sq() const;
+  auto norm_sq() const -> decltype(std::norm(T()));
 
   /**
    * Set all entries of the vector to 0.
@@ -898,7 +921,7 @@ TypeVector<T>::cross(const TypeVector<T2> & p) const
 #ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
-Real TypeVector<T>::size() const
+auto TypeVector<T>::size() const -> decltype(std::norm(T()))
 {
   libmesh_deprecated();
   return this->norm();
@@ -909,7 +932,7 @@ Real TypeVector<T>::size() const
 
 template <typename T>
 inline
-Real TypeVector<T>::norm() const
+auto TypeVector<T>::norm() const -> decltype(std::norm(T()))
 {
   return std::sqrt(this->norm_sq());
 }
@@ -929,7 +952,7 @@ void TypeVector<T>::zero()
 #ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
-Real TypeVector<T>::size_sq() const
+auto TypeVector<T>::size_sq() const -> decltype(std::norm(T()))
 {
   libmesh_deprecated();
   return this->norm_sq();
@@ -940,7 +963,7 @@ Real TypeVector<T>::size_sq() const
 
 template <typename T>
 inline
-Real TypeVector<T>::norm_sq() const
+auto TypeVector<T>::norm_sq() const -> decltype(std::norm(T()))
 {
 #if LIBMESH_DIM == 1
   return (TensorTools::norm_sq(_coords[0]));
@@ -1126,5 +1149,14 @@ TypeVector<T> TypeVector<T>::unit() const
 
 }
 } // namespace libMesh
+
+namespace std
+{
+template <typename T>
+auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()))
+{
+  return vector.norm();
+}
+} // namespace std
 
 #endif // LIBMESH_TYPE_VECTOR_H

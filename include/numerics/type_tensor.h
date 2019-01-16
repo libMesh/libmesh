@@ -29,6 +29,21 @@
 #include <cmath>
 #include <tuple>
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename, typename>
+class DualNumber;
+}
+namespace std
+{
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> norm(const MetaPhysicL::DualNumber<T, D> & in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> norm(MetaPhysicL::DualNumber<T, D> && in);
+}
+#endif
+
 namespace libMesh
 {
 
@@ -289,7 +304,8 @@ public:
    * \returns A copy of the result, this tensor is unchanged.
    */
   template <typename T2>
-  TypeTensor<T> operator * (const TypeTensor<T2> &) const;
+  TypeTensor<typename CompareTypes<T, T2>::supertype>
+  operator * (const TypeTensor<T2> &) const;
 
   /**
    * Multiply this tensor by a tensor value in place
@@ -347,14 +363,14 @@ public:
    * \deprecated Use the norm() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  Real size() const;
+  auto size() const -> decltype(std::norm(T()));
 #endif
 
   /**
    * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    */
-  Real norm() const;
+  auto norm() const -> decltype(std::norm(T()));
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. sum of the
@@ -363,14 +379,14 @@ public:
    * \deprecated Use the norm_sq() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  Real size_sq() const;
+  auto size_sq() const -> decltype(std::norm(T()));
 #endif
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. sum of the
    * element magnitudes squared.
    */
-  Real norm_sq() const;
+  auto norm_sq() const -> decltype(std::norm(T()));
 
   /**
    * \returns The determinant of the tensor.
@@ -752,27 +768,27 @@ TypeTensor<T>::operator + (const TypeTensor<T2> & p) const
 {
 
 #if LIBMESH_DIM == 1
-  return TypeTensor(_coords[0] + p._coords[0]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] + p._coords[0]);
 #endif
 
 #if LIBMESH_DIM == 2
-  return TypeTensor(_coords[0] + p._coords[0],
-                    _coords[1] + p._coords[1],
-                    0.,
-                    _coords[2] + p._coords[2],
-                    _coords[3] + p._coords[3]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] + p._coords[0],
+                                                             _coords[1] + p._coords[1],
+                                                             0.,
+                                                             _coords[2] + p._coords[2],
+                                                             _coords[3] + p._coords[3]);
 #endif
 
 #if LIBMESH_DIM == 3
-  return TypeTensor(_coords[0] + p._coords[0],
-                    _coords[1] + p._coords[1],
-                    _coords[2] + p._coords[2],
-                    _coords[3] + p._coords[3],
-                    _coords[4] + p._coords[4],
-                    _coords[5] + p._coords[5],
-                    _coords[6] + p._coords[6],
-                    _coords[7] + p._coords[7],
-                    _coords[8] + p._coords[8]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] + p._coords[0],
+                                                             _coords[1] + p._coords[1],
+                                                             _coords[2] + p._coords[2],
+                                                             _coords[3] + p._coords[3],
+                                                             _coords[4] + p._coords[4],
+                                                             _coords[5] + p._coords[5],
+                                                             _coords[6] + p._coords[6],
+                                                             _coords[7] + p._coords[7],
+                                                             _coords[8] + p._coords[8]);
 #endif
 
 }
@@ -822,27 +838,27 @@ TypeTensor<T>::operator - (const TypeTensor<T2> & p) const
 {
 
 #if LIBMESH_DIM == 1
-  return TypeTensor(_coords[0] - p._coords[0]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] - p._coords[0]);
 #endif
 
 #if LIBMESH_DIM == 2
-  return TypeTensor(_coords[0] - p._coords[0],
-                    _coords[1] - p._coords[1],
-                    0.,
-                    _coords[2] - p._coords[2],
-                    _coords[3] - p._coords[3]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] - p._coords[0],
+                                                             _coords[1] - p._coords[1],
+                                                             0.,
+                                                             _coords[2] - p._coords[2],
+                                                             _coords[3] - p._coords[3]);
 #endif
 
 #if LIBMESH_DIM == 3
-  return TypeTensor(_coords[0] - p._coords[0],
-                    _coords[1] - p._coords[1],
-                    _coords[2] - p._coords[2],
-                    _coords[3] - p._coords[3],
-                    _coords[4] - p._coords[4],
-                    _coords[5] - p._coords[5],
-                    _coords[6] - p._coords[6],
-                    _coords[7] - p._coords[7],
-                    _coords[8] - p._coords[8]);
+  return TypeTensor<typename CompareTypes<T, T2>::supertype>(_coords[0] - p._coords[0],
+                                                             _coords[1] - p._coords[1],
+                                                             _coords[2] - p._coords[2],
+                                                             _coords[3] - p._coords[3],
+                                                             _coords[4] - p._coords[4],
+                                                             _coords[5] - p._coords[5],
+                                                             _coords[6] - p._coords[6],
+                                                             _coords[7] - p._coords[7],
+                                                             _coords[8] - p._coords[8]);
 #endif
 
 }
@@ -1166,9 +1182,10 @@ TypeTensor<T>::operator * (const TypeVector<T2> & p) const
 template <typename T>
 template <typename T2>
 inline
-TypeTensor<T> TypeTensor<T>::operator * (const TypeTensor<T2> & p) const
+TypeTensor<typename CompareTypes<T, T2>::supertype>
+TypeTensor<T>::operator * (const TypeTensor<T2> & p) const
 {
-  TypeTensor<T> returnval;
+  TypeTensor<typename CompareTypes<T, T2>::supertype> returnval;
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     for (unsigned int j=0; j<LIBMESH_DIM; j++)
       for (unsigned int k=0; k<LIBMESH_DIM; k++)
@@ -1214,7 +1231,7 @@ TypeTensor<T>::contract (const TypeTensor<T2> & t) const
 #ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
-Real TypeTensor<T>::size() const
+auto TypeTensor<T>::size() const -> decltype(std::norm(T()))
 {
   libmesh_deprecated();
   return this->norm();
@@ -1225,7 +1242,7 @@ Real TypeTensor<T>::size() const
 
 template <typename T>
 inline
-Real TypeTensor<T>::norm() const
+auto TypeTensor<T>::norm() const -> decltype(std::norm(T()))
 {
   return std::sqrt(this->norm_sq());
 }
@@ -1285,7 +1302,7 @@ void TypeTensor<T>::zero()
 #ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
-Real TypeTensor<T>::size_sq () const
+auto TypeTensor<T>::size_sq () const -> decltype(std::norm(T()))
 {
   libmesh_deprecated();
   return this->norm_sq();
@@ -1296,7 +1313,7 @@ Real TypeTensor<T>::size_sq () const
 
 template <typename T>
 inline
-Real TypeTensor<T>::norm_sq () const
+auto TypeTensor<T>::norm_sq () const -> decltype(std::norm(T()))
 {
   Real sum = 0.;
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
