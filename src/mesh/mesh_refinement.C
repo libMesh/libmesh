@@ -1461,6 +1461,8 @@ bool MeshRefinement::_coarsen_elements ()
 
 bool MeshRefinement::_refine_elements ()
 {
+  libmesh_assert(_mesh.is_prepared() || _mesh.is_replicated());
+
   // This function must be run on all processors at once
   parallel_object_only();
 
