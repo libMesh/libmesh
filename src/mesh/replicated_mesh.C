@@ -24,95 +24,60 @@
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/utility.h"
+#include "libmesh/point.h"
+#ifdef LIBMESH_HAVE_NANOFLANN
+#include "libmesh/nanoflann.hpp"
+#endif
 
 // C++ includes
 #include <unordered_map>
 #include <unordered_set>
 
-namespace
-{
-using namespace libMesh;
-
-// A custom comparison function, based on Point::operator<,
-// that tries to ignore floating point differences in components
-// of the point
-class FuzzyPointCompare
-{
-private:
-  Real _tol;
-
-public:
-  // Constructor takes the tolerance to be used in fuzzy comparisons
-  FuzzyPointCompare(Real tol) : _tol(tol) {}
-
-  // This is inspired directly by Point::operator<
-  bool operator()(const Point & lhs, const Point & rhs)
-  {
-    for (unsigned i=0; i<LIBMESH_DIM; ++i)
-      {
-        // If the current components are within some tolerance
-        // of one another, then don't attempt the less-than comparison.
-        // Note that this may cause something strange to happen, as Roy
-        // believes he can prove it is not a total ordering...
-        Real rel_size = std::max(std::abs(lhs(i)), std::abs(rhs(i)));
-
-        // Don't use relative tolerance if both numbers are already small.
-        // How small?  Some possible options are:
-        // * std::numeric_limits<Real>::epsilon()
-        // * TOLERANCE
-        // * 1.0
-        // If we use std::numeric_limits<Real>::epsilon(), we'll
-        // do more relative comparisons for small numbers, but
-        // increase the chance for false positives?  If we pick 1.0,
-        // we'll never "increase" the difference between small numbers
-        // in the test below.
-        if (rel_size < 1.)
-          rel_size = 1.;
-
-        // Don't attempt the comparison if lhs(i) and rhs(i) are too close
-        // together.
-        if ( std::abs(lhs(i) - rhs(i)) / rel_size < _tol)
-          continue;
-
-        if (lhs(i) < rhs(i))
-          return true;
-        if (lhs(i) > rhs(i))
-          return false;
-      }
-
-    // We compared all the components without returning yet, so
-    // each component was neither greater than nor less than they other.
-    // They might be equal, so return false.
-    return false;
-  }
-
-  // Needed by std::sort on vector<pair<Point,id>>
-  bool operator()(const std::pair<Point, dof_id_type> & lhs,
-                  const std::pair<Point, dof_id_type> & rhs)
-  {
-    return (*this)(lhs.first, rhs.first);
-  }
-
-  // comparison function where lhs is a Point and rhs is a pair<Point,dof_id_type>.
-  // This is used in routines like lower_bound, where a specific value is being
-  // searched for.
-  bool operator()(const Point & lhs, std::pair<Point, dof_id_type> & rhs)
-  {
-    return (*this)(lhs, rhs.first);
-  }
-
-  // And the other way around...
-  bool operator()(std::pair<Point, dof_id_type> & lhs, const Point & rhs)
-  {
-    return (*this)(lhs.first, rhs);
-  }
-};
-}
-
-
-
 namespace libMesh
 {
+
+// This class adapts a vector of Nodes (represented by a pair of a Point and a dof_id_type)
+// for use in a nanoflann KD-Tree
+
+class VectorOfNodesAdaptor
+{
+private:
+  const std::vector<std::pair<Point, dof_id_type>> _nodes;
+
+public:
+  VectorOfNodesAdaptor(const std::vector<std::pair<Point, dof_id_type>> & nodes) :
+    _nodes(nodes)
+  {}
+
+  /**
+   * Must return the number of data points
+   */
+  inline size_t kdtree_get_point_count() const { return _nodes.size(); }
+
+  /**
+   * \returns The dim'th component of the idx'th point in the class:
+   * Since this is inlined and the "dim" argument is typically an immediate value, the
+   *  "if's" are actually solved at compile time.
+   */
+  inline Real kdtree_get_pt(const size_t idx, int dim) const
+    {
+      libmesh_assert_less (idx, _nodes.size());
+      libmesh_assert_less (dim, 3);
+
+      const Point & p(_nodes[idx].first);
+
+      if (dim==0) return p(0);
+      if (dim==1) return p(1);
+      return p(2);
+    }
+
+  /*
+   * Optional bounding-box computation
+   */
+  template <class BBOX>
+  bool kdtree_get_bbox(BBOX & /* bb */) const { return false; }
+};
+
 
 // ------------------------------------------------------------
 // ReplicatedMesh class member functions
@@ -968,80 +933,57 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
             }
         }
 
+      // We require nanoflann for the "binary search" (really kd-tree)
+      // option to work. If it's not available, turn that option off,
+      // warn the user, and fall back on the N^2 search algorithm.
+      if (use_binary_search)
+        {
+#ifndef LIBMESH_HAVE_NANOFLANN
+          use_binary_search = false;
+          libmesh_warning("The use_binary_search option in the "
+                          "ReplicatedMesh stitching algorithms requires nanoflann "
+                          "support. Falling back on N^2 search algorithm.");
+#endif
+        }
 
       if (use_binary_search)
         {
-          // Store points from both stitched faces in sorted vectors for faster
-          // searching later.
-          typedef std::vector<std::pair<Point, dof_id_type>> PointVector;
-          PointVector
-            this_sorted_bndry_nodes(this_boundary_node_ids.size()),
-            other_sorted_bndry_nodes(other_boundary_node_ids.size());
+#ifdef LIBMESH_HAVE_NANOFLANN
+          typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, VectorOfNodesAdaptor>, VectorOfNodesAdaptor, 3> kd_tree_t;
 
-          // Comparison object that will be used later. So far, I've had reasonable success
-          // with TOLERANCE...
-          FuzzyPointCompare mein_comp(TOLERANCE);
-
-          // Create and sort the vectors we will use to do the geometric searching
+          // Create the dataset needed to build the kd tree with nanoflann
+          std::vector<std::pair<Point, dof_id_type>> this_mesh_nodes(this_boundary_node_ids.size());
+          std::set<dof_id_type>::iterator current_node = this_boundary_node_ids.begin();
+          for (unsigned int ctr = 0; current_node != this_boundary_node_ids.end(); ++current_node, ++ctr)
           {
-            std::set<dof_id_type> * set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-            const ReplicatedMesh * mesh_array[2] = {this, other_mesh};
-            PointVector * vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
-
-            for (unsigned i=0; i<2; ++i)
-              {
-                std::set<dof_id_type>::iterator
-                  set_it     = set_array[i]->begin(),
-                  set_it_end = set_array[i]->end();
-
-                // Fill up the vector with the contents of the set...
-                for (unsigned ctr=0; set_it != set_it_end; ++set_it, ++ctr)
-                  {
-                    (*vec_array[i])[ctr] = std::make_pair(mesh_array[i]->point(*set_it), // The geometric point
-                                                          *set_it);                      // Its ID
-                  }
-
-                // Sort the vectors based on the FuzzyPointCompare struct op()
-                std::sort(vec_array[i]->begin(), vec_array[i]->end(), mein_comp);
-              }
+            this_mesh_nodes[ctr].first = this->point(*current_node);
+            this_mesh_nodes[ctr].second = *current_node;
           }
 
-          // Build up the node_to_node_map and node_to_elems_map using the sorted vectors of Points.
-          for (const auto & pr : this_sorted_bndry_nodes)
-            {
-              // Current point we're working on
-              Point this_point = pr.first;
+          VectorOfNodesAdaptor vec_nodes_adaptor(this_mesh_nodes);
 
-              // FuzzyPointCompare does a fuzzy equality comparison internally to handle
-              // slight differences between the list of nodes on each mesh.
-              PointVector::iterator other_iter = Utility::binary_find(other_sorted_bndry_nodes.begin(),
-                                                                      other_sorted_bndry_nodes.end(),
-                                                                      this_point,
-                                                                      mein_comp);
+          kd_tree_t this_kd_tree(3, vec_nodes_adaptor, 10);
+          this_kd_tree.buildIndex();
 
-              // Not every node on this_sorted_bndry_nodes will necessarily be stitched, so
-              // if its pair is not found on other_mesh, just continue.
-              if (other_iter != other_sorted_bndry_nodes.end())
-                {
-                  // Check that the points do indeed match - should not be necessary unless something
-                  // is wrong with binary_find.  To be on the safe side, we'll check.
-                  {
-                    // Grab the other point from the iterator
-                    Point other_point = other_iter->first;
+          // Storage for nearest neighbor in the loop below
+          std::vector<size_t> ret_index(1);
+          std::vector<Real> ret_dist_sqr(1);
 
-                    if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
-                      libmesh_error_msg("Error: mismatched points: " << this_point << " and " << other_point);
-                  }
+          // Loop over other mesh. For each node, find its nearest neighbor in this mesh, and fill in the maps.
+          for (auto node : other_boundary_node_ids)
+          {
+            const Real query_pt[] = {other_mesh->point(node)(0), other_mesh->point(node)(1), other_mesh->point(node)(2)};
+            this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index[0], &ret_dist_sqr[0]);
+            node_to_node_map[this_mesh_nodes[ret_index[0]].second] = node;
+            other_to_this_node_map[node] = this_mesh_nodes[ret_index[0]].second;
+          }
 
-
-                  // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
-                  dof_id_type
-                    this_node_id = pr.second,
-                    other_node_id = other_iter->second;
-                  node_to_node_map[this_node_id] = other_node_id;
-                  other_to_this_node_map[other_node_id] = this_node_id;
-                }
-            }
+          // If the 2 maps don't have the same size, it means we have overwritten a value in node_to_node_map
+          // It means one node in this mesh is the nearest neighbor of several nodes in other mesh.
+          // Not possible !
+          if (node_to_node_map.size() != other_to_this_node_map.size())
+            libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
+#endif
         }
       else
         {
