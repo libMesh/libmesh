@@ -74,7 +74,6 @@ public:
    */
   template <class BBOX>
   bool kdtree_get_bbox(BBOX & /* bb */) const { return false; }
-
 };
 
 
@@ -932,9 +931,22 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
             }
         }
 
+      // We require nanoflann for the "binary search" (really kd-tree)
+      // option to work. If it's not available, turn that option off,
+      // warn the user, and fall back on the N^2 search algorithm.
+      if (use_binary_search)
+        {
+#ifndef LIBMESH_HAVE_NANOFLANN
+          use_binary_search = false;
+          libmesh_warning("The use_binary_search option in the "
+                          "ReplicatedMesh stitching algorithms requires nanoflann "
+                          "support. Falling back on N^2 search algorithm.");
+#endif
+        }
 
       if (use_binary_search)
         {
+#ifdef LIBMESH_HAVE_NANOFLANN
           typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, VectorOfNodesAdaptor>, VectorOfNodesAdaptor, 3> kd_tree_t;
 
           // Create the dataset needed to build the kd tree with nanoflann
@@ -969,7 +981,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           // Not possible !
           if (node_to_node_map.size() != other_to_this_node_map.size())
             libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
-
+#endif
         }
       else
         {
