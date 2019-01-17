@@ -37,7 +37,8 @@ class MeshBase;
 
 
 /**
- * This class implements writing meshes in the Gmsh format.
+ * \brief Reading and writing meshes in the Gmsh format.
+ *
  * For a full description of the Gmsh format and to obtain the
  * GMSH software see
  * <a href="http://http://www.geuz.org/gmsh/">the Gmsh home page</a>
@@ -70,8 +71,14 @@ public:
    * Reads in a mesh in the Gmsh *.msh format from the ASCII file
    * given by name.
    *
-   * The user is responsible for calling Mesh::prepare_for_use()
+   * \note The user is responsible for calling Mesh::prepare_for_use()
    * after reading the mesh and before using it.
+   *
+   * The physical group names defined in the Gmesh-file are stored, depending
+   * on the element dimension, as either subdomain name or as side name. The
+   * IDs of the former can be retrieved by using the MeshBase::get_id_by_name
+   * method; the IDs of the latter can be retriebed by using the
+   * MeshBase::get_boundary_info and the BoundaryInfo::get_id_by_name methods.
    */
   virtual void read (const std::string & name) override;
 
