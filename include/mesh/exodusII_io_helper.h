@@ -327,11 +327,40 @@ public:
 
   /**
    * Writes the vector of values to the element variables.
+   *
+   * The 'values' vector is assumed to be in the order:
+   * {(u1, u2, u3, ..., uN), (v1, v2, v3, ..., vN), (w1, w2, w3, ..., wN)}
+   * where N is the number of elements.
+   *
+   * This ordering is produced by calls to ES::build_elemental_solution_vector().
+   * ES::build_discontinuous_solution_vector(), on the other hand, produces an
+   * element-major ordering. See the function below for that case.
    */
-  void write_element_values(const MeshBase & mesh,
-                            const std::vector<Real> & values,
-                            int timestep,
-                            const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
+  void write_element_values
+  (const MeshBase & mesh,
+   const std::vector<Real> & values,
+   int timestep,
+   const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
+
+  /**
+   * Same as the function above, but assume the input 'values' vector is
+   * in element-major order, i.e.
+   * {(u1,v1,w1), (u2,v2,w2), ... (uN,vN,wN)}
+   * This function is called by
+   * ExodusII_IO::write_element_data_from_discontinuous_nodal_data()
+   * because ES::build_discontinuous_solution_vector() builds the solution
+   * vector in this order.
+   *
+   * \note If some variables are subdomain-restricted, then the tuples will
+   * be of different lengths for each element, i.e.
+   * {(u1,v1,w1), (u2,v2), ... (uN,vN,wN)}
+   * if variable w is not active on element 2.
+   */
+  void write_element_values_element_major
+  (const MeshBase & mesh,
+   const std::vector<Real> & values,
+   int timestep,
+   const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
 
   /**
    * Writes the vector of values to a nodal variable.

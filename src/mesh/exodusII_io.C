@@ -95,7 +95,6 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
 
   es.build_variable_names  (solution_names, nullptr, system_names);
   es.build_discontinuous_solution_vector (v, system_names);
-
   this->write_nodal_data_discontinuous(name, v, solution_names);
 }
 
@@ -633,7 +632,8 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
           names.push_back(var);
     }
 
-  // If we pass in a list of names to "get_solution" it'll filter the variables coming back
+  // If we pass in a list of names to "build_elemental_solution_vector()"
+  // it'll filter the variables coming back.
   std::vector<Number> soln;
   es.build_elemental_solution_vector(soln, names);
 
@@ -693,6 +693,266 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   exio_helper->initialize_element_variables(names, vars_active_subdomains);
   exio_helper->write_element_values(mesh, soln, _timestep, vars_active_subdomains);
 #endif
+}
+
+
+
+void
+ExodusII_IO::write_element_data_from_discontinuous_nodal_data
+(const EquationSystems & es,
+ const std::set<std::string> * system_names,
+ const std::string & var_suffix)
+{
+  // Be sure that some other function has already opened the file and prepared it
+  // for writing. This is the same behavior as the write_element_data() function
+  // which we are trying to mimic.
+  if (MeshOutput<MeshBase>::mesh().processor_id() == 0 && !exio_helper->opened_for_writing)
+    libmesh_error_msg("ERROR, ExodusII file must be initialized before outputting element variables.");
+
+  // This function currently only works on serialized meshes.  The
+  // "true" flag specifies that we only need the mesh serialized to
+  // processor 0
+  MeshSerializer serialize(MeshInput<MeshBase>::mesh(),
+                           !MeshOutput<MeshBase>::_is_parallel_format,
+                           true);
+
+  // Note: in general we want to respect the contents of
+  // _output_variables, only building a solution vector with values
+  // from the requested variables. First build a list of all variable
+  // names, then throw out ones that aren't in _output_variables, if
+  // any.
+  std::vector<std::string> var_names;
+  es.build_variable_names (var_names, /*fetype=*/nullptr, system_names);
+
+  // Debugging:
+  // libMesh::out << "List of all variable names: " << std::endl;
+  // for (const auto & var_name : var_names)
+  //   libMesh::out << var_name << std::endl;
+
+  // Remove all names from var_names that are not in _output_variables.
+  // Note: This approach avoids errors when the user provides invalid
+  // variable names in _output_variables, as the code will not try to
+  // write a variable that doesn't exist.
+  if (!_output_variables.empty())
+    var_names.erase
+      (std::remove_if
+       (var_names.begin(),
+        var_names.end(),
+        [this](const std::string & name)
+        {return !std::count(_output_variables.begin(),
+                            _output_variables.end(),
+                            name);}),
+       var_names.end());
+
+  // Debugging:
+  // libMesh::out << "List of variable names after white-listing: " << std::endl;
+  // for (const auto & var_name : var_names)
+  //   libMesh::out << var_name << std::endl;
+
+  // Build a solution vector, limiting the results to the variables in
+  // var_names and the Systems in system_names, and only computing values
+  // at the vertices.
+  std::vector<Number> v;
+  es.build_discontinuous_solution_vector
+    (v, system_names, &var_names, /*vertices_only=*/true);
+
+  // Debugging: what is the ordering of the vector v the ES builds?
+  // libMesh::out << "Vector v from build_discontinuous_solution_vector():" << std::endl;
+  // for (const auto & val : v)
+  //   libMesh::out << val << ' ';
+  // libMesh::out << std::endl;
+
+  // Debugging:
+  // libMesh::out << "Discontinuous solution vector has size: " << v.size() << std::endl;
+
+  // Get active subdomains for each variable in var_names.
+  std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
+  es.get_vars_active_subdomains(var_names, vars_active_subdomains);
+
+  // Debugging: print which of the original variables are active on
+  // which subdomains (or 'All' if they are active on all subdomains).
+  // unsigned int ctr = 0;
+  // for (const auto & s : vars_active_subdomains)
+  //   {
+  //     libMesh::out << "Active subdomains for variable " << ctr++ << ": " << std::endl;
+  //     if (s.empty())
+  //       libMesh::out << "All" << std::endl;
+  //     else
+  //       for (const auto & id : s)
+  //         libMesh::out << id << std::endl;
+  //   }
+
+  // Determine names of variables to write based on the number of
+  // nodes/vertices the elements in different subdomains have.
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  std::map<subdomain_id_type, unsigned int> subdomain_id_to_vertices_per_elem;
+  for (const auto & elem : mesh.active_element_ptr_range())
+    {
+      // Try to insert key/value pair into the map. If this returns
+      // false, check the returned iterator's value to make sure it
+      // matches. It shouldn't actually be possible for this to fail
+      // (since if the Mesh was like this it would have already
+      // failed) but it doesn't hurt to be on the safe side.
+      auto pr2 = subdomain_id_to_vertices_per_elem.insert
+        (std::make_pair(elem->subdomain_id(), elem->n_vertices()));
+      if (!pr2.second && pr2.first->second != elem->n_vertices())
+        libmesh_error_msg("Elem with different number of vertices found.");
+    }
+
+  // Determine "derived" variable names. These names are created by
+  // starting with the base variable name and appending the user's
+  // variable_suffix (default: "_elem_node_") followed by a node id.
+  //
+  // Not every derived variable will be active on every subdomain,
+  // even if the original variable _is_ active.  Subdomains can have
+  // different geometric element types (with differing numbers of
+  // nodes), so some of the derived variable names will be inactive on
+  // those subdomains.
+  //
+  // Since we would otherwise generate the same name once per
+  // subdomain, we keep the list of names unique as we are creating
+  // it. We can't use a std::set for this because we don't want the
+  // variables names to be in a different order from the order
+  // they were written in the call to: build_discontinuous_solution_vector()
+  //
+  // The list of derived variable names includes one for each vertex,
+  // for higher-order elements we currently only write out vertex
+  // values, but this could be changed in the future without too much
+  // trouble.
+  std::vector<std::string> derived_var_names;
+
+  // Keep track of mapping from derived_name to (orig_name, node_id)
+  // pair. We will use this later to determine whether a given
+  // variable is active on a given subdomain.
+  std::map<std::string, std::pair<std::string, unsigned int>>
+    derived_name_to_orig_name_and_node_id;
+
+  for (const auto & pr : subdomain_id_to_vertices_per_elem)
+    {
+      const subdomain_id_type sbd_id = pr.first;
+      const unsigned int vertices_per_elem =
+        subdomain_id_to_vertices_per_elem[sbd_id];
+
+      // Debugging:
+      // libMesh::out << "Subdomain " << sbd_id
+      //              << " has elements with " << vertices_per_elem
+      //              << " vertices." << std::endl;
+
+      std::ostringstream oss;
+      for (unsigned int n=0; n<vertices_per_elem; ++n)
+        for (unsigned int var_id=0; var_id<var_names.size(); ++var_id)
+          {
+            oss.str("");
+            oss.clear();
+            oss << var_names[var_id] << var_suffix << n;
+            std::string derived_name = oss.str();
+
+            // Only add this var name if it's not already in the list.
+            // TODO: what order will the variables be in in the hybrid
+            // case when a subdomain with elements having nodes comes
+            // before a subdomain with elements having more nodes.
+            if (!std::count(derived_var_names.begin(), derived_var_names.end(), derived_name))
+              {
+                derived_var_names.push_back(derived_name);
+                // Add entry for derived_name -> (orig_name, node_id) mapping.
+                derived_name_to_orig_name_and_node_id[derived_name] =
+                  std::make_pair(var_names[var_id], n);
+              }
+          }
+    }
+
+  // Debugging: print the names we constructed.
+  // libMesh::out << "Derived var names:" << std::endl;
+  // for (const auto & name : derived_var_names)
+  //   libMesh::out << name << std::endl;
+
+  // For each derived variable name, determine whether it is active
+  // based on how many nodes/vertices the elements in a given subdomain have,
+  // and whether they were active on the subdomain to begin with.
+  std::vector<std::set<subdomain_id_type>>
+    derived_vars_active_subdomains(derived_var_names.size());
+
+  for (auto derived_var_id : index_range(derived_var_names))
+    {
+      const auto & derived_name = derived_var_names[derived_var_id];
+      auto it = derived_name_to_orig_name_and_node_id.find(derived_name);
+      if (it == derived_name_to_orig_name_and_node_id.end())
+        libmesh_error_msg("Unmapped derived variable name: " << derived_name);
+
+      // Convenience variables for the map entry's contents.
+      const std::string & orig_name = it->second.first;
+      const unsigned int node_id = it->second.second;
+
+      // Debugging
+      // libMesh::out << "Derived name: " << derived_name
+      //              << " comes from original name " << orig_name
+      //              << " and node id " << node_id << std::endl;
+
+      // For each subdomain, determine whether the current variable
+      // should be active on that subdomain.
+      for (const auto & pr : subdomain_id_to_vertices_per_elem)
+        {
+          // Convenience variables for the current subdomain and the
+          // number of nodes elements in this subdomain have.
+          subdomain_id_type sbd_id = pr.first;
+          unsigned int vertices_per_elem_this_sbd =
+            subdomain_id_to_vertices_per_elem[sbd_id];
+
+          // Check whether variable orig_name was active on this
+          // subdomain to begin with by looking in the
+          // vars_active_subdomains container. We assume that the
+          // location of orig_name in the var_names vector matches its
+          // index in the vars_active_subdomains container.
+          auto var_loc = std::find(var_names.begin(), var_names.end(), orig_name);
+          if (var_loc == var_names.end())
+            libmesh_error_msg("Variable " << orig_name << " somehow not found in var_names array.");
+          auto var_id = std::distance(var_names.begin(), var_loc);
+
+          // This derived variable only has a chance of being active
+          // on the current subdomain if the original variable was
+          // active on this subdomain.
+          bool orig_var_active =
+            (vars_active_subdomains[var_id].empty() ||
+             vars_active_subdomains[var_id].count(sbd_id));
+
+          // If the var was originally active, check whether the
+          // elements in this subdomain have enough nodes for the
+          // corresponding derived variable to be active.
+          if (orig_var_active && node_id < vertices_per_elem_this_sbd)
+            {
+              // Debugging: status message
+              // libMesh::out << "Derived variable: " << derived_name
+              //              << " is active on subdomain " << sbd_id
+              //              << std::endl;
+              derived_vars_active_subdomains[derived_var_id].insert(sbd_id);
+            }
+        } // end loop over subdomain_id_to_vertices_per_elem
+    } // end loop over derived_var_names
+
+  // Debugging: print the results of the active/inactive determination.
+  // for (auto derived_var_id : index_range(derived_var_names))
+  //   {
+  //     libMesh::out << "Active subdomains for derived variable " << derived_var_names[derived_var_id] << ": ";
+  //     const auto & s = derived_vars_active_subdomains[derived_var_id];
+  //     if (s.empty())
+  //       libMesh::out << "All" << std::endl;
+  //     else
+  //       {
+  //         for (const auto id : s)
+  //           libMesh::out << id << " ";
+  //         libMesh::out << std::endl;
+  //       }
+  //   }
+
+  // Call function which writes the derived variable names to the
+  // Exodus file.
+  exio_helper->initialize_element_variables(derived_var_names, derived_vars_active_subdomains);
+
+  // ES::build_discontinuous_solution_vector() creates a vector with
+  // an element-major ordering, so call Helper::write_element_values()
+  // passing false for the last argument.
+  exio_helper->write_element_values_element_major
+    (mesh, v, _timestep, derived_vars_active_subdomains);
 }
 
 
