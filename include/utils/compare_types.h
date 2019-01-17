@@ -178,6 +178,7 @@ SUPERTYPE(double, long double);
 } // namespace libMesh
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
+#define LIBMESH_DUAL_NUMBER_COMPARE_TYPES
 
 namespace MetaPhysicL
 {
