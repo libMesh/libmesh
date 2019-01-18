@@ -138,16 +138,16 @@ private:
   /**
    * write the nodal values of soln to a vtkUnstructuredGrid
    */
-  void node_values_to_vtk(const std::string& name,
+  void node_values_to_vtk(const std::string & name,
                           const std::vector<Real> & local_values);
 
   /**
    * Extract the values of soln that correspond to the nodes
    *
-   * This method overrides all values in local_values
+   * This method overwrites all values in local_values
    */
   void get_local_node_values(std::vector<Number> & local_values,
-                             size_t variable,
+                             std::size_t variable,
                              const std::vector<Number> & soln,
                              const std::vector<std::string> & names);
 

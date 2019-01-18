@@ -496,8 +496,8 @@ void VTKIO::node_values_to_vtk(const std::string & name,
   _vtk_grid->GetPointData()->AddArray(data);
 }
 
-void VTKIO::get_local_node_values(std::vector<Number>& local_values,
-                                  size_t variable,
+void VTKIO::get_local_node_values(std::vector<Number> & local_values,
+                                  std::size_t variable,
                                   const std::vector<Number> & soln,
                                   const std::vector<std::string> & names)
 {
