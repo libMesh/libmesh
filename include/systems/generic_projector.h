@@ -633,6 +633,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             context.get_edge_fe( var, edge_fe );
 
           fe->get_xyz();
+          fe->get_JxW();
 
           fe->get_phi();
           if (dim > 1)
