@@ -64,35 +64,16 @@ RBEIMAssembly::~RBEIMAssembly()
 
 void RBEIMAssembly::evaluate_basis_function(unsigned int var,
                                             const Elem & element,
-                                            const QBase & element_qrule,
+                                            const std::vector<Point> & points,
                                             std::vector<Number> & values)
 {
   LOG_SCOPE("evaluate_basis_function", "RBEIMAssembly");
-
-  bool repeated_qrule = false;
-  if (_qrule)
-    {
-      repeated_qrule =
-        ( (element_qrule.type()      == _qrule->type()) &&
-          (element_qrule.get_dim()   == _qrule->get_dim()) &&
-          (element_qrule.get_order() == _qrule->get_order()) );
-    }
-
-  // If the qrule is not repeated, then we need to make a new copy of element_qrule.
-  if (!repeated_qrule)
-    {
-      _qrule = QBase::build(element_qrule.type(),
-                            element_qrule.get_dim(),
-                            element_qrule.get_order());
-
-      get_fe().attach_quadrature_rule (_qrule.get());
-    }
 
   const std::vector<std::vector<Real>> & phi = get_fe().get_phi();
 
   // The FE object caches data, hence we recompute as little as
   // possible on the call to reinit.
-  get_fe().reinit (&element);
+  get_fe().reinit (&element, &points);
 
   std::vector<dof_id_type> dof_indices_var;
 
@@ -101,14 +82,14 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
 
   libmesh_assert(dof_indices_var.size() == phi.size());
 
-  unsigned int n_qpoints = _qrule->n_points();
-  values.resize(n_qpoints);
+  unsigned int n_points = points.size();
+  values.resize(n_points);
 
-  for (unsigned int qp=0; qp<n_qpoints; qp++)
+  for (unsigned int pt_index=0; pt_index<n_points; pt_index++)
     {
-      values[qp] = 0.;
+      values[pt_index] = 0.;
       for (auto i : index_range(dof_indices_var))
-        values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
+        values[pt_index] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][pt_index];
     }
 }
 

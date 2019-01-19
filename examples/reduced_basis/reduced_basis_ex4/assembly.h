@@ -132,16 +132,13 @@ struct EIM_F : RBEIMAssembly
     // The number of local degrees of freedom in each variable
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
-    // Now we will build the affine operator
-    unsigned int n_qpoints = c.get_element_qrule().n_points();
-
     std::vector<Number> eim_values;
     evaluate_basis_function(eim_var,
                             c.get_elem(),
-                            c.get_element_qrule(),
+                            c.get_element_qrule().get_points(),
                             eim_values);
 
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
+    for (unsigned int qp=0; qp != c.get_element_qrule().n_points(); qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         c.get_elem_residual()(i) += JxW[qp] * (eim_values[qp]*phi[i][qp]);
   }
