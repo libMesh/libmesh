@@ -36531,7 +36531,7 @@ else
   enabledtk=no
 fi
 
-          if test "$enabledtk" != "xno"; then :
+          if test "x$enabledtk" != "xno"; then :
 
                   enabledtk=yes
 
@@ -36551,6 +36551,7 @@ fi
           enableifpack=no
 
           enableepetraext=no
+  enableepetra=no
 
 
 
