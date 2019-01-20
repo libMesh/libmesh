@@ -64,11 +64,12 @@ public:
 
   /**
    * Evaluate variable \p var_number of this object's EIM basis function
-   * at the points \p qpoints. Fill \p values with the basis function values.
+   * at the points \p points, where the points are in reference coordinates.
+   * Fill \p values with the basis function values.
    */
   virtual void evaluate_basis_function(unsigned int var,
                                        const Elem & element,
-                                       const QBase & element_qrule,
+                                       const std::vector<Point> & points,
                                        std::vector<Number> & values);
 
   /**
@@ -111,10 +112,10 @@ private:
   std::unique_ptr<NumericVector<Number>> _ghosted_basis_function;
 
   /**
-   * We store an FE object and an associated quadrature rule.
+   * We store an FE object so we can easily reinit in evaluate_basis_function.
    */
   std::unique_ptr<FEBase> _fe;
-  std::unique_ptr<QBase> _qrule;
+
 };
 
 }
