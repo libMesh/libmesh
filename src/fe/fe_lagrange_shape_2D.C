@@ -16,23 +16,218 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 
+// Anonymous namespace for functions shared by LAGRANGE and
+// L2_LAGRANGE implementations. Implementations appear at the bottom
+// of this file.
+namespace
+{
+using namespace libMesh;
+
+Real fe_lagrange_2D_shape(const ElemType,
+                          const Order order,
+                          const unsigned int i,
+                          const Point & p);
+
+Real fe_lagrange_2D_shape_deriv(const ElemType type,
+                                const Order order,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Point & p);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
+                                       const Order order,
+                                       const unsigned int i,
+                                       const unsigned int j,
+                                       const Point & p);
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+} // anonymous namespace
+
+
+
 namespace libMesh
 {
-
-
-
 
 template <>
 Real FE<2,LAGRANGE>::shape(const ElemType type,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
+{
+  return fe_lagrange_2D_shape(type, order, i, p);
+}
+
+
+
+template <>
+Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
+                              const Order order,
+                              const unsigned int i,
+                              const Point & p)
+{
+  return fe_lagrange_2D_shape(type, order, i, p);
+}
+
+
+template <>
+Real FE<2,LAGRANGE>::shape(const Elem * elem,
+                           const Order order,
+                           const unsigned int i,
+                           const Point & p)
+{
+  libmesh_assert(elem);
+
+  // call the orientation-independent shape functions
+  return fe_lagrange_2D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+}
+
+
+
+template <>
+Real FE<2,L2_LAGRANGE>::shape(const Elem * elem,
+                              const Order order,
+                              const unsigned int i,
+                              const Point & p)
+{
+  libmesh_assert(elem);
+
+  // call the orientation-independent shape functions
+  return fe_lagrange_2D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+}
+
+
+
+template <>
+Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
+                                 const Order order,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p)
+{
+  return fe_lagrange_2D_shape_deriv(type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
+                                    const Order order,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p)
+{
+  return fe_lagrange_2D_shape_deriv(type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<2,LAGRANGE>::shape_deriv(const Elem * elem,
+                                 const Order order,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p)
+{
+  libmesh_assert(elem);
+
+  // call the orientation-independent shape functions
+  return fe_lagrange_2D_shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+template <>
+Real FE<2,L2_LAGRANGE>::shape_deriv(const Elem * elem,
+                                    const Order order,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p)
+{
+  libmesh_assert(elem);
+
+
+  // call the orientation-independent shape functions
+  return fe_lagrange_2D_shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <>
+Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
+                                        const Order order,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p)
+{
+  return fe_lagrange_2D_shape_second_deriv(type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
+                                           const Order order,
+                                           const unsigned int i,
+                                           const unsigned int j,
+                                           const Point & p)
+{
+  return fe_lagrange_2D_shape_second_deriv(type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<2,LAGRANGE>::shape_second_deriv(const Elem * elem,
+                                        const Order order,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p)
+{
+  libmesh_assert(elem);
+
+  // call the orientation-independent shape functions
+  return fe_lagrange_2D_shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+template <>
+Real FE<2,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
+                                           const Order order,
+                                           const unsigned int i,
+                                           const unsigned int j,
+                                           const Point & p)
+{
+  libmesh_assert(elem);
+
+  // call the orientation-independent shape functions
+  return fe_lagrange_2D_shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+} // namespace libMesh
+
+
+
+// Anonymous namespace function definitions
+namespace
+{
+using namespace libMesh;
+
+Real fe_lagrange_2D_shape(const ElemType type,
+                          const Order order,
+                          const unsigned int i,
+                          const Point & p)
 {
 #if LIBMESH_DIM > 1
 
@@ -206,29 +401,13 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape(const Elem * elem,
-                           const Order order,
-                           const unsigned int i,
-                           const Point & p)
-{
-  libmesh_assert(elem);
-
-  // call the orientation-independent shape functions
-  return FE<2,LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
-}
-
-
-
-template <>
-Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point & p)
+Real fe_lagrange_2D_shape_deriv(const ElemType type,
+                                const Order order,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Point & p)
 {
 #if LIBMESH_DIM > 1
-
 
   libmesh_assert_less (j, 2);
 
@@ -548,30 +727,13 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape_deriv(const Elem * elem,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point & p)
-{
-  libmesh_assert(elem);
-
-
-  // call the orientation-independent shape functions
-  return FE<2,LAGRANGE>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
-}
-
-
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point & p)
+Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
+                                       const Order order,
+                                       const unsigned int i,
+                                       const unsigned int j,
+                                       const Point & p)
 {
 #if LIBMESH_DIM > 1
 
@@ -903,21 +1065,6 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 #endif
 }
 
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-
-template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const Elem * elem,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point & p)
-{
-  libmesh_assert(elem);
-
-  // call the orientation-independent shape functions
-  return FE<2,LAGRANGE>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
-}
-
-#endif
-
-} // namespace libMesh
+} // anonymous namespace
