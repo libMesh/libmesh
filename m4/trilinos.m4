@@ -365,7 +365,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
                 [DTK_MAKEFILE_EXPORT=$withdtkdir/packages/dtk/Makefile.export.Makefile.export.DataTransferKit],
                 [enabledtk=no])
 
-          AS_IF([test "$enabledtk" != "xno"],
+          AS_IF([test "x$enabledtk" != "xno"],
                 [
                   enabledtk=yes
                   AC_DEFINE(TRILINOS_HAVE_DTK, 1, [Flag indicating whether the library shall be compiled to use the DataTransferKit])
@@ -387,6 +387,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   dnl anyone ever wants to go back and write a configure test with
   dnl an older Trilinos, that would be great!
   enableepetraext=no
+  enableepetra=no
 
 
   AC_SUBST(AZTECOO_MAKEFILE_EXPORT)
