@@ -16,26 +16,215 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 
+// Anonymous namespace for functions shared by LAGRANGE and
+// L2_LAGRANGE implementations. Implementations appear at the bottom
+// of this file.
+namespace
+{
+using namespace libMesh;
+
+Real fe_lagrange_1D_shape(const ElemType,
+                          const Order order,
+                          const unsigned int i,
+                          const Point & p);
+
+Real fe_lagrange_1D_shape_deriv(const ElemType,
+                                const Order order,
+                                const unsigned int i,
+                                const unsigned int libmesh_dbg_var(j),
+                                const Point & p);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Real fe_lagrange_1D_shape_second_deriv(const ElemType,
+                                       const Order order,
+                                       const unsigned int i,
+                                       const unsigned int libmesh_dbg_var(j),
+                                       const Point & p);
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+} // anonymous namespace
+
+
+
 namespace libMesh
 {
 
-
-
-
 template <>
-Real FE<1,LAGRANGE>::shape(const ElemType,
+Real FE<1,LAGRANGE>::shape(const ElemType elem_type,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
 {
-  const Real xi = p(0);
+  return fe_lagrange_1D_shape(elem_type, order, i, p);
+}
 
+template <>
+Real FE<1,L2_LAGRANGE>::shape(const ElemType elem_type,
+                              const Order order,
+                              const unsigned int i,
+                              const Point & p)
+{
+  return fe_lagrange_1D_shape(elem_type, order, i, p);
+}
+
+
+template <>
+Real FE<1,LAGRANGE>::shape(const Elem * elem,
+                           const Order order,
+                           const unsigned int i,
+                           const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_1D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+}
+
+
+
+template <>
+Real FE<1,L2_LAGRANGE>::shape(const Elem * elem,
+                              const Order order,
+                              const unsigned int i,
+                              const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_1D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+}
+
+
+
+template <>
+Real FE<1,LAGRANGE>::shape_deriv(const ElemType elem_type,
+                                 const Order order,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p)
+{
+  return fe_lagrange_1D_shape_deriv(elem_type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType elem_type,
+                                    const Order order,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p)
+{
+  return fe_lagrange_1D_shape_deriv(elem_type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
+                                 const Order order,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_1D_shape_deriv(elem->type(),
+                                    static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+template <>
+Real FE<1,L2_LAGRANGE>::shape_deriv(const Elem * elem,
+                                    const Order order,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_1D_shape_deriv(elem->type(),
+                                    static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <>
+Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType elem_type,
+                                        const Order order,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p)
+{
+  return fe_lagrange_1D_shape_second_deriv(elem_type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,L2_LAGRANGE>::shape_second_deriv(const ElemType elem_type,
+                                           const Order order,
+                                           const unsigned int i,
+                                           const unsigned int j,
+                                           const Point & p)
+{
+  return fe_lagrange_1D_shape_second_deriv(elem_type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,LAGRANGE>::shape_second_deriv(const Elem * elem,
+                                        const Order order,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_1D_shape_second_deriv(elem->type(),
+                                           static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+template <>
+Real FE<1,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
+                                           const Order order,
+                                           const unsigned int i,
+                                           const unsigned int j,
+                                           const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_1D_shape_second_deriv(elem->type(),
+                                           static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+} // namespace libMesh
+
+
+
+// Anonymous namespace function definitions
+namespace
+{
+using namespace libMesh;
+
+Real fe_lagrange_1D_shape(const ElemType,
+                          const Order order,
+                          const unsigned int i,
+                          const Point & p)
+{
+  const Real xi = p(0);
 
   switch (order)
     {
@@ -113,32 +302,17 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
 
 
 
-template <>
-Real FE<1,LAGRANGE>::shape(const Elem * elem,
-                           const Order order,
-                           const unsigned int i,
-                           const Point & p)
-{
-  libmesh_assert(elem);
-
-  return FE<1,LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
-}
-
-
-
-template <>
-Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int libmesh_dbg_var(j),
-                                 const Point & p)
+Real fe_lagrange_1D_shape_deriv(const ElemType,
+                                const Order order,
+                                const unsigned int i,
+                                const unsigned int libmesh_dbg_var(j),
+                                const Point & p)
 {
   // only d()/dxi in 1D!
 
   libmesh_assert_equal_to (j, 0);
 
   const Real xi = p(0);
-
 
   switch (order)
     {
@@ -214,30 +388,13 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 }
 
 
-
-template <>
-Real FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point & p)
-{
-  libmesh_assert(elem);
-
-  return FE<1,LAGRANGE>::shape_deriv(elem->type(),
-                                     static_cast<Order>(order + elem->p_level()), i, j, p);
-}
-
-
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <>
-Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int libmesh_dbg_var(j),
-                                        const Point & p)
+Real fe_lagrange_1D_shape_second_deriv(const ElemType,
+                                       const Order order,
+                                       const unsigned int i,
+                                       const unsigned int libmesh_dbg_var(j),
+                                       const Point & p)
 {
   // Don't need to switch on j.  1D shape functions
   // depend on xi only!
@@ -300,21 +457,6 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
     } // end switch (order)
 }
 
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-
-template <>
-Real FE<1,LAGRANGE>::shape_second_deriv(const Elem * elem,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point & p)
-{
-  libmesh_assert(elem);
-
-  return FE<1,LAGRANGE>::shape_second_deriv(elem->type(),
-                                            static_cast<Order>(order + elem->p_level()), i, j, p);
 }
-
-#endif
-
-} // namespace libMesh
