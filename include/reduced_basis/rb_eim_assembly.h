@@ -112,7 +112,7 @@ private:
   std::unique_ptr<NumericVector<Number>> _ghosted_basis_function;
 
   /**
-   * We store an FE object so we can easiyl reinit in evaluate_basis_function.
+   * We store an FE object so we can easily reinit in evaluate_basis_function.
    */
   std::unique_ptr<FEBase> _fe;
 
