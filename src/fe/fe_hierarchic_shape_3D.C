@@ -16,19 +16,38 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/number_lookups.h"
 
-namespace libMesh
-{
-
-// anonymous namespace for local helper functions
+// Anonymous namespace for functions shared by HIERARCHIC and
+// L2_HIERARCHIC implementations. Implementations appear at the bottom
+// of this file.
 namespace
 {
+using namespace libMesh;
+
+Real fe_hierarchic_3D_shape(const Elem * elem,
+                            const Order order,
+                            const unsigned int i,
+                            const Point & p);
+
+Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
+                                  const Order order,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
+                                         const Order order,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const Point & p);
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 Point get_min_point(const Elem * elem,
                     unsigned int a,
@@ -636,10 +655,13 @@ void cube_indices(const Elem * elem,
       i2 = cube_number_page[basisnum] + 2;
     }
 }
+
 } // end anonymous namespace
 
 
 
+namespace libMesh
+{
 
 template <>
 Real FE<3,HIERARCHIC>::shape(const ElemType,
@@ -647,7 +669,19 @@ Real FE<3,HIERARCHIC>::shape(const ElemType,
                              const unsigned int,
                              const Point &)
 {
-  libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge and face orientation is needed.");
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,L2_HIERARCHIC>::shape(const ElemType,
+                                const Order,
+                                const unsigned int,
+                                const Point &)
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
   return 0.;
 }
 
@@ -658,6 +692,136 @@ Real FE<3,HIERARCHIC>::shape(const Elem * elem,
                              const Order order,
                              const unsigned int i,
                              const Point & p)
+{
+  return fe_hierarchic_3D_shape(elem, order, i, p);
+}
+
+
+
+template <>
+Real FE<3,L2_HIERARCHIC>::shape(const Elem * elem,
+                                const Order order,
+                                const unsigned int i,
+                                const Point & p)
+{
+  return fe_hierarchic_3D_shape(elem, order, i, p);
+}
+
+
+
+template <>
+Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
+                                   const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point & )
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,L2_HIERARCHIC>::shape_deriv(const ElemType,
+                                      const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point & )
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,HIERARCHIC>::shape_deriv(const Elem * elem,
+                                   const Order order,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point & p)
+{
+  return fe_hierarchic_3D_shape_deriv(elem, order, i, j, p);
+}
+
+
+template <>
+Real FE<3,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
+                                      const Order order,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p)
+{
+  return fe_hierarchic_3D_shape_deriv(elem, order, i, j, p);
+}
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <>
+Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
+                                          const Order,
+                                          const unsigned int,
+                                          const unsigned int,
+                                          const Point & )
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
+                                             const Order,
+                                             const unsigned int,
+                                             const unsigned int,
+                                             const Point & )
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                          const Order order,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point & p)
+{
+  return fe_hierarchic_3D_shape_second_deriv(elem, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                             const Order order,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p)
+{
+  return fe_hierarchic_3D_shape_second_deriv(elem, order, i, j, p);
+}
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+} // namespace libMesh
+
+
+
+namespace
+{
+using namespace libMesh;
+
+Real fe_hierarchic_3D_shape(const Elem * elem,
+                            const Order order,
+                            const unsigned int i,
+                            const Point & p)
 {
 #if LIBMESH_DIM == 3
 
@@ -699,26 +863,11 @@ Real FE<3,HIERARCHIC>::shape(const Elem * elem,
 
 
 
-
-template <>
-Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
-                                   const Order,
-                                   const unsigned int,
-                                   const unsigned int,
-                                   const Point & )
-{
-  libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge and face orientation is needed.");
-  return 0.;
-}
-
-
-
-template <>
-Real FE<3,HIERARCHIC>::shape_deriv(const Elem * elem,
-                                   const Order order,
-                                   const unsigned int i,
-                                   const unsigned int j,
-                                   const Point & p)
+Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
+                                  const Order order,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p)
 {
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
@@ -765,27 +914,14 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem * elem,
 }
 
 
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <>
-Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
-                                          const Order,
-                                          const unsigned int,
-                                          const unsigned int,
-                                          const Point & )
-{
-  libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge and face orientation is needed.");
-  return 0.;
-}
-
-
-
-template <>
-Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem * elem,
-                                          const Order order,
-                                          const unsigned int i,
-                                          const unsigned int j,
-                                          const Point & p)
+Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
+                                         const Order order,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const Point & p)
 {
   libmesh_assert(elem);
 
@@ -857,6 +993,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem * elem,
     / 2. / eps;
 }
 
-#endif
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-} // namespace libMesh
+
+} // anonymous namespace
