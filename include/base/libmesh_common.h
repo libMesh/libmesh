@@ -165,9 +165,8 @@ template<typename T>
 inline std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
 
 // std::isnan() is in <cmath> as of C++11.
-inline bool libmesh_isnan(float a) { return std::isnan(a); }
-inline bool libmesh_isnan(double a) { return std::isnan(a); }
-inline bool libmesh_isnan(long double a) { return std::isnan(a); }
+template <typename T>
+inline bool libmesh_isnan(T x) { return std::isnan(x); }
 
 template <typename T>
 inline bool libmesh_isnan(std::complex<T> a)
