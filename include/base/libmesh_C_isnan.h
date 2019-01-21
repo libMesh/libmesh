@@ -20,6 +20,8 @@
 #ifndef LIBMESH_LIBMESH_C_ISNAN_H
 #define LIBMESH_LIBMESH_C_ISNAN_H
 
+// These functions should never have been called directly, and are
+// also deprecated for internal library use now.
 int libmesh_C_isnan_float(float a);
 int libmesh_C_isnan_double(double a);
 int libmesh_C_isnan_longdouble(long double a);

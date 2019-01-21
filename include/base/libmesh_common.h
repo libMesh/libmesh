@@ -57,9 +57,6 @@
 // _basic_ library functionality
 #include "libmesh/libmesh_base.h"
 #include "libmesh/libmesh_exceptions.h"
-extern "C" {
-#include "libmesh/libmesh_C_isnan.h"
-}
 
 // Proxy class for libMesh::out/err output
 #include "libmesh/ostream_proxy.h"
