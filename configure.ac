@@ -389,6 +389,10 @@ LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
 AS_IF([test "x$have_cxx11_alias_declarations" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 support for alias declarations])])
 
+LIBMESH_TEST_CXX11_ARRAY
+AS_IF([test "x$have_cxx11_array" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::array])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
