@@ -221,7 +221,9 @@ data = [
     '2018-10-04', 886, 190239, # b7c021ef
     '2018-11-04', 886, 190164, # b68a3414
     '2018-12-04', 886, 190650, # 3134aa86
-       ]
+#2019
+    '2019-01-04', 886, 191341, # 08ea2d6d
+]
 
 # Extract the dates from the data array
 date_strings = data[0::3]
@@ -249,7 +251,7 @@ ax1.plot(date_nums, n_files, color=u'#4878cf', marker='o', linestyle='-', marker
 ax1.set_ylabel('Files (blue circles)')
 
 # Set up x-tick locations
-ticks_names = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017']
+ticks_names = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017', '2019']
 
 # Get numerical values for the names
 tick_nums = []
