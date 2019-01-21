@@ -16,24 +16,215 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/utility.h"
 
+// Anonymous namespace for functions shared by HIERARCHIC and
+// L2_HIERARCHIC implementations. Implementations appear at the bottom
+// of this file.
+namespace
+{
+using namespace libMesh;
+
+Real fe_hierarchic_1D_shape(const ElemType,
+                            const Order libmesh_dbg_var(order),
+                            const unsigned int i,
+                            const Point & p);
+
+Real fe_hierarchic_1D_shape_deriv(const ElemType,
+                                  const Order libmesh_dbg_var(order),
+                                  const unsigned int i,
+                                  const unsigned int libmesh_dbg_var(j),
+                                  const Point & p);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Real fe_hierarchic_1D_shape_second_deriv(const ElemType,
+                                         const Order libmesh_dbg_var(order),
+                                         const unsigned int i,
+                                         const unsigned int libmesh_dbg_var(j),
+                                         const Point & p);
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+} // anonymous namespace
+
+
 
 namespace libMesh
 {
 
+template <>
+Real FE<1,HIERARCHIC>::shape(const ElemType elem_type,
+                             const Order order,
+                             const unsigned int i,
+                             const Point & p)
+{
+  return fe_hierarchic_1D_shape(elem_type, order, i, p);
+}
+
 
 
 template <>
-Real FE<1,HIERARCHIC>::shape(const ElemType,
-                             const Order libmesh_dbg_var(order),
+Real FE<1,L2_HIERARCHIC>::shape(const ElemType elem_type,
+                                const Order order,
+                                const unsigned int i,
+                                const Point & p)
+{
+  return fe_hierarchic_1D_shape(elem_type, order, i, p);
+}
+
+
+
+template <>
+Real FE<1,HIERARCHIC>::shape(const Elem * elem,
+                             const Order order,
                              const unsigned int i,
                              const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_hierarchic_1D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+}
+
+
+
+template <>
+Real FE<1,L2_HIERARCHIC>::shape(const Elem * elem,
+                                const Order order,
+                                const unsigned int i,
+                                const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_hierarchic_1D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+}
+
+
+
+template <>
+Real FE<1,HIERARCHIC>::shape_deriv(const ElemType elem_type,
+                                   const Order order,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point & p)
+{
+  return fe_hierarchic_1D_shape_deriv(elem_type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,L2_HIERARCHIC>::shape_deriv(const ElemType elem_type,
+                                      const Order order,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p)
+{
+  return fe_hierarchic_1D_shape_deriv(elem_type, order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,HIERARCHIC>::shape_deriv(const Elem * elem,
+                                   const Order order,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_hierarchic_1D_shape_deriv(elem->type(),
+                                      static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+template <>
+Real FE<1,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
+                                      const Order order,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_hierarchic_1D_shape_deriv(elem->type(),
+                                      static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <>
+Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType elem_type,
+                                          const Order order,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point & p)
+{
+  return fe_hierarchic_1D_shape_second_deriv(elem_type, order, i, j, p);
+}
+
+
+
+
+template <>
+Real FE<1,L2_HIERARCHIC>::shape_second_deriv(const ElemType elem_type,
+                                             const Order order,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p)
+{
+  return fe_hierarchic_1D_shape_second_deriv(elem_type, order, i, j, p);
+}
+
+
+template <>
+Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                          const Order order,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_hierarchic_1D_shape_second_deriv(elem->type(),
+                                             static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+
+
+template <>
+Real FE<1,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                             const Order order,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p)
+{
+  libmesh_assert(elem);
+
+  return fe_hierarchic_1D_shape_second_deriv(elem->type(),
+                                             static_cast<Order>(order + elem->p_level()), i, j, p);
+}
+
+#endif
+
+} // namespace libMesh
+
+
+
+namespace
+{
+using namespace libMesh;
+
+Real fe_hierarchic_1D_shape(const ElemType,
+                            const Order libmesh_dbg_var(order),
+                            const unsigned int i,
+                            const Point & p)
 {
   libmesh_assert_less (i, order+1u);
 
@@ -97,25 +288,11 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 
 
 
-template <>
-Real FE<1,HIERARCHIC>::shape(const Elem * elem,
-                             const Order order,
-                             const unsigned int i,
-                             const Point & p)
-{
-  libmesh_assert(elem);
-
-  return FE<1,HIERARCHIC>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
-}
-
-
-
-template <>
-Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
-                                   const Order libmesh_dbg_var(order),
-                                   const unsigned int i,
-                                   const unsigned int libmesh_dbg_var(j),
-                                   const Point & p)
+Real fe_hierarchic_1D_shape_deriv(const ElemType,
+                                  const Order libmesh_dbg_var(order),
+                                  const unsigned int i,
+                                  const unsigned int libmesh_dbg_var(j),
+                                  const Point & p)
 {
   // only d()/dxi in 1D!
 
@@ -181,28 +358,13 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 
 
 
-template <>
-Real FE<1,HIERARCHIC>::shape_deriv(const Elem * elem,
-                                   const Order order,
-                                   const unsigned int i,
-                                   const unsigned int j,
-                                   const Point & p)
-{
-  libmesh_assert(elem);
-
-  return FE<1,HIERARCHIC>::shape_deriv(elem->type(),
-                                       static_cast<Order>(order + elem->p_level()), i, j, p);
-}
-
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <>
-Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
-                                          const Order libmesh_dbg_var(order),
-                                          const unsigned int i,
-                                          const unsigned int libmesh_dbg_var(j),
-                                          const Point & p)
+Real fe_hierarchic_1D_shape_second_deriv(const ElemType,
+                                         const Order libmesh_dbg_var(order),
+                                         const unsigned int i,
+                                         const unsigned int libmesh_dbg_var(j),
+                                         const Point & p)
 {
   // only d2()/d2xi in 1D!
 
@@ -263,21 +425,6 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
   return returnval;
 }
 
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-
-template <>
-Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem * elem,
-                                          const Order order,
-                                          const unsigned int i,
-                                          const unsigned int j,
-                                          const Point & p)
-{
-  libmesh_assert(elem);
-
-  return FE<1,HIERARCHIC>::shape_second_deriv(elem->type(),
-                                              static_cast<Order>(order + elem->p_level()), i, j, p);
-}
-
-#endif
-
-} // namespace libMesh
+} // anonymous namespace
