@@ -23,7 +23,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ISNAN_ISINF],
     ]])],[
         AC_MSG_RESULT(yes)
         have_cxx11_isnan=yes
-        AC_DEFINE(HAVE_CXX11_ISNAN, 1, [Flag indicating whether compiler supports std::isnan])
+        dnl AC_DEFINE(HAVE_CXX11_ISNAN, 1, [Flag indicating whether compiler supports std::isnan])
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -37,7 +37,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ISNAN_ISINF],
     ]])],[
         AC_MSG_RESULT(yes)
         have_cxx11_isinf=yes
-        AC_DEFINE(HAVE_CXX11_ISINF, 1, [Flag indicating whether compiler supports std::isinf])
+        dnl AC_DEFINE(HAVE_CXX11_ISINF, 1, [Flag indicating whether compiler supports std::isinf])
     ],[
         AC_MSG_RESULT(no)
     ])

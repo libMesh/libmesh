@@ -393,6 +393,12 @@ LIBMESH_TEST_CXX11_ARRAY
 AS_IF([test "x$have_cxx11_array" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 support for std::array])])
 
+LIBMESH_TEST_CXX11_ISNAN_ISINF
+AS_IF([test "x$have_cxx11_isnan" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::isnan])])
+AS_IF([test "x$have_cxx11_isinf" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::isinf])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -404,7 +410,6 @@ LIBMESH_TEST_CXX11_CONDITION_VARIABLE
 LIBMESH_TEST_CXX11_TYPE_TRAITS
 LIBMESH_TEST_CXX11_MATH_FUNCS
 LIBMESH_TEST_CXX17_FALLTHROUGH_ATTRIBUTE
-LIBMESH_TEST_CXX11_ISNAN_ISINF
 
 #-----------------------------------------------------
 # Initialize libtool.  By default, we will build
