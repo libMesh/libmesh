@@ -3,6 +3,79 @@ dnl Tests for various C++11 features.  These will probably only work
 dnl if they are run after the autoconf test that sets -std=c++11.
 dnl ----------------------------------------------------------------
 
+dnl Test C++11 std::isnan, std::isinf
+AC_DEFUN([LIBMESH_TEST_CXX11_ISNAN_ISINF],
+  [
+    have_cxx11_isnan=no
+    have_cxx11_isinf=no
+
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_MSG_CHECKING(for C++11 std::isnan)
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <cmath>
+    ]], [[
+    if (std::isnan(0.0))
+      return 1;
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx11_isnan=yes
+        dnl AC_DEFINE(HAVE_CXX11_ISNAN, 1, [Flag indicating whether compiler supports std::isnan])
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_MSG_CHECKING(for C++11 std::isinf)
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <cmath>
+    ]], [[
+    if (std::isinf(0.0))
+      return 1;
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx11_isinf=yes
+        dnl AC_DEFINE(HAVE_CXX11_ISINF, 1, [Flag indicating whether compiler supports std::isinf])
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+  ])
+
+dnl Test C++11 std::array
+AC_DEFUN([LIBMESH_TEST_CXX11_ARRAY],
+  [
+    have_cxx11_array=no
+
+    AC_MSG_CHECKING(for C++11 std::array)
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <array>
+    ]], [[
+    std::array<double, 4> a;
+    a[0] = 42.0;
+    double * begin = a.data();
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx11_array=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+  ])
+
 dnl Test C++11 std::vector::data()
 AC_DEFUN([LIBMESH_TEST_CXX11_VECTOR_DATA],
   [

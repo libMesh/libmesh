@@ -365,22 +365,50 @@ LIBMESH_TEST_CXX11_VECTOR_DATA
 AS_IF([test "x$have_cxx11_vector_data" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 support for std::vector::data()])])
 
+LIBMESH_TEST_CXX11_SHARED_PTR
+AS_IF([test "x$have_cxx11_shared_ptr" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::shared_ptr])])
+
+LIBMESH_TEST_CXX11_RVALUE_REFERENCES
+AS_IF([test "x$have_cxx11_rvalue_references" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for rvalue references])])
+
+LIBMESH_TEST_CXX11_TO_STRING
+AS_IF([test "x$have_cxx11_to_string" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::to_string()])])
+
+LIBMESH_TEST_CXX11_CONSTEXPR
+AS_IF([test "x$have_cxx11_constexpr" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for constexpr])])
+
+LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES
+AS_IF([test "x$have_cxx11_variadic_templates" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for variadic templates])])
+
+LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
+AS_IF([test "x$have_cxx11_alias_declarations" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for alias declarations])])
+
+LIBMESH_TEST_CXX11_ARRAY
+AS_IF([test "x$have_cxx11_array" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::array])])
+
+LIBMESH_TEST_CXX11_ISNAN_ISINF
+AS_IF([test "x$have_cxx11_isnan" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::isnan])])
+AS_IF([test "x$have_cxx11_isinf" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std::isinf])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
 # --------------------------------------------------------------
-LIBMESH_TEST_CXX11_RVALUE_REFERENCES
-LIBMESH_TEST_CXX11_CONSTEXPR
-LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
-LIBMESH_TEST_CXX11_SHARED_PTR
 LIBMESH_TEST_CXX14_MAKE_UNIQUE
 LIBMESH_TEST_CXX11_REGEX
-LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES
 LIBMESH_TEST_CXX11_THREAD
 LIBMESH_TEST_CXX11_CONDITION_VARIABLE
 LIBMESH_TEST_CXX11_TYPE_TRAITS
 LIBMESH_TEST_CXX11_MATH_FUNCS
-LIBMESH_TEST_CXX11_TO_STRING
 LIBMESH_TEST_CXX17_FALLTHROUGH_ATTRIBUTE
 
 #-----------------------------------------------------

@@ -57,9 +57,6 @@
 // _basic_ library functionality
 #include "libmesh/libmesh_base.h"
 #include "libmesh/libmesh_exceptions.h"
-extern "C" {
-#include "libmesh/libmesh_C_isnan.h"
-}
 
 // Proxy class for libMesh::out/err output
 #include "libmesh/ostream_proxy.h"
@@ -167,22 +164,21 @@ inline T libmesh_real(std::complex<T> a) { return std::real(a); }
 template<typename T>
 inline std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
 
-// isnan isn't actually C++ standard yet; in contexts where it's not defined in
-// cmath, libmesh_isnan will just end up returning false.
-inline bool libmesh_isnan(float a) { return libmesh_C_isnan_float(a); }
-inline bool libmesh_isnan(double a) { return libmesh_C_isnan_double(a); }
-inline bool libmesh_isnan(long double a) { return libmesh_C_isnan_longdouble(a); }
+// std::isnan() is in <cmath> as of C++11.
+template <typename T>
+inline bool libmesh_isnan(T x) { return std::isnan(x); }
 
 template <typename T>
-inline bool libmesh_isnan(std::complex<T> a) { return (libmesh_isnan(std::real(a)) || libmesh_isnan(std::imag(a))); }
+inline bool libmesh_isnan(std::complex<T> a)
+{ return (std::isnan(std::real(a)) || std::isnan(std::imag(a))); }
 
-// Same goes for isinf, which can be implemented in terms of isnan.
-// http://stackoverflow.com/a/2249173/659433
+// std::isinf() is in <cmath> as of C++11.
 template <typename T>
-inline bool libmesh_isinf(T x) { return !libmesh_isnan(x) && libmesh_isnan(x - x); }
+inline bool libmesh_isinf(T x) { return std::isinf(x); }
 
 template <typename T>
-inline bool libmesh_isinf(std::complex<T> a) { return (libmesh_isinf(std::real(a)) || libmesh_isinf(std::imag(a))); }
+inline bool libmesh_isinf(std::complex<T> a)
+{ return (std::isinf(std::real(a)) || std::isinf(std::imag(a))); }
 
 // Define the value type for unknowns in simulations.
 // This is either Real or Complex, depending on how
