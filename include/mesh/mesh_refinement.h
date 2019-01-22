@@ -48,8 +48,11 @@ class Elem;
 class PointLocatorBase;
 
 /**
- * This is the \p MeshRefinement class.  This class implements
- * adaptive mesh refinement algorithms for a \p MeshBase.
+ * \brief Implements (adaptive) mesh refinement algorithms for a \p MeshBase.
+ *
+ * \note Before using any of the algorithms in this class on a distributed
+ * mesh, the user needs to make sure that the mesh is prepared
+ * (MeshBase::prepare_for_use).
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
