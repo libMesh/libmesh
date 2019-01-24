@@ -34,6 +34,7 @@ public:
   CPPUNIT_TEST( testPushVecVec );
   CPPUNIT_TEST( testPullVecVec );
   CPPUNIT_TEST( testPushMultimap );
+  CPPUNIT_TEST( testPushMultimapVecVec );
 
   // Our sync functions need to support sending to ranks that don't
   // exist!  If we're on N processors but working on a mesh
@@ -44,6 +45,7 @@ public:
   CPPUNIT_TEST( testPushVecVecOversized );
 //  CPPUNIT_TEST( testPullVecVecOversized );
   CPPUNIT_TEST( testPushMultimapOversized );
+  CPPUNIT_TEST( testPushMultimapVecVecOversized );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -119,6 +121,35 @@ public:
             for (int i=-1; i != diffsqrt; ++i)
               data[d][0].push_back(d);
             data[d][1].push_back(d);
+          }
+      }
+  }
+
+
+
+  // Multimap data to send/recieve with each processor rank.  For this
+  // test, processor p will send to destination d the integer d, in
+  // two subvectors with sqrt(c) and 1 copies, followed by a vector
+  // with 1 copy, iff c := |p-d| is a square number.
+  void fill_vector_data
+    (std::multimap<processor_id_type, std::vector<std::vector<unsigned int>>> & data,
+     int M)
+  {
+    const int rank = TestCommWorld->rank();
+    for (int d=0; d != M; ++d)
+      {
+        int diffsize = std::abs(d-rank);
+        int diffsqrt = std::sqrt(diffsize);
+        if (diffsqrt*diffsqrt == diffsize)
+          {
+            std::vector<std::vector<unsigned int>> vv(2);
+            for (int i=-1; i != diffsqrt; ++i)
+              vv[0].push_back(d);
+            vv[1].push_back(d);
+            data.emplace(d, vv);
+            vv.resize(1);
+            vv[0].resize(1);
+            data.emplace(d, vv);
           }
       }
   }
@@ -500,6 +531,95 @@ public:
   void testPushMultimapOversized()
   {
     testPushMultimapImpl((TestCommWorld->size() + 4) * 2);
+  }
+
+
+  void testPushMultimapVecVecImpl(int M)
+  {
+    const int size = TestCommWorld->size(),
+              rank = TestCommWorld->rank();
+
+    // This is going to make sense because of C++11's guarantees
+    // regarding preservation of insert ordering in multimaps,
+    // combined with MPI's guarantees about non-overtaking
+    std::multimap<processor_id_type, std::vector<std::vector<unsigned int>>> data, received_data;
+
+    fill_vector_data(data, M);
+
+    auto collect_data =
+      [&received_data]
+      (processor_id_type pid,
+       const typename std::vector<std::vector<unsigned int>> & data)
+      {
+        received_data.emplace(pid, data);
+      };
+
+    Parallel::push_parallel_vector_data(*TestCommWorld, data, collect_data);
+
+    // Test the received results, for each processor id p we're in
+    // charge of.
+    std::vector<std::size_t> checked_sizes(size, 0);
+    for (int p=rank; p != M; p += size)
+      for (int srcp=0; srcp != size; ++srcp)
+        {
+          int diffsize = std::abs(srcp-p);
+          int diffsqrt = std::sqrt(diffsize);
+          auto rng = received_data.equal_range(srcp);
+          if (diffsqrt*diffsqrt != diffsize)
+            {
+              for (auto & pvv : as_range(rng))
+                {
+                  for (auto & v : pvv.second)
+                  CPPUNIT_ASSERT_EQUAL(std::count(v.begin(), v.end(), p), std::ptrdiff_t(0));
+                }
+              continue;
+            }
+
+          CPPUNIT_ASSERT(rng.first != rng.second);
+          for (auto pvv_it = rng.first; pvv_it != rng.second; ++pvv_it)
+            {
+              if(pvv_it->second.size() != std::size_t(2))
+                libmesh_error();
+              CPPUNIT_ASSERT_EQUAL(pvv_it->second.size(), std::size_t(2));
+              std::ptrdiff_t cnt = std::count(pvv_it->second[0].begin(), pvv_it->second[0].end(), p);
+              if (cnt)
+                {
+                  CPPUNIT_ASSERT_EQUAL(cnt, std::ptrdiff_t(diffsqrt+1));
+                  std::ptrdiff_t cnt2 = std::count(pvv_it->second[1].begin(), pvv_it->second[1].end(), p);
+                  CPPUNIT_ASSERT_EQUAL(cnt2, std::ptrdiff_t(1));
+                  auto pvv_it2 = pvv_it; ++pvv_it2;
+                  CPPUNIT_ASSERT(pvv_it2 != rng.second);
+                  CPPUNIT_ASSERT_EQUAL(pvv_it2->second.size(), std::size_t(1));
+                  std::ptrdiff_t cnt3 = std::count(pvv_it2->second[0].begin(), pvv_it2->second[0].end(), p);
+                  CPPUNIT_ASSERT_EQUAL(cnt3, std::ptrdiff_t(1));
+                  checked_sizes[srcp] += cnt + cnt2 + cnt3;
+                  break;
+                }
+              ++pvv_it;
+              libmesh_assert(pvv_it != rng.second);
+            }
+        }
+
+    for (int srcp=0; srcp != size; ++srcp)
+      {
+        std::size_t total_size = 0;
+        for (auto & pvv : as_range(received_data.equal_range(srcp)))
+          for (auto & v : pvv.second)
+            total_size += v.size();
+        CPPUNIT_ASSERT_EQUAL(checked_sizes[srcp], total_size);
+      }
+  }
+
+
+  void testPushMultimapVecVec()
+  {
+    testPushMultimapVecVecImpl(TestCommWorld->size());
+  }
+
+
+  void testPushMultimapVecVecOversized()
+  {
+    testPushMultimapVecVecImpl((TestCommWorld->size() + 4) * 2);
   }
 
 };
