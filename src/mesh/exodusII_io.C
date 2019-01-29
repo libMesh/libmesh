@@ -883,8 +883,17 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   // ES::build_discontinuous_solution_vector() creates a vector with
   // an element-major ordering, so call Helper::write_element_values()
   // passing false for the last argument.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  // TODO: Make this work when complex variables are enabled by
+  // writing the real and complex parts separately. See
+  // ExodusII_IO::write_element_data() for details.
+  libmesh_not_implemented_msg
+    ("write_element_data_from_discontinuous_nodal_data() is not "
+     "yet supported when complex variables are enabled.");
+#else
   exio_helper->write_element_values_element_major
     (mesh, v, _timestep, derived_vars_active_subdomains);
+#endif
 }
 
 
