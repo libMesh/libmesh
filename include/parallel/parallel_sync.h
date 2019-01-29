@@ -414,26 +414,64 @@ void pull_parallel_vector_data(const Communicator & comm,
 {
   typedef typename MapToVectors::mapped_type query_type;
 
-  std::map<processor_id_type, std::vector<datum> >
+  std::multimap<processor_id_type, std::vector<datum> >
     response_data, received_data;
 
   StandardType<datum> datatype;
+
+#ifndef NDEBUG
+  processor_id_type max_pid = 0;
+  for (auto p : queries)
+    max_pid = std::max(max_pid, p.first);
+#endif
 
   auto gather_functor =
     [&gather_data, &response_data]
     (processor_id_type pid, query_type query)
     {
-      gather_data(pid, query, response_data[pid]);
-      libmesh_assert_equal_to(query.size(), response_data[pid].size());
+      auto new_data_it =
+        response_data.emplace(pid, std::vector<datum>());
+      gather_data(pid, query, new_data_it->second);
+      libmesh_assert_equal_to(query.size(), new_data_it->second.size());
     };
 
   push_parallel_vector_data (comm, queries, gather_functor);
 
+  std::map<processor_id_type, unsigned int> responses_acted_on;
+
+  const processor_id_type num_procs = comm.size();
+
   auto action_functor =
-    [&act_on_data, &queries]
+    [&act_on_data, &queries, &responses_acted_on,
+#ifndef NDEBUG
+     max_pid,
+#endif
+     num_procs
+    ]
     (processor_id_type pid, const std::vector<datum> & data)
     {
-      act_on_data(pid, queries.at(pid), data);
+      auto q_pid_its = queries.equal_range(pid);
+      auto query_it = q_pid_its.first;
+      libmesh_assert(query_it != q_pid_its.second);
+
+      // We rely on responses coming in the same order as queries
+      const unsigned int nth_query = responses_acted_on[pid]++;
+      for (unsigned int i=0; i != nth_query; ++i)
+        {
+          query_it++;
+          if (query_it == q_pid_its.second)
+            {
+              do
+                {
+                  pid += num_procs;
+                  q_pid_its = queries.equal_range(pid);
+                  libmesh_assert_less_equal(pid, max_pid);
+                } while (q_pid_its.first == q_pid_its.second);
+              query_it = q_pid_its.first;
+            }
+        }
+
+      act_on_data(pid, query_it->second, data);
     };
 
   push_parallel_vector_data (comm, response_data, action_functor);
@@ -455,8 +493,8 @@ void pull_parallel_vector_data(const Communicator & comm,
 {
   typedef typename MapToVectors::mapped_type query_type;
 
-  std::map<processor_id_type, std::vector<std::vector<datum,A>>>
-    response_data;
+  // First index: order of creation, irrelevant
+  std::vector<std::vector<std::vector<datum,A>>> response_data;
   std::vector<Request> response_reqs;
 
   // We'll grab a tag so we can overlap request sends and receives
@@ -468,20 +506,22 @@ void pull_parallel_vector_data(const Communicator & comm,
      &response_data, &response_reqs, &tag]
     (processor_id_type pid, query_type query)
     {
-      gather_data(pid, query, response_data[pid]);
+      std::vector<std::vector<datum,A>> response;
+      gather_data(pid, query, response);
       libmesh_assert_equal_to(query.size(),
-                              response_data[pid].size());
+                              response.size());
 
       // Just act on data if the user requested a send-to-self
       if (pid == comm.rank())
         {
-          act_on_data(pid, query, response_data[pid]);
+          act_on_data(pid, query, response);
         }
       else
         {
           Request sendreq;
-          comm.send(pid, response_data[pid], sendreq, tag);
+          comm.send(pid, response, sendreq, tag);
           response_reqs.push_back(sendreq);
+          response_data.push_back(std::move(response));
         }
     };
 
