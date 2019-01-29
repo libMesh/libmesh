@@ -724,11 +724,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   std::vector<std::string> var_names;
   es.build_variable_names (var_names, /*fetype=*/nullptr, system_names);
 
-  // Debugging:
-  // libMesh::out << "List of all variable names: " << std::endl;
-  // for (const auto & var_name : var_names)
-  //   libMesh::out << var_name << std::endl;
-
   // Remove all names from var_names that are not in _output_variables.
   // Note: This approach avoids errors when the user provides invalid
   // variable names in _output_variables, as the code will not try to
@@ -744,11 +739,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
                             name);}),
        var_names.end());
 
-  // Debugging:
-  // libMesh::out << "List of variable names after white-listing: " << std::endl;
-  // for (const auto & var_name : var_names)
-  //   libMesh::out << var_name << std::endl;
-
   // Build a solution vector, limiting the results to the variables in
   // var_names and the Systems in system_names, and only computing values
   // at the vertices.
@@ -756,31 +746,9 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   es.build_discontinuous_solution_vector
     (v, system_names, &var_names, /*vertices_only=*/true);
 
-  // Debugging: what is the ordering of the vector v the ES builds?
-  // libMesh::out << "Vector v from build_discontinuous_solution_vector():" << std::endl;
-  // for (const auto & val : v)
-  //   libMesh::out << val << ' ';
-  // libMesh::out << std::endl;
-
-  // Debugging:
-  // libMesh::out << "Discontinuous solution vector has size: " << v.size() << std::endl;
-
   // Get active subdomains for each variable in var_names.
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
   es.get_vars_active_subdomains(var_names, vars_active_subdomains);
-
-  // Debugging: print which of the original variables are active on
-  // which subdomains (or 'All' if they are active on all subdomains).
-  // unsigned int ctr = 0;
-  // for (const auto & s : vars_active_subdomains)
-  //   {
-  //     libMesh::out << "Active subdomains for variable " << ctr++ << ": " << std::endl;
-  //     if (s.empty())
-  //       libMesh::out << "All" << std::endl;
-  //     else
-  //       for (const auto & id : s)
-  //         libMesh::out << id << std::endl;
-  //   }
 
   // Determine names of variables to write based on the number of
   // nodes/vertices the elements in different subdomains have.
@@ -833,11 +801,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
       const unsigned int vertices_per_elem =
         subdomain_id_to_vertices_per_elem[sbd_id];
 
-      // Debugging:
-      // libMesh::out << "Subdomain " << sbd_id
-      //              << " has elements with " << vertices_per_elem
-      //              << " vertices." << std::endl;
-
       std::ostringstream oss;
       for (unsigned int n=0; n<vertices_per_elem; ++n)
         for (unsigned int var_id=0; var_id<var_names.size(); ++var_id)
@@ -861,11 +824,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
           }
     }
 
-  // Debugging: print the names we constructed.
-  // libMesh::out << "Derived var names:" << std::endl;
-  // for (const auto & name : derived_var_names)
-  //   libMesh::out << name << std::endl;
-
   // For each derived variable name, determine whether it is active
   // based on how many nodes/vertices the elements in a given subdomain have,
   // and whether they were active on the subdomain to begin with.
@@ -882,11 +840,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
       // Convenience variables for the map entry's contents.
       const std::string & orig_name = it->second.first;
       const unsigned int node_id = it->second.second;
-
-      // Debugging
-      // libMesh::out << "Derived name: " << derived_name
-      //              << " comes from original name " << orig_name
-      //              << " and node id " << node_id << std::endl;
 
       // For each subdomain, determine whether the current variable
       // should be active on that subdomain.
@@ -919,30 +872,9 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
           // elements in this subdomain have enough nodes for the
           // corresponding derived variable to be active.
           if (orig_var_active && node_id < vertices_per_elem_this_sbd)
-            {
-              // Debugging: status message
-              // libMesh::out << "Derived variable: " << derived_name
-              //              << " is active on subdomain " << sbd_id
-              //              << std::endl;
-              derived_vars_active_subdomains[derived_var_id].insert(sbd_id);
-            }
+            derived_vars_active_subdomains[derived_var_id].insert(sbd_id);
         } // end loop over subdomain_id_to_vertices_per_elem
     } // end loop over derived_var_names
-
-  // Debugging: print the results of the active/inactive determination.
-  // for (auto derived_var_id : index_range(derived_var_names))
-  //   {
-  //     libMesh::out << "Active subdomains for derived variable " << derived_var_names[derived_var_id] << ": ";
-  //     const auto & s = derived_vars_active_subdomains[derived_var_id];
-  //     if (s.empty())
-  //       libMesh::out << "All" << std::endl;
-  //     else
-  //       {
-  //         for (const auto id : s)
-  //           libMesh::out << id << " ";
-  //         libMesh::out << std::endl;
-  //       }
-  //   }
 
   // Call function which writes the derived variable names to the
   // Exodus file.

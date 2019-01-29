@@ -1097,11 +1097,8 @@ EquationSystems::build_discontinuous_solution_vector
         }
     }
 
-  // Debugging: verify we found the expected number of variables to write.
-  // libMesh::out << "In build_discontinuous_solution_vector(), nv = " << nv << std::endl;
-  unsigned int tw=0;
-
   // get the total weight
+  unsigned int tw=0;
   for (const auto & elem : _mesh.active_element_ptr_range())
     tw += vertices_only ? elem->n_vertices() : elem->n_nodes();
 

@@ -1970,9 +1970,6 @@ void ExodusII_IO_Helper::write_element_values_element_major
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  // Debugging:
-  // libMesh::out << "num_elem_vars=" << num_elem_vars << std::endl;
-
   // We will eventually loop over the element blocks (subdomains) and
   // write the data one block (subdomain) at a time. Build a data
   // structure that keeps track of how many elements are in each
@@ -2010,16 +2007,6 @@ void ExodusII_IO_Helper::write_element_values_element_major
         }
     }
 
-  // Debugging: print the active variables for each subdomain.
-  // for (const auto & pr : subdomain_to_active_vars)
-  //   {
-  //     libMesh::out << "Subdomain " << pr.first
-  //                  << " has active vars: ";
-  //     for (const auto & var_id : pr.second)
-  //       libMesh::out << var_id << " ";
-  //     libMesh::out << std::endl;
-  //   }
-
   // Sanity check: we must have an entry in vars_active_subdomains for
   // each variable that we are potentially writing out.
   libmesh_assert_equal_to
@@ -2053,16 +2040,6 @@ void ExodusII_IO_Helper::write_element_values_element_major
         unsigned int values_offset = 0;
         for (auto & elem : elem_range)
           {
-            // How many active variables are there on the current
-            // subdomain?
-            // unsigned int n_active_vars =
-            //   subdomain_to_active_vars[elem->subdomain_id()].size();
-
-            // Debugging:
-            // libMesh::out << "Elem " << elem->id()
-            //              << " has " << n_active_vars
-            //              << " active variables." << std::endl;
-
             // We'll use the Elem's subdomain id in several places below.
             subdomain_id_type sbd_id = elem->subdomain_id();
 
@@ -2089,17 +2066,8 @@ void ExodusII_IO_Helper::write_element_values_element_major
                   (var_set.count(var_id),
                    "var_id " << var_id << " not found in set of active variables!");
 
-                // Debugging:
-                // libMesh::out << "The local index of this variable is: "
-                //              << local_index << std::endl;
-                // libMesh::out << "Index in the values vector is: "
-                //              << values_offset + local_index
-                //              << std::endl;
                 data.push_back(values[values_offset + local_index]);
               }
-
-            // Debugging: how far are we going to jump ahead in the vector?
-            // libMesh::out << "Incrementing values_offset by " << var_set.size() << std::endl;
 
             // Increment to the next Elem's values
             values_offset += var_set.size();
