@@ -1331,6 +1331,17 @@ void ExodusII_IO::write_element_data (const EquationSystems &)
 
 
 
+void
+ExodusII_IO::write_element_data_from_discontinuous_nodal_data
+(const EquationSystems &,
+ const std::set<std::string> *,
+ const std::string & )
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
 void ExodusII_IO::write_nodal_data (const std::string &,
                                     const std::vector<Number> &,
                                     const std::vector<std::string> &)
