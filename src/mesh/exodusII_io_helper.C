@@ -2073,13 +2073,19 @@ void ExodusII_IO_Helper::write_element_values_element_major
             values_offset += var_set.size();
           } // for elem
 
-        // Now write 'data' to Exodus file.
-        ex_err = exII::ex_put_elem_var(ex_id,
-                                       timestep,
-                                       var_id+1,
-                                       this->get_block_id(sbd_idx),
-                                       data.size(),
-                                       data.data());
+        // Now write 'data' to Exodus file, in single precision if requested.
+        if (_single_precision)
+          {
+            std::vector<float> float_data(data.begin(), data.end());
+            ex_err = exII::ex_put_elem_var
+              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), float_data.size(), float_data.data());
+          }
+        else
+          {
+            ex_err = exII::ex_put_elem_var
+              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), data.size(), data.data());
+          }
+
         EX_CHECK_ERR(ex_err, "Error writing element values.");
       } // for each var_id
 
