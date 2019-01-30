@@ -724,20 +724,45 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   std::vector<std::string> var_names;
   es.build_variable_names (var_names, /*fetype=*/nullptr, system_names);
 
+  // Get a subset of all variable names that are CONSTANT,
+  // MONOMIALs. We treat those slightly differently since they can
+  // truly only have a single value per Elem.
+  std::vector<std::string> monomial_var_names;
+  const FEType fe_type(CONSTANT, MONOMIAL);
+  es.build_variable_names(monomial_var_names, &fe_type);
+
   // Remove all names from var_names that are not in _output_variables.
   // Note: This approach avoids errors when the user provides invalid
   // variable names in _output_variables, as the code will not try to
   // write a variable that doesn't exist.
   if (!_output_variables.empty())
-    var_names.erase
-      (std::remove_if
-       (var_names.begin(),
-        var_names.end(),
-        [this](const std::string & name)
-        {return !std::count(_output_variables.begin(),
-                            _output_variables.end(),
-                            name);}),
-       var_names.end());
+    {
+      var_names.erase
+        (std::remove_if
+         (var_names.begin(),
+          var_names.end(),
+          [this](const std::string & name)
+          {return !std::count(_output_variables.begin(),
+                              _output_variables.end(),
+                              name);}),
+         var_names.end());
+
+      // Also filter the monomial variable names.
+      monomial_var_names.erase
+        (std::remove_if
+         (monomial_var_names.begin(),
+          monomial_var_names.end(),
+          [this](const std::string & name)
+          {return !std::count(_output_variables.begin(),
+                              _output_variables.end(),
+                              name);}),
+         monomial_var_names.end());
+    }
+
+  // Debugging: print filtered monomial variable names.
+  // libMesh::out << "CONSTANT, MONOMIAL variable names:" << std::endl;
+  // for (const auto & var_name: monomial_var_names)
+  //   libMesh::out << var_name << std::endl;
 
   // Build a solution vector, limiting the results to the variables in
   // var_names and the Systems in system_names, and only computing values
@@ -745,6 +770,15 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   std::vector<Number> v;
   es.build_discontinuous_solution_vector
     (v, system_names, &var_names, /*vertices_only=*/true);
+
+  // Debugging: what is the ordering of the vector v the ES builds?
+  // libMesh::out << "Vector v from build_discontinuous_solution_vector():" << std::endl;
+  // for (const auto & val : v)
+  //   libMesh::out << val << ' ';
+  // libMesh::out << std::endl;
+
+  // Debugging:
+  // libMesh::out << "Discontinuous solution vector has size: " << v.size() << std::endl;
 
   // Get active subdomains for each variable in var_names.
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
@@ -803,11 +837,11 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
 
       std::ostringstream oss;
       for (unsigned int n=0; n<vertices_per_elem; ++n)
-        for (unsigned int var_id=0; var_id<var_names.size(); ++var_id)
+        for (const auto & orig_var_name : var_names)
           {
             oss.str("");
             oss.clear();
-            oss << var_names[var_id] << var_suffix << n;
+            oss << orig_var_name << var_suffix << n;
             std::string derived_name = oss.str();
 
             // Only add this var name if it's not already in the list.
@@ -819,16 +853,27 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
                 derived_var_names.push_back(derived_name);
                 // Add entry for derived_name -> (orig_name, node_id) mapping.
                 derived_name_to_orig_name_and_node_id[derived_name] =
-                  std::make_pair(var_names[var_id], n);
+                  std::make_pair(orig_var_name, n);
               }
           }
     }
+
+  // Debugging
+  // libMesh::out << "List of derived variable names." << std::endl;
+  // for (const auto & derived_var_name : derived_var_names)
+  //   libMesh::out << derived_var_name << std::endl;
 
   // For each derived variable name, determine whether it is active
   // based on how many nodes/vertices the elements in a given subdomain have,
   // and whether they were active on the subdomain to begin with.
   std::vector<std::set<subdomain_id_type>>
     derived_vars_active_subdomains(derived_var_names.size());
+
+  // A new data structure for keeping track of a list of variable names
+  // that are in the discontinous solution vector on each subdomain. Used
+  // for indexing.
+  std::map<subdomain_id_type, std::vector<std::string>>
+    subdomain_to_var_names;
 
   for (auto derived_var_id : index_range(derived_var_names))
     {
@@ -872,9 +917,150 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
           // elements in this subdomain have enough nodes for the
           // corresponding derived variable to be active.
           if (orig_var_active && node_id < vertices_per_elem_this_sbd)
-            derived_vars_active_subdomains[derived_var_id].insert(sbd_id);
+            {
+              derived_vars_active_subdomains[derived_var_id].insert(sbd_id);
+              subdomain_to_var_names[sbd_id].push_back(derived_name);
+            }
         } // end loop over subdomain_id_to_vertices_per_elem
     } // end loop over derived_var_names
+
+  // Debugging: print vectors of derived variable names on each subdomain.
+  // for (const auto & pr : subdomain_to_var_names)
+  //   {
+  //     const auto & sbd_id = pr.first;
+  //     const auto & name_vec = pr.second;
+  //     libMesh::out << "List of variable names (useful for indexing) on subdomain "
+  //                  << sbd_id << std::endl;
+  //     for (const auto & name : name_vec)
+  //       libMesh::out << name << std::endl;
+  //   }
+
+  // At this point we've built the "true" list of derived names, but
+  // if there are any CONSTANT MONOMIALS in this list, we now want to
+  // remove all but one copy of them from the derived_var_names list,
+  // and rename them in (but not remove them from) the
+  // subdomain_to_var_names list, and then update the
+  // derived_vars_active_subdomains containers before finally calling
+  // the Exodus helper functions.
+  for (auto & derived_var_name : derived_var_names)
+    {
+      // Debugging
+      // libMesh::out << "Checking " << derived_var_name << std::endl;
+
+      // Get the original name associated with this derived name.
+      auto it = derived_name_to_orig_name_and_node_id.find(derived_var_name);
+      if (it == derived_name_to_orig_name_and_node_id.end())
+        libmesh_error_msg("Unmapped derived variable name: " << derived_var_name);
+
+      // Convenience variables for the map entry's contents.
+      const std::string & orig_name = it->second.first;
+      //const unsigned int node_id = it->second.second;
+
+      // Was the original name a constant monomial?
+      if (std::count(monomial_var_names.begin(),
+                     monomial_var_names.end(),
+                     orig_name))
+        {
+          // Debugging
+          // libMesh::out << "Variable " << orig_name
+          //              << " is a CONSTANT, MONOMIAL."
+          //              << std::endl;
+
+          // Rename this variable in the subdomain_to_var_names vectors.
+          for (auto & pr : subdomain_to_var_names)
+            {
+              // Reference to ordered list of variable names on this subdomain.
+              auto & name_vec = pr.second;
+
+              auto it =
+                std::find(name_vec.begin(),
+                          name_vec.end(),
+                          derived_var_name);
+
+              if (it != name_vec.end())
+                {
+                  // Actually rename it back to the orig_name, dropping
+                  // the "_elem_corner_" stuff.
+                  // Debugging:
+                  // libMesh::out << "Renaming variable " << derived_var_name
+                  //              << " to " << orig_name << std::endl;
+                  *it = orig_name;
+                }
+            }
+
+          // Finally, rename the variable in the derived_var_names vector itself.
+          derived_var_name = orig_name;
+        } // if (monomial)
+    } // end loop over derived names
+
+  // Debugging: print vectors of derived variable names on each subdomain (again).
+  // for (const auto & pr : subdomain_to_var_names)
+  //   {
+  //     const auto & sbd_id = pr.first;
+  //     const auto & name_vec = pr.second;
+  //     libMesh::out << "List of variable names (after renaming) on subdomain "
+  //                  << sbd_id << std::endl;
+  //     for (const auto & name : name_vec)
+  //       libMesh::out << name << std::endl;
+  //   }
+
+  // Debugging:
+  // libMesh::out << "List of derived variable names (after renaming)." << std::endl;
+  // for (const auto & derived_var_name : derived_var_names)
+  //   libMesh::out << derived_var_name << std::endl;
+
+  // Now remove duplicate entries from derived_var_names after the first.
+  // Also update the derived_vars_active_subdomains container in a consistent way.
+  {
+    std::vector<std::string> derived_var_names_edited;
+    std::vector<std::set<subdomain_id_type>> derived_vars_active_subdomains_edited;
+    std::vector<unsigned int> found_first(monomial_var_names.size());
+
+    for (auto i : index_range(derived_var_names))
+      {
+        const auto & derived_var_name = derived_var_names[i];
+        const auto & active_set = derived_vars_active_subdomains[i];
+
+        // Determine whether we will keep this derived variable name in
+        // the final container.
+        bool keep = true;
+        for (auto j : index_range(monomial_var_names))
+          if (derived_var_name == monomial_var_names[j])
+            {
+              if (!found_first[j])
+                found_first[j] = 1;
+
+              else
+                keep = false;
+            }
+
+        if (keep)
+          {
+            derived_var_names_edited.push_back(derived_var_name);
+            derived_vars_active_subdomains_edited.push_back(active_set);
+          }
+      }
+
+    // We built the filtered ranges, now swap them with the originals.
+    derived_var_names.swap(derived_var_names_edited);
+    derived_vars_active_subdomains.swap(derived_vars_active_subdomains_edited);
+  }
+
+  // Debugging:
+  // libMesh::out << "List of derived variable names (after removing)." << std::endl;
+  // for (const auto & derived_var_name : derived_var_names)
+  //   libMesh::out << derived_var_name << std::endl;
+
+  // Debugging:
+  // libMesh::out << "Contents of derived_vars_active_subdomains (after removing)." << std::endl;
+  // unsigned int ctr = 0;
+  // for (const auto & s : derived_vars_active_subdomains)
+  //   {
+  //     libMesh::out << ctr++ << ": ";
+  //     for (const auto & id : s)
+  //       libMesh::out << id << " ";
+  //     libMesh::out << std::endl;
+  //   }
 
   // Call function which writes the derived variable names to the
   // Exodus file.
@@ -892,7 +1078,10 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
      "yet supported when complex variables are enabled.");
 #else
   exio_helper->write_element_values_element_major
-    (mesh, v, _timestep, derived_vars_active_subdomains);
+    (mesh, v, _timestep,
+     derived_vars_active_subdomains,
+     derived_var_names,
+     subdomain_to_var_names);
 #endif
 }
 

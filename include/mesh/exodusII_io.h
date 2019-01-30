@@ -196,12 +196,9 @@ public:
    *
    * This may be useful if you have a viz tool which is capable of
    * interpreting this element data as a discontinuous solution field.
-   * This function should generally _not_ be used for writing out
-   * (CONSTANT, MONOMIAL) data as it is always going to be overkill
-   * for that purpose.  (Imagine you have a CONSTANT, MONOMIAL
-   * variable on a Hex8 element, you would get 8 copies of a single
-   * value corresponding to each of the element's nodes, probably not
-   * what you want.)
+   * Note that (CONSTANT, MONOMIAL) data is still written as a single
+   * value per element, as it makes no sense to write n_vertices
+   * copies of the same value.
    *
    * The 'var_suffix' parameter, which defaults to "_elem_node_", is
    * used to generate the elemental variable names, and is inserted

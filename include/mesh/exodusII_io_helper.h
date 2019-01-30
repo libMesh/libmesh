@@ -360,7 +360,9 @@ public:
   (const MeshBase & mesh,
    const std::vector<Real> & values,
    int timestep,
-   const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
+   const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains,
+   const std::vector<std::string> & derived_var_names,
+   const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names);
 
   /**
    * Writes the vector of values to a nodal variable.

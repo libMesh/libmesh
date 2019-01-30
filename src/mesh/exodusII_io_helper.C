@@ -1702,16 +1702,16 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
   if (names.size() == 0)
     return;
 
-  // Quick return if we have already called this function
-  if (_elem_vars_initialized)
-    return;
-
   // Be sure that variables in the file match what we are asking for
   if (num_elem_vars > 0)
     {
       this->check_existing_vars(ELEMENTAL, names, this->elem_var_names);
       return;
     }
+
+  // Quick return if we have already called this function
+  if (_elem_vars_initialized)
+    return;
 
   // Set the flag so we can skip this stuff on subsequent calls to
   // initialize_element_variables()
@@ -1961,7 +1961,9 @@ void ExodusII_IO_Helper::write_element_values_element_major
 (const MeshBase & mesh,
  const std::vector<Real> & values,
  int timestep,
- const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
+ const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains,
+ const std::vector<std::string> & derived_var_names,
+ const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1979,34 +1981,6 @@ void ExodusII_IO_Helper::write_element_values_element_major
   for (const auto & elem : mesh.active_element_ptr_range())
     subdomain_to_n_elem[elem->subdomain_id()] += 1;
 
-  // Map from subdomain id to the set of active variable is on that subdomain.
-  // This is the inverse of the "vars_active_subdomains" map.
-  // In this case, empty sets are not allowed, however. If every variable is
-  // active, all ids will appear in the set.
-  std::map<subdomain_id_type, std::set<unsigned int>> subdomain_to_active_vars;
-  for (auto var_id : index_range(vars_active_subdomains))
-    {
-      // Reference to the set of active subdomains for variable var_id
-      const auto & s = vars_active_subdomains[var_id];
-
-      // If the set is empty, this variable is active on all
-      // subdomains, so increment the count for each entry in the
-      // subdomain_map.
-      if (s.empty())
-        {
-          for (const auto & pr : subdomain_to_n_elem)
-            subdomain_to_active_vars[pr.first].insert(var_id);
-        }
-
-      // Otherwise, for each entry in s, insert in the corresponding
-      // set in subdomain_to_active_vars.
-      else
-        {
-          for (const auto & sbd_id : s)
-            subdomain_to_active_vars[sbd_id].insert(var_id);
-        }
-    }
-
   // Sanity check: we must have an entry in vars_active_subdomains for
   // each variable that we are potentially writing out.
   libmesh_assert_equal_to
@@ -2014,7 +1988,7 @@ void ExodusII_IO_Helper::write_element_values_element_major
      static_cast<unsigned>(num_elem_vars));
 
   // The size of the subdomain map is the number of blocks.
-  auto it = subdomain_to_n_elem.begin();
+  auto subdomain_to_n_elem_iter = subdomain_to_n_elem.begin();
 
   // Store range of active Elem pointers. We are going to loop over
   // the elements n_vars * n_subdomains times, so let's make sure
@@ -2023,19 +1997,22 @@ void ExodusII_IO_Helper::write_element_values_element_major
     (mesh.active_elements_begin(),
      mesh.active_elements_end());
 
-  for (unsigned int sbd_idx=0; it!=subdomain_to_n_elem.end(); ++it, ++sbd_idx)
+  for (unsigned int sbd_idx=0;
+       subdomain_to_n_elem_iter != subdomain_to_n_elem.end();
+       ++subdomain_to_n_elem_iter, ++sbd_idx)
     for (unsigned int var_id=0; var_id<static_cast<unsigned>(num_elem_vars); ++var_id)
       {
         // Reference to the set of active subdomains for the current variable.
         const auto & active_subdomains
           = vars_active_subdomains[var_id];
 
-        if (!(active_subdomains.empty() || active_subdomains.count(it->first)))
+        if (!(active_subdomains.empty() ||
+              active_subdomains.count(subdomain_to_n_elem_iter->first)))
           continue;
 
         // Vector to hold values that will be written to Exodus file.
         std::vector<Real> data;
-        data.reserve(it->second);
+        data.reserve(subdomain_to_n_elem_iter->second);
 
         unsigned int values_offset = 0;
         for (auto & elem : elem_range)
@@ -2043,34 +2020,56 @@ void ExodusII_IO_Helper::write_element_values_element_major
             // We'll use the Elem's subdomain id in several places below.
             subdomain_id_type sbd_id = elem->subdomain_id();
 
-            // Reference to the set of active variables on
-            // this subdomain.
-            const auto & var_set =
-              subdomain_to_active_vars[sbd_id];
+            // Get reference to the list of variable names defining
+            // the indexing for the current Elem's subdomain.
+            auto subdomain_to_var_names_iter =
+              subdomain_to_var_names.find(sbd_id);
+
+            if (subdomain_to_var_names_iter == subdomain_to_var_names.end())
+              libmesh_error_msg("No list of variable names found for subdomain " << sbd_id);
+
+            const auto & var_names_this_sbd
+              = subdomain_to_var_names_iter->second;
 
             // Only extract values if Elem is in the current subdomain.
-            if (sbd_id == it->first)
+            if (sbd_id == subdomain_to_n_elem_iter->first)
               {
-                // Use subdomain_to_active_vars[sbd_id] to figure
-                // out index of the current var_id.  Example: if
-                // subdomain_to_active_vars[sbd_id] = {0,2,3,4}
-                // and var_id==3, then we are going to grab the
-                // value at index 2, which is the position of
-                // var_id 3.
-                auto local_index =
-                  std::distance(var_set.begin(), var_set.find(var_id));
+                // Location of current var_id in the list of all variables on this
+                // subdomain. FIXME: linear search but it's over a typically relatively
+                // short vector of active variable names on this subdomain. We could do
+                // a nested std::map<string,index> instead of a std::vector where the
+                // location of the string is implicitly the index..
+                auto pos =
+                  std::find(var_names_this_sbd.begin(),
+                            var_names_this_sbd.end(),
+                            derived_var_names[var_id]);
 
-                // It shouldn't be possible for var_id to be missing
-                // from the var_set, so let's assert this is the case.
-                libmesh_assert_msg
-                  (var_set.count(var_id),
-                   "var_id " << var_id << " not found in set of active variables!");
+                if (pos == var_names_this_sbd.end())
+                  libmesh_error_msg("Derived name " << derived_var_names[var_id] << " not found!");
 
-                data.push_back(values[values_offset + local_index]);
+                // Find the current variable's location in the list of all variable
+                // names on the current Elem's subdomain.
+                auto true_index =
+                  std::distance(var_names_this_sbd.begin(), pos);
+
+                // Debugging: print the index of this variable on the current subdomain.
+                // libMesh::out << "true_index = " << true_index << std::endl;
+
+                data.push_back(values[values_offset + true_index]);
               }
 
+            // The "true" offset is how much we have to advance the index for each Elem
+            // in this subdomain.
+            auto true_offset = var_names_this_sbd.size();
+
+            // Debugging
+            // libMesh::out << "true_offset = " << true_offset << std::endl;
+
+            // Debugging
+            // libMesh::out << "New method: advance values_offset by " << true_offset << std::endl;
+
             // Increment to the next Elem's values
-            values_offset += var_set.size();
+            values_offset += true_offset;
           } // for elem
 
         // Now write 'data' to Exodus file, in single precision if requested.
