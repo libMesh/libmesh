@@ -92,17 +92,19 @@ typedef uint64_t unique_id_type;
 typedef dof_id_type numeric_index_type;
 
 
-// Define processor id storage type.  We default to short to save
-// space, but expanding to support more than 2^16-2 procs should work
-// too.
+// Define processor id storage type.
 #if LIBMESH_PROCESSOR_ID_BYTES == 1
 typedef uint8_t processor_id_type;
+#elif LIBMESH_PROCESSOR_ID_BYTES == 2
+typedef uint16_t processor_id_type;
 #elif LIBMESH_PROCESSOR_ID_BYTES == 4
-typedef uint32_t processor_id_type;
+typedef uint32_t processor_id_type; // default
 #elif LIBMESH_PROCESSOR_ID_BYTES == 8
 typedef uint64_t processor_id_type;
-#else // LIBMESH_PROCESSOR_ID_BYTES = 2 (default)
-typedef uint16_t processor_id_type;
+#else
+// We should not get here: it's not currently possible to set any
+// other size.
+DIE A HORRIBLE DEATH HERE...
 #endif
 
 
