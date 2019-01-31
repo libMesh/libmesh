@@ -946,7 +946,9 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 #endif
         }
 
-      if (use_binary_search)
+      if (this_boundary_node_ids.size())
+      {
+        if (use_binary_search)
         {
 #ifdef LIBMESH_HAVE_NANOFLANN
           typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, VectorOfNodesAdaptor>, VectorOfNodesAdaptor, 3> kd_tree_t;
@@ -974,8 +976,11 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           {
             const Real query_pt[] = {other_mesh->point(node)(0), other_mesh->point(node)(1), other_mesh->point(node)(2)};
             this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index[0], &ret_dist_sqr[0]);
-            node_to_node_map[this_mesh_nodes[ret_index[0]].second] = node;
-            other_to_this_node_map[node] = this_mesh_nodes[ret_index[0]].second;
+            if (ret_dist_sqr[0] < TOLERANCE*TOLERANCE)
+            {
+              node_to_node_map[this_mesh_nodes[ret_index[0]].second] = node;
+              other_to_this_node_map[node] = this_mesh_nodes[ret_index[0]].second;
+            }
           }
 
           // If the 2 maps don't have the same size, it means we have overwritten a value in node_to_node_map
@@ -985,37 +990,38 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
             libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
 #endif
         }
-      else
+        else
         {
           // Otherwise, use a simple N^2 search to find the closest matching points. This can be helpful
           // in the case that we have tolerance issues which cause mismatch between the two surfaces
           // that are being stitched.
           for (const auto & this_node_id : this_boundary_node_ids)
+          {
+            Node & this_node = this->node_ref(this_node_id);
+
+            bool found_matching_nodes = false;
+
+            for (const auto & other_node_id : other_boundary_node_ids)
             {
-              Node & this_node = this->node_ref(this_node_id);
+              const Node & other_node = other_mesh->node_ref(other_node_id);
 
-              bool found_matching_nodes = false;
+              Real node_distance = (this_node - other_node).norm();
 
-              for (const auto & other_node_id : other_boundary_node_ids)
-                {
-                  const Node & other_node = other_mesh->node_ref(other_node_id);
+              if (node_distance < tol*h_min)
+              {
+                // Make sure we didn't already find a matching node!
+                if (found_matching_nodes)
+                  libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
 
-                  Real node_distance = (this_node - other_node).norm();
+                node_to_node_map[this_node_id] = other_node_id;
+                other_to_this_node_map[other_node_id] = this_node_id;
 
-                  if (node_distance < tol*h_min)
-                    {
-                      // Make sure we didn't already find a matching node!
-                      if (found_matching_nodes)
-                        libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
-
-                      node_to_node_map[this_node_id] = other_node_id;
-                      other_to_this_node_map[other_node_id] = this_node_id;
-
-                      found_matching_nodes = true;
-                    }
-                }
+                found_matching_nodes = true;
+              }
             }
+          }
         }
+      }
 
       // Build up the node_to_elems_map, using only one loop over other_mesh
       for (auto & el : other_mesh->element_ptr_range())
