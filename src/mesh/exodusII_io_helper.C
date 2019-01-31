@@ -2052,21 +2052,12 @@ void ExodusII_IO_Helper::write_element_values_element_major
                 auto true_index =
                   std::distance(var_names_this_sbd.begin(), pos);
 
-                // Debugging: print the index of this variable on the current subdomain.
-                // libMesh::out << "true_index = " << true_index << std::endl;
-
                 data.push_back(values[values_offset + true_index]);
               }
 
             // The "true" offset is how much we have to advance the index for each Elem
             // in this subdomain.
             auto true_offset = var_names_this_sbd.size();
-
-            // Debugging
-            // libMesh::out << "true_offset = " << true_offset << std::endl;
-
-            // Debugging
-            // libMesh::out << "New method: advance values_offset by " << true_offset << std::endl;
 
             // Increment to the next Elem's values
             values_offset += true_offset;
