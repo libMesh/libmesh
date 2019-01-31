@@ -41,6 +41,14 @@ template <typename T, typename D>
 MetaPhysicL::DualNumber<T, D> norm(const MetaPhysicL::DualNumber<T, D> & in);
 template <typename T, typename D>
 MetaPhysicL::DualNumber<T, D> norm(MetaPhysicL::DualNumber<T, D> && in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> sqrt(const MetaPhysicL::DualNumber<T, D> & in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> sqrt(MetaPhysicL::DualNumber<T, D> && in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> abs(const MetaPhysicL::DualNumber<T, D> & in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> abs(MetaPhysicL::DualNumber<T, D> && in);
 }
 #endif
 
