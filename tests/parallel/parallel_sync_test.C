@@ -5,6 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/parallel_sync.h>
+#include <libmesh/int_range.h>
 #include <libmesh/simple_range.h>
 
 #include "test_comm.h"
@@ -41,7 +42,7 @@ public:
   // partitioned into M parts with M > N, then subpartition p belongs
   // to processor p%N.  Let's make M > N for these tests.
   CPPUNIT_TEST( testPushOversized );
-//  CPPUNIT_TEST( testPullOversized );
+  CPPUNIT_TEST( testPullOversized );
   CPPUNIT_TEST( testPushVecVecOversized );
 //  CPPUNIT_TEST( testPullVecVecOversized );
   CPPUNIT_TEST( testPushMultimapOversized );
@@ -258,28 +259,13 @@ public:
     Parallel::pull_parallel_vector_data
       (*TestCommWorld, data, compose_replies, collect_replies, ex);
 
-    // Test the received results, for each processor id p we're in
-    // charge of.
-    std::vector<std::size_t> checked_sizes(size, 0);
-    for (int p=rank; p != M; p += size)
-      for (int srcp=0; srcp != size; ++srcp)
-        {
-          int diffsize = std::abs(srcp-p);
-          int diffsqrt = std::sqrt(diffsize);
-          if (diffsqrt*diffsqrt != diffsize)
-            {
-              CPPUNIT_ASSERT_EQUAL(received_data.count(srcp), std::size_t(0));
-              continue;
-            }
-
-          CPPUNIT_ASSERT_EQUAL(received_data.count(srcp), std::size_t(1));
-          const std::vector<unsigned int> & datum = received_data[srcp];
-          CPPUNIT_ASSERT_EQUAL(std::count(datum.begin(), datum.end(), p*p), std::ptrdiff_t(diffsqrt+1));
-          checked_sizes[srcp] += diffsqrt+1;
-        }
-
-    for (int srcp=0; srcp != size; ++srcp)
-      CPPUNIT_ASSERT_EQUAL(checked_sizes[srcp], received_data[srcp].size());
+    // Test the received results, for each query we sent.
+    for (int p=0; p != M; ++p)
+      {
+        CPPUNIT_ASSERT_EQUAL(data[p].size(), received_data[p].size());
+        for (auto i : index_range(data[p]))
+          CPPUNIT_ASSERT_EQUAL(data[p][i]*data[p][i], received_data[p][i]);
+      }
   }
 
 
