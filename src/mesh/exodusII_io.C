@@ -933,16 +933,16 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
               // Reference to ordered list of variable names on this subdomain.
               auto & name_vec = pr.second;
 
-              auto it =
+              auto name_vec_it =
                 std::find(name_vec.begin(),
                           name_vec.end(),
                           derived_var_name);
 
-              if (it != name_vec.end())
+              if (name_vec_it != name_vec.end())
                 {
                   // Actually rename it back to the orig_name, dropping
                   // the "_elem_corner_" stuff.
-                  *it = orig_name;
+                  *name_vec_it = orig_name;
                 }
             }
 
