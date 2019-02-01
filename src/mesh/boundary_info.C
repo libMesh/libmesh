@@ -1902,9 +1902,9 @@ BoundaryInfo::build_node_list_from_side_list()
     };
 
   response_type * ex = nullptr;
-      Parallel::pull_parallel_vector_data
-        (this->comm(), node_ids_requested, node_gather_functor,
-         node_action_functor, ex);
+  Parallel::pull_parallel_vector_data
+    (this->comm(), node_ids_requested, node_gather_functor,
+     node_action_functor, ex);
 }
 
 
