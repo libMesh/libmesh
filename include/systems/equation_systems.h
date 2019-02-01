@@ -379,9 +379,16 @@ public:
    * the names from \p build_variable_names()).
    * If systems_names!=nullptr, only include data from the
    * specified systems.
+   * If vertices_only == true, then for higher-order elements only
+   * the solution at the vertices is computed. This can be useful
+   * when plotting discontinous solutions on higher-order elements
+   * and only a lower-order representation is required.
    */
-  void build_discontinuous_solution_vector (std::vector<Number> & soln,
-                                            const std::set<std::string> * system_names=nullptr) const;
+  void build_discontinuous_solution_vector
+  (std::vector<Number> & soln,
+   const std::set<std::string> * system_names = nullptr,
+   const std::vector<std::string> * var_names = nullptr,
+   bool vertices_only = false) const;
 
   /**
    * Read & initialize the systems from disk using the XDR data format.

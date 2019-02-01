@@ -185,6 +185,33 @@ public:
   void write_element_data (const EquationSystems & es);
 
   /**
+   * Similar to the function above, but instead of only handling
+   * (CONSTANT, MONOMIAL) data, writes out a general discontinuous
+   * solution field, e.g. (FIRST, L2_LAGRANGE) or (SECOND, MONOMIAL)
+   * as a number of elemental fields equal to the number of vertices in
+   * each element. For example, if you have a (FIRST, L2_LAGRANGE)
+   * variable "u" defined on HEX8 elements, calling this function
+   * would by default write 8 elemental fields named u_elem_node_0,
+   * u_elem_node_1, u_elem_node_2, etc.
+   *
+   * This may be useful if you have a viz tool which is capable of
+   * interpreting this element data as a discontinuous solution field.
+   * Note that (CONSTANT, MONOMIAL) data is still written as a single
+   * value per element, as it makes no sense to write n_vertices
+   * copies of the same value.
+   *
+   * The 'var_suffix' parameter, which defaults to "_elem_node_", is
+   * used to generate the elemental variable names, and is inserted
+   * between the base variable name and the node id which the variable
+   * applies to, e.g. "u_elem_node_0", "u_elem_node_1", etc.
+   */
+  void
+  write_element_data_from_discontinuous_nodal_data
+  (const EquationSystems & es,
+   const std::set<std::string> * system_names = nullptr,
+   const std::string & var_suffix = "_elem_node_");
+
+  /**
    * Bring in base class functionality for name resolution and to
    * avoid warnings about hidden overloaded virtual functions.
    */

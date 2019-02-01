@@ -1702,16 +1702,16 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
   if (names.size() == 0)
     return;
 
-  // Quick return if we have already called this function
-  if (_elem_vars_initialized)
-    return;
-
   // Be sure that variables in the file match what we are asking for
   if (num_elem_vars > 0)
     {
       this->check_existing_vars(ELEMENTAL, names, this->elem_var_names);
       return;
     }
+
+  // Quick return if we have already called this function
+  if (_elem_vars_initialized)
+    return;
 
   // Set the flag so we can skip this stuff on subsequent calls to
   // initialize_element_variables()
@@ -1823,16 +1823,27 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
   // Fills up names_from_file for us
   this->read_var_names(type);
 
-  // Both the names of the global variables and their order must match
-  if (names_from_file != names)
+  // Both the number of variables and their names (up to the first
+  // MAX_STR_LENGTH characters) must match for the names we are
+  // planning to write and the names already in the file.
+  bool match =
+    std::equal(names.begin(), names.end(),
+               names_from_file.begin(),
+               [](const std::string & a,
+                  const std::string & b) -> bool
+               {
+                 return a.compare(/*pos=*/0, /*len=*/MAX_STR_LENGTH, b) == 0;
+               });
+
+  if (!match)
     {
       libMesh::err << "Error! The Exodus file already contains the variables:" << std::endl;
       for (const auto & name : names_from_file)
-        libMesh::out << name << std::endl;
+        libMesh::err << name << std::endl;
 
       libMesh::err << "And you asked to write:" << std::endl;
       for (const auto & name : names)
-        libMesh::out << name << std::endl;
+        libMesh::err << name << std::endl;
 
       libmesh_error_msg("Cannot overwrite existing variables in Exodus II file.");
     }
@@ -1862,22 +1873,23 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 
 
-void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
-                                              const std::vector<Real> & values,
-                                              int timestep,
-                                              const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
+void ExodusII_IO_Helper::write_element_values
+(const MeshBase & mesh,
+ const std::vector<Real> & values,
+ int timestep,
+ const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
-
-  // Loop over the element blocks and write the data one block at a time
-  std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  // loop through element and map between block and element vector
+  // We will eventually loop over the element blocks (subdomains) and
+  // write the data one block at a time. Build a data structure that
+  // maps each subdomain to a list of element ids it contains.
+  std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
   for (const auto & elem : mesh.active_element_ptr_range())
     subdomain_map[elem->subdomain_id()].push_back(elem->id());
 
@@ -1886,34 +1898,45 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
   // which may not include inactive elements.
   dof_id_type n_elem = mesh.n_elem();
 
+  // Sanity check: we must have an entry in vars_active_subdomains for
+  // each variable that we are potentially writing out.
+  libmesh_assert_equal_to
+    (vars_active_subdomains.size(),
+     static_cast<unsigned>(num_elem_vars));
+
   // For each variable, create a 'data' array which holds all the elemental variable
   // values *for a given block* on this processor, then write that data vector to file
   // before moving onto the next block.
-  libmesh_assert_equal_to(vars_active_subdomains.size(), static_cast<unsigned>(num_elem_vars));
-  for (unsigned int i=0; i<static_cast<unsigned>(num_elem_vars); ++i)
+  for (unsigned int var_id=0; var_id<static_cast<unsigned>(num_elem_vars); ++var_id)
     {
       // The size of the subdomain map is the number of blocks.
-      std::map<subdomain_id_type, std::vector<unsigned int>>::iterator it = subdomain_map.begin();
+      auto it = subdomain_map.begin();
 
-      const std::set<subdomain_id_type> & active_subdomains = vars_active_subdomains[i];
+      // Reference to the set of active subdomains for the current variable.
+      const auto & active_subdomains
+        = vars_active_subdomains[var_id];
+
       for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
         {
           // Skip any variable/subdomain pairs that are inactive.
           // Note that if active_subdomains is empty, it is interpreted
           // as being active on *all* subdomains.
-          if (!active_subdomains.empty())
-            if (active_subdomains.find(it->first) == active_subdomains.end())
-              {
-                continue;
-              }
+          if (!(active_subdomains.empty() || active_subdomains.count(it->first)))
+            continue;
 
-          const std::vector<unsigned int> & elem_nums = (*it).second;
+          // Get reference to list of elem ids which are in the
+          // current subdomain and count, allocate storage to hold
+          // data that will be written to file.
+          const auto & elem_nums = it->second;
           const unsigned int num_elems_this_block =
             cast_int<unsigned int>(elem_nums.size());
           std::vector<Real> data(num_elems_this_block);
 
+          // variable-major ordering is:
+          // (u1, u2, u3, ..., uN), (v1, v2, v3, ..., vN), ...
+          // where N is the number of elements.
           for (unsigned int k=0; k<num_elems_this_block; ++k)
-            data[k] = values[i*n_elem + elem_nums[k]];
+            data[k] = values[var_id*n_elem + elem_nums[k]];
 
           if (_single_precision)
             {
@@ -1921,7 +1944,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
 
               ex_err = exII::ex_put_elem_var(ex_id,
                                              timestep,
-                                             i+1,
+                                             var_id+1,
                                              this->get_block_id(j),
                                              num_elems_this_block,
                                              cast_data.data());
@@ -1930,7 +1953,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
             {
               ex_err = exII::ex_put_elem_var(ex_id,
                                              timestep,
-                                             i+1,
+                                             var_id+1,
                                              this->get_block_id(j),
                                              num_elems_this_block,
                                              data.data());
@@ -1938,6 +1961,134 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
           EX_CHECK_ERR(ex_err, "Error writing element values.");
         }
     }
+
+  ex_err = exII::ex_update(ex_id);
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+}
+
+
+
+void ExodusII_IO_Helper::write_element_values_element_major
+(const MeshBase & mesh,
+ const std::vector<Real> & values,
+ int timestep,
+ const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains,
+ const std::vector<std::string> & derived_var_names,
+ const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names)
+{
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // Ask the file how many element vars it has, store it in the num_elem_vars variable.
+  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
+
+  // We will eventually loop over the element blocks (subdomains) and
+  // write the data one block (subdomain) at a time. Build a data
+  // structure that keeps track of how many elements are in each
+  // subdomain. This will allow us to reserve space in the data vector
+  // we are going to write.
+  std::map<subdomain_id_type, unsigned int> subdomain_to_n_elem;
+  for (const auto & elem : mesh.active_element_ptr_range())
+    subdomain_to_n_elem[elem->subdomain_id()] += 1;
+
+  // Sanity check: we must have an entry in vars_active_subdomains for
+  // each variable that we are potentially writing out.
+  libmesh_assert_equal_to
+    (vars_active_subdomains.size(),
+     static_cast<unsigned>(num_elem_vars));
+
+  // The size of the subdomain map is the number of blocks.
+  auto subdomain_to_n_elem_iter = subdomain_to_n_elem.begin();
+
+  // Store range of active Elem pointers. We are going to loop over
+  // the elements n_vars * n_subdomains times, so let's make sure
+  // the predicated iterators aren't slowing us down too much.
+  ConstElemRange elem_range
+    (mesh.active_elements_begin(),
+     mesh.active_elements_end());
+
+  for (unsigned int sbd_idx=0;
+       subdomain_to_n_elem_iter != subdomain_to_n_elem.end();
+       ++subdomain_to_n_elem_iter, ++sbd_idx)
+    for (unsigned int var_id=0; var_id<static_cast<unsigned>(num_elem_vars); ++var_id)
+      {
+        // Reference to the set of active subdomains for the current variable.
+        const auto & active_subdomains
+          = vars_active_subdomains[var_id];
+
+        if (!(active_subdomains.empty() ||
+              active_subdomains.count(subdomain_to_n_elem_iter->first)))
+          continue;
+
+        // Vector to hold values that will be written to Exodus file.
+        std::vector<Real> data;
+        data.reserve(subdomain_to_n_elem_iter->second);
+
+        unsigned int values_offset = 0;
+        for (auto & elem : elem_range)
+          {
+            // We'll use the Elem's subdomain id in several places below.
+            subdomain_id_type sbd_id = elem->subdomain_id();
+
+            // Get reference to the list of variable names defining
+            // the indexing for the current Elem's subdomain.
+            auto subdomain_to_var_names_iter =
+              subdomain_to_var_names.find(sbd_id);
+
+            if (subdomain_to_var_names_iter == subdomain_to_var_names.end())
+              libmesh_error_msg("No list of variable names found for subdomain " << sbd_id);
+
+            const auto & var_names_this_sbd
+              = subdomain_to_var_names_iter->second;
+
+            // Only extract values if Elem is in the current subdomain.
+            if (sbd_id == subdomain_to_n_elem_iter->first)
+              {
+                // Location of current var_id in the list of all variables on this
+                // subdomain. FIXME: linear search but it's over a typically relatively
+                // short vector of active variable names on this subdomain. We could do
+                // a nested std::map<string,index> instead of a std::vector where the
+                // location of the string is implicitly the index..
+                auto pos =
+                  std::find(var_names_this_sbd.begin(),
+                            var_names_this_sbd.end(),
+                            derived_var_names[var_id]);
+
+                if (pos == var_names_this_sbd.end())
+                  libmesh_error_msg("Derived name " << derived_var_names[var_id] << " not found!");
+
+                // Find the current variable's location in the list of all variable
+                // names on the current Elem's subdomain.
+                auto true_index =
+                  std::distance(var_names_this_sbd.begin(), pos);
+
+                data.push_back(values[values_offset + true_index]);
+              }
+
+            // The "true" offset is how much we have to advance the index for each Elem
+            // in this subdomain.
+            auto true_offset = var_names_this_sbd.size();
+
+            // Increment to the next Elem's values
+            values_offset += true_offset;
+          } // for elem
+
+        // Now write 'data' to Exodus file, in single precision if requested.
+        if (_single_precision)
+          {
+            std::vector<float> float_data(data.begin(), data.end());
+            ex_err = exII::ex_put_elem_var
+              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), float_data.size(), float_data.data());
+          }
+        else
+          {
+            ex_err = exII::ex_put_elem_var
+              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), data.size(), data.data());
+          }
+
+        EX_CHECK_ERR(ex_err, "Error writing element values.");
+      } // for each var_id
 
   ex_err = exII::ex_update(ex_id);
   EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
