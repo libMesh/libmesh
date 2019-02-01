@@ -219,9 +219,6 @@ public:
 
   void testPullImpl(int M)
   {
-    const int size = TestCommWorld->size(),
-              rank = TestCommWorld->rank();
-
     std::map<processor_id_type, std::vector<unsigned int> > data, received_data;
 
     fill_scalar_data(data, M);
@@ -348,11 +345,8 @@ public:
 
   void testPullVecVecImpl(int M)
   {
-    const int size = TestCommWorld->size(),
-              rank = TestCommWorld->rank();
-
     std::map<processor_id_type, std::vector<std::vector<unsigned int>>> data;
-    std::map<processor_id_type, std::vector<unsigned int>> received_data;
+    std::map<processor_id_type, std::vector<std::vector<unsigned int>>> received_data;
 
     fill_vector_data(data, M);
 
@@ -390,9 +384,10 @@ public:
               CPPUNIT_ASSERT_EQUAL(query[i][j]*query[i][j], response[i][j]);
           }
         auto & vec = received_data[pid];
-        vec.insert(vec.end(), response[0].begin(), response[0].end());
+        vec.emplace_back(response[0].begin(), response[0].end());
         CPPUNIT_ASSERT_EQUAL(response[1].size(), std::size_t(1));
         CPPUNIT_ASSERT_EQUAL(response[1][0], response[0][0]);
+        vec.emplace_back(response[1].begin(), response[1].end());
       };
 
     // Do the pull
@@ -400,32 +395,14 @@ public:
     Parallel::pull_parallel_vector_data
       (*TestCommWorld, data, compose_replies, collect_replies, ex);
 
-    // Test the received results, for each processor id p we're in
-    // charge of.
-    std::vector<std::size_t> checked_sizes(size, 0);
-    for (int p=rank; p != M; p += size)
-      for (int srcp=0; srcp != size; ++srcp)
-        {
-          int diffsize = std::abs(srcp-p);
-          int diffsqrt = std::sqrt(diffsize);
-          if (diffsqrt*diffsqrt != diffsize)
-            {
-              if (received_data.count(srcp))
-                {
-                  const std::vector<unsigned int> & datum = received_data[srcp];
-                  CPPUNIT_ASSERT_EQUAL(std::count(datum.begin(), datum.end(), p*p), std::ptrdiff_t(0));
-                }
-              continue;
-            }
-
-          CPPUNIT_ASSERT_EQUAL(received_data.count(srcp), std::size_t(1));
-          const std::vector<unsigned int> & datum = received_data[srcp];
-          CPPUNIT_ASSERT_EQUAL(std::count(datum.begin(), datum.end(), p*p), std::ptrdiff_t(diffsqrt+1));
-          checked_sizes[srcp] += diffsqrt+1;
-        }
-
-    for (int srcp=0; srcp != size; ++srcp)
-      CPPUNIT_ASSERT_EQUAL(checked_sizes[srcp], received_data[srcp].size());
+    // Test the received results, for each query we sent.
+    for (int p=0; p != M; ++p)
+      {
+        CPPUNIT_ASSERT_EQUAL(data[p].size(), received_data[p].size());
+        for (auto i : index_range(data[p]))
+          for (auto j : index_range(data[p][i]))
+            CPPUNIT_ASSERT_EQUAL(data[p][i][j]*data[p][i][j], received_data[p][i][j]);
+      }
   }
 
 
