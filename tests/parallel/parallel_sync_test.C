@@ -44,7 +44,7 @@ public:
   CPPUNIT_TEST( testPushOversized );
   CPPUNIT_TEST( testPullOversized );
   CPPUNIT_TEST( testPushVecVecOversized );
-//  CPPUNIT_TEST( testPullVecVecOversized );
+  CPPUNIT_TEST( testPullVecVecOversized );
   CPPUNIT_TEST( testPushMultimapOversized );
   CPPUNIT_TEST( testPushMultimapVecVecOversized );
 
