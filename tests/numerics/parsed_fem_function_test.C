@@ -123,7 +123,9 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testValues);
   CPPUNIT_TEST(testGradients);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   CPPUNIT_TEST(testHessians);
+#endif
   CPPUNIT_TEST(testInlineGetter);
   CPPUNIT_TEST(testInlineSetter);
   CPPUNIT_TEST(testNormals);
