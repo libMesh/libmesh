@@ -1828,11 +1828,11 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
     {
       libMesh::err << "Error! The Exodus file already contains the variables:" << std::endl;
       for (const auto & name : names_from_file)
-        libMesh::out << name << std::endl;
+        libMesh::err << name << std::endl;
 
       libMesh::err << "And you asked to write:" << std::endl;
       for (const auto & name : names)
-        libMesh::out << name << std::endl;
+        libMesh::err << name << std::endl;
 
       libmesh_error_msg("Cannot overwrite existing variables in Exodus II file.");
     }
