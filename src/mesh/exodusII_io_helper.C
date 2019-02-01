@@ -1826,24 +1826,16 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
   // Both the number of variables and their names (up to the first
   // MAX_STR_LENGTH characters) must match for the names we are
   // planning to write and the names already in the file.
-  bool check_failed = false;
+  bool match =
+    std::equal(names.begin(), names.end(),
+               names_from_file.begin(),
+               [](const std::string & a,
+                  const std::string & b) -> bool
+               {
+                 return a.compare(/*pos=*/0, /*len=*/MAX_STR_LENGTH, b) == 0;
+               });
 
-  if (names.size() != names_from_file.size())
-    check_failed = true;
-
-  if (!check_failed)
-    {
-      for (const auto i : index_range(names))
-        if (names[i].compare
-            (/*pos=*/0, /*len=*/MAX_STR_LENGTH,
-             names_from_file[i]) != 0)
-          {
-            check_failed = true;
-            break;
-          }
-    }
-
-  if (check_failed)
+  if (!match)
     {
       libMesh::err << "Error! The Exodus file already contains the variables:" << std::endl;
       for (const auto & name : names_from_file)
