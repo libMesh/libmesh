@@ -831,9 +831,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
             std::string derived_name = oss.str();
 
             // Only add this var name if it's not already in the list.
-            // TODO: what order will the variables be in in the hybrid
-            // case when a subdomain with elements having nodes comes
-            // before a subdomain with elements having more nodes.
             if (!std::count(derived_var_names.begin(), derived_var_names.end(), derived_name))
               {
                 derived_var_names.push_back(derived_name);
