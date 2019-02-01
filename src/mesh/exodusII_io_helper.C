@@ -2017,8 +2017,12 @@ void ExodusII_IO_Helper::write_element_values_element_major
         const auto & active_subdomains
           = vars_active_subdomains[var_id];
 
-        if (!(active_subdomains.empty() ||
-              active_subdomains.count(subdomain_to_n_elem_iter->first)))
+        // If the vars_active_subdomains container passed to this function
+        // has an empty entry, it means the variable really is not active on
+        // _any_ subdomains, not that it is active on _all_ subdomains. This
+        // is just due to the way that we build the vars_active_subdomains
+        // container.
+        if (!active_subdomains.count(subdomain_to_n_elem_iter->first))
           continue;
 
         // Vector to hold values that will be written to Exodus file.
