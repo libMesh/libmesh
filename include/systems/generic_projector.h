@@ -787,8 +787,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
       const bool has_side_nodes =
         (n_nodes > n_vertices + ((dim > 2) * n_edges));
 
-      // We may be out of DoFs at this point or we may have interior
-      // DoFs to project too
+      // We may be out of nodes at this point or we have interior
+      // nodes which may have DoFs to project too
       const bool has_interior_nodes =
         (n_nodes > n_vertices + ((dim > 2) * n_edges) + n_sides);
 
@@ -1231,6 +1231,24 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           fe_type.order =
             libMesh::Order (fe_type.order + elem.p_level());
 
+          // If this is a Lagrange element with DoFs on edges then by
+          // convention we interpolate at the node rather than project
+          // along the edge.
+          if (fe_type.family == LAGRANGE)
+            {
+              if (fe_type.order > 1)
+                {
+                  const dof_id_type dof_id =
+                    edge_node.dof_number(system.number(), var, 0);
+                  const processor_id_type pid =
+                    edge_node.processor_id();
+                  FValue fval = f.eval_at_point
+                    (context, var_component, edge_node, system.time);
+                  insert_id(dof_id, fval, pid);
+                }
+              continue;
+            }
+
           // If this is a low order monomial element which has merely
           // been h refined then we already copied all its dofs
           if (fe_type.family == MONOMIAL &&
@@ -1352,6 +1370,24 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           fe_type.order =
             libMesh::Order (fe_type.order + elem.p_level());
 
+          // If this is a Lagrange element with DoFs on sides then by
+          // convention we interpolate at the node rather than project
+          // along the side.
+          if (fe_type.family == LAGRANGE)
+            {
+              if (fe_type.order > 1)
+                {
+                  const dof_id_type dof_id =
+                    side_node.dof_number(system.number(), var, 0);
+                  const processor_id_type pid =
+                    side_node.processor_id();
+                  FValue fval = f.eval_at_point
+                    (context, var_component, side_node, system.time);
+                  insert_id(dof_id, fval, pid);
+                }
+              continue;
+            }
+
           // If this is a low order monomial element which has merely
           // been h refined then we already copied all its dofs
           if (fe_type.family == MONOMIAL &&
@@ -1464,6 +1500,35 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           const unsigned int var_component =
             system.variable_scalar_number(var, 0);
+
+          // If this is a Lagrange element with interior DoFs then by
+          // convention we interpolate at the interior node rather
+          // than project along the interior.
+          if (fe_type.family == LAGRANGE)
+            {
+              if (fe_type.order > 1)
+                {
+                  const unsigned int first_interior_node =
+                    (elem->n_vertices() +
+                     ((elem->dim() > 2) * elem->n_edges()) +
+                     ((elem->dim() > 1) * elem->n_sides()));
+                  const unsigned int n_nodes = elem->n_nodes();
+
+                  // < vs != is important here for HEX20, QUAD8!
+                  for (unsigned int n = first_interior_node; n < n_nodes; ++n)
+                    {
+                      const Node & interior_node = elem->node_ref(n);
+                      const dof_id_type dof_id =
+                        interior_node.dof_number(system.number(), var, 0);
+                      const processor_id_type pid =
+                        interior_node.processor_id();
+                      FValue fval = f.eval_at_point
+                        (context, var_component, interior_node, system.time);
+                      insert_id(dof_id, fval, pid);
+                    }
+                }
+              continue;
+            }
 
 #ifdef LIBMESH_ENABLE_AMR
           if (elem->refinement_flag() == Elem::JUST_COARSENED)
