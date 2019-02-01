@@ -2040,8 +2040,14 @@ void ExodusII_IO_Helper::write_element_values_element_major
             auto subdomain_to_var_names_iter =
               subdomain_to_var_names.find(sbd_id);
 
+            // It's possible, but unusual, for there to be an Elem
+            // from a subdomain that has no active variables from the
+            // set of variables we are currently writing. If that
+            // happens, we can just go to the next Elem because we
+            // don't need to advance the offset into the values
+            // vector, etc.
             if (subdomain_to_var_names_iter == subdomain_to_var_names.end())
-              libmesh_error_msg("No list of variable names found for subdomain " << sbd_id);
+              continue;
 
             const auto & var_names_this_sbd
               = subdomain_to_var_names_iter->second;
