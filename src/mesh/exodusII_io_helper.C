@@ -2017,8 +2017,12 @@ void ExodusII_IO_Helper::write_element_values_element_major
         const auto & active_subdomains
           = vars_active_subdomains[var_id];
 
-        if (!(active_subdomains.empty() ||
-              active_subdomains.count(subdomain_to_n_elem_iter->first)))
+        // If the vars_active_subdomains container passed to this function
+        // has an empty entry, it means the variable really is not active on
+        // _any_ subdomains, not that it is active on _all_ subdomains. This
+        // is just due to the way that we build the vars_active_subdomains
+        // container.
+        if (!active_subdomains.count(subdomain_to_n_elem_iter->first))
           continue;
 
         // Vector to hold values that will be written to Exodus file.
@@ -2036,8 +2040,14 @@ void ExodusII_IO_Helper::write_element_values_element_major
             auto subdomain_to_var_names_iter =
               subdomain_to_var_names.find(sbd_id);
 
+            // It's possible, but unusual, for there to be an Elem
+            // from a subdomain that has no active variables from the
+            // set of variables we are currently writing. If that
+            // happens, we can just go to the next Elem because we
+            // don't need to advance the offset into the values
+            // vector, etc.
             if (subdomain_to_var_names_iter == subdomain_to_var_names.end())
-              libmesh_error_msg("No list of variable names found for subdomain " << sbd_id);
+              continue;
 
             const auto & var_names_this_sbd
               = subdomain_to_var_names_iter->second;
