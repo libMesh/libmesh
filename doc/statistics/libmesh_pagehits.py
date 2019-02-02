@@ -223,6 +223,7 @@ data = [
     'Oct 2018',   9150,      0, 0.0,
     'Nov 2018',   8135,      0, 0.0,
     'Dec 2018',   7522,      0, 0.0,
+    'Jan 2019',   8643,      0, 0.0,
 ]
 
 # Extract number of hits/month
@@ -250,13 +251,13 @@ ax = fig.add_subplot(111)
 # The color used comes from sns.color_palette("muted").as_hex() They
 # are the "same basic order of hues as the default matplotlib color
 # cycle but more attractive colors."
-ax.bar(date_nums, n_hits_month, width=30, color=u'#4878cf')
+ax.plot(date_nums, n_hits_month, marker='o', linewidth=2, color=u'#4878cf')
 
 # Create title
-fig.suptitle('LibMesh Page Hits/Month (in Thousands)')
+fig.suptitle('libmesh.github.io Hits/Month (in Thousands)')
 
 # Set up x-tick locations -- August of each year
-ticks_names = ['2012', '2013', '2014', '2015', '2016', '2017']
+ticks_names = ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']
 
 # Get numerical values for the names
 tick_nums = []
