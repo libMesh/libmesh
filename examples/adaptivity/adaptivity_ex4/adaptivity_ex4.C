@@ -657,8 +657,7 @@ void assemble_biharmonic(EquationSystems & es,
                          const std::string & system_name)
 {
   // Ignore unused parameter warnings when libmesh is configured without certain options.
-  libmesh_ignore(es);
-  libmesh_ignore(system_name);
+  libmesh_ignore(es, system_name);
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES

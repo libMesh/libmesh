@@ -514,8 +514,7 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
 #else
   // Avoid unused variable warnings when compiling without infinite
   // elements and/or SLEPc enabled.
-  libmesh_ignore(es);
-  libmesh_ignore(system_name);
+  libmesh_ignore(es, system_name);
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS && LIBMESH_HAVE_SLEPC
 }
 
@@ -568,9 +567,7 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
 
   // this function does not work without infinite elements properly.
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  libmesh_ignore(es);
-  libmesh_ignore(output);
-  libmesh_ignore(SysName);
+  libmesh_ignore(es, output, SysName);
 #else
 
   //Since we don't need any functionality that is special for EigenSystem,

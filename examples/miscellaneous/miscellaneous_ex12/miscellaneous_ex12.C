@@ -852,7 +852,6 @@ void assemble_shell (EquationSystems & es,
 
 #else
   // Avoid compiler warnings
-  libmesh_ignore(es);
-  libmesh_ignore(system_name);
+  libmesh_ignore(es, system_name);
 #endif // defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
 }

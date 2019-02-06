@@ -116,10 +116,7 @@ void write_output(EquationSystems & es,
                   FEMParameters & param)
 {
   // Ignore parameters when there are no output formats available.
-  libmesh_ignore(es);
-  libmesh_ignore(t_step);
-  libmesh_ignore(solution_type);
-  libmesh_ignore(param);
+  libmesh_ignore(es, t_step, solution_type, param);
 
 #ifdef LIBMESH_HAVE_GMV
   if (param.output_gmv)
@@ -292,8 +289,7 @@ int main (int argc, char ** argv)
 {
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_ignore(argc);
-  libmesh_ignore(argv);
+  libmesh_ignore(argc, argv);
   libmesh_example_requires(false, "--enable-amr");
 #else
   // Skip this 2D example if libMesh was compiled as 1D-only.

@@ -110,10 +110,7 @@ void write_output(EquationSystems & es,
                   FEMParameters & param)
 {
   // Ignore parameters when there are no output formats available.
-  libmesh_ignore(es);
-  libmesh_ignore(a_step);
-  libmesh_ignore(solution_type);
-  libmesh_ignore(param);
+  libmesh_ignore(es, a_step, solution_type, param);
 
 #ifdef LIBMESH_HAVE_GMV
   if (param.output_gmv)

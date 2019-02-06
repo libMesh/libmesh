@@ -331,8 +331,6 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
       }
 #else
   // Avoid compiler warnings
-  libmesh_ignore(mesh);
-  libmesh_ignore(lower_limit);
-  libmesh_ignore(upper_limit);
+  libmesh_ignore(mesh, lower_limit, upper_limit);
 #endif // LIBMESH_HAVE_TETGEN
 }
