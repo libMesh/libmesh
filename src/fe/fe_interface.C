@@ -470,6 +470,18 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 
 
+unsigned int
+FEInterface::n_dofs (const unsigned int dim,
+                     const FEType & fe_t,
+                     const Elem * elem)
+{
+  FEType p_refined_fe_t = fe_t;
+  p_refined_fe_t.order = static_cast<Order>(p_refined_fe_t.order + elem->p_level());
+  return FEInterface::n_dofs(dim, p_refined_fe_t, elem->type());
+}
+
+
+
 unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
                                          const FEType & fe_t,
                                          const ElemType t,
