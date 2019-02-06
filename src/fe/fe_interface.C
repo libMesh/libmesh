@@ -932,15 +932,7 @@ void FEInterface::compute_data(const unsigned int dim,
 
 #endif
 
-  // We need to "trick" the FEInterface::n_dofs() function into giving
-  // us the number of dofs for a potentially p-refined Elem, but we
-  // should _not_ use this temporary FEType object for the shape() or
-  // shape_deriv() calls below because they already take into account
-  // potentially elevated p-levels internally.
-  FEType p_refined_fe_t = fe_t;
-  p_refined_fe_t.order = static_cast<Order>(p_refined_fe_t.order + elem->p_level());
-
-  const unsigned int n_dof = n_dofs (dim, p_refined_fe_t, elem->type());
+  const unsigned int n_dof = n_dofs (dim, fe_t, elem);
   const Point & p = data.p;
   data.shape.resize(n_dof);
 
