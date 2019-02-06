@@ -26,6 +26,7 @@
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -1582,5 +1583,46 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
       return 1;
     }
 }
+
+
+
+FEContinuity FEInterface::get_continuity(FEType & fe_type)
+{
+  switch (fe_type.family)
+    {
+      // Discontinuous elements
+    case MONOMIAL:
+    case L2_HIERARCHIC:
+    case L2_LAGRANGE:
+    case XYZ:
+    case SCALAR:
+      return DISCONTINUOUS;
+
+      // C0 elements
+    case LAGRANGE:
+    case HIERARCHIC:
+    case BERNSTEIN:
+    case SZABAB:
+    case INFINITE_MAP:
+    case JACOBI_20_00:
+    case JACOBI_30_00:
+    case LEGENDRE:
+    case LAGRANGE_VEC:
+      return C_ZERO;
+
+      // C1 elements
+    case CLOUGH:
+    case HERMITE:
+    case SUBDIVISION:
+      return C_ONE;
+
+    case NEDELEC_ONE:
+      return H_CURL;
+
+    default:
+      libmesh_error_msg("Unknown FE Family " << Utility::enum_to_string(fe_type.family));
+    }
+}
+
 
 } // namespace libMesh
