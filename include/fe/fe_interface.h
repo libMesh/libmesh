@@ -101,6 +101,17 @@ public:
                              const ElemType t);
 
   /**
+   * Similar to the function above but takes an Elem * and accounts for
+   * p-refinement internally, if any. This function is designed to prevent
+   * users from needing to trick FEInterface::n_dofs() into giving them
+   * the right number of dofs when working with p-refined elements. See,
+   * e.g. FEInterface::compute_data().
+   */
+  static unsigned int n_dofs(const unsigned int dim,
+                             const FEType & fe_t,
+                             const Elem * elem);
+
+  /**
    * \returns The number of dofs at node n for a finite element
    * of type \p fe_t.
    * Automatically decides which finite element class to use.
