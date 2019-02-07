@@ -625,55 +625,36 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS],
 
 AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
   [
-    have_cxx11_shared_ptr=init
+    have_cxx11_shared_ptr=no
 
+    AC_MSG_CHECKING(for C++11 std::shared_ptr support)
     AC_LANG_PUSH([C++])
 
     # Save any original value that CXXFLAGS had
-    saveCXXFLAGS="$CXXFLAGS"
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
-    # Try compiling the test code in all methods requested by the user
-    for method in ${METHODS}; do
-        AS_CASE("${method}",
-            [optimized|opt],      [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPT $CPPFLAGS_OPT"],
-            [debug|dbg],          [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DBG $CPPFLAGS_DBG"],
-            [devel],              [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DEVEL $CPPFLAGS_DEVEL"],
-            [profiling|pro|prof], [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_PROF $CPPFLAGS_PROF"],
-            [oprofile|oprof],     [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPROF $CPPFLAGS_OPROF"],
-            [AC_MSG_ERROR([bad value ${method} for --with-methods])])
-
-        CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-        # If compilation fails for *any* of the methods, we'll disable
-        # shared_ptr support for *all* methods.
-        AS_IF([test "x$have_cxx11_shared_ptr" != "xno"],
-              [
-                AC_MSG_CHECKING([for C++11 std::shared_ptr support with ${method} flags])
-
-                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-                @%:@include <memory>
-                ]], [[
-                    std::shared_ptr<int> p1;
-                    std::shared_ptr<int> p2 (new int);
-                    std::shared_ptr<int> p3 (p2);
-                    p3.reset(new int);
-                ]])],[
-                    have_cxx11_shared_ptr=yes
-                    AC_MSG_RESULT(yes)
-                ],[
-                    have_cxx11_shared_ptr=no
-                    AC_MSG_RESULT(no)
-                ])
-              ])
-
-        # Restore the original flags, whatever they were.
-        CXXFLAGS="$saveCXXFLAGS"
-    done
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <memory>
+    ]], [[
+        std::shared_ptr<int> p1;
+        std::shared_ptr<int> p2 (new int);
+        std::shared_ptr<int> p3 (p2);
+        p3.reset(new int);
+    ]])],[
+        have_cxx11_shared_ptr=yes
+        AC_MSG_RESULT(yes)
+    ],[
+        have_cxx11_shared_ptr=no
+        AC_MSG_RESULT(no)
+    ])
 
     dnl Only set the header file variable if our flag was set to 'yes'.
     AS_IF([test "x$have_cxx11_shared_ptr" = "xyes"],
           [AC_DEFINE(HAVE_CXX11_SHARED_PTR, 1, [Flag indicating whether compiler supports std::shared_ptr])])
 
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
     AC_LANG_POP([C++])
 
     AM_CONDITIONAL(HAVE_CXX11_SHARED_PTR, test x$have_cxx11_shared_ptr == xyes)

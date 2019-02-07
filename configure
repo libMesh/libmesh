@@ -10071,8 +10071,10 @@ if test "x$have_cxx11_vector_data" != "xyes"; then :
 fi
 
 
-    have_cxx11_shared_ptr=init
+    have_cxx11_shared_ptr=no
 
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::shared_ptr support" >&5
+$as_echo_n "checking for C++11 std::shared_ptr support... " >&6; }
     ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -10081,47 +10083,22 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
     # Save any original value that CXXFLAGS had
-    saveCXXFLAGS="$CXXFLAGS"
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
-    # Try compiling the test code in all methods requested by the user
-    for method in ${METHODS}; do
-        case "${method}" in #(
-  optimized|opt) :
-    CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPT $CPPFLAGS_OPT" ;; #(
-  debug|dbg) :
-    CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DBG $CPPFLAGS_DBG" ;; #(
-  devel) :
-    CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DEVEL $CPPFLAGS_DEVEL" ;; #(
-  profiling|pro|prof) :
-    CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_PROF $CPPFLAGS_PROF" ;; #(
-  oprofile|oprof) :
-    CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPROF $CPPFLAGS_OPROF" ;; #(
-  *) :
-    as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5 ;;
-esac
-
-        CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-        # If compilation fails for *any* of the methods, we'll disable
-        # shared_ptr support for *all* methods.
-        if test "x$have_cxx11_shared_ptr" != "xno"; then :
-
-                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::shared_ptr support with ${method} flags" >&5
-$as_echo_n "checking for C++11 std::shared_ptr support with ${method} flags... " >&6; }
-
-                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-                #include <memory>
+    #include <memory>
 
 int
 main ()
 {
 
-                    std::shared_ptr<int> p1;
-                    std::shared_ptr<int> p2 (new int);
-                    std::shared_ptr<int> p3 (p2);
-                    p3.reset(new int);
+        std::shared_ptr<int> p1;
+        std::shared_ptr<int> p2 (new int);
+        std::shared_ptr<int> p3 (p2);
+        p3.reset(new int);
 
   ;
   return 0;
@@ -10129,24 +10106,18 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-                    have_cxx11_shared_ptr=yes
-                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+        have_cxx11_shared_ptr=yes
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 else
 
-                    have_cxx11_shared_ptr=no
-                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        have_cxx11_shared_ptr=no
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-fi
-
-        # Restore the original flags, whatever they were.
-        CXXFLAGS="$saveCXXFLAGS"
-    done
 
         if test "x$have_cxx11_shared_ptr" = "xyes"; then :
 
@@ -10154,6 +10125,8 @@ $as_echo "#define HAVE_CXX11_SHARED_PTR 1" >>confdefs.h
 
 fi
 
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
     ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
