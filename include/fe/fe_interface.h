@@ -45,6 +45,7 @@ enum FEFamily : int;
 enum Order : int;
 enum FEFieldType : int;
 enum ElemType : int;
+enum FEContinuity : int;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 class PeriodicBoundaries;
@@ -404,6 +405,14 @@ public:
    */
   static unsigned int n_vec_dim (const MeshBase & mesh,
                                  const FEType & fe_type);
+  /**
+   * Returns the input FEType's FEContinuity based on the underlying
+   * FEFamily and potentially the Order, although we do not currently
+   * support FEs with order-dependent continuity. These should exactly
+   * match the FEBase::get_continuity() specializations/overrides for
+   * the different FE types.
+   */
+  static FEContinuity get_continuity(FEType & fe_type);
 
 private:
 
