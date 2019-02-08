@@ -73,7 +73,7 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   _next_free_unpartitioned_node_id(this->n_processors()),
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
-  this->copy_nodes_and_elements(other_mesh);
+  this->copy_nodes_and_elements(other_mesh, true);
   _n_nodes = other_mesh.n_nodes();
   _n_elem  = other_mesh.n_elem();
   _max_node_id = other_mesh.max_node_id();
@@ -92,7 +92,30 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   _next_unpartitioned_unique_id =
     other_mesh._next_unpartitioned_unique_id;
 #endif
-  this->get_boundary_info() = other_mesh.get_boundary_info();
+
+  auto & this_boundary_info = this->get_boundary_info();
+  const auto & other_boundary_info = other_mesh.get_boundary_info();
+
+  this_boundary_info = other_boundary_info;
+
+  this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
+
+  // Use the first BoundaryInfo object to build the list of side boundary ids
+  std::vector<boundary_id_type> side_boundaries;
+  other_boundary_info.build_side_boundary_ids(side_boundaries);
+
+  // Assign those boundary ids in our BoundaryInfo object
+  for (const auto & side_bnd_id : side_boundaries)
+    this_boundary_info.sideset_name(side_bnd_id) =
+      other_boundary_info.get_sideset_name(side_bnd_id);
+
+  // Do the same thing for node boundary ids
+  std::vector<boundary_id_type> node_boundaries;
+  other_boundary_info.build_node_boundary_ids(node_boundaries);
+
+  for (const auto & node_bnd_id : node_boundaries)
+    this_boundary_info.nodeset_name(node_bnd_id) =
+      other_boundary_info.get_nodeset_name(node_bnd_id);
 
   // Need to copy extra_ghost_elems
   for (auto & elem : other_mesh._extra_ghost_elems)
@@ -110,8 +133,31 @@ DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
   _next_free_unpartitioned_node_id(this->n_processors()),
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
-  this->copy_nodes_and_elements(other_mesh);
-  this->get_boundary_info() = other_mesh.get_boundary_info();
+  this->copy_nodes_and_elements(other_mesh, true);
+
+  auto & this_boundary_info = this->get_boundary_info();
+  const auto & other_boundary_info = other_mesh.get_boundary_info();
+
+  this_boundary_info = other_boundary_info;
+
+  this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
+
+  // Use the first BoundaryInfo object to build the list of side boundary ids
+  std::vector<boundary_id_type> side_boundaries;
+  other_boundary_info.build_side_boundary_ids(side_boundaries);
+
+  // Assign those boundary ids in our BoundaryInfo object
+  for (const auto & side_bnd_id : side_boundaries)
+    this_boundary_info.sideset_name(side_bnd_id) =
+      other_boundary_info.get_sideset_name(side_bnd_id);
+
+  // Do the same thing for node boundary ids
+  std::vector<boundary_id_type> node_boundaries;
+  other_boundary_info.build_node_boundary_ids(node_boundaries);
+
+  for (const auto & node_bnd_id : node_boundaries)
+    this_boundary_info.nodeset_name(node_bnd_id) =
+      other_boundary_info.get_nodeset_name(node_bnd_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = other_mesh.parallel_max_unique_id();
