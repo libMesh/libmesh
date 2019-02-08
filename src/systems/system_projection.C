@@ -377,8 +377,8 @@ void System::project_vector (const NumericVector<Number> & old_v,
       OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector);
       VectorSetAction<Number> setter(new_vector);
 
-      Threads::parallel_for (active_local_elem_range,
-                             FEMProjector(*this, f, &g, setter, vars));
+      FEMProjector projector(*this, f, &g, setter, vars);
+      projector.project(active_local_elem_range);
 
       // Copy the SCALAR dofs from old_vector to new_vector
       // Note: We assume that all SCALAR dofs are on the
@@ -809,8 +809,8 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
       OldSolutionGradientCoefs g(*this);
       MatrixFillAction<Real, Number> setter(proj_mat);
 
-      Threads::parallel_for (active_local_elem_range,
-                             ProjMatFiller(*this, f, &g, setter, vars));
+      ProjMatFiller mat_filler(*this, f, &g, setter, vars);
+      mat_filler.project(active_local_elem_range);
 
       // Set the SCALAR dof transfer entries too.
       // Note: We assume that all SCALAR dofs are on the
@@ -958,14 +958,14 @@ void System::project_vector (NumericVector<Number> & new_vector,
     {
       FEMFunctionWrapper<Gradient> gw(*g);
 
-      Threads::parallel_for
-        (active_local_range,
-         FEMProjector(*this, fw, &gw, setter, vars));
+      FEMProjector projector(*this, fw, &gw, setter, vars);
+      projector.project(active_local_range);
     }
   else
-    Threads::parallel_for
-      (active_local_range,
-       FEMProjector(*this, fw, nullptr, setter, vars));
+    {
+      FEMProjector projector(*this, fw, nullptr, setter, vars);
+      projector.project(active_local_range);
+    }
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
