@@ -47,7 +47,9 @@ public:
   CPPUNIT_TEST_SUITE( MeshFunctionTest );
 
 #if LIBMESH_DIM > 1
+#ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( test_p_level );
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -61,6 +63,7 @@ public:
 
   // test that mesh function works correctly with non-zero
   // Elem::p_level() values.
+#ifdef LIBMESH_ENABLE_AMR
   void test_p_level()
   {
     ReplicatedMesh mesh(*TestCommWorld);
@@ -125,6 +128,7 @@ public:
         CPPUNIT_ASSERT_DOUBLES_EQUAL(vec_values(0), mesh_function_value, TOLERANCE*TOLERANCE);
       }
   }
+#endif // LIBMESH_ENABLE_AMR
 };
 
 
