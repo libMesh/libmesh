@@ -54,16 +54,16 @@ class SideTest : public CppUnit::TestCase {
 
 private:
   ElemClass elem;
-  std::vector<Node> nodes;
+  std::vector<std::unique_ptr<Node>> nodes;
 
 public:
   void setUp() {
     elem.set_id() = 0;
-    nodes.resize(elem.n_nodes());
+    Point dummy;
     for (auto i : elem.node_index_range())
       {
-        nodes[i].set_id() = i;
-        elem.set_node(i) = &nodes[i];
+        nodes.push_back(libmesh_make_unique<Node>(dummy, /*id=*/i));
+        elem.set_node(i) = nodes[i].get();
       }
   }
 
