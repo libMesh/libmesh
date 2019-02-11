@@ -24,7 +24,7 @@
 #include "libmesh/cell_hex8.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/enum_elem_quality.h"
-
+#include "libmesh/tensor_value.h"
 
 namespace libMesh
 {
@@ -319,6 +319,91 @@ Real Hex::quality (const ElemQuality q) const
         return sqrt3 * min_edge / max_diag ;
       }
 
+
+    case SHAPE:
+    case SKEW:
+      {
+        // From: P. Knupp, "Algebraic mesh quality metrics for
+        // unstructured initial meshes," Finite Elements in Analysis
+        // and Design 39, 2003, p. 217-241, Sections 6.2 and 6.3.
+
+        // Make local copies of points, we will access these several
+        // times below.
+        const Point
+          x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3),
+          x4 = point(4), x5 = point(5), x6 = point(6), x7 = point(7);
+
+        // The columns of the Jacobian matrices are:
+        // \vec{x}_{\xi}   = \vec{a1}*eta*zeta + \vec{b1}*eta + \vec{c1}*zeta + \vec{d1}
+        // \vec{x}_{\eta}  = \vec{a2}*xi*zeta  + \vec{b2}*xi  + \vec{c2}*zeta + \vec{d2}
+        // \vec{x}_{\zeta} = \vec{a3}*xi*eta   + \vec{b3}*xi  + \vec{c3}*eta  + \vec{d3}
+        // where the ai, bi, ci, and di are constants defined below.
+        const Point a1 = -x0 + x1 - x2 + x3 + x4 - x5 + x6 - x7;
+        const Point b1 =  x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7;
+        const Point c1 =  x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7;
+        const Point d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7;
+
+        const Point a2 =  a1;
+        const Point b2 =  b1;
+        const Point c2 =  x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7;
+        const Point d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7;
+
+        const Point a3 =  a1;
+        const Point b3 =  c1;
+        const Point c3 =  c2;
+        const Point d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
+
+        // Form the nodal Jacobians. These were computed using a
+        // Python script and the formulas above. Note that we are
+        // actually computing the Jacobian _columns_ and passing them
+        // to the RealTensor constructor which expects _rows_, but
+        // it's OK because we are only interested in determinants and
+        // products which are not affected by taking the transpose.
+        std::array<RealTensor, 8> A =
+          {
+            RealTensor(d1, d2, d3),
+            RealTensor(d1, b2 + d2, b3 + d3),
+            RealTensor(b1 + d1, b2 + d2, a3 + b3 + c3 + d3),
+            RealTensor(b1 + d1, d2, c3 + d3),
+            RealTensor(c1 + d1, c2 + d2, d3),
+            RealTensor(c1 + d1, a2 + b2 + c2 + d2, b3 + d3),
+            RealTensor(a1 + b1 + c1 + d1, a2 + b2 + c2 + d2, a3 + b3 + c3 + d3),
+            RealTensor(a1 + b1 + c1 + d1, c2 + d2, c3 + d3)
+          };
+
+        // Compute Nodal areas, alpha_k = det(A_k).
+        // If any of these are zero or negative, we return zero
+        // (lowest possible value) for the quality, since the formulas
+        // below require positive nodal areas.
+        std::array<Real, 8> alpha;
+        for (unsigned int k=0; k<alpha.size(); ++k)
+          {
+            alpha[k] = A[k].det();
+            if (alpha[k] <= 0.)
+              return 0.;
+          }
+
+        // Compute metric tensors, T_k = A_k^T * A_k.
+        std::array<RealTensor, 8> T;
+        for (unsigned int k=0; k<T.size(); ++k)
+          T[k] = A[k] * A[k].transpose();
+
+        // Compute and return the shape metric. These only use the
+        // diagonal entries of the T_k.
+        Real den = 0.;
+        if (q == SHAPE)
+          {
+            for (unsigned int k=0; k<T.size(); ++k)
+              den += T[k].tr() / std::pow(alpha[k], 2./3.);
+            return (den == 0.) ? 0 : (24. / den);
+          }
+        else
+          {
+            for (unsigned int k=0; k<T.size(); ++k)
+              den += std::pow(std::sqrt(T[k](0,0) * T[k](1,1) * T[k](2,2)) / alpha[k], 2./3.);
+            return (den == 0.) ? 0 : (8. / den);
+          }
+      }
 
       /**
        * I don't know what to do for this metric.
