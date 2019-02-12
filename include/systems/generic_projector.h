@@ -139,18 +139,18 @@ public:
   // depend on boundary data from earlier calculations.
   std::unordered_map<dof_id_type, FValue> ids_to_save;
 
+  // This needs to be sorted so we can get sorted dof indices cheaply
+  // later
+  typedef std::set<unsigned int> var_set;
+
   // We now need to divide our threadable work into stages, to allow
   // for the potential necessity of MPI communication in between them.
   struct SubFunctor {
     GenericProjector & projector;
 
-    SubFunctor (GenericProjector & p) : projector(p) {}
-  };
+    SubFunctor (GenericProjector & p);
 
-  struct SubProjector : public SubFunctor {
-    SubProjector (GenericProjector & p);
-
-    // While we're looping over nodes, also figure out which ghosted
+    // While we're working on nodes, also figure out which ghosted
     // nodes will have data we might need to send to their owners
     // instead of being acted on by ourselves.
     //
@@ -163,31 +163,63 @@ public:
     // because we won't need them until subsequent phases
     std::unordered_map<dof_id_type, FValue> new_ids_to_save;
 
-    // Our subclasses will need to merge saved ids
-    void join (const SubProjector & other);
-
-  protected:
-    // For thread safety and efficiency we'll want thread-local copies
-    // of various functors
-    ProjectionAction action;
-    FFunctor f;
-    std::unique_ptr<GFunctor> g;
-
-    const System & system;
-
-    // Each stage of the work we do will require us to prepare
-    // FEMContext objects to assist in the work.
-    FEMContext context;
-    std::vector<FEContinuity> conts;
-
     // Helper function for filling new_ids_to_push
-    void find_dofs_to_send (const Node & node);
+    void find_dofs_to_send (const Node & node,
+                            const Elem & elem,
+                            unsigned short node_num,
+                            const var_set & vars);
 
     // When we have new data to act on, we may also need to save it
     // and get ready to push it.
     void insert_id(dof_id_type id,
                    const FValue & val,
                    processor_id_type pid);
+
+    void insert_ids(const std::vector<dof_id_type> & ids,
+                    const std::vector<FValue> & vals,
+                    processor_id_type pid);
+
+    // Our subclasses will need to merge saved ids
+    void join (const SubFunctor & other);
+
+  protected:
+    // For thread safety and efficiency we'll want thread-local copies
+    // of various functors
+    ProjectionAction action;
+    FFunctor f;
+
+    // Each stage of the work we do will require us to prepare
+    // FEMContext objects to assist in the work.
+    FEMContext context;
+
+    // These get used often enough to cache them
+    std::vector<FEContinuity> conts;
+
+    const System & system;
+  };
+
+
+  typedef std::pair<const Node *, std::tuple<const Elem *, unsigned short, var_set>>
+    node_projection;
+
+  typedef StoredRange<std::vector<node_projection>::const_iterator,
+                      node_projection> node_range;
+
+
+  struct SubProjector : public SubFunctor {
+    SubProjector (GenericProjector & p);
+
+    using SubFunctor::action;
+    using SubFunctor::f;
+    using SubFunctor::system;
+    using SubFunctor::context;
+    using SubFunctor::conts;
+    using SubFunctor::insert_id;
+    using SubFunctor::insert_ids;
+
+  protected:
+    // Projections of C1 elements require a gradient as well
+    std::unique_ptr<GFunctor> g;
 
     void construct_projection
       (const std::vector<dof_id_type> & dof_indices_var,
@@ -198,34 +230,34 @@ public:
   };
 
 
-  typedef std::unordered_set<unsigned int> var_set;
+  // First we'll copy DoFs where we can, while sorting remaining DoFs
+  // for interpolation and projection later.
+  struct SortAndCopy : public SubFunctor {
+    SortAndCopy (GenericProjector & p) : SubFunctor(p) {}
 
-  struct SortWork : public SubFunctor {
-    SortWork (GenericProjector & p) : SubFunctor(p), f(p.master_f) {}
+    SortAndCopy (SortAndCopy & other, Threads::split) : SubFunctor(other.projector) {}
 
-    SortWork (SortWork & other, Threads::split) : SubFunctor(other.projector), f(other.projector.master_f) {}
+    using SubFunctor::action;
+    using SubFunctor::f;
+    using SubFunctor::system;
+    using SubFunctor::context;
+    using SubFunctor::insert_ids;
 
     void operator() (const ConstElemRange & range);
 
     // We need to merge saved multimaps when working from multiple
     // threads
-    void join (const SortWork & other);
+    void join (const SortAndCopy & other);
 
-    FFunctor f;
+    // For vertices, edges and sides, we need to know what element,
+    // what local vertex/edge/side number, and what set of variables
+    // to evaluate.
+    typedef std::unordered_multimap<const Node *, std::tuple<const Elem *, unsigned short, var_set>> ves_multimap;
 
-    typedef std::unordered_multimap<const Node *, std::tuple<const Elem *, unsigned short, var_set>> es_multimap;
-
-    std::unordered_multimap<const Node *, std::pair<const Elem *, var_set>> vertices;
-    es_multimap edges, sides;
+    ves_multimap vertices, edges, sides;
     std::vector<const Elem *> interiors;
   };
 
-
-  typedef std::pair<const Node *, std::pair<const Elem *, var_set>>
-    vertex_projection;
-
-  typedef StoredRange<std::vector<vertex_projection>::const_iterator,
-                      vertex_projection> vertex_range;
 
   struct ProjectVertices : public SubProjector {
     ProjectVertices (GenericProjector & p) : SubProjector(p) {}
@@ -240,17 +272,12 @@ public:
     using SubProjector::conts;
 
     using SubProjector::insert_id;
+    using SubProjector::insert_ids;
     using SubProjector::construct_projection;
 
-    void operator() (const vertex_range & range);
+    void operator() (const node_range & range);
   };
 
-
-  typedef std::pair<const Node *, std::tuple<const Elem *, unsigned short, var_set>>
-    es_projection;
-
-  typedef StoredRange<std::vector<es_projection>::const_iterator,
-                      es_projection> es_range;
 
   struct ProjectEdges : public SubProjector {
     ProjectEdges (GenericProjector & p) : SubProjector(p) {}
@@ -265,9 +292,10 @@ public:
     using SubProjector::conts;
 
     using SubProjector::insert_id;
+    using SubProjector::insert_ids;
     using SubProjector::construct_projection;
 
-    void operator() (const es_range & range);
+    void operator() (const node_range & range);
   };
 
   struct ProjectSides : public SubProjector {
@@ -283,9 +311,10 @@ public:
     using SubProjector::conts;
 
     using SubProjector::insert_id;
+    using SubProjector::insert_ids;
     using SubProjector::construct_projection;
 
-    void operator() (const es_range & range);
+    void operator() (const node_range & range);
   };
 
 
@@ -305,6 +334,7 @@ public:
     using SubProjector::conts;
 
     using SubProjector::insert_id;
+    using SubProjector::insert_ids;
     using SubProjector::construct_projection;
 
     void operator() (const interior_range & range);
@@ -346,16 +376,12 @@ public:
   }
 
 
-  void insert(const FEMContext & c,
-              unsigned int var_num,
+  void insert(const std::vector<dof_id_type> & dof_indices,
               const DenseVector<Val> & Ue)
   {
     const numeric_index_type
       first = target_vector.first_local_index(),
       last  = target_vector.last_local_index();
-
-    const std::vector<dof_id_type> & dof_indices =
-      c.get_dof_indices(var_num);
 
     unsigned int size = Ue.size();
 
@@ -370,6 +396,7 @@ public:
           target_vector.set(dof_indices[i], Ue(i));
     }
   }
+
 };
 
 
@@ -407,9 +434,19 @@ public:
 
   bool is_grid_projection() { return false; }
 
-  void eval_old_dofs (const FEMContext & /* c */,
-                      unsigned int /* var_component */,
-                      std::vector<Output> /* values */)
+  void eval_old_dofs (const Elem &,
+                      unsigned int,
+                      unsigned int,
+                      std::vector<dof_id_type> &,
+                      std::vector<Output> &)
+  { libmesh_error(); }
+
+  void eval_old_dofs (const Elem &,
+                      const FEType &,
+                      unsigned int,
+                      unsigned int,
+                      std::vector<dof_id_type> &,
+                      std::vector<Output> &)
   { libmesh_error(); }
 
 private:
@@ -655,18 +692,82 @@ public:
     return n;
   }
 
-  void eval_old_dofs (const FEMContext & c,
-                      unsigned int var,
+  void eval_old_dofs (const Elem & elem,
+                      unsigned int node_num,
+                      unsigned int var_num,
+                      std::vector<dof_id_type> & indices,
                       std::vector<Output> & values)
   {
-    LOG_SCOPE ("eval_old_dofs()", "OldSolutionValue");
+    LOG_SCOPE ("eval_old_dofs(node)", "OldSolutionValue");
 
-    this->check_old_context(c);
+    this->sys.get_dof_map().dof_indices(elem, node_num, indices, var_num);
 
-    const std::vector<dof_id_type> & old_dof_indices =
-      this->old_context.get_dof_indices(var);
+    std::vector<dof_id_type> old_indices;
 
-    libmesh_assert_equal_to (old_dof_indices.size(), values.size());
+    this->sys.get_dof_map().old_dof_indices(elem, node_num, old_indices, var_num);
+
+    libmesh_assert_equal_to (old_indices.size(), indices.size());
+
+    values.resize(old_indices.size());
+
+    old_solution.get(old_indices, values);
+  }
+
+
+  void eval_old_dofs (const Elem & elem,
+                      const FEType & fe_type,
+                      unsigned int sys_num,
+                      unsigned int var_num,
+                      std::vector<dof_id_type> & indices,
+                      std::vector<Output> & values)
+  {
+    LOG_SCOPE ("eval_old_dofs(elem)", "OldSolutionValue");
+
+    // We're only to be asked for old dofs on elements that can copy
+    // them through DO_NOTHING or through refinement.
+    const Elem & old_elem =
+      (elem.refinement_flag() == Elem::JUST_REFINED) ?
+      *elem.parent() : elem;
+
+    // If there are any element-based DOF numbers, get them
+    const unsigned int nc = FEInterface::n_dofs_per_elem(elem.dim(),
+                                                         fe_type,
+                                                         elem.type());
+
+    std::vector<dof_id_type> old_dof_indices(nc);
+    indices.resize(nc);
+
+    // We should never have fewer dofs than necessary on an
+    // element unless we're getting indices on a parent element,
+    // and we should never need those indices
+    if (nc != 0)
+      {
+        libmesh_assert(old_elem.old_dof_object);
+
+        const std::pair<unsigned int, unsigned int>
+          vg_and_offset = elem.var_to_vg_and_offset(sys_num,var_num);
+        const unsigned int vg = vg_and_offset.first;
+        const unsigned int vig = vg_and_offset.second;
+
+        const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
+        libmesh_assert_greater(elem.n_systems(), sys_num);
+        libmesh_assert_greater_equal(n_comp, nc);
+
+        for (unsigned int i=0; i<nc; i++)
+          {
+            const dof_id_type d_old =
+              old_elem.old_dof_object->dof_number(sys_num, vg, vig, i, n_comp);
+            const dof_id_type d_new =
+              elem.dof_number(sys_num, vg, vig, i, n_comp);
+            libmesh_assert_not_equal_to (d_old, DofObject::invalid_id);
+            libmesh_assert_not_equal_to (d_new, DofObject::invalid_id);
+
+            old_dof_indices[i] = d_old;
+            indices[i] = d_new;
+          }
+      }
+
+    values.resize(nc);
 
     old_solution.get(old_dof_indices, values);
   }
@@ -818,22 +919,32 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
 {
   LOG_SCOPE ("project", "GenericProjector");
 
-  SortWork sort_work(*this);
+  // Unless we split sort and copy into two passes we can't know for
+  // sure ahead of time whether we need to save the copied ids
+  done_saving_ids = false;
+
+  SortAndCopy sort_work(*this);
   Threads::parallel_reduce (range, sort_work);
   ProjectionAction action(master_action);
-
-  std::vector<vertex_projection> vertices(sort_work.vertices.begin(),
-                                          sort_work.vertices.end());
-
-  done_saving_ids = sort_work.edges.empty() &&
-    sort_work.sides.empty() && sort_work.interiors.empty();
 
   // Keep track of dof ids and values to send to other ranks
   std::unordered_map<dof_id_type, std::pair<FValue, processor_id_type>> ids_to_push;
 
+  ids_to_push.insert(sort_work.new_ids_to_push.begin(),
+                     sort_work.new_ids_to_push.end());
+  ids_to_save.insert(sort_work.new_ids_to_save.begin(),
+                     sort_work.new_ids_to_save.end());
+
+  std::vector<node_projection> vertices(sort_work.vertices.begin(),
+                                        sort_work.vertices.end());
+
+  done_saving_ids = sort_work.edges.empty() &&
+    sort_work.sides.empty() && sort_work.interiors.empty();
+  system.comm().max(done_saving_ids);
+
   {
     ProjectVertices project_vertices(*this);
-    Threads::parallel_reduce (vertex_range(&vertices), project_vertices);
+    Threads::parallel_reduce (node_range(&vertices), project_vertices);
     ids_to_push.insert(project_vertices.new_ids_to_push.begin(),
                        project_vertices.new_ids_to_push.end());
     ids_to_save.insert(project_vertices.new_ids_to_save.begin(),
@@ -841,12 +952,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   }
 
   done_saving_ids = sort_work.sides.empty() && sort_work.interiors.empty();
+  system.comm().max(done_saving_ids);
+
   this->send_and_insert_dof_values(ids_to_push, action);
 
   {
-    std::vector<es_projection> edges(sort_work.edges.begin(), sort_work.edges.end());
+    std::vector<node_projection> edges(sort_work.edges.begin(), sort_work.edges.end());
     ProjectEdges project_edges(*this);
-    Threads::parallel_reduce (es_range(&edges), project_edges);
+    Threads::parallel_reduce (node_range(&edges), project_edges);
     ids_to_push.insert(project_edges.new_ids_to_push.begin(),
                        project_edges.new_ids_to_push.end());
     ids_to_save.insert(project_edges.new_ids_to_save.begin(),
@@ -854,12 +967,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   }
 
   done_saving_ids = sort_work.interiors.empty();
+  system.comm().max(done_saving_ids);
+
   this->send_and_insert_dof_values(ids_to_push, action);
 
   {
-    std::vector<es_projection> sides(sort_work.sides.begin(), sort_work.sides.end());
+    std::vector<node_projection> sides(sort_work.sides.begin(), sort_work.sides.end());
     ProjectSides project_sides(*this);
-    Threads::parallel_reduce (es_range(&sides), project_sides);
+    Threads::parallel_reduce (node_range(&sides), project_sides);
     ids_to_push.insert(project_sides.new_ids_to_push.begin(),
                        project_sides.new_ids_to_push.end());
     ids_to_save.insert(project_sides.new_ids_to_save.begin(),
@@ -876,16 +991,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
                             project_interiors);
 }
 
+
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
-GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::SubProjector
+GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor::SubFunctor
   (GenericProjector & p) :
-  SubFunctor(p), action(p.master_action), f(p.master_f),
-  system(p.system), context(p.system), conts(p.system.n_vars())
+  projector(p), action(p.master_action), f(p.master_f),
+  context(p.system), conts(p.system.n_vars()), system(p.system)
 {
-  if (p.master_g)
-    g.reset(new GFunctor(*p.master_g));
-
   // Loop over all the variables we've been requested to project, to
   // pre-request
   for (const auto & var : this->projector.variables)
@@ -930,9 +1043,6 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::Su
           this->conts[var] = cont;
           if (cont == C_ONE)
             {
-              // Our C1 elements need gradient information
-              libmesh_assert(g);
-
               fe->get_dphi();
               if (dim > 1)
                 side_fe->get_dphi();
@@ -944,16 +1054,33 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::Su
 
   // Now initialize any user requested shape functions, xyz vals, etc
   f.init_context(context);
-  if (g)
-    g->init_context(context);
-
-  // this->init_context(context);
 }
 
 
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
-void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::insert_id
+GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::SubProjector
+  (GenericProjector & p) :
+  SubFunctor(p)
+{
+  if (p.master_g)
+    g.reset(new GFunctor(*p.master_g));
+
+#ifndef NDEBUG
+  // Our C1 elements need gradient information
+  for (const auto & var : this->projector.variables)
+    if (this->conts[var] == C_ONE)
+      libmesh_assert(g);
+#endif
+
+  if (g)
+    g->init_context(context);
+}
+
+
+template <typename FFunctor, typename GFunctor,
+          typename FValue, typename ProjectionAction>
+void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor::insert_id
   (dof_id_type id, const FValue & val, processor_id_type pid)
 {
   auto iter = new_ids_to_push.find(id);
@@ -974,8 +1101,36 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjecto
 
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
-void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::join
-  (const GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector & other)
+void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor::insert_ids
+  (const std::vector<dof_id_type> & ids, const std::vector<FValue> & vals, processor_id_type pid)
+{
+  libmesh_assert_equal_to(ids.size(), vals.size());
+  for (auto i : index_range(ids))
+    {
+      const dof_id_type id = ids[i];
+      const FValue & val = vals[i];
+
+      auto iter = new_ids_to_push.find(id);
+      if (iter == new_ids_to_push.end())
+        action.insert(id, val);
+      else
+        {
+          libmesh_assert(pid != DofObject::invalid_processor_id);
+          iter->second = std::make_pair(val, pid);
+        }
+      if (!this->projector.done_saving_ids)
+        {
+          libmesh_assert(!new_ids_to_save.count(id));
+          new_ids_to_save[id] = val;
+        }
+    }
+}
+
+
+template <typename FFunctor, typename GFunctor,
+          typename FValue, typename ProjectionAction>
+void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor::join
+  (const GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor & other)
 {
   new_ids_to_push.insert(other.new_ids_to_push.begin(), other.new_ids_to_push.end());
   new_ids_to_save.insert(other.new_ids_to_save.begin(), other.new_ids_to_save.end());
@@ -984,10 +1139,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjecto
 
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
-void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::operator()
+void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy::operator()
   (const ConstElemRange & range)
 {
-  // Look at all the elements in the range.  Determine sets of
+  // Look at all the elements in the range.  Directly copy values from
+  // unchanged elements.  For other elements, determine sets of
   // vertices, edge nodes, and side nodes to project.
   //
   // As per our other weird nomenclature, "sides" means faces in 3D
@@ -999,22 +1155,98 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
   // We'll keep track of which variables can be projected from which
   // elements.
 
-  typedef std::unordered_set<unsigned int> var_set;
+  // If we copy DoFs on a node, keep track of it so we don't bother
+  // with any redundant interpolations or projections later.
+  //
+  // We still need to keep track of *which* variables get copied,
+  // since we may be able to copy elements which lack some
+  // subdomain-restricted variables.
+  //
+  // For extra_hanging_dofs FE types, we'll keep track of which
+  // variables were copied from vertices, and which from edges/sides,
+  // because those types need copies made from *both* on hanging
+  // nodes.
+  std::unordered_map<const Node *, std::pair<var_set, var_set>> copied_nodes;
+
+  const unsigned int sys_num = system.number();
+
+  // At hanging nodes for variables with extra hanging dofs we'll need
+  // to do projections *separately* from vertex elements and side/edge
+  // elements.
+  std::vector<unsigned short> extra_hanging_dofs;
+  bool all_extra_hanging_dofs = true;
+  for (auto v_num : this->projector.variables)
+    {
+      if (extra_hanging_dofs.size() <= v_num)
+        extra_hanging_dofs.resize(v_num+1, false);
+      extra_hanging_dofs[v_num] =
+        FEInterface::extra_hanging_dofs(system.variable(v_num).type());
+
+      if (!extra_hanging_dofs[v_num])
+        all_extra_hanging_dofs = false;
+    }
 
   for (const auto & elem : range)
     {
-      // If we're doing AMR, this might be a grid projection with a cheap
-      // early exit.
+      // If we're doing AMR, we might be able to copy more DoFs than
+      // we interpolate or project.
+      bool copy_this_elem = false;
+
 #ifdef LIBMESH_ENABLE_AMR
-      // If this element doesn't have an old_dof_object, but it
-      // wasn't just refined or just coarsened into activity, then
-      // it must be newly added, so the user is responsible for
-      // setting the new dofs on it during a grid projection.
-      if (!elem->old_dof_object &&
-          elem->refinement_flag() != Elem::JUST_REFINED &&
-          elem->refinement_flag() != Elem::JUST_COARSENED &&
-          f.is_grid_projection())
-        continue;
+      // If we're projecting from an old grid
+      if (f.is_grid_projection())
+        {
+          // If this element doesn't have an old_dof_object, but it
+          // wasn't just refined or just coarsened into activity, then
+          // it must be newly added, so the user is responsible for
+          // setting the new dofs on it during a grid projection.
+          if (!elem->old_dof_object &&
+              elem->refinement_flag() != Elem::JUST_REFINED &&
+              elem->refinement_flag() != Elem::JUST_COARSENED)
+            continue;
+
+          // If this is an unchanged element, just copy everything
+          if ((elem->refinement_flag() != Elem::JUST_REFINED &&
+              elem->refinement_flag() != Elem::JUST_COARSENED &&
+              elem->p_refinement_flag() != Elem::JUST_REFINED &&
+              elem->p_refinement_flag() != Elem::JUST_COARSENED))
+            copy_this_elem = true;
+          else
+            {
+              bool reinitted = false;
+
+              // If this element has a low order monomial which has
+              // merely been h refined, copy it.
+              for (auto v_num : this->projector.variables)
+                {
+                  const Variable & var = system.variable(v_num);
+                  if (!var.active_on_subdomain(elem->subdomain_id()))
+                    continue;
+                  FEType fe_type = var.type();
+
+                  if (fe_type.family == MONOMIAL &&
+                      fe_type.order == CONSTANT &&
+                      elem->p_level() == 0 &&
+                      elem->refinement_flag() != Elem::JUST_COARSENED &&
+                      elem->p_refinement_flag() != Elem::JUST_COARSENED)
+                    {
+                      if (!reinitted)
+                        {
+                          reinitted = true;
+                          context.pre_fe_reinit(system, elem);
+                        }
+
+                      std::vector<FValue> Ue(1);
+                      std::vector<dof_id_type> elem_dof_ids(1);
+
+                      f.eval_old_dofs(*elem, fe_type, sys_num, v_num,
+                                      elem_dof_ids, Ue);
+
+                      action.insert(elem_dof_ids[0], Ue[0]);
+                    }
+                }
+            }
+        }
 #endif // LIBMESH_ENABLE_AMR
 
       const int dim = elem->dim();
@@ -1026,7 +1258,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
       // In 1-D we already handle our sides as vertices
       const unsigned int n_sides = (dim > 1) * elem->n_sides();
 
-      // What variables are supported on each kind of node on elem?
+      // What variables are supported on each kind of node on this elem?
       var_set vertex_vars, edge_vars, side_vars;
 
       // If we have non-vertex nodes, the first is an edge node, but
@@ -1084,28 +1316,111 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
           if (FEInterface::n_dofs_per_elem(dim, fe_type, elem_type) ||
               (has_interior_nodes &&
                FEInterface::n_dofs_at_node(dim, fe_type, elem_type, n_nodes-1)))
-            if (interiors.empty() || interiors.back() != elem)
-              interiors.push_back(elem);
+            {
+              // We may have already just copied constant monomials,
+              // or we may be about to copy the whole element
+              if ((f.is_grid_projection() &&
+                   fe_type.family == MONOMIAL &&
+                   fe_type.order == CONSTANT &&
+                   elem->p_level() == 0 &&
+                   elem->refinement_flag() != Elem::JUST_COARSENED &&
+                   elem->p_refinement_flag() != Elem::JUST_COARSENED)
+                  || copy_this_elem
+                  )
+                continue;
+
+              // We need to project any other variables
+              if (interiors.empty() || interiors.back() != elem)
+                interiors.push_back(elem);
+            }
         }
 
       // We'll use a greedy algorithm in most cases: if another
       // element has already claimed some of our DoFs, we'll let it do
       // the work.
+      auto erase_covered_vars = []
+        (const Node * node, var_set & remaining, const ves_multimap & covered)
+        {
+          auto covered_range = covered.equal_range(node);
+          for (const auto & v_ent : as_range(covered_range))
+            for (const unsigned int var_covered :
+                 std::get<2>(v_ent.second))
+              remaining.erase(var_covered);
+        };
+
+      auto erase_nonhanging_vars = [&extra_hanging_dofs]
+        (const Node * node, var_set & remaining, const ves_multimap & covered)
+        {
+          auto covered_range = covered.equal_range(node);
+          for (const auto & v_ent : as_range(covered_range))
+            for (const unsigned int var_covered :
+                 std::get<2>(v_ent.second))
+              if (!extra_hanging_dofs[var_covered])
+                remaining.erase(var_covered);
+        };
+
+      auto erase_copied_vars = [&copied_nodes, &extra_hanging_dofs]
+        (const Node * node, bool is_vertex, var_set & remaining)
+        {
+          auto copying_range = copied_nodes.equal_range(node);
+          for (const auto & v_ent : as_range(copying_range))
+            {
+              for (const unsigned int var_covered :
+                   v_ent.second.first)
+                if (is_vertex || !extra_hanging_dofs[var_covered])
+                  remaining.erase(var_covered);
+
+              for (const unsigned int var_covered :
+                   v_ent.second.second)
+                if (!is_vertex || !extra_hanging_dofs[var_covered])
+                  remaining.erase(var_covered);
+            }
+        };
+
       for (unsigned int v=0; v != n_vertices; ++v)
         {
           const Node * node = elem->node_ptr(v);
 
           auto remaining_vars = vertex_vars;
 
-          auto set_range = vertices.equal_range(node);
-          for (const auto & v_ent : as_range(set_range))
-            for (const unsigned int var_covered :
-                 v_ent.second.second)
-              remaining_vars.erase(var_covered);
+          erase_covered_vars(node, remaining_vars, vertices);
 
-          if (!remaining_vars.empty())
+          if (remaining_vars.empty())
+            continue;
+
+          if (!all_extra_hanging_dofs)
+            {
+              erase_nonhanging_vars(node, remaining_vars, edges);
+              if (remaining_vars.empty())
+                continue;
+
+              erase_nonhanging_vars(node, remaining_vars, sides);
+              if (remaining_vars.empty())
+                continue;
+            }
+
+          erase_copied_vars(node, true, remaining_vars);
+          if (remaining_vars.empty())
+            continue;
+
+          if (copy_this_elem)
+            {
+              for (auto var : remaining_vars)
+                {
+                  std::vector<dof_id_type> node_dof_ids;
+                  std::vector<FValue> values;
+
+                  f.eval_old_dofs(*elem, v, var, node_dof_ids, values);
+
+                  insert_ids(node_dof_ids, values, node->processor_id());
+                }
+              copied_nodes[node].first.insert(remaining_vars.begin(),
+                                              remaining_vars.end());
+              this->find_dofs_to_send(*node, *elem, v, remaining_vars);
+            }
+          else
             vertices.emplace
-              (node, std::make_pair(elem, std::move(remaining_vars)));
+              (node, std::make_tuple(elem, v, std::move(remaining_vars)));
         }
 
       if (has_edge_nodes)
@@ -1116,13 +1431,41 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
 
               auto remaining_vars = edge_vars;
 
-              auto set_range = edges.equal_range(node);
-              for (const auto & v_ent : as_range(set_range))
-                for (const unsigned int var_covered :
-                     std::get<2>(v_ent.second))
-                  remaining_vars.erase(var_covered);
+              erase_covered_vars(node, remaining_vars, edges);
+              if (remaining_vars.empty())
+                continue;
 
-              if (!remaining_vars.empty())
+              erase_covered_vars(node, remaining_vars, sides);
+              if (remaining_vars.empty())
+                continue;
+
+              if (!all_extra_hanging_dofs)
+                {
+                  erase_nonhanging_vars(node, remaining_vars, vertices);
+                  if (remaining_vars.empty())
+                    continue;
+                }
+
+              erase_copied_vars(node, false, remaining_vars);
+              if (remaining_vars.empty())
+                continue;
+
+              if (copy_this_elem)
+                {
+                  for (auto var : remaining_vars)
+                    {
+                      std::vector<dof_id_type> edge_dof_ids;
+                      std::vector<FValue> values;
+
+                      f.eval_old_dofs(*elem, n_vertices+e, var, edge_dof_ids, values);
+
+                      insert_ids(edge_dof_ids, values, node->processor_id());
+                    }
+                  copied_nodes[node].second.insert(remaining_vars.begin(),
+                                                   remaining_vars.end());
+                  this->find_dofs_to_send(*node, *elem, n_vertices+e, remaining_vars);
+                }
+              else
                 edges.emplace
                   (node, std::make_tuple(elem, e, std::move(remaining_vars)));
             }
@@ -1133,8 +1476,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
           for (unsigned int side=0; side != n_sides; ++side)
             {
               const Node * node = nullptr;
+              unsigned short node_num = n_vertices+(dim>2)*n_edges+side;
               if (dim != 3)
-                node = elem->node_ptr(n_vertices+(dim>2)*n_edges+side);
+                node = elem->node_ptr(node_num);
               else
                 {
                   // In 3D only some sides may have nodes
@@ -1145,7 +1489,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
 
                       if (elem->is_node_on_side(n, side))
                         {
-                          node = elem->node_ptr(n);
+                          node_num = n;
+                          node = elem->node_ptr(node_num);
                           break;
                         }
                     }
@@ -1156,15 +1501,70 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
 
               auto remaining_vars = side_vars;
 
-              auto set_range = sides.equal_range(node);
-              for (const auto & v_ent : as_range(set_range))
-                for (const unsigned int var_covered :
-                     std::get<2>(v_ent.second))
-                  remaining_vars.erase(var_covered);
+              erase_covered_vars(node, remaining_vars, edges);
+              if (remaining_vars.empty())
+                continue;
 
-              if (!remaining_vars.empty())
+              erase_covered_vars(node, remaining_vars, sides);
+              if (remaining_vars.empty())
+                continue;
+
+              if (!all_extra_hanging_dofs)
+                {
+                  erase_nonhanging_vars(node, remaining_vars, vertices);
+                  if (remaining_vars.empty())
+                    continue;
+                }
+
+              erase_copied_vars(node, false, remaining_vars);
+              if (remaining_vars.empty())
+                continue;
+
+              if (copy_this_elem)
+                {
+                  for (auto var : remaining_vars)
+                    {
+                      std::vector<dof_id_type> side_dof_ids;
+                      std::vector<FValue> values;
+
+                      f.eval_old_dofs(*elem, node_num, var, side_dof_ids, values);
+
+                      insert_ids(side_dof_ids, values, node->processor_id());
+                    }
+                  copied_nodes[node].second.insert(remaining_vars.begin(),
+                                                   remaining_vars.end());
+                  this->find_dofs_to_send(*node, *elem, node_num, remaining_vars);
+                }
+              else
                 sides.emplace
                   (node, std::make_tuple(elem, side, std::move(remaining_vars)));
+            }
+        }
+
+      // Elements with elemental dofs might need those copied too.
+      if (copy_this_elem)
+        {
+          for (auto v_num : this->projector.variables)
+            {
+              const Variable & var = system.variable(v_num);
+              if (!var.active_on_subdomain(elem->subdomain_id()))
+                continue;
+              FEType fe_type = var.type();
+
+              std::vector<FValue> Ue;
+              std::vector<dof_id_type> elem_dof_ids;
+              f.eval_old_dofs(*elem, fe_type, sys_num, v_num,
+                              elem_dof_ids, Ue);
+              action.insert(elem_dof_ids, Ue);
+
+              if (has_interior_nodes)
+                {
+                  std::vector<FValue> Un;
+                  std::vector<dof_id_type> node_dof_ids;
+
+                  f.eval_old_dofs(*elem, n_nodes-1, v_num, node_dof_ids, Un);
+                  action.insert(node_dof_ids, Un);
+                }
             }
         }
     }
@@ -1173,26 +1573,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::o
 
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
-void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::join
-  (const GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork & other)
+void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy::join
+  (const GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy & other)
 {
-  for (const auto & pair : other.vertices)
-    {
-      const Node * node = pair.first;
-      auto remaining_vars = pair.second.second;
-
-      auto my_range = vertices.equal_range(node);
-      for (const auto & v_ent : as_range(my_range))
-        for (const unsigned int var_covered :
-             v_ent.second.second)
-          remaining_vars.erase(var_covered);
-
-      if (!remaining_vars.empty())
-        vertices.emplace
-          (node, std::make_pair(pair.second.first, std::move(remaining_vars)));
-    }
-
-  auto merge_others = [](es_multimap & self, const es_multimap & other_mm)
+  auto merge_multimaps = [](ves_multimap & self, const ves_multimap & other_mm)
     {
       for (const auto & pair : other_mm)
         {
@@ -1213,29 +1597,35 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortWork::j
         }
     };
 
-  merge_others(edges, other.edges);
-  merge_others(sides, other.sides);
+  merge_multimaps(vertices, other.vertices);
+  merge_multimaps(edges, other.edges);
+  merge_multimaps(sides, other.sides);
 }
 
 
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVertices::operator()
-  (const vertex_range & range)
+  (const node_range & range)
 {
   LOG_SCOPE ("project_vertices","GenericProjector");
+
+  const unsigned int sys_num = system.number();
 
   for (const auto & v_pair : range)
     {
       const Node & vertex = *v_pair.first;
-      const Elem & elem = *v_pair.second.first;
+      const Elem & elem = *std::get<0>(v_pair.second);
+      const unsigned int n = std::get<1>(v_pair.second);
+      const var_set & vertex_vars = std::get<2>(v_pair.second);
+
       context.pre_fe_reinit(system, &elem);
 
-      this->find_dofs_to_send(vertex);
+      this->find_dofs_to_send(vertex, elem, n, vertex_vars);
 
       // Look at all the variables we're supposed to interpolate from
       // this element on this vertex
-      for (const auto & var : v_pair.second.second)
+      for (const auto & var : vertex_vars)
         {
           const Variable & variable = system.variable(var);
           const FEType & base_fe_type = variable.type();
@@ -1248,12 +1638,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
           const FEContinuity & cont = this->conts[var];
           if (cont == DISCONTINUOUS)
             {
-              libmesh_assert_equal_to(vertex.n_comp(system.number(), var), 0);
+              libmesh_assert_equal_to(vertex.n_comp(sys_num, var), 0);
             }
           else if (cont == C_ZERO)
             {
-              libmesh_assert(vertex.n_comp(system.number(), var));
-              const dof_id_type id = vertex.dof_number(system.number(), var, 0);
+              libmesh_assert(vertex.n_comp(sys_num, var));
+              const dof_id_type id = vertex.dof_number(sys_num, var, 0);
               // C_ZERO elements have a single nodal value DoF at vertices
               const FValue val = f.eval_at_node
                 (context, var_component, /*dim=*/ 0, // Don't care w/C0
@@ -1262,8 +1652,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
             }
           else if (cont == C_ONE)
             {
-              libmesh_assert(vertex.n_comp(system.number(), var));
-              const dof_id_type first_id = vertex.dof_number(system.number(), var, 0);
+              libmesh_assert(vertex.n_comp(sys_num, var));
+              const dof_id_type first_id = vertex.dof_number(sys_num, var, 0);
 
               // C_ONE elements have a single nodal value and dim
               // gradient values at vertices, as well as cross
@@ -1289,7 +1679,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                 {
                   const int i_am_child =
                     elem.parent()->which_child_am_i(&elem);
-                  const unsigned int n = elem.get_node_index(&vertex);
                   is_parent_vertex =
                     elem.parent()->is_vertex_on_parent(i_am_child, n);
                 }
@@ -1300,7 +1689,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
               // The hermite element vertex shape functions are weird
               if (base_fe_type.family == HERMITE)
                 {
-                  const unsigned int n = elem.get_node_index(&vertex);
                   const FValue val =
                     f.eval_at_node(context,
                                    var_component,
@@ -1458,9 +1846,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdges::operator()
-  (const es_range & range)
+  (const node_range & range)
 {
   LOG_SCOPE ("project_edges","GenericProjector");
+
+  const unsigned int sys_num = system.number();
 
   for (const auto & e_pair : range)
     {
@@ -1479,15 +1869,18 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
 
       const Node & edge_node = *e_pair.first;
       const int dim = elem.dim();
+      const var_set & edge_vars = std::get<2>(e_pair.second);
 
-      context.edge = std::get<1>(e_pair.second);
+      const unsigned short edge_num = std::get<1>(e_pair.second);
+      const unsigned short node_num = elem.n_vertices() + edge_num;
+      context.edge = edge_num;
       context.pre_fe_reinit(system, &elem);
 
-      this->find_dofs_to_send(edge_node);
+      this->find_dofs_to_send(edge_node, elem, node_num, edge_vars);
 
       // Look at all the variables we're supposed to interpolate from
       // this element on this edge
-      for (const auto & var : std::get<2>(e_pair.second))
+      for (const auto & var : edge_vars)
         {
           const Variable & variable = system.variable(var);
           const FEType & base_fe_type = variable.type();
@@ -1511,7 +1904,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
               if (fe_type.order > 1)
                 {
                   const dof_id_type dof_id =
-                    edge_node.dof_number(system.number(), var, 0);
+                    edge_node.dof_number(sys_num, var, 0);
                   const processor_id_type pid =
                     edge_node.processor_id();
                   FValue fval = f.eval_at_point
@@ -1599,9 +1992,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSides::operator()
-  (const es_range & range)
+  (const node_range & range)
 {
   LOG_SCOPE ("project_sides","GenericProjector");
+
+  const unsigned int sys_num = system.number();
 
   for (const auto & s_pair : range)
     {
@@ -1620,15 +2015,32 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
 
       const Node & side_node = *s_pair.first;
       const int dim = elem.dim();
+      const var_set & side_vars = std::get<2>(s_pair.second);
 
-      context.side = std::get<1>(s_pair.second);
+      const unsigned int side_num = std::get<1>(s_pair.second);
+      unsigned short node_num = elem.n_vertices()+side_num;
+      // In 3D only some sides may have nodes
+      if (dim == 3)
+        for (auto n : IntRange<unsigned int>(0, elem.n_nodes()))
+          {
+            if (!elem.is_face(n))
+              continue;
+
+            if (elem.is_node_on_side(n, side_num))
+              {
+                node_num = n;
+                break;
+              }
+          }
+
+      context.side = side_num;
       context.pre_fe_reinit(system, &elem);
 
-      this->find_dofs_to_send(side_node);
+      this->find_dofs_to_send(side_node, elem, node_num, side_vars);
 
       // Look at all the variables we're supposed to interpolate from
       // this element on this side
-      for (const auto & var : std::get<2>(s_pair.second))
+      for (const auto & var : side_vars)
         {
           const Variable & variable = system.variable(var);
           const FEType & base_fe_type = variable.type();
@@ -1652,7 +2064,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
               if (fe_type.order > 1)
                 {
                   const dof_id_type dof_id =
-                    side_node.dof_number(system.number(), var, 0);
+                    side_node.dof_number(sys_num, var, 0);
                   const processor_id_type pid =
                     side_node.processor_id();
                   FValue fval = f.eval_at_point
@@ -1744,6 +2156,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectInte
 {
   LOG_SCOPE ("project_interiors","GenericProjector");
 
+  const unsigned int sys_num = system.number();
+
   // Iterate over all dof-bearing element interiors in the range
   for (const auto & elem : range)
     {
@@ -1795,7 +2209,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectInte
                     {
                       const Node & interior_node = elem->node_ref(n);
                       const dof_id_type dof_id =
-                        interior_node.dof_number(system.number(), var, 0);
+                        interior_node.dof_number(sys_num, var, 0);
                       const processor_id_type pid =
                         interior_node.processor_id();
                       FValue fval = f.eval_at_point
@@ -1861,9 +2275,11 @@ template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 void
 GenericProjector<FFunctor, GFunctor, FValue,
-                 ProjectionAction>::SubProjector::find_dofs_to_send
-  (const Node & node)
+                 ProjectionAction>::SubFunctor::find_dofs_to_send
+  (const Node & node, const Elem & elem, unsigned short node_num, const var_set & vars)
 {
+  libmesh_assert (&node == elem.node_ptr(node_num));
+
   // Any ghosted node in our range might have an owner who needs our
   // data
   const processor_id_type owner = node.processor_id();
@@ -1873,24 +2289,34 @@ GenericProjector<FFunctor, GFunctor, FValue,
       const DofMap & dof_map = system.get_dof_map();
 
       // But let's check and see if we can be certain the owner can
-      // compute any or all of its own dof coefficients on that node
-      std::vector<dof_id_type> node_dof_ids, elem_dof_ids;
-      dof_map.dof_indices(&node, node_dof_ids);
+      // compute any or all of its own dof coefficients on that node.
+      std::vector<dof_id_type> node_dof_ids, patch_dof_ids;
+      for (const auto & var : vars)
+        {
+          const Variable & variable = system.variable(var);
+
+          if (!variable.active_on_subdomain(elem.subdomain_id()))
+            continue;
+
+          dof_map.dof_indices(elem, node_num, node_dof_ids, var);
+        }
       libmesh_assert(std::is_sorted(node_dof_ids.begin(),
                                     node_dof_ids.end()));
       const std::vector<dof_id_type> & patch =
         (*this->projector.nodes_to_elem)[node.id()];
       for (const auto & elem_id : patch)
         {
-          const Elem * elem = mesh.query_elem_ptr(elem_id);
-          if (!elem->active())
+          const Elem & patch_elem = mesh.elem_ref(elem_id);
+          if (!patch_elem.active() || owner != patch_elem.processor_id())
             continue;
-          dof_map.dof_indices(elem, elem_dof_ids);
-          std::sort(elem_dof_ids.begin(), elem_dof_ids.end());
+          dof_map.dof_indices(&patch_elem, patch_dof_ids);
+          std::sort(patch_dof_ids.begin(), patch_dof_ids.end());
 
+          // Remove any node_dof_ids that we see can be calculated on
+          // this element
           std::vector<dof_id_type> diff_ids(node_dof_ids.size());
           auto it = std::set_difference(node_dof_ids.begin(), node_dof_ids.end(),
-                                        elem_dof_ids.begin(), elem_dof_ids.end(), diff_ids.begin());
+                                        patch_dof_ids.begin(), patch_dof_ids.end(), diff_ids.begin());
           diff_ids.resize(it-diff_ids.begin());
           node_dof_ids.swap(diff_ids);
           if (node_dof_ids.empty())
@@ -2122,8 +2548,7 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::co
   // Transfer new edge solutions to element
   const processor_id_type pid = node ?
     node->processor_id() : DofObject::invalid_processor_id;
-  for (unsigned int i=0; i != free_dofs; ++i)
-    insert_id(free_dof_ids[i], Ufree(i), pid);
+  insert_ids(free_dof_ids, Ufree.get_values(), pid);
 }
 
 

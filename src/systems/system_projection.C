@@ -508,18 +508,87 @@ public:
                      const Point & p,
                      Real /* time */ = 0.);
 
-  void eval_old_dofs (const FEMContext & c,
-                      unsigned int var,
+  void eval_old_dofs (const Elem & elem,
+                      unsigned int node_num,
+                      unsigned int var_num,
+                      std::vector<dof_id_type> & indices,
                       std::vector<DSNA> & values)
   {
-    LOG_SCOPE ("eval_old_dofs()", "OldSolutionValue");
+    LOG_SCOPE ("eval_old_dofs(node)", "OldSolutionCoefs");
 
-    this->check_old_context(c);
+    this->sys.get_dof_map().dof_indices(elem, node_num, indices, var_num);
 
-    const std::vector<dof_id_type> & old_dof_indices =
-      this->old_context.get_dof_indices(var);
+    std::vector<dof_id_type> old_indices;
 
-    libmesh_assert_equal_to (old_dof_indices.size(), values.size());
+    this->sys.get_dof_map().old_dof_indices(elem, node_num, old_indices, var_num);
+
+    libmesh_assert_equal_to (old_indices.size(), indices.size());
+
+    values.resize(old_indices.size());
+
+    for (auto i : index_range(values))
+      {
+        values[i].resize(1);
+        values[i].raw_at(0) = 1;
+        values[i].raw_index(0) = old_indices[i];
+      }
+  }
+
+
+  void eval_old_dofs (const Elem & elem,
+                      const FEType & fe_type,
+                      unsigned int sys_num,
+                      unsigned int var_num,
+                      std::vector<dof_id_type> & indices,
+                      std::vector<DSNA> & values)
+  {
+    LOG_SCOPE ("eval_old_dofs(elem)", "OldSolutionCoefs");
+
+    // We're only to be asked for old dofs on elements that can copy
+    // them through DO_NOTHING or through refinement.
+    const Elem & old_elem =
+      (elem.refinement_flag() == Elem::JUST_REFINED) ?
+      *elem.parent() : elem;
+
+    // If there are any element-based DOF numbers, get them
+    const unsigned int nc = FEInterface::n_dofs_per_elem(elem.dim(),
+                                                         fe_type,
+                                                         elem.type());
+
+    std::vector<dof_id_type> old_dof_indices(nc);
+    indices.resize(nc);
+
+    // We should never have fewer dofs than necessary on an
+    // element unless we're getting indices on a parent element,
+    // and we should never need those indices
+    if (nc != 0)
+      {
+        libmesh_assert(old_elem.old_dof_object);
+
+        const std::pair<unsigned int, unsigned int>
+          vg_and_offset = elem.var_to_vg_and_offset(sys_num,var_num);
+        const unsigned int vg = vg_and_offset.first;
+        const unsigned int vig = vg_and_offset.second;
+
+        const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
+        libmesh_assert_greater(elem.n_systems(), sys_num);
+        libmesh_assert_greater_equal(n_comp, nc);
+
+        for (unsigned int i=0; i<nc; i++)
+          {
+            const dof_id_type d_old =
+              old_elem.old_dof_object->dof_number(sys_num, vg, vig, i, n_comp);
+            const dof_id_type d_new =
+              elem.dof_number(sys_num, vg, vig, i, n_comp);
+            libmesh_assert_not_equal_to (d_old, DofObject::invalid_id);
+            libmesh_assert_not_equal_to (d_new, DofObject::invalid_id);
+
+            old_dof_indices[i] = d_old;
+            indices[i] = d_new;
+          }
+      }
+
+    values.resize(old_dof_indices.size());
 
     for (auto i : index_range(values))
       {
@@ -736,16 +805,13 @@ public:
     }
   }
 
-  void insert(const FEMContext & c,
-              unsigned int var_num,
-              const DenseVector<DynamicSparseNumberArray<ValIn, dof_id_type> > & Ue)
+
+  void insert(const std::vector<dof_id_type> & dof_indices,
+              const std::vector<DynamicSparseNumberArray<ValIn, dof_id_type> > & Ue)
   {
     const numeric_index_type
       begin_dof = target_matrix.row_start(),
       end_dof = target_matrix.row_stop();
-
-    const std::vector<dof_id_type> & dof_indices =
-      c.get_dof_indices(var_num);
 
     unsigned int size = Ue.size();
 
@@ -760,7 +826,7 @@ public:
           const dof_id_type dof_i = dof_indices[i];
           if ((dof_i >= begin_dof) && (dof_i < end_dof))
             {
-              const DynamicSparseNumberArray<ValIn,dof_id_type> & dnsa = Ue(i);
+              const DynamicSparseNumberArray<ValIn,dof_id_type> & dnsa = Ue[i];
               const std::size_t dnsa_size = dnsa.size();
               for (unsigned int j = 0; j != dnsa_size; ++j)
                 {
