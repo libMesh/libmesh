@@ -1102,7 +1102,20 @@ void ExodusII_IO_Helper::create(std::string filename)
             (std::min(sizeof(Real), sizeof(double)));
         }
 
-      ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
+      // By default we just open the Exodus file in "EX_CLOBBER" mode,
+      // which, according to "ncdump -k", writes the file in "64-bit
+      // offset" mode, which is a NETCDF3 file format.
+      int mode = EX_CLOBBER;
+
+      // If HDF5 is available, by default we will write Exodus files
+      // in a more modern NETCDF4-compatible format. For this file
+      // type, "ncdump -k" will report "netCDF-4".
+#ifdef LIBMESH_HAVE_HDF5
+      mode |= EX_NETCDF4;
+      mode |= EX_NOCLASSIC;
+#endif
+
+      ex_id = exII::ex_create(filename.c_str(), mode, &comp_ws, &io_ws);
 
       EX_CHECK_ERR(ex_id, "Error creating ExodusII mesh file.");
 
