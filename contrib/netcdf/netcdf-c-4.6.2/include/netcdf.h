@@ -266,9 +266,9 @@ NOTE: The NC_MAX_DIMS, NC_MAX_ATTRS, and NC_MAX_VARS limits
       are *not* enforced after version 4.5.0
 */
 /**@{*/
-#define NC_MAX_DIMS     1024 /* not enforced after 4.5.0 */
+#define NC_MAX_DIMS     65536 /* not enforced after 4.5.0 */
 #define NC_MAX_ATTRS    8192 /* not enforced after 4.5.0 */
-#define NC_MAX_VARS     8192 /* not enforced after 4.5.0 */
+#define NC_MAX_VARS     524288 /* not enforced after 4.5.0 */
 #define NC_MAX_NAME     256
 #define NC_MAX_VAR_DIMS 1024 /**< max per variable dimensions */
 /**@}*/
