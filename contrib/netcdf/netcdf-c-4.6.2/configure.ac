@@ -72,7 +72,10 @@ AC_CONFIG_LINKS([nc_test4/ref_hdf5_compat3.nc:nc_test4/ref_hdf5_compat3.nc])
 AC_CONFIG_LINKS([hdf4_test/ref_chunked.hdf4:hdf4_test/ref_chunked.hdf4])
 AC_CONFIG_LINKS([hdf4_test/ref_contiguous.hdf4:hdf4_test/ref_contiguous.hdf4])
 
-AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
+AM_INIT_AUTOMAKE(
+m4_esyscmd([AS_CASE(`automake --version | head -n 1`,
+           [*1.11*], [echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11],
+           [echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11 serial-tests])]))
 
 # use silent rules - requires at least automake 1.11
 AM_SILENT_RULES(yes)
