@@ -1842,7 +1842,8 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
   this->read_var_names(type);
 
   // Both the number of variables and their names (up to the first
-  // MAX_STR_LENGTH characters) must match for the names we are
+  // MAX_STR_LENGTH - 1 characters, the last character is reserved for
+  // a null-terminator character) must match for the names we are
   // planning to write and the names already in the file.
   bool match =
     std::equal(names.begin(), names.end(),
@@ -1850,7 +1851,7 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
                [](const std::string & a,
                   const std::string & b) -> bool
                {
-                 return a.compare(/*pos=*/0, /*len=*/MAX_STR_LENGTH, b) == 0;
+                 return a.compare(/*pos=*/0, /*len=*/MAX_STR_LENGTH - 1, b) == 0;
                });
 
   if (!match)
