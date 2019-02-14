@@ -24,7 +24,8 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
-#include <cstdlib> // std::strtol
+#include <cstdlib> // std::strtol, std::malloc, std::free
+#include <cstring> // std::strncpy
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/enum_elem_type.h"
@@ -973,7 +974,11 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
 
 
 
-void ExodusII_IO_Helper::write_var_names_impl(const char * var_type, int & count, std::vector<std::string> & names)
+void
+ExodusII_IO_Helper::write_var_names_impl
+(const char * var_type,
+ int & count,
+ std::vector<std::string> & names)
 {
   // Update the count variable so that it's available to other parts of the class.
   count = cast_int<int>(names.size());
@@ -997,11 +1002,11 @@ void ExodusII_IO_Helper::write_var_names_impl(const char * var_type, int & count
             libMesh::out << names_table.get_char_star(i) << std::endl;
         }
 
-      ex_err = exII::ex_put_var_names(ex_id,
-                                      var_type,
-                                      count,
-                                      names_table.get_char_star_star()
-                                      );
+      ex_err = exII::ex_put_var_names
+        (ex_id,
+         var_type,
+         count,
+         names_table.get_char_star_star());
 
       EX_CHECK_ERR(ex_err, "Error writing variable names.");
     }
@@ -2674,22 +2679,29 @@ int ExodusII_IO_Helper::Conversion::get_side_map(int i) const
 
 
 
-ExodusII_IO_Helper::NamesData::NamesData(size_t n_strings, size_t string_length) :
-  data_table(n_strings),
-  data_table_pointers(n_strings),
+ExodusII_IO_Helper::NamesData::NamesData(std::size_t n_strings,
+                                         std::size_t string_length) :
   counter(0),
-  table_size(n_strings)
+  table_size(n_strings),
+  string_len(string_length)
 {
-  for (size_t i=0; i<n_strings; ++i)
-    {
-      data_table[i].resize(string_length + 1);
+  // Allocate space for the pointers.
+  data_table = static_cast<char **>(std::malloc(n_strings * sizeof(char *)));
 
-      // Properly terminate these C-style strings, just to be safe.
-      data_table[i][0] = '\0';
+  // Allocate space for the strings. We use calloc so there is no
+  // possibility of garbage characters in the strings. Every character
+  // is effectively set to the null terminator character.
+  for (std::size_t i=0; i<n_strings; ++i)
+    data_table[i] = static_cast<char*>(std::calloc(string_length, sizeof(char)));
+}
 
-      // Set pointer into the data_table
-      data_table_pointers[i] = data_table[i].data();
-    }
+
+
+ExodusII_IO_Helper::NamesData::~NamesData()
+{
+  for (std::size_t i=0; i<table_size; ++i)
+    std::free(data_table[i]);
+  std::free(data_table);
 }
 
 
@@ -2698,11 +2710,11 @@ void ExodusII_IO_Helper::NamesData::push_back_entry(const std::string & name)
 {
   libmesh_assert_less (counter, table_size);
 
-  // 1.) Copy the C++ string into the vector<char>...
-  size_t num_copied = name.copy(data_table[counter].data(), data_table[counter].size()-1);
-
-  // 2.) ...And null-terminate it.
-  data_table[counter][num_copied] = '\0';
+  // Note: if strncpy copies fewer than the requested number of
+  // characters, it writes additional null bytes to ensure that
+  // the total requested number of bytes is written.
+  std::strncpy(data_table[counter], name.c_str(), string_len - 1);
+  data_table[counter][string_len - 1] = '\0';
 
   // Go to next row
   ++counter;
@@ -2712,18 +2724,18 @@ void ExodusII_IO_Helper::NamesData::push_back_entry(const std::string & name)
 
 char ** ExodusII_IO_Helper::NamesData::get_char_star_star()
 {
-  return data_table_pointers.data();
+  return data_table;
 }
 
 
 
 char * ExodusII_IO_Helper::NamesData::get_char_star(int i)
 {
-  if (static_cast<unsigned>(i) >= table_size)
+  if (static_cast<std::size_t>(i) >= table_size)
     libmesh_error_msg("Requested char * " << i << " but only have " << table_size << "!");
 
   else
-    return data_table[i].data();
+    return data_table[i];
 }
 
 

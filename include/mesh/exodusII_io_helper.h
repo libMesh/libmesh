@@ -1278,11 +1278,15 @@ class ExodusII_IO_Helper::NamesData
 public:
   /**
    * Constructor.  Allocates enough storage to hold n_strings of
-   * length string_length.  (Actually allocates string_length+1 characters
-   * per string to account for the trailing '\0' character.)
+   * length string_length.
    */
   explicit
-  NamesData(size_t n_strings, size_t string_length);
+  NamesData(std::size_t n_strings, std::size_t string_length);
+
+  /**
+   * Frees memory allocated in the constructor.
+   */
+  ~NamesData();
 
   /**
    * Adds another name to the current data table.
@@ -1300,12 +1304,12 @@ public:
   char * get_char_star(int i);
 
 private:
-  // C++ data structures for managing string memory
-  std::vector<std::vector<char>> data_table;
-  std::vector<char *> data_table_pointers;
+  // Underlying C data structure managed by this class.
+  char ** data_table;
 
-  size_t counter;
-  size_t table_size;
+  std::size_t counter;
+  std::size_t table_size;
+  std::size_t string_len;
 };
 
 
