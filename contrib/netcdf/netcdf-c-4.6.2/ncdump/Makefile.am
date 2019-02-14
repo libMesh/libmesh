@@ -98,7 +98,14 @@ if USE_NETCDF4
 TESTS += tst_inmemory_nc4.sh
 endif
 
-endif BUILD_TESTSETS
+else # when BUILD_TESTSETS is false, we still need this rule
+ctest.c:
+	cp $(top_srcdir)/ncdump/ref_ctest.c $(top_srcdir)/ncdump/ctest.c
+
+ctest64.c:
+	cp $(top_srcdir)/ncdump/ref_ctest64.c $(top_srcdir)/ncdump/ctest64.c
+
+endif BUILD_TESTSETS_FALSE
 
 # These files all have to be included with the distribution.
 EXTRA_DIST = run_tests.sh tst_64bit.sh tst_output.sh test0.cdl		\
