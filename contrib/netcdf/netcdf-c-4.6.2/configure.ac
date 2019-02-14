@@ -72,7 +72,11 @@ AC_CONFIG_LINKS([nc_test4/ref_hdf5_compat3.nc:nc_test4/ref_hdf5_compat3.nc])
 AC_CONFIG_LINKS([hdf4_test/ref_chunked.hdf4:hdf4_test/ref_chunked.hdf4])
 AC_CONFIG_LINKS([hdf4_test/ref_contiguous.hdf4:hdf4_test/ref_contiguous.hdf4])
 
-AM_INIT_AUTOMAKE([foreign dist-zip subdir-objects])
+AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
+
+# use silent rules - requires at least automake 1.11
+AM_SILENT_RULES(yes)
+
 AM_MAINTAINER_MODE()
 
 # Check for the existence of this file before proceeding.
@@ -360,10 +364,12 @@ fi
 # --enable-dap => enable-dap4
 enable_dap4=$enable_dap
 # Default is now to always do the short remote tests
-AC_MSG_CHECKING([whether dap remote testing should be enabled (default on)])
+AC_MSG_CHECKING([whether dap remote testing should be enabled (default off)])
 AC_ARG_ENABLE([dap-remote-tests],
               [AS_HELP_STRING([--disable-dap-remote-tests],
-                                 [disable dap remote tests])])
+                              [disable dap remote tests])],
+                              [],
+                              [enable_dap_remote_tests=no]) # disabled by default
 test "x$enable_dap_remote_tests" = xno || enable_dap_remote_tests=yes
 if test "x$enable_dap" = "xno" ; then
   enable_dap_remote_tests=no
