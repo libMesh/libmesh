@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Dataset
+         name="test_opaque_array.nc"
+         dapVersion="4.0"
+         dmrVersion="1.0"
+         xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+         xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+    <Dimension name="d2" size="2"/>
+    <Opaque name="vo2" _edu.ucar.opaque.size="8">
+        <Dim name="/d2"/>
+        <Dim name="/d2"/>
+    </Opaque>
+    <Attribute name="_DAP4_Little_Endian" type="UInt8">
+        <Value value="1"/>
+    </Attribute>
+</Dataset>

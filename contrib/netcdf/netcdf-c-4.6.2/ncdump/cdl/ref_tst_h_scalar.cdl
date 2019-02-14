@@ -1,0 +1,48 @@
+netcdf tst_h_scalar {
+variables:
+	string vstrvar1 ;
+		string vstrvar1:vstratt1 = NIL ;
+		string vstrvar1:vstratt2 = NIL ;
+		string vstrvar1:vstratt3 = "" ;
+		string vstrvar1:vstratt4 = "foo" ;
+		vstrvar1:fstratt = "" ;
+		vstrvar1:intatt = 0 ;
+	string fstrvar ;
+		string fstrvar:vstratt1 = NIL ;
+		string fstrvar:vstratt2 = NIL ;
+		string fstrvar:vstratt3 = "" ;
+		string fstrvar:vstratt4 = "foo" ;
+		fstrvar:fstratt = "" ;
+		fstrvar:intatt = 0 ;
+	int intvar ;
+		string intvar:vstratt1 = NIL ;
+		string intvar:vstratt2 = NIL ;
+		string intvar:vstratt3 = "" ;
+		string intvar:vstratt4 = "foo" ;
+		intvar:fstratt = "" ;
+		intvar:intatt = 0 ;
+	string vstrvar2 ;
+	string vstrvar3 ;
+	string vstrvar4 ;
+
+// global attributes:
+		string :vstratt1 = NIL ;
+		string :vstratt2 = NIL ;
+		string :vstratt3 = "" ;
+		string :vstratt4 = "foo" ;
+		:fstratt = "" ;
+		:intatt = 0 ;
+data:
+
+ vstrvar1 = NIL ;
+
+ fstrvar = _ ;
+
+ intvar = 0 ;
+
+ vstrvar2 = NIL ;
+
+ vstrvar3 = _ ;
+
+ vstrvar4 = "foo" ;
+}

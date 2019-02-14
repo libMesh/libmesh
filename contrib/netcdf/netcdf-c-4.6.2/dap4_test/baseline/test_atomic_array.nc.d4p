@@ -1,0 +1,66 @@
+<Dataset
+   name="test_atomic_array.nc"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Dimensions>
+    <Dimension name="d1" size="1"/>
+    <Dimension name="d2" size="2"/>
+    <Dimension name="d3" size="3"/>
+    <Dimension name="d4" size="4"/>
+    <Dimension name="d5" size="5"/>
+  </Dimensions>
+  <Types>
+    <Enumeration name="cloud_class_t" basetype="Int8">
+      <EnumConst name="Clear" value="0"/>
+      <EnumConst name="Cumulonimbus" value="1"/>
+      <EnumConst name="Stratus" value="2"/>
+      <EnumConst name="Stratocumulus" value="3"/>
+      <EnumConst name="Cumulus" value="4"/>
+      <EnumConst name="Altostratus" value="5"/>
+      <EnumConst name="Nimbostratus" value="6"/>
+      <EnumConst name="Altocumulus" value="7"/>
+      <EnumConst name="Cirrostratus" value="8"/>
+      <EnumConst name="Cirrocumulus" value="9"/>
+      <EnumConst name="Cirrus" value="10"/>
+      <EnumConst name="Missing" value="127"/>
+    </Enumeration>
+  </Types>
+  <Variables>
+    <UInt8 name="vu8">
+      <Dim name="/d2"/>
+      <Dim name="/d3"/>
+    </UInt8>
+    <Int16 name="v16">
+      <Dim name="/d4"/>
+    </Int16>
+    <UInt32 name="vu32">
+      <Dim name="/d2"/>
+      <Dim name="/d3"/>
+    </UInt32>
+    <Float64 name="vd">
+      <Dim name="/d2"/>
+    </Float64>
+    <Char name="vc">
+      <Dim name="/d2"/>
+    </Char>
+    <String name="vs">
+      <Dim name="/d2"/>
+      <Dim name="/d2"/>
+    </String>
+    <Opaque name="vo" type="/opaque8_t">
+      <Dim name="/d1"/>
+      <Dim name="/d2"/>
+    </Opaque>
+    <Enum name="primary_cloud" enum="/cloud_class_t">
+      <Dim name="/d5"/>
+      <Attribute name="_FillValue" type="/cloud_class_t">
+        <Value value="Missing"/>
+      </Attribute>
+    </Enum>
+  </Variables>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+</Dataset>

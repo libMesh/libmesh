@@ -1,0 +1,27 @@
+netcdf test_unlim1 {
+dimensions:
+	lat = 3 ;
+	lon = 2 ;
+	time = UNLIMITED ; // (2 currently)
+variables:
+	float lat(lat) ;
+		lat:units = "degrees_north" ;
+	float lon(lon) ;
+		lon:units = "degrees_east" ;
+	double time(time) ;
+		time:units = "seconds since 2009-01-01" ;
+	float pr(time, lat, lon) ;
+		pr:standard_name = "air_pressure_at_sea_level" ;
+		pr:units = "hPa" ;
+
+// global attributes:
+		:title = "example for workshop" ;
+data:
+ pr =
+  0, 1,
+  2, 3,
+  4, 5,
+  10, 11,
+  12, 13,
+  14, 15 ;
+}

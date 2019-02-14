@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Dataset
+         name="test_struct_array.nc"
+         dapVersion="4.0"
+         dmrVersion="1.0"
+         xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+         xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+    <Dimension name="dx" size="4"/>
+    <Dimension name="dy" size="3"/>
+    <Structure name="s">
+        <Int32 name="x"/>
+        <Int32 name="y"/>
+        <Dim name="/dx"/>
+        <Dim name="/dy"/>
+    </Structure>
+    <Attribute name="_DAP4_Little_Endian" type="UInt8">
+        <Value value="1"/>
+    </Attribute>
+</Dataset>

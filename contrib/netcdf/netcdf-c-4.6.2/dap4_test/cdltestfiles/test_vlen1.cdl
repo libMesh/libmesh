@@ -1,0 +1,11 @@
+netcdf test_vlen1 {
+
+types:
+  int(*) vlen_t;
+
+variables:
+  vlen_t x;  
+
+data:
+  x = {1, 3, 5, 7};
+}

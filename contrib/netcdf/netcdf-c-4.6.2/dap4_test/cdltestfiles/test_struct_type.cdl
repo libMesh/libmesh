@@ -1,0 +1,11 @@
+netcdf test_struct_type {
+  types:
+    compound c_t {
+      int x ;
+      int y ;
+    }; // c_t
+variables:
+  c_t s;
+data:
+  s = {1,-2};
+}

@@ -1,0 +1,16 @@
+netcdf test_vlen6 {
+
+types:
+  int(*) v_t;
+
+dimensions:
+  d=2;
+
+variables:
+  v_t v1(d);  
+
+data:
+
+ v1 = {1,3,5,7}, {17,19} ;
+}
+

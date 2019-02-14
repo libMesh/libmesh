@@ -1,0 +1,13 @@
+netcdf test_anon_dim.syn {
+dimensions:
+	_Anonymous6 = 6 ;
+variables:
+	int vu32(_Anonymous6) ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ vu32 = -1169720286, -920699049, -2088732436, 1060190036, -1123468835, 
+    922940053 ;
+}

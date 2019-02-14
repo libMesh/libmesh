@@ -1,0 +1,1437 @@
+<html><!-- InstanceBegin template="/Templates/MyUnidata.dwt" codeOutsideHTMLIsLocked="true" -->
+
+<head>
+<!-- InstanceBeginEditable name="Title" -->
+<TITLE>Introduction to FAN Language and Utilities </TITLE>    <link rel="shortcut icon" href="http://www.unidata.ucar.edu/favicon.ico" type="image/x-icon" />
+
+</head>
+
+<body>
+<!-- InstanceBeginEditable name="Content Goes Here" -->
+<h1 align="center">Introduction to FAN Language and Utilities <br />
+  FAN Version 2.0 <br />
+</h1>
+<h3 align="center">Harvey Davies <br />
+  CSIRO Division of Atmospheric Research, <br />
+  Private Bag No. 1, Mordialloc 3195, Australia <br />
+  email: hld@dar.csiro.au <br />
+  <br />
+  Scientific Visitor from January to August 1996 at <br />
+  UCAR/Unidata Program Center, <br />
+  P.O. Box 3000, Boulder, Colorado 80307-3000, USA <br />
+  email: hld@ucar.edu <br />
+</h3>
+<hr />
+<h1>Introduction</h1>
+<p><em>FAN (File Array Notation)</em> is an array-oriented language for identifying
+  data items in files for the purpose of extraction or modification. FAN specifications
+  consist of</p>
+<ul>
+  <li>one or more filenames</li>
+  <li>one or more variable (array) names or ID numbers</li>
+  <li>attribute names or ID numbers (optional)</li>
+  <li>dimension names or ID numbers (optional)</li>
+  <li>subscripts in various possible forms (optional)</li>
+</ul>
+<p>NetCDF is the only format currently supported. However FAN is intended to be
+  generic and it is hoped that there will eventually also be FAN interfaces to
+  various other formats.</p>
+<p>This document describes the FAN language and four utilities based on FAN. The
+  use of these utilities can greatly decrease the need for programming in Fortran
+  or C. They can be called from the Unix command line and shell scripts.</p>
+<p>The first is <tt><b>nc2text</b></tt> which prints selected data from netCDF
+  variables. The standard utility <tt><b>ncdump</b></tt> can also print data from
+  netCDF variables, but only entire variables and only together with metadata
+  in CDL form.</p>
+<p>The second is <tt><b>ncmeta</b></tt> which prints selected metadata from one
+  or more netCDF files. This metadata can include rank, shape, file names, variable
+  names, dimension names and attribute names.</p>
+<p>The third is <tt><b>ncrob</b></tt> which reads data from one or more netCDF
+  variables, performs some process on it and then either prints the result or
+  writes it to a netCDF array. The letters `<tt><b>rob</b></tt>&#39; in `<tt><b>ncrob</b></tt>&#39;
+  stand for <em>Reduce Or Broadcast</em>. <em>Reduce</em> means to produce an
+  array (e.g. sum, mean, maximum) with less dimensions than the original. <em>Broadcast</em>
+  means to copy one array to another, recycling values if necessary. An example
+  is copying the same vector to each row of a matrix. It is possible to process
+  large volumes of data (e.g. 100 MB) using <tt><b>ncrob</b></tt>.</p>
+<p>The fourth is <tt><b>text2nc</b></tt> which can be used to read small volumes
+  (say up to a few thousand lines) of ASCII data and copy it into netCDF variables.
+  It is also possible to use <tt><b>text2nc</b></tt> to create, modify and delete
+  attributes.</p>
+<p>This document does not cover other ways of using FAN. These include some local
+  (CSIRO DAR) utilities (e.g. contouring program <tt><b>con_cif</b></tt>), the
+  array-oriented languages IDL and J (for which there are FAN interfaces) and
+  direct use of the C API (application programmer interface).</p>
+<h2>Simple Examples</h2>
+<p>Let us start with a simple netCDF file <tt><b>vec.nc</b></tt> which is printed
+  (in CDL) as follows:</p>
+<pre>
+<strong>$ ncdump vec.nc
+netcdf vec {
+dimensions:
+        n = UNLIMITED ; // (5 currently)
+variables:
+        float v(n) ;
+data:
+ v = 10 , 20.3 , 30.2 , 40.9 , 50  ;
+}
+</strong>
+</pre>
+<p>Here `<tt><b>$</b></tt>&#39; is the UNIX command-line prompt. The following
+  uses <tt><b>nc2text</b></tt> to print the whole array <tt><b>v</b></tt>:</p>
+<pre>
+<strong>$ nc2text vec.nc v
+10 20.3 30.2 40.9 50
+</strong>
+</pre>
+<p>Individual elements can be selected using subscripts. For example:</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[0]&#39;
+10
+$ nc2text vec.nc &#39;v[3]&#39;
+40.9
+</strong>
+</pre>
+<p>Several can be selected using a subscript consisting of a list of indices such
+  as:</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[0 3 1 3]&#39;
+10 40.9 20.3 40.9
+</strong>
+</pre>
+<p>We can write to a netCDF file using <tt><b>text2nc</b></tt>. The following
+  changes the third element from 30.2 to 30.7 and then prints <tt><b>v</b></tt>:</p>
+<pre>
+<strong>$ echo 30.7 | text2nc vec.nc &#39;v[2]&#39;
+$ nc2text vec.nc v
+10 20.3 30.7 40.9 50
+</strong>
+</pre>
+<p>Here <tt><b>text2nc</b></tt> reads ASCII text data from standard input, which
+  in this case is a pipe connected to the standard output of <tt><b>echo</b></tt>.
+  Since the dimension has <tt><b>UNLIMITED</b></tt> size, we can append values
+  as follows:</p>
+<pre>
+<strong>$ echo 60.5 70.2 | text2nc vec.nc &#39;v[5 6]&#39;
+$ nc2text vec.nc v
+10 20.3 30.7 40.9 50 60.5 70.2
+</strong>
+</pre>
+<p>Next we use <tt><b>ncrob</b></tt> to calculate and print the arithmetic mean
+  of <tt><b>v</b></tt>.</p>
+<pre>
+<strong>$ ncrob -r am vec.nc v /
+40.3714
+</strong>
+</pre>
+<p>The option <tt><b>-r am</b></tt> specifies that an <em>arithmetic mean</em>
+  is to be calculated. The following example stores the mean in the same file,
+  naming the variable <tt><b>v_mean</b></tt>:</p>
+<pre>
+<strong>$ ncrob -r am vec.nc v / v_mean
+$ nc2text vec.nc v_mean
+40.3714
+</strong>
+</pre>
+<p>The `<tt><b>/</b></tt>&#39; separates the input from the output. If no output
+  is specified then results are printed. In fact <tt><b>ncrob</b></tt> can be
+  used in place of <tt><b>nc2text</b></tt> to print data from a netCDF file. E.g.</p>
+<pre>
+<strong>$ ncrob vec.nc v /
+10 20.3 30.7 40.9 50 60.5 70.2
+$ ncrob vec.nc v_mean /
+40.3714
+</strong>
+</pre>
+<p>Finally we use <tt><b>ncmeta</b></tt> to print metadata. The shape is printed
+  by:</p>
+<pre>
+<strong>$ ncmeta v vec.nc
+5
+</strong>
+</pre>
+<p>and the following prints the variable name, dimension name and shape:</p>
+<pre>
+<strong>$ ncmeta -w vds v vec.nc
+v n 5
+</strong>
+</pre>
+<h2>What is New in Version 2?</h2>
+<p>The utility <tt><b>ncmeta</b></tt> is new.</p>
+<p>There are significant enhancements to the utility <tt><b>ncrob</b></tt>. It
+  can now print results as well as write them to netCDF files. (This means that
+  <tt><b>nc2text</b></tt> is no longer really needed.) In version 1 the output
+  FAN specification could only be a single (final) argument. There can now be
+  zero (implying printed output) or more output arguments following a `<tt><b>/</b></tt>&#39;
+  which separates input arguments from output arguments. (The old convention is
+  deprecated but still supported.) It is now possible to create new variables
+  without specifying the <tt><b>-c</b></tt> option or an output filename. There
+  is a facility for merging dimensions. There are several new options related
+  to printing and similar to those of <tt><b>nc2text</b></tt>. A number of bugs
+  in <tt><b>ncrob</b></tt> have been fixed, including one with a serious effect
+  on speed.</p>
+<h1>FAN Language</h1>
+<p><a id="High_level_Syntax" name="High_level_Syntax"></a></p>
+<h2>High-level Syntax</h2>
+<p>A FAN specification can be either a single command-line argument or span several
+  arguments. Use of multiple arguments decreases the need for quoting and allows
+  use of UNIX <em>wildcarding</em> (a.k.a. <em>globbing</em>) facilities. A FAN
+  specification can have any of the following forms:</p>
+<center>
+  <table border="1" summary="syntax meaning">
+    <tr>
+      <td><b>Syntax</b> </td>
+      <td><b>Meaning</b></td>
+    </tr>
+    <tr>
+      <td><em>fanio</em> <tt><b>/</b></tt> <em>fanio</em> </td>
+      <td>netCDF input and netCDF output</td>
+    </tr>
+    <tr>
+      <td><em>fanio</em> <tt><b>/</b></tt> </td>
+      <td>netCDF input and output to <tt><b>stdout</b></tt> (i.e. printed)</td>
+    </tr>
+    <tr>
+      <td><em>fanio</em> </td>
+      <td>Either netCDF input or netCDF output (but not both)</td>
+    </tr>
+  </table>
+</center>
+<p>where <em>fanio</em> is a FAN input/output specification, which has the form:
+  <br />
+  <em>pair</em> <tt><b>;</b></tt> <em>pair</em> <tt><b>;</b></tt> <em>pair</em>
+  <tt><b>;</b></tt> ... <br />
+  A semicolon (`<tt><b>;</b></tt>&#39;) has the same effect as commencing a new
+  argument. Any sequence of one or more whitespace characters (space, tab, newline)
+  is equivalent to a single space.</p>
+<p>A <em>pair</em> can take any of the following forms: <br />
+  <em>filename vas</em> <br />
+  <em>vas filename</em> <br />
+  <em>filename</em> <br />
+  <em>vas</em> <br />
+</p>
+<p>A <em>filename</em> must contain at least one period (`<tt><b>.</b></tt>&#39;)
+  to distinguish it from a variable name. This will be the case if netCDF filenames
+  have a conventional suffix such as the recommended <tt><b>.nc</b></tt>. (In
+  any case it is always possible to prefix a redundant `<tt><b>./</b></tt>&#39;
+  directory as in `<tt><b>./unconventional</b></tt>&#39; or `<tt><b>/usr/./IdidItMyWay</b></tt>&#39;!)</p>
+<p>A <em>vas</em> is a <em>variable or attribute specification</em> which can
+  have any of the following forms: <br />
+  <em>var</em> <br />
+  <em>var</em><tt><b>[</b></tt><em>subscript</em><tt><b>,</b></tt> <em>subscript</em><tt><b>,</b></tt>
+  <em>subscript</em><tt><b>,</b></tt> ...<tt><b>]</b></tt> <br />
+  <em>var</em><tt><b>[</b></tt><em>subscript</em><tt><b>,</b></tt> <em>subscript</em><tt><b>,</b></tt>
+  <em>subscript</em><tt><b>,</b></tt> ...<tt><b>)</b></tt> <br />
+  <em>var</em><tt><b>(</b></tt><em>subscript</em><tt><b>,</b></tt> <em>subscript</em><tt><b>,</b></tt>
+  <em>subscript</em><tt><b>,</b></tt> ...<tt><b>]</b></tt> <br />
+  <em>var</em><tt><b>(</b></tt><em>subscript</em><tt><b>,</b></tt> <em>subscript</em><tt><b>,</b></tt>
+  <em>subscript</em><tt><b>,</b></tt> ...<tt><b>)</b></tt> <br />
+  <em>var</em><tt><b>:</b></tt><em>att</em> <br />
+  <tt><b>:</b></tt><em>att</em> <br />
+  where <em>var</em> is a variable name or ID number and <em>att</em> is an attribute
+  name or ID number. It is usually more convenient to identify variables, attributes
+  and dimensions by name rather than ID number. The use of ID numbers is discussed
+  in Section&nbsp;<a
+href="#Using_ID_Numbers"><em>Using ID Numbers</em></a>. Attributes are discussed
+  in Section&nbsp;<a
+href="#Attributes"><em>Attributes</em></a>.</p>
+<p>A pair without a <em>filename</em> or <em>vas</em> uses that of the previous
+  pair. The first pair has no effect by itself unless it contains both a <em>filename</em>
+  and a <em>vas</em>. Thus the following all access the same values:</p>
+<pre>
+<strong>$ nc2text &#39;vec.nc v[0 4]&#39;
+10 50
+$ nc2text &#39;v[0 4] vec.nc&#39;
+10 50
+$ nc2text vec.nc &#39;v[0 4]&#39;
+10 50
+$ nc2text &#39;v[0 4]&#39; vec.nc
+10 50
+$ nc2text &#39;  v [  0   4 ]      vec.nc  &#39;
+10 50
+</strong>
+</pre>
+<p>The following are equivalent ways of concatenating variables <tt><b>v</b></tt>
+  and <tt><b>v_mean</b></tt>:</p>
+<pre>
+<strong>$ nc2text &#39;vec.nc v&#39; &#39;vec.nc v_mean&#39;
+10 20.3 30.7 40.9 50 60.5 70.2
+40.3714
+$ nc2text &#39;vec.nc v&#39; &#39;v_mean&#39;
+10 20.3 30.7 40.9 50 60.5 70.2
+40.3714
+$ nc2text &#39;vec.nc v; v_mean&#39;
+10 20.3 30.7 40.9 50 60.5 70.2
+40.3714
+$ nc2text vec.nc v v_mean
+10 20.3 30.7 40.9 50 60.5 70.2
+40.3714
+</strong>
+</pre>
+<p>Now let us copy file <tt><b>vec.nc</b></tt> to <tt><b>vec_new.nc</b></tt> and
+  then demonstrate concatenation of data from different files:</p>
+<pre>
+<strong>$ cp vec.nc vec_new.nc
+$ nc2text v vec.nc vec_new.nc
+10 20.3 30.7 40.9 50 60.5 70.2
+10 20.3 30.7 40.9 50 60.5 70.2
+$ nc2text v vec*.nc
+10 20.3 30.7 40.9 50 60.5 70.2
+10 20.3 30.7 40.9 50 60.5 70.2
+</strong>
+</pre>
+<p>Note the use of UNIX <em>wildcarding</em> facilities in the latter example
+  using the <em>metacharacter</em> `<tt><b>*</b></tt>&#39; in <tt><b>vec*.nc</b></tt>
+  which matches both <tt><b>vec.nc</b></tt> and <tt><b>vec_new.nc</b></tt>.</p>
+<h2>Subscripts</h2>
+<p>As mentioned in Section <a href="#High_level_Syntax"><em>High level Syntax</em></a>,
+  subscripts are enclosed by either `<tt><b>[</b></tt>&#39; or `<tt><b>(</b></tt>&#39;
+  on the left and either `<tt><b>]</b></tt>&#39; or `<tt><b>)</b></tt>&#39; on
+  the right.</p>
+<p>A left bracket `<tt><b>[</b></tt>&#39; implies the C convention of starting
+  subscripts at 0; while a left parenthesis `<tt><b>(</b></tt>&#39; implies the
+  Fortran convention of starting at 1. This starting value of 0 or 1 is called
+  the <em>index origin</em>. A mnemonic to associate <em>left</em> with <em>index
+  origin</em> is an <em>x-axis with the origin on the left</em>.</p>
+<p>The right hand delimiter controls the relative significance of multiple dimensions.
+  A `<tt><b>]</b></tt>&#39; implies conventional <em>row-major</em> (or <em>lexicographic</em>)
+  order in which the rightmost subscript varies fastest; while a `<tt><b>)</b></tt>&#39;
+  implies the Fortran convention of <em>column-major</em> order in which the leftmost
+  subscript varies fastest.</p>
+<p>So far our examples have involved only a single dimension. Now consider a netCDF
+  file <tt><b>mat.nc</b></tt> containing a 2-dimensional array (i.e. a matrix).
+  We print it as follows:</p>
+<pre>
+<strong>$ ncdump mat.nc
+netcdf mat {
+dimensions:
+        row = 2 ;
+        col = 3 ;
+variables:
+        short M(row, col) ;
+data:
+ M =
+  11, 12, 13,
+  21, 22, 23 ;
+}
+</strong>
+</pre>
+<p>The following are equivalent ways of printing the final element:</p>
+<pre>
+<strong>$ nc2text &#39;mat.nc M[1,2]&#39;
+23
+$ nc2text &#39;mat.nc M(2,3]&#39;
+23
+$ nc2text &#39;mat.nc M(3,2)&#39;
+23
+$ nc2text &#39;mat.nc M[2,1)&#39;
+23
+</strong>
+</pre>
+<p>Subscript values can be less than the index origin and are then relative to
+  the end. So the final element could also be accessed by:</p>
+<pre>
+<strong>$ nc2text &#39;mat.nc M[-1,-1]&#39;
+23
+$ nc2text &#39;mat.nc M(0,0)&#39;
+23
+</strong>
+</pre>
+<p>As we have seen before, a subscript can contain a list of indices. Thus one
+  could use any of the following to select all rows, but exclude the middle column:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M[0 1,0 2]&#39;
+11 13
+21 23
+$ nc2text mat.nc &#39;M(1 2,1 3]&#39;
+11 13
+21 23
+$ nc2text mat.nc &#39;M(1 3,1 2)&#39;
+11 13
+21 23
+</strong>
+</pre>
+<h3>Triplet Notation</h3>
+<p>A sequence of indices forming an <em>arithmetic progression</em> as in</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[0 2 4 6]&#39;
+10 30.7 50 70.2
+</strong>
+</pre>
+<p>can be specified using a generalization of Fortran&nbsp;90 <em>triplet notation</em>,
+  in this case:</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[0:6:2]&#39;
+10 30.7 50 70.2
+</strong>
+</pre>
+<p>The triplet <tt><b>0:6:2</b></tt> means <em>0 to 6 in steps of 2</em>. A <em>triplet</em>
+  can take two forms: <br />
+  <em>start</em><tt><b>:</b></tt><em>finish</em><tt><b>:</b></tt><em>stride</em>
+  <br />
+  <em>start</em><tt><b>:</b></tt><em>finish</em> <br />
+  The second form implies a stride of 1. It is possible to omit <em>start</em>
+  and/or <em>finish</em>. Let &nbsp;<var>I</var>&nbsp; be the index-origin (0
+  or 1). If the stride is positive then <em>start</em> defaults to &nbsp;<var>I</var>&nbsp;
+  (i.e. first element) and <em>finish</em> to &nbsp;<var>I</var>-1&nbsp; (i.e.
+  final element). These are reversed for a negative stride; <em>start</em> defaults
+  to &nbsp;<var>I</var>-1&nbsp; and <em>finish</em> to &nbsp;<var>I</var>. E.g.</p>
+<pre>
+<strong>$ nc2text vec.nc v
+10 20.3 30.7 40.9 50 60.5 70.2
+$ nc2text vec.nc &#39;v[:6:2]&#39;
+10 30.7 50 70.2
+$ nc2text vec.nc &#39;v[0::2]&#39;
+10 30.7 50 70.2
+$ nc2text vec.nc &#39;v[::2]&#39;
+10 30.7 50 70.2
+$ nc2text vec.nc &#39;v[0:2]&#39;
+10 20.3 30.7
+$ nc2text vec.nc &#39;v[:2]&#39;
+10 20.3 30.7
+$ nc2text vec.nc &#39;v[2:]&#39;
+30.7 40.9 50 60.5 70.2
+$ nc2text vec.nc &#39;v[::-1]&#39;
+70.2 60.5 50 40.9 30.7 20.3 10
+</strong>
+</pre>
+<p>Note how the latter example reverses the order. A triplet can wrap-around the
+  start or end. This is useful with cyclic dimensions such as longitude. Wrap-around
+  is shown by:</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[3:1]&#39;
+40.9 50 60.5 70.2 10 20.3
+$ nc2text vec.nc &#39;v[1:3:-1]&#39;
+20.3 10 70.2 60.5 50 40.9
+</strong>
+</pre>
+<p>But the following does not imply wrap-around:</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[0:-1:1]&#39;
+10 20.3 30.7 40.9 50 60.5 70.2
+</strong>
+</pre>
+<p>since <tt><b>-1</b></tt> means <em>final</em> (i.e. same as <tt><b>6</b></tt>).
+  Each subscript can contain any number of triplets and individual values. The
+  colon (<tt><b>:</b></tt>) operator has higher precedence than concatenation.
+  This is shown by the following:</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[2 :4]&#39;
+30.2 40.9 50
+</strong>
+</pre>
+<p>which is equivalent to:</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[2:4]&#39;
+30.2 40.9 50
+</strong>
+</pre>
+<p>However parentheses can be used to override this precedence rule. E.g.</p>
+<pre>
+<strong>$ nc2text vec.nc &#39;v[2 (:4)]&#39;
+30.2 10 20.3 30.2 40.9 50
+</strong>
+</pre>
+<h3>Omitting Subscripts</h3>
+<p>An omitted subscript implies the whole dimension. Thus we can print the first
+  row of <tt><b>mat</b></tt> as follows:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M[0]&#39;
+11 12 13
+</strong>
+</pre>
+<p>and exclude the middle column by:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M[,0 -1]&#39;
+11 13
+21 23
+</strong>
+</pre>
+<h3>Dimension Names</h3>
+<p>Dimension names play an important role in FAN. Instead of:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M(2 1,1 3]&#39;
+21 23
+11 13
+</strong>
+</pre>
+<p>one can use:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M(row=2 1,col=1 3]&#39;
+21 23
+11 13
+</strong>
+</pre>
+<p>This is clearer for human readers. But specifying dimension names also provides
+  the important facility of transposing dimensions. For example this allows <tt><b>ncrob</b></tt>
+  to produce statistics (e.g. means) for rows as well as the normal columns. To
+  transpose the above matrix, one could specify:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M(col=1 3,row=2 1]&#39;
+21 11
+23 13
+</strong>
+</pre>
+<p>since the order in which dimensions are specified controls their order in the
+  output. To transpose a whole matrix one need only specify the dimension names
+  as in the following:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M[col,row]&#39;
+11 21
+12 22
+13 23
+</strong>
+</pre>
+<p>or using column-major order:</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M(row,col)&#39;
+11 21
+12 22
+13 23
+</strong>
+</pre>
+<p>In fact only one dimension name is needed, since any not mentioned are appended
+  in their input order. E.g.</p>
+<pre>
+<strong>$ nc2text mat.nc &#39;M[col]&#39;
+11 21
+12 22
+13 23
+</strong>
+</pre>
+<h3>Indirect Indexing</h3>
+<p>So far we have located elements using direct index values. FAN also allows
+  an indirect method using <em>coordinate variables</em> (i.e. variables with
+  the same names as dimensions). Consider the following geographic netCDF file
+  <tt><b>geog.nc</b></tt>:</p>
+<pre>
+<strong>$ ncdump geog.nc
+netcdf geog {
+dimensions:
+        lat = 3 ;
+        lon = 4 ;
+variables:
+        float lat(lat) ;
+                lat:units = &quot;degrees_north&quot; ;
+        float lon(lon) ;
+                lon:units = &quot;degrees_east&quot; ;
+        double tsur(lat, lon) ;
+data:
+ lat = -45 , 0 , 45  ;
+ lon = -180 , -90 , 0 , 90  ;
+ tsur =
+  11, 12, 13, 14,
+  21, 22, 23, 24,
+  31, 32, 33, 34 ;
+}
+</strong>
+</pre>
+<p>FAN provides several <em>indirect indexing operators</em>. Perhaps the most
+  useful of these is `<tt><b>~</b></tt>&#39;, which gives the index of the coordinate
+  value <em>closest to</em> its argument. Thus:</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;lat[~-40]&#39;
+-45
+</strong>
+</pre>
+<p>prints the latitude closest to 40�S and</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;tsur[~-40,~10]&#39;
+13
+</strong>
+</pre>
+<p>prints the element of <tt><b>tsur</b></tt> closest to the point 40�S, 10�E.
+  Note that FAN knows nothing about circular wrap-around and does not consider
+  360� to be equal to 0�. The following shows how indirect indexing can be used
+  within triplets:</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;tsur[ lat = ~90:~-90:-2 , lon = ~10: ]&#39;
+33 34
+13 14
+</strong>
+</pre>
+<p>This gives every second latitude from that closest the north pole to that closest
+  the south pole, and all longitudes from that closest to 10�E to the final one.
+  The other indirect indexing operators are as follows:</p>
+<table border="1" summary="other @ max and min operators">
+  <tr>
+    <td><tt><b>@ max &lt;</b></tt> </td>
+    <td>index value corresponding to maximum coordinate value less than argument</td>
+  </tr>
+  <tr>
+    <td><tt><b>@ max &lt;=</b></tt> </td>
+    <td>index value corresponding to maximum coordinate value less than or equal
+      to argument</td>
+  </tr>
+  <tr>
+    <td><tt><b>@ min &gt;</b></tt> </td>
+    <td>index value corresponding to minimum coordinate value greater than argument</td>
+  </tr>
+  <tr>
+    <td><tt><b>@ min &gt;=</b></tt> </td>
+    <td>index value corresponding to minimum coordinate value greater than or
+      equal to argument</td>
+  </tr>
+</table>
+<p>Thus the following prints the minimum longitude greater than 10�E:</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;lon[@ min &gt; 10]&#39;
+90
+</strong>
+</pre>
+<p>and the following retrieves the rows from the <em>maximum latitude less than
+  or equal to 30�N</em> to the <em>closest latitude to 90�N</em>, and the columns
+  from the second (i.e 1 with respect to index origin of 0) to <em>minimum longitude
+  greater than 0</em>.</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;tsur[lat= @max&lt;=30 : ~90, lon= 1 : @min &gt; 0]&#39;
+22 23 24
+32 33 34
+</strong>
+</pre>
+<h3>Offsets</h3>
+<p>It is possible to specify <em>offsets</em> using an expression of the form
+  <br />
+  <em>index</em> <tt><b>+</b></tt> <em>offset</em> <br />
+  where <em>offset</em> is an integer constant (which can be negative). The offset
+  must be the right hand argument of `<tt><b>+</b></tt>&#39;. Note that this `<tt><b>+</b></tt>&#39;
+  operator has even higher precedence than `<tt><b>:</b></tt>&#39;. Here are some
+  examples of the use of offsets:</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;lon[ ~-100 + -1 : ~-360 + 2 ]&#39;
+-180 -90 0
+</strong>
+</pre>
+<p>prints the longitudes from that <em>one before the closest to 100�W</em> to
+  that <em>two beyond the closest to 360�W</em>. Note how the negative offset
+  is specified as `<tt><b>+ -1</b></tt>&#39;, which is <em>not</em> equivalent
+  to `<tt><b>-1</b></tt>&#39; as in:</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;lon[ ~-100-1 : ~-360 + 2 ]&#39;
+-90 90 -180 -90 0
+</strong>
+</pre>
+<p>which is equivalent to both the following (Note the wrap-around.):</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;lon[ (~-100) (-1:~-360 + 2) ]&#39;
+-90 90 -180 -90 0
+$ nc2text geog.nc &#39;lon[ 1 3:2 ]&#39;
+-90 90 -180 -90 0
+</strong>
+</pre>
+<p>One use for offsets is to append along the <tt><b>UNLIMITED</b></tt> dimension
+  without needing to know its current size. The expression `<tt><b>-1+1</b></tt>&#39;
+  represents the index value for appending immediately after the current final
+  record. Thus we could append a value to variable <tt><b>v</b></tt> in file <tt><b>vec_new.nc</b></tt>
+  (whose <tt><b>UNLIMITED</b></tt> dimension <tt><b>n</b></tt> has the current
+  size 7) by:</p>
+<pre>
+<strong>$ echo 80 | text2nc &#39;vec_new.nc v[-1 + 1]&#39;
+$ nc2text &#39;vec_new.nc v&#39;
+10 20.3 30.7 40.9 50 60.5 70.2 80
+</strong>
+</pre>
+<p>Then we could append two more values by:</p>
+<pre>
+<strong>$ echo 90 100.1 | text2nc &#39;vec_new.nc v[ -1 + 1 : -1 + 2 ]&#39;
+$ nc2text &#39;vec_new.nc v&#39;
+10 20.3 30.7 40.9 50 60.5 70.2 80 90 100.1
+</strong>
+</pre>
+<p>giving a new size of 10 for the <tt><b>UNLIMITED</b></tt> dimension.</p>
+<h3>Coordinate Variable Unit Conversion</h3>
+<p>In file <tt><b>geog.nc</b></tt> the <tt><b>units</b></tt> attribute is <tt><b>degrees_north</b></tt>
+  for <tt><b>lat</b></tt> and <tt><b>degrees_east</b></tt> for <tt><b>lon</b></tt>.
+  One may want to specify coordinate values in some other units. The following
+  shows how this can be done by appending the unit (enclosed in braces i.e. `<tt><b>{}</b></tt>&#39;)
+  to the value:</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;tsur[ lat=~0.8{radian}, lon = ~ -1.5 { radian } ]&#39;
+32
+</strong>
+</pre>
+<p>giving the value at the point closest to latitude 0.8 radians north and longitude
+  1.5 radians west. This unit conversion (like that during FAN input and output)
+  is done using the Unidata units library discussed in Appendix C of <a
+href="/software/netcdf/guide_toc.html"> NetCDF
+  User&#39;s Guide</a>.</p>
+<p><a id="Attributes" name="Attributes"></a></p>
+<h2>Attributes</h2>
+<p>As noted in Section <a href="#High_level_Syntax"><em>High level Syntax</em></a>
+  an attribute <em>vas</em> can take two forms: <br />
+  <em>var</em><tt><b>:</b></tt><em>att</em> <br />
+  <tt><b>:</b></tt><em>att</em> <br />
+  As in CDL, the latter denotes a <em>global attribute</em>. The following writes
+  the global attribute <tt><b>title</b></tt> and then reads and prints it:</p>
+<pre>
+<strong>$ echo &#39;Sample geographic file&#39; | text2nc -h &#39;geog.nc :title&#39;
+$ nc2text &#39;geog.nc :title&#39;
+Sample geographic file
+</strong>
+</pre>
+<p>(The <tt><b>-h</b></tt> flag means `<em>Do not append a line to the global
+  attribute</em> <tt><b>history</b></tt>&#39;.)</p>
+<p>Attributes cannot have subscripts, so there is no way of accessing only part
+  of an attribute. Attributes are automatically created if they do not exist and
+  their type and size can be changed. The following gives variable <tt><b>lat</b></tt>
+  the new attribute <tt><b>valid_range</b></tt> (with type <tt><b>float</b></tt>)
+  and then prints it:</p>
+<pre>
+<strong>$ echo -90 90 | text2nc -h -t float &#39;geog.nc lat:valid_range&#39;
+$ nc2text &#39;geog.nc lat:valid_range&#39;
+-90 90
+</strong>
+</pre>
+<p>The following gives variable <tt><b>lat</b></tt> another new attribute <tt><b>foo</b></tt>
+  (by copying variable <tt><b>v</b></tt> from file <tt><b>vec.nc</b></tt>), then
+  modifies it, then deletes it.</p>
+<pre>
+<strong>$ nc2text &#39;vec.nc v[:4]&#39; | text2nc -h -t double &#39;geog.nc lat:foo&#39;
+$ nc2text &#39;geog.nc lat:foo&#39;
+10 20.3 30.2 40.9 50
+$ echo &#39;Hello&#39; | text2nc -h &#39;geog.nc lat:foo&#39; # Modify attribute &#39;lat:foo&#39;
+$ nc2text &#39;geog.nc lat:foo&#39;
+Hello
+$ text2nc -h &#39;geog.nc lat:foo&#39; &lt; /dev/null    # Delete attribute &#39;lat:foo&#39;
+</strong>
+</pre>
+<p>Note how one can delete attributes by changing their size to 0. The file <tt><b>/dev/null</b></tt>
+  is a standard UNIX pseudo-file that is empty for input.</p>
+<p><a id="Using_ID_Numbers" name="Using_ID_Numbers"></a></p>
+<h2>Using ID Numbers for Variables, Dimensions and Attributes</h2>
+<p>It is possible to use ID numbers in place of names for variables, dimensions
+  and attributes. However dimension ID numbers must be followed by <tt><b>=</b></tt>
+  so they can be distinguished from index values. ID numbers begin at 0 regardless
+  of the index origin. Negative values are relative to the end, which is represented
+  by <tt><b>-1</b></tt>.</p>
+<p>There are some situations where ID numbers are more convenient than names.
+  For example, one might adopt the convention that coordinate variables should
+  be defined first, after which there should be only a single other (main) variable
+  in each file. A shell-script to process such files can refer to the main variable
+  as <tt><b>-1</b></tt>. The following shows the use of such a variable ID number:</p>
+<pre>
+<strong>$ nc2text geog.nc -1
+11 12 13 14
+21 22 23 24
+31 32 33 34
+</strong>
+</pre>
+<p>The following prints the first attribute of the second variable:</p>
+<pre>
+<strong>$ nc2text geog.nc &#39;1:0&#39;
+degrees_east
+</strong>
+</pre>
+<p>The following Korn shell script <tt><b>pratts</b></tt> prints all the non-global
+  attributes in the files specified by its arguments.</p>
+<pre>
+<strong>$ cat pratts
+#!/bin/ksh
+for FILE
+do
+    integer VARID=0
+    # Following true if variable VARID exists
+    while VARNAME=&quot;$(ncmeta -s -w v $FILE $VARID)&quot;; test -n &quot;$VARNAME&quot;
+    do
+        integer ATTID=0
+        # Following true if attribute ATTID exists
+        while ATTNAME=&quot;$(ncmeta -s -w a $FILE $VARID:$ATTID)&quot;; test -n &quot;$ATTNAME&quot;
+        do
+        print -n &quot;$FILE $VARNAME:$ATTNAME &quot;
+        nc2text $FILE &quot;$VARNAME:$ATTNAME&quot;
+        (( ATTID += 1 ))
+        done
+        (( VARID += 1 ))
+    done
+done
+</strong>
+</pre>
+<p>We can use <tt><b>pratts</b></tt> on file <tt><b>geog.nc</b></tt> as follows:</p>
+<pre>
+<strong>$ pratts geog.nc
+geog.nc lat:units degrees_north
+geog.nc lat:valid_range -90 90
+geog.nc lon:units degrees_east
+</strong>
+</pre>
+<h1>FAN Utilities</h1>
+<h2>Introduction to Utilities</h2>
+<p>This section provides a more detailed description of the four FAN utilities,
+  <tt><b>nc2text</b></tt>, <tt><b>text2nc</b></tt>, <tt><b>ncmeta</b></tt> and
+  <tt><b>ncrob</b></tt>, commencing with some features common to several utilities.
+  The usage summaries in Sections <a href="#nc2text_Usage"><em>nc2text Usage</em></a>,
+  <a
+href="#text2nc_Usage"><em>text2nc Usage</em></a>, <a
+href="#ncmeta_Usage"><em>ncmeta Usage</em></a> and <a
+href="#ncrob_Usage"><em>ncrob Usage</em></a> can be printed by entering the command
+  name without any arguments.</p>
+<p>All netCDF types (<tt><b>char, byte, short, long, float</b></tt> and <tt><b>double</b></tt>)
+  can be read and written. During input/output there is automatic conversion to
+  or from type <tt><b>double</b></tt>, which is used for internal storage and
+  processing.</p>
+<h3>Options Common to several Utilities</h3>
+<p>The two flags <tt><b>-h</b></tt> and <tt><b>-H</b></tt> specify what is to
+  be written to the global attribute <tt><b>history</b></tt>. The <tt><b>-h</b></tt>
+  flag means `<em>Do not write any history</em>&#39;. The <tt><b>-H</b></tt> flag
+  means `<em>Exclude time-stamp and user-name</em> (<tt><b>LOGNAME</b></tt>) <em>from
+  history</em>&#39;. This flag is useful in program testing, since it causes the
+  same values to be written to <tt><b>history</b></tt> each time, thus facilitating
+  comparison of actual output with that expected.</p>
+<p>Section 4.5 of <a
+href="/software/netcdf/guide_toc.html"> NetCDF
+  User&#39;s Guide</a> explains the two aspects of error-handling: suppression
+  of error messages and fatality of errors. The default mode is <em>verbose</em>
+  and <em>fatal</em>. <em>Non-verbose (silent)</em> mode is set by flag <tt><b>-s</b></tt>.
+  <em>Non-fatal (persevere)</em> mode is set by flag <tt><b>-p</b></tt>.</p>
+<p>The <tt><b>-e</b></tt> flag means `<em>Write error messages to</em> <tt><b>stdout</b></tt>
+  <em>not</em> <tt><b>stderr</b></tt>&#39;.</p>
+<p>The option `<tt><b>-t</b></tt> <em>type</em>&#39; sets the data-type for new
+  variables or attributes. Valid values are <tt><b>char, byte, short, long, float</b></tt>
+  and <tt><b>double</b></tt>. These can be abbreviated to their first letter.</p>
+<p>The option `<tt><b>-u</b></tt> <em>unit</em>&#39; sets the unit of measure
+  for ASCII text data, providing conversion to or from those defined by netCDF
+  <tt><b>units</b></tt> attributes.</p>
+<p><a id="Scaling" name="Scaling"></a></p>
+<h3>Scaling and Unit Conversion</h3>
+<p>All netCDF input and output values are transformed by a linear equation defined
+  by the attributes <tt><b>add_offset</b></tt>, <tt><b>scale_factor</b></tt> and
+  <tt><b>units</b></tt>; together with any unit defined by the <tt><b>-u</b></tt>
+  option mentioned above. The output <tt><b>units</b></tt> attribute is defined
+  or modified in some situations such as when it is undefined but the corresponding
+  input attribute is defined.</p>
+<p>All unit conversion is done using the <em>Units Library</em> documented in
+  Appendix C of <a
+href="/software/netcdf/guide_toc.html"> NetCDF
+  User&#39;s Guide</a>. The environment variable <tt><b>UDUNITS_PATH</b></tt>
+  can be used to specify a non-standard units file. (See <tt><b>man</b></tt> document
+  <tt><b>udunits(3)</b></tt>.)</p>
+<h3>Missing Values</h3>
+<p>Values read from a netCDF file are considered missing if outside the <em>valid
+  range</em> defined by the attribute <tt><b>valid_range</b></tt> or the attributes
+  <tt><b>valid_min</b></tt>, and <tt><b>valid_max</b></tt>. If these do not define
+  either the minimum or the maximum then an attempt is made to define it based
+  on the principle that the <em>missing value</em> must be outside the valid range.
+  The <em>missing value</em> is defined by the attribute <tt><b>missing_value</b></tt>,
+  or if this is undefined then the <em>fill value</em> (defined by attribute <tt><b>_FillValue</b></tt>
+  if defined, otherwise the default fill value for the data type).</p>
+<h3>Environment Variables</h3>
+<p>The environment variable <tt><b>UDUNITS_PATH</b></tt> was mentioned in Section
+  <a href="#Scaling"><em>Scaling</em></a>. The environment variable <tt><b>COLUMNS</b></tt>
+  (default: 80) defines the page width and is used to print data of type <tt><b>character</b></tt>.</p>
+<h2>nc2text</h2>
+<p>This utility prints variable and attribute values from netCDF files.</p>
+<p><a id="nc2text_Usage" name="nc2text_Usage"></a></p>
+<h3>Usage</h3>
+<pre>
+<strong>Usage: nc2text [-eps] [-f %s] [-m %s] [-n %d] [-u %s] &lt;FANI&gt;
+&lt;FANI&gt; netCDF FAN specification for input
+-e            Write error messages to stdout not stderr
+-p            Persevere after errors
+-s            Silent mode: Suppress warning messages
+-f &lt;string&gt;:  Format for output (default: C_format attribute (&quot;%G&quot; if none))
+-m &lt;string&gt;:  Missing value for output (default: _ )
+-n &lt;integer&gt;: Number of fields per line of output (default: 10 if numeric)
+              (Environment variable COLUMNS defines default for characters)
+-u &lt;string&gt;:  Unit of measure for output (default: unit in file)
+</strong>
+</pre>
+<h3>Examples</h3>
+<p>The following prints the first three elements of variable <tt><b>v</b></tt>
+  of file <tt><b>vec.nc</b></tt>:</p>
+<pre>
+<strong>$ nc2text &#39;vec.nc v[0 1 2]&#39;
+10 20.3 30.2
+</strong>
+</pre>
+<p>The following uses <tt><b>text2nc</b></tt> to</p>
+<ul>
+  <li>set attribute <tt><b>v:units</b></tt> to `<tt><b>degF</b></tt>&#39;</li>
+  <li>set attribute <tt><b>v:valid_min</b></tt> to -460�F (just below 0�K)</li>
+  <li>modify <tt><b>v[2]</b></tt> so it is less than this valid minimum i.e. missing.</li>
+</ul>
+<pre>
+<strong>$ echo degF | text2nc vec.nc &#39;v:units&#39;
+$ echo -460 | text2nc -t float vec.nc &#39;v:valid_min&#39;
+$ echo -999 | text2nc vec.nc &#39;v[2]&#39;
+</strong>
+</pre>
+<p>Then we print four Celsius temperatures per line. The text `<tt><b>MISSING</b></tt>&#39;
+  is printed for missing values. Normal values are printed using the C format
+  <tt><b>%8.4f</b></tt> (equivalent to the Fortran format <tt><b>F8.4</b></tt>
+  i.e 4 decimal places with a total field width of 8 characters).</p>
+<pre>
+<strong>$ nc2text -f &#39;%8.4f&#39; -m &#39; MISSING&#39; -n 4 -u degC vec.nc &#39;v[:4]&#39;
+-12.2222  -6.5000  MISSING   4.9444
+ 10.0000
+</strong>
+</pre>
+<h2>ncmeta</h2>
+<p>This utility prints metadata from netCDF files. This metadata can include rank,
+  shape, file names, variable names, dimension names and attribute names.</p>
+<p><a id="ncmeta_Usage" name="ncmeta_Usage"></a></p>
+<h3>Usage</h3>
+<pre>
+<strong>Usage: ncmeta [-eps] [-w &lt;LETTERS&gt;] &lt;FANI&gt;
+&lt;FANI&gt; netCDF FAN specification for input
+-e            Write error messages to stdout not stderr
+-p            Persevere after errors
+-s            Silent mode: Suppress warning messages
+-w &lt;LETTERS&gt;: What to print using following (default: s)
+                 a: attribute names
+                 d: dimension names
+                 f: file names
+                 r: rank (number of dimensions)
+                 s: shape (dimension sizes)
+                 v: variable names
+
+Example: ncmeta -w fvs abc.nc var1 var2
+</strong>
+</pre>
+<p><a id="ncmeta_Examples" name="ncmeta_Examples"></a></p>
+<h3>Examples</h3>
+<p>The following examples print the shape of the specified variables:</p>
+<pre>
+<strong>$ ncmeta vec.nc v
+5
+$ ncmeta geog.nc tsur
+3 4
+</strong>
+</pre>
+<p>The following example prints the filename, variable name, rank, dimensions
+  and shape of the specified variables:</p>
+<pre>
+<strong>$ ncmeta -w fvrds vec.nc v &#39;geog.nc tsur&#39; lat lon
+vec.nc v 1 n 5
+geog.nc tsur 2 lat lon 3 4
+geog.nc lat 1 lat 3
+geog.nc lon 1 lon 4
+</strong>
+</pre>
+<p>The following example prints the variable name and attribute name of the first
+  (0) attribute of the first (0) variable:</p>
+<pre>
+<strong>$ ncmeta -w va geog.nc &#39;0:0&#39;
+lat units
+</strong>
+</pre>
+<h2>ncrob</h2>
+<p>This utility reads data from one or more netCDF variables, performs some process
+  on it and then either prints the result or writes it to one or more netCDF variables.
+  The type of process is defined by option `<tt><b>-r</b></tt> <em>string</em>&#39;,
+  where <em>string</em> is one of the following:</p>
+<center>
+  <table border="1" summary="option meanings">
+    <tr>
+      <td><tt><b>am</b></tt> </td>
+      <td>arithmetic mean</td>
+    </tr>
+    <tr>
+      <td><tt><b>broadcast</b></tt> </td>
+      <td>cyclic copy</td>
+    </tr>
+    <tr>
+      <td><tt><b>count</b></tt> </td>
+      <td>number of non-missing values</td>
+    </tr>
+    <tr>
+      <td><tt><b>fill</b></tt> </td>
+      <td>fill with missing values</td>
+    </tr>
+    <tr>
+      <td><tt><b>gm</b></tt> </td>
+      <td>geometric mean</td>
+    </tr>
+    <tr>
+      <td><tt><b>max</b></tt> </td>
+      <td>maximum</td>
+    </tr>
+    <tr>
+      <td><tt><b>min</b></tt> </td>
+      <td>minimum</td>
+    </tr>
+    <tr>
+      <td><tt><b>prod</b></tt> </td>
+      <td>product</td>
+    </tr>
+    <tr>
+      <td><tt><b>sd</b></tt> </td>
+      <td>unadjusted standard deviation (divisor is &nbsp;<var>n</var>&nbsp;)</td>
+    </tr>
+    <tr>
+      <td><tt><b>sd1</b></tt> </td>
+      <td>adjusted standard deviation (divisor is &nbsp;<var>n</var>-1&nbsp;)</td>
+    </tr>
+    <tr>
+      <td><tt><b>sum</b></tt> </td>
+      <td>sum</td>
+    </tr>
+    <tr>
+      <td><tt><b>sum2</b></tt> </td>
+      <td>sum of squares of values</td>
+    </tr>
+  </table>
+</center>
+<p>A <tt><b>broadcast</b></tt> copies successive elements from input to output.
+  Whenever the end of input is reached, reading begins again at the start of input.
+  The whole process continues until reaching the end of output.</p>
+<p>A <tt><b>fill</b></tt> simply fills the output variable with missing values.
+  There must be input, although it is used only to define the shape of new variables.</p>
+<p>The other processes are all <em>reductions</em>, in the sense that they reduce
+  the <em>rank</em> (number of dimensions). The number of input elements (&nbsp;<var>I</var>&nbsp;)
+  must be a multiple of both the number of output elements (&nbsp;<var>N</var>&nbsp;)
+  and the number of weights (&nbsp;<var>M</var>&nbsp;) (if any, as specified by
+  option <tt><b>-w</b></tt>).</p>
+<p>If the process is <tt><b>count</b></tt> and there are no weights then the result
+  is the number of non-missing values. If there are weights then the result is
+  the sum of the weights of the non-missing values.</p>
+<p>Let vector &nbsp;<var>X</var><sub>0</sub>,&nbsp;<var>X</var><sub>1</sub>,&nbsp;...,&nbsp;<var>
+  X</var><sub><var>i</var></sub>,&nbsp;...,&nbsp;<var>X</var><sub><var> I</var>-1</sub>&nbsp;
+  represent the selected input data elements in the specified order. Similarly,
+  let vector &nbsp;<var>Y</var><sub>0</sub>,&nbsp;<var>Y</var><sub>1</sub>,&nbsp;...&nbsp;<var>
+  Y</var><sub><var>j</var></sub>,&nbsp;...,&nbsp;<var>Y</var><sub><var> N</var>-1</sub>&nbsp;
+  represent the resultant output data. Let &nbsp;<var>n</var>&nbsp;=&nbsp;<var>I</var>&nbsp;�&nbsp;<var>N</var>.</p>
+<p>If the process is <tt><b>sum</b></tt> and there are no weights then</p>
+<center>
+  &nbsp;&nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;=&nbsp;<strong> Sum</strong><sub><var>i</var>=0,<var>n</var>-1</sub>&nbsp;<var>X</var><sub>
+  <var>Ni</var>+<var>j</var></sub>&nbsp;&nbsp;
+</center>
+<p>If weights &nbsp;<var>W</var><sub>0</sub>,&nbsp;<var>W</var><sub>1</sub>,&nbsp;...,&nbsp;<var>
+  W</var><sub><var>k</var></sub>,&nbsp;...,&nbsp;<var>W</var><sub><var> M</var>-1</sub>&nbsp;
+  are defined and &nbsp;<var>m</var>&nbsp;=&nbsp;<var>I</var>&nbsp;�&nbsp;<var>M</var>&nbsp;
+  then</p>
+<center>
+  &nbsp;&nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;=&nbsp;<strong> Sum</strong><sub><var>i</var>=0,<var>n</var>-1</sub>&nbsp;<var>W</var><sub>
+  <strong>floor</strong>((<var>Ni</var>+<var>j</var>)/m)</sub><var>X</var><sub>
+  <var>Ni</var>+<var>j</var></sub>&nbsp;&nbsp;
+</center>
+<p>where &nbsp;<strong>floor</strong>(&nbsp;<var>x</var>&nbsp;)&nbsp; represents
+  the floor of &nbsp;<var>x</var>&nbsp; i.e. the greatest integer &nbsp;&lt;=&nbsp;<var>x</var>.</p>
+<p>This is calculated using the following algorithm:</p>
+<p>&nbsp;<var>n</var>&nbsp; <tt><b>:=</b></tt> &nbsp;<var>I</var>�<var>N</var>&nbsp;
+  <br />
+  &nbsp;<var>m</var>&nbsp; <tt><b>:=</b></tt> &nbsp;<var>I</var>�<var>M</var>&nbsp;
+  <br />
+  <b>for</b> &nbsp;<var>j</var>&nbsp; <b>from</b> 0 <b>to</b> &nbsp;<var>N</var>-1&nbsp;
+  <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> &nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;
+  <tt><b>:=</b></tt> 0 <br />
+  <b>for</b> &nbsp;<var>i</var>&nbsp; <b>from</b> 0 <b>to</b> &nbsp;<var>I</var>-1&nbsp;
+  <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> &nbsp;<var>j</var>&nbsp; <tt><b>:=</b></tt> &nbsp;<var>i</var>&nbsp;<strong>mod</strong>&nbsp;<var>n</var>&nbsp;
+  <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> &nbsp;<var>k</var>&nbsp; <tt><b>:=</b></tt> &nbsp;<strong>floor</strong>(&nbsp;<var>i</var>/m&nbsp;)&nbsp;
+  <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> <b>if</b> &nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;�=&nbsp;
+  <tt><b>missing_value</b></tt> <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> <tt>&nbsp;&nbsp;&nbsp;</tt> <b>if</b> <tt><b>valid_min</b></tt>
+  &nbsp;&lt;=&nbsp;<var>X</var><sub><var>i</var></sub>&nbsp;&lt;=&nbsp; <tt><b>valid_max</b></tt>
+  <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> <tt>&nbsp;&nbsp;&nbsp;</tt> <tt>&nbsp;&nbsp;&nbsp;</tt>
+  &nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp; <tt><b>:=</b></tt> &nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;+&nbsp;<var>W</var><sub>
+  <var>k</var></sub>&nbsp;<var>X</var><sub><var>i</var></sub>&nbsp; <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> <tt>&nbsp;&nbsp;&nbsp;</tt> <b>else if</b> <tt><b>suddenDeath</b></tt>
+  <br />
+  <tt>&nbsp;&nbsp;&nbsp;</tt> <tt>&nbsp;&nbsp;&nbsp;</tt> <tt>&nbsp;&nbsp;&nbsp;</tt>
+  &nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp; <tt><b>:=</b></tt> <tt><b>missing_value</b></tt>
+  <br />
+</p>
+<p>Note that this definition of &nbsp;<var>k</var>&nbsp; means that the first
+  &nbsp;<var>m</var>&nbsp; elements have the first weight &nbsp;<var>W</var><sub>0</sub>&nbsp;,
+  the next &nbsp;<var>m</var>&nbsp; have the second weight &nbsp;<var>W</var><sub>1</sub>&nbsp;,
+  and so on.</p>
+<p>As an example consider an input array which is a matrix &nbsp;<var>A</var>&nbsp;
+  with &nbsp;<var>R</var>&nbsp; rows and &nbsp;<var>C</var>&nbsp; columns. Thus
+  &nbsp;<var>I</var>=<var>RC</var>. If we want column sums then the output vector
+  would be of length &nbsp;<var>C</var>&nbsp; i.e. &nbsp;<var>N</var>=<var>C</var>.
+  Now &nbsp;<var>n</var>=&nbsp;<var>I</var>&nbsp;�&nbsp;<var>N</var>&nbsp;=&nbsp;<var>
+  R</var>. So the unweighted sum is</p>
+<center>
+  &nbsp;&nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;=&nbsp;<strong> Sum</strong><sub><var>i</var>=0,<var>R</var>-1</sub>&nbsp;<var>X</var><sub>
+  <var>Ci</var>+<var>j</var></sub>&nbsp;=&nbsp;<strong>Sum</strong><sub> <var>i</var>=0,<var>R</var>-1</sub>&nbsp;<var>A</var><sub><var>ij</var></sub>&nbsp;&nbsp;
+</center>
+<p>and the weighted sum is</p>
+<center>
+  &nbsp;&nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;=&nbsp;<strong> Sum</strong><sub><var>i</var>=0,<var>R</var>-1</sub>&nbsp;<var>W</var><sub>
+  <strong>floor</strong>((<var>Ci</var>+<var>j</var>)/C)</sub>&nbsp;<var> X</var><sub><var>Ci</var>+<var>j</var></sub>&nbsp;=&nbsp;<strong>Sum</strong><sub>
+  <var>i</var>=0,<var>R</var>-1</sub>&nbsp;<var>W</var><sub><var>i</var></sub>&nbsp;<var>
+  A</var><sub><var>ij</var></sub>&nbsp;&nbsp;
+</center>
+<p>If the process is <tt><b>prod</b></tt> and there are no weights then</p>
+<center>
+  &nbsp;&nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;=&nbsp;<strong> Product</strong><sub><var>i</var>=0,<var>n</var>-1</sub>&nbsp;<var>X</var><sub>
+  <var>Ni</var>+<var>j</var></sub>&nbsp;&nbsp;
+</center>
+<p>If weights are defined then</p>
+<center>
+  &nbsp;&nbsp;<var>Y</var><sub><var>j</var></sub>&nbsp;=&nbsp;<strong> Product</strong><sub><var>i</var>=0,<var>n</var>-1</sub>&nbsp;<var>X</var><sub>
+  <var>Ni</var>+<var>j</var></sub>&nbsp;<sup><var>W</var><sub><strong> floor</strong>((<var>Ni</var>+<var>j</var>)/m)</sub></sup>&nbsp;&nbsp;
+</center>
+<p>In general the shape (dimension vector) of the destination should match the
+  trailing dimensions of the source. Then the reduction process operates over
+  those leading dimensions absent from the destination.</p>
+<p>Note that FAN allows you to transpose dimensions by specifying them in an order
+  different from that in the file. Thus the leading source dimensions are those
+  specified first. The order of the remaining dimensions must match those of the
+  destination.</p>
+<p>The other reduction processes are treated similarly. However <tt><b>min</b></tt>
+  and <tt><b>max</b></tt> do not allow weights.</p>
+<p>If the <tt><b>-m</b></tt> flag is specified then the result is missing if any
+  of the values it depends on is missing (<em>sudden death mode</em>). Otherwise
+  missing values are omitted (<em>filter mode</em>) i.e. essentially treated as
+  having a weight of 0.</p>
+<p>The <tt><b>-b</b></tt> option sets the size of the input buffer. This can improve
+  efficiency when reading very large variables.</p>
+<p>The <tt><b>-c</b></tt> option creates a new destination variable with the specified
+  rank (number of dimensions). If the variable already exists then this option
+  is ignored. If the destination file does not exist then it is created. The variable
+  is created with the same attributes as the (first if several) source variable,
+  and the specified number of its trailing dimensions, together with any associated
+  coordinate variables. However a broadcast is slightly different in that a new
+  leading dimension is created from the leading source dimensions by taking the
+  product of their sizes (so the total number of elements is unchanged) and concatenating
+  their names. The data-type of the new variable is specified using option <tt><b>-t</b></tt>
+  and defaults to the type of the source variable.</p>
+<p><a id="ncrob_Usage" name="ncrob_Usage"></a></p>
+<h3>Usage</h3>
+<pre>
+<strong>Usage: ncrob [options] &lt;FANI&gt; / &lt;FANO&gt;
+&lt;FANI&gt;: FAN specification for input
+&lt;FANO&gt;: FAN specification for output (default: stdout)
+-e            Write error messages to stdout not stderr
+-H            Exclude time-stamp &amp; LOGNAME from history
+-h            Do not write history
+-m            If any value missing then result missing
+-p            Persevere after errors
+-s            Silent mode: Suppress warning messages
+-b &lt;int&gt;:     Max. buffer size (Kbytes) (default: 512)
+-c &lt;int&gt;:     Rank (decrement if &lt; 0) of any Created variable including stdout
+              (default: input rank for broadcast, else -1)
+-f &lt;string&gt;:  Format for stdout (default: C_format attribute (&quot;%G&quot; if none))
+-M &lt;string&gt;:  Missing value for stdout (default: _ )
+-n &lt;integer&gt;: Number of fields per line for stdout (default: 10 if numeric)
+              (Environment variable COLUMNS defines default for characters)
+-r &lt;string&gt;:  Reduction type (am broadcast count fill gm max min prod
+               sd sd1 sum sum2) (default: broadcast)
+-t char|byte|short|long|float|double: new variable type (default: input type)
+-u &lt;string&gt;:  Unit of measure for stdout (default: unit in file)
+-w &lt;reals&gt;:   Weight vector(e.g. -w &#39;3 1.5 .8&#39;)
+</strong>
+</pre>
+<p>If the `<tt><b>/</b></tt>&#39; is omitted then the final argument is taken
+  as <tt><b>&lt;FANO&gt;</b></tt>. (This version 1 convention is deprecated.)
+  If <tt><b>&lt;FANO&gt;</b></tt> does not specify a filename or variable name
+  then the first one in <tt><b>&lt;FANI&gt;</b></tt> is used.</p>
+<h3>Examples</h3>
+<p>The following prints the variable <tt><b>M</b></tt> in file <tt><b>mat.nc</b></tt>:</p>
+<pre>
+<strong>$ ncrob mat.nc M /
+11 12 13
+21 22 23
+</strong>
+</pre>
+<p>The following prints the column sums, row means and overall product:</p>
+<pre>
+<strong>$ ncrob -r sum mat.nc M /       # sum of each column
+32 34 36
+$ ncrob -r am mat.nc &#39;M[col]&#39; / # arithmetic mean of each row
+12 22
+$ ncrob -r prod -c 0 -f &#39;%.0f&#39; mat.nc M / # overall product
+18234216
+</strong>
+</pre>
+<p>The first two commands have no <tt><b>-c</b></tt> option, so the rank of the
+  result is one less than that of the input. The third specifies <tt><b>-c 0</b></tt>,
+  so the result has rank 0, i.e. is scalar. The following attempts to put this
+  same data into three new variables in the same file:</p>
+<pre>
+<strong>$ ncrob -h -r sum mat.nc M / col_sum
+$ ncrob -h -r am mat.nc &#39;M[col]&#39; / row_am
+$ ncrob -h -r prod -c 0 mat.nc M / prod
+$ ncdump mat.nc
+netcdf mat {
+dimensions:
+        row = 2 ;
+        col = 3 ;
+variables:
+        short M(row, col) ;
+        short col_sum(col) ;
+        short row_am(row) ;
+        short prod ;
+data:
+ M =
+  11, 12, 13,
+  21, 22, 23 ;
+ col_sum = 32, 34, 36 ;
+ row_am = 12, 22 ;
+ prod = _ ;
+}
+</strong>
+</pre>
+<p>Why is <tt><b>prod</b></tt> dumped as <tt><b>_</b></tt> (i.e. fill) rather
+  than 18234216 as before? The problem is that <tt><b>ncrob</b></tt> has created
+  a new variable of the same type as the source variable, which in this case is
+  <tt><b>short</b></tt> and incapable of storing such a large number. The solution
+  is to specify the type using the <tt><b>-t</b></tt> option. Let&#39;s also create
+  a new file <tt><b>prod.nc</b></tt>. E.g.</p>
+<pre>
+<strong>$ ncrob -h -r prod -c 0 -t long mat.nc M / prod.nc prod
+$ ncdump prod.nc
+netcdf prod {
+variables:
+        long prod ;
+data:
+ prod = 18234216 ;
+}
+</strong>
+</pre>
+<p>Next let&#39;s calculate a weighted mean of each column. Let&#39;s give the
+  first row twice the weight of the second:</p>
+<pre>
+<strong>$ ncrob -r am -w &#39;2 1&#39; M mat.nc /
+14.3333 15.3333 16.3333
+</strong>
+</pre>
+<p>Thus the mean of the first column is (2 * 11 + 1 * 21)/3 = 14.3333. Negative
+  weights can be used to obtain differences. E.g.</p>
+<pre>
+<strong>$ ncrob -r sum -w &#39;1 -1&#39; M mat.nc /            # row1 - row2
+-10 -10 -10
+$ ncrob -r sum -w &#39;1 -1&#39; &#39;M(col=3 1]&#39; mat.nc / # col3 - col1
+</strong>
+</pre>
+<p>Finally we demonstrate broadcasting. Let&#39;s first copy the matrix <tt><b>M</b></tt>
+  to two variables in a new file called <tt><b>new.nc</b></tt>. One new variable
+  has the same name (<tt><b>M</b></tt>) and shape. The other is named <tt><b>V</b></tt>
+  and is a vector with the new dimension <tt><b>row_col</b></tt> formed from dimensions
+  <tt><b>row</b></tt> and <tt><b>col</b></tt>.</p>
+<pre>
+<strong>$ ncrob -h M mat.nc / new.nc
+$ ncrob -h -c 1 M mat.nc / new.nc V
+$ ncdump new.nc
+netcdf new {
+dimensions:
+        row = 2 ;
+        col = 3 ;
+        row_col = 6 ;
+variables:
+        short M(row, col) ;
+        short V(row_col) ;
+data:
+ M =
+  11, 12, 13,
+  21, 22, 23 ;
+ V = 11, 12, 13, 21, 22, 23 ;
+}
+</strong>
+</pre>
+<p>Now let&#39;s broadcast the variable <tt><b>col_sum</b></tt> in file <tt><b>mat.nc</b></tt>
+  to these variables <tt><b>M</b></tt> and <tt><b>V</b></tt> in the file <tt><b>new.nc</b></tt>:</p>
+<pre>
+<strong>$ ncrob -h mat.nc col_sum / new.nc M V
+$ ncdump new.nc
+netcdf new {
+dimensions:
+        row = 2 ;
+        col = 3 ;
+        row_col = 6 ;
+variables:
+        short M(row, col) ;
+        short V(row_col) ;
+data:
+ M =
+  32, 34, 36,
+  32, 34, 36 ;
+ V = 32, 34, 36, 32, 34, 36 ;
+}
+</strong>
+</pre>
+<p>Four copies of the input were needed to fill the output.</p>
+<h2>text2nc</h2>
+<p>This utility reads ASCII text data from standard input and writes it to a netCDF
+  variable or attribute. The netCDF file and variable must already exist. However,
+  as discussed in Section <a
+href="#Attributes"><em>Attributes</em></a>, <tt><b>text2nc</b></tt> can create
+  attributes, delete them, and modify their type, size and value. If end-of-input
+  occurs before end-of-output then the input values are recycled.</p>
+<p><a id="text2nc_Usage" name="text2nc_Usage"></a></p>
+<h3>Usage</h3>
+<pre>
+<strong>Usage: text2nc [-eHhps] [-m %f] [-u %s] &lt;FANO&gt;
+&lt;FANO&gt;: netCDF FAN specification for output
+-e           Write error messages to stdout not stderr
+-H           Exclude time-stamp &amp; LOGNAME from history
+-h           Do not write history
+-p           Persevere after errors
+-s           Silent mode: Suppress warning messages
+-m &lt;real&gt;:   Missing value for input (default: 1.79769E+308)
+-t char|byte|short|long|float|double: data-type (for attributes only)
+             (default: double for numeric input data, else char)
+-u &lt;string&gt;: Unit of measure for input (default: unit in file)
+</strong>
+</pre>
+<p><a id="text2nc_Examples" name="text2nc_Examples"></a></p>
+<h3>Examples</h3>
+<p>Let&#39;s start with the following file:</p>
+<pre>
+<strong>$ ncdump vec.nc
+netcdf vec {
+dimensions:
+        n = UNLIMITED ; // (5 currently)
+variables:
+        float v(n) ;
+data:
+ v = 10 , 20.3 , 30.2 , 40.9 , 50  ;
+}
+</strong>
+</pre>
+<p>Let&#39;s assume these data are Celsius temperatures, so we define a valid
+  minimum by:</p>
+<pre>
+<strong>$ echo -273.2 | text2nc -h vec.nc &#39;v:valid_min&#39;
+</strong>
+</pre>
+<p>Then we modify two existing values:</p>
+<pre>
+<strong>$ echo 15 17 | text2nc -h -u degC vec.nc &#39;v[0 3]&#39;
+$ ncdump vec.nc
+netcdf vec {
+dimensions:
+        n = UNLIMITED ; // (5 currently)
+variables:
+        float v(n) ;
+                v:valid_min = -273.2 ;
+                v:units = &quot;degC&quot; ;
+data:
+ v = 15 , 20.3 , 30.2 , 17 , 50  ;
+}
+</strong>
+</pre>
+<p>Note that the <tt><b>units</b></tt> attribute was created because we specified
+  <tt><b>-u&nbsp;degC</b></tt>, but there was no existing <tt><b>units</b></tt>
+  attribute. Now let&#39;s append three values and print the resulting <tt><b>v</b></tt>:</p>
+<pre>
+<strong>$ echo -999 32 1e9 | text2nc -h -u degF -m 1e9 vec.nc &#39;v[-1+1:-1+3]&#39;
+$ nc2text -f &#39;%0.1f&#39; vec.nc v
+15.0 20.3 30.2 17.0 50.0 _ 0.0 _
+</strong>
+</pre>
+<p>The first value (<tt><b>-999</b></tt>) is treated as missing because (even
+  after conversion to Celsius) it is less than the valid minimum of <tt><b>-273.2</b></tt>.
+  The second value (32�F) is converted to 0�C. The third value (<tt><b>1e9</b></tt>)
+  is treated as missing because it matches the input missing value specified by
+  <tt><b>-m 1e9</b></tt>.</p>
+<p>Finally, let&#39;s change every second value to 0�K:</p>
+<pre>
+<strong>$ echo 0 | text2nc -h -u degK vec.nc &#39;v[1::2]&#39;
+$ nc2text -f &#39;%0.1f&#39; vec.nc v
+15.0 -273.1 30.2 -273.1 50.0 -273.1 0.0 -273.1
+</strong>
+</pre>
+<p></p>
+<!-- InstanceEndEditable -->
+  </div> <!-- /#container -->
+ </div> <!-- /#wrap -->
+
+  <!-- See footer.css for the styling of this section -->
+ <footer>
+  <div id="triptych-column-container">
+    <div id="triptych-columns">
+      <div class="column triptych_left">
+        <h2>Follow Unidata</h2>
+        <ul class="tabular half follow-icons">
+          <li>
+            <a href="https://twitter.com/unidata"><img src="/images/twitter.png" alt="Twitter" title="Twitter" /></a>
+          </li>
+          <li>
+            <a href="https://plus.google.com/105982992127916444326/posts"><img src="/images/googleplus.png" alt="Google+" title="Google+" /></a>
+          </li>
+          <li>
+            <a href="https://www.facebook.com/Unidata"><img src="/images/facebook.png" alt="Facebook" title="Facebook"/></a>
+          </li>
+          <li>
+            <a href="http://www.youtube.com/user/unidatanews"><img src="/images/youtube.png" alt="YouTube Channel" title="YouTube Channel"/></a>
+          </li>
+          <li>
+            <a href="http://www.unidata.ucar.edu/blogs/news/feed/entries/atom"><img src="/images/rss.png" alt="News@Unidata blog" title="News@Unidata blog"/></a>
+          </li>
+          <li>
+            <a href="http://www.unidata.ucar.edu/blogs/developer/feed/entries/atom"><img src="/images/blog.png" alt="Developers' Blog" title="Developers' Blog"/></a>
+          </li>
+        </ul>
+      </div> <!-- /.column column_left -->
+
+      <div class="column triptych_center">
+       <h2>Unidata
+        <div class="triptych_logos">
+          <a class="noicon" href="http://www.nsf.gov/"> <img alt="UCP" src="/images/logos/nsf_logo_transparent.png"/></a>
+        </div>
+        <div  class="triptych_logos" style="padding-right:1em;">
+          <a class="noicon" href="http://www.ucp.ucar.edu/"> <img alt="UCP" id="ucp_small" src="/images/logos/ucp-logo2_transparent.png"/></a>
+        </div></h2>
+        <ul class="tabular full" style="padding-right:0.5em;">
+          <li style="text-align: center;">
+            Unidata is s a member of the
+            <a href="http://www.ucp.ucar.edu/">UCAR Community Programs</a>,
+            managed by the
+            <a href="http://www.ucar.edu">University Corporation for Atmospheric Research</a>,
+            and funded by the
+            <a href="http://www.nsf.gov">National Science Foundation</a>.
+          </li>
+          <li style="text-align: center;">
+            Read Unidata's <a href="http://www.unidata.ucar.edu/legal/participation.html">Participation Policy</a>.
+          </li>
+          <li>
+            <table style="width:100%">
+              <tr>
+                <td style="width:33%;text-align:left;">&#169;
+                  <script type="text/javascript">
+                    document.write(new Date().getFullYear());
+                  </script> UCAR</td>
+                <td style="width:33%;text-align:center;"><a href="http://www2.ucar.edu/privacy-policy">Privacy Policy</a></td>
+                <td style="width:33%;text-align:right;"><a href="http://www2.ucar.edu/terms-of-use">Terms of Use</a></td>
+              </tr>
+            </table>
+          </li>
+        </ul>
+      </div> <!-- /.column column_center -->
+
+      <div class="column triptych_right">
+       <h2>Contact Unidata</h2>
+        <ul class="tabular full">
+          <li>
+            For support: <b><a href="mailto:support@unidata.ucar.edu">support@unidata.ucar.edu</a></b>
+          </li>
+          <li>
+            By <b><a href="/about/index.html#visit">postal mail</a></b> or <b><a href="/about/index.html#visit">in person</a></b>
+          </li>
+          <li>
+            About this website: <b><a href="mailto:plaza@unidata.ucar.edu">plaza@unidata.ucar.edu</a></b>
+          </li>
+          <li>
+            By telephone: <b>303.497.8643</b>
+          </li>
+        </ul>
+      </div> <!-- /.column column_right -->
+
+      <a href="/about/tour/">
+       <div class="column column_extra" id="who_are_we">
+        <h2>Welcome to Unidata</h2>
+        <ul class="tabular full">
+          <li>
+            Learn more about who we are and what we do...
+          </li>
+        </ul>
+       </div> <!-- /.column column_extra -->
+      </a>
+
+      <span class="stretch"> </span>
+    </div> <!-- /#triptych-columns -->
+  </div> <!-- /#triptych-column-container -->
+ </footer>
+
+
+
+</body>
+
+
+<!-- InstanceEnd -->

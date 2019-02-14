@@ -1,0 +1,12 @@
+netcdf test_opaque_array {
+types:
+  opaque(8) o_t;  
+dimensions:
+  d2 = 2;
+variables:
+  o_t vo2(d2,d2);
+data:
+ vo2 =
+   0X0123456789ABCDEF, 0XABCDEF0000000000,
+   0XFEDCBA9876543210, 0XFEDCBA9999999999;
+}

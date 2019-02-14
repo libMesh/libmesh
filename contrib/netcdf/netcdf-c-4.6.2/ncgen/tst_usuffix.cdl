@@ -1,0 +1,9 @@
+netcdf tst_usuffix {
+variables:
+	float att_var ;
+		att_var:uint_att = 73U ;
+		att_var:uint_att2 = 73U ;
+data:
+
+ att_var = 10 ;
+}

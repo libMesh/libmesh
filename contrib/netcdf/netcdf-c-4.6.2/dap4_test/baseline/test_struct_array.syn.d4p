@@ -1,0 +1,34 @@
+<Dataset
+   name="test_struct_array.nc"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Dimensions>
+    <Dimension name="dx" size="4"/>
+    <Dimension name="dy" size="3"/>
+  </Dimensions>
+  <Types>
+    <Structure name="s">
+      <Int32 name="x"/>
+      <Int32 name="y"/>
+    </Structure>
+  </Types>
+  <Variables>
+    <Float32 name="z">
+      <Dim name="/dx"/>
+    </Float32>
+    <Float32 name="t">
+      <Dim name="/dy"/>
+    </Float32>
+    <Struct name="s" type="/s">
+      <Dim name="/dx"/>
+      <Dim name="/dy"/>
+      <Map name="/z"/>
+      <Map name="/t"/>
+    </Struct>
+  </Variables>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+</Dataset>

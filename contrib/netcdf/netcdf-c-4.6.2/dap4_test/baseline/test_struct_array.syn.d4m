@@ -1,0 +1,18 @@
+netcdf test_struct_array {
+types:
+  compound s_t {
+    int x ;
+    int y ;
+  }; // s_t
+dimensions:
+	dx = 4 ;
+	dy = 3 ;
+variables:
+	float z(dx) ;
+	float t(dy) ;
+	s_t s(dx, dy) ;
+ 		string s:_edu.ucar.maps = "/z", "/t" ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+}

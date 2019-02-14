@@ -1,0 +1,51 @@
+<Dataset
+   name="test_atomic_types.syn"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Types>
+    <Enumeration name="cloud_class_t" basetype="Int8">
+      <EnumConst name="Clear" value="0"/>
+      <EnumConst name="Cumulonimbus" value="1"/>
+      <EnumConst name="Stratus" value="2"/>
+      <EnumConst name="Stratocumulus" value="3"/>
+      <EnumConst name="Cumulus" value="4"/>
+      <EnumConst name="Altostratus" value="5"/>
+      <EnumConst name="Nimbostratus" value="6"/>
+      <EnumConst name="Altocumulus" value="7"/>
+      <EnumConst name="Cirrostratus" value="8"/>
+      <EnumConst name="Cirrocumulus" value="9"/>
+      <EnumConst name="Cirrus" value="10"/>
+      <EnumConst name="Missing" value="127"/>
+    </Enumeration>
+  </Types>
+  <Variables>
+    <Int8 name="v8"/>
+    <UInt8 name="vu8"/>
+    <Int16 name="v16"/>
+    <UInt16 name="vu16"/>
+    <Int32 name="v32"/>
+    <UInt32 name="vu32"/>
+    <Int64 name="v64"/>
+    <UInt64 name="vu64"/>
+    <Float32 name="vf"/>
+    <Float64 name="vd"/>
+    <Char name="vc"/>
+    <String name="vs"/>
+    <Opaque name="vo" type="/opaque16_t"/>
+    <Enum name="primary_cloud" enum="/cloud_class_t">
+      <Attribute name="_FillValue" type="/cloud_class_t">
+        <Value value="Missing"/>
+      </Attribute>
+    </Enum>
+    <Enum name="secondary_cloud" enum="/cloud_class_t">
+      <Attribute name="_FillValue" type="/cloud_class_t">
+        <Value value="Missing"/>
+      </Attribute>
+    </Enum>
+  </Variables>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+</Dataset>

@@ -1,0 +1,28 @@
+netcdf nestedDAS {
+dimensions:
+	maxStrlen64 = 64 ;
+variables:
+	byte b31 ;
+	char b32(maxStrlen64) ;
+		b32:billy = "Bob is my real name" ;
+		b32:Robert = "Really wants to be called Billy" ;
+
+// global attributes:
+		:humans.position = "There are too many humans." ;
+		:humans.offer = "Here are a few..." ;
+		:b31.class.text.long_name = "textually yours" ;
+		:b31.class.text.short_name = "ty" ;
+		:b31.class.long_name = "class is dismissed" ;
+		:b31.class.short_name = "cid\n",
+			"kid\n",
+			"bid\n",
+			"did" ;
+		:b31.foo.long_name = "It is beyond all recognition" ;
+		:b31.foo.short_name = "foobar" ;
+		:b31.foo.SS_number = "304-66-9876" ;
+data:
+
+ b31 = 0 ;
+
+ b32 = "This is a data test string (pass 0)." ;
+}

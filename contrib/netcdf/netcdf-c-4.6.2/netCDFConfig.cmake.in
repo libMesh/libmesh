@@ -1,0 +1,42 @@
+# NetCDF Configuration Summary
+#
+# General
+#
+@PACKAGE_INIT@
+
+set(NetCDFVersion "@PACKAGE_VERSION@")
+set_and_check(netCDF_INSTALL_PREFIX "@PACKAGE_CMAKE_INSTALL_PREFIX@")
+set_and_check(netCDF_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+set_and_check(netCDF_LIB_DIR "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
+
+set(netCDF_LIBRARIES netcdf)
+
+# include target information
+include("${CMAKE_CURRENT_LIST_DIR}/netCDFTargets.cmake")
+
+# Compiling Options
+#
+set(netCDF_C_COMPILER "@CC_VERSION@")
+set(netCDF_C_COMPILER_FLAGS "@CFLAGS@")
+set(netCDF_C_CPP_FLAGS "@CPPFLAGS@")
+set(netCDF_LDFLAGS "@LDFLAGS@")
+set(netCDF_AM_CFLAGS "@AM_CFLAGS@")
+set(netCDF_AM_CPPFLAGS "@AM_CPPFLAGS@")
+set(netCDF_AM_LDFLAGS "@AM_LDFLAGS@")
+set(netCDF_SHARED @enable_shared@)
+set(netCDF_STATIC @enable_static@)
+
+# Features:
+#
+set(netCDF_HAS_NC2 @HAS_NC2@)
+set(netCDF_HAS_NC4 @HAS_NC4@)
+set(netCDF_HAS_HDF4 @HAS_HDF4@)
+set(netCDF_HAS_HDF5 @HAS_HDF5@)
+set(netCDF_HAS_PNETCDF @HAS_PNETCDF@)
+set(netCDF_HAS_PARALLEL @HAS_PARALLEL@)
+set(netCDF_HAS_DAP @HAS_DAP2@)
+set(netCDF_HAS_DAP2 @HAS_DAP2@)
+set(netCDF_HAS_DAP4 @HAS_DAP4@)
+set(netCDF_HAS_DISKLESS @HAS_DISKLESS@)
+set(netCDF_HAS_MMAP @HAS_MMAP@)
+set(netCDF_HAS_JNA @HAS_JNA@)

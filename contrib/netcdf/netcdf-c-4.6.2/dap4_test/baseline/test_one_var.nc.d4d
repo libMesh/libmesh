@@ -1,0 +1,10 @@
+netcdf test_one_var.nc {
+variables:
+	int t ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ t = 17 ;
+}

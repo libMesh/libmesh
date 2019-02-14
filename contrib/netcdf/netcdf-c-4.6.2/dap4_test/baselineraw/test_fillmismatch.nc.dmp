@@ -1,0 +1,10 @@
+netcdf test_fillmismatch {
+variables:
+	ubyte uv8 ;
+	short v16 ;
+	uint uv32 ;
+		uv32:_FillValue = 17U ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+}

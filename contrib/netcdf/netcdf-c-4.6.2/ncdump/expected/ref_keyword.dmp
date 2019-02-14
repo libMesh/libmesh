@@ -1,0 +1,8 @@
+netcdf ref_keyword {
+variables:
+	int data ;
+		data :_FillValue = 0 ;
+data:
+
+ data = 177 ;
+}

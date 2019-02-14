@@ -1,0 +1,48 @@
+<Dataset
+   name="test_groups1.nc"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Dimensions>
+    <Dimension name="dim1" size="5"/>
+  </Dimensions>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+  <Groups>
+    <Group name="g">
+      <Dimensions>
+        <Dimension name="dim2" size="3"/>
+      </Dimensions>
+      <Groups>
+        <Group name="h">
+          <Dimensions>
+            <Dimension name="dim3" size="7"/>
+          </Dimensions>
+          <Variables>
+            <Int32 name="v1">
+              <Dim name="/dim1"/>
+            </Int32>
+            <Float32 name="v2">
+              <Dim name="/g/dim2"/>
+            </Float32>
+          </Variables>
+        </Group>
+        <Group name="i">
+          <Dimensions>
+            <Dimension name="dim3" size="7"/>
+          </Dimensions>
+          <Variables>
+            <Int32 name="v1">
+              <Dim name="/dim1"/>
+            </Int32>
+            <Float32 name="v3">
+              <Dim name="/g/i/dim3"/>
+            </Float32>
+          </Variables>
+        </Group>
+      </Groups>
+    </Group>
+  </Groups>
+</Dataset>

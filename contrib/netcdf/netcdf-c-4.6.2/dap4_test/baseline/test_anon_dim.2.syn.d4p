@@ -1,0 +1,21 @@
+<Dataset
+   name="test_anon_dim.syn"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Dimensions>
+    <Dimension name="_Anonymous4" size="4"/>
+  </Dimensions>
+  <Variables>
+    <Int32 name="vu32">
+      <Dim name="/_Anonymous4"/>
+    </Int32>
+  </Variables>
+  <Attribute name="_dap4.ce" type="String">
+    <Value value="/vu32[0:3]"/>
+  </Attribute>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+</Dataset>

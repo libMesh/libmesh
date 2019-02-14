@@ -1,0 +1,16 @@
+/*! \page architecture NetCDF Library Architecture
+
+\image html netcdf_architecture.png "NetCDF Architecture"
+\image latex netcdf_architecture.png "NetCDF Architecture"
+\image rtf netcdf_architecture.png "NetCDF Architecture"
+
+
+The netCDF C-based libraries depend on a core C library and some externally developed libraries.
+
+- NetCDF-Java is an independent implementation, not shown here
+- C-based 3rd-party netCDF APIs for other languages include Python, Ruby, Perl, Fortran-2003, MATLAB, IDL, and R
+- Libraries that don't support netCDF-4 include Perl and old C++
+- 3rd party libraries are optional (HDF5, HDF4, zlib, szlib, PnetCDF, libcurl), depending on what features are needed and how netCDF is configured
+- "Apps" in the above means applications, not mobile apps!
+
+*/

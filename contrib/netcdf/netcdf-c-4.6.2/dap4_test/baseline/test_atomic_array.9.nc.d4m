@@ -1,0 +1,10 @@
+netcdf test_atomic_array.9 {
+dimensions:
+	_Anonymous3 = 3 ;
+variables:
+	short v16(_Anonymous3) ;
+
+// global attributes:
+		string :_dap4.ce = "/v16[3,0:1]" ;
+		:_DAP4_Little_Endian = 1UB ;
+}

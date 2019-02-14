@@ -1,0 +1,12 @@
+netcdf test_opaque {
+types:
+  opaque(16) opaque16_t ;
+variables:
+	opaque16_t vo1 ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ vo1 = 0X0123456789ABCDEF0000000000000000 ;
+}

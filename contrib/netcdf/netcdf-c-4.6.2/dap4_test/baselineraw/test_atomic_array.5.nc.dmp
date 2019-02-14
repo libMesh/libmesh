@@ -1,0 +1,28 @@
+netcdf test_atomic_array.5 {
+types:
+  opaque(16) opaque16_t ;
+dimensions:
+	_Anonymous1 = 1 ;
+	_Anonymous2 = 2 ;
+variables:
+	ubyte vu8(_Anonymous1, _Anonymous2) ;
+	double vd(_Anonymous1) ;
+	string vs(_Anonymous1, _Anonymous1) ;
+	opaque16_t vo(_Anonymous1, _Anonymous1) ;
+
+// global attributes:
+		string :_dap4.ce = "/vu8[1][0:2:2];/vd[1];/vs[1][0];/vo[0][1]" ;
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ vu8 =
+  3, 5 ;
+
+ vd = 1024.8 ;
+
+ vs =
+  "Καλημέα" ;
+
+ vo =
+  0XABCDEF00000000000000000000000000 ;
+}

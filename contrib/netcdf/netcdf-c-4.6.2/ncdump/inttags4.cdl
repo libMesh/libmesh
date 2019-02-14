@@ -1,0 +1,23 @@
+netcdf inttags64 {
+dimensions:
+	d = 3 ;
+variables:
+	ubyte ub(d);
+	ushort us(d);
+	uint ui(d);
+	int64 i64(d);
+	uint64 ui64(d);
+// global attributes:
+		:attrll = -23232244LL, 1214124123423LL, -2353424234LL ;
+data:
+
+ ub = 255UB, 255ub, 255u ;
+
+ us = 65534US, 65534us, 65534u ;
+
+ ui = 4294967294UL, 4294967294ul, 4294967294u ;
+
+ i64 = 9223372036854775807LL, 9223372036854775807ll, 9223372036854775807 ;
+
+ ui64 = 18446744073709551615ULL, 18446744073709551615ull, 18446744073709551615uLL;
+}

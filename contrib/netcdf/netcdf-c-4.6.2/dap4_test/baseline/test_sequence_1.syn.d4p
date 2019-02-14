@@ -1,0 +1,20 @@
+<Dataset
+   name="test_sequence_1.syn"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Types>
+    <Structure name="s_base">
+      <Int32 name="i1"/>
+      <Int16 name="sh1"/>
+    </Structure>
+    <Vlen name="s_t" type="/s_base"/>
+  </Types>
+  <Variables>
+    <Seq name="s" type="/s_t"/>
+  </Variables>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+</Dataset>

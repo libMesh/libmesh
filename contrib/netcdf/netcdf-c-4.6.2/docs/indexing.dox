@@ -1,0 +1,431 @@
+/** \file
+
+\internal
+
+\page nchashmap Indexed Access to Metadata Objects
+
+\tableofcontents
+
+The original internal representations of metadata in memory
+relied on linear searching of lists to locate various objects
+by name or by numeric id: by _varid_ or by _grpid_ for example.
+
+In recent years, the flaws in that approach have become obvious
+as users create files with extremely large numbers of objects:
+groups, variables, attributes, and dimensions. One case
+has 14 megabytes of metadata. Creating and (especially) later
+opening such files was exceedingly slow.
+
+This problem was partially alleviated in both netcdf-3 (libsrc)
+and netcdf-4 (libsrc4) by adding name hashing tables.
+However, and especially for netcdf-4, linear search still prevailed.
+
+A pervasive change has been made to try to change searches by name
+or by id from O(n) to O(1).
+This uses hashing for name-based search
+and vectors for numeric id-based search.
+All other cases were left as O(n) searches.
+
+This document describes the architecture and details of the netCDF
+internal object lookup mechanisms now in place.
+
+\section Sindexed_searches Indexed Searches
+
+There are, as a rule, two searches that are used to locate
+metadata object: (1) search by name and (2) search by
+externally visible id (e.g. dimid or varid).
+
+It is currently the case that after all the metadata is read or
+created, hashing is used for locating objects by name. In all
+other cases -- apparently -- lookup is by linear search of a
+of linked list.
+
+It is relevant that, once created, no metadata object -- except
+attributes -- can be deleted.  They can be renamed, but that
+does not change the associated structure or id.  Deletion only
+occurs when an error occurs in creating an object or on invoking
+"nc_close()".
+
+The numeric identifiers for dimensions, types, and groups are
+all globally unique across a file.  But note that variable id's
+are not globally unique (IMO a bad design decision) but are only
+unique within the containing group.  Thus, in order to provide a
+unique id for a variable it must be composed of the containing
+group id plus the variable id.
+
+Note also that names are unique only within a group and with respect
+to some kind of metadata. That is a group cannot have e.g. two
+dimensions with the same name. But it can have a variable and a dimension
+with the same name (as with coordinate variables).
+
+Finally, attribute names are unique only with respect to each other
+and with respect to the containing object (a variable or a group).
+
+\section Sbasic_data_structures Basic Data Structures
+
+The basic data structures used by the new lookup mechanisms
+are described in the following sections.
+
+\subsection Snclist NClist
+
+With rare exceptions, vectors of objects are maintained as
+instances of NClist, which provides a dynamically extendible
+vector of pointers: pointers to metadata objects in this case.
+It is possible to append new objects or insert at a specific
+vector offset, or overwrite an existing pointer at a specific
+offset.
+
+The NClist structure definition is as follows.
+
+\code
+typedef struct NClist {
+  size_t alloc;
+  size_t length;
+  void** content;
+} NClist;
+\endcode
+
+\subsection Snc_hashmap NC_hashmap
+
+The NC_hashmap type is a hash table mapping a string
+(the key) to a data item. As a rule, the data item is a pointer to a
+metadata object.  The current implementation supports table
+expansion when the # of entries in the table starts to get too
+large. A simple linear rehash is used for collisions
+and no separate hash-chain is used.  This means that when
+expanded, it must be completely rebuilt. The performance hit for
+this has yet to be determined. The alternative is to move to some
+form of extendible hashing as used in databases.
+
+The hashtable definition is as follows.
+
+\code
+typedef struct NC_hashmap {
+  size_t size;
+  size_t count;
+  NC_hentry* table;
+} NC_hashmap;
+\endcode
+
+where size is the current allocated size and count is the
+number of active entries in the table. The "table" field is 
+a vector of entries of this form.
+
+\code
+typedef struct NC_hentry {
+    int flags;
+    uintptr_t data;
+    unsigned int hashkey;
+    size_t keysize;
+    char* key;
+} NC_hentry;
+\endcode
+
+The _flags_ field indicates the state of the entry and can be
+in one of three disjoint states:
+
+1. ACTIVE - there is an object referenced in this entry
+2. DELETED - an entry was deleted, but must be marked so
+   that linear rehash will work.
+3. EMPTY - unused
+
+The "data" field is of type "uintptr_t". Note that we assume
+that sizeof(unintptr_t) == sizeof(void*). This is very
+important.  It is supposed to be the case that a value of type
+uintptr_t is an integer of sufficient size to hold a void* pointer.
+
+This means that the data field can hold an unsigned integer or a
+void* pointer. As a pointer, it often points to an instance of a
+variable, or dimension, or other object.
+
+The hashkey field is a CRC32 hash of the key. Note that comparing
+hashkeys is not sufficient to ensure that the corresponding keys are
+the same because hash collisions are possible. Even moving to, say,
+64 bit keys, is probably not sufficient to avoid hash collisions.
+A 128 bit key (e.g. MD5) might be sufficient but mathematical
+investigation would be required.
+
+Since comparing only hash keys is not sufficient, it is necessary to store
+a copy of the actual key. The key and keysize fields are used for this.
+
+\subsection Sncindex NCindex
+
+An "index" \(aka instance of type "NCindex"\) is a combination
+of one NClist instance plus one NC_hashmap instance.
+The hashmap maps a name to the position of the correspondingly
+named object in the NClist part of the NCindex.
+
+An index is used to provide several kinds of lookup with respect
+to a specific list of metadata objects. For example, the
+subgroups of a group are stored using a vector of pointers to
+the subgroup objects.  This also provides information about
+creation order, which is sometimes important.  However, we often
+need fast access to that vector by name so an NCindex object
+provides these capabilities. The NCindex object contains:
+
+1. A vector into which the object pointers can be stored
+   and iterated over.
+2. A map from name to the corresponding object index in the vector.
+
+Note that currently, NCindex is only used in libsrc4 and libhdf4.
+But if performance issues warrant, it will also be used in
+libsrc.
+
+Note also that alternative implementations are feasible that do not
+use a hash table for name indexing, but rather keep a list sorted by name
+and use binary search to do name-based lookup. If this alternative were
+implemented, then it is probable that we could get rid of using the NC_hashmap
+structure altogether for netcdf-4. There is a performance cost since binary
+search is O(log n). In practice, it is probable that this is of negligable
+effect. The advantage is that rename operations become considerably simpler.
+
+\section Sglobal_object_access Global Object Access
+
+As mentioned, dimension, group, and type external id's (dimid,
+grpid, typeid) are unique across the whole file. It is therefore
+convenient to store in memory a per-file vector for each object
+type such that the external id of the object is the same as the
+position of that object in the corresponding per-file
+vector. This makes lookup by external id very efficient.
+Note that this was already the case for netcdf-3 (libsrc) so
+this is a change for libsrc4 only.
+
+The global set of dimensions, types, and groups is maintained by
+three instances of NClist in the NC_FILE_INFO structure:
+namely _alldims_, _alltypes_, and _allgroups_.
+The position of the object within the corresponding list determines
+the object's external id. Thus, a position of a dimension object within the
+"alldims" field of the file structure determines its dimid. Similarly
+for types and groups.
+
+\section Sper_group_object_access Per-Group Object Access
+
+Each group object (NC_GRP_INFO_T) contains five instances of
+NCindex. One is for dimensions, one is for types, one is for
+subgroups, one is for variables, and one is for attributes.  An
+index is used for two reasons. First, it allows name-based lookup
+for these items. Second, the declaration order is maintained by
+the list within the index's vector. Note that the position of
+an object in a group index vector has no necessary
+relationship to the position of that object within the global
+vectors.
+
+Note however that the index vector for variables does define
+the variable id, which is unique only within a group.
+In this special case, the external id for the variable is
+the same as its offset in the index's vector for the group.
+
+A note about typeids. Since user defined types have an external
+id starting at NC_FIRSTUSERTYPEID, we leave the global type
+vector entries 0..NC_FIRSTUSERTYPEID-1 empty.
+
+\section Smetadata_object_header Metadata Object Header
+
+Each metadata object (e.g. NC_DIM_INFO_T, NC_VAR_INFO_T)
+now has what is called a "hdr" object as its first field.
+This provides a form of pseudo-inheritance for these objects
+because they can all be cast to "NC_OBJ" to get common information.
+The structure of the header is as follows.
+
+\code
+typedef struct NC_OBJ {
+    NC_SORT sort;
+    char* name; /* assumed to be null terminated */
+    size_t id;
+    unsigned int hashkey;
+} NC_OBJ;
+\endcode
+
+The sort is one of the values _NCVAR_, _NCDIM_, _NCATT_, _NCTYP_, or _NCGRP_.
+The name is assumed to be nul terminated. The id is the assigned id
+for the object. The hashkey is the same hash value as used in nchashtable.c.
+
+\section Scliches Programming cliches
+
+\subsection Slookupname Lookup an Object by Name
+
+In the original code, the following _cliche_ (code snippet)
+was common for looking up an object by name.
+\code
+NC_GRP_INFO_T* grp = ...;
+...
+NC_GRP_INFO_T* g;
+...
+for (g = grp->children; g; g = g->l.next) {
+    if(strcmp(name,g->name)==0) {
+      ... code to process matching grp by name
+    }
+...
+}
+\endcode
+In this case, this loop is iterating across all the subgroups (children)
+of the grp. It does so by walking the linked list of child groups.
+It does a name comparison in order to find the group with the desired name.
+
+In the new code, this iteration cliche is replaced by something
+that will look like this.
+\code
+NC_GRP_INFO_T* grp = ...;
+NC_GRP_INFO_T* g;
+...
+g = ncindexlookup(grp->children,name);
+if(g != NULL)
+      ... code to process matching grp by name
+}
+\endcode
+In this case, the iteration is replaced by a hashtable lookup.
+
+\subsection Slookupid Lookup an Object by id
+
+In the original code, the following _cliche_ (code snippet)
+was common for looking up an object by its id (dimid, varid, etc).
+\code
+NC_GRP_INFO_T* grp = ...;
+...
+NC_DIM_INFO_T* d;
+...
+for (d = grp->dim; d; d = d->l.next) {
+    if(varid == d->dimid)
+      ... code to process matching dim by index
+    }
+...
+}
+\endcode
+In this case, this loop is iterating across all the dimension objects
+of the grp. It does so by walking the linked list of dimensions.
+It does an id comparison in order to find the group with the desired
+dimension.
+
+In the new code, this iteration cliche is replaced by something
+that will look like this.
+\code
+NC_FILE_INFO_T* h5 = ...;
+NC_DIM_INFO_T* d;;
+...
+d = nclistget(h5->alldims,id);
+if(d != NULL)
+      ... code to process matching dim by id
+}
+\endcode
+This shows how the alldims vector is used to map from a
+dimid directly to the matching dimension object.
+In this example, h5 is the NC_FILE_INFO_T file object.
+This approach works for dimension ids, group ids, and type ids
+because they are globally unique.
+
+For variables and attributes, we have to use the containing group's
+NCindex, such as grp->vars. In this case, the varid, is mapped using
+code like this.
+\code
+NC_GRP_INFO_T* grp = ...;
+NC_VAR_INFO_T* v;
+...
+v = ncindexith(grp->vars,id);
+if(v != NULL)
+      ... code to process matching variable by id
+}
+\endcode
+
+\subsection Siterate Iterating over sets of objects
+
+In the original code, the following _cliche_ (code snippet)
+was common.
+\code
+NC_GRP_INFO_T* grp;
+...
+NC_GRP_INFO_T* g;
+...
+for (g = grp->children; g; g = g->l.next)
+...
+\endcode
+In this case, this loop is iterating across all the subgroups (children)
+of the grp. It does so by walking the linked list of child groups.
+Similar loops are used to walk a list of dimensions, variables, types,
+or attributes.
+
+In the new code, this iteration cliche is replaced by something
+that will look like this.
+\code
+NC_GRP_INFO_T* grp;
+...
+for(i=0;i<ncindexsize(grp->children);i++) {
+  NC_GRP_INFO_T* g = nclistith(grp->children,i);
+...
+}
+\endcode
+In this case, the iteration is by index into the underlying vector.
+
+\section Sperf Performance
+
+The initial impetus for this change was to improve the performance
+of netcdf-4 metadata loading by replacing linear searches with O(1)
+searches.
+
+In fact, this goal has not been met. It appears to be the case
+that the metadata loading costs are entirely dominated by the
+performance of the HDF5 library. The reason for this is that
+the netcdf-c library loads all the metadata immediately
+when a file is opened. This in turn means that all of the metadata
+is immediately extracted from the underlying HDF5 file. So, there is
+no opportunity for lazy loading to be used.
+
+The remedys of which I can conceive are these.
+
+1. Modify the netcdf-c library to also do lazy loading
+   (work on this is under way).
+2. Store a single metadata object into the file so it can
+   be read at one shot. This object would then be processed
+   in-memory to construct the internal metadata. The costs for
+   this approach are space in the file plus the need to keep it
+   consistent with the actual metadata stored by HDF5.
+
+It should be noted that there is an effect from this change.
+Using gprof, one can see that in the original code the obj_list_add
+function was the dominate function called by a large percentage (about 20%).
+Whereas with the new code, the function call distribution is much more
+even with no function taking more than 4-5%.
+
+Some other observations:
+
+1. the utf8 code now shows up as taking about 4%. Given that most names
+   are straight ASCII, it might pay to try to optimize for this to avoid
+   invoking the utf8 processing code.
+2. In the new code, attribute processing appears to take up a lot of the
+   time. This, however might be an artifact of the test cases.
+3. There is a small performance improvement from avoiding walking the linked
+   list. It appears that creating a file is about 10% faster and opening a file
+   is also about 10% faster.
+
+\section Snotes_and_warnings Notes and Warning
+
+1. NCindex is currently not used for enum constants and compound fields.
+   Additionally, it is not used for listing the dimensions associated
+   with a variable.
+2. References between meta-data objects (e.g. group parent or
+   containing group) are stored directly and not using any kind
+   of vector or hashtable.
+3. Attribute deletion is still a costly operation because it causes
+   the whole attribute index to be rebuilt.
+4. Renaming is still a costly operation because it causes
+   the whole containing index to be rebuilt.
+5. As in the original code, object ids (dimid, etc) are assigned
+   explicitly using counters within the NC_FILE_INFO_T object.
+   When stored into, for example, "alldims", the position of the
+   object is forcibly made to match the value of the assigned id.
+6. The file nchashmap.c has a constant, SMALLTABLE, that controls
+   the size of the default hash table. Setting this constant
+   may be useful in debugging by reducing the default table size.
+7. The file ncindex.c has a constant, SMALLTABLE, that controls
+   the size of the default hash table. Setting this constant
+   may be useful in debugging by reducing the default table size.
+8. The file ncindex.c has a constant, NCNOHASH, that controls
+   if the index uses that hash table versus just searching the
+   index's vector. This is for experimental purposes.
+
+\section Sprovenance Contact Information
+
+__Author__: Dennis Heimbigner<br>
+__Initial Version__: 01/10/2018<br>
+__Last Revised__: 03/15/2018
+
+*/

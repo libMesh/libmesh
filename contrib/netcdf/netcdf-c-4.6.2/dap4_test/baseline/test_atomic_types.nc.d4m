@@ -1,0 +1,29 @@
+netcdf test_atomic_types {
+types:
+  byte enum cloud_class_t {Clear = 0, Cumulonimbus = 1, Stratus = 2, 
+      Stratocumulus = 3, Cumulus = 4, Altostratus = 5, Nimbostratus = 6, 
+      Altocumulus = 7, Cirrostratus = 8, Cirrocumulus = 9, Cirrus = 10, 
+      Missing = 127} ;
+  opaque(8) opaque8_t ;
+variables:
+	byte v8 ;
+	ubyte vu8 ;
+	short v16 ;
+	ushort vu16 ;
+	int v32 ;
+	uint vu32 ;
+	int64 v64 ;
+	uint64 vu64 ;
+	float vf ;
+	double vd ;
+	char vc ;
+	string vs ;
+	opaque8_t vo ;
+	cloud_class_t primary_cloud ;
+		cloud_class_t primary_cloud:_FillValue = Missing ;
+	cloud_class_t secondary_cloud ;
+		cloud_class_t secondary_cloud:_FillValue = Missing ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+}

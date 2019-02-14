@@ -1,0 +1,9 @@
+netcdf test_one_vararray {
+dimensions:
+	d2 = 2 ;
+variables:
+	int t(d2) ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+}

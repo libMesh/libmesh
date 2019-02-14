@@ -1,0 +1,17 @@
+netcdf test_vlen7 {
+types:
+  compound v1_base_t {
+    int v_t ;
+  }; // v1_base_t
+  v1_base_t(*) v1_t ;
+dimensions:
+	d = 1 ;
+variables:
+	v1_t v1(d) ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ v1 = {{17}, {19}, {21}} ;
+}

@@ -1,0 +1,8 @@
+netcdf test_one_vararray {
+dimensions:
+ d2 = 2;
+variables:
+  int t(d2);
+data:
+  t = 17, 37;
+}

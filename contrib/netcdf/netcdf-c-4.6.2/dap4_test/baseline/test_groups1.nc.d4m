@@ -1,0 +1,28 @@
+netcdf test_groups1 {
+dimensions:
+	dim1 = 5 ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+
+group: g {
+  dimensions:
+  	dim2 = 3 ;
+
+  group: h {
+    dimensions:
+    	dim3 = 7 ;
+    variables:
+    	int v1(dim1) ;
+    	float v2(dim2) ;
+    } // group h
+
+  group: i {
+    dimensions:
+    	dim3 = 7 ;
+    variables:
+    	int v1(dim1) ;
+    	float v3(dim3) ;
+    } // group i
+  } // group g
+}

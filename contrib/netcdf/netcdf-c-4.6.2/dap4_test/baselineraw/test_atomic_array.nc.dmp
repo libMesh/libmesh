@@ -1,0 +1,51 @@
+netcdf test_atomic_array {
+types:
+  byte enum cloud_class_t {Clear = 0, Cumulonimbus = 1, Stratus = 2, 
+      Stratocumulus = 3, Cumulus = 4, Altostratus = 5, Nimbostratus = 6, 
+      Altocumulus = 7, Cirrostratus = 8, Cirrocumulus = 9, Cirrus = 10, 
+      Missing = 127} ;
+  opaque(16) opaque16_t ;
+dimensions:
+	d1 = 1 ;
+	d2 = 2 ;
+	d3 = 3 ;
+	d4 = 4 ;
+	d5 = 5 ;
+variables:
+	ubyte vu8(d2, d3) ;
+	short v16(d4) ;
+	uint vu32(d2, d3) ;
+	double vd(d2) ;
+	char vc(d2) ;
+	string vs(d2, d2) ;
+	opaque16_t vo(d1, d2) ;
+	cloud_class_t primary_cloud(d5) ;
+		cloud_class_t primary_cloud:_FillValue = Missing ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ vu8 =
+  255, 1, 2,
+  3, 4, 5 ;
+
+ v16 = 1, 2, 3, 4 ;
+
+ vu32 =
+  5, 4, 3,
+  2, 1, 0 ;
+
+ vd = 17.9, 1024.8 ;
+
+ vc = "@&" ;
+
+ vs =
+  "hello\tworld", "\r\n",
+  "Καλημέα", "abc" ;
+
+ vo =
+  0X0123456789ABCDEF0000000000000000, 0XABCDEF00000000000000000000000000 ;
+
+ primary_cloud = Clear, Stratus, Clear, Cumulonimbus, _ ;
+}

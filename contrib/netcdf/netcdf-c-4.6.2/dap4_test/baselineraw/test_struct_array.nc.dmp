@@ -1,0 +1,22 @@
+netcdf test_struct_array {
+types:
+  compound s_t {
+    int x ;
+    int y ;
+  }; // s_t
+dimensions:
+	dx = 4 ;
+	dy = 3 ;
+variables:
+	s_t s(dx, dy) ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ s =
+  {1, -1}, {17, 37}, {-32767, 32767},
+  {-1, 3}, {-2, 2}, {-3, 1},
+  {-4, 12}, {-8, 8}, {-12, 4},
+  {-5, 15}, {-10, 10}, {-15, 5} ;
+}
