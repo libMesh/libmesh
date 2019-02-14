@@ -337,7 +337,7 @@ public:
   contract (const TypeTensor<T2> &) const;
 
   /**
-   * Multiply this tensor by a vector, i.e. matrix-vector product.
+   * Right-multiply this tensor by a vector, i.e. matrix-vector product.
    * The tensor and vector may contain different numeric types.
    *
    * \returns A copy of the result vector, this tensor is unchanged.
@@ -345,6 +345,16 @@ public:
   template <typename T2>
   TypeVector<typename CompareTypes<T,T2>::supertype>
   operator * (const TypeVector<T2> &) const;
+
+  /**
+   * Left-multiply this tensor by a vector, i.e. matrix-vector product.
+   * The tensor and vector may contain different numeric types.
+   *
+   * \returns A copy of the result vector, this tensor is unchanged.
+   */
+  template <typename T2>
+  TypeVector<typename CompareTypes<T,T2>::supertype>
+  left_multiply (const TypeVector<T2> & p) const;
 
   /**
    * \returns The transpose of this tensor (with complex numbers not conjugated).
@@ -1185,7 +1195,27 @@ TypeTensor<T>::operator * (const TypeVector<T2> & p) const
   return returnval;
 }
 
+template <typename T>
+template <typename T2>
+inline
+TypeVector<typename CompareTypes<T,T2>::supertype>
+TypeTensor<T>::left_multiply (const TypeVector<T2> & p) const
+{
+  TypeVector<typename CompareTypes<T,T2>::supertype> returnval;
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
+      returnval(i) += p(i)*(*this)(i,j);
 
+  return returnval;
+}
+
+template <typename T, typename T2>
+inline
+TypeVector<typename CompareTypes<T,T2>::supertype>
+operator * (const TypeVector<T> & a, const TypeTensor<T2> & b)
+{
+  return b.left_multiply(a);
+}
 
 template <typename T>
 template <typename T2>
