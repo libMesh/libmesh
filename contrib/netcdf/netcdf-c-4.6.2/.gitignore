@@ -14,6 +14,13 @@ ncgen/ncgen
 ncgen3/ncgen3
 ncdump/ctest.c
 ncdump/ctest64.c
+libsrc/ncx.c
+libsrc/attr.c
+libsrc/putget.c
+nc_test/test_write.c
+nc_test/test_read.c
+nc_test/test_put.c
+nc_test/test_get.c
 
 # 'make check' produces these
 examples/C/pres_temp_4D.nc
