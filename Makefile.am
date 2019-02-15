@@ -42,7 +42,18 @@ EXTRA_DIST = reference_elements \
              contrib/tecplot/README \
              contrib/bin/strip_dup_incl_paths.pl \
              contrib/bin/strip_dup_libs.pl \
-             CITATION
+             CITATION \
+             contrib/metaphysicl/README
+
+# If the metaphysicl submodule has not been initialized, throw an
+# error during "make dist". We need the submodule to be properly
+# initalized so that the sources can be copied into the distribution,
+# and trying to do it "on the fly" is too complicated.
+contrib/metaphysicl/README:
+	@echo ""
+	@echo "Error: You must run git submodule update --init contrib/metaphysicl first"
+	@echo ""
+	@exit 1
 
 nobase_data_DATA = \
         reference_elements/2D/one_quad.xda \
