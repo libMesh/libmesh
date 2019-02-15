@@ -1,0 +1,53 @@
+netcdf nc4_unsigned_types {
+dimensions:
+	lat = 6 ;
+	lon = 5 ;
+	time = 2 ;
+variables:
+	int lat(lat) ;
+		string lat:units = "degrees_north" ;
+	int lon(lon) ;
+		string lon:units = "degrees_east" ;
+	int time(time) ;
+		string time:units = "seconds" ;
+	uint temp(time, lat, lon) ;
+		string temp:_edu.ucar.maps = "/time", "/lat", "/lon" ;
+	ushort rh(time, lat, lon) ;
+		rh:_FillValue = 9999US ;
+		string rh:_edu.ucar.maps = "/time", "/lat", "/lon" ;
+data:
+
+ lat = 0, 10, 20, 30, 40, 50 ;
+
+ lon = -140, -118, -96, -84, -52 ;
+
+ time = 1, 2 ;
+
+ temp =
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7 ;
+
+ rh =
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2 ;
+}

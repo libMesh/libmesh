@@ -1,0 +1,12 @@
+netcdf test_struct_type {
+types:
+  compound s_t {
+    int x ;
+    int y ;
+  }; // s_t
+variables:
+	s_t s ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+}

@@ -1,0 +1,15 @@
+netcdf test {
+dimensions:
+	person = 5 ;
+variables:
+	int person.age(person) ;
+
+// global attributes:
+		:Facility.PrincipleInvestigator = "Mark Abbott\n",
+			"Ph.D" ;
+		:Facility.DataCenter = "COAS Environmental Computer Facility" ;
+		:Facility.DrifterType = "MetOcean WOCE/OCM" ;
+data:
+
+ person.age = 1, 2, 3, 5, 8 ;
+}

@@ -1,0 +1,37 @@
+<Dataset
+   name="test_enum_2.nc"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Types>
+    <Enumeration name="cloud_class_t" basetype="Int8">
+      <EnumConst name="Clear" value="0"/>
+      <EnumConst name="Cumulonimbus" value="1"/>
+      <EnumConst name="Stratus" value="2"/>
+      <EnumConst name="Stratocumulus" value="3"/>
+      <EnumConst name="Cumulus" value="4"/>
+      <EnumConst name="Altostratus" value="5"/>
+      <EnumConst name="Nimbostratus" value="6"/>
+      <EnumConst name="Altocumulus" value="7"/>
+      <EnumConst name="Cirrostratus" value="8"/>
+      <EnumConst name="Cirrocumulus" value="9"/>
+      <EnumConst name="Cirrus" value="10"/>
+      <EnumConst name="Missing" value="127"/>
+    </Enumeration>
+  </Types>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+  <Groups>
+    <Group name="h">
+      <Variables>
+        <Enum name="primary_cloud" enum="/cloud_class_t">
+          <Attribute name="_FillValue" type="/cloud_class_t">
+            <Value value="Missing"/>
+          </Attribute>
+        </Enum>
+      </Variables>
+    </Group>
+  </Groups>
+</Dataset>

@@ -1,0 +1,401 @@
+/**
+@if INTERNAL
+
+@page inmemintern Internal Architecture for NC_INMEMORY Support
+
+\tableofcontents
+
+<!-- Note that this file has the .dox extension, but is mostly markdown -->
+<!-- Begin MarkDown -->
+
+# Introduction {#inmemintern_intro}
+
+This document describes the internal workings
+of the inmemory features of the netcdf-c library.
+The companion document to this -- inmemory.md --
+describes the "external" operation of the inmemory features.
+
+This document describes how the in-memory operation
+is implemented both for netcdf-3 files and for netcdf-4 files.
+
+# Generic Capabilities {#inmemintern_general}
+
+Both the netcdf-3 and netcdf-4 implementations assume that
+they are initially given a (pointer,size) pair representing
+a chunk of allocated memory of specified size.
+
+If a file is being created instead of opened, then only the size
+is needed and the netcdf-c library will internally allocate the
+corresponding memory chunk.
+
+If NC_DISKLESS is being used, then a chunk of memory is allocated
+whose size is the same as the length of the file, and the contents
+of the file is then read into that chunk of memory.
+
+This information is in general represented by the following struct
+(see include/netcdf_mem.h).
+````
+typedef struct NC_memio {
+    size_t size;
+    void* memory;
+    int flags;
+} NC_memio;
+
+````
+The flags field describes properties and constraints to be applied
+to the given memory. At the moment, only this one flag is defined.
+````
+#define NC_MEMIO_LOCKED 1
+````
+If this flag is set, then the netcdf library will ensure that
+the original allocated memory is ```locked```, which means
+that it  will never be realloc'd nor free'd.
+Note that this flag is ignored when creating a memory file: it is only
+relevant when opening a pre-allocated chunk of memory via the
+_nc_open_mem_ function.
+
+Note that this flag does not prevent the memory from being modified.
+If there is room, then the memory may be modified in place. If the size
+of the memory needs to be increased and the this flag is set, then
+the operation will fail.
+
+When the _nc_close_memio_ function is called instead of
+_nc_close_, then the currently allocated memory (and its size)
+is returned. If the _NC_MEMIO_LOCKED_ flag is set, then it
+should be the case that the chunk of memory returned is the same
+as originally provided. However, the size may be different
+because it represents the amount of memory that contains
+meaningful data; this value may be less than the original provided size.
+The actual allocated size for the memory chunk is the same as originally
+provided, so it that value is needed, then the caller must save it somewhere.
+
+Note also that ownership of the memory chunk is given to the
+caller, and it is the caller's responsibility to _free_ the memory.
+
+# NetCDF-4 Implementation {#inmemintern_nc4}
+
+The implementation of in-memory support for netcdf-4 files
+is quite complicated. 
+
+The netCDF-4 implemention relies on the HDF5 library.  In order
+to implement in-memory storage of data, the HDF5 core driver is
+used to manage underlying storage of the netcdf-c file.
+
+An HDF5 driver is an abstract interface that allows different
+underlying storage implementations. So there is a standard file
+driver as well as a core driver, which uses memory as the
+underlying storage.
+
+Generically, the memory is referred to as a file image [1].
+
+## libhdf5/nc4mem
+
+The primary API for in-memory operations is in the file
+libhdf5/nc4mem.c and the defined functions are described in the next sections
+
+### nc4mem.NC4_open_image_file
+
+The signature is:
+````
+int NC4_open_image_file(NC_FILE_INFO_T* h5)
+````
+Basically, this function sets up the necessary state information
+to use the HDF5 core driver.
+It obtains the memory chunk and size from the _h5->mem.memio_ field.
+
+Specifically, this function converts the 
+_NC_MEMIO_LOCKED_ flag into using the HDF5 image specific flags:
+_H5LT_FILE_IMAGE_DONT_COPY_ and  _H5LT_FILE_IMAGE_DONT_RELEASE_.
+It then invokes the function _libhdf5/nc4memcb/NC4_image_init_
+function to do the necessary HDF5 specific setup.
+
+### nc4mem.NC4_create_image_file
+
+The signature is:
+````
+int NC4_create_image_file(NC_FILE_INFO_T* h5, size_t initialsize)
+````
+
+This function sets up the necessary state information
+to use the HDF5 core driver, but for a newly created file.
+It initializes the memory chunk and size in the _h5->mem.memio_ field
+from the _initialsize_ argument and it leaves the memory chunk pointer NULL.
+It ignores the _NC_MEMIO_LOCKED_ flag.
+It then invokes the function _libhdf5/nc4memcb/NC4_image_init_
+function to do the necessary HDF5 specific setup.
+
+### libhdf5/hdf5file.c/nc4_close-netcdf4_file
+
+When a file is closed, this function is invoked. As part of its operation,
+and if the file is an in-memory file, it does one of two things.
+
+1. If the user provided an _NC_memio_ instance, then return the final image
+in that instance; the user is then responsible for freeing it.
+2. If no _NC_memio_ instance was provided, then just discard the final image.
+
+## libhdf5/nc4memcb
+
+The HDF5 core driver uses an abstract interface for managing the
+allocation and free'ing of memory. This interface is defined
+as a set of callback functions [2] that implement the functions
+of this struct.
+
+````
+typedef struct {
+    void *(*_malloc)(size_t size, H5_file_image_op_t op, void *udata);
+    void *(*_memcpy)(void *dest, const void *src, size_t size,
+                     H5_file_image_op_t op, void *udata);
+    void *(*_realloc)(void *ptr, size_t size,
+                      H5_file_image_op_t op, void *udata);
+    herr_t (*_free)(void *ptr, H5_file_image_op_t op, void *udata);
+    void *(*udata_copy)(void *udata); 
+    herr_t (*udata_free)(void *udata); 
+    void *udata;
+} H5_file_image_callbacks_t;
+````
+The _udata_ field at the end defines any extra state needed by the functions.
+Each function is passed the udata as its last argument. The structure of the
+udata is arbitrary, and is passed as _void*_ to the functions.
+
+The _udata_ structure and callback functions used by the netcdf-c library
+are defined in the file _libhdf5/nc4memcb.c_. Setup is defined by the
+function _NC4_image_init_ in that same file.
+
+The _udata_ structure used by netcdf is as follows.
+````
+typedef struct {
+    void *app_image_ptr;	/* Pointer to application buffer */
+    size_t app_image_size;	/* Size of application buffer */
+    void *fapl_image_ptr;	/* Pointer to FAPL buffer */
+    size_t fapl_image_size;	/* Size of FAPL buffer */
+    int fapl_ref_count;		/* Reference counter for FAPL buffer */
+    void *vfd_image_ptr;	/* Pointer to VFD buffer (Note: VFD => used by core driver) */
+    size_t vfd_image_size;	/* Size of VFD buffer */
+    int vfd_ref_count;		/* Reference counter for VFD buffer */
+    unsigned flags;		/* Flags indicate how the file image will be opened */
+    int ref_count;		/* Reference counter on udata struct */
+    NC_FILE_INFO_T* h5;		/* Pointer to the netcdf parent structure */
+} H5LT_file_image_ud_t;
+````
+
+It is necessary to understand one more point about the callback functions.
+The first four take an argument of type _H5_file_image_op_t_ -- the operator.
+This is an enumeration that indicates additional context about the purpose for
+which the callback is being invoked. For the purposes of the netcdf-4
+implementation, only the following operators are used.
+
+- H5FD_FILE_IMAGE_OP_PROPERTY_LIST_SET
+- H5FD_FILE_IMAGE_OP_PROPERTY_LIST_COPY
+- H5FD_FILE_IMAGE_OP_PROPERTY_LIST_GET
+- H5FD_FILE_IMAGE_OP_PROPERTY_LIST_CLOSE
+- H5FD_FILE_IMAGE_OP_FILE_OPEN
+- H5FD_FILE_IMAGE_OP_FILE_RESIZE
+- H5FD_FILE_IMAGE_OP_FILE_CLOSE
+
+As can be seen, basically the operators indicate if the operation is with respect to
+an HDF5 property list, or with respect to a file (i.e. a core image in this case).
+For each callback described below, the per-operator actions will be described.
+Not all operators are used with all callbacks.
+
+Internally, the HDF5 core driver thinks it is doing the following:
+
+1. Allocate memory and copy the incoming memory chunk into that newly allocated memory
+   (call image_malloc followed by image_memcpy).
+2. Periodically reallocate the memory to increase its size
+   (call image_realloc).
+3. Free up the memory as no longer needed
+   (call image_free).
+
+It turns out that for propertly lists, realloc is never called.
+However the HDF5 core driver follows all of the above steps.
+
+The following sections describe the callback function operation.
+
+### libhdf5/nc4memcb/local_image_malloc
+
+This function is called to allocated an internal chunk of memory so
+the original provided memory is no longer needed. In order to implement
+the netcdf-c semantics, we modify this behavior.
+
+#### Operator H5FD_FILE_IMAGE_OP_PROPERTY_LIST_SET
+We assume that the property list image info will never need to be modified,
+so we just copy the incoming buffer info (the app_image fields) into the fapl_image fields. 
+
+#### Operator H5FD_FILE_IMAGE_OP_PROPERTY_LIST_COPY
+Basically just return the fapl_image_ptr field, so no actual copying.
+
+#### Operator H5FD_FILE_IMAGE_OP_PROPERTY_LIST_COPY and H5FD_FILE_IMAGE_OP_PROPERTY_LIST_GET
+Basically just return the fapl_image_ptr field, so no actual copying or malloc needed.
+
+#### Operator H5FD_FILE_IMAGE_OP_FILE_OPEN
+Since we always start by using the original incoming image buffer, we just
+need to store that pointer and size into the vfd_image fields (remember, vfd is that
+used by the core driver).
+
+### libhdf5/nc4memcb/local_image_memcpy
+This function is supposed to be used to copy the incoming buffer into an internally
+malloc'd buffer. Since we use the original buffer, no memcpy is actually needed.
+As a safety check, we do actually do a memcpy if, for some reason, the _src_ and _dest_
+arguments are different. In practice, this never happens.
+
+### libhdf5/nc4memcb/local_image_realloc
+Since the property list image is never realloc'd this is only called with 
+_H5FD_FILE_IMAGE_OP_FILE_RESIZE_.
+
+If the memory is not locked (i.e. the _NC_MEMIO_LOCKED_ flag was not used),
+then we are free to realloc the vfd_ptr.  But if the memory is locked,
+then we cannot realloc and we must fake it as follows:
+
+1. If the chunk is big enough, then pretend to do a realloc by
+   changing the vfd_image_size.
+2. If the chunk is not big enough to accomodate the requested new size,
+   then fail.
+
+There is one important complication. It turns out that the image_realloc
+callback is sometimes called with a ptr argument value of NULL. This assumes
+that if realloc is called with a NULL buffer pointer, then it acts like _malloc_.
+Since we have found that some systems to do not implement this, we implement it
+in our local_image_realloc code and do a _malloc_ instead of _realloc_.
+
+### libhdf5/nc4memcb/local_image_free
+
+This function is, of course, invoked to deallocate memory.
+It is only invoked with the 
+H5FD_FILE_IMAGE_OP_PROPERTY_LIST_CLOSE
+and H5FD_FILE_IMAGE_OP_FILE_CLOSE
+operators.
+
+#### Operator H5FD_FILE_IMAGE_OP_PROPERTY_LIST_CLOSE
+For the way the netcdf library uses it, it should still be the case that
+the fapl pointer is same as original incoming app_ptr, so we do not need
+to do anything for this operator.
+
+#### Operator H5FD_FILE_IMAGE_OP_FILE_CLOSE
+Since in our implementation, we maintain control of the memory, this case
+will never free any memory, but may save a pointer to the current vfd memory
+so it can be returned to the original caller, if they want it.
+Specifically the vfd_image_ptr and vfd_image_size are always
+copied to the _udata->h5->mem.memio_ field so they can
+be referenced by higher level code.
+
+### libhdf5/nc4memcb/local_udata_copy
+Our version of this function only manipulates the reference count.
+
+### libhdf5/nc4memcb/local_udata_free
+Our version of this function only manipulates the reference count.
+
+# NetCDF-3 Implementation {#inmemintern_nc3}
+
+The netcdf-3 code -- in libsrc -- has its own, internal storage
+management API as defined in the file _libsrc/ncio.h_. It implements
+the API in the form of a set of function pointers as defined in the
+structure _struct_ _ncio_. These function have the following signatures
+and semantics.
+
+- int ncio_relfunc(ncio*, off_t offset, int rflags) --
+  Indicate that you are done with the region which begins at offset.
+- int ncio_getfunc(ncio*, off_t offset, size_t extent, int rflags, void **const vpp) --
+  Request that the region (offset, extent) be made available through *vpp.
+- int ncio_movefunc(ncio*, off_t to, off_t from, size_t nbytes, int rflags) --
+  Like memmove(), safely move possibly overlapping data.
+- int ncio_syncfunc(ncio*) --
+  Write out any dirty buffers to disk and ensure that next read will get data from disk.
+- int ncio_pad_lengthfunc(ncio*, off_t length) --
+  Sync any changes to disk, then truncate or extend file so its size is length.
+- int ncio_closefunc(ncio*, int doUnlink)
+  -- Write out any dirty buffers and ensure that next read will not get cached data.
+  Then sync any changes, and then close the open file.
+
+The _NC_INMEMORY_ semantics are implemented by creating an implementation of the above functions
+specific for handling in-memory support. This is implemented in the file _libsrc/memio.c_.
+
+## Open/Create/Close
+
+Open and close related functions exist in _memio.c_ that are not specifically part of the API.
+These functions are defined in the following sections.
+
+### memio_create
+Signature:
+````
+int memio_create(const char* path, int ioflags, size_t initialsz, off_t igeto, size_t igetsz, size_t* sizehintp, void* parameters /*ignored*/, ncio* *nciopp, void** const mempp)
+````
+Create a new file. Invoke _memio_new_ to create the _ncio_
+instance.  If it is intended that the resulting file be
+persisted to the file system, then verify that writing such a
+file is possible.  Also create an initial in-memory buffer to
+hold the file data.  Otherwise act like e.g. _posixio_create_.
+
+### memio_open
+Signature:
+````
+int memio_open(const char* path, int ioflags, off_t igeto, size_t igetsz, size_t* sizehintp, void* parameters, ncio* *nciopp, void** const mempp)
+````
+Open an existing file. Invoke _memio_new_ to create the _ncio_
+instance.  If it is intended that the resulting file be
+persisted to the file system, then verify that writing such a
+file is possible.  Also create an initial in-memory buffer to
+hold the file data. Read the contents of the existing file into
+the allocated memory.
+Otherwise act like e.g. _posixio_open_.
+
+### memio_extract
+Signature:
+````
+int memio_extract(ncio* const nciop, size_t* sizep, void** memoryp)
+````
+This function is called as part of the NC3_close function in the event that
+the user wants the final in-memory chunk returned to them via _nc_close_mem_.
+It captures the existing in-memory chunk and returns it. At this point,
+memio will no longer have access to that memory.
+
+## API Semantics
+
+The semantic interaction of the above API and NC_INMEMORY are described in the following sections.
+
+### ncio_relfunc
+Just unlock the in-memory chunk.
+
+### ncio_getfunc
+First guarantee that the requested region exists, and if necessary,
+realloc to make it exist. If realloc is needed, and the
+file is locked, then fail.
+
+### ncio_movefunc
+First guarantee that the requested destination region exists, and if necessary,
+realloc to make it exist. If realloc is needed, and the
+file is locked, then fail.
+
+### ncio_syncfunc
+This is a no-op as far as memio is concerned.
+
+### ncio_pad_lengthfunc
+This may realloc the allocated in-memory buffer to achieve padding
+rounded up to the pagesize.
+
+### ncio_filesizefunc
+This just returns the used size of the in-memory chunk.
+Note that the allocated size might be larger.
+
+### ncio_closefunc
+If the usere wants the contents persisted, then write out the used portion
+of the in-memory chunk to the target file.
+Then, if the in-memory chunk is not locked, or for some reason has
+been modified, go ahead and free that memory.
+
+# References {#inmemintern_bib}
+
+1. https://support.hdfgroup.org/HDF5/doc1.8/Advanced/FileImageOperations/HDF5FileImageOperations.pdf
+2. https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetFileImageCallbacks
+
+# Point of Contact {#inmemintern_poc}
+
+__Author__: Dennis Heimbigner<br>
+__Email__: dmh at ucar dot edu<br>
+__Initial Version__: 8/28/2018<br>
+__Last Revised__: 8/28/2018
+
+<!-- End MarkDown -->
+
+@endif
+
+*/

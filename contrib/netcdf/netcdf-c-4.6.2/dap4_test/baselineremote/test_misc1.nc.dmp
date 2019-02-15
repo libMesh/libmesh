@@ -1,0 +1,29 @@
+netcdf test_misc1 {
+dimensions:
+	lat = 6 ;
+	lon = 4 ;
+	time = UNLIMITED ; // (0 currently)
+	unlim = UNLIMITED ; // (3 currently)
+variables:
+	float lat(lat) ;
+		lat:units = "d" ;
+	float lon(lon) ;
+		lon:units = "d" ;
+	double time(time) ;
+		time:units = "s" ;
+	float pr(time, lat, lon) ;
+		pr:standard_name = "a" ;
+		pr:units = "h" ;
+	float var(unlim) ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+		:title = "e" ;
+data:
+
+ lat = _, _, _, _, _, _ ;
+
+ lon = _, _, _, _ ;
+
+ var = 0, 1, 3 ;
+}

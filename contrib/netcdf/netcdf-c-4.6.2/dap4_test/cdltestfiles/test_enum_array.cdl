@@ -1,0 +1,14 @@
+netcdf test_enum_array {
+types:
+  byte enum cloud_class_t {Clear = 0, Cumulonimbus = 1, Stratus = 2, 
+      Stratocumulus = 3, Cumulus = 4, Altostratus = 5, Nimbostratus = 6, 
+      Altocumulus = 7, Cirrostratus = 8, Cirrocumulus = 9, Cirrus = 10, 
+      Missing = 127} ;
+dimensions:
+  d5 = 5;
+variables:
+  cloud_class_t primary_cloud(d5);
+    cloud_class_t primary_cloud:_FillValue = Missing ;
+data:
+ primary_cloud = Clear, Stratus, Clear, Cumulonimbus, _ ;
+}

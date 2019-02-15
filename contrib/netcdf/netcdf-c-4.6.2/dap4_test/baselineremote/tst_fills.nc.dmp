@@ -1,0 +1,17 @@
+netcdf tst_fills {
+variables:
+	ubyte uv8 ;
+	short v16 ;
+	int uv32 ;
+		uv32:_FillValue = 17 ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ uv8 = 240 ;
+
+ v16 = 32700 ;
+
+ uv32 = 111000 ;
+}

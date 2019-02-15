@@ -1,0 +1,27 @@
+<Dataset
+   name="test_struct_nested.nc"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Types>
+    <Structure name="x">
+      <Struct name="field1" type="/x_field1"/>
+      <Struct name="field2" type="/x_field2"/>
+    </Structure>
+    <Structure name="x_field1">
+      <Int32 name="x"/>
+      <Int32 name="y"/>
+    </Structure>
+    <Structure name="x_field2">
+      <Int32 name="x"/>
+      <Int32 name="y"/>
+    </Structure>
+  </Types>
+  <Variables>
+    <Struct name="x" type="/x"/>
+  </Variables>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+</Dataset>

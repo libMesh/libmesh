@@ -1,0 +1,34 @@
+<Dataset
+   name="test_atomic_array.nc"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Dimensions>
+    <Dimension name="_Anonymous1" size="1"/>
+    <Dimension name="_Anonymous2" size="2"/>
+  </Dimensions>
+  <Variables>
+    <UInt8 name="vu8">
+      <Dim name="/_Anonymous1"/>
+      <Dim name="/_Anonymous2"/>
+    </UInt8>
+    <Float64 name="vd">
+      <Dim name="/_Anonymous1"/>
+    </Float64>
+    <String name="vs">
+      <Dim name="/_Anonymous1"/>
+      <Dim name="/_Anonymous1"/>
+    </String>
+    <Opaque name="vo" type="/opaque8_t">
+      <Dim name="/_Anonymous1"/>
+      <Dim name="/_Anonymous1"/>
+    </Opaque>
+  </Variables>
+  <Attribute name="_dap4.ce" type="String">
+    <Value value="/vu8[1][0:2:2];/vd[1];/vs[1][0];/vo[0][1]"/>
+  </Attribute>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+</Dataset>

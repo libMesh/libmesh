@@ -1,0 +1,19 @@
+netcdf test_sequence_2.syn {
+types:
+  compound s_base_t {
+    int i1 ;
+    short sh1 ;
+  }; // s_base_t
+  s_base_t(*) s_t ;
+dimensions:
+	_Anonymous2 = 2 ;
+variables:
+	s_t s(_Anonymous2) ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ s = {{-920699049, 896}}, 
+    {{-1123468835, -18686}, {2125143125, -21899}, {1268468519, -22144}, {989876086, 3361}} ;
+}

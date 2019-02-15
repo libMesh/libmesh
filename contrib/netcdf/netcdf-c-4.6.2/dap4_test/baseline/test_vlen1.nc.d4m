@@ -1,0 +1,12 @@
+netcdf test_vlen1 {
+types:
+  compound x_base_t {
+    int x ;
+  }; // x_base_t
+  x_base_t(*) x_t ;
+variables:
+	x_t x ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+}

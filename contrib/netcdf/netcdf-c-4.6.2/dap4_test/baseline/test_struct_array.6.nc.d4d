@@ -1,0 +1,20 @@
+netcdf test_struct_array.6.nc {
+types:
+  compound s_t {
+    int x ;
+    int y ;
+  }; // s_t
+dimensions:
+	_Anonymous2 = 2 ;
+variables:
+	s_t s(_Anonymous2, _Anonymous2) ;
+
+// global attributes:
+		string :_dap4.ce = "/s[0:2:3][0:1]" ;
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ s =
+  {1, -1}, {17, 37},
+  {-4, 12}, {-8, 8} ;
+}

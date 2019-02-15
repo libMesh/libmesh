@@ -1,0 +1,15 @@
+netcdf test_struct_nested {
+  types:
+    compound s1_t {
+      int x ;
+      int y ;
+    }; // s1_t
+    compound s2_t {
+      s1_t field1 ;
+      s1_t field2 ;
+    }; // s2_t
+variables:
+  s2_t x;
+data:
+  x = {{1,-2}, {255, 90}};
+}

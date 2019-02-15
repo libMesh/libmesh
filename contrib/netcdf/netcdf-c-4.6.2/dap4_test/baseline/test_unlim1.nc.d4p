@@ -1,0 +1,52 @@
+<Dataset
+   name="test_unlim1.nc"
+   dapVersion="4.0"
+   dmrVersion="1.0"
+   xmlns="http://xml.opendap.org/ns/DAP/4.0#"
+   xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#">
+  <Dimensions>
+    <Dimension name="lat" size="3"/>
+    <Dimension name="lon" size="2"/>
+    <Dimension name="time" size="2" _edu.ucar.isunlimited="1"/>
+  </Dimensions>
+  <Variables>
+    <Float32 name="lat">
+      <Dim name="/lat"/>
+      <Attribute name="units" type="String">
+        <Value value="degrees_north"/>
+      </Attribute>
+    </Float32>
+    <Float32 name="lon">
+      <Dim name="/lon"/>
+      <Attribute name="units" type="String">
+        <Value value="degrees_east"/>
+      </Attribute>
+    </Float32>
+    <Float64 name="time">
+      <Dim name="/time"/>
+      <Attribute name="units" type="String">
+        <Value value="seconds since 2009-01-01"/>
+      </Attribute>
+    </Float64>
+    <Float32 name="pr">
+      <Dim name="/time"/>
+      <Dim name="/lat"/>
+      <Dim name="/lon"/>
+      <Map name="/time"/>
+      <Map name="/lat"/>
+      <Map name="/lon"/>
+      <Attribute name="standard_name" type="String">
+        <Value value="air_pressure_at_sea_level"/>
+      </Attribute>
+      <Attribute name="units" type="String">
+        <Value value="hPa"/>
+      </Attribute>
+    </Float32>
+  </Variables>
+  <Attribute name="_DAP4_Little_Endian" type="UInt8">
+    <Value value="1"/>
+  </Attribute>
+  <Attribute name="title" type="String">
+    <Value value="example for workshop"/>
+  </Attribute>
+</Dataset>

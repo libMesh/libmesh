@@ -1,0 +1,19 @@
+netcdf test_vlen10 {
+types:
+  compound v_base_v_t_t {
+    int x ;
+    float y ;
+  }; // v_base_v_t_t
+  compound v_base_t {
+    v_base_v_t_t v_t ;
+  }; // v_base_t
+  v_base_t(*) v_t ;
+variables:
+	v_t v ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ v = {{{17, 30.7}}, {{19, 101.1}}} ;
+}

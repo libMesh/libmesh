@@ -1,0 +1,16 @@
+netcdf test_sequence_1 {
+types:
+  compound s_base_t {
+    int i1 ;
+    short sh1 ;
+  }; // s_base_t
+  s_base_t(*) s_t ;
+variables:
+	s_t s ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ s = {{-920699049, 896}} ;
+}

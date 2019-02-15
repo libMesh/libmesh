@@ -1,0 +1,8 @@
+netcdf tst_gattenum {
+types:
+  ubyte enum Bradys {Mike = 0, Carol = 1, Greg = 2, Marsha = 3, Peter = 4, 
+      Jan = 5, Bobby = 6, Whats-her-face = 7, Alice = 8} ;
+
+// global attributes:
+		Bradys :brady_attribute = Mike, Marsha, Alice;
+}

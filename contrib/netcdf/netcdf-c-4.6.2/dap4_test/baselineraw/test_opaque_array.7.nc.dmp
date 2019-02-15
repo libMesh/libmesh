@@ -1,0 +1,17 @@
+netcdf test_opaque_array.7 {
+types:
+  opaque(16) opaque16_t ;
+dimensions:
+	_Anonymous1 = 1 ;
+	_Anonymous2 = 2 ;
+variables:
+	opaque16_t vo2(_Anonymous1, _Anonymous2) ;
+
+// global attributes:
+		string :_dap4.ce = "/vo2[1][0:1]" ;
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ vo2 =
+  0XFEDCBA98765432100000000000000000, 0XFEDCBA99999999990000000000000000 ;
+}

@@ -1,0 +1,13 @@
+netcdf test {
+variables:
+	double f64 ;
+
+// global attributes:
+		:Facility.PrincipleInvestigator = "Mark Abbott\n",
+			"Ph.D" ;
+		:Facility.DataCenter = "COAS Environmental Computer Facility" ;
+		:Facility.DrifterType = "MetOcean WOCE/OCM" ;
+data:
+
+ f64 = 1000 ;
+}

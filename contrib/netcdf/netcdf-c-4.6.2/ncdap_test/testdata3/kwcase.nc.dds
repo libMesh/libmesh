@@ -1,0 +1,9 @@
+Dataset {
+    Float64 Grid[Grid = 12];
+    Grid {
+      Array:
+        Float32 SST[Grid = 12];
+      Maps:
+        Float64 Grid[Grid = 12];
+    } SST;
+} kwcase.nc;

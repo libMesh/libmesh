@@ -1,0 +1,8 @@
+netcdf test_opaque {
+types:
+  opaque(8) o_t;  
+variables:
+  o_t vo1;
+data:
+ vo1 = 0X0123456789ABCDEF ;
+}

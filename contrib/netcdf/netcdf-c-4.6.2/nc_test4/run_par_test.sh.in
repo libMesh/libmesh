@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# This .in file is processed at build time into a shell that runs some
+# parallel I/O tests for HDF5 parallel I/O.
+
+# Ed Hartnett, Dennis Heimbigner, Ward Fisher
+
+set -e
+echo
+echo "Testing MPI parallel I/O with various other mode flags..."
+@MPIEXEC@ -n 1 ./tst_mode
+echo
+echo "Testing MPI parallel I/O without netCDF..."
+@MPIEXEC@ -n 4 ./tst_mpi_parallel
+echo
+echo "Testing very simple parallel I/O with 4 processors..."
+@MPIEXEC@ -n 4 ./tst_parallel
+echo
+echo "Testing simple parallel I/O with 16 processors..."
+@MPIEXEC@ -n 16 ./tst_parallel3
+echo
+echo "num_proc   time(s)  write_rate(B/s)"
+@MPIEXEC@ -n 1 ./tst_parallel4
+@MPIEXEC@ -n 2 ./tst_parallel4
+@MPIEXEC@ -n 4 ./tst_parallel4
+@MPIEXEC@ -n 8 ./tst_parallel4
+
+#@MPIEXEC@ -n 16 ./tst_parallel4
+#@MPIEXEC@ -n 32 ./tst_parallel4
+#@MPIEXEC@ -n 64 ./tst_parallel4
+echo
+echo "Testing collective writes with some 0 element writes..."
+@MPIEXEC@ -n 4 ./tst_parallel5
+
+echo
+echo "Parallel Performance Test for NASA"
+@MPIEXEC@ -n 4 ./tst_nc4perf
+
+echo
+echo "Parallel I/O test for Collective I/O, contributed by HDF Group."
+@MPIEXEC@ -n 1 ./tst_simplerw_coll_r
+@MPIEXEC@ -n 2 ./tst_simplerw_coll_r
+@MPIEXEC@ -n 4 ./tst_simplerw_coll_r

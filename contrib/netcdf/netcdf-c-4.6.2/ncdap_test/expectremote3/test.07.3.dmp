@@ -1,0 +1,24 @@
+netcdf test {
+dimensions:
+	maxStrlen64 = 64 ;
+	person = 5 ;
+variables:
+	char person.name(person, maxStrlen64) ;
+	int person.age(person) ;
+
+// global attributes:
+		:Facility.PrincipleInvestigator = "Mark Abbott\n",
+			"Ph.D" ;
+		:Facility.DataCenter = "COAS Environmental Computer Facility" ;
+		:Facility.DrifterType = "MetOcean WOCE/OCM" ;
+data:
+
+ person.name =
+  "This is a data test string (pass 0).",
+  "This is a data test string (pass 1).",
+  "This is a data test string (pass 2).",
+  "This is a data test string (pass 3).",
+  "This is a data test string (pass 4)." ;
+
+ person.age = 1, 2, 3, 5, 8 ;
+}

@@ -1,0 +1,11 @@
+netcdf test_fill {
+variables:
+  ubyte uv8;
+  short v16;
+  uint uv32;
+	uv32:_FillValue=17;
+data:
+  uv8 = 240;
+  v16 = 32700;
+  uv32 = 111000;
+}

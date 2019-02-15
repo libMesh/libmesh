@@ -1,0 +1,13 @@
+netcdf test_vlen4 {
+
+types:
+  int(*) v_t;
+  compound c_t {v_t f1(2);};
+
+variables:
+  c_t v1;  
+
+data:
+  v1 = {{{1, 3, 5, 7},{100,200}}} ;
+}
+

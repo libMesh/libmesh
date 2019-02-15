@@ -1,0 +1,35 @@
+netcdf test_groups1 {
+dimensions:
+  dim1 = 5 ;
+
+group: g {
+  dimensions:
+    dim2 = 3 ;
+
+  group: h {
+    dimensions:
+      dim3 = 7 ;
+    variables:
+      int v1(dim1);
+      float v2(dim2);
+    data:
+
+     v1 = -876354855, -1761252264, 1723477387, -46827465, 1475147969;
+
+     v2 = 12, -100, _ ;
+  } // group h
+
+  group: i {
+    dimensions:
+      dim3 = 7 ;
+    variables:
+      int v1(dim1);
+      float v3(dim3);
+    data:
+
+     v1 = 2, 3, 5, 7, 11 ;
+
+     v3 = 23, 29, 19, 31, 17, 37, 13 ;
+  } // group i
+} // group g
+}

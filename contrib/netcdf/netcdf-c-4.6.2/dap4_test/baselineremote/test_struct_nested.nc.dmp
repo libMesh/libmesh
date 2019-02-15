@@ -1,0 +1,23 @@
+netcdf test_struct_nested {
+types:
+  compound x_field1_t {
+    int x ;
+    int y ;
+  }; // x_field1_t
+  compound x_field2_t {
+    int x ;
+    int y ;
+  }; // x_field2_t
+  compound x_t {
+    x_field1_t field1 ;
+    x_field2_t field2 ;
+  }; // x_t
+variables:
+	x_t x ;
+
+// global attributes:
+		:_DAP4_Little_Endian = 1UB ;
+data:
+
+ x = {{1, -2}, {255, 90}} ;
+}
