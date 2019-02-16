@@ -97,16 +97,6 @@ exodusII.h: \$(top_srcdir)/contrib/exodusii/v5.22/exodus/cbind/include/exodusII.
 
 endif
 
-if LIBMESH_ENABLE_NETCDF_V3
-
-netcdf.h: \$(top_srcdir)/contrib/netcdf/v3/netcdf.h
-	\$(AM_V_GEN)rm -f \$@ && \$(LN_S) -f \$< \$@
-
-  BUILT_SOURCES  += netcdf.h
-  DISTCLEANFILES += netcdf.h
-
-endif
-
 if LIBMESH_ENABLE_NETCDF_V4
 
 netcdf.h: \$(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
