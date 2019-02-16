@@ -38549,17 +38549,48 @@ fi
 
       if test "x$enableparmetis" = "xyes"; then :
 
-                              if test "x$build_metis" = "xyes"; then :
+
+                    if test "x$build_metis" = "xno" && test $petsc_have_parmetis -gt 0; then :
+
+
+$as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
+
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with PETSc Parmetis support >>>" >&5
+$as_echo "<<< Configuring library with PETSc Parmetis support >>>" >&6; }
+
+fi
+
+                                        if test "x$build_metis" = "xno" && test $petsc_have_parmetis -eq 0; then :
+
+                  PARMETIS_INCLUDE=""
+                  PARMETIS_LIB=""
+                  enableparmetis=no
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&5
+$as_echo "<<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&6; }
+
+fi
+
+                                                  if test "x$build_metis" = "xyes" && test $petsc_have_parmetis -gt 0; then :
+
+                  PARMETIS_INCLUDE=""
+                  PARMETIS_LIB=""
+                  enableparmetis=no
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&5
+$as_echo "<<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&6; }
+
+fi
+
+                    if test "x$build_metis" = "xyes" && test $petsc_have_parmetis -eq 0; then :
 
                   PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
                   PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
 
-fi
-
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Parmetis support >>>" >&5
-$as_echo "<<< Configuring library with Parmetis support >>>" >&6; }
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with internal Parmetis support >>>" >&5
+$as_echo "<<< Configuring library with internal Parmetis support >>>" >&6; }
+
+fi
 
 else
 
