@@ -702,8 +702,6 @@ EXODUS_NOT_NETCDF4_FLAG
 EXODUS_INCLUDE
 LIBMESH_ENABLE_NETCDF_V4_FALSE
 LIBMESH_ENABLE_NETCDF_V4_TRUE
-LIBMESH_ENABLE_NETCDF_V3_FALSE
-LIBMESH_ENABLE_NETCDF_V3_TRUE
 LIBMESH_ENABLE_NETCDF_FALSE
 LIBMESH_ENABLE_NETCDF_TRUE
 NETCDF_INCLUDE
@@ -40865,15 +40863,19 @@ fi
   netcdfversion=no
 fi
 
+    if test "x$netcdfversion" = "x3"; then :
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using netCDF 3.x is no longer supported, using version 4.x instead. >>>" >&5
+$as_echo "<<< Using netCDF 3.x is no longer supported, using version 4.x instead. >>>" >&6; }
+          netcdfversion=4
+
+fi
+
   case "${netcdfversion}" in #(
   3) :
-                                    NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
 
-$as_echo "#define HAVE_NETCDF 1" >>confdefs.h
-
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 3 support >>>" >&5
-$as_echo "<<< Configuring library with NetCDF version 3 support >>>" >&6; }
-                                                                                libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4" ;; #(
+                                  as_fn_error $? ">>> Error: netCDF3 is no longer distributed with libMesh <<<" "$LINENO" 5
+                ;; #(
   4) :
     NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
 
@@ -40896,9 +40898,6 @@ $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; } ;; #
             enablenetcdf=no
            ;;
 esac
-
-  ac_config_files="$ac_config_files contrib/netcdf/v3/Makefile"
-
 
     if test "x$enablenested" = "xyes"; then :
 
@@ -40925,14 +40924,6 @@ fi
 else
   LIBMESH_ENABLE_NETCDF_TRUE='#'
   LIBMESH_ENABLE_NETCDF_FALSE=
-fi
-
- if test x$netcdfversion = x3; then
-  LIBMESH_ENABLE_NETCDF_V3_TRUE=
-  LIBMESH_ENABLE_NETCDF_V3_FALSE='#'
-else
-  LIBMESH_ENABLE_NETCDF_V3_TRUE='#'
-  LIBMESH_ENABLE_NETCDF_V3_FALSE=
 fi
 
  if test x$netcdfversion = x4; then
@@ -42752,10 +42743,6 @@ if test -z "${LIBMESH_ENABLE_NETCDF_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_F
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${LIBMESH_ENABLE_NETCDF_V3_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_V3_FALSE}"; then
-  as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF_V3\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${LIBMESH_ENABLE_NETCDF_V4_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_V4_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF_V4\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -44017,7 +44004,6 @@ do
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
     "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
     "contrib/capnproto/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/capnproto/Makefile" ;;
-    "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
     "contrib/exodusii/v5.22/exodus/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/Makefile" ;;
     "contrib/nemesis/v3.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v3.09/Makefile" ;;
