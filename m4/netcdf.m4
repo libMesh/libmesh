@@ -19,17 +19,18 @@ AC_DEFUN([CONFIGURE_NETCDF],
   dnl fix for --disable-optional
   AS_IF([test "x$enablenetcdf" = "xno"], [netcdfversion=no])
 
+  dnl netCDF3 is no longer distributed with libMesh
+  AS_IF([test "x$netcdfversion" = "x3"],
+        [
+          AC_MSG_RESULT([<<< Using netCDF 3.x is no longer supported, using version 4.x instead. >>>])
+          netcdfversion=4
+        ])
+
   AS_CASE("${netcdfversion}",
-          [3], [dnl The NETCDF API is distributed with libmesh, so we don't have to guess
-                dnl where it might be installed...
-                NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
-                AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
-                AC_MSG_RESULT(<<< Configuring library with NetCDF version 3 support >>>)
-                dnl pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-                dnl note this is madness - we will run configure in the subdirectory v4, but not use it,
-                dnl so this is nothing more than a hedge against that failing.  we need it to work for
-                dnl 'make dist' to work
-                libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"],
+          [3], [
+                 dnl We shouldn't get here, see if test above.
+                 AC_MSG_ERROR([>>> Error: netCDF3 is no longer distributed with libMesh <<<])
+               ],
           [4], [NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
                 AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
                 dnl building netcdf-4 requires that we support nested subpackages
@@ -45,8 +46,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
             NETCDF_INCLUDE=""
             enablenetcdf=no
           ])
-
-  AC_CONFIG_FILES([contrib/netcdf/v3/Makefile])
 
   dnl allow opt-out for nested subpackages
   AS_IF([test "x$enablenested" = "xyes"],
