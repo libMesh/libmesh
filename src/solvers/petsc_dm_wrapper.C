@@ -75,7 +75,7 @@ namespace libMesh
       return 0;
     }
 
-    //! Help PETSc identify the coarser DM given a dmf
+    //! Help PETSc identify the coarser DM dmc given the fine DM dmf
     PetscErrorCode __libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm comm, DM * dmc)
     {
       libmesh_assert(dmc);
@@ -298,6 +298,9 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
     {
       if (n_levels > 1 )
         {
+          // Set context dimension
+          (*_ctx_vec[i-1]).mesh_dim = mesh.mesh_dimension();
+
           // Set pointers to surrounding dm levels to help PETSc refine/coarsen
           if ( i == 1 ) // were at the coarsest mesh
             {
@@ -315,9 +318,13 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
               (*_ctx_vec[i-1]).finer_dm   = _dms[i].get();
             }
 
-      // Create and attach a sized vector to the current ctx
-      _vec_vec[i-1]->init( _mesh_dof_sizes[i-1] );
-      _ctx_vec[i-1]->current_vec = _vec_vec[i-1].get();
+          // Create and attach a sized vector to the current ctx
+          _vec_vec[i-1]->init( _mesh_dof_sizes[i-1] );
+          _ctx_vec[i-1]->current_vec = _vec_vec[i-1].get();
+
+          // Set a global DM for to be used as reference when using fieldsplit
+          _ctx_vec[i-1]->global_dm = &(this->get_dm(n_levels-1));
+
         }
 
     } // End context creation
@@ -343,6 +350,18 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // old_dof_indices information in the projection creation.
   if (n_levels > 1 )
     {
+
+      // First, stash the coarse dof indices for FS purposes
+      unsigned int n_vars  = system.n_vars();
+      _ctx_vec[0]->dof_vec.resize(n_vars);
+
+      for( unsigned int v = 0; v < n_vars; v++ )
+        {
+          std::vector<numeric_index_type> di;
+          system.get_dof_map().local_variable_indices(di, system.get_mesh(), v);
+          _ctx_vec[0]->dof_vec[v] = di;
+        }
+
       START_LOG ("PDM_refine", "PetscDMWrapper");
       mesh_refinement.uniformly_refine(1);
       STOP_LOG  ("PDM_refine", "PetscDMWrapper");
@@ -361,11 +380,23 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
     {
       if ( i != n_levels )
         {
+          // Stash the rest of the dof indices
+          unsigned int n_vars  = system.n_vars();
+          _ctx_vec[i]->dof_vec.resize(n_vars);
+
+          for( unsigned int v = 0; v < n_vars; v++ )
+            {
+              std::vector<numeric_index_type> di;
+              system.get_dof_map().local_variable_indices(di, system.get_mesh(), v);
+              _ctx_vec[i]->dof_vec[v] = di;
+            }
+
           unsigned int ndofs_c = _mesh_dof_sizes[i-1];
           unsigned int ndofs_f = _mesh_dof_sizes[i];
 
           // Create the Interpolation matrix and set its pointer
           _ctx_vec[i-1]->K_interp_ptr = _pmtx_vec[i-1].get();
+          _ctx_vec[i-1]->K_sub_interp_ptr = _subpmtx_vec[i-1].get();
 
           unsigned int ndofs_local     = system.get_dof_map().n_dofs_on_processor(system.processor_id());
           unsigned int ndofs_old_first = system.get_dof_map().first_old_dof(system.processor_id());
@@ -377,6 +408,7 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
 
           // Disable Mat destruction since PETSc destroys these for us
           _ctx_vec[i-1]->K_interp_ptr->set_destroy_mat_on_exit(false);
+          _ctx_vec[i-1]->K_sub_interp_ptr->set_destroy_mat_on_exit(false);
 
           // TODO: Projection matrix sparsity pattern?
           //MatSetOption(_ctx_vec[i-1]->K_interp_ptr->mat(), MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
