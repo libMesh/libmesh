@@ -46,6 +46,13 @@ namespace libMesh
   {
 
     //! Help PETSc identify the finer DM given a dmc
+    PetscErrorCode __libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, const PetscInt fields[], IS *is, DM *subdm)
+    {
+
+      return 0;
+    }
+
+    //! Help PETSc identify the finer DM given a dmc
     PetscErrorCode __libmesh_petsc_DMRefine(DM dmc, MPI_Comm comm, DM * dmf)
     {
       libmesh_assert(dmc);
@@ -149,7 +156,6 @@ namespace libMesh
     }
 
   } // end extern C functions
-
 
 
 PetscDMWrapper::~PetscDMWrapper()
@@ -780,6 +786,7 @@ void PetscDMWrapper::init_dm_data(unsigned int n_levels, const Parallel::Communi
   _star_forests.resize(n_levels);
   _ctx_vec.resize(n_levels);
   _pmtx_vec.resize(n_levels);
+  _subpmtx_vec.resize(n_levels);
   _vec_vec.resize(n_levels);
   _mesh_dof_sizes.resize(n_levels);
   _mesh_dof_loc_sizes.resize(n_levels);
@@ -791,6 +798,7 @@ void PetscDMWrapper::init_dm_data(unsigned int n_levels, const Parallel::Communi
       _star_forests[i] = libmesh_make_unique<PetscSF>();
       _ctx_vec[i] = libmesh_make_unique<PetscDMContext>();
       _pmtx_vec[i]= libmesh_make_unique<PetscMatrix<Real>>(comm);
+      _subpmtx_vec[i]= libmesh_make_unique<PetscMatrix<Real>>(comm);
       _vec_vec[i] = libmesh_make_unique<PetscVector<Real>>(comm);
     }
 }
