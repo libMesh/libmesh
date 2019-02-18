@@ -224,27 +224,84 @@ namespace libMesh
       libmesh_assert(dmc);
       libmesh_assert(dmf);
       libmesh_assert(mat);
-      libmesh_assert(vec); // optional scaling (not needed for mg)
+      libmesh_assert(vec); // Optional scaling (not needed for mg)
 
+      // Get a communicator from incoming DM
       PetscErrorCode ierr;
-
-      // get a communicator from incomming DM
       MPI_Comm comm;
       PetscObjectGetComm((PetscObject)dmc, &comm);
 
-      // extract our coarse context from the incoming DM
+      // Extract our coarse context from the incoming DM
       void * ctx_c = NULL;
-      ierr = DMShellGetContext(dmc, &ctx_c);LIBMESH_CHKERR(ierr);
+      ierr = DMShellGetContext(dmc, &ctx_c);
+      LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_c);
       PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
 
-      // check / give PETSc its matrix
-      libmesh_assert(p_ctx_c->K_interp_ptr);
-      *(mat) = p_ctx_c->K_interp_ptr->mat();
-      *(vec) = PETSC_NULL;
+      // Extract our fine context from the incoming DM
+      void * ctx_f = NULL;
+      ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
+      libmesh_assert(ctx_f);
+      PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
 
+      // Check for existing projection matrix
+      libmesh_assert(p_ctx_c->K_interp_ptr);
+      libmesh_assert(p_ctx_c->K_sub_interp_ptr);
+
+      // If were doing fieldsplit we need to construct sub projection
+      // matrices. We compare the passed in number of DMs fields to a
+      // global DM in order to determine if a subprojection is needed.
+      PetscInt nfieldsc,nfieldsf, nfieldsg;
+      libmesh_assert(p_ctx_c->global_dm);
+      DM * globaldm = p_ctx_c->global_dm;
+
+      ierr = DMCreateFieldIS(dmc, &nfieldsc, NULL, NULL);
+      LIBMESH_CHKERR(ierr);
+      ierr = DMCreateFieldIS(dmf, &nfieldsf, NULL, NULL);
+      LIBMESH_CHKERR(ierr);
+      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, NULL, NULL);
+      LIBMESH_CHKERR(ierr);
+
+      // If subfields are identified, were doing FS so we need to create the subProjectionMatrix
+      if (nfieldsc < nfieldsg)
+        {
+          // Loop over the fields and merge their index sets.
+          std::vector<std::vector<numeric_index_type>> allrows,allcols;
+          std::vector<numeric_index_type> rows,cols;
+          allrows = p_ctx_f->dof_vec;
+          allcols = p_ctx_c->dof_vec;
+
+          // For internal libmesh submat extraction need to merge all
+          // field dofs and then sort the vectors so that they match
+          // the Projection Matrix ordering
+          static const int n_subfields = nfieldsc;
+          if ( n_subfields > 1 )
+            {
+              for (int i = 0 ; i < n_subfields ; i++)
+                {
+                  rows.insert(rows.end(), allrows[i].begin(), allrows[i].end());
+                  cols.insert(cols.end(), allcols[i].begin(), allcols[i].end());
+                }
+              std::sort(rows.begin(),rows.end());
+              std::sort(cols.begin(),cols.end());
+            }
+
+          // Now that we have merged the fine and coarse index sets
+          // were ready to make the submatrix and pass it off to PETSc
+          Mat  submat;
+          ierr = MatCreate(comm, &submat);
+          LIBMESH_CHKERR(ierr);
+          p_ctx_c->K_interp_ptr->create_submatrix (*p_ctx_c->K_sub_interp_ptr, rows, cols);
+          *(mat) = p_ctx_c->K_sub_interp_ptr->mat();
+        }
+      else // We are not doing fieldsplit, so return entire projection
+        *(mat) = p_ctx_c->K_interp_ptr->mat();
+
+      // Vec scaling isnt needed so were done.
+      *(vec) = PETSC_NULL;
       return 0;
-    }
+
+    } // end __libmesh_petsc_DMCreateInterpolation
 
     //! Function to give PETSc that sets the Restriction Matrix between two DMs
     PetscErrorCode
