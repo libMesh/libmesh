@@ -141,15 +141,76 @@ namespace libMesh
 
       PetscErrorCode ierr;
 
-      // extract our context from the incoming dmf
+      // Extract our context from the incoming dmf
       void * ctx_f = NULL;
       ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx = static_cast<PetscDMContext*>(ctx_f);
 
-      // check / set the coarser DM
+      // First, ensure that there exists a coarse DM that we want to
+      // set. There ought to be as we created it while walking the
+      // hierarchy.
       libmesh_assert(p_ctx->coarser_dm);
       libmesh_assert(*(p_ctx->coarser_dm));
+
+      // In situations using fieldsplit we need to (potentially)
+      // provide a coarser DM which only has the relevant subfields in
+      // it. Since we create global DMs for each mesh level, we need
+      // to extract the section from the DM, and check the number of
+      // fields. When less than all the fields are used, we need to
+      // create the proper subsections.
+
+      // Get the number of fields and their names from the incomming
+      // fine DM and the global reference DM
+      PetscInt nfieldsf, nfieldsg;
+      char ** fieldnamesf;
+      char ** fieldnamesg;
+
+      libmesh_assert(p_ctx->global_dm);
+      DM * globaldm = p_ctx->global_dm;
+      ierr = DMCreateFieldIS(dmf, &nfieldsf, &fieldnamesf, NULL);
+      LIBMESH_CHKERR(ierr);
+      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, &fieldnamesg, NULL);
+      LIBMESH_CHKERR(ierr);
+
+      // If the probed number of fields is less than the number of
+      // global fields, this amounts to PETSc 'indicating' to us we
+      // are doing FS. So, we must create subsections for the coarser
+      // DMs.
+      if ( nfieldsf < nfieldsg )
+        {
+          PetscSection section;
+          PetscSection subsection;
+          PetscInt * subfields = new PetscInt[nfieldsf]; // extracted fields
+
+          // First, get the section from the coarse DM
+          ierr = DMGetSection(*(p_ctx->coarser_dm), &section);
+          LIBMESH_CHKERR(ierr);
+
+          // Now, match fine grid DM field names to their global DM
+          //  counterparts. Since PETSc can internally reassign field
+          //  numbering under a fieldsplit, we must extract
+          //  subsections via the field names. This is admittedly
+          //  gross, but c'est la vie.
+          for (int i = 0; i < nfieldsf ; i++)
+            {
+              for (int j = 0; j < nfieldsg ;j++)
+                if ( strcmp( fieldnamesg[j], fieldnamesf[i] ) == 0 )
+                  subfields[i] = j;
+            }
+
+          // Next, for the found fields we now make a subsection and set it for the coarser DM
+          ierr = PetscSectionCreateSubsection(section, nfieldsf, subfields, &subsection);
+          LIBMESH_CHKERR(ierr);
+          ierr = DMSetSection(*(p_ctx->coarser_dm) , subsection);
+          LIBMESH_CHKERR(ierr);
+          ierr = PetscSectionDestroy(&subsection);
+          LIBMESH_CHKERR(ierr);
+
+          delete [] subfields;
+        }
+
+      // Finally, set the coarser DM
       *(dmc) = *(p_ctx->coarser_dm);
 
       return 0;
