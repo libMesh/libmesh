@@ -40,11 +40,9 @@ PetscDMWrapper::~PetscDMWrapper()
 
 void PetscDMWrapper::clear()
 {
-  // This will also Destroy the attached PetscSection and PetscSF as well
-  // Destroy doesn't free the memory, but just resets points internally
-  // in the struct, so we'd still need to wipe out the memory on our side
-  for( auto dm_it = _dms.begin(); dm_it < _dms.end(); ++dm_it )
-    DMDestroy( dm_it->get() );
+  // PETSc will destroy the attached PetscSection, PetscSF as well as
+  // other relateds such as the Projections so we just tidy up the
+  // containers here.
 
   _dms.clear();
   _sections.clear();
