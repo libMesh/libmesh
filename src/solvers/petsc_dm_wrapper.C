@@ -21,6 +21,7 @@
 
 #include "libmesh/ignore_warnings.h"
 #include <petscsf.h>
+#include <petsc/private/dmimpl.h>
 #include "libmesh/restore_warnings.h"
 
 #include "libmesh/petsc_dm_wrapper.h"
@@ -45,9 +46,65 @@ namespace libMesh
   extern "C"
   {
 
-    //! Help PETSc identify the finer DM given a dmc
+    //! Help PETSc create a subDM given a global dm when using fieldsplit
     PetscErrorCode __libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, const PetscInt fields[], IS *is, DM *subdm)
     {
+      PetscErrorCode ierr;
+      // Basically, we copy the PETSc ShellCreateSubDM implementation,
+      // but also need to set the embedding dim and we also propagate
+      // the relevant function pointers to the subDM for GMG purposes.
+      // Since this is called by PETSc we gotta pull some of this info
+      // from the context in the DM.
+
+      // Get our context
+      void * ctx = NULL;
+      ierr = DMShellGetContext(dm, & ctx);
+      LIBMESH_CHKERR(ierr);
+      libmesh_assert(ctx);
+      PetscDMContext * p_ctx = static_cast<PetscDMContext * >(ctx);
+
+      if (subdm)
+        {
+          ierr = DMShellCreate(PetscObjectComm((PetscObject) dm), subdm);
+          LIBMESH_CHKERR(ierr);
+
+          // Set the DM embedding dimension to help PetscDS (Discrete System)
+          ierr = DMSetCoordinateDim(*subdm, p_ctx->mesh_dim);
+          LIBMESH_CHKERR(ierr);
+
+          // Now set the function pointers for the subDM
+          if (dm->ops->coarsen)
+            {
+              ierr = DMShellSetCoarsen(*subdm, dm->ops->coarsen);
+              LIBMESH_CHKERR(ierr);
+            }
+          if (dm->ops->refine)
+            {
+              ierr = DMShellSetRefine(*subdm, dm->ops->refine);
+              LIBMESH_CHKERR(ierr);
+            }
+          if (dm->ops->createinterpolation)
+            {
+              ierr = DMShellSetCreateInterpolation(*subdm, dm->ops->createinterpolation);
+              LIBMESH_CHKERR(ierr);
+            }
+          if (dm->ops->createrestriction)
+            {
+              ierr = DMShellSetCreateRestriction(*subdm, dm->ops->createrestriction);
+              LIBMESH_CHKERR(ierr);
+            }
+          ierr = DMShellGetContext(dm, &ctx);
+          LIBMESH_CHKERR(ierr);
+          if (ctx)
+            {
+              ierr = DMShellSetContext(*subdm, ctx);
+              LIBMESH_CHKERR(ierr);
+            }
+
+          // Lastly, Compute the subsection for the subDM
+          ierr = DMCreateSubDM_Section_Private(dm, numFields, fields, is, subdm);
+          LIBMESH_CHKERR(ierr);
+        }
 
       return 0;
     }
@@ -248,6 +305,10 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
       ierr = DMShellCreate(system.comm().get(), &dm);
       LIBMESH_CHKERR(ierr);
 
+      // Set the DM embedding dimension to help PetscDS (Discrete System)
+      ierr = DMSetCoordinateDim(dm, mesh.mesh_dimension());
+      CHKERRABORT(system.comm().get(),ierr);
+
       // Build the PetscSection and attach it to the DM
       this->build_section(system, section);
       ierr = DMSetDefaultSection(dm, section);
@@ -279,6 +340,9 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
 
       ierr = DMShellSetRefine ( dm, __libmesh_petsc_DMRefine );
       LIBMESH_CHKERR(ierr);
+
+      ierr= DMShellSetCreateSubDM(dm, __libmesh_petsc_DMCreateSubDM);
+      CHKERRABORT(system.comm().get(), ierr);
 
       // Uniformly coarsen if not the coarsest grid and distribute dof info.
       if ( level != 1 )
