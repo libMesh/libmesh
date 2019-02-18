@@ -404,7 +404,7 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           unsigned int ndofs_old_size  = ndofs_old_end - ndofs_old_first;
 
           // Init and zero the matrix
-          _ctx_vec[i-1]->K_interp_ptr->init(ndofs_f, ndofs_c, ndofs_local, ndofs_old_size);
+          _ctx_vec[i-1]->K_interp_ptr->init(ndofs_f, ndofs_c, ndofs_local, ndofs_old_size, 30 , 20);
 
           // Disable Mat destruction since PETSc destroys these for us
           _ctx_vec[i-1]->K_interp_ptr->set_destroy_mat_on_exit(false);
