@@ -59,7 +59,7 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // for each grid level, but for now, we're just using the
   // finest level
   unsigned int n_levels = 1;
-  this->init_dm_data(n_levels);
+  this->init_dm_data(n_levels, system.comm());
 
   for(unsigned int level = 0; level < n_levels; level++)
     {
@@ -456,7 +456,7 @@ dof_id_type PetscDMWrapper::check_section_n_dofs( const System & system, PetscSe
   return n_local_dofs;
 }
 
-void PetscDMWrapper::init_dm_data(unsigned int n_levels)
+  void PetscDMWrapper::init_dm_data( unsigned int n_levels, const Parallel::Communicator & comm )
 {
   _dms.resize(n_levels);
   _sections.resize(n_levels);
