@@ -470,7 +470,7 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   ierr = PetscSectionSetUp(section);LIBMESH_CHKERR(ierr);
 
   // Sanity checking at least that local_n_dofs match
-  libmesh_assert_equal_to(system.n_local_dofs(),this->check_section_n_dofs(system, section));
+  libmesh_assert_equal_to(system.n_local_dofs(),this->check_section_n_dofs(section));
 
   STOP_LOG ("build_section()", "PetscDMWrapper");
 }
@@ -752,7 +752,7 @@ void PetscDMWrapper::add_dofs_helper (const System & system,
 }
 
 
-dof_id_type PetscDMWrapper::check_section_n_dofs( const System & system, PetscSection & section )
+dof_id_type PetscDMWrapper::check_section_n_dofs( PetscSection & section )
 {
   PetscInt n_local_dofs = 0;
 

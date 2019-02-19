@@ -193,7 +193,7 @@ private:
    * The PetscSection contains local dof information. This helper function just facilitates
    * sanity checking that in fact it only has n_local_dofs.
    */
-  dof_id_type check_section_n_dofs( const System & system, PetscSection & section );
+  dof_id_type check_section_n_dofs( PetscSection & section );
 
   //! Helper function to reduce code duplication when setting dofs in section
   void add_dofs_helper (const System & system,
