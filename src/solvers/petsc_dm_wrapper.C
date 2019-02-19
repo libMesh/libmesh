@@ -56,7 +56,7 @@ namespace libMesh
 
       // extract our context from the incoming dmc
       void * ctx_c = NULL;
-      ierr = DMShellGetContext(dmc, & ctx_c);CHKERRABORT(comm, ierr);
+      ierr = DMShellGetContext(dmc, & ctx_c);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_c);
       PetscDMContext * p_ctx = static_cast<PetscDMContext * >(ctx_c);
 
@@ -79,7 +79,7 @@ namespace libMesh
 
       // extract our context from the incoming dmf
       void * ctx_f = NULL;
-      ierr = DMShellGetContext(dmf, &ctx_f);CHKERRABORT(comm, ierr);
+      ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx = static_cast<PetscDMContext*>(ctx_f);
 
@@ -91,7 +91,7 @@ namespace libMesh
       return 0;
     }
 
-    //! Function to give PETSc that sets the Interpolation Matrix between two dms
+    //! Function to give PETSc that sets the Interpolation Matrix between two DMs
     PetscErrorCode
     __libmesh_petsc_DMCreateInterpolation (DM dmc /*coarse*/, DM dmf /*fine*/,
                                          Mat * mat ,Vec * vec)
@@ -101,9 +101,15 @@ namespace libMesh
       libmesh_assert(mat);
       libmesh_assert(vec); // optional scaling (not needed for mg)
 
-      // extract our coarse context from the incoming dm
+      PetscErrorCode ierr;
+
+      // get a communicator from incomming DM
+      MPI_Comm comm;
+      PetscObjectGetComm((PetscObject)dmc, &comm);
+
+      // extract our coarse context from the incoming DM
       void * ctx_c = NULL;
-      DMShellGetContext(dmc, &ctx_c);
+      ierr = DMShellGetContext(dmc, &ctx_c);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_c);
       PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
 
@@ -115,7 +121,7 @@ namespace libMesh
       return 0;
     }
 
-    //! Function to give PETSc that sets the Restriction Matrix between two dms
+    //! Function to give PETSc that sets the Restriction Matrix between two DMs
     PetscErrorCode
     __libmesh_petsc_DMCreateRestriction (DM dmc /*coarse*/, DM dmf/*fine*/, Mat * mat)
     {
@@ -123,9 +129,15 @@ namespace libMesh
       libmesh_assert(dmf);
       libmesh_assert(mat);
 
-      // extract our fine context from the incoming dm
+      PetscErrorCode ierr;
+
+      // get a communicator from incomming DM
+      MPI_Comm comm;
+      PetscObjectGetComm((PetscObject)dmc, &comm);
+
+      // extract our fine context from the incoming DM
       void * ctx_f = NULL;
-      DMShellGetContext(dmf, &ctx_f);
+      ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
 
@@ -228,12 +240,12 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
 
       // The shell will contain other DM info
       ierr = DMShellCreate(system.comm().get(), &dm);
-      CHKERRABORT(system.comm().get(),ierr);
+      LIBMESH_CHKERR(ierr);
 
       // Build the PetscSection and attach it to the DM
       this->build_section(system, section);
       ierr = DMSetDefaultSection(dm, section);
-      CHKERRABORT(system.comm().get(),ierr);
+      LIBMESH_CHKERR(ierr);
 
       // We only need to build the star forest if we're in a parallel environment
       if (system.n_processors() > 1)
@@ -241,26 +253,26 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           // Build the PetscSF and attach it to the DM
           this->build_sf(system, star_forest);
           ierr = DMSetDefaultSF(dm, star_forest);
-          CHKERRABORT(system.comm().get(),ierr);
+          LIBMESH_CHKERR(ierr);
         }
 
       // Set PETSC's Restriction, Interpolation, Coarsen and Refine functions for the current DM
       ierr = DMShellSetCreateInterpolation ( dm, __libmesh_petsc_DMCreateInterpolation );
-      CHKERRABORT(system.comm().get(), ierr);
+      LIBMESH_CHKERR(ierr);
 
       // Not implemented. For now we rely on galerkin style restrictions
       bool supply_restriction = false;
       if (supply_restriction)
         {
         ierr = DMShellSetCreateRestriction ( dm, __libmesh_petsc_DMCreateRestriction  );
-        CHKERRABORT(system.comm().get(), ierr);
+        LIBMESH_CHKERR(ierr);
         }
 
       ierr = DMShellSetCoarsen ( dm, __libmesh_petsc_DMCoarsen );
-      CHKERRABORT(system.comm().get(), ierr);
+      LIBMESH_CHKERR(ierr);
 
       ierr = DMShellSetRefine ( dm, __libmesh_petsc_DMRefine );
-      CHKERRABORT(system.comm().get(), ierr);
+      LIBMESH_CHKERR(ierr);
 
       // Uniformly coarsen if not the coarsest grid and distribute dof info.
       if ( level != 1 )
@@ -313,10 +325,10 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           DM & dm = this->get_dm(i-1);
 
           ierr = DMShellSetGlobalVector( dm, (*_ctx_vec[ i-1 ]).current_vec->vec() );
-          CHKERRABORT(system.comm().get(), ierr);
+          LIBMESH_CHKERR(ierr);
 
           ierr = DMShellSetContext( dm, _ctx_vec[ i-1 ].get() );
-          CHKERRABORT(system.comm().get(), ierr);
+          LIBMESH_CHKERR(ierr);
         }
     }
 
@@ -393,7 +405,7 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // Lastly, give SNES the finest level DM
   DM & dm = this->get_dm(n_levels-1);
   ierr = SNESSetDM(snes, dm);
-  CHKERRABORT(system.comm().get(),ierr);
+  LIBMESH_CHKERR(ierr);
 
   STOP_LOG ("init_and_attach_petscdm()", "PetscDMWrapper");
 }
@@ -404,17 +416,17 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
 
   PetscErrorCode ierr;
   ierr = PetscSectionCreate(system.comm().get(),&section);
-  CHKERRABORT(system.comm().get(),ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Tell the PetscSection about all of our System variables
   ierr = PetscSectionSetNumFields(section,system.n_vars());
-  CHKERRABORT(system.comm().get(),ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Set the actual names of all the field variables
   for( unsigned int v = 0; v < system.n_vars(); v++ )
     {
       ierr = PetscSectionSetFieldName( section, v, system.variable_name(v).c_str() );
-      CHKERRABORT(system.comm().get(),ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   // For building the section, we need to create local-to-global map
@@ -446,7 +458,7 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
     libmesh_error_msg("ERROR: Must use --node-major-dofs with PetscSection!");
 
   //else if (!system.identify_variable_groups())
-  //  ierr = PetscSectionSetUseFieldOffsets(section,PETSC_TRUE);CHKERRABORT(system.comm().get(),ierr);
+  //  ierr = PetscSectionSetUseFieldOffsets(section,PETSC_TRUE);LIBMESH_CHKERR(ierr);
   //else
   //  {
   //    std::string msg = "ERROR: Only node-major or var-major ordering supported for PetscSection!\n";
@@ -455,7 +467,7 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   //    libmesh_error_msg(msg);
   //  }
 
-  ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
+  ierr = PetscSectionSetUp(section);LIBMESH_CHKERR(ierr);
 
   // Sanity checking at least that local_n_dofs match
   libmesh_assert_equal_to(system.n_local_dofs(),this->check_section_n_dofs(system, section));
@@ -507,7 +519,7 @@ void PetscDMWrapper::build_sf( const System & system, PetscSF & star_forest )
   PetscSFNode * remote_dofs = sf_nodes.data();
 
   PetscErrorCode ierr;
-  ierr = PetscSFCreate(system.comm().get(), &star_forest);CHKERRABORT(system.comm().get(),ierr);
+  ierr = PetscSFCreate(system.comm().get(), &star_forest);LIBMESH_CHKERR(ierr);
 
   // TODO: We should create pointers to arrays so we don't have to copy
   //       and then can use PETSC_OWN_POINTER where PETSc will take ownership
@@ -519,7 +531,7 @@ void PetscDMWrapper::build_sf( const System & system, PetscSF & star_forest )
                          PETSC_COPY_VALUES,
                          remote_dofs,
                          PETSC_COPY_VALUES);
-  CHKERRABORT(system.comm().get(),ierr);
+  LIBMESH_CHKERR(ierr);
 
   STOP_LOG ("build_sf()", "PetscDMWrapper");
 }
@@ -637,7 +649,7 @@ void PetscDMWrapper::set_point_range_in_section (const System & system,
     }
 
   PetscErrorCode ierr = PetscSectionSetChart(section, pstart, pend);
-  CHKERRABORT(system.comm().get(),ierr);
+  LIBMESH_CHKERR(ierr);
 }
 
 void PetscDMWrapper::add_dofs_to_section (const System & system,
@@ -696,12 +708,12 @@ void PetscDMWrapper::add_dofs_to_section (const System & system,
           const int n_dofs = system.variable(scalar_var).type().order.get_order();
 
           ierr = PetscSectionSetFieldDof( section, local_id, scalar_var, n_dofs );
-          CHKERRABORT(system.comm().get(),ierr);
+          LIBMESH_CHKERR(ierr);
 
           // In the SCALAR case, there are no other variables associate with the "point"
           // the total number of dofs on the point is the same as that for the field
           ierr = PetscSectionSetDof( section, local_id, n_dofs );
-          CHKERRABORT(system.comm().get(),ierr);
+          LIBMESH_CHKERR(ierr);
         }
     }
 
@@ -726,7 +738,7 @@ void PetscDMWrapper::add_dofs_helper (const System & system,
                                                          v,
                                                          n_dofs_at_dofobject );
 
-          CHKERRABORT(system.comm().get(),ierr);
+          LIBMESH_CHKERR(ierr);
 
           total_n_dofs_at_dofobject += n_dofs_at_dofobject;
         }
@@ -736,7 +748,7 @@ void PetscDMWrapper::add_dofs_helper (const System & system,
 
   PetscErrorCode ierr =
     PetscSectionSetDof( section, local_id, total_n_dofs_at_dofobject );
-  CHKERRABORT(system.comm().get(),ierr);
+  LIBMESH_CHKERR(ierr);
 }
 
 
@@ -747,13 +759,13 @@ dof_id_type PetscDMWrapper::check_section_n_dofs( const System & system, PetscSe
   // Grap the starting and ending points from the section
   PetscInt pstart, pend;
   PetscErrorCode ierr = PetscSectionGetChart(section, &pstart, &pend);
-  CHKERRABORT(system.comm().get(),ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Count up the n_dofs for each point from the section
   for( PetscInt p = pstart; p < pend; p++ )
     {
       PetscInt n_dofs;
-      ierr = PetscSectionGetDof(section,p,&n_dofs);CHKERRABORT(system.comm().get(),ierr);
+      ierr = PetscSectionGetDof(section,p,&n_dofs);LIBMESH_CHKERR(ierr);
       n_local_dofs += n_dofs;
     }
 
