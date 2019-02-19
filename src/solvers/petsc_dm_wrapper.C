@@ -47,6 +47,10 @@ void PetscDMWrapper::clear()
   _dms.clear();
   _sections.clear();
   _star_forests.clear();
+  _pmtx_vec.clear();
+  _vec_vec.clear();
+  _ctx_vec.clear();
+
 }
 
 void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
@@ -461,12 +465,20 @@ dof_id_type PetscDMWrapper::check_section_n_dofs( const System & system, PetscSe
   _dms.resize(n_levels);
   _sections.resize(n_levels);
   _star_forests.resize(n_levels);
+  _ctx_vec.resize(n_levels);
+  _pmtx_vec.resize(n_levels);
+  _vec_vec.resize(n_levels);
+  _mesh_dof_sizes.resize(n_levels);
+  _mesh_dof_loc_sizes.resize(n_levels);
 
   for( unsigned int i = 0; i < n_levels; i++ )
     {
       _dms[i] = libmesh_make_unique<DM>();
       _sections[i] = libmesh_make_unique<PetscSection>();
       _star_forests[i] = libmesh_make_unique<PetscSF>();
+      _ctx_vec[i] = libmesh_make_unique<PetscDMContext>();
+      _pmtx_vec[i]= libmesh_make_unique<PetscMatrix<Real>>(comm);
+      _vec_vec[i] = libmesh_make_unique<PetscVector<Real>>(comm);
     }
 }
 

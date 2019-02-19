@@ -31,12 +31,36 @@
 #include "libmesh/ignore_warnings.h"
 #include <petsc.h>
 #include "libmesh/restore_warnings.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
 
 namespace libMesh
 {
   // Forward declarations
   class System;
   class DofObject;
+
+  //! Struct to house data regarding where in the mesh hierarchy we are located
+  struct PetscDMContext
+  {
+    int n_dofs;
+    DM * coarser_dm;
+    DM * finer_dm;
+    libMesh::PetscMatrix<libMesh::Real > * K_interp_ptr;
+    libMesh::PetscMatrix<libMesh::Real > * K_restrict_ptr;
+    libMesh::PetscVector<libMesh::Real > * current_vec;
+
+    PetscDMContext()
+    {
+      n_dofs = -12345;
+      coarser_dm = NULL;
+      finer_dm = NULL;
+      K_interp_ptr = NULL;
+      K_restrict_ptr = NULL;
+      current_vec = NULL;
+    }
+
+  };
 
 /**
  * This class defines a wrapper around the PETSc DM infrastructure.
@@ -71,6 +95,22 @@ private:
 
   //! Vector of star forests for all grid levels
   std::vector<std::unique_ptr<PetscSF>> _star_forests;
+
+  //! Vector of projection matrixes for all grid levels
+  std::vector<std::unique_ptr<PetscMatrix<Real>>> _pmtx_vec;
+
+  //! Vector of internal PetscDM context structs for all grid levels
+  std::vector<std::unique_ptr<PetscDMContext>> _ctx_vec;
+
+  //! Vector of solution vectors for all grid levels
+  std::vector<std::unique_ptr<PetscVector<Real>>> _vec_vec;
+
+  //! Stores n_dofs for each grid level, to be used for projection matrix sizing
+  std::vector<unsigned int> _mesh_dof_sizes;
+
+  //! Stores n_local_dofs for each grid level, to be used for projection vector sizing
+  std::vector<unsigned int> _mesh_dof_loc_sizes;
+
 
   //! Init all the n_mesh_level dependent data structures
   void init_dm_data(unsigned int n_levels, const Parallel::Communicator & comm);
