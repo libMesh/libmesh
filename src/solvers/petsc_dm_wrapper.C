@@ -25,10 +25,12 @@
 
 #include "libmesh/petsc_dm_wrapper.h"
 #include "libmesh/system.h"
+#include "libmesh/mesh.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/partitioner.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
-#include "libmesh/dof_map.h"
 
 namespace libMesh
 {
@@ -164,18 +166,42 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
 
   PetscErrorCode ierr;
 
-  // Eventually, we'll traverse the mesh hierarchy and cache
-  // for each grid level, but for now, we're just using the
-  // finest level
-  unsigned int n_levels = 1;
+  MeshBase & mesh = system.get_mesh();   // Convenience
+  MeshRefinement mesh_refinement(mesh); // Used for swapping between grids
+
+  // First walk over the active local elements and see how many maximum MG levels we can construct
+  // TODO: How many MG levels did the user request?
+  unsigned int n_levels = 0;
+  for ( auto & elem : mesh.active_local_element_ptr_range() )
+    {
+      if ( elem->level() > n_levels )
+        n_levels = elem->level();
+    }
+  // On coarse grids some processors may have no active local elements,
+  // these processors shouldnt make projections
+  if (n_levels >= 1)
+    n_levels += 1;
+
+  // Init data structures: data[0] ~ coarse grid, data[n_levels-1] ~ fine grid
   this->init_dm_data(n_levels, system.comm());
 
-  for(unsigned int level = 0; level < n_levels; level++)
-    {
-      DM & dm = this->get_dm(level);
-      PetscSection & section = this->get_section(level);
-      PetscSF & star_forest = this->get_star_forest(level);
+  // Step 1.  contract : all active elements have no children
+  mesh.contract();
 
+  // Start on finest grid. Construct DM datas and stash some info for
+  // later projection_matrix and vec sizing
+  for(unsigned int level = n_levels; level >= 1; level--)
+    {
+      // Save the n_fine_dofs before coarsening for later projection matrix sizing
+      _mesh_dof_sizes[level-1] = system.get_dof_map().n_dofs();
+      _mesh_dof_loc_sizes[level-1] = system.get_dof_map().n_local_dofs();
+
+      // Get refs to things we will fill
+      DM & dm = this->get_dm(level-1);
+      PetscSection & section = this->get_section(level-1);
+      PetscSF & star_forest = this->get_star_forest(level-1);
+
+      // The shell will contain other DM info
       ierr = DMShellCreate(system.comm().get(), &dm);
       CHKERRABORT(system.comm().get(),ierr);
 
@@ -192,10 +218,126 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           ierr = DMSetDefaultSF(dm, star_forest);
           CHKERRABORT(system.comm().get(),ierr);
         }
+
+      // Set PETSC's Restriction, Interpolation, Coarsen and Refine functions for the current DM
+      ierr = DMShellSetCreateInterpolation ( dm, __libmesh_petsc_DMCreateInterpolation );
+      CHKERRABORT(system.comm().get(), ierr);
+
+      // Not implemented. For now we rely on galerkin style restrictions
+      bool supply_restriction = false;
+      if (supply_restriction)
+        {
+        ierr = DMShellSetCreateRestriction ( dm, __libmesh_petsc_DMCreateRestriction  );
+        CHKERRABORT(system.comm().get(), ierr);
+        }
+
+      ierr = DMShellSetCoarsen ( dm, __libmesh_petsc_DMCoarsen );
+      CHKERRABORT(system.comm().get(), ierr);
+
+      ierr = DMShellSetRefine ( dm, __libmesh_petsc_DMRefine );
+      CHKERRABORT(system.comm().get(), ierr);
+
+      // Uniformly coarsen if not the coarsest grid and distribute dof info.
+      // We dont repartition because we are assuming an initially load balanced grid
+      if ( level != 1 )
+        {
+          mesh.partitioner() = NULL;
+          mesh_refinement.uniformly_coarsen(1);
+
+          system.get_dof_map().distribute_dofs(mesh);
+          system.reinit_constraints();
+        }
+    } // End PETSc data structure creation
+
+  // Now fill the corresponding internal PetscDMContext for each created DM
+  for( unsigned int i=1; i <= n_levels; i++ )
+    {
+      // Set pointers to surrounding dm levels to help PETSc refine/coarsen
+      if ( i == 1 ) // were at the coarsest mesh
+        {
+          (*_ctx_vec[i-1]).coarser_dm = NULL;
+          (*_ctx_vec[i-1]).finer_dm   = _dms[1].get();
+        }
+      else if( i == n_levels ) // were at the finest mesh
+        {
+          (*_ctx_vec[i-1]).coarser_dm = _dms[_dms.size() - 2].get();
+          (*_ctx_vec[i-1]).finer_dm   = NULL;
+        }
+      else // were in the middle of the heirarchy
+        {
+          (*_ctx_vec[i-1]).coarser_dm = _dms[i-2].get();
+          (*_ctx_vec[i-1]).finer_dm   = _dms[i].get();
+        }
+
+      // Create and attach a sized vector to the current ctx
+      _vec_vec[i-1]->init( _mesh_dof_sizes[i-1] );
+      _ctx_vec[i-1]->current_vec = _vec_vec[i-1].get();
+
+    } // End context creation
+
+  // Attach a vector and context to each DM
+  for ( unsigned int i = 1; i <= n_levels ; ++i)
+    {
+      DM & dm = this->get_dm(i-1);
+
+      ierr = DMShellSetGlobalVector( dm, (*_ctx_vec[ i-1 ]).current_vec->vec() );
+      CHKERRABORT(system.comm().get(), ierr);
+
+      ierr = DMShellSetContext( dm, _ctx_vec[ i-1 ].get() );
+      CHKERRABORT(system.comm().get(), ierr);
     }
 
-  // We need to set only the finest level DM in the SNES
-  DM & dm = this->get_dm(0);
+  // DM structures created, now we need projection matrixes.
+  // To prepare for projection creation go to second coarsest mesh so we can utilize
+  // old_dof_indices information in the projection creation.
+  mesh_refinement.uniformly_refine(1);
+  system.get_dof_map().distribute_dofs(mesh);;
+  system.reinit_constraints();
+
+  // Create the Interpolation Matrices between adjacent mesh levels
+  for ( unsigned int i = 1 ; i < n_levels ; ++i )
+    {
+      if ( i != n_levels )
+        {
+          unsigned int ndofs_c = _mesh_dof_sizes[i-1];
+          unsigned int ndofs_f = _mesh_dof_sizes[i];
+
+          // Create the Interpolation matrix and set its pointer
+          _ctx_vec[i-1]->K_interp_ptr = _pmtx_vec[i-1].get();
+
+          unsigned int ndofs_local = system.get_dof_map().n_dofs_on_processor(system.processor_id());
+          unsigned int ndofs_old_first = system.get_dof_map().first_old_dof(system.processor_id());
+          unsigned int ndofs_old_end   = system.get_dof_map().end_old_dof(system.processor_id());
+          unsigned int ndofs_old_size   = ndofs_old_end - ndofs_old_first;
+
+          // Init and zero the matrix
+          _ctx_vec[i-1]->K_interp_ptr->init(ndofs_f, ndofs_c, ndofs_local, ndofs_old_size);
+
+          // Disable Mat destruction since PETSc destroys these for us
+          _ctx_vec[i-1]->K_interp_ptr->set_destroy_mat_on_exit(false);
+
+          // TODO: Projection matrix sparsity pattern?
+          //MatSetOption(_ctx_vec[i-1]->K_interp_ptr->mat(), MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+
+          // Compute the interpolation matrix and set K_interp_ptr
+          system.projection_matrix(*_ctx_vec[i-1]->K_interp_ptr);
+
+          // Always close matrix that contains altered data
+          _ctx_vec[i-1]->K_interp_ptr->close();
+        }
+
+      // Move to next grid to make next projection
+      if ( i != n_levels - 1 )
+        {
+          mesh.partitioner() = NULL;
+          mesh_refinement.uniformly_refine(1);
+          system.get_dof_map().distribute_dofs(mesh);
+          system.reinit_constraints();
+        }
+    } // End create transfer operators. System back at the finest grid
+
+  // Lastly, give SNES the finest level DM
+  DM & dm = this->get_dm(n_levels-1);
   ierr = SNESSetDM(snes, dm);
   CHKERRABORT(system.comm().get(),ierr);
 
@@ -565,7 +707,7 @@ dof_id_type PetscDMWrapper::check_section_n_dofs( const System & system, PetscSe
   return n_local_dofs;
 }
 
-  void PetscDMWrapper::init_dm_data( unsigned int n_levels, const Parallel::Communicator & comm )
+void PetscDMWrapper::init_dm_data(unsigned int n_levels, const Parallel::Communicator & comm)
 {
   _dms.resize(n_levels);
   _sections.resize(n_levels);
