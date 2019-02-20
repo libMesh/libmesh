@@ -1040,8 +1040,8 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
   unsigned ex_el_num = 0;
 
   // Element variable truth table
-  int * var_table = new int[block_ids.size() * elem_var_names.size()];
-  exII::ex_get_var_tab(ex_id, "e", block_ids.size(), elem_var_names.size(), var_table);
+  std::vector<int> var_table(block_ids.size() * elem_var_names.size());
+  exII::ex_get_var_tab(ex_id, "e", block_ids.size(), elem_var_names.size(), var_table.data());
 
   for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
@@ -1077,8 +1077,6 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
           ex_el_num++;
         }
     }
-
-  delete[] var_table;
 }
 
 
