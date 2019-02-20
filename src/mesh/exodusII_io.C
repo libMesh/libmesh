@@ -849,7 +849,14 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
 
   // A new data structure for keeping track of a list of variable names
   // that are in the discontinous solution vector on each subdomain. Used
-  // for indexing.
+  // for indexing. Note: if a variable was inactive at the System level,
+  // an entry for it will still be in the discontinuous solution vector,
+  // but it will just have a value of zero. On the other hand, when we
+  // create the derived variable names some of them are "inactive" on
+  // different subdomains in the sense that they don't exist at all, i.e.
+  // there is no zero padding for them. We need to be able to distinguish
+  // between these two types in order to do the indexing into this vector
+  // correctly.
   std::map<subdomain_id_type, std::vector<std::string>>
     subdomain_to_var_names;
 
@@ -884,20 +891,31 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
             libmesh_error_msg("Variable " << orig_name << " somehow not found in var_names array.");
           auto var_id = std::distance(var_names.begin(), var_loc);
 
-          // This derived variable only has a chance of being active
-          // on the current subdomain if the original variable was
-          // active on this subdomain.
-          bool orig_var_active =
-            (vars_active_subdomains[var_id].empty() ||
-             vars_active_subdomains[var_id].count(sbd_id));
-
-          // If the var was originally active, check whether the
-          // elements in this subdomain have enough nodes for the
-          // corresponding derived variable to be active.
-          if (orig_var_active && node_id < vertices_per_elem_this_sbd)
+          // The derived_var will only be active if this subdomain has
+          // enough vertices for that to be the case.
+          if (node_id < vertices_per_elem_this_sbd)
             {
-              derived_vars_active_subdomains[derived_var_id].insert(sbd_id);
+              // Regardless of whether the original variable was not active on this subdomain,
+              // the discontinuous solution vector will have zero padding for it, and
+              // we will need to account for it. Therefore it should still be added to
+              // the subdomain_to_var_names data structure!
               subdomain_to_var_names[sbd_id].push_back(derived_name);
+
+              // If the original variable was not active on the
+              // current subdomain, it should not be added to the
+              // derived_vars_active_subdomains data structure, since
+              // it will not be written to the Exodus file.
+
+              // Determine if the original variable was active on the
+              // current subdomain.
+              bool orig_var_active =
+                (vars_active_subdomains[var_id].empty() ||
+                 vars_active_subdomains[var_id].count(sbd_id));
+
+              // And only if it was, add it to the
+              // derived_vars_active_subdomains data structure.
+              if (orig_var_active)
+                derived_vars_active_subdomains[derived_var_id].insert(sbd_id);
             }
         } // end loop over subdomain_id_to_vertices_per_elem
     } // end loop over derived_var_names
