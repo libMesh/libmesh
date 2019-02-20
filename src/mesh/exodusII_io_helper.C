@@ -1039,8 +1039,14 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
   // Sequential index which we can use to look up the element ID in the elem_num_map.
   unsigned ex_el_num = 0;
 
+  // Element variable truth table
+  std::vector<int> var_table(block_ids.size() * elem_var_names.size());
+  exII::ex_get_var_tab(ex_id, "e", block_ids.size(), elem_var_names.size(), var_table.data());
+
   for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
+      if (!var_table[elem_var_names.size()*i + var_index])
+        continue;
       ex_err = exII::ex_get_elem_block(ex_id,
                                        block_ids[i],
                                        nullptr,
