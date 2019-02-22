@@ -21,6 +21,19 @@ CXXFLAGS_PROF += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
 # should do no harm on other platforms.
 AM_LDFLAGS += -no-undefined
 
+# As discussed on this thread [0], automake passes -h to tar in the
+# "make dist" target, and this has the effect of creating hard links
+# out of soft links in the resulting archives.  Since not all
+# filesystems support hard links well (for example AFS, see libmesh
+# #2046) this option causes the directory links to be created as
+# normal files instead. The --hard-dereference option requires at least tar 1.29 to
+# work, but we generally completely control the systems where we run
+# "make dist" and therefore we don't need the most portable "make
+# dist" possible, but rather a "make dist" target that gives us the
+# most portable tarballs possible.
+# [0]: http://gnu-automake.7480.n7.nabble.com/bug-19616-dist-tarball-contains-hardlinks-td21667.html
+TAR_OPTIONS = --hard-dereference
+export TAR_OPTIONS
 
 # AM_CPPFLAGS are method-independent cppflags that
 # we use when compiling libmesh proper, or its utility
