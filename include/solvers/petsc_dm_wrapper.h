@@ -19,8 +19,10 @@
 #define LIBMESH_PETSC_DM_WRAPPER_H
 
 #include "libmesh/libmesh_common.h"
+#include "libmesh/petsc_macro.h"
 
 #ifdef LIBMESH_HAVE_PETSC
+#if !PETSC_VERSION_LESS_THAN(3,7,3)
 
 #include <vector>
 #include <memory>
@@ -216,6 +218,7 @@ private:
 
 }
 
+#endif // #if PETSC_VERSION
 #endif // #ifdef LIBMESH_HAVE_PETSC
 
 #endif // LIBMESH_PETSC_DM_WRAPPER_H

@@ -16,8 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh/libmesh_common.h"
+#include "libmesh/petsc_macro.h"
 
 #ifdef LIBMESH_HAVE_PETSC
+#if !PETSC_VERSION_LESS_THAN(3,7,3)
 
 #include "libmesh/ignore_warnings.h"
 #include <petscsf.h>
@@ -47,7 +49,11 @@ namespace libMesh
   {
 
     //! Help PETSc create a subDM given a global dm when using fieldsplit
+#if PETSC_VERSION_LESS_THAN(3,9,0)
+    PetscErrorCode __libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, PetscInt fields[], IS *is, DM *subdm)
+#else
     PetscErrorCode __libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, const PetscInt fields[], IS *is, DM *subdm)
+#endif
     {
       PetscErrorCode ierr;
       // Basically, we copy the PETSc ShellCreateSubDM implementation,
@@ -184,7 +190,11 @@ namespace libMesh
           PetscInt * subfields = new PetscInt[nfieldsf]; // extracted fields
 
           // First, get the section from the coarse DM
+#if PETSC_VERSION_LESS_THAN(3,10,0)
+          ierr = DMGetDefaultSection(*(p_ctx->coarser_dm), &section);
+#else
           ierr = DMGetSection(*(p_ctx->coarser_dm), &section);
+#endif
           LIBMESH_CHKERR(ierr);
 
           // Now, match fine grid DM field names to their global DM
@@ -202,7 +212,11 @@ namespace libMesh
           // Next, for the found fields we now make a subsection and set it for the coarser DM
           ierr = PetscSectionCreateSubsection(section, nfieldsf, subfields, &subsection);
           LIBMESH_CHKERR(ierr);
+#if PETSC_VERSION_LESS_THAN(3,10,0)
+          ierr = DMSetDefaultSection(*(p_ctx->coarser_dm) , subsection);
+#else
           ierr = DMSetSection(*(p_ctx->coarser_dm) , subsection);
+#endif
           LIBMESH_CHKERR(ierr);
           ierr = PetscSectionDestroy(&subsection);
           LIBMESH_CHKERR(ierr);
@@ -1019,4 +1033,5 @@ void PetscDMWrapper::init_dm_data(unsigned int n_levels, const Parallel::Communi
 
 } // end namespace libMesh
 
+#endif // PETSC_VERSION
 #endif // LIBMESH_HAVE_PETSC

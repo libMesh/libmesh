@@ -96,8 +96,9 @@ protected:
   /**
    * Wrapper object for interacting with PetscDM
    */
+#if !PETSC_VERSION_LESS_THAN(3,7,3)
   PetscDMWrapper _dm_wrapper;
-
+#endif
 private:
 
   /**
