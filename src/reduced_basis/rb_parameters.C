@@ -99,12 +99,8 @@ void RBParameters::get_extra_parameter_names(std::set<std::string> & param_names
 {
   param_names.clear();
 
-  const_iterator it     = _extra_parameters.begin();
-  const_iterator it_end = _extra_parameters.end();
-  for ( ; it != it_end; ++it)
-    {
-      param_names.insert( it->first );
-    }
+  for (const auto & pr : _extra_parameters)
+    param_names.insert(pr.first);
 }
 
 RBParameters::const_iterator RBParameters::begin() const
