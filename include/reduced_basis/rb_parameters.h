@@ -44,9 +44,15 @@ class RBParameters
 public:
 
   /**
-   * Constructor.
+   * The special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  RBParameters();
+  RBParameters () = default;
+  RBParameters (RBParameters &&) = default;
+  RBParameters (const RBParameters &) = default;
+  RBParameters & operator= (const RBParameters &) = default;
+  RBParameters & operator= (RBParameters &&) = default;
+  ~RBParameters() = default;
 
   /**
    * Constructor. Set parameters based on the std::map \p parameter_map.
