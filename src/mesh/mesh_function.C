@@ -512,7 +512,7 @@ void MeshFunction::gradient (const Point & p,
                   {
                     // local coordinates
                     for (std::size_t v=0; v<dim; v++)
-                      for (std::size_t xyz=0; xyz<dim; xyz++)
+                      for (std::size_t xyz=0; xyz<LIBMESH_DIM; xyz++)
                         {
                           // FIXME: this needs better syntax: It is matrix-vector multiplication.
                           grad(xyz) += data.local_transform[v][xyz]
@@ -626,9 +626,9 @@ void MeshFunction::discontinuous_gradient (const Point & p,
               // sum over all indices
               for (auto i : index_range(dof_indices))
                 {
-                  // local coordinates
+                  // local coordinates.
                   for (std::size_t v=0; v<dim; v++)
-                    for (std::size_t xyz=0; xyz<dim; xyz++)
+                    for (std::size_t xyz=0; xyz<LIBMESH_DIM; xyz++)
                       {
                         // FIXME: this needs better syntax: It is matrix-vector multiplication.
                         grad(xyz) += data.local_transform[v][xyz]

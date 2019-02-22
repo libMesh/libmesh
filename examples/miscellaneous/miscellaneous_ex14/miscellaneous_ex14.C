@@ -193,10 +193,15 @@ int main (int argc, char** argv)
   builder.build_inf_elem(true);
 
   // Reassign subdomain_id() of all infinite elements.
-  // Otherwise, the Exodus-API will fail.
+  // and their neighbours. This makes finding the surface
+  // between these elemests much easier.
   for (auto & elem : mesh.element_ptr_range())
     if (elem->infinite())
-      elem->subdomain_id() = 1;
+      {
+        elem->subdomain_id() = 1;
+        // the base elements are always the 0-th neighor.
+        elem->neighbor(0)->subdomain_id()=2;
+      }
 
   // find the neighbours; for correct linking the two areas
   mesh.find_neighbors();
@@ -208,7 +213,7 @@ int main (int argc, char** argv)
   EigenSystem & eig_sys = eq_sys.add_system<EigenSystem> ("EigenSE");
 
   //set the complete type of the variable
-  FEType fe_type(SECOND, LAGRANGE, FIFTH, JACOBI_20_00, CARTESIAN);
+  FEType fe_type(SECOND, LAGRANGE, SECOND, JACOBI_20_00, CARTESIAN);
 
   // Name the variable of interest 'phi' and approximate it as \p fe_type.
   eig_sys.add_variable("phi", fe_type);
@@ -250,9 +255,8 @@ int main (int argc, char** argv)
   SlepcSolverConfiguration ConfigSolver(*solver);
 
   // set the spectral transformation: the default (SHIFT) will not converge
-  // so we should some more elaborate scheme.
+  // so we apply some more elaborate scheme.
   ConfigSolver.SetST(SINVERT);
-
   solver ->set_solver_configuration(ConfigSolver);
 
   // attach the name of the function that assembles the matrix equation:
@@ -464,7 +468,7 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
       for (unsigned int qp=0; qp<max_qp; qp++)
         {
 
-          // get the Coulomb potential at the core:
+          // compute the Coulomb potential
           potval=-1./(q_point[qp]).norm();
 
           // Now, get number of shape functions that are nonzero at this point::
@@ -506,6 +510,165 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
       matrix_B.add_matrix (M, dof_indices);
 
     } // end of element loop
+
+   // After the setup of the main part, we add the contributions from the surface,
+   // arising due to the partial integration.
+   // Keeping these terms follows the suggestion of Bettess (P. Bettess "Infinite Elements", Penshaw Pres 1992)
+   subdomain_id_type sd;
+   // For easier syntax, we loop over infinite elements and their neighbours separately.
+   // loop over INFINITE ELEMENTS
+   sd=1;{
+      QGauss qrule2 (dim-1, fe_type.default_quadrature_order());
+      UniquePtr<FEBase> face_fe (FEBase::build_InfFE(dim, fe_type));
+      face_fe->attach_quadrature_rule (&qrule2);
+
+      MeshBase::const_element_iterator          el  = mesh.active_local_subdomain_elements_begin(sd);
+      const MeshBase::const_element_iterator end_el = mesh.active_local_subdomain_elements_end(sd);
+      for ( ; el != end_el; ++el){
+         const Elem* elem = *el;
+
+         //dof_map.dof_indices (elem, dof_indices_lm,lm_num);
+         dof_map.dof_indices (elem, dof_indices);
+
+         // Having the correct face, we can start initializing all quantities:
+         const std::vector<Real>& JxW = face_fe->get_JxW();
+         const std::vector<Point>& q_point = face_fe->get_xyz();
+         const std::vector<std::vector<RealGradient> >& dphi = face_fe->get_dphi();
+         const std::vector<std::vector<Real> >& phi = face_fe->get_phi();
+         const std::vector<Point>& normal = face_fe->get_normals();
+         const std::vector<RealGradient>& dphase = face_fe->get_dphase();
+         const std::vector<Real>& weight = face_fe->get_Sobolev_weight(); // in publication called D
+
+         // the base side always has number 0
+         const unsigned int side=0;
+         face_fe->reinit (elem, side);
+         unsigned int n_sf = face_fe->n_shape_functions();
+
+         H.resize (dof_indices.size(), dof_indices.size());
+
+         for (unsigned int pts=0; pts<q_point.size(); pts++){
+            for (unsigned int i=0; i<n_sf; i++){
+               // A(i,j)=A(column, row) =A(bra,ket)
+               for (unsigned int j=0; j<n_sf; j++){
+                  //WARNING: The normal() of infinite elements points inwards! Thus, the sign is flipped.
+                  libmesh_assert(normal[pts]*q_point[pts]/q_point[pts].norm() > 0);
+                  H(i,j)-=.5*JxW[pts]*weight[pts]*phi[i][pts]*normal[pts]*(dphi[j][pts]+ik*dphase[pts]*phi[j][pts]);
+               }
+            }
+         }
+        matrix_A.add_matrix (H, dof_indices);
+      } // end of element loop
+   }
+   // loop over NEIGHBOURS OF INFINITE ELEMENTS
+   sd=2; {
+      // Build a Finite Element object of the specified type.  Since the
+      // \p FEBase::build() member dynamically creates memory we will
+      // store the object as an \p UniquePtr<FEBase>.  This can be thought
+      // of as a pointer that will clean up after itself.
+      UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+
+      QGauss qrule2 (dim-1, fe_type.default_quadrature_order());
+      UniquePtr<FEBase> face_fe (FEBase::build(dim, fe_type));
+      face_fe->attach_quadrature_rule (&qrule2);
+
+      MeshBase::const_element_iterator       el  = mesh.active_local_subdomain_elements_begin(sd);
+      const MeshBase::const_element_iterator end_el = mesh.active_local_subdomain_elements_end(sd);
+      for ( ; el != end_el; ++el){
+         const Elem* elem = *el;
+
+         dof_map.dof_indices (elem, dof_indices);
+
+#ifdef DEBUG
+         unsigned int num_neighbors=0;
+
+         for (unsigned int i=0; i<elem->n_neighbors(); i++){
+            if (elem->neighbor(i)->infinite()){
+               num_neighbors++;
+            }
+         }
+         libmesh_assert_greater(num_neighbors,0);
+         libmesh_assert_greater(elem->n_neighbors(), num_neighbors);
+#endif
+
+         // In contrast to the infinite elements, here it is not as easy to find the correct side.
+         // Also, a single finite element can have multiple infinite neighbours.
+         for(unsigned int prev_neighbor=0; prev_neighbor<elem->n_neighbors(); prev_neighbor++){
+
+            // Having the correct face, we can start initializing all quantities:
+            const std::vector<Real>& JxW =face_fe->get_JxW();
+            const std::vector<Point>& q_point = face_fe->get_xyz();
+            const std::vector<std::vector<RealGradient> >& dphi = face_fe->get_dphi();
+            const std::vector<std::vector<Real> >& phi = face_fe->get_phi();
+            const std::vector<Point>& normal = face_fe->get_normals();
+
+            Elem* relevant_neighbor=elem->neighbor(prev_neighbor);
+
+            // Get the correct face to the finite element; for thise, continue looping
+            // until a neighbor is an infinite element.
+            // If none is found, we leave this loop
+            for (; prev_neighbor<elem->n_neighbors(); prev_neighbor++){
+               if (elem->neighbor(prev_neighbor)->infinite()){
+                  relevant_neighbor=elem->neighbor(prev_neighbor);
+                  break;
+               }
+            }
+            if ( prev_neighbor == elem->n_neighbors()){
+               break;
+            }
+
+            // now, we need to find the side of this element which faces the infinite element neighbor.
+            // This is used as a consistency-check in debug-mode.
+            unsigned int side=0;
+            unsigned int found_s=0;
+            // Trying to get a reasonable bound; I would like to avoid that it breaks.
+            Real tol=0.01*elem->hmin();
+            while (found_s==0){
+               for(unsigned int n=0; n< elem->n_sides(); n++){
+                  if (relevant_neighbor->close_to_point(elem->side_ptr(n)->centroid(), tol)){
+                     found_s++;
+                     side=n;
+#ifndef DEBUG
+                     // We should never find more than 1 element...
+                     break;
+#endif
+                  }
+               }
+               tol*=2.;
+
+#ifdef DEBUG
+               // In case of 1/3 elem->hmin(), we can expect the point to be near all neighboring elements.
+               if (tol > 0.2*elem->hmin()){
+                  err<<"Warning: tolerance reached "<<tol<<","<<std::endl;
+                  err<<"       but element-height is "<<elem->hmin()<<std::endl;
+                  err<<"       (element id: "<<elem->id()<<")"<<std::endl;
+               }
+#endif
+            }
+
+#ifdef DEBUG
+            libmesh_assert_equal_to(found_s, 1);
+#endif
+            //out<<"neighbor id: "<<relevant_neighbor->id();
+            //out<<"  this id: "<<elem->id()<<std::endl;
+            face_fe->reinit (elem, side);
+            unsigned int n_sf = face_fe->n_shape_functions();
+
+            H.resize (dof_indices.size(), dof_indices.size());
+
+            for (unsigned int pts=0; pts<q_point.size(); pts++){
+               // i=bra, j=ket
+               for (unsigned int j=0; j<n_sf; j++){
+                  for (unsigned int i=0; i<n_sf; i++){
+                     libmesh_assert(normal[pts]*q_point[pts]/q_point[pts].norm() > 0);
+                     H(i,j)+=.5*JxW[pts]*normal[pts]*phi[i][pts]*dphi[j][pts];
+                  }
+               }
+            }
+            matrix_A.add_matrix (H, dof_indices);
+
+         } // end infinite neighbor-loop
+      } // end of element loop
+   }
 
   /**
    * All done!
@@ -562,6 +725,10 @@ void SlepcSolverConfiguration::configure_solver()
 }
 #endif // LIBMESH_HAVE_SLEPC
 
+// To see the solution, even in the infinite-element region.
+// The analytic solution is c*exp(-abs(|r|)) where r is the distance from the origin
+// and C is some normalization constant (here ~0.08).
+// The gradient is given just to show that it works.
 void line_print(EquationSystems& es, std::string output, std::string SysName)
 {
 
@@ -597,6 +764,7 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
   Point q_point;
   const Real start=-r;
   Number soln;
+  Gradient grad;
 
   for (int pts=1;pts<=N;pts++)
     {
@@ -605,14 +773,23 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
       q_point = Point(start+ 2*pts*r/N, 0., 0.);
 
       soln=system.point_value(phi_var, q_point);
+      grad=system.point_gradient(phi_var, q_point);
 
       // and print them to the output-file:
       re_out<<" "<<std::setw(12)<<q_point(0);
       im_out<<" "<<std::setw(12)<<q_point(0);
       abs_out<<" "<<std::setw(12)<<q_point(0);
-      re_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::real(soln)<<std::endl;
-      im_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::imag(soln)<<std::endl;
-      abs_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::abs(soln)<<std::endl;
+      re_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::real(soln);
+      im_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::imag(soln);
+      abs_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::abs(soln);
+      // print the probability-current as well:
+      re_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::imag(grad(0)*soln)<<std::endl;
+      im_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::imag(grad(0)*soln)<<std::endl;
+      abs_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::abs(std::imag(grad(0)*soln))<<std::endl;
+
+      // check that the solution is close to the analytic answer.
+      // Comparing abs(soln) because there is a degree of freedom in the global phase.
+      libmesh_assert_less(std::abs(std::abs(soln)-0.081*exp(-q_point.norm())), .0011);
 
     }
 #endif //LIBMESH_ENABLE_INFINITE_ELEMENTS

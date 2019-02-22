@@ -2158,13 +2158,11 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
   // as well try to catch a particularly nasty potential error
   libmesh_assert (e.contains_point(p));
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  if (e.infinite())
-    libmesh_not_implemented();
-#endif
-
   // Get the dof map to get the proper indices for our computation
   const DofMap & dof_map = this->get_dof_map();
+
+  // write the element dimension into a separate variable.
+  const unsigned int dim = e.dim();
 
   // Make sure we can evaluate on this element.
   libmesh_assert (dof_map.is_evaluable(e, var));
@@ -2181,25 +2179,30 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
 
   FEType fe_type = dof_map.variable_type(var);
 
-  // Build a FE again so we can calculate u(p)
-  std::unique_ptr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h.
+  Point coor = FEInterface::inverse_map(dim, fe_type, &e, p);
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-  // Build a vector of point co-ordinates to send to reinit
-  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
-
-  // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealGradient>> &  dphi = fe->get_dphi();
-
-  // Reinitialize the element and compute the shape function values at coor
-  fe->reinit (&e, &coor);
+  // get the shape function value via the FEInterface to also handle the case
+  // of infinite elements correcly, the shape function is not fe->phi().
+  FEComputeData fe_data(this->get_equation_systems(), coor);
+  fe_data.enable_derivative();
+  FEInterface::compute_data(dim, fe_type, &e, fe_data);
 
   // Get ready to accumulate a gradient
   Gradient grad_u;
 
   for (unsigned int l=0; l<num_dofs; l++)
     {
-      grad_u.add_scaled (dphi[l][0], this->current_solution (dof_indices[l]));
+      // Chartesian coordinates have allways LIBMESH_DIM entries,
+      // local coordinates have as many coordinates as the element has.
+      for (std::size_t v=0; v<dim; v++)
+        for (std::size_t xyz=0; xyz<LIBMESH_DIM; xyz++)
+          {
+            // FIXME: this needs better syntax: It is matrix-vector multiplication.
+            grad_u(xyz) += fe_data.local_transform[v][xyz]
+              * fe_data.dshape[l](v)
+              * this->current_solution (dof_indices[l]);
+          }
     }
 
   return grad_u;
