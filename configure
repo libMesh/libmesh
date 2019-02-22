@@ -1246,6 +1246,7 @@ enable_nlopt
 with_nlopt_include
 with_nlopt_lib
 enable_capnproto
+enable_capnp_required
 with_capnproto
 enable_hdf5
 with_hdf5
@@ -2040,6 +2041,8 @@ Optional Features:
   --disable-glpk          build without GLPK support
   --disable-nlopt         build without NLOPT support
   --disable-capnproto     build without Cap'n Proto support
+  --enable-capnp-required Error if Cap'n Proto support is not detected by
+                          configure
   --enable-hdf5           build libmesh with HDF5 support, the selected HDF5
                           must be compatible with contrib/netcdf
   --disable-netcdf        build without netCDF binary I/O
@@ -40287,6 +40290,21 @@ else
 fi
 
 
+      # Check whether --enable-capnp-required was given.
+if test "${enable_capnp_required+set}" = set; then :
+  enableval=$enable_capnp_required; case "${enableval}" in #(
+  yes) :
+    capnprequired=yes ;; #(
+  no) :
+    capnprequired=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-capnp-required" "$LINENO" 5 ;;
+esac
+else
+  capnprequired=no
+fi
+
+
     if test "x$HAVE_CXX11" = "x" || test "x$HAVE_CXX11" = "x0"; then :
 
           enablecapnproto=no
@@ -40439,6 +40457,10 @@ $as_echo "<<< Configuring library with CAPNPROTO support >>>" >&6; }
 
 fi
 
+fi
+
+      if test "x$enablecapnproto" != "xyes" && test "x$capnprequired" = "xyes"; then :
+  as_fn_error 6 "*** Cap'n Proto was not found, but --enable-capnp-required was specified. Make sure the capnp executable is in your PATH" "$LINENO" 5
 fi
 
 

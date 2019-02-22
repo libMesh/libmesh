@@ -16,6 +16,17 @@ AC_DEFUN([CONFIGURE_CAPNPROTO],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-capnproto)])],
                 [enablecapnproto=$enableoptional])
 
+  dnl Throw an error during configure if the user passes --enable-capnp-required
+  dnl and capnp can't be configured for whatever reason.
+  AC_ARG_ENABLE(capnp-required,
+                AC_HELP_STRING([--enable-capnp-required],
+                               [Error if Cap'n Proto support is not detected by configure]),
+                [AS_CASE("${enableval}",
+                         [yes], [capnprequired=yes],
+                         [no],  [capnprequired=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-capnp-required)])],
+                     [capnprequired=no])
+
   dnl Cap'n Proto code uses 'auto', and therefore requires C++11 support.
   AS_IF([test "x$HAVE_CXX11" = "x" || test "x$HAVE_CXX11" = "x0"],
         [
@@ -125,6 +136,11 @@ AC_DEFUN([CONFIGURE_CAPNPROTO],
                   AC_MSG_RESULT([<<< Configuring library with CAPNPROTO support >>>])
                 ])
         ])
+
+  dnl If capnproto is not enabled but it was required, error out now
+  dnl instead of compiling libmesh in an invalid configuration.
+  AS_IF([test "x$enablecapnproto" != "xyes" && test "x$capnprequired" = "xyes"],
+        [AC_MSG_ERROR([*** Cap'n Proto was not found, but --enable-capnp-required was specified. Make sure the capnp executable is in your PATH], 6)])
 
   dnl Substitute the substitution variables
   AC_SUBST(CAPNPROTO_INCLUDE)
