@@ -790,6 +790,10 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
       im_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::imag(grad(0)*soln)<<std::endl;
       abs_out<<"  "<<std::setw(12)<<std::scientific<<std::setprecision(6)<<std::abs(std::imag(grad(0)*soln))<<std::endl;
 
+      // check that the solution is close to the analytic answer.
+      // Comparing abs(soln) because there is a degree of freedom in the global phase.
+      libmesh_assert_less(std::abs(std::abs(soln)-0.081*exp(-q_point.norm())), .0011);
+
     }
 #endif //LIBMESH_ENABLE_INFINITE_ELEMENTS
 }
