@@ -40,6 +40,7 @@ RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
 void RBParameters::clear()
 {
   _parameters.clear();
+  _extra_parameters.clear();
 }
 
 Real RBParameters::get_value(const std::string & param_name) const
@@ -59,6 +60,23 @@ void RBParameters::set_value(const std::string & param_name, Real value)
   _parameters[param_name] = value;
 }
 
+Real RBParameters::get_extra_value(const std::string & param_name) const
+{
+  // find the parameter value
+  const_iterator it = _extra_parameters.find(param_name);
+
+  // throw and error if the parameter doesn't exist
+  if (it == _extra_parameters.end())
+    libmesh_error_msg("Error: parameter " << param_name << " does not exist in extra parameters.");
+
+  return it->second;
+}
+
+void RBParameters::set_extra_value(const std::string & param_name, Real value)
+{
+  _extra_parameters[param_name] = value;
+}
+
 unsigned int RBParameters::n_parameters() const
 {
   return cast_int<unsigned int>
@@ -71,6 +89,18 @@ void RBParameters::get_parameter_names(std::set<std::string> & param_names) cons
 
   const_iterator it     = _parameters.begin();
   const_iterator it_end = _parameters.end();
+  for ( ; it != it_end; ++it)
+    {
+      param_names.insert( it->first );
+    }
+}
+
+void RBParameters::get_extra_parameter_names(std::set<std::string> & param_names) const
+{
+  param_names.clear();
+
+  const_iterator it     = _extra_parameters.begin();
+  const_iterator it_end = _extra_parameters.end();
   for ( ; it != it_end; ++it)
     {
       param_names.insert( it->first );

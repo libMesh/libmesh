@@ -73,6 +73,17 @@ public:
   void set_value(const std::string & param_name, Real value);
 
   /**
+   * Get the value of the specific extra parameter.
+   */
+  Real get_extra_value(const std::string & param_name) const;
+
+  /**
+   * Set the value of the specified extra parameter. If param_name
+   * doesn't already exist, it is added to the extra parameters.
+   */
+  void set_extra_value(const std::string & param_name, Real value);
+
+  /**
    * Get the number of parameters that have been added.
    */
   unsigned int n_parameters() const;
@@ -81,6 +92,11 @@ public:
    * Fill \p param_names with the names of the parameters.
    */
   void get_parameter_names(std::set<std::string> & param_names) const;
+
+  /**
+   * Fill \p param_names with the names of the extra parameters.
+   */
+  void get_extra_parameter_names(std::set<std::string> & param_names) const;
 
   /**
    * Get a constant iterator to beginning of this RBParameters object.
@@ -120,6 +136,11 @@ private:
    * The map that stores the actual parameters, indexed by names.
    */
   std::map<std::string, Real> _parameters;
+
+  /**
+   * The map that stores extra parameters not used for RB training, indexed by names.
+   */
+  std::map<std::string, Real> _extra_parameters;
 
 };
 
