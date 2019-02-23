@@ -50,26 +50,25 @@ namespace libMesh
     DM * coarser_dm;
     DM * finer_dm;
     DM * global_dm;
-    libMesh::PetscMatrix<libMesh::Real > * K_interp_ptr;
-    libMesh::PetscMatrix<libMesh::Real > * K_sub_interp_ptr;
-    libMesh::PetscMatrix<libMesh::Real > * K_restrict_ptr;
-    libMesh::PetscVector<libMesh::Real > * current_vec;
+    PetscMatrix<libMesh::Real > * K_interp_ptr;
+    PetscMatrix<libMesh::Real > * K_sub_interp_ptr;
+    PetscMatrix<libMesh::Real > * K_restrict_ptr;
+    PetscVector<libMesh::Real > * current_vec;
 
     //! Stores local dofs for each var for use in subprojection matrixes
     std::vector<std::vector<numeric_index_type>> dof_vec;
 
-    PetscDMContext()
-    {
-      n_dofs = -12345;
-      mesh_dim = -12345;
-      coarser_dm = nullptr;
-      finer_dm = nullptr;
-      global_dm = nullptr;
-      K_interp_ptr = nullptr;
-      K_sub_interp_ptr = nullptr;
-      K_restrict_ptr = nullptr;
-      current_vec = nullptr;
-    }
+    PetscDMContext() :
+      n_dofs(-12345),
+      mesh_dim(-12345),
+      coarser_dm(nullptr),
+      finer_dm(nullptr),
+      global_dm(nullptr),
+      K_interp_ptr(nullptr),
+      K_sub_interp_ptr(nullptr),
+      K_restrict_ptr(nullptr),
+      current_vec(nullptr)
+    {}
 
   };
 

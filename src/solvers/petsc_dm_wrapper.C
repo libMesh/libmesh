@@ -50,20 +50,20 @@ namespace libMesh
 
     //! Help PETSc create a subDM given a global dm when using fieldsplit
 #if PETSC_VERSION_LESS_THAN(3,9,0)
-    PetscErrorCode __libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, PetscInt fields[], IS *is, DM *subdm)
+    PetscErrorCode libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, PetscInt fields[], IS *is, DM *subdm)
 #else
-    PetscErrorCode __libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, const PetscInt fields[], IS *is, DM *subdm)
+    PetscErrorCode libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, const PetscInt fields[], IS *is, DM *subdm)
 #endif
     {
       PetscErrorCode ierr;
       // Basically, we copy the PETSc ShellCreateSubDM implementation,
-      // but also need to set the embedding dim and we also propagate
+      // but also need to set the embedding dim and also propagate
       // the relevant function pointers to the subDM for GMG purposes.
       // Since this is called by PETSc we gotta pull some of this info
       // from the context in the DM.
 
       // Get our context
-      void * ctx = NULL;
+      void * ctx = nullptr;
       ierr = DMShellGetContext(dm, & ctx);
       LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx);
@@ -116,7 +116,7 @@ namespace libMesh
     }
 
     //! Help PETSc identify the finer DM given a dmc
-    PetscErrorCode __libmesh_petsc_DMRefine(DM dmc, MPI_Comm comm, DM * dmf)
+    PetscErrorCode libmesh_petsc_DMRefine(DM dmc, MPI_Comm comm, DM * dmf)
     {
       libmesh_assert(dmc);
       libmesh_assert(dmf);
@@ -125,7 +125,7 @@ namespace libMesh
       PetscErrorCode ierr;
 
       // extract our context from the incoming dmc
-      void * ctx_c = NULL;
+      void * ctx_c = nullptr;
       ierr = DMShellGetContext(dmc, & ctx_c);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_c);
       PetscDMContext * p_ctx = static_cast<PetscDMContext * >(ctx_c);
@@ -139,7 +139,7 @@ namespace libMesh
     }
 
     //! Help PETSc identify the coarser DM dmc given the fine DM dmf
-    PetscErrorCode __libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm comm, DM * dmc)
+    PetscErrorCode libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm comm, DM * dmc)
     {
       libmesh_assert(dmc);
       libmesh_assert(dmf);
@@ -148,7 +148,7 @@ namespace libMesh
       PetscErrorCode ierr;
 
       // Extract our context from the incoming dmf
-      void * ctx_f = NULL;
+      void * ctx_f = nullptr;
       ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx = static_cast<PetscDMContext*>(ctx_f);
@@ -174,9 +174,9 @@ namespace libMesh
 
       libmesh_assert(p_ctx->global_dm);
       DM * globaldm = p_ctx->global_dm;
-      ierr = DMCreateFieldIS(dmf, &nfieldsf, &fieldnamesf, NULL);
+      ierr = DMCreateFieldIS(dmf, &nfieldsf, &fieldnamesf, nullptr);
       LIBMESH_CHKERR(ierr);
-      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, &fieldnamesg, NULL);
+      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, &fieldnamesg, nullptr);
       LIBMESH_CHKERR(ierr);
 
       // If the probed number of fields is less than the number of
@@ -187,7 +187,7 @@ namespace libMesh
         {
           PetscSection section;
           PetscSection subsection;
-          PetscInt * subfields = new PetscInt[nfieldsf]; // extracted fields
+          std::vector<PetscInt> subfields(nfieldsf); // extracted fields
 
           // First, get the section from the coarse DM
 #if PETSC_VERSION_LESS_THAN(3,10,0)
@@ -210,7 +210,7 @@ namespace libMesh
             }
 
           // Next, for the found fields we now make a subsection and set it for the coarser DM
-          ierr = PetscSectionCreateSubsection(section, nfieldsf, subfields, &subsection);
+          ierr = PetscSectionCreateSubsection(section, nfieldsf, subfields.data(), &subsection);
           LIBMESH_CHKERR(ierr);
 #if PETSC_VERSION_LESS_THAN(3,10,0)
           ierr = DMSetDefaultSection(*(p_ctx->coarser_dm) , subsection);
@@ -220,8 +220,6 @@ namespace libMesh
           LIBMESH_CHKERR(ierr);
           ierr = PetscSectionDestroy(&subsection);
           LIBMESH_CHKERR(ierr);
-
-          delete [] subfields;
         }
 
       // Finally, set the coarser DM
@@ -232,7 +230,7 @@ namespace libMesh
 
     //! Function to give PETSc that sets the Interpolation Matrix between two DMs
     PetscErrorCode
-    __libmesh_petsc_DMCreateInterpolation (DM dmc /*coarse*/, DM dmf /*fine*/,
+    libmesh_petsc_DMCreateInterpolation (DM dmc /*coarse*/, DM dmf /*fine*/,
                                          Mat * mat ,Vec * vec)
     {
       libmesh_assert(dmc);
@@ -246,14 +244,14 @@ namespace libMesh
       PetscObjectGetComm((PetscObject)dmc, &comm);
 
       // Extract our coarse context from the incoming DM
-      void * ctx_c = NULL;
+      void * ctx_c = nullptr;
       ierr = DMShellGetContext(dmc, &ctx_c);
       LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_c);
       PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
 
       // Extract our fine context from the incoming DM
-      void * ctx_f = NULL;
+      void * ctx_f = nullptr;
       ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
@@ -269,11 +267,11 @@ namespace libMesh
       libmesh_assert(p_ctx_c->global_dm);
       DM * globaldm = p_ctx_c->global_dm;
 
-      ierr = DMCreateFieldIS(dmc, &nfieldsc, NULL, NULL);
+      ierr = DMCreateFieldIS(dmc, &nfieldsc, nullptr, nullptr);
       LIBMESH_CHKERR(ierr);
-      ierr = DMCreateFieldIS(dmf, &nfieldsf, NULL, NULL);
+      ierr = DMCreateFieldIS(dmf, &nfieldsf, nullptr, nullptr);
       LIBMESH_CHKERR(ierr);
-      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, NULL, NULL);
+      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, nullptr, nullptr);
       LIBMESH_CHKERR(ierr);
 
       // If subfields are identified, were doing FS so we need to create the subProjectionMatrix
@@ -288,7 +286,7 @@ namespace libMesh
           // For internal libmesh submat extraction need to merge all
           // field dofs and then sort the vectors so that they match
           // the Projection Matrix ordering
-          static const int n_subfields = nfieldsc;
+          const int n_subfields = nfieldsc;
           if ( n_subfields > 1 )
             {
               for (int i = 0 ; i < n_subfields ; i++)
@@ -302,9 +300,6 @@ namespace libMesh
 
           // Now that we have merged the fine and coarse index sets
           // were ready to make the submatrix and pass it off to PETSc
-          Mat  submat;
-          ierr = MatCreate(comm, &submat);
-          LIBMESH_CHKERR(ierr);
           p_ctx_c->K_interp_ptr->create_submatrix (*p_ctx_c->K_sub_interp_ptr, rows, cols);
           *(mat) = p_ctx_c->K_sub_interp_ptr->mat();
         }
@@ -315,11 +310,11 @@ namespace libMesh
       *(vec) = PETSC_NULL;
       return 0;
 
-    } // end __libmesh_petsc_DMCreateInterpolation
+    } // end libmesh_petsc_DMCreateInterpolation
 
     //! Function to give PETSc that sets the Restriction Matrix between two DMs
     PetscErrorCode
-    __libmesh_petsc_DMCreateRestriction (DM dmc /*coarse*/, DM dmf/*fine*/, Mat * mat)
+    libmesh_petsc_DMCreateRestriction (DM dmc /*coarse*/, DM dmf/*fine*/, Mat * mat)
     {
       libmesh_assert(dmc);
       libmesh_assert(dmf);
@@ -332,7 +327,7 @@ namespace libMesh
       PetscObjectGetComm((PetscObject)dmc, &comm);
 
       // extract our fine context from the incoming DM
-      void * ctx_f = NULL;
+      void * ctx_f = nullptr;
       ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
@@ -394,14 +389,14 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
     n_levels += 1;
 
   // How many MG levels did the user request?
-  int usr_requested_mg_lvls = 0;
+  unsigned int usr_requested_mg_lvls = 0;
   usr_requested_mg_lvls = command_line_next("-pc_mg_levels", usr_requested_mg_lvls);
 
   // Only construct however many levels were requested if something was actually requested
   if ( usr_requested_mg_lvls != 0 )
     {
       // Dont request more than avail num levels on mesh, require at least 2 levels
-      libmesh_assert_less_equal( (unsigned int)usr_requested_mg_lvls, n_levels );
+      libmesh_assert_less_equal( usr_requested_mg_lvls, n_levels );
       libmesh_assert( usr_requested_mg_lvls > 1 );
 
       n_levels = usr_requested_mg_lvls;
@@ -456,24 +451,24 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
         }
 
       // Set PETSC's Restriction, Interpolation, Coarsen and Refine functions for the current DM
-      ierr = DMShellSetCreateInterpolation ( dm, __libmesh_petsc_DMCreateInterpolation );
+      ierr = DMShellSetCreateInterpolation ( dm, libmesh_petsc_DMCreateInterpolation );
       LIBMESH_CHKERR(ierr);
 
       // Not implemented. For now we rely on galerkin style restrictions
       bool supply_restriction = false;
       if (supply_restriction)
         {
-        ierr = DMShellSetCreateRestriction ( dm, __libmesh_petsc_DMCreateRestriction  );
+        ierr = DMShellSetCreateRestriction ( dm, libmesh_petsc_DMCreateRestriction  );
         LIBMESH_CHKERR(ierr);
         }
 
-      ierr = DMShellSetCoarsen ( dm, __libmesh_petsc_DMCoarsen );
+      ierr = DMShellSetCoarsen ( dm, libmesh_petsc_DMCoarsen );
       LIBMESH_CHKERR(ierr);
 
-      ierr = DMShellSetRefine ( dm, __libmesh_petsc_DMRefine );
+      ierr = DMShellSetRefine ( dm, libmesh_petsc_DMRefine );
       LIBMESH_CHKERR(ierr);
 
-      ierr= DMShellSetCreateSubDM(dm, __libmesh_petsc_DMCreateSubDM);
+      ierr= DMShellSetCreateSubDM(dm, libmesh_petsc_DMCreateSubDM);
       CHKERRABORT(system.comm().get(), ierr);
 
       // Uniformly coarsen if not the coarsest grid and distribute dof info.
@@ -500,13 +495,13 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           // Set pointers to surrounding dm levels to help PETSc refine/coarsen
           if ( i == 1 ) // were at the coarsest mesh
             {
-              (*_ctx_vec[i-1]).coarser_dm = NULL;
+              (*_ctx_vec[i-1]).coarser_dm = nullptr;
               (*_ctx_vec[i-1]).finer_dm   = _dms[1].get();
             }
           else if( i == n_levels ) // were at the finest mesh
             {
               (*_ctx_vec[i-1]).coarser_dm = _dms[_dms.size() - 2].get();
-              (*_ctx_vec[i-1]).finer_dm   = NULL;
+              (*_ctx_vec[i-1]).finer_dm   = nullptr;
             }
           else // were in the middle of the hierarchy
             {
