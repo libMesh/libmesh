@@ -227,7 +227,9 @@ void PetscDiffSolver::clear()
   int ierr = LibMeshSNESDestroy(&_snes);
   LIBMESH_CHKERR(ierr);
 
+#if !PETSC_VERSION_LESS_THAN(3,7,3)
   _dm_wrapper.clear();
+#endif
 }
 
 
@@ -354,8 +356,10 @@ void PetscDiffSolver::setup_petsc_data()
   bool use_petsc_dm = libMesh::on_command_line("--use_petsc_dm");
 
   // This needs to be called before SNESSetFromOptions
+#if !PETSC_VERSION_LESS_THAN(3,7,3)
   if (use_petsc_dm)
     this->_dm_wrapper.init_and_attach_petscdm(_system, _snes);
+#endif
 
   // If we're not using PETSc DM, let's keep around
   // the old style for fieldsplit

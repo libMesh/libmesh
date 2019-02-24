@@ -19,8 +19,10 @@
 #define LIBMESH_PETSC_DM_WRAPPER_H
 
 #include "libmesh/libmesh_common.h"
+#include "libmesh/petsc_macro.h"
 
 #ifdef LIBMESH_HAVE_PETSC
+#if !PETSC_VERSION_LESS_THAN(3,7,3)
 
 #include <vector>
 #include <memory>
@@ -31,12 +33,44 @@
 #include "libmesh/ignore_warnings.h"
 #include <petsc.h>
 #include "libmesh/restore_warnings.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
 
 namespace libMesh
 {
   // Forward declarations
   class System;
   class DofObject;
+
+  //! Struct to house data regarding where in the mesh hierarchy we are located
+  struct PetscDMContext
+  {
+    int n_dofs;
+    int mesh_dim;
+    DM * coarser_dm;
+    DM * finer_dm;
+    DM * global_dm;
+    PetscMatrix<libMesh::Real > * K_interp_ptr;
+    PetscMatrix<libMesh::Real > * K_sub_interp_ptr;
+    PetscMatrix<libMesh::Real > * K_restrict_ptr;
+    PetscVector<libMesh::Real > * current_vec;
+
+    //! Stores local dofs for each var for use in subprojection matrixes
+    std::vector<std::vector<numeric_index_type>> dof_vec;
+
+    PetscDMContext() :
+      n_dofs(-12345),
+      mesh_dim(-12345),
+      coarser_dm(nullptr),
+      finer_dm(nullptr),
+      global_dm(nullptr),
+      K_interp_ptr(nullptr),
+      K_sub_interp_ptr(nullptr),
+      K_restrict_ptr(nullptr),
+      current_vec(nullptr)
+    {}
+
+  };
 
 /**
  * This class defines a wrapper around the PETSc DM infrastructure.
@@ -72,15 +106,33 @@ private:
   //! Vector of star forests for all grid levels
   std::vector<std::unique_ptr<PetscSF>> _star_forests;
 
+  //! Vector of projection matrixes for all grid levels
+  std::vector<std::unique_ptr<PetscMatrix<Real>>> _pmtx_vec;
+
+  //! Vector of sub projection matrixes for all grid levels for fieldsplit
+  std::vector<std::unique_ptr<PetscMatrix<Real>>> _subpmtx_vec;
+
+  //! Vector of internal PetscDM context structs for all grid levels
+  std::vector<std::unique_ptr<PetscDMContext>> _ctx_vec;
+
+  //! Vector of solution vectors for all grid levels
+  std::vector<std::unique_ptr<PetscVector<Real>>> _vec_vec;
+
+  //! Stores n_dofs for each grid level, to be used for projection matrix sizing
+  std::vector<unsigned int> _mesh_dof_sizes;
+
+  //! Stores n_local_dofs for each grid level, to be used for projection vector sizing
+  std::vector<unsigned int> _mesh_dof_loc_sizes;
+
   //! Init all the n_mesh_level dependent data structures
-  void init_dm_data(unsigned int n_levels);
+  void init_dm_data(unsigned int n_levels, const Parallel::Communicator & comm);
 
   //! Get reference to DM for the given mesh level
   /**
    * init_dm_data() should be called before this function.
    */
   DM & get_dm(unsigned int level)
-  { libmesh_assert(level < _dms.size());
+    { libmesh_assert_less(level, _dms.size());
     return *(_dms[level].get()); }
 
   //! Get reference to PetscSection for the given mesh level
@@ -88,7 +140,7 @@ private:
    * init_dm_data() should be called before this function.
    */
   PetscSection & get_section(unsigned int level)
-  { libmesh_assert(level < _sections.size());
+    { libmesh_assert_less(level, _sections.size());
     return *(_sections[level].get()); }
 
   //! Get reference to PetscSF for the given mesh level
@@ -96,7 +148,7 @@ private:
    * init_dm_data() should be called before this function.
    */
   PetscSF & get_star_forest(unsigned int level)
-  { libmesh_assert(level < _star_forests.size());
+    { libmesh_assert_less(level, _star_forests.size());
     return *(_star_forests[level].get()); }
 
   //! Takes System, empty PetscSection and populates the PetscSection
@@ -153,7 +205,7 @@ private:
    * The PetscSection contains local dof information. This helper function just facilitates
    * sanity checking that in fact it only has n_local_dofs.
    */
-  dof_id_type check_section_n_dofs( const System & system, PetscSection & section );
+  dof_id_type check_section_n_dofs( PetscSection & section );
 
   //! Helper function to reduce code duplication when setting dofs in section
   void add_dofs_helper (const System & system,
@@ -165,6 +217,7 @@ private:
 
 }
 
+#endif // #if PETSC_VERSION
 #endif // #ifdef LIBMESH_HAVE_PETSC
 
 #endif // LIBMESH_PETSC_DM_WRAPPER_H
