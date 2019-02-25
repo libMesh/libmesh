@@ -23,6 +23,8 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
+#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_HAVE_METAPHYSICL
 
 #include <vector>
 #include <memory>
@@ -217,6 +219,8 @@ private:
 
 }
 
+#endif // #if LIBMESH_HAVE_METAPHYSICL
+#endif // #if LIBMESH_ENABLE_AMR
 #endif // #if PETSC_VERSION
 #endif // #ifdef LIBMESH_HAVE_PETSC
 
