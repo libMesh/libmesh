@@ -991,6 +991,12 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
                 keep = false;
             }
 
+        // We also don't keep variables that are not active on any subdomains.
+        // Contrary to other uses of the var_active_subdomains container where
+        // the empty set means "all" subdomains, here it really means "none".
+        if (active_set.empty())
+          keep = false;
+
         if (keep)
           {
             derived_var_names_edited.push_back(derived_var_name);
