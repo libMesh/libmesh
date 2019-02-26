@@ -47,7 +47,7 @@ std::unique_ptr<T> make_unique(Args &&... args)
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 }
-#define libmesh_make_unique make_unique
+#define libmesh_make_unique libMesh::make_unique
 
 #endif
 
