@@ -64,7 +64,8 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_renumber_nodes_and_elements(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
-  _default_ghosting(new GhostPointNeighbors(*this))
+  _default_ghosting(new GhostPointNeighbors(*this)),
+  _point_locator_close_to_point_tol(0.)
 {
   _elem_dims.insert(d);
   _ghosting_functors.insert(_default_ghosting.get());
@@ -92,7 +93,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(new GhostPointNeighbors(*this)),
-  _ghosting_functors(other_mesh._ghosting_functors)
+  _ghosting_functors(other_mesh._ghosting_functors),
+  _point_locator_close_to_point_tol(0.)
 {
   // Make sure we don't accidentally delete the other mesh's default
   // ghosting functor; we'll use our own if that's needed.
@@ -486,6 +488,9 @@ const PointLocatorBase & MeshBase::point_locator () const
       libmesh_assert(!Threads::in_threads);
 
       _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
+
+      if (_point_locator_close_to_point_tol > 0.)
+        _point_locator->set_close_to_point_tol(_point_locator_close_to_point_tol);
     }
 
   return *_point_locator;
@@ -505,6 +510,9 @@ std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
       parallel_object_only();
 
       _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
+
+      if (_point_locator_close_to_point_tol > 0.)
+        _point_locator->set_close_to_point_tol(_point_locator_close_to_point_tol);
     }
 
   // Otherwise there was a master point locator, and we can grab a
@@ -720,5 +728,27 @@ void MeshBase::detect_interior_parents()
         }
     }
 }
+
+
+
+void MeshBase::set_point_locator_close_to_point_tol(Real val)
+{
+  _point_locator_close_to_point_tol = val;
+  if (_point_locator)
+    {
+      if (val > 0.)
+        _point_locator->set_close_to_point_tol(val);
+      else
+        _point_locator->unset_close_to_point_tol();
+    }
+}
+
+
+
+Real MeshBase::get_point_locator_close_to_point_tol() const
+{
+  return _point_locator_close_to_point_tol;
+}
+
 
 } // namespace libMesh
