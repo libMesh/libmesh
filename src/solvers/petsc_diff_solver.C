@@ -337,6 +337,15 @@ unsigned int PetscDiffSolver::solve()
   SNESConvergedReason reason;
   SNESGetConvergedReason(_snes, &reason);
 
+  PetscInt l_its, nl_its;
+  ierr = SNESGetLinearSolveIterations(_snes,&l_its);
+  LIBMESH_CHKERR(ierr);
+  this->_inner_iterations = l_its;
+
+  ierr = SNESGetIterationNumber(_snes,&nl_its);
+  LIBMESH_CHKERR(ierr);
+  this->_outer_iterations = nl_its;
+
   return convert_solve_result(reason);
 }
 
