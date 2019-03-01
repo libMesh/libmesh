@@ -981,6 +981,18 @@ public:
   std::unique_ptr<PointLocatorBase> sub_point_locator () const;
 
   /**
+   * Set value used by PointLocatorBase::close_to_point_tol().
+   *
+   * Defaults to 0.0. If nonzero, calls close_to_point_tol() whenever
+   * a new PointLocator is built for use by this Mesh.  Since the Mesh
+   * controls the creation and destruction of the PointLocator, if
+   * there are any parameters we need to customize on it, the Mesh
+   * will need to know about them.
+   */
+  void set_point_locator_close_to_point_tol(Real val);
+  Real get_point_locator_close_to_point_tol() const;
+
+  /**
    * Releases the current \p PointLocator object.
    */
   void clear_point_locator ();
@@ -1473,6 +1485,12 @@ protected:
    * MeshBase because the cost is trivial.
    */
   std::set<GhostingFunctor *> _ghosting_functors;
+
+  /**
+   * If nonzero, we will call PointLocatorBase::set_close_to_point_tol()
+   * on any PointLocators that we create.
+   */
+  Real _point_locator_close_to_point_tol;
 
   /**
    * The partitioner class is a friend so that it can set
