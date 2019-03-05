@@ -3316,12 +3316,12 @@ void DofMap::process_constraints (MeshBase & mesh)
   // non-local constraints that we'll need to take into account.
   this->allgather_recursive_constraints(mesh);
 
-  if(_error_on_cyclic_constraint)
+  if (_error_on_constraint_loop)
   {
-    // Optionally check for cyclic constraints and throw an error
+    // Optionally check for constraint loops and throw an error
     // if they're detected. We always do this check below in dbg/devel
     // mode but here we optionally do it in opt mode as well.
-    check_for_cyclic_constraints();
+    check_for_constraint_loops();
   }
 
   // Create a set containing the DOFs we already depend on
@@ -3370,7 +3370,7 @@ void DofMap::process_constraints (MeshBase & mesh)
 
             for (const auto & item : subconstraint_row)
               {
-                // Assert that the constraint is not cyclic.
+                // Assert that the constraint does not form a cycle.
                 libmesh_assert(item.first != expandable);
                 constraint_row[item.first] += item.second * this_coef;
               }
@@ -3418,6 +3418,12 @@ void DofMap::process_constraints (MeshBase & mesh)
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 void DofMap::check_for_cyclic_constraints()
+{
+  // Eventually make this officially libmesh_deprecated();
+  check_for_constraint_loops();
+}
+
+void DofMap::check_for_constraint_loops()
 {
   // Create a set containing the DOFs we already depend on
   typedef std::set<dof_id_type> RCSet;
@@ -3471,7 +3477,7 @@ void DofMap::check_for_cyclic_constraints()
             for (const auto & item : subconstraint_row)
               {
                 if (item.first == expandable)
-                  libmesh_error_msg("Cyclic constraint detected");
+                  libmesh_error_msg("Constraint loop detected");
 
                 constraint_row[item.first] += item.second * this_coef;
               }
@@ -3508,6 +3514,7 @@ void DofMap::check_for_cyclic_constraints()
       }
 }
 #else
+void DofMap::check_for_constraint_loops() {}
 void DofMap::check_for_cyclic_constraints()
 {
   // Do nothing

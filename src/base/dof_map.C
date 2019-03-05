@@ -131,7 +131,7 @@ DofMap::DofMap(const unsigned int number,
                MeshBase & mesh) :
   ParallelObject (mesh.comm()),
   _dof_coupling(nullptr),
-  _error_on_cyclic_constraint(false),
+  _error_on_constraint_loop(false),
   _variables(),
   _variable_groups(),
   _variable_group_numbers(),
@@ -237,7 +237,14 @@ bool DofMap::is_periodic_boundary (const boundary_id_type boundaryid) const
 
 void DofMap::set_error_on_cyclic_constraint(bool error_on_cyclic_constraint)
 {
-  _error_on_cyclic_constraint = error_on_cyclic_constraint;
+  // This function will eventually be officially libmesh_deprecated();
+  // Call DofMap::set_error_on_constraint_loop() instead.
+  set_error_on_constraint_loop(error_on_cyclic_constraint);
+}
+
+void DofMap::set_error_on_constraint_loop(bool error_on_constraint_loop)
+{
+  _error_on_constraint_loop = error_on_constraint_loop;
 }
 
 

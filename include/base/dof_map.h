@@ -490,11 +490,16 @@ public:
 
   /**
    * Specify whether or not we perform an extra (opt-mode enabled) check
-   * for cyclic constraints. If a cyclic constraint is present then
-   * the system constraints are not valid, so if \p error_on_cyclic_constraint
+   * for constraint loops. If a constraint loop is present then
+   * the system constraints are not valid, so if \p error_on_constraint_loop
    * is true we will throw an error in this case.
+   *
+   * \note We previously referred to these types of constraints as
+   * "cyclic" but that has now been deprecated, and these will now
+   * instead be referred to as "constraint loops" in libMesh.
    */
   void set_error_on_cyclic_constraint(bool error_on_cyclic_constraint);
+  void set_error_on_constraint_loop(bool error_on_constraint_loop);
 
   /**
    * \returns The \p VariableGroup description object for group \p g.
@@ -856,11 +861,21 @@ public:
   void process_constraints (MeshBase &);
 
   /**
-   * Throw an error if we detect and cyclic constraints, since these
-   * are not supported by libMesh and give erroneous results if they
-   * are present.
+   * Throw an error if we detect any constraint loops, i.e.
+   * A -> B -> C -> A
+   * that is, "dof A is constrained in terms of dof B which is
+   * constrained in terms of dof C which is constrained in terms of
+   * dof A", since these are not supported by libMesh and give
+   * erroneous results if they are present.
+   *
+   * \note The original "cyclic constraint" terminology was
+   * unfortunate since the word cyclic is used by some software to
+   * indicate an actual type of rotational/angular contraint and not
+   * (as here) a cyclic graph. The former nomenclature will eventually
+   * be deprecated in favor of "constraint loop".
    */
   void check_for_cyclic_constraints();
+  void check_for_constraint_loops();
 
   /**
    * Adds a copy of the user-defined row to the constraint matrix, using
@@ -1496,9 +1511,10 @@ private:
 
   /**
    * This flag indicates whether or not we do an opt-mode check for
-   * the presence of cyclic constraints.
+   * the presence of constraint loops, i.e. cases where the constraint
+   * graph is cyclic.
    */
-  bool _error_on_cyclic_constraint;
+  bool _error_on_constraint_loop;
 
   /**
    * The finite element type for each variable.
