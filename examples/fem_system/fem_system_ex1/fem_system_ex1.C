@@ -190,7 +190,13 @@ int main (int argc, char ** argv)
   if (slvr_type == "newton")
     system.time_solver->diff_solver() = libmesh_make_unique<NewtonSolver>(system);
   else if (slvr_type == "petscdiff")
+#ifndef LIBMESH_HAVE_PETSC
+#ifndef LIBMESH_HAVE_METAPHYSICL
     system.time_solver->diff_solver() = libmesh_make_unique<PetscDiffSolver>(system);
+#else
+  libmesh_example_requires(false, "--enable-petsc --enable-metaphysicl-required");
+#endif
+#endif
   else
     libmesh_error_msg("Error: specified solver_type not understood");
 
