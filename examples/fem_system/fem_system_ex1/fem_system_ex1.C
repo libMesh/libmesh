@@ -36,7 +36,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/mesh.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
@@ -98,7 +98,7 @@ int main (int argc, char ** argv)
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
   const unsigned int dim               = infile("dimension", 2);
   const std::string slvr_type          = infile("solver_type", "newton");
-  const std::string mesh_type          = infile("mesh_type"  , "serial");
+  const std::string mesh_type          = infile("mesh_type"  , "replicated");
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -116,8 +116,8 @@ int main (int argc, char ** argv)
 
   if (mesh_type == "distributed")
     mesh.reset(new DistributedMesh(init.comm()));
-  else if (mesh_type == "serial")
-    mesh.reset(new SerialMesh(init.comm()));
+  else if (mesh_type == "replicated")
+    mesh.reset(new ReplicatedMesh(init.comm()));
   else
     libmesh_error_msg("Error: specified mesh_type not understood");
 

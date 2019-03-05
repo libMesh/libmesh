@@ -29,8 +29,8 @@ max_adaptivesteps = 0
 # Choice of DiffSolver type. Options are: {newton, petscdiff}
 solver_type = newton
 
-# Choice of mesh type. Options are: {serial, distributed}
-mesh_type = serial
+# Choice of mesh type. Options are: {replicated, distributed}
+mesh_type = replicated
 
 # Turn this on to silence the Solver chatter
 solver_quiet = false
