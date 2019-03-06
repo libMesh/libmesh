@@ -159,7 +159,8 @@ public:
                                         const bool skip_find_neighbors = false,
                                         dof_id_type element_id_offset = 0,
                                         dof_id_type node_id_offset = 0,
-                                        unique_id_type unique_id_offset = 0);
+                                        unique_id_type unique_id_offset = 0,
+                                        const bool skip_prepare = false);
 
 
   /**

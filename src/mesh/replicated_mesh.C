@@ -1146,7 +1146,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       // of neighbors will be copied verbatim from the other mesh
       this->copy_nodes_and_elements(*other_mesh, skip_find_neighbors,
                                     elem_delta, node_delta,
-                                    unique_delta);
+                                    unique_delta, /* skip_prepare= */ true);
 
       // Copy BoundaryInfo from other_mesh too.  We do this via the
       // list APIs rather than element-by-element for speed.
@@ -1330,7 +1330,21 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
         }
     }
 
-  this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false, skip_find_neighbors);
+  {
+    auto prev_allow_renumbering = this->allow_renumbering();
+    auto prev_allow_remote_element_removal = allow_remote_element_removal();
+    auto prev_skip_partitioning = skip_partitioning();
+
+    this->allow_renumbering(false);
+    this->allow_remote_element_removal(false);
+    this->skip_partitioning(true);
+
+    this->prepare_for_use(false, skip_find_neighbors);
+
+    this->allow_renumbering(prev_allow_renumbering);
+    this->allow_remote_element_removal(prev_allow_remote_element_removal);
+    this->skip_partitioning(prev_skip_partitioning);
+  }
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh

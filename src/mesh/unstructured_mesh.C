@@ -66,7 +66,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
                                                  unique_id_offset
 #endif
-                                               )
+                                               ,
+                                               const bool skip_prepare)
 {
   LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
 
@@ -209,19 +210,22 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
       }
   }
 
-  //Finally prepare the new Mesh for use.  Keep the same numbering and
-  //partitioning for now.
-  this->allow_renumbering(false);
-  this->allow_remote_element_removal(false);
-  this->skip_partitioning(true);
+  if (!skip_prepare)
+  {
+    //Finally prepare the new Mesh for use.  Keep the same numbering and
+    //partitioning for now.
+    this->allow_renumbering(false);
+    this->allow_remote_element_removal(false);
+    this->skip_partitioning(true);
 
-  this->prepare_for_use(false, skip_find_neighbors);
+    this->prepare_for_use(false, skip_find_neighbors);
 
-  //But in the long term, use the same renumbering and partitioning
-  //policies as our source mesh.
-  this->allow_renumbering(other_mesh.allow_renumbering());
-  this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
-  this->skip_partitioning(other_mesh.skip_partitioning());
+    //But in the long term, use the same renumbering and partitioning
+    //policies as our source mesh.
+    this->allow_renumbering(other_mesh.allow_renumbering());
+    this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
+    this->skip_partitioning(other_mesh.skip_partitioning());
+  }
 }
 
 
