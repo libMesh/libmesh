@@ -42,6 +42,7 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testEdgeBoundaryConditions );
 #endif
+  CPPUNIT_TEST( testNodeListFromSideList );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -347,6 +348,36 @@ public:
       }
   }
 
+  void testNodeListFromSideList()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    bi.build_node_list_from_side_list();
+
+    auto node_list = bi.build_node_list();
+
+    // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
+    // top, and left sides, respectively.  *Some* processor ought to
+    // see each.
+
+    for (boundary_id_type i = 1 ; i != 4; ++i)
+      {
+        bool has_bcid = false;
+        for (auto tpl : node_list)
+          if (std::get<1>(tpl) == i)
+            has_bcid = true;
+        mesh.comm().max(has_bcid);
+        CPPUNIT_ASSERT(has_bcid);
+      }
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryInfoTest );
