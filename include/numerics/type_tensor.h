@@ -1204,7 +1204,7 @@ TypeTensor<T>::left_multiply (const TypeVector<T2> & p) const
   TypeVector<typename CompareTypes<T,T2>::supertype> returnval;
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     for (unsigned int j=0; j<LIBMESH_DIM; j++)
-      returnval(i) += p(i)*(*this)(i,j);
+      returnval(i) += p(j)*(*this)(j,i);
 
   return returnval;
 }
