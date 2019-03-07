@@ -2291,7 +2291,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // balancing.  But if the mesh is disallowing repartitioning, we
   // won't touch processor_id on any node where it's valid, regardless
   // of whether or not it's canonical.
-  bool repartition_all_nodes = !mesh.skip_partitioning();
+  bool repartition_all_nodes = !mesh.skip_noncritical_partitioning();
   std::unordered_set<const Node *> valid_nodes;
 
   // If we aren't allowed to repartition, then we're going to leave

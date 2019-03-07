@@ -60,7 +60,8 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
-  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
+  _skip_noncritical_partitioning(false),
+  _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
@@ -87,7 +88,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(other_mesh._next_unique_id),
 #endif
-  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
+  _skip_noncritical_partitioning(false),
+  _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
   _allow_remote_element_removal(true),
   _elem_dims(other_mesh._elem_dims),
@@ -237,8 +239,11 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
       gf->mesh_reinit();
     }
 
-  // Partition the mesh.
-  this->partition();
+  // Partition the mesh unless *all* partitioning is to be skipped.
+  // If only noncritical partitioning is to be skipped, the
+  // partition() call will still check for orphaned nodes.
+  if (!skip_partitioning())
+    this->partition();
 
   // If we're using DistributedMesh, we'll probably want it
   // parallelized.
@@ -435,10 +440,10 @@ void MeshBase::partition (const unsigned int n_parts)
       libmesh_assert (this->is_serial());
       partitioner()->partition (*this, n_parts);
     }
-  // A nullptr partitioner means don't repartition; skip_partitioning()
-  // checks on this.
-  // Non-serial meshes may not be ready for repartitioning here.
-  else if (!skip_partitioning())
+  // A nullptr partitioner or a skip_partitioning(true) call or a
+  // skip_noncritical_partitioning(true) call means don't repartition;
+  // skip_noncritical_partitioning() checks all these.
+  else if (!skip_noncritical_partitioning())
     {
       partitioner()->partition (*this, n_parts);
     }

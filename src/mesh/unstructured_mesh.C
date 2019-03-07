@@ -213,6 +213,9 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
   //partitioning for now.
   this->allow_renumbering(false);
   this->allow_remote_element_removal(false);
+
+  // We should generally be able to skip *all* partitioning here
+  // because we're only adding one already-consistent mesh to another.
   this->skip_partitioning(true);
 
   this->prepare_for_use(false, skip_find_neighbors);
@@ -221,7 +224,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
   //policies as our source mesh.
   this->allow_renumbering(other_mesh.allow_renumbering());
   this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
-  this->skip_partitioning(other_mesh.skip_partitioning());
+  this->skip_partitioning(other_mesh._skip_all_partitioning);
+  this->skip_noncritical_partitioning(other_mesh._skip_noncritical_partitioning);
 }
 
 
