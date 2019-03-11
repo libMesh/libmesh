@@ -200,8 +200,10 @@ AC_MSG_RESULT([configuring size of boundary_id... $boundary_bytes])
 AC_ARG_WITH([dof_id_bytes],
             AS_HELP_STRING([--with-dof-id-bytes=<1|2|4|8>],
                            [bytes used per dof object id, dof index [4]]),
-            [dof_bytes="$withval"],
-            [dof_bytes=4])
+            [dof_bytes="$withval"
+             dof_bytes_setting="explicit"],
+            [dof_bytes=4
+             dof_bytes_setting="implicit"])
 
 AS_CASE("$dof_bytes",
         [1], [AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id])],
@@ -212,6 +214,7 @@ AS_CASE("$dof_bytes",
           AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
           AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
           dof_bytes=4
+          dof_bytes_setting="implicit"
         ])
 
 AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])

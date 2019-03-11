@@ -168,13 +168,28 @@ AS_IF([test $enablepetsc != no],
         petsc_use_64bit_indices=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_64BIT_INDICES`
 
         dnl If PETSc is using 64-bit indices, make sure that
-        dnl $dof_bytes==8, or else print an informative message and
-        dnl disable PETSc.
+        dnl $dof_bytes==8, or *make* $dof_bytes=8 if the user didn't
+        dnl specify otherwise, or else give an informative error.
+        AS_IF([test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes_setting" != "explicit"],
+              [AS_IF([test $dof_bytes != "8"],
+                     [AC_MSG_RESULT([>>> adopting PETSc dof_id size: 8])])
+               dof_bytes=8
+               dof_bytes_setting="explicit"
+               AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id])
+              ])
         AS_IF([test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes" != "8"],
               [AC_MSG_ERROR([<<< PETSc is using 64-bit indices, you must configure libmesh with --with-dof-id-bytes=8. >>>])])
 
         dnl If PETSc is using 32-bit indices, make sure that
-        dnl libmesh's $dof_bytes<=4.
+        dnl libmesh's $dof_bytes<=4, or *make* $dof_bytes=4 if the
+        dnl user didn't specify otherwise, or else give an informative
+        dnl error.
+        AS_IF([test $petsc_use_64bit_indices = "0" && test "$dof_bytes_setting" != "explicit"],
+              [AS_IF([test $dof_bytes != "4"],
+                     [AC_MSG_RESULT([>>> adopting PETSc dof_id size: 4])])
+               dof_bytes=4
+               dof_bytes_setting="explicit"
+              ])
         AS_IF([test "$petsc_use_64bit_indices" = "0" && test $dof_bytes -gt 4],
               [AC_MSG_ERROR([<<< PETSc is using 32-bit indices, you must configure libmesh with --with-dof-id-bytes=<1|2|4>. >>>])])
 
