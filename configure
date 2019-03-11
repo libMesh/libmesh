@@ -31539,8 +31539,10 @@ $as_echo "configuring size of boundary_id... $boundary_bytes" >&6; }
 # Check whether --with-dof_id_bytes was given.
 if test "${with_dof_id_bytes+set}" = set; then :
   withval=$with_dof_id_bytes; dof_bytes="$withval"
+             dof_bytes_setting="explicit"
 else
   dof_bytes=4
+             dof_bytes_setting="implicit"
 fi
 
 
@@ -31569,6 +31571,7 @@ $as_echo ">>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&6; 
 $as_echo "#define DOF_ID_BYTES 4" >>confdefs.h
 
           dof_bytes=4
+          dof_bytes_setting="implicit"
          ;;
 esac
 
@@ -35801,11 +35804,32 @@ if test $enablepetsc != no; then :
 
         petsc_use_64bit_indices=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_64BIT_INDICES`
 
-                                if test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes" != "8"; then :
+                                if test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes_setting" != "explicit"; then :
+  if test $dof_bytes != "8"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> adopting PETSc dof_id size: 8" >&5
+$as_echo ">>> adopting PETSc dof_id size: 8" >&6; }
+fi
+               dof_bytes=8
+               dof_bytes_setting="explicit"
+
+$as_echo "#define DOF_ID_BYTES 8" >>confdefs.h
+
+
+fi
+        if test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes" != "8"; then :
   as_fn_error $? "<<< PETSc is using 64-bit indices, you must configure libmesh with --with-dof-id-bytes=8. >>>" "$LINENO" 5
 fi
 
-                        if test "$petsc_use_64bit_indices" = "0" && test $dof_bytes -gt 4; then :
+                                        if test $petsc_use_64bit_indices = "0" && test "$dof_bytes_setting" != "explicit"; then :
+  if test $dof_bytes != "4"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> adopting PETSc dof_id size: 4" >&5
+$as_echo ">>> adopting PETSc dof_id size: 4" >&6; }
+fi
+               dof_bytes=4
+               dof_bytes_setting="explicit"
+
+fi
+        if test "$petsc_use_64bit_indices" = "0" && test $dof_bytes -gt 4; then :
   as_fn_error $? "<<< PETSc is using 32-bit indices, you must configure libmesh with --with-dof-id-bytes=<1|2|4>. >>>" "$LINENO" 5
 fi
 
