@@ -182,8 +182,9 @@ extern "C"
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
     PetscVector<Number> X(x, rc.sys.comm());
-    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, &X);
 
+    R.close();
+    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, &X);
     R.close();
 
     return rc.ierr;
@@ -220,6 +221,7 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
 
+    R.close();
     PetscVector<Number> X(x, rc.sys.comm());
     rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, &X);
 
@@ -261,6 +263,7 @@ extern "C"
       libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
                         "Jacobian-vector products!");
 
+    R.close();
     PetscVector<Number> X(x, rc.sys.comm());
     rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, &X);
 
@@ -375,6 +378,7 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
+    PC.close();
     sys.get_dof_map().enforce_constraints_on_jacobian(sys, &PC);
 
     PC.close();
