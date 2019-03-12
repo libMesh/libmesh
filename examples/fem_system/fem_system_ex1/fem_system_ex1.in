@@ -26,7 +26,13 @@ coarsegridsize = 20
 # The maximum number of adaptive steps per timestep
 max_adaptivesteps = 0
 
-# Turn this off to see the NewtonSolver chatter
+# Choice of DiffSolver type. Options are: {newton, petscdiff}
+solver_type = newton
+
+# Choice of mesh type. Options are: {replicated, distributed}
+mesh_type = replicated
+
+# Turn this on to silence the Solver chatter
 solver_quiet = false
 
 # Solve the 2D or 3D problem

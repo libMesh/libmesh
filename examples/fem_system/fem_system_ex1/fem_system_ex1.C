@@ -36,6 +36,8 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/mesh.h"
+#include "libmesh/replicated_mesh.h"
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/uniform_refinement_estimator.h"
@@ -46,8 +48,11 @@
 // The systems and solvers we may use
 #include "naviersystem.h"
 #include "libmesh/diff_solver.h"
+#include "libmesh/petsc_diff_solver.h"
+#include "libmesh/newton_solver.h"
 #include "libmesh/euler_solver.h"
 #include "libmesh/steady_solver.h"
+#include "libmesh/partitioner.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -79,6 +84,9 @@ int main (int argc, char ** argv)
   // Parse the input file
   GetPot infile("fem_system_ex1.in");
 
+  // Override input file arguments from the command line
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
   const Real global_tolerance          = infile("global_tolerance", 0.);
   const unsigned int nelem_target      = infile("n_elements", 400);
@@ -89,6 +97,8 @@ int main (int argc, char ** argv)
   const unsigned int coarserefinements = infile("coarserefinements", 0);
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
   const unsigned int dim               = infile("dimension", 2);
+  const std::string slvr_type          = infile("solver_type", "newton");
+  const std::string mesh_type          = infile("mesh_type"  , "replicated");
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -102,10 +112,17 @@ int main (int argc, char ** argv)
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
-  Mesh mesh(init.comm());
+  std::shared_ptr<UnstructuredMesh> mesh;
+
+  if (mesh_type == "distributed")
+    mesh.reset(new DistributedMesh(init.comm()));
+  else if (mesh_type == "replicated")
+    mesh.reset(new ReplicatedMesh(init.comm()));
+  else
+    libmesh_error_msg("Error: specified mesh_type not understood");
 
   // And an object to refine it
-  MeshRefinement mesh_refinement(mesh);
+  MeshRefinement mesh_refinement(*mesh);
   mesh_refinement.coarsen_by_parents() = true;
   mesh_refinement.absolute_global_tolerance() = global_tolerance;
   mesh_refinement.nelem_target() = nelem_target;
@@ -119,14 +136,14 @@ int main (int argc, char ** argv)
   // elements in 3D.  Building these higher-order elements allows
   // us to use higher-order approximation, as in example 3.
   if (dim == 2)
-    MeshTools::Generation::build_square (mesh,
+    MeshTools::Generation::build_square (*mesh,
                                          coarsegridsize,
                                          coarsegridsize,
                                          0., 1.,
                                          0., 1.,
                                          QUAD9);
   else if (dim == 3)
-    MeshTools::Generation::build_cube (mesh,
+    MeshTools::Generation::build_cube (*mesh,
                                        coarsegridsize,
                                        coarsegridsize,
                                        coarsegridsize,
@@ -135,13 +152,20 @@ int main (int argc, char ** argv)
                                        0., 1.,
                                        HEX27);
 
+  if  (slvr_type == "petscdiff")
+    {
+      mesh->allow_renumbering(false);
+      mesh->allow_remote_element_removal(false);
+      mesh->partitioner() = nullptr;
+    }
+
   mesh_refinement.uniformly_refine(coarserefinements);
 
   // Print information about the mesh to the screen.
-  mesh.print_info();
+  mesh->print_info();
 
   // Create an equation systems object.
-  EquationSystems equation_systems (mesh);
+  EquationSystems equation_systems (*mesh);
 
   // Declare the system "Navier-Stokes" and its variables.
   NavierSystem & system =
@@ -163,7 +187,20 @@ int main (int argc, char ** argv)
   system.deltat = deltat;
 
   // And the nonlinear solver options
+  if (slvr_type == "newton")
+    system.time_solver->diff_solver() = libmesh_make_unique<NewtonSolver>(system);
+  else if (slvr_type == "petscdiff")
+#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_HAVE_METAPHYSICL)
+    system.time_solver->diff_solver() = libmesh_make_unique<PetscDiffSolver>(system);
+#else
+  libmesh_example_requires(false, "--enable-petsc --enable-metaphysicl-required");
+#endif
+  else
+    libmesh_error_msg("Error: specified solver_type not understood");
+
   DiffSolver & solver = *(system.time_solver->diff_solver().get());
+  solver.init();
+
   solver.quiet = infile("solver_quiet", true);
   solver.verbose = !solver.quiet;
   solver.max_nonlinear_iterations =
@@ -293,7 +330,7 @@ int main (int argc, char ** argv)
           equation_systems.reinit();
 
           libMesh::out << "Refined mesh to "
-                       << mesh.n_active_elem()
+                       << mesh->n_active_elem()
                        << " active elements and "
                        << equation_systems.n_active_dofs()
                        << " active dofs."
@@ -324,7 +361,7 @@ int main (int argc, char ** argv)
                     << t_step+1
                     << ".e";
 
-          ExodusII_IO(mesh).write_timestep(file_name.str(),
+          ExodusII_IO(*mesh).write_timestep(file_name.str(),
                                            equation_systems,
                                            1, // This number indicates how many time steps
                                               // are being written to the file
