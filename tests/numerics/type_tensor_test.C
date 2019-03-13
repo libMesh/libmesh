@@ -6,6 +6,7 @@
 
 // libmesh includes
 #include <libmesh/tensor_value.h>
+#include <libmesh/vector_value.h>
 
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
@@ -30,6 +31,7 @@ public:
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testInverse);
+  CPPUNIT_TEST(testLeftMultiply);
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -58,6 +60,18 @@ private:
     for (unsigned i=0; i<3; ++i)
       for (unsigned j=0; j<3; ++j)
         CPPUNIT_ASSERT_DOUBLES_EQUAL(inverse(i,j), true_inverse(i,j), 1.e-12);
+  }
+
+  void testLeftMultiply()
+  {
+    TensorValue<Real> tensor(1, 2, 0, 3, 4, 0);
+    VectorValue<Real> vector(5, 6, 0);
+    auto left_mult = vector * tensor;
+    auto right_mult = tensor * vector;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(left_mult(0), 23, 1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(left_mult(1), 34, 1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(right_mult(0), 17, 1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(right_mult(1), 39, 1e-12);
   }
 
 };
