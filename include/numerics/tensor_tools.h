@@ -99,6 +99,10 @@ inline
 auto norm_sq(const VectorValue<T> & a) -> decltype(std::norm(T()))
 {return a.norm_sq();}
 
+template<typename T>
+inline
+bool is_zero(const T & a){ return a.is_zero();}
+
 // Any tensor-rank-independent code will need to include
 // tensor_tools.h, so we define rank-increasing and real-to-number type
 // conversion functions here, starting with the generic case to apply

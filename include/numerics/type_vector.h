@@ -341,6 +341,11 @@ public:
   auto norm_sq() const -> decltype(std::norm(T()));
 
   /**
+   * \returns True if all values in the vector are zero
+   */
+  bool is_zero() const;
+
+  /**
    * Set all entries of the vector to 0.
    */
   void zero();
@@ -990,6 +995,15 @@ auto TypeVector<T>::norm_sq() const -> decltype(std::norm(T()))
 }
 
 
+template <typename T>
+inline
+bool TypeVector<T>::is_zero() const
+{
+  for (const auto & val : _coords)
+    if (val != 0)
+      return false;
+  return true;
+}
 
 template <typename T>
 inline

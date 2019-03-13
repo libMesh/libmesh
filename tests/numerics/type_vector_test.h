@@ -34,6 +34,8 @@
   CPPUNIT_TEST( testValueBase );                \
   CPPUNIT_TEST( testZeroBase );                 \
                                                 \
+  CPPUNIT_TEST( testIsZero );                   \
+                                                \
   CPPUNIT_TEST( testEqualityBase );             \
   CPPUNIT_TEST( testInEqualityBase );           \
   CPPUNIT_TEST( testAssignmentBase );           \
@@ -271,6 +273,30 @@ public:
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
       CPPUNIT_ASSERT_EQUAL( T(0), avector(i));
+  }
+
+  void testIsZero()
+  {
+    {
+#if LIBMESH_DIM > 2
+      DerivedClass avector(0,0,0);
+#elif LIBMESH_DIM > 1
+      DerivedClass avector(0,0);
+#else
+      DerivedClass avector(0);
+#endif
+      CPPUNIT_ASSERT(avector.is_zero());
+    }
+    {
+#if LIBMESH_DIM > 2
+      DerivedClass avector(1,1,1);
+#elif LIBMESH_DIM > 1
+      DerivedClass avector(1,1);
+#else
+      DerivedClass avector(1);
+#endif
+      CPPUNIT_ASSERT(!avector.is_zero());
+    }
   }
 
   void testNormBase()
