@@ -1000,7 +1000,7 @@ inline
 bool TypeVector<T>::is_zero() const
 {
   for (const auto & val : _coords)
-    if (val != 0)
+    if (val != T(0))
       return false;
   return true;
 }
