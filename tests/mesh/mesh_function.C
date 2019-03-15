@@ -120,12 +120,16 @@ public:
     for (const auto & node : mesh.local_node_ptr_range())
       {
         (*mesh_function)(*node, /*time=*/ 0., vec_values);
-        Real mesh_function_value = projection_function(*node,
-                                                       es.parameters,
-                                                       dummy,
-                                                       dummy);
+        Number mesh_function_value =
+          projection_function(*node,
+                              es.parameters,
+                              dummy,
+                              dummy);
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(vec_values(0), mesh_function_value, TOLERANCE*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL
+          (libmesh_real(vec_values(0)),
+           libmesh_real(mesh_function_value),
+           TOLERANCE*TOLERANCE);
       }
   }
 #endif // LIBMESH_ENABLE_AMR
