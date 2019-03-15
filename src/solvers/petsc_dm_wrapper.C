@@ -20,8 +20,7 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
-#ifdef LIBMESH_ENABLE_AMR
-#ifdef LIBMESH_HAVE_METAPHYSICL
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 #include "libmesh/ignore_warnings.h"
 #include <petscsf.h>
@@ -1030,7 +1029,6 @@ void PetscDMWrapper::init_dm_data(unsigned int n_levels, const Parallel::Communi
 
 } // end namespace libMesh
 
-#endif // LIBMESH_HAVE_METAPHYSICL
-#endif // LIBMESH_ENABLE_AMR
+#endif // #if LIBMESH_ENABLE_AMR && LIBMESH_HAVE_METAPHYSICL && !LIBMESH_USE_COMPLEX_NUMBERS
 #endif // PETSC_VERSION
 #endif // LIBMESH_HAVE_PETSC
