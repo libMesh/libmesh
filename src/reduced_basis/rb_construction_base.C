@@ -148,6 +148,15 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
       params.set_value(param_name, param_value);
     }
 
+  // Add potential extra values
+  std::set<std::string> extra_param_names;
+  get_parameters().get_extra_parameter_names(extra_param_names);
+  for (auto & name : extra_param_names)
+    {
+      const Real val = get_parameters().get_extra_value(name);
+      params.set_extra_value(name, val);
+    }
+
   return params;
 }
 
