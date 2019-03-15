@@ -97,10 +97,8 @@ protected:
    * Wrapper object for interacting with PetscDM
    */
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
-#ifdef LIBMESH_ENABLE_AMR
-#ifdef LIBMESH_HAVE_METAPHYSICL
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
   PetscDMWrapper _dm_wrapper;
-#endif
 #endif
 #endif
 

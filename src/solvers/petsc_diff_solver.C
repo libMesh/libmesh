@@ -228,10 +228,8 @@ void PetscDiffSolver::clear()
   LIBMESH_CHKERR(ierr);
 
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
-#ifdef LIBMESH_ENABLE_AMR
-#ifdef LIBMESH_HAVE_METAPHYSICL
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
   _dm_wrapper.clear();
-#endif
 #endif
 #endif
 }
@@ -370,11 +368,9 @@ void PetscDiffSolver::setup_petsc_data()
 
   // This needs to be called before SNESSetFromOptions
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
-#ifdef LIBMESH_ENABLE_AMR
-#ifdef LIBMESH_HAVE_METAPHYSICL
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
   if (use_petsc_dm)
     this->_dm_wrapper.init_and_attach_petscdm(_system, _snes);
-#endif
 #endif
 #endif
 
