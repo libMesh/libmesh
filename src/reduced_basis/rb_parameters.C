@@ -109,6 +109,16 @@ RBParameters::const_iterator RBParameters::end() const
   return _parameters.end();
 }
 
+RBParameters::const_iterator RBParameters::extra_begin() const
+{
+  return _extra_parameters.begin();
+}
+
+RBParameters::const_iterator RBParameters::extra_end() const
+{
+  return _extra_parameters.end();
+}
+
 bool RBParameters::operator==(const RBParameters & rhs) const
 {
   return (this->_parameters == rhs._parameters &&

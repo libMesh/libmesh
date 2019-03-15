@@ -149,13 +149,9 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
     }
 
   // Add potential extra values
-  std::set<std::string> extra_param_names;
-  get_parameters().get_extra_parameter_names(extra_param_names);
-  for (auto & name : extra_param_names)
-    {
-      const Real val = get_parameters().get_extra_value(name);
-      params.set_extra_value(name, val);
-    }
+  const auto & mine = get_parameters();
+  for (const auto & pr : as_range(mine.extra_begin(), mine.extra_end()))
+    params.set_extra_value(pr.first, pr.second);
 
   return params;
 }
