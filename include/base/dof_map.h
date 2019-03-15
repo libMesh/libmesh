@@ -716,18 +716,40 @@ public:
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
-   * for the node.
+   * for the \p node.
    */
   void dof_indices (const Node * const node,
                     std::vector<dof_id_type> & di) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
-   * for the node.   For one variable \p vn.
+   * for the \p node, for one variable \p vn.
    */
   void dof_indices (const Node * const node,
                     std::vector<dof_id_type> & di,
                     const unsigned int vn) const;
+
+  /**
+   * Appends to the vector \p di the global degree of freedom indices
+   * for \p elem.node_ref(n), for one variable \p vn.  On hanging
+   * nodes with both vertex and non-vertex DoFs, only those indices
+   * which are directly supported on \p elem are included.
+   */
+  void dof_indices (const Elem & elem,
+                    unsigned int n,
+                    std::vector<dof_id_type> & di,
+                    const unsigned int vn) const;
+
+  /**
+   * Appends to the vector \p di the old global degree of freedom
+   * indices for \p elem.node_ref(n), for one variable \p vn.  On
+   * hanging nodes with both vertex and non-vertex DoFs, only those
+   * indices which are directly supported on \p elem are included.
+   */
+  void old_dof_indices (const Elem & elem,
+                        unsigned int n,
+                        std::vector<dof_id_type> & di,
+                        const unsigned int vn) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -1410,6 +1432,16 @@ private:
                      std::size_t & tot_size
 #endif
                      ) const;
+
+  /**
+   * Helper function that implements the element-nodal versions of
+   * dof_indices and old_dof_indices
+   */
+  void _node_dof_indices (const Elem & elem,
+                          unsigned int n,
+                          const DofObject & obj,
+                          std::vector<dof_id_type> & di,
+                          const unsigned int vn) const;
 
   /**
    * Builds a sparsity pattern
