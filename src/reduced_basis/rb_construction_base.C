@@ -148,6 +148,11 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
       params.set_value(param_name, param_value);
     }
 
+  // Add potential extra values
+  const auto & mine = get_parameters();
+  for (const auto & pr : as_range(mine.extra_begin(), mine.extra_end()))
+    params.set_extra_value(pr.first, pr.second);
+
   return params;
 }
 

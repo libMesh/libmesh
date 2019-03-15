@@ -105,14 +105,16 @@ public:
   void get_extra_parameter_names(std::set<std::string> & param_names) const;
 
   /**
-   * Get a constant iterator to beginning of this RBParameters object.
+   * Get const_iterator access to the parameters stored in this RBParameters object.
    */
   const_iterator begin() const;
+  const_iterator end() const;
 
   /**
-   * Get a constant iterator to the end of this RBParameters object.
+   * Get const_iterator access to the extra parameters stored in this RBParameters object.
    */
-  const_iterator end() const;
+  const_iterator extra_begin() const;
+  const_iterator extra_end() const;
 
   /**
    * Two RBParameters are equal if they have the same _parameters map.
