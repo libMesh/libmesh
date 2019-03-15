@@ -407,6 +407,11 @@ public:
   auto norm_sq() const -> decltype(std::norm(T()));
 
   /**
+   * \returns True if all values in the tensor are zero
+   */
+  bool is_zero() const;
+
+  /**
    * \returns The determinant of the tensor.
    *
    * Because these are 3x3 tensors at most, we don't do an LU
@@ -1286,6 +1291,15 @@ auto TypeTensor<T>::norm() const -> decltype(std::norm(T()))
 }
 
 
+template <typename T>
+inline
+bool TypeTensor<T>::is_zero() const
+{
+  for (const auto & val : _coords)
+    if (val != T(0))
+      return false;
+  return true;
+}
 
 template <typename T>
 inline

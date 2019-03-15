@@ -33,6 +33,7 @@ public:
   CPPUNIT_TEST(testInverse);
   CPPUNIT_TEST(testLeftMultiply);
 #endif
+  CPPUNIT_TEST(testIsZero);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -74,6 +75,17 @@ private:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(right_mult(1), 39, 1e-12);
   }
 
+  void testIsZero()
+  {
+    {
+      TensorValue<double> tensor;
+      CPPUNIT_ASSERT(tensor.is_zero());
+    }
+    {
+      TensorValue<double> tensor(0,1,2,3,4,5,6,7,8);
+      CPPUNIT_ASSERT(!tensor.is_zero());
+    }
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TypeTensorTest);
