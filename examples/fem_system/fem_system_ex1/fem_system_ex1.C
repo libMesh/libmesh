@@ -72,12 +72,6 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--disable-singleprecision");
 #endif
 
-  // This example uses the new PetscDMWrapper which currently does not
-  // compile when complex numbers are enabled.
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  libmesh_example_requires(false, "--disable-complex");
-#endif
-
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_requires(false, "--enable-amr");
 #else
