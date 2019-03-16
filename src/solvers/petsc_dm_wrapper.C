@@ -490,11 +490,18 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // Now fill the corresponding internal PetscDMContext for each created DM
   for( unsigned int i=1; i <= n_levels; i++ )
     {
+      // Set context dimension
+      (*_ctx_vec[i-1]).mesh_dim = mesh.mesh_dimension();
+
+      // Create and attach a sized vector to the current ctx
+      _vec_vec[i-1]->init( _mesh_dof_sizes[i-1] );
+      _ctx_vec[i-1]->current_vec = _vec_vec[i-1].get();
+
+      // Set a global DM to be used as reference when using fieldsplit
+      _ctx_vec[i-1]->global_dm = &(this->get_dm(n_levels-1));
+
       if (n_levels > 1 )
         {
-          // Set context dimension
-          (*_ctx_vec[i-1]).mesh_dim = mesh.mesh_dimension();
-
           // Set pointers to surrounding dm levels to help PETSc refine/coarsen
           if ( i == 1 ) // were at the coarsest mesh
             {
@@ -511,20 +518,12 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
               (*_ctx_vec[i-1]).coarser_dm = _dms[i-2].get();
               (*_ctx_vec[i-1]).finer_dm   = _dms[i].get();
             }
-
-          // Create and attach a sized vector to the current ctx
-          _vec_vec[i-1]->init( _mesh_dof_sizes[i-1] );
-          _ctx_vec[i-1]->current_vec = _vec_vec[i-1].get();
-
-          // Set a global DM for to be used as reference when using fieldsplit
-          _ctx_vec[i-1]->global_dm = &(this->get_dm(n_levels-1));
-
         }
 
     } // End context creation
 
   // Attach a vector and context to each DM
-  if (n_levels > 1 )
+  if ( n_levels >= 1 )
     {
 
       for ( unsigned int i = 1; i <= n_levels ; ++i)
