@@ -51,10 +51,10 @@ namespace libMesh
     DM * coarser_dm;
     DM * finer_dm;
     DM * global_dm;
-    PetscMatrix<libMesh::Real > * K_interp_ptr;
-    PetscMatrix<libMesh::Real > * K_sub_interp_ptr;
-    PetscMatrix<libMesh::Real > * K_restrict_ptr;
-    PetscVector<libMesh::Real > * current_vec;
+    PetscMatrix<libMesh::Number> * K_interp_ptr;
+    PetscMatrix<libMesh::Number> * K_sub_interp_ptr;
+    PetscMatrix<libMesh::Number> * K_restrict_ptr;
+    PetscVector<libMesh::Number> * current_vec;
 
     //! Stores local dofs for each var for use in subprojection matrixes
     std::vector<std::vector<numeric_index_type>> dof_vec;
@@ -108,16 +108,16 @@ private:
   std::vector<std::unique_ptr<PetscSF>> _star_forests;
 
   //! Vector of projection matrixes for all grid levels
-  std::vector<std::unique_ptr<PetscMatrix<Real>>> _pmtx_vec;
+  std::vector<std::unique_ptr<PetscMatrix<Number>>> _pmtx_vec;
 
   //! Vector of sub projection matrixes for all grid levels for fieldsplit
-  std::vector<std::unique_ptr<PetscMatrix<Real>>> _subpmtx_vec;
+  std::vector<std::unique_ptr<PetscMatrix<Number>>> _subpmtx_vec;
 
   //! Vector of internal PetscDM context structs for all grid levels
   std::vector<std::unique_ptr<PetscDMContext>> _ctx_vec;
 
   //! Vector of solution vectors for all grid levels
-  std::vector<std::unique_ptr<PetscVector<Real>>> _vec_vec;
+  std::vector<std::unique_ptr<PetscVector<Number>>> _vec_vec;
 
   //! Stores n_dofs for each grid level, to be used for projection matrix sizing
   std::vector<unsigned int> _mesh_dof_sizes;

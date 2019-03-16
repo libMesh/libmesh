@@ -1023,9 +1023,9 @@ void PetscDMWrapper::init_dm_data(unsigned int n_levels, const Parallel::Communi
       _sections[i] = libmesh_make_unique<PetscSection>();
       _star_forests[i] = libmesh_make_unique<PetscSF>();
       _ctx_vec[i] = libmesh_make_unique<PetscDMContext>();
-      _pmtx_vec[i]= libmesh_make_unique<PetscMatrix<Real>>(comm);
-      _subpmtx_vec[i]= libmesh_make_unique<PetscMatrix<Real>>(comm);
-      _vec_vec[i] = libmesh_make_unique<PetscVector<Real>>(comm);
+      _pmtx_vec[i]= libmesh_make_unique<PetscMatrix<Number>>(comm);
+      _subpmtx_vec[i]= libmesh_make_unique<PetscMatrix<Number>>(comm);
+      _vec_vec[i] = libmesh_make_unique<PetscVector<Number>>(comm);
     }
 }
 
