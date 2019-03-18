@@ -423,7 +423,7 @@ public:
    * match the FEBase::get_continuity() specializations/overrides for
    * the different FE types.
    */
-  static FEContinuity get_continuity(FEType & fe_type);
+  static FEContinuity get_continuity(const FEType & fe_type);
 
 private:
 
