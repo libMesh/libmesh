@@ -1590,7 +1590,7 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
 
 
 
-FEContinuity FEInterface::get_continuity(FEType & fe_type)
+FEContinuity FEInterface::get_continuity(const FEType & fe_type)
 {
   switch (fe_type.family)
     {
