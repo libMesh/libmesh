@@ -1236,7 +1236,7 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
       // their last remaining dirichlet/periodic/user constraint?
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
       _dof_constraints.clear();
-      _stashed_dof_constraints.clear();
+      //_stashed_dof_constraints.clear();
       _primal_constraint_values.clear();
       _adjoint_constraint_values.clear();
 #endif
@@ -1289,7 +1289,7 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
   // recalculate dof constraints from scratch
   _dof_constraints.clear();
-  _stashed_dof_constraints.clear();
+  //_stashed_dof_constraints.clear();
   _primal_constraint_values.clear();
   _adjoint_constraint_values.clear();
 
