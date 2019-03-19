@@ -580,10 +580,11 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 {
   LOG_SCOPE("add_scaled_matrix_and_vector()", "RBConstruction");
 
-  if(!apply_dof_constraints)
+  if (!apply_dof_constraints)
   {
-    // Use the stashed constraints in this case
-    this->get_dof_map().stash_dof_constraints();
+    // Use the stashed constraints, which in this case have the
+    // Dirichlet constraints removed.
+    this->get_dof_map().swap_dof_constraints();
   }
 
   bool assemble_matrix = (input_matrix != nullptr);
@@ -765,10 +766,10 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
   if (assemble_vector)
     input_vector->close();
 
-  if(!apply_dof_constraints)
+  if (!apply_dof_constraints)
   {
-    // Revert to the non-stashed constraints
-    this->get_dof_map().unstash_dof_constraints();
+    // Revert to the original constraints
+    this->get_dof_map().swap_dof_constraints();
   }
 }
 
