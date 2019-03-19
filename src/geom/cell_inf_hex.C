@@ -462,7 +462,8 @@ bool InfHex::contains_point (const Point & p, Real tol) const
                                             std::min(pt1_o.norm_sq(),
                                                      std::min(pt2_o.norm_sq(),
                                                               pt3_o.norm_sq())));
-  // for a coarse grid, it is important to account for tha fact
+
+  // For a coarse grid, it is important to account for the fact
   // that the sides are not spherical, thus the closest point
   // can be closer than all edges.
   // This is an estimator using Pythagoras:
