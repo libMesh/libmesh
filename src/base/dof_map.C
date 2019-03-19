@@ -889,7 +889,7 @@ void DofMap::clear()
 #ifdef LIBMESH_ENABLE_AMR
 
   _dof_constraints.clear();
-  //_stashed_dof_constraints.clear();
+  _stashed_dof_constraints.clear();
   _primal_constraint_values.clear();
   _adjoint_constraint_values.clear();
   _n_old_dfs = 0;

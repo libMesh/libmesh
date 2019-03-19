@@ -1234,9 +1234,10 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
     {
       // Clear out any old constraints; maybe the user just deleted
       // their last remaining dirichlet/periodic/user constraint?
+      // Note: any _stashed_dof_constraints are not cleared as it
+      // may be the user's intention to restore them later.
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
       _dof_constraints.clear();
-      //_stashed_dof_constraints.clear();
       _primal_constraint_values.clear();
       _adjoint_constraint_values.clear();
 #endif
@@ -1288,8 +1289,9 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
 
   // recalculate dof constraints from scratch
+  // Note: any _stashed_dof_constraints are not cleared as it
+  // may be the user's intention to restore them later.
   _dof_constraints.clear();
-  //_stashed_dof_constraints.clear();
   _primal_constraint_values.clear();
   _adjoint_constraint_values.clear();
 
