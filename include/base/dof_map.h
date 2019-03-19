@@ -936,6 +936,23 @@ public:
     _dof_constraints.swap(_stashed_dof_constraints);
   }
 
+  /**
+   * Similar to the stash/unstash_dof_constraints() API, but swaps
+   * _dof_constraints and _stashed_dof_constraints without asserting
+   * that the source or destination is empty first.
+   *
+   * \note There is an implicit assumption that swapping between sets
+   * of Constraints does not change the sparsity pattern or expand the
+   * send_list, since the only thing changed is the DofConstraints
+   * themselves.  This is intended to work for swapping between
+   * DofConstraints A and B, where A is used to define the send_list,
+   * and B is a subset of A.
+   */
+  void swap_dof_constraints()
+  {
+    _dof_constraints.swap(_stashed_dof_constraints);
+  }
+
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * \returns An iterator pointing to the first Node constraint row.
