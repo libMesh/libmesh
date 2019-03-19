@@ -221,10 +221,17 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
   Point pt0_o(this->point(0) - my_origin);
   Point pt1_o(this->point(1) - my_origin);
   Point pt2_o(this->point(2) - my_origin);
-  const Real min_distance_sq = std::min(pt0_o.norm_sq(),
-                                        std::min(pt1_o.norm_sq(),
-                                                 pt2_o.norm_sq()));
-
+  const Real tmp_min_distance_sq = std::min(pt0_o.norm_sq(),
+                                            std::min(pt1_o.norm_sq(),
+                                                     pt2_o.norm_sq()));
+  // for a coarse grid, it is important to account for tha fact
+  // that the sides are not spherical, thus the closest point
+  // can be closer than all edges.
+  // This is an estimator using Pythagoras:
+  const Real min_distance_sq = tmp_min_distance_sq
+                              - .5*std::max((point(0)-point(1)).norm_sq(),
+                                             std::max((point(0)-point(2)).norm_sq(),
+                                                      (point(1)-point(2)).norm_sq()));
   // work with 1% allowable deviation.  We can still fall
   // back to the InfFE::inverse_map()
   const Real conservative_p_dist_sq = 1.01 * (Point(p - my_origin).norm_sq());
