@@ -2300,7 +2300,7 @@ void DofMap::_node_dof_indices (const Elem & elem,
           di.resize(di.size() + nc, DofObject::invalid_id);
         }
       else
-        for (int i=n_comp-1; i>=dof_offset; i--)
+        for (unsigned int i = dof_offset; i != n_comp; ++i)
           {
             const dof_id_type d =
               obj.dof_number(sys_num, vg, vig, i, n_comp);
