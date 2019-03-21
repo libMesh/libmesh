@@ -1678,6 +1678,17 @@ void DofMap::prepare_send_list ()
   std::vector<dof_id_type> (_send_list.begin(), new_end).swap (_send_list);
 }
 
+void DofMap::reinit_send_list (MeshBase & mesh)
+{
+  this->clear_send_list();
+  this->add_neighbors_to_send_list(mesh);
+
+  // This is assuming that we only need to recommunicate
+  // the constraints and no new ones have been added since
+  // a previous call to reinit_constraints.
+  this->process_constraints(mesh);
+  this->prepare_send_list();
+}
 
 void DofMap::set_implicit_neighbor_dofs(bool implicit_neighbor_dofs)
 {
