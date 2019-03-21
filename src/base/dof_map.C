@@ -2287,7 +2287,7 @@ void DofMap::_node_dof_indices (const Elem & elem,
   // degrees of freedom, we use the non-vertex dofs (which
   // come in reverse order starting from the end, to
   // simplify p refinement)
-  if (extra_hanging_dofs && !elem.is_vertex(n))
+  if (extra_hanging_dofs && nc && !elem.is_vertex(n))
     {
       const int dof_offset = n_comp - nc;
 
