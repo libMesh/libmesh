@@ -440,6 +440,16 @@ public:
   void prepare_send_list ();
 
   /**
+   * Clears the \p _send_list vector. This should be done in order to completely
+   * rebuild the send_list from scratch rather than merely adding to the existing
+   * send_list.
+   */
+  void clear_send_list ()
+  {
+    _send_list.clear();
+  }
+
+  /**
    * \returns A constant reference to the \p _send_list for this processor.
    *
    * The \p _send_list contains the global indices of all the

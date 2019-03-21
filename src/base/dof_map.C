@@ -882,7 +882,7 @@ void DofMap::clear()
   _first_df.clear();
   _end_df.clear();
   _first_scalar_df.clear();
-  _send_list.clear();
+  this->clear_send_list();
   this->clear_sparsity();
   need_full_sparsity_pattern = false;
 
@@ -935,7 +935,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
   dof_id_type next_free_dof = 0;
 
   // Clear the send list before we rebuild it
-  _send_list.clear();
+  this->clear_send_list();
 
   // Set temporary DOF indices on this processor
   if (node_major_dofs)
