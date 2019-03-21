@@ -88,10 +88,10 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(other_mesh._next_unique_id),
 #endif
-  _skip_noncritical_partitioning(false),
-  _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false),
-  _allow_remote_element_removal(true),
+  _skip_noncritical_partitioning(other_mesh._skip_noncritical_partitioning),
+  _skip_all_partitioning(other_mesh._skip_all_partitioning),
+  _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
+  _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(new GhostPointNeighbors(*this)),
