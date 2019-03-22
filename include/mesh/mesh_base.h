@@ -1229,6 +1229,8 @@ public:
   virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) = 0;
   virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const = 0;
   virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const = 0;
+  virtual SimpleRange<element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) = 0;
+  virtual SimpleRange<const_element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const = 0;
 
   virtual element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) = 0;
   virtual element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) = 0;
