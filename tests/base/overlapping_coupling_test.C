@@ -253,3 +253,93 @@ protected:
   }
 
 };
+
+// Mainly just to sanity check the mesh construction and
+// the assumptions made in the OverlappingCouplingFunctor
+class OverlappingFunctorTest : public CppUnit::TestCase,
+                               public OverlappingTestBase
+{
+public:
+
+  CPPUNIT_TEST_SUITE( OverlappingFunctorTest );
+
+  CPPUNIT_TEST( checkCouplingFunctorQuad );
+  CPPUNIT_TEST( checkCouplingFunctorQuadUnifRef );
+  CPPUNIT_TEST( checkCouplingFunctorTri );
+  CPPUNIT_TEST( checkCouplingFunctorTriUnifRef );
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+
+  public:
+  void setUp()
+  {
+    this->build_quad_mesh();
+    this->init(*_mesh);
+  }
+
+  void tearDown()
+  { this->clear(); }
+
+  void checkCouplingFunctorQuad()
+  { this->run_coupling_functor_test(0); }
+
+  void checkCouplingFunctorQuadUnifRef()
+  { this->run_coupling_functor_test(1); }
+
+  void checkCouplingFunctorTri()
+  {
+    MeshTools::Modification::all_tri(*_mesh);
+    _es->reinit();
+    this->run_coupling_functor_test(0);
+  }
+
+  void checkCouplingFunctorTriUnifRef()
+  {
+    MeshTools::Modification::all_tri(*_mesh);
+    _es->reinit();
+    this->run_coupling_functor_test(1);
+  }
+
+private:
+
+  // This is basically to sanity check the coupling functor
+  // with the supplied mesh to make sure all the assumptions
+  // are kosher.
+  void run_coupling_functor_test(unsigned int n_refinements)
+  {
+    if( n_refinements > 0 )
+      {
+        MeshRefinement refine(*_mesh);
+        refine.uniformly_refine(n_refinements);
+        _es->reinit();
+      }
+
+    System & system = _es->get_system("SimpleSystem");
+
+    OverlappingCouplingFunctor coupling_functor(system);
+
+    std::unordered_map<const Elem *,const CouplingMatrix*> subdomain_one_couplings;
+    std::unordered_map<const Elem *,const CouplingMatrix*> subdomain_two_couplings;
+
+    coupling_functor( _mesh->active_subdomain_elements_begin(1),
+                      _mesh->active_subdomain_elements_end(1),
+                      DofObject::invalid_processor_id,
+                      subdomain_one_couplings );
+
+    coupling_functor( _mesh->active_subdomain_elements_begin(2),
+                      _mesh->active_subdomain_elements_end(2),
+                      DofObject::invalid_processor_id,
+                      subdomain_two_couplings );
+
+    dof_id_type n_elems_subdomain_two = std::distance( _mesh->active_subdomain_elements_begin(2),
+                                                       _mesh->active_subdomain_elements_end(2) );
+
+    CPPUNIT_ASSERT_EQUAL( n_elems_subdomain_two, (dof_id_type) subdomain_one_couplings.size() );
+    CPPUNIT_ASSERT_EQUAL( 2*n_elems_subdomain_two, (dof_id_type) subdomain_two_couplings.size() );
+  }
+
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( OverlappingFunctorTest );
