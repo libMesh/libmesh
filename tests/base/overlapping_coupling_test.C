@@ -9,6 +9,7 @@
 #include <libmesh/numeric_vector.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
+#include <libmesh/face_quad4.h>
 #include <libmesh/ghosting_functor.h>
 #include <libmesh/coupling_matrix.h>
 #include <libmesh/quadrature_gauss.h>
@@ -129,3 +130,126 @@ private:
   std::unique_ptr<CouplingMatrix> _coupling_matrix;
 };
 
+
+// Common functionality for all the different tests we'll be running
+// We're creating two elements that will live in subdomain 1 and one
+// element that is lives in subdomain 2 that overlaps both elements in
+// subdomain 1, but is not topologically connected.
+class OverlappingTestBase
+{
+protected:
+
+  std::unique_ptr<MeshBase> _mesh;
+
+  std::unique_ptr<EquationSystems> _es;
+
+  void build_quad_mesh(unsigned int n_refinements = 0)
+  {
+    // We are making assumptions in various places about the presence
+    // of the elements on the current processor so we're restricting to
+    // ReplicatedMesh for now.
+    _mesh.reset(new ReplicatedMesh(*TestCommWorld));
+
+    _mesh->set_mesh_dimension(2);
+
+    _mesh->add_point( Point(0.0,0.0),0 );
+    _mesh->add_point( Point(1.0,0.0),1 );
+    _mesh->add_point( Point(1.0,1.0),2 );
+    _mesh->add_point( Point(0.0,1.0),3 );
+
+    {
+      Elem* elem = _mesh->add_elem( new Quad4 );
+      elem->set_id(0);
+      elem->subdomain_id() = 1;
+
+      for (unsigned int n=0; n<4; n++)
+        elem->set_node(n) = _mesh->node_ptr(n);
+    }
+
+    _mesh->add_point( Point(1.0,2.0),4 );
+    _mesh->add_point( Point(0.0,2.0),5 );
+
+    {
+      Elem* elem = _mesh->add_elem( new Quad4 );
+      elem->set_id(1);
+      elem->subdomain_id() = 1;
+
+      elem->set_node(0) = _mesh->node_ptr(3);
+      elem->set_node(1) = _mesh->node_ptr(2);
+      elem->set_node(2) = _mesh->node_ptr(4);
+      elem->set_node(3) = _mesh->node_ptr(5);
+    }
+
+    _mesh->add_point( Point(0.0,0.0),6 );
+    _mesh->add_point( Point(1.0,0.0),7 );
+    _mesh->add_point( Point(1.0,2.0),8 );
+    _mesh->add_point( Point(0.0,2.0),9 );
+
+    {
+      Elem* elem = _mesh->add_elem( new Quad4 );
+      elem->set_id(2);
+      elem->subdomain_id() = 2;
+
+      elem->set_node(0) = _mesh->node_ptr(6);
+      elem->set_node(1) = _mesh->node_ptr(7);
+      elem->set_node(2) = _mesh->node_ptr(8);
+      elem->set_node(3) = _mesh->node_ptr(9);
+    }
+
+    _mesh->prepare_for_use();
+
+    if (n_refinements > 0)
+      {
+        MeshRefinement refine(*_mesh);
+        refine.uniformly_refine(n_refinements);
+      }
+  }
+
+  void init(MeshBase & mesh)
+  {
+    _es.reset( new EquationSystems(*_mesh) );
+    LinearImplicitSystem & sys = _es->add_system<LinearImplicitSystem> ("SimpleSystem");
+
+    std::set<subdomain_id_type> sub_one;
+    sub_one.insert(1);
+
+    std::set<subdomain_id_type> sub_two;
+    sub_two.insert(2);
+
+    sys.add_variable("U", FIRST, LAGRANGE, &sub_two);
+    sys.add_variable("L", FIRST, LAGRANGE, &sub_two);
+
+    sys.add_variable("V", FIRST, LAGRANGE, &sub_one);
+    sys.add_variable("p", FIRST, LAGRANGE, &sub_one);
+
+    _es->init();
+  }
+
+  void clear()
+  {
+    _es.reset();
+    _mesh.reset();
+  }
+
+  void setup_coupling_matrix( std::unique_ptr<CouplingMatrix> & coupling )
+  {
+    System & system = _es->get_system("SimpleSystem");
+
+
+    coupling.reset( new CouplingMatrix(system.n_vars()) );
+
+    const unsigned int u_var = system.variable_number("U");
+    const unsigned int l_var = system.variable_number("L");
+    const unsigned int v_var = system.variable_number("V");
+    const unsigned int p_var = system.variable_number("p");
+
+    // Only adding the overlapping couplings since the primary ones should
+    // be there by default.
+    (*coupling)(u_var,v_var) = true;
+    (*coupling)(l_var,v_var) = true;
+    (*coupling)(l_var,p_var) = true;
+    (*coupling)(v_var,u_var) = true;
+    (*coupling)(v_var,l_var) = true;
+  }
+
+};
