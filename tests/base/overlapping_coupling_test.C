@@ -17,6 +17,7 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/mesh_modification.h>
 #include <libmesh/partitioner.h>
+#include <libmesh/sparse_matrix.h>
 
 
 #include "test_comm.h"
@@ -619,6 +620,181 @@ private:
 
 };
 
+
+// This testing class now exercises testing the sparsity
+// pattern augmented by the OverlappingCouplingFunctor
+class OverlappingCouplingGhostingTest : public CppUnit::TestCase,
+                                        public OverlappingTestBase
+{
+public:
+  CPPUNIT_TEST_SUITE( OverlappingCouplingGhostingTest );
+
+  CPPUNIT_TEST( testSparsityCouplingMatrix );
+  CPPUNIT_TEST( testSparsityNullCouplingMatrix );
+  CPPUNIT_TEST( testSparsityNullCouplingMatrixUnifRef );
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+
+  void setUp()
+  {}
+
+  void tearDown()
+  { this->clear(); }
+
+  void testSparsityCouplingMatrix()
+  {
+    this->run_sparsity_pattern_test(0, true);
+  }
+
+  void testSparsityNullCouplingMatrix()
+  {
+    this->run_sparsity_pattern_test(0, false);
+  }
+
+  void testSparsityNullCouplingMatrixUnifRef()
+  {
+    this->run_sparsity_pattern_test(1, false);
+  }
+
+private:
+
+  void run_sparsity_pattern_test(const unsigned int n_refinements, bool build_coupling_matrix)
+  {
+    this->build_quad_mesh(n_refinements);
+    this->init(*_mesh);
+
+    std::unique_ptr<CouplingMatrix> coupling_matrix;
+    if (build_coupling_matrix)
+      this->setup_coupling_matrix(coupling_matrix);
+
+    LinearImplicitSystem & system = _es->get_system<LinearImplicitSystem>("SimpleSystem");
+
+    // If we don't add this coupling functor and properly recompute the
+    // sparsity pattern, then PETSc will throw a malloc error when we
+    // try to assemble into the global matrix
+    OverlappingCouplingFunctor coupling_functor(system);
+    coupling_functor.set_coupling_matrix(coupling_matrix);
+
+    DofMap & dof_map = system.get_dof_map();
+    dof_map.add_coupling_functor(coupling_functor);
+    dof_map.reinit_send_list(system.get_mesh());
+
+    // Update current local solution
+    system.current_local_solution = libMesh::NumericVector<libMesh::Number>::build(system.comm());
+
+    system.current_local_solution->init(system.n_dofs(), system.n_local_dofs(),
+                                        dof_map.get_send_list(), false,
+                                        libMesh::GHOSTED);
+
+    system.solution->localize(*(system.current_local_solution),dof_map.get_send_list());
+
+    // Now that we've added the coupling functor, we need
+    // to recompute the sparsity
+    dof_map.clear_sparsity();
+    dof_map.compute_sparsity(system.get_mesh());
+
+    // Now that we've recomputed the sparsity pattern, we need
+    // to reinitialize the system matrix.
+    libMesh::SparseMatrix<libMesh::Number> & matrix = system.get_matrix("System Matrix");
+    libmesh_assert(dof_map.is_attached(matrix));
+    matrix.init();
+
+    std::unique_ptr<PointLocatorBase> point_locator = _mesh->sub_point_locator();
+
+    const unsigned int u_var = system.variable_number("U");
+    const unsigned int v_var = system.variable_number("V");
+
+    DenseMatrix<Number> K12, K21;
+
+    FEMContext subdomain_one_context(system);
+    FEMContext subdomain_two_context(system);
+
+    // Add normally coupled parts of the matrix
+    for (const auto & elem : _mesh->active_local_subdomain_elements_ptr_range(1))
+      {
+        subdomain_one_context.pre_fe_reinit(system,elem);
+        subdomain_one_context.elem_fe_reinit();
+
+        std::vector<dof_id_type> & rows = subdomain_one_context.get_dof_indices();
+
+        // Fill with ones in case PETSc ignores the zeros at some point
+        std::fill( subdomain_one_context.get_elem_jacobian().get_values().begin(),
+                   subdomain_one_context.get_elem_jacobian().get_values().end(),
+                   1);
+
+        // Insert the Jacobian for the dofs for this element
+        system.matrix->add_matrix( subdomain_one_context.get_elem_jacobian(), rows );
+      }
+
+    for (const auto & elem : _mesh->active_local_subdomain_elements_ptr_range(2))
+      {
+        // A little extra unit testing on the range iterator
+        CPPUNIT_ASSERT_EQUAL(2, (int)elem->subdomain_id());
+
+        const std::vector<libMesh::Point> & qpoints = subdomain_two_context.get_element_fe(u_var)->get_xyz();
+
+        // Setup the context for the current element
+        subdomain_two_context.pre_fe_reinit(system,elem);
+        subdomain_two_context.elem_fe_reinit();
+
+        // We're only assembling rows for the dofs on subdomain 2 (U,L), so
+        // the current element will have all those dof_indices.
+        std::vector<dof_id_type> & rows = subdomain_two_context.get_dof_indices();
+
+        std::fill( subdomain_two_context.get_elem_jacobian().get_values().begin(),
+                   subdomain_two_context.get_elem_jacobian().get_values().end(),
+                   1);
+
+        // Insert the Jacobian for the normally coupled dofs for this element
+        system.matrix->add_matrix( subdomain_two_context.get_elem_jacobian(), rows );
+
+        std::set<subdomain_id_type> allowed_subdomains;
+        allowed_subdomains.insert(1);
+
+        // Now loop over the quadrature points and find the subdomain-one element that overlaps
+        // with the current subdomain-two element and then add a local element matrix with
+        // the coupling to the global matrix to try and trip any issues with sparsity pattern
+        // construction
+        for ( const auto & qp : qpoints )
+          {
+            const Elem * overlapping_elem = (*point_locator)( qp, &allowed_subdomains );
+            CPPUNIT_ASSERT(overlapping_elem);
+
+            // Setup the context for the overlapping element
+            subdomain_one_context.pre_fe_reinit(system,overlapping_elem);
+            subdomain_one_context.elem_fe_reinit();
+
+            // We're only coupling to the "V" variable so only need those dof indices
+            std::vector<dof_id_type> & v_indices = subdomain_one_context.get_dof_indices(v_var);
+            std::vector<dof_id_type> columns(rows);
+            columns.insert( columns.end(), v_indices.begin(), v_indices.end() );
+
+            // This will also zero the matrix so we can just insert zeros for this test
+            K21.resize( rows.size(), columns.size() );
+
+            std::fill(K21.get_values().begin(), K21.get_values().end(), 1);
+
+            // Now adding this local matrix to the global would trip a PETSc
+            // malloc error if the sparsity pattern hasn't been correctly
+            // built to include the overlapping coupling.
+            system.matrix->add_matrix (K21, rows, columns);
+
+            // Now add the other part of the overlapping coupling
+            K12.resize(v_indices.size(), rows.size());
+            std::fill(K12.get_values().begin(), K12.get_values().end(), 1);
+            system.matrix->add_matrix(K12,v_indices,rows);
+          }
+      } // end element loop
+
+    // We need to make sure to close the matrix for this test. There could still
+    // be PETSc malloc errors tripped here if we didn't allocate the off-processor
+    // part of the sparsity pattern correctly.
+    system.matrix->close();
+  }
+
+};
 #endif // LIBMESH_HAVE_PETSC
 
 
@@ -626,4 +802,5 @@ CPPUNIT_TEST_SUITE_REGISTRATION( OverlappingFunctorTest );
 
 #ifdef LIBMESH_HAVE_PETSC
 CPPUNIT_TEST_SUITE_REGISTRATION( OverlappingAlgebraicGhostingTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( OverlappingCouplingGhostingTest );
 #endif
