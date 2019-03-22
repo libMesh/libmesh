@@ -421,6 +421,10 @@ public:
   virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) override;
   virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const override;
   virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const override;
+  virtual SimpleRange<element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) override
+  { return {active_local_subdomain_elements_begin(subdomain_id), active_local_subdomain_elements_end(subdomain_id)}; }
+  virtual SimpleRange<const_element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const override
+  { return {active_local_subdomain_elements_begin(subdomain_id), active_local_subdomain_elements_end(subdomain_id)}; }
 
   virtual element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) override;
   virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) override;

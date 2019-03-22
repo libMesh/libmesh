@@ -1239,6 +1239,8 @@ public:
   virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) = 0;
   virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const = 0;
   virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const = 0;
+  virtual SimpleRange<element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) = 0;
+  virtual SimpleRange<const_element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const = 0;
 
   virtual element_iterator local_level_elements_begin (unsigned int level) = 0;
   virtual element_iterator local_level_elements_end (unsigned int level) = 0;
