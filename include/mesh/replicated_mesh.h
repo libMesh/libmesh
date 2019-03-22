@@ -380,6 +380,10 @@ public:
   virtual element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) override;
   virtual const_element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const override;
   virtual const_element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const override;
+  virtual SimpleRange<element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) override
+  { return {active_subdomain_set_elements_begin(ss), active_subdomain_set_elements_end(ss)}; }
+  virtual SimpleRange<const_element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) const override
+  { return {active_subdomain_set_elements_begin(ss), active_subdomain_set_elements_end(ss)}; }
 
   virtual element_iterator ghost_elements_begin () override;
   virtual element_iterator ghost_elements_end () override;
