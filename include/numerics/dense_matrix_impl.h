@@ -216,7 +216,7 @@ void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T> & M3)
     this->_multiply_blas(M3, RIGHT_MULTIPLY);
   else
     {
-      // (*this) <- M3 * (*this)
+      // (*this) <- (*this) * M3
       // Where:
       // (*this) = (m x n),
       // M2      = (m x p),
