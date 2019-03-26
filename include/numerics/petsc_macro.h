@@ -87,12 +87,11 @@ typedef PetscTruth PetscBool;
 #  define LibMeshPCDestroy(x)          PCDestroy(x)
 #endif
 
-// Once PETSc-3.11.0 is released, "&& PETSC_VERSION_RELEASE" should be removed
-#if PETSC_VERSION_LESS_THAN(3,11,0) && PETSC_VERSION_RELEASE
-#  define LibMeshVecScatterCreate(xin,ix,yin,iy,newctx)  VecScatterCreate(xin,ix,yin,iy,newctx)
-#else
-#  define LibMeshVecScatterCreate(xin,ix,yin,iy,newctx)  VecScatterCreateWithData(xin,ix,yin,iy,newctx)
-#endif
+// PETSc devs temporarily considered adding VecScatterCreateWithData, but
+// it was dropped in PETSc-130e142e39 and never made it into any release.
+// We will keep the ifdef for backwards compatibility in case anyone wrote
+// code directly using it, but that should be pretty unlikely.
+#define LibMeshVecScatterCreate(xin,ix,yin,iy,newctx)  VecScatterCreate(xin,ix,yin,iy,newctx)
 
 #if PETSC_RELEASE_LESS_THAN(3,1,1)
 typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;
