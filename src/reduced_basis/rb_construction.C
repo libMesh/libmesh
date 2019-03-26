@@ -580,13 +580,6 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 {
   LOG_SCOPE("add_scaled_matrix_and_vector()", "RBConstruction");
 
-  if (!apply_dof_constraints)
-  {
-    // Use the stashed constraints, which in this case have the
-    // Dirichlet constraints removed.
-    this->get_dof_map().swap_dof_constraints();
-  }
-
   bool assemble_matrix = (input_matrix != nullptr);
   bool assemble_vector = (input_vector != nullptr);
 
@@ -709,12 +702,15 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           context.get_elem_jacobian() *= 0.5;
         }
 
-      // Apply constraints, e.g. Dirichlet and periodic constraints
-      this->get_dof_map().constrain_element_matrix_and_vector
-        (context.get_elem_jacobian(),
-          context.get_elem_residual(),
-          context.get_dof_indices(),
-          /*asymmetric_constraint_rows*/ false );
+      if (apply_dof_constraints)
+        {
+          // Apply constraints, e.g. Dirichlet and periodic constraints
+          this->get_dof_map().constrain_element_matrix_and_vector
+            (context.get_elem_jacobian(),
+             context.get_elem_residual(),
+             context.get_dof_indices(),
+             /*asymmetric_constraint_rows*/ false );
+        }
 
       // Scale and add to global matrix and/or vector
       context.get_elem_jacobian() *= scalar;
@@ -765,12 +761,6 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
     input_matrix->close();
   if (assemble_vector)
     input_vector->close();
-
-  if (!apply_dof_constraints)
-  {
-    // Revert to the original constraints
-    this->get_dof_map().swap_dof_constraints();
-  }
 }
 
 void RBConstruction::set_context_solution_vec(NumericVector<Number> & vec)
