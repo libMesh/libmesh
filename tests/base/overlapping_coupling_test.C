@@ -362,6 +362,7 @@ protected:
 
 // Mainly just to sanity check the mesh construction and
 // the assumptions made in the OverlappingCouplingFunctor
+// as well as the custom Partitioner.
 class OverlappingFunctorTest : public CppUnit::TestCase,
                                public OverlappingTestBase
 {
@@ -373,6 +374,8 @@ public:
   CPPUNIT_TEST( checkCouplingFunctorQuadUnifRef );
   CPPUNIT_TEST( checkCouplingFunctorTri );
   CPPUNIT_TEST( checkCouplingFunctorTriUnifRef );
+  CPPUNIT_TEST( checkOverlappingPartitioner );
+  CPPUNIT_TEST( checkOverlappingPartitionerUnifRef );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -406,6 +409,16 @@ public:
     MeshTools::Modification::all_tri(*_mesh);
     _es->reinit();
     this->run_coupling_functor_test(1);
+  }
+
+  void checkOverlappingPartitioner()
+  {
+    this->run_partitioner_test(0);
+  }
+
+  void checkOverlappingPartitionerUnifRef()
+  {
+    this->run_partitioner_test(1);
   }
 
 private:
@@ -444,6 +457,45 @@ private:
 
     CPPUNIT_ASSERT_EQUAL( n_elems_subdomain_two, (dof_id_type) subdomain_one_couplings.size() );
     CPPUNIT_ASSERT_EQUAL( 2*n_elems_subdomain_two, (dof_id_type) subdomain_two_couplings.size() );
+  }
+
+  void run_partitioner_test(unsigned int n_refinements)
+  {
+    if( n_refinements > 0 )
+      {
+        MeshRefinement refine(*_mesh);
+        refine.uniformly_refine(n_refinements);
+        _es->reinit();
+      }
+
+    System & system = _es->get_system("SimpleSystem");
+
+    std::set<processor_id_type> sub_one_proc_ids, sub_two_proc_ids;
+    for (auto & elem : _mesh->active_subdomain_elements_ptr_range(1))
+      sub_one_proc_ids.insert(elem->processor_id());
+
+    for (auto & elem : _mesh->active_subdomain_elements_ptr_range(2))
+      sub_two_proc_ids.insert(elem->processor_id());
+
+
+    // Everyone should be on the same processor if only 1 processor
+    if( system.n_processors() == 1 )
+      {
+        CPPUNIT_ASSERT_EQUAL( 1, (int)sub_one_proc_ids.size() );
+        CPPUNIT_ASSERT_EQUAL( 1, (int)sub_two_proc_ids.size() );
+        CPPUNIT_ASSERT( sub_one_proc_ids == sub_two_proc_ids );
+      }
+    // Otherwise these sets should be disjoint
+    else
+      {
+        // Make sure no subdomain one ids in the subdomain two ids
+        for (auto & id : sub_one_proc_ids )
+          CPPUNIT_ASSERT( sub_two_proc_ids.find(id) == sub_two_proc_ids.end() );
+
+        // Vice-versa
+        for (auto & id : sub_two_proc_ids )
+          CPPUNIT_ASSERT( sub_one_proc_ids.find(id) == sub_one_proc_ids.end() );
+      }
   }
 
 };
