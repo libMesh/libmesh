@@ -16,6 +16,7 @@
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/mesh_modification.h>
+#include <libmesh/partitioner.h>
 
 
 #include "test_comm.h"
@@ -128,6 +129,109 @@ private:
   std::unique_ptr<PointLocatorBase> _point_locator;
 
   std::unique_ptr<CouplingMatrix> _coupling_matrix;
+};
+
+
+// We use a custom partioner for this test to help ensure we're
+// testing the cases we want. In particular, we're going to
+// ensure that elements in subdomain one are on different processors
+// from elements subdomain two so we know ghosting will be required
+// for algebraic and coupling ghosting between the two subdomains.
+class OverlappingTestPartitioner : public Partitioner
+{
+public:
+
+  OverlappingTestPartitioner () = default;
+  OverlappingTestPartitioner (const OverlappingTestPartitioner &) = default;
+  OverlappingTestPartitioner (OverlappingTestPartitioner &&) = default;
+  OverlappingTestPartitioner & operator= (const OverlappingTestPartitioner &) = default;
+  OverlappingTestPartitioner & operator= (OverlappingTestPartitioner &&) = default;
+  virtual ~OverlappingTestPartitioner() = default;
+
+  /**
+   * \returns A copy of this partitioner wrapped in a smart pointer.
+   */
+  virtual std::unique_ptr<Partitioner> clone () const override
+  {
+    return libmesh_make_unique<OverlappingTestPartitioner>(*this);
+  }
+
+protected:
+
+  /**
+   * Partition the \p MeshBase into \p n subdomains.
+   */
+  virtual void _do_partition (MeshBase & mesh,
+                              const unsigned int n) override
+  {
+    // If we're on one partition, then everyone gets to be on that partition
+    if (n == 1)
+      this->single_partition_range (mesh.active_elements_begin(), mesh.active_elements_end());
+    else
+      {
+        libmesh_assert_greater (n, 0);
+
+        // If there are more partitions than elements, then just
+        // assign one element to each partition
+        if (mesh.n_active_elem() <= n)
+          {
+            processor_id_type e = 0;
+            for (auto & elem : mesh.active_element_ptr_range() )
+              {
+                elem->processor_id() = e;
+                e++;
+              }
+          }
+        // Otherwise, we'll split up the partitions into two groups
+        // and then assign the elements of each subdomain into each of
+        // the two groups
+        else
+          {
+            unsigned int n_sub_two_elems = std::distance( mesh.active_subdomain_elements_begin(2),
+                                                          mesh.active_subdomain_elements_end(2) );
+
+            unsigned int n_parts_sub_two = 0;
+            if( n_sub_two_elems < n/2 )
+              n_parts_sub_two = n_sub_two_elems;
+            else
+                n_parts_sub_two = n/2;
+
+            const unsigned int n_parts_sub_one = n - n_parts_sub_two;
+
+            const dof_id_type sub_two_blk_size = cast_int<dof_id_type>
+              (std::distance( mesh.active_subdomain_elements_begin(2),
+                              mesh.active_subdomain_elements_end(2) )/n_parts_sub_two );
+
+            this->assign_proc_id_subdomain( mesh, 2, sub_two_blk_size, n_parts_sub_two, 0 );
+
+
+            const dof_id_type sub_one_blk_size = cast_int<dof_id_type>
+              (std::distance( mesh.active_subdomain_elements_begin(1),
+                              mesh.active_subdomain_elements_end(1) )/n_parts_sub_one );
+
+            this->assign_proc_id_subdomain( mesh, 1, sub_one_blk_size, n_parts_sub_one, n_parts_sub_two );
+          }
+      }
+  }
+
+  void assign_proc_id_subdomain( const MeshBase & mesh,
+                                 const subdomain_id_type sid,
+                                 const dof_id_type blksize,
+                                 const unsigned int n_parts,
+                                 const processor_id_type offset )
+  {
+    dof_id_type e = 0;
+    for (auto & elem : mesh.active_subdomain_elements_ptr_range(sid))
+      {
+        if ((e/blksize) < n_parts)
+          elem->processor_id() = offset + cast_int<processor_id_type>(e/blksize);
+        else
+          elem->processor_id() = offset;
+
+        e++;
+      }
+  }
+
 };
 
 
