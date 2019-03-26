@@ -449,8 +449,8 @@ void Build::parallel_sync ()
   auto pid = comm.rank();
   auto num_procs = comm.size();
 
-  auto dof_tag = comm.get_unique_tag(998);
-  auto row_tag = comm.get_unique_tag(9998);
+  auto dof_tag = comm.get_unique_tag();
+  auto row_tag = comm.get_unique_tag();
 
   const auto n_global_dofs   = dof_map.n_dofs();
   const auto n_dofs_on_proc  = dof_map.n_dofs_on_processor(pid);

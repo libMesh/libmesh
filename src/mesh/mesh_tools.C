@@ -2365,11 +2365,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
         }
     };
 
-  // Push using non-blocking I/O
-  std::vector<Parallel::Request> push_requests;
-
   Parallel::push_parallel_vector_data
-    (mesh.comm(), ids_to_push, push_requests, action_functor);
+    (mesh.comm(), ids_to_push, action_functor);
 
   // Now new_proc_ids is correct for every node we used to own.  Let's
   // ask every other processor about the nodes they used to own.  But
@@ -2382,9 +2379,6 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       if (it != new_proc_ids.end() && it->second != mesh.processor_id())
         ex_local_nodes.insert(node);
     }
-
-  // Let's finish with previous I/O before we start more.
-  Parallel::wait(push_requests);
 
   SyncProcIdsFromMap sync(new_proc_ids, mesh);
   if (repartition_all_nodes)

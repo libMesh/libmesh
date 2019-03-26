@@ -588,10 +588,9 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   mesh.find_neighbors (/* reset_remote_elements = */ true,
                        /* reset_current_list    = */ true);
 
-  // Get a unique message tag to use in communications; we'll default
-  // to some numbers around pi*10000
+  // Get a unique message tag to use in communications
   Parallel::MessageTag
-    element_neighbors_tag = mesh.comm().get_unique_tag(31416);
+    element_neighbors_tag = mesh.comm().get_unique_tag();
 
   // Now any element with a nullptr neighbor either
   // (i) lives on the physical domain boundary, or

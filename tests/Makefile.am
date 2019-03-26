@@ -71,8 +71,10 @@ unit_tests_sources = \
   numerics/vector_value_test.C \
   numerics/type_tensor_test.C \
   numerics/dense_matrix_test.C \
+  parallel/message_tag.C \
   parallel/packed_range_test.C \
   parallel/parallel_sort_test.C \
+  parallel/parallel_sync_test.C \
   parallel/parallel_test.C \
   parallel/parallel_point_test.C \
   partitioning/partitioner_test.h \

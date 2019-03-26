@@ -178,6 +178,9 @@ inline status Communicator::probe (const unsigned int src_processor_id,
 
   status stat;
 
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
+
   libmesh_call_mpi
     (MPI_Probe (src_processor_id, tag.value(), this->get(), &stat));
 
@@ -196,6 +199,9 @@ inline Status Communicator::packed_range_probe (const unsigned int src_processor
   Status stat((StandardType<typename Packing<T>::buffer_type>()));
 
   int int_flag;
+
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
 
   libmesh_call_mpi(MPI_Iprobe(src_processor_id,
                               tag.value(),
@@ -218,6 +224,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
 
+  libmesh_assert_less(dest_processor_id, this->size());
+
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
       MPI_Ssend : MPI_Send) (dataptr,
@@ -239,6 +247,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
+
+  libmesh_assert_less(dest_processor_id, this->size());
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -266,6 +276,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T * dataptr = const_cast<T*> (&buf);
 
+  libmesh_assert_less(dest_processor_id, this->size());
+
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
       MPI_Ssend : MPI_Send) (dataptr,
@@ -287,6 +299,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = const_cast<T*>(&buf);
+
+  libmesh_assert_less(dest_processor_id, this->size());
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -416,6 +430,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const MessageTag & tag) const
 {
   LOG_SCOPE("send()", "Parallel");
+
+  libmesh_assert_less(dest_processor_id, this->size());
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -778,6 +794,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   // datatype so we can later query the size
   Status stat(this->probe(src_processor_id, tag), StandardType<T>(&buf));
 
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
+
   libmesh_call_mpi
     (MPI_Recv (&buf, 1, StandardType<T>(&buf), src_processor_id,
                tag.value(), this->get(), stat.get()));
@@ -794,6 +813,9 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    const MessageTag & tag) const
 {
   LOG_SCOPE("receive()", "Parallel");
+
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
 
   libmesh_call_mpi
     (MPI_Irecv (&buf, 1, StandardType<T>(&buf), src_processor_id,
@@ -929,6 +951,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
   buf.resize(stat.size());
 
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
+
   // Use stat.source() and stat.tag() in the receive - if
   // src_processor_id is or tag is "any" then we want to be sure we
   // try to receive the same message we just probed.
@@ -952,6 +977,9 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    const MessageTag & tag) const
 {
   LOG_SCOPE("receive()", "Parallel");
+
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
 
   libmesh_call_mpi
     (MPI_Irecv (buf.empty() ? nullptr : buf.data(),
@@ -1190,6 +1218,10 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
       recv = sendvec;
       return;
     }
+
+  libmesh_assert_less(dest_processor_id, this->size());
+  libmesh_assert(source_processor_id < this->size() ||
+                 source_processor_id == any_source);
 
   // MPI_STATUS_IGNORE is from MPI-2; using it with some versions of
   // MPICH may cause a crash:
@@ -1448,6 +1480,8 @@ inline void Communicator::broadcast (bool & data, const unsigned int root_id) co
   // MPI::BOOL available
   char char_data = data;
 
+  libmesh_assert_less(root_id, this->size());
+
   // Spread data to remote processors.
   libmesh_call_mpi
     (MPI_Bcast (&char_data, 1, StandardType<char>(&char_data),
@@ -1514,6 +1548,8 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
   // and get the data from the remote processors.
   // Pass nullptr if our vector is empty.
   T * data_ptr = data.empty() ? nullptr : data.data();
+
+  libmesh_assert_less(root_id, this->size());
 
   libmesh_call_mpi
     (MPI_Bcast (data_ptr, cast_int<int>(data.size()),
@@ -2618,6 +2654,8 @@ inline void Communicator::gather(const unsigned int root_id,
 
       StandardType<T> send_type(&sendval);
 
+      libmesh_assert_less(root_id, this->size());
+
       libmesh_call_mpi
         (MPI_Gather(const_cast<T*>(&sendval), 1, send_type,
                     recv.empty() ? nullptr : recv.data(), 1, send_type,
@@ -2672,6 +2710,8 @@ inline void Communicator::gather(const unsigned int root_id,
   if (root_id == this->rank())
     r.resize(globalsize);
 
+  libmesh_assert_less(root_id, this->size());
+
   // and get the data from the remote processors
   libmesh_call_mpi
     (MPI_Gatherv (r_src.empty() ? nullptr : r_src.data(), mysize,
@@ -2722,6 +2762,8 @@ inline void Communicator::gather(const unsigned int root_id,
       std::string r;
       if (this->rank() == root_id)
         r.resize(globalsize, 0);
+
+      libmesh_assert_less(root_id, this->size());
 
       // and get the data from the remote processors.
       libmesh_call_mpi
@@ -2942,6 +2984,8 @@ void Communicator::scatter(const std::vector<T,A> & data,
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   libmesh_ignore(data_ptr); // unused ifndef LIBMESH_HAVE_MPI
 
+  libmesh_assert_less(root_id, this->size());
+
   libmesh_call_mpi
     (MPI_Scatter (data_ptr, 1, StandardType<T>(data_ptr),
                   &recv, 1, StandardType<T>(&recv), root_id, this->get()));
@@ -2979,6 +3023,8 @@ void Communicator::scatter(const std::vector<T,A> & data,
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
   libmesh_ignore(data_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
+
+  libmesh_assert_less(root_id, this->size());
 
   libmesh_call_mpi
     (MPI_Scatter (data_ptr, recv_buffer_size, StandardType<T>(data_ptr),
@@ -3031,6 +3077,8 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   int * count_ptr = const_cast<int*>(counts.empty() ? nullptr : counts.data());
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
   libmesh_ignore(data_ptr, count_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
+
+  libmesh_assert_less(root_id, this->size());
 
   // Scatter the non-uniform chunks
   libmesh_call_mpi
@@ -3203,6 +3251,53 @@ inline void Communicator::allgather_packed_range(Context * context,
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);
     }
+}
+
+
+
+template <typename T, typename A>
+inline bool Communicator::possibly_receive (unsigned int & src_processor_id,
+                                            std::vector<T,A> & buf,
+                                            const DataType & type,
+                                            Request & req,
+                                            const MessageTag & tag) const
+{
+  LOG_SCOPE("possibly_receive()", "Parallel");
+
+  Status stat(type);
+
+  int int_flag = 0;
+
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
+
+  libmesh_call_mpi(MPI_Iprobe(src_processor_id,
+                              tag.value(),
+                              this->get(),
+                              &int_flag,
+                              stat.get()));
+
+  if (int_flag)
+  {
+    buf.resize(stat.size());
+
+    src_processor_id = stat.source();
+
+    libmesh_call_mpi
+      (MPI_Irecv (buf.data(),
+                  cast_int<int>(buf.size()),
+                  type,
+                  src_processor_id,
+                  tag.value(),
+                  this->get(),
+                  req.get()));
+
+    // The MessageTag should stay registered for the Request lifetime
+    req.add_post_wait_work
+      (new Parallel::PostWaitDereferenceTag(tag));
+  }
+
+  return int_flag;
 }
 
 

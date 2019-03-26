@@ -1100,7 +1100,7 @@ bool MeshRefinement::make_coarsening_compatible()
       parallel_object_only();
 
       Parallel::MessageTag
-        uncoarsenable_tag = this->comm().get_unique_tag(2718);
+        uncoarsenable_tag = this->comm().get_unique_tag();
       std::vector<Parallel::Request> uncoarsenable_push_requests(n_proc-1);
 
       for (processor_id_type p = 0; p != n_proc; ++p)
@@ -1733,7 +1733,7 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
               parents_to_coarsen[elem->processor_id()].push_back(elem->id());
 
           Parallel::MessageTag
-            coarsen_tag = this->comm().get_unique_tag(271);
+            coarsen_tag = this->comm().get_unique_tag();
           std::vector<Parallel::Request> coarsen_push_requests(n_proc-1);
 
           for (processor_id_type p = 0; p != n_proc; ++p)

@@ -376,7 +376,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // we do not own
 
   // Let's get a unique message tag to use for send()/receive()
-  Parallel::MessageTag nodes_tag = mesh.comm().get_unique_tag(12345);
+  Parallel::MessageTag nodes_tag = mesh.comm().get_unique_tag();
 
   std::vector<std::vector<int>>
     needed_node_idxs (nemhelper->num_node_cmaps); // the indices we will ask for

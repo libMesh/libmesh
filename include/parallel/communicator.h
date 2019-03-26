@@ -143,13 +143,22 @@ public:
   const communicator & get() const { return _communicator; }
 
   /**
-   * Get a tag that is unique to this Communicator.
+   * Get a tag that is unique to this Communicator.  A requested tag
+   * value may be provided.  If no request is made then an automatic
+   * unique tag value will be generated; such usage of
+   * get_unique_tag() must be done on every processor in a consistent
+   * order.
    *
    * \note If people are also using magic numbers or copying
-   * communicators around then we can't guarantee the tag is unique to
-   * this MPI_Comm.
+   * raw communicators around then we can't guarantee the tag is
+   * unique to this MPI_Comm.
+   *
+   * \note Leaving \p tagvalue unspecified is recommended in most
+   * cases.  Manually selecting tag values is dangerous, as tag values may be
+   * freed and reselected earlier than expected in asynchronous
+   * communication algorithms.
    */
-  MessageTag get_unique_tag(int tagvalue) const;
+  MessageTag get_unique_tag(int tagvalue = MessageTag::invalid_tag) const;
 
   /**
    * Reference an already-acquired tag, so that we know it will
@@ -191,10 +200,15 @@ private:
   processor_id_type _rank, _size;
   SendMode _send_mode;
 
-  // mutable used_tag_values - not thread-safe, but then Parallel::
-  // isn't thread-safe in general.
+  // mutable used_tag_values and tag_queue - not thread-safe, but then
+  // Parallel:: isn't thread-safe in general.
   mutable std::map<int, unsigned int> used_tag_values;
-  bool          _I_duped_it;
+  mutable int _next_tag;
+
+  int _max_tag;
+
+  // Keep track of duplicate/split operations so we know when to free
+  bool _I_duped_it;
 
   // Communication operations:
 public:
@@ -213,6 +227,11 @@ public:
    * Pause execution until all processors reach a certain point.
    */
   void barrier () const;
+
+  /**
+   * Start a barrier that doesn't block
+   */
+  void nonblocking_barrier (Request & req) const;
 
   /**
    * Verify that a local variable has the same value on all processors.
@@ -412,6 +431,36 @@ public:
                 const DataType & type,
                 Request & req,
                 const MessageTag & tag=any_tag) const;
+
+  /**
+   * Nonblocking-receive from one processor with user-defined type.
+   *
+   * Checks to see if a message can be received from the
+   * src_processor_id .  If so, it starts a non-blocking
+   * receive using the passed in request and returns true
+   *
+   * Otherwise - if there is no message to receive it returns false
+   *
+   * Note: The buf does NOT need to properly sized before this call
+   * this will resize the buffer automatically
+   *
+   * If \p T is a container, container-of-containers, etc., then
+   * \p type should be the DataType of the underlying fixed-size
+   * entries in the container(s).
+   *
+   * @param src_processor_id The pid to receive from or "any".
+   * will be set to the actual src being receieved from
+   * @param buf THe buffer to receive into
+   * @param type The intrinsic datatype to receive
+   * @param req The request to use
+   * @param tag The tag to use
+   */
+  template <typename T, typename A>
+  bool possibly_receive (unsigned int & src_processor_id,
+                         std::vector<T,A> & buf,
+                         const DataType & type,
+                         Request & req,
+                         const MessageTag & tag) const;
 
   /**
    * Blocking-send range-of-pointers to one processor.  This
