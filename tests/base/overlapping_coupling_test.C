@@ -300,6 +300,8 @@ protected:
       elem->set_node(3) = _mesh->node_ptr(9);
     }
 
+    _mesh->partitioner() = std::unique_ptr<Partitioner>(new OverlappingTestPartitioner);
+
     _mesh->prepare_for_use();
 
     if (n_refinements > 0)
