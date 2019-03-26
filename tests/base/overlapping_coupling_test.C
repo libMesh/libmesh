@@ -500,4 +500,130 @@ private:
 
 };
 
+// In this testing, we're relying on the presence of PETSc
+#ifdef LIBMESH_HAVE_PETSC
+
+
+// This testing class the algebraic ghosting of the
+// OverlappingCouplingFunctor.
+class OverlappingAlgebraicGhostingTest : public CppUnit::TestCase,
+                                         public OverlappingTestBase
+{
+public:
+  CPPUNIT_TEST_SUITE( OverlappingAlgebraicGhostingTest );
+
+  CPPUNIT_TEST( testGhostingCouplingMatrix );
+  CPPUNIT_TEST( testGhostingNullCouplingMatrix );
+  CPPUNIT_TEST( testGhostingNullCouplingMatrixUnifRef );
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+
+  void setUp()
+  {}
+
+  void tearDown()
+  { this->clear(); }
+
+  void testGhostingCouplingMatrix()
+  {
+    this->run_ghosting_test(0, true);
+  }
+
+  void testGhostingNullCouplingMatrix()
+  {
+    this->run_ghosting_test(0, false);
+  }
+
+  void testGhostingNullCouplingMatrixUnifRef()
+  {
+    std::unique_ptr<CouplingMatrix> coupling_matrix;
+
+    this->run_ghosting_test(2, false);
+  }
+
+private:
+
+  void run_ghosting_test(const unsigned int n_refinements, bool build_coupling_matrix)
+  {
+    this->build_quad_mesh(n_refinements);
+    this->init(*_mesh);
+
+    std::unique_ptr<CouplingMatrix> coupling_matrix;
+    if (build_coupling_matrix)
+      this->setup_coupling_matrix(coupling_matrix);
+
+    LinearImplicitSystem & system = _es->get_system<LinearImplicitSystem>("SimpleSystem");
+
+    // If we don't add this coupling functor and properly recompute the
+    // sparsity pattern, then PETSc will throw a malloc error when we
+    // try to assemble into the global matrix
+    OverlappingCouplingFunctor functor(system);
+    functor.set_coupling_matrix(coupling_matrix);
+
+    DofMap & dof_map = system.get_dof_map();
+    dof_map.add_algebraic_ghosting_functor(functor);
+    dof_map.reinit_send_list(system.get_mesh());
+
+    // Update current local solution
+    system.current_local_solution = libMesh::NumericVector<libMesh::Number>::build(system.comm());
+
+    system.current_local_solution->init(system.n_dofs(), system.n_local_dofs(),
+                                        dof_map.get_send_list(), false,
+                                        libMesh::GHOSTED);
+
+    system.solution->localize(*(system.current_local_solution),dof_map.get_send_list());
+
+    std::unique_ptr<PointLocatorBase> point_locator = _mesh->sub_point_locator();
+
+    const unsigned int u_var = system.variable_number("U");
+
+    DenseMatrix<Number> K;
+
+    FEMContext subdomain_one_context(system);
+    FEMContext subdomain_two_context(system);
+
+    // The use case on which this test is based, we only add terms to the residual
+    // corresponding to the dofs in the second subdomain, but that have couplings
+    // to dofs in the first subdomain.
+    for (const auto & elem : _mesh->active_local_subdomain_elements_ptr_range(2))
+      {
+        // A little extra unit testing on the range iterator
+        CPPUNIT_ASSERT_EQUAL(2, (int)elem->subdomain_id());
+
+        const std::vector<libMesh::Point> & qpoints = subdomain_two_context.get_element_fe(u_var)->get_xyz();
+
+        // Setup the context for the current element
+        subdomain_two_context.pre_fe_reinit(system,elem);
+        subdomain_two_context.elem_fe_reinit();
+
+        std::set<subdomain_id_type> allowed_subdomains;
+        allowed_subdomains.insert(1);
+
+        // Now loop over the quadrature points and find the subdomain-one element that overlaps
+        // with the current subdomain-two element and then initialize the FEMContext for the
+        // subdomain-one element. If the algebraic ghosting has not been done properly,
+        // this will error.
+        for ( const auto & qp : qpoints )
+          {
+            const Elem * overlapping_elem = (*point_locator)( qp, &allowed_subdomains );
+            CPPUNIT_ASSERT(overlapping_elem);
+
+            // Setup the context for the overlapping element
+            subdomain_one_context.pre_fe_reinit(system,overlapping_elem);
+            subdomain_one_context.elem_fe_reinit();
+          }
+      }
+  }
+
+};
+
+#endif // LIBMESH_HAVE_PETSC
+
+
 CPPUNIT_TEST_SUITE_REGISTRATION( OverlappingFunctorTest );
+
+#ifdef LIBMESH_HAVE_PETSC
+CPPUNIT_TEST_SUITE_REGISTRATION( OverlappingAlgebraicGhostingTest );
+#endif
