@@ -735,10 +735,10 @@ void DenseMatrix<T>::_lu_decompose ()
       _pivots[i] = i;
 
       // std::abs(complex) must return a Real!
-      Real the_max = std::abs( A(i,i) );
+      auto the_max = std::abs( A(i,i) );
       for (unsigned int j=i+1; j<n_rows; ++j)
         {
-          Real candidate_max = std::abs( A(j,i) );
+          auto candidate_max = std::abs( A(j,i) );
           if (the_max < candidate_max)
             {
               the_max = candidate_max;

@@ -267,13 +267,13 @@ public:
    * \returns The minimum entry in the matrix, or the minimum real
    * part in the case of complex numbers.
    */
-  Real min () const;
+  auto min () const -> decltype(libmesh_real(T(0)));
 
   /**
    * \returns The maximum entry in the matrix, or the maximum real
    * part in the case of complex numbers.
    */
-  Real max () const;
+  auto max () const -> decltype(libmesh_real(T(0)));
 
   /**
    * \returns The l1-norm of the matrix, that is, the max column sum:
@@ -283,7 +283,7 @@ public:
    * This is the natural matrix norm that is compatible to the l1-norm
    * for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
    */
-  Real l1_norm () const;
+  auto l1_norm () const -> decltype(std::abs(T(0)));
 
   /**
    * \returns The linfty-norm of the matrix, that is, the max row sum:
@@ -293,7 +293,7 @@ public:
    * This is the natural matrix norm that is compatible to the
    * linfty-norm of vectors, i.e. \f$ |Mv|_\infty \leq |M|_\infty |v|_\infty \f$.
    */
-  Real linfty_norm () const;
+  auto linfty_norm () const -> decltype(std::abs(T(0)));
 
   /**
    * Left multiplies by the transpose of the matrix \p A.
@@ -946,17 +946,17 @@ DenseMatrix<T> & DenseMatrix<T>::operator -= (const DenseMatrix<T> & mat)
 
 template<typename T>
 inline
-Real DenseMatrix<T>::min () const
+auto DenseMatrix<T>::min () const -> decltype(libmesh_real(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
-  Real my_min = libmesh_real((*this)(0,0));
+  auto my_min = libmesh_real((*this)(0,0));
 
   for (unsigned int i=0; i!=this->_m; i++)
     {
       for (unsigned int j=0; j!=this->_n; j++)
         {
-          Real current = libmesh_real((*this)(i,j));
+          auto current = libmesh_real((*this)(i,j));
           my_min = (my_min < current? my_min : current);
         }
     }
@@ -967,17 +967,17 @@ Real DenseMatrix<T>::min () const
 
 template<typename T>
 inline
-Real DenseMatrix<T>::max () const
+auto DenseMatrix<T>::max () const -> decltype(libmesh_real(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
-  Real my_max = libmesh_real((*this)(0,0));
+  auto my_max = libmesh_real((*this)(0,0));
 
   for (unsigned int i=0; i!=this->_m; i++)
     {
       for (unsigned int j=0; j!=this->_n; j++)
         {
-          Real current = libmesh_real((*this)(i,j));
+          auto current = libmesh_real((*this)(i,j));
           my_max = (my_max > current? my_max : current);
         }
     }
@@ -988,17 +988,17 @@ Real DenseMatrix<T>::max () const
 
 template<typename T>
 inline
-Real DenseMatrix<T>::l1_norm () const
+auto DenseMatrix<T>::l1_norm () const -> decltype(std::abs(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
 
-  Real columnsum = 0.;
+  decltype(std::abs(T(0))) columnsum = 0.;
   for (unsigned int i=0; i!=this->_m; i++)
     {
       columnsum += std::abs((*this)(i,0));
     }
-  Real my_max = columnsum;
+  auto my_max = columnsum;
   for (unsigned int j=1; j!=this->_n; j++)
     {
       columnsum = 0.;
@@ -1015,17 +1015,17 @@ Real DenseMatrix<T>::l1_norm () const
 
 template<typename T>
 inline
-Real DenseMatrix<T>::linfty_norm () const
+auto DenseMatrix<T>::linfty_norm () const -> decltype(std::abs(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
 
-  Real rowsum = 0.;
+  decltype(std::abs(T(0))) rowsum = 0.;
   for (unsigned int j=0; j!=this->_n; j++)
     {
       rowsum += std::abs((*this)(0,j));
     }
-  Real my_max = rowsum;
+  auto my_max = rowsum;
   for (unsigned int i=1; i!=this->_m; i++)
     {
       rowsum = 0.;
