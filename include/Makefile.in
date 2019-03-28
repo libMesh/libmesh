@@ -799,6 +799,7 @@ include_HEADERS = \
         numerics/coupling_matrix.h \
         numerics/dense_matrix.h \
         numerics/dense_matrix_base.h \
+        numerics/dense_matrix_base_impl.h \
         numerics/dense_matrix_impl.h \
         numerics/dense_submatrix.h \
         numerics/dense_subvector.h \
