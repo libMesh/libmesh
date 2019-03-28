@@ -31,6 +31,7 @@
 #include "capnp/message.h"
 
 // C++ includes
+#include <string>
 
 namespace libMesh
 {
@@ -40,6 +41,10 @@ class RBEvaluation;
 class TransientRBEvaluation;
 class RBEIMEvaluation;
 class RBSCMEvaluation;
+class RBParametrized;
+class ReplicatedMesh;
+class Elem;
+class Point;
 
 namespace RBDataDeserialization
 {
