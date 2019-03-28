@@ -993,7 +993,7 @@ auto DenseMatrix<T>::l1_norm () const -> decltype(std::abs(T(0)))
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
 
-  decltype(std::abs(T(0))) columnsum = 0.;
+  auto columnsum = std::abs(T(0));
   for (unsigned int i=0; i!=this->_m; i++)
     {
       columnsum += std::abs((*this)(i,0));
@@ -1020,7 +1020,7 @@ auto DenseMatrix<T>::linfty_norm () const -> decltype(std::abs(T(0)))
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
 
-  decltype(std::abs(T(0))) rowsum = 0.;
+  auto rowsum = std::abs(T(0));
   for (unsigned int j=0; j!=this->_n; j++)
     {
       rowsum += std::abs((*this)(0,j));
