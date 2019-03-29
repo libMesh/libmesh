@@ -338,6 +338,7 @@ void assembly_with_dg_fem_context(EquationSystems& es,
       }
 }
 
+
 Number cubic_test (const Point& p,
                    const Parameters&,
                    const std::string&,
@@ -349,6 +350,79 @@ Number cubic_test (const Point& p,
 
   return x*(1-x)*(1-x) + x*x*(1-y) + x*(1-y)*(1-z) + y*(1-y)*z + z*(1-z)*(1-z);
 }
+
+
+Number new_linear_test (const Point& p,
+                    const Parameters&,
+                    const std::string&,
+                    const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
+  const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
+
+  return x + 2*y + 3*z - 1;
+}
+
+
+Number disc_thirds_test (const Point& p,
+                         const Parameters&,
+                         const std::string&,
+                         const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
+  const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
+
+  return (3*x < 1) + (3*y < 2) + (3*z > 2);
+}
+
+
+struct TripleFunction : public FunctionBase<Number>
+{
+  TripleFunction() {}
+
+  virtual std::unique_ptr<FunctionBase<Number>> clone () const
+  { return libmesh_make_unique<TripleFunction>(); }
+
+  // We only really need the vector-valued output for projections
+  virtual Number operator() (const Point &,
+                             const Real /*time*/ = 0.) override
+  { libmesh_error(); }
+
+  virtual void operator() (const Point & p,
+                           const Real time,
+                           DenseVector<Number> & output) override
+  {
+    libmesh_assert_greater(output.size(), 0);
+    Parameters params;
+    output(0) = cubic_test(p, params, "", "");
+    if (output.size() > 0)
+      output(1) = new_linear_test(p, params, "", "");
+    if (output.size() > 1)
+      output(2) = disc_thirds_test(p, params, "", "");
+  }
+
+  Number component (unsigned int i,
+                    const Point & p,
+                    Real /* time */) override
+  {
+    Parameters params;
+    switch (i) {
+    case 0:
+      return cubic_test(p, params, "", "");
+    case 1:
+      return new_linear_test(p, params, "", "");
+    case 2:
+      return disc_thirds_test(p, params, "", "");
+    default:
+      libmesh_error();
+    }
+    return 0;
+  }
+
+
+};
 
 
 class SystemsTest : public CppUnit::TestCase {
@@ -403,6 +477,8 @@ public:
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("u", THIRD, HIERARCHIC);
+    sys.add_variable("v", FIRST, LAGRANGE);
+    sys.add_variable("w", CONSTANT, MONOMIAL);
 
     MeshTools::Generation::build_line (mesh,
                                        3,
@@ -410,13 +486,20 @@ public:
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, nullptr, es.parameters);
+    TripleFunction tfunc;
+    sys.project_solution(&tfunc);
 
     for (Real x = 0.1; x < 1; x += 0.2)
       {
         Point p(x);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
                                      libmesh_real(cubic_test(p,es.parameters,"","")),
+                                     TOLERANCE*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                     libmesh_real(new_linear_test(p,es.parameters,"","")),
+                                     TOLERANCE*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                     libmesh_real(disc_thirds_test(p,es.parameters,"","")),
                                      TOLERANCE*TOLERANCE);
       }
   }
@@ -428,6 +511,8 @@ public:
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("u", THIRD, HIERARCHIC);
+    sys.add_variable("v", FIRST, LAGRANGE);
+    sys.add_variable("w", CONSTANT, MONOMIAL);
 
     MeshTools::Generation::build_square (mesh,
                                          3, 3,
@@ -435,7 +520,8 @@ public:
                                          elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, nullptr, es.parameters);
+    TripleFunction tfunc;
+    sys.project_solution(&tfunc);
 
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
@@ -443,6 +529,12 @@ public:
           Point p(x,y);
           CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
                                        libmesh_real(cubic_test(p,es.parameters,"","")),
+                                       TOLERANCE*TOLERANCE);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                       libmesh_real(new_linear_test(p,es.parameters,"","")),
+                                       TOLERANCE*TOLERANCE);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                       libmesh_real(disc_thirds_test(p,es.parameters,"","")),
                                        TOLERANCE*TOLERANCE);
         }
   }
@@ -454,6 +546,8 @@ public:
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("u", THIRD, HIERARCHIC);
+    sys.add_variable("v", FIRST, LAGRANGE);
+    sys.add_variable("w", CONSTANT, MONOMIAL);
 
     MeshTools::Generation::build_cube (mesh,
                                        3, 3, 3,
@@ -461,7 +555,8 @@ public:
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, nullptr, es.parameters);
+    TripleFunction tfunc;
+    sys.project_solution(&tfunc);
 
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
@@ -470,6 +565,12 @@ public:
             Point p(x,y,z);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
                                          libmesh_real(cubic_test(p,es.parameters,"","")),
+                                         TOLERANCE*TOLERANCE);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                         libmesh_real(new_linear_test(p,es.parameters,"","")),
+                                         TOLERANCE*TOLERANCE);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                         libmesh_real(disc_thirds_test(p,es.parameters,"","")),
                                          TOLERANCE*TOLERANCE);
           }
   }
