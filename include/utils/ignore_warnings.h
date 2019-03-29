@@ -82,6 +82,9 @@
 #if (__GNUC__ > 6)
 #pragma GCC diagnostic ignored "-Wint-in-bool-context"
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#if (__GNUC__ > 7)
+#pragma GCC diagnostic ignored "-Wparentheses"
+#endif // GCC > 7
 #endif // GCC > 6
 #endif // GCC > 5
 #endif // GCC > 4.5
