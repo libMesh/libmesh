@@ -100,6 +100,11 @@ namespace libMesh
               ierr = DMShellSetCreateRestriction(*subdm, dm->ops->createrestriction);
               LIBMESH_CHKERR(ierr);
             }
+          if (dm->ops->createsubdm)
+            {
+              ierr = DMShellSetCreateSubDM(*subdm, dm->ops->createsubdm);
+              LIBMESH_CHKERR(ierr);
+            }
           ierr = DMShellGetContext(dm, &ctx);
           LIBMESH_CHKERR(ierr);
           if (ctx)
