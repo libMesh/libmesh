@@ -561,12 +561,6 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
    }
    // loop over NEIGHBOURS OF INFINITE ELEMENTS
    sd=2; {
-      // Build a Finite Element object of the specified type.  Since the
-      // \p FEBase::build() member dynamically creates memory we will
-      // store the object as an \p UniquePtr<FEBase>.  This can be thought
-      // of as a pointer that will clean up after itself.
-      UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
-
       QGauss qrule2 (dim-1, fe_type.default_quadrature_order());
       UniquePtr<FEBase> face_fe (FEBase::build(dim, fe_type));
       face_fe->attach_quadrature_rule (&qrule2);
