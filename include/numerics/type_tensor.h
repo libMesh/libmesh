@@ -1407,6 +1407,20 @@ bool TypeTensor<T>::operator == (const TypeTensor<T> & rhs) const
 
 }
 
+template <typename T, typename T2>
+inline
+TypeTensor<typename CompareTypes<T, T2>::supertype>
+outer_product(const TypeVector<T> & a, const TypeVector<T2> & b)
+{
+  TypeTensor<typename CompareTypes<T, T2>::supertype> ret;
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
+      ret(i,j) = a(i) * libmesh_conj(b(j));
+
+  return ret;
+}
+
+
 } // namespace libMesh
 
 #endif // LIBMESH_TYPE_TENSOR_H

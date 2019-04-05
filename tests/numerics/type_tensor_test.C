@@ -60,7 +60,7 @@ private:
 
     for (unsigned i=0; i<3; ++i)
       for (unsigned j=0; j<3; ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(inverse(i,j), true_inverse(i,j), 1.e-12);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(inverse(i,j), true_inverse(i,j), TOLERANCE * TOLERANCE);
   }
 
   void testLeftMultiply()
@@ -73,6 +73,23 @@ private:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(left_mult(1), 34, 1e-12);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(right_mult(0), 17, 1e-12);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(right_mult(1), 39, 1e-12);
+  }
+
+  void testOuterProduct()
+  {
+    auto tol = TOLERANCE * TOLERANCE;
+    VectorValue<Real> a(2, 3, 4);
+    VectorValue<Real> b(5, 6, 7);
+    auto product = outer_product(a, b);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(0, 0), 10, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(0, 1), 12, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(0, 2), 14, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(1, 0), 15, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(1, 1), 18, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(1, 2), 21, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(2, 0), 20, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(2, 1), 24, tol);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(product(2, 2), 28, tol);
   }
 
   void testIsZero()
