@@ -55,15 +55,15 @@ protected:
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.2, 0.8, 0.2, 0.7, QUAD9);
 
-    // We'll need to skip repartitioning with DistributedMesh for now;
-    // otherwise the boundary meshes' interior parents might get
+    // We'll need to skip most repartitioning with DistributedMesh for
+    // now; otherwise the boundary meshes' interior parents might get
     // shuffled off to different processors.
     if (!_mesh->is_serial())
       {
-        _mesh->skip_partitioning(true);
-        _left_boundary_mesh->skip_partitioning(true);
-        _all_boundary_mesh->skip_partitioning(true);
-        _internal_boundary_mesh->skip_partitioning(true);
+        _mesh->skip_noncritical_partitioning(true);
+        _left_boundary_mesh->skip_noncritical_partitioning(true);
+        _all_boundary_mesh->skip_noncritical_partitioning(true);
+        _internal_boundary_mesh->skip_noncritical_partitioning(true);
       }
 
     // Set subdomain ids for specific elements. This allows us to later
