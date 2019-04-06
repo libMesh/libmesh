@@ -133,10 +133,6 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
         el->subdomain_id() = old->subdomain_id();
 
-        for (auto s : old->side_index_range())
-          if (old->neighbor_ptr(s) == remote_elem)
-            el->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
-
 #ifdef LIBMESH_ENABLE_AMR
         if (old->has_children())
           for (unsigned int c = 0, nc = old->n_children(); c != nc; ++c)
@@ -180,6 +176,9 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         //Hold onto it
         if (!skip_find_neighbors)
           {
+            for (auto s : old->side_index_range())
+              if (old->neighbor_ptr(s) == remote_elem)
+                el->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
             this->add_elem(el);
           }
         else
@@ -187,15 +186,13 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
             Elem * new_el = this->add_elem(el);
             old_elems_to_new_elems[old] = new_el;
           }
-
-        // Add the link between the original element and this copy to the map
-        if (skip_find_neighbors)
-          old_elems_to_new_elems[old] = el;
       }
 
     // Loop (again) over the elements to fill in the neighbors
     if (skip_find_neighbors)
       {
+        old_elems_to_new_elems[remote_elem] = const_cast<RemoteElem*>(remote_elem);
+
         for (const auto & old_elem : other_mesh.element_ptr_range())
           {
             Elem * new_elem = old_elems_to_new_elems[old_elem];
