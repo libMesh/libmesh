@@ -24,7 +24,10 @@
 
 #include "libmesh/ignore_warnings.h"
 #include <petscsf.h>
+#if PETSC_VERSION_LESS_THAN(3,11,0)
 #include <petsc/private/dmimpl.h>
+#endif
+#include <petscdmshell.h>
 #include "libmesh/restore_warnings.h"
 
 #include "libmesh/petsc_dm_wrapper.h"
@@ -80,33 +83,97 @@ namespace libMesh
           LIBMESH_CHKERR(ierr);
 
           // Now set the function pointers for the subDM
+          // Some DMShellGet* functions only exist with PETSc >= 3.11.1.
+
+          // Set Coarsen function pointer
+#if PETSC_VERSION_LESS_THAN(3,11,0)
           if (dm->ops->coarsen)
             {
               ierr = DMShellSetCoarsen(*subdm, dm->ops->coarsen);
               LIBMESH_CHKERR(ierr);
             }
+#else
+          PetscErrorCode (*coarsen)(DM,MPI_Comm,DM*) = nullptr;
+          ierr = DMShellGetCoarsen(dm, &coarsen);
+          LIBMESH_CHKERR(ierr);
+          if (coarsen)
+            {
+              ierr = DMShellSetCoarsen(*subdm, coarsen);
+              LIBMESH_CHKERR(ierr);
+            }
+#endif
+
+          // Set Refine function pointer
+#if PETSC_VERSION_LESS_THAN(3,11,0)
           if (dm->ops->refine)
             {
               ierr = DMShellSetRefine(*subdm, dm->ops->refine);
               LIBMESH_CHKERR(ierr);
             }
+#else
+          PetscErrorCode (*refine)(DM,MPI_Comm,DM*) = nullptr;
+          ierr = DMShellGetRefine(dm, &refine);
+          if (refine)
+            {
+              ierr = DMShellSetRefine(*subdm, refine);
+              LIBMESH_CHKERR(ierr);
+            }
+#endif
+
+          // Set Interpolation function pointer
+#if PETSC_VERSION_LESS_THAN(3,11,0)
           if (dm->ops->createinterpolation)
             {
               ierr = DMShellSetCreateInterpolation(*subdm, dm->ops->createinterpolation);
               LIBMESH_CHKERR(ierr);
             }
+#else
+          PetscErrorCode (*interp)(DM,DM,Mat*,Vec*) = nullptr;
+          ierr = DMShellGetCreateInterpolation(*subdm, &interp);
+          LIBMESH_CHKERR(ierr);
+          if (interp)
+            {
+              ierr = DMShellSetCreateInterpolation(*subdm, interp);
+              LIBMESH_CHKERR(ierr);
+            }
+#endif
+
+          // Set Restriction function pointer
+#if PETSC_VERSION_LESS_THAN(3,11,0)
           if (dm->ops->createrestriction)
             {
               ierr = DMShellSetCreateRestriction(*subdm, dm->ops->createrestriction);
               LIBMESH_CHKERR(ierr);
             }
+#else
+          PetscErrorCode (*createrestriction)(DM,DM,Mat*) = nullptr;
+          ierr = DMShellGetCreateRestriction(*subdm, &createrestriction);
+          LIBMESH_CHKERR(ierr);
+          if (createrestriction)
+            {
+              ierr = DMShellSetCreateRestriction(*subdm, createrestriction);
+              LIBMESH_CHKERR(ierr);
+            }
+#endif
+
+          // Set CreateSubDM function pointer
+#if PETSC_VERSION_LESS_THAN(3,11,0)
           if (dm->ops->createsubdm)
             {
               ierr = DMShellSetCreateSubDM(*subdm, dm->ops->createsubdm);
               LIBMESH_CHKERR(ierr);
             }
-          ierr = DMShellGetContext(dm, &ctx);
+#else
+          PetscErrorCode (*createsubdm)(DM,PetscInt,const PetscInt[],IS*,DM*) = nullptr;
+          ierr = DMShellGetCreateSubDM(*subdm, &createsubdm);
           LIBMESH_CHKERR(ierr);
+          if (createsubdm)
+            {
+              ierr = DMShellSetCreateSubDM(*subdm, createsubdm);
+              LIBMESH_CHKERR(ierr);
+            }
+#endif
+          // Set Context pointer
           if (ctx)
             {
               ierr = DMShellSetContext(*subdm, ctx);
