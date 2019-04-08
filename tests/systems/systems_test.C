@@ -515,12 +515,8 @@ public:
                                        0., 1.,
                                        elem_type);
 
-    for (unsigned int i=0; i != 6; ++i)
-      {
-        Elem * elem = mesh.query_elem_ptr(i);
-        if (elem)
-          elem->subdomain_id() = i;
-      }
+    for (auto & elem : mesh.element_ptr_range())
+      elem->subdomain_id() = elem->id();
 
     es.init();
     TripleFunction tfunc;
@@ -553,12 +549,8 @@ public:
                                          0., 1., 0., 1.,
                                          elem_type);
 
-    for (unsigned int i=0; i != 9; ++i)
-      {
-        Elem * elem = mesh.query_elem_ptr(i);
-        if (elem)
-          elem->subdomain_id() = i/2;
-      }
+    for (auto & elem : mesh.element_ptr_range())
+      elem->subdomain_id() = elem->id()/2;
 
     es.init();
     TripleFunction tfunc;
@@ -592,12 +584,8 @@ public:
                                        0., 1., 0., 1., 0., 1.,
                                        elem_type);
 
-    for (unsigned int i=0; i != 27; ++i)
-      {
-        Elem * elem = mesh.query_elem_ptr(i);
-        if (elem)
-          elem->subdomain_id() = i/6;
-      }
+    for (auto & elem : mesh.element_ptr_range())
+      elem->subdomain_id() = elem->id()/6;
 
     es.init();
     TripleFunction tfunc;
