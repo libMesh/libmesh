@@ -476,31 +476,51 @@ public:
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
-    sys.add_variable("v", FIRST, LAGRANGE);
-    sys.add_variable("w", CONSTANT, MONOMIAL);
+
+    std::set<subdomain_id_type> u_subdomains {0, 1, 4, 5},
+                                v_subdomains {1, 2, 3, 4},
+                                w_subdomains {0, 1, 2, 3, 4};
+
+    sys.add_variable("u", THIRD,    HIERARCHIC, &u_subdomains);
+    sys.add_variable("v", FIRST,    LAGRANGE,   &v_subdomains);
+    sys.add_variable("w", CONSTANT, MONOMIAL,   &w_subdomains);
 
     MeshTools::Generation::build_line (mesh,
-                                       3,
+                                       6,
                                        0., 1.,
                                        elem_type);
+
+    for (unsigned int i=0; i != 6; ++i)
+      {
+        Elem * elem = mesh.query_elem_ptr(i);
+        if (elem)
+          elem->subdomain_id() = i;
+      }
 
     es.init();
     TripleFunction tfunc;
     sys.project_solution(&tfunc);
 
+    std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
     for (Real x = 0.1; x < 1; x += 0.2)
       {
         Point p(x);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                     libmesh_real(cubic_test(p,es.parameters,"","")),
-                                     TOLERANCE*TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                     libmesh_real(new_linear_test(p,es.parameters,"","")),
-                                     TOLERANCE*TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
-                                     libmesh_real(disc_thirds_test(p,es.parameters,"","")),
-                                     TOLERANCE*TOLERANCE);
+        const Elem * elem = (*locator)(p);
+        subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
+        TestCommWorld->max(sbd_id);
+
+        if (u_subdomains.count(sbd_id))
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                       libmesh_real(cubic_test(p,es.parameters,"","")),
+                                       TOLERANCE*TOLERANCE);
+        if (v_subdomains.count(sbd_id))
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                       libmesh_real(new_linear_test(p,es.parameters,"","")),
+                                       TOLERANCE*TOLERANCE);
+        if (w_subdomains.count(sbd_id))
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                       libmesh_real(disc_thirds_test(p,es.parameters,"","")),
+                                       TOLERANCE*TOLERANCE);
       }
   }
 
@@ -510,32 +530,52 @@ public:
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
-    sys.add_variable("v", FIRST, LAGRANGE);
-    sys.add_variable("w", CONSTANT, MONOMIAL);
+
+    std::set<subdomain_id_type> u_subdomains {0, 1, 4, 5},
+                                v_subdomains {1, 2, 3, 4},
+                                w_subdomains {0, 1, 2, 3, 4};
+
+    sys.add_variable("u", THIRD,    HIERARCHIC, &u_subdomains);
+    sys.add_variable("v", FIRST,    LAGRANGE,   &v_subdomains);
+    sys.add_variable("w", CONSTANT, MONOMIAL,   &w_subdomains);
 
     MeshTools::Generation::build_square (mesh,
                                          3, 3,
                                          0., 1., 0., 1.,
                                          elem_type);
 
+    for (unsigned int i=0; i != 9; ++i)
+      {
+        Elem * elem = mesh.query_elem_ptr(i);
+        if (elem)
+          elem->subdomain_id() = i/2;
+      }
+
     es.init();
     TripleFunction tfunc;
     sys.project_solution(&tfunc);
 
+    std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         {
           Point p(x,y);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                       libmesh_real(cubic_test(p,es.parameters,"","")),
-                                       TOLERANCE*TOLERANCE);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                       libmesh_real(new_linear_test(p,es.parameters,"","")),
-                                       TOLERANCE*TOLERANCE);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
-                                       libmesh_real(disc_thirds_test(p,es.parameters,"","")),
-                                       TOLERANCE*TOLERANCE);
+          const Elem * elem = (*locator)(p);
+          subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
+          TestCommWorld->max(sbd_id);
+
+          if (u_subdomains.count(sbd_id))
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                         libmesh_real(cubic_test(p,es.parameters,"","")),
+                                         TOLERANCE*TOLERANCE);
+          if (v_subdomains.count(sbd_id))
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                         libmesh_real(new_linear_test(p,es.parameters,"","")),
+                                         TOLERANCE*TOLERANCE);
+          if (w_subdomains.count(sbd_id))
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                         libmesh_real(disc_thirds_test(p,es.parameters,"","")),
+                                         TOLERANCE*TOLERANCE);
         }
   }
 
@@ -545,33 +585,54 @@ public:
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
-    sys.add_variable("v", FIRST, LAGRANGE);
-    sys.add_variable("w", CONSTANT, MONOMIAL);
+
+    std::set<subdomain_id_type> u_subdomains {0, 1, 4, 5},
+                                v_subdomains {1, 2, 3, 4},
+                                w_subdomains {0, 1, 2, 3, 4};
+
+    sys.add_variable("u", THIRD,    HIERARCHIC, &u_subdomains);
+    sys.add_variable("v", FIRST,    LAGRANGE,   &v_subdomains);
+    sys.add_variable("w", CONSTANT, MONOMIAL,   &w_subdomains);
 
     MeshTools::Generation::build_cube (mesh,
                                        3, 3, 3,
                                        0., 1., 0., 1., 0., 1.,
                                        elem_type);
 
+    for (unsigned int i=0; i != 27; ++i)
+      {
+        Elem * elem = mesh.query_elem_ptr(i);
+        if (elem)
+          elem->subdomain_id() = i/6;
+      }
+
     es.init();
     TripleFunction tfunc;
     sys.project_solution(&tfunc);
 
+    std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         for (Real z = 0.1; z < 1; z += 0.2)
           {
             Point p(x,y,z);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                         libmesh_real(cubic_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                         libmesh_real(new_linear_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
-                                         libmesh_real(disc_thirds_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
+            const Elem * elem = (*locator)(p);
+            subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
+            TestCommWorld->max(sbd_id);
+
+            if (u_subdomains.count(sbd_id))
+              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                           libmesh_real(cubic_test(p,es.parameters,"","")),
+                                           TOLERANCE*TOLERANCE);
+
+            if (v_subdomains.count(sbd_id))
+              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                           libmesh_real(new_linear_test(p,es.parameters,"","")),
+                                           TOLERANCE*TOLERANCE);
+            if (w_subdomains.count(sbd_id))
+              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                           libmesh_real(disc_thirds_test(p,es.parameters,"","")),
+                                           TOLERANCE*TOLERANCE);
           }
   }
 
