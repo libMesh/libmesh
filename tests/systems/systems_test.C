@@ -462,6 +462,31 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 private:
+  void tripleValueTest (const Point & p,
+                        const System & sys,
+                        const PointLocatorBase & locator,
+                        std::set<subdomain_id_type> & u_subdomains,
+                        std::set<subdomain_id_type> & v_subdomains,
+                        std::set<subdomain_id_type> & w_subdomains,
+                        const Parameters & param)
+  {
+    const Elem * elem = locator(p);
+    subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
+    TestCommWorld->max(sbd_id);
+
+    if (u_subdomains.count(sbd_id))
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                   libmesh_real(cubic_test(p,param,"","")),
+                                   TOLERANCE*TOLERANCE);
+    if (v_subdomains.count(sbd_id))
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                   libmesh_real(new_linear_test(p,param,"","")),
+                                   TOLERANCE*TOLERANCE);
+    if (w_subdomains.count(sbd_id))
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                   libmesh_real(disc_thirds_test(p,param,"","")),
+                                   TOLERANCE*TOLERANCE);
+  }
 
 public:
   void setUp()
@@ -503,25 +528,9 @@ public:
 
     std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
     for (Real x = 0.1; x < 1; x += 0.2)
-      {
-        Point p(x);
-        const Elem * elem = (*locator)(p);
-        subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
-        TestCommWorld->max(sbd_id);
-
-        if (u_subdomains.count(sbd_id))
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                       libmesh_real(cubic_test(p,es.parameters,"","")),
-                                       TOLERANCE*TOLERANCE);
-        if (v_subdomains.count(sbd_id))
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                       libmesh_real(new_linear_test(p,es.parameters,"","")),
-                                       TOLERANCE*TOLERANCE);
-        if (w_subdomains.count(sbd_id))
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
-                                       libmesh_real(disc_thirds_test(p,es.parameters,"","")),
-                                       TOLERANCE*TOLERANCE);
-      }
+      tripleValueTest(Point(x), sys, *locator,
+                      u_subdomains, v_subdomains, w_subdomains,
+                      es.parameters);
   }
 
   void testProjectSquare(const ElemType elem_type)
@@ -558,25 +567,9 @@ public:
     std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
-        {
-          Point p(x,y);
-          const Elem * elem = (*locator)(p);
-          subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
-          TestCommWorld->max(sbd_id);
-
-          if (u_subdomains.count(sbd_id))
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                         libmesh_real(cubic_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
-          if (v_subdomains.count(sbd_id))
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                         libmesh_real(new_linear_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
-          if (w_subdomains.count(sbd_id))
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
-                                         libmesh_real(disc_thirds_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
-        }
+        tripleValueTest(Point(x,y), sys, *locator,
+                        u_subdomains, v_subdomains, w_subdomains,
+                        es.parameters);
   }
 
   void testProjectCube(const ElemType elem_type)
@@ -614,26 +607,9 @@ public:
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         for (Real z = 0.1; z < 1; z += 0.2)
-          {
-            Point p(x,y,z);
-            const Elem * elem = (*locator)(p);
-            subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
-            TestCommWorld->max(sbd_id);
-
-            if (u_subdomains.count(sbd_id))
-              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                           libmesh_real(cubic_test(p,es.parameters,"","")),
-                                           TOLERANCE*TOLERANCE);
-
-            if (v_subdomains.count(sbd_id))
-              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                           libmesh_real(new_linear_test(p,es.parameters,"","")),
-                                           TOLERANCE*TOLERANCE);
-            if (w_subdomains.count(sbd_id))
-              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
-                                           libmesh_real(disc_thirds_test(p,es.parameters,"","")),
-                                           TOLERANCE*TOLERANCE);
-          }
+          tripleValueTest(Point(x,y,z), sys, *locator,
+                          u_subdomains, v_subdomains, w_subdomains,
+                          es.parameters);
   }
 
   void testProjectCubeWithMeshFunction(const ElemType elem_type)
