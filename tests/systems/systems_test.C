@@ -527,6 +527,19 @@ public:
       tripleValueTest(Point(x), sys, *locator,
                       u_subdomains, v_subdomains, w_subdomains,
                       es.parameters);
+
+#ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+      if ((elem->id()/2)%2)
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+
+    locator = mesh.sub_point_locator();
+    for (Real x = 0.1; x < 1; x += 0.2)
+      tripleValueTest(Point(x), sys, *locator,
+                      u_subdomains, v_subdomains, w_subdomains,
+                      es.parameters);
+#endif
   }
 
   void testProjectSquare(const ElemType elem_type)
@@ -562,6 +575,20 @@ public:
         tripleValueTest(Point(x,y), sys, *locator,
                         u_subdomains, v_subdomains, w_subdomains,
                         es.parameters);
+
+#ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+      if ((elem->id()/2)%2)
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+
+    locator = mesh.sub_point_locator();
+    for (Real x = 0.1; x < 1; x += 0.2)
+      for (Real y = 0.1; y < 1; y += 0.2)
+        tripleValueTest(Point(x,y), sys, *locator,
+                        u_subdomains, v_subdomains, w_subdomains,
+                        es.parameters);
+#endif
   }
 
   void testProjectCube(const ElemType elem_type)
@@ -598,6 +625,21 @@ public:
           tripleValueTest(Point(x,y,z), sys, *locator,
                           u_subdomains, v_subdomains, w_subdomains,
                           es.parameters);
+
+  #ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+      if ((elem->id()/2)%2)
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+
+    locator = mesh.sub_point_locator();
+    for (Real x = 0.1; x < 1; x += 0.2)
+      for (Real y = 0.1; y < 1; y += 0.2)
+        for (Real z = 0.1; z < 1; z += 0.2)
+          tripleValueTest(Point(x,y,z), sys, *locator,
+                          u_subdomains, v_subdomains, w_subdomains,
+                          es.parameters);
+  #endif
   }
 
   void testProjectCubeWithMeshFunction(const ElemType elem_type)
