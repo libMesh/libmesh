@@ -1503,6 +1503,13 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
             cast_int<unsigned int>(my_side_dofs.size());
           libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
+#ifndef NDEBUG
+          for (auto i : my_side_dofs)
+            libmesh_assert_less(i, my_dof_indices.size());
+          for (auto i : neigh_side_dofs)
+            libmesh_assert_less(i, neigh_dof_indices.size());
+#endif
+
           Ke.resize (n_side_dofs, n_side_dofs);
           Ue.resize(n_side_dofs);
 
