@@ -183,7 +183,6 @@ bool EquationSystems::reinit_solutions ()
 
 #ifdef LIBMESH_ENABLE_AMR
 
-  bool dof_constraints_created = false;
   bool mesh_changed = false;
 
   // FIXME: For backwards compatibility, assume
@@ -211,7 +210,6 @@ bool EquationSystems::reinit_solutions ()
         sys.prolong_vectors();
       }
     mesh_changed = true;
-    dof_constraints_created = true;
   }
 
   if (this->_refine_in_reinit)
@@ -229,15 +227,11 @@ bool EquationSystems::reinit_solutions ()
           for (unsigned int i=0; i != this->n_systems(); ++i)
             {
               System & sys = this->get_system(i);
-              if (!dof_constraints_created)
-                {
-                  sys.get_dof_map().distribute_dofs(_mesh);
-                  sys.reinit_constraints();
-                }
+              sys.get_dof_map().distribute_dofs(_mesh);
+              sys.reinit_constraints();
               sys.restrict_vectors();
             }
           mesh_changed = true;
-          dof_constraints_created = true;
         }
 
       // Once vectors are all restricted, we can delete
@@ -252,15 +246,11 @@ bool EquationSystems::reinit_solutions ()
           for (unsigned int i=0; i != this->n_systems(); ++i)
             {
               System & sys = this->get_system(i);
-              if (!dof_constraints_created)
-                {
-                  sys.get_dof_map().distribute_dofs(_mesh);
-                  sys.reinit_constraints();
-                }
+              sys.get_dof_map().distribute_dofs(_mesh);
+              sys.reinit_constraints();
               sys.prolong_vectors();
             }
           mesh_changed = true;
-          // dof_constraints_created = true;
         }
     }
 
