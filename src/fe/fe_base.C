@@ -1380,7 +1380,8 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   if (!elem->active())
     return;
 
-  const FEType & base_fe_type = dof_map.variable_type(variable_number);
+  const Variable & var = dof_map.variable(variable_number);
+  const FEType & base_fe_type = var.type();
 
   // Construct FE objects for this element and its neighbors.
   std::unique_ptr<FEGenericBase<OutputShape>> my_fe
@@ -1436,6 +1437,9 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
       const Elem * neigh = elem->neighbor_ptr(s);
 
       if (!neigh)
+        continue;
+
+      if (!var.active_on_subdomain(neigh->subdomain_id()))
         continue;
 
       // h refinement constraints:
