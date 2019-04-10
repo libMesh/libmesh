@@ -1380,7 +1380,8 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   if (!elem->active())
     return;
 
-  const FEType & base_fe_type = dof_map.variable_type(variable_number);
+  const Variable & var = dof_map.variable(variable_number);
+  const FEType & base_fe_type = var.type();
 
   // Construct FE objects for this element and its neighbors.
   std::unique_ptr<FEGenericBase<OutputShape>> my_fe
@@ -1431,212 +1432,224 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (auto s : elem->side_index_range())
-    if (elem->neighbor_ptr(s) != nullptr)
-      {
-        // Get pointers to the element's neighbor.
-        const Elem * neigh = elem->neighbor_ptr(s);
+    {
+      // Get pointers to the element's neighbor.
+      const Elem * neigh = elem->neighbor_ptr(s);
 
-        // h refinement constraints:
-        // constrain dofs shared between
-        // this element and ones coarser
-        // than this element.
-        if (neigh->level() < elem->level())
-          {
-            unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
-            libmesh_assert_less (s_neigh, neigh->n_neighbors());
+      if (!neigh)
+        continue;
 
-            // Find the minimum p level; we build the h constraint
-            // matrix with this and then constrain away all higher p
-            // DoFs.
-            libmesh_assert(neigh->active());
-            const unsigned int min_p_level =
-              std::min(elem->p_level(), neigh->p_level());
+      if (!var.active_on_subdomain(neigh->subdomain_id()))
+        continue;
 
-            // we may need to make the FE objects reinit with the
-            // minimum shared p_level
-            const unsigned int old_elem_level = elem->p_level();
-            if (elem->p_level() != min_p_level)
-              my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() - old_elem_level + min_p_level);
-            const unsigned int old_neigh_level = neigh->p_level();
-            if (old_neigh_level != min_p_level)
-              neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() - old_neigh_level + min_p_level);
+      // h refinement constraints:
+      // constrain dofs shared between
+      // this element and ones coarser
+      // than this element.
+      if (neigh->level() < elem->level())
+        {
+          unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
+          libmesh_assert_less (s_neigh, neigh->n_neighbors());
 
-            my_fe->reinit(elem, s);
+          // Find the minimum p level; we build the h constraint
+          // matrix with this and then constrain away all higher p
+          // DoFs.
+          libmesh_assert(neigh->active());
+          const unsigned int min_p_level =
+            std::min(elem->p_level(), neigh->p_level());
 
-            // This function gets called element-by-element, so there
-            // will be a lot of memory allocation going on.  We can
-            // at least minimize this for the case of the dof indices
-            // by efficiently preallocating the requisite storage.
-            // n_nodes is not necessarily n_dofs, but it is better
-            // than nothing!
-            my_dof_indices.reserve    (elem->n_nodes());
-            neigh_dof_indices.reserve (neigh->n_nodes());
+          // we may need to make the FE objects reinit with the
+          // minimum shared p_level
+          const unsigned int old_elem_level = elem->p_level();
+          if (elem->p_level() != min_p_level)
+            my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() - old_elem_level + min_p_level);
+          const unsigned int old_neigh_level = neigh->p_level();
+          if (old_neigh_level != min_p_level)
+            neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() - old_neigh_level + min_p_level);
 
-            dof_map.dof_indices (elem, my_dof_indices,
-                                 variable_number,
-                                 min_p_level);
-            dof_map.dof_indices (neigh, neigh_dof_indices,
-                                 variable_number,
-                                 min_p_level);
+          my_fe->reinit(elem, s);
 
-            const unsigned int n_qp = my_qface.n_points();
+          // This function gets called element-by-element, so there
+          // will be a lot of memory allocation going on.  We can
+          // at least minimize this for the case of the dof indices
+          // by efficiently preallocating the requisite storage.
+          // n_nodes is not necessarily n_dofs, but it is better
+          // than nothing!
+          my_dof_indices.reserve    (elem->n_nodes());
+          neigh_dof_indices.reserve (neigh->n_nodes());
 
-            FEInterface::inverse_map (Dim, base_fe_type, neigh,
-                                      q_point, neigh_qface);
+          dof_map.dof_indices (elem, my_dof_indices,
+                               variable_number,
+                               min_p_level);
+          dof_map.dof_indices (neigh, neigh_dof_indices,
+                               variable_number,
+                               min_p_level);
 
-            neigh_fe->reinit(neigh, &neigh_qface);
+          const unsigned int n_qp = my_qface.n_points();
 
-            // We're only concerned with DOFs whose values (and/or first
-            // derivatives for C1 elements) are supported on side nodes
-            FEType elem_fe_type = base_fe_type;
-            if (old_elem_level != min_p_level)
-              elem_fe_type.order = base_fe_type.order.get_order() - old_elem_level + min_p_level;
-            FEType neigh_fe_type = base_fe_type;
-            if (old_neigh_level != min_p_level)
-              neigh_fe_type.order = base_fe_type.order.get_order() - old_neigh_level + min_p_level;
-            FEInterface::dofs_on_side(elem,  Dim, elem_fe_type,  s,       my_side_dofs);
-            FEInterface::dofs_on_side(neigh, Dim, neigh_fe_type, s_neigh, neigh_side_dofs);
+          FEInterface::inverse_map (Dim, base_fe_type, neigh,
+                                    q_point, neigh_qface);
 
-            const unsigned int n_side_dofs =
-              cast_int<unsigned int>(my_side_dofs.size());
-            libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
+          neigh_fe->reinit(neigh, &neigh_qface);
 
-            Ke.resize (n_side_dofs, n_side_dofs);
-            Ue.resize(n_side_dofs);
+          // We're only concerned with DOFs whose values (and/or first
+          // derivatives for C1 elements) are supported on side nodes
+          FEType elem_fe_type = base_fe_type;
+          if (old_elem_level != min_p_level)
+            elem_fe_type.order = base_fe_type.order.get_order() - old_elem_level + min_p_level;
+          FEType neigh_fe_type = base_fe_type;
+          if (old_neigh_level != min_p_level)
+            neigh_fe_type.order = base_fe_type.order.get_order() - old_neigh_level + min_p_level;
+          FEInterface::dofs_on_side(elem,  Dim, elem_fe_type,  s,       my_side_dofs);
+          FEInterface::dofs_on_side(neigh, Dim, neigh_fe_type, s_neigh, neigh_side_dofs);
 
-            // Form the projection matrix, (inner product of fine basis
-            // functions against fine test functions)
-            for (unsigned int is = 0; is != n_side_dofs; ++is)
-              {
-                const unsigned int i = my_side_dofs[is];
-                for (unsigned int js = 0; js != n_side_dofs; ++js)
-                  {
-                    const unsigned int j = my_side_dofs[js];
-                    for (unsigned int qp = 0; qp != n_qp; ++qp)
-                      {
-                        Ke(is,js) += JxW[qp] * TensorTools::inner_product(phi[i][qp], phi[j][qp]);
-                        if (cont != C_ZERO)
-                          Ke(is,js) += JxW[qp] *
-                            TensorTools::inner_product((*dphi)[i][qp] *
-                                                       (*face_normals)[qp],
-                                                       (*dphi)[j][qp] *
-                                                       (*face_normals)[qp]);
-                      }
-                  }
-              }
+          const unsigned int n_side_dofs =
+            cast_int<unsigned int>(my_side_dofs.size());
+          libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
-            // Form the right hand sides, (inner product of coarse basis
-            // functions against fine test functions)
-            for (unsigned int is = 0; is != n_side_dofs; ++is)
-              {
-                const unsigned int i = neigh_side_dofs[is];
-                Fe.resize (n_side_dofs);
-                for (unsigned int js = 0; js != n_side_dofs; ++js)
-                  {
-                    const unsigned int j = my_side_dofs[js];
-                    for (unsigned int qp = 0; qp != n_qp; ++qp)
-                      {
-                        Fe(js) += JxW[qp] *
-                          TensorTools::inner_product(neigh_phi[i][qp],
-                                                     phi[j][qp]);
-                        if (cont != C_ZERO)
-                          Fe(js) += JxW[qp] *
-                            TensorTools::inner_product((*neigh_dphi)[i][qp] *
-                                                       (*face_normals)[qp],
-                                                       (*dphi)[j][qp] *
-                                                       (*face_normals)[qp]);
-                      }
-                  }
-                Ke.cholesky_solve(Fe, Ue[is]);
-              }
-
-            for (unsigned int js = 0; js != n_side_dofs; ++js)
-              {
-                const unsigned int j = my_side_dofs[js];
-                const dof_id_type my_dof_g = my_dof_indices[j];
-                libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
-
-                // Hunt for "constraining against myself" cases before
-                // we bother creating a constraint row
-                bool self_constraint = false;
-                for (unsigned int is = 0; is != n_side_dofs; ++is)
-                  {
-                    const unsigned int i = neigh_side_dofs[is];
-                    const dof_id_type their_dof_g = neigh_dof_indices[i];
-                    libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
-
-                    if (their_dof_g == my_dof_g)
-                      {
 #ifndef NDEBUG
-                        const Real their_dof_value = Ue[is](js);
-                        libmesh_assert_less (std::abs(their_dof_value-1.),
-                                             10*TOLERANCE);
-
-                        for (unsigned int k = 0; k != n_side_dofs; ++k)
-                          libmesh_assert(k == is ||
-                                         std::abs(Ue[k](js)) <
-                                         10*TOLERANCE);
+          for (auto i : my_side_dofs)
+            libmesh_assert_less(i, my_dof_indices.size());
+          for (auto i : neigh_side_dofs)
+            libmesh_assert_less(i, neigh_dof_indices.size());
 #endif
 
-                        self_constraint = true;
-                        break;
-                      }
-                  }
+          Ke.resize (n_side_dofs, n_side_dofs);
+          Ue.resize(n_side_dofs);
 
-                if (self_constraint)
-                  continue;
-
-                DofConstraintRow * constraint_row;
-
-                // we may be running constraint methods concurrently
-                // on multiple threads, so we need a lock to
-                // ensure that this constraint is "ours"
+          // Form the projection matrix, (inner product of fine basis
+          // functions against fine test functions)
+          for (unsigned int is = 0; is != n_side_dofs; ++is)
+            {
+              const unsigned int i = my_side_dofs[is];
+              for (unsigned int js = 0; js != n_side_dofs; ++js)
                 {
-                  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                  const unsigned int j = my_side_dofs[js];
+                  for (unsigned int qp = 0; qp != n_qp; ++qp)
+                    {
+                      Ke(is,js) += JxW[qp] * TensorTools::inner_product(phi[i][qp], phi[j][qp]);
+                      if (cont != C_ZERO)
+                        Ke(is,js) += JxW[qp] *
+                          TensorTools::inner_product((*dphi)[i][qp] *
+                                                     (*face_normals)[qp],
+                                                     (*dphi)[j][qp] *
+                                                     (*face_normals)[qp]);
+                    }
+                }
+            }
 
-                  if (dof_map.is_constrained_dof(my_dof_g))
-                    continue;
+          // Form the right hand sides, (inner product of coarse basis
+          // functions against fine test functions)
+          for (unsigned int is = 0; is != n_side_dofs; ++is)
+            {
+              const unsigned int i = neigh_side_dofs[is];
+              Fe.resize (n_side_dofs);
+              for (unsigned int js = 0; js != n_side_dofs; ++js)
+                {
+                  const unsigned int j = my_side_dofs[js];
+                  for (unsigned int qp = 0; qp != n_qp; ++qp)
+                    {
+                      Fe(js) += JxW[qp] *
+                        TensorTools::inner_product(neigh_phi[i][qp],
+                                                   phi[j][qp]);
+                      if (cont != C_ZERO)
+                        Fe(js) += JxW[qp] *
+                          TensorTools::inner_product((*neigh_dphi)[i][qp] *
+                                                     (*face_normals)[qp],
+                                                     (*dphi)[j][qp] *
+                                                     (*face_normals)[qp]);
+                    }
+                }
+              Ke.cholesky_solve(Fe, Ue[is]);
+            }
 
-                  constraint_row = &(constraints[my_dof_g]);
-                  libmesh_assert(constraint_row->empty());
+          for (unsigned int js = 0; js != n_side_dofs; ++js)
+            {
+              const unsigned int j = my_side_dofs[js];
+              const dof_id_type my_dof_g = my_dof_indices[j];
+              libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
+
+              // Hunt for "constraining against myself" cases before
+              // we bother creating a constraint row
+              bool self_constraint = false;
+              for (unsigned int is = 0; is != n_side_dofs; ++is)
+                {
+                  const unsigned int i = neigh_side_dofs[is];
+                  const dof_id_type their_dof_g = neigh_dof_indices[i];
+                  libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
+
+                  if (their_dof_g == my_dof_g)
+                    {
+#ifndef NDEBUG
+                      const Real their_dof_value = Ue[is](js);
+                      libmesh_assert_less (std::abs(their_dof_value-1.),
+                                           10*TOLERANCE);
+
+                      for (unsigned int k = 0; k != n_side_dofs; ++k)
+                        libmesh_assert(k == is ||
+                                       std::abs(Ue[k](js)) <
+                                       10*TOLERANCE);
+#endif
+
+                      self_constraint = true;
+                      break;
+                    }
                 }
 
-                for (unsigned int is = 0; is != n_side_dofs; ++is)
-                  {
-                    const unsigned int i = neigh_side_dofs[is];
-                    const dof_id_type their_dof_g = neigh_dof_indices[i];
-                    libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
-                    libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
+              if (self_constraint)
+                continue;
 
-                    const Real their_dof_value = Ue[is](js);
+              DofConstraintRow * constraint_row;
 
-                    if (std::abs(their_dof_value) < 10*TOLERANCE)
-                      continue;
+              // we may be running constraint methods concurrently
+              // on multiple threads, so we need a lock to
+              // ensure that this constraint is "ours"
+              {
+                Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-                    constraint_row->insert(std::make_pair(their_dof_g,
-                                                          their_dof_value));
-                  }
+                if (dof_map.is_constrained_dof(my_dof_g))
+                  continue;
+
+                constraint_row = &(constraints[my_dof_g]);
+                libmesh_assert(constraint_row->empty());
               }
 
-            my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() + old_elem_level - min_p_level);
-            neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() + old_neigh_level - min_p_level);
-          }
+              for (unsigned int is = 0; is != n_side_dofs; ++is)
+                {
+                  const unsigned int i = neigh_side_dofs[is];
+                  const dof_id_type their_dof_g = neigh_dof_indices[i];
+                  libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
+                  libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
 
-        // p refinement constraints:
-        // constrain dofs shared between
-        // active elements and neighbors with
-        // lower polynomial degrees
-        const unsigned int min_p_level =
-          neigh->min_p_level_by_neighbor(elem, elem->p_level());
-        if (min_p_level < elem->p_level())
-          {
-            // Adaptive p refinement of non-hierarchic bases will
-            // require more coding
-            libmesh_assert(my_fe->is_hierarchic());
-            dof_map.constrain_p_dofs(variable_number, elem,
-                                     s, min_p_level);
-          }
-      }
+                  const Real their_dof_value = Ue[is](js);
+
+                  if (std::abs(their_dof_value) < 10*TOLERANCE)
+                    continue;
+
+                  constraint_row->insert(std::make_pair(their_dof_g,
+                                                        their_dof_value));
+                }
+            }
+
+          my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() + old_elem_level - min_p_level);
+          neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() + old_neigh_level - min_p_level);
+        }
+
+      // p refinement constraints:
+      // constrain dofs shared between
+      // active elements and neighbors with
+      // lower polynomial degrees
+      const unsigned int min_p_level =
+        neigh->min_p_level_by_neighbor(elem, elem->p_level());
+      if (min_p_level < elem->p_level())
+        {
+          // Adaptive p refinement of non-hierarchic bases will
+          // require more coding
+          libmesh_assert(my_fe->is_hierarchic());
+          dof_map.constrain_p_dofs(variable_number, elem,
+                                   s, min_p_level);
+        }
+    }
 }
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

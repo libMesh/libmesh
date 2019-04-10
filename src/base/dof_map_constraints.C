@@ -1360,6 +1360,12 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
     if (this->is_constrained_dof(dof_number))
       libmesh_error_msg("ERROR: DOF " << dof_number << " was already constrained!");
 
+  libmesh_assert_less(dof_number, this->n_dofs());
+#ifndef NDEBUG
+  for (const auto & pr : constraint_row)
+    libmesh_assert_less(pr.first, this->n_dofs());
+#endif
+
   // We don't get insert_or_assign until C++17 so we make do.
   std::pair<DofConstraints::iterator, bool> it =
     _dof_constraints.insert(std::make_pair(dof_number, constraint_row));
@@ -2956,7 +2962,10 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
               {
                 DofConstraintRow & row = _dof_constraints[constrained];
                 for (auto & kv : pushed_keys_vals_to_me[i])
-                  row[kv.first] = kv.second;
+                  {
+                    libmesh_assert_less(kv.first, this->n_dofs());
+                    row[kv.first] = kv.second;
+                  }
 
                 const Number primal_rhs = pushed_rhss_to_me[i][max_qoi_num];
 
@@ -3684,6 +3693,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
                   DofConstraintRow & row = _dof_constraints[constrained];
                   for (auto & key_val : keys_vals[i])
                     {
+                      libmesh_assert_less(key_val.first, this->n_dofs());
                       row[key_val.first] = key_val.second;
                     }
                   if (ids_rhss[i].second != Number(0))
@@ -4180,7 +4190,10 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                   DofConstraintRow & row = _dof_constraints[constrained];
                   row.clear();
                   for (auto & pair : data[i])
-                    row[pair.first] = pair.second;
+                    {
+                      libmesh_assert_less(pair.first, this->n_dofs());
+                      row[pair.first] = pair.second;
+                    }
 
                   // And prepare to check for more recursive constraints
                   unexpanded_dofs.insert(constrained);
