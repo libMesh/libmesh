@@ -423,6 +423,7 @@ public:
                        unsigned int i,
                        unsigned int /*elem_dim*/,
                        const Node & n,
+                       bool /*extra_hanging_dofs*/,
                        const Real time)
   { return _f->component(c, i, n, time); }
 
@@ -671,6 +672,7 @@ public:
                        unsigned int i,
                        unsigned int elem_dim,
                        const Node & n,
+                       bool /* extra_hanging_dofs */,
                        Real /* time */ =0.);
 
   Output eval_at_point(const FEMContext & c,
@@ -819,9 +821,14 @@ eval_at_node(const FEMContext & c,
              unsigned int i,
              unsigned int /* elem_dim */,
              const Node & n,
+             bool extra_hanging_dofs,
              Real /* time */)
 {
   LOG_SCOPE ("Number eval_at_node()", "OldSolutionValue");
+
+  // This should only be called on vertices
+  libmesh_assert_less(c.get_elem().get_node_index(&n),
+                      c.get_elem().n_vertices());
 
   // Handle offset from non-scalar components in previous variables
   libmesh_assert_less(i, this->component_to_var.size());
@@ -833,8 +840,16 @@ eval_at_node(const FEMContext & c,
   // Be sure to handle cases where the variable wasn't defined on
   // this node (due to changing subdomain support) or where the
   // variable has no components on this node (due to Elem order
-  // exceeding FE order)
+  // exceeding FE order) or where the old_dof_object dofs might
+  // correspond to non-vertex dofs (due to extra_hanging_dofs and
+  // refinement)
+
+  const Elem::RefinementState flag = c.get_elem().refinement_flag();
+
   if (n.old_dof_object &&
+      (!extra_hanging_dofs ||
+       flag == Elem::JUST_COARSENED ||
+       flag == Elem::DO_NOTHING) &&
       n.old_dof_object->n_vars(sys.number()) &&
       n.old_dof_object->n_comp(sys.number(), var))
     {
@@ -856,9 +871,14 @@ eval_at_node(const FEMContext & c,
              unsigned int i,
              unsigned int elem_dim,
              const Node & n,
+             bool extra_hanging_dofs,
              Real /* time */)
 {
   LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionValue");
+
+  // This should only be called on vertices
+  libmesh_assert_less(c.get_elem().get_node_index(&n),
+                      c.get_elem().n_vertices());
 
   // Handle offset from non-scalar components in previous variables
   libmesh_assert_less(i, this->component_to_var.size());
@@ -870,8 +890,16 @@ eval_at_node(const FEMContext & c,
   // Be sure to handle cases where the variable wasn't defined on
   // this node (due to changing subdomain support) or where the
   // variable has no components on this node (due to Elem order
-  // exceeding FE order)
+  // exceeding FE order) or where the old_dof_object dofs might
+  // correspond to non-vertex dofs (due to extra_hanging_dofs and
+  // refinement)
+
+  const Elem::RefinementState flag = c.get_elem().refinement_flag();
+
   if (n.old_dof_object &&
+      (!extra_hanging_dofs ||
+       flag == Elem::JUST_COARSENED ||
+       flag == Elem::DO_NOTHING) &&
       n.old_dof_object->n_vars(sys.number()) &&
       n.old_dof_object->n_comp(sys.number(), var))
     {
@@ -1612,6 +1640,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
 
   const unsigned int sys_num = system.number();
 
+  // Variables with extra hanging dofs can't safely use eval_at_node
+  // in as many places as variables without can.
+  std::vector<unsigned short> extra_hanging_dofs;
+  for (auto v_num : this->projector.variables)
+    {
+      if (extra_hanging_dofs.size() <= v_num)
+        extra_hanging_dofs.resize(v_num+1, false);
+      extra_hanging_dofs[v_num] =
+        FEInterface::extra_hanging_dofs(system.variable(v_num).type());
+    }
+
   for (const auto & v_pair : range)
     {
       const Node & vertex = *v_pair.first;
@@ -1647,7 +1686,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
               // C_ZERO elements have a single nodal value DoF at vertices
               const FValue val = f.eval_at_node
                 (context, var_component, /*dim=*/ 0, // Don't care w/C0
-                 vertex, system.time);
+                 vertex, extra_hanging_dofs[var], system.time);
               insert_id(id, val, vertex.processor_id());
             }
           else if (cont == C_ONE)
@@ -1694,6 +1733,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                                    var_component,
                                    dim,
                                    vertex,
+                                   extra_hanging_dofs[var],
                                    system.time);
                   insert_id(first_id, val, vertex.processor_id());
 
@@ -1703,6 +1743,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                                     var_component,
                                     dim,
                                     vertex,
+                                    extra_hanging_dofs[var],
                                     system.time) :
                     g->eval_at_point(context,
                                      var_component,
@@ -1823,12 +1864,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                     (unsigned int)(1 + dim));
                   const FValue val =
                     f.eval_at_node(context, var_component, dim,
-                                   vertex, system.time);
+                                   vertex, extra_hanging_dofs[var],
+                                   system.time);
                   insert_id(first_id, val, vertex.processor_id());
                   VectorValue<FValue> grad =
                     is_parent_vertex ?
                     g->eval_at_node(context, var_component, dim,
-                                    vertex, system.time) :
+                                    vertex, extra_hanging_dofs[var],
+                                    system.time) :
                     g->eval_at_point(context, var_component, vertex,
                                      system.time);
                   for (int i=0; i!= dim; ++i)

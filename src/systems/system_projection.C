@@ -501,6 +501,7 @@ public:
                      unsigned int i,
                      unsigned int elem_dim,
                      const Node & n,
+                     bool extra_hanging_dofs,
                      Real /* time */ = 0.);
 
   DSNA eval_at_point(const FEMContext & c,
@@ -701,6 +702,7 @@ eval_at_node(const FEMContext & c,
              unsigned int i,
              unsigned int /* elem_dim */,
              const Node & n,
+             bool extra_hanging_dofs,
              Real /* time */)
 {
   LOG_SCOPE ("Real eval_at_node()", "OldSolutionCoefs");
@@ -711,8 +713,16 @@ eval_at_node(const FEMContext & c,
   // Be sure to handle cases where the variable wasn't defined on
   // this node (due to changing subdomain support) or where the
   // variable has no components on this node (due to Elem order
-  // exceeding FE order)
+  // exceeding FE order) or where the old_dof_object dofs might
+  // correspond to non-vertex dofs (due to extra_hanging_dofs and
+  // refinement)
+
+  const Elem::RefinementState flag = c.get_elem().refinement_flag();
+
   if (n.old_dof_object &&
+      (!extra_hanging_dofs ||
+       flag == Elem::JUST_COARSENED ||
+       flag == Elem::DO_NOTHING) &&
       n.old_dof_object->n_vars(sys.number()) &&
       n.old_dof_object->n_comp(sys.number(), i))
     {
@@ -738,6 +748,7 @@ eval_at_node(const FEMContext & c,
              unsigned int i,
              unsigned int elem_dim,
              const Node & n,
+             bool extra_hanging_dofs,
              Real /* time */)
 {
   LOG_SCOPE ("RealGradient eval_at_node()", "OldSolutionCoefs");
@@ -748,8 +759,16 @@ eval_at_node(const FEMContext & c,
   // Be sure to handle cases where the variable wasn't defined on
   // this node (due to changing subdomain support) or where the
   // variable has no components on this node (due to Elem order
-  // exceeding FE order)
+  // exceeding FE order) or where the old_dof_object dofs might
+  // correspond to non-vertex dofs (due to extra_hanging_dofs and
+  // refinement)
+
+  const Elem::RefinementState flag = c.get_elem().refinement_flag();
+
   if (n.old_dof_object &&
+      (!extra_hanging_dofs ||
+       flag == Elem::JUST_COARSENED ||
+       flag == Elem::DO_NOTHING) &&
       n.old_dof_object->n_vars(sys.number()) &&
       n.old_dof_object->n_comp(sys.number(), i))
     {
