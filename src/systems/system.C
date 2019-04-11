@@ -2021,8 +2021,13 @@ Number System::point_value(unsigned int var,
   if (!insist_on_success || !mesh.is_serial())
     locator.enable_out_of_mesh_mode();
 
-  // Get a pointer to the element that contains P
-  const Elem * e = locator(p);
+  // Get a pointer to an element that contains p and allows us to
+  // evaluate var
+  const std::set<subdomain_id_type> & raw_subdomains =
+    this->variable(var).active_subdomains();
+  const std::set<subdomain_id_type> * implicit_subdomains =
+    raw_subdomains.empty() ? nullptr : &raw_subdomains;
+  const Elem * e = locator(p, implicit_subdomains);
 
   Number u = 0;
 
@@ -2145,8 +2150,13 @@ Gradient System::point_gradient(unsigned int var,
   if (!insist_on_success || !mesh.is_serial())
     locator.enable_out_of_mesh_mode();
 
-  // Get a pointer to the element that contains P
-  const Elem * e = locator(p);
+  // Get a pointer to an element that contains p and allows us to
+  // evaluate var
+  const std::set<subdomain_id_type> & raw_subdomains =
+    this->variable(var).active_subdomains();
+  const std::set<subdomain_id_type> * implicit_subdomains =
+    raw_subdomains.empty() ? nullptr : &raw_subdomains;
+  const Elem * e = locator(p, implicit_subdomains);
 
   Gradient grad_u;
 
@@ -2284,8 +2294,13 @@ Tensor System::point_hessian(unsigned int var,
   if (!insist_on_success || !mesh.is_serial())
     locator.enable_out_of_mesh_mode();
 
-  // Get a pointer to the element that contains P
-  const Elem * e = locator(p);
+  // Get a pointer to an element that contains p and allows us to
+  // evaluate var
+  const std::set<subdomain_id_type> & raw_subdomains =
+    this->variable(var).active_subdomains();
+  const std::set<subdomain_id_type> * implicit_subdomains =
+    raw_subdomains.empty() ? nullptr : &raw_subdomains;
+  const Elem * e = locator(p, implicit_subdomains);
 
   Tensor hess_u;
 
