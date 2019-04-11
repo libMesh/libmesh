@@ -523,6 +523,7 @@ public:
     sys.project_solution(&tfunc);
 
     std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       tripleValueTest(Point(x), sys, *locator,
                       u_subdomains, v_subdomains, w_subdomains,
@@ -535,6 +536,7 @@ public:
     es.reinit();
 
     locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       tripleValueTest(Point(x), sys, *locator,
                       u_subdomains, v_subdomains, w_subdomains,
@@ -570,6 +572,7 @@ public:
     sys.project_solution(&tfunc);
 
     std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         tripleValueTest(Point(x,y), sys, *locator,
@@ -583,6 +586,7 @@ public:
     es.reinit();
 
     locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         tripleValueTest(Point(x,y), sys, *locator,
@@ -619,6 +623,7 @@ public:
     sys.project_solution(&tfunc);
 
     std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         for (Real z = 0.1; z < 1; z += 0.2)
@@ -633,6 +638,7 @@ public:
     es.reinit();
 
     locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         for (Real z = 0.1; z < 1; z += 0.2)
