@@ -1560,7 +1560,8 @@ public:
   /**
    * \returns The value of the solution variable \p var at the physical
    * point \p p in the mesh, without knowing a priori which element
-   * contains \p p.
+   * contains \p p, using the degree of freedom coefficients in \p sol
+   * (or in \p current_local_solution if \p sol is left null).
    *
    * \note This function uses \p MeshBase::sub_point_locator(); users
    * may or may not want to call \p MeshBase::clear_point_locator()
@@ -1578,16 +1579,20 @@ public:
    * the method to return 0 when the point is not located.
    */
   Number point_value(unsigned int var, const Point & p,
-                     const bool insist_on_success = true) const;
+                     const bool insist_on_success = true,
+                     const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * \returns The value of the solution variable \p var at the physical
-   * point \p p contained in local Elem \p e
+   * point \p p contained in local Elem \p e, using the degree of
+   * freedom coefficients in \p sol (or in \p current_local_solution
+   * if \p sol is left null).
    *
    * This version of point_value can be run in serial, but assumes \p e is in
    * the local mesh partition or is algebraically ghosted.
    */
-  Number point_value(unsigned int var, const Point & p, const Elem & e) const;
+  Number point_value(unsigned int var, const Point & p, const Elem & e,
+                     const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * Calls the version of point_value() which takes a reference.
@@ -1598,17 +1603,27 @@ public:
   Number point_value(unsigned int var, const Point & p, const Elem * e) const;
 
   /**
+   * Calls the parallel version of point_value().
+   * This function exists only to prevent people from accidentally
+   * calling the version of point_value() that has a boolean third
+   * argument, which would result in incorrect output.
+   */
+  Number point_value(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
+
+  /**
    * \returns The gradient of the solution variable \p var at the physical
    * point \p p in the mesh, similarly to point_value.
    */
   Gradient point_gradient(unsigned int var, const Point & p,
-                          const bool insist_on_success = true) const;
+                          const bool insist_on_success = true,
+                          const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * \returns The gradient of the solution variable \p var at the physical
    * point \p p in local Elem \p e in the mesh, similarly to point_value.
    */
-  Gradient point_gradient(unsigned int var, const Point & p, const Elem & e) const;
+  Gradient point_gradient(unsigned int var, const Point & p, const Elem & e,
+                          const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * Calls the version of point_gradient() which takes a reference.
@@ -1619,18 +1634,28 @@ public:
   Gradient point_gradient(unsigned int var, const Point & p, const Elem * e) const;
 
   /**
+   * Calls the parallel version of point_gradient().
+   * This function exists only to prevent people from accidentally
+   * calling the version of point_gradient() that has a boolean third
+   * argument, which would result in incorrect output.
+   */
+  Gradient point_gradient(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
+
+  /**
    * \returns The second derivative tensor of the solution variable \p var
    * at the physical point \p p in the mesh, similarly to point_value.
    */
   Tensor point_hessian(unsigned int var, const Point & p,
-                       const bool insist_on_success = true) const;
+                       const bool insist_on_success = true,
+                       const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * \returns The second derivative tensor of the solution variable \p var
    * at the physical point \p p in local Elem \p e in the mesh, similarly to
    * point_value.
    */
-  Tensor point_hessian(unsigned int var, const Point & p, const Elem & e) const;
+  Tensor point_hessian(unsigned int var, const Point & p, const Elem & e,
+                       const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * Calls the version of point_hessian() which takes a reference.
@@ -1639,6 +1664,15 @@ public:
    * would result in unnecessary PointLocator calls.
    */
   Tensor point_hessian(unsigned int var, const Point & p, const Elem * e) const;
+
+  /**
+   * Calls the parallel version of point_hessian().
+   * This function exists only to prevent people from accidentally
+   * calling the version of point_hessian() that has a boolean third
+   * argument, which would result in incorrect output.
+   */
+  Tensor point_hessian(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
+
 
   /**
    * Fills the std::set with the degrees of freedom on the local

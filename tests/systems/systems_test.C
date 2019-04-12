@@ -18,6 +18,7 @@
 #include <libmesh/cell_tet4.h>
 #include <libmesh/zero_function.h>
 #include <libmesh/linear_implicit_system.h>
+#include <libmesh/transient_system.h>
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/node_elem.h>
 #include <libmesh/edge_edge2.h>
@@ -338,6 +339,7 @@ void assembly_with_dg_fem_context(EquationSystems& es,
       }
 }
 
+
 Number cubic_test (const Point& p,
                    const Parameters&,
                    const std::string&,
@@ -349,6 +351,79 @@ Number cubic_test (const Point& p,
 
   return x*(1-x)*(1-x) + x*x*(1-y) + x*(1-y)*(1-z) + y*(1-y)*z + z*(1-z)*(1-z);
 }
+
+
+Number new_linear_test (const Point& p,
+                    const Parameters&,
+                    const std::string&,
+                    const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
+  const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
+
+  return x + 2*y + 3*z - 1;
+}
+
+
+Number disc_thirds_test (const Point& p,
+                         const Parameters&,
+                         const std::string&,
+                         const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
+  const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
+
+  return (3*x < 1) + (3*y < 2) + (3*z > 2);
+}
+
+
+struct TripleFunction : public FunctionBase<Number>
+{
+  TripleFunction(Number _offset = 0) : offset(_offset) {}
+
+  virtual std::unique_ptr<FunctionBase<Number>> clone () const
+  { return libmesh_make_unique<TripleFunction>(offset); }
+
+  // We only really need the vector-valued output for projections
+  virtual Number operator() (const Point &,
+                             const Real /*time*/ = 0.) override
+  { libmesh_error(); }
+
+  virtual void operator() (const Point & p,
+                           const Real time,
+                           DenseVector<Number> & output) override
+  {
+    libmesh_assert_greater(output.size(), 0);
+    Parameters params;
+    output(0) = cubic_test(p, params, "", "") + offset;
+    if (output.size() > 0)
+      output(1) = new_linear_test(p, params, "", "") + offset;
+    if (output.size() > 1)
+      output(2) = disc_thirds_test(p, params, "", "") + offset;
+  }
+
+  Number component (unsigned int i,
+                    const Point & p,
+                    Real /* time */) override
+  {
+    Parameters params;
+    switch (i) {
+    case 0:
+      return cubic_test(p, params, "", "") + offset;
+    case 1:
+      return new_linear_test(p, params, "", "") + offset;
+    case 2:
+      return disc_thirds_test(p, params, "", "") + offset;
+    default:
+      libmesh_error();
+    }
+    return 0;
+  }
+
+  Number offset;
+};
 
 
 class SystemsTest : public CppUnit::TestCase {
@@ -388,6 +463,55 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 private:
+  void tripleValueTest (const Point & p,
+                        const TransientExplicitSystem & sys,
+                        const PointLocatorBase & locator,
+                        std::set<subdomain_id_type> & u_subdomains,
+                        std::set<subdomain_id_type> & v_subdomains,
+                        std::set<subdomain_id_type> & w_subdomains,
+                        const Parameters & param)
+  {
+    const Elem * elem = locator(p);
+    subdomain_id_type sbd_id = elem ? elem->subdomain_id() : 0;
+    TestCommWorld->max(sbd_id);
+
+    if (u_subdomains.count(sbd_id))
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                     libmesh_real(cubic_test(p,param,"","")),
+                                     TOLERANCE*TOLERANCE*10);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,sys.old_local_solution.get())),
+                                     libmesh_real(cubic_test(p,param,"","") + Number(10)),
+                                     TOLERANCE*TOLERANCE*100);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,sys.older_local_solution.get())),
+                                     libmesh_real(cubic_test(p,param,"","") + Number(20)),
+                                     TOLERANCE*TOLERANCE*100);
+      }
+    if (v_subdomains.count(sbd_id))
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                     libmesh_real(new_linear_test(p,param,"","")),
+                                     TOLERANCE*TOLERANCE*10);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p,sys.old_local_solution.get())),
+                                     libmesh_real(new_linear_test(p,param,"","") + Number(10)),
+                                     TOLERANCE*TOLERANCE*100);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p,sys.older_local_solution.get())),
+                                     libmesh_real(new_linear_test(p,param,"","") + Number(20)),
+                                     TOLERANCE*TOLERANCE*100);
+      }
+    if (w_subdomains.count(sbd_id))
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                     libmesh_real(disc_thirds_test(p,param,"","")),
+                                     TOLERANCE*TOLERANCE*10);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p,sys.old_local_solution.get())),
+                                     libmesh_real(disc_thirds_test(p,param,"","") + Number(10)),
+                                     TOLERANCE*TOLERANCE*100);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p,sys.older_local_solution.get())),
+                                     libmesh_real(disc_thirds_test(p,param,"","") + Number(20)),
+                                     TOLERANCE*TOLERANCE*100);
+      }
+  }
 
 public:
   void setUp()
@@ -401,24 +525,53 @@ public:
     Mesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
-    System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
+    TransientExplicitSystem &sys =
+      es.add_system<TransientExplicitSystem> ("SimpleSystem");
+
+    std::set<subdomain_id_type> u_subdomains {0, 1, 4, 5},
+                                v_subdomains {1, 2, 3, 4},
+                                w_subdomains {0, 1, 2, 3, 4};
+
+    sys.add_variable("u", THIRD,    HIERARCHIC, &u_subdomains);
+    sys.add_variable("v", FIRST,    LAGRANGE,   &v_subdomains);
+    sys.add_variable("w", CONSTANT, MONOMIAL,   &w_subdomains);
 
     MeshTools::Generation::build_line (mesh,
-                                       3,
+                                       6,
                                        0., 1.,
                                        elem_type);
 
-    es.init();
-    sys.project_solution(cubic_test, nullptr, es.parameters);
+    for (auto & elem : mesh.element_ptr_range())
+      elem->subdomain_id() = elem->id();
 
+    es.init();
+    TripleFunction tfunc;
+    sys.project_solution(&tfunc);
+    tfunc.offset = 10;
+    sys.project_vector(*sys.old_local_solution, &tfunc);
+    tfunc.offset = 20;
+    sys.project_vector(*sys.older_local_solution, &tfunc);
+
+    std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
-      {
-        Point p(x);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                     libmesh_real(cubic_test(p,es.parameters,"","")),
-                                     TOLERANCE*TOLERANCE);
-      }
+      tripleValueTest(Point(x), sys, *locator,
+                      u_subdomains, v_subdomains, w_subdomains,
+                      es.parameters);
+
+#ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+      if ((elem->id()/2)%2)
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+
+    locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
+    for (Real x = 0.1; x < 1; x += 0.2)
+      tripleValueTest(Point(x), sys, *locator,
+                      u_subdomains, v_subdomains, w_subdomains,
+                      es.parameters);
+#endif
   }
 
   void testProjectSquare(const ElemType elem_type)
@@ -426,25 +579,55 @@ public:
     Mesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
-    System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
+    TransientExplicitSystem &sys =
+      es.add_system<TransientExplicitSystem> ("SimpleSystem");
+
+    std::set<subdomain_id_type> u_subdomains {0, 1, 4, 5},
+                                v_subdomains {1, 2, 3, 4},
+                                w_subdomains {0, 1, 2, 3, 4};
+
+    sys.add_variable("u", THIRD,    HIERARCHIC, &u_subdomains);
+    sys.add_variable("v", FIRST,    LAGRANGE,   &v_subdomains);
+    sys.add_variable("w", CONSTANT, MONOMIAL,   &w_subdomains);
 
     MeshTools::Generation::build_square (mesh,
                                          3, 3,
                                          0., 1., 0., 1.,
                                          elem_type);
 
-    es.init();
-    sys.project_solution(cubic_test, nullptr, es.parameters);
+    for (auto & elem : mesh.element_ptr_range())
+      elem->subdomain_id() = elem->id()/2;
 
+    es.init();
+    TripleFunction tfunc;
+    sys.project_solution(&tfunc);
+    tfunc.offset = 10;
+    sys.project_vector(*sys.old_local_solution, &tfunc);
+    tfunc.offset = 20;
+    sys.project_vector(*sys.older_local_solution, &tfunc);
+
+    std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
-        {
-          Point p(x,y);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                       libmesh_real(cubic_test(p,es.parameters,"","")),
-                                       TOLERANCE*TOLERANCE);
-        }
+        tripleValueTest(Point(x,y), sys, *locator,
+                        u_subdomains, v_subdomains, w_subdomains,
+                        es.parameters);
+
+#ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+      if ((elem->id()/2)%2)
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+
+    locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
+    for (Real x = 0.1; x < 1; x += 0.2)
+      for (Real y = 0.1; y < 1; y += 0.2)
+        tripleValueTest(Point(x,y), sys, *locator,
+                        u_subdomains, v_subdomains, w_subdomains,
+                        es.parameters);
+#endif
   }
 
   void testProjectCube(const ElemType elem_type)
@@ -452,26 +635,57 @@ public:
     Mesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
-    System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
+    TransientExplicitSystem &sys =
+      es.add_system<TransientExplicitSystem> ("SimpleSystem");
+
+    std::set<subdomain_id_type> u_subdomains {0, 1, 4, 5},
+                                v_subdomains {1, 2, 3, 4},
+                                w_subdomains {0, 1, 2, 3, 4};
+
+    sys.add_variable("u", THIRD,    HIERARCHIC, &u_subdomains);
+    sys.add_variable("v", FIRST,    LAGRANGE,   &v_subdomains);
+    sys.add_variable("w", CONSTANT, MONOMIAL,   &w_subdomains);
 
     MeshTools::Generation::build_cube (mesh,
                                        3, 3, 3,
                                        0., 1., 0., 1., 0., 1.,
                                        elem_type);
 
-    es.init();
-    sys.project_solution(cubic_test, nullptr, es.parameters);
+    for (auto & elem : mesh.element_ptr_range())
+      elem->subdomain_id() = elem->id()/6;
 
+    es.init();
+    TripleFunction tfunc;
+    sys.project_solution(&tfunc);
+    tfunc.offset = 10;
+    sys.project_vector(*sys.old_local_solution, &tfunc);
+    tfunc.offset = 20;
+    sys.project_vector(*sys.older_local_solution, &tfunc);
+
+    std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
         for (Real z = 0.1; z < 1; z += 0.2)
-          {
-            Point p(x,y,z);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                         libmesh_real(cubic_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
-          }
+          tripleValueTest(Point(x,y,z), sys, *locator,
+                          u_subdomains, v_subdomains, w_subdomains,
+                          es.parameters);
+
+  #ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+      if ((elem->id()/2)%2)
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+
+    locator = mesh.sub_point_locator();
+    locator->enable_out_of_mesh_mode();
+    for (Real x = 0.1; x < 1; x += 0.2)
+      for (Real y = 0.1; y < 1; y += 0.2)
+        for (Real z = 0.1; z < 1; z += 0.2)
+          tripleValueTest(Point(x,y,z), sys, *locator,
+                          u_subdomains, v_subdomains, w_subdomains,
+                          es.parameters);
+  #endif
   }
 
   void testProjectCubeWithMeshFunction(const ElemType elem_type)
