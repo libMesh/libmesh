@@ -456,10 +456,10 @@ private:
    * DoF index information.  This is packed into a contiguous buffer of the following format:
    *
    * \verbatim
-   * [ns end_0 end_1 ... end_{ns-1} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0
+   * [ns end_0 end_1 ... end_{ns-2} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0
    *                                (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1
    *                                ...
-   *                                (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_ns ]
+   *                                (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_{ns-2} ]
    * \endverbatim
    *
    * where 'end_s' is the index past the end of the variable group storage for system \p s.
