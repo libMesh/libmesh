@@ -153,6 +153,18 @@ void MeshBase::set_spatial_dimension(unsigned char d)
 
 
 
+unsigned int MeshBase::add_elem_integer(const std::string & name)
+{
+  for (auto i : index_range(_elem_integer_names))
+    if (_elem_integer_names[i] == name)
+      return i;
+
+  _elem_integer_names.push_back(name);
+  return _elem_integer_names.size()-1;
+}
+
+
+
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
   LOG_SCOPE("prepare_for_use()", "MeshBase");

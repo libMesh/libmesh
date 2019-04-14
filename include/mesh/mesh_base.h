@@ -725,7 +725,16 @@ public:
 #endif
 
   /**
-   * Prepare a newly created (or read) mesh for use.
+   * Register an integer datum (of type dof_id_type) to be added to
+   * each element in the mesh.
+   *
+   * \returns The index number for the new datum, or for the existing
+   * datum if one by the same name has already been added.
+   */
+  unsigned int add_elem_integer(const std::string & name);
+
+  /**
+   * Prepare a newly ecreated (or read) mesh for use.
    * This involves 4 steps:
    *  1.) call \p find_neighbors()
    *  2.) call \p partition()
@@ -1504,6 +1513,12 @@ protected:
    * Mesh::spatial_dimension() for more information.
    */
   unsigned char _spatial_dimension;
+
+  /**
+   * The array of names for integer data associated with each element
+   * in the mesh
+   */
+  std::vector<std::string> _elem_integer_names;
 
   /**
    * The default geometric GhostingFunctor, used to implement standard
