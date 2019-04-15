@@ -497,7 +497,7 @@ DofObject::add_extra_integers (const unsigned int n_integers)
     {
       if (n_integers)
         {
-          _idx_buf.resize(n_integers+1);
+          _idx_buf.resize(n_integers+1, DofObject::invalid_id);
           _idx_buf[0] = dof_id_type(-1);
         }
       return;
@@ -514,7 +514,7 @@ DofObject::add_extra_integers (const unsigned int n_integers)
           if (n_integers != old_n_integers)
             {
               // Make or remove space as needed by count change
-              _idx_buf.resize(_idx_buf.size()+n_integers-old_n_integers);
+              _idx_buf.resize(_idx_buf.size()+n_integers-old_n_integers, DofObject::invalid_id);
 
               // The start index for the extra integers is unchanged.
             }
@@ -535,7 +535,7 @@ DofObject::add_extra_integers (const unsigned int n_integers)
             _idx_buf[i]++;
 
           // Append space for extra integers
-          _idx_buf.resize(_idx_buf.size()+n_integers);
+          _idx_buf.resize(_idx_buf.size()+n_integers, DofObject::invalid_id);
         }
     }
 }
