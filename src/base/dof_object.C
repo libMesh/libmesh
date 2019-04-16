@@ -165,7 +165,7 @@ void DofObject::set_old_dof_object ()
 void DofObject::set_n_systems (const unsigned int ns)
 {
   const unsigned int old_ns = this->n_systems();
- 
+
   // Check for trivial return
   if (ns == old_ns)
     return;
