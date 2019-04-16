@@ -519,6 +519,10 @@ Elem * DistributedMesh::add_elem (Elem * e)
   //     }
   // #endif
 
+  // Make sure any new element is given space for any extra integers
+  // we've requested
+  e->add_extra_integers(_elem_integer_names.size());
+
   return e;
 }
 
@@ -552,6 +556,10 @@ Elem * DistributedMesh::insert_elem (Elem * e)
     _n_elem++;
 
   _elements[e->id()] = e;
+
+  // Make sure any new element is given space for any extra integers
+  // we've requested
+  e->add_extra_integers(_elem_integer_names.size());
 
   return e;
 }

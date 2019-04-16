@@ -311,6 +311,10 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
 
   _elements[id] = e;
 
+  // Make sure any new element is given space for any extra integers
+  // we've requested
+  e->add_extra_integers(_elem_integer_names.size());
+
   return e;
 }
 
@@ -334,6 +338,10 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
     }
 
   _elements[e->id()] = e;
+
+  // Make sure any new element is given space for any extra integers
+  // we've requested
+  e->add_extra_integers(_elem_integer_names.size());
 
   return e;
 }
