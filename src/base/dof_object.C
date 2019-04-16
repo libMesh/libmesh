@@ -592,7 +592,8 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
 
   // Check as best we can for internal consistency now
   libmesh_assert(_idx_buf.empty() ||
-                 (std::abs(dof_id_signed_type(_idx_buf[0])) <= _idx_buf.size()));
+                 (std::abs(dof_id_signed_type(_idx_buf[0])) <=
+                  cast_int<dof_id_signed_type>(_idx_buf.size())));
 #ifdef DEBUG
   if (!_idx_buf.empty())
     {
