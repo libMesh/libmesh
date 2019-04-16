@@ -165,6 +165,18 @@ unsigned int MeshBase::add_elem_integer(const std::string & name)
 
 
 
+unsigned int MeshBase::add_node_integer(const std::string & name)
+{
+  for (auto i : index_range(_node_integer_names))
+    if (_node_integer_names[i] == name)
+      return i;
+
+  _node_integer_names.push_back(name);
+  return _node_integer_names.size()-1;
+}
+
+
+
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
   LOG_SCOPE("prepare_for_use()", "MeshBase");

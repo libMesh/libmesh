@@ -725,6 +725,7 @@ Node * DistributedMesh::add_node (Node * n)
     }
 #endif
 
+  n->add_extra_integers(_node_integer_names.size());
 
   // Unpartitioned nodes should be added on every processor
   // And shouldn't be added in the same batch as ghost nodes

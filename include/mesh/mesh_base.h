@@ -734,6 +734,15 @@ public:
   unsigned int add_elem_integer(const std::string & name);
 
   /**
+   * Register an integer datum (of type dof_id_type) to be added to
+   * each node in the mesh.
+   *
+   * \returns The index number for the new datum, or for the existing
+   * datum if one by the same name has already been added.
+   */
+  unsigned int add_node_integer(const std::string & name);
+
+  /**
    * Prepare a newly ecreated (or read) mesh for use.
    * This involves 4 steps:
    *  1.) call \p find_neighbors()
@@ -1519,6 +1528,12 @@ protected:
    * in the mesh
    */
   std::vector<std::string> _elem_integer_names;
+
+  /**
+   * The array of names for integer data associated with each node
+   * in the mesh
+   */
+  std::vector<std::string> _node_integer_names;
 
   /**
    * The default geometric GhostingFunctor, used to implement standard

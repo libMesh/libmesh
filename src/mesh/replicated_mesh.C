@@ -439,6 +439,8 @@ Node * ReplicatedMesh::add_point (const Point & p,
                       cast_int<dof_id_type>(_nodes.size()-1) : id).release();
       n->processor_id() = proc_id;
 
+      n->add_extra_integers(_node_integer_names.size());
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       if (!n->valid_unique_id())
         n->set_unique_id() = _next_unique_id++;
@@ -470,6 +472,8 @@ Node * ReplicatedMesh::add_node (Node * n)
   if (!n->valid_unique_id())
     n->set_unique_id() = _next_unique_id++;
 #endif
+
+  n->add_extra_integers(_node_integer_names.size());
 
   _nodes.push_back(n);
 
@@ -509,6 +513,8 @@ Node * ReplicatedMesh::insert_node(Node * n)
   if (!n->valid_unique_id())
     n->set_unique_id() = _next_unique_id++;
 #endif
+
+  n->add_extra_integers(_node_integer_names.size());
 
   // We have enough space and this spot isn't already occupied by
   // another node, so go ahead and add it.
