@@ -91,8 +91,11 @@ public:
 #endif
 
   /**
-   * Clear the \p DofMap data structures and return to
-   * a pristine state.
+   * Clear the \p DofMap data structures holding degree of freedom
+   * data.
+   *
+   * If any extra integers are associated with this \p DofObject,
+   * their count and values are unchanged.
    */
   void clear_dofs ();
 
@@ -196,9 +199,35 @@ public:
   unsigned int n_systems() const;
 
   /**
-   *  Sets the number of systems for this \p DofObject
+   * \returns The total number of pseudo-systems associated with this
+   * \p DofObject :
+   * n_systems(), plus one iff \p this->has_extra_integers()
+   */
+  unsigned int n_pseudo_systems() const;
+
+  /**
+   * Sets the number of systems for this \p DofObject.  If this number
+   * is a change, also clears all variable count and DoF indexing
+   * associated with this \p DofObject.
+   *
+   * If any extra integers are associated with this \p DofObject,
+   * their count and values are unchanged.
    */
   void set_n_systems (const unsigned int s);
+
+  /**
+   * Sets the value on this object of the extra integer associated
+   * with \p index, which should have been obtained via a call to \p
+   * MeshBase::add_elem_integer or \p MeshBase::add_node_integer
+   */
+  void set_extra_integer (const unsigned int index, const dof_id_type value);
+
+  /**
+   * Gets the value on this object of the extra integer associated
+   * with \p index, which should have been obtained via a call to \p
+   * MeshBase::add_elem_integer or \p MeshBase::add_node_integer
+   */
+  dof_id_type get_extra_integer (const unsigned int index);
 
   /**
    * Adds an additional system to the \p DofObject
@@ -342,6 +371,23 @@ public:
                           const unsigned int vg) const;
 
   /**
+   * Assigns a set of extra integers to this \p DofObject.  There will
+   * now be \p n_integers associated; this *replaces*, not augments,
+   * any previous count.
+   */
+  void add_extra_integers (const unsigned int n_integers);
+
+  /**
+   * Returns how many extra integers are associated to the \p DofObject
+   */
+  unsigned int n_extra_integers () const;
+
+  /**
+   * Returns whether extra integers are associated to the \p DofObject
+   */
+  bool has_extra_integers () const;
+
+  /**
    * An invalid \p id to distinguish an uninitialized \p DofObject
    */
   static const dof_id_type invalid_id = static_cast<dof_id_type>(-1);
@@ -456,33 +502,47 @@ private:
    * DoF index information.  This is packed into a contiguous buffer of the following format:
    *
    * \verbatim
-   * [ns end_0 end_1 ... end_{ns-1} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0
-   *                                (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1
-   *                                ...
-   *                                (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_ns ]
+   * [hdr end_0 end_1 ... end_{nps-2} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0
+   *                                  (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1
+   *                                   ...
+   *                                  (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_{nps-2} ]
    * \endverbatim
    *
-   * where 'end_s' is the index past the end of the variable group storage for system \p s.
+   * 'hdr' determines whether this \p DofObject \p has_extra_integers()
+   * associated with it; iff so then it is negative.
    *
-   * \note We specifically do not store the end for the last system - this always _idx_buf.size().
+   * The total number of "pseudo systems" is nps := abs(hdr).
    *
-   * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 variable groups, respectively.  The _idx_buf then looks like:
+   * The total number of true systems is
+   * \verbatim
+   * ns = hdr,            hdr >= 0
+   *    = abs(hdr) - 1,   otherwise.
+   * \endverbatim
+   *
+   * 'end_s' is the index past the end of the variable group (or
+   * integer) storage for (pseudo) system \p s.
+   *
+   * \note We specifically do not store the end for the last (pseudo)
+   * system - this always _idx_buf.size().
+   *
+   * As a first example, consider the case of 4 systems, with 3, 0, 1,
+   * 2 variable groups, respectively.  The _idx_buf then looks like:
    *
    * \verbatim
    * [4 10 10 12 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1)]
    * [0  1  2  3         4     5     6     7     8     9         10    11      12    13    14    15]
    * \endverbatim
    *
-   * The ending index is then given by:
+   * The ending index for each (pseudo) system is then given by:
    *
    * \verbatim
-   * end_s = _idx_buf.size(), s == (ns-1),
-   *       = _idx_buf[s+1]    otherwise.
+   * end_s = _idx_buf.size(),                        s == (nps-1),
+   *       = _idx_buf[s+1] + has_extra_integers(),   otherwise.
    * \endverbatim
    *
    * The starting indices are not specifically stored, but rather inferred as follows:
    *
-   * start_s = _idx_buf[s];
+   * start_s = abs(_idx_buf[s])
    *
    * Now, the defining characteristic of the \p VariableGroup is that it supports
    * an arbitrary number of variables of the same type.  At the \p DofObject level, what
@@ -502,6 +562,23 @@ private:
    * *within the system*. So for a system with 2 variable groups, 4 and 8 variables each,
    * the 5th variable in the system is the 1st variable in 2nd variable group.
    * (Now of course 0-base everything...  but you get the idea.)
+   *
+   * When hdr is *negative* when cast to a signed type, then we
+   * interpret that to mean there exists one pseudo-system following
+   * the true systems, one for which the _idx_buf data stores the
+   * values associated with add_extra_integer entries, not ncv and idx
+   * data associated with system variables.  We still return only the
+   * number of true systems for n_systems(), but we report
+   * has_extra_integers() as true iff hdr is negative, and abs(hdr)
+   * will reflect the total number of pseudo-systems, n_systems()+1.
+   *
+   * E.g. if we had added two extra integers to the example case
+   * above, the _idx_buf then looks like:
+   *
+   * \verbatim
+   * [-5 11 11 13 17 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1) (xtra1 xtra2)]
+   * [0   1  2  3  4         5     6     7     8     9    10         11    12      13    14    15    16      17    18]
+   * \endverbatim
    */
   typedef dof_id_type index_t;
   typedef std::vector<index_t> index_buffer_t;
@@ -528,6 +605,16 @@ private:
    * The ending index for system \p s.
    */
   unsigned int end_idx(const unsigned int s) const;
+
+  /**
+   * The starting index for an extra_integers pseudosystem
+   */
+  unsigned int start_idx_ints() const;
+
+  /**
+   * The ending index for an extra_integers pseudosystem
+   */
+  unsigned int end_idx_ints() const;
 
   // methods only available for unit testing
 #ifdef LIBMESH_IS_UNIT_TESTING
@@ -620,11 +707,7 @@ void DofObject::invalidate ()
 inline
 void DofObject::clear_dofs ()
 {
-  // vector swap trick to force deallocation
-  index_buffer_t().swap(_idx_buf);
-
-  libmesh_assert_equal_to (this->n_systems(), 0);
-  libmesh_assert (_idx_buf.empty());
+  this->set_n_systems(0);
 }
 
 
@@ -748,8 +831,19 @@ bool DofObject::valid_processor_id () const
 inline
 unsigned int DofObject::n_systems () const
 {
-  return _idx_buf.empty() ?
-    0 : cast_int<unsigned int>(_idx_buf[0]);
+  const int hdr = _idx_buf.empty() ?
+    0 : cast_int<int>(dof_id_signed_type(_idx_buf[0]));
+  return hdr >= 0 ? hdr : (-hdr-1);
+}
+
+
+
+inline
+unsigned int DofObject::n_pseudo_systems () const
+{
+  const int hdr = _idx_buf.empty() ?
+    0 : cast_int<int>(dof_id_signed_type(_idx_buf[0]));
+  return std::abs(hdr);
 }
 
 
@@ -883,6 +977,67 @@ dof_id_type DofObject::dof_number(const unsigned int s,
 
 
 inline
+void
+DofObject::set_extra_integer(const unsigned int index,
+                             const dof_id_type value)
+{
+  libmesh_assert_less(index, this->n_extra_integers());
+  libmesh_assert_less(this->n_pseudo_systems(), _idx_buf.size());
+
+  const unsigned int start_idx_i = this->start_idx_ints();
+
+  libmesh_assert_less(start_idx_i+index, _idx_buf.size());
+  _idx_buf[start_idx_i+index] = value;
+}
+
+
+
+inline
+dof_id_type
+DofObject::get_extra_integer (const unsigned int index)
+{
+  libmesh_assert_less(index, this->n_extra_integers());
+  libmesh_assert_less(this->n_systems(), _idx_buf.size());
+
+  const unsigned int start_idx_i = this->start_idx_ints();
+
+  libmesh_assert_less(start_idx_i+index, _idx_buf.size());
+  return _idx_buf[start_idx_i+index];
+}
+
+
+
+inline
+unsigned int
+DofObject::n_extra_integers () const
+{
+  if (_idx_buf.empty())
+    return 0;
+
+  const int hdr = dof_id_signed_type(_idx_buf[0]);
+  if (hdr >= 0)
+    return 0;
+
+  const unsigned int start_idx_i = this->start_idx_ints();
+
+  return _idx_buf.size() - start_idx_i;
+}
+
+
+
+inline
+bool
+DofObject::has_extra_integers () const
+{
+  if (_idx_buf.empty())
+    return 0;
+
+  return (dof_id_signed_type(_idx_buf[0]) < 0);
+}
+
+
+
+inline
 std::pair<unsigned int, unsigned int>
 DofObject::var_to_vg_and_offset(const unsigned int s,
                                 const unsigned int var) const
@@ -938,7 +1093,7 @@ unsigned int DofObject::start_idx (const unsigned int s) const
   libmesh_assert_less (s, this->n_systems());
   libmesh_assert_less (s, _idx_buf.size());
 
-  return cast_int<unsigned int>(_idx_buf[s]);
+  return cast_int<unsigned int>(std::abs(dof_id_signed_type(_idx_buf[s])));
 }
 
 
@@ -949,9 +1104,33 @@ unsigned int DofObject::end_idx (const unsigned int s) const
   libmesh_assert_less (s, this->n_systems());
   libmesh_assert_less (s, _idx_buf.size());
 
-  return ((s+1) == this->n_systems()) ?
+  return ((s+1) == this->n_pseudo_systems()) ?
     cast_int<unsigned int>(_idx_buf.size()) :
     cast_int<unsigned int>(_idx_buf[s+1]);
+}
+
+
+
+inline
+unsigned int DofObject::start_idx_ints () const
+{
+  libmesh_assert (this->has_extra_integers());
+
+  unsigned int n_sys = this->n_systems();
+
+  libmesh_assert_less(this->n_systems(), _idx_buf.size());
+  return n_sys ? cast_int<unsigned int>(_idx_buf[this->n_systems()]) :
+                 (n_sys+1);
+}
+
+
+
+inline
+unsigned int DofObject::end_idx_ints () const
+{
+  libmesh_assert (this->has_extra_integers());
+
+  return cast_int<unsigned int>(_idx_buf.size());
 }
 
 

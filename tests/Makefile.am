@@ -48,6 +48,7 @@ unit_tests_sources = \
   mesh/boundary_info.C \
   mesh/checkpoint.C \
   mesh/contains_point.C \
+  mesh/extra_integers.C \
   mesh/mesh_input.C \
   mesh/mesh_function.C \
   mesh/mixed_dim_mesh_test.C \

@@ -13,6 +13,9 @@
   CPPUNIT_TEST( testInvalidateProcId );         \
   CPPUNIT_TEST( testSetNSystems );              \
   CPPUNIT_TEST( testSetNVariableGroups );       \
+  CPPUNIT_TEST( testAddExtraInts );             \
+  CPPUNIT_TEST( testSetNSystemsExtraInts );     \
+  CPPUNIT_TEST( testSetNVariableGroupsExtraInts ); \
   CPPUNIT_TEST( testManualDofCalculation );     \
   CPPUNIT_TEST( testJensEftangBug );
 
@@ -121,6 +124,122 @@ public:
           CPPUNIT_ASSERT_EQUAL( nvpg[vg], aobject.n_vars(s,vg) );
       }
   }
+
+  void testAddExtraInts()
+  {
+    DofObject aobject(*instance);
+
+    aobject.add_extra_integers (9);
+
+    CPPUNIT_ASSERT(aobject.has_extra_integers());
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 9, aobject.n_extra_integers() );
+
+    for (unsigned int i=0; i != 9; ++i)
+      {
+        CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
+        aobject.set_extra_integer(i, i);
+        CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+      }
+
+    aobject.add_extra_integers (6);
+
+    CPPUNIT_ASSERT(aobject.has_extra_integers());
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 6, aobject.n_extra_integers() );
+
+    for (unsigned int i=0; i != 6; ++i)
+      CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+  }
+
+  void testSetNSystemsExtraInts()
+  {
+    DofObject aobject(*instance);
+
+    aobject.add_extra_integers (5);
+
+    aobject.set_n_systems (10);
+
+    CPPUNIT_ASSERT(aobject.has_extra_integers());
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 5, aobject.n_extra_integers() );
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 10, aobject.n_systems() );
+
+    for (unsigned int i=0; i != 5; ++i)
+      {
+        CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
+        aobject.set_extra_integer(i, i);
+        CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+      }
+
+    aobject.add_extra_integers (9);
+
+    for (unsigned int i=0; i != 5; ++i)
+      CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+
+    for (unsigned int i=5; i != 9; ++i)
+      CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
+
+    aobject.set_n_systems (6);
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 9, aobject.n_extra_integers() );
+
+    for (unsigned int i=0; i != 5; ++i)
+      CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+
+    for (unsigned int i=5; i != 9; ++i)
+      {
+        CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
+        aobject.set_extra_integer(i, i);
+        CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+      }
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 6, aobject.n_systems() );
+
+    for (unsigned int i=0; i != 9; ++i)
+      CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+  }
+
+  void testSetNVariableGroupsExtraInts()
+  {
+    DofObject aobject(*instance);
+
+    aobject.set_n_systems (2);
+
+    aobject.add_extra_integers (5);
+
+    for (unsigned int i=0; i != 5; ++i)
+      {
+        CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
+        aobject.set_extra_integer(i, i);
+        CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+      }
+
+    std::vector<unsigned int> nvpg;
+
+    nvpg.push_back(10);
+    nvpg.push_back(20);
+    nvpg.push_back(30);
+
+    aobject.set_n_vars_per_group (0, nvpg);
+    aobject.set_n_vars_per_group (1, nvpg);
+
+    for (unsigned int s=0; s<2; s++)
+      {
+        CPPUNIT_ASSERT_EQUAL( (unsigned int) 60, aobject.n_vars(s) );
+        CPPUNIT_ASSERT_EQUAL( (unsigned int) 3,  aobject.n_var_groups(s) );
+
+        for (unsigned int vg=0; vg<3; vg++)
+          CPPUNIT_ASSERT_EQUAL( nvpg[vg], aobject.n_vars(s,vg) );
+      }
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 5, aobject.n_extra_integers() );
+
+    for (unsigned int i=0; i != 5; ++i)
+      CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+  }
+
 
   void testManualDofCalculation()
   {
