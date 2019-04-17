@@ -894,10 +894,21 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                         // We need to set h_min to some value. It's too expensive to
                         // search for the element that actually contains this node,
                         // since that would require a PointLocator. As a result, we
-                        // just use the first element in the mesh to give us hmin.
-                        const Elem * first_active_elem = *mesh_array[i]->active_elements_begin();
-                        h_min = first_active_elem->hmin();
-                        h_min_updated = true;
+                        // just use the first (non-NodeElem!) element in the mesh to
+                        // give us hmin if it's never been set before.
+                        if (!h_min_updated)
+                          {
+                            for (const auto & elem : mesh_array[i]->element_ptr_range())
+                              {
+                                Real current_h_min = elem->hmin();
+                                if (current_h_min > 0.)
+                                  {
+                                    h_min = current_h_min;
+                                    h_min_updated = true;
+                                    break;
+                                  }
+                              }
+                          }
                       }
                   }
               }
