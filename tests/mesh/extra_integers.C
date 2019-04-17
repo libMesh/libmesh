@@ -46,6 +46,8 @@ protected:
 
     // Request some extra integers before building
     unsigned int i1 = mesh.add_elem_integer("i1");
+    unsigned int ni1 = mesh.add_node_integer("ni1");
+    unsigned int ni2 = mesh.add_node_integer("ni2");
 
     MeshTools::Generation::build_line(mesh,
                                       /*nx=*/10,
@@ -60,18 +62,34 @@ protected:
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->point(0)(0)*100));
       }
 
+    for (const auto & node : mesh.node_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(node->n_extra_integers(), 2u);
+        CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni1), DofObject::invalid_id);
+        CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni2), DofObject::invalid_id);
+      }
+
     // Force (in parallel) a different partitioning - we'll simply put
     // everything on rank 0, which hopefully is not what our default
     // partitioner did!
     mesh.partition(1);
 
     CPPUNIT_ASSERT_EQUAL(i1, mesh.add_elem_integer("i1"));
+    CPPUNIT_ASSERT_EQUAL(ni1, mesh.add_node_integer("ni1"));
+    CPPUNIT_ASSERT_EQUAL(ni2, mesh.add_node_integer("ni2"));
 
     // Make sure we didn't screw up any extra integers thereby.
     for (const auto & elem : mesh.element_ptr_range())
       {
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), 1u);
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->point(0)(0)*100));
+      }
+
+    for (const auto & node : mesh.node_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(node->n_extra_integers(), 2u);
+        CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni1), DofObject::invalid_id);
+        CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni2), DofObject::invalid_id);
       }
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -88,6 +106,8 @@ protected:
         else
           {
             CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->point(0)(0)*100));
+            for (auto & node : elem->node_ref_range())
+              CPPUNIT_ASSERT_EQUAL(node.n_extra_integers(), 2u);
           }
       }
 #endif
