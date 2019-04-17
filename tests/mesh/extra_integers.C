@@ -101,14 +101,10 @@ protected:
     for (const auto & elem : mesh.element_ptr_range())
       {
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), 1u);
-        if (elem->level())
-          CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), DofObject::invalid_id);
-        else
-          {
-            CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->point(0)(0)*100));
-            for (auto & node : elem->node_ref_range())
-              CPPUNIT_ASSERT_EQUAL(node.n_extra_integers(), 2u);
-          }
+        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->top_parent()->point(0)(0)*100));
+        if (!elem->level())
+          for (auto & node : elem->node_ref_range())
+            CPPUNIT_ASSERT_EQUAL(node.n_extra_integers(), 2u);
       }
 #endif
   }
