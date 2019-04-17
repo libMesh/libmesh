@@ -733,6 +733,12 @@ public:
    */
   unsigned int add_elem_integer(const std::string & name);
 
+  /*
+   * \returns The index number for the named extra element integer
+   * datum, which must have already been added.
+   */
+  unsigned int get_elem_integer_index(const std::string & name) const;
+
   /**
    * Register an integer datum (of type dof_id_type) to be added to
    * each node in the mesh.
@@ -741,6 +747,12 @@ public:
    * datum if one by the same name has already been added.
    */
   unsigned int add_node_integer(const std::string & name);
+
+  /*
+   * \returns The index number for the named extra node integer
+   * datum, which must have already been added.
+   */
+  unsigned int get_node_integer_index(const std::string & name) const;
 
   /**
    * Prepare a newly ecreated (or read) mesh for use.
