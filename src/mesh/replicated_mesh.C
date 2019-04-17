@@ -1052,6 +1052,19 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
         }
         else
         {
+          // In the unlikely event that two meshes composed entirely of
+          // NodeElems are being stitched together, we will not have
+          // selected a valid h_min value yet, and the distance
+          // comparison below will be true for essentially any two
+          // nodes. In this case we simply fall back on an absolute
+          // distance check.
+          if (!h_min_updated)
+            {
+              libmesh_warning("No valid h_min value was found, falling back on "
+                              "absolute distance check in the N^2 search algorithm.");
+              h_min = 1.;
+            }
+
           // Otherwise, use a simple N^2 search to find the closest matching points. This can be helpful
           // in the case that we have tolerance issues which cause mismatch between the two surfaces
           // that are being stitched.
