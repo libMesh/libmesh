@@ -908,10 +908,21 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                         // We need to set h_min to some value. It's too expensive to
                         // search for the element that actually contains this node,
                         // since that would require a PointLocator. As a result, we
-                        // just use the first element in the mesh to give us hmin.
-                        const Elem * first_active_elem = *mesh_array[i]->active_elements_begin();
-                        h_min = first_active_elem->hmin();
-                        h_min_updated = true;
+                        // just use the first (non-NodeElem!) element in the mesh to
+                        // give us hmin if it's never been set before.
+                        if (!h_min_updated)
+                          {
+                            for (const auto & elem : mesh_array[i]->element_ptr_range())
+                              {
+                                Real current_h_min = elem->hmin();
+                                if (current_h_min > 0.)
+                                  {
+                                    h_min = current_h_min;
+                                    h_min_updated = true;
+                                    break;
+                                  }
+                              }
+                          }
                       }
                   }
               }
@@ -1055,6 +1066,19 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
         }
         else
         {
+          // In the unlikely event that two meshes composed entirely of
+          // NodeElems are being stitched together, we will not have
+          // selected a valid h_min value yet, and the distance
+          // comparison below will be true for essentially any two
+          // nodes. In this case we simply fall back on an absolute
+          // distance check.
+          if (!h_min_updated)
+            {
+              libmesh_warning("No valid h_min value was found, falling back on "
+                              "absolute distance check in the N^2 search algorithm.");
+              h_min = 1.;
+            }
+
           // Otherwise, use a simple N^2 search to find the closest matching points. This can be helpful
           // in the case that we have tolerance issues which cause mismatch between the two surfaces
           // that are being stitched.
