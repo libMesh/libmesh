@@ -518,6 +518,18 @@ public:
                      unsigned int qp,
                      OutputType & u) const;
 
+
+  /**
+   * \returns The time derivative (rate) of the solution gradient
+   * of variable \p var at the quadrature point \p qp on the current
+   * element interior.
+   */
+  template<typename OutputType>
+  void interior_rate_gradient(unsigned int var,
+                              unsigned int qp,
+                              OutputType & u) const;
+
+
   /**
    * \returns The time derivative (rate) of the solution variable
    * \p var at the quadrature point \p qp on the current element side.
