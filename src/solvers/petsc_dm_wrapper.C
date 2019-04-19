@@ -24,7 +24,7 @@
 
 #include "libmesh/ignore_warnings.h"
 #include <petscsf.h>
-#if PETSC_VERSION_LESS_THAN(3,11,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
 #include <petsc/private/dmimpl.h>
 #endif
 #include <petscdmshell.h>
@@ -83,10 +83,10 @@ namespace libMesh
           LIBMESH_CHKERR(ierr);
 
           // Now set the function pointers for the subDM
-          // Some DMShellGet* functions only exist with PETSc >= 3.11.1.
+          // Some DMShellGet* functions only exist with PETSc >= 3.12.0.
 
           // Set Coarsen function pointer
-#if PETSC_VERSION_LESS_THAN(3,11,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->coarsen)
             {
               ierr = DMShellSetCoarsen(*subdm, dm->ops->coarsen);
@@ -104,7 +104,7 @@ namespace libMesh
 #endif
 
           // Set Refine function pointer
-#if PETSC_VERSION_LESS_THAN(3,11,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->refine)
             {
               ierr = DMShellSetRefine(*subdm, dm->ops->refine);
@@ -121,7 +121,7 @@ namespace libMesh
 #endif
 
           // Set Interpolation function pointer
-#if PETSC_VERSION_LESS_THAN(3,11,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->createinterpolation)
             {
               ierr = DMShellSetCreateInterpolation(*subdm, dm->ops->createinterpolation);
@@ -139,7 +139,7 @@ namespace libMesh
 #endif
 
           // Set Restriction function pointer
-#if PETSC_VERSION_LESS_THAN(3,11,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->createrestriction)
             {
               ierr = DMShellSetCreateRestriction(*subdm, dm->ops->createrestriction);
@@ -157,7 +157,7 @@ namespace libMesh
 #endif
 
           // Set CreateSubDM function pointer
-#if PETSC_VERSION_LESS_THAN(3,11,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->createsubdm)
             {
               ierr = DMShellSetCreateSubDM(*subdm, dm->ops->createsubdm);
