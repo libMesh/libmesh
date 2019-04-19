@@ -898,7 +898,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                         // give us hmin if it's never been set before.
                         if (!h_min_updated)
                           {
-                            for (const auto & elem : mesh_array[i]->element_ptr_range())
+                            for (const auto & elem : mesh_array[i]->active_element_ptr_range())
                               {
                                 Real current_h_min = elem->hmin();
                                 if (current_h_min > 0.)
@@ -907,6 +907,15 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                                     h_min_updated = true;
                                     break;
                                   }
+                              }
+
+                            // If, after searching all the active elements, we did not update
+                            // h_min, give up and set h_min to 1 so that we don't repeat this
+                            // fruitless search
+                            if (!h_min_updated)
+                              {
+                                h_min_updated = true;
+                                h_min = 1.0;
                               }
                           }
                       }
