@@ -1259,7 +1259,16 @@ void FEMContext::interior_rate(unsigned int var, unsigned int qp,
                    &DiffContext::get_elem_solution_rate>(var, qp, u);
 }
 
-
+template<typename OutputType>
+void FEMContext::interior_rate_gradient(unsigned int var, unsigned int qp,
+                                        OutputType & dudot) const
+{
+  this->some_gradient<OutputType,
+                      &FEMContext::get_element_fe<typename TensorTools::MakeReal
+                                                  <typename TensorTools::DecrementRank
+                                                   <OutputType>::type>::type>,
+                      &DiffContext::get_elem_solution_rate>(var, qp, dudot);
+}
 
 template<typename OutputType>
 void FEMContext::side_rate(unsigned int var, unsigned int qp,
@@ -2017,6 +2026,9 @@ template void FEMContext::fixed_point_hessian<Tensor>(unsigned int, const Point 
 
 template void FEMContext::interior_rate<Number>(unsigned int, unsigned int, Number &) const;
 template void FEMContext::interior_rate<Gradient>(unsigned int, unsigned int, Gradient &) const;
+
+template void FEMContext::interior_rate_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template void FEMContext::interior_rate_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
 
 template void FEMContext::side_rate<Number>(unsigned int, unsigned int, Number &) const;
 template void FEMContext::side_rate<Gradient>(unsigned int, unsigned int, Gradient &) const;
