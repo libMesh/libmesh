@@ -739,6 +739,19 @@ public:
    */
   unsigned int get_elem_integer_index(const std::string & name) const;
 
+  /*
+   * \returns The name for the indexed extra element integer
+   * datum, which must have already been added.
+   */
+  const std::string & get_elem_integer_name(unsigned int i) const
+  { return _elem_integer_names[i]; }
+
+  /*
+   * \returns The number of extra element integers for which space is
+   * being reserved on this mesh.
+   */
+  unsigned int n_elem_integers() const { return _elem_integer_names.size(); }
+
   /**
    * Register an integer datum (of type dof_id_type) to be added to
    * each node in the mesh.
@@ -753,6 +766,19 @@ public:
    * datum, which must have already been added.
    */
   unsigned int get_node_integer_index(const std::string & name) const;
+
+  /*
+   * \returns The name for the indexed extra node integer
+   * datum, which must have already been added.
+   */
+  const std::string & get_node_integer_name(unsigned int i) const
+  { return _node_integer_names[i]; }
+
+  /*
+   * \returns The number of extra node integers for which space is
+   * being reserved on this mesh.
+   */
+  unsigned int n_node_integers() const { return _node_integer_names.size(); }
 
   /**
    * Prepare a newly ecreated (or read) mesh for use.
