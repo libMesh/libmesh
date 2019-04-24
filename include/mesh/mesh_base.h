@@ -136,7 +136,11 @@ public:
   BoundaryInfo & get_boundary_info() { return *boundary_info; }
 
   /**
-   * Deletes all the data that are currently stored.
+   * Deletes all the element and node data that is currently stored.
+   *
+   * elem and node extra_integer data is nevertheless *retained* here,
+   * for better compatibility between that feature and older code's
+   * use of MeshBase::clear()
    */
   virtual void clear ();
 
