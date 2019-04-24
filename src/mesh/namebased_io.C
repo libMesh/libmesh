@@ -291,6 +291,15 @@ void NameBasedIO::write (const std::string & name)
       else if (name.rfind(".nem") < name.size() ||
                name.rfind(".n")   < name.size())
         Nemesis_IO(mymesh).write(name);
+
+      else if (name.rfind(".cpa") < name.size())
+        CheckpointIO(mymesh,false).write(name);
+
+      else if (name.rfind(".cpr") < name.size())
+        CheckpointIO(mymesh,true).write(name);
+
+      else
+        libmesh_error_msg("Couldn't deduce filetype for " << name);
     }
 
   // serial file formats
@@ -364,6 +373,8 @@ void NameBasedIO::write (const std::string & name)
             libMesh::err
               << " ERROR: Unrecognized file extension: " << name
               << "\n   I understand the following:\n\n"
+              << "     *.cpa   -- libMesh ASCII checkpoint format\n"
+              << "     *.cpr   -- libMesh binary checkpoint format,\n"
               << "     *.dat   -- Tecplot ASCII file\n"
               << "     *.e     -- Sandia's ExodusII format\n"
               << "     *.exd   -- Sandia's ExodusII format\n"
@@ -415,7 +426,6 @@ void NameBasedIO::write (const std::string & name)
           mymesh.comm().barrier();
         }
     }
-
 }
 
 
