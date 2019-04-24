@@ -227,7 +227,7 @@ public:
    * with \p index, which should have been obtained via a call to \p
    * MeshBase::add_elem_integer or \p MeshBase::add_node_integer
    */
-  dof_id_type get_extra_integer (const unsigned int index);
+  dof_id_type get_extra_integer (const unsigned int index) const;
 
   /**
    * Adds an additional system to the \p DofObject
@@ -994,7 +994,7 @@ DofObject::set_extra_integer(const unsigned int index,
 
 inline
 dof_id_type
-DofObject::get_extra_integer (const unsigned int index)
+DofObject::get_extra_integer (const unsigned int index) const
 {
   libmesh_assert_less(index, this->n_extra_integers());
   libmesh_assert_less(this->n_systems(), _idx_buf.size());
