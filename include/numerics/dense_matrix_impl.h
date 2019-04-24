@@ -28,6 +28,23 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/libmesh.h"
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename, typename>
+class DualNumber;
+}
+namespace std
+{
+// When instantiating a DenseMatrix<DualNumber> we need these declarations visible
+// in order to compile the DenseMatrix<T>::_cholesky_decompose method
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> sqrt(const MetaPhysicL::DualNumber<T, D> & in);
+template <typename T, typename D>
+MetaPhysicL::DualNumber<T, D> sqrt(MetaPhysicL::DualNumber<T, D> && in);
+}
+#endif
+
 namespace libMesh
 {
 
