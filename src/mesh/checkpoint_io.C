@@ -921,7 +921,9 @@ file_id_type CheckpointIO::read_header (const std::string & name)
       this->read_bc_names<file_id_type>(io, boundary_info, false); // nodeset names
 
       // read extra integer names?
+      std::swap(input_version, this->version());
       const bool read_extra_integers = this->version_at_least_1_5();
+      std::swap(input_version, this->version());
 
       if (read_extra_integers)
         this->read_integers_names<file_id_type>
