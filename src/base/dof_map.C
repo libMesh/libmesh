@@ -1110,7 +1110,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
             {
               Node & node = elem->node_ref(n);
 
-              if (node.processor_id() < this->processor_id())
+              if (node.processor_id() != this->processor_id())
                 continue;
 
               const unsigned int n_comp = node.n_comp(sys_num, var_num);
