@@ -117,11 +117,10 @@ namespace libMesh
     }
 
     //! Help PETSc identify the finer DM given a dmc
-    PetscErrorCode libmesh_petsc_DMRefine(DM dmc, MPI_Comm comm, DM * dmf)
+    PetscErrorCode libmesh_petsc_DMRefine(DM dmc, MPI_Comm /*comm*/, DM * dmf)
     {
       libmesh_assert(dmc);
       libmesh_assert(dmf);
-      libmesh_assert(comm);
 
       PetscErrorCode ierr;
 
@@ -140,11 +139,10 @@ namespace libMesh
     }
 
     //! Help PETSc identify the coarser DM dmc given the fine DM dmf
-    PetscErrorCode libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm comm, DM * dmc)
+    PetscErrorCode libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm /*comm*/, DM * dmc)
     {
       libmesh_assert(dmc);
       libmesh_assert(dmf);
-      libmesh_assert(comm);
 
       PetscErrorCode ierr;
 
