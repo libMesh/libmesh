@@ -1088,9 +1088,7 @@ void CheckpointIO::read_nodes (Xdr & io)
         }
       else
         {
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
           Node * node =
-#endif
             mesh.add_point(p, id, pid);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
