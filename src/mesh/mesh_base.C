@@ -336,6 +336,10 @@ void MeshBase::clear ()
 void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
   _ghosting_functors.erase(&ghosting_functor);
+
+  auto it = _shared_functors.find(&ghosting_functor);
+  if (it != _shared_functors.end())
+    _shared_functors.erase(it);
 }
 
 
