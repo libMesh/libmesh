@@ -84,10 +84,13 @@ void Elem::refine (MeshRefinement & mesh_refinement)
       for (unsigned int c = 0; c != nc; c++)
         {
           Elem * current_child = this->child_ptr(c);
-          libmesh_assert(current_child->subactive());
-          current_child->set_refinement_flag(Elem::JUST_REFINED);
-          current_child->set_p_level(parent_p_level);
-          current_child->set_p_refinement_flag(this->p_refinement_flag());
+          if (current_child != remote_elem)
+            {
+              libmesh_assert(current_child->subactive());
+              current_child->set_refinement_flag(Elem::JUST_REFINED);
+              current_child->set_p_level(parent_p_level);
+              current_child->set_p_refinement_flag(this->p_refinement_flag());
+            }
         }
     }
 
@@ -98,11 +101,14 @@ void Elem::refine (MeshRefinement & mesh_refinement)
   // projection operations correct
   // this->set_p_refinement_flag(Elem::INACTIVE);
 
+#ifndef NDEBUG
   for (unsigned int c = 0; c != nc; c++)
-    {
-      libmesh_assert_equal_to (this->child_ptr(c)->parent(), this);
-      libmesh_assert(this->child_ptr(c)->active());
-    }
+    if (this->child_ptr(c) != remote_elem)
+      {
+        libmesh_assert_equal_to (this->child_ptr(c)->parent(), this);
+        libmesh_assert(this->child_ptr(c)->active());
+      }
+#endif
   libmesh_assert (this->ancestor());
 }
 
