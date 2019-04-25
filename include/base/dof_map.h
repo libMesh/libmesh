@@ -306,6 +306,18 @@ public:
                             bool to_mesh = true);
 
   /**
+   * Adds a functor which can specify coupling requirements for
+   * creation of sparse matrices.
+   *
+   * GhostingFunctor memory when using this method is managed by the
+   * shared_ptr mechanism.
+   */
+  void add_coupling_functor(std::shared_ptr<GhostingFunctor> coupling_functor,
+                            bool to_mesh = true)
+  { _shared_functors[coupling_functor.get()] = coupling_functor;
+    this->add_coupling_functor(*coupling_functor, to_mesh); }
+
+  /**
    * Removes a functor which was previously added to the set of
    * coupling functors, from both this DofMap and from the underlying
    * mesh.
@@ -354,6 +366,18 @@ public:
    */
   void add_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor,
                                       bool to_mesh = true);
+
+  /**
+   * Adds a functor which can specify algebraic ghosting requirements
+   * for use with distributed vectors.
+   *
+   * GhostingFunctor memory when using this method is managed by the
+   * shared_ptr mechanism.
+   */
+  void add_algebraic_ghosting_functor(std::shared_ptr<GhostingFunctor> evaluable_functor,
+                                      bool to_mesh = true)
+  { _shared_functors[evaluable_functor.get()] = evaluable_functor;
+    this->add_algebraic_ghosting_functor(*evaluable_functor, to_mesh); }
 
   /**
    * Removes a functor which was previously added to the set of
@@ -1711,6 +1735,12 @@ private:
    * geometrically ghosted elements.
    */
   std::set<GhostingFunctor *> _coupling_functors;
+
+  /**
+   * Hang on to references to any GhostingFunctor objects we were
+   * passed in shared_ptr form
+   */
+  std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor> > _shared_functors;
 
   /**
    * Default false; set to true if any attached matrix requires a full

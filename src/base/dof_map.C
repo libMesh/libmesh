@@ -876,6 +876,8 @@ void DofMap::clear()
     this->add_algebraic_ghosting_functor(*_default_evaluating);
   }
 
+  this->_shared_functors.clear();
+
   _variables.clear();
   _variable_groups.clear();
   _variable_group_numbers.clear();
@@ -1839,6 +1841,10 @@ DofMap::remove_coupling_functor(GhostingFunctor & coupling_functor)
 {
   _coupling_functors.erase(&coupling_functor);
   _mesh.remove_ghosting_functor(coupling_functor);
+
+  auto it = _shared_functors.find(&coupling_functor);
+  if (it != _shared_functors.end())
+    _shared_functors.erase(it);
 }
 
 
@@ -1859,6 +1865,10 @@ DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor)
 {
   _algebraic_ghosting_functors.erase(&evaluable_functor);
   _mesh.remove_ghosting_functor(evaluable_functor);
+
+  auto it = _shared_functors.find(&evaluable_functor);
+  if (it != _shared_functors.end())
+    _shared_functors.erase(it);
 }
 
 
