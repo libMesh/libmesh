@@ -252,7 +252,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(n_ghosts(), 1);
 
     // Add another functor, making two
-    GhostPointNeighbors gpn(mesh);
+    auto gpn = std::make_shared<GhostPointNeighbors>(mesh);
     mesh.add_ghosting_functor(gpn);
     CPPUNIT_ASSERT_EQUAL(n_ghosts(), 2);
 
@@ -261,7 +261,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(n_ghosts(), 1);
 
     // Which can be removed too
-    mesh.remove_ghosting_functor(gpn);
+    mesh.remove_ghosting_functor(*gpn);
     CPPUNIT_ASSERT_EQUAL(n_ghosts(), 0);
 
     // Adding a new system shouldn't add any default ghosting if the
@@ -291,13 +291,14 @@ public:
 
     // Adding a user functor to evaluables and couplings should add it
     // to the mesh
-    GhostPointNeighbors gpn2(mesh), gpn3(mesh);
+    GhostPointNeighbors gpn2(mesh);
     sys1.get_dof_map().add_algebraic_ghosting_functor(gpn2);
     CPPUNIT_ASSERT_EQUAL(n_ghosts(), 6);
     CPPUNIT_ASSERT_EQUAL(n_evaluables(sys1), 2);
     CPPUNIT_ASSERT_EQUAL(n_couplings(sys1), 1);
 
     // Unless we say not to.
+    auto gpn3 = std::make_shared<GhostPointNeighbors>(mesh);
     sys1.get_dof_map().add_coupling_functor(gpn3, /*to_mesh=*/false);
     CPPUNIT_ASSERT_EQUAL(n_ghosts(), 6);
     CPPUNIT_ASSERT_EQUAL(n_evaluables(sys1), 2);
