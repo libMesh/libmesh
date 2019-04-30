@@ -907,6 +907,18 @@ public:
   { _ghosting_functors.insert(&ghosting_functor); }
 
   /**
+   * Adds a functor which can specify ghosting requirements for use on
+   * distributed meshes.  Multiple ghosting functors can be added; any
+   * element which is required by any functor will be ghosted.
+   *
+   * GhostingFunctor memory when using this method is managed by the
+   * shared_ptr mechanism.
+   */
+  void add_ghosting_functor(std::shared_ptr<GhostingFunctor> ghosting_functor)
+  { _shared_functors[ghosting_functor.get()] = ghosting_functor;
+    this->add_ghosting_functor(*ghosting_functor); }
+
+  /**
    * Removes a functor which was previously added to the set of
    * ghosting functors.
    */
@@ -1592,6 +1604,12 @@ protected:
    * MeshBase because the cost is trivial.
    */
   std::set<GhostingFunctor *> _ghosting_functors;
+
+  /**
+   * Hang on to references to any GhostingFunctor objects we were
+   * passed in shared_ptr form
+   */
+  std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor> > _shared_functors;
 
   /**
    * If nonzero, we will call PointLocatorBase::set_close_to_point_tol()
