@@ -40,8 +40,8 @@ data = [
 '\'16', 125,
 '\'17', 133,
 '\'18', 149,
-'\'19', 44,
-'T', 102,
+'\'19', 46,
+'T', 104,
     ]
 
 # Extract the x-axis labels from the data array
