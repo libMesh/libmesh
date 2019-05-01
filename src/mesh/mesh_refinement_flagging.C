@@ -48,6 +48,10 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector & error_
 {
   parallel_object_only();
 
+  // Verify that our error vector is consistent, using std::vector to
+  // avoid confusing this->comm().verify
+  libmesh_assert(this->comm().verify(dynamic_cast<const std::vector<ErrorVectorReal> &>(error_per_cell)));
+
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
@@ -167,6 +171,10 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector & error
 {
   parallel_object_only();
 
+  // Verify that our error vector is consistent, using std::vector to
+  // avoid confusing this->comm().verify
+  libmesh_assert(this->comm().verify(dynamic_cast<const std::vector<ErrorVectorReal> &>(error_per_cell_in)));
+
   libmesh_assert_greater (_coarsen_threshold, 0);
 
   // Check for valid fractions..
@@ -229,6 +237,10 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector & error
 bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_per_cell)
 {
   parallel_object_only();
+
+  // Verify that our error vector is consistent, using std::vector to
+  // avoid confusing this->comm().verify
+  libmesh_assert(this->comm().verify(dynamic_cast<const std::vector<ErrorVectorReal> &>(error_per_cell)));
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
@@ -438,6 +450,10 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector & error_p
 {
   parallel_object_only();
 
+  // Verify that our error vector is consistent, using std::vector to
+  // avoid confusing this->comm().verify
+  libmesh_assert(this->comm().verify(dynamic_cast<const std::vector<ErrorVectorReal> &>(error_per_cell)));
+
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
@@ -570,6 +586,10 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector & error_per
                                                    const Real coarsen_frac,
                                                    const unsigned int max_l)
 {
+  // Verify that our error vector is consistent, using std::vector to
+  // avoid confusing this->comm().verify
+  libmesh_assert(this->comm().verify(dynamic_cast<const std::vector<ErrorVectorReal> &>(error_per_cell)));
+
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
