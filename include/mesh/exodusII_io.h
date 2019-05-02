@@ -133,6 +133,14 @@ public:
                                unsigned int timestep=1);
 
   /**
+   * Copy global variables into scalar variables of a System object.
+   */
+  void copy_scalar_solution(System & system,
+                            std::vector<std::string> system_var_names,
+                            std::vector<std::string> exodus_var_names,
+                            unsigned int timestep=1);
+
+  /**
    * Given an elemental variable and a time step, returns a mapping from the
    * elements (top parent) unique IDs to the value of the elemental variable at
    * the corresponding time step index.
@@ -324,6 +332,11 @@ public:
    * Return list of the nodal variable names
    */
   const std::vector<std::string> & get_nodal_var_names();
+
+  /**
+   * Return list of the global variable names
+   */
+  const std::vector<std::string> & get_global_var_names();
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   /**
