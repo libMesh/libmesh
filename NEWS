@@ -12,6 +12,9 @@
   * FEInterface::get_continuity() should take a const reference.
   * Fix complex-enabled bug in unit test.
   * Fixes for mesh stitching when NodeElems are involved.
+  * Remove deprecated Elem API calls from misc_ex6.
+  * Assert consistent ErrorVector values for flagging.
+  * Restrict adaptivity ex3 max_r_steps.
 
 1.3.1 -> 1.4.0
   * BoundaryInfo:
