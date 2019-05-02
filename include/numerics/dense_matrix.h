@@ -91,6 +91,12 @@ public:
   virtual void zero() override;
 
   /**
+   * Get submatrix with the smallest row and column indices and the submatrix size.
+   */
+  DenseMatrix sub_matrix(unsigned int row_id, unsigned int row_size,
+                         unsigned int col_id, unsigned int col_size) const;
+
+  /**
    * \returns The \p (i,j) element of the matrix.
    */
   T operator() (const unsigned int i,
@@ -827,6 +833,37 @@ void DenseMatrix<T>::zero()
   _decomposition_type = NONE;
 
   std::fill (_val.begin(), _val.end(), static_cast<T>(0));
+}
+
+
+
+template<typename T>
+inline
+DenseMatrix<T> DenseMatrix<T>::sub_matrix(unsigned int row_id, unsigned int row_size,
+                                          unsigned int col_id, unsigned int col_size) const
+{
+  libmesh_assert_less (row_id + row_size - 1, this->_m);
+  libmesh_assert_less (col_id + col_size - 1, this->_n);
+
+  DenseMatrix<T> sub;
+  sub._m = row_size;
+  sub._n = col_size;
+  sub._val.resize(row_size * col_size);
+
+  unsigned int end_col = this->_n - col_size - col_id;
+  unsigned int p = row_id * this->_n;
+  unsigned int q = 0;
+  for (unsigned int i=0; i<row_size; i++)
+  {
+    // skip the beginning columns
+    p += col_id;
+    for (unsigned int j=0; j<col_size; j++)
+      sub._val[q++] = _val[p++];
+    // skip the rest columns
+    p += end_col;
+  }
+
+  return sub;
 }
 
 

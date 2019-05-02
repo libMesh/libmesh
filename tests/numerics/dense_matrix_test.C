@@ -38,6 +38,7 @@ public:
   CPPUNIT_TEST(testEVDreal);
   CPPUNIT_TEST(testEVDcomplex);
   CPPUNIT_TEST(testComplexSVD);
+  CPPUNIT_TEST(testSubMatrix);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -367,6 +368,21 @@ private:
 #endif
   }
 
+  void testSubMatrix()
+  {
+    DenseMatrix<Number> A(4, 3);
+    A(0,0) = 1.0; A(0,1) = 2.0; A(0,2) = 3.0;
+    A(1,0) = 4.0; A(1,1) = 5.0; A(1,2) = 6.0;
+    A(2,0) = 7.0; A(2,1) = 8.0; A(2,2) = 9.0;
+    A(3,0) =10.0; A(3,1) =11.0; A(3,2) =12.0;
+
+    DenseMatrix<Number> B(2, 2);
+    B(0,0) = 7.0; B(0,1) = 8.0;
+    B(1,0) =10.0; B(1,1) =11.0;
+
+    DenseMatrix<Number> C = A.sub_matrix(2, 2, 0, 2);
+    CPPUNIT_ASSERT(B == C);
+  }
 };
 
 // Only run the test if we expect it can actually work!
