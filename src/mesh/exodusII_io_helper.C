@@ -1045,8 +1045,6 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
-      if (!var_table[elem_var_names.size()*i + var_index])
-        continue;
       ex_err = exII::ex_get_elem_block(ex_id,
                                        block_ids[i],
                                        nullptr,
@@ -1055,7 +1053,17 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
                                        nullptr);
       EX_CHECK_ERR(ex_err, "Error getting number of elements in block.");
 
-      std::vector<Real> block_elem_var_values(num_elem);
+      // If the current variable isn't active on this subdomain, advance
+      // the index by the number of elements on this block and go to the
+      // next loop iteration.
+      if (!var_table[elem_var_names.size()*i + var_index])
+        {
+          ex_el_num += num_elem_this_blk;
+          continue;
+        }
+
+      std::vector<Real> block_elem_var_values(num_elem_this_blk);
+
       ex_err = exII::ex_get_elem_var(ex_id,
                                      time_step,
                                      var_index+1,
