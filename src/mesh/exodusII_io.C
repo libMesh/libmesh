@@ -36,6 +36,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_mesh.h"
+#include "libmesh/dof_map.h"
 
 namespace libMesh
 {
@@ -546,6 +547,39 @@ void ExodusII_IO::copy_elemental_solution(System & system,
             }
         }
     }
+
+  system.solution->close();
+  system.update();
+}
+
+void ExodusII_IO::copy_scalar_solution(System & system,
+                                       std::vector<std::string> system_var_names,
+                                       std::vector<std::string> exodus_var_names,
+                                       unsigned int timestep)
+{
+  if (!exio_helper->opened_for_reading)
+    libmesh_error_msg("ERROR, ExodusII file must be opened for reading before copying a scalar solution!");
+
+  if (system_var_names.size() != exodus_var_names.size())
+    libmesh_error_msg("ERROR, the number of system_var_names must match exodus_var_names.");
+
+  std::vector<Real> values_from_exodus;
+  read_global_variable(exodus_var_names, timestep, values_from_exodus);
+
+  if (system.processor_id() == (system.n_processors()-1))
+  {
+    const DofMap & dof_map = system.get_dof_map();
+
+    for (std::size_t i = 0; i < system_var_names.size(); i++)
+    {
+      const unsigned int var_num = system.variable_scalar_number(system_var_names[i], 0);
+
+      std::vector<dof_id_type> SCALAR_dofs;
+      dof_map.SCALAR_dof_indices(SCALAR_dofs, var_num);
+
+      system.solution->set (SCALAR_dofs[0], values_from_exodus[i]);
+    }
+  }
 
   system.solution->close();
   system.update();
@@ -1372,6 +1406,12 @@ const std::vector<std::string> & ExodusII_IO::get_elem_var_names()
   return exio_helper->elem_var_names;
 }
 
+const std::vector<std::string> & ExodusII_IO::get_global_var_names()
+{
+  exio_helper->read_var_names(ExodusII_IO_Helper::GLOBAL);
+  return exio_helper->global_var_names;
+}
+
 ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
 {
   // Provide a warning when accessing the helper object
@@ -1469,6 +1509,16 @@ void ExodusII_IO::copy_elemental_solution(System &,
 
 
 
+void ExodusII_IO::copy_scalar_solution(System &,
+                                       std::vector<std::string>,
+                                       std::vector<std::string>,
+                                       unsigned int)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
 void ExodusII_IO::write_element_data (const EquationSystems &)
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
@@ -1552,6 +1602,11 @@ const std::vector<std::string> & ExodusII_IO::get_elem_var_names()
 }
 
 const std::vector<std::string> & ExodusII_IO::get_nodal_var_names()
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+const std::vector<std::string> & ExodusII_IO::get_global_var_names()
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
