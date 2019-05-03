@@ -1,3 +1,21 @@
+1.4.0 -> 1.4.1
+  * This is a bugfix release for 1.4.0.
+  * Correctly identify automake 1.15 as too old
+  * Close residual/vector before applying constraints
+  * Capture iterations from PETSc in DiffSolver
+  * Fix 2006 bug with refinement within ES::reinit()
+  * Fix remote_elem copying in UnstructuredMesh
+  * Fix issue with subdomain-restricted variables and hanging nodes (#2099)
+  * Drop VecScatterCreateWithData() workaround. This did not end up making
+    it into a release version of PETSc.
+  * Fix doco in DenseMatrix::right_multiply.
+  * FEInterface::get_continuity() should take a const reference.
+  * Fix complex-enabled bug in unit test.
+  * Fixes for mesh stitching when NodeElems are involved.
+  * Remove deprecated Elem API calls from misc_ex6.
+  * Assert consistent ErrorVector values for flagging.
+  * Restrict adaptivity ex3 max_r_steps.
+
 1.3.1 -> 1.4.0
   * BoundaryInfo:
     - BoundaryInfo::build_foo_list(): sort vector before returning.
