@@ -225,6 +225,18 @@ public:
   { return _elem_dims; }
 
   /**
+   * Most of the time you should not need to call this, as the element
+   * dimensions will be set automatically by a call to cache_elem_dims(),
+   * therefore only call this if you know what you're doing.
+   *
+   * In some specialized situations, for example when adding a single
+   * Elem on all procs, it can be faster to skip calling cache_elem_dims()
+   * and simply specify the element dimensions manually, which is why this
+   * setter exists.
+   */
+  void set_elem_dimensions(const std::set<unsigned char> & elem_dims);
+
+  /**
    * \returns The "spatial dimension" of the mesh.
    *
    * The spatial dimension is defined as:

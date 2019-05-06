@@ -136,6 +136,21 @@ unsigned int MeshBase::mesh_dimension() const
 
 
 
+void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
+{
+#ifdef DEBUG
+  // In debug mode, we call cache_elem_dims() and then make sure
+  // the result actually agrees with what the user specified.
+  parallel_object_only();
+
+  this->cache_elem_dims();
+  libmesh_assert_msg(_elem_dims == elem_dims, \
+                     "Specified element dimensions does not match true element dimensions!");
+#endif
+
+  _elem_dims = elem_dims;
+}
+
 unsigned int MeshBase::spatial_dimension () const
 {
   return cast_int<unsigned int>(_spatial_dimension);
