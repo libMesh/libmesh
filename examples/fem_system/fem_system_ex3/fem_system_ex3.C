@@ -241,8 +241,8 @@ int main (int argc, char ** argv)
   if( newton_solver &&
       (time_solver == std::string("euler") || time_solver == std::string("euler2") ) )
     {
-      LinearSolver<Number> & linear_solver = newton_solver->get_linear_solver();
 #ifdef LIBMESH_HAVE_EIGEN_SPARSE
+      LinearSolver<Number> & linear_solver = newton_solver->get_linear_solver();
       EigenSparseLinearSolver<Number> * eigen_linear_solver =
         dynamic_cast<EigenSparseLinearSolver<Number> *>(&linear_solver);
 
