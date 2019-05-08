@@ -566,6 +566,17 @@ void ExodusII_IO::copy_scalar_solution(System & system,
   std::vector<Real> values_from_exodus;
   read_global_variable(exodus_var_names, timestep, values_from_exodus);
 
+#ifdef LIBMESH_HAVE_MPI
+  if (this->n_processors() > 1)
+  {
+    const Parallel::MessageTag tag(1);
+    if (this->processor_id() == this->n_processors()-1)
+      this->comm().receive(0, values_from_exodus, tag);
+    if (this->processor_id() == 0)
+      this->comm().send(this->n_processors()-1, values_from_exodus, tag);
+  }
+#endif
+
   if (system.processor_id() == (system.n_processors()-1))
   {
     const DofMap & dof_map = system.get_dof_map();
@@ -613,6 +624,9 @@ void ExodusII_IO::read_global_variable(std::vector<std::string> global_var_names
   exio_helper->read_var_names(ExodusII_IO_Helper::GLOBAL);
   exio_helper->read_global_values(values_from_exodus, timestep);
   std::vector<std::string> global_var_names_exodus = exio_helper->global_var_names;
+
+  if (values_from_exodus.size() == 0)
+    return;   // This will happen in parallel on procs that are not 0
 
   global_values.clear();
   for (std::size_t i = 0; i != size; ++i)
