@@ -621,6 +621,10 @@ public:
     unsigned int rank = TestCommWorld->rank();
     unsigned int color = rank % 2;
     TestCommWorld->split(color, rank, subcomm);
+
+    CPPUNIT_ASSERT(subcomm.size() >= 1);
+    CPPUNIT_ASSERT(subcomm.size() >= TestCommWorld->size() / 2);
+    CPPUNIT_ASSERT(subcomm.size() <= TestCommWorld->size() / 2 + 1);
   }
 
 
@@ -634,6 +638,9 @@ public:
     type = MPI_COMM_TYPE_SHARED;
 #endif
     TestCommWorld->split_by_type(type, rank, i, subcomm);
+
+    CPPUNIT_ASSERT(subcomm.size() >= 1);
+    CPPUNIT_ASSERT(subcomm.size() <= TestCommWorld->size());
   }
 };
 
