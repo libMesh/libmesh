@@ -624,6 +624,17 @@ public:
   }
 
 
+  void testSplitByType ()
+  {
+    Parallel::Communicator subcomm;
+    unsigned int rank = TestCommWorld->rank();
+    Parallel::info i;
+    int type = 0;
+#ifdef LIBMESH_HAVE_MPI
+    type = MPI_COMM_TYPE_SHARED;
+#endif
+    TestCommWorld->split_by_type(type, rank, i, subcomm);
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ParallelTest );
