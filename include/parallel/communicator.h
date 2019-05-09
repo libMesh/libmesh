@@ -65,6 +65,11 @@ class Packing;
 typedef MPI_Comm communicator;
 
 /**
+ * Info object used by some MPI-3 methods
+ */
+typedef MPI_Info info;
+
+/**
  * Processor id meaning "Accept from any source"
  */
 const unsigned int any_source =
@@ -76,6 +81,8 @@ const unsigned int any_source =
 // unique types for function overloading to work
 // properly.
 typedef int communicator; // Must match petsc-nompi definition
+
+typedef int info;
 
 const unsigned int any_source=0;
 
@@ -124,9 +131,16 @@ public:
   ~Communicator ();
 
   /*
-   * Create a new communicator between some subset of \p this
+   * Create a new communicator between some subset of \p this,
+   * based on specified "color"
    */
   void split(int color, int key, Communicator & target) const;
+
+  /*
+   * Create a new communicator between some subset of \p this,
+   * based on specified split "type" (e.g. MPI_COMM_TYPE_SHARED)
+   */
+  void split_by_type(int split_type, int key, info i, Communicator & target) const;
 
   /*
    * Create a new duplicate of \p this communicator

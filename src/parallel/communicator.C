@@ -102,8 +102,27 @@ void Communicator::split(int color, int key, Communicator & target) const
   target._I_duped_it = (color != MPI_UNDEFINED);
   target.send_mode(this->send_mode());
 }
+
+
+void Communicator::split_by_type(int split_type, int key, info i, Communicator & target) const
+{
+  target.clear();
+  MPI_Comm newcomm;
+  libmesh_call_mpi
+    (MPI_Comm_split_type(this->get(), split_type, key, i, &newcomm));
+
+  target.assign(newcomm);
+  target._I_duped_it = (split_type != MPI_UNDEFINED);
+  target.send_mode(this->send_mode());
+}
+
 #else
 void Communicator::split(int, int, Communicator & target) const
+{
+  target.assign(this->get());
+}
+
+void Communicator::split_by_type(int, int, info, Communicator & target) const
 {
   target.assign(this->get());
 }
