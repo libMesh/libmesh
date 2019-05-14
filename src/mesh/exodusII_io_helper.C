@@ -1701,7 +1701,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
       // Vectors to be filled and passed to exII::ex_put_concat_node_sets()
       std::vector<int> node_set_ids;
-      std::vector<int> num_nodes_per_set;
+      num_nodes_per_set.clear(); // use existing class member, avoid shadowing
       std::vector<int> num_dist_per_set(node_boundary_ids.size()); // all zeros
       std::vector<int> node_sets_node_index;
       std::vector<int> node_sets_node_list;
