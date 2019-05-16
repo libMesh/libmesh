@@ -239,6 +239,13 @@ public:
   void read_nodeset(int id);
 
   /**
+   * New API that reads all nodesets simultaneously. This may be slightly
+   * faster than reading them one at a time. Calls ex_get_concat_node_sets()
+   * under the hood.
+   */
+  void read_all_nodesets();
+
+  /**
    * Closes the \p ExodusII mesh file.
    */
   void close();
@@ -524,6 +531,22 @@ public:
 
   // Number of distribution factors per set
   std::vector<int> num_node_df_per_set;
+
+  // Starting indices for each nodeset in the node_sets_node_list vector.
+  // Used in the calls to ex_{put,get}_concat_node_sets().
+  std::vector<int> node_sets_node_index;
+
+  // Starting indices for each nodeset in the node_sets_dist_fact vector.
+  // Used in the calls to ex_{put,get}_concat_node_sets().
+  std::vector<int> node_sets_dist_index;
+
+  // Node ids for all nodes in nodesets, concatenated together.
+  // Used in the calls to ex_{put,get}_concat_node_sets().
+  std::vector<int> node_sets_node_list;
+
+  // Distribution factors for all nodes in all nodesets, concatenated together.
+  // Used in the calls to ex_{put,get}_concat_node_sets().
+  std::vector<Real> node_sets_dist_fact;
 
   // List of element numbers in all sidesets
   std::vector<int> elem_list;

@@ -378,7 +378,15 @@ void ExodusII_IO::read (const std::string & fname)
 
   // Read nodeset info
   {
-    exio_helper->read_nodeset_info();
+    // This fills in the following fields of the helper for later use:
+    // nodeset_ids
+    // num_nodes_per_set
+    // num_node_df_per_set
+    // node_sets_node_index
+    // node_sets_dist_index
+    // node_sets_node_list
+    // node_sets_dist_fact
+    exio_helper->read_all_nodesets();
 
     for (int nodeset=0; nodeset<exio_helper->num_node_sets; nodeset++)
       {
@@ -389,10 +397,13 @@ void ExodusII_IO::read (const std::string & fname)
         if (!nodeset_name.empty())
           mesh.get_boundary_info().nodeset_name(nodeset_id) = nodeset_name;
 
-        exio_helper->read_nodeset(nodeset);
+        // Get starting index of node ids for current nodeset.
+        unsigned int offset = exio_helper->node_sets_node_index[nodeset];
 
-        for (const auto & exodus_id : exio_helper->node_list)
+        for (int i=0; i<exio_helper->num_nodes_per_set[nodeset]; ++i)
           {
+            int exodus_id = exio_helper->node_sets_node_list[i + offset];
+
             // As before, the entries in 'node_list' are 1-based
             // indices into the node_num_map array, so we have to map
             // them.  See comment above.
