@@ -1496,12 +1496,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
             {
               unsigned int connect_index   = cast_int<unsigned int>((i*num_nodes_per_elem)+j);
               unsigned elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
-              if (verbose)
-                {
-                  libMesh::out << "Exodus node index " << j
-                               << " = LibMesh node index " << elem_node_index << std::endl;
-                }
-
               if (!use_discontinuous)
                 {
                   // The global id for the current node in libmesh.
@@ -1682,34 +1676,79 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  // Maps from nodeset id to the nodes
-  std::map<boundary_id_type, std::vector<int>> node;
+  // build_node_list() builds a sorted list of (node-id, bc-id) tuples
+  // that is sorted by node-id, but we actually want it to be sorted
+  // by bc-id, i.e. the second argument of the tuple.
+  typedef std::tuple<dof_id_type, boundary_id_type> tuple_t;
+  std::vector<tuple_t> bc_tuples =
+    mesh.get_boundary_info().build_node_list();
 
-  // Accumulate the vectors to pass into ex_put_node_set
-  // build_node_list() builds a list of (node-id, bc-id) tuples.
-  for (const auto & t : mesh.get_boundary_info().build_node_list())
-    node[std::get<1>(t)].push_back(std::get<0>(t) + 1);
+  // We use std::stable_sort so that the entries within a single
+  // nodeset remain in whatever order they were previously in.
+  std::stable_sort(bc_tuples.begin(), bc_tuples.end(),
+                   [](const tuple_t & t1,
+                      const tuple_t & t2)
+                   { return std::get<1>(t1) < std::get<1>(t2); });
 
   std::vector<boundary_id_type> node_boundary_ids;
   mesh.get_boundary_info().build_node_boundary_ids(node_boundary_ids);
 
   // Write out the nodeset names, but only if there is something to write
-  if (node_boundary_ids.size() > 0)
+  if (node_boundary_ids.size() > 0 &&
+      bc_tuples.size() > 0)
     {
       NamesData names_table(node_boundary_ids.size(), MAX_STR_LENGTH);
 
-      for (const auto & nodeset_id : node_boundary_ids)
+      // Vectors to be filled and passed to exII::ex_put_concat_node_sets()
+      std::vector<int> node_set_ids;
+      num_nodes_per_set.clear(); // use existing class member, avoid shadowing
+      std::vector<int> num_dist_per_set(node_boundary_ids.size()); // all zeros
+      std::vector<int> node_sets_node_index;
+      std::vector<int> node_sets_node_list;
+
+      // Pre-allocate space
+      node_set_ids.reserve(node_boundary_ids.size());
+      num_nodes_per_set.reserve(node_boundary_ids.size());
+      node_sets_node_index.reserve(node_boundary_ids.size());
+      node_sets_node_list.reserve(bc_tuples.size());
+
+      // Assign entries to node_sets_node_list, keeping track of counts as we go.
+      std::map<boundary_id_type, unsigned int> nodeset_counts;
+      for (const auto & t : bc_tuples)
         {
-          int actual_id = nodeset_id;
-
-          names_table.push_back_entry(mesh.get_boundary_info().get_nodeset_name(nodeset_id));
-
-          ex_err = exII::ex_put_node_set_param(ex_id, actual_id, node[nodeset_id].size(), 0);
-          EX_CHECK_ERR(ex_err, "Error writing nodeset parameters");
-
-          ex_err = exII::ex_put_node_set(ex_id, actual_id, node[nodeset_id].data());
-          EX_CHECK_ERR(ex_err, "Error writing nodesets");
+          const dof_id_type & node_id = std::get<0>(t) + 1; // Note: we use 1-based node ids in Exodus!
+          const boundary_id_type & nodeset_id = std::get<1>(t);
+          node_sets_node_list.push_back(node_id);
+          nodeset_counts[nodeset_id] += 1;
         }
+
+      // Fill in other indexing vectors needed by Exodus
+      unsigned int running_sum = 0;
+      for (const auto & pr : nodeset_counts)
+        {
+          node_set_ids.push_back(pr.first);
+          num_nodes_per_set.push_back(pr.second);
+          node_sets_node_index.push_back(running_sum);
+          names_table.push_back_entry(mesh.get_boundary_info().get_nodeset_name(pr.first));
+          running_sum += pr.second;
+        }
+
+      // Write all nodesets together.
+      ex_err = exII::ex_put_concat_node_sets
+        (ex_id,
+         node_set_ids.data(),
+         num_nodes_per_set.data(),
+         num_dist_per_set.data(),
+         node_sets_node_index.data(),
+         // Note: we use a dummy value for "node_sets_dist_index"
+         // since we aren't writing any distribution factors. We
+         // correspondingly pass nullptr for the node_sets_dist_fact
+         // vector, since it will not be used for anything when there
+         // are 0 distribution factors.
+         node_sets_node_index.data(),
+         node_sets_node_list.data(),
+         /*node_sets_dist_fact*/nullptr);
+      EX_CHECK_ERR(ex_err, "Error writing concatenated nodesets");
 
       // Write out the nodeset names
       ex_err = exII::ex_put_names(ex_id, exII::EX_NODE_SET, names_table.get_char_star_star());
