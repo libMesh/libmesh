@@ -792,6 +792,69 @@ void ExodusII_IO_Helper::read_nodeset(int id)
 
 
 
+void ExodusII_IO_Helper::read_all_nodesets()
+{
+  // Figure out how many nodesets there are in the file so we can
+  // properly resize storage as necessary.
+  num_node_sets =
+    this->inquire
+    (exII::EX_INQ_NODE_SETS,
+     "Error retrieving number of node sets");
+
+  // Figure out how many nodes there are in all the nodesets.
+  int total_nodes_in_all_sets =
+    this->inquire
+    (exII::EX_INQ_NS_NODE_LEN,
+     "Error retrieving number of nodes in all node sets.");
+
+  // Figure out how many distribution factors there are in all the nodesets.
+  int total_df_in_all_sets =
+    this->inquire
+    (exII::EX_INQ_NS_DF_LEN,
+     "Error retrieving number of distribution factors in all node sets.");
+
+  // If there are no nodesets, there's nothing to read in.
+  if (num_node_sets == 0)
+    return;
+
+  // Allocate space to read all the nodeset data.
+  // Use existing class members where possible to avoid shadowing
+  nodeset_ids.clear();          nodeset_ids.resize(num_node_sets);
+  num_nodes_per_set.clear();    num_nodes_per_set.resize(num_node_sets);
+  num_node_df_per_set.clear();  num_node_df_per_set.resize(num_node_sets);
+  node_sets_node_index.clear(); node_sets_node_index.resize(num_node_sets);
+  node_sets_dist_index.clear(); node_sets_dist_index.resize(num_node_sets);
+  node_sets_node_list.clear();  node_sets_node_list.resize(total_nodes_in_all_sets);
+  node_sets_dist_fact.clear();  node_sets_dist_fact.resize(total_df_in_all_sets);
+
+  // Read all the nodeset data
+  ex_err = exII::ex_get_concat_node_sets
+    (ex_id,
+     nodeset_ids.data(),
+     num_nodes_per_set.data(),
+     num_node_df_per_set.data(),
+     node_sets_node_index.data(),
+     node_sets_dist_index.data(),
+     node_sets_node_list.data(),
+     total_df_in_all_sets ? node_sets_dist_fact.data() : nullptr);
+  EX_CHECK_ERR(ex_err, "Error reading concatenated nodesets");
+
+  // Read the nodeset names from file!
+  char name_buffer[MAX_STR_LENGTH];
+  for (int i=0; i<num_node_sets; ++i)
+    {
+      ex_err = exII::ex_get_name
+        (ex_id,
+         exII::EX_NODE_SET,
+         nodeset_ids[i],
+         name_buffer);
+      EX_CHECK_ERR(ex_err, "Error getting node set name.");
+      id_to_ns_names[nodeset_ids[i]] = name_buffer;
+    }
+}
+
+
+
 void ExodusII_IO_Helper::close()
 {
   // Always call close on processor 0.
@@ -1700,15 +1763,17 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
       NamesData names_table(node_boundary_ids.size(), MAX_STR_LENGTH);
 
       // Vectors to be filled and passed to exII::ex_put_concat_node_sets()
-      std::vector<int> node_set_ids;
-      num_nodes_per_set.clear(); // use existing class member, avoid shadowing
-      std::vector<int> num_dist_per_set(node_boundary_ids.size()); // all zeros
-      std::vector<int> node_sets_node_index;
-      std::vector<int> node_sets_node_list;
+      // Use existing class members and avoid variable shadowing.
+      nodeset_ids.clear();
+      num_nodes_per_set.clear();
+      num_node_df_per_set.clear();
+      node_sets_node_index.clear();
+      node_sets_node_list.clear();
 
       // Pre-allocate space
-      node_set_ids.reserve(node_boundary_ids.size());
+      nodeset_ids.reserve(node_boundary_ids.size());
       num_nodes_per_set.reserve(node_boundary_ids.size());
+      num_node_df_per_set.resize(node_boundary_ids.size()); // all zeros
       node_sets_node_index.reserve(node_boundary_ids.size());
       node_sets_node_list.reserve(bc_tuples.size());
 
@@ -1726,7 +1791,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
       unsigned int running_sum = 0;
       for (const auto & pr : nodeset_counts)
         {
-          node_set_ids.push_back(pr.first);
+          nodeset_ids.push_back(pr.first);
           num_nodes_per_set.push_back(pr.second);
           node_sets_node_index.push_back(running_sum);
           names_table.push_back_entry(mesh.get_boundary_info().get_nodeset_name(pr.first));
@@ -1736,9 +1801,9 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
       // Write all nodesets together.
       ex_err = exII::ex_put_concat_node_sets
         (ex_id,
-         node_set_ids.data(),
+         nodeset_ids.data(),
          num_nodes_per_set.data(),
-         num_dist_per_set.data(),
+         num_node_df_per_set.data(),
          node_sets_node_index.data(),
          // Note: we use a dummy value for "node_sets_dist_index"
          // since we aren't writing any distribution factors. We
