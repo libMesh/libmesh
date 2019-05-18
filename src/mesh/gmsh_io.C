@@ -707,10 +707,6 @@ void GmshIO::read_mesh(std::istream & in)
             // libMesh::out << "max_elem_dimension_seen=" << max_elem_dimension_seen << std::endl;
             // libMesh::out << "min_elem_dimension_seen=" << min_elem_dimension_seen << std::endl;
 
-            // If the difference between the max and min element dimension seen is larger than
-            // 1, (e.g. the file has 1D and 3D elements only) we don't handle this case.
-            if (max_elem_dimension_seen - min_elem_dimension_seen > 1)
-              libmesh_error_msg("Cannot handle meshes with dimension mismatch greater than 1.");
 
             // How many different element dimensions did we see while reading from file?
             unsigned n_dims_seen = std::accumulate(elem_dimensions_seen.begin(),
@@ -718,10 +714,6 @@ void GmshIO::read_mesh(std::istream & in)
                                                    static_cast<unsigned>(0),
                                                    std::plus<unsigned>());
 
-            // Have not yet tested a case where 1, 2, and 3D elements are all in the same Mesh,
-            // though it should theoretically be possible to handle.
-            if (n_dims_seen == 3)
-              libmesh_error_msg("Reading meshes with 1, 2, and 3D elements not currently supported.");
 
             // Set mesh_dimension based on the largest element dimension seen.
             mesh.set_mesh_dimension(max_elem_dimension_seen);
