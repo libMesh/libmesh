@@ -43,7 +43,7 @@ namespace libMesh
   class System;
   class DofObject;
 
-  //! Struct to house data regarding where in the mesh hierarchy we are located
+  //! Struct to house data regarding where in the mesh hierarchy we are located.
   struct PetscDMContext
   {
     int n_dofs;
@@ -59,8 +59,11 @@ namespace libMesh
     //! Stores local dofs for each var for use in subprojection matrixes
     std::vector<std::vector<numeric_index_type>> dof_vec;
 
-    PetscDMContext() :
-      n_dofs(-12345),
+    //! Stores subfield ids for use in subprojection matrixes on coarser DMs
+    std::vector<PetscInt> subfields;
+
+  PetscDMContext() :
+    n_dofs(-12345),
       mesh_dim(-12345),
       coarser_dm(nullptr),
       finer_dm(nullptr),

@@ -66,7 +66,7 @@ namespace libMesh
       // Since this is called by PETSc we gotta pull some of this info
       // from the context in the DM.
 
-      // Get our context
+      // First, retrieve our context
       void * ctx = nullptr;
       ierr = DMShellGetContext(dm, & ctx);
       LIBMESH_CHKERR(ierr);
@@ -226,29 +226,27 @@ namespace libMesh
       void * ctx_f = nullptr;
       ierr = DMShellGetContext(dmf, &ctx_f);LIBMESH_CHKERR(ierr);
       libmesh_assert(ctx_f);
-      PetscDMContext * p_ctx = static_cast<PetscDMContext*>(ctx_f);
+      PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
 
       // First, ensure that there exists a coarse DM that we want to
       // set. There ought to be as we created it while walking the
       // hierarchy.
-      libmesh_assert(p_ctx->coarser_dm);
-      libmesh_assert(*(p_ctx->coarser_dm));
+      libmesh_assert(p_ctx_f->coarser_dm);
+      libmesh_assert(*(p_ctx_f->coarser_dm));
 
-      // In situations using fieldsplit we need to (potentially)
-      // provide a coarser DM which only has the relevant subfields in
-      // it. Since we create global DMs for each mesh level, we need
-      // to extract the section from the DM, and check the number of
-      // fields. When less than all the fields are used, we need to
-      // create the proper subsections.
-
-      // Get the number of fields and their names from the incomming
-      // fine DM and the global reference DM
+      // In situations using fieldsplit we need to provide a coarser
+      // DM which only has the relevant subfields in it. Since we
+      // create global DMs for each mesh level, we need to also create
+      // the subDMs. We do this by checking the number of fields. When
+      // less than all the fields are used, we need to create the
+      // proper subDMs. We get the number of fields and their names
+      // from the incomming fine DM and the global reference DM
       PetscInt nfieldsf, nfieldsg;
       char ** fieldnamesf;
       char ** fieldnamesg;
 
-      libmesh_assert(p_ctx->global_dm);
-      DM * globaldm = p_ctx->global_dm;
+      libmesh_assert(p_ctx_f->global_dm);
+      DM * globaldm = p_ctx_f->global_dm;
       ierr = DMCreateFieldIS(dmf, &nfieldsf, &fieldnamesf, nullptr);
       LIBMESH_CHKERR(ierr);
       ierr = DMCreateFieldIS(*globaldm, &nfieldsg, &fieldnamesg, nullptr);
@@ -256,49 +254,49 @@ namespace libMesh
 
       // If the probed number of fields is less than the number of
       // global fields, this amounts to PETSc 'indicating' to us we
-      // are doing FS. So, we must create subsections for the coarser
+      // are doing FS. So, we must create subDMs for the coarser
       // DMs.
       if ( nfieldsf < nfieldsg )
         {
-          PetscSection section;
-          PetscSection subsection;
-          std::vector<PetscInt> subfields(nfieldsf); // extracted fields
+          p_ctx_f->subfields.clear();
+          p_ctx_f->subfields.resize(nfieldsf);
 
-          // First, get the section from the coarse DM
-#if PETSC_VERSION_LESS_THAN(3,10,0)
-          ierr = DMGetDefaultSection(*(p_ctx->coarser_dm), &section);
-#else
-          ierr = DMGetSection(*(p_ctx->coarser_dm), &section);
-#endif
-          LIBMESH_CHKERR(ierr);
-
-          // Now, match fine grid DM field names to their global DM
-          //  counterparts. Since PETSc can internally reassign field
-          //  numbering under a fieldsplit, we must extract
-          //  subsections via the field names. This is admittedly
-          //  gross, but c'est la vie.
+          // To select the subDM fields we match fine grid DM field
+          //  names to their global DM counterparts. Since PETSc can
+          //  internally reassign field numbering under a fieldsplit,
+          //  we must extract subsections via the field names. This is
+          //  admittedly gross, but c'est la vie.
           for (int i = 0; i < nfieldsf ; i++)
             {
               for (int j = 0; j < nfieldsg ;j++)
                 if ( strcmp( fieldnamesg[j], fieldnamesf[i] ) == 0 )
-                  subfields[i] = j;
+                  p_ctx_f->subfields[i] = j;
             }
 
-          // Next, for the found fields we now make a subsection and set it for the coarser DM
-          ierr = PetscSectionCreateSubsection(section, nfieldsf, subfields.data(), &subsection);
-          LIBMESH_CHKERR(ierr);
-#if PETSC_VERSION_LESS_THAN(3,10,0)
-          ierr = DMSetDefaultSection(*(p_ctx->coarser_dm) , subsection);
-#else
-          ierr = DMSetSection(*(p_ctx->coarser_dm) , subsection);
-#endif
-          LIBMESH_CHKERR(ierr);
-          ierr = PetscSectionDestroy(&subsection);
-          LIBMESH_CHKERR(ierr);
-        }
+          // Next, for the found fields we create a subDM
+          DM subdm;
+          libmesh_petsc_DMCreateSubDM(*(p_ctx_f->coarser_dm), nfieldsf,
+                                      p_ctx_f->subfields.data(), nullptr, &subdm);
 
-      // Finally, set the coarser DM
-      *(dmc) = *(p_ctx->coarser_dm);
+          // Extract our coarse context from the created subDM so we
+          // can set its subfields for use in createInterp.
+          void * ctx_c = nullptr;
+          ierr = DMShellGetContext(subdm, &ctx_c);
+          LIBMESH_CHKERR(ierr);
+          libmesh_assert(ctx_c);
+          PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
+
+          // propogate subfield info to subDM
+          p_ctx_c->subfields = p_ctx_f->subfields;
+
+          // return created subDM to PETSc
+          *(dmc) = subdm;
+        }
+      else {
+        // No fieldsplit was requested so set the coarser DM to the
+        // global coarser DM.
+        *(dmc) = *(p_ctx_f->coarser_dm);
+      }
 
       return 0;
     }
@@ -331,26 +329,26 @@ namespace libMesh
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
 
-      // Check for existing projection matrix
+      // Check for existing global projection matrix
       libmesh_assert(p_ctx_c->K_interp_ptr);
-      libmesh_assert(p_ctx_c->K_sub_interp_ptr);
 
       // If were doing fieldsplit we need to construct sub projection
       // matrices. We compare the passed in number of DMs fields to a
       // global DM in order to determine if a subprojection is needed.
-      PetscInt nfieldsc,nfieldsf, nfieldsg;
+      PetscInt nfieldsf, nfieldsg;
+
       libmesh_assert(p_ctx_c->global_dm);
       DM * globaldm = p_ctx_c->global_dm;
 
-      ierr = DMCreateFieldIS(dmc, &nfieldsc, nullptr, nullptr);
-      LIBMESH_CHKERR(ierr);
       ierr = DMCreateFieldIS(dmf, &nfieldsf, nullptr, nullptr);
       LIBMESH_CHKERR(ierr);
       ierr = DMCreateFieldIS(*globaldm, &nfieldsg, nullptr, nullptr);
       LIBMESH_CHKERR(ierr);
 
-      // If subfields are identified, were doing FS so we need to create the subProjectionMatrix
-      if (nfieldsc < nfieldsg)
+      // If the probed number of fields is less than the number of
+      // global fields, this amounts to PETSc 'indicating' to us we
+      // are doing FS.
+      if ( nfieldsf < nfieldsg)
         {
           // Loop over the fields and merge their index sets.
           std::vector<std::vector<numeric_index_type>> allrows,allcols;
@@ -361,10 +359,10 @@ namespace libMesh
           // For internal libmesh submat extraction need to merge all
           // field dofs and then sort the vectors so that they match
           // the Projection Matrix ordering
-          const int n_subfields = nfieldsc;
-          if ( n_subfields > 1 )
+          const int n_subfields = p_ctx_f->subfields.size();
+          if ( n_subfields >= 1 )
             {
-              for (int i = 0 ; i < n_subfields ; i++)
+              for (int i : p_ctx_f->subfields)
                 {
                   rows.insert(rows.end(), allrows[i].begin(), allrows[i].end());
                   cols.insert(cols.end(), allcols[i].begin(), allcols[i].end());
@@ -376,15 +374,21 @@ namespace libMesh
           // Now that we have merged the fine and coarse index sets
           // were ready to make the submatrix and pass it off to PETSc
           p_ctx_c->K_interp_ptr->create_submatrix (*p_ctx_c->K_sub_interp_ptr, rows, cols);
+
+          // return to PETSc the created submatrix
           *(mat) = p_ctx_c->K_sub_interp_ptr->mat();
+
+        } // endif less incoming DM fields than global DM fields
+      else
+        {
+          // We are not doing fieldsplit, so return global projection
+          *(mat) = p_ctx_c->K_interp_ptr->mat();
         }
-      else // We are not doing fieldsplit, so return entire projection
-        *(mat) = p_ctx_c->K_interp_ptr->mat();
 
       // Vec scaling isnt needed so were done.
       *(vec) = PETSC_NULL;
-      return 0;
 
+      return 0;
     } // end libmesh_petsc_DMCreateInterpolation
 
     //! Function to give PETSc that sets the Restriction Matrix between two DMs
