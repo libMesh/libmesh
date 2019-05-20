@@ -81,12 +81,10 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
       else
         {
           // build a new 0-dimensional quadrature-rule:
-          radial_qrule.release();
           radial_qrule=QBase::build(QGAUSS, 0, fe_type.radial_order);
           radial_qrule->init(NODEELEM, 0);
 
           //the base_qrule is set up with dim-1, but apparently we need dim, so we replace it:
-          base_qrule.release();
           base_qrule=QBase::build(qrule->type(), side->dim(), qrule->get_order());
 
           //FIXME: Do I have to care about the order of my neighbours element?
