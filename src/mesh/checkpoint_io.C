@@ -198,11 +198,17 @@ processor_id_type CheckpointIO::select_split_config(const std::string & input_na
         if (!in.good())
           {
             // otherwise fall back to a serial/single-split mesh
+            auto orig_header_name = header_name;
             header_name = header_file(input_name, 1);
             std::ifstream in2 (header_name.c_str());
             if (!in2.good())
               {
-                libmesh_error_msg("ERROR: cannot locate header file for input '" << input_name << "'");
+                libmesh_error_msg("ERROR: Neither one of the following files can be located:\n\t'"
+                                  << orig_header_name << "' nor\n\t'" << input_name << "'\n"
+                                  << "If you are running a parallel job, double check that you've "
+                                  << "created a split for " << _my_n_processors << " ranks.\n"
+                                  << "Note: One of paths above may refer to a valid directory on your "
+                                  << "system, however we are attempting to read a valid header file.");
               }
           }
       }
