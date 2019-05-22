@@ -840,7 +840,7 @@ void ExodusII_IO_Helper::read_all_nodesets()
   EX_CHECK_ERR(ex_err, "Error reading concatenated nodesets");
 
   // Read the nodeset names from file!
-  char name_buffer[MAX_STR_LENGTH];
+  char name_buffer[MAX_STR_LENGTH+1];
   for (int i=0; i<num_node_sets; ++i)
     {
       ex_err = exII::ex_get_name
