@@ -107,10 +107,14 @@ namespace libMesh
               ierr = DMShellSetContext(*subdm, ctx);
               LIBMESH_CHKERR(ierr);
             }
-
+#if PETSC_VERSION_LESS_THAN(3,11,0)
           // Lastly, Compute the subsection for the subDM
           ierr = DMCreateSubDM_Section_Private(dm, numFields, fields, is, subdm);
           LIBMESH_CHKERR(ierr);
+#else
+          ierr = DMCreateSectionSubDM(dm, numFields, fields, is, subdm);
+          LIBMESH_CHKERR(ierr);
+#endif
         }
 
       return 0;
