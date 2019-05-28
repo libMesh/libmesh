@@ -42,7 +42,7 @@ void QBase::init(const ElemType t,
   switch(_dim)
     {
     case 0:
-      this->init_0D(_type);
+      this->init_0D();
 
       return;
 
@@ -78,7 +78,7 @@ void QBase::init (const Elem & elem,
 
 
 
-void QBase::init_0D(const ElemType)
+void QBase::init_0D()
 {
   _points.resize(1);
   _weights.resize(1);
