@@ -47,7 +47,7 @@ void QBase::init(const ElemType t,
       return;
 
     case 1:
-      this->init_1D(_type);
+      this->init_1D();
 
       return;
 

@@ -35,7 +35,7 @@ QuadratureType QConical::type() const
   return QCONICAL;
 }
 
-void QConical::init_1D(const ElemType /*type_in*/)
+void QConical::init_1D()
 {
   QGauss gauss1D(1, get_order());
 

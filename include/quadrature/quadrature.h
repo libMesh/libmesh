@@ -271,7 +271,7 @@ protected:
    * It is assumed that derived quadrature rules will at least
    * define the init_1D function, therefore it is pure virtual.
    */
-  virtual void init_1D (const ElemType type=INVALID_ELEM) = 0;
+  virtual void init_1D () = 0;
 
   /**
    * Initializes the 2D quadrature rule by filling the points and

@@ -88,7 +88,7 @@ private:
   /**
    * Just uses a Gauss rule in 1D.
    */
-  virtual void init_1D (const ElemType) override;
+  virtual void init_1D () override;
 
   /**
    * More efficient rules for quadrilaterals.

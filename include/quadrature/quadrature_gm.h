@@ -126,7 +126,7 @@ private:
   /**
    * In 1D, simply use a Gauss rule.
    */
-  virtual void init_1D (const ElemType) override;
+  virtual void init_1D () override;
 
   /**
    * Initialize a 2D GM rule.  Only makes sense for Tris.

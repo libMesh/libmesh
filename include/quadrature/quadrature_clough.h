@@ -64,7 +64,7 @@ public:
 
 private:
 
-  void init_1D (const ElemType _type=INVALID_ELEM) override;
+  void init_1D () override;
   void init_2D (const ElemType _type=INVALID_ELEM) override;
   void init_3D (const ElemType _type=INVALID_ELEM) override;
 };

@@ -65,7 +65,7 @@ public:
 
 private:
 
-  virtual void init_1D (const ElemType _type=INVALID_ELEM) override;
+  virtual void init_1D () override;
   virtual void init_2D (const ElemType _type=INVALID_ELEM) override;
   virtual void init_3D (const ElemType _type=INVALID_ELEM) override;
 };
