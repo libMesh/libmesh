@@ -262,8 +262,7 @@ protected:
    * weights vectors with the appropriate values.  Generally this
    * is just one point with weight 1.
    */
-  virtual void init_0D (const ElemType type=INVALID_ELEM,
-                        unsigned int p_level=0);
+  virtual void init_0D (const ElemType type=INVALID_ELEM);
 
   /**
    * Initializes the 1D quadrature rule by filling the points and
