@@ -350,46 +350,6 @@ protected:
   std::vector<Real> _weights;
 };
 
-
-
-// ------------------------------------------------------------
-// QBase class members
-
-inline
-QBase::QBase(unsigned int d,
-             Order o) :
-  allow_rules_with_negative_weights(true),
-  _dim(d),
-  _order(o),
-  _type(INVALID_ELEM),
-  _p_level(0)
-{
-}
-
-
-
-
-inline
-void QBase::print_info(std::ostream & os) const
-{
-  libmesh_assert(!_points.empty());
-  libmesh_assert(!_weights.empty());
-
-  Real summed_weights=0;
-  os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
-  for (unsigned int qpoint=0; qpoint<this->n_points(); qpoint++)
-    {
-      os << " Point " << qpoint << ":\n"
-         << "  "
-         << _points[qpoint]
-         << "\n Weight:\n "
-         << "  w=" << _weights[qpoint] << "\n" << std::endl;
-
-      summed_weights += _weights[qpoint];
-    }
-  os << "Summed Weights: " << summed_weights << std::endl;
-}
-
 } // namespace libMesh
 
 #endif // LIBMESH_QUADRATURE_H
