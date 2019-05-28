@@ -57,7 +57,7 @@ void QGauss::init_3D(const ElemType type_in,
     case TET4:
     case TET10:
       {
-        switch(_order + 2*p_level)
+        switch(get_order())
           {
             // Taken from pg. 222 of "The finite element method," vol. 1
             // ed. 5 by Zienkiewicz & Taylor
@@ -459,7 +459,7 @@ void QGauss::init_3D(const ElemType type_in,
             // Fall back on Grundmann-Moller or Conical Product rules at high orders.
           default:
             {
-              if ((allow_rules_with_negative_weights) && (_order + 2*p_level < 34))
+              if ((allow_rules_with_negative_weights) && (get_order() < 34))
                 {
                   // The Grundmann-Moller rules are defined to arbitrary order and
                   // can have significantly fewer evaluation points than conical product
