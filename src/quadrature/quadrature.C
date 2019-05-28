@@ -88,6 +88,20 @@ void QBase::init_0D()
 
 
 
+void QBase::init_2D ()
+{
+  libmesh_not_implemented();
+}
+
+
+
+void QBase::init_3D ()
+{
+  libmesh_not_implemented();
+}
+
+
+
 void QBase::scale(std::pair<Real, Real> old_range,
                   std::pair<Real, Real> new_range)
 {
