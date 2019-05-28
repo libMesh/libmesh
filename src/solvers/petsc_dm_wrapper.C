@@ -240,7 +240,7 @@ namespace libMesh
       // the subDMs. We do this by checking the number of fields. When
       // less than all the fields are used, we need to create the
       // proper subDMs. We get the number of fields and their names
-      // from the incomming fine DM and the global reference DM
+      // from the incoming fine DM and the global reference DM
       PetscInt nfieldsf, nfieldsg;
       char ** fieldnamesf;
       char ** fieldnamesg;
@@ -401,7 +401,7 @@ namespace libMesh
 
       PetscErrorCode ierr;
 
-      // get a communicator from incomming DM
+      // get a communicator from incoming DM
       MPI_Comm comm;
       PetscObjectGetComm((PetscObject)dmc, &comm);
 
