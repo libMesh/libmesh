@@ -19,19 +19,20 @@
 
 // Local includes
 #include "libmesh/quadrature_simpson.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
 
 
-void QSimpson::init_2D(const ElemType type_in)
+void QSimpson::init_2D()
 {
 #if LIBMESH_DIM > 1
 
   //-----------------------------------------------------------------------
   // 2D quadrature rules
-  switch (type_in)
+  switch (_type)
     {
 
 
@@ -102,7 +103,7 @@ void QSimpson::init_2D(const ElemType type_in)
       //---------------------------------------------
       // Unsupported type
     default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
+      libmesh_error_msg("Element type not supported!:" << Utility::enum_to_string(_type));
     }
 #endif
 }

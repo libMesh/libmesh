@@ -25,10 +25,10 @@ namespace libMesh
 {
 
 
-void QMonomial::init_2D(const ElemType type_in)
+void QMonomial::init_2D()
 {
 
-  switch (type_in)
+  switch (_type)
     {
       //---------------------------------------------
       // Quadrilateral quadrature rules
@@ -529,7 +529,7 @@ void QMonomial::init_2D(const ElemType type_in)
     default:
       {
         QGauss gauss_rule(2, _order);
-        gauss_rule.init(type_in, _p_level);
+        gauss_rule.init(_type, _p_level);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (gauss_rule.get_points() );
@@ -537,7 +537,7 @@ void QMonomial::init_2D(const ElemType type_in)
 
         return;
       }
-    } // end switch (type_in)
+    } // end switch (_type)
 }
 
 } // namespace libMesh

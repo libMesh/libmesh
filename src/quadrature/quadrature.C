@@ -52,7 +52,7 @@ void QBase::init(const ElemType t,
       return;
 
     case 2:
-      this->init_2D(_type);
+      this->init_2D();
 
       return;
 

@@ -131,7 +131,7 @@ private:
   /**
    * Initialize a 2D GM rule.  Only makes sense for Tris.
    */
-  virtual void init_2D (const ElemType _type=INVALID_ELEM) override;
+  virtual void init_2D () override;
 
   /**
    * Initialize a 3D GM rule.  Only makes sense for Tets.

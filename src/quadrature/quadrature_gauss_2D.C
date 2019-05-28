@@ -20,18 +20,19 @@
 // Local includes
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_conical.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
 
-void QGauss::init_2D(const ElemType type_in)
+void QGauss::init_2D()
 {
 #if LIBMESH_DIM > 1
 
   //-----------------------------------------------------------------------
   // 2D quadrature rules
-  switch (type_in)
+  switch (_type)
     {
 
 
@@ -1276,7 +1277,7 @@ void QGauss::init_2D(const ElemType type_in)
               // automatically generate using a 1D Gauss rule on
               // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
               QConical conical_rule(2, _order);
-              conical_rule.init(type_in, _p_level);
+              conical_rule.init(_type, _p_level);
 
               // Swap points and weights with the about-to-be destroyed rule.
               _points.swap (conical_rule.get_points() );
@@ -1291,7 +1292,7 @@ void QGauss::init_2D(const ElemType type_in)
       //---------------------------------------------
       // Unsupported type
     default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
+      libmesh_error_msg("Element type not supported:" << Utility::enum_to_string(_type));
     }
 #endif
 }

@@ -18,15 +18,16 @@
 
 // Local includes
 #include "libmesh/quadrature_conical.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
 
 
-void QConical::init_2D(const ElemType type_in)
+void QConical::init_2D()
 {
-  switch (type_in)
+  switch (_type)
     {
     case TRI3:
     case TRI6:
@@ -38,7 +39,7 @@ void QConical::init_2D(const ElemType type_in)
       //---------------------------------------------
       // Unsupported element type
     default:
-      libmesh_error_msg("ERROR: Unsupported element type: " << type_in);
+      libmesh_error_msg("ERROR: Unsupported element type: " << Utility::enum_to_string(_type));
     } // end switch (type_in)
 }
 

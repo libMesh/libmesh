@@ -77,7 +77,7 @@ private:
   /**
    * The conical product rules are defined in 2D only for Tris.
    */
-  virtual void init_2D (const ElemType _type=INVALID_ELEM) override;
+  virtual void init_2D () override;
   /**
    * The conical product rules are defined in 3D only for Tets.
    */
