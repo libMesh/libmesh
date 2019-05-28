@@ -126,8 +126,7 @@ private:
   /**
    * In 1D, simply use a Gauss rule.
    */
-  virtual void init_1D (const ElemType,
-                        unsigned int = 0) override;
+  virtual void init_1D (const ElemType) override;
 
   /**
    * Initialize a 3D GM rule.  Only makes sense for Tets.

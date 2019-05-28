@@ -72,8 +72,7 @@ private:
   /**
    * The optimal "conical product" rule in 1D is simply Gauss.
    */
-  virtual void init_1D (const ElemType,
-                        unsigned int = 0) override;
+  virtual void init_1D (const ElemType) override;
 
   /**
    * The conical product rules are defined in 2D only for Tris.

@@ -35,10 +35,9 @@ QuadratureType QConical::type() const
   return QCONICAL;
 }
 
-void QConical::init_1D(const ElemType /*type_in*/,
-                       unsigned int p)
+void QConical::init_1D(const ElemType /*type_in*/)
 {
-  QGauss gauss1D(1, static_cast<Order>(_order+2*p));
+  QGauss gauss1D(1, get_order());
 
   // Swap points and weights with the about-to-be destroyed rule.
   _points.swap(gauss1D.get_points());

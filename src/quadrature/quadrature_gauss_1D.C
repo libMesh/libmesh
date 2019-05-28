@@ -27,8 +27,7 @@ namespace libMesh
 
 
 
-void QGauss::init_1D(const ElemType,
-                     unsigned int /*p_level*/)
+void QGauss::init_1D(const ElemType)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
