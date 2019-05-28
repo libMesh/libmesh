@@ -30,7 +30,7 @@ void QConical::init_3D()
     case TET4:
     case TET10:
       {
-        this->conical_product_tet(_p_level);
+        this->conical_product_tet();
         return;
       } // end case TET4, TET10
 

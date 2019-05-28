@@ -100,15 +100,15 @@ void QConical::conical_product_tri()
 // Builds and scales a Gauss rule and a Jacobi rule.
 // Then combines them to compute points and weights
 // of a 3D conical product rule for the Tet.
-void QConical::conical_product_tet(unsigned int p)
+void QConical::conical_product_tet()
 {
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert_equal_to (this->get_dim(), 3);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
-  QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
+  QGauss  gauss1D(1, get_order());
+  QJacobi jacA1D(1, get_order(), /*alpha=*/1, /*beta=*/0);
+  QJacobi jacB1D(1, get_order(), /*alpha=*/2, /*beta=*/0);
 
   // The Gauss rule needs to be scaled to [0,1]
   std::pair<Real, Real> old_range(-1.0L, 1.0L);

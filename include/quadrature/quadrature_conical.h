@@ -91,9 +91,9 @@ private:
 
   /**
    * Implementation of conical product rule for a Tet in 3D of
-   * order = _order+2*p.
+   * order get_order().
    */
-  void conical_product_tet(unsigned int p);
+  void conical_product_tet();
 
   /**
    * Implementation of conical product rule for a Pyramid in 3D of
