@@ -77,7 +77,7 @@ private:
 
   virtual void init_1D () override;
   virtual void init_2D () override;
-  virtual void init_3D (const ElemType _type=INVALID_ELEM) override;
+  virtual void init_3D () override;
 
   /**
    * The Dunavant rules are for triangles. This function takes

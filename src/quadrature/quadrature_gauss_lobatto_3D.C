@@ -19,13 +19,14 @@
 
 // Local includes
 #include "libmesh/quadrature_gauss_lobatto.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
-void QGaussLobatto::init_3D(const ElemType type_in)
+void QGaussLobatto::init_3D()
 {
-  switch (type_in)
+  switch (_type)
     {
     case HEX8:
     case HEX20:
@@ -44,7 +45,7 @@ void QGaussLobatto::init_3D(const ElemType type_in)
       // for a Gauss-Lobatto rule, i.e. a rule with integration points
       // on the element boundary, for a reason.
     default:
-      libmesh_error_msg("ERROR: Unsupported type: " << type_in);
+      libmesh_error_msg("ERROR: Unsupported type: " << Utility::enum_to_string(_type));
     }
 }
 

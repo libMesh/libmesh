@@ -66,7 +66,7 @@ private:
 
   void init_1D () override;
   void init_2D () override;
-  void init_3D (const ElemType _type=INVALID_ELEM) override;
+  void init_3D () override;
 };
 
 } // namespace libMesh

@@ -19,13 +19,12 @@
 
 // Local includes
 #include "libmesh/quadrature_gm.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
-
-
-void QGrundmann_Moller::init_3D(const ElemType type_in)
+void QGrundmann_Moller::init_3D()
 {
   // Nearly all GM rules contain negative weights, so if you are not
   // allowing rules with negative weights, we cannot continue!
@@ -35,7 +34,7 @@ void QGrundmann_Moller::init_3D(const ElemType type_in)
                       << "Either select a different quadrature class or\n" \
                       << "set allow_rules_with_negative_weights==true.");
 
-  switch (type_in)
+  switch (_type)
     {
     case TET4:
     case TET10:
@@ -159,8 +158,8 @@ void QGrundmann_Moller::init_3D(const ElemType type_in)
       } // end case TET4, TET10
 
     default:
-      libmesh_error_msg("ERROR: Unsupported element type: " << type_in);
-    } // end switch (type_in)
+      libmesh_error_msg("ERROR: Unsupported element type: " << Utility::enum_to_string(_type));
+    } // end switch (_type)
 }
 
 } // namespace libMesh

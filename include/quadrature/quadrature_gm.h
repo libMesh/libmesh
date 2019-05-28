@@ -136,7 +136,7 @@ private:
   /**
    * Initialize a 3D GM rule.  Only makes sense for Tets.
    */
-  virtual void init_3D (const ElemType _type=INVALID_ELEM) override;
+  virtual void init_3D () override;
 
   /**
    * This routine is called from init_2D() and init_3D().  It actually

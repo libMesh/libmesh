@@ -296,7 +296,7 @@ protected:
    * may only be defined in 1D.  If not redefined, gives an
    * error (when \p DEBUG is defined) when called.
    */
-  virtual void init_3D (const ElemType)
+  virtual void init_3D ()
   {
 #ifdef DEBUG
     libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 3D.");

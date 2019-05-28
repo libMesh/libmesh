@@ -98,7 +98,7 @@ private:
   /**
    * More efficient rules for hexahedra.
    */
-  virtual void init_3D (const ElemType _type=INVALID_ELEM) override;
+  virtual void init_3D () override;
 
 
 

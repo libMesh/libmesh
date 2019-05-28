@@ -18,15 +18,14 @@
 
 // Local includes
 #include "libmesh/quadrature_conical.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
-
-
-void QConical::init_3D(const ElemType type_in)
+void QConical::init_3D()
 {
-  switch (type_in)
+  switch (_type)
     {
     case TET4:
     case TET10:
@@ -47,8 +46,8 @@ void QConical::init_3D(const ElemType type_in)
       //---------------------------------------------
       // Unsupported element type
     default:
-      libmesh_error_msg("ERROR: Unsupported element type: " << type_in);
-    } // end switch (type_in)
+      libmesh_error_msg("ERROR: Unsupported element type: " << Utility::enum_to_string(_type));
+    } // end switch (_type)
 }
 
 } // namespace libMesh
