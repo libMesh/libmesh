@@ -177,14 +177,14 @@ void QConical::conical_product_tet()
 // The integral can now be approximated by the product of three 1D quadrature rules:
 // A Jacobi rule with alpha==2, beta==0 in w, and Gauss rules in v and u.  In this way
 // we can obtain 3D rules to any order for which the 1D rules exist.
-void QConical::conical_product_pyramid(unsigned int p)
+void QConical::conical_product_pyramid()
 {
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert_equal_to (this->get_dim(), 3);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jac1D(1,static_cast<Order>(_order+2*p),2,0);
+  QGauss  gauss1D(1, get_order());
+  QJacobi jac1D(1, get_order(), 2, 0);
 
   // These rules should have the same number of points
   libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());

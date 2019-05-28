@@ -38,7 +38,7 @@ void QConical::init_3D()
     case PYRAMID13:
     case PYRAMID14:
       {
-        this->conical_product_pyramid(_p_level);
+        this->conical_product_pyramid();
         return;
       } // end case PYRAMID5
 
