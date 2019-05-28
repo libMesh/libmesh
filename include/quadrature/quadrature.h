@@ -198,9 +198,18 @@ public:
                      unsigned int p_level=0);
 
   /**
-   * \returns The order of the quadrature rule.
+   * \returns The current "total" order of the quadrature rule which
+   * can vary element by element, depending on the Elem::p_level(),
+   * which gets passed to us during init().
+   *
+   * Each additional power of p increases the quadrature order
+   * required to integrate the mass matrix by 2, hence the formula
+   * below.
+   *
+   * \todo This function should also be used in all of the Order
+   * switch statements in the rules themselves.
    */
-  Order get_order() const { return static_cast<Order>(_order + _p_level); }
+  Order get_order() const { return static_cast<Order>(_order + 2 * _p_level); }
 
   /**
    * Prints information relevant to the quadrature rule, by default to
