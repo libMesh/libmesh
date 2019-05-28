@@ -24,15 +24,14 @@ namespace libMesh
 
 
 
-void QConical::init_2D(const ElemType type_in,
-                       unsigned int p)
+void QConical::init_2D(const ElemType type_in)
 {
   switch (type_in)
     {
     case TRI3:
     case TRI6:
       {
-        this->conical_product_tri(p);
+        this->conical_product_tri(_p_level);
         return;
       } // end case TRI3, TRI6
 

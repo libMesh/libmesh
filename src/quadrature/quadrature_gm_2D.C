@@ -25,8 +25,7 @@ namespace libMesh
 
 
 
-void QGrundmann_Moller::init_2D(const ElemType type_in,
-                                unsigned int p)
+void QGrundmann_Moller::init_2D(const ElemType type_in)
 {
   // Nearly all GM rules contain negative weights, so if you are not
   // allowing rules with negative weights, we cannot continue!
@@ -41,13 +40,13 @@ void QGrundmann_Moller::init_2D(const ElemType type_in,
     case TRI3:
     case TRI6:
       {
-        switch(_order + 2*p)
+        switch(get_order())
           {
 
           default:
             {
               // Untested above _order=23 but should work...
-              gm_rule((_order + 2*p)/2, /*dim=*/2);
+              gm_rule(get_order()/2, /*dim=*/2);
               return;
             }
           } // end switch (order)

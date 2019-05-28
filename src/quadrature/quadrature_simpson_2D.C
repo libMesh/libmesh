@@ -25,8 +25,7 @@ namespace libMesh
 
 
 
-void QSimpson::init_2D(const ElemType type_in,
-                       unsigned int)
+void QSimpson::init_2D(const ElemType type_in)
 {
 #if LIBMESH_DIM > 1
 

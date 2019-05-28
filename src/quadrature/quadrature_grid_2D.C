@@ -24,15 +24,9 @@ namespace libMesh
 {
 
 
-void QGrid::init_2D(const ElemType type_in,
-                    unsigned int)
+void QGrid::init_2D(const ElemType type_in)
 {
 #if LIBMESH_DIM > 1
-
-  //-----------------------------------------------------------------------
-  // 2D quadrature rules
-
-  // We ignore p - the grid rule is just for experimentation
 
   switch (type_in)
     {
@@ -48,7 +42,7 @@ void QGrid::init_2D(const ElemType type_in,
       {
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
-        QGrid q1D(1,_order);
+        QGrid q1D(1, _order);
         q1D.init(EDGE2);
         tensor_product_quad( q1D );
         return;

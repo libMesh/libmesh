@@ -281,8 +281,7 @@ protected:
    * may only be defined in 1D.  If not redefined, gives an
    * error (when \p DEBUG is defined) when called.
    */
-  virtual void init_2D (const ElemType,
-                        unsigned int = 0)
+  virtual void init_2D (const ElemType)
   {
 #ifdef DEBUG
     libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 2D.");

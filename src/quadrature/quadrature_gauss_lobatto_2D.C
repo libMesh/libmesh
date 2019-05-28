@@ -23,8 +23,7 @@
 namespace libMesh
 {
 
-void QGaussLobatto::init_2D(const ElemType type_in,
-                            unsigned int p)
+void QGaussLobatto::init_2D(const ElemType type_in)
 {
   switch (type_in)
     {
@@ -37,7 +36,7 @@ void QGaussLobatto::init_2D(const ElemType type_in,
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QGaussLobatto q1D(1, _order);
-        q1D.init(EDGE2, p);
+        q1D.init(EDGE2, _p_level);
         tensor_product_quad(q1D);
         return;
       }

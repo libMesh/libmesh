@@ -93,8 +93,7 @@ private:
   /**
    * More efficient rules for quadrilaterals.
    */
-  virtual void init_2D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) override;
+  virtual void init_2D (const ElemType _type=INVALID_ELEM) override;
 
   /**
    * More efficient rules for hexahedra.

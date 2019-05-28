@@ -129,15 +129,14 @@ private:
   virtual void init_1D (const ElemType) override;
 
   /**
+   * Initialize a 2D GM rule.  Only makes sense for Tris.
+   */
+  virtual void init_2D (const ElemType _type=INVALID_ELEM) override;
+
+  /**
    * Initialize a 3D GM rule.  Only makes sense for Tets.
    */
   virtual void init_3D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) override;
-
-  /**
-   * Initialize a 2D GM rule.  Only makes sense for Tris.
-   */
-  virtual void init_2D (const ElemType _type=INVALID_ELEM,
                         unsigned int p_level=0) override;
 
   /**
