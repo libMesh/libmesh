@@ -24,15 +24,14 @@ namespace libMesh
 
 
 
-void QConical::init_3D(const ElemType type_in,
-                       unsigned int p)
+void QConical::init_3D(const ElemType type_in)
 {
   switch (type_in)
     {
     case TET4:
     case TET10:
       {
-        this->conical_product_tet(p);
+        this->conical_product_tet(_p_level);
         return;
       } // end case TET4, TET10
 
@@ -40,7 +39,7 @@ void QConical::init_3D(const ElemType type_in,
     case PYRAMID13:
     case PYRAMID14:
       {
-        this->conical_product_pyramid(p);
+        this->conical_product_pyramid(_p_level);
         return;
       } // end case PYRAMID5
 

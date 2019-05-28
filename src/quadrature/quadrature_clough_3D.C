@@ -24,13 +24,10 @@ namespace libMesh
 {
 
 
-void QClough::init_3D(const ElemType type_in,
-                      unsigned int)
+void QClough::init_3D(const ElemType type_in)
 {
 #if LIBMESH_DIM == 3
 
-  //-----------------------------------------------------------------------
-  // 3D quadrature rules
   switch (type_in)
     {
       // Unsupported type

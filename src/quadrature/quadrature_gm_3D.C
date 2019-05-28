@@ -25,8 +25,7 @@ namespace libMesh
 
 
 
-void QGrundmann_Moller::init_3D(const ElemType type_in,
-                                unsigned int p)
+void QGrundmann_Moller::init_3D(const ElemType type_in)
 {
   // Nearly all GM rules contain negative weights, so if you are not
   // allowing rules with negative weights, we cannot continue!
@@ -41,7 +40,7 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
     case TET4:
     case TET10:
       {
-        switch(_order + 2*p)
+        switch(get_order())
           {
             // We hard-code the first few orders based on output from
             // the mp-quadrature library:
@@ -153,7 +152,7 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
           default:
             {
               // Untested above _order=23 but should work...
-              gm_rule((_order + 2*p)/2, /*dim=*/3);
+              gm_rule(get_order()/2, /*dim=*/3);
               return;
             }
           } // end switch (order)

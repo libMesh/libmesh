@@ -24,15 +24,10 @@ namespace libMesh
 {
 
 
-void QGrid::init_3D(const ElemType type_in,
-                    unsigned int)
+void QGrid::init_3D(const ElemType type_in)
 {
 #if LIBMESH_DIM == 3
 
-  //-----------------------------------------------------------------------
-  // 3D quadrature rules
-
-  // We ignore p - the grid rule is just for experimentation
   switch (type_in)
     {
       //---------------------------------------------

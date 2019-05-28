@@ -57,7 +57,7 @@ void QBase::init(const ElemType t,
       return;
 
     case 3:
-      this->init_3D(_type,_p_level);
+      this->init_3D(_type);
 
       return;
 

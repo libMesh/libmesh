@@ -25,8 +25,7 @@ namespace libMesh
 {
 
 
-void QMonomial::init_3D(const ElemType type_in,
-                        unsigned int p)
+void QMonomial::init_3D(const ElemType type_in)
 {
 
   switch (type_in)
@@ -37,7 +36,7 @@ void QMonomial::init_3D(const ElemType type_in,
     case HEX20:
     case HEX27:
       {
-        switch(_order + 2*p)
+        switch(get_order())
           {
 
             // The CONSTANT/FIRST rule is the 1-point Gauss "product" rule...we fall
@@ -323,7 +322,7 @@ void QMonomial::init_3D(const ElemType type_in,
     default:
       {
         QGauss gauss_rule(3, _order);
-        gauss_rule.init(type_in, p);
+        gauss_rule.init(type_in, _p_level);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (gauss_rule.get_points() );
