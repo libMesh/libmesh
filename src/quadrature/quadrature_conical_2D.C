@@ -32,7 +32,7 @@ void QConical::init_2D()
     case TRI3:
     case TRI6:
       {
-        this->conical_product_tri(_p_level);
+        this->conical_product_tri();
         return;
       } // end case TRI3, TRI6
 

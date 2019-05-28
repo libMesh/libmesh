@@ -85,9 +85,9 @@ private:
 
   /**
    * Implementation of conical product rule for a Tri in 2D of
-   * order = _order+2*p.
+   * order get_order().
    */
-  void conical_product_tri(unsigned int p);
+  void conical_product_tri();
 
   /**
    * Implementation of conical product rule for a Tet in 3D of

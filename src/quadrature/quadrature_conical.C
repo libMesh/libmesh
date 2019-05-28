@@ -49,14 +49,14 @@ void QConical::init_1D()
 // Builds and scales a Gauss rule and a Jacobi rule.
 // Then combines them to compute points and weights
 // of a 2D conical product rule.
-void QConical::conical_product_tri(unsigned int p)
+void QConical::conical_product_tri()
 {
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert_equal_to (this->get_dim(), 2);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jac1D(1,static_cast<Order>(_order+2*p),1,0);
+  QGauss  gauss1D(1, get_order());
+  QJacobi jac1D(1, get_order(), 1, 0);
 
   // The Gauss rule needs to be scaled to [0,1]
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
