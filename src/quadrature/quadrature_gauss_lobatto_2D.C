@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QGaussLobatto::init_2D()
+void QGaussLobatto::init_2D(const ElemType, unsigned int)
 {
   switch (_type)
     {

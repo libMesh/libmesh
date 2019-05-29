@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 
-void QGrid::init_3D()
+void QGrid::init_3D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM == 3
 

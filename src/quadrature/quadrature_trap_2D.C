@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QTrap::init_2D()
+void QTrap::init_2D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM > 1
 

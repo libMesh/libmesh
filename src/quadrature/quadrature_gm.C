@@ -36,7 +36,7 @@ QuadratureType QGrundmann_Moller::type() const
 
 
 
-void QGrundmann_Moller::init_1D()
+void QGrundmann_Moller::init_1D(const ElemType, unsigned int)
 {
   QGauss gauss1D(1, get_order());
 

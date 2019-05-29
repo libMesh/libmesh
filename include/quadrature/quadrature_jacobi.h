@@ -85,7 +85,7 @@ private:
   const unsigned int _alpha;
   const unsigned int _beta;
 
-  virtual void init_1D () override;
+  virtual void init_1D (const ElemType, unsigned int) override;
 };
 
 } // namespace libMesh

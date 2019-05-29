@@ -26,7 +26,7 @@
 namespace libMesh
 {
 
-void QGauss::init_3D()
+void QGauss::init_3D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM == 3
 

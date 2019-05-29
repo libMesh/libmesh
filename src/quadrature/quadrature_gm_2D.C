@@ -24,9 +24,7 @@
 namespace libMesh
 {
 
-
-
-void QGrundmann_Moller::init_2D()
+void QGrundmann_Moller::init_2D(const ElemType, unsigned int)
 {
   // Nearly all GM rules contain negative weights, so if you are not
   // allowing rules with negative weights, we cannot continue!

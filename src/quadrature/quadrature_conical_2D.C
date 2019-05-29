@@ -25,7 +25,7 @@ namespace libMesh
 
 
 
-void QConical::init_2D()
+void QConical::init_2D(const ElemType, unsigned int)
 {
   switch (_type)
     {

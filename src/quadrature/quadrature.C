@@ -110,7 +110,7 @@ void QBase::init (const Elem & elem,
 
 
 
-void QBase::init_0D()
+void QBase::init_0D(const ElemType, unsigned int)
 {
   _points.resize(1);
   _weights.resize(1);
@@ -120,14 +120,14 @@ void QBase::init_0D()
 
 
 
-void QBase::init_2D ()
+void QBase::init_2D (const ElemType, unsigned int)
 {
   libmesh_not_implemented();
 }
 
 
 
-void QBase::init_3D ()
+void QBase::init_3D (const ElemType, unsigned int)
 {
   libmesh_not_implemented();
 }

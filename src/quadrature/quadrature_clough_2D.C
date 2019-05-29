@@ -26,7 +26,7 @@ namespace libMesh
 {
 
 
-void QClough::init_2D()
+void QClough::init_2D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM > 1
   QGauss gauss_rule(2, _order);

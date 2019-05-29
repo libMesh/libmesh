@@ -25,7 +25,7 @@
 namespace libMesh
 {
 
-void QGaussLobatto::init_1D()
+void QGaussLobatto::init_1D(const ElemType, unsigned int)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules

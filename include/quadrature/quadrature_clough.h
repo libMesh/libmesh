@@ -64,9 +64,9 @@ public:
 
 private:
 
-  void init_1D () override;
-  void init_2D () override;
-  void init_3D () override;
+  virtual void init_1D (const ElemType, unsigned int) override;
+  virtual void init_2D (const ElemType, unsigned int) override;
+  virtual void init_3D (const ElemType, unsigned int) override;
 };
 
 } // namespace libMesh

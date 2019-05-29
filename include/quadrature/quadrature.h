@@ -261,8 +261,13 @@ protected:
    * Initializes the 0D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  Generally this
    * is just one point with weight 1.
+   *
+   * \note The arguments should no longer be used for anything in
+   * derived classes, they are only maintained for backwards
+   * compatibility and will eventually be removed.
    */
-  virtual void init_0D ();
+  virtual void init_0D (const ElemType type=INVALID_ELEM,
+                        unsigned int p_level=0);
 
   /**
    * Initializes the 1D quadrature rule by filling the points and
@@ -270,8 +275,13 @@ protected:
    * the rule will be defined by the implementing class.
    * It is assumed that derived quadrature rules will at least
    * define the init_1D function, therefore it is pure virtual.
+   *
+   * \note The arguments should no longer be used for anything in
+   * derived classes, they are only maintained for backwards
+   * compatibility and will eventually be removed.
    */
-  virtual void init_1D () = 0;
+  virtual void init_1D (const ElemType type=INVALID_ELEM,
+                        unsigned int p_level=0) = 0;
 
   /**
    * Initializes the 2D quadrature rule by filling the points and
@@ -280,8 +290,13 @@ protected:
    * Should not be pure virtual since a derived quadrature rule
    * may only be defined in 1D.  If not overridden, throws an
    * error.
+   *
+   * \note The arguments should no longer be used for anything in
+   * derived classes, they are only maintained for backwards
+   * compatibility and will eventually be removed.
    */
-  virtual void init_2D ();
+  virtual void init_2D (const ElemType type=INVALID_ELEM,
+                        unsigned int p_level=0);
 
   /**
    * Initializes the 3D quadrature rule by filling the points and
@@ -290,8 +305,13 @@ protected:
    * Should not be pure virtual since a derived quadrature rule
    * may only be defined in 1D.  If not overridden, throws an
    * error.
+   *
+   * \note The arguments should no longer be used for anything in
+   * derived classes, they are only maintained for backwards
+   * compatibility and will eventually be removed.
    */
-  virtual void init_3D ();
+  virtual void init_3D (const ElemType type=INVALID_ELEM,
+                        unsigned int p_level=0);
 
   /**
    * Constructs a 2D rule from the tensor product of \p q1D with

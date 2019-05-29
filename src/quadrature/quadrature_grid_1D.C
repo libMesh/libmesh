@@ -25,7 +25,7 @@
 namespace libMesh
 {
 
-void QGrid::init_1D()
+void QGrid::init_1D(const ElemType, unsigned int)
 {
   _points.resize(_order + 1);
   _weights.resize(_order + 1);

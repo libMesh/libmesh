@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QClough::init_1D()
+void QClough::init_1D(const ElemType, unsigned int)
 {
   QGauss gauss_rule(1, _order);
   gauss_rule.init(_type, _p_level);

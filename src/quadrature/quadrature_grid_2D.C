@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QGrid::init_2D()
+void QGrid::init_2D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM > 1
 

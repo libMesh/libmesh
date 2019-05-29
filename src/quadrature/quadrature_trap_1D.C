@@ -23,7 +23,7 @@
 namespace libMesh
 {
 
-void QTrap::init_1D()
+void QTrap::init_1D(const ElemType, unsigned int)
 {
   _points.resize(2);
   _weights.resize(2);

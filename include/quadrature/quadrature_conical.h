@@ -70,18 +70,13 @@ public:
 private:
 
   /**
-   * The optimal "conical product" rule in 1D is simply Gauss.
+   * In 1D, use a Gauss rule.
+   * In 2D, the conical product rule is only defined for Tris.
+   * In 3D, the conical product rule is only defined for Tets.
    */
-  virtual void init_1D () override;
-
-  /**
-   * The conical product rules are defined in 2D only for Tris.
-   */
-  virtual void init_2D () override;
-  /**
-   * The conical product rules are defined in 3D only for Tets.
-   */
-  virtual void init_3D () override;
+  virtual void init_1D (const ElemType, unsigned int) override;
+  virtual void init_2D (const ElemType, unsigned int) override;
+  virtual void init_3D (const ElemType, unsigned int) override;
 
   /**
    * Implementation of conical product rule for a Tri in 2D of
