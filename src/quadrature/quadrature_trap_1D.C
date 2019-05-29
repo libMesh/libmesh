@@ -23,13 +23,8 @@
 namespace libMesh
 {
 
-
-
-void QTrap::init_1D(const ElemType,
-                    unsigned int)
+void QTrap::init_1D(const ElemType, unsigned int)
 {
-  //----------------------------------------------------------------------
-  // 1D quadrature rules
   _points.resize(2);
   _weights.resize(2);
 
@@ -38,8 +33,6 @@ void QTrap::init_1D(const ElemType,
 
   _weights[0] = 1.;
   _weights[1] = 1.;
-
-  return;
 }
 
 } // namespace libMesh

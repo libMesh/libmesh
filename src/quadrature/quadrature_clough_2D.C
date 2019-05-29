@@ -20,21 +20,21 @@
 // Local includes
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
 
-void QClough::init_2D(const ElemType type_in,
-                      unsigned int p)
+void QClough::init_2D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM > 1
   QGauss gauss_rule(2, _order);
-  gauss_rule.init(TRI6, p);
+  gauss_rule.init(TRI6, _p_level);
 
   //-----------------------------------------------------------------------
   // 2D quadrature rules
-  switch (type_in)
+  switch (_type)
     {
 
       //---------------------------------------------
@@ -72,7 +72,7 @@ void QClough::init_2D(const ElemType type_in,
       //---------------------------------------------
       // Unsupported type
     default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
+      libmesh_error_msg("Element type not supported: " << Utility::enum_to_string(_type));
     }
 #endif
 }

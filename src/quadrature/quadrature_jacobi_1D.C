@@ -23,10 +23,7 @@
 namespace libMesh
 {
 
-
-
-void QJacobi::init_1D(const ElemType,
-                      unsigned int p)
+void QJacobi::init_1D(const ElemType, unsigned int)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
@@ -39,7 +36,7 @@ void QJacobi::init_1D(const ElemType,
 
   if ((_alpha == 1) && (_beta == 0))
     {
-      switch(_order + 2*p)
+      switch(get_order())
         {
         case CONSTANT:
         case FIRST:
@@ -791,7 +788,7 @@ void QJacobi::init_1D(const ElemType,
   else if ((_alpha == 2) && (_beta == 0))
     {
 
-      switch(_order + 2*p)
+      switch(get_order())
         {
         case CONSTANT:
         case FIRST:

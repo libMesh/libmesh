@@ -86,24 +86,12 @@ public:
 private:
 
   /**
-   * Just uses a Gauss rule in 1D.
+   * Uses a Gauss rule in 1D.  More efficient rules for non tensor
+   * product bases on quadrilaterals and hexahedra.
    */
-  virtual void init_1D (const ElemType,
-                        unsigned int =0) override;
-
-  /**
-   * More efficient rules for quadrilaterals.
-   */
-  virtual void init_2D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) override;
-
-  /**
-   * More efficient rules for hexahedra.
-   */
-  virtual void init_3D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) override;
-
-
+  virtual void init_1D (const ElemType, unsigned int) override;
+  virtual void init_2D (const ElemType, unsigned int) override;
+  virtual void init_3D (const ElemType, unsigned int) override;
 
   /**
    * Wissmann published three interesting "partially symmetric" rules

@@ -25,12 +25,11 @@
 namespace libMesh
 {
 
-void QGaussLobatto::init_1D(const ElemType,
-                            unsigned int p)
+void QGaussLobatto::init_1D(const ElemType, unsigned int)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
-  switch(_order + 2*p)
+  switch(get_order())
     {
       // Since Gauss-Lobatto rules must include the endpoints of the
       // domain, there is no 1-point rule.  The two-point

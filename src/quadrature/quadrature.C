@@ -24,6 +24,38 @@
 namespace libMesh
 {
 
+QBase::QBase(unsigned int d,
+             Order o) :
+  allow_rules_with_negative_weights(true),
+  _dim(d),
+  _order(o),
+  _type(INVALID_ELEM),
+  _p_level(0)
+{}
+
+
+void QBase::print_info(std::ostream & os) const
+{
+  libmesh_assert(!_points.empty());
+  libmesh_assert(!_weights.empty());
+
+  Real summed_weights=0;
+  os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
+  for (unsigned int qpoint=0; qpoint<this->n_points(); qpoint++)
+    {
+      os << " Point " << qpoint << ":\n"
+         << "  "
+         << _points[qpoint]
+         << "\n Weight:\n "
+         << "  w=" << _weights[qpoint] << "\n" << std::endl;
+
+      summed_weights += _weights[qpoint];
+    }
+  os << "Summed Weights: " << summed_weights << std::endl;
+}
+
+
+
 void QBase::init(const ElemType t,
                  unsigned int p)
 {
@@ -42,22 +74,22 @@ void QBase::init(const ElemType t,
   switch(_dim)
     {
     case 0:
-      this->init_0D(_type,_p_level);
+      this->init_0D();
 
       return;
 
     case 1:
-      this->init_1D(_type,_p_level);
+      this->init_1D();
 
       return;
 
     case 2:
-      this->init_2D(_type,_p_level);
+      this->init_2D();
 
       return;
 
     case 3:
-      this->init_3D(_type,_p_level);
+      this->init_3D();
 
       return;
 
@@ -78,13 +110,26 @@ void QBase::init (const Elem & elem,
 
 
 
-void QBase::init_0D(const ElemType,
-                    unsigned int)
+void QBase::init_0D(const ElemType, unsigned int)
 {
   _points.resize(1);
   _weights.resize(1);
   _points[0] = Point(0.);
   _weights[0] = 1.0;
+}
+
+
+
+void QBase::init_2D (const ElemType, unsigned int)
+{
+  libmesh_not_implemented();
+}
+
+
+
+void QBase::init_3D (const ElemType, unsigned int)
+{
+  libmesh_not_implemented();
 }
 
 

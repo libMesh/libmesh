@@ -19,22 +19,18 @@
 
 // Local includes
 #include "libmesh/quadrature_trap.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
-
-
-
-
-void QTrap::init_3D(const ElemType type_in,
-                    unsigned int)
+void QTrap::init_3D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM == 3
 
   //-----------------------------------------------------------------------
   // 3D quadrature rules
-  switch (type_in)
+  switch (_type)
     {
       //---------------------------------------------
       // Hex quadrature rules
@@ -116,7 +112,7 @@ void QTrap::init_3D(const ElemType type_in,
       //---------------------------------------------
       // Unsupported type
     default:
-      libmesh_error_msg("ERROR: Unsupported type: " << type_in);
+      libmesh_error_msg("ERROR: Unsupported type: " << Utility::enum_to_string(_type));
     }
 #endif
 }

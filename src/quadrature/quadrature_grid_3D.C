@@ -19,21 +19,17 @@
 
 // Local includes
 #include "libmesh/quadrature_grid.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
 
-void QGrid::init_3D(const ElemType type_in,
-                    unsigned int)
+void QGrid::init_3D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM == 3
 
-  //-----------------------------------------------------------------------
-  // 3D quadrature rules
-
-  // We ignore p - the grid rule is just for experimentation
-  switch (type_in)
+  switch (_type)
     {
       //---------------------------------------------
       // Hex quadrature rules
@@ -146,7 +142,7 @@ void QGrid::init_3D(const ElemType type_in,
       //---------------------------------------------
       // Unsupported type
     default:
-      libmesh_error_msg("ERROR: Unsupported type: " << type_in);
+      libmesh_error_msg("ERROR: Unsupported type: " << Utility::enum_to_string(_type));
     }
 #endif
 }

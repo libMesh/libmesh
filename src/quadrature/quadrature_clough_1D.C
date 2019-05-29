@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
@@ -26,18 +24,13 @@
 namespace libMesh
 {
 
-
-
-void QClough::init_1D(const ElemType _elemtype,
-                      unsigned int p)
+void QClough::init_1D(const ElemType, unsigned int)
 {
   QGauss gauss_rule(1, _order);
-  gauss_rule.init(_elemtype, p);
+  gauss_rule.init(_type, _p_level);
 
   _points.swap(gauss_rule.get_points());
   _weights.swap(gauss_rule.get_weights());
-
-  return;
 }
 
 } // namespace libMesh

@@ -23,13 +23,8 @@
 namespace libMesh
 {
 
-
-
-void QSimpson::init_1D(const ElemType,
-                       unsigned int)
+void QSimpson::init_1D(const ElemType, unsigned int)
 {
-  //----------------------------------------------------------------------
-  // 1D quadrature rules
   _points.resize(3);
   _weights.resize(3);
 
@@ -40,8 +35,6 @@ void QSimpson::init_1D(const ElemType,
   _weights[0] = Real(1)/3;
   _weights[1] = Real(4)/3;
   _weights[2] = Real(1)/3;
-
-  return;
 }
 
 } // namespace libMesh

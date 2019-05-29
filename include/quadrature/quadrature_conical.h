@@ -70,39 +70,31 @@ public:
 private:
 
   /**
-   * The optimal "conical product" rule in 1D is simply Gauss.
+   * In 1D, use a Gauss rule.
+   * In 2D, the conical product rule is only defined for Tris.
+   * In 3D, the conical product rule is only defined for Tets.
    */
-  virtual void init_1D (const ElemType,
-                        unsigned int = 0) override;
-
-  /**
-   * The conical product rules are defined in 2D only for Tris.
-   */
-  virtual void init_2D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) override;
-  /**
-   * The conical product rules are defined in 3D only for Tets.
-   */
-  virtual void init_3D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) override;
+  virtual void init_1D (const ElemType, unsigned int) override;
+  virtual void init_2D (const ElemType, unsigned int) override;
+  virtual void init_3D (const ElemType, unsigned int) override;
 
   /**
    * Implementation of conical product rule for a Tri in 2D of
-   * order = _order+2*p.
+   * order get_order().
    */
-  void conical_product_tri(unsigned int p);
+  void conical_product_tri();
 
   /**
    * Implementation of conical product rule for a Tet in 3D of
-   * order = _order+2*p.
+   * order get_order().
    */
-  void conical_product_tet(unsigned int p);
+  void conical_product_tet();
 
   /**
    * Implementation of conical product rule for a Pyramid in 3D of
-   * order = _order+2*p.
+   * order get_order().
    */
-  void conical_product_pyramid(unsigned int p);
+  void conical_product_pyramid();
 };
 
 } // namespace libMesh

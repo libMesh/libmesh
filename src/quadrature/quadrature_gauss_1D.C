@@ -27,12 +27,11 @@ namespace libMesh
 
 
 
-void QGauss::init_1D(const ElemType,
-                     unsigned int p_level)
+void QGauss::init_1D(const ElemType, unsigned int)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
-  switch(_order + 2*p_level)
+  switch(get_order())
     {
     case CONSTANT:
     case FIRST:

@@ -35,10 +35,9 @@ QuadratureType QConical::type() const
   return QCONICAL;
 }
 
-void QConical::init_1D(const ElemType /*type_in*/,
-                       unsigned int p)
+void QConical::init_1D(const ElemType, unsigned int)
 {
-  QGauss gauss1D(1, static_cast<Order>(_order+2*p));
+  QGauss gauss1D(1, get_order());
 
   // Swap points and weights with the about-to-be destroyed rule.
   _points.swap(gauss1D.get_points());
@@ -50,14 +49,14 @@ void QConical::init_1D(const ElemType /*type_in*/,
 // Builds and scales a Gauss rule and a Jacobi rule.
 // Then combines them to compute points and weights
 // of a 2D conical product rule.
-void QConical::conical_product_tri(unsigned int p)
+void QConical::conical_product_tri()
 {
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert_equal_to (this->get_dim(), 2);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jac1D(1,static_cast<Order>(_order+2*p),1,0);
+  QGauss  gauss1D(1, get_order());
+  QJacobi jac1D(1, get_order(), 1, 0);
 
   // The Gauss rule needs to be scaled to [0,1]
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
@@ -101,15 +100,15 @@ void QConical::conical_product_tri(unsigned int p)
 // Builds and scales a Gauss rule and a Jacobi rule.
 // Then combines them to compute points and weights
 // of a 3D conical product rule for the Tet.
-void QConical::conical_product_tet(unsigned int p)
+void QConical::conical_product_tet()
 {
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert_equal_to (this->get_dim(), 3);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
-  QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
+  QGauss  gauss1D(1, get_order());
+  QJacobi jacA1D(1, get_order(), /*alpha=*/1, /*beta=*/0);
+  QJacobi jacB1D(1, get_order(), /*alpha=*/2, /*beta=*/0);
 
   // The Gauss rule needs to be scaled to [0,1]
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
@@ -178,14 +177,14 @@ void QConical::conical_product_tet(unsigned int p)
 // The integral can now be approximated by the product of three 1D quadrature rules:
 // A Jacobi rule with alpha==2, beta==0 in w, and Gauss rules in v and u.  In this way
 // we can obtain 3D rules to any order for which the 1D rules exist.
-void QConical::conical_product_pyramid(unsigned int p)
+void QConical::conical_product_pyramid()
 {
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert_equal_to (this->get_dim(), 3);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jac1D(1,static_cast<Order>(_order+2*p),2,0);
+  QGauss  gauss1D(1, get_order());
+  QJacobi jac1D(1, get_order(), 2, 0);
 
   // These rules should have the same number of points
   libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());

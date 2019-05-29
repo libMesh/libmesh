@@ -19,22 +19,16 @@
 
 // Local includes
 #include "libmesh/quadrature_grid.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
 
-
-void QGrid::init_2D(const ElemType type_in,
-                    unsigned int)
+void QGrid::init_2D(const ElemType, unsigned int)
 {
 #if LIBMESH_DIM > 1
 
-  //-----------------------------------------------------------------------
-  // 2D quadrature rules
-
-  // We ignore p - the grid rule is just for experimentation
-
-  switch (type_in)
+  switch (_type)
     {
 
 
@@ -48,7 +42,7 @@ void QGrid::init_2D(const ElemType type_in,
       {
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
-        QGrid q1D(1,_order);
+        QGrid q1D(1, _order);
         q1D.init(EDGE2);
         tensor_product_quad( q1D );
         return;
@@ -84,7 +78,7 @@ void QGrid::init_2D(const ElemType type_in,
       //---------------------------------------------
       // Unsupported type
     default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
+      libmesh_error_msg("Element type not supported!:" << Utility::enum_to_string(_type));
     }
 #endif
 }
