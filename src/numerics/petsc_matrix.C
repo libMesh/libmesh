@@ -154,9 +154,11 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   LIBMESH_CHKERR(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERR(ierr);
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
+  ierr = MatSetBlockSize(_mat,blocksize);
+  LIBMESH_CHKERR(ierr);
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
-  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
   if (blocksize > 1)
     {
       // specified blocksize, bs>1.
@@ -169,8 +171,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       libmesh_assert_equal_to (n_oz     % blocksize, 0);
 
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetBlockSize(_mat, blocksize);
       LIBMESH_CHKERR(ierr);
       ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, n_nz/blocksize, PETSC_NULL);
       LIBMESH_CHKERR(ierr);
@@ -257,9 +257,11 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   LIBMESH_CHKERR(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERR(ierr);
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
+  ierr = MatSetBlockSize(_mat,blocksize);
+  LIBMESH_CHKERR(ierr);
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
-  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
   if (blocksize > 1)
     {
       // specified blocksize, bs>1.
@@ -270,8 +272,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       libmesh_assert_equal_to (n_global % blocksize, 0);
 
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetBlockSize(_mat, blocksize);
       LIBMESH_CHKERR(ierr);
 
       // transform the per-entry n_nz and n_oz arrays into their block counterparts.
@@ -379,9 +379,11 @@ void PetscMatrix<T>::init ()
   LIBMESH_CHKERR(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERR(ierr);
+  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
+  ierr = MatSetBlockSize(_mat,blocksize);
+  LIBMESH_CHKERR(ierr);
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
-  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
   if (blocksize > 1)
     {
       // specified blocksize, bs>1.
@@ -392,8 +394,6 @@ void PetscMatrix<T>::init ()
       libmesh_assert_equal_to (n_global % blocksize, 0);
 
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetBlockSize(_mat, blocksize);
       LIBMESH_CHKERR(ierr);
 
       // transform the per-entry n_nz and n_oz arrays into their block counterparts.
