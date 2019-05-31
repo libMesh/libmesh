@@ -1628,6 +1628,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
   merge_multimaps(vertices, other.vertices);
   merge_multimaps(edges, other.edges);
   merge_multimaps(sides, other.sides);
+
+  SubFunctor::join(other);
 }
 
 
