@@ -22,6 +22,12 @@
 // System includes
 #include <complex>
 
+#include "libmesh_config.h"
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#include "libmesh_common.h" // for Real
+#endif
+
 namespace libMesh
 {
 
@@ -73,6 +79,9 @@ ScalarTraits_true(unsigned long);
 ScalarTraits_true(float);
 ScalarTraits_true(double);
 ScalarTraits_true(long double);
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+ScalarTraits_true(Real);
+#endif
 
 template<typename T>
 struct ScalarTraits<std::complex<T>> { static const bool value = ScalarTraits<T>::value; };
@@ -153,6 +162,18 @@ SUPERTYPE(int, long double);
 SUPERTYPE(float, double);
 SUPERTYPE(float, long double);
 SUPERTYPE(double, long double);
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+SUPERTYPE(unsigned char, Real);
+SUPERTYPE(unsigned short, Real);
+SUPERTYPE(unsigned int, Real);
+SUPERTYPE(char, Real);
+SUPERTYPE(short, Real);
+SUPERTYPE(int, Real);
+SUPERTYPE(float, Real);
+SUPERTYPE(double, Real);
+SUPERTYPE(long double, Real);
+#endif
 
 #undef CompareTypes_super
 #undef SUPERTYPE

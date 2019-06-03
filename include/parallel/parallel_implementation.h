@@ -169,6 +169,11 @@ inline data_type dataplusint_type<double>() { return MPI_DOUBLE_INT; }
 template<>
 inline data_type dataplusint_type<long double>() { return MPI_LONG_DOUBLE_INT; }
 
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+template<>
+inline data_type dataplusint_type<Real>() { return StandardType<std::pair<Real,int>>(nullptr); }
+#endif
+
 
 
 inline status Communicator::probe (const unsigned int src_processor_id,

@@ -61,18 +61,6 @@
 // Proxy class for libMesh::out/err output
 #include "libmesh/ostream_proxy.h"
 
-// Here we add missing types to the standard namespace.  For example,
-// std::max(double, float) etc... are well behaved but not defined
-// by the standard.  This also includes workarounds for super-strict
-// implementations, for example Sun Studio and PGI C++.  However,
-// this necessarily requires breaking the ISO-C++ standard, and is
-// really just a hack.  As such, only do it if we are building the
-// libmesh library itself.  Specifically, *DO NOT* export this to
-// user code or install this header.
-#ifdef LIBMESH_IS_COMPILING_ITSELF
-#  include "libmesh/libmesh_augment_std_namespace.h"
-#endif
-
 // Make sure the libmesh_nullptr define is available for backwards
 // compatibility, although we no longer use it in the library.
 #include "libmesh/libmesh_nullptr.h"
@@ -131,17 +119,37 @@ typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 // considered "good enough" when doing floating point comparisons.
 // For example, v == 0 is changed to std::abs(v) < TOLERANCE.
 
-#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
+#ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
+static const Real TOLERANCE = 2.5e-3;
+# define MPI_REAL MPI_FLOAT
+# if defined (LIBMESH_DEFAULT_TRIPLE_PRECISION) || \
+     defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
+#  error Cannot define multiple precision levels
+# endif
+#endif
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
 static const Real TOLERANCE = 1.e-8;
 # define MPI_REAL MPI_LONG_DOUBLE
-#else
+# if defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
+#  error Cannot define multiple precision levels
+# endif
+#endif
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+static const Real TOLERANCE = 1.e-12;
+# ifdef LIBMESH_HAVE_MPI
+#  ifdef LIBMESH_HAVE_PETSC
+    // Use a PETSc definition since they did the hard work already
+#   define MPI_REAL MPIU_REAL
+#  else
+#   error We only support MPI+quadruple precision via PETSc
+#  endif
+# endif
+#endif
+#if !defined (LIBMESH_DEFAULT_SINGLE_PRECISION) && \
+    !defined (LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
+    !defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
 static const Real TOLERANCE = 1.e-6;
 # define MPI_REAL MPI_DOUBLE
-#endif
-#else
-static const Real TOLERANCE = 2.5e-3;
-# define MPI_REAL MPI_FLOAT
 #endif
 
 // Define the type to use for complex numbers
@@ -590,5 +598,22 @@ namespace libMeshEnums
 {
 using namespace libMesh;
 }
+
+
+// Here we add missing types to the standard namespace.  For example,
+// std::max(double, float) etc... are well behaved but not defined
+// by the standard.  This also includes workarounds for super-strict
+// implementations, for example Sun Studio and PGI C++.  However,
+// this necessarily requires breaking the ISO-C++ standard, and is
+// really just a hack.  As such, only do it if we are building the
+// libmesh library itself.  Specifically, *DO NOT* export this to
+// user code or install this header.
+//
+// We put this at the end of libmesh_common.h so we can make use of
+// any exotic definitions of Real above.
+#ifdef LIBMESH_IS_COMPILING_ITSELF
+#  include "libmesh/libmesh_augment_std_namespace.h"
+#endif
+
 
 #endif // LIBMESH_LIBMESH_COMMON_H

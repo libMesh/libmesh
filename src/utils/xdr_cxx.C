@@ -643,9 +643,14 @@ xdrproc_t xdr_translator<float>() { return (xdrproc_t)(xdr_float); }
 template <>
 xdrproc_t xdr_translator<double>() { return (xdrproc_t)(xdr_double); }
 
-// FIXME - no XDR love for long doubles?
+// FIXME - no XDR love for quadruple precision; not even for long double?
 template <>
 xdrproc_t xdr_translator<long double>() { return (xdrproc_t)(xdr_double); }
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+template <>
+xdrproc_t xdr_translator<Real>() { return (xdrproc_t)(xdr_double); }
+#endif
 
 } // end anonymous namespace
 

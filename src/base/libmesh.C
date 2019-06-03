@@ -1059,12 +1059,19 @@ template double         command_line_next<double>          (std::string, double)
 template long double    command_line_next<long double>     (std::string, long double);
 template std::string    command_line_next<std::string>     (std::string, std::string);
 
-template void         command_line_vector<unsigned short>  (const std::string &, std::vector<unsigned short> &);
-template void         command_line_vector<unsigned int>    (const std::string &, std::vector<unsigned int> &);
-template void         command_line_vector<short>           (const std::string &, std::vector<short> &);
-template void         command_line_vector<int>             (const std::string &, std::vector<int> &);
-template void         command_line_vector<float>           (const std::string &, std::vector<float> &);
-template void         command_line_vector<double>          (const std::string &, std::vector<double> &);
-template void         command_line_vector<long double>     (const std::string &, std::vector<long double> &);
+template void           command_line_vector<unsigned short>(const std::string &, std::vector<unsigned short> &);
+template void           command_line_vector<unsigned int>  (const std::string &, std::vector<unsigned int> &);
+template void           command_line_vector<short>         (const std::string &, std::vector<short> &);
+template void           command_line_vector<int>           (const std::string &, std::vector<int> &);
+template void           command_line_vector<float>         (const std::string &, std::vector<float> &);
+template void           command_line_vector<double>        (const std::string &, std::vector<double> &);
+template void           command_line_vector<long double>   (const std::string &, std::vector<long double> &);
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+template Real           command_line_value<Real>           (const std::string &, Real);
+template Real           command_line_value<Real>           (const std::vector<std::string> &, Real);
+template Real           command_line_next<Real>            (std::string, Real);
+template void           command_line_vector<Real>          (const std::string &, std::vector<Real> &);
+#endif
 
 } // namespace libMesh

@@ -19,6 +19,20 @@
 #ifndef LIBMESH_OP_FUNCTION_H
 #define LIBMESH_OP_FUNCTION_H
 
+#include "libmesh_config.h"
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# include "libmesh/libmesh_common.h" // Real
+# ifdef LIBMESH_HAVE_MPI
+#  ifdef LIBMESH_HAVE_PETSC
+  // PETSc gives us some useful MPI operators for __float128
+#   include <libmesh/ignore_warnings.h>
+#   include <petscsys.h>
+#   include <libmesh/restore_warnings.h>
+#  endif
+# endif
+#endif
+
 // C++ includes
 #include <type_traits>
 
@@ -142,6 +156,29 @@ LIBMESH_PARALLEL_INTEGER_OPS(unsigned long long);                               
 LIBMESH_PARALLEL_FLOAT_OPS(float);
 LIBMESH_PARALLEL_FLOAT_OPS(double);
 LIBMESH_PARALLEL_FLOAT_OPS(long double);
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# ifdef LIBMESH_HAVE_MPI
+#  ifndef LIBMESH_HAVE_PETSC
+#   error We require PETSc support for MPI with quadruple precision data
+#  endif
+
+  template<>
+  class OpFunction<Real>
+  {
+  public:
+    static MPI_Op max()          { return MPIU_MAX; }
+    static MPI_Op min()          { return MPIU_MIN; }
+    static MPI_Op sum()          { return MPIU_SUM; }
+    static MPI_Op product()      { libmesh_not_implemented(); return MPI_PROD; }
+    static MPI_Op max_location() { libmesh_not_implemented(); return MPI_MAXLOC; }
+    static MPI_Op min_location() { libmesh_not_implemented(); return MPI_MINLOC; }
+  };
+
+# else
+  LIBMESH_PARALLEL_FLOAT_OPS(Real);
+# endif
+#endif
 
 } // namespace Parallel
 

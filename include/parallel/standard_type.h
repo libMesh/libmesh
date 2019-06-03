@@ -121,6 +121,12 @@ LIBMESH_STANDARD_TYPE(float,MPI_FLOAT);
 LIBMESH_STANDARD_TYPE(double,MPI_DOUBLE);
 LIBMESH_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
 
+// Quad and float128 types aren't standard C++, so only work with them
+// if configure and PETSc encapsulated the non-standard issues.
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  LIBMESH_STANDARD_TYPE(Real,MPIU_REAL);
+#endif
+
 template<typename T1, typename T2>
 class StandardType<std::pair<T1, T2>> : public DataType
 {
