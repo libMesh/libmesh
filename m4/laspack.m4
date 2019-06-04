@@ -12,6 +12,13 @@ AC_DEFUN([CONFIGURE_LASPACK],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-laspack)])],
                 [enablelaspack=$enableoptional])
 
+  AS_IF([test "x$enablelaspack" = "xyes" &&
+         (test "x$enabletripleprecision" != "xno" ||
+          test "x$enablequadrupleprecision" != "xno")],
+        [enablelaspack=no
+         AC_MSG_RESULT(<<< Disabling LASPACK support due to extended precision >>>)
+        ], [])
+
   dnl The LASPACK API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   AS_IF([test "x$enablelaspack" = "xyes"],
