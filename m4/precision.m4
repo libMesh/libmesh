@@ -44,9 +44,9 @@ AS_IF([test "x$enablesingleprecision" != "xno"],
       ],
       [test "x$enablequadrupleprecision" != "xno"],
       [
-        AC_DEFINE(DEFAULT_QUADRUPLE_PRECISION, 1, [Flag indicating if quadruple-precision (__float128) should be used for most floating-point calculations])
-        AC_DEFINE(DEFAULT_SCALAR_TYPE, [__float128], [Data type to be used for most floating-point calculations])
-        AC_MSG_RESULT(<<< Default floating point is quadruple precision (__float128) >>>)
+        AC_DEFINE(DEFAULT_QUADRUPLE_PRECISION, 1, [Flag indicating if quadruple-precision (boost::multiprecision::float128) should be used for most floating-point calculations])
+        AC_DEFINE(DEFAULT_SCALAR_TYPE, [boost::multiprecision::float128], [Data type to be used for most floating-point calculations])
+        AC_MSG_RESULT(<<< Default floating point is quadruple precision (boost::multiprecision::float128) >>>)
       ],
       [
         AC_DEFINE(DEFAULT_DOUBLE_PRECISION, 1, [Flag indicating if double-precision (double) should be used for most floating-point calculations])
