@@ -4,6 +4,15 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
+#if defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION) || \
+    defined(LIBMESH_DEFAULT_TRIPLE_PRECISION)
+# define LIBMESH_ASSERT_FP_EQUAL(first,second,delta) \
+         CPPUNIT_ASSERT_DOUBLES_EQUAL(double(first-second),0,double(delta))
+#else
+# define LIBMESH_ASSERT_FP_EQUAL(first,second,delta) \
+         CPPUNIT_ASSERT_DOUBLES_EQUAL(first,second,delta)
+#endif
+
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
 // warnings.  These can be ignored in GCC as long as we wrap the
