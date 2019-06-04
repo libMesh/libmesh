@@ -91,14 +91,14 @@ public:
 
                 if (node)
                   {
-                    CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(0), i*h,
-                                                 TOLERANCE*TOLERANCE);
+                    LIBMESH_ASSERT_FP_EQUAL((*node)(0), i*h,
+                                            TOLERANCE*TOLERANCE);
                     if (LIBMESH_DIM > 1)
-                      CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(1), j*h,
-                                                   TOLERANCE*TOLERANCE);
+                      LIBMESH_ASSERT_FP_EQUAL((*node)(1), j*h,
+                                              TOLERANCE*TOLERANCE);
                     if (LIBMESH_DIM > 2)
-                      CPPUNIT_ASSERT_DOUBLES_EQUAL((*node)(2), k*h,
-                                                   TOLERANCE*TOLERANCE);
+                      LIBMESH_ASSERT_FP_EQUAL((*node)(2), k*h,
+                                              TOLERANCE*TOLERANCE);
                   }
               }
           }

@@ -110,9 +110,9 @@ public:
         for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
           {
             Point p(x,y);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                         libmesh_real(x+y),
-                                         TOLERANCE*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                    libmesh_real(x+y),
+                                    TOLERANCE*TOLERANCE);
           }
     }
   }
@@ -194,7 +194,7 @@ public:
         for (auto i : index_range(file_var_names))
           {
             Real read_val = sys.point_value(i, elem->centroid());
-            CPPUNIT_ASSERT_DOUBLES_EQUAL
+            LIBMESH_ASSERT_FP_EQUAL
               (read_val, expected_values[i], TOLERANCE*TOLERANCE);
           }
     } // end second scope

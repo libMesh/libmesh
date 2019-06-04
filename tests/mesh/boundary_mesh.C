@@ -206,8 +206,8 @@ public:
             CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
             // We only added right edges
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(elem->centroid()(0), 0.8,
-                                         TOLERANCE*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(elem->centroid()(0), 0.8,
+                                    TOLERANCE*TOLERANCE);
           }
         else
           {
@@ -235,8 +235,8 @@ public:
         CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
         // We only added left edges
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(elem->centroid()(0), 0.2,
-                                     TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(elem->centroid()(0), 0.2,
+                                TOLERANCE*TOLERANCE);
       }
 
     for (const auto & elem : _left_boundary_mesh->active_element_ptr_range())

@@ -163,9 +163,9 @@ public:
       for (a = -1.0; a < 1.0; a+=0.2642)
         for (y = -1.0; y < 1.0; y+=0.3156)
           {
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(R.Eval(p), x*a, 1.e-12);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(dR.Eval(p), a+x*y, 1.e-12);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(d2R.Eval(p), 2*y, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(R.Eval(p), x*a, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(dR.Eval(p), a+x*y, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(d2R.Eval(p), 2*y, 1.e-12);
           }
   }
 
@@ -205,9 +205,9 @@ public:
       for (a = -1.0; a < 1.0; a+=0.2642)
         for (y = -1.0; y < 1.0; y+=0.3156)
           {
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(R.Eval(p), x*a, 1.e-12);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(dR.Eval(p), a+x*a, 1.e-12);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(d2R.Eval(p), 2*a+x*a, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(R.Eval(p), x*a, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(dR.Eval(p), a+x*a, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(d2R.Eval(p), 2*a+x*a, 1.e-12);
           }
   }
 };

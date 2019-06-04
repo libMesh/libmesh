@@ -76,9 +76,9 @@ public:
       if (!to_one || my_comm->rank() == root_pid)
         // Yes I really mean v.size()
         for (libMesh::dof_id_type i=0; i<v.size(); i++)
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(libMesh::libmesh_real(i),
-                                       libMesh::libmesh_real(l[i]),
-                                       libMesh::TOLERANCE*libMesh::TOLERANCE);
+          LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(i),
+                                  libMesh::libmesh_real(l[i]),
+                                  libMesh::TOLERANCE*libMesh::TOLERANCE);
     }
   }
 
@@ -128,9 +128,9 @@ public:
         {
           end_index += block_size + p;
           for (unsigned int j = 0; j != block_size; ++j)
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libMesh::libmesh_real(values[p*block_size+j]),
-                                         libMesh::libmesh_real(end_index-j-1),
-                                         libMesh::TOLERANCE*libMesh::TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(values[p*block_size+j]),
+                                    libMesh::libmesh_real(end_index-j-1),
+                                    libMesh::TOLERANCE*libMesh::TOLERANCE);
         }
     }
   }

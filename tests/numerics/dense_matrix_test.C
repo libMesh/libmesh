@@ -56,7 +56,7 @@ private:
 
     for (unsigned int i = 0; i < a.size(); ++i)
       for (unsigned int j = 0; j < b.size(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(a_times_b(i,j)), libmesh_real(a_times_b_correct(i,j)), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(a_times_b(i,j)), libmesh_real(a_times_b_correct(i,j)), TOLERANCE*TOLERANCE);
   }
 
   void testSVD()
@@ -87,14 +87,14 @@ private:
 
     for (unsigned i=0; i<U.m(); ++i)
       for (unsigned j=0; j<U.n(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(U(i,j)), libmesh_real(true_U(i,j)), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(U(i,j)), libmesh_real(true_U(i,j)), TOLERANCE*TOLERANCE);
 
     for (unsigned i=0; i<VT.m(); ++i)
       for (unsigned j=0; j<VT.n(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(VT(i,j)), libmesh_real(true_VT(i,j)), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(VT(i,j)), libmesh_real(true_VT(i,j)), TOLERANCE*TOLERANCE);
 
     for (unsigned i=0; i<sigma.size(); ++i)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
   }
 
   // This function is called by testEVD for different matrices.  The
@@ -144,7 +144,7 @@ private:
             // Subtract and assert that the norm of the difference is
             // below some tolerance.
             lhs -= rhs;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
           }
         else
           {
@@ -169,7 +169,7 @@ private:
               }
 
             lhs -= rhs;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
 
             // libMesh::out << "lhs=" << std::endl;
             // lhs.print_scientific(libMesh::out, /*precision=*/15);
@@ -188,7 +188,7 @@ private:
               }
 
             lhs -= rhs;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
 
             // libMesh::out << "lhs=" << std::endl;
             // lhs.print_scientific(libMesh::out, /*precision=*/15);
@@ -223,7 +223,7 @@ private:
               }
 
             lhs -= rhs;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
           }
         else
           {
@@ -248,7 +248,7 @@ private:
               }
 
             lhs -= rhs;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
 
             // 2.)
             lhs.zero();
@@ -261,7 +261,7 @@ private:
               }
 
             lhs -= rhs;
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
 
             // We'll skip the second member of the complex conjugate
             // pair.  If the first one worked, the second one should
@@ -286,8 +286,8 @@ private:
         // the test problems.  I'm not sure what controls the accuracy
         // of the eigenvalue computation in LAPACK, there is no way to
         // set a tolerance in the LAPACKgeev_ interface.
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/true_lambda_real[i], /*actual=*/lambda_real(i), std::sqrt(TOLERANCE)*TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/true_lambda_imag[i], /*actual=*/lambda_imag(i), std::sqrt(TOLERANCE)*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/true_lambda_real[i], /*actual=*/lambda_real(i), std::sqrt(TOLERANCE)*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/true_lambda_imag[i], /*actual=*/lambda_imag(i), std::sqrt(TOLERANCE)*TOLERANCE);
       }
 #endif
   }
@@ -351,7 +351,7 @@ private:
     true_sigma(2) = 6.64680908281e-07;
 
     for (unsigned i=0; i<sigma.size(); ++i)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), 1.e-10);
+      LIBMESH_ASSERT_FP_EQUAL(sigma(i), true_sigma(i), 1.e-10);
 #endif
   }
 

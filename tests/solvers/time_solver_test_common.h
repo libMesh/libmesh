@@ -69,9 +69,9 @@ protected:
             Number exact_soln = system.u(system.time);
             Real rel_error =  std::abs((exact_soln - (*system.solution)(0))/exact_soln);
 
-            CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0,
-                                          rel_error,
-                                          std::numeric_limits<Real>::epsilon()*10 );
+            LIBMESH_ASSERT_FP_EQUAL( 0.0,
+                                     rel_error,
+                                     std::numeric_limits<Real>::epsilon()*10 );
           }
       }
   }
