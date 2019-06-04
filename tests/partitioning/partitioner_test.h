@@ -1,19 +1,15 @@
 #ifndef __fe_test_h__
 #define __fe_test_h__
 
-#include "test_comm.h"
-
 #include <libmesh/distributed_mesh.h>
 #include <libmesh/elem.h>
 #include <libmesh/partitioner.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/mesh_generation.h>
 
-// Ignore unused parameter warnings coming from cppunit headers
-#include <libmesh/ignore_warnings.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
-#include <libmesh/restore_warnings.h>
+#include "test_comm.h"
+#include "libmesh_cppunit.h"
+
 
 #if LIBMESH_DIM > 2
 #define PARTITIONERTEST                         \

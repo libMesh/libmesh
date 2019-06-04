@@ -3,8 +3,7 @@
 
 #include <libmesh/type_vector.h>
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
+#include "libmesh_cppunit.h"
 
 #define TYPEVECTORTEST                          \
   CPPUNIT_TEST( testNorm );                     \

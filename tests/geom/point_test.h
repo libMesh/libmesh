@@ -1,9 +1,7 @@
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
-
 #include <libmesh/point.h>
 
 #include "../numerics/type_vector_test.h"
+#include "libmesh_cppunit.h"
 
 #define POINTTEST TYPEVECTORTEST
 
