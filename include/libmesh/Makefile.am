@@ -12,6 +12,7 @@ BUILT_SOURCES = \
         dof_map.h \
         dof_object.h \
         factory.h \
+        float128_shims.h \
         getpot.h \
         ghost_point_neighbors.h \
         ghosting_functor.h \
@@ -556,6 +557,9 @@ dof_object.h: $(top_srcdir)/include/base/dof_object.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 factory.h: $(top_srcdir)/include/base/factory.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+float128_shims.h: $(top_srcdir)/include/base/float128_shims.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 getpot.h: $(top_srcdir)/include/base/getpot.h
