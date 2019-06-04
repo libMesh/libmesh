@@ -54,6 +54,11 @@
 # include "libmesh/restore_warnings.h"
 #endif
 
+// Quad precision if we need it
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#include "libmesh/float128_shims.h"
+#endif
+
 // _basic_ library functionality
 #include "libmesh/libmesh_base.h"
 #include "libmesh/libmesh_exceptions.h"
