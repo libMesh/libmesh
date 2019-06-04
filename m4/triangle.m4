@@ -12,6 +12,12 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-triangle)])],
                 [enabletriangle=$enableoptional])
 
+  AS_IF([test "x$enabletriangle" = "xyes" &&
+         test "x$enablequadrupleprecision" != "xno"],
+        [enabletriangle=no
+         AC_MSG_RESULT(<<< Disabling Triangle support due to quadruple precision >>>)
+        ], [])
+
   dnl The TRIANGLE API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   AS_IF([test "x$enabletriangle" = "xyes"],
