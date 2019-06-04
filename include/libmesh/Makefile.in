@@ -458,6 +458,7 @@ libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
 libmesh_optional_LIBS = @libmesh_optional_LIBS@
 libmesh_pkgconfig_requires = @libmesh_pkgconfig_requires@
+libmesh_precision_LIBS = @libmesh_precision_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
@@ -492,7 +493,7 @@ vtkversion = @vtkversion@
 # include the magic script!
 EXTRA_DIST = rebuild_makefile.sh
 BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
-	dof_map.h dof_object.h factory.h getpot.h \
+	dof_map.h dof_object.h factory.h float128_shims.h getpot.h \
 	ghost_point_neighbors.h ghosting_functor.h id_types.h \
 	libmesh.h libmesh_C_isnan.h libmesh_augment_std_namespace.h \
 	libmesh_base.h libmesh_common.h libmesh_documentation.h \
@@ -902,6 +903,9 @@ dof_object.h: $(top_srcdir)/include/base/dof_object.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 factory.h: $(top_srcdir)/include/base/factory.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+float128_shims.h: $(top_srcdir)/include/base/float128_shims.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 getpot.h: $(top_srcdir)/include/base/getpot.h

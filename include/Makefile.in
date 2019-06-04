@@ -538,6 +538,7 @@ libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
 libmesh_optional_LIBS = @libmesh_optional_LIBS@
 libmesh_pkgconfig_requires = @libmesh_pkgconfig_requires@
+libmesh_precision_LIBS = @libmesh_precision_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
@@ -601,6 +602,7 @@ include_HEADERS = \
         base/dof_map.h \
         base/dof_object.h \
         base/factory.h \
+        base/float128_shims.h \
         base/getpot.h \
         base/ghost_point_neighbors.h \
         base/ghosting_functor.h \

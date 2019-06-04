@@ -659,6 +659,7 @@ libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
 libmesh_optional_LIBS = @libmesh_optional_LIBS@
 libmesh_pkgconfig_requires = @libmesh_pkgconfig_requires@
+libmesh_precision_LIBS = @libmesh_precision_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@

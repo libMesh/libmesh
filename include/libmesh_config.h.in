@@ -49,8 +49,8 @@
    floating-point calculations */
 #undef DEFAULT_DOUBLE_PRECISION
 
-/* Flag indicating if quadruple-precision (__float128) should be used for most
-   floating-point calculations */
+/* Flag indicating if quadruple-precision (boost::multiprecision::float128)
+   should be used for most floating-point calculations */
 #undef DEFAULT_QUADRUPLE_PRECISION
 
 /* Data type to be used for most floating-point calculations */
