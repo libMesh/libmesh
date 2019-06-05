@@ -991,4 +991,16 @@ void  NumericVector<T>::swap (NumericVector<T> & v)
 } // namespace libMesh
 
 
+// Workaround for weird boost/NumericVector interaction bug
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+namespace boost { namespace multiprecision { namespace detail {
+template <typename T, typename To>
+struct is_lossy_conversion<libMesh::NumericVector<T>, To> {
+  typedef boost::mpl::true_ type;
+  static const bool value = type::value;
+};
+}}}
+#endif
+
+
 #endif  // LIBMESH_NUMERIC_VECTOR_H
