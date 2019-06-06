@@ -2219,8 +2219,8 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
 
       Number exact_value = 0;
       for (const auto & j : constraint_row)
-        exact_value += j.second * (*solution_local)(j.first);
-      exact_value -= (*solution_local)(constrained_dof);
+        exact_value -= j.second * (*solution_local)(j.first);
+      exact_value += (*solution_local)(constrained_dof);
       if (!homogeneous)
         {
           DofConstraintValueMap::const_iterator rhsit =
@@ -2255,8 +2255,8 @@ void DofMap::enforce_constraints_on_jacobian (const NonlinearImplicitSystem & sy
       const DofConstraintRow constraint_row = pr.second;
 
       for (const auto & j : constraint_row)
-        jac->set(constrained_dof, j.first, j.second);
-      jac->set(constrained_dof, constrained_dof, -1);
+        jac->set(constrained_dof, j.first, -j.second);
+      jac->set(constrained_dof, constrained_dof, 1);
     }
 }
 
