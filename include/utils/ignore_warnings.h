@@ -66,8 +66,9 @@
 #pragma GCC diagnostic ignored "-Wredundant-decls"
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #pragma GCC diagnostic ignored "-Wswitch-default"
-// And this for Eigen
+// And these are for Eigen
 #pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wstack-protector"
 // And this for VTK
 #pragma GCC diagnostic ignored "-Wlogical-op"
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
