@@ -49,18 +49,21 @@ void get_hilbert_coords (const Point & p,
   static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
 
   const long double // put (x,y,z) in [0,1]^3 (don't divide by 0)
-    x = ((bbox.first(0) == bbox.second(0)) ? 0. :
+    x = static_cast<long double>
+        ((bbox.first(0) == bbox.second(0)) ? 0. :
          (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
 
 #if LIBMESH_DIM > 1
-    y = ((bbox.first(1) == bbox.second(1)) ? 0. :
+    y = static_cast<long double>
+        ((bbox.first(1) == bbox.second(1)) ? 0. :
          (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
 #else
     y = 0.,
 #endif
 
 #if LIBMESH_DIM > 2
-    z = ((bbox.first(2) == bbox.second(2)) ? 0. :
+    z = static_cast<long double>
+        ((bbox.first(2) == bbox.second(2)) ? 0. :
          (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
 #else
   z = 0.;
