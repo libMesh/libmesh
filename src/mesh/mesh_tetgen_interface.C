@@ -252,7 +252,10 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
       std::vector<Point>::const_iterator ihole;
       unsigned hole_index = 0;
       for (ihole=holes.begin(); ihole!=holes.end(); ++ihole)
-        tetgen_wrapper.set_hole(hole_index++, (*ihole)(0), (*ihole)(1), (*ihole)(2));
+        tetgen_wrapper.set_hole(hole_index++,
+                                REAL((*ihole)(0)),
+                                REAL((*ihole)(1)),
+                                REAL((*ihole)(2)));
     }
 
 
@@ -360,7 +363,10 @@ void TetGenMeshInterface::fill_pointlist(TetGenWrapper & wrapper)
     for (auto & node : this->_mesh.node_ptr_range())
       {
         _sequential_to_libmesh_node_map[index] = node->id();
-        wrapper.set_node(index++, (*node)(0), (*node)(1), (*node)(2));
+        wrapper.set_node(index++,
+                         REAL((*node)(0)),
+                         REAL((*node)(1)),
+                         REAL((*node)(2)));
       }
   }
 }
