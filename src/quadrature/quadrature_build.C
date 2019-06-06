@@ -27,6 +27,7 @@
 #include "libmesh/quadrature_trap.h"
 #include "libmesh/quadrature_gauss_lobatto.h"
 #include "libmesh/quadrature_conical.h"
+#include "libmesh/quadrature_nodal.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_quadrature_type.h"
@@ -164,6 +165,9 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
 
     case QCONICAL:
       return libmesh_make_unique<QConical>(_dim, _order);
+
+    case QNODAL:
+      return libmesh_make_unique<QNodal>(_dim, _order);
 
     default:
       libmesh_error_msg("ERROR: Bad qt=" << _qt);
