@@ -592,17 +592,17 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	diff_qoi.h fem_physics.h quadrature.h quadrature_clough.h \
 	quadrature_composite.h quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
-	quadrature_jacobi.h quadrature_monomial.h quadrature_simpson.h \
-	quadrature_trap.h rb_assembly_expansion.h rb_construction.h \
-	rb_construction_base.h rb_data_deserialization.h \
-	rb_data_serialization.h rb_eim_assembly.h \
-	rb_eim_construction.h rb_eim_evaluation.h rb_eim_theta.h \
-	rb_evaluation.h rb_parameters.h rb_parametrized.h \
-	rb_parametrized_function.h rb_scm_construction.h \
-	rb_scm_evaluation.h rb_temporal_discretization.h rb_theta.h \
-	rb_theta_expansion.h transient_rb_assembly_expansion.h \
-	transient_rb_construction.h transient_rb_evaluation.h \
-	transient_rb_theta_expansion.h \
+	quadrature_jacobi.h quadrature_monomial.h quadrature_nodal.h \
+	quadrature_simpson.h quadrature_trap.h rb_assembly_expansion.h \
+	rb_construction.h rb_construction_base.h \
+	rb_data_deserialization.h rb_data_serialization.h \
+	rb_eim_assembly.h rb_eim_construction.h rb_eim_evaluation.h \
+	rb_eim_theta.h rb_evaluation.h rb_parameters.h \
+	rb_parametrized.h rb_parametrized_function.h \
+	rb_scm_construction.h rb_scm_evaluation.h \
+	rb_temporal_discretization.h rb_theta.h rb_theta_expansion.h \
+	transient_rb_assembly_expansion.h transient_rb_construction.h \
+	transient_rb_evaluation.h transient_rb_theta_expansion.h \
 	boundary_volume_solution_transfer.h direct_solution_transfer.h \
 	dtk_adapter.h dtk_evaluator.h dtk_solution_transfer.h \
 	meshfree_interpolation.h meshfree_solution_transfer.h \
@@ -1824,6 +1824,9 @@ quadrature_jacobi.h: $(top_srcdir)/include/quadrature/quadrature_jacobi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_monomial.h: $(top_srcdir)/include/quadrature/quadrature_monomial.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+quadrature_nodal.h: $(top_srcdir)/include/quadrature/quadrature_nodal.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_simpson.h: $(top_srcdir)/include/quadrature/quadrature_simpson.h
