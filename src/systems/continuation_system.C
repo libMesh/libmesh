@@ -416,7 +416,7 @@ void ContinuationSystem::continuation_solve()
       Real nonlinear_residual_afterstep = 0.;
 
       // The linear solver tolerance, can be updated dynamically at each Newton step.
-      Real current_linear_tolerance = 0.;
+      double current_linear_tolerance = 0.;
 
       // The nonlinear loop
       for (newton_step=0; newton_step<newton_solver->max_nonlinear_iterations; ++newton_step)
@@ -448,9 +448,9 @@ void ContinuationSystem::continuation_solve()
               libmesh_assert_not_equal_to (nonlinear_residual_beforestep, 0.0);
               libmesh_assert_not_equal_to (nonlinear_residual_afterstep, 0.0);
 
-              current_linear_tolerance = std::min(gam*std::pow(nonlinear_residual_afterstep/nonlinear_residual_beforestep, alp),
-                                                  current_linear_tolerance*current_linear_tolerance
-                                                  );
+              current_linear_tolerance =
+                double(std::min(gam*std::pow(nonlinear_residual_afterstep/nonlinear_residual_beforestep, alp),
+                                current_linear_tolerance*current_linear_tolerance));
 
               // Don't let it get ridiculously small!!
               if (current_linear_tolerance < 1.e-12)
@@ -589,7 +589,8 @@ void ContinuationSystem::continuation_solve()
 
           // We select a tolerance for the y-system which is based on the inexact Newton
           // tolerance but scaled by an extra term proportional to the RHS (which is not -> 0 in this case)
-          const Real ysystemtol=current_linear_tolerance*(nonlinear_residual_beforestep/yrhsnorm);
+          const double ysystemtol =
+            double(current_linear_tolerance*(nonlinear_residual_beforestep/yrhsnorm));
           if (!quiet)
             libMesh::out << "ysystemtol=" << ysystemtol << std::endl;
 

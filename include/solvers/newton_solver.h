@@ -140,7 +140,7 @@ public:
    * The tolerance for linear solves is kept below this multiplier (which
    * defaults to 1e-3) times the norm of the current nonlinear residual
    */
-  Real linear_tolerance_multiplier;
+  double linear_tolerance_multiplier;
 
 protected:
 

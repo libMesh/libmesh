@@ -208,12 +208,12 @@ public:
    * Any required linear solves will at first be done with this tolerance;
    * the DiffSolver may tighten the tolerance for later solves.
    */
-  Real initial_linear_tolerance;
+  double initial_linear_tolerance;
 
   /**
    * The tolerance for linear solves is kept above this minimum
    */
-  Real minimum_linear_tolerance;
+  double minimum_linear_tolerance;
 
   /**
    * Enumeration return type for the solve() function.  Multiple SolveResults

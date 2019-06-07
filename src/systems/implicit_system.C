@@ -346,7 +346,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
         linear_solver->solve (*matrix, pc,
                               this->add_sensitivity_solution(p),
                               this->get_sensitivity_rhs(p),
-                              solver_params.second,
+                              double(solver_params.second),
                               solver_params.first);
 
       totalrval.first  += rval.first;
@@ -399,7 +399,7 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
         const std::pair<unsigned int, Real> rval =
           linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
                                         this->get_adjoint_rhs(i),
-                                        solver_params.second,
+                                        double(solver_params.second),
                                         solver_params.first);
 
         totalrval.first  += rval.first;
@@ -544,7 +544,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
         const std::pair<unsigned int, Real> rval =
           linear_solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
                                 *(temprhs[i]),
-                                solver_params.second,
+                                double(solver_params.second),
                                 solver_params.first);
 
         totalrval.first  += rval.first;
@@ -634,7 +634,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
   const std::pair<unsigned int, Real> rval =
     linear_solver->solve (*matrix, this->add_weighted_sensitivity_solution(),
                           *temprhs,
-                          solver_params.second,
+                          double(solver_params.second),
                           solver_params.first);
 
   this->release_linear_solver(linear_solver);

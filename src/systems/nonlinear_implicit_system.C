@@ -105,11 +105,11 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   const unsigned int maxfuncs =
     es.parameters.get<unsigned int>("nonlinear solver maximum function evaluations");
 
-  const Real abs_resid_tol =
-    es.parameters.get<Real>("nonlinear solver absolute residual tolerance");
+  const double abs_resid_tol =
+    double(es.parameters.get<Real>("nonlinear solver absolute residual tolerance"));
 
-  const Real rel_resid_tol =
-    es.parameters.get<Real>("nonlinear solver relative residual tolerance");
+  const double rel_resid_tol =
+    double(es.parameters.get<Real>("nonlinear solver relative residual tolerance"));
 
   const Real abs_step_tol =
     es.parameters.get<Real>("nonlinear solver absolute step tolerance");
@@ -121,11 +121,11 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   const unsigned int maxlinearits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  const Real linear_tol =
-    es.parameters.get<Real>("linear solver tolerance");
+  const double linear_tol =
+    double(es.parameters.get<Real>("linear solver tolerance"));
 
-  const Real linear_min_tol =
-    es.parameters.get<Real>("linear solver minimum tolerance");
+  const double linear_min_tol =
+    double(es.parameters.get<Real>("linear solver minimum tolerance"));
 
   // Set all the parameters on the NonlinearSolver
   nonlinear_solver->max_nonlinear_iterations = maxits;

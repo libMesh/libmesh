@@ -309,8 +309,8 @@ public:
    * stopping condition.
    *
    */
-  Real absolute_residual_tolerance;
-  Real relative_residual_tolerance;
+  double absolute_residual_tolerance;
+  double relative_residual_tolerance;
 
   /**
    * The NonlinearSolver should exit after the full nonlinear step norm is
