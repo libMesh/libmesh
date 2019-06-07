@@ -173,6 +173,11 @@ AS_IF([test "x$enableoptional" = "xyes"],
                 AS_ECHO(["  libmesh_optional_LIBS............ : $libmesh_optional_LIBS"])
                 AS_ECHO([])
               ])
+        AS_IF([test "x$libmesh_precision_LIBS" != "x"],
+              [
+                AS_ECHO(["  libmesh_precision_LIBS........... : $libmesh_precision_LIBS"])
+                AS_ECHO([])
+              ])
       ])
 AS_ECHO(["-------------------------------------------------------------------------------"])
 AS_ECHO(["Configure complete, now type 'make' and then 'make install'."])
