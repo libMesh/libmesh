@@ -150,6 +150,10 @@ public:
    */
   operator T () const { return _accessor.get(); }
 
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  operator boost::multiprecision::backends::float128_backend () const { return _accessor.get().backend(); }
+#endif
+
 private:
   ParameterAccessor<T> & _accessor;
 };
@@ -174,6 +178,10 @@ public:
    * Getter: get the value of the parameter we access.
    */
   T get() const { return _accessor.get(); }
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  operator boost::multiprecision::backends::float128_backend () const { return _accessor.get().backend(); }
+#endif
 
 private:
   const ParameterAccessor<T> & _accessor;
