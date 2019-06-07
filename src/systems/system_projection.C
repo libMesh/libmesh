@@ -26,6 +26,10 @@
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 
+// With quad precision we need the shim function declarations to
+// precede the MetaPhysicL use of them
+#include "libmesh/libmesh_common.h"
+
 // FIXME - having to do this with MetaPhysicL brings me shame - RHS
 #include "libmesh/ignore_warnings.h"
 // Template specialization declarations in here need to *precede* code
