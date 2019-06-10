@@ -237,10 +237,10 @@ public:
     LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.5, 1.5, 0.5)), 0.5, TOLERANCE * TOLERANCE);  // back
 
     // Outside the box, closest to a corner.
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(2., 2., 2.)), std::sqrt(3.), TOLERANCE * TOLERANCE);    // Point along line (0,0,0) -> (1,1,1)
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(-1., -1., -1.)), std::sqrt(3.), TOLERANCE * TOLERANCE); // Point along line (0,0,0) -> (1,1,1)
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.5, 1.5, -0.5)), std::sqrt(3.)/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,1,0)
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.5, -0.5, -0.5)), std::sqrt(3.)/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,0,0)
+    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(2., 2., 2.)), std::sqrt(Real(3)), TOLERANCE * TOLERANCE);    // Point along line (0,0,0) -> (1,1,1)
+    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(-1., -1., -1.)), std::sqrt(Real(3)), TOLERANCE * TOLERANCE); // Point along line (0,0,0) -> (1,1,1)
+    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.5, 1.5, -0.5)), std::sqrt(Real(3))/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,1,0)
+    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.5, -0.5, -0.5)), std::sqrt(Real(3))/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,0,0)
   }
 };
 

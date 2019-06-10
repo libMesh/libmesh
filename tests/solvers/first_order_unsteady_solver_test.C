@@ -23,10 +23,10 @@ public:
   { return 5.0; }
 
   virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ )
-  { return 2.1; }
+  { return Real(21)/10; }
 
   virtual Number u( Real t )
-  { return 5.0/2.1*t; }
+  { return Real(50)/21*t; }
 };
 
 //! Implements ODE: 5.0\dot{u} = 2.0t, u(0) = 0;
@@ -46,7 +46,7 @@ public:
   { return 5.0; }
 
   virtual Number u( Real t )
-  { return 1.0/5.0*t*t; }
+  { return 1/Real(5)*t*t; }
 };
 
 template<typename TimeSolverType>

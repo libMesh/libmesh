@@ -207,7 +207,7 @@ public:
             sumw += qrule->w(qp);
 
           // Make sure that the weights add up to the value we expect
-          LIBMESH_ASSERT_REALS_EQUAL(1./6., sumw, quadrature_tolerance);
+          LIBMESH_ASSERT_REALS_EQUAL(1/Real(6), sumw, quadrature_tolerance);
 
           // Test integrating different polynomial powers
           for (int x_power=0; x_power<=order; ++x_power)
@@ -555,7 +555,7 @@ public:
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           sum += qrule->w(qp);
 
-        LIBMESH_ASSERT_REALS_EQUAL( 1./6., sum , quadrature_tolerance );
+        LIBMESH_ASSERT_REALS_EQUAL( 1/Real(6), sum , quadrature_tolerance );
 
         qrule->init (PRISM15);
 

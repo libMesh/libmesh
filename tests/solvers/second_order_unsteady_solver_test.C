@@ -23,16 +23,16 @@ public:
   {}
 
   virtual Number F( FEMContext & /*context*/, unsigned int /*qp*/ ) override
-  { return -2.71; }
+  { return -Real(271)/100; }
 
   virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ ) override
   { return 0.0; }
 
   virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ ) override
-  { return 3.14; }
+  { return Real(314)/100; }
 
   virtual Number u( Real t ) override
-  { return 2.71/3.14*0.5*t*t; }
+  { return Real(271)/Real(314)*0.5*t*t; }
 };
 
 //! Implements ODE: 1.0\ddot{u} = 6.0*t+2.0, u(0) = 0, \dot{u}(0) = 0
