@@ -106,13 +106,16 @@ public:
       exii.copy_elemental_solution(sys, "teste", "e");
 #endif
 
+      // Exodus only handles double precision
+      Real exotol = std::max(TOLERANCE*TOLERANCE, Real(1e-12));
+
       for (Real x = Real(1.L/6.L); x < 1; x += Real(1.L/3.L))
         for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
           {
             Point p(x,y);
             LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
                                     libmesh_real(x+y),
-                                    TOLERANCE*TOLERANCE);
+                                    exotol);
           }
     }
   }
