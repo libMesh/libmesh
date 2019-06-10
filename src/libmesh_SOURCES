@@ -303,6 +303,10 @@ libmesh_SOURCES =  \
         src/quadrature/quadrature_monomial_1D.C \
         src/quadrature/quadrature_monomial_2D.C \
         src/quadrature/quadrature_monomial_3D.C \
+        src/quadrature/quadrature_nodal.C \
+        src/quadrature/quadrature_nodal_1D.C \
+        src/quadrature/quadrature_nodal_2D.C \
+        src/quadrature/quadrature_nodal_3D.C \
         src/quadrature/quadrature_simpson.C \
         src/quadrature/quadrature_simpson_1D.C \
         src/quadrature/quadrature_simpson_2D.C \

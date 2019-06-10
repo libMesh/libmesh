@@ -902,6 +902,7 @@ include_HEADERS = \
         quadrature/quadrature_grid.h \
         quadrature/quadrature_jacobi.h \
         quadrature/quadrature_monomial.h \
+        quadrature/quadrature_nodal.h \
         quadrature/quadrature_simpson.h \
         quadrature/quadrature_trap.h \
         reduced_basis/rb_assembly_expansion.h \

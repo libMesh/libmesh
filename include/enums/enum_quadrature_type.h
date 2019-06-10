@@ -43,6 +43,7 @@ enum QuadratureType : int {
                      QGAUSS_LOBATTO    = 9,
                      QCLOUGH           = 21,
                      QCOMPOSITE        = 31,
+                     QNODAL            = 32,
                      // Invalid
                      INVALID_Q_RULE    = 127};
 }

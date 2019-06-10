@@ -320,6 +320,7 @@ BUILT_SOURCES = \
         quadrature_grid.h \
         quadrature_jacobi.h \
         quadrature_monomial.h \
+        quadrature_nodal.h \
         quadrature_simpson.h \
         quadrature_trap.h \
         rb_assembly_expansion.h \
@@ -1478,6 +1479,9 @@ quadrature_jacobi.h: $(top_srcdir)/include/quadrature/quadrature_jacobi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_monomial.h: $(top_srcdir)/include/quadrature/quadrature_monomial.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+quadrature_nodal.h: $(top_srcdir)/include/quadrature/quadrature_nodal.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_simpson.h: $(top_srcdir)/include/quadrature/quadrature_simpson.h
