@@ -286,7 +286,7 @@ int main (int argc, char ** argv)
   // default values
   std::vector<std::string> names;
   unsigned char dim               = static_cast<unsigned char>(-1);
-  double threshold                = TOLERANCE;
+  double threshold                = double(TOLERANCE);
   XdrMODE format                  = READ;
   bool verbose                    = false;
 
