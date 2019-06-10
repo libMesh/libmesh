@@ -7,6 +7,8 @@
 #include "libmesh/parsed_fem_function.h"
 #include "libmesh/system.h"
 
+#ifdef LIBMESH_HAVE_FPARSER
+
 // test includes
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -288,3 +290,5 @@ private:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ParsedFEMFunctionTest);
+
+#endif // #ifdef LIBMESH_HAVE_FPARSER

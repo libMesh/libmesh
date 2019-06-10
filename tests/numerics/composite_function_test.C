@@ -110,7 +110,7 @@ private:
 
   void testTimeDependence()
   {
-
+#ifdef LIBMESH_HAVE_FPARSER
     // We'll test the order of adding these functions to
     // make sure time dependence gets detected/updated correctly
     // for each
@@ -198,7 +198,7 @@ private:
       composite.attach_subfunction(zero, index_set);
       CPPUNIT_ASSERT(!composite.is_time_dependent());
     }
-
+#endif // #ifdef LIBMESH_HAVE_FPARSER
   }
 };
 
