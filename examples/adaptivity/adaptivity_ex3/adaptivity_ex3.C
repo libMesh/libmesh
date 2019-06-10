@@ -794,8 +794,9 @@ void assemble_laplace(EquationSystems & es,
       // which is applicable to non-Lagrange finite element
       // discretizations.
       {
-        // Start logging the boundary condition computation
-        perf_log.push ("BCs");
+        // Start logging the boundary condition computation.  We use a
+        // macro to log everything in this scope.
+        LOG_SCOPE_WITH("BCs", "", perf_log);
 
         // The penalty value.
         const Real penalty = 1.e10;
@@ -825,9 +826,6 @@ void assemble_laplace(EquationSystems & es,
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
             }
-
-        // Stop logging the boundary condition computation
-        perf_log.pop ("BCs");
       }
 
 
@@ -837,15 +835,11 @@ void assemble_laplace(EquationSystems & es,
       // and NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
-      perf_log.push ("matrix insertion");
+      LOG_SCOPE_WITH("matrix insertion", "", perf_log);
 
       dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
-
-      // Start logging the insertion of the local (element)
-      // matrix and vector into the global matrix and vector
-      perf_log.pop ("matrix insertion");
     }
 
   // That's it.  We don't need to do anything else to the

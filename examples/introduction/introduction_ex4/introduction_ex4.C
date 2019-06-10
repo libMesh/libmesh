@@ -561,14 +561,10 @@ void assemble_poisson(EquationSystems & es,
       // and NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
-      perf_log.push ("matrix insertion");
+      LOG_SCOPE_WITH("matrix insertion", "", perf_log);
 
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
-
-      // Start logging the insertion of the local (element)
-      // matrix and vector into the global matrix and vector
-      perf_log.pop ("matrix insertion");
     }
 
   // That's it.  We don't need to do anything else to the

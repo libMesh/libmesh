@@ -833,8 +833,9 @@ void assemble_biharmonic(EquationSystems & es,
       // problem: Dirichlet boundary conditions include *both*
       // boundary values and boundary normal fluxes.
       {
-        // Start logging the boundary condition computation
-        perf_log.push ("BCs");
+        // Start logging the boundary condition computation.  We use a
+        // macro to log everything in this scope.
+        LOG_SCOPE_WITH("BCs", "", perf_log);
 
         // The penalty values, for solution boundary trace and flux.
         const Real penalty = 1e10;
@@ -910,9 +911,6 @@ void assemble_biharmonic(EquationSystems & es,
 
                 }
             }
-
-        // Stop logging the boundary condition computation
-        perf_log.pop ("BCs");
       }
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
@@ -925,15 +923,11 @@ void assemble_biharmonic(EquationSystems & es,
       // and NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
-      perf_log.push ("matrix insertion");
+      LOG_SCOPE_WITH("matrix insertion", "", perf_log);
 
       dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
-
-      // Stop logging the insertion of the local (element)
-      // matrix and vector into the global matrix and vector
-      perf_log.pop ("matrix insertion");
     }
 
   // That's it.  We don't need to do anything else to the
