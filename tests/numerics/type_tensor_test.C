@@ -47,7 +47,7 @@ private:
 
     for (unsigned i=0; i<3; ++i)
       for (unsigned j=0; j<3; ++j)
-        LIBMESH_ASSERT_FP_EQUAL(inverse(i,j), true_inverse(i,j), TOLERANCE * TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(inverse(i,j), true_inverse(i,j), 1e-12);
   }
 
   void testLeftMultiply()
