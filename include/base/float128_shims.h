@@ -76,11 +76,17 @@ inline boost::multiprecision::float128 norm
 LIBMESH_FLOAT128_MATH_BOOL(isinf)
 LIBMESH_FLOAT128_MATH_BOOL(isnan)
 
+// Shimming modf by hand since Boost didn't add a shim until 1.62 and
+// I'd like to still support systems with older Boost in /usr/include/
 inline boost::multiprecision::float128 modf
   (const boost::multiprecision::float128 in,
    boost::multiprecision::float128 * intpart)
 {
-  return boost::math::modf(in, intpart);
+#ifdef BOOST_MP_USE_QUAD
+  return __modfq(in.backend().value(), &intpart->backend().value());
+#elif defined(BOOST_MP_USE_FLOAT128)
+  return modfq(in.backend().value(), &intpart->backend().value());
+#endif
 }
 
 LIBMESH_FLOAT128_BINARY(pow)
