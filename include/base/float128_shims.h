@@ -73,6 +73,18 @@ inline boost::multiprecision::float128 norm
   return in * in;
 }
 
+inline boost::multiprecision::float128 real
+  (const boost::multiprecision::float128 in)
+{
+  return in;
+}
+
+inline boost::multiprecision::float128 imag
+  (const boost::multiprecision::float128 /*in*/)
+{
+  return 0;
+}
+
 LIBMESH_FLOAT128_MATH_BOOL(isinf)
 LIBMESH_FLOAT128_MATH_BOOL(isnan)
 
