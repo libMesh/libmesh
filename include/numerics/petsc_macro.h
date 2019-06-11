@@ -112,6 +112,39 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 # define LibMeshCreateSubMatrix MatCreateSubMatrix
 #endif
 
+// If we're using quad precision, we need to disambiguate std
+// operations on PetscScalar
+
+namespace std
+{
+#define LIBMESH_PETSCSCALAR_UNARY(funcname) \
+inline PetscScalar funcname \
+  (const PetscScalar in) \
+{ \
+  return boost::multiprecision::funcname \
+    (boost::multiprecision::float128(in)).backend().value(); \
+}
+
+LIBMESH_PETSCSCALAR_UNARY(sqrt)
+LIBMESH_PETSCSCALAR_UNARY(exp)
+LIBMESH_PETSCSCALAR_UNARY(log)
+LIBMESH_PETSCSCALAR_UNARY(log10)
+LIBMESH_PETSCSCALAR_UNARY(sin)
+LIBMESH_PETSCSCALAR_UNARY(cos)
+LIBMESH_PETSCSCALAR_UNARY(tan)
+LIBMESH_PETSCSCALAR_UNARY(asin)
+LIBMESH_PETSCSCALAR_UNARY(acos)
+LIBMESH_PETSCSCALAR_UNARY(atan)
+LIBMESH_PETSCSCALAR_UNARY(sinh)
+LIBMESH_PETSCSCALAR_UNARY(cosh)
+LIBMESH_PETSCSCALAR_UNARY(tanh)
+LIBMESH_PETSCSCALAR_UNARY(abs)
+LIBMESH_PETSCSCALAR_UNARY(fabs)
+LIBMESH_PETSCSCALAR_UNARY(ceil)
+LIBMESH_PETSCSCALAR_UNARY(floor)
+
+}
+
 #else // LIBMESH_HAVE_PETSC
 
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor) 1
