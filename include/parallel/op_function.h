@@ -27,7 +27,13 @@
 #  ifdef LIBMESH_HAVE_PETSC
   // PETSc gives us some useful MPI operators for __float128
 #   include <libmesh/ignore_warnings.h>
+#   ifdef I
+#    define LIBMESH_SAW_I
+#   endif
 #   include <petscsys.h>
+#   ifndef LIBMESH_SAW_I
+#    undef I // Avoid complex.h contamination
+#   endif
 #   include <libmesh/restore_warnings.h>
 #  endif
 # endif

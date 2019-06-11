@@ -27,7 +27,13 @@
 // For the definition of PetscBLASInt.
 #if (LIBMESH_HAVE_PETSC)
 # include "libmesh/petsc_macro.h"
+# ifdef I
+#  define LIBMESH_SAW_I
+# endif
 # include <petscsys.h>
+# ifndef LIBMESH_SAW_I
+#  undef I // Avoid complex.h contamination
+# endif
 #endif
 
 // C++ includes

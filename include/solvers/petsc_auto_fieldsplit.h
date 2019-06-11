@@ -31,7 +31,13 @@
 // PCFieldSplitSetIs seems to have appeared late in the PETSc 3.1
 // releases; we'll support it in 3.2 onward so we don't have to worry
 // about compilation errors
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petscksp.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 
 namespace libMesh
 {

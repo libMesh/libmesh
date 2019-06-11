@@ -50,7 +50,13 @@
 
 
 // Petsc include files.
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petscmat.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 
 
 

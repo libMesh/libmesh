@@ -28,7 +28,13 @@
 #include "libmesh/petsc_solver_exception.h"
 
 // Petsc include files.
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petscksp.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 
 // Local includes
 #include "libmesh/linear_solver.h"

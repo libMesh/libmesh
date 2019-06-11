@@ -60,7 +60,13 @@
 // Petsc include files
 // Wrapped to avoid triggering our more paranoid warnings
 #include <libmesh/ignore_warnings.h>
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petsc.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 #include <libmesh/restore_warnings.h>
 
 #if PETSC_RELEASE_LESS_THAN(3,1,1)

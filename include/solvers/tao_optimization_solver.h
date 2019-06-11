@@ -30,7 +30,13 @@
 #include "libmesh/optimization_solver.h"
 
 // Include header for the Tao optimization library
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petsctao.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 
 namespace libMesh
 {
