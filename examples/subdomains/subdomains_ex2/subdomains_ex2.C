@@ -519,9 +519,9 @@ void assemble_poisson(EquationSystems & es,
       // via the penalty method. This is discussed at length in
       // example 3.
       {
-
-        // Start logging the boundary condition computation
-        perf_log.push ("BCs");
+        // Start logging the boundary condition computation.  We use a
+        // macro to log everything in this scope.
+        LOG_SCOPE_WITH("BCs", "", perf_log);
 
         // The following loops over the sides of the element.
         // If the element has no neighbor on a side then that
@@ -584,10 +584,6 @@ void assemble_poisson(EquationSystems & es,
                     Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
                 }
             }
-
-
-        // Stop logging the boundary condition computation
-        perf_log.pop ("BCs");
       }
 
 
@@ -597,7 +593,7 @@ void assemble_poisson(EquationSystems & es,
       // and PetscVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
-      perf_log.push ("matrix insertion");
+      LOG_SCOPE_WITH("matrix insertion", "", perf_log);
 
       if (dof_indices.size())
         {
@@ -610,10 +606,6 @@ void assemble_poisson(EquationSystems & es,
           system.matrix->add_matrix (Ke, dof_indices2);
           system.rhs->add_vector    (Fe, dof_indices2);
         }
-
-      // Start logging the insertion of the local (element)
-      // matrix and vector into the global matrix and vector
-      perf_log.pop ("matrix insertion");
     }
 
   // That's it.  We don't need to do anything else to the
