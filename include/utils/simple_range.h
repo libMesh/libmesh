@@ -32,18 +32,18 @@ namespace libMesh
  * \author  Roy H. Stogner
  */
 
-template <typename I>
+template <typename IndexType>
 class SimpleRange
 {
 public:
-  SimpleRange(I begin, I end) : _begin(begin), _end(end) {}
+  SimpleRange(IndexType begin, IndexType end) : _begin(begin), _end(end) {}
 
-  I begin() const { return _begin; }
+  IndexType begin() const { return _begin; }
 
-  I end () const { return _end; }
+  IndexType end () const { return _end; }
 
 private:
-  I _begin, _end;
+  IndexType _begin, _end;
 };
 
 
@@ -53,8 +53,8 @@ private:
  * range. Useful for writing range-based for loops over the pair
  * returned by std::equal_range() and std::map::equal_range().
  */
-template<typename I>
-SimpleRange<I> as_range(const std::pair<I, I> & p)
+template<typename IndexType>
+SimpleRange<IndexType> as_range(const std::pair<IndexType, IndexType> & p)
 {
   return {p.first, p.second};
 }
@@ -65,9 +65,9 @@ SimpleRange<I> as_range(const std::pair<I, I> & p)
  * As above, but can be used in cases where a std::pair is not
  * otherwise involved.
  */
-template<typename I>
-SimpleRange<I> as_range(const I & first,
-                        const I & second)
+template<typename IndexType>
+SimpleRange<IndexType> as_range(const IndexType & first,
+                        const IndexType & second)
 {
   return {first, second};
 }

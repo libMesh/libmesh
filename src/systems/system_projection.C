@@ -46,35 +46,35 @@ namespace libMesh
 {
 // From the perspective of libMesh gradient vectors, a DSNA is a
 // scalar component
-template <typename T, typename I>
-struct ScalarTraits<MetaPhysicL::DynamicSparseNumberArray<T,I> >
+template <typename T, typename IndexType>
+struct ScalarTraits<MetaPhysicL::DynamicSparseNumberArray<T,IndexType> >
 {
   static const bool value = true;
 };
 
 // And although MetaPhysicL knows how to combine DSNA with something
 // else, we need to teach libMesh too.
-template <typename T, typename I, typename T2>
-struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
+template <typename T, typename IndexType, typename T2>
+struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,IndexType>, T2>
 {
   typedef typename
   MetaPhysicL::DynamicSparseNumberArray
-  <typename CompareTypes<T,T2>::supertype,I> supertype;
+  <typename CompareTypes<T,T2>::supertype,IndexType> supertype;
 };
 
 template <typename T> struct TypeToSend;
 
-template <typename T, typename I>
-struct TypeToSend<MetaPhysicL::DynamicSparseNumberArray<T,I>> {
-  typedef std::vector<std::pair<I,T>> type;
+template <typename T, typename IndexType>
+struct TypeToSend<MetaPhysicL::DynamicSparseNumberArray<T,IndexType>> {
+  typedef std::vector<std::pair<IndexType,T>> type;
 };
 
-template <typename T, typename I>
-const std::vector<std::pair<I,T>>
-convert_to_send(MetaPhysicL::DynamicSparseNumberArray<T,I> & in)
+template <typename T, typename IndexType>
+const std::vector<std::pair<IndexType,T>>
+convert_to_send(MetaPhysicL::DynamicSparseNumberArray<T,IndexType> & in)
 {
   const std::size_t in_size = in.size();
-  std::vector<std::pair<I,T>> returnval(in_size);
+  std::vector<std::pair<IndexType,T>> returnval(in_size);
 
   for (std::size_t i=0; i != in_size; ++i)
     {
@@ -84,9 +84,9 @@ convert_to_send(MetaPhysicL::DynamicSparseNumberArray<T,I> & in)
   return returnval;
 }
 
-template <typename SendT, typename T, typename I>
+template <typename SendT, typename T, typename IndexType>
 void convert_from_receive (SendT & received,
-                           MetaPhysicL::DynamicSparseNumberArray<T,I> & converted)
+                           MetaPhysicL::DynamicSparseNumberArray<T,IndexType> & converted)
 {
   const std::size_t received_size = received.size();
   converted.resize(received_size);
