@@ -226,7 +226,7 @@ int main (int argc, char ** argv)
           bool node_out = false;
           for (auto & n : elem->node_ref_range())
             {
-              double d = n.norm();
+              Real d = n.norm();
               if (d<0.8)
                 node_in = true;
               else
@@ -251,7 +251,7 @@ int main (int argc, char ** argv)
   // the circle to 1.
   for (auto elem : mesh.element_ptr_range())
     {
-      double d = elem->centroid().norm();
+      Real d = elem->centroid().norm();
       if (d < 0.8)
         elem->subdomain_id() = 1;
     }

@@ -200,12 +200,12 @@ void tetrahedralize_domain(const Parallel::Communicator & comm)
   // 5.) Set parameters and tetrahedralize the domain
 
   // 0 means "use TetGen default value"
-  Real quality_constraint = 2.0;
+  double quality_constraint = 2.0;
 
   // The volume constraint determines the max-allowed tetrahedral
   // volume in the Mesh.  TetGen will split cells which are larger than
   // this size
-  Real volume_constraint = 0.001;
+  double volume_constraint = 0.001;
 
   // Construct the Delaunay tetrahedralization
   TetGenMeshInterface t(mesh);

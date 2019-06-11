@@ -72,8 +72,8 @@ void NonlinearNeoHookeCurrentConfig::calculate_tangent()
 
 void NonlinearNeoHookeCurrentConfig::calculate_stress()
 {
-  double mu = E / (2.0 * (1.0 + nu));
-  double lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
+  Real mu = E / (2.0 * (1.0 + nu));
+  Real lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
 
   Real detF = F.det();
   RealTensor Ft = F.transpose();
@@ -121,7 +121,7 @@ void NonlinearNeoHookeCurrentConfig::get_linearized_stiffness(DenseMatrix<Real> 
 {
   stiffness.resize(3, 3);
 
-  double G_IK = (sigma * dphi[i][current_qp]) * dphi[j][current_qp];
+  Real G_IK = (sigma * dphi[i][current_qp]) * dphi[j][current_qp];
   stiffness(0, 0) += G_IK;
   stiffness(1, 1) += G_IK;
   stiffness(2, 2) += G_IK;

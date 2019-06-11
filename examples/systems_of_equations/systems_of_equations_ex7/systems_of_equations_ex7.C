@@ -535,9 +535,9 @@ int main (int argc, char ** argv)
   const Real x_length = infile("x_length", 0.);
   const Real y_length = infile("y_length", 0.);
   const Real z_length = infile("z_length", 0.);
-  const Real n_elem_x = infile("n_elem_x", 0);
-  const Real n_elem_y = infile("n_elem_y", 0);
-  const Real n_elem_z = infile("n_elem_z", 0);
+  const int n_elem_x = infile("n_elem_x", 0);
+  const int n_elem_y = infile("n_elem_y", 0);
+  const int n_elem_z = infile("n_elem_z", 0);
   const std::string approx_order = infile("approx_order", "FIRST");
   const std::string fe_family = infile("fe_family", "LAGRANGE");
 
