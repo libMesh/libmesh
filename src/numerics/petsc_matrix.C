@@ -30,6 +30,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
+
 // For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earlier.
 // For example:
 // [0]PETSC ERROR: --------------------- Error Message ------------------------------------
@@ -528,10 +529,10 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
   // Could be useful for setting boundary conditions...
   if (!rows.empty())
     ierr = MatZeroRows(_mat, cast_int<PetscInt>(rows.size()),
-                       numeric_petsc_cast(rows.data()), diag_value,
+                       numeric_petsc_cast(rows.data()), PS(diag_value),
                        NULL, NULL);
   else
-    ierr = MatZeroRows(_mat, 0, NULL, diag_value, NULL,
+    ierr = MatZeroRows(_mat, 0, NULL, PS(diag_value), NULL,
                        NULL);
 #endif
 
@@ -805,7 +806,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
   ierr = MatSetValues(_mat,
                       n_rows, numeric_petsc_cast(rows.data()),
                       n_cols, numeric_petsc_cast(cols.data()),
-                      const_cast<PetscScalar *>(dm.get_values().data()),
+                      pPS(const_cast<T*>(dm.get_values().data())),
                       ADD_VALUES);
   LIBMESH_CHKERR(ierr);
 }
@@ -850,7 +851,7 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T> & dm,
   ierr = MatSetValuesBlocked(_mat,
                              n_brows, numeric_petsc_cast(brows.data()),
                              n_bcols, numeric_petsc_cast(bcols.data()),
-                             const_cast<PetscScalar *>(dm.get_values().data()),
+                             pPS(const_cast<T*>(dm.get_values().data())),
                              ADD_VALUES);
   LIBMESH_CHKERR(ierr);
 }
