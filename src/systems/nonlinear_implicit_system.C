@@ -111,11 +111,11 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   const double rel_resid_tol =
     double(es.parameters.get<Real>("nonlinear solver relative residual tolerance"));
 
-  const Real abs_step_tol =
-    es.parameters.get<Real>("nonlinear solver absolute step tolerance");
+  const double abs_step_tol =
+    double(es.parameters.get<Real>("nonlinear solver absolute step tolerance"));
 
-  const Real rel_step_tol =
-    es.parameters.get<Real>("nonlinear solver relative step tolerance");
+  const double rel_step_tol =
+    double(es.parameters.get<Real>("nonlinear solver relative step tolerance"));
 
   // Get the user-specified linear solver tolerances
   const unsigned int maxlinearits =
