@@ -121,8 +121,18 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 // If we're using quad precision, we need to disambiguate std
 // operations on PetscScalar
 
+#if LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# include <boost/multiprecision/float128.hpp>
+
 namespace std
 {
+inline
+std::ostream & operator<< (std::ostream & os, const PetscScalar in)
+{
+  os << (boost::multiprecision::float128(in));
+  return os;
+}
+
 #define LIBMESH_PETSCSCALAR_UNARY(funcname) \
 inline PetscScalar funcname \
   (const PetscScalar in) \
@@ -149,7 +159,54 @@ LIBMESH_PETSCSCALAR_UNARY(fabs)
 LIBMESH_PETSCSCALAR_UNARY(ceil)
 LIBMESH_PETSCSCALAR_UNARY(floor)
 
+} // namespace std
+
+// Helper functions for boost float128 compatibility
+namespace libMesh
+{
+template <typename T>
+PetscScalar PS(T val)
+{
+  return val.backend().value();
 }
+
+template <typename T>
+PetscScalar * pPS(T * ptr)
+{
+  return &(ptr->backend().value());
+}
+
+template <typename T>
+const PetscScalar * pPS(const T * ptr)
+{
+  return &(ptr->backend().value());
+}
+} // namespace libMesh
+
+#else
+
+namespace libMesh
+{
+template <typename T>
+PetscScalar PS(T val)
+{
+  return val;
+}
+
+template <typename T>
+PetscScalar * pPS(T * ptr)
+{
+  return ptr;
+}
+
+template <typename T>
+const PetscScalar * pPS(const T * ptr)
+{
+  return ptr;
+}
+} // namespace libMesh
+
+#endif // LIBMESH_ENABLE_QUADRUPLE_PRECISION
 
 #else // LIBMESH_HAVE_PETSC
 
