@@ -108,6 +108,8 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
 {
   LOG_SCOPE("solve_standard()", "SlepcEigenSolver");
 
+  this->clear ();
+
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
@@ -132,6 +134,8 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
                                      const double tol,         // solver tolerance
                                      const unsigned int m_its) // maximum number of iterations
 {
+  this->clear ();
+
   this->init ();
 
   PetscErrorCode ierr=0;
@@ -294,6 +298,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
                                         const double tol,         // solver tolerance
                                         const unsigned int m_its) // maximum number of iterations
 {
+  this->clear ();
+
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
@@ -322,6 +328,8 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
                                         const double tol,         // solver tolerance
                                         const unsigned int m_its) // maximum number of iterations
 {
+  this->clear();
+
   this->init ();
 
   PetscErrorCode ierr=0;
@@ -366,6 +374,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
                                         const double tol,         // solver tolerance
                                         const unsigned int m_its) // maximum number of iterations
 {
+  this->clear();
+
   this->init ();
 
   PetscErrorCode ierr=0;
@@ -411,6 +421,8 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
                                         const double tol,         // solver tolerance
                                         const unsigned int m_its) // maximum number of iterations
 {
+  this->clear();
+
   this->init ();
 
   PetscErrorCode ierr=0;
