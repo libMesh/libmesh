@@ -85,16 +85,19 @@ private:
     true_sigma(0) = 9.525518091565109e+00;
     true_sigma(1) = 5.143005806586446e-01;
 
+    // Tolerance is bounded by the double literals above and by using Real
+    const Real tol = std::max(Real(1e-12), TOLERANCE*TOLERANCE);
+
     for (unsigned i=0; i<U.m(); ++i)
       for (unsigned j=0; j<U.n(); ++j)
-        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(U(i,j)), libmesh_real(true_U(i,j)), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(U(i,j)), libmesh_real(true_U(i,j)), tol);
 
     for (unsigned i=0; i<VT.m(); ++i)
       for (unsigned j=0; j<VT.n(); ++j)
-        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(VT(i,j)), libmesh_real(true_VT(i,j)), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(VT(i,j)), libmesh_real(true_VT(i,j)), tol);
 
     for (unsigned i=0; i<sigma.size(); ++i)
-      LIBMESH_ASSERT_FP_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(sigma(i), true_sigma(i), tol);
   }
 
   // This function is called by testEVD for different matrices.  The
@@ -104,7 +107,8 @@ private:
   // in-place.
   void testEVD_helper(DenseMatrix<Real> & A,
                       std::vector<Real> true_lambda_real,
-                      std::vector<Real> true_lambda_imag)
+                      std::vector<Real> true_lambda_imag,
+                      Real tol)
   {
     // Note: see bottom of this file, we only do this test if PETSc is
     // available, but this function currently only exists if we're
@@ -130,7 +134,7 @@ private:
     for (unsigned eigenval=0; eigenval<N; ++eigenval)
       {
         // Only check real eigenvalues
-        if (std::abs(lambda_imag(eigenval)) < TOLERANCE*TOLERANCE)
+        if (std::abs(lambda_imag(eigenval)) < tol*tol)
           {
             // remove print libMesh::out << "Checking eigenvalue: " << eigenval << std::endl;
             DenseVector<Real> lhs(N), rhs(N);
@@ -144,7 +148,7 @@ private:
             // Subtract and assert that the norm of the difference is
             // below some tolerance.
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
           }
         else
           {
@@ -169,7 +173,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
 
             // libMesh::out << "lhs=" << std::endl;
             // lhs.print_scientific(libMesh::out, /*precision=*/15);
@@ -188,7 +192,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
 
             // libMesh::out << "lhs=" << std::endl;
             // lhs.print_scientific(libMesh::out, /*precision=*/15);
@@ -211,7 +215,7 @@ private:
     for (unsigned eigenval=0; eigenval<N; ++eigenval)
       {
         // Only check real eigenvalues
-        if (std::abs(lambda_imag(eigenval)) < TOLERANCE*TOLERANCE)
+        if (std::abs(lambda_imag(eigenval)) < tol*tol)
           {
             // remove print libMesh::out << "Checking eigenvalue: " << eigenval << std::endl;
             DenseVector<Real> lhs(N), rhs(N);
@@ -223,7 +227,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
           }
         else
           {
@@ -248,7 +252,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
 
             // 2.)
             lhs.zero();
@@ -261,7 +265,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
 
             // We'll skip the second member of the complex conjugate
             // pair.  If the first one worked, the second one should
@@ -286,8 +290,8 @@ private:
         // the test problems.  I'm not sure what controls the accuracy
         // of the eigenvalue computation in LAPACK, there is no way to
         // set a tolerance in the LAPACKgeev_ interface.
-        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/true_lambda_real[i], /*actual=*/lambda_real(i), std::sqrt(TOLERANCE)*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/true_lambda_imag[i], /*actual=*/lambda_imag(i), std::sqrt(TOLERANCE)*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/true_lambda_real[i], /*actual=*/lambda_real(i), std::sqrt(tol)*tol);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/true_lambda_imag[i], /*actual=*/lambda_imag(i), std::sqrt(tol)*tol);
       }
 #endif
   }
@@ -308,7 +312,7 @@ private:
     std::vector<Real> true_lambda_imag(3); // all zero
 
     // call helper function to compute and verify results.
-    testEVD_helper(A, true_lambda_real, true_lambda_imag);
+    testEVD_helper(A, true_lambda_real, true_lambda_imag, TOLERANCE);
   }
 
   void testEVDcomplex()
@@ -329,8 +333,12 @@ private:
     true_lambda_imag[1] = 17.60083096447099;
     true_lambda_imag[2] = -17.60083096447099;
 
+    // We're good up to double precision (due to the truncated
+    // literals above) or Real precision, whichever is worse
+    const Real tol = std::max(Real(1e-6), TOLERANCE);
+
     // call helper function to compute and verify results
-    testEVD_helper(A, true_lambda_real, true_lambda_imag);
+    testEVD_helper(A, true_lambda_real, true_lambda_imag, tol);
   }
 
   void testComplexSVD()
