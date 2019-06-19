@@ -123,6 +123,13 @@ int main(int argc, char ** argv)
 #ifndef LIBMESH_HAVE_ZLIB_H
   libmesh_example_requires(false, "--enable-zlib");
 #endif
+  // Nanoflann is giving me trouble with extended Reals
+#ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
+  libmesh_example_requires(false, "--disable-triple-precision");
+#endif
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  libmesh_example_requires(false, "--disable-quadruple-precision");
+#endif
 
   // Initialize libMesh.
   LibMeshInit init (argc, argv);

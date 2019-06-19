@@ -110,6 +110,12 @@ int main (int argc, char ** argv)
   libmesh_example_requires (false, "XDR support");
 #endif
 
+  // This examples requires parallel minloc() support, which we don't
+  // implement yet for float128
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  libmesh_example_requires (false, "--disable-quadruple-precision");
+#endif
+
   // Read the "distributed_load" flag from the command line
   GetPot command_line (argc, argv);
   int distributed_load = 0;
