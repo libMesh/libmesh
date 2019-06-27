@@ -945,13 +945,25 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   // Allocate enough space to store the nodal variable values
   nodal_var_values.resize(num_nodes);
 
+  std::vector<Real> unmapped_nodal_var_values(num_nodes);
+
   // Call the Exodus API to read the nodal variable values
   ex_err = exII::ex_get_nodal_var(ex_id,
                                   time_step,
                                   var_index+1,
                                   num_nodes,
-                                  nodal_var_values.data());
+                                  unmapped_nodal_var_values.data());
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
+
+  for (unsigned i=0; i<static_cast<unsigned>(num_nodes); i++)
+    {
+      // Use the node_num_map to obtain the ID of this node in the Exodus file,
+      // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
+      unsigned mapped_node_id = this->node_num_map[i] - 1;
+
+      // Store the nodal value in the map.
+      nodal_var_values[mapped_node_id] = unmapped_nodal_var_values[i];
+    }
 }
 
 
@@ -1082,7 +1094,7 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
   unsigned int var_index = 0;
   bool found = false;
 
-  // Do a linear search for nodal_var_name in nodal_var_names
+  // Do a linear search for elem_var_name in elemental_var_names
   for (; var_index != elem_var_names.size(); ++var_index)
     if (elem_var_names[var_index] == elemental_var_name)
       {
