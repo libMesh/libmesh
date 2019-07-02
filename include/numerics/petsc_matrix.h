@@ -151,6 +151,11 @@ public:
    */
   void update_preallocation_and_zero();
 
+  /**
+   * Reset matrix to use the original nonzero pattern provided by users
+   */
+  void reset_preallocation();
+
   virtual void clear () override;
 
   virtual void zero () override;
@@ -163,7 +168,24 @@ public:
 
   virtual numeric_index_type m () const override;
 
+  /**
+   * Get the number of rows owned by this process
+   */
+  numeric_index_type local_m () const;
+
   virtual numeric_index_type n () const override;
+
+  /**
+   * Get the number of columns owned by this process
+   */
+  numeric_index_type local_n () const;
+
+  /**
+   * Get the number of rows and columns owned by this process
+   * @param i Row size
+   * @param j Column size
+   */
+  void get_local_size (numeric_index_type & m, numeric_index_type & n) const;
 
   virtual numeric_index_type row_start () const override;
 
