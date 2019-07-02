@@ -470,6 +470,14 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
   libmesh_not_implemented();
 }
 
+template <typename T>
+void PetscMatrix<T>::reset_preallocation()
+{
+  libmesh_assert (this->initialized());
+
+  auto ierr = MatResetPreallocation(_mat);
+  LIBMESH_CHKERR(ierr);
+}
 
 template <typename T>
 void PetscMatrix<T>::zero ()
@@ -1002,7 +1010,18 @@ numeric_index_type PetscMatrix<T>::m () const
   return static_cast<numeric_index_type>(petsc_m);
 }
 
+template <typename T>
+numeric_index_type PetscMatrix<T>::local_m () const
+{
+  libmesh_assert (this->initialized());
 
+  PetscInt m = 0;
+
+  auto ierr = MatGetLocalSize (_mat, &m, PETSC_NULL);
+  LIBMESH_CHKERR(ierr);
+
+  return static_cast<numeric_index_type>(m);
+}
 
 template <typename T>
 numeric_index_type PetscMatrix<T>::n () const
@@ -1018,7 +1037,33 @@ numeric_index_type PetscMatrix<T>::n () const
   return static_cast<numeric_index_type>(petsc_n);
 }
 
+template <typename T>
+numeric_index_type PetscMatrix<T>::local_n () const
+{
+  libmesh_assert (this->initialized());
 
+  PetscInt n = 0;
+
+  auto ierr = MatGetLocalSize (_mat, PETSC_NULL, &n);
+  LIBMESH_CHKERR(ierr);
+
+  return static_cast<numeric_index_type>(n);
+}
+
+template <typename T>
+void PetscMatrix<T>::get_local_size (numeric_index_type & m,
+                                     numeric_index_type & n) const
+{
+  libmesh_assert (this->initialized());
+
+  PetscInt petsc_m = 0, petsc_n = 0;
+
+  auto ierr = MatGetLocalSize (_mat, &petsc_m, &petsc_n);
+  LIBMESH_CHKERR(ierr);
+
+  m = static_cast<numeric_index_type>(petsc_m);
+  n = static_cast<numeric_index_type>(petsc_n);
+}
 
 template <typename T>
 numeric_index_type PetscMatrix<T>::row_start () const
