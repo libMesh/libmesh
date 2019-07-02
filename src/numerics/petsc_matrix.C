@@ -473,10 +473,16 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
 template <typename T>
 void PetscMatrix<T>::reset_preallocation()
 {
+#if !PETSC_VERSION_LESS_THAN(3,8,0)
   libmesh_assert (this->initialized());
 
   auto ierr = MatResetPreallocation(_mat);
   LIBMESH_CHKERR(ierr);
+#else
+  libmesh_warning("Your version of PETSc doesn't support resetting of "
+                  "preallocation, so we will use your most recent sparsity "
+                  "pattern. This may result in a degradation of performance\n");
+#endif
 }
 
 template <typename T>
