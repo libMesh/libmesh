@@ -473,7 +473,7 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
 template <typename T>
 void PetscMatrix<T>::reset_preallocation()
 {
-#if !PETSC_VERSION_LESS_THAN(3,8,0)
+#if !PETSC_VERSION_LESS_THAN(3,9,0)
   libmesh_assert (this->initialized());
 
   auto ierr = MatResetPreallocation(_mat);
