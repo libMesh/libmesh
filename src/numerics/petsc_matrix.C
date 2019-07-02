@@ -172,11 +172,11 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
       LIBMESH_CHKERR(ierr);
-      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, n_nz/blocksize, PETSC_NULL);
+      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, n_nz/blocksize, NULL);
       LIBMESH_CHKERR(ierr);
       ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
-                                        n_nz/blocksize, PETSC_NULL,
-                                        n_oz/blocksize, PETSC_NULL);
+                                        n_nz/blocksize, NULL,
+                                        n_oz/blocksize, NULL);
       LIBMESH_CHKERR(ierr);
     }
   else
@@ -186,9 +186,9 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
         case AIJ:
           ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
           LIBMESH_CHKERR(ierr);
-          ierr = MatSeqAIJSetPreallocation(_mat, n_nz, PETSC_NULL);
+          ierr = MatSeqAIJSetPreallocation(_mat, n_nz, NULL);
           LIBMESH_CHKERR(ierr);
-          ierr = MatMPIAIJSetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
+          ierr = MatMPIAIJSetPreallocation(_mat, n_nz, NULL, n_oz, NULL);
           LIBMESH_CHKERR(ierr);
           break;
 
@@ -196,7 +196,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 #if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
           ierr = MatSetType(_mat, MATHYPRE);
           LIBMESH_CHKERR(ierr);
-          ierr = MatHYPRESetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
+          ierr = MatHYPRESetPreallocation(_mat, n_nz, NULL, n_oz, NULL);
           LIBMESH_CHKERR(ierr);
 #else
           libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
@@ -514,7 +514,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
     ierr = MatZeroRows(_mat, rows.size(),
                        numeric_petsc_cast(rows.data()), diag_value);
   else
-    ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value);
+    ierr = MatZeroRows(_mat, 0, NULL, diag_value);
 #else
   // As of petsc-dev at the time of 3.1.0, MatZeroRows now takes two additional
   // optional arguments.  The optional arguments (x,b) can be used to specify the
@@ -523,10 +523,10 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
   if (!rows.empty())
     ierr = MatZeroRows(_mat, cast_int<PetscInt>(rows.size()),
                        numeric_petsc_cast(rows.data()), diag_value,
-                       PETSC_NULL, PETSC_NULL);
+                       NULL, NULL);
   else
-    ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value, PETSC_NULL,
-                       PETSC_NULL);
+    ierr = MatZeroRows(_mat, 0, NULL, diag_value, NULL,
+                       NULL);
 #endif
 
   LIBMESH_CHKERR(ierr);
@@ -939,7 +939,7 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
   PetscErrorCode ierr;
 #if PETSC_VERSION_LESS_THAN(3,0,0)
   if (&petsc_dest == this)
-    ierr = MatTranspose(_mat,PETSC_NULL);
+    ierr = MatTranspose(_mat,NULL);
   else
     ierr = MatTranspose(_mat,&petsc_dest._mat);
   LIBMESH_CHKERR(ierr);
@@ -1017,7 +1017,7 @@ numeric_index_type PetscMatrix<T>::local_m () const
 
   PetscInt m = 0;
 
-  auto ierr = MatGetLocalSize (_mat, &m, PETSC_NULL);
+  auto ierr = MatGetLocalSize (_mat, &m, NULL);
   LIBMESH_CHKERR(ierr);
 
   return static_cast<numeric_index_type>(m);
@@ -1044,7 +1044,7 @@ numeric_index_type PetscMatrix<T>::local_n () const
 
   PetscInt n = 0;
 
-  auto ierr = MatGetLocalSize (_mat, PETSC_NULL, &n);
+  auto ierr = MatGetLocalSize (_mat, NULL, &n);
   LIBMESH_CHKERR(ierr);
 
   return static_cast<numeric_index_type>(n);
