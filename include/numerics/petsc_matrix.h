@@ -168,10 +168,7 @@ public:
 
   virtual numeric_index_type m () const override;
 
-  /**
-   * Get the number of rows owned by this process
-   */
-  numeric_index_type local_m () const;
+  numeric_index_type local_m () const final;
 
   virtual numeric_index_type n () const override;
 
