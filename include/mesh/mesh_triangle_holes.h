@@ -68,6 +68,18 @@ public:
    * Return an (arbitrary) point which lies inside the hole.
    */
   virtual Point inside() const = 0;
+
+  /**
+   * Starting indices of points for a hole with multiple disconnected boundaries.
+   */
+  virtual std::vector<unsigned int> segment_indices() const
+  {
+    // default to only one enclosing boundary
+    std::vector<unsigned int> seg;
+    seg.push_back(0);
+    seg.push_back(n_points());
+    return seg;
+  }
 };
 
 
@@ -133,23 +145,31 @@ public:
   ArbitraryHole(const Point & center,
                 const std::vector<Point> & points);
 
+  ArbitraryHole(const Point & center,
+                const std::vector<Point> & points,
+                const std::vector<unsigned int> & segment_indices);
+
   virtual unsigned int n_points() const override;
 
   virtual Point point(const unsigned int n) const override;
 
   virtual Point inside() const override;
 
+  virtual std::vector<unsigned int> segment_indices() const override;
+
 private:
   /**
    * arbitrary (x,y) location inside the hole
    */
-  Point _center;
+  const Point _center;
 
   /**
    * Reference to the vector of points which makes up
    * the hole.
    */
-  const std::vector<Point> & _points;
+  const std::vector<Point> _points;
+
+  std::vector<unsigned int> _segment_indices;
 };
 
 } // namespace libMesh

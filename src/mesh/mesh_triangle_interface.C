@@ -136,9 +136,6 @@ void TriangleInterface::triangulate()
   else if (_triangulation_type==GENERATE_CONVEX_HULL)
     initial.numberofsegments = n_hole_points; // One segment for each hole point
 
-  // Debugging
-  // libMesh::out << "Number of segments set to: " << initial.numberofsegments << std::endl;
-
   // Allocate space for the segments (2 int per segment)
   if (initial.numberofsegments > 0)
     {
@@ -155,20 +152,26 @@ void TriangleInterface::triangulate()
   if (have_holes)
     for (const auto & hole : *_holes)
       {
-        for (unsigned int ctr=0, h=0; h<hole->n_points(); ctr+=2, ++h)
+        for (unsigned int ctr=0, h=0, i=0; i<hole->segment_indices().size()-1; ++i)
           {
-            Point p = hole->point(h);
+            unsigned int begp = hole_offset + hole->segment_indices()[i];
+            unsigned int endp = hole->segment_indices()[i+1];
 
-            const unsigned int index0 = 2*hole_offset+ctr;
-            const unsigned int index1 = 2*hole_offset+ctr+1;
+            for (; h<endp; ctr+=2, ++h)
+              {
+                Point p = hole->point(h);
 
-            // Save the x,y locations in the triangle struct.
-            initial.pointlist[index0] = p(0);
-            initial.pointlist[index1] = p(1);
+                const unsigned int index0 = 2*hole_offset+ctr;
+                const unsigned int index1 = 2*hole_offset+ctr+1;
 
-            // Set the points which define the segments
-            initial.segmentlist[index0] = hole_offset+h;
-            initial.segmentlist[index1] = (h == hole->n_points() - 1) ? hole_offset : hole_offset + h + 1; // wrap around
+                // Save the x,y locations in the triangle struct.
+                initial.pointlist[index0] = p(0);
+                initial.pointlist[index1] = p(1);
+
+                // Set the points which define the segments
+                initial.segmentlist[index0] = hole_offset+h;
+                initial.segmentlist[index1] = (h == endp - 1) ? begp : hole_offset + h + 1; // wrap around
+              }
           }
 
         // Update the hole_offset for the next hole

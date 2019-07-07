@@ -35,7 +35,8 @@ TriangleInterface::PolygonHole::PolygonHole(const Point & center,
   _center(center),
   _radius(radius),
   _n_points(n_points_in)
-{}
+{
+}
 
 
 unsigned int TriangleInterface::PolygonHole::n_points() const
@@ -53,14 +54,11 @@ Point TriangleInterface::PolygonHole::point(const unsigned int n) const
                0.);
 }
 
-
-
 Point TriangleInterface::PolygonHole::inside() const
 {
   // The center of the hole is definitely inside.
   return _center;
 }
-
 
 
 //
@@ -70,8 +68,18 @@ TriangleInterface::ArbitraryHole::ArbitraryHole(const Point & center,
                                                 const std::vector<Point> & points)
   : _center(center),
     _points(points)
-{}
+{
+  _segment_indices.push_back(0);
+  _segment_indices.push_back(points.size());
+}
 
+TriangleInterface::ArbitraryHole::ArbitraryHole(const Point & center,
+                                                const std::vector<Point> & points,
+                                                const std::vector<unsigned int> & segment_indices)
+  : _center(center),
+    _points(points),
+    _segment_indices(segment_indices)
+{}
 
 unsigned int TriangleInterface::ArbitraryHole::n_points() const
 {
@@ -91,6 +99,10 @@ Point  TriangleInterface::ArbitraryHole::inside() const
   return _center;
 }
 
+std::vector<unsigned int> TriangleInterface::ArbitraryHole::segment_indices() const
+{
+  return _segment_indices;
+}
 
 } // namespace libMesh
 
