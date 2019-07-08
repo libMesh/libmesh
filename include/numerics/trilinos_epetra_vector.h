@@ -179,6 +179,8 @@ public:
 
   virtual NumericVector<T> & operator -= (const NumericVector<T> & v) override;
 
+  virtual NumericVector<T> & operator *= (const NumericVector<T> & v) override;
+
   virtual NumericVector<T> & operator /= (const NumericVector<T> & v) override;
 
   virtual void reciprocal() override;

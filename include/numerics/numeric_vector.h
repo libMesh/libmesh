@@ -391,6 +391,15 @@ public:
   NumericVector<T> & operator *= (const T a) { this->scale(a); return *this; }
 
   /**
+   * Computes the component-wise multiplication of this vector's entries by
+   * another's,
+   * \f$ u_i \leftarrow u_i v_i \, \forall i\f$
+   *
+   * \returns A reference to *this.
+   */
+  virtual NumericVector<T> & operator *= (const NumericVector<T> & v) = 0;
+
+  /**
    * Scales the vector by \p 1/a,
    * \f$ \vec{u} \leftarrow \frac{1}{a}\vec{u} \f$.
    * Equivalent to \p u.scale(1./a)
@@ -405,7 +414,7 @@ public:
    *
    * \returns A reference to *this.
    */
-  virtual NumericVector<T> & operator /= (const NumericVector<T> & /*v*/) = 0;
+  virtual NumericVector<T> & operator /= (const NumericVector<T> & v) = 0;
 
   /**
    * Computes the pointwise reciprocal,

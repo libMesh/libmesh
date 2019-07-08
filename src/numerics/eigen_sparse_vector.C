@@ -107,6 +107,21 @@ NumericVector<T> & EigenSparseVector<T>::operator -= (const NumericVector<T> & v
 
 
 template <typename T>
+NumericVector<T> & EigenSparseVector<T>::operator *= (const NumericVector<T> & v_in)
+{
+  libmesh_assert (this->closed());
+  libmesh_assert_equal_to(size(), v_in.size());
+
+  const EigenSparseVector<T> & v = cast_ref<const EigenSparseVector<T> &>(v_in);
+
+  _vec = _vec.cwiseProduct(v._vec);
+
+  return *this;
+}
+
+
+
+template <typename T>
 NumericVector<T> & EigenSparseVector<T>::operator /= (const NumericVector<T> & v_in)
 {
   libmesh_assert (this->closed());
