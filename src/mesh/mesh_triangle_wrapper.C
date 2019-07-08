@@ -102,7 +102,8 @@ void TriangleWrapper::destroy(TriangleWrapper::triangulateio & t, TriangleWrappe
 
 void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input,
                                        UnstructuredMesh & mesh_output,
-                                       const ElemType type)
+                                       const ElemType type,
+                                       const triangulateio * voronoi)
 {
   // Transfer the information into the LibMesh mesh.
   mesh_output.clear();
@@ -164,6 +165,35 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
   // neighbors...
   //mesh_output.prepare_for_use(/*skip_renumber =*/false);
   mesh_output.find_neighbors();
+
+  // set boundary info
+  if (voronoi && triangle_data_input.edgemarkerlist)
+  {
+    BoundaryInfo & boundary_info = mesh_output.get_boundary_info();
+    for (int e=0; e<triangle_data_input.numberofedges; ++e)
+    {
+      if (triangle_data_input.edgemarkerlist[e] != 0)
+      {
+        int p1 = triangle_data_input.edgelist[e + e];
+        int p2 = triangle_data_input.edgelist[e + e + 1];
+        int elem_id = voronoi->edgelist[e + e];
+        unsigned short int s;
+        if (p1 == triangle_data_input.trianglelist[elem_id*3] &&
+            p2 == triangle_data_input.trianglelist[elem_id*3 + 1])
+          s = 0;
+        else if (p1 == triangle_data_input.trianglelist[elem_id*3 + 1] &&
+                 p2 == triangle_data_input.trianglelist[elem_id*3 + 2])
+          s = 1;
+        else if (p1 == triangle_data_input.trianglelist[elem_id*3 + 2] &&
+                 p2 == triangle_data_input.trianglelist[elem_id*3])
+          s = 2;
+        else
+          libmesh_error_msg("ERROR: finding element errors for boundary edges.");
+
+        boundary_info.add_side(elem_id, s, triangle_data_input.edgemarkerlist[e]);
+      }
+    }
+  }
 }
 
 

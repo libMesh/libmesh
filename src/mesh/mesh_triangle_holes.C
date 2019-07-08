@@ -35,8 +35,7 @@ TriangleInterface::PolygonHole::PolygonHole(const Point & center,
   _center(center),
   _radius(radius),
   _n_points(n_points_in)
-{
-}
+{}
 
 
 unsigned int TriangleInterface::PolygonHole::n_points() const

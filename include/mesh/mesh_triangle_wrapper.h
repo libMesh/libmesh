@@ -95,7 +95,8 @@ void destroy(triangulateio & t, IO_Type);
  */
 void copy_tri_to_mesh(const triangulateio & triangle_data_input,
                       UnstructuredMesh & mesh_output,
-                      const ElemType type);
+                      const ElemType type,
+                      const triangulateio * voronoi = nullptr);
 } // namespace TriangleWrapper
 } // namespace libMesh
 

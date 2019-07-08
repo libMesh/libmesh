@@ -174,6 +174,13 @@ public:
    */
   std::vector<std::pair<unsigned int, unsigned int>> segments;
 
+  /**
+   * Attaches boundary markers.
+   * If segments is set, the number of markers must be equal to the size of segments,
+   * otherwise, it is equal to the number of points.
+   */
+  void attach_boundary_marker(const std::vector<int> * markers) { _markers = markers; }
+
 private:
   /**
    * Reference to the mesh which is to be created by triangle.
@@ -185,6 +192,11 @@ private:
    * are no holes!
    */
   const std::vector<Hole*> * _holes;
+
+  /**
+   * Boundary markers
+   */
+  const std::vector<int> * _markers;
 
   /**
    * The type of elements to generate.  (Defaults to

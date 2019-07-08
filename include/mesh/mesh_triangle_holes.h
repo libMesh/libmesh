@@ -34,8 +34,12 @@ namespace libMesh
 /**
  * An abstract class for defining a 2-dimensional hole.  We assume that
  * the connectivity of the hole is implicit in the numbering of the points,
- * i.e. node 0 is connected to node 1, node 1 is connected to node 2, etc,
- * and the last node "wraps around" to connect back to node 0.
+ * controlled by segment_indices vector.
+ * The size of segment_indices is equal to the number of segments plus one.
+ * Each segment has segment_indices[i+1]-segment_indices[i] connected points,
+ * with node segment_indices[i] is connected to node segment_indices[i+1],
+ * node segment_indices[i+1] is connected to node segment_indices[i+2], etc,
+ * and the last node "wraps around" to connect back to node segment_indices[i].
  *
  * \author John W. Peterson
  * \date 2011

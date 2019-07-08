@@ -44,6 +44,7 @@ namespace libMesh
 TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
   : _mesh(mesh),
     _holes(nullptr),
+    _markers(nullptr),
     _elem_type(TRI3),
     _desired_area(0.1),
     _minimum_angle(20.0),
@@ -114,10 +115,12 @@ void TriangleInterface::triangulate()
   // Triangle data structure for the mesh
   TriangleWrapper::triangulateio initial;
   TriangleWrapper::triangulateio final;
+  TriangleWrapper::triangulateio voronoi;
 
   // Pseudo-Constructor for the triangle io structs
   TriangleWrapper::init(initial);
   TriangleWrapper::init(final);
+  TriangleWrapper::init(voronoi);
 
   initial.numberofpoints = _mesh.n_nodes() + n_hole_points;
   initial.pointlist      = static_cast<REAL*>(std::malloc(initial.numberofpoints * 2 * sizeof(REAL)));
@@ -140,6 +143,8 @@ void TriangleInterface::triangulate()
   if (initial.numberofsegments > 0)
     {
       initial.segmentlist = static_cast<int *> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
+      if (_markers)
+        initial.segmentmarkerlist = static_cast<int *> (std::malloc(initial.numberofsegments * sizeof(int)));
     }
 
 
@@ -171,6 +176,9 @@ void TriangleInterface::triangulate()
                 // Set the points which define the segments
                 initial.segmentlist[index0] = hole_offset+h;
                 initial.segmentlist[index1] = (h == endp - 1) ? begp : hole_offset + h + 1; // wrap around
+                if (_markers)
+                  // 1 is reserved for boundaries of holes
+                  initial.segmentmarkerlist[hole_offset+h] = 1;
               }
           }
 
@@ -199,6 +207,8 @@ void TriangleInterface::triangulate()
                 dof_id_type n = ctr/2; // ctr is always even
                 initial.segmentlist[index] = hole_offset+n;
                 initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
+                if (_markers)
+                  initial.segmentmarkerlist[hole_offset + n] = (*_markers)[n];
               }
           }
 
@@ -215,6 +225,8 @@ void TriangleInterface::triangulate()
 
       initial.segmentlist[index0] = hole_offset + this->segments[s].first;
       initial.segmentlist[index1] = hole_offset + this->segments[s].second;
+      if (_markers)
+        initial.segmentmarkerlist[hole_offset + s] = (*_markers)[s];
     }
 
 
@@ -249,11 +261,15 @@ void TriangleInterface::triangulate()
   // a ~ Imposes a maximum triangle area constraint.
   // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
   //     constraining segments on later refinements of the mesh.
+  // -e  Outputs (to an .edge file) a list of edges of the triangulation.
+  // -v  Outputs the Voronoi diagram associated with the triangulation.
   // Create the flag strings, depends on element type
   std::ostringstream flags;
 
   // Default flags always used
-  flags << "zBPQ";
+  flags << "zPQ";
+  if (_markers)
+    flags << "ev";
 
   // Flags which are specific to the type of triangulation
   switch (_triangulation_type)
@@ -316,16 +332,33 @@ void TriangleInterface::triangulate()
     flags << _extra_flags;
 
   // Refine the initial output to conform to the area constraint
-  TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
-                               &initial,
-                               &final,
-                               nullptr); // voronoi ouput -- not used
+  if (_markers)
+  {
+    // need Voronoi to generate boundary information
+    TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
+                                 &initial,
+                                 &final,
+                                 &voronoi);
+
+    // Send the information computed by Triangle to the Mesh.
+    TriangleWrapper::copy_tri_to_mesh(final,
+                                      _mesh,
+                                      _elem_type,
+                                      &voronoi);
+  }
+  else
+  {
+    TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
+                                 &initial,
+                                 &final,
+                                 nullptr);
+    // Send the information computed by Triangle to the Mesh.
+    TriangleWrapper::copy_tri_to_mesh(final,
+                                      _mesh,
+                                      _elem_type);
+  }
 
 
-  // Send the information computed by Triangle to the Mesh.
-  TriangleWrapper::copy_tri_to_mesh(final,
-                                    _mesh,
-                                    _elem_type);
 
   // To the naked eye, a few smoothing iterations usually looks better,
   // so we do this by default unless the user says not to.
@@ -336,6 +369,7 @@ void TriangleInterface::triangulate()
   // Clean up.
   TriangleWrapper::destroy(initial,      TriangleWrapper::INPUT);
   TriangleWrapper::destroy(final,        TriangleWrapper::OUTPUT);
+  TriangleWrapper::destroy(voronoi,      TriangleWrapper::OUTPUT);
 
   // Prepare the mesh for use before returning.  This ensures (among
   // other things) that it is partitioned and therefore users can
