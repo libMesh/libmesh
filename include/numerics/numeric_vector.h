@@ -409,7 +409,7 @@ public:
   NumericVector<T> & operator /= (const T a) { this->scale(1./a); return *this; }
 
   /**
-   * Computes the pointwise division of this vector's entries by another's,
+   * Computes the component-wise division of this vector's entries by another's,
    * \f$ u_i \leftarrow \frac{u_i}{v_i} \, \forall i\f$
    *
    * \returns A reference to *this.
@@ -417,7 +417,7 @@ public:
   virtual NumericVector<T> & operator /= (const NumericVector<T> & v) = 0;
 
   /**
-   * Computes the pointwise reciprocal,
+   * Computes the component-wise reciprocal,
    * \f$ u_i \leftarrow \frac{1}{u_i} \, \forall i\f$
    */
   virtual void reciprocal() = 0;
