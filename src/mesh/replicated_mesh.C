@@ -1417,5 +1417,184 @@ dof_id_type ReplicatedMesh::n_active_elem () const
                                                  this->active_elements_end()));
 }
 
+std::vector<dof_id_type>
+ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * subdomain_ids) const
+{
+  // find number of disconnected subdomains
+  std::vector<dof_id_type> representative_elem_ids;
+
+  // use subdomain_ids as markers for all elements to indicate if the elements
+  // have been visited. Note: here subdomain ID is unrelated with element
+  // subdomain_id().
+  std::vector<subdomain_id_type> subdomains;
+  if (!subdomain_ids)
+    subdomain_ids = &subdomains;
+  subdomain_ids->clear();
+  subdomain_ids->resize(max_elem_id() + 1, Elem::invalid_subdomain_id);
+
+  // counter of disconnected subdomains
+  subdomain_id_type subdomain_counter = 0;
+
+  // a stack for visiting elements, make its capacity sufficiently large to avoid
+  // memory allocation and deallocation when the vector size changes
+  std::vector<Elem *> list;
+  list.reserve(n_elem());
+
+  // counter of visited elements
+  dof_id_type visited = 0;
+  do
+  {
+    for (const auto & elem : active_element_ptr_range())
+      if ((*subdomain_ids)[elem->id()] == Elem::invalid_subdomain_id)
+      {
+        list.push_back(elem);
+        (*subdomain_ids)[elem->id()] = subdomain_counter;
+        break;
+      }
+
+    dof_id_type min_id = std::numeric_limits<dof_id_type>::max();
+    while (list.size() > 0)
+    {
+      // pop up an element
+      Elem * elem = list.back(); list.pop_back(); ++visited;
+
+      min_id = std::min(elem->id(), min_id);
+
+      for (auto s : elem->side_index_range())
+      {
+        Elem * neighbor = elem->neighbor_ptr(s);
+        if (neighbor != nullptr && (*subdomain_ids)[neighbor->id()] == Elem::invalid_subdomain_id)
+        {
+          // neighbor must be active
+          libmesh_assert(neighbor->active());
+          list.push_back(neighbor);
+          (*subdomain_ids)[neighbor->id()] = subdomain_counter;
+        }
+      }
+    }
+
+    representative_elem_ids.push_back(min_id);
+    subdomain_counter++;
+  }
+  while (visited != n_elem());
+
+  return representative_elem_ids;
+}
+
+std::unordered_map<dof_id_type, std::vector<std::vector<Point>>>
+ReplicatedMesh::get_boundary_points() const
+{
+  if (mesh_dimension() != 2)
+    libmesh_error_msg("Error: get_boundary_points only works for 2D now");
+
+  // find number of disconnected subdomains
+  // subdomains will hold the IDs of disconnected subdomains for all elements.
+  std::vector<subdomain_id_type> subdomains;
+  std::vector<dof_id_type> elem_ids = get_disconnected_subdomains(&subdomains);
+
+  std::unordered_map<dof_id_type, std::vector<std::vector<Point>>> boundary_points;
+
+  // get all boundary sides that are to be erased later during visiting
+  // use a comparison functor to avoid run-time randomness due to pointers
+  struct boundary_side_compare
+  {
+    bool operator()(const std::pair<const Elem *, unsigned int> & lhs,
+                    const std::pair<const Elem *, unsigned int> & rhs) const
+      {
+        if (lhs.first->id() < rhs.first->id())
+          return true;
+        else if (lhs.first->id() == rhs.first->id())
+        {
+          if (lhs.second < rhs.second)
+            return true;
+        }
+        return false;
+      }
+  };
+  std::set<std::pair<const Elem *, unsigned int>, boundary_side_compare> boundary_elements;
+  for (const auto & elem : active_element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) == nullptr)
+        boundary_elements.insert(std::pair<const Elem *, unsigned int>(elem, s));
+
+  while (!boundary_elements.empty())
+  {
+    // get the first entry as the seed
+    const Elem * eseed = boundary_elements.begin()->first;
+    unsigned int sseed = boundary_elements.begin()->second;
+
+    // get the subdomain ID that these boundary sides attached to
+    subdomain_id_type subdomain_id = subdomains[eseed->id()];
+
+    // start visiting the mesh to find all boundary nodes with the seed
+    std::vector<Point> bpoints;
+    const Elem * elem = eseed;
+    unsigned int s = sseed;
+    std::vector<unsigned int> local_side_nodes = elem->nodes_on_side(s);
+    while (true)
+    {
+      std::pair<const Elem *, unsigned int> side(elem, s);
+      libmesh_assert(boundary_elements.find(side) != boundary_elements.end());
+      boundary_elements.erase(side);
+
+      // push all nodes on the side except the node on the other end of the side (index 1)
+      for (unsigned int i = 0; i < local_side_nodes.size(); ++i)
+        if (i != 1)
+          bpoints.push_back(*static_cast<const Point *>(elem->node_ptr(local_side_nodes[i])));
+
+      // use the last node to find next element and side
+      const Node * node = elem->node_ptr(local_side_nodes[1]);
+      std::set<const Elem *> neighbors;
+      elem->find_point_neighbors(*node, neighbors);
+
+      // if only one neighbor is found (itself), this node is a cornor node on boundary
+      if (neighbors.size() != 1)
+        neighbors.erase(elem);
+
+      // find the connecting side
+      bool found = false;
+      for (const auto & neighbor : neighbors)
+      {
+        for (auto ss : neighbor->side_index_range())
+          if (neighbor->neighbor_ptr(ss) == nullptr && !(elem == neighbor && s == ss))
+          {
+            local_side_nodes = neighbor->nodes_on_side(ss);
+            // we expect the starting point of the side to be the same as the end of the previous side
+            if (neighbor->node_ptr(local_side_nodes[0]) == node)
+            {
+              elem = neighbor;
+              s = ss;
+              found = true;
+              break;
+            }
+            else if (neighbor->node_ptr(local_side_nodes[1]) == node)
+            {
+              elem = neighbor;
+              s = ss;
+              found = true;
+              // flip nodes in local_side_nodes because the side is in an opposite direction
+              auto temp(local_side_nodes);
+              local_side_nodes[0] = temp[1];
+              local_side_nodes[1] = temp[0];
+              for (unsigned int i = 2; i < temp.size(); ++i)
+                local_side_nodes[temp.size() + 1 - i] = temp[i];
+              break;
+            }
+          }
+        if (found)
+          break;
+      }
+      if (!found)
+        libmesh_error_msg("ERROR: mesh topology error on visiting boundary sides");
+
+      // exit if we reach the starting point
+      if (elem == eseed && s == sseed)
+        break;
+    }
+    boundary_points[elem_ids[subdomain_id]].push_back(bpoints);
+  }
+
+  return boundary_points;
+}
 
 } // namespace libMesh

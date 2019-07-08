@@ -27,6 +27,7 @@
 
 // C++ Includes
 #include <cstddef>
+#include <unordered_map>
 
 namespace libMesh
 {
@@ -227,6 +228,32 @@ public:
                         bool verbose=true,
                         bool use_binary_search=true,
                         bool enforce_all_nodes_match_on_boundaries=false);
+
+  /**
+   * Return IDs of representative elements of all disconnected subdomains.
+   * Subdomains are considered connected only when they are sharing at least
+   * one d-1 dimensional object (side in 2D, face in 3D), where d is
+   * the mesh dimension.
+   * The optional argument can be used for getting the subdomain IDs of all
+   * elements with element IDs as the index.
+   * This function cannot be called for a mesh with hanging nodes from
+   * adaptive mesh refinement.
+   */
+  std::vector<dof_id_type> get_disconnected_subdomains(std::vector<subdomain_id_type> * subdomain_ids = nullptr) const;
+
+  /**
+   * Return all points on boundary.
+   * The key of the returned unordered map is the ID of a representative
+   * element of all disconnected subdomains. Subdomains are considered
+   * connected only when they are sharing at least one d-1 dimensional object
+   * (side in 2D), where d is the mesh dimension.
+   * The size of the unordered map value is the number of disconnected
+   * boundaries for a subdomain. Boundaries are considered
+   * connected only when they are sharing a d-2 dimensional object.
+   * This function currently only works for 2D meshes.
+   * The points of each boundary are ordered to form an enclosure.
+   */
+  std::unordered_map<dof_id_type, std::vector<std::vector<Point>>> get_boundary_points() const;
 
 public:
   /**
