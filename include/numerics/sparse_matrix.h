@@ -187,6 +187,11 @@ public:
   virtual numeric_index_type m () const = 0;
 
   /**
+   * Get the number of rows owned by this process
+   */
+  virtual numeric_index_type local_m () const { return row_stop() - row_start(); }
+
+  /**
    * \returns The column-dimension of the matrix.
    */
   virtual numeric_index_type n () const = 0;
