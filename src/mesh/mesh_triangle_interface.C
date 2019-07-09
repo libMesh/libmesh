@@ -45,6 +45,7 @@ TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
   : _mesh(mesh),
     _holes(nullptr),
     _markers(nullptr),
+    _regions(nullptr),
     _elem_type(TRI3),
     _desired_area(0.1),
     _minimum_angle(20.0),
@@ -52,6 +53,7 @@ TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
     _triangulation_type(GENERATE_CONVEX_HULL),
     _insert_extra_points(false),
     _smooth_after_generating(true),
+    _quiet(true),
     _serializer(_mesh)
 {}
 
@@ -244,6 +246,20 @@ void TriangleInterface::triangulate()
         }
     }
 
+  if (_regions)
+    {
+      initial.numberofregions = _regions->size();
+      initial.regionlist      = static_cast<REAL*>(std::malloc(initial.numberofregions * 4 * sizeof(REAL)));
+      for (std::size_t i=0, ctr=0; i<_regions->size(); ++i, ctr+=4)
+        {
+          Point inside_point = (*_regions)[i]->inside();
+          initial.regionlist[ctr]   = inside_point(0);
+          initial.regionlist[ctr+1] = inside_point(1);
+          initial.regionlist[ctr+2] = (*_regions)[i]->attribute();
+          initial.regionlist[ctr+3] = (*_regions)[i]->max_area();
+        }
+    }
+
   // Set the triangulation flags.
   // c ~ enclose convex hull with segments
   // z ~ use zero indexing
@@ -267,7 +283,13 @@ void TriangleInterface::triangulate()
   std::ostringstream flags;
 
   // Default flags always used
-  flags << "zPQ";
+  flags << "z";
+
+  if (_quiet)
+    flags << "QP";
+  else
+    flags << "V";
+
   if (_markers)
     flags << "ev";
 
@@ -326,6 +348,9 @@ void TriangleInterface::triangulate()
   // add minimum angle constraint
   if (_minimum_angle > TOLERANCE)
     flags << "q" << std::fixed << _minimum_angle;
+
+  if (_regions)
+    flags << "Aa";
 
   // add user provided extra flags
   if (_extra_flags.size() > 0)

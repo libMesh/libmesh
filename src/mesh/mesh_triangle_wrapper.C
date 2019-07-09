@@ -133,6 +133,11 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
             for (unsigned int n=0; n<3; ++n)
               elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
 
+            // use the first attribute to set the subdomain ID
+            if (triangle_data_input.triangleattributelist)
+              elem->subdomain_id() =
+                std::round(triangle_data_input.
+                           triangleattributelist[i * triangle_data_input.numberoftriangleattributes]);
             break;
           }
 
@@ -148,6 +153,11 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
             elem->set_node(4) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 3]);
             elem->set_node(5) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 4]);
 
+            // use the first attribute to set the subdomain ID
+            if (triangle_data_input.triangleattributelist)
+              elem->subdomain_id() =
+                std::round(triangle_data_input.
+                           triangleattributelist[i * triangle_data_input.numberoftriangleattributes]);
             break;
           }
 

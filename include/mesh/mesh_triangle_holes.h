@@ -176,6 +176,51 @@ private:
   std::vector<unsigned int> _segment_indices;
 };
 
+
+
+
+
+/**
+ * A class for defining a 2-dimensional region for Triangle.
+ */
+class TriangleInterface::Region
+{
+public:
+  /**
+   * Constructor
+   */
+  Region(const Point & center,
+         Real attribute = 0,
+         Real max_area = -std::numeric_limits<Real>::max())
+  : _center(center),
+    _attribute(attribute),
+    _max_area(max_area) {}
+
+  Point inside() const { return _center; }
+
+  Real attribute() const { return _attribute; }
+
+  Real max_area() const { return _max_area; }
+
+private:
+  /**
+   * Arbitrary (x,y) location inside the region
+   */
+  const Point _center;
+
+  /**
+   * Attribute of the region
+   * Default value for attribute is zero.
+   */
+  Real _attribute;
+
+  /**
+   * Maximum area that is allowed for all triangles in this region
+   * Default negative maximum area means that no area constraint will be imposed.
+   */
+  Real _max_area;
+};
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_TRIANGLE
