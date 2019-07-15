@@ -171,9 +171,8 @@ void DofObject::set_n_systems (const unsigned int ns)
     return;
 
   const unsigned int nei = this->n_extra_integers();
-  const unsigned int header_size = ns + bool(nei);
-  const unsigned int hdr = nei ?
-    cast_int<unsigned int>(-cast_int<int>(header_size)) : header_size;
+  const dof_id_type header_size = ns + bool(nei);
+  const dof_id_type hdr = nei ? -header_size : header_size;
   index_buffer_t new_buf(header_size + nei, hdr);
   if (nei)
     {
