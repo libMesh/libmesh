@@ -157,6 +157,18 @@ public:
   {
     DofObject aobject(*instance);
 
+    aobject.add_extra_integers (1);
+
+    aobject.add_system();
+
+    CPPUNIT_ASSERT(aobject.has_extra_integers());
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 1, aobject.n_extra_integers() );
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 1, aobject.n_systems() );
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 0, aobject.n_vars(0) );
+
     aobject.add_extra_integers (4);
 
     aobject.add_system();
@@ -165,7 +177,10 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( (unsigned int) 4, aobject.n_extra_integers() );
 
-    CPPUNIT_ASSERT_EQUAL( (unsigned int) 1, aobject.n_systems() );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 2, aobject.n_systems() );
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 0, aobject.n_vars(0) );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 0, aobject.n_vars(1) );
 
     for (unsigned int i=0; i != 4; ++i)
       {
@@ -182,7 +197,7 @@ public:
     for (unsigned int i=4; i != 7; ++i)
       CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
 
-    aobject.add_system()
+    aobject.add_system();
 
     CPPUNIT_ASSERT_EQUAL( (unsigned int) 7, aobject.n_extra_integers() );
 
@@ -196,7 +211,11 @@ public:
         CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
       }
 
-    CPPUNIT_ASSERT_EQUAL( (unsigned int) 2, aobject.n_systems() );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 3, aobject.n_systems() );
+
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 0, aobject.n_vars(0) );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 0, aobject.n_vars(1) );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int) 0, aobject.n_vars(2) );
 
     for (unsigned int i=0; i != 7; ++i)
       CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
