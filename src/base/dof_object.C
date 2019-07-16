@@ -171,17 +171,20 @@ void DofObject::set_n_systems (const unsigned int ns)
     return;
 
   const unsigned int nei = this->n_extra_integers();
-  const unsigned int header_size = ns + bool(nei);
-  index_buffer_t new_buf(header_size + nei, header_size);
+  const dof_id_type header_size = ns + bool(nei);
+  const dof_id_type hdr = nei ? -header_size : header_size;
+  index_buffer_t new_buf(header_size + nei, hdr);
   if (nei)
     {
-      const unsigned int start_idx_ints =
-        cast_int<unsigned int>(_idx_buf[old_ns+1]);
+      const unsigned int start_idx_ints = old_ns ?
+        cast_int<unsigned int>(_idx_buf[old_ns]) :
+        1;
       libmesh_assert_less(start_idx_ints, _idx_buf.size());
       std::copy(_idx_buf.begin()+start_idx_ints,
                 _idx_buf.end(),
                 new_buf.begin()+header_size);
-      _idx_buf[1] = 2;
+      if (ns)
+        std::fill(new_buf.begin()+1, new_buf.begin()+ns+1, ns+1);
     }
 
   // vector swap trick to force deallocation when shrinking
@@ -223,13 +226,16 @@ void DofObject::add_system()
   if (this->has_extra_integers())
     {
       // this inserts the extra_integers' start position as the start
-      // position for the new system, minus 1 so we can increment
-      // all those counts in one sweep next.
-      _idx_buf.insert(it, *it-1);
+      // position for the new system.  We'll increment all those
+      // counts in one sweep next, to account for header expansion.
+      _idx_buf.insert(it, *it);
 
       _idx_buf[0]--;
       for (unsigned int i=1; i<ns_orig+2; i++)
-        _idx_buf[i]++;
+        {
+          libmesh_assert_less(i, _idx_buf.size());
+          _idx_buf[i]++;
+        }
     }
   else
     {
@@ -238,7 +244,10 @@ void DofObject::add_system()
       _idx_buf.insert(it, cast_int<dof_id_type>(_idx_buf.size()));
 
       for (unsigned int i=0; i<ns_orig+1; i++)
-        _idx_buf[i]++;
+        {
+          libmesh_assert_less(i, _idx_buf.size());
+          _idx_buf[i]++;
+        }
     }
 
   libmesh_assert_equal_to (this->n_systems(), (ns_orig+1));
