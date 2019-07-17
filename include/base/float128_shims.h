@@ -85,6 +85,29 @@ inline boost::multiprecision::float128 imag
   return 0;
 }
 
+template <>
+struct plus<boost::multiprecision::float128>
+{
+  boost::multiprecision::float128 operator ()
+    (const boost::multiprecision::float128 a,
+     const boost::multiprecision::float128 b)
+  {
+    return a + b;
+  }
+};
+
+template <>
+struct multiplies<boost::multiprecision::float128>
+{
+  boost::multiprecision::float128 operator ()
+    (const boost::multiprecision::float128 a,
+     const boost::multiprecision::float128 b)
+  {
+    return a * b;
+  }
+};
+
+
 LIBMESH_FLOAT128_MATH_BOOL(isinf)
 LIBMESH_FLOAT128_MATH_BOOL(isnan)
 
