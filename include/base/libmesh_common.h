@@ -140,7 +140,7 @@ static const Real TOLERANCE = 1.e-8;
 # endif
 #endif
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-static const Real TOLERANCE = 1.e-12;
+static const Real TOLERANCE = 1.e-11;
 # ifdef LIBMESH_HAVE_MPI
 #  ifdef LIBMESH_HAVE_PETSC
     // Use a PETSc definition since they did the hard work already
