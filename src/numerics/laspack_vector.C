@@ -106,6 +106,21 @@ NumericVector<T> & LaspackVector<T>::operator -= (const NumericVector<T> & v)
 
 
 template <typename T>
+NumericVector<T> & LaspackVector<T>::operator *= (const NumericVector<T> & v)
+{
+  libmesh_assert_equal_to(size(), v.size());
+
+  const numeric_index_type n = this->size();
+
+  for (numeric_index_type i=0; i<n; i++)
+    this->set(i, (*this)(i) * v(i));
+
+  return *this;
+}
+
+
+
+template <typename T>
 NumericVector<T> & LaspackVector<T>::operator /= (const NumericVector<T> & v)
 {
   libmesh_assert_equal_to(size(), v.size());

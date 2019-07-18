@@ -128,6 +128,21 @@ EpetraVector<T>::operator -= (const NumericVector<T> & v)
 
 template <typename T>
 NumericVector<T> &
+EpetraVector<T>::operator *= (const NumericVector<T> & v)
+{
+  libmesh_assert(this->closed());
+  libmesh_assert_equal_to(size(), v.size());
+
+  const EpetraVector<T> & v_vec = cast_ref<const EpetraVector<T> &>(v);
+
+  _vec->Multiply(1.0, *v_vec._vec, *_vec, 0.0);
+
+  return *this;
+}
+
+
+template <typename T>
+NumericVector<T> &
 EpetraVector<T>::operator /= (const NumericVector<T> & v)
 {
   libmesh_assert(this->closed());
