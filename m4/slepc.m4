@@ -31,11 +31,12 @@ AC_DEFUN([CONFIGURE_SLEPC],
                 [
                   AC_CHECK_HEADER([$SLEPC_DIR/include/slepcversion.h],
                                   [SLEPC_INCLUDE="-I$SLEPC_DIR/include"],
-                                  [
-                                    AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepcversion.h not found). SLEPc disabled. >>>)
-                                    unset SLEPC_DIR
-                                    enableslepc=no
-                                  ])
+                                  [AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h],
+                                                   [SLEPC_INCLUDE="-I$SLEPC_DIR/$PETSC_ARCH/include"],
+                                                   [AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepcversion.h not found). SLEPc disabled. >>>)
+                                                    unset SLEPC_DIR
+                                                    enableslepc=no]
+                                  )])
                 ])
 
             dnl I didn't check this code branch since I don't use a
@@ -51,11 +52,20 @@ AC_DEFUN([CONFIGURE_SLEPC],
           [
             dnl Similar to petsc, we need the slepc version number.
             dnl Note slepc will most likely only work with the corresponding version of petsc
-            slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
-            slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
-            slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
-            slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
+            AC_CHECK_HEADER([$SLEPC_DIR/include/slepcversion.h],
+                            [
+                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
+                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
+                             ],
+                             [
+                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
+                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
+                             ]
+            )
 
+            slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
             dnl Older PETSc (3.3 and earlier) might not work if the version numbers don't match exactly.
             oldpetsc=no
 
@@ -78,6 +88,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
                   [test -r ${SLEPC_DIR}/conf/slepc_common_variables],    [includefile=${SLEPC_DIR}/conf/slepc_common_variables],
                   [test -r ${SLEPC_DIR}/conf/slepc_variables],           [includefile=${SLEPC_DIR}/conf/slepc_variables],
                   [test -r ${SLEPC_DIR}/lib/slepc/conf/slepc_variables], [includefile=${SLEPC_DIR}/lib/slepc/conf/slepc_variables], dnl 3.6.0
+                  [test -r ${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepc_variables], [includefile=${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepc_variables],
                   [AC_MSG_RESULT([<<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>])
                    enableslepc=no])
 
