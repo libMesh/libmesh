@@ -142,12 +142,7 @@ static const Real TOLERANCE = 1.e-8;
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 static const Real TOLERANCE = 1.e-11;
 # ifdef LIBMESH_HAVE_MPI
-#  ifdef LIBMESH_HAVE_PETSC
-    // Use a PETSc definition since they did the hard work already
-#   define MPI_REAL MPIU_REAL
-#  else
-#   error We only support MPI+quadruple precision via PETSc
-#  endif
+#  define MPI_REAL libMesh::Parallel::StandardType<Real>()
 # endif
 #endif
 #if !defined (LIBMESH_DEFAULT_SINGLE_PRECISION) && \

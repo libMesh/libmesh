@@ -21,32 +21,57 @@
 
 #include "libmesh_config.h"
 
-#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-# include "libmesh/libmesh_common.h" // Real
-# ifdef LIBMESH_HAVE_MPI
-#  ifdef LIBMESH_HAVE_PETSC
-  // PETSc gives us some useful MPI operators for __float128
-#   include <libmesh/ignore_warnings.h>
-#   ifdef I
-#    define LIBMESH_SAW_I
-#   endif
-#   include <petscsys.h>
-#   ifndef LIBMESH_SAW_I
-#    undef I // Avoid complex.h contamination
-#   endif
-#   include <libmesh/restore_warnings.h>
-#  endif
-# endif
-#endif
+#ifdef LIBMESH_HAVE_MPI
+#  include "mpi.h"
+#endif // LIBMESH_HAVE_MPI
 
 // C++ includes
+#include <functional>
 #include <type_traits>
+
+
 
 namespace libMesh
 {
 
 namespace Parallel
 {
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# ifdef LIBMESH_HAVE_MPI
+# define LIBMESH_MPI_BINARY(funcname) \
+inline void \
+libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
+{ \
+  const int size = *len; \
+ \
+  Real *in = static_cast<Real*>(a); \
+  Real *inout = static_cast<Real*>(b); \
+  for (int i=0; i != size; ++i) \
+    inout[i] = std::funcname(in[i],inout[i]); \
+}
+
+# define LIBMESH_MPI_BINARY_FUNCTOR(funcname) \
+inline void \
+libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
+{ \
+  const int size = *len; \
+ \
+  Real *in = static_cast<Real*>(a); \
+  Real *inout = static_cast<Real*>(b); \
+  for (int i=0; i != size; ++i) \
+    inout[i] = std::funcname<Real>()(in[i],inout[i]); \
+}
+
+
+LIBMESH_MPI_BINARY(max)
+LIBMESH_MPI_BINARY(min)
+LIBMESH_MPI_BINARY_FUNCTOR(plus)
+LIBMESH_MPI_BINARY_FUNCTOR(multiplies)
+
+# endif // LIBMESH_HAVE_MPI
+#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+
+
 //-------------------------------------------------------------------
 
 // Templated helper class to be used with static_assert.
@@ -165,19 +190,30 @@ LIBMESH_PARALLEL_FLOAT_OPS(long double);
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 # ifdef LIBMESH_HAVE_MPI
-#  ifndef LIBMESH_HAVE_PETSC
-#   error We require PETSc support for MPI with quadruple precision data
-#  endif
+
+// FIXME - we'll still need to free these to keep valgrind happy
+#define LIBMESH_MPI_OPFUNCTION(mpiname, funcname) \
+  static MPI_Op mpiname() { \
+    static MPI_Op LIBMESH_MPI_##mpiname = MPI_OP_NULL; \
+    if (LIBMESH_MPI_##mpiname == MPI_OP_NULL) \
+      { \
+        libmesh_call_mpi \
+          (MPI_Op_create(libmesh_mpi_##funcname, true, &LIBMESH_MPI_##mpiname)); \
+      } \
+    return LIBMESH_MPI_##mpiname;  \
+  }
 
   template<>
   class OpFunction<Real>
   {
   public:
-    static MPI_Op max()          { return MPIU_MAX; }
-    static MPI_Op min()          { return MPIU_MIN; }
-    static MPI_Op sum()          { return MPIU_SUM; }
-    static MPI_Op product()      { libmesh_not_implemented(); return MPI_PROD; }
+    LIBMESH_MPI_OPFUNCTION(max, max)
+    LIBMESH_MPI_OPFUNCTION(min, min)
+    LIBMESH_MPI_OPFUNCTION(sum, plus)
+    LIBMESH_MPI_OPFUNCTION(product, multiplies)
+
     static MPI_Op max_location() { libmesh_not_implemented(); return MPI_MAXLOC; }
+
     static MPI_Op min_location() { libmesh_not_implemented(); return MPI_MINLOC; }
   };
 
