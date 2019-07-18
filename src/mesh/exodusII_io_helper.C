@@ -146,6 +146,7 @@ void init_element_equivalence_map()
       element_equivalence_map["PYRAMID14"] = PYRAMID14;
     }
 }
+
 }
 
 
@@ -331,6 +332,133 @@ void ExodusII_IO_Helper::message(const std::string & msg, int i)
 }
 
 
+void * ExodusII_IO_Helper::create_input_buffer(std::vector<Real> & our_data)
+{
+  // We should never do this multiple times at once
+  libmesh_assert(!mapped_vectors.count(&our_data));
+
+  if (_single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          std::vector<float> * vec =
+            new std::vector<float>(our_data.size());
+          void * vec_ptr = static_cast<void *>(vec);
+          mapped_vectors[&our_data] = vec_ptr;
+          return static_cast<void *>(vec->data());
+        }
+    }
+  else
+    {
+      if (sizeof(Real) != sizeof(double))
+        {
+          std::vector<double> * vec =
+            new std::vector<double>(our_data.size());
+          void * vec_ptr = static_cast<void *>(vec);
+          mapped_vectors[&our_data] = vec_ptr;
+          return static_cast<void *>(vec->data());
+        }
+    }
+  return static_cast<void *>(our_data.data());
+}
+
+void ExodusII_IO_Helper::move_input_buffer_data(std::vector<Real> & our_data)
+{
+  if (_single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          libmesh_assert(mapped_vectors.count(&our_data));
+          auto it = mapped_vectors.find(&our_data);
+          void * vec_ptr = it->second;
+          std::vector<float> * vec =
+            static_cast<std::vector<float> *>(vec_ptr);
+          libmesh_assert_equal_to(vec->size(), our_data.size());
+          our_data.assign(vec->begin(), vec->end());
+          mapped_vectors.erase(it);
+          delete vec;
+        }
+    }
+  else
+    {
+      if (sizeof(Real) != sizeof(double))
+        {
+          libmesh_assert(mapped_vectors.count(&our_data));
+          auto it = mapped_vectors.find(&our_data);
+          void * vec_ptr = it->second;
+          std::vector<double> * vec =
+            static_cast<std::vector<double> *>(vec_ptr);
+          libmesh_assert_equal_to(vec->size(), our_data.size());
+          our_data.assign(vec->begin(), vec->end());
+          mapped_vectors.erase(it);
+          delete vec;
+        }
+    }
+  libmesh_assert(!mapped_vectors.count(&our_data));
+}
+
+void * ExodusII_IO_Helper::create_output_buffer(const std::vector<Real> & our_data)
+{
+  // We should never do this multiple times at once
+  libmesh_assert(!mapped_vectors.count(&our_data));
+
+  if (_single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          std::vector<float> * vec =
+            new std::vector<float>(our_data.begin(), our_data.end());
+          void * vec_ptr = static_cast<void *>(vec);
+          mapped_vectors[&our_data] = vec_ptr;
+          return static_cast<void *>(vec->data());
+        }
+    }
+  else
+    {
+      if (sizeof(Real) != sizeof(double))
+        {
+          std::vector<double> * vec =
+            new std::vector<double>(our_data.begin(), our_data.end());
+          void * vec_ptr = static_cast<void *>(vec);
+          mapped_vectors[&our_data] = vec_ptr;
+          return static_cast<void *>(vec->data());
+        }
+    }
+  return const_cast<void *>(static_cast<const void *>(our_data.data()));
+}
+
+void ExodusII_IO_Helper::remove_output_buffer(const std::vector<Real> & our_data)
+{
+  if (_single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          libmesh_assert(mapped_vectors.count(&our_data));
+          auto it = mapped_vectors.find(&our_data);
+          void * vec_ptr = it->second;
+          std::vector<float> * vec =
+            static_cast<std::vector<float> *>(vec_ptr);
+          mapped_vectors.erase(it);
+          delete vec;
+        }
+    }
+  else
+    {
+      if (sizeof(Real) != sizeof(double))
+        {
+          libmesh_assert(mapped_vectors.count(&our_data));
+          auto it = mapped_vectors.find(&our_data);
+          void * vec_ptr = it->second;
+          std::vector<double> * vec =
+            static_cast<std::vector<double> *>(vec_ptr);
+          mapped_vectors.erase(it);
+          delete vec;
+        }
+    }
+  libmesh_assert(!mapped_vectors.count(&our_data));
+}
+
+
 
 void ExodusII_IO_Helper::open(const char * filename, bool read_only)
 {
@@ -475,9 +603,13 @@ void ExodusII_IO_Helper::read_nodes()
   if (num_nodes)
     {
       ex_err = exII::ex_get_coord(ex_id,
-                                  static_cast<void *>(x.data()),
-                                  static_cast<void *>(y.data()),
-                                  static_cast<void *>(z.data()));
+                                  create_input_buffer(x),
+                                  create_input_buffer(y),
+                                  create_input_buffer(z));
+
+      move_input_buffer_data(x);
+      move_input_buffer_data(y);
+      move_input_buffer_data(z);
 
       EX_CHECK_ERR(ex_err, "Error retrieving nodal data.");
       message("Nodal data retrieved successfully.");
@@ -827,7 +959,6 @@ void ExodusII_IO_Helper::read_all_nodesets()
   node_sets_node_list.clear();  node_sets_node_list.resize(total_nodes_in_all_sets);
   node_sets_dist_fact.clear();  node_sets_dist_fact.resize(total_df_in_all_sets);
 
-  // Read all the nodeset data
   ex_err = exII::ex_get_concat_node_sets
     (ex_id,
      nodeset_ids.data(),
@@ -836,7 +967,11 @@ void ExodusII_IO_Helper::read_all_nodesets()
      node_sets_node_index.data(),
      node_sets_dist_index.data(),
      node_sets_node_list.data(),
-     total_df_in_all_sets ? node_sets_dist_fact.data() : nullptr);
+     total_df_in_all_sets ? create_input_buffer(node_sets_dist_fact) : nullptr);
+
+  if (total_df_in_all_sets)
+    move_input_buffer_data(node_sets_dist_fact);
+
   EX_CHECK_ERR(ex_err, "Error reading concatenated nodesets");
 
   // Read the nodeset names from file!
@@ -901,7 +1036,9 @@ void ExodusII_IO_Helper::read_time_steps()
   if (num_time_steps > 0)
     {
       time_steps.resize(num_time_steps);
-      ex_err = exII::ex_get_all_times(ex_id, time_steps.data());
+      ex_err = exII::ex_get_all_times(ex_id,
+                                      create_input_buffer(time_steps));
+      move_input_buffer_data(time_steps);
       EX_CHECK_ERR(ex_err, "Error reading timesteps!");
     }
 }
@@ -952,7 +1089,8 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
                                   time_step,
                                   var_index+1,
                                   num_nodes,
-                                  unmapped_nodal_var_values.data());
+                                  create_input_buffer(unmapped_nodal_var_values));
+  move_input_buffer_data(unmapped_nodal_var_values);
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
 
   for (unsigned i=0; i<static_cast<unsigned>(num_nodes); i++)
@@ -1144,7 +1282,8 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
                                      var_index+1,
                                      block_ids[i],
                                      num_elem_this_blk,
-                                     block_elem_var_values.data());
+                                     create_input_buffer(block_elem_var_values));
+      move_input_buffer_data(block_elem_var_values);
       EX_CHECK_ERR(ex_err, "Error getting elemental values.");
 
       for (unsigned j=0; j<static_cast<unsigned>(num_elem_this_blk); j++)
@@ -1390,27 +1529,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
           }
     }
 
-  if (_single_precision)
-    {
-      std::vector<float>
-        x_single(x.begin(), x.end()),
-        y_single(y.begin(), y.end()),
-        z_single(z.begin(), z.end());
-
-      ex_err = exII::ex_put_coord(ex_id,
-                                  x_single.empty() ? nullptr : x_single.data(),
-                                  y_single.empty() ? nullptr : y_single.data(),
-                                  z_single.empty() ? nullptr : z_single.data());
-    }
-  else
-    {
-      ex_err = exII::ex_put_coord(ex_id,
-                                  x.empty() ? nullptr : x.data(),
-                                  y.empty() ? nullptr : y.data(),
-                                  z.empty() ? nullptr : z.data());
-    }
-
-
+  ex_err = exII::ex_put_coord(ex_id,
+                              x.empty() ? nullptr : create_output_buffer(x),
+                              y.empty() ? nullptr : create_output_buffer(y),
+                              z.empty() ? nullptr : create_output_buffer(z));
+  if (!x.empty())
+    remove_output_buffer(x);
+  if (!y.empty())
+    remove_output_buffer(y);
+  if (!z.empty())
+    remove_output_buffer(z);
   EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
 
   if (!use_discontinuous)
@@ -2006,7 +2134,8 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
     }
   else
     {
-      ex_err = exII::ex_put_time(ex_id, timestep, &time);
+      double cast_time = double(time);
+      ex_err = exII::ex_put_time(ex_id, timestep, &cast_time);
     }
   EX_CHECK_ERR(ex_err, "Error writing timestep.");
 
@@ -2081,26 +2210,15 @@ void ExodusII_IO_Helper::write_element_values
           for (unsigned int k=0; k<num_elems_this_block; ++k)
             data[k] = values[var_id*n_elem + elem_nums[k]];
 
-          if (_single_precision)
-            {
-              std::vector<float> cast_data(data.begin(), data.end());
+          ex_err = exII::ex_put_elem_var(ex_id,
+                                         timestep,
+                                         var_id+1,
+                                         this->get_block_id(j),
+                                         num_elems_this_block,
+                                         create_output_buffer(data));
+          if (!data.empty())
+            remove_output_buffer(data);
 
-              ex_err = exII::ex_put_elem_var(ex_id,
-                                             timestep,
-                                             var_id+1,
-                                             this->get_block_id(j),
-                                             num_elems_this_block,
-                                             cast_data.data());
-            }
-          else
-            {
-              ex_err = exII::ex_put_elem_var(ex_id,
-                                             timestep,
-                                             var_id+1,
-                                             this->get_block_id(j),
-                                             num_elems_this_block,
-                                             data.data());
-            }
           EX_CHECK_ERR(ex_err, "Error writing element values.");
         }
     }
@@ -2228,17 +2346,11 @@ void ExodusII_IO_Helper::write_element_values_element_major
           } // for elem
 
         // Now write 'data' to Exodus file, in single precision if requested.
-        if (_single_precision)
-          {
-            std::vector<float> float_data(data.begin(), data.end());
-            ex_err = exII::ex_put_elem_var
-              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), float_data.size(), float_data.data());
-          }
-        else
-          {
-            ex_err = exII::ex_put_elem_var
-              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), data.size(), data.data());
-          }
+        ex_err = exII::ex_put_elem_var
+          (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx),
+           data.size(), create_output_buffer(data));
+        if (!data.empty())
+          remove_output_buffer(data);
 
         EX_CHECK_ERR(ex_err, "Error writing element values.");
       } // for each var_id
@@ -2254,15 +2366,10 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Real> 
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  if (_single_precision)
-    {
-      std::vector<float> cast_values(values.begin(), values.end());
-      ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, cast_values.data());
-    }
-  else
-    {
-      ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, values.data());
-    }
+  ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes,
+                                  create_output_buffer(values));
+  if (!values.empty())
+    remove_output_buffer(values);
   EX_CHECK_ERR(ex_err, "Error writing nodal values.");
 
   ex_err = exII::ex_update(ex_id);
@@ -2315,15 +2422,10 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  if (_single_precision)
-    {
-      std::vector<float> cast_values(values.begin(), values.end());
-      ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars, cast_values.data());
-    }
-  else
-    {
-      ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars, values.data());
-    }
+  ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars,
+                                  create_output_buffer(values));
+  if (!values.empty())
+    remove_output_buffer(values);
   EX_CHECK_ERR(ex_err, "Error writing global values.");
 
   ex_err = exII::ex_update(ex_id);
@@ -2339,7 +2441,9 @@ void ExodusII_IO_Helper::read_global_values(std::vector<Real> & values, int time
 
   values.clear();
   values.resize(num_global_vars);
-  ex_err = exII::ex_get_glob_vars(ex_id, timestep, num_global_vars, values.data());
+  ex_err = exII::ex_get_glob_vars(ex_id, timestep, num_global_vars,
+                                  create_input_buffer(values));
+  move_input_buffer_data(values);
   EX_CHECK_ERR(ex_err, "Error reading global values.");
 }
 
