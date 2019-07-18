@@ -76,7 +76,7 @@ void QTrap::init_3D(const ElemType, unsigned int)
 
 
 
-        _weights[0] = .0416666666666666666666666666666666666666666667;
+        _weights[0] = 1/Real(24);
         _weights[1] = _weights[0];
         _weights[2] = _weights[0];
         _weights[3] = _weights[0];

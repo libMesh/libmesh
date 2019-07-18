@@ -73,9 +73,9 @@ void QTrap::init_2D(const ElemType, unsigned int)
         _points[2](1) = 1.;
 
 
-        _weights[0] = 1./6.;
-        _weights[1] = 1./6.;
-        _weights[2] = 1./6.;
+        _weights[0] = 1/Real(6);
+        _weights[1] = 1/Real(6);
+        _weights[2] = 1/Real(6);
 
         return;
       }
