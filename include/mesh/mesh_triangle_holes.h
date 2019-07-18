@@ -34,8 +34,12 @@ namespace libMesh
 /**
  * An abstract class for defining a 2-dimensional hole.  We assume that
  * the connectivity of the hole is implicit in the numbering of the points,
- * i.e. node 0 is connected to node 1, node 1 is connected to node 2, etc,
- * and the last node "wraps around" to connect back to node 0.
+ * controlled by segment_indices vector.
+ * The size of segment_indices is equal to the number of segments plus one.
+ * Each segment has segment_indices[i+1]-segment_indices[i] connected points,
+ * with node segment_indices[i] is connected to node segment_indices[i+1],
+ * node segment_indices[i+1] is connected to node segment_indices[i+2], etc,
+ * and the last node "wraps around" to connect back to node segment_indices[i].
  *
  * \author John W. Peterson
  * \date 2011
@@ -68,6 +72,18 @@ public:
    * Return an (arbitrary) point which lies inside the hole.
    */
   virtual Point inside() const = 0;
+
+  /**
+   * Starting indices of points for a hole with multiple disconnected boundaries.
+   */
+  virtual std::vector<unsigned int> segment_indices() const
+  {
+    // default to only one enclosing boundary
+    std::vector<unsigned int> seg;
+    seg.push_back(0);
+    seg.push_back(n_points());
+    return seg;
+  }
 };
 
 
@@ -133,23 +149,76 @@ public:
   ArbitraryHole(const Point & center,
                 const std::vector<Point> & points);
 
+  ArbitraryHole(const Point & center,
+                const std::vector<Point> & points,
+                const std::vector<unsigned int> & segment_indices);
+
   virtual unsigned int n_points() const override;
 
   virtual Point point(const unsigned int n) const override;
 
   virtual Point inside() const override;
 
+  virtual std::vector<unsigned int> segment_indices() const override;
+
 private:
   /**
    * arbitrary (x,y) location inside the hole
    */
-  Point _center;
+  const Point _center;
 
   /**
    * Reference to the vector of points which makes up
    * the hole.
    */
-  const std::vector<Point> & _points;
+  const std::vector<Point> _points;
+
+  std::vector<unsigned int> _segment_indices;
+};
+
+
+
+
+
+/**
+ * A class for defining a 2-dimensional region for Triangle.
+ */
+class TriangleInterface::Region
+{
+public:
+  /**
+   * Constructor
+   */
+  Region(const Point & center,
+         Real attribute = 0,
+         Real max_area = -std::numeric_limits<Real>::max())
+  : _center(center),
+    _attribute(attribute),
+    _max_area(max_area) {}
+
+  Point inside() const { return _center; }
+
+  Real attribute() const { return _attribute; }
+
+  Real max_area() const { return _max_area; }
+
+private:
+  /**
+   * Arbitrary (x,y) location inside the region
+   */
+  const Point _center;
+
+  /**
+   * Attribute of the region
+   * Default value for attribute is zero.
+   */
+  Real _attribute;
+
+  /**
+   * Maximum area that is allowed for all triangles in this region
+   * Default negative maximum area means that no area constraint will be imposed.
+   */
+  Real _max_area;
 };
 
 } // namespace libMesh

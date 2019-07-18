@@ -47,6 +47,7 @@ unit_tests_sources = \
   mesh/distort.C \
   mesh/boundary_mesh.C \
   mesh/boundary_info.C \
+  mesh/boundary_points.C \
   mesh/checkpoint.C \
   mesh/contains_point.C \
   mesh/extra_integers.C \

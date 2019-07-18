@@ -44,6 +44,8 @@ namespace libMesh
 TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
   : _mesh(mesh),
     _holes(nullptr),
+    _markers(nullptr),
+    _regions(nullptr),
     _elem_type(TRI3),
     _desired_area(0.1),
     _minimum_angle(20.0),
@@ -51,6 +53,7 @@ TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
     _triangulation_type(GENERATE_CONVEX_HULL),
     _insert_extra_points(false),
     _smooth_after_generating(true),
+    _quiet(true),
     _serializer(_mesh)
 {}
 
@@ -114,10 +117,12 @@ void TriangleInterface::triangulate()
   // Triangle data structure for the mesh
   TriangleWrapper::triangulateio initial;
   TriangleWrapper::triangulateio final;
+  TriangleWrapper::triangulateio voronoi;
 
   // Pseudo-Constructor for the triangle io structs
   TriangleWrapper::init(initial);
   TriangleWrapper::init(final);
+  TriangleWrapper::init(voronoi);
 
   initial.numberofpoints = _mesh.n_nodes() + n_hole_points;
   initial.pointlist      = static_cast<REAL*>(std::malloc(initial.numberofpoints * 2 * sizeof(REAL)));
@@ -136,13 +141,12 @@ void TriangleInterface::triangulate()
   else if (_triangulation_type==GENERATE_CONVEX_HULL)
     initial.numberofsegments = n_hole_points; // One segment for each hole point
 
-  // Debugging
-  // libMesh::out << "Number of segments set to: " << initial.numberofsegments << std::endl;
-
   // Allocate space for the segments (2 int per segment)
   if (initial.numberofsegments > 0)
     {
       initial.segmentlist = static_cast<int *> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
+      if (_markers)
+        initial.segmentmarkerlist = static_cast<int *> (std::malloc(initial.numberofsegments * sizeof(int)));
     }
 
 
@@ -155,20 +159,29 @@ void TriangleInterface::triangulate()
   if (have_holes)
     for (const auto & hole : *_holes)
       {
-        for (unsigned int ctr=0, h=0; h<hole->n_points(); ctr+=2, ++h)
+        for (unsigned int ctr=0, h=0, i=0; i<hole->segment_indices().size()-1; ++i)
           {
-            Point p = hole->point(h);
+            unsigned int begp = hole_offset + hole->segment_indices()[i];
+            unsigned int endp = hole->segment_indices()[i+1];
 
-            const unsigned int index0 = 2*hole_offset+ctr;
-            const unsigned int index1 = 2*hole_offset+ctr+1;
+            for (; h<endp; ctr+=2, ++h)
+              {
+                Point p = hole->point(h);
 
-            // Save the x,y locations in the triangle struct.
-            initial.pointlist[index0] = p(0);
-            initial.pointlist[index1] = p(1);
+                const unsigned int index0 = 2*hole_offset+ctr;
+                const unsigned int index1 = 2*hole_offset+ctr+1;
 
-            // Set the points which define the segments
-            initial.segmentlist[index0] = hole_offset+h;
-            initial.segmentlist[index1] = (h == hole->n_points() - 1) ? hole_offset : hole_offset + h + 1; // wrap around
+                // Save the x,y locations in the triangle struct.
+                initial.pointlist[index0] = p(0);
+                initial.pointlist[index1] = p(1);
+
+                // Set the points which define the segments
+                initial.segmentlist[index0] = hole_offset+h;
+                initial.segmentlist[index1] = (h == endp - 1) ? begp : hole_offset + h + 1; // wrap around
+                if (_markers)
+                  // 1 is reserved for boundaries of holes
+                  initial.segmentmarkerlist[hole_offset+h] = 1;
+              }
           }
 
         // Update the hole_offset for the next hole
@@ -196,6 +209,8 @@ void TriangleInterface::triangulate()
                 dof_id_type n = ctr/2; // ctr is always even
                 initial.segmentlist[index] = hole_offset+n;
                 initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
+                if (_markers)
+                  initial.segmentmarkerlist[hole_offset + n] = (*_markers)[n];
               }
           }
 
@@ -212,6 +227,8 @@ void TriangleInterface::triangulate()
 
       initial.segmentlist[index0] = hole_offset + this->segments[s].first;
       initial.segmentlist[index1] = hole_offset + this->segments[s].second;
+      if (_markers)
+        initial.segmentmarkerlist[hole_offset + s] = (*_markers)[s];
     }
 
 
@@ -226,6 +243,20 @@ void TriangleInterface::triangulate()
           Point inside_point = (*_holes)[i]->inside();
           initial.holelist[ctr]   = inside_point(0);
           initial.holelist[ctr+1] = inside_point(1);
+        }
+    }
+
+  if (_regions)
+    {
+      initial.numberofregions = _regions->size();
+      initial.regionlist      = static_cast<REAL*>(std::malloc(initial.numberofregions * 4 * sizeof(REAL)));
+      for (std::size_t i=0, ctr=0; i<_regions->size(); ++i, ctr+=4)
+        {
+          Point inside_point = (*_regions)[i]->inside();
+          initial.regionlist[ctr]   = inside_point(0);
+          initial.regionlist[ctr+1] = inside_point(1);
+          initial.regionlist[ctr+2] = (*_regions)[i]->attribute();
+          initial.regionlist[ctr+3] = (*_regions)[i]->max_area();
         }
     }
 
@@ -246,11 +277,21 @@ void TriangleInterface::triangulate()
   // a ~ Imposes a maximum triangle area constraint.
   // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
   //     constraining segments on later refinements of the mesh.
+  // -e  Outputs (to an .edge file) a list of edges of the triangulation.
+  // -v  Outputs the Voronoi diagram associated with the triangulation.
   // Create the flag strings, depends on element type
   std::ostringstream flags;
 
   // Default flags always used
-  flags << "zBPQ";
+  flags << "z";
+
+  if (_quiet)
+    flags << "QP";
+  else
+    flags << "V";
+
+  if (_markers)
+    flags << "ev";
 
   // Flags which are specific to the type of triangulation
   switch (_triangulation_type)
@@ -308,21 +349,41 @@ void TriangleInterface::triangulate()
   if (_minimum_angle > TOLERANCE)
     flags << "q" << std::fixed << _minimum_angle;
 
+  if (_regions)
+    flags << "Aa";
+
   // add user provided extra flags
   if (_extra_flags.size() > 0)
     flags << _extra_flags;
 
   // Refine the initial output to conform to the area constraint
-  TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
-                               &initial,
-                               &final,
-                               nullptr); // voronoi ouput -- not used
+  if (_markers)
+  {
+    // need Voronoi to generate boundary information
+    TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
+                                 &initial,
+                                 &final,
+                                 &voronoi);
+
+    // Send the information computed by Triangle to the Mesh.
+    TriangleWrapper::copy_tri_to_mesh(final,
+                                      _mesh,
+                                      _elem_type,
+                                      &voronoi);
+  }
+  else
+  {
+    TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
+                                 &initial,
+                                 &final,
+                                 nullptr);
+    // Send the information computed by Triangle to the Mesh.
+    TriangleWrapper::copy_tri_to_mesh(final,
+                                      _mesh,
+                                      _elem_type);
+  }
 
 
-  // Send the information computed by Triangle to the Mesh.
-  TriangleWrapper::copy_tri_to_mesh(final,
-                                    _mesh,
-                                    _elem_type);
 
   // To the naked eye, a few smoothing iterations usually looks better,
   // so we do this by default unless the user says not to.
@@ -333,6 +394,7 @@ void TriangleInterface::triangulate()
   // Clean up.
   TriangleWrapper::destroy(initial,      TriangleWrapper::INPUT);
   TriangleWrapper::destroy(final,        TriangleWrapper::OUTPUT);
+  TriangleWrapper::destroy(voronoi,      TriangleWrapper::OUTPUT);
 
   // Prepare the mesh for use before returning.  This ensures (among
   // other things) that it is partitioned and therefore users can

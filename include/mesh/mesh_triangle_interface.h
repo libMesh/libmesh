@@ -112,6 +112,13 @@ public:
   class ArbitraryHole;
 
   /**
+   * The region class defines the interface
+   * and functionality of a "region" which appears in a 2D mesh.
+   * See mesh_triangle_holes.C/h for definitions.
+   */
+  class Region;
+
+  /**
    * This is the main public interface for this function.
    * Internally, it calls Triangle's triangulate routine.
    */
@@ -156,6 +163,11 @@ public:
   bool & smooth_after_generating() {return _smooth_after_generating;}
 
   /**
+   * Whether or not to make Triangle quiet
+   */
+  bool & quiet() {return _quiet;}
+
+  /**
    * Attaches a vector of Hole* pointers which will be
    * meshed around.
    */
@@ -174,6 +186,19 @@ public:
    */
   std::vector<std::pair<unsigned int, unsigned int>> segments;
 
+  /**
+   * Attaches boundary markers.
+   * If segments is set, the number of markers must be equal to the size of segments,
+   * otherwise, it is equal to the number of points.
+   */
+  void attach_boundary_marker(const std::vector<int> * markers) { _markers = markers; }
+
+  /**
+   * Attaches regions for using attribute to set subdomain IDs and better
+   * controlling the triangle sizes within the regions.
+   */
+  void attach_region_list(const std::vector<Region*> * regions) { _regions = regions; }
+
 private:
   /**
    * Reference to the mesh which is to be created by triangle.
@@ -185,6 +210,17 @@ private:
    * are no holes!
    */
   const std::vector<Hole*> * _holes;
+
+  /**
+   * Boundary markers
+   */
+  const std::vector<int> * _markers;
+
+  /**
+   * A pointer to a vector of Regions*s.  If this is nullptr, there
+   * are no regions!
+   */
+  const std::vector<Region*> * _regions;
 
   /**
    * The type of elements to generate.  (Defaults to
@@ -226,6 +262,11 @@ private:
    * it is generated.  True by default.
    */
   bool _smooth_after_generating;
+
+  /**
+   * Flag which tells if we want to suppress Triangle outputs
+   */
+  bool _quiet;
 
   /**
    * Triangle only operates on serial meshes.
