@@ -16,26 +16,46 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
   AS_IF([test "$enableslepc" !=  no],
         [
-          dnl Test to see if SLEPC_DIR set by user.  If not set, then
-          dnl try to autodetect in a default directory
+          dnl If SLEPC_DIR is not set, we should try PETSC_DIR
+          dnl since SLPEc could live in the same place as PETSc
           AS_IF([test "x$SLEPC_DIR" = x],
-                [export SLEPC_DIR=/usr/lib/slepc])
+                [export SLEPC_DIR=$PETSC_DIR])
 
           dnl Test to see if SLEPC_DIR and petscversion were set by user or
           dnl autodetection.  If not set, then disable slepc, print a message.
           AS_IF([test "x$SLEPC_DIR" = "x" || test "x$petscversion" = "x"],
-                [
-                  enableslepc=no
-                  AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly to enable SLEPc. >>>)
+                 [
+                   dnl Test to see if SLEPC_DIR set by user.  If not set, then
+                   dnl try to autodetect in a default directory
+                   AC_CHECK_HEADER([/usr/lib/slepc/slepcversion.h],
+                                  [
+                                   export SLEPC_DIR=/usr/lib/slepc
+                                   SLEPC_INCLUDE="-I$SLEPC_DIR/include"
+                                  ],
+                                  [
+                                    enableslepc=no
+                                    AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly to enable SLEPc. >>>)
+                                  ])
                 ],
                 [
                   AC_CHECK_HEADER([$SLEPC_DIR/include/slepcversion.h],
-                                  [SLEPC_INCLUDE="-I$SLEPC_DIR/include"],
+                                  [SLEPC_INCLUDE="-I$SLEPC_DIR/include"
+                                   slepc_in_petsc_arch=no],
                                   [AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h],
-                                                   [SLEPC_INCLUDE="-I$SLEPC_DIR/$PETSC_ARCH/include"],
-                                                   [AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepcversion.h not found). SLEPc disabled. >>>)
-                                                    unset SLEPC_DIR
-                                                    enableslepc=no]
+                                                   [SLEPC_INCLUDE="-I$SLEPC_DIR/$PETSC_ARCH/include"
+                                                    slepc_in_petsc_arch=yes],
+                                                   [AC_CHECK_HEADER(
+                                                                    [/usr/lib/slepc/slepcversion.h],
+                                                                    [
+                                                                     export SLEPC_DIR=/usr/lib/slepc
+                                                                     SLEPC_INCLUDE="-I$SLEPC_DIR/include"
+                                                                    ],
+                                                                    [
+                                                                     AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepcversion.h not found). SLEPc disabled. >>>)
+                                                                      unset SLEPC_DIR
+                                                                      enableslepc=no
+                                                                     ])
+                                                    ]
                                   )])
                 ])
 
@@ -52,7 +72,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
           [
             dnl Similar to petsc, we need the slepc version number.
             dnl Note slepc will most likely only work with the corresponding version of petsc
-            AC_CHECK_HEADER([$SLEPC_DIR/include/slepcversion.h],
+            AS_IF([test "x$slepc_in_petsc_arch" != "xyes"],
                             [
                                slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
                                slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
