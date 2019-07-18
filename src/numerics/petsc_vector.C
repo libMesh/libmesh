@@ -28,9 +28,11 @@
 
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/int_range.h"
+#include "libmesh/op_function.h"
 #include "libmesh/parallel.h"
 #include "libmesh/petsc_macro.h"
-#include "libmesh/int_range.h"
+#include "libmesh/standard_type.h"
 
 namespace libMesh
 {
@@ -1053,8 +1055,10 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
           }
 
 
-          MPI_Reduce (local_values.data(), v_local.data(), n, MPI_REAL, MPI_SUM,
-                      pid, this->comm().get());
+          MPI_Reduce (local_values.data(), v_local.data(), n,
+                      Parallel::StandardType<Real>(),
+                      Parallel::OpFunction<Real>::sum(), pid,
+                      this->comm().get());
         }
     }
 }
@@ -1133,12 +1137,14 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
       // collect entries from other proc's in real_v_local, imag_v_local
       MPI_Reduce (real_local_values.data(),
                   real_v_local.data(), n,
-                  MPI_REAL, MPI_SUM,
+                  Parallel::StandardType<Real>(),
+                  Parallel::OpFunction<Real>::sum(),
                   pid, this->comm().get());
 
       MPI_Reduce (imag_local_values.data(),
                   imag_v_local.data(), n,
-                  MPI_REAL, MPI_SUM,
+                  Parallel::StandardType<Real>(),
+                  Parallel::OpFunction<Real>::sum(),
                   pid, this->comm().get());
 
       // copy real_v_local and imag_v_local to v_local
