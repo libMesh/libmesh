@@ -35887,11 +35887,18 @@ ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/include/slepcversion.h" "$a
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   SLEPC_INCLUDE="-I$SLEPC_DIR/include"
 else
-
-                                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepcversion.h not found). SLEPc disabled. >>>" >&5
+  as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  SLEPC_INCLUDE="-I$SLEPC_DIR/$PETSC_ARCH/include"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepcversion.h not found). SLEPc disabled. >>>" >&5
 $as_echo "<<< Invalid \"\$SLEPC_DIR\" detected (slepcversion.h not found). SLEPc disabled. >>>" >&6; }
-                                    unset SLEPC_DIR
-                                    enableslepc=no
+                                                    unset SLEPC_DIR
+                                                    enableslepc=no
+
+fi
+
 
 fi
 
@@ -35913,11 +35920,26 @@ fi
 
     if test "x$enableslepc" = "xyes"; then :
 
-                                    slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
-            slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
-            slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
-            slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
+                                    as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/include/slepcversion.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/include/slepcversion.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
 
+                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
+                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
+
+else
+
+                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
+                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
+
+
+fi
+
+
+
+            slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
                         oldpetsc=no
 
             if test $petscmajor -lt 3; then :
@@ -35947,8 +35969,10 @@ elif test -r ${SLEPC_DIR}/conf/slepc_variables; then :
   includefile=${SLEPC_DIR}/conf/slepc_variables
 elif test -r ${SLEPC_DIR}/lib/slepc/conf/slepc_variables; then :
   includefile=${SLEPC_DIR}/lib/slepc/conf/slepc_variables
+elif                   test -r ${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepc_variables; then :
+  includefile=${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepc_variables
 else
-                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>" >&5
 $as_echo "<<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>" >&6; }
                    enableslepc=no
 fi
