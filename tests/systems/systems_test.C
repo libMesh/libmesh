@@ -682,7 +682,7 @@ public:
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
+    sys.add_variable("u", THIRD, MONOMIAL);
 
     MeshTools::Generation::build_cube (mesh,
                                        3, 3, 3,
@@ -712,7 +712,9 @@ public:
     EquationSystems proj_es(proj_mesh);
 
     System &proj_sys = proj_es.add_system<System> ("ProjectionSystem");
-    proj_sys.add_variable("u", SECOND, LAGRANGE);
+
+    // use 3rd order again so we can expect exact results
+    proj_sys.add_variable("u", THIRD, HIERARCHIC);
 
     MeshTools::Generation::build_cube (proj_mesh,
                                        5, 5, 5,
