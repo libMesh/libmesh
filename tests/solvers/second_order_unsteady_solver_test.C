@@ -121,7 +121,7 @@ public:
     // For \beta = 1/6, we have the "linear acceleration method" for which
     // we should be able to exactly integrate linear (in time) acceleration
     // functions.
-    this->set_beta(1.0/6.0);
+    this->set_beta(Real(1)/Real(6));
     this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase>>(0.5,10);
   }
 
@@ -135,7 +135,7 @@ public:
     // For \beta = 1/6, we have the "linear acceleration method" for which
     // we should be able to exactly integrate linear (in time) acceleration
     // functions.
-    this->set_beta(1.0/6.0);
+    this->set_beta(Real(1)/Real(6));
     this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }
 
