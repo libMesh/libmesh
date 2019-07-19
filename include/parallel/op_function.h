@@ -50,6 +50,26 @@ libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
     inout[i] = std::funcname(in[i],inout[i]); \
 }
 
+# define LIBMESH_MPI_LOCATOR(funcname) \
+inline void \
+libmesh_mpi_##funcname##_location(void * a, void * b, int * len, MPI_Datatype *) \
+{ \
+  const int size = *len; \
+ \
+  typedef std::pair<Real, int> dtype; \
+ \
+  dtype *in = static_cast<dtype*>(a); \
+  dtype *inout = static_cast<dtype*>(b); \
+  for (int i=0; i != size; ++i) \
+    { \
+      Real old_inout = inout[i].first; \
+      inout[i].first = std::funcname(in[i].first,inout[i].first); \
+      if (old_inout != inout[i].first) \
+        inout[i].second = in[i].second; \
+    } \
+}
+
+
 # define LIBMESH_MPI_BINARY_FUNCTOR(funcname) \
 inline void \
 libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
@@ -65,6 +85,8 @@ libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
 
 LIBMESH_MPI_BINARY(max)
 LIBMESH_MPI_BINARY(min)
+LIBMESH_MPI_LOCATOR(max)
+LIBMESH_MPI_LOCATOR(min)
 LIBMESH_MPI_BINARY_FUNCTOR(plus)
 LIBMESH_MPI_BINARY_FUNCTOR(multiplies)
 
@@ -212,9 +234,8 @@ LIBMESH_PARALLEL_FLOAT_OPS(long double);
     LIBMESH_MPI_OPFUNCTION(sum, plus)
     LIBMESH_MPI_OPFUNCTION(product, multiplies)
 
-    static MPI_Op max_location() { libmesh_not_implemented(); return MPI_MAXLOC; }
-
-    static MPI_Op min_location() { libmesh_not_implemented(); return MPI_MINLOC; }
+    LIBMESH_MPI_OPFUNCTION(max_location, max_location)
+    LIBMESH_MPI_OPFUNCTION(min_location, min_location)
   };
 
 # else
