@@ -52,7 +52,7 @@ protected:
 
     // We're going to want to check our solution, and when we run
     // "make check" with LIBMESH_RUN='mpirun -np N" for N>1 then we'll
-    // need to avoid checking on the processors that are just
+    // need to keep that check in sync with the processors that are just
     // twiddling their thumbs, not owning our mesh point.
     std::vector<dof_id_type> solution_index;
     solution_index.push_back(0);
@@ -63,16 +63,19 @@ protected:
         system.solve();
         system.time_solver->advance_timestep();
 
+        Real rel_error = 0;
+
         if (has_solution)
           {
-            // Use relative error for comparison, so "exact" is 0
             Number exact_soln = system.u(system.time);
-            Real rel_error =  std::abs((exact_soln - (*system.solution)(0))/exact_soln);
-
-            LIBMESH_ASSERT_FP_EQUAL( 0.0,
-                                     rel_error,
-                                     std::numeric_limits<Real>::epsilon()*10 );
+            rel_error =  std::abs((exact_soln - (*system.solution)(0))/exact_soln);
           }
+        system.comm().max(rel_error);
+
+        // Using relative error for comparison, so "exact" is 0
+        LIBMESH_ASSERT_FP_EQUAL( 0.0,
+                                 rel_error,
+                                 std::numeric_limits<Real>::epsilon()*10 );
       }
   }
 
