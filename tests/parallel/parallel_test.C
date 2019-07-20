@@ -24,6 +24,8 @@ public:
   CPPUNIT_TEST( testMax );
   CPPUNIT_TEST( testMinloc );
   CPPUNIT_TEST( testMaxloc );
+  CPPUNIT_TEST( testMinlocReal );
+  CPPUNIT_TEST( testMaxlocReal );
   CPPUNIT_TEST( testInfinityMin );
   CPPUNIT_TEST( testInfinityMax );
   CPPUNIT_TEST( testIsendRecv );
@@ -308,6 +310,33 @@ public:
 
     CPPUNIT_ASSERT_EQUAL (max+1,
                           cast_int<int>(TestCommWorld->size()));
+    CPPUNIT_ASSERT_EQUAL (maxid, static_cast<unsigned int>(TestCommWorld->size()-1));
+  }
+
+
+
+  void testMinlocReal ()
+  {
+    Real min = (TestCommWorld->rank() + 1) % TestCommWorld->size();
+    unsigned int minid = 0;
+
+    TestCommWorld->minloc(min, minid);
+
+    CPPUNIT_ASSERT_EQUAL (min, Real(0));
+    CPPUNIT_ASSERT_EQUAL (minid, static_cast<unsigned int>(TestCommWorld->size()-1));
+  }
+
+
+
+  void testMaxlocReal ()
+  {
+    Real max = TestCommWorld->rank();
+    unsigned int maxid = 0;
+
+    TestCommWorld->maxloc(max, maxid);
+
+    // Hope nobody uses 1677216 procs with single precision
+    CPPUNIT_ASSERT_EQUAL (max+1, Real(TestCommWorld->size()));
     CPPUNIT_ASSERT_EQUAL (maxid, static_cast<unsigned int>(TestCommWorld->size()-1));
   }
 
