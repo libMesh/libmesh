@@ -1451,6 +1451,8 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
         (*subdomain_ids)[elem->id()] = subdomain_counter;
         break;
       }
+    // we should be able to find a seed here
+    libmesh_assert(list.size() > 0);
 
     dof_id_type min_id = std::numeric_limits<dof_id_type>::max();
     while (list.size() > 0)
@@ -1476,7 +1478,7 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
     representative_elem_ids.push_back(min_id);
     subdomain_counter++;
   }
-  while (visited != n_elem());
+  while (visited != n_active_elem());
 
   return representative_elem_ids;
 }
