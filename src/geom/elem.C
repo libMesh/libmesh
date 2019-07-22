@@ -2407,6 +2407,11 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
         return TRI6;
       }
 
+      // Currently there is no TRISHELL6, so similarly to other types
+      // where this is the case, we just return the input.
+    case TRISHELL3:
+      return TRISHELL3;
+
     case QUAD4:
     case QUAD8:
       {
@@ -2419,10 +2424,9 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
     case QUADSHELL4:
     case QUADSHELL8:
       {
-        if (full_ordered)
-          libmesh_error();
-        else
-          return QUADSHELL8;
+        // There is no QUADSHELL9, so in that sense QUADSHELL8 is the
+        // "full ordered" element.
+        return QUADSHELL8;
       }
 
     case QUAD9:
@@ -2535,7 +2539,8 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
     default:
       {
         // what did we miss?
-        libmesh_error();
+        libmesh_error_msg("No second order equivalent element type for et =  "
+                          << Utility::enum_to_string(et));
       }
     }
 }
