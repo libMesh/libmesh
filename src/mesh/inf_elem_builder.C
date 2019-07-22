@@ -197,12 +197,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
 
       // Now transform the set of pairs to a list of (possibly
       // duplicate) global node numbers.
-      std::set<std::pair<dof_id_type,unsigned int>>::iterator face_it = inner_faces.begin();
-      const std::set<std::pair<dof_id_type,unsigned int>>::iterator face_end = inner_faces.end();
-      for (; face_it!=face_end; ++face_it)
+      for (const auto & p : inner_faces)
         {
-          std::pair<dof_id_type,unsigned int> p = *face_it;
-
           // build a full-ordered side element to get _all_ the base nodes
           std::unique_ptr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
@@ -222,7 +218,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       const std::size_t ibn_size_before = inner_boundary_node_numbers.size();
 #endif
       std::sort (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
-      std::vector<dof_id_type>::iterator unique_end =
+      auto unique_end =
         std::unique (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
 
       std::size_t unique_size = std::distance(inner_boundary_node_numbers.begin(), unique_end);
@@ -235,11 +231,9 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       inner_boundary_nodes->reserve (unique_size);
       inner_boundary_nodes->clear();
 
-
-      std::vector<dof_id_type>::iterator pos_it = inner_boundary_node_numbers.begin();
-      for (; pos_it != unique_end; ++pos_it)
+      for (const auto & dof : as_range(inner_boundary_node_numbers.begin(), unique_end))
         {
-          const Node * node = this->_mesh.node_ptr(*pos_it);
+          const Node * node = this->_mesh.node_ptr(dof);
           inner_boundary_nodes->push_back(node);
         }
 
@@ -490,19 +484,18 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
   // for each boundary node, add an outer_node with
   // double distance from origin.
-  std::set<dof_id_type>::iterator on_it = onodes.begin();
-  for ( ; on_it != onodes.end(); ++on_it)
+  for (const auto & dof : onodes)
     {
-      Point p = (Point(this->_mesh.point(*on_it)) * 2) - origin;
+      Point p = (Point(this->_mesh.point(dof)) * 2) - origin;
       if (_mesh.is_serial())
         {
           // Add with a default id in serial
-          outer_nodes[*on_it]=this->_mesh.add_point(p);
+          outer_nodes[dof]=this->_mesh.add_point(p);
         }
       else
         {
           // Pick a unique id in parallel
-          Node & bnode = _mesh.node_ref(*on_it);
+          Node & bnode = _mesh.node_ref(dof);
           dof_id_type new_id = bnode.id() + old_max_node_id;
           Node * new_node =
             this->_mesh.add_point(p, new_id,
@@ -510,7 +503,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           new_node->set_unique_id() = old_max_unique_id + bnode.id();
 #endif
-          outer_nodes[*on_it] = new_node;
+          outer_nodes[dof] = new_node;
         }
     }
 
