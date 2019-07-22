@@ -1442,6 +1442,7 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
 
   // counter of visited elements
   dof_id_type visited = 0;
+  dof_id_type n_active = n_active_elem();
   do
   {
     for (const auto & elem : active_element_ptr_range())
@@ -1478,7 +1479,7 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
     representative_elem_ids.push_back(min_id);
     subdomain_counter++;
   }
-  while (visited != n_active_elem());
+  while (visited != n_active);
 
   return representative_elem_ids;
 }
