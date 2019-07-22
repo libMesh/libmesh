@@ -43,8 +43,26 @@ public:
   void setUp() {}
   void tearDown() {}
 
-  typedef std::vector<std::tuple<unsigned, unsigned, Real>> TabulatedVals;
-  typedef std::vector<std::tuple<unsigned, unsigned, Point>> TabulatedGrads;
+  struct TabulatedVal
+  {
+    TabulatedVal(unsigned int i_in, unsigned int qp_in, Real val_in)
+      : i(i_in), qp(qp_in), val(val_in) {}
+    unsigned int i;
+    unsigned int qp;
+    Real val;
+  };
+
+  struct TabulatedGrad
+  {
+    TabulatedGrad(unsigned int i_in, unsigned int qp_in, Point grad_in)
+      : i(i_in), qp(qp_in), grad(grad_in) {}
+    unsigned int i;
+    unsigned int qp;
+    Point grad;
+  };
+
+  typedef std::vector<TabulatedVal> TabulatedVals;
+  typedef std::vector<TabulatedGrad> TabulatedGrads;
 
   void testDifferentOrders ()
   {
@@ -218,21 +236,9 @@ public:
     // Test whether the computed values match the tabulated values to
     // the specified accuracy.
     for (const auto & t : val_table)
-      {
-        unsigned int i = std::get<0>(t);
-        unsigned int qp = std::get<1>(t);
-        Real val = std::get<2>(t);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(phi[i][qp], val, 1.e-4);
-      }
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(phi[t.i][t.qp], t.val, 1.e-4);
     for (const auto & t : grad_table)
-      {
-        unsigned int i = std::get<0>(t);
-        unsigned int qp = std::get<1>(t);
-        Point grad = std::get<2>(t);
-        // std::cout << "grad " << grad << std::endl;
-        // std::cout << "dphi[" << i << "][" << qp << "] " << dphi[i][qp] << std::endl;
-        CPPUNIT_ASSERT_DOUBLES_EQUAL((dphi[i][qp] - grad).norm_sq(), 0., 1.e-4);
-      }
+      CPPUNIT_ASSERT_DOUBLES_EQUAL((dphi[t.i][t.qp] - t.grad).norm_sq(), 0., 1.e-4);
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
   }
