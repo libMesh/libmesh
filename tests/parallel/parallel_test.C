@@ -18,6 +18,7 @@ public:
   CPPUNIT_TEST( testAllGatherEmptyVectorString );
   CPPUNIT_TEST( testAllGatherHalfEmptyVectorString );
   CPPUNIT_TEST( testBroadcast );
+  CPPUNIT_TEST( testBroadcastNestedType );
   CPPUNIT_TEST( testScatter );
   CPPUNIT_TEST( testBarrier );
   CPPUNIT_TEST( testMin );
@@ -163,6 +164,47 @@ public:
 
     for (std::size_t i=0; i<src.size(); i++)
       CPPUNIT_ASSERT_EQUAL( src[i] , dest[i] );
+  }
+
+
+
+  void testBroadcastNestedType()
+  {
+    using std::pair;
+    typedef pair<pair<pair<pair<int, int>, int>, int>, int> pppp;
+    std::vector<pppp> src(3), dest(3);
+
+    src[0].first.first.first.first=0;
+    src[0].first.first.first.second=-1;
+    src[0].first.second = -2;
+    src[0].second = -3;
+    src[1].first.first.first.first=10;
+    src[1].first.first.first.second=9;
+    src[1].first.second = 8;
+    src[1].second = 7;
+    src[2].first.first.first.first=20;
+    src[2].first.first.first.second=19;
+    src[2].first.second = 18;
+    src[2].second = 17;
+
+    if (TestCommWorld->rank() == 0)
+      dest = src;
+
+    TestCommWorld->broadcast(dest);
+
+    for (std::size_t i=0; i<src.size(); i++)
+      {
+        CPPUNIT_ASSERT_EQUAL(src[i].first.first.first.first,
+                             dest[i].first.first.first.first);
+        CPPUNIT_ASSERT_EQUAL(src[i].first.first.first.second,
+                             dest[i].first.first.first.second);
+        CPPUNIT_ASSERT_EQUAL(src[i].first.first.second,
+                             dest[i].first.first.second);
+        CPPUNIT_ASSERT_EQUAL(src[i].first.second,
+                             dest[i].first.second);
+        CPPUNIT_ASSERT_EQUAL(src[i].second,
+                             dest[i].second);
+      }
   }
 
 
