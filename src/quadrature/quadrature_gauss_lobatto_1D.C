@@ -102,7 +102,7 @@ void QGaussLobatto::init_1D(const ElemType, unsigned int)
         _points[ 3]    = -_points[1];
         _points[ 4]    = -_points[0];
 
-        _weights[ 0]   = 0.1;
+        _weights[ 0]   = 1/Real(10);
         _weights[ 1]   = Real(49)/90;
         _weights[ 2]   = Real(32)/45;
         _weights[ 3]   = _weights[1];
