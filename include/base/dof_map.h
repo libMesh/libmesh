@@ -600,24 +600,24 @@ public:
    */
   bool has_blocked_representation() const
   {
-#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
     return ((this->n_variable_groups() == 1) && (this->n_variables() > 1));
-#else
-    return false;
-#endif
   }
 
   /**
    * \returns The block size, if the variables are amenable to block storage.
    * Otherwise 1.
+   * This routine was originally designed to enable a blocked storage, but
+   * it turns out this information is still super useful for solvers even when
+   * we do not use the blocked storage (e.g., MATMPIBAIJ in PETSc). For example (in PCHMG),
+   * for a system of PDEs, to construct an efficient multilevel preconditioner, we coarsen
+   * the matrix of one single PDE instead of the entire huge matrix. In order to
+   * accomplish this, we need to know many PDEs we have. Another use case,
+   * the fieldsplit preconditioner can be constructed in place with this info wihtout
+   * involving any user efforts.
    */
   unsigned int block_size() const
   {
-#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
     return (this->has_blocked_representation() ? this->n_variables() : 1);
-#else
-    return 1;
-#endif
   }
 
   /**
