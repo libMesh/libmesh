@@ -52,8 +52,8 @@ with libmesh:
 
 .) Update contrib/boost/include/Makefile.am with the list of files:
    cd $LIBMESH_ROOT/contrib/boost/include
-   find boost -type f > file_list.txt
-   (copy the list of files into Makefile.am with trailing backslashes)
+   find boost -type f | sort | perl -pe 's/$/ \\/;s/^/        /' > file_list.txt
+   Then replace the existing list of files in Makefile.am
 
 .) If you are bumping the minimum required version of Boost for libmesh,
    set the new minimum version in two places in m4/boost.m4.
