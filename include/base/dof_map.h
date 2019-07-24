@@ -606,7 +606,7 @@ public:
   /**
    * \returns The block size, if the variables are amenable to block storage.
    * Otherwise 1.
-   * This rontinue was originally designed to enable a blocked storage, but
+   * This routine was originally designed to enable a blocked storage, but
    * it turns out this information is still super useful for solvers even when
    * we do not use the blocked storage (e.g., MATMPIBAIJ in PETSc). For example (in PCHMG),
    * for a system of PDEs, to construct an efficient multilevel preconditioner, we coarsen
