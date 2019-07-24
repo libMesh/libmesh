@@ -181,6 +181,18 @@ const PetscScalar * pPS(const T * ptr)
 {
   return &(ptr->backend().value());
 }
+
+template <typename T>
+PetscReal * pPR(T * ptr)
+{
+  return &(ptr->backend().value());
+}
+
+template <typename T>
+const PetscReal * pPR(const T * ptr)
+{
+  return &(ptr->backend().value());
+}
 } // namespace libMesh
 
 #else
@@ -201,6 +213,18 @@ PetscScalar * pPS(T * ptr)
 
 template <typename T>
 const PetscScalar * pPS(const T * ptr)
+{
+  return ptr;
+}
+
+template <typename T>
+PetscReal * pPR(T * ptr)
+{
+  return ptr;
+}
+
+template <typename T>
+const PetscReal * pPR(const T * ptr)
 {
   return ptr;
 }
