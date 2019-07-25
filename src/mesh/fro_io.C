@@ -67,7 +67,7 @@ void FroIO::write (const std::string & fname)
       for (unsigned int n=0; n<the_mesh.n_nodes(); n++)
         out_stream << n+1 << " \t"
                    << std::scientific
-                   << std::setprecision(12)
+                   << std::setprecision(this->ascii_precision())
                    << the_mesh.point(n)(0) << " \t"
                    << the_mesh.point(n)(1) << " \t"
                    << 0. << '\n';

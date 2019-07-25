@@ -878,8 +878,8 @@ void UNVIO::nodes_out (std::ostream & out_file)
   // A reference to the parent class's mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // Use scientific notation with capital E and 16 digits for printing out the coordinates
-  out_file << std::scientific << std::setprecision(16) << std::uppercase;
+  // Use scientific notation with capital E and default 17 digits for printing out the coordinates
+  out_file << std::scientific << std::setprecision(this->ascii_precision()) << std::uppercase;
 
   for (const auto & current_node : mesh.node_ptr_range())
     {

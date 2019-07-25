@@ -190,7 +190,7 @@ void MEDITIO::write_ascii (const std::string & fname,
       const std::size_t n_vars = solution_names->size();
       bbout << "3 1 " << the_mesh.n_nodes() << " 2\n";
       for (dof_id_type n=0; n<the_mesh.n_nodes(); n++)
-        bbout << std::setprecision(10) << (*vec)[n*n_vars + scalar_idx] << " ";
+        bbout << std::setprecision(this->ascii_precision()) << (*vec)[n*n_vars + scalar_idx] << " ";
       bbout << "\n";
     } // endif
 }
