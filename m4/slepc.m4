@@ -16,56 +16,65 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
   AS_IF([test "$enableslepc" !=  no],
         [
-          dnl If SLEPC_DIR is not set, we should try PETSC_DIR
-          dnl since SLPEc could live in the same place as PETSc
-          AS_IF([test "x$SLEPC_DIR" = x],
+          dnl If SLEPC_DIR is not set, but $PETSC_DIR is, it's possible
+          dnl that there is a SLEPc within PETSc.  Not sure about using
+          dnl "export" here but the same thing is done in petsc.m4 so it
+          dnl probably doesn't hurt anything.
+          AS_IF([test "x$SLEPC_DIR" = "x" && test "x$PETSC_DIR" != "x"],
                 [export SLEPC_DIR=$PETSC_DIR])
 
-          dnl Test to see if SLEPC_DIR and petscversion were set by user or
-          dnl autodetection.  If not set, then disable slepc, print a message.
-          AS_IF([test "x$SLEPC_DIR" = "x" || test "x$petscversion" = "x"],
-                 [
-                   dnl Test to see if SLEPC_DIR set by user.  If not set, then
-                   dnl try to autodetect in a default directory
-                   AC_CHECK_HEADER([/usr/lib/slepc/slepcversion.h],
-                                  [
-                                   export SLEPC_DIR=/usr/lib/slepc
-                                   SLEPC_INCLUDE="-I$SLEPC_DIR/include"
-                                  ],
-                                  [
-                                    enableslepc=no
-                                    AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly to enable SLEPc. >>>)
-                                  ])
-                ],
+          # It doesn't seem likely that we would find a /usr/lib/slepc
+          # when we already didn't find a /usr/lib/petsc (otherwise,
+          # PETSC_DIR would be set!)  so let's rule that case out just
+          # to be safe.
+          AS_IF([test "x$SLEPC_DIR" = "x"],
                 [
-                  AC_CHECK_HEADER([$SLEPC_DIR/include/slepcversion.h],
-                                  [SLEPC_INCLUDE="-I$SLEPC_DIR/include"
-                                   slepc_in_petsc_arch=no],
-                                  [AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h],
-                                                   [SLEPC_INCLUDE="-I$SLEPC_DIR/$PETSC_ARCH/include"
-                                                    slepc_in_petsc_arch=yes],
-                                                   [AC_CHECK_HEADER(
-                                                                    [/usr/lib/slepc/slepcversion.h],
-                                                                    [
-                                                                     export SLEPC_DIR=/usr/lib/slepc
-                                                                     SLEPC_INCLUDE="-I$SLEPC_DIR/include"
-                                                                    ],
-                                                                    [
-                                                                     AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepcversion.h not found). SLEPc disabled. >>>)
-                                                                      unset SLEPC_DIR
-                                                                      enableslepc=no
-                                                                     ])
-                                                    ]
-                                  )])
+                  dnl SLEPC_DIR (and hence PETSC_DIR) was not set. Even *if* we found a SLEPc
+                  dnl in /usr/lib/slepc, I don't see how we would be able to configure it reliably
+                  dnl without PETSC_DIR? This seems like it shouldn't happen, but we'll print a
+                  dnl message just in case so people know what's going on.
+                  enableslepc=no
+                  AC_MSG_RESULT([<<< Could not infer SLEPC_DIR from PETSC_DIR, SLEPc disabled. >>>])
                 ])
 
-            dnl I didn't check this code branch since I don't use a
-            dnl PETSC_ARCH, but running AC_CHECK_HEADER on slepcconf.h
-            dnl should be pretty safe... from what I can tell it just
-            dnl #defines a few things.
-            AS_IF([test "x$PETSC_ARCH" != "x"],
-                  [AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h],
-                                   [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])])
+          dnl Check for different flavors of PETSc installs.
+          AS_IF([test "x$SLEPC_DIR" != "x"],
+                [
+                  dnl 1.) A standalone (make install) SLEPc build
+                  dnl 2.) SLEPc in a PETSC_ARCH directory
+                  dnl 3.) SLEPc in /usr/lib/slepc
+                  slepc_standalone=no
+                  slepc_in_petsc_arch=no
+                  slepc_in_usr_lib=no
+
+                  dnl 1.)
+                  AC_CHECK_HEADER([$SLEPC_DIR/include/slepcversion.h],
+                                  [SLEPC_INCLUDE="-I$SLEPC_DIR/include"
+                                   slepc_standalone=yes],[])
+
+                  dnl 2.)
+                  AS_IF([test "x$slepc_standalone" != "xyes" && test "x$PETSC_ARCH" != "x"],
+                        [
+                          AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h],
+                                          [SLEPC_INCLUDE="-I$SLEPC_DIR/$PETSC_ARCH/include"
+                                          slepc_in_petsc_arch=yes],[])
+                        ])
+
+                  dnl 3.)
+                  AS_IF([test "x$slepc_standalone" != "xyes" && test "x$slepc_in_petsc_arch" != "xyes"],
+                        [
+                          AC_CHECK_HEADER([/usr/lib/slepc/slepcversion.h],
+                                          [
+                                            export SLEPC_DIR=/usr/lib/slepc
+                                            SLEPC_INCLUDE="-I$SLEPC_DIR/include"
+                                          ],
+                                          [
+                                            AC_MSG_RESULT([<<< No valid SLEPC installation found, SLEPc disabled. >>>])
+                                            unset SLEPC_DIR
+                                            enableslepc=no
+                                          ])
+                        ])
+                ])
         ])
 
     AS_IF([test "x$enableslepc" = "xyes"],
