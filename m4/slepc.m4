@@ -72,18 +72,13 @@ AC_DEFUN([CONFIGURE_SLEPC],
           [
             dnl Similar to petsc, we need the slepc version number.
             dnl Note slepc will most likely only work with the corresponding version of petsc
+            slepc_version_header=$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h
             AS_IF([test "x$slepc_in_petsc_arch" != "xyes"],
-                            [
-                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
-                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
-                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
-                             ],
-                             [
-                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
-                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
-                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
-                             ]
-            )
+                  [slepc_version_header=$SLEPC_DIR/include/slepcversion.h])
+
+            slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $slepc_version_header | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+            slepcminor=`grep "define SLEPC_VERSION_MINOR" $slepc_version_header | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
+            slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $slepc_version_header | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
 
             slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
             dnl Older PETSc (3.3 and earlier) might not work if the version numbers don't match exactly.
