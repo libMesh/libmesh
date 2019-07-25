@@ -35870,76 +35870,70 @@ fi
 
   if test "$enableslepc" !=  no; then :
 
-                              if test "x$SLEPC_DIR" = x; then :
+                                                  if test "x$SLEPC_DIR" = "x" && test "x$PETSC_DIR" != "x"; then :
   export SLEPC_DIR=$PETSC_DIR
 fi
 
-                              if test "x$SLEPC_DIR" = "x" || test "x$petscversion" = "x"; then :
+          # It doesn't seem likely that we would find a /usr/lib/slepc
+          # when we already didn't find a /usr/lib/petsc (otherwise,
+          # PETSC_DIR would be set!)  so let's rule that case out just
+          # to be safe.
+          if test "x$SLEPC_DIR" = "x"; then :
 
-                                                         ac_fn_cxx_check_header_mongrel "$LINENO" "/usr/lib/slepc/slepcversion.h" "ac_cv_header__usr_lib_slepc_slepcversion_h" "$ac_includes_default"
-if test "x$ac_cv_header__usr_lib_slepc_slepcversion_h" = xyes; then :
-
-                                   export SLEPC_DIR=/usr/lib/slepc
-                                   SLEPC_INCLUDE="-I$SLEPC_DIR/include"
-
-else
-
-                                    enableslepc=no
-                                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&5
-$as_echo "<<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&6; }
+                                                                                          enableslepc=no
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Could not infer SLEPC_DIR from PETSC_DIR, SLEPc disabled. >>>" >&5
+$as_echo "<<< Could not infer SLEPC_DIR from PETSC_DIR, SLEPc disabled. >>>" >&6; }
 
 fi
 
+                    if test "x$SLEPC_DIR" != "x"; then :
 
+                                                                        slepc_standalone=no
+                  slepc_in_petsc_arch=no
+                  slepc_in_usr_lib=no
 
-else
-
-                  as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/include/slepcversion.h" | $as_tr_sh`
+                                    as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/include/slepcversion.h" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/include/slepcversion.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   SLEPC_INCLUDE="-I$SLEPC_DIR/include"
-                                   slepc_in_petsc_arch=no
-else
-  as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h" | $as_tr_sh`
+                                   slepc_standalone=yes
+fi
+
+
+
+                                    if test "x$slepc_standalone" != "xyes" && test "x$PETSC_ARCH" != "x"; then :
+
+                          as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   SLEPC_INCLUDE="-I$SLEPC_DIR/$PETSC_ARCH/include"
-                                                    slepc_in_petsc_arch=yes
-else
-  ac_fn_cxx_check_header_mongrel "$LINENO" "/usr/lib/slepc/slepcversion.h" "ac_cv_header__usr_lib_slepc_slepcversion_h" "$ac_includes_default"
+                                          slepc_in_petsc_arch=yes
+fi
+
+
+
+fi
+
+                                    if test "x$slepc_standalone" != "xyes" && test "x$slepc_in_petsc_arch" != "xyes"; then :
+
+                          ac_fn_cxx_check_header_mongrel "$LINENO" "/usr/lib/slepc/slepcversion.h" "ac_cv_header__usr_lib_slepc_slepcversion_h" "$ac_includes_default"
 if test "x$ac_cv_header__usr_lib_slepc_slepcversion_h" = xyes; then :
 
-                                                                     export SLEPC_DIR=/usr/lib/slepc
-                                                                     SLEPC_INCLUDE="-I$SLEPC_DIR/include"
+                                            export SLEPC_DIR=/usr/lib/slepc
+                                            SLEPC_INCLUDE="-I$SLEPC_DIR/include"
 
 else
 
-                                                                     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepcversion.h not found). SLEPc disabled. >>>" >&5
-$as_echo "<<< Invalid \"\$SLEPC_DIR\" detected (slepcversion.h not found). SLEPc disabled. >>>" >&6; }
-                                                                      unset SLEPC_DIR
-                                                                      enableslepc=no
-
-fi
-
-
-
-
-fi
-
+                                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< No valid SLEPC installation found, SLEPc disabled. >>>" >&5
+$as_echo "<<< No valid SLEPC installation found, SLEPc disabled. >>>" >&6; }
+                                            unset SLEPC_DIR
+                                            enableslepc=no
 
 fi
 
 
 
 fi
-
-                                                            if test "x$PETSC_ARCH" != "x"; then :
-  as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
-  SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"
-fi
-
 
 fi
 
@@ -35947,20 +35941,14 @@ fi
 
     if test "x$enableslepc" = "xyes"; then :
 
-                                    if test "x$slepc_in_petsc_arch" != "xyes"; then :
-
-                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
-                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
-                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
-
-else
-
-                               slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
-                               slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
-                               slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
-
-
+                                    slepc_version_header=$SLEPC_DIR/$PETSC_ARCH/include/slepcversion.h
+            if test "x$slepc_in_petsc_arch" != "xyes"; then :
+  slepc_version_header=$SLEPC_DIR/include/slepcversion.h
 fi
+
+            slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $slepc_version_header | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+            slepcminor=`grep "define SLEPC_VERSION_MINOR" $slepc_version_header | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
+            slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $slepc_version_header | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
 
             slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
                         oldpetsc=no
