@@ -796,11 +796,12 @@ void Xdr::data (T & a, const char * comment_in)
         libmesh_assert(out.get());
         libmesh_assert (out->good());
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
+        // We will use scientific notation sufficient to exactly
+        // represent our floating point precision in the following
+        // output.  The desired precision and format will
+        // automatically determine the width.
         *out << std::scientific
-             << std::setprecision(16);
+             << std::setprecision(std::numeric_limits<T>::max_digits10);
 
         this->do_write(a);
 
@@ -891,11 +892,12 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
         libmesh_assert(out.get());
         libmesh_assert (out->good());
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
+        // We will use scientific notation sufficient to exactly
+        // represent our floating point precision in the following
+        // output.  The desired precision and format will
+        // automatically determine the width.
         *out << std::scientific
-             << std::setprecision(16);
+             << std::setprecision(std::numeric_limits<T>::max_digits10);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
@@ -988,11 +990,12 @@ void Xdr::data_stream (double * val, const unsigned int len, const unsigned int 
         // Save stream flags
         std::ios_base::fmtflags out_flags = out->flags();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
+        // We will use scientific notation sufficient to exactly
+        // represent our floating point precision in the following
+        // output.  The desired precision and format will
+        // automatically determine the width.
         *out << std::scientific
-             << std::setprecision(16);
+             << std::setprecision(std::numeric_limits<double>::max_digits10);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
@@ -1087,11 +1090,12 @@ void Xdr::data_stream (float * val, const unsigned int len, const unsigned int l
         // Save stream flags
         std::ios_base::fmtflags out_flags = out->flags();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
+        // We will use scientific notation sufficient to exactly
+        // represent our floating point precision in the following
+        // output.  The desired precision and format will
+        // automatically determine the width.
         *out << std::scientific
-             << std::setprecision(16);
+             << std::setprecision(std::numeric_limits<float>::max_digits10);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
@@ -1212,11 +1216,12 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
         // Save stream flags
         std::ios_base::fmtflags out_flags = out->flags();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
+        // We will use scientific notation sufficient to exactly
+        // represent our floating point precision in the following
+        // output.  The desired precision and format will
+        // automatically determine the width.
         *out << std::scientific
-             << std::setprecision(16);
+             << std::setprecision(std::numeric_limits<long double>::max_digits10);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
@@ -1335,11 +1340,12 @@ void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const
         // Save stream flags
         std::ios_base::fmtflags out_flags = out->flags();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
+        // We will use scientific notation sufficient to exactly
+        // represent our floating point precision in the following
+        // output.  The desired precision and format will
+        // automatically determine the width.
         *out << std::scientific
-             << std::setprecision(16);
+             << std::setprecision(std::numeric_limits<double>::max_digits10);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
@@ -1466,13 +1472,13 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
         std::ios_base::fmtflags out_flags = out->flags();
 
         // We will use scientific notation with a precision of
-        // 'digits10' digits in the following output.  The desired
+        // 'max_digits10' digits in the following output.  The desired
         // precision and format will automatically determine the
         // width.  Note: digit10 is the number of digits (in decimal
         // base) that can be represented without change.  Equivalent
         // to FLT_DIG, DBL_DIG or LDBL_DIG for floating types.
         *out << std::scientific
-             << std::setprecision(std::numeric_limits<long double>::digits10);
+             << std::setprecision(std::numeric_limits<long double>::max_digits10);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
