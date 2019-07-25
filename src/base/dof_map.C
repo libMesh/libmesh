@@ -2244,6 +2244,8 @@ void DofMap::dof_indices (const Elem & elem,
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
+
 void DofMap::old_dof_indices (const Elem & elem,
                               unsigned int n,
                               std::vector<dof_id_type> & di,
@@ -2253,6 +2255,8 @@ void DofMap::old_dof_indices (const Elem & elem,
   libmesh_assert(old_obj);
   this->_node_dof_indices(elem, n, *old_obj, di, vn);
 }
+
+#endif // LIBMESH_ENABLE_AMR
 
 
 

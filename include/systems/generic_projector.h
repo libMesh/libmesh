@@ -1345,6 +1345,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
               (has_interior_nodes &&
                FEInterface::n_dofs_at_node(dim, fe_type, elem_type, n_nodes-1)))
             {
+#ifdef LIBMESH_ENABLE_AMR
               // We may have already just copied constant monomials,
               // or we may be about to copy the whole element
               if ((f.is_grid_projection() &&
@@ -1356,6 +1357,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
                   || copy_this_elem
                   )
                 continue;
+#endif // LIBMESH_ENABLE_AMR
 
               // We need to project any other variables
               if (interiors.empty() || interiors.back() != elem)
@@ -1959,6 +1961,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
               continue;
             }
 
+#ifdef LIBMESH_ENABLE_AMR
           // If this is a low order monomial element which has merely
           // been h refined then we already copied all its dofs
           if (fe_type.family == MONOMIAL &&
@@ -1966,6 +1969,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
               elem.refinement_flag() != Elem::JUST_COARSENED &&
               elem.p_refinement_flag() != Elem::JUST_COARSENED)
             continue;
+#endif // LIBMESH_ENABLE_AMR
 
           // FIXME: Need to generalize this to vector-valued elements. [PB]
           FEBase * fe = nullptr;
@@ -2119,6 +2123,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
               continue;
             }
 
+#ifdef LIBMESH_ENABLE_AMR
           // If this is a low order monomial element which has merely
           // been h refined then we already copied all its dofs
           if (fe_type.family == MONOMIAL &&
@@ -2126,6 +2131,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
               elem.refinement_flag() != Elem::JUST_COARSENED &&
               elem.p_refinement_flag() != Elem::JUST_COARSENED)
             continue;
+#endif // LIBMESH_ENABLE_AMR
 
           // FIXME: Need to generalize this to vector-valued elements. [PB]
           FEBase * fe = nullptr;
