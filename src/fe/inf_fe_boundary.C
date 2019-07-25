@@ -275,9 +275,11 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
       {
         psi_map[i].resize         (n_total_qp);
         dpsidxi_map[i].resize     (n_total_qp);
-        dpsideta_map[i].resize     (n_total_qp);
+        dpsideta_map[i].resize    (n_total_qp);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         d2psidxi2_map[i].resize   (n_total_qp);
+        d2psidxideta_map[i].resize(n_total_qp);
+        d2psideta2_map[i].resize  (n_total_qp);
 #endif
       }
 
