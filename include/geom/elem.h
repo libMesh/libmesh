@@ -2468,6 +2468,8 @@ Elem * Elem::parent ()
 inline
 void Elem::set_parent (Elem * p)
 {
+  // We no longer support using parent() as interior_parent()
+  libmesh_assert_equal_to(this->dim(), p ? p->dim() : this->dim());
   _elemlinks[0] = p;
 }
 
