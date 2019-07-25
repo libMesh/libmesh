@@ -305,11 +305,13 @@ protected:
 
     _mesh->prepare_for_use();
 
+#ifdef LIBMESH_ENABLE_AMR
     if (n_refinements > 0)
       {
         MeshRefinement refine(*_mesh);
         refine.uniformly_refine(n_refinements);
       }
+#endif // LIBMESH_ENABLE_AMR
   }
 
   void init(MeshBase & mesh)
@@ -429,12 +431,14 @@ private:
   // are kosher.
   void run_coupling_functor_test(unsigned int n_refinements)
   {
+#ifdef LIBMESH_ENABLE_AMR
     if( n_refinements > 0 )
       {
         MeshRefinement refine(*_mesh);
         refine.uniformly_refine(n_refinements);
         _es->reinit();
       }
+#endif // LIBMESH_ENABLE_AMR
 
     System & system = _es->get_system("SimpleSystem");
 
@@ -462,12 +466,14 @@ private:
 
   void run_partitioner_test(unsigned int n_refinements)
   {
+#ifdef LIBMESH_ENABLE_AMR
     if( n_refinements > 0 )
       {
         MeshRefinement refine(*_mesh);
         refine.uniformly_refine(n_refinements);
         _es->reinit();
       }
+#endif // LIBMESH_ENABLE_AMR
 
     System & system = _es->get_system("SimpleSystem");
 

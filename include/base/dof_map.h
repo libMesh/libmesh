@@ -764,6 +764,8 @@ public:
                     std::vector<dof_id_type> & di,
                     const unsigned int vn) const;
 
+#ifdef LIBMESH_ENABLE_AMR
+
   /**
    * Appends to the vector \p di the old global degree of freedom
    * indices for \p elem.node_ref(n), for one variable \p vn.  On
@@ -774,6 +776,8 @@ public:
                         unsigned int n,
                         std::vector<dof_id_type> & di,
                         const unsigned int vn) const;
+
+#endif // LIBMESH_ENABLE_AMR
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -1364,6 +1368,8 @@ public:
    */
   // void augment_send_list_for_projection(const MeshBase &);
 
+#ifdef LIBMESH_ENABLE_AMR
+
   /**
    * Fills the vector di with the global degree of freedom indices
    * for the element using the \p DofMap::old_dof_object.
@@ -1373,10 +1379,13 @@ public:
   void old_dof_indices (const Elem * const elem,
                         std::vector<dof_id_type> & di,
                         const unsigned int vn = libMesh::invalid_uint) const;
+
   /**
    * \returns The total number of degrees of freedom on old_dof_objects
    */
   dof_id_type n_old_dofs() const { return _n_old_dfs; }
+
+#endif // LIBMESH_ENABLE_AMR
 
   /**
    * Constrains degrees of freedom on side \p s of element \p elem which
