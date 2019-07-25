@@ -1171,7 +1171,7 @@ void Elem::remove_links_to_me()
 #else
               unsigned int my_s = neigh->which_neighbor_am_i(this);
               libmesh_assert_less (my_s, neigh->n_neighbors());
-              libmesh_assert_equal_to (neigh->neighbor(my_s), this);
+              libmesh_assert_equal_to (neigh->neighbor_ptr(my_s), this);
               neigh->set_neighbor(my_s, nullptr);
 #endif
             }
