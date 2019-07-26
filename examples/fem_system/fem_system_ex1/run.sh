@@ -11,7 +11,12 @@ example_dir=examples/fem_system/$example_name
 # First, run with standard options from input files.
 run_example "$example_name"
 
-# Next, lets run with pure fieldsplit without gmg
+# Next, lets run with pure fieldsplit without gmg, if we have PETSc
+
+if [ "x$petscmajor" == "x" ]; then
+  exit
+fi
+
 fs_lu_options="--use_petsc_dm --node-major-dofs \
 -snes_view -snes_monitor -snes_converged_reason -snes_rtol 1.0e-4 \
 -ksp_type fgmres -ksp_converged_reason -ksp_monitor_true_residual \
@@ -32,7 +37,17 @@ run_example "$example_name" "solver_type=petscdiff coarsegridsize=6 transient=fa
 # And again with some timestepping coverage
 run_example "$example_name" "solver_type=petscdiff coarsegridsize=6 coarserefinements=1 transient=true n_timesteps=3 $fs_lu_options"
 
-# Rerun with options demonstrating fieldpslit+gmg on the velocity block.
+# Rerun with options demonstrating fieldpslit+gmg on the velocity
+# block, if we have a new enough PETSc
+
+if [ $petscmajor -lt 3 ]; then
+  exit
+fi
+
+if [ $petscmajor -eq 3 -a $petscminor -lt 8 ]; then
+  exit
+fi
+
 fs_gmg_options="--use_petsc_dm --node-major-dofs \
  -snes_view -snes_monitor -snes_converged_reason -snes_rtol 1.0e-4 \
  -ksp_type fgmres -ksp_rtol 1.0e-5 \
