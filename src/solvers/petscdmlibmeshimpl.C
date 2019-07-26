@@ -1192,8 +1192,17 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
 
   dm->ops->refine             = 0; // DMRefine_libMesh;
   dm->ops->coarsen            = 0; // DMCoarsen_libMesh;
+
+  // * dm->ops->getinjection was renamed to dm->ops->createinjection in PETSc 5a84ad338 (5 Jul 2019)
+  // * dm->ops-getaggregates was removed in PETSc 97779f9a (5 Jul 2019)
+  // * Both changes were merged into PETSc master in 94aad3ce (7 Jul 2019).
+#if PETSC_RELEASE_LESS_THAN(3,12,0)
   dm->ops->getinjection       = 0; // DMGetInjection_libMesh;
   dm->ops->getaggregates      = 0; // DMGetAggregates_libMesh;
+#else
+  dm->ops->createinjection = 0;
+#endif
+
 
 #if PETSC_RELEASE_LESS_THAN(3,3,1)
   dm->ops->createfielddecompositiondm  = DMCreateFieldDecompositionDM_libMesh;
