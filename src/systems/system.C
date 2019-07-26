@@ -1121,11 +1121,12 @@ unsigned int System::add_variable (const std::string & var,
         should_be_in_vg = false;
 
       // they are restricted, we aren't?
-      if (their_active_subdomains && !active_subdomains)
+      if (their_active_subdomains &&
+          (!active_subdomains || (active_subdomains && active_subdomains->empty())))
         should_be_in_vg = false;
 
       // they aren't restricted, we are?
-      if (!their_active_subdomains && active_subdomains)
+      if (!their_active_subdomains && (active_subdomains && !active_subdomains->empty()))
         should_be_in_vg = false;
 
       if (their_active_subdomains && active_subdomains)
