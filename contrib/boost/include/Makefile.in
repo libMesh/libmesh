@@ -2115,6 +2115,7 @@ oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 petscmajor = @petscmajor@
 petscmajorminor = @petscmajorminor@
+petscminor = @petscminor@
 petscversion = @petscversion@
 prefix = @prefix@
 program_transform_name = @program_transform_name@

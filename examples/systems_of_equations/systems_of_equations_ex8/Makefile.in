@@ -672,6 +672,7 @@ oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 petscmajor = @petscmajor@
 petscmajorminor = @petscmajorminor@
+petscminor = @petscminor@
 petscversion = @petscversion@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
@@ -763,7 +764,9 @@ data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 #
 # Running the tests
 #
-TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)"
+TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir); export LIBMESH_DIR; \
+	METHODS="$(METHODS)"; export METHODS; petscmajor=@petscmajor@ \
+	petscminor=@petscminor@
 TESTS = $(check_SCRIPTS)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
