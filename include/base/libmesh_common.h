@@ -287,42 +287,42 @@ extern bool warned_about_auto_ptr;
 
 #define libmesh_assert_equal_to_msg(expr1,expr2, msg)                   \
   do {                                                                  \
-    if (!(expr1 == expr2)) {                                            \
+    if (!((expr1) == (expr2))) {                                        \
       libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_not_equal_to_msg(expr1,expr2, msg)               \
   do {                                                                  \
-    if (!(expr1 != expr2)) {                                            \
+    if (!((expr1) != (expr2))) {                                        \
       libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_less_msg(expr1,expr2, msg)                       \
   do {                                                                  \
-    if (!(expr1 < expr2)) {                                             \
+    if (!((expr1) < (expr2))) {                                         \
       libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
   do {                                                                  \
-    if (!(expr1 > expr2)) {                                             \
+    if (!((expr1) > (expr2))) {                                         \
       libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
   do {                                                                  \
-    if (!(expr1 <= expr2)) {                                            \
+    if (!((expr1) <= (expr2))) {                                        \
       libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
   do {                                                                  \
-    if (!(expr1 >= expr2)) {                                            \
+    if (!((expr1) >= (expr2))) {                                        \
       libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
