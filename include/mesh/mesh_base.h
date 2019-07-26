@@ -756,6 +756,11 @@ public:
   unsigned int get_elem_integer_index(const std::string & name) const;
 
   /*
+   * \returns Whether or not the mesh has an element integer with its name.
+   */
+  bool has_elem_integer(const std::string & name) const;
+
+  /*
    * \returns The name for the indexed extra element integer
    * datum, which must have already been added.
    */
@@ -782,6 +787,11 @@ public:
    * datum, which must have already been added.
    */
   unsigned int get_node_integer_index(const std::string & name) const;
+
+  /*
+   * \returns Whether or not the mesh has a node integer with its name.
+   */
+  bool has_node_integer(const std::string & name) const;
 
   /*
    * \returns The name for the indexed extra node integer
