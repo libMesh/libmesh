@@ -829,6 +829,7 @@ PETSC_CC_INCLUDES
 PETSCINCLUDEDIRS
 PETSCLINKLIBS
 petscmajorminor
+petscminor
 petscmajor
 petscversion
 enablepetsc
@@ -35645,6 +35646,7 @@ fi
   # and AC_DEFINE commands.  This prevents libmesh_config.h from having
   # confusing information in it if the test compilation steps fail.
   if test $enablepetsc != no; then :
+
 
 
 

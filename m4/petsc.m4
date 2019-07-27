@@ -341,6 +341,7 @@ AC_DEFUN([CONFIGURE_PETSC],
         [
           AC_SUBST(petscversion)
           AC_SUBST(petscmajor)
+          AC_SUBST(petscminor)
           AC_SUBST(petscmajorminor)
 
           AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MAJOR, [$petscmajor],
