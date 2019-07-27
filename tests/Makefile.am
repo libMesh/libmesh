@@ -30,6 +30,7 @@ unit_tests_sources = \
   fe/fe_hermite_test.C \
   fe/fe_hierarchic_test.C \
   fe/inf_fe_legendre_test.C \
+  fe/inf_fe_jacobi_test.C \
   fe/fe_l2_hierarchic_test.C \
   fe/fe_l2_lagrange_test.C \
   fe/fe_lagrange_test.C \
