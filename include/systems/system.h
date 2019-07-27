@@ -1085,7 +1085,9 @@ public:
 
   /**
    * Adds the variable \p var to the list of variables
-   * for this system.
+   * for this system. If \p active_subdomains is either \p nullptr
+   * (the default) or points to an empty set, then it will be assumed that
+   * \p var has no subdomain restrictions
    *
    * \returns The index number for the new variable.
    */
@@ -1096,7 +1098,9 @@ public:
   /**
    * Adds the variable \p var to the list of variables
    * for this system.  Same as before, but assumes \p LAGRANGE
-   * as default value for \p FEType.family.
+   * as default value for \p FEType.family. If \p active_subdomains is either
+   * \p nullptr (the default) or points to an empty set, then it will be assumed
+   * that \p var has no subdomain restrictions
    */
   unsigned int add_variable (const std::string & var,
                              const Order order = FIRST,
@@ -1105,7 +1109,9 @@ public:
 
   /**
    * Adds the variable \p var to the list of variables
-   * for this system.
+   * for this system. If \p active_subdomains is either \p nullptr
+   * (the default) or points to an empty set, then it will be assumed that
+   * \p var has no subdomain restrictions
    *
    * \returns The index number for the new variable.
    */
@@ -1116,7 +1122,9 @@ public:
   /**
    * Adds the variable \p var to the list of variables
    * for this system.  Same as before, but assumes \p LAGRANGE
-   * as default value for \p FEType.family.
+   * as default value for \p FEType.family. If \p active_subdomains is either
+   * \p nullptr (the default) or points to an empty set, then it will be assumed that
+   * \p var has no subdomain restrictions
    */
   unsigned int add_variables (const std::vector<std::string> & vars,
                               const Order order = FIRST,
