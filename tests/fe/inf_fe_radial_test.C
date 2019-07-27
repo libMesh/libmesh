@@ -33,10 +33,20 @@
 
 using namespace libMesh;
 
-class InfFEJacobiTest : public CppUnit::TestCase
+/**
+ * This class is for unit testing the "radial" basis function
+ * aspects of the InfFE. There are several possible choices
+ * for these basis functions, including:
+ * - JACOBI_20_00
+ * - JACOBI_30_00
+ * - LEGENDRE
+ * - LAGRANGE
+ * Only the first three are currently tested by this class.
+ */
+class InfFERadialTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE( InfFEJacobiTest );
+  CPPUNIT_TEST_SUITE( InfFERadialTest );
   CPPUNIT_TEST( testDifferentOrders );
   CPPUNIT_TEST_SUITE_END();
 
@@ -67,6 +77,11 @@ public:
 
   void testDifferentOrders ()
   {
+    testSingleOrder(FIRST, LEGENDRE);
+    testSingleOrder(SECOND, LEGENDRE);
+    testSingleOrder(THIRD, LEGENDRE);
+    testSingleOrder(FOURTH, LEGENDRE);
+
     testSingleOrder(FIRST, JACOBI_20_00);
     testSingleOrder(SECOND, JACOBI_20_00);
     testSingleOrder(THIRD, JACOBI_20_00);
@@ -172,9 +187,9 @@ public:
     // Test whether the computed values match the tabulated values to
     // the specified accuracy.
     for (const auto & t : val_table)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(phi[t.i][t.qp], t.val, 1.e-4);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(t.val, phi[t.i][t.qp], 1.e-4);
     for (const auto & t : grad_table)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL((dphi[t.i][t.qp] - t.grad).norm_sq(), 0., 1.e-4);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(0., (dphi[t.i][t.qp] - t.grad).norm_sq(), 1.e-4);
 
     // Make sure there are actually reference values
     if (val_table.empty())
@@ -187,6 +202,79 @@ public:
 
   void setUp()
   {
+    ////////////////////////////////////////////////////////////////////////////////
+    // Arbitrarily selected LEGENDRE reference values.
+    ////////////////////////////////////////////////////////////////////////////////
+    tabulated_vals[std::make_pair(FIRST, LEGENDRE)] =
+      {
+        {0,9,0.0550016}, {1,5,0.41674},   {2,8,0.0147376}, {3,7,0.111665},
+        {4,6,0.0737011}, {5,1,0.0803773}, {6,11,0.275056}, {7,15,0.021537}
+      };
+
+    tabulated_vals[std::make_pair(SECOND, LEGENDRE)] =
+      {
+        {0,3,0.0425633}, {1,6,0.0343526}, {2,2,0.158848}, {3,7,0.128206},
+        {4,12,0.220829}, {5,5,-0.136549}, {6,0,0.0149032}, {7,10,-0.0334936},
+        {8,16,0.00399329}, {9,18,-0.00209733}, {10,2,0.0556194}, {11,17,-0.000561977}
+      };
+
+    tabulated_vals[std::make_pair(THIRD, LEGENDRE)] =
+      {
+        {12,9,0.136657}, {13,6,0.175034}, {14,20,-0.0011016}, {15,15,0.0428935}
+      };
+
+    tabulated_vals[std::make_pair(FOURTH, LEGENDRE)] =
+      {
+        {16,3,0.00826618}, {17,10,-0.547813}, {18,14,0.311004}, {19,27,-0.00192085}
+      };
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Arbitrarily selected LEGENDRE reference gradients.
+    ////////////////////////////////////////////////////////////////////////////////
+    tabulated_grads[std::make_pair(FIRST, LEGENDRE)] =
+      {
+        {0,9,Point(-0.0429458, -0.0115073, 0.)},
+        {1,5,Point(0.177013, -0.177013, -0.483609)},
+        {2,8,Point(0.0115073, 0.0115073, 0.00842393)},
+        {3,7,Point(-0.177013, 0.0474305, 0.)},
+        {4,6,Point(-0.031305, -0.116832,  0.10025)},
+        {5,1,Point(0.0474191, -0.0474191, 0.872917)},
+        {6,11,Point(0.0575466, 0.0575466, -0.11251)},
+        {7,15,Point(-0.00353805, 0.000948017, 0.000111572)}
+      };
+
+    tabulated_grads[std::make_pair(SECOND, LEGENDRE)] =
+      {
+        {0,3,Point(-0.0959817, -0.0959817, 0.0702635)},
+        {1,6,Point(0.0625228, -0.0625228, 0.0457699)},
+        {2,2,Point(0.358209, 0.0959817, -2.77556e-17)},
+        {3,7,Point(-0.233338, 0.0625228, -6.93889e-17)},
+        {4,12,Point(-0.0323071, -0.0323071, -0.0729771)},
+        {5,5,Point(0.248523, 0.0665915, -0.245097)},
+        {6,0,Point(0.0336072, -0.00900502, 0.288589)},
+        {7,10,Point(-0.0396234, 0.0396234, -0.0290064)},
+        {8,16,Point(0.000443217, 0.000443217, 0.000333678)},
+        {9,18,Point(-0.000232783, -6.23741e-05, 9.35433e-05)},
+        {10,2,Point(-0.0336072, 0.0336072, 0.985214)},
+        {11,17,Point(6.23741e-05, -6.23741e-05, -2.05961e-05)},
+      };
+
+    tabulated_grads[std::make_pair(THIRD, LEGENDRE)] =
+      {
+        {12,9,Point(0.0536552, 0.200244, -0.0849541)},
+        {13,6,Point(-0.0921697, 0.0921697, 0.461056)},
+        {14,20,Point(2.35811e-05, -8.80059e-05, 3.58959e-05)},
+        {15,15,Point(-0.0386352, 0.0103523, -0.0197323)},
+      };
+
+    tabulated_grads[std::make_pair(FOURTH, LEGENDRE)] =
+      {
+        {16,3,Point(-0.0190603, 0.0051072, 0.308529)},
+        {17,10,Point(0.244125, -0.244125, 0.140907)},
+        {18,14,Point(-0.0985844, 0.0985844, -0.502591)},
+        {19,27,Point(0.000115647, -3.09874e-05, 4.30775e-05)}
+      };
+
     ////////////////////////////////////////////////////////////////////////////////
     // Arbitrarily selected JACOBI_20_00 reference values.
     ////////////////////////////////////////////////////////////////////////////////
@@ -209,18 +297,12 @@ public:
 
     tabulated_vals[std::make_pair(THIRD, JACOBI_20_00)] =
       {
-        {12,9,0.0837876},
-        {13,6,0.350068},
-        {14,20,0.0244336},
-        {15,15,0.0181532}
+        {12,9,0.0837876}, {13,6,0.350068}, {14,20,0.0244336}, {15,15,0.0181532}
       };
 
     tabulated_vals[std::make_pair(FOURTH, JACOBI_20_00)] =
       {
-        {16,3,0.0165324},
-        {17,10,-0.720085},
-        {18,14,0.0777511},
-        {19,27,0.0453842}
+        {16,3,0.0165324}, {17,10,-0.720085}, {18,14,0.0777511}, {19,27,0.0453842}
       };
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -296,18 +378,12 @@ public:
 
     tabulated_vals[std::make_pair(THIRD, JACOBI_30_00)] =
       {
-        {12,9,0.0469849},
-        {13,6,0.437585},
-        {14,20,0.0450821},
-        {15,15,0.0469849}
+        {12,9,0.0469849}, {13,6,0.437585}, {14,20,0.0450821}, {15,15,0.0469849}
       };
 
     tabulated_vals[std::make_pair(FOURTH, JACOBI_30_00)] =
       {
-        {16,3,0.0206655},
-        {17,10,-0.748341},
-        {18,14,0},
-        {19,27,0.115995}
+        {16,3,0.0206655}, {17,10,-0.748341}, {18,14,0}, {19,27,0.115995}
       };
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -366,4 +442,4 @@ public:
 
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( InfFEJacobiTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( InfFERadialTest );
