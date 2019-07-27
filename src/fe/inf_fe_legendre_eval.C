@@ -18,95 +18,36 @@
 
 // Local Includes
 #include "libmesh/libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
 #include "libmesh/inf_fe.h"
-#include "libmesh/inf_fe_macro.h"
+#include "libmesh/jacobi_polynomials.h"
 
 using namespace libMesh;
 
 // Anonymous namespace for local helper functions
 namespace {
 
-// Evaluate P_n(x) using the three term recurrence relation.  Note
-// that using the three term recurrence is more accurate than the
-// unrolled Horner scheme that was used here previously and requires a
-// lot less code.
-// TODO: C++17 will have std::legendre() in <cmath>, so eventually we
-// can just use that.
+// When alpha=beta=0, the Jacobi polynomials reduce to the Legendre polynomials.
 Real legendre_eval(unsigned int n, Real x)
 {
-  Real p0 = 1;
-  Real p1 = x;
   if (n == 0)
-    return p0;
+    return 1.;
 
-  unsigned int i = 1;
-  while (i < n)
-    {
-      // Swapping saves a temporary, since this immediately updates p0
-      // and then p1 is updated on the next line. Note that p0 and p1
-      // appear in opposite positions than is usual in the update
-      // formula because of this swap!
-      std::swap(p0, p1);
-      p1 = ((2*i + 1) * x * p0 - i * p1) / (i + 1);
-      ++i;
-    }
+  Real val = JacobiPolynomials::value(n, /*alpha=*/0, /*beta=*/0, x);
 
-  // To match the original implementation, we add 1 to the result for
-  // n odd, and subtract 1 for n even. I'm not sure why this is done
-  // as it is not part of the "standard" Legendre polynomial definition.
-  return p1 + (n % 2 == 0 ? -1 : +1);
+  // For n>0, there is an even/odd shift of -1/+1 applied. I'm not
+  // sure why this is done for the infinite elements, as it is not
+  // part of the "standard" Legendre polynomial definition, I'm just
+  // copying what was done in the original implementation...
+  return val + (n % 2 == 0 ? -1 : +1);
 }
 
-
-
-// Evaluate d/dx P_n(x) using a recurrence relation.
-// To evaluate the derivatives, we also need to evaluate the values,
-// so this function duplicates some of legendre_eval(). That seems OK to me
-// though since it is so simple. The recurrence relation we are using
-// is from Wikipedia:
-// (2n+1) * P_n = d/dx (P_{n+1} - P_{n-1})
-// There are no plans for Legendre function derivatives to be in
-// C++17, so we will need our own implementation for the forseeable
-// future.  Finally, note that the shift which is applied to the
-// values does not affect the derivatives, so it does not show up
-// here.
 Real legendre_eval_deriv(unsigned int n, Real x)
 {
-  if (n == 0)
-    return 0;
-
-  Real p0 = 1;
-  Real p1 = x;
-
-  // The recurrence relation we're using only requires one previous
-  // derivative value, but it is from two iterations ago, so we still
-  // need to keep track of two values.
-  Real dp0 = 0;
-  Real dp1 = 1;
-
-  unsigned int i = 1;
-  while (i < n)
-    {
-      // Swapping saves a temporary, since this immediately updates p0
-      // and then p1 is updated on the next line. Note that p0 and p1
-      // appear in opposite positions than is usual in the update
-      // formula because of this swap!
-      std::swap(p0, p1);
-      p1 = ((2*i + 1) * x * p0 - i * p1) / (i + 1);
-
-      // Note that dp1 appears in the formula below, but because we
-      // swapped, it's really dp0. Also, we have already updated the
-      // values, so:
-      // p1 is now P_{i+1}(x)
-      // p0 is now P_{i}(x)
-      std::swap(dp0, dp1);
-      dp1 = (2*i + 1) * p0 + dp1;
-      ++i;
-    }
-  return dp1;
+  return JacobiPolynomials::deriv(n, /*alpha=*/0, /*beta=*/0, x);
 }
-
 } // anonymous namespace
 
 
