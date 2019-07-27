@@ -431,6 +431,7 @@ include_HEADERS =  \
         utils/hashword.h \
         utils/ignore_warnings.h \
         utils/int_range.h \
+        utils/jacobi_polynomials.h \
         utils/libmesh_nullptr.h \
         utils/location_maps.h \
         utils/mapvector.h \
