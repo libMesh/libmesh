@@ -61,10 +61,10 @@ void QNodal::init_2D(const ElemType, unsigned int)
         // vertex (wv), and edge (we) weights are obtained by:
         // 1.) Requiring that they sum to the reference element volume.
         // 2.) Minimizing the Frobenius norm of the difference between
-        //     the resulting nodal quadrature (diagonal) mass matrix
+        //     the suitably scaled nodal quadrature (diagonal) mass matrix
         //     and the true mass matrix for the reference element.
-        Real wv = Real(19) / 90;
-        Real we = Real(71) / 90;
+        Real wv = Real(12) / 79;
+        Real we = Real(67) / 79;
 
         _weights = {wv, wv, wv, wv, we, we, we, we};
 
