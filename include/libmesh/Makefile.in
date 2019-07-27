@@ -636,17 +636,18 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	sensitivity_data.h steady_system.h system.h system_norm.h \
 	system_subset.h system_subset_by_subdomain.h \
 	transient_system.h compare_types.h error_vector.h hashword.h \
-	ignore_warnings.h int_range.h libmesh_nullptr.h \
-	location_maps.h mapvector.h null_output_iterator.h \
-	number_lookups.h ostream_proxy.h parameters.h perf_log.h \
-	perfmon.h plt_loader.h point_locator_base.h \
-	point_locator_tree.h pointer_to_pointer_iter.h \
-	pool_allocator.h restore_warnings.h simple_range.h \
-	statistics.h string_to_enum.h timestamp.h topology_map.h \
-	tree.h tree_base.h tree_node.h utility.h vectormap.h xdr_cxx.h \
-	parallel_communicator_specializations $(am__append_1) \
-	$(am__append_3) $(am__append_5) $(am__append_7) \
-	$(am__append_9) $(am__append_11) libmesh_config.h
+	ignore_warnings.h int_range.h jacobi_polynomials.h \
+	libmesh_nullptr.h location_maps.h mapvector.h \
+	null_output_iterator.h number_lookups.h ostream_proxy.h \
+	parameters.h perf_log.h perfmon.h plt_loader.h \
+	point_locator_base.h point_locator_tree.h \
+	pointer_to_pointer_iter.h pool_allocator.h restore_warnings.h \
+	simple_range.h statistics.h string_to_enum.h timestamp.h \
+	topology_map.h tree.h tree_base.h tree_node.h utility.h \
+	vectormap.h xdr_cxx.h parallel_communicator_specializations \
+	$(am__append_1) $(am__append_3) $(am__append_5) \
+	$(am__append_7) $(am__append_9) $(am__append_11) \
+	libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) libmesh_config.h
@@ -2146,6 +2147,9 @@ ignore_warnings.h: $(top_srcdir)/include/utils/ignore_warnings.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 int_range.h: $(top_srcdir)/include/utils/int_range.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+jacobi_polynomials.h: $(top_srcdir)/include/utils/jacobi_polynomials.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_nullptr.h: $(top_srcdir)/include/utils/libmesh_nullptr.h
