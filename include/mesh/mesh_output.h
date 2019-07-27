@@ -136,7 +136,7 @@ public:
   /**
    * Return/set the precision to use when writing ASCII files.
    *
-   * By default we use numeric_limits<Real>::digits10 + 2, which
+   * By default we use numeric_limits<Real>::max_digits10, which
    * should be enough to write out to ASCII and get the exact same
    * Real back when reading in.
    */
@@ -195,7 +195,7 @@ MeshOutput<MT>::MeshOutput (const bool is_parallel_format, const bool serial_onl
   _is_parallel_format(is_parallel_format),
   _serial_only_needed_on_proc_0(serial_only_needed_on_proc_0),
   _obj(nullptr),
-  _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
+  _ascii_precision (std::numeric_limits<Real>::max_digits10)
 {}
 
 
@@ -206,7 +206,7 @@ MeshOutput<MT>::MeshOutput (const MT & obj, const bool is_parallel_format, const
   _is_parallel_format(is_parallel_format),
   _serial_only_needed_on_proc_0(serial_only_needed_on_proc_0),
   _obj (&obj),
-  _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
+  _ascii_precision (std::numeric_limits<Real>::max_digits10)
 {
   if (!_is_parallel_format && !this->mesh().is_serial())
     {
