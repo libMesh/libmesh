@@ -78,7 +78,7 @@ public:
   TEST_ONE_ORDER(QTRAP, FIRST, 1);
   TEST_ALL_ORDERS(QGRID, 1);
 
-  // In genreal, QNodal rules (e.g. QTRAP) are only exact for linears.
+  // In general, QNodal rules (e.g. QTRAP) are only exact for linears.
   // QSIMPSON is a special case of a nodal quadrature which obtains
   // higher accuracy.
   TEST_ONE_ORDER(QNODAL, /*ignored*/FIRST, /*max order=*/1);
