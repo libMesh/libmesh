@@ -427,6 +427,7 @@ BUILT_SOURCES = \
         hashword.h \
         ignore_warnings.h \
         int_range.h \
+        jacobi_polynomials.h \
         libmesh_nullptr.h \
         location_maps.h \
         mapvector.h \
@@ -1800,6 +1801,9 @@ ignore_warnings.h: $(top_srcdir)/include/utils/ignore_warnings.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 int_range.h: $(top_srcdir)/include/utils/int_range.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+jacobi_polynomials.h: $(top_srcdir)/include/utils/jacobi_polynomials.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_nullptr.h: $(top_srcdir)/include/utils/libmesh_nullptr.h
