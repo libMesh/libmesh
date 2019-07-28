@@ -59,11 +59,8 @@ void QNodal::init_3D(const ElemType, unsigned int)
           };
 
         // vertex (wv), tri edge (wt), and quad edge (wq) weights are
-        // obtained by:
-        // 1.) Requiring that they sum to the reference element volume.
-        // 2.) Minimizing the Frobenius norm of the difference between
-        //     the suitably scaled nodal quadrature (diagonal) mass matrix
-        //     and the true mass matrix for the reference element.
+        // obtained using the same approach that was used for the Quad8,
+        // see quadrature_nodal_2D.C for details.
         Real wv = Real(1) / 34;
         Real wt = Real(4) / 51;
         Real wq = Real(2) / 17;
@@ -91,11 +88,9 @@ void QNodal::init_3D(const ElemType, unsigned int)
             Point(0.,-1,+1), Point(+1,0.,+1), Point(0.,+1,+1), Point(-1,0.,+1)
           };
 
-        // vertex (wv), and edge (we) weights are obtained by:
-        // 1.) Requiring that they sum to the reference element volume.
-        // 2.) Minimizing the Frobenius norm of the difference between
-        //     the suitably scaled quadrature (diagonal) mass matrix
-        //     and the true mass matrix for the reference element.
+        // vertex (wv), and edge (we) weights are obtained using the
+        // same approach that was used for the Quad8, see
+        // quadrature_nodal_2D.C for details.
         Real wv = Real(7) / 31;
         Real we = Real(16) / 31;
 

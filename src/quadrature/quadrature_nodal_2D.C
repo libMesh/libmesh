@@ -58,11 +58,75 @@ void QNodal::init_2D(const ElemType, unsigned int)
             Point(0.,-1), Point(+1,0.), Point(0.,+1), Point(-1,0.)
           };
 
-        // vertex (wv), and edge (we) weights are obtained by:
-        // 1.) Requiring that they sum to the reference element volume.
-        // 2.) Minimizing the Frobenius norm of the difference between
-        //     the suitably scaled nodal quadrature (diagonal) mass matrix
-        //     and the true mass matrix for the reference element.
+        // The weights for the Quad8 nodal quadrature rule are
+        // obtained from the following specific steps. Other
+        // "serendipity" type rules are obtained similarly.
+        //
+        // 1.) Due to the symmetry of the bi-unit square domain, we
+        // first note that there are only two "classes" of node in the
+        // Quad8: vertices (with associated weight wv) and edges (with
+        // associated weight we).
+        //
+        // 2.) In order for such a nodal quadrature rule to be exact
+        // for constants, the weights must sum to the area of the
+        // reference element, and therefore we must have:
+        // 4*wv + 4*we = 4 --> wv + we = 1
+        //
+        // 3.) Due to symmetry (once again), such a rule is then
+        // automatically exact for the linear polynomials "x" and "y",
+        // regardless of the values of wv and we.
+        //
+        // 4.) We therefore still have two unknowns and one equation.
+        // Attempting to additionally make the nodal quadrature rule
+        // exact for the quadratic polynomials "x^2" and "y^2" leads
+        // to a rule with negative weights, namely:
+        // wv = -1/3
+        // we = 4/3
+        // Note: these are the same values one obtains by integrating
+        // the corresponding Quad8 Lagrange basis functions over the
+        // reference element.
+        //
+        // Since the weights appear on the diagonal of the nodal
+        // quadrature rule's approximation to the mass matrix, rules
+        // with negative weights yield an indefinite mass matrix,
+        // i.e. one with both positive and negative eigenvalues. Rules
+        // with negative weights can also produce a negative integral
+        // approximation to a strictly positive integrand, which may
+        // be unacceptable in some situations.
+        //
+        // 5.) Requiring all positive weights therefore restricts the
+        // nodal quadrature rule to only be exact for linears. But
+        // there is still one free parameter remaining, and thus we
+        // need some other criterion in order to complete the
+        // description of the rule.
+        //
+        // Here, we have decided to choose the quadrature weights in
+        // such a way that the resulting nodal quadrature mass matrix
+        // approximation is "proportional" to the true mass matrix's
+        // diagonal entries for the reference element. We therefore
+        // pose the following constrained optimization problem:
+        //
+        //     { min_{wv, we} |diag(M) - C*diag(W)|^2
+        // (O) {
+        //     { subject to wv + we = 1
+        //
+        // where:
+        // * M is the true mass matrix
+        // * W is the nodal quadrature approximation to the mass
+        //   matrix. In this particular case:
+        //   diag(W) = [wv,wv,wv,wv,we,we,we,we]
+        // * C = tr(M) / vol(E) is the ratio between the trace of the
+        //   true mass matrix and the volume of the reference
+        //   element. For all Lagrange finite elements, we have C<1.
+        //
+        // 6.) The optimization problem (O) is solved directly by
+        // substituting the algebraic constraint into the functional
+        // which is to be minimized, then setting the derivative with
+        // respect to the remaining parameter equal to zero and
+        // solving. In the Quad8 and Hex20 cases, there is only one
+        // free parameter, while in the Prism15 case there are two
+        // free parameters, so a 2x2 system of linear equations must
+        // be solved.
         Real wv = Real(12) / 79;
         Real we = Real(67) / 79;
 
