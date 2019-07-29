@@ -192,6 +192,17 @@ unsigned int MeshBase::get_elem_integer_index(const std::string & name) const
 
 
 
+bool MeshBase::has_elem_integer(const std::string & name) const
+{
+  for (auto & entry : _elem_integer_names)
+    if (entry == name)
+      return true;
+
+  return false;
+}
+
+
+
 unsigned int MeshBase::add_node_integer(const std::string & name)
 {
   for (auto i : index_range(_node_integer_names))
@@ -212,6 +223,17 @@ unsigned int MeshBase::get_node_integer_index(const std::string & name) const
 
   libmesh_error_msg("Unknown node integer " << name);
   return libMesh::invalid_uint;
+}
+
+
+
+bool MeshBase::has_node_integer(const std::string & name) const
+{
+  for (auto & entry : _node_integer_names)
+    if (entry == name)
+      return true;
+
+  return false;
 }
 
 
