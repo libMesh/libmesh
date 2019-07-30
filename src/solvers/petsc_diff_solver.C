@@ -267,7 +267,12 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
 #endif
       return DiffSolver::CONVERGED_RELATIVE_STEP;
     case SNES_CONVERGED_ITS:
+      // SNES_CONVERGED_TR_DELTA was changed to a diverged condition,
+      // SNES_DIVERGED_TR_DELTA, in PETSc 1c6b2ff8df. This change will
+      // likely be in 3.12 and later releases.
+#if PETSC_RELEASE_LESS_THAN(3,12,0)
     case SNES_CONVERGED_TR_DELTA:
+#endif
       return DiffSolver::CONVERGED_NO_REASON;
     case SNES_DIVERGED_FUNCTION_DOMAIN:
     case SNES_DIVERGED_FUNCTION_COUNT:
