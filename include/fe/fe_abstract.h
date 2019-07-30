@@ -457,6 +457,7 @@ public:
    * \returns The mapping object
    */
   const FEMap & get_fe_map() const { return *_fe_map.get(); }
+  FEMap & get_fe_map() { return *_fe_map.get(); }
 
   /**
    * Prints the Jacobian times the weight for each quadrature point.
