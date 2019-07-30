@@ -976,6 +976,12 @@ public:
   { _custom_solution = custom_sol; }
 
   /**
+   * Calls set_jacobian_tolerance() on all the FE objects controlled
+   * by this class. (Actually, it calls this on the underlying)
+   */
+  void set_jacobian_tolerance(Real tol);
+
+  /**
    * System from which to acquire moving mesh information
    */
   System * _mesh_sys;

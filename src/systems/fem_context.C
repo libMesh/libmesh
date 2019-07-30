@@ -1477,6 +1477,22 @@ void FEMContext::elem_position_get()
 
 
 
+void FEMContext::set_jacobian_tolerance(Real tol)
+{
+  for (auto & m : _element_fe)
+    for (auto & pr : m)
+      pr.second->get_fe_map().set_jacobian_tolerance(tol);
+
+  for (auto & m : _side_fe)
+    for (auto & pr : m)
+      pr.second->get_fe_map().set_jacobian_tolerance(tol);
+
+  for (auto & pr : _edge_fe)
+    pr.second->get_fe_map().set_jacobian_tolerance(tol);
+}
+
+
+
 // We can ignore the theta argument in the current use of this
 // function, because elem_subsolutions will already have been set to
 // the theta value.
