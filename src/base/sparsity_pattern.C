@@ -38,7 +38,7 @@ namespace SparsityPattern
 Build::Build (const MeshBase & mesh_in,
               const DofMap & dof_map_in,
               const CouplingMatrix * dof_coupling_in,
-              std::set<GhostingFunctor *> coupling_functors_in,
+              const std::set<GhostingFunctor *> & coupling_functors_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in) :
   ParallelObject(dof_map_in),
