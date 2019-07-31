@@ -82,8 +82,8 @@ public:
   virtual QuadratureType type() const override;
 
 private:
-  const unsigned int _alpha;
-  const unsigned int _beta;
+  unsigned int _alpha;
+  unsigned int _beta;
 
   virtual void init_1D (const ElemType, unsigned int) override;
 };
