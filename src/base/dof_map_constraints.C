@@ -342,6 +342,13 @@ private:
     // Get FE objects of the appropriate type
     std::unique_ptr<FEGenericBase<OutputType>> fe = FEGenericBase<OutputType>::build(dim, fe_type);
 
+    // Set tolerance on underlying FEMap object. This will allow us to
+    // avoid spurious negative Jacobian errors while imposing BCs by
+    // simply ignoring them. This should only be required in certain
+    // special cases, see the DirichletBoundaries comments on this
+    // parameter for more information.
+    fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
+
     // Prepare variables for projection
     std::unique_ptr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
     std::unique_ptr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
