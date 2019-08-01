@@ -181,6 +181,20 @@ public:
   std::unique_ptr<FEMFunctionBase<Gradient>> g_fem;
 
   const System * f_system;
+
+  /**
+   * Defaults to zero, but can be set to a custom small negative value
+   * to try and avoid spurious zero (or negative) Jacobian values when
+   * applying Dirichlet constraints. This can be useful in various
+   * different situations, for example:
+   * 1.) When specifying DirichletBCs on poorly-shaped elements.
+   * 2.) When degenerate Hexahedra are used in place of Prisms for convenience.
+   * 3.) On elements (e.g. Pyramids) which always have a zero Jacobian at the "apex" node.
+   * In theory there's nothing preventing someone from specifying
+   * DirichletBCs in such cases; setting this tolerance to a small
+   * negative value makes this possible in practice.
+   */
+  Real jacobian_tolerance;
 };
 
 
