@@ -1,8 +1,7 @@
 #ifndef __dof_object_test_h__
 #define __dof_object_test_h__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
+#include "libmesh_cppunit.h"
 
 #define DOFOBJECTTEST                           \
   CPPUNIT_TEST( testSetId );                    \

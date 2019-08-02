@@ -182,10 +182,10 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_6 = unit_tests-opt$(EXEEXT)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
-am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h base/dof_map_test.C \
-	base/default_coupling_test.C base/getpot_test.C \
-	base/point_neighbor_coupling_test.C \
+am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
+	stream_redirector.h test_comm.h base/dof_object_test.h \
+	base/dof_map_test.C base/default_coupling_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -316,10 +316,10 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h base/dof_map_test.C \
-	base/default_coupling_test.C base/getpot_test.C \
-	base/point_neighbor_coupling_test.C \
+am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
+	stream_redirector.h test_comm.h base/dof_object_test.h \
+	base/dof_map_test.C base/default_coupling_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -446,10 +446,10 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h base/dof_map_test.C \
-	base/default_coupling_test.C base/getpot_test.C \
-	base/point_neighbor_coupling_test.C \
+am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
+	stream_redirector.h test_comm.h base/dof_object_test.h \
+	base/dof_map_test.C base/default_coupling_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -576,10 +576,10 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h base/dof_map_test.C \
-	base/default_coupling_test.C base/getpot_test.C \
-	base/point_neighbor_coupling_test.C \
+am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
+	stream_redirector.h test_comm.h base/dof_object_test.h \
+	base/dof_map_test.C base/default_coupling_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -705,10 +705,10 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h base/dof_map_test.C \
-	base/default_coupling_test.C base/getpot_test.C \
-	base/point_neighbor_coupling_test.C \
+am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
+	stream_redirector.h test_comm.h base/dof_object_test.h \
+	base/dof_map_test.C base/default_coupling_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -1632,8 +1632,8 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 	       -DLIBMESH_IS_UNIT_TESTING
 
 AM_LDFLAGS = $(libmesh_LDFLAGS)
-unit_tests_sources = driver.C test_comm.h stream_redirector.h \
-	base/dof_object_test.h base/dof_map_test.C \
+unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
+	test_comm.h base/dof_object_test.h base/dof_map_test.C \
 	base/default_coupling_test.C base/getpot_test.C \
 	base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C fe/fe_bernstein_test.C \

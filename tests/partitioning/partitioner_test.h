@@ -1,19 +1,15 @@
 #ifndef __fe_test_h__
 #define __fe_test_h__
 
-#include "test_comm.h"
-
 #include <libmesh/distributed_mesh.h>
 #include <libmesh/elem.h>
 #include <libmesh/partitioner.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/mesh_generation.h>
 
-// Ignore unused parameter warnings coming from cppunit headers
-#include <libmesh/ignore_warnings.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
-#include <libmesh/restore_warnings.h>
+#include "test_comm.h"
+#include "libmesh_cppunit.h"
+
 
 #if LIBMESH_DIM > 2
 #define PARTITIONERTEST                         \
@@ -110,14 +106,6 @@ public:
     this->testPartition(TestCommWorld->size());
   }
 };
-
-// THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
-// std::auto_ptr, which in turn produces -Wdeprecated-declarations
-// warnings.  These can be ignored in GCC as long as we wrap the
-// offending code in appropriate pragmas.  We'll put an
-// ignore_warnings at the end of this file so it's the last warnings
-// related header that our including code sees.
-#include <libmesh/ignore_warnings.h>
 
 #define INSTANTIATE_PARTITIONER_TEST(partitionersubclass, meshclass)        \
   class PartitionerTest_##partitionersubclass##_##meshclass :               \

@@ -28,14 +28,9 @@
 #include <libmesh/face_tri3.h>
 #include <libmesh/face_tri6.h>
 
-
-// Ignore unused parameter warnings coming from cppunit headers
-#include <libmesh/ignore_warnings.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
-#include <libmesh/restore_warnings.h>
-
 #include <vector>
+
+#include "libmesh_cppunit.h"
 
 #define SIDETEST                                \
   CPPUNIT_TEST( testIsNodeOnSide );             \
@@ -171,13 +166,6 @@ public:
 
 };
 
-// THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
-// std::auto_ptr, which in turn produces -Wdeprecated-declarations
-// warnings.  These can be ignored in GCC as long as we wrap the
-// offending code in appropriate pragmas.  We'll put an
-// ignore_warnings at the end of this file so it's the last warnings
-// related header that our including code sees.
-#include <libmesh/ignore_warnings.h>
 
 #define INSTANTIATE_SIDETEST(elemclass, sidetype, indexbegin, indexend)                \
   class SideTest_##elemclass##_##sidetype##_##indexbegin##_##indexend :                \

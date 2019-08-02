@@ -17,8 +17,9 @@ CXXFLAGS_PROF += $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
 
 unit_tests_sources = \
   driver.C \
-  test_comm.h \
+  libmesh_cppunit.h \
   stream_redirector.h \
+  test_comm.h \
   base/dof_object_test.h \
   base/dof_map_test.C \
   base/default_coupling_test.C \

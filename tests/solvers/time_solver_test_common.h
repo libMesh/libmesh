@@ -4,6 +4,10 @@
 #include <libmesh/enum_solver_type.h>
 #include <libmesh/enum_preconditioner_type.h>
 
+#include "test_comm.h"
+#include "libmesh_cppunit.h"
+
+
 using namespace libMesh;
 
 template<typename TimeSolverType>

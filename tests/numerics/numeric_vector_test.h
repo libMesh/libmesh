@@ -8,11 +8,8 @@
 #include <libmesh/parallel.h>
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
-// Ignore unused parameter warnings coming from cppuint headers
-#include <libmesh/ignore_warnings.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/TestCase.h>
-#include <libmesh/restore_warnings.h>
+#include "libmesh_cppunit.h"
+
 
 #define NUMERICVECTORTEST                       \
   CPPUNIT_TEST( testLocalize );                 \
