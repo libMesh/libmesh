@@ -877,7 +877,8 @@ void UnstructuredMesh::all_first_order ()
         for (unsigned int c = 0, nc = so_elem->n_children(); c != nc; ++c)
           {
             Elem * child = so_elem->child_ptr(c);
-            child->set_parent(lo_elem);
+            if (child != remote_elem)
+              child->set_parent(lo_elem);
             lo_elem->add_child(child, c);
           }
 
