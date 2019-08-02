@@ -173,9 +173,9 @@ public:
     // Test whether the computed values match the tabulated values to
     // the specified accuracy.
     for (const auto & t : val_table)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(t.val, phi[t.i][t.qp], 1.e-4);
+      LIBMESH_ASSERT_FP_EQUAL(t.val, phi[t.i][t.qp], 1.e-4);
     for (const auto & t : grad_table)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(0., (dphi[t.i][t.qp] - t.grad).norm_sq(), 1.e-4);
+      LIBMESH_ASSERT_FP_EQUAL(0., (dphi[t.i][t.qp] - t.grad).norm_sq(), 1.e-4);
 
     // Make sure there are actually reference values
     if (val_table.empty())
