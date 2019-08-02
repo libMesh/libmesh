@@ -513,6 +513,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   {
                     failing = true;
                     elem->print_info(libMesh::err);
+                    failing = false;
                     if (calculate_xyz)
                       {
                         libmesh_error_msg("ERROR: negative Jacobian " \
@@ -589,6 +590,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   {
                     failing = true;
                     elem->print_info(libMesh::err);
+                    failing = false;
                     libmesh_error_msg("Encountered invalid 1D element!");
                   }
                 else
@@ -635,6 +637,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   {
                     failing = true;
                     elem->print_info(libMesh::err);
+                    failing = false;
                     libmesh_error_msg("Encountered invalid 1D element!");
                   }
                 else
@@ -758,6 +761,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   {
                     failing = true;
                     elem->print_info(libMesh::err);
+                    failing = false;
                     if (calculate_xyz)
                       {
                         libmesh_error_msg("ERROR: negative Jacobian " \
@@ -858,6 +862,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   {
                     failing = true;
                     elem->print_info(libMesh::err);
+                    failing = false;
                     if (calculate_xyz)
                       {
                         libmesh_error_msg("ERROR: negative Jacobian " \
@@ -1092,6 +1097,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   {
                     failing = true;
                     elem->print_info(libMesh::err);
+                    failing = false;
                     if (calculate_xyz)
                       {
                         libmesh_error_msg("ERROR: negative Jacobian " \
