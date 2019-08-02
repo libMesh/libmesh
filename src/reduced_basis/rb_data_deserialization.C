@@ -99,6 +99,10 @@ void RBEvaluationDeserialization::read_from_file(const std::string & path,
 #endif
 
   load_rb_evaluation_data(_rb_eval, rb_eval_reader, read_error_bound_data);
+
+  int error = close(fd);
+  if (error)
+    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
 }
 
 // ---- RBEvaluationDeserialization (END) ----
@@ -145,6 +149,10 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string & pa
                                     rb_eval_reader,
                                     trans_rb_eval_reader,
                                     read_error_bound_data);
+
+  int error = close(fd);
+  if (error)
+    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
 }
 
 // ---- TransientRBEvaluationDeserialization (END) ----
@@ -189,6 +197,10 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
   load_rb_eim_evaluation_data(_rb_eim_eval,
                               rb_eval_reader,
                               rb_eim_eval_reader);
+
+  int error = close(fd);
+  if (error)
+    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
 }
 
 // ---- RBEIMEvaluationDeserialization (END) ----
@@ -227,6 +239,10 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
 
   load_rb_scm_evaluation_data(_rb_scm_eval,
                               rb_scm_eval_reader);
+
+  int error = close(fd);
+  if (error)
+    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
 }
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
