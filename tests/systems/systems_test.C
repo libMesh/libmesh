@@ -463,39 +463,39 @@ private:
 
     if (u_subdomains.count(sbd_id))
       {
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                     libmesh_real(cubic_test(p,param,"","")),
-                                     TOLERANCE*TOLERANCE*10);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,sys.old_local_solution.get())),
-                                     libmesh_real(cubic_test(p,param,"","") + Number(10)),
-                                     TOLERANCE*TOLERANCE*100);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,sys.older_local_solution.get())),
-                                     libmesh_real(cubic_test(p,param,"","") + Number(20)),
-                                     TOLERANCE*TOLERANCE*100);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                libmesh_real(cubic_test(p,param,"","")),
+                                TOLERANCE*TOLERANCE*10);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p,sys.old_local_solution.get())),
+                                libmesh_real(cubic_test(p,param,"","") + Number(10)),
+                                TOLERANCE*TOLERANCE*100);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p,sys.older_local_solution.get())),
+                                libmesh_real(cubic_test(p,param,"","") + Number(20)),
+                                TOLERANCE*TOLERANCE*100);
       }
     if (v_subdomains.count(sbd_id))
       {
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                     libmesh_real(new_linear_test(p,param,"","")),
-                                     TOLERANCE*TOLERANCE*10);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p,sys.old_local_solution.get())),
-                                     libmesh_real(new_linear_test(p,param,"","") + Number(10)),
-                                     TOLERANCE*TOLERANCE*100);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(1,p,sys.older_local_solution.get())),
-                                     libmesh_real(new_linear_test(p,param,"","") + Number(20)),
-                                     TOLERANCE*TOLERANCE*100);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                libmesh_real(new_linear_test(p,param,"","")),
+                                TOLERANCE*TOLERANCE*10);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(1,p,sys.old_local_solution.get())),
+                                libmesh_real(new_linear_test(p,param,"","") + Number(10)),
+                                TOLERANCE*TOLERANCE*100);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(1,p,sys.older_local_solution.get())),
+                                libmesh_real(new_linear_test(p,param,"","") + Number(20)),
+                                TOLERANCE*TOLERANCE*100);
       }
     if (w_subdomains.count(sbd_id))
       {
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p)),
-                                     libmesh_real(disc_thirds_test(p,param,"","")),
-                                     TOLERANCE*TOLERANCE*10);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p,sys.old_local_solution.get())),
-                                     libmesh_real(disc_thirds_test(p,param,"","") + Number(10)),
-                                     TOLERANCE*TOLERANCE*100);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(2,p,sys.older_local_solution.get())),
-                                     libmesh_real(disc_thirds_test(p,param,"","") + Number(20)),
-                                     TOLERANCE*TOLERANCE*100);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(2,p)),
+                                libmesh_real(disc_thirds_test(p,param,"","")),
+                                TOLERANCE*TOLERANCE*10);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(2,p,sys.old_local_solution.get())),
+                                libmesh_real(disc_thirds_test(p,param,"","") + Number(10)),
+                                TOLERANCE*TOLERANCE*100);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(2,p,sys.older_local_solution.get())),
+                                libmesh_real(disc_thirds_test(p,param,"","") + Number(20)),
+                                TOLERANCE*TOLERANCE*100);
       }
   }
 
@@ -682,7 +682,7 @@ public:
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", THIRD, HIERARCHIC);
+    sys.add_variable("u", THIRD, MONOMIAL);
 
     MeshTools::Generation::build_cube (mesh,
                                        3, 3, 3,
@@ -712,7 +712,9 @@ public:
     EquationSystems proj_es(proj_mesh);
 
     System &proj_sys = proj_es.add_system<System> ("ProjectionSystem");
-    proj_sys.add_variable("u", SECOND, LAGRANGE);
+
+    // use 3rd order again so we can expect exact results
+    proj_sys.add_variable("u", THIRD, HIERARCHIC);
 
     MeshTools::Generation::build_cube (proj_mesh,
                                        5, 5, 5,
@@ -727,9 +729,9 @@ public:
         for (Real z = 0.1; z < 1; z += 0.2)
           {
             Point p(x,y,z);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(proj_sys.point_value(0,p)),
-                                         libmesh_real(cubic_test(p,es.parameters,"","")),
-                                         TOLERANCE*TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(proj_sys.point_value(0,p)),
+                                    libmesh_real(cubic_test(p,es.parameters,"","")),
+                                    TOLERANCE*TOLERANCE);
           }
   }
 
@@ -873,7 +875,7 @@ public:
     // number of nodes in the mesh and the number of nodes we zero on.
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes()) - static_cast<Real>(projected_nodes_set.size());
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(sys.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(sys.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
   }
 
   void testDofCouplingWithVarGroups()
@@ -941,7 +943,7 @@ public:
     // solution is the product of the number of variables and number of nodes.
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * system.n_vars());
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
   }
 
   void testAssemblyWithDgFemContext()

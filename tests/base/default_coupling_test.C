@@ -128,9 +128,9 @@ public:
 
                     Point p = n3->centroid();
 
-                    CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
-                                                 libmesh_real(cubic_default_coupling_test(p,es.parameters,"","")),
-                                                 TOLERANCE*TOLERANCE);
+                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
+                                            libmesh_real(cubic_default_coupling_test(p,es.parameters,"","")),
+                                            TOLERANCE*TOLERANCE);
                   }
               }
           }

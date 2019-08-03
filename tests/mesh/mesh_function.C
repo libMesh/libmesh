@@ -112,7 +112,7 @@ public:
                               dummy,
                               dummy);
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL
+        LIBMESH_ASSERT_FP_EQUAL
           (libmesh_real(vec_values(0)),
            libmesh_real(mesh_function_value),
            TOLERANCE*TOLERANCE);

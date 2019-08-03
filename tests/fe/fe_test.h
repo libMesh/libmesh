@@ -148,7 +148,7 @@ public:
             for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               u += _fe->get_phi()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 
-            CPPUNIT_ASSERT_DOUBLES_EQUAL
+            LIBMESH_ASSERT_FP_EQUAL
               (libmesh_real(u),
                libmesh_real(x + 0.25*y + 0.0625*z),
                TOLERANCE*TOLERANCE);
@@ -189,14 +189,14 @@ public:
             for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               grad_u += _fe->get_dphi()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u(0)), 1.0,
-                                         TOLERANCE*sqrt(TOLERANCE));
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 1.0,
+                                    TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 1)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u(1)), 0.25,
-                                           TOLERANCE*sqrt(TOLERANCE));
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), 0.25,
+                                      TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 2)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u(2)), 0.0625,
-                                           TOLERANCE*sqrt(TOLERANCE));
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.0625,
+                                      TOLERANCE*sqrt(TOLERANCE));
           }
 #endif
   }
@@ -242,14 +242,14 @@ public:
 #endif
               }
 
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u_x), 1.0,
-                                         TOLERANCE*sqrt(TOLERANCE));
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 1.0,
+                                    TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 1)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u_y), 0.25,
-                                           TOLERANCE*sqrt(TOLERANCE));
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), 0.25,
+                                      TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 2)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u_z), 0.0625,
-                                           TOLERANCE*sqrt(TOLERANCE));
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.0625,
+                                      TOLERANCE*sqrt(TOLERANCE));
           }
 #endif
   }
