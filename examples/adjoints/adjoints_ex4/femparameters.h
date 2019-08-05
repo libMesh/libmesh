@@ -130,8 +130,8 @@ public:
   libMesh::Real min_step_length;
   unsigned int max_linear_iterations, max_nonlinear_iterations;
   libMesh::Real relative_step_tolerance, relative_residual_tolerance,
-    absolute_residual_tolerance,
-    initial_linear_tolerance, minimum_linear_tolerance,
+    absolute_residual_tolerance;
+  double initial_linear_tolerance, minimum_linear_tolerance,
     linear_tolerance_multiplier;
 
   // Initialization

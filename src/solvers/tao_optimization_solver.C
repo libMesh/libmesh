@@ -82,7 +82,7 @@ extern "C"
     sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     if (solver->objective_object != nullptr)
-      (*objective) = solver->objective_object->objective(*(sys.current_local_solution), sys);
+      (*objective) = PS(solver->objective_object->objective(*(sys.current_local_solution), sys));
     else
       libmesh_error_msg("Objective function not defined in __libmesh_tao_objective");
 

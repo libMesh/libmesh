@@ -25,6 +25,12 @@
 #include <vector>
 
 
+#include "libmesh_config.h"
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#include "libmesh_common.h" // Real
+#endif
+
+
 namespace libMesh
 {
 
@@ -95,6 +101,9 @@ LIBMESH_INT_TYPE(unsigned long long);
 LIBMESH_FLOAT_TYPE(float);
 LIBMESH_FLOAT_TYPE(double);
 LIBMESH_FLOAT_TYPE(long double);
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+LIBMESH_FLOAT_TYPE(Real);
+#endif
 
 #define LIBMESH_ATTRIBUTES_COMMA ,
 

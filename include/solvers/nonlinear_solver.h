@@ -309,8 +309,8 @@ public:
    * stopping condition.
    *
    */
-  Real absolute_residual_tolerance;
-  Real relative_residual_tolerance;
+  double absolute_residual_tolerance;
+  double relative_residual_tolerance;
 
   /**
    * The NonlinearSolver should exit after the full nonlinear step norm is
@@ -323,8 +323,8 @@ public:
    *
    * \note Not all NonlinearSolvers support \p relative_step_tolerance!
    */
-  Real absolute_step_tolerance;
-  Real relative_step_tolerance;
+  double absolute_step_tolerance;
+  double relative_step_tolerance;
 
   /**
    * Each linear solver step should exit after \p max_linear_iterations
@@ -336,12 +336,12 @@ public:
    * Any required linear solves will at first be done with this tolerance;
    * the NonlinearSolver may tighten the tolerance for later solves.
    */
-  Real initial_linear_tolerance;
+  double initial_linear_tolerance;
 
   /**
    * The tolerance for linear solves is kept above this minimum
    */
-  Real minimum_linear_tolerance;
+  double minimum_linear_tolerance;
 
   /**
    * After a call to solve this will reflect whether or not the nonlinear

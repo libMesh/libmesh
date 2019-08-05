@@ -943,7 +943,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   Vec f;
   ierr = SNESGetFunction(_snes, &f, 0, 0);
   LIBMESH_CHKERR(ierr);
-  ierr = VecNorm(f, NORM_2, &final_residual_norm);
+  ierr = VecNorm(f, NORM_2, pPR(&final_residual_norm));
   LIBMESH_CHKERR(ierr);
 
   // Get and store the reason for convergence

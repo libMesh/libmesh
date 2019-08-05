@@ -112,9 +112,9 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
 
       const Point p = elem->centroid();
 
-      x[forward_map[elem->id()]] = p(0);
-      y[forward_map[elem->id()]] = p(1);
-      z[forward_map[elem->id()]] = p(2);
+      x[forward_map[elem->id()]] = double(p(0));
+      y[forward_map[elem->id()]] = double(p(1));
+      z[forward_map[elem->id()]] = double(p(2));
     }
 
   // We need an integer reference to pass to the Sfc interface.

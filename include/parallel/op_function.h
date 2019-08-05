@@ -19,14 +19,81 @@
 #ifndef LIBMESH_OP_FUNCTION_H
 #define LIBMESH_OP_FUNCTION_H
 
+#include "libmesh_config.h"
+
+#ifdef LIBMESH_HAVE_MPI
+#  include "mpi.h"
+#endif // LIBMESH_HAVE_MPI
+
 // C++ includes
+#include <functional>
 #include <type_traits>
+
+
 
 namespace libMesh
 {
 
 namespace Parallel
 {
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# ifdef LIBMESH_HAVE_MPI
+# define LIBMESH_MPI_BINARY(funcname) \
+inline void \
+libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
+{ \
+  const int size = *len; \
+ \
+  Real *in = static_cast<Real*>(a); \
+  Real *inout = static_cast<Real*>(b); \
+  for (int i=0; i != size; ++i) \
+    inout[i] = std::funcname(in[i],inout[i]); \
+}
+
+# define LIBMESH_MPI_LOCATOR(funcname) \
+inline void \
+libmesh_mpi_##funcname##_location(void * a, void * b, int * len, MPI_Datatype *) \
+{ \
+  const int size = *len; \
+ \
+  typedef std::pair<Real, int> dtype; \
+ \
+  dtype *in = static_cast<dtype*>(a); \
+  dtype *inout = static_cast<dtype*>(b); \
+  for (int i=0; i != size; ++i) \
+    { \
+      Real old_inout = inout[i].first; \
+      inout[i].first = std::funcname(in[i].first,inout[i].first); \
+      if (old_inout != inout[i].first) \
+        inout[i].second = in[i].second; \
+    } \
+}
+
+
+# define LIBMESH_MPI_BINARY_FUNCTOR(funcname) \
+inline void \
+libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
+{ \
+  const int size = *len; \
+ \
+  Real *in = static_cast<Real*>(a); \
+  Real *inout = static_cast<Real*>(b); \
+  for (int i=0; i != size; ++i) \
+    inout[i] = std::funcname<Real>()(in[i],inout[i]); \
+}
+
+
+LIBMESH_MPI_BINARY(max)
+LIBMESH_MPI_BINARY(min)
+LIBMESH_MPI_LOCATOR(max)
+LIBMESH_MPI_LOCATOR(min)
+LIBMESH_MPI_BINARY_FUNCTOR(plus)
+LIBMESH_MPI_BINARY_FUNCTOR(multiplies)
+
+# endif // LIBMESH_HAVE_MPI
+#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+
+
 //-------------------------------------------------------------------
 
 // Templated helper class to be used with static_assert.
@@ -142,6 +209,39 @@ LIBMESH_PARALLEL_INTEGER_OPS(unsigned long long);                               
 LIBMESH_PARALLEL_FLOAT_OPS(float);
 LIBMESH_PARALLEL_FLOAT_OPS(double);
 LIBMESH_PARALLEL_FLOAT_OPS(long double);
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# ifdef LIBMESH_HAVE_MPI
+
+// FIXME - we'll still need to free these to keep valgrind happy
+#define LIBMESH_MPI_OPFUNCTION(mpiname, funcname) \
+  static MPI_Op mpiname() { \
+    static MPI_Op LIBMESH_MPI_##mpiname = MPI_OP_NULL; \
+    if (LIBMESH_MPI_##mpiname == MPI_OP_NULL) \
+      { \
+        libmesh_call_mpi \
+          (MPI_Op_create(libmesh_mpi_##funcname, true, &LIBMESH_MPI_##mpiname)); \
+      } \
+    return LIBMESH_MPI_##mpiname;  \
+  }
+
+  template<>
+  class OpFunction<Real>
+  {
+  public:
+    LIBMESH_MPI_OPFUNCTION(max, max)
+    LIBMESH_MPI_OPFUNCTION(min, min)
+    LIBMESH_MPI_OPFUNCTION(sum, plus)
+    LIBMESH_MPI_OPFUNCTION(product, multiplies)
+
+    LIBMESH_MPI_OPFUNCTION(max_location, max_location)
+    LIBMESH_MPI_OPFUNCTION(min_location, min_location)
+  };
+
+# else
+  LIBMESH_PARALLEL_FLOAT_OPS(Real);
+# endif
+#endif
 
 } // namespace Parallel
 

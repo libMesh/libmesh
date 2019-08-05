@@ -131,20 +131,20 @@ public:
    * How tightly should the Newton iterations attempt to converge delta_lambda.
    * Defaults to 1.e-6.
    */
-  Real continuation_parameter_tolerance;
+  double continuation_parameter_tolerance;
 
   /**
    * How tightly should the Newton iterations attempt to converge ||delta_u||
    * Defaults to 1.e-6.
    */
-  Real solution_tolerance;
+  double solution_tolerance;
 
   /**
    * How much to try to reduce the residual by at the first (inexact) Newton step.
    * This is frequently something large like 1/2 in an inexact Newton method, to
    * prevent oversolving.
    */
-  Real initial_newton_tolerance;
+  double initial_newton_tolerance;
 
   /**
    * Stores the current solution and continuation parameter

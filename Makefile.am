@@ -44,7 +44,7 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
 
-LIBS             = $(libmesh_optional_LIBS)
+LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS)
 
 # additional files which must be included in 'make dist'
 EXTRA_DIST = reference_elements \

@@ -44,7 +44,8 @@ namespace Parallel {
 
 /**
  * Templated function to return the appropriate MPI datatype
- * for use with built-in C types when combined with an int
+ * for use with built-in C types when combined with an int,
+ * or MPI_DATATYPE_NULL for types which have no predefined datatype.
  */
 template <typename T>
 inline data_type dataplusint_type();
@@ -168,6 +169,26 @@ inline data_type dataplusint_type<double>() { return MPI_DOUBLE_INT; }
 
 template<>
 inline data_type dataplusint_type<long double>() { return MPI_LONG_DOUBLE_INT; }
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+template<>
+inline data_type dataplusint_type<Real>() { return MPI_DATATYPE_NULL; }
+#endif
+
+template <typename T>
+inline
+std::pair<data_type, std::unique_ptr<StandardType<std::pair<T,int>>>>
+dataplusint_type_acquire()
+{
+  std::pair<data_type, std::unique_ptr<StandardType<std::pair<T,int>>>> return_val;
+  return_val.first = dataplusint_type<T>();
+  if (return_val.first == MPI_DATATYPE_NULL)
+    {
+      return_val.second.reset(new StandardType<std::pair<T,int>>());
+      return_val.first = *return_val.second;
+    }
+  return return_val;
+}
 
 
 
@@ -2205,8 +2226,10 @@ inline void Communicator::minloc(T & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
+
       libmesh_call_mpi
-        (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1, dataplusint_type<T>(),
+        (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1,
+                        dataplusint_type_acquire<T>().first,
                         OpFunction<T>::min_location(), this->get()));
       r = data_in.val;
       min_id = data_in.rank;
@@ -2228,9 +2251,10 @@ inline void Communicator::minloc(bool & r,
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out;
+
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
-                        dataplusint_type<int>(),
+                        dataplusint_type_acquire<int>().first,
                         OpFunction<int>::min_location(), this->get()));
       r = data_out.val;
       min_id = data_out.rank;
@@ -2257,10 +2281,11 @@ inline void Communicator::minloc(std::vector<T,A1> & r,
           data_in[i].rank = this->rank();
         }
       std::vector<DataPlusInt<T>> data_out(r.size());
+
       libmesh_call_mpi
         (MPI_Allreduce (data_in.data(), data_out.data(),
                         cast_int<int>(r.size()),
-                        dataplusint_type<T>(),
+                        dataplusint_type_acquire<T>().first,
                         OpFunction<T>::min_location(), this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
@@ -2398,11 +2423,11 @@ inline void Communicator::maxloc(T & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
+
       libmesh_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &data_in, 1,
-                        dataplusint_type<T>(),
-                        OpFunction<T>::max_location(),
-                        this->get()));
+                        dataplusint_type_acquire<T>().first,
+                        OpFunction<T>::max_location(), this->get()));
       r = data_in.val;
       max_id = data_in.rank;
     }
@@ -2423,9 +2448,10 @@ inline void Communicator::maxloc(bool & r,
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out;
+
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
-                        dataplusint_type<int>(),
+                        dataplusint_type_acquire<int>().first,
                         OpFunction<int>::max_location(),
                         this->get()));
       r = data_out.val;
@@ -2453,10 +2479,11 @@ inline void Communicator::maxloc(std::vector<T,A1> & r,
           data_in[i].rank = this->rank();
         }
       std::vector<DataPlusInt<T>> data_out(r.size());
+
       libmesh_call_mpi
         (MPI_Allreduce (data_in.data(), data_out.data(),
                         cast_int<int>(r.size()),
-                        dataplusint_type<T>(),
+                        dataplusint_type_acquire<T>().first,
                         OpFunction<T>::max_location(),
                         this->get()));
       for (std::size_t i=0; i != r.size(); ++i)

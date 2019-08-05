@@ -32,7 +32,13 @@
 
 // PETSc includes
 #include "libmesh/ignore_warnings.h"
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petsc.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 #include "libmesh/restore_warnings.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_vector.h"

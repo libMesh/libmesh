@@ -196,7 +196,7 @@ public:
   /**
    * Required change in objective function which signals convergence.
    */
-  Real objective_function_relative_tolerance;
+  double objective_function_relative_tolerance;
 
   /**
    * Control how much is output from the OptimizationSolver as it's running.

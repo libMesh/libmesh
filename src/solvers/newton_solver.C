@@ -303,7 +303,7 @@ unsigned int NewtonSolver::solve()
   SparseMatrix<Number> & matrix = *(_system.matrix);
 
   // Set starting linear tolerance
-  Real current_linear_tolerance = initial_linear_tolerance;
+  double current_linear_tolerance = initial_linear_tolerance;
 
   // Start counting our linear solver steps
   _inner_iterations = 0;
@@ -375,8 +375,9 @@ unsigned int NewtonSolver::solve()
                      << current_residual << std::endl;
 
       // Make sure our linear tolerance is low enough
-      current_linear_tolerance = std::min (current_linear_tolerance,
-                                           current_residual * linear_tolerance_multiplier);
+      current_linear_tolerance =
+        double(std::min (current_linear_tolerance,
+                         current_residual * linear_tolerance_multiplier));
 
       // But don't let it be too small
       if (current_linear_tolerance < minimum_linear_tolerance)
@@ -385,7 +386,10 @@ unsigned int NewtonSolver::solve()
         }
 
       // If starting the nonlinear solve with a really good initial guess, we dont want to set an absurd linear tolerance
-      current_linear_tolerance = std::max(current_linear_tolerance, absolute_residual_tolerance / current_residual / 10.0);
+      current_linear_tolerance =
+        double(std::max(current_linear_tolerance,
+                        absolute_residual_tolerance / current_residual
+                        / 10.0));
 
       // At this point newton_iterate is the current guess, and
       // linear_solution is now about to become the NEGATIVE of the next

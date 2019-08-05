@@ -68,7 +68,7 @@ public:
    * Simple constructor to use for smoothing purposes
    */
   VariationalMeshSmoother(UnstructuredMesh & mesh,
-                          double theta=0.5,
+                          Real theta=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5);
@@ -78,11 +78,11 @@ public:
    */
   VariationalMeshSmoother(UnstructuredMesh & mesh,
                           std::vector<float> * adapt_data,
-                          double theta=0.5,
+                          Real theta=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5,
-                          double percent_to_move=1);
+                          Real percent_to_move=1);
 
   /**
    * Even more complicated constructor for mesh redistribution based on adapt_data with an
@@ -91,11 +91,11 @@ public:
   VariationalMeshSmoother(UnstructuredMesh & mesh,
                           const UnstructuredMesh * area_of_interest,
                           std::vector<float> * adapt_data,
-                          double theta=0.5,
+                          Real theta=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5,
-                          double percent_to_move=1);
+                          Real percent_to_move=1);
 
   enum MetricType
     {
@@ -129,12 +129,12 @@ public:
    * the user specifies an actual number of smoothing
    * iterations.
    */
-  double smooth(unsigned int n_iterations);
+  Real smooth(unsigned int n_iterations);
 
   /**
    * \returns Max distance a node moved during the last smooth.
    */
-  double distance_moved() const { return _distance; }
+  Real distance_moved() const { return _distance; }
 
   /**
    * Allow user to control whether the metric is generated from the initial mesh.
@@ -151,17 +151,17 @@ private:
   /**
    * Max distance of the last set of movement.
    */
-  double _distance;
+  Real _distance;
 
   /**
    * Dampening factor
    */
-  const double _percent_to_move;
+  const Real _percent_to_move;
 
   /**
    * Records a relative "distance moved"
    */
-  double _dist_norm;
+  Real _dist_norm;
 
   /**
    * Map for hanging_nodes
@@ -182,7 +182,7 @@ private:
   const unsigned _miniterBC;
   MetricType _metric;
   AdaptType _adaptive_func;
-  const double _theta;
+  const Real _theta;
   bool _generate_data;
 
   /**
@@ -258,9 +258,9 @@ private:
   };
 
 
-  int writegr(const Array2D<double> & R);
+  int writegr(const Array2D<Real> & R);
 
-  int readgr(Array2D<double> & R,
+  int readgr(Array2D<Real> & R,
              std::vector<int> & mask,
              Array2D<int> & cells,
              std::vector<int> & mcells,
@@ -268,136 +268,136 @@ private:
              std::vector<int> & hnodes);
 
   int readmetr(std::string name,
-               Array3D<double> & H);
+               Array3D<Real> & H);
 
-  int read_adp(std::vector<double> & afun);
+  int read_adp(std::vector<Real> & afun);
 
-  double jac3(double x1, double y1, double z1,
-              double x2, double y2, double z2,
-              double x3, double y3, double z3);
+  Real jac3(Real x1, Real y1, Real z1,
+            Real x2, Real y2, Real z2,
+            Real x3, Real y3, Real z3);
 
-  double jac2(double x1, double y1,
-              double x2, double y2);
+  Real jac2(Real x1, Real y1,
+            Real x2, Real y2);
 
-  int basisA(Array2D<double> & Q,
+  int basisA(Array2D<Real> & Q,
              int nvert,
-             const std::vector<double> & K,
-             const Array2D<double> & H,
+             const std::vector<Real> & K,
+             const Array2D<Real> & H,
              int me);
 
-  void adp_renew(const Array2D<double> & R,
+  void adp_renew(const Array2D<Real> & R,
                  const Array2D<int> & cells,
-                 std::vector<double> & afun,
+                 std::vector<Real> & afun,
                  int adp);
 
-  void full_smooth(Array2D<double> & R,
+  void full_smooth(Array2D<Real> & R,
                    const std::vector<int> & mask,
                    const Array2D<int> & cells,
                    const std::vector<int> & mcells,
                    const std::vector<int> & edges,
                    const std::vector<int> & hnodes,
-                   double w,
+                   Real w,
                    const std::vector<int> & iter,
                    int me,
-                   const Array3D<double> & H,
+                   const Array3D<Real> & H,
                    int adp,
                    int gr);
 
-  double maxE(Array2D<double> & R,
-              const Array2D<int> & cells,
-              const std::vector<int> & mcells,
-              int me,
-              const Array3D<double> & H,
-              double v,
-              double epsilon,
-              double w,
-              std::vector<double> & Gamma,
-              double & qmin);
+  Real maxE(Array2D<Real> & R,
+            const Array2D<int> & cells,
+            const std::vector<int> & mcells,
+            int me,
+            const Array3D<Real> & H,
+            Real v,
+            Real epsilon,
+            Real w,
+            std::vector<Real> & Gamma,
+            Real & qmin);
 
-  double minq(const Array2D<double> & R,
-              const Array2D<int> & cells,
-              const std::vector<int> & mcells,
-              int me,
-              const Array3D<double> & H,
-              double & vol,
-              double & Vmin);
+  Real minq(const Array2D<Real> & R,
+            const Array2D<int> & cells,
+            const std::vector<int> & mcells,
+            int me,
+            const Array3D<Real> & H,
+            Real & vol,
+            Real & Vmin);
 
-  double minJ(Array2D<double> & R,
+  Real minJ(Array2D<Real> & R,
+            const std::vector<int> & mask,
+            const Array2D<int> & cells,
+            const std::vector<int> & mcells,
+            Real epsilon,
+            Real w,
+            int me,
+            const Array3D<Real> & H,
+            Real vol,
+            const std::vector<int> & edges,
+            const std::vector<int> & hnodes,
+            int msglev,
+            Real & Vmin,
+            Real & emax,
+            Real & qmin,
+            int adp,
+            const std::vector<Real> & afun);
+
+  Real minJ_BC(Array2D<Real> & R,
+               const std::vector<int> & mask,
+               const Array2D<int> & cells,
+               const std::vector<int> & mcells,
+               Real epsilon,
+               Real w,
+               int me,
+               const Array3D<Real> & H,
+               Real vol,
+               int msglev,
+               Real & Vmin,
+               Real & emax,
+               Real & qmin,
+               int adp,
+               const std::vector<Real> & afun,
+               int NCN);
+
+  Real localP(Array3D<Real> & W,
+              Array2D<Real> & F,
+              Array2D<Real> & R,
+              const std::vector<int> & cell_in,
               const std::vector<int> & mask,
-              const Array2D<int> & cells,
-              const std::vector<int> & mcells,
-              double epsilon,
-              double w,
+              Real epsilon,
+              Real w,
+              int nvert,
+              const Array2D<Real> & H,
               int me,
-              const Array3D<double> & H,
-              double vol,
-              const std::vector<int> & edges,
-              const std::vector<int> & hnodes,
-              int msglev,
-              double & Vmin,
-              double & emax,
-              double & qmin,
+              Real vol,
+              int f,
+              Real & Vmin,
+              Real & qmin,
               int adp,
-              const std::vector<double> & afun);
+              const std::vector<Real> & afun,
+              std::vector<Real> & Gloc);
 
-  double minJ_BC(Array2D<double> & R,
-                 const std::vector<int> & mask,
-                 const Array2D<int> & cells,
-                 const std::vector<int> & mcells,
-                 double epsilon,
-                 double w,
-                 int me,
-                 const Array3D<double> & H,
-                 double vol,
-                 int msglev,
-                 double & Vmin,
-                 double & emax,
-                 double & qmin,
-                 int adp,
-                 const std::vector<double> & afun,
-                 int NCN);
+  Real avertex(const std::vector<Real> & afun,
+               std::vector<Real> & G,
+               const Array2D<Real> & R,
+               const std::vector<int> & cell_in,
+               int nvert,
+               int adp);
 
-  double localP(Array3D<double> & W,
-                Array2D<double> & F,
-                Array2D<double> & R,
-                const std::vector<int> & cell_in,
-                const std::vector<int> & mask,
-                double epsilon,
-                double w,
-                int nvert,
-                const Array2D<double> & H,
-                int me,
-                double vol,
-                int f,
-                double & Vmin,
-                double & qmin,
-                int adp,
-                const std::vector<double> & afun,
-                std::vector<double> & Gloc);
-
-  double avertex(const std::vector<double> & afun,
-                 std::vector<double> & G,
-                 const Array2D<double> & R,
-                 const std::vector<int> & cell_in,
-                 int nvert,
-                 int adp);
-
-  double vertex(Array3D<double> & W,
-                Array2D<double> & F,
-                const Array2D<double> & R,
-                const std::vector<int> & cell_in,
-                double epsilon,
-                double w,
-                int nvert,
-                const std::vector<double> & K,
-                const Array2D<double> & H,
-                int me,
-                double vol,
-                int f,
-                double & Vmin,
-                int adp,
-                const std::vector<double> & g,
-                double sigma);
+  Real vertex(Array3D<Real> & W,
+              Array2D<Real> & F,
+              const Array2D<Real> & R,
+              const std::vector<int> & cell_in,
+              Real epsilon,
+              Real w,
+              int nvert,
+              const std::vector<Real> & K,
+              const Array2D<Real> & H,
+              int me,
+              Real vol,
+              int f,
+              Real & Vmin,
+              int adp,
+              const std::vector<Real> & g,
+              Real sigma);
 
   void metr_data_gen(std::string grid,
                      std::string metr,
@@ -406,32 +406,32 @@ private:
   int solver(int n,
              const std::vector<int> & ia,
              const std::vector<int> & ja,
-             const std::vector<double> & a,
-             std::vector<double> & x,
-             const std::vector<double> & b,
-             double eps,
+             const std::vector<Real> & a,
+             std::vector<Real> & x,
+             const std::vector<Real> & b,
+             Real eps,
              int maxite,
              int msglev);
 
   int pcg_ic0(int n,
               const std::vector<int> & ia,
               const std::vector<int> & ja,
-              const std::vector<double> & a,
-              const std::vector<double> & u,
-              std::vector<double> & x,
-              const std::vector<double> & b,
-              std::vector<double> & r,
-              std::vector<double> & p,
-              std::vector<double> & z,
-              double eps,
+              const std::vector<Real> & a,
+              const std::vector<Real> & u,
+              std::vector<Real> & x,
+              const std::vector<Real> & b,
+              std::vector<Real> & r,
+              std::vector<Real> & p,
+              std::vector<Real> & z,
+              Real eps,
               int maxite,
               int msglev);
 
   int pcg_par_check(int n,
                     const std::vector<int> & ia,
                     const std::vector<int> & ja,
-                    const std::vector<double> & a,
-                    double eps,
+                    const std::vector<Real> & a,
+                    Real eps,
                     int maxite,
                     int msglev);
 

@@ -33,7 +33,13 @@
 #include "libmesh/petsc_solver_exception.h"
 
 // PETSc include files.
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petscvec.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 
 // C++ includes
 #include <cstddef>

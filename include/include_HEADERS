@@ -23,6 +23,7 @@ include_HEADERS =  \
         base/dof_map.h \
         base/dof_object.h \
         base/factory.h \
+        base/float128_shims.h \
         base/getpot.h \
         base/ghost_point_neighbors.h \
         base/ghosting_functor.h \

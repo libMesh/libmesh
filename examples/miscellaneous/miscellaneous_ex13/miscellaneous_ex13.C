@@ -64,6 +64,13 @@
 #include "libmesh/ignore_warnings.h"
 # include <Eigen/Dense>
 #include "libmesh/restore_warnings.h"
+
+// Use Eigen dense numerics with libMesh::Real
+typedef Eigen::Matrix<libMesh::Real, 2, 2> MyMatrix2d;
+typedef Eigen::Matrix<libMesh::Real, 3, 3> MyMatrix3d;
+typedef Eigen::Matrix<libMesh::Real, 2, 1> MyVector2d;
+typedef Eigen::Matrix<libMesh::Real, 3, 1> MyVector3d;
+typedef Eigen::Matrix<libMesh::Real, Eigen::Dynamic, Eigen::Dynamic> MyMatrixXd;
 #endif
 
 // Bring in everything from the libMesh namespace
@@ -103,6 +110,12 @@ int main (int argc, char ** argv)
   // it requires XDR support in libmesh.
 #ifndef LIBMESH_HAVE_XDR
   libmesh_example_requires (false, "XDR support");
+#endif
+
+  // This examples requires parallel minloc() support, which we don't
+  // implement yet for float128
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  libmesh_example_requires (false, "--disable-quadruple-precision");
 #endif
 
   // Read the "distributed_load" flag from the command line
@@ -351,7 +364,7 @@ void assemble_shell (EquationSystems & es,
   const bool distributed_load  = es.parameters.get<bool> ("distributed load");
 
   // The membrane elastic matrix.
-  Eigen::Matrix3d Hm;
+  MyMatrix3d Hm;
   Hm <<
     1., nu, 0.,
     nu, 1., 0.,
@@ -359,7 +372,7 @@ void assemble_shell (EquationSystems & es,
   Hm *= h * E/(1-nu*nu);
 
   // The bending elastic matrix.
-  Eigen::Matrix3d Hf;
+  MyMatrix3d Hf;
   Hf <<
     1., nu, 0.,
     nu, 1., 0.,
@@ -367,10 +380,10 @@ void assemble_shell (EquationSystems & es,
   Hf *= h*h*h/12 * E/(1-nu*nu);
 
   // The shear elastic matrices.
-  Eigen::Matrix2d Hc0 = Eigen::Matrix2d::Identity();
+  MyMatrix2d Hc0 = MyMatrix2d::Identity();
   Hc0 *= h * 5./6*E/(2*(1+nu));
 
-  Eigen::Matrix2d Hc1 = Eigen::Matrix2d::Identity();
+  MyMatrix2d Hc1 = MyMatrix2d::Identity();
   Hc1 *= h*h*h/12 * 5./6*E/(2*(1+nu));
 
   // Get the Finite Element type, this will be
@@ -443,14 +456,14 @@ void assemble_shell (EquationSystems & es,
       fe->reinit (elem, &nodes);
 
       //Store local orthonormal basis at the nodes
-      std::vector<Eigen::Matrix3d> Qnode;
+      std::vector<MyMatrix3d> Qnode;
       for (unsigned int i=0; i<elem->n_nodes(); ++i)
         {
-          Eigen::Vector3d a1;
+          MyVector3d a1;
           a1 << dxyzdxi[i](0), dxyzdxi[i](1), dxyzdxi[i](2);
-          Eigen::Vector3d a2;
+          MyVector3d a2;
           a2 << dxyzdeta[i](0), dxyzdeta[i](1), dxyzdeta[i](2);
-          Eigen::Vector3d n;
+          MyVector3d n;
           n = a1.cross(a2);
           n /= n.norm();
 
@@ -459,7 +472,7 @@ void assemble_shell (EquationSystems & es,
           Real C  = n(2);
           if (std::abs(1.+C)<1e-6)
             {
-              Eigen::Matrix3d Q;
+              MyMatrix3d Q;
               Q <<
                 1, 0, 0,
                 0, -1, 0,
@@ -468,7 +481,7 @@ void assemble_shell (EquationSystems & es,
             }
           else
             {
-              Eigen::Matrix3d Q;
+              MyMatrix3d Q;
               Q <<
                 C+1./(1+C)*ny*ny, -1./(1+C)*nx*ny, nx,
                 -1./(1+C)*nx*ny, C+1./(1+C)*nx*nx, ny,
@@ -493,28 +506,28 @@ void assemble_shell (EquationSystems & es,
         {
 
           //Covariant basis at the quadrature point
-          Eigen::Vector3d a1;
+          MyVector3d a1;
           a1 << dxyzdxi[qp](0), dxyzdxi[qp](1), dxyzdxi[qp](2);
-          Eigen::Vector3d a2;
+          MyVector3d a2;
           a2 << dxyzdeta[qp](0), dxyzdeta[qp](1), dxyzdeta[qp](2);
-          Eigen::Vector3d n;
+          MyVector3d n;
           n = a1.cross(a2);
           n /= n.norm();
-          Eigen::Matrix3d F0;
+          MyMatrix3d F0;
           F0 <<
             a1(0), a2(0), n(0),
             a1(1), a2(1), n(1),
             a1(2), a2(2), n(2);
 
           //Contravariant basis
-          Eigen::Matrix3d F0it;
+          MyMatrix3d F0it;
           F0it = F0.inverse().transpose();
 
           //Local orthonormal basis at the quadrature point
           Real nx = n(0);
           Real ny = n(1);
           Real C  = n(2);
-          Eigen::Matrix3d Q;
+          MyMatrix3d Q;
           if (std::abs(1.+C) < 1e-6)
             {
               Q <<
@@ -530,28 +543,28 @@ void assemble_shell (EquationSystems & es,
                 -nx,             -ny,              C;
             }
 
-          Eigen::Matrix2d C0;
+          MyMatrix2d C0;
           C0 = F0it.block<3,2>(0,0).transpose()*Q.block<3,2>(0,0);
 
           // Normal derivatives in reference coordinates
-          Eigen::Vector3d d2Xdxi2(d2xyzdxi2[qp](0), d2xyzdxi2[qp](1), d2xyzdxi2[qp](2));
-          Eigen::Vector3d d2Xdeta2(d2xyzdeta2[qp](0), d2xyzdeta2[qp](1), d2xyzdeta2[qp](2));
-          Eigen::Vector3d d2Xdxideta(d2xyzdxideta[qp](0), d2xyzdxideta[qp](1), d2xyzdxideta[qp](2));
+          MyVector3d d2Xdxi2(d2xyzdxi2[qp](0), d2xyzdxi2[qp](1), d2xyzdxi2[qp](2));
+          MyVector3d d2Xdeta2(d2xyzdeta2[qp](0), d2xyzdeta2[qp](1), d2xyzdeta2[qp](2));
+          MyVector3d d2Xdxideta(d2xyzdxideta[qp](0), d2xyzdxideta[qp](1), d2xyzdxideta[qp](2));
 
-          Eigen::Matrix2d b;
+          MyMatrix2d b;
           b <<
             n.dot(d2Xdxi2), n.dot(d2Xdxideta),
             n.dot(d2Xdxideta), n.dot(d2Xdeta2);
 
-          Eigen::Vector3d dndxi = -b(0,0)*F0it.col(0) - b(0,1)*F0it.col(1);
-          Eigen::Vector3d dndeta = -b(1,0)*F0it.col(0) - b(1,1)*F0it.col(1);
+          MyVector3d dndxi = -b(0,0)*F0it.col(0) - b(0,1)*F0it.col(1);
+          MyVector3d dndeta = -b(1,0)*F0it.col(0) - b(1,1)*F0it.col(1);
 
-          Eigen::Matrix2d bhat;
+          MyMatrix2d bhat;
           bhat <<
             F0it.col(1).dot(dndeta), -F0it.col(0).dot(dndeta),
             -F0it.col(1).dot(dndxi), F0it.col(0).dot(dndxi);
 
-          Eigen::Matrix2d bc;
+          MyMatrix2d bc;
           bc = bhat*C0;
 
           // Mean curvature
@@ -564,8 +577,8 @@ void assemble_shell (EquationSystems & es,
               Real C1i = dphidxi[i][qp]*C0(0,0) + dphideta[i][qp]*C0(1,0);
               Real C2i = dphidxi[i][qp]*C0(0,1) + dphideta[i][qp]*C0(1,1);
 
-              Eigen::MatrixXd B0I(3, 5);
-              B0I = Eigen::MatrixXd::Zero(3, 5);
+              MyMatrixXd B0I(3, 5);
+              B0I = MyMatrixXd::Zero(3, 5);
               B0I.block<1,3>(0,0) = C1i*Q.col(0).transpose();
               B0I.block<1,3>(1,0) = C2i*Q.col(1).transpose();
               B0I.block<1,3>(2,0) = C2i*Q.col(0).transpose()+C1i*Q.col(1).transpose();
@@ -574,14 +587,14 @@ void assemble_shell (EquationSystems & es,
               Real bc1i = dphidxi[i][qp]*bc(0,0) + dphideta[i][qp]*bc(1,0);
               Real bc2i = dphidxi[i][qp]*bc(0,1) + dphideta[i][qp]*bc(1,1);
 
-              Eigen::Vector2d V1i(-Q.col(0).dot(Qnode[i].col(1)),
+              MyVector2d V1i(-Q.col(0).dot(Qnode[i].col(1)),
                                   Q.col(0).dot(Qnode[i].col(0)));
 
-              Eigen::Vector2d V2i(-Q.col(1).dot(Qnode[i].col(1)),
+              MyVector2d V2i(-Q.col(1).dot(Qnode[i].col(1)),
                                   Q.col(1).dot(Qnode[i].col(0)));
 
-              Eigen::MatrixXd B1I(3,5);
-              B1I = Eigen::MatrixXd::Zero(3,5);
+              MyMatrixXd B1I(3,5);
+              B1I = MyMatrixXd::Zero(3,5);
               B1I.block<1,3>(0,0) = bc1i*Q.col(0).transpose();
               B1I.block<1,3>(1,0) = bc2i*Q.col(1).transpose();
               B1I.block<1,3>(2,0) = bc2i*Q.col(0).transpose()+bc1i*Q.col(1).transpose();
@@ -591,30 +604,30 @@ void assemble_shell (EquationSystems & es,
               B1I.block<1,2>(2,3) = C2i*V1i.transpose()+C1i*V2i.transpose();
 
               // Matrix B2, second order membrane-bending strain
-              Eigen::MatrixXd B2I(3,5);
-              B2I = Eigen::MatrixXd::Zero(3,5);
+              MyMatrixXd B2I(3,5);
+              B2I = MyMatrixXd::Zero(3,5);
 
               B2I.block<1,2>(0,3) = bc1i*V1i.transpose();
               B2I.block<1,2>(1,3) = bc2i*V2i.transpose();
               B2I.block<1,2>(2,3) = bc2i*V1i.transpose()+bc1i*V2i.transpose();
 
               // Matrix Bc0, zeroth order shear strain
-              Eigen::MatrixXd Bc0I(2,5);
-              Bc0I = Eigen::MatrixXd::Zero(2,5);
+              MyMatrixXd Bc0I(2,5);
+              Bc0I = MyMatrixXd::Zero(2,5);
               Bc0I.block<1,3>(0,0) = C1i*Q.col(2).transpose();
               Bc0I.block<1,3>(1,0) = C2i*Q.col(2).transpose();
               Bc0I.block<1,2>(0,3) = phi[i][qp]*V1i.transpose();
               Bc0I.block<1,2>(1,3) = phi[i][qp]*V2i.transpose();
 
               // Matrix Bc1, first order shear strain
-              Eigen::MatrixXd Bc1I(2,5);
-              Bc1I = Eigen::MatrixXd::Zero(2,5);
+              MyMatrixXd Bc1I(2,5);
+              Bc1I = MyMatrixXd::Zero(2,5);
               Bc1I.block<1,3>(0,0) = bc1i*Q.col(2).transpose();
               Bc1I.block<1,3>(1,0) = bc2i*Q.col(2).transpose();
 
               // Drilling dof (in-plane rotation)
-              Eigen::Vector2d BdxiI(dphidxi[i][qp],dphideta[i][qp]);
-              Eigen::Vector2d BdI = C0.transpose()*BdxiI;
+              MyVector2d BdxiI(dphidxi[i][qp],dphideta[i][qp]);
+              MyVector2d BdI = C0.transpose()*BdxiI;
 
               for (unsigned int j=0; j<n_var_dofs; ++j)
                 {
@@ -623,8 +636,8 @@ void assemble_shell (EquationSystems & es,
                   Real C1j = dphidxi[j][qp]*C0(0,0) + dphideta[j][qp]*C0(1,0);
                   Real C2j = dphidxi[j][qp]*C0(0,1) + dphideta[j][qp]*C0(1,1);
 
-                  Eigen::MatrixXd B0J(3,5);
-                  B0J = Eigen::MatrixXd::Zero(3,5);
+                  MyMatrixXd B0J(3,5);
+                  B0J = MyMatrixXd::Zero(3,5);
                   B0J.block<1,3>(0,0) = C1j*Q.col(0).transpose();
                   B0J.block<1,3>(1,0) = C2j*Q.col(1).transpose();
                   B0J.block<1,3>(2,0) = C2j*Q.col(0).transpose()+C1j*Q.col(1).transpose();
@@ -633,14 +646,14 @@ void assemble_shell (EquationSystems & es,
                   Real bc1j = dphidxi[j][qp]*bc(0,0) + dphideta[j][qp]*bc(1,0);
                   Real bc2j = dphidxi[j][qp]*bc(0,1) + dphideta[j][qp]*bc(1,1);
 
-                  Eigen::Vector2d V1j(-Q.col(0).dot(Qnode[j].col(1)),
+                  MyVector2d V1j(-Q.col(0).dot(Qnode[j].col(1)),
                                       Q.col(0).dot(Qnode[j].col(0)));
 
-                  Eigen::Vector2d V2j(-Q.col(1).dot(Qnode[j].col(1)),
+                  MyVector2d V2j(-Q.col(1).dot(Qnode[j].col(1)),
                                       Q.col(1).dot(Qnode[j].col(0)));
 
-                  Eigen::MatrixXd B1J(3,5);
-                  B1J = Eigen::MatrixXd::Zero(3,5);
+                  MyMatrixXd B1J(3,5);
+                  B1J = MyMatrixXd::Zero(3,5);
                   B1J.block<1,3>(0,0) = bc1j*Q.col(0).transpose();
                   B1J.block<1,3>(1,0) = bc2j*Q.col(1).transpose();
                   B1J.block<1,3>(2,0) = bc2j*Q.col(0).transpose()+bc1j*Q.col(1).transpose();
@@ -650,34 +663,34 @@ void assemble_shell (EquationSystems & es,
                   B1J.block<1,2>(2,3) = C2j*V1j.transpose()+C1j*V2j.transpose();
 
                   // Matrix B2, second order membrane-bending strain
-                  Eigen::MatrixXd B2J(3,5);
-                  B2J = Eigen::MatrixXd::Zero(3,5);
+                  MyMatrixXd B2J(3,5);
+                  B2J = MyMatrixXd::Zero(3,5);
 
                   B2J.block<1,2>(0,3) = bc1j*V1j.transpose();
                   B2J.block<1,2>(1,3) = bc2j*V2j.transpose();
                   B2J.block<1,2>(2,3) = bc2j*V1j.transpose()+bc1j*V2j.transpose();
 
                   // Matrix Bc0, zeroth order shear strain
-                  Eigen::MatrixXd Bc0J(2, 5);
-                  Bc0J = Eigen::MatrixXd::Zero(2,5);
+                  MyMatrixXd Bc0J(2, 5);
+                  Bc0J = MyMatrixXd::Zero(2,5);
                   Bc0J.block<1,3>(0,0) = C1j*Q.col(2).transpose();
                   Bc0J.block<1,3>(1,0) = C2j*Q.col(2).transpose();
                   Bc0J.block<1,2>(0,3) = phi[j][qp]*V1j.transpose();
                   Bc0J.block<1,2>(1,3) = phi[j][qp]*V2j.transpose();
 
                   // Matrix Bc1, first order shear strain
-                  Eigen::MatrixXd Bc1J(2, 5);
-                  Bc1J = Eigen::MatrixXd::Zero(2,5);
+                  MyMatrixXd Bc1J(2, 5);
+                  Bc1J = MyMatrixXd::Zero(2,5);
                   Bc1J.block<1,3>(0,0) = bc1j*Q.col(2).transpose();
                   Bc1J.block<1,3>(1,0) = bc2j*Q.col(2).transpose();
 
                   // Drilling dof
-                  Eigen::Vector2d BdxiJ(dphidxi[j][qp], dphideta[j][qp]);
-                  Eigen::Vector2d BdJ = C0.transpose()*BdxiJ;
+                  MyVector2d BdxiJ(dphidxi[j][qp], dphideta[j][qp]);
+                  MyVector2d BdJ = C0.transpose()*BdxiJ;
 
                   // The total stiffness matrix coupling the nodes
                   // I and J is a sum of membrane, bending and shear contributions.
-                  Eigen::MatrixXd local_KIJ(5, 5);
+                  MyMatrixXd local_KIJ(5, 5);
                   local_KIJ = JxW[qp] * (
                                          B0I.transpose() * Hm * B0J
                                          +  B2I.transpose() * Hf * B0J
@@ -692,20 +705,23 @@ void assemble_shell (EquationSystems & es,
                                          );
 
                   // Going from 5 to 6 dofs to add drilling dof
-                  Eigen::MatrixXd full_local_KIJ(6, 6);
-                  full_local_KIJ = Eigen::MatrixXd::Zero(6, 6);
+                  MyMatrixXd full_local_KIJ(6, 6);
+                  full_local_KIJ = MyMatrixXd::Zero(6, 6);
                   full_local_KIJ.block<5,5>(0,0)=local_KIJ;
 
                   // Drilling dof stiffness contribution
-                  full_local_KIJ(5,5) = Hf(0,0)*JxW[qp]*BdI.transpose()*BdJ;
+                  //
+                  // The explicit conversion to Real here is to work
+                  // around an Eigen+boost::float128 incompatibility.
+                  full_local_KIJ(5,5) = Real(Hf(0,0)*JxW[qp]*BdI.transpose()*BdJ);
 
                   // Transform the stiffness matrix to global coordinates
-                  Eigen::MatrixXd global_KIJ(6,6);
-                  Eigen::MatrixXd TI(6,6);
-                  TI = Eigen::MatrixXd::Identity(6,6);
+                  MyMatrixXd global_KIJ(6,6);
+                  MyMatrixXd TI(6,6);
+                  TI = MyMatrixXd::Identity(6,6);
                   TI.block<3,3>(3,3) = Qnode[i].transpose();
-                  Eigen::MatrixXd TJ(6,6);
-                  TJ = Eigen::MatrixXd::Identity(6,6);
+                  MyMatrixXd TJ(6,6);
+                  TJ = MyMatrixXd::Identity(6,6);
                   TJ.block<3,3>(3,3) = Qnode[j].transpose();
                   global_KIJ = TI.transpose()*full_local_KIJ*TJ;
 

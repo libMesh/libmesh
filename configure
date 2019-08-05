@@ -870,6 +870,7 @@ NODEPRECATEDFLAG
 CFLAGS_DVL
 CXXFLAGS_DVL
 GXX_VERSION
+libmesh_precision_LIBS
 PKG_CONFIG
 libmesh_LDFLAGS
 CXXCPP
@@ -29366,6 +29367,8 @@ else
 fi
 
 
+libmesh_precision_LIBS=""
+
 if test "x$enablesingleprecision" != "xno"; then :
 
         if test "x$enabletripleprecision" != "xno"; then :
@@ -29408,10 +29411,76 @@ elif test "x$enablequadrupleprecision" != "xno"; then :
 $as_echo "#define DEFAULT_QUADRUPLE_PRECISION 1" >>confdefs.h
 
 
-$as_echo "#define DEFAULT_SCALAR_TYPE __float128" >>confdefs.h
+$as_echo "#define DEFAULT_SCALAR_TYPE boost::multiprecision::float128" >>confdefs.h
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is quadruple precision (__float128) >>>" >&5
-$as_echo "<<< Default floating point is quadruple precision (__float128) >>>" >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is quadruple precision (boost::multiprecision::float128) >>>" >&5
+$as_echo "<<< Default floating point is quadruple precision (boost::multiprecision::float128) >>>" >&6; }
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can build a trivial quad precision program" >&5
+$as_echo_n "checking whether we can build a trivial quad precision program... " >&6; }
+
+        saveLIBS="$LIBS"
+        if test "x$REAL_GXX" != "x"; then :
+  libmesh_precision_LIBS="-lquadmath"
+               LIBS="$saveLIBS -lquadmath"
+               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                 #include <quadmath.h>
+                 int main(int argc, char **argv)
+                 {
+                   __float128 f = 1;
+                   return isinfq(f);
+                 }
+
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                 as_fn_error $? "*** Quad precision specified, gcc detected, but quadmath not found." "$LINENO" 5
+                 enablequadrupleprecision=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+elif test "x$is_intel_icc" != "x"; then :
+  libmesh_precision_LIBS=""
+               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                 #include <mathimf.h>
+                 int main(int argc, char **argv)
+                 {
+                   _Quad f = 0;
+                   return int(__cosq(f));
+                 }
+
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                 as_fn_error $? "*** Quad precision specified, Intel detected, but mathimf not found." "$LINENO" 5
+                 enablequadrupleprecision=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+        LIBS="$saveLIBS"
 
 else
 
@@ -29425,6 +29494,8 @@ $as_echo "#define DEFAULT_SCALAR_TYPE double" >>confdefs.h
 $as_echo "<<< Default floating point is double precision (double) >>>" >&6; }
 
 fi
+
+
 
 
 # --------------------------------------------------------------
@@ -37724,6 +37795,15 @@ else
 fi
 
 
+  if test "x$enablelaspack" = "xyes" &&
+         (test "x$enabletripleprecision" != "xno" ||
+          test "x$enablequadrupleprecision" != "xno"); then :
+  enablelaspack=no
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling LASPACK support due to extended precision >>>" >&5
+$as_echo "<<< Disabling LASPACK support due to extended precision >>>" >&6; }
+
+fi
+
       if test "x$enablelaspack" = "xyes"; then :
 
           LASPACK_INCLUDE="-I\$(top_srcdir)/contrib/laspack"
@@ -38878,6 +38958,15 @@ else
   enabletriangle=$enableoptional
 fi
 
+
+  if test "x$enabletriangle" = "xyes" &&
+         (test "x$enabletripleprecision" != "xno" ||
+          test "x$enablequadrupleprecision" != "xno"); then :
+  enabletriangle=no
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling Triangle support due to extended precision >>>" >&5
+$as_echo "<<< Disabling Triangle support due to extended precision >>>" >&6; }
+
+fi
 
       if test "x$enabletriangle" = "xyes"; then :
 
@@ -46327,6 +46416,12 @@ fi
         if test "x$libmesh_optional_LIBS" != "x"; then :
 
                 $as_echo "  libmesh_optional_LIBS............ : $libmesh_optional_LIBS"
+                $as_echo
+
+fi
+        if test "x$libmesh_precision_LIBS" != "x"; then :
+
+                $as_echo "  libmesh_precision_LIBS........... : $libmesh_precision_LIBS"
                 $as_echo
 
 fi

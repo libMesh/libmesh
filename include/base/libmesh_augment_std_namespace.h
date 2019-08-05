@@ -20,39 +20,31 @@
 #ifndef LIBMESH_LIBMESH_AUGMENT_STD_NAMESPACE_H
 #define LIBMESH_LIBMESH_AUGMENT_STD_NAMESPACE_H
 
+#include "libmesh_common.h"
+
 
 // For some reason the real std::max, std::min
 // don't handle mixed compatible types
+#define LIBMESH_DEFINE_MAX_MIN(type1, type2) \
+inline auto max(type1 a, type2 b) -> decltype(a>b?a:b) \
+{ return (a>b?a:b); } \
+inline auto min(type1 a, type2 b) -> decltype(a<b?a:b) \
+{ return (a<b?a:b); }
+
+#define LIBMESH_DEFINE_BOTH_MAX_MIN(type1, type2) \
+LIBMESH_DEFINE_MAX_MIN(type1, type2) \
+LIBMESH_DEFINE_MAX_MIN(type2, type1)
+
 namespace std {
-inline long double max(long double a, double b)
-{ return (a>b?a:b); }
-inline long double min(long double a, double b)
-{ return (a<b?a:b); }
+LIBMESH_DEFINE_BOTH_MAX_MIN(long double, double)
+LIBMESH_DEFINE_BOTH_MAX_MIN(long double, float)
+LIBMESH_DEFINE_BOTH_MAX_MIN(double, float)
 
-inline long double max(double a, long double b)
-{ return (a>b?a:b); }
-inline long double min(double a, long double b)
-{ return (a<b?a:b); }
-
-inline double max(double a, float b)
-{ return (a>b?a:b); }
-inline double min(double a, float b)
-{ return (a<b?a:b); }
-
-inline double max(float a, double b)
-{ return (a>b?a:b); }
-inline double min(float a, double b)
-{ return (a<b?a:b); }
-
-inline long double max(long double a, float b)
-{ return (a>b?a:b); }
-inline long double min(long double a, float b)
-{ return (a<b?a:b); }
-
-inline long double max(float a, long double b)
-{ return (a>b?a:b); }
-inline long double min(float a, long double b)
-{ return (a<b?a:b); }
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+LIBMESH_DEFINE_BOTH_MAX_MIN(libMesh::Real, long double)
+LIBMESH_DEFINE_BOTH_MAX_MIN(libMesh::Real, double)
+LIBMESH_DEFINE_BOTH_MAX_MIN(libMesh::Real, float)
+#endif
 
 // fix for std::abs() overload ambiguity
 #if defined (__SUNPRO_CC) || defined(__PGI)

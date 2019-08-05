@@ -84,6 +84,16 @@ public:
                  const dof_id_type id = invalid_id);
 
   /**
+   * Disambiguate constructing from non-Real scalars
+   */
+  template <typename T,
+            typename = typename
+              boostcopy::enable_if_c<ScalarTraits<T>::value,void>::type>
+  Node (const T x) :
+    Point (x,0,0)
+  { this->set_id() = invalid_id; }
+
+  /**
    * Destructor.
    */
   ~Node ();

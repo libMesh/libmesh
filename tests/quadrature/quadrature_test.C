@@ -191,8 +191,13 @@ public:
     // There are 3 different families of quadrature rules for tetrahedra
     QuadratureType qtype[3] = {QCONICAL, QGRUNDMANN_MOLLER, QGAUSS};
 
+    int end_order = 7;
+    // Our higher order tet rules were only computed to double precision
+    if (quadrature_tolerance < 1e-16)
+      end_order = 2;
+
     for (int qt=0; qt<3; ++qt)
-      for (int order=0; order<7; ++order)
+      for (int order=0; order<end_order; ++order)
         {
           std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
                                                       /*dim=*/3,

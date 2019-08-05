@@ -25,7 +25,13 @@
 // This only works with petsc-3.3 and above.
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
 #include <petscdm.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 #include "libmesh/nonlinear_implicit_system.h"
 
 /**

@@ -22,6 +22,8 @@ AC_ARG_ENABLE(quadrupleprecision,
               enablequadrupleprecision=$enableval,
               enablequadrupleprecision=no)
 
+libmesh_precision_LIBS=""
+
 AS_IF([test "x$enablesingleprecision" != "xno"],
       [
         AS_IF([test "x$enabletripleprecision" != "xno"], [AC_MSG_ERROR(<<< Cannot simultaneously default to single and triple precision >>>)],
@@ -44,13 +46,55 @@ AS_IF([test "x$enablesingleprecision" != "xno"],
       ],
       [test "x$enablequadrupleprecision" != "xno"],
       [
-        AC_DEFINE(DEFAULT_QUADRUPLE_PRECISION, 1, [Flag indicating if quadruple-precision (__float128) should be used for most floating-point calculations])
-        AC_DEFINE(DEFAULT_SCALAR_TYPE, [__float128], [Data type to be used for most floating-point calculations])
-        AC_MSG_RESULT(<<< Default floating point is quadruple precision (__float128) >>>)
+        AC_DEFINE(DEFAULT_QUADRUPLE_PRECISION, 1, [Flag indicating if quadruple-precision (boost::multiprecision::float128) should be used for most floating-point calculations])
+        AC_DEFINE(DEFAULT_SCALAR_TYPE, [boost::multiprecision::float128], [Data type to be used for most floating-point calculations])
+        AC_MSG_RESULT(<<< Default floating point is quadruple precision (boost::multiprecision::float128) >>>)
+
+        AC_MSG_CHECKING(whether we can build a trivial quad precision program)
+
+        saveLIBS="$LIBS"
+        AS_IF([test "x$REAL_GXX" != "x"],
+              [libmesh_precision_LIBS="-lquadmath"
+               LIBS="$saveLIBS -lquadmath"
+               AC_LINK_IFELSE([AC_LANG_SOURCE([[
+                 @%:@include <quadmath.h>
+                 int main(int argc, char **argv)
+                 {
+                   __float128 f = 1;
+                   return isinfq(f);
+                 }
+               ]])],[
+                 AC_MSG_RESULT(yes)
+               ],[
+                 AC_MSG_RESULT(no)
+                 AC_MSG_ERROR([*** Quad precision specified, gcc detected, but quadmath not found.])
+                 enablequadrupleprecision=no
+               ])
+              ],
+              [test "x$is_intel_icc" != "x"],
+              [libmesh_precision_LIBS=""
+               AC_LINK_IFELSE([AC_LANG_SOURCE([[
+                 @%:@include <mathimf.h>
+                 int main(int argc, char **argv)
+                 {
+                   _Quad f = 0;
+                   return int(__cosq(f));
+                 }
+               ]])],[
+                 AC_MSG_RESULT(yes)
+               ],[
+                 AC_MSG_RESULT(no)
+                 AC_MSG_ERROR([*** Quad precision specified, Intel detected, but mathimf not found.])
+                 enablequadrupleprecision=no
+               ])
+              ])
+        LIBS="$saveLIBS"
       ],
       [
         AC_DEFINE(DEFAULT_DOUBLE_PRECISION, 1, [Flag indicating if double-precision (double) should be used for most floating-point calculations])
         AC_DEFINE(DEFAULT_SCALAR_TYPE, double, [Data type to be used for most floating-point calculations])
         AC_MSG_RESULT(<<< Default floating point is double precision (double) >>>)
       ])
+
+  AC_SUBST(libmesh_precision_LIBS)
 ])

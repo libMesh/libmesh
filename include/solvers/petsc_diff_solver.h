@@ -30,7 +30,13 @@
 #include "libmesh/petsc_dm_wrapper.h"
 
 // PETSc includes
-# include <petscsnes.h>
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
+#include <petscsnes.h>
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
 
 namespace libMesh
 {

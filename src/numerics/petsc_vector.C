@@ -28,9 +28,11 @@
 
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/int_range.h"
+#include "libmesh/op_function.h"
 #include "libmesh/parallel.h"
 #include "libmesh/petsc_macro.h"
-#include "libmesh/int_range.h"
+#include "libmesh/standard_type.h"
 
 namespace libMesh
 {
@@ -143,7 +145,7 @@ void PetscVector<T>::set (const numeric_index_type i, const T value)
 
   PetscErrorCode ierr=0;
   PetscInt i_val = static_cast<PetscInt>(i);
-  PetscScalar petsc_value = static_cast<PetscScalar>(value);
+  PetscScalar petsc_value = PS(value);
 
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
@@ -185,7 +187,7 @@ void PetscVector<T>::add (const numeric_index_type i, const T value)
 
   PetscErrorCode ierr=0;
   PetscInt i_val = static_cast<PetscInt>(i);
-  PetscScalar petsc_value = static_cast<PetscScalar>(value);
+  PetscScalar petsc_value = PS(value);
 
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES);
   LIBMESH_CHKERR(ierr);
@@ -207,7 +209,7 @@ void PetscVector<T>::add_vector (const T * v,
 
   PetscErrorCode ierr=0;
   const PetscInt * i_val = reinterpret_cast<const PetscInt *>(dof_indices.data());
-  const PetscScalar * petsc_value = static_cast<const PetscScalar *>(v);
+  const PetscScalar * petsc_value = pPS(v);
 
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
                        i_val, petsc_value, ADD_VALUES);
@@ -324,7 +326,7 @@ void PetscVector<T>::add (const T v_in)
   this->_get_array(false);
 
   for (numeric_index_type i=0; i<_local_size; i++)
-    _values[i] += v_in;
+    _values[i] += PetscScalar(v_in);
 }
 
 
@@ -343,7 +345,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
   this->_restore_array();
 
   PetscErrorCode ierr = 0;
-  PetscScalar a = static_cast<PetscScalar>(a_in);
+  PetscScalar a = PS(a_in);
 
   // Make sure the NumericVector passed in is really a PetscVector
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
@@ -389,7 +391,7 @@ void PetscVector<T>::insert (const T * v,
   PetscErrorCode ierr=0;
   PetscInt * idx_values = numeric_petsc_cast(dof_indices.data());
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
-                       idx_values, v, INSERT_VALUES);
+                       idx_values, pPS(v), INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
 
   this->_is_closed = false;
@@ -403,7 +405,7 @@ void PetscVector<T>::scale (const T factor_in)
   this->_restore_array();
 
   PetscErrorCode ierr = 0;
-  PetscScalar factor = static_cast<PetscScalar>(factor_in);
+  PetscScalar factor = PS(factor_in);
 
   if (this->type() != GHOSTED)
     {
@@ -527,7 +529,7 @@ PetscVector<T>::operator = (const T s_in)
   libmesh_assert(this->closed());
 
   PetscErrorCode ierr = 0;
-  PetscScalar s = static_cast<PetscScalar>(s_in);
+  PetscScalar s = PS(s_in);
 
   if (this->size() != 0)
     {
@@ -648,7 +650,7 @@ PetscVector<T>::operator = (const std::vector<T> & v)
       numeric_index_type first = first_local_index();
       numeric_index_type last = last_local_index();
       for (numeric_index_type i=0; i<last-first; i++)
-        _values[i] =  static_cast<PetscScalar>(v[first + i]);
+        _values[i] = PS(v[first + i]);
     }
 
   /**
@@ -658,7 +660,7 @@ PetscVector<T>::operator = (const std::vector<T> & v)
   else
     {
       for (numeric_index_type i=0; i<_local_size; i++)
-        _values[i] = static_cast<PetscScalar>(v[i]);
+        _values[i] = PS(v[i]);
     }
 
   // Make sure ghost dofs are up to date
@@ -1053,8 +1055,10 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
           }
 
 
-          MPI_Reduce (local_values.data(), v_local.data(), n, MPI_REAL, MPI_SUM,
-                      pid, this->comm().get());
+          MPI_Reduce (local_values.data(), v_local.data(), n,
+                      Parallel::StandardType<Real>(),
+                      Parallel::OpFunction<Real>::sum(), pid,
+                      this->comm().get());
         }
     }
 }
@@ -1133,12 +1137,14 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
       // collect entries from other proc's in real_v_local, imag_v_local
       MPI_Reduce (real_local_values.data(),
                   real_v_local.data(), n,
-                  MPI_REAL, MPI_SUM,
+                  Parallel::StandardType<Real>(),
+                  Parallel::OpFunction<Real>::sum(),
                   pid, this->comm().get());
 
       MPI_Reduce (imag_local_values.data(),
                   imag_v_local.data(), n,
-                  MPI_REAL, MPI_SUM,
+                  Parallel::StandardType<Real>(),
+                  Parallel::OpFunction<Real>::sum(),
                   pid, this->comm().get());
 
       // copy real_v_local and imag_v_local to v_local

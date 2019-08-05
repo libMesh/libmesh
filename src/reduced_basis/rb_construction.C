@@ -140,8 +140,8 @@ void RBConstruction::solve_for_matrix_and_rhs(LinearSolver<Number> & input_solve
   input_solver.init();
 
   // Get the user-specifiied linear solver tolerance
-  const Real tol  =
-    es.parameters.get<Real>("linear solver tolerance");
+  const double tol  =
+    double(es.parameters.get<Real>("linear solver tolerance"));
 
   // Get the user-specified maximum # of linear solver iterations
   const unsigned int maxits =

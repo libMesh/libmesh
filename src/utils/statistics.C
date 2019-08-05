@@ -372,6 +372,9 @@ template class StatisticsVector<double>;
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
 template class StatisticsVector<long double>;
 #endif
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+template class StatisticsVector<Real>;
+#endif
 template class StatisticsVector<int>;
 template class StatisticsVector<unsigned int>;
 

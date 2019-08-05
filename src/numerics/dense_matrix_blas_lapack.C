@@ -167,7 +167,10 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T> & other,
   std::vector<T> result (result_size);
 
   // Finally ready to call the BLAS
-  BLASgemm_(transa, transb, &M, &N, &K, &alpha, A->get_values().data(), &LDA, B->get_values().data(), &LDB, &beta, result.data(), &LDC);
+  BLASgemm_(transa, transb, &M, &N, &K, pPS(&alpha),
+            pPS(A->get_values().data()), &LDA,
+            pPS(B->get_values().data()), &LDB, pPS(&beta),
+            pPS(result.data()), &LDC);
 
   // Update the relevant dimension for this matrix.
   switch (flag)
@@ -248,7 +251,8 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   PetscBLASInt INFO = 0;
 
   // Ready to call the actual factorization routine through PETSc's interface
-  LAPACKgetrf_(&M, &N, this->_val.data(), &LDA, _pivots.data(), &INFO);
+  LAPACKgetrf_(&M, &N, pPS(this->_val.data()), &LDA, _pivots.data(),
+               &INFO);
 
   // Check return value for errors
   if (INFO != 0)
@@ -482,8 +486,10 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   // Ready to call the actual factorization routine through PETSc's interface.
 #ifdef LIBMESH_USE_REAL_NUMBERS
   // Note that the call to LAPACKgesvd_ may modify _val
-  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, _val.data(), &LDA, sigma_val.data(), U_val.data(),
-               &LDU, VT_val.data(), &LDVT, WORK.data(), &LWORK, &INFO);
+  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, pPS(_val.data()), &LDA,
+               pPS(sigma_val.data()), pPS(U_val.data()), &LDU,
+               pPS(VT_val.data()), &LDVT, pPS(WORK.data()), &LWORK,
+               &INFO);
 #else
   // When we have LIBMESH_USE_COMPLEX_NUMBERS then we must pass an array of Complex
   // numbers to LAPACKgesvd_, but _val may contain Reals so we copy to Number below to
@@ -602,7 +608,7 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // Used to determine the effective rank of A.  Singular values
   // S(i) <= RCOND*S(1) are treated as zero.  If RCOND < 0, machine
   // precision is used instead.
-  Real RCOND = rcond;
+  PetscScalar RCOND = rcond;
 
   // RANK
   // The effective rank of A, i.e., the number of singular values
@@ -648,7 +654,9 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   //              PetscScalar *,        // WORK
   //              const PetscBLASInt *, // LWORK
   //              PetscBLASInt *);      // INFO
-  LAPACKgelss_(&M, &N, &NRHS, A_trans_vals.data(), &LDA, B.data(), &LDB, S.data(), &RCOND, &RANK, WORK.data(), &LWORK, &INFO);
+  LAPACKgelss_(&M, &N, &NRHS, pPS(A_trans_vals.data()), &LDA,
+               pPS(B.data()), &LDB, pPS(S.data()), &RCOND, &RANK,
+               pPS(WORK.data()), &LWORK, &INFO);
 
   // Check for errors in the Lapack call
   if (INFO < 0)
@@ -852,15 +860,15 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   LAPACKgeev_(&JOBVL,
               &JOBVR,
               &N,
-              _val.data(),
+              pPS(_val.data()),
               &LDA,
-              lambda_real_val.data(),
-              lambda_imag_val.data(),
-              VL_ptr,
+              pPS(lambda_real_val.data()),
+              pPS(lambda_imag_val.data()),
+              pPS(VL_ptr),
               &LDVL,
-              VR_ptr,
+              pPS(VR_ptr),
               &LDVR,
-              WORK.data(),
+              pPS(WORK.data()),
               &LWORK,
               &INFO);
 
@@ -964,7 +972,8 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
   PetscBLASInt INFO = 0;
 
   // Finally, ready to call the Lapack getrs function
-  LAPACKgetrs_(TRANS, &N, &NRHS, _val.data(), &LDA, _pivots.data(), x_vec.data(), &LDB, &INFO);
+  LAPACKgetrs_(TRANS, &N, &NRHS, pPS(_val.data()), &LDA,
+               _pivots.data(), pPS(x_vec.data()), &LDB, &INFO);
 
   // Check return value for errors
   if (INFO != 0)
@@ -1099,7 +1108,8 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
   PetscBLASInt INCY = 1;
 
   // Finally, ready to call the BLAS function
-  BLASgemv_(TRANS, &M, &N, &alpha, a.data(), &LDA, x.data(), &INCX, &beta, y.data(), &INCY);
+  BLASgemv_(TRANS, &M, &N, pPS(&alpha), pPS(a.data()), &LDA,
+            pPS(x.data()), &INCX, pPS(&beta), pPS(y.data()), &INCY);
 }
 
 

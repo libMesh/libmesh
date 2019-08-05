@@ -280,7 +280,7 @@ void assemble_ellipticdg(EquationSystems & es,
               std::unique_ptr<const Elem> elem_side (elem->build_side_ptr(side));
               // h element dimension to compute the interior penalty penalty parameter
               const unsigned int elem_b_order = static_cast<unsigned int> (fe_elem_face->get_order());
-              const double h_elem = elem->volume()/elem_side->volume() * 1./pow(elem_b_order, 2.);
+              const Real h_elem = elem->volume()/elem_side->volume() * 1./pow(elem_b_order, 2.);
 
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -341,7 +341,7 @@ void assemble_ellipticdg(EquationSystems & es,
                   const unsigned int elem_b_order = static_cast<unsigned int>(fe_elem_face->get_order());
                   const unsigned int neighbor_b_order = static_cast<unsigned int>(fe_neighbor_face->get_order());
                   const double side_order = (elem_b_order + neighbor_b_order)/2.;
-                  const double h_elem = (elem->volume()/elem_side->volume()) * 1./pow(side_order,2.);
+                  const Real h_elem = (elem->volume()/elem_side->volume()) * 1./pow(side_order,2.);
 
                   // The quadrature point locations on the neighbor side
                   std::vector<Point> qface_neighbor_point;

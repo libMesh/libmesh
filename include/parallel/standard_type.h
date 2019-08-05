@@ -121,6 +121,37 @@ LIBMESH_STANDARD_TYPE(float,MPI_FLOAT);
 LIBMESH_STANDARD_TYPE(double,MPI_DOUBLE);
 LIBMESH_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
 
+// Quad and float128 types aren't standard C++, so only work with them
+// if configure and PETSc encapsulated the non-standard issues.
+#ifdef LIBMESH_HAVE_MPI
+# ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  template<>
+  class StandardType<Real> : public DataType
+  {
+  public:
+    explicit
+      StandardType(const Real * = nullptr) {
+        libmesh_call_mpi(MPI_Type_contiguous(2, MPI_DOUBLE, &_datatype));
+        this->commit();
+      }
+
+    StandardType(const StandardType<Real> & t)
+      : DataType()
+    {
+      libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+    }
+
+    ~StandardType() {
+      this->free();
+    }
+  };
+# endif
+#else
+# ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+  LIBMESH_STANDARD_TYPE(Real,);
+# endif
+#endif
+
 template<typename T1, typename T2>
 class StandardType<std::pair<T1, T2>> : public DataType
 {

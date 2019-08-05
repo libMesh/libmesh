@@ -122,8 +122,8 @@ void LinearImplicitSystem::solve ()
     linear_solver->init();
 
   // Get the user-specified linear solver tolerance
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
+  const double tol =
+    double(es.parameters.get<Real>("linear solver tolerance"));
 
   // Get the user-specified maximum # of linear solver iterations
   const unsigned int maxits =

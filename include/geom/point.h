@@ -64,6 +64,16 @@ public:
   {}
 
   /**
+   * Disambiguate constructing from non-Real scalars
+   */
+  template <typename T,
+            typename = typename
+              boostcopy::enable_if_c<ScalarTraits<T>::value,void>::type>
+  Point (const T x) :
+    TypeVector<Real> (x,0,0)
+  {}
+
+  /**
    * Empty.
    */
   ~Point() {}

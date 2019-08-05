@@ -955,8 +955,10 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
   ierr = VecSet(xl, SNES_VI_NINF);CHKERRQ(ierr);
   ierr = VecSet(xu, SNES_VI_INF);CHKERRQ(ierr);
 #else
-  ierr = VecSet(xl, PETSC_NINFINITY);CHKERRQ(ierr);
-  ierr = VecSet(xu, PETSC_INFINITY);CHKERRQ(ierr);
+  // Workaround for nonstandard Q suffix warning with quad precision
+  const PetscReal petsc_inf = std::numeric_limits<PetscReal>::max() / 4;
+  ierr = VecSet(xl, -petsc_inf);CHKERRQ(ierr);
+  ierr = VecSet(xu, petsc_inf);CHKERRQ(ierr);
 #endif
   if (sys.nonlinear_solver->bounds != nullptr)
     sys.nonlinear_solver->bounds(XL,XU,sys);

@@ -1209,7 +1209,10 @@ void GmshIO::write_post (const std::string & fname,
                       const Point & vertex = elem->point(n);
                       if (this->binary())
                         {
-                          double tmp = vertex(d);
+#if defined(LIBMESH_DEFAULT_TRIPLE_PRECISION) || defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
+                          libmesh_warning("Gmsh binary writes use only double precision!");
+#endif
+                          double tmp = double(vertex(d));
                           std::memcpy(buf, &tmp, sizeof(double));
                           out_stream.write(reinterpret_cast<char *>(buf), sizeof(double));
                         }
@@ -1229,7 +1232,7 @@ void GmshIO::write_post (const std::string & fname,
                                  << "complex numbers. Will only write the real part of "
                                  << "variable " << varname << std::endl;
 #endif
-                    double tmp = libmesh_real((*v)[elem->node_id(i)*n_vars + ivar]);
+                    double tmp = double(libmesh_real((*v)[elem->node_id(i)*n_vars + ivar]));
                     std::memcpy(buf, &tmp, sizeof(double));
                     out_stream.write(reinterpret_cast<char *>(buf), sizeof(double));
                   }

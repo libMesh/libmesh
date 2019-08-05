@@ -84,6 +84,13 @@ public:
   TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
   { return TypeNTensor<N-1,T>(); }
 
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TypeNTensor &>::type
+  operator = (const Scalar & libmesh_dbg_var(p))
+  { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
+
   /**
    * Add two tensors.
    */
@@ -178,6 +185,11 @@ public:
    * entry magnitudes squared.
    */
   auto norm_sq() const -> decltype(std::norm(T())) { return 0.;}
+
+  /**
+   * Set all entries of the tensor to 0.
+   */
+  void zero() { libmesh_not_implemented(); }
 
   /**
    * \returns \p true if two tensors are equal, \p false otherwise.
