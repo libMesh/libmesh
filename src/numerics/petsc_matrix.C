@@ -334,6 +334,14 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
     }
 
+  // Make it an error for PETSc to allocate new nonzero entries during assembly
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR);
+#else
+  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
+#endif
+  LIBMESH_CHKERR(ierr);
+
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
   LIBMESH_CHKERR(ierr);
@@ -454,6 +462,14 @@ void PetscMatrix<T>::init ()
         default: libmesh_error_msg("Unsupported petsc matrix type");
       }
     }
+
+  // Make it an error for PETSc to allocate new nonzero entries during assembly
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR);
+#else
+  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
+#endif
+  LIBMESH_CHKERR(ierr);
 
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
