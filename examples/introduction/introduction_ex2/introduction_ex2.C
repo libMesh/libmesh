@@ -33,12 +33,11 @@
 // by passing argc and argv to PETSc you may specify
 // command line arguments to PETSc.  For example, you might
 // try running this example as:
-//
-// ./introduction_ex2 -log_info
+// ./introduction_ex2 -info
 //
 // to see what PETSc is doing behind the scenes or
 //
-// ./introduction_ex2 -log_summary
+// ./introduction_ex2 -log_view
 //
 // to get a summary of what PETSc did.
 // Among other things, libMesh::init() initializes the MPI
