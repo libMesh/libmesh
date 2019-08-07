@@ -33,6 +33,7 @@
 // by passing argc and argv to PETSc you may specify
 // command line arguments to PETSc.  For example, you might
 // try running this example as:
+//
 // ./introduction_ex2 -info
 //
 // to see what PETSc is doing behind the scenes or
