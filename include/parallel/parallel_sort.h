@@ -121,7 +121,7 @@ private:
 
   /**
    * Sorts the local data into bins across all processors.
-   * Right now it constructs a BenSorter<KeyType> object.
+   * Right now it constructs a BinSorter<KeyType> object.
    * In the future this could be a template parameter.
    */
   void binsort ();
