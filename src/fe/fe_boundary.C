@@ -94,6 +94,10 @@ REINIT_ERROR(0, MONOMIAL, reinit)      { libmesh_error_msg("ERROR: Cannot reinit
 REINIT_ERROR(0, MONOMIAL, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D MONOMIAL elements!"); }
 SIDEMAP_ERROR(0, MONOMIAL, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D MONOMIAL elements!"); }
 
+REINIT_ERROR(0, MONOMIAL_VEC, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D MONOMIAL_VEC elements!"); }
+REINIT_ERROR(0, MONOMIAL_VEC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D MONOMIAL_VEC elements!"); }
+SIDEMAP_ERROR(0, MONOMIAL_VEC, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D MONOMIAL_VEC elements!"); }
+
 REINIT_ERROR(0, SCALAR, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D SCALAR elements!"); }
 REINIT_ERROR(0, SCALAR, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D SCALAR elements!"); }
 SIDEMAP_ERROR(0, SCALAR, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D SCALAR elements!"); }
@@ -126,6 +130,7 @@ REINIT_ERROR(1, LAGRANGE_VEC, edge_reinit)  { libmesh_error_msg("ERROR: Cannot e
 REINIT_ERROR(1, L2_LAGRANGE, edge_reinit)   { libmesh_error_msg("ERROR: Cannot edge_reinit 1D L2_LAGRANGE elements!"); }
 REINIT_ERROR(1, XYZ, edge_reinit)           { libmesh_error_msg("ERROR: Cannot edge_reinit 1D XYZ elements!"); }
 REINIT_ERROR(1, MONOMIAL, edge_reinit)      { libmesh_error_msg("ERROR: Cannot edge_reinit 1D MONOMIAL elements!"); }
+REINIT_ERROR(1, MONOMIAL_VEC, edge_reinit)      { libmesh_error_msg("ERROR: Cannot edge_reinit 1D MONOMIAL_VEC elements!"); }
 REINIT_ERROR(1, SCALAR, edge_reinit)        { libmesh_error_msg("ERROR: Cannot edge_reinit 1D SCALAR elements!"); }
 REINIT_ERROR(1, NEDELEC_ONE, reinit)        { libmesh_error_msg("ERROR: Cannot reinit 1D NEDELEC_ONE elements!"); }
 REINIT_ERROR(1, NEDELEC_ONE, edge_reinit)   { libmesh_error_msg("ERROR: Cannot edge_reinit 1D NEDELEC_ONE elements!"); }
@@ -1089,6 +1094,8 @@ template void FE<1,HERMITE>::reinit(Elem const *, unsigned int, Real, const std:
 template void FE<1,HERMITE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<1,MONOMIAL>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<1,MONOMIAL>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template void FE<1,MONOMIAL_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<1,MONOMIAL_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<1,SCALAR>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<1,SCALAR>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
@@ -1124,6 +1131,9 @@ template void FE<2,HERMITE>::edge_reinit(Elem const *, unsigned int, Real, const
 template void FE<2,MONOMIAL>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<2,MONOMIAL>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<2,MONOMIAL>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<2,MONOMIAL_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<2,MONOMIAL_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template void FE<2,MONOMIAL_VEC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<2,SCALAR>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<2,SCALAR>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<2,SCALAR>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
@@ -1170,6 +1180,9 @@ template void FE<3,HERMITE>::edge_reinit(Elem const *, unsigned int, Real, const
 template void FE<3,MONOMIAL>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<3,MONOMIAL>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<3,MONOMIAL>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<3,MONOMIAL_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<3,MONOMIAL_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template void FE<3,MONOMIAL_VEC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<3,SCALAR>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<3,SCALAR>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<3,SCALAR>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);

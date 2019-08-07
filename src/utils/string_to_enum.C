@@ -238,6 +238,7 @@ void init_fefamily_to_enum ()
       fefamily_to_enum["HIERARCHIC"   ]=HIERARCHIC;
       fefamily_to_enum["L2_HIERARCHIC"]=L2_HIERARCHIC;
       fefamily_to_enum["MONOMIAL"     ]=MONOMIAL;
+      fefamily_to_enum["MONOMIAL_VEC" ]=MONOMIAL_VEC;
       fefamily_to_enum["SCALAR"       ]=SCALAR;
       fefamily_to_enum["XYZ"          ]=XYZ;
       fefamily_to_enum["BERNSTEIN"    ]=BERNSTEIN;

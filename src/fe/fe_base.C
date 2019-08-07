@@ -390,6 +390,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           case LAGRANGE_VEC:
             return libmesh_make_unique<FELagrangeVec<0>>(fet);
 
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FEMonomialVec<0>>(fet);
+
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
@@ -401,6 +404,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           case LAGRANGE_VEC:
             return libmesh_make_unique<FELagrangeVec<1>>(fet);
 
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FEMonomialVec<1>>(fet);
+
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
@@ -411,6 +417,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           {
           case LAGRANGE_VEC:
             return libmesh_make_unique<FELagrangeVec<2>>(fet);
+
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FEMonomialVec<2>>(fet);
 
           case NEDELEC_ONE:
             return libmesh_make_unique<FENedelecOne<2>>(fet);
@@ -425,6 +434,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           {
           case LAGRANGE_VEC:
             return libmesh_make_unique<FELagrangeVec<3>>(fet);
+
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FEMonomialVec<3>>(fet);
 
           case NEDELEC_ONE:
             return libmesh_make_unique<FENedelecOne<3>>(fet);
