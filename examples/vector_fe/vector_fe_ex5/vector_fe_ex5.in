@@ -1,0 +1,7 @@
+# DG parameters
+epsilon = -1
+sigma = 6
+
+# Mesh parameters
+nx = 15
+ny = 15
