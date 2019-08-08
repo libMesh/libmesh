@@ -75,6 +75,11 @@ AC_DEFUN([CONFIGURE_SLEPC],
                                           ])
                         ])
                 ])
+
+            dnl With a separate $PETSC_ARCH we have a separate configuration-specific directory
+            AS_IF([test "x$PETSC_ARCH" != "x"],
+                  [AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h],
+                                   [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])])
         ])
 
     AS_IF([test "x$enableslepc" = "xyes"],
