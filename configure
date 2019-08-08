@@ -36010,6 +36010,16 @@ fi
 
 fi
 
+                        if test "x$PETSC_ARCH" != "x"; then :
+  as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"
+fi
+
+
+fi
+
 fi
 
     if test "x$enableslepc" = "xyes"; then :
