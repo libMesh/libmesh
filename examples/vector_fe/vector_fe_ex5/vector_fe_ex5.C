@@ -48,9 +48,6 @@ class SparseMatrix;
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// Function prototype for the exact solution.
-Real exact_solution(const int component, const Real x, const Real y, const Real z = 0.);
-
 // residual assembly function
 void compute_residual(const NumericVector<Number> & X,
                       NumericVector<Number> & R,

@@ -19,6 +19,9 @@ using namespace libMesh;
 // Function prototype for the exact solution.
 Real exact_solution(const int component, const Real x, const Real y, const Real z = 0.);
 
+// Forcing function
+Real forcing_function(const int component, const Real x, const Real y, const Real z = 0.);
+
 void
 compute_residual(const NumericVector<Number> & X,
                  NumericVector<Number> & R,
@@ -80,6 +83,12 @@ compute_residual(const NumericVector<Number> & X,
   //
   // The element Jacobian * quadrature weight at each integration point.
   const auto & JxW = fe->get_JxW();
+
+  // element integration points
+  const auto & xyz = fe->get_xyz();
+
+  // The element shape function values evaluated at the quadrature points
+  const auto & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature points.
   const auto & dphi = fe->get_dphi();
@@ -168,10 +177,20 @@ compute_residual(const NumericVector<Number> & X,
         grad_u[qp] += dof_u[i] * dphi[i][qp];
     }
 
-    // diffusion elemental residual
     for (unsigned int qp = 0; qp < qrule.n_points(); qp++)
+    {
+      auto forcing_func = VectorValue<Number>(forcing_function(0, xyz[qp](0), xyz[qp](1)),
+                                              forcing_function(1, xyz[qp](0), xyz[qp](1)),
+                                              0);
       for (std::size_t i = 0; i < dof_indices.size(); i++)
+      {
+        // diffusion elemental residual
         Fe(i) += JxW[qp] * dphi[i][qp].contract(grad_u[qp]);
+
+        // forcing function
+        Fe(i) += JxW[qp] * phi[i][qp] * forcing_func;
+      }
+    }
 
     // Now we consider residual contributions from the sides
     for (auto side : elem->side_index_range())

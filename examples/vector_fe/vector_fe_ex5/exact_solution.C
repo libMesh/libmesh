@@ -15,8 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-
 // C++ Includes
 #include <math.h>
 
@@ -36,24 +34,43 @@ using namespace libMesh;
  * function to get f.  This is the well-known "method of
  * manufactured solutions".
  */
-Real exact_solution (const int component,
-                     const Real x,
-                     const Real y,
-                     const Real z = 0.)
+Real
+exact_solution(const int component, const Real x, const Real y, const Real z = 0.)
 {
   static const Real pi = acos(-1.);
 
   switch (component)
-    {
+  {
     case 0:
-      return cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
+      return cos(.5 * pi * x) * sin(.5 * pi * y) * cos(.5 * pi * z);
     case 1:
-      return sin(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z);
+      return sin(.5 * pi * x) * cos(.5 * pi * y) * cos(.5 * pi * z);
     case 2:
-      return sin(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z)*cos(.5*pi*x*y*z);
+      return 0;
     default:
       libmesh_error_msg("Invalid component = " << component);
-    }
+  }
+
+  // dummy
+  return 0.0;
+}
+
+Real
+forcing_function(const int component, const Real x, const Real y, const Real z = 0.)
+{
+  static const Real pi = acos(-1.);
+
+  switch (component)
+  {
+    case 0:
+      return -3. * pi * pi * sin(pi * y / 2.) * cos(pi * x / 2.) * cos(pi * z / 2.) / 4.;
+    case 1:
+      return -3. * pi * pi * sin(pi * x / 2.) * cos(pi * y / 2.) * cos(pi * z / 2.) / 4.;
+    case 2:
+      return 0;
+    default:
+      libmesh_error_msg("Invalid component = " << component);
+  }
 
   // dummy
   return 0.0;
