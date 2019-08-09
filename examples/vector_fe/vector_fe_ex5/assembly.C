@@ -124,8 +124,8 @@ compute_residual(const NumericVector<Number> & X,
   std::vector<dof_id_type> dof_indices_neighbor;
 
   /// Vectors to hold the local solution degree of freedom values
-  std::vector<Real> dof_u;
-  std::vector<Real> dof_u_neighbor;
+  std::vector<Number> dof_u;
+  std::vector<Number> dof_u_neighbor;
 
   /// Vector to hold the local solution
   std::vector<VectorValue<Number>> u;
