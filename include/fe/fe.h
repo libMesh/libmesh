@@ -58,13 +58,19 @@ struct FEOutputType
 template<>
 struct FEOutputType<LAGRANGE_VEC>
 {
-  typedef RealGradient type;
+  typedef RealVectorValue type;
 };
 
 template<>
 struct FEOutputType<NEDELEC_ONE>
 {
-  typedef RealGradient type;
+  typedef RealVectorValue type;
+};
+
+template<>
+struct FEOutputType<MONOMIAL_VEC>
+{
+  typedef RealVectorValue type;
 };
 
 
@@ -938,6 +944,27 @@ public:
   {}
 };
 
+/**
+ * FEMonomialVec objects are used for working with vector-valued
+ * discontinuous finite elements
+ *
+ * \author Alex D. Lindsay
+ * \date 2019
+ */
+template <unsigned int Dim>
+class FEMonomialVec : public FE<Dim,MONOMIAL_VEC>
+{
+public:
+
+  /**
+   * Constructor. Creates a vector Monomial finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FEMonomialVec(const FEType & fet) :
+    FE<Dim,MONOMIAL_VEC> (fet)
+  {}
+};
 
 
 

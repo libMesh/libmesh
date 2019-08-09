@@ -102,6 +102,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case MONOMIAL:
             return libmesh_make_unique<FE<0,MONOMIAL>>(fet);
 
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FE<0,MONOMIAL_VEC>>(fet);
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
             return libmesh_make_unique<FE<0,SZABAB>>(fet);
@@ -148,6 +151,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case MONOMIAL:
             return libmesh_make_unique<FE<1,MONOMIAL>>(fet);
+
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FE<1,MONOMIAL_VEC>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
@@ -197,6 +203,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case MONOMIAL:
             return libmesh_make_unique<FE<2,MONOMIAL>>(fet);
+
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FE<2,MONOMIAL_VEC>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
@@ -252,6 +261,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case MONOMIAL:
             return libmesh_make_unique<FE<3,MONOMIAL>>(fet);
+
+          case MONOMIAL_VEC:
+            return libmesh_make_unique<FE<3,MONOMIAL_VEC>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:

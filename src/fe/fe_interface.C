@@ -134,6 +134,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
       case MONOMIAL:                                                    \
         prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
+      case MONOMIAL_VEC:                                                \
+        prefix FEMonomialVec<dim>::func_and_args suffix                 \
       case SCALAR:                                                      \
         prefix FE<dim,SCALAR>::func_and_args suffix                     \
       case BERNSTEIN:                                                   \
@@ -183,6 +185,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
+      case MONOMIAL_VEC:                                                \
         libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
@@ -198,6 +201,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
+      case MONOMIAL_VEC:                                                \
+        prefix FEMonomialVec<dim>::func_and_args suffix                 \
       case HERMITE:                                                     \
       case HIERARCHIC:                                                  \
       case L2_HIERARCHIC:                                               \
@@ -266,6 +271,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
       case MONOMIAL:                                                    \
         prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
+      case MONOMIAL_VEC:                                                \
+        prefix FEMonomialVec<dim>::func_and_args suffix                 \
       case SCALAR:                                                      \
         prefix FE<dim,SCALAR>::func_and_args suffix                     \
       case XYZ:                                                         \
@@ -307,6 +314,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix  FE<2,SUBDIVISION>::func_and_args suffix                 \
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
+      case MONOMIAL_VEC:                                                \
         libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
@@ -322,6 +330,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
+      case MONOMIAL_VEC:                                                \
+        prefix FEMonomialVec<dim>::func_and_args suffix                 \
       case HERMITE:                                                     \
       case HIERARCHIC:                                                  \
       case L2_HIERARCHIC:                                               \
@@ -1218,6 +1228,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         }
       break;
     case MONOMIAL:
+    case MONOMIAL_VEC:
       switch (el_t)
         {
         case EDGE2:
@@ -1538,6 +1549,7 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case LAGRANGE:
     case L2_LAGRANGE:
     case MONOMIAL:
+    case MONOMIAL_VEC:
     case L2_HIERARCHIC:
     case XYZ:
     case SUBDIVISION:
@@ -1567,6 +1579,7 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
     {
     case LAGRANGE_VEC:
     case NEDELEC_ONE:
+    case MONOMIAL_VEC:
       return TYPE_VECTOR;
     default:
       return TYPE_SCALAR;
@@ -1582,6 +1595,7 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
       //       to the mesh dimension. This will break for mixed-dimension meshes.
     case LAGRANGE_VEC:
     case NEDELEC_ONE:
+    case MONOMIAL_VEC:
       return mesh.mesh_dimension();
     default:
       return 1;
@@ -1596,6 +1610,7 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
     {
       // Discontinuous elements
     case MONOMIAL:
+    case MONOMIAL_VEC:
     case L2_HIERARCHIC:
     case L2_LAGRANGE:
     case XYZ:

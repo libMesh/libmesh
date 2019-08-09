@@ -59,6 +59,7 @@ enum FEFamily : int {
                // Vector-valued elements
                LAGRANGE_VEC = 41,
                NEDELEC_ONE  = 42,
+               MONOMIAL_VEC = 43,
                // Invalid
                INVALID_FE   = 99};
 

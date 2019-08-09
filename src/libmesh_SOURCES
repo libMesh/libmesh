@@ -77,6 +77,7 @@ libmesh_SOURCES =  \
         src/fe/fe_monomial_shape_1D.C \
         src/fe/fe_monomial_shape_2D.C \
         src/fe/fe_monomial_shape_3D.C \
+        src/fe/fe_monomial_vec.C \
         src/fe/fe_nedelec_one.C \
         src/fe/fe_nedelec_one_shape_2D.C \
         src/fe/fe_nedelec_one_shape_3D.C \

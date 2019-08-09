@@ -75,7 +75,8 @@
   template class FE< (_dim), MONOMIAL>;                                 \
   template class FE< (_dim), SCALAR>;                                   \
   template class FE< (_dim), XYZ>;                                      \
-  template class FE< (_dim), NEDELEC_ONE>
+  template class FE< (_dim), NEDELEC_ONE>;                              \
+  template class FE< (_dim), MONOMIAL_VEC>
 
 #define INSTANTIATE_ALL_MAPS(_dim)              \
   INSTANTIATE_MAPS(_dim,CLOUGH);                \
@@ -88,7 +89,8 @@
   INSTANTIATE_MAPS(_dim,MONOMIAL);              \
   INSTANTIATE_MAPS(_dim,SCALAR);                \
   INSTANTIATE_MAPS(_dim,XYZ);                   \
-  INSTANTIATE_MAPS(_dim,NEDELEC_ONE)
+  INSTANTIATE_MAPS(_dim,NEDELEC_ONE);           \
+  INSTANTIATE_MAPS(_dim,MONOMIAL_VEC)
 
 #else //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
@@ -104,7 +106,8 @@
   template class FE< (_dim), BERNSTEIN>;                                \
   template class FE< (_dim), SZABAB>;                                   \
   template class FE< (_dim), XYZ>;                                      \
-  template class FE< (_dim), NEDELEC_ONE>
+  template class FE< (_dim), NEDELEC_ONE>;                              \
+  template class FE< (_dim), MONOMIAL_VEC>
 
 #define INSTANTIATE_ALL_MAPS(_dim)              \
   INSTANTIATE_MAPS(_dim,CLOUGH);                \
@@ -119,7 +122,8 @@
   INSTANTIATE_MAPS(_dim,BERNSTEIN);             \
   INSTANTIATE_MAPS(_dim,SZABAB);                \
   INSTANTIATE_MAPS(_dim,XYZ);                   \
-  INSTANTIATE_MAPS(_dim,NEDELEC_ONE)
+  INSTANTIATE_MAPS(_dim,NEDELEC_ONE);           \
+  INSTANTIATE_MAPS(_dim,MONOMIAL_VEC)
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
