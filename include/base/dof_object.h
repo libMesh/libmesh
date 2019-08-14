@@ -403,7 +403,7 @@ public:
    * Returns how many extra integers are associated to the \p DofObject
    *
    * If non-integer data has been associated, each datum of type T
-   * counts for * sizeof(T)/sizeof(dof_id_type) times in the return
+   * counts for sizeof(T)/sizeof(dof_id_type) times in the return
    * value.
    */
   unsigned int n_extra_integers () const;
