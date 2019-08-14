@@ -22,11 +22,15 @@
 // Local Includes
 #include "libmesh/libmesh_config.h"
 
-#include "libmesh/elem.h"
 #include "libmesh/id_types.h"
+#include "libmesh/packing.h"
 
 namespace libMesh
 {
+
+// Forward declarations
+class Elem;
+
 namespace Parallel
 {
 
