@@ -21,15 +21,18 @@
 #define LIBMESH_MESH_INSERTER_ITERATOR_H
 
 // Local includes
-#include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
-#include "libmesh/node.h"
 
 // C++ includes
 #include <iterator>
 
 namespace libMesh
 {
+
+// Forward declarations
+class Elem;
+class Node;
+class Point;
 
 /**
  * A class for templated methods that expect output iterator
