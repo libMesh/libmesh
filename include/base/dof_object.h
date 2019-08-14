@@ -230,6 +230,25 @@ public:
   dof_id_type get_extra_integer (const unsigned int index) const;
 
   /**
+   * Sets the value on this object of the extra datum associated
+   * with \p index, which should have been obtained via a call to \p
+   * MeshBase::add_elem_datum or \p MeshBase::add_node_datum using
+   * the same type T.
+   */
+  template <typename T>
+  void set_extra_datum (const unsigned int index, const T value);
+
+  /**
+   * Gets the value on this object of the extra datum associated
+   * with \p index, which should have been obtained via a call to \p
+   * MeshBase::add_elem_datum or \p MeshBase::add_node_datum using
+   * the same type T.
+   */
+  template <typename T>
+  T get_extra_datum (const unsigned int index) const;
+
+
+  /**
    * Adds an additional system to the \p DofObject
    */
   void add_system ();
@@ -374,11 +393,18 @@ public:
    * Assigns a set of extra integers to this \p DofObject.  There will
    * now be \p n_integers associated; this *replaces*, not augments,
    * any previous count.
+   *
+   * If non-integer data is in the set, each datum of type T should be
+   * counted sizeof(T)/sizeof(dof_id_type) times in \p n_integers.
    */
   void add_extra_integers (const unsigned int n_integers);
 
   /**
    * Returns how many extra integers are associated to the \p DofObject
+   *
+   * If non-integer data has been associated, each datum of type T
+   * counts for * sizeof(T)/sizeof(dof_id_type) times in the return
+   * value.
    */
   unsigned int n_extra_integers () const;
 
@@ -1003,6 +1029,47 @@ DofObject::get_extra_integer (const unsigned int index) const
 
   libmesh_assert_less(start_idx_i+index, _idx_buf.size());
   return _idx_buf[start_idx_i+index];
+}
+
+
+
+template <typename T>
+inline
+void
+DofObject::set_extra_datum(const unsigned int index,
+                           const T value)
+{
+#ifndef NDEBUG
+  const unsigned int n_more_integers = (sizeof(T)-1)/sizeof(dof_id_type);
+#endif
+  libmesh_assert_less(index+n_more_integers, this->n_extra_integers());
+  libmesh_assert_less(this->n_pseudo_systems(), _idx_buf.size());
+
+  const unsigned int start_idx_i = this->start_idx_ints();
+
+  libmesh_assert_less(start_idx_i+index+n_more_integers, _idx_buf.size());
+  memcpy(&_idx_buf[start_idx_i+index], &value, sizeof(T));
+}
+
+
+
+template <typename T>
+inline
+T
+DofObject::get_extra_datum (const unsigned int index) const
+{
+#ifndef NDEBUG
+  const unsigned int n_more_integers = (sizeof(T)-1)/sizeof(dof_id_type);
+#endif
+  libmesh_assert_less(index+n_more_integers, this->n_extra_integers());
+  libmesh_assert_less(this->n_systems(), _idx_buf.size());
+
+  const unsigned int start_idx_i = this->start_idx_ints();
+
+  libmesh_assert_less(start_idx_i+index+n_more_integers, _idx_buf.size());
+  T returnval;
+  memcpy(&returnval, &_idx_buf[start_idx_i+index], sizeof(T));
+  return returnval;
 }
 
 
