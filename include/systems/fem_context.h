@@ -33,6 +33,7 @@
 
 // C++ includes
 #include <map>
+#include <set>
 
 namespace libMesh
 {

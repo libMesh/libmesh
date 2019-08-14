@@ -25,8 +25,9 @@
 #include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes
-#include <vector>
 #include <memory>
+#include <set>
+#include <vector>
 
 namespace libMesh
 {

@@ -36,8 +36,9 @@ enum PointLocatorType : int;
 
 // C++ includes
 #include <cstddef>
-#include <vector>
 #include <memory>
+#include <set>
+#include <vector>
 
 namespace libMesh
 {
