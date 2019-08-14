@@ -23,7 +23,6 @@
 // Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/face_tri3_subdivision.h"
-#include "libmesh/elem.h"
 
 namespace libMesh
 {
