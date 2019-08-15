@@ -24,7 +24,6 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_base.h"
-#include "libmesh/parallel.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -55,6 +54,11 @@ class vtkMPIController;
  */
 namespace libMesh
 {
+
+// Forward declarations
+namespace Parallel {
+  class Communicator;
+}
 
 /**
  * The \p LibMeshInit class, when constructed, initializes
@@ -115,12 +119,12 @@ public:
    * for the user-input MPI_Comm if we were constructed with one, or a
    * wrapper for MPI_COMM_WORLD by default.
    */
-  const Parallel::Communicator & comm() const { return _comm; }
+  const Parallel::Communicator & comm() const { return *_comm; }
 
-  Parallel::Communicator & comm() { return _comm; }
+  Parallel::Communicator & comm() { return *_comm; }
 
 private:
-  Parallel::Communicator _comm;
+  Parallel::Communicator * _comm;
 
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
   // VTK object for dealing with MPI stuff in VTK.

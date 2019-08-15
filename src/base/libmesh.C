@@ -430,7 +430,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // Duplicate the input communicator for internal use
       // And get a Parallel::Communicator copy too, to use
       // as a default for that API
-      this->_comm = COMM_WORLD_IN;
+      this->_comm = new Parallel::Communicator(COMM_WORLD_IN);
 
       libMesh::GLOBAL_COMM_WORLD = COMM_WORLD_IN;
 
@@ -774,7 +774,8 @@ LibMeshInit::~LibMeshInit()
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
-      this->_comm.clear();
+      this->comm().clear();
+      delete this->_comm;
 
       if (libmesh_initialized_mpi)
         {
