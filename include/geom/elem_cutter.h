@@ -27,7 +27,6 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/communicator.h"
 
 // C++ includes

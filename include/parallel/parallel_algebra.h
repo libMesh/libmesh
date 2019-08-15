@@ -26,7 +26,6 @@
 
 // Local Includes
 #include "libmesh/libmesh_config.h"
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/op_function.h"
 #include "libmesh/standard_type.h"
 #include "libmesh/point.h"

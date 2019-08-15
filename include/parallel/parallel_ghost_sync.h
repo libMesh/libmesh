@@ -21,7 +21,6 @@
 #define LIBMESH_PARALLEL_GHOST_SYNC_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/communicator.h"
 #include "libmesh/elem.h"
 #include "libmesh/location_maps.h"

@@ -21,7 +21,6 @@
 #define LIBMESH_HP_COARSENTEST_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/hp_selector.h"

@@ -26,7 +26,6 @@
 // libMesh includes
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/parallel_object.h"
 
 // C++ includes

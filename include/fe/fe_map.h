@@ -25,7 +25,6 @@
 #include "libmesh/point.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/fe_type.h"
-#include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes
 #include <memory>

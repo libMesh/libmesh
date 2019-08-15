@@ -21,7 +21,6 @@
 #define LIBMESH_UNSTEADY_SOLVER_H
 
 // Local includes
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/libmesh_common.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/time_solver.h"

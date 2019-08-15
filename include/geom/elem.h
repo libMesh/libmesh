@@ -28,7 +28,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/node.h"
 #include "libmesh/enum_elem_type.h" // INVALID_ELEM
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/multi_predicates.h"
 #include "libmesh/pointer_to_pointer_iter.h"
 #include "libmesh/int_range.h"

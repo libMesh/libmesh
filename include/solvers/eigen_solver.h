@@ -29,7 +29,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/enum_solver_package.h" // SLEPC_SOLVERS
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS

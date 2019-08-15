@@ -21,7 +21,6 @@
 #define LIBMESH_MESH_BASE_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_object.h" // for invalid_processor_id
 #include "libmesh/libmesh_common.h"

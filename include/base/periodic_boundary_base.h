@@ -25,7 +25,6 @@
 
 // Local Includes
 #include "libmesh/point.h"
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/dense_matrix.h"
 
 // C++ Includes

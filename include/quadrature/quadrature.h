@@ -26,7 +26,6 @@
 #include "libmesh/point.h"
 #include "libmesh/enum_elem_type.h" // INVALID_ELEM
 #include "libmesh/enum_order.h" // INVALID_ORDER
-#include "libmesh/auto_ptr.h" // deprecated
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh

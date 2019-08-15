@@ -29,7 +29,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
-#include "libmesh/auto_ptr.h" // deprecated
 
 // Trilinos includes.  Ignore many unused parameter warnings coming
 // from these headers.

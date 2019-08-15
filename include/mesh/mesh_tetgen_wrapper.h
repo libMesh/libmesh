@@ -21,9 +21,6 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
-// libMesh includes
-#include "libmesh/auto_ptr.h" // deprecated
-
 // TetGen include file
 #include "tetgen.h"  // Defines REAL and other Tetgen types
 

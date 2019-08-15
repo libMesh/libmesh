@@ -21,7 +21,6 @@
 #define LIBMESH_FE_TYPE_H
 
 // Local includes
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/compare_types.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/enum_order.h"
