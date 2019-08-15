@@ -22,7 +22,6 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/parallel.h"
 #include "libmesh/system_norm.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
@@ -48,6 +47,10 @@ class ErrorVector;
 class EquationSystems;
 class System;
 template <typename T> class NumericVector;
+
+namespace Parallel {
+  class Communicator;
+}
 
 /**
  * This class holds functions that will estimate the error

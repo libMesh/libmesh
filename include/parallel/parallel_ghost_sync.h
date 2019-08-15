@@ -22,10 +22,10 @@
 
 // Local Includes
 #include "libmesh/auto_ptr.h" // deprecated
+#include "libmesh/communicator.h"
 #include "libmesh/elem.h"
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/parallel_sync.h"
 
