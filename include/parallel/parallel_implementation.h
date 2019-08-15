@@ -1449,7 +1449,7 @@ inline void Communicator::allgather(const std::basic_string<T> & sendval,
     return;
 
   // monolithic receive buffer
-  std::string r(globalsize, 0);
+  std::basic_string<T> r(globalsize, 0);
 
   // and get the data from the remote processors.
   libmesh_call_mpi
@@ -1514,7 +1514,7 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
 
   std::vector<T> data_c(data_size);
 #ifndef NDEBUG
-  std::string orig(data);
+  std::basic_string<T> orig(data);
 #endif
 
   if (this->rank() == root_id)
@@ -1613,7 +1613,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T>,A> & data,
       while (iter != temp.end())
         {
           std::size_t curr_len = *iter++;
-          data.push_back(std::string(iter, iter+curr_len));
+          data.push_back(std::basic_string<T>(iter, iter+curr_len));
           iter += curr_len;
         }
     }
@@ -2607,7 +2607,7 @@ inline void Communicator::gather(const unsigned int root_id,
         }
 
       // monolithic receive buffer
-      std::string r;
+      std::basic_string<T> r;
       if (this->rank() == root_id)
         r.resize(globalsize, 0);
 
