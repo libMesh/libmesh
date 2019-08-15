@@ -22,7 +22,6 @@
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/elem.h"
-#include "libmesh/threads.h"
 #include "libmesh/tensor_value.h"
 
 namespace libMesh
