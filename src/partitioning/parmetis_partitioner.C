@@ -26,7 +26,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parmetis_partitioner.h"
 #include "libmesh/metis_partitioner.h"
-#include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/parallel_only.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/parmetis_helper.h"
