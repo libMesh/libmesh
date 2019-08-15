@@ -18,8 +18,9 @@
 
 // Local includes
 #include "libmesh/libmesh.h"
+
+#include "libmesh/communicator.h"
 #include "libmesh/getpot.h"
-#include "libmesh/parallel.h"
 #include "libmesh/reference_counter.h"
 #include "libmesh/libmesh_singleton.h"
 #include "libmesh/remote_elem.h"
