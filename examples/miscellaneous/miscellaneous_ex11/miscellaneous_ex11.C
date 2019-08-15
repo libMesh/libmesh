@@ -58,6 +58,7 @@
 #include "libmesh/vtk_io.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/parallel.h"
 
 // These are the include files typically needed for subdivision elements.
 #include "libmesh/face_tri3_subdivision.h"

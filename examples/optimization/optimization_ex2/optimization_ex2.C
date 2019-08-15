@@ -49,6 +49,7 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/optimization_system.h"
 #include "libmesh/optimization_solver.h"
+#include "libmesh/parallel.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
