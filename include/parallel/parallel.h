@@ -30,6 +30,7 @@
 #include "libmesh/parallel_only.h"
 #include "libmesh/post_wait_copy_buffer.h"
 #include "libmesh/post_wait_delete_buffer.h"
+#include "libmesh/post_wait_dereference_shared_ptr.h"
 #include "libmesh/post_wait_dereference_tag.h"
 #include "libmesh/post_wait_free_buffer.h"
 #include "libmesh/post_wait_unpack_buffer.h"

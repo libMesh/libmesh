@@ -24,7 +24,6 @@
 #include "libmesh/message_tag.h"
 #include "libmesh/request.h"
 #include "libmesh/status.h"
-#include "libmesh/post_wait_dereference_shared_ptr.h"
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
