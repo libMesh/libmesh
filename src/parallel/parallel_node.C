@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/distributed_mesh.h"
@@ -26,6 +24,9 @@
 #include "libmesh/node.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/parallel_node.h"
+
+// C++ includes
+#include <cstring> // memcpy
 
 // Helper functions in anonymous namespace
 

@@ -26,7 +26,6 @@
 // C++ includes
 #include <complex>
 #include <cstddef>
-#include <cstring> // memcpy
 #include <iterator>
 #include <limits>
 #include <map>
