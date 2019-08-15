@@ -463,6 +463,8 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // Let's be sure we properly initialize on every processor at once:
   libmesh_parallel_only(this->comm());
 
+#else
+  this->_comm = new Parallel::Communicator(); // So comm() doesn't dereference null
 #endif
 
 #if defined(LIBMESH_HAVE_PETSC)
@@ -789,6 +791,8 @@ LibMeshInit::~LibMeshInit()
             }
         }
     }
+#else
+  delete this->_comm;
 #endif
 }
 

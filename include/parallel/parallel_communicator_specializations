@@ -4,23 +4,18 @@
 
 // Some of these specializations are defined in an MPI-independent way
 
-    inline
     bool verify(const std::string & r) const;
 
-    inline
     bool verify(const bool & r) const;
 
     template <typename T, typename A>
     inline
     bool semiverify(const std::vector<T,A> * r) const;
 
-    inline
     bool semiverify(const std::string * r) const;
 
-    inline
     bool semiverify(const bool * r) const;
 
-    inline
     void min(bool &r) const;
 
     template <typename T, typename A>
@@ -31,7 +26,6 @@
     inline
     void min(std::vector<bool,A> &r) const;
 
-    inline
     void minloc(bool &r,
                 unsigned int &min_id) const;
 
@@ -40,7 +34,6 @@
     void minloc(std::vector<bool,A1> &r,
                 std::vector<unsigned int,A2> &min_id) const;
 
-    inline
     void max(bool &r) const;
 
     template <typename T, typename A>
@@ -51,7 +44,6 @@
     inline
     void max(std::vector<bool,A> &r) const;
 
-    inline
     void maxloc(bool &r,
                 unsigned int &max_id) const;
 
