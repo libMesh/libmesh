@@ -27,7 +27,6 @@
 // Local includes
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/petsc_macro.h"
-#include "libmesh/parallel.h"
 
 // C++ includes
 #include <algorithm>

@@ -29,6 +29,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
+#include "libmesh/parallel.h"
 
 
 // For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earlier.

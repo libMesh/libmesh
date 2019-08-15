@@ -27,6 +27,7 @@
 #include "libmesh/error_vector.h"
 #include "libmesh/vectormap.h"
 #include "libmesh/metis_csr_graph.h"
+#include "libmesh/parallel.h"
 
 #ifdef LIBMESH_HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces

@@ -18,6 +18,7 @@
 
 #include "libmesh/diff_qoi.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parallel.h"
 
 namespace libMesh
 {

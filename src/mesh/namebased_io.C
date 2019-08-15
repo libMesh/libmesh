@@ -48,6 +48,8 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/enum_xdr_mode.h"
 
+#include "libmesh/parallel.h" // broadcast
+
 
 namespace libMesh
 {

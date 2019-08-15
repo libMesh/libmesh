@@ -2,6 +2,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/elem.h>
 #include <libmesh/node.h>
+#include <libmesh/parallel.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
