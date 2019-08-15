@@ -24,7 +24,7 @@
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h"
+#include "libmesh/parallel_elem.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/remote_elem.h"
 
@@ -53,7 +53,6 @@ namespace libMesh
 namespace Parallel
 {
 
-template <>
 template <>
 unsigned int
 Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator in)
@@ -130,7 +129,6 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
 
 
 template <>
-template <>
 unsigned int
 Packing<const Elem *>::packed_size (std::vector<largest_id_type>::iterator in)
 {
@@ -139,7 +137,6 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::iterator in)
 
 
 
-template <>
 template <>
 unsigned int
 Packing<const Elem *>::packable_size (const Elem * const & elem,
@@ -178,7 +175,6 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
 
 
 template <>
-template <>
 unsigned int
 Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const DistributedMesh * mesh)
@@ -189,7 +185,6 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
 
 
 template <>
-template <>
 unsigned int
 Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const ParallelMesh * mesh)
@@ -199,7 +194,6 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
 
 
 
-template <>
 template <>
 void
 Packing<const Elem *>::pack (const Elem * const & elem,
@@ -324,7 +318,6 @@ Packing<const Elem *>::pack (const Elem * const & elem,
 
 
 template <>
-template <>
 void
 Packing<const Elem *>::pack (const Elem * const & elem,
                              std::back_insert_iterator<std::vector<largest_id_type>> data_out,
@@ -335,7 +328,6 @@ Packing<const Elem *>::pack (const Elem * const & elem,
 
 
 
-template <>
 template <>
 void
 Packing<const Elem *>::pack (const Elem * const & elem,
@@ -348,7 +340,6 @@ Packing<const Elem *>::pack (const Elem * const & elem,
 
 
 // FIXME - this needs serious work to be 64-bit compatible
-template <>
 template <>
 Elem *
 Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
@@ -803,7 +794,6 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
 
 template <>
-template <>
 Elem *
 Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
                          DistributedMesh * mesh)
@@ -813,7 +803,6 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
 
 
-template <>
 template <>
 Elem *
 Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,

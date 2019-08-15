@@ -35,7 +35,6 @@
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/parallel.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/xdr_cxx.h"
 

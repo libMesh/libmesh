@@ -24,8 +24,8 @@
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_mesh.h"
+#include "libmesh/parallel_node.h"
 
 // Helper functions in anonymous namespace
 
@@ -57,7 +57,6 @@ namespace Parallel
 {
 
 template <>
-template <>
 unsigned int
 Packing<const Node *>::packable_size (const Node * const & node,
                                       const MeshBase * mesh)
@@ -73,7 +72,6 @@ Packing<const Node *>::packable_size (const Node * const & node,
 
 
 
-template <>
 template <>
 unsigned int
 Packing<const Node *>::packed_size (const std::vector<largest_id_type>::const_iterator in)
@@ -97,7 +95,6 @@ Packing<const Node *>::packed_size (const std::vector<largest_id_type>::const_it
 
 
 template <>
-template <>
 unsigned int
 Packing<const Node *>::packed_size (const std::vector<largest_id_type>::iterator in)
 {
@@ -106,7 +103,6 @@ Packing<const Node *>::packed_size (const std::vector<largest_id_type>::iterator
 
 
 
-template <>
 template <>
 unsigned int
 Packing<const Node *>::packable_size (const Node * const & node,
@@ -118,7 +114,6 @@ Packing<const Node *>::packable_size (const Node * const & node,
 
 
 template <>
-template <>
 unsigned int
 Packing<const Node *>::packable_size (const Node * const & node,
                                       const ParallelMesh * mesh)
@@ -128,7 +123,6 @@ Packing<const Node *>::packable_size (const Node * const & node,
 
 
 
-template <>
 template <>
 void
 Packing<const Node *>::pack (const Node * const & node,
@@ -179,7 +173,6 @@ Packing<const Node *>::pack (const Node * const & node,
 
 
 template <>
-template <>
 void
 Packing<const Node *>::pack (const Node * const & node,
                              std::back_insert_iterator<std::vector<largest_id_type>> data_out,
@@ -191,7 +184,6 @@ Packing<const Node *>::pack (const Node * const & node,
 
 
 template <>
-template <>
 void
 Packing<const Node *>::pack (const Node * const & node,
                              std::back_insert_iterator<std::vector<largest_id_type>> data_out,
@@ -202,7 +194,6 @@ Packing<const Node *>::pack (const Node * const & node,
 
 
 
-template <>
 template <>
 Node *
 Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
@@ -312,7 +303,6 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
 
 template <>
-template <>
 Node *
 Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
                          DistributedMesh * mesh)
@@ -322,7 +312,6 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
 
 
-template <>
 template <>
 Node *
 Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,

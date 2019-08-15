@@ -20,7 +20,7 @@
 // Local Includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h"    // also includes mpi.h
+#include "libmesh/communicator.h"    // also includes mpi.h
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
