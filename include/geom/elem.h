@@ -2307,60 +2307,6 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
 
 
 inline
-unsigned int Elem::which_side_am_i (const Elem * e) const
-{
-  libmesh_assert(e);
-
-  const unsigned int ns = this->n_sides();
-  const unsigned int nn = this->n_nodes();
-
-  const unsigned int en = e->n_nodes();
-
-  // e might be on any side until proven otherwise
-  std::vector<bool> might_be_side(ns, true);
-
-  for (unsigned int i=0; i != en; ++i)
-    {
-      Point side_point = e->point(i);
-      unsigned int local_node_id = libMesh::invalid_uint;
-
-      // Look for a node of this that's contiguous with node i of
-      // e. Note that the exact floating point comparison of Point
-      // positions is intentional, see the class documentation for
-      // this function.
-      for (unsigned int j=0; j != nn; ++j)
-        if (this->point(j) == side_point)
-          local_node_id = j;
-
-      // If a node of e isn't contiguous with some node of this, then
-      // e isn't a side of this.
-      if (local_node_id == libMesh::invalid_uint)
-        return libMesh::invalid_uint;
-
-      // If a node of e isn't contiguous with some node on side s of
-      // this, then e isn't on side s.
-      for (unsigned int s=0; s != ns; ++s)
-        if (!this->is_node_on_side(local_node_id, s))
-          might_be_side[s] = false;
-    }
-
-  for (unsigned int s=0; s != ns; ++s)
-    if (might_be_side[s])
-      {
-#ifdef DEBUG
-        for (unsigned int s2=s+1; s2 < ns; ++s2)
-          libmesh_assert (!might_be_side[s2]);
-#endif
-        return s;
-      }
-
-  // Didn't find any matching side
-  return libMesh::invalid_uint;
-}
-
-
-
-inline
 bool Elem::active() const
 {
 #ifdef LIBMESH_ENABLE_AMR
@@ -2647,53 +2593,6 @@ unsigned int Elem::max_descendant_p_level () const
     max_p_level = std::max(max_p_level,
                            c.max_descendant_p_level());
   return max_p_level;
-}
-
-
-
-inline
-void Elem::set_p_level(unsigned int p)
-{
-  // Maintain the parent's p level as the minimum of it's children
-  if (this->parent() != nullptr)
-    {
-      unsigned int parent_p_level = this->parent()->p_level();
-
-      // If our new p level is less than our parents, our parents drops
-      if (parent_p_level > p)
-        {
-          this->parent()->set_p_level(p);
-
-          // And we should keep track of the drop, in case we need to
-          // do a projection later.
-          this->parent()->set_p_refinement_flag(Elem::JUST_COARSENED);
-        }
-      // If we are the lowest p level and it increases, so might
-      // our parent's, but we have to check every other child to see
-      else if (parent_p_level == _p_level && _p_level < p)
-        {
-          _p_level = cast_int<unsigned char>(p);
-          parent_p_level = cast_int<unsigned char>(p);
-          for (auto & c : this->parent()->child_ref_range())
-            parent_p_level = std::min(parent_p_level,
-                                      c.p_level());
-
-          // When its children all have a higher p level, the parent's
-          // should rise
-          if (parent_p_level > this->parent()->p_level())
-            {
-              this->parent()->set_p_level(parent_p_level);
-
-              // And we should keep track of the rise, in case we need to
-              // do a projection later.
-              this->parent()->set_p_refinement_flag(Elem::JUST_REFINED);
-            }
-
-          return;
-        }
-    }
-
-  _p_level = cast_int<unsigned char>(p);
 }
 
 

@@ -38,6 +38,52 @@ namespace libMesh
  */
 #ifdef LIBMESH_ENABLE_AMR
 
+void Elem::set_p_level(unsigned int p)
+{
+  // Maintain the parent's p level as the minimum of it's children
+  if (this->parent() != nullptr)
+    {
+      unsigned int parent_p_level = this->parent()->p_level();
+
+      // If our new p level is less than our parents, our parents drops
+      if (parent_p_level > p)
+        {
+          this->parent()->set_p_level(p);
+
+          // And we should keep track of the drop, in case we need to
+          // do a projection later.
+          this->parent()->set_p_refinement_flag(Elem::JUST_COARSENED);
+        }
+      // If we are the lowest p level and it increases, so might
+      // our parent's, but we have to check every other child to see
+      else if (parent_p_level == _p_level && _p_level < p)
+        {
+          _p_level = cast_int<unsigned char>(p);
+          parent_p_level = cast_int<unsigned char>(p);
+          for (auto & c : this->parent()->child_ref_range())
+            parent_p_level = std::min(parent_p_level,
+                                      c.p_level());
+
+          // When its children all have a higher p level, the parent's
+          // should rise
+          if (parent_p_level > this->parent()->p_level())
+            {
+              this->parent()->set_p_level(parent_p_level);
+
+              // And we should keep track of the rise, in case we need to
+              // do a projection later.
+              this->parent()->set_p_refinement_flag(Elem::JUST_REFINED);
+            }
+
+          return;
+        }
+    }
+
+  _p_level = cast_int<unsigned char>(p);
+}
+
+
+
 void Elem::refine (MeshRefinement & mesh_refinement)
 {
   libmesh_assert_equal_to (this->refinement_flag(), Elem::REFINE);
