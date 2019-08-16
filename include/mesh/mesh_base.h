@@ -770,8 +770,29 @@ public:
   /*
    * \returns The number of extra element integers for which space is
    * being reserved on this mesh.
+   *
+   * If non-integer data has been associated, each datum of type T
+   * counts for sizeof(T)/sizeof(dof_id_type) times in the return
+   * value.
    */
   unsigned int n_elem_integers() const { return _elem_integer_names.size(); }
+
+  /**
+   * Register a datum (of type T) to be added to each element in the
+   * mesh.
+   *
+   * \returns The starting index number for the new datum, or for the
+   * existing datum if one by the same name has already been added.
+   *
+   * If type T is larger than dof_id_type, its data will end up
+   * spanning multiple index values, but will be queried with the
+   * starting index number.
+   *
+   * No type checking is done with this function!  If you add data of
+   * type T, don't try to access it with a call specifying type U.
+   */
+  template <typename T>
+  unsigned int add_elem_datum(const std::string & name);
 
   /**
    * Register an integer datum (of type dof_id_type) to be added to
@@ -803,8 +824,29 @@ public:
   /*
    * \returns The number of extra node integers for which space is
    * being reserved on this mesh.
+   *
+   * If non-integer data has been associated, each datum of type T
+   * counts for sizeof(T)/sizeof(dof_id_type) times in the return
+   * value.
    */
   unsigned int n_node_integers() const { return _node_integer_names.size(); }
+
+  /**
+   * Register a datum (of type T) to be added to each node in the
+   * mesh.
+   *
+   * \returns The starting index number for the new datum, or for the
+   * existing datum if one by the same name has already been added.
+   *
+   * If type T is larger than dof_id_type, its data will end up
+   * spanning multiple index values, but will be queried with the
+   * starting index number.
+   *
+   * No type checking is done with this function!  If you add data of
+   * type T, don't try to access it with a call specifying type U.
+   */
+  template <typename T>
+  unsigned int add_node_datum(const std::string & name);
 
   /**
    * Prepare a newly ecreated (or read) mesh for use.
@@ -1767,6 +1809,30 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
   const_node_iterator (const MeshBase::node_iterator & rhs) :
     variant_filter_iterator<Predicate, Node * const, Node * const &, Node * const *>(rhs) {}
 };
+
+
+template <typename T>
+inline
+unsigned int MeshBase::add_elem_datum(const std::string & name)
+{
+  unsigned int start_idx = this->add_elem_integer(name);
+  unsigned int n_more_integers = (sizeof(T)-1)/sizeof(dof_id_type);
+  for (unsigned int i=0; i != n_more_integers; ++i)
+    this->add_elem_integer(name+"__"+std::to_string(i));
+  return start_idx;
+}
+
+
+template <typename T>
+inline
+unsigned int MeshBase::add_node_datum(const std::string & name)
+{
+  unsigned int start_idx = this->add_node_integer(name);
+  unsigned int n_more_integers = (sizeof(T)-1)/sizeof(dof_id_type);
+  for (unsigned int i=0; i != n_more_integers; ++i)
+    this->add_node_integer(name+"__"+std::to_string(i));
+  return start_idx;
+}
 
 
 } // namespace libMesh

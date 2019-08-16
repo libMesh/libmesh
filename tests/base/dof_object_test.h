@@ -12,7 +12,7 @@
   CPPUNIT_TEST( testInvalidateProcId );         \
   CPPUNIT_TEST( testSetNSystems );              \
   CPPUNIT_TEST( testSetNVariableGroups );       \
-  CPPUNIT_TEST( testAddExtraInts );             \
+  CPPUNIT_TEST( testAddExtraData );             \
   CPPUNIT_TEST( testAddSystemExtraInts );       \
   CPPUNIT_TEST( testSetNSystemsExtraInts );     \
   CPPUNIT_TEST( testSetNVariableGroupsExtraInts ); \
@@ -125,7 +125,7 @@ public:
       }
   }
 
-  void testAddExtraInts()
+  void testAddExtraData()
   {
     DofObject aobject(*instance);
 
@@ -135,11 +135,24 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( (unsigned int) 9, aobject.n_extra_integers() );
 
+    unsigned int ints_per_Real = (sizeof(Real)-1)/sizeof(dof_id_type) + 1;
+
+    for (unsigned int i=0; i != 9; ++i)
+      CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
+
     for (unsigned int i=0; i != 9; ++i)
       {
-        CPPUNIT_ASSERT_EQUAL( DofObject::invalid_id, aobject.get_extra_integer(i) );
-        aobject.set_extra_integer(i, i);
-        CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+        // Try out a char at i=1
+        if (i == 1)
+          aobject.set_extra_datum<char>(i, '1');
+        // Try out an extra Real at i=2 if we'll have room
+        if (i == 2 && ints_per_Real <= 4)
+          aobject.set_extra_datum<Real>(i, pi);
+        if (i < 1 || i >= (2 + ints_per_Real))
+          {
+            aobject.set_extra_integer(i, i);
+            CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+          }
       }
 
     aobject.add_extra_integers (6);
@@ -149,7 +162,14 @@ public:
     CPPUNIT_ASSERT_EQUAL( (unsigned int) 6, aobject.n_extra_integers() );
 
     for (unsigned int i=0; i != 6; ++i)
-      CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+      {
+        if (i == 1)
+          CPPUNIT_ASSERT_EQUAL(aobject.get_extra_datum<char>(i), '1');
+        if (i == 2 && ints_per_Real <= 4)
+          CPPUNIT_ASSERT_EQUAL(aobject.get_extra_datum<Real>(i), pi);
+        if (i < 1 || i >= (2 + ints_per_Real))
+          CPPUNIT_ASSERT_EQUAL( dof_id_type(i), aobject.get_extra_integer(i) );
+      }
   }
 
   void testAddSystemExtraInts()

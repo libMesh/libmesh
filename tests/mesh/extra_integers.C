@@ -32,13 +32,16 @@ public:
 
 protected:
   // Helper functions called by the test implementations, saves a few lines of code.
-  std::array<unsigned int, 3>
+  std::array<unsigned int, 6>
     build_mesh(Mesh & mesh, ElemType elem_type, unsigned int n_elem_per_side)
   {
     // Request some extra integers before building
     unsigned int i1 = mesh.add_elem_integer("i1");
+    unsigned int r1 = mesh.add_elem_datum<Real>("r1");
     unsigned int ni1 = mesh.add_node_integer("ni1");
     unsigned int ni2 = mesh.add_node_integer("ni2");
+    unsigned int nr1 = mesh.add_node_datum<Real>("nr1");
+    unsigned int nr2 = mesh.add_node_datum<Real>("nr2");
 
     const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     const unsigned int ymax = test_elem->dim() > 1;
@@ -54,26 +57,39 @@ protected:
                                        0., ymax,
                                        0., zmax,
                                        elem_type);
-    return {i1, ni1, ni2};
+    return {i1, r1, ni1, ni2, nr1, nr2};
   }
 
 
-  void test_and_set_initial_integers
-    (Mesh & mesh, unsigned int i1, unsigned int ni1, unsigned int ni2)
+  void test_and_set_initial_data
+    (Mesh & mesh, std::array<unsigned int, 6> ini)
   {
+    const unsigned int i1 = ini[0],
+                       r1 = ini[1],
+                       ni1 = ini[2],
+                       ni2 = ini[3],
+                       nr1 = ini[4];
     for (const auto & elem : mesh.element_ptr_range())
       {
-        CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), 1u);
+        const unsigned int expected_extra_ints =
+          2 + (sizeof(Real)-1)/sizeof(dof_id_type);
+        CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), expected_extra_ints);
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), DofObject::invalid_id);
         elem->set_extra_integer(i1, dof_id_type(elem->point(0)(0)*100));
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->point(0)(0)*100));
+        elem->set_extra_datum<Real>(r1, elem->point(0)(0)*1000);
+        CPPUNIT_ASSERT_EQUAL(elem->get_extra_datum<Real>(r1), elem->point(0)(0)*1000);
       }
 
     for (const auto & node : mesh.node_ptr_range())
       {
-        CPPUNIT_ASSERT_EQUAL(node->n_extra_integers(), 2u);
+        const unsigned int expected_extra_ints =
+          4 + (sizeof(Real)-1)/sizeof(dof_id_type)*2;
+        CPPUNIT_ASSERT_EQUAL(node->n_extra_integers(), expected_extra_ints);
         CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni1), DofObject::invalid_id);
         CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni2), DofObject::invalid_id);
+        node->set_extra_datum<Real>(nr1, (*node)(0)*1000);
+        CPPUNIT_ASSERT_EQUAL(node->get_extra_datum<Real>(nr1), (*node)(0)*1000);
       }
 
   }
@@ -92,9 +108,15 @@ protected:
         if (!elem->level())
 #endif
           for (auto & node : elem->node_ref_range())
-            CPPUNIT_ASSERT_EQUAL(node.n_extra_integers(), 2u);
+            {
+              const unsigned int expected_extra_ints =
+                4 + (sizeof(Real)-1)/sizeof(dof_id_type)*2;
+              CPPUNIT_ASSERT_EQUAL(node.n_extra_integers(), expected_extra_ints);
+            }
 
-        CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), 1u);
+        const unsigned int expected_extra_ints =
+          2 + (sizeof(Real)-1)/sizeof(dof_id_type);
+        CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), expected_extra_ints);
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(top_parent->point(0)(0)*100));
       }
   }
@@ -104,10 +126,12 @@ protected:
   {
     Mesh mesh(*TestCommWorld);
 
-    std::array<unsigned int, 3> ini = build_mesh(mesh, elem_type, n_elem_per_side);
-    const unsigned int i1 = ini[0], ni1 = ini[1], ni2 = ini[2];
+    std::array<unsigned int, 6> ini = build_mesh(mesh, elem_type, n_elem_per_side);
+    const unsigned int i1 = ini[0],
+                       ni1 = ini[2],
+                       ni2 = ini[3];
 
-    test_and_set_initial_integers(mesh, i1, ni1, ni2);
+    test_and_set_initial_data(mesh, ini);
 
     // Force (in parallel) a different partitioning - we'll simply put
     // everything on rank 0, which hopefully is not what our default
@@ -133,10 +157,10 @@ protected:
   {
     Mesh mesh(*TestCommWorld);
 
-    std::array<unsigned int, 3> ini = build_mesh(mesh, elem_type, n_elem_per_side);
-    const unsigned int i1 = ini[0], ni1 = ini[1], ni2 = ini[2];
+    std::array<unsigned int, 6> ini = build_mesh(mesh, elem_type, n_elem_per_side);
+    const unsigned int i1 = ini[0], ni1 = ini[2], ni2 = ini[3];
 
-    test_and_set_initial_integers(mesh, i1, ni1, ni2);
+    test_and_set_initial_data(mesh, ini);
 
     const std::string filename =
       std::string("extra_integers.cp") + (binary ? "r" : "a");
@@ -149,7 +173,7 @@ protected:
 
     mesh2.read(filename);
 
-    // Make sure everything got transferred to the second mesh
+    // Make sure the integers got transferred to the second mesh
     CPPUNIT_ASSERT_EQUAL(i1, mesh2.add_elem_integer("i1"));
     CPPUNIT_ASSERT_EQUAL(ni1, mesh2.add_node_integer("ni1"));
     CPPUNIT_ASSERT_EQUAL(ni2, mesh2.add_node_integer("ni2"));
