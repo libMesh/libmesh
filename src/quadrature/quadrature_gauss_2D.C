@@ -334,11 +334,14 @@ void QGauss::init_2D(const ElemType, unsigned int)
 
               // In each of the rows below, the first two entries are (z1, z2) which imply
               // z3.  The third entry is the weight for each of the points in the cyclic permutation.
+              // The original publication tabulated about 16 decimal digits for each point and weight
+              // parameter. The additional digits shown here were obtained using a code in the
+              // mp-quadrature library, https://github.com/jwpeterson/mp-quadrature
               const Real rule_data[nrows][3] = {
-                {6.2382265094402118e-02, 6.7517867073916085e-02, 2.6517028157436251e-02}, // group A
-                {5.5225456656926611e-02, 3.2150249385198182e-01, 4.3881408714446055e-02}, // group B
-                {3.4324302945097146e-02, 6.6094919618673565e-01, 2.8775042784981585e-02}, // group C
-                {5.1584233435359177e-01, 2.7771616697639178e-01, 6.7493187009802774e-02}  // group D
+                {Real(6.2382265094402118173683000996350e-02L), Real(6.7517867073916085442557131050869e-02L), Real(2.6517028157436251428754180460739e-02L)}, // group A
+                {Real(5.5225456656926611737479190275645e-02L), Real(3.2150249385198182266630784919920e-01L), Real(4.3881408714446055036769903139288e-02L)}, // group B
+                {Real(3.4324302945097146469630642483938e-02L), Real(6.6094919618673565761198031019780e-01L), Real(2.8775042784981585738445496900219e-02L)}, // group C
+                {Real(5.1584233435359177925746338682643e-01L), Real(2.7771616697639178256958187139372e-01L), Real(6.7493187009802774462697086166421e-02L)}  // group D
               };
 
               for (unsigned int i=0, offset=0; i<nrows; ++i)
