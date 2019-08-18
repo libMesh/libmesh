@@ -2,6 +2,8 @@ pkg_cppflags  = -DLIBMESH_IS_COMPILING_METIS
 pkg_cppflags += -DUSE_GKRAND
 pkg_cppflags += -I$(srcdir)/include  -I$(srcdir)/GKlib -I$(srcdir)/libmetis
 pkg_cppflags += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
+include_HEADERS = \
+	include/metis.h
 pkg_sources = \
 	include/metis.h \
 	GKlib/b64.c \
