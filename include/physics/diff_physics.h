@@ -24,6 +24,7 @@
 #include "libmesh/libmesh.h"
 
 // C++ includes
+#include <map>
 #include <memory>
 #include <set>
 #include <vector>
