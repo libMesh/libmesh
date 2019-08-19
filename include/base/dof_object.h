@@ -29,6 +29,7 @@
 
 // C++ includes
 #include <cstddef>
+#include <cstring>
 #include <vector>
 
 namespace libMesh
@@ -1048,7 +1049,7 @@ DofObject::set_extra_datum(const unsigned int index,
   const unsigned int start_idx_i = this->start_idx_ints();
 
   libmesh_assert_less(start_idx_i+index+n_more_integers, _idx_buf.size());
-  memcpy(&_idx_buf[start_idx_i+index], &value, sizeof(T));
+  std::memcpy(&_idx_buf[start_idx_i+index], &value, sizeof(T));
 }
 
 
@@ -1068,7 +1069,7 @@ DofObject::get_extra_datum (const unsigned int index) const
 
   libmesh_assert_less(start_idx_i+index+n_more_integers, _idx_buf.size());
   T returnval;
-  memcpy(&returnval, &_idx_buf[start_idx_i+index], sizeof(T));
+  std::memcpy(&returnval, &_idx_buf[start_idx_i+index], sizeof(T));
   return returnval;
 }
 
