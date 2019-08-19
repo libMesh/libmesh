@@ -24,9 +24,14 @@
 // C++ Includes
 #include <vector>
 
+#ifdef LIBMESH_HAVE_PARMETIS
+
+// Before we include a header wrapped in a namespace, we'd better make
+// sure none of its dependencies end up in that namespace
+#include <mpi.h>
+
 // Include the ParMETIS header files.  We need this so we can use
 // ParMetis' idx_t and real_t types directly.
-#ifdef LIBMESH_HAVE_PARMETIS
 namespace Parmetis {
 extern "C" {
 #     include "libmesh/ignore_warnings.h"

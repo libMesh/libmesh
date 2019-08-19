@@ -55,21 +55,12 @@ enum ElemType : int;
       libmesh_exceptionless_error();            \
     } } while (0)
 
-
-
-// Through several subsequent levels of includes, the exodusII.h
-// header includes <errno.h>.  On very specific system/compiler combinations
-// (currently GCC 5.2.0+ OSX Yosemite, El Capitan, possibly others) errno.h
-// cannot be included while wrapped in a namespace (as we do with the exII
-// namespace below).  A workaround for this is to simply include errno.h
-// not in any namespace prior to including exodusII.h.
-//
-// The same is also true for string.h.
-#ifdef LIBMESH_COMPILER_HAS_BROKEN_ERRNO_T
+// Before we include a header wrapped in a namespace, we'd better make
+// sure none of its dependencies end up in that namespace
 #include <errno.h>
-#include <string.h>
-#endif
-
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 #include <libmesh/ignore_warnings.h>
 namespace exII {

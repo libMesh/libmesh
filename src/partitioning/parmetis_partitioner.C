@@ -34,6 +34,10 @@
 // Include the ParMETIS header file.
 #ifdef LIBMESH_HAVE_PARMETIS
 
+// Before we include a header wrapped in a namespace, we'd better make
+// sure none of its dependencies end up in that namespace
+#include <mpi.h>
+
 namespace Parmetis {
 extern "C" {
 #     include "libmesh/ignore_warnings.h"
