@@ -390,7 +390,7 @@ void Communicator::minloc(bool & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
-      DataPlusInt<int> data_out;
+      DataPlusInt<int> data_out = data_in;
 
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
@@ -432,7 +432,7 @@ void Communicator::maxloc(bool & r,
       libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
-      DataPlusInt<int> data_out;
+      DataPlusInt<int> data_out = data_in;
 
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
