@@ -151,7 +151,7 @@ Packing<const Node *>::pack (const Node * const & node,
     {
       const Real node_i = (*node)(i);
       largest_id_type Real_as_idtypes[idtypes_per_Real];
-      memcpy(Real_as_idtypes, &node_i, sizeof(Real));
+      std::memcpy(Real_as_idtypes, &node_i, sizeof(Real));
       for (unsigned int j=0; j != idtypes_per_Real; ++j)
         *data_out++ =(Real_as_idtypes[j]);
     }
@@ -233,7 +233,7 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
           Real idtypes_as_Real;
-          memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
+          std::memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
           in += idtypes_per_Real;
           libmesh_assert_less_equal ((*node)(i), idtypes_as_Real + (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
           libmesh_assert_greater_equal ((*node)(i), idtypes_as_Real - (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
@@ -264,7 +264,7 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
           Real idtypes_as_Real;
-          memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
+          std::memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
           (*node)(i) = idtypes_as_Real;
           in += idtypes_per_Real;
         }
