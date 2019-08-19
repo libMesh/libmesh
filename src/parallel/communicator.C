@@ -276,12 +276,13 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
 
 
 status Communicator::probe (const unsigned int src_processor_id,
-                                   const MessageTag & tag) const
+                            const MessageTag & tag) const
 {
   LOG_SCOPE("probe()", "Parallel");
 
 #ifndef LIBMESH_HAVE_MPI
   libmesh_not_implemented();
+  libmesh_ignore(src_processor_id, tag);
 #endif
 
   status stat;
