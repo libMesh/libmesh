@@ -50,6 +50,12 @@
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
 
+#ifdef LIBMESH_HAVE_MPI
+#include "vtkMPI.h"
+#include "vtkMPICommunicator.h"
+#include "vtkMPIController.h"
+#endif
+
 #include "libmesh/restore_warnings.h"
 
 // A convenient macro for comparing VTK versions.  Returns 1 if the
@@ -259,9 +265,25 @@ void VTKIO::write_nodal_data (const std::string & fname,
   if (!names.empty() && soln.empty())
     libmesh_error_msg("Empty soln vector in VTKIO::write_nodal_data().");
 
+  // Get a reference to the mesh
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+
   // we only use Unstructured grids
   _vtk_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
   vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+#ifdef LIBMESH_HAVE_MPI
+  // Set VTK to the same communicator as libMesh
+  vtkSmartPointer<vtkMPICommunicator> vtk_comm = vtkSmartPointer<vtkMPICommunicator>::New();
+  MPI_Comm mpi_comm = mesh.comm().get();
+  vtkMPICommunicatorOpaqueComm vtk_opaque_comm(&mpi_comm);
+  vtk_comm->InitializeExternal(&vtk_opaque_comm);
+
+  vtkSmartPointer<vtkMPIController> vtk_mpi_ctrl = vtkSmartPointer<vtkMPIController>::New();
+  vtk_mpi_ctrl->SetCommunicator(vtk_comm);
+
+  writer->SetController(vtk_mpi_ctrl);
+#endif
 
   // add nodes to the grid and update _local_node_map
   _local_node_map.clear();
