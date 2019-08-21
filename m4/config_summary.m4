@@ -179,6 +179,21 @@ AS_IF([test "x$enableoptional" = "xyes"],
                 AS_ECHO([])
               ])
       ])
+AS_ECHO([])
+AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
+      [
+        AS_ECHO([ \
+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" \
+"! WARNING: You used --enable-glibcxx-debugging. This setting breaks ABI !" \
+"!          compatibility. You need to make sure that when you link C++  !" \
+"!          libraries in combination with the debug version of libMesh   !" \
+"!          that ALL OF THESE LIBRARIES are compiled with the            !" \
+"!            -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC                 !" \
+"!          flags.                                                       !" \
+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"])
+        AS_ECHO([])
+      ])
+
 AS_ECHO(["-------------------------------------------------------------------------------"])
 AS_ECHO(["Configure complete, now type 'make' and then 'make install'."])
 AS_ECHO([])

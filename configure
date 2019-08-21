@@ -1937,9 +1937,9 @@ Optional Features:
   --enable-cxx11-required Error if compiler does not support C++11
   --enable-sanitize="opt dbg devel prof oprof"
                           turn on sanitizer flags for the given methods
-  --disable-glibcxx-debugging
-                          omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even
-                          in dbg mode
+  --enable-glibcxx-debugging
+                          enable -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC in
+                          dbg mode
   --enable-glibcxx-debugging-cppunit
                           Use GLIBCXX debugging flags for unit tests
   --enable-coverage       configure code coverage analysis tools
@@ -7778,7 +7778,8 @@ fi
 fi
 
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
-  # definitions. however, allow the knowing user to preclude that if they need to.
+  # definitions. Should only be used by a knowing user, because these options break
+  # ABI compatibility.
   # Check whether --enable-glibcxx-debugging was given.
 if test "${enable_glibcxx_debugging+set}" = set; then :
   enableval=$enable_glibcxx_debugging; case "${enableval}" in #(
@@ -7790,7 +7791,7 @@ if test "${enable_glibcxx_debugging+set}" = set; then :
     as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging" "$LINENO" 5 ;;
 esac
 else
-  enableglibcxxdebugging=yes
+  enableglibcxxdebugging=no
 fi
 
 
@@ -46438,6 +46439,22 @@ fi
 fi
 
 fi
+$as_echo
+if test "x$enableglibcxxdebugging" = "xyes"; then :
+
+        $as_echo  \
+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" \
+"! WARNING: You used --enable-glibcxx-debugging. This setting breaks ABI !" \
+"!          compatibility. You need to make sure that when you link C++  !" \
+"!          libraries in combination with the debug version of libMesh   !" \
+"!          that ALL OF THESE LIBRARIES are compiled with the            !" \
+"!            -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC                 !" \
+"!          flags.                                                       !" \
+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        $as_echo
+
+fi
+
 $as_echo "-------------------------------------------------------------------------------"
 $as_echo "Configure complete, now type 'make' and then 'make install'."
 $as_echo

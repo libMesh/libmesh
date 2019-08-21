@@ -419,15 +419,16 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
         ])
 
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
-  # definitions. however, allow the knowing user to preclude that if they need to.
+  # definitions. Should only be used by a knowing user, because these options break
+  # ABI compatibility.
   AC_ARG_ENABLE(glibcxx-debugging,
-                [AS_HELP_STRING([--disable-glibcxx-debugging],
-                                [omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even in dbg mode])],
+                [AS_HELP_STRING([--enable-glibcxx-debugging],
+                                [enable -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC in dbg mode])],
                 [AS_CASE("${enableval}",
                          [yes], [enableglibcxxdebugging=yes],
                          [no],  [enableglibcxxdebugging=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging)])],
-                [enableglibcxxdebugging=yes])
+                [enableglibcxxdebugging=no])
 
   # GLIBCXX debugging causes untold woes on mac machines - so disable it
   AS_IF([test `uname` = "Darwin"],
