@@ -26,7 +26,6 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/parallel.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/time_solver.h"

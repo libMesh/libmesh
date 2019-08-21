@@ -24,7 +24,6 @@
 #include "libmesh/message_tag.h"
 #include "libmesh/request.h"
 #include "libmesh/status.h"
-#include "libmesh/post_wait_dereference_shared_ptr.h"
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
@@ -252,6 +251,7 @@ public:
    * Containers must have the same value in every entry.
    */
   template <typename T>
+  inline
   bool verify(const T & r) const;
 
   /**
@@ -260,6 +260,7 @@ public:
    * Containers must have the same value in every entry.
    */
   template <typename T>
+  inline
   bool semiverify(const T * r) const;
 
   /**
@@ -267,6 +268,7 @@ public:
    * on all processors.  Containers are replaced element-wise.
    */
   template <typename T>
+  inline
   void min(T & r) const;
 
   /**
@@ -275,6 +277,7 @@ public:
    * which originally held the minimum value.
    */
   template <typename T>
+  inline
   void minloc(T & r,
               unsigned int & min_id) const;
 
@@ -284,6 +287,7 @@ public:
    * the minimum rank where a corresponding minimum was found.
    */
   template <typename T, typename A1, typename A2>
+  inline
   void minloc(std::vector<T,A1> & r,
               std::vector<unsigned int,A2> & min_id) const;
 
@@ -292,6 +296,7 @@ public:
    * on all processors.  Containers are replaced element-wise.
    */
   template <typename T>
+  inline
   void max(T & r) const;
 
   /**
@@ -300,6 +305,7 @@ public:
    * which originally held the maximum value.
    */
   template <typename T>
+  inline
   void maxloc(T & r,
               unsigned int & max_id) const;
 
@@ -309,6 +315,7 @@ public:
    * the minimum rank where a corresponding maximum was found.
    */
   template <typename T, typename A1, typename A2>
+  inline
   void maxloc(std::vector<T,A1> & r,
               std::vector<unsigned int,A2> & max_id) const;
 
@@ -317,6 +324,7 @@ public:
    * on all processors.  Containers are replaced element-wise.
    */
   template <typename T>
+  inline
   void sum(T & r) const;
 
   /**
@@ -325,6 +333,7 @@ public:
    * processor 0.
    */
   template <typename T>
+  inline
   void set_union(T & data, const unsigned int root_id) const;
 
   /**
@@ -332,6 +341,7 @@ public:
    * replace it with their union over all processors.
    */
   template <typename T>
+  inline
   void set_union(T & data) const;
 
   /**
@@ -354,6 +364,7 @@ public:
    * \param flag Output.  True if a message exists.  False otherwise.
    */
   template <typename T>
+  inline
   Status packed_range_probe (const unsigned int src_processor_id,
                              const MessageTag & tag,
                              bool & flag) const;
@@ -362,6 +373,7 @@ public:
    * Blocking-send to one processor with data-defined type.
    */
   template <typename T>
+  inline
   void send (const unsigned int dest_processor_id,
              const T & buf,
              const MessageTag & tag=no_tag) const;
@@ -370,6 +382,7 @@ public:
    * Nonblocking-send to one processor with data-defined type.
    */
   template <typename T>
+  inline
   void send (const unsigned int dest_processor_id,
              const T & buf,
              Request & req,
@@ -383,6 +396,7 @@ public:
    * entries in the container(s).
    */
   template <typename T>
+  inline
   void send (const unsigned int dest_processor_id,
              const T & buf,
              const DataType & type,
@@ -396,6 +410,7 @@ public:
    * entries in the container(s).
    */
   template <typename T>
+  inline
   void send (const unsigned int dest_processor_id,
              const T & buf,
              const DataType & type,
@@ -406,6 +421,7 @@ public:
    * Blocking-receive from one processor with data-defined type.
    */
   template <typename T>
+  inline
   Status receive (const unsigned int dest_processor_id,
                   T & buf,
                   const MessageTag & tag=any_tag) const;
@@ -414,6 +430,7 @@ public:
    * Nonblocking-receive from one processor with data-defined type.
    */
   template <typename T>
+  inline
   void receive (const unsigned int dest_processor_id,
                 T & buf,
                 Request & req,
@@ -427,6 +444,7 @@ public:
    * entries in the container(s).
    */
   template <typename T>
+  inline
   Status receive (const unsigned int dest_processor_id,
                   T & buf,
                   const DataType & type,
@@ -440,6 +458,7 @@ public:
    * entries in the container(s).
    */
   template <typename T>
+  inline
   void receive (const unsigned int dest_processor_id,
                 T & buf,
                 const DataType & type,
@@ -470,6 +489,7 @@ public:
    * @param tag The tag to use
    */
   template <typename T, typename A>
+  inline
   bool possibly_receive (unsigned int & src_processor_id,
                          std::vector<T,A> & buf,
                          const DataType & type,
@@ -490,6 +510,7 @@ public:
    * error checking
    */
   template <typename Context, typename Iter>
+  inline
   void send_packed_range (const unsigned int dest_processor_id,
                           const Context * context,
                           Iter range_begin,
@@ -510,6 +531,7 @@ public:
    * error checking
    */
   template <typename Context, typename Iter>
+  inline
   void send_packed_range (const unsigned int dest_processor_id,
                           const Context * context,
                           Iter range_begin,
@@ -526,6 +548,7 @@ public:
    * 4. The message must be received by Communicator::nonblocking_receive_packed_range()
    */
   template <typename Context, typename Iter>
+  inline
   void nonblocking_send_packed_range (const unsigned int dest_processor_id,
                                       const Context * context,
                                       Iter range_begin,
@@ -543,6 +566,7 @@ public:
    * 4. The message must be received by Communicator::nonblocking_receive_packed_range()
    */
   template <typename Context, typename Iter>
+  inline
   void nonblocking_send_packed_range (const unsigned int dest_processor_id,
                                       const Context * context,
                                       Iter range_begin,
@@ -578,6 +602,7 @@ public:
    * is used to advance to the beginning of the next object's data.
    */
   template <typename Context, typename OutputIter, typename T>
+  inline
   void receive_packed_range (const unsigned int dest_processor_id,
                              Context * context,
                              OutputIter out,
@@ -597,6 +622,7 @@ public:
    * Communicator::packed_range_probe.
    */
   template <typename Context, typename OutputIter, typename T>
+  inline
   void nonblocking_receive_packed_range (const unsigned int src_processor_id,
                                          Context * context,
                                          OutputIter out,
@@ -618,6 +644,7 @@ public:
    * Communicator::packed_range_probe.
    */
   template <typename Context, typename OutputIter, typename T>
+  inline
   void nonblocking_receive_packed_range (const unsigned int src_processor_id,
                                          Context * context,
                                          OutputIter out,
@@ -633,6 +660,7 @@ public:
    * other data \p recv from a (potentially different) processor.
    */
   template <typename T1, typename T2>
+  inline
   void send_receive(const unsigned int dest_processor_id,
                     const T1 & send,
                     const unsigned int source_processor_id,
@@ -678,6 +706,7 @@ public:
    */
   template <typename Context1, typename RangeIter, typename Context2,
             typename OutputIter, typename T>
+  inline
   void send_receive_packed_range(const unsigned int dest_processor_id,
                                  const Context1 * context1,
                                  RangeIter send_begin,
@@ -695,6 +724,7 @@ public:
    * a user-specified MPI Dataype.
    */
   template <typename T1, typename T2>
+  inline
   void send_receive(const unsigned int dest_processor_id,
                     const T1 & send,
                     const DataType & type1,

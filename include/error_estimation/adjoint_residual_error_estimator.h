@@ -21,7 +21,6 @@
 #define LIBMESH_ADJOINT_RESIDUAL_ERROR_ESTIMATOR_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/error_estimator.h"
 #include "libmesh/qoi_set.h"
 

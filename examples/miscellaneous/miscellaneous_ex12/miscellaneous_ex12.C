@@ -56,6 +56,7 @@
 #include "libmesh/getpot.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
+#include "libmesh/parallel.h"
 
 // Eigen includes
 #ifdef LIBMESH_HAVE_EIGEN

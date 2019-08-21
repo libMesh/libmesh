@@ -21,7 +21,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/parallel_implementation.h" // for inline max(int)
+#include "libmesh/parallel.h" // for inline max(int)
 
 namespace libMesh
 {
@@ -273,6 +273,179 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
 
   return MessageTag(tagvalue, this);
 }
+
+
+status Communicator::probe (const unsigned int src_processor_id,
+                            const MessageTag & tag) const
+{
+  LOG_SCOPE("probe()", "Parallel");
+
+#ifndef LIBMESH_HAVE_MPI
+  libmesh_not_implemented();
+  libmesh_ignore(src_processor_id, tag);
+#endif
+
+  status stat;
+
+  libmesh_assert(src_processor_id < this->size() ||
+                 src_processor_id == any_source);
+
+  libmesh_call_mpi
+    (MPI_Probe (src_processor_id, tag.value(), this->get(), &stat));
+
+  return stat;
+}
+
+
+bool Communicator::verify(const bool & r) const
+{
+  const unsigned char rnew = r;
+  return this->verify(rnew);
+}
+
+
+bool Communicator::semiverify(const bool * r) const
+{
+  if (r)
+    {
+      const unsigned char rnew = *r;
+      return this->semiverify(&rnew);
+    }
+
+  const unsigned char * rptr = nullptr;
+  return this->semiverify(rptr);
+}
+
+
+bool Communicator::verify(const std::string & r) const
+{
+  if (this->size() > 1)
+    {
+      // Cannot use <char> since MPI_MIN is not
+      // strictly defined for chars!
+      std::vector<short int> temp; temp.reserve(r.size());
+      for (std::size_t i=0; i != r.size(); ++i)
+        temp.push_back(r[i]);
+      return this->verify(temp);
+    }
+  return true;
+}
+
+
+bool Communicator::semiverify(const std::string * r) const
+{
+  if (this->size() > 1)
+    {
+      std::size_t rsize = r ? r->size() : 0;
+      std::size_t * psize = r ? &rsize : nullptr;
+
+      if (!this->semiverify(psize))
+        return false;
+
+      this->max(rsize);
+
+      // Cannot use <char> since MPI_MIN is not
+      // strictly defined for chars!
+      std::vector<short int> temp (rsize);
+      if (r)
+        {
+          temp.reserve(rsize);
+          for (std::size_t i=0; i != rsize; ++i)
+            temp.push_back((*r)[i]);
+        }
+
+      std::vector<short int> * ptemp = r ? &temp: nullptr;
+
+      return this->semiverify(ptemp);
+    }
+  return true;
+}
+
+
+void Communicator::min(bool & r) const
+{
+  if (this->size() > 1)
+    {
+      LOG_SCOPE("min(bool)", "Parallel");
+
+      unsigned int temp = r;
+      libmesh_call_mpi
+        (MPI_Allreduce (MPI_IN_PLACE, &temp, 1,
+                        StandardType<unsigned int>(),
+                        OpFunction<unsigned int>::min(),
+                        this->get()));
+      r = temp;
+    }
+}
+
+
+void Communicator::minloc(bool & r,
+                          unsigned int & min_id) const
+{
+  if (this->size() > 1)
+    {
+      LOG_SCOPE("minloc(bool)", "Parallel");
+
+      DataPlusInt<int> data_in;
+      libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      data_in.val = r;
+      data_in.rank = this->rank();
+      DataPlusInt<int> data_out = data_in;
+
+      libmesh_call_mpi
+        (MPI_Allreduce (&data_in, &data_out, 1,
+                        dataplusint_type_acquire<int>().first,
+                        OpFunction<int>::min_location(), this->get()));
+      r = data_out.val;
+      min_id = data_out.rank;
+    }
+  else
+    min_id = this->rank();
+}
+
+
+void Communicator::max(bool & r) const
+{
+  if (this->size() > 1)
+    {
+      LOG_SCOPE("max(bool)", "Parallel");
+
+      unsigned int temp = r;
+      libmesh_call_mpi
+        (MPI_Allreduce (MPI_IN_PLACE, &temp, 1,
+                        StandardType<unsigned int>(),
+                        OpFunction<unsigned int>::max(),
+                        this->get()));
+      r = temp;
+    }
+}
+
+
+void Communicator::maxloc(bool & r,
+                          unsigned int & max_id) const
+{
+  if (this->size() > 1)
+    {
+      LOG_SCOPE("maxloc(bool)", "Parallel");
+
+      DataPlusInt<int> data_in;
+      libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      data_in.val = r;
+      data_in.rank = this->rank();
+      DataPlusInt<int> data_out = data_in;
+
+      libmesh_call_mpi
+        (MPI_Allreduce (&data_in, &data_out, 1,
+                        dataplusint_type_acquire<int>().first,
+                        OpFunction<int>::max_location(),
+                        this->get()));
+      r = data_out.val;
+      max_id = data_out.rank;
+    }
+  else
+    max_id = this->rank();
+}
+
 
 
 } // namespace Parallel

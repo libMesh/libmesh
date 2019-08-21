@@ -21,8 +21,6 @@
 #define LIBMESH_DIFF_QOI_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // deprecated
-#include "libmesh/parallel.h"
 #include "libmesh/diff_context.h"
 
 // C++ includes
@@ -34,6 +32,10 @@ namespace libMesh
 // Forward declarations
 class DiffContext;
 class QoISet;
+
+namespace Parallel {
+  class Communicator;
+}
 
 /**
  * This class provides a specific system class.  It aims

@@ -25,6 +25,7 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/communicator.h"
 #include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel.h"
 
 
 namespace libMesh

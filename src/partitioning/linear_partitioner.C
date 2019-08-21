@@ -21,6 +21,7 @@
 #include "libmesh/linear_partitioner.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
+#include "libmesh/parallel.h"
 
 namespace libMesh
 {

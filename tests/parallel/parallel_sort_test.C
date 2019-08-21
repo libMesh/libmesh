@@ -1,4 +1,5 @@
 #include <libmesh/parallel_sort.h>
+#include <libmesh/parallel.h>
 
 #include <algorithm>
 

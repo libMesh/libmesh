@@ -22,7 +22,7 @@
 #include "libmesh/topology_map.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
-#include "libmesh/parallel.h"
+#include "libmesh/parallel_only.h"
 #include "libmesh/remote_elem.h"
 
 // C++ Includes

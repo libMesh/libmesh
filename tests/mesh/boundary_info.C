@@ -7,6 +7,7 @@
 #include <libmesh/zero_function.h>
 #include <libmesh/dirichlet_boundaries.h>
 #include <libmesh/dof_map.h>
+#include <libmesh/parallel.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"

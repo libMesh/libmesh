@@ -24,6 +24,7 @@
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/utility.h"
+#include "libmesh/parallel.h"
 #include "libmesh/point.h"
 #ifdef LIBMESH_HAVE_NANOFLANN
 #include "libmesh/nanoflann.hpp"

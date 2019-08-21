@@ -2,6 +2,7 @@
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/mesh_generation.h"
+#include "libmesh/parallel.h"
 #include "libmesh/partitioner.h"
 
 #include "test_comm.h"

@@ -17,15 +17,16 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_mesh.h"
+#include "libmesh/parallel_node.h"
+
+// C++ includes
+#include <cstring> // memcpy
 
 // Helper functions in anonymous namespace
 
@@ -57,7 +58,6 @@ namespace Parallel
 {
 
 template <>
-template <>
 unsigned int
 Packing<const Node *>::packable_size (const Node * const & node,
                                       const MeshBase * mesh)
@@ -73,7 +73,6 @@ Packing<const Node *>::packable_size (const Node * const & node,
 
 
 
-template <>
 template <>
 unsigned int
 Packing<const Node *>::packed_size (const std::vector<largest_id_type>::const_iterator in)
@@ -97,7 +96,6 @@ Packing<const Node *>::packed_size (const std::vector<largest_id_type>::const_it
 
 
 template <>
-template <>
 unsigned int
 Packing<const Node *>::packed_size (const std::vector<largest_id_type>::iterator in)
 {
@@ -106,7 +104,6 @@ Packing<const Node *>::packed_size (const std::vector<largest_id_type>::iterator
 
 
 
-template <>
 template <>
 unsigned int
 Packing<const Node *>::packable_size (const Node * const & node,
@@ -118,7 +115,6 @@ Packing<const Node *>::packable_size (const Node * const & node,
 
 
 template <>
-template <>
 unsigned int
 Packing<const Node *>::packable_size (const Node * const & node,
                                       const ParallelMesh * mesh)
@@ -128,7 +124,6 @@ Packing<const Node *>::packable_size (const Node * const & node,
 
 
 
-template <>
 template <>
 void
 Packing<const Node *>::pack (const Node * const & node,
@@ -156,7 +151,7 @@ Packing<const Node *>::pack (const Node * const & node,
     {
       const Real node_i = (*node)(i);
       largest_id_type Real_as_idtypes[idtypes_per_Real];
-      memcpy(Real_as_idtypes, &node_i, sizeof(Real));
+      std::memcpy(Real_as_idtypes, &node_i, sizeof(Real));
       for (unsigned int j=0; j != idtypes_per_Real; ++j)
         *data_out++ =(Real_as_idtypes[j]);
     }
@@ -179,7 +174,6 @@ Packing<const Node *>::pack (const Node * const & node,
 
 
 template <>
-template <>
 void
 Packing<const Node *>::pack (const Node * const & node,
                              std::back_insert_iterator<std::vector<largest_id_type>> data_out,
@@ -191,7 +185,6 @@ Packing<const Node *>::pack (const Node * const & node,
 
 
 template <>
-template <>
 void
 Packing<const Node *>::pack (const Node * const & node,
                              std::back_insert_iterator<std::vector<largest_id_type>> data_out,
@@ -202,7 +195,6 @@ Packing<const Node *>::pack (const Node * const & node,
 
 
 
-template <>
 template <>
 Node *
 Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
@@ -241,7 +233,7 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
           Real idtypes_as_Real;
-          memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
+          std::memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
           in += idtypes_per_Real;
           libmesh_assert_less_equal ((*node)(i), idtypes_as_Real + (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
           libmesh_assert_greater_equal ((*node)(i), idtypes_as_Real - (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
@@ -272,7 +264,7 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
           Real idtypes_as_Real;
-          memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
+          std::memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
           (*node)(i) = idtypes_as_Real;
           in += idtypes_per_Real;
         }
@@ -312,7 +304,6 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
 
 template <>
-template <>
 Node *
 Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
                          DistributedMesh * mesh)
@@ -322,7 +313,6 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
 
 
-template <>
 template <>
 Node *
 Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,

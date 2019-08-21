@@ -29,7 +29,6 @@
 #include "libmesh/fem_function_base.h"
 #include "libmesh/patch_recovery_error_estimator.h"
 #include "libmesh/patch.h"
-#include "libmesh/point.h"
 
 
 namespace libMesh

@@ -37,6 +37,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/parallel.h"
 
 namespace libMesh
 {

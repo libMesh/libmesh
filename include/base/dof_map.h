@@ -22,7 +22,6 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/variable.h"

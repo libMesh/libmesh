@@ -21,7 +21,6 @@
 #define LIBMESH_RB_EIM_EVALUATION_H
 
 // libMesh includes
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/point.h"
 #include "libmesh/rb_evaluation.h"
 #include "libmesh/replicated_mesh.h"

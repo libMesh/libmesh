@@ -22,7 +22,8 @@
 
 
 // Local includes
-#include "libmesh/parallel.h"
+#include "libmesh/communicator.h"
+#include "libmesh/parallel_only.h"
 
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once

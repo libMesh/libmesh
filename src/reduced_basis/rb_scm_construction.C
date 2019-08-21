@@ -33,7 +33,6 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/getpot.h"
-#include "libmesh/parallel.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/enum_eigen_solver_type.h"
 

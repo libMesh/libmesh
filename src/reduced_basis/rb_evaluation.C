@@ -22,10 +22,10 @@
 #include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
+#include "libmesh/communicator.h"
 #include "libmesh/libmesh_version.h"
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/parallel.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/mesh_tools.h"

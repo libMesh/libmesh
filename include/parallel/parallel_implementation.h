@@ -26,7 +26,6 @@
 // C++ includes
 #include <complex>
 #include <cstddef>
-#include <cstring> // memcpy
 #include <iterator>
 #include <limits>
 #include <map>
@@ -190,23 +189,6 @@ dataplusint_type_acquire()
   return return_val;
 }
 
-
-
-inline status Communicator::probe (const unsigned int src_processor_id,
-                                   const MessageTag & tag) const
-{
-  LOG_SCOPE("probe()", "Parallel");
-
-  status stat;
-
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
-
-  libmesh_call_mpi
-    (MPI_Probe (src_processor_id, tag.value(), this->get(), &stat));
-
-  return stat;
-}
 
 template<typename T>
 inline Status Communicator::packed_range_probe (const unsigned int src_processor_id,
@@ -1467,7 +1449,7 @@ inline void Communicator::allgather(const std::basic_string<T> & sendval,
     return;
 
   // monolithic receive buffer
-  std::string r(globalsize, 0);
+  std::basic_string<T> r(globalsize, 0);
 
   // and get the data from the remote processors.
   libmesh_call_mpi
@@ -1532,7 +1514,7 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
 
   std::vector<T> data_c(data_size);
 #ifndef NDEBUG
-  std::string orig(data);
+  std::basic_string<T> orig(data);
 #endif
 
   if (this->rank() == root_id)
@@ -1631,7 +1613,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T>,A> & data,
       while (iter != temp.end())
         {
           std::size_t curr_len = *iter++;
-          data.push_back(std::string(iter, iter+curr_len));
+          data.push_back(std::basic_string<T>(iter, iter+curr_len));
           iter += curr_len;
         }
     }
@@ -1804,13 +1786,6 @@ inline void Communicator::nonblocking_receive_packed_range (const unsigned int s
 
 
 #else // LIBMESH_HAVE_MPI
-
-/**
- * We do not currently support probes on one processor without MPI.
- */
-inline status Communicator::probe (const unsigned int,
-                                   const MessageTag &) const
-{ libmesh_not_implemented(); status s; return s; }
 
 /**
  * We do not currently support sends on one processor without MPI.
@@ -2030,28 +2005,6 @@ inline bool Communicator::semiverify(const T * r) const
 
 
 
-inline bool Communicator::verify(const bool & r) const
-{
-  const unsigned char rnew = r;
-  return this->verify(rnew);
-}
-
-
-
-inline bool Communicator::semiverify(const bool * r) const
-{
-  if (r)
-    {
-      const unsigned char rnew = *r;
-      return this->semiverify(&rnew);
-    }
-
-  const unsigned char * rptr = nullptr;
-  return this->semiverify(rptr);
-}
-
-
-
 template <typename T, typename A>
 inline bool Communicator::semiverify(const std::vector<T,A> * r) const
 {
@@ -2093,53 +2046,6 @@ inline bool Communicator::semiverify(const std::vector<T,A> * r) const
 
 
 
-inline bool Communicator::verify(const std::string & r) const
-{
-  if (this->size() > 1)
-    {
-      // Cannot use <char> since MPI_MIN is not
-      // strictly defined for chars!
-      std::vector<short int> temp; temp.reserve(r.size());
-      for (std::size_t i=0; i != r.size(); ++i)
-        temp.push_back(r[i]);
-      return this->verify(temp);
-    }
-  return true;
-}
-
-
-
-inline bool Communicator::semiverify(const std::string * r) const
-{
-  if (this->size() > 1)
-    {
-      std::size_t rsize = r ? r->size() : 0;
-      std::size_t * psize = r ? &rsize : nullptr;
-
-      if (!this->semiverify(psize))
-        return false;
-
-      this->max(rsize);
-
-      // Cannot use <char> since MPI_MIN is not
-      // strictly defined for chars!
-      std::vector<short int> temp (rsize);
-      if (r)
-        {
-          temp.reserve(rsize);
-          for (std::size_t i=0; i != rsize; ++i)
-            temp.push_back((*r)[i]);
-        }
-
-      std::vector<short int> * ptemp = r ? &temp: nullptr;
-
-      return this->semiverify(ptemp);
-    }
-  return true;
-}
-
-
-
 template <typename T>
 inline void Communicator::min(T & libmesh_mpi_var(r)) const
 {
@@ -2154,23 +2060,6 @@ inline void Communicator::min(T & libmesh_mpi_var(r)) const
     }
 }
 
-
-
-inline void Communicator::min(bool & r) const
-{
-  if (this->size() > 1)
-    {
-      LOG_SCOPE("min(bool)", "Parallel");
-
-      unsigned int temp = r;
-      libmesh_call_mpi
-        (MPI_Allreduce (MPI_IN_PLACE, &temp, 1,
-                        StandardType<unsigned int>(),
-                        OpFunction<unsigned int>::min(),
-                        this->get()));
-      r = temp;
-    }
-}
 
 
 template <typename T, typename A>
@@ -2233,31 +2122,6 @@ inline void Communicator::minloc(T & r,
                         OpFunction<T>::min_location(), this->get()));
       r = data_in.val;
       min_id = data_in.rank;
-    }
-  else
-    min_id = this->rank();
-}
-
-
-inline void Communicator::minloc(bool & r,
-                                 unsigned int & min_id) const
-{
-  if (this->size() > 1)
-    {
-      LOG_SCOPE("minloc(bool)", "Parallel");
-
-      DataPlusInt<int> data_in;
-      libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
-      data_in.val = r;
-      data_in.rank = this->rank();
-      DataPlusInt<int> data_out;
-
-      libmesh_call_mpi
-        (MPI_Allreduce (&data_in, &data_out, 1,
-                        dataplusint_type_acquire<int>().first,
-                        OpFunction<int>::min_location(), this->get()));
-      r = data_out.val;
-      min_id = data_out.rank;
     }
   else
     min_id = this->rank();
@@ -2353,23 +2217,6 @@ inline void Communicator::max(T & libmesh_mpi_var(r)) const
 }
 
 
-inline void Communicator::max(bool & r) const
-{
-  if (this->size() > 1)
-    {
-      LOG_SCOPE("max(bool)", "Parallel");
-
-      unsigned int temp = r;
-      libmesh_call_mpi
-        (MPI_Allreduce (MPI_IN_PLACE, &temp, 1,
-                        StandardType<unsigned int>(),
-                        OpFunction<unsigned int>::max(),
-                        this->get()));
-      r = temp;
-    }
-}
-
-
 template <typename T, typename A>
 inline void Communicator::max(std::vector<T,A> & r) const
 {
@@ -2430,32 +2277,6 @@ inline void Communicator::maxloc(T & r,
                         OpFunction<T>::max_location(), this->get()));
       r = data_in.val;
       max_id = data_in.rank;
-    }
-  else
-    max_id = this->rank();
-}
-
-
-inline void Communicator::maxloc(bool & r,
-                                 unsigned int & max_id) const
-{
-  if (this->size() > 1)
-    {
-      LOG_SCOPE("maxloc(bool)", "Parallel");
-
-      DataPlusInt<int> data_in;
-      libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
-      data_in.val = r;
-      data_in.rank = this->rank();
-      DataPlusInt<int> data_out;
-
-      libmesh_call_mpi
-        (MPI_Allreduce (&data_in, &data_out, 1,
-                        dataplusint_type_acquire<int>().first,
-                        OpFunction<int>::max_location(),
-                        this->get()));
-      r = data_out.val;
-      max_id = data_out.rank;
     }
   else
     max_id = this->rank();
@@ -2786,7 +2607,7 @@ inline void Communicator::gather(const unsigned int root_id,
         }
 
       // monolithic receive buffer
-      std::string r;
+      std::basic_string<T> r;
       if (this->rank() == root_id)
         r.resize(globalsize, 0);
 

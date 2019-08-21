@@ -23,7 +23,6 @@
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/point.h"
 #include "libmesh/parallel_object.h"
 #ifdef LIBMESH_HAVE_NANOFLANN

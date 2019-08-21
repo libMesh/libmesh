@@ -32,7 +32,8 @@
 #include "libmesh/ignore_warnings.h"
 #include "hilbert.h"
 #include "libmesh/restore_warnings.h"
-#include "libmesh/parallel.h"
+
+#include "libmesh/standard_type.h"
 
 // C++ includes
 #include <cstddef>

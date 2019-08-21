@@ -53,6 +53,7 @@
 #include "libmesh/function_base.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parallel.h"
 
 namespace libMesh
 {

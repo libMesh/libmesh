@@ -28,7 +28,6 @@
 #include "libmesh/tecplot_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/elem.h"
-#include "libmesh/parallel.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/int_range.h"
 

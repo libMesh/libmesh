@@ -20,7 +20,6 @@
 #define LIBMESH_PARALLEL_SORT_H
 
 // Local Includes
-#include "libmesh/parallel.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel_object.h"
 
@@ -30,9 +29,12 @@
 namespace libMesh
 {
 
-
 namespace Parallel
 {
+
+// Forward declarations
+class Communicator;
+
 /**
  * The parallel sorting method is templated on the
  * type of data which is to be sorted.  It may later

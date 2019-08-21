@@ -20,19 +20,23 @@
 // Local Includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h"    // also includes mpi.h
+#include "libmesh/communicator.h"    // also includes mpi.h
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parmetis_partitioner.h"
 #include "libmesh/metis_partitioner.h"
-#include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/parallel_only.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/parmetis_helper.h"
 
 // Include the ParMETIS header file.
 #ifdef LIBMESH_HAVE_PARMETIS
+
+// Before we include a header wrapped in a namespace, we'd better make
+// sure none of its dependencies end up in that namespace
+#include <mpi.h>
 
 namespace Parmetis {
 extern "C" {

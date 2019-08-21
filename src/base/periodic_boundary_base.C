@@ -20,8 +20,10 @@
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-#include "libmesh/boundary_info.h" // BoundaryInfo::invalid_id
 #include "libmesh/periodic_boundary_base.h"
+
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/boundary_info.h" // BoundaryInfo::invalid_id
 
 namespace libMesh
 {

@@ -464,6 +464,59 @@ bool Elem::is_semilocal(const processor_id_type my_pid) const
 
 
 
+unsigned int Elem::which_side_am_i (const Elem * e) const
+{
+  libmesh_assert(e);
+
+  const unsigned int ns = this->n_sides();
+  const unsigned int nn = this->n_nodes();
+
+  const unsigned int en = e->n_nodes();
+
+  // e might be on any side until proven otherwise
+  std::vector<bool> might_be_side(ns, true);
+
+  for (unsigned int i=0; i != en; ++i)
+    {
+      Point side_point = e->point(i);
+      unsigned int local_node_id = libMesh::invalid_uint;
+
+      // Look for a node of this that's contiguous with node i of
+      // e. Note that the exact floating point comparison of Point
+      // positions is intentional, see the class documentation for
+      // this function.
+      for (unsigned int j=0; j != nn; ++j)
+        if (this->point(j) == side_point)
+          local_node_id = j;
+
+      // If a node of e isn't contiguous with some node of this, then
+      // e isn't a side of this.
+      if (local_node_id == libMesh::invalid_uint)
+        return libMesh::invalid_uint;
+
+      // If a node of e isn't contiguous with some node on side s of
+      // this, then e isn't on side s.
+      for (unsigned int s=0; s != ns; ++s)
+        if (!this->is_node_on_side(local_node_id, s))
+          might_be_side[s] = false;
+    }
+
+  for (unsigned int s=0; s != ns; ++s)
+    if (might_be_side[s])
+      {
+#ifdef DEBUG
+        for (unsigned int s2=s+1; s2 < ns; ++s2)
+          libmesh_assert (!might_be_side[s2]);
+#endif
+        return s;
+      }
+
+  // Didn't find any matching side
+  return libMesh::invalid_uint;
+}
+
+
+
 bool Elem::contains_vertex_of(const Elem * e) const
 {
   // Our vertices are the first numbered nodes

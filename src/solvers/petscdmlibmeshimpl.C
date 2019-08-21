@@ -40,6 +40,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/elem.h"
+#include "libmesh/parallel.h"
 
 
 using namespace libMesh;

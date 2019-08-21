@@ -31,6 +31,7 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/petsc_solver_exception.h"
+#include "libmesh/parallel_only.h"
 
 // PETSc include files.
 #ifdef I
