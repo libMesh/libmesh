@@ -896,6 +896,70 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 }
 
 
+Real FEInterface::shape_second_deriv(const unsigned int dim,
+                                     const FEType & fe_t,
+                                     const ElemType t,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p)
+{
+  libmesh_assert_greater (dim*(dim-1),j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(t))
+    libmesh_not_implemented();
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_second_deriv(t, o, i, j, p), return , ;);
+    case 1:
+      fe_family_switch (1, shape_second_deriv(t, o, i, j, p), return , ;);
+    case 2:
+      fe_family_switch (2, shape_second_deriv(t, o, i, j, p), return  , ;);
+    case 3:
+      fe_family_switch (3, shape_second_deriv(t, o, i, j, p), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+  return 0;
+}
+
+
+Real FEInterface::shape_second_deriv(const unsigned int dim,
+                                     const FEType & fe_t,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p)
+{
+  libmesh_assert_greater (dim,j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    libmesh_not_implemented();
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_second_deriv(elem, o, i, j, p), return , ;);
+    case 1:
+      fe_family_switch (1, shape_second_deriv(elem, o, i, j, p), return , ;);
+    case 2:
+      fe_family_switch (2, shape_second_deriv(elem, o, i, j, p), return , ;);
+    case 3:
+      fe_family_switch (3, shape_second_deriv(elem, o, i, j, p), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+  return 0;
+}
+
+
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const FEType & fe_t,
