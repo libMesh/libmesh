@@ -81,6 +81,11 @@ libmesh_SOURCES =  \
         src/fe/fe_nedelec_one.C \
         src/fe/fe_nedelec_one_shape_2D.C \
         src/fe/fe_nedelec_one_shape_3D.C \
+        src/fe/fe_rational.C \
+        src/fe/fe_rational_shape_0D.C \
+        src/fe/fe_rational_shape_1D.C \
+        src/fe/fe_rational_shape_2D.C \
+        src/fe/fe_rational_shape_3D.C \
         src/fe/fe_scalar.C \
         src/fe/fe_scalar_shape_0D.C \
         src/fe/fe_scalar_shape_1D.C \
