@@ -216,6 +216,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case BERNSTEIN:
             return libmesh_make_unique<FE<0,BERNSTEIN>>(fet);
+
+          case RATIONAL_BERNSTEIN:
+            return libmesh_make_unique<FE<0,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
@@ -260,6 +263,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case BERNSTEIN:
             return libmesh_make_unique<FE<1,BERNSTEIN>>(fet);
+
+          case RATIONAL_BERNSTEIN:
+            return libmesh_make_unique<FE<1,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
@@ -306,6 +312,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case BERNSTEIN:
             return libmesh_make_unique<FE<2,BERNSTEIN>>(fet);
+
+          case RATIONAL_BERNSTEIN:
+            return libmesh_make_unique<FE<2,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
@@ -355,6 +364,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case BERNSTEIN:
             return libmesh_make_unique<FE<3,BERNSTEIN>>(fet);
+
+          case RATIONAL_BERNSTEIN:
+            return libmesh_make_unique<FE<3,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:

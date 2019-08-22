@@ -41,6 +41,7 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     case MONOMIAL: // PB: Shouldn't this be L2 conforming?
     case MONOMIAL_VEC: // PB: Shouldn't this be L2 conforming?
     case XYZ: // PB: Shouldn't this be L2 conforming?
+    case RATIONAL_BERNSTEIN:
     case L2_HIERARCHIC: // PB: Shouldn't this be L2 conforming?
     case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
     case JACOBI_20_00: // PB: For infinite elements...

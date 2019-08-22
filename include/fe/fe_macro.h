@@ -106,6 +106,7 @@
   template class FE< (_dim), BERNSTEIN>;                                \
   template class FE< (_dim), SZABAB>;                                   \
   template class FE< (_dim), XYZ>;                                      \
+  template class FE< (_dim), RATIONAL_BERNSTEIN>;                       \
   template class FE< (_dim), NEDELEC_ONE>;                              \
   template class FE< (_dim), MONOMIAL_VEC>
 
@@ -122,6 +123,7 @@
   INSTANTIATE_MAPS(_dim,BERNSTEIN);             \
   INSTANTIATE_MAPS(_dim,SZABAB);                \
   INSTANTIATE_MAPS(_dim,XYZ);                   \
+  INSTANTIATE_MAPS(_dim,RATIONAL_BERNSTEIN);    \
   INSTANTIATE_MAPS(_dim,NEDELEC_ONE);           \
   INSTANTIATE_MAPS(_dim,MONOMIAL_VEC)
 
