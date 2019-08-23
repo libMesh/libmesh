@@ -24,6 +24,7 @@
 #include "libmesh/node.h"
 #include "libmesh/parallel_only.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/libmesh_logging.h"
 
 // C++ Includes
 #include <limits>

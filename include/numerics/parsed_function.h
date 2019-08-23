@@ -20,6 +20,7 @@
 
 #include "libmesh/libmesh_config.h"
 #include "libmesh/function_base.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 
@@ -27,7 +28,6 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/point.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // FParser includes
 #include "libmesh/fparser_ad.hh"
