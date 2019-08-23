@@ -75,7 +75,7 @@ class EulerSolverTest : public CppUnit::TestCase,
 public:
   CPPUNIT_TEST_SUITE( EulerSolverTest );
 
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEulerSolverConstantFirstOrderODE );
   CPPUNIT_TEST( testEulerSolverLinearTimeFirstOrderODE );
 #endif
@@ -108,7 +108,7 @@ class Euler2SolverTest : public CppUnit::TestCase,
 public:
   CPPUNIT_TEST_SUITE( Euler2SolverTest );
 
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEuler2SolverConstantFirstOrderODE );
   CPPUNIT_TEST( testEuler2SolverLinearTimeFirstOrderODE );
 #endif

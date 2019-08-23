@@ -26,7 +26,7 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testDofOrdering );
 #endif
   CPPUNIT_TEST( testPointLocatorTree );
@@ -210,7 +210,7 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testDofOrdering );
 #endif
 #endif
@@ -353,7 +353,7 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testDofOrdering );
 #endif
 #endif
@@ -613,7 +613,7 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testDofOrdering );
 #endif
 #endif
@@ -876,7 +876,7 @@ public:
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testMesh );
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testDofOrdering );
 #endif
 #endif

@@ -359,7 +359,7 @@ public:
 
   CPPUNIT_TEST_SUITE( OverlappingFunctorTest );
 
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( checkCouplingFunctorQuad );
   CPPUNIT_TEST( checkCouplingFunctorQuadUnifRef );
   CPPUNIT_TEST( checkCouplingFunctorTri );
@@ -420,7 +420,7 @@ private:
   // linear solver, so let's only run it if we have PETSc.
   void run_coupling_functor_test(unsigned int n_refinements)
   {
-#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_PETSC)
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_SOLVER)
     if( n_refinements > 0 )
       {
         MeshRefinement refine(*_mesh);

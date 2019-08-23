@@ -85,7 +85,7 @@ class NewmarkSolverTest : public CppUnit::TestCase,
 public:
   CPPUNIT_TEST_SUITE( NewmarkSolverTest );
 
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODESecondOrderStyle );
   CPPUNIT_TEST( testNewmarkSolverLinearTimeSecondOrderODESecondOrderStyle );
   CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODEFirstOrderStyle );
@@ -152,7 +152,7 @@ class EulerSolverSecondOrderTest : public CppUnit::TestCase,
 public:
   CPPUNIT_TEST_SUITE( EulerSolverSecondOrderTest );
 
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEulerSolverConstantSecondOrderODE );
 #endif
 
@@ -174,7 +174,7 @@ class Euler2SolverSecondOrderTest : public CppUnit::TestCase,
 public:
   CPPUNIT_TEST_SUITE( Euler2SolverSecondOrderTest );
 
-#ifdef LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEuler2SolverConstantSecondOrderODE );
 #endif
 
