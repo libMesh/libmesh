@@ -347,6 +347,19 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
+Real FE<1,CLOUGH>::shape_second_deriv(const ElemType,
+                                      const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point &)
+{
+  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
+  return 0.;
+}
+
+
+
+template <>
 Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
