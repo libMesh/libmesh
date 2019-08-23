@@ -74,10 +74,21 @@ public:
     const unsigned int ny = _dim > 1;
     const unsigned int nz = _dim > 2;
 
+    if (family == RATIONAL_BERNSTEIN)
+      {
+        unsigned int weight_index =
+          _mesh->add_node_datum<Real>("rational_weight");
+        libmesh_assert_equal_to(weight_index, 0);
+      }
+
     MeshTools::Generation::build_cube (*_mesh,
                                        1, ny, nz,
                                        0., 1., 0., ny, 0., nz,
                                        elem_type);
+
+    if (family == RATIONAL_BERNSTEIN)
+      for (auto node : _mesh->node_ptr_range())
+        node->set_extra_datum<Real>(0, 1.);
 
     _es = new EquationSystems(*_mesh);
     _sys = &(_es->add_system<System> ("SimpleSystem"));
