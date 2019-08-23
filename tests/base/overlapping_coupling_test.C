@@ -359,12 +359,14 @@ public:
 
   CPPUNIT_TEST_SUITE( OverlappingFunctorTest );
 
+#ifdef LIBMESH_HAVE_PETSC
   CPPUNIT_TEST( checkCouplingFunctorQuad );
   CPPUNIT_TEST( checkCouplingFunctorQuadUnifRef );
   CPPUNIT_TEST( checkCouplingFunctorTri );
   CPPUNIT_TEST( checkCouplingFunctorTriUnifRef );
   CPPUNIT_TEST( checkOverlappingPartitioner );
   CPPUNIT_TEST( checkOverlappingPartitionerUnifRef );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -414,17 +416,18 @@ private:
 
   // This is basically to sanity check the coupling functor
   // with the supplied mesh to make sure all the assumptions
-  // are kosher.
+  // are kosher. This test requires AMR and some kind of a
+  // linear solver, so let's only run it if we have PETSc.
   void run_coupling_functor_test(unsigned int n_refinements)
   {
-#ifdef LIBMESH_ENABLE_AMR
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_PETSC)
     if( n_refinements > 0 )
       {
         MeshRefinement refine(*_mesh);
         refine.uniformly_refine(n_refinements);
         _es->reinit();
       }
-#endif // LIBMESH_ENABLE_AMR
+#endif
 
     System & system = _es->get_system("SimpleSystem");
 
