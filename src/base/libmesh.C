@@ -27,6 +27,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/print_trace.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/perf_log.h"
 
 // C/C++ includes
 #include <iostream>

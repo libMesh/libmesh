@@ -47,6 +47,15 @@ enum FEMNormType : int;
 #include <vector>
 #include <memory>
 
+// This define may be useful in --disable-optional builds when it is
+// possible that libmesh will not have any solvers available.
+#if defined(LIBMESH_HAVE_PETSC) || \
+  defined(LIBMESH_HAVE_EIGEN)   || \
+  defined(LIBMESH_HAVE_LASPACK) || \
+  defined(LIBMESH_TRILINOS_HAVE_AZTECOO)
+#define LIBMESH_HAVE_SOLVER 1
+#endif
+
 namespace libMesh
 {
 

@@ -24,6 +24,7 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
 
 // C++ Includes
 #include <unordered_set>

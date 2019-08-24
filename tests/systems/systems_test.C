@@ -421,15 +421,21 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testProjectHierarchicQuad9 );
   CPPUNIT_TEST( testProjectHierarchicTri6 );
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testBlockRestrictedVarNDofs );
+#endif
 #endif // LIBMESH_DIM > 1
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testProjectHierarchicHex27 );
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testAssemblyWithDgFemContext );
+#endif
 #endif // LIBMESH_DIM > 2
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testDofCouplingWithVarGroups );
+#endif
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
