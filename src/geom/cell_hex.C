@@ -26,6 +26,8 @@
 #include "libmesh/enum_elem_quality.h"
 #include "libmesh/tensor_value.h"
 
+#include <array>
+
 namespace libMesh
 {
 
