@@ -1273,6 +1273,17 @@ void ExodusII_IO::write_timestep (const std::string & fname,
 
 
 
+void
+ExodusII_IO::write_sideset_data
+/**/(int timestep,
+     const std::vector<std::string> & var_names,
+     const std::vector<std::set<boundary_id_type>> & side_ids,
+     const std::vector<std::map<BCTuple, Real>> & bc_vals)
+{
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  exio_helper->write_sideset_data(mesh, timestep, var_names, side_ids, bc_vals);
+}
+
 void ExodusII_IO::write (const std::string & fname)
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();

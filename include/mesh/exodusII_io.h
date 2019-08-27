@@ -266,6 +266,31 @@ public:
                        const std::set<std::string> * system_names=nullptr);
 
   /**
+   * FIXME: This tuple should be defined in the BoundaryInfo class/header file
+   * since it is convenient to have wherever BoundaryInfo functions are called...
+   */
+  typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> BCTuple;
+
+  /**
+   * The Exodus format can also store values on sidesets. This can be
+   * thought of as an alternative to defining an elemental variable
+   * field on lower-dimensional elements making up a part of the
+   * boundary. The inputs to the function are:
+   * .) var_names[i] is the name of the ith sideset variable to be written to file.
+   * .) side_ids[i] is a set of side_ids where var_names[i] is active.
+   * .) bc_vals[i] is a map from (elem,side,id) BCTuple objects to the
+   *    corresponding real-valued data.
+   *
+   * \note You must have already written the mesh by calling
+   * e.g. write() before calling this function, because it uses the
+   * existing ordering of the Exodus sidesets.
+   */
+  void write_sideset_data (int timestep,
+                           const std::vector<std::string> & var_names,
+                           const std::vector<std::set<boundary_id_type>> & side_ids,
+                           const std::vector<std::map<BCTuple, Real>> & bc_vals);
+
+  /**
    * Sets the list of variable names to be included in the output.
    * This is _optional_.  If this is never called then all variables
    * will be present. If this is called and an empty vector is supplied

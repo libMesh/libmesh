@@ -277,6 +277,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   ex_err(0),
   num_dim(0),
   num_global_vars(0),
+  num_sideset_vars(0),
   num_nodes(0),
   num_elem(0),
   num_elem_blk(0),
@@ -523,6 +524,9 @@ void ExodusII_IO_Helper::read_header()
 
   ex_err = exII::ex_get_var_param(ex_id, "g", &num_global_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of global variables.");
+
+  ex_err = exII::ex_get_var_param(ex_id, "s", &num_sideset_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of sideset variables.");
 
   message("Exodus header info retrieved successfully.");
 }
@@ -1166,7 +1170,9 @@ void ExodusII_IO_Helper::read_var_names_impl(const char * var_type,
 
 
 
-void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::string> & names)
+void
+ExodusII_IO_Helper::write_var_names(ExodusVarType type,
+                                    const std::vector<std::string> & names)
 {
   switch (type)
     {
@@ -1179,6 +1185,14 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
     case GLOBAL:
       this->write_var_names_impl("g", num_global_vars, names);
       break;
+    case SIDESET:
+      {
+        // Note: calling this function *sets* num_sideset_vars to the
+        // number of entries in the 'names' vector, num_sideset_vars
+        // does not already need to be set before calling this.
+        this->write_var_names_impl("s", num_sideset_vars, names);
+        break;
+      }
     default:
       libmesh_error_msg("Unrecognized ExodusVarType " << type);
     }
@@ -1186,7 +1200,10 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
 
 
 
-void ExodusII_IO_Helper::write_var_names_impl(const char * var_type, int & count, std::vector<std::string> & names)
+void
+ExodusII_IO_Helper::write_var_names_impl(const char * var_type,
+                                         int & count,
+                                         const std::vector<std::string> & names)
 {
   // Update the count variable so that it's available to other parts of the class.
   count = cast_int<int>(names.size());
@@ -2141,6 +2158,165 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
   ex_err = exII::ex_update(ex_id);
   EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+}
+
+
+
+void
+ExodusII_IO_Helper::write_sideset_data
+/**/(const MeshBase & mesh,
+     int timestep,
+     const std::vector<std::string> & var_names,
+     const std::vector<std::set<boundary_id_type>> & side_ids,
+     const std::vector<std::map<BCTuple, Real>> & bc_vals)
+{
+  // Write the sideset variable names to file. This function should
+  // only be called once for SIDESET variables, repeated calls to
+  // write_var_names overwrites/changes the order of names that were
+  // there previously, and will mess up any data that has already been
+  // written.
+  this->write_var_names(SIDESET, var_names);
+
+  // I hope that we are allowed to call read_sideset_info() even
+  // though we are in the middle of writing? It seems to work provided
+  // that you have already written the mesh itself... read_sideset_info()
+  // fills in the following data members:
+  // .) num_side_sets
+  // .) ss_ids
+  this->read_sideset_info();
+
+  // Debugging:
+  // libMesh::out << "File has " << num_side_sets << " side sets." << std::endl;
+
+  // We'll use this object to map Exodus side ids to libmesh side ids.
+  ExodusII_IO_Helper::ElementMaps em;
+
+  // Write "truth" table for sideset variables.  The function
+  // exII::ex_put_var_param() must be called before
+  // exII::ex_put_sset_var_tab() For us, this happens during the call
+  // to ExodusII_IO_Helper::write_var_names(). sset_var_tab is a logically
+  // (num_side_sets x num_sset_var) integer array of 0s and 1s
+  // indicating which sidesets a given sideset variable is defined on.
+  std::vector<int> sset_var_tab(num_side_sets * var_names.size());
+
+  // We now call read_sideset() once per sideset and write any sideset
+  // variable values which are defined there.
+  int offset=0;
+  for (int ss=0; ss<num_side_sets; ++ss)
+    {
+      // We don't know num_sides_per_set for each set until we call
+      // read_sideset(). The values for each sideset are stored (using
+      // the offsets) into the 'elem_list' and 'side_list' arrays of
+      // this class.
+      offset += (ss > 0 ? num_sides_per_set[ss-1] : 0);
+      this->read_sideset(ss, offset);
+
+      // Debugging:
+      // libMesh::out << "Sideset " << ss_ids[ss]
+      //              << " has " << num_sides_per_set[ss]
+      //              << " entries."
+      //              << std::endl;
+
+      // For each variable in var_names, write the values for the
+      // current sideset, if any.
+      for (unsigned int var=0; var<var_names.size(); ++var)
+        {
+          // If this var has no values on this sideset, go to the next one.
+          if (!side_ids[var].count(ss_ids[ss]))
+            continue;
+
+          // Otherwise, fill in this entry of the sideset truth table.
+          sset_var_tab[ss*var_names.size() + var] = 1;
+
+          // Data vector that will eventually be passed to exII::ex_put_sset_var().
+          std::vector<Real> sset_var_vals(num_sides_per_set[ss]);
+
+          // Get reference to the BCTuple -> Real map for this variable.
+          const auto & data_map = bc_vals[var];
+
+          // Loop over elem_list, side_list entries in current sideset.
+          for (int i=0; i<num_sides_per_set[ss]; ++i)
+            {
+              // Get elem_id and side_id from the respective lists that
+              // are filled in by calling read_sideset().
+              //
+              // Note: these are Exodus-specific ids, so we have to convert them
+              // to libmesh ids, as that is what will be in the bc_tuples.
+              //
+              // TODO: we should probably consult the exodus_elem_num_to_libmesh
+              // mapping in order to figure out which libmesh element id 'elem_id'
+              // actually corresponds to here, instead of just assuming it will be
+              // off by one. Unfortunately that data structure does not seemed to
+              // be used at the moment. If we assume that write_sideset_data() is
+              // always called following write(), then this should be a fairly safe
+              // assumption...
+              dof_id_type elem_id = elem_list[i + offset] - 1;
+              unsigned int side_id = side_list[i + offset] - 1;
+
+              // Sanity check: make sure that the "off by one"
+              // assumption we used above to set 'elem_id' is valid.
+              auto check_it = libmesh_elem_num_to_exodus.find(elem_id);
+              if (check_it == libmesh_elem_num_to_exodus.end() ||
+                  check_it->second != elem_list[i + offset])
+                libmesh_error_msg("Error mapping Exodus elem id to libmesh elem id.");
+
+              // Map from Exodus side ids to libmesh side ids.
+              ExodusII_IO_Helper::Conversion conv =
+                em.assign_conversion(mesh.elem_ptr(elem_id)->type());
+
+              // Map from Exodus side ids to libmesh side ids.
+              unsigned int converted_side_id = conv.get_side_map(side_id);
+
+              // Debugging:
+              // libMesh::out << "side_id=" << side_id
+              //              << ", converted_side_id=" << converted_side_id
+              //              << std::endl;
+
+              // Construct a key so we can quickly see whether there is any
+              // data for this variable in the map.
+              BCTuple key = std::make_tuple
+                (elem_id,
+                 converted_side_id,
+                 ss_ids[ss]);
+
+              // Find the data for this (elem,side,id) tuple. Throw an
+              // error if not found.
+              auto it = data_map.find(key);
+
+              if (it == data_map.end())
+                libmesh_error_msg("Error: could not find data for variable "
+                                  << var_names[var] << ", elem " << elem_id
+                                  << ", side " << converted_side_id
+                                  << ", b_id " << ss_ids[ss]);
+
+              // Store value in vector which will be passed to Exodus.
+              sset_var_vals[i] = it->second;
+            } // end for (i)
+
+          // As far as I can tell, there is no "concat" version of writing
+          // sideset data, you have to call ex_put_sset_var() once per (variable,
+          // sideset) pair.
+          if (sset_var_vals.size() > 0)
+            {
+              ex_err = exII::ex_put_sset_var
+                (ex_id,
+                 timestep,
+                 var + 1, // 1-based variable index of current variable
+                 ss_ids[ss],
+                 num_sides_per_set[ss],
+                 sset_var_vals.data());
+              EX_CHECK_ERR(ex_err, "Error writing sideset vars.");
+            }
+        } // end for (var)
+    } // end for (ss)
+
+  // Finally, write the sideset truth table.
+  ex_err =
+    exII::ex_put_sset_var_tab(ex_id,
+                              num_side_sets,
+                              cast_int<int>(var_names.size()),
+                              sset_var_tab.data());
+  EX_CHECK_ERR(ex_err, "Error writing sideset var truth table.");
 }
 
 
