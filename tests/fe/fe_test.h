@@ -53,6 +53,69 @@ Gradient linear_test_grad (const Point&,
 }
 
 
+// Higher order rational bases need uniform weights to exactly
+// represent linears; we can easily try out other functions on
+// tensor product elements.
+static const Real rational_w = 0.75;
+
+inline
+Number rational_test (const Point& p,
+                      const Parameters&,
+                      const std::string&,
+                      const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+  const Real denom = ((1-x)*(1-x)+x*x+2*rational_w*x*(1-x))*
+                     ((1-y)*(1-y)+y*y+2*rational_w*y*(1-y))*
+                     ((1-z)*(1-z)+z*z+2*rational_w*z*(1-z));
+
+  return (x + 0.25*y + 0.0625*z)/denom;
+}
+
+inline
+Gradient rational_test_grad (const Point& p,
+                             const Parameters&,
+                             const std::string&,
+                             const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+  const Real xpoly = (1-x)*(1-x)+x*x+2*rational_w*x*(1-x);
+  const Real xderiv = -2*(1-x)+2*x+2*rational_w*(1-2*x);
+  const Real ypoly = (1-y)*(1-y)+y*y+2*rational_w*y*(1-y);
+  const Real yderiv = -2*(1-y)+2*y+2*rational_w*(1-2*y);
+  const Real zpoly = (1-z)*(1-z)+z*z+2*rational_w*z*(1-z);
+  const Real zderiv = -2*(1-z)+2*z+2*rational_w*(1-2*z);
+
+  const Real denom = xpoly * ypoly * zpoly;
+
+  const Real numer = (x + 0.25*y + 0.0625*z);
+
+  Gradient grad_n = 1, grad_d = xderiv * ypoly * zpoly;
+  if (LIBMESH_DIM > 1)
+    {
+      grad_n(1) = 0.25;
+      grad_d(1) = xpoly * yderiv * zpoly;
+    }
+  if (LIBMESH_DIM > 2)
+    {
+      grad_n(2) = 0.0625;
+      grad_d(2) = xpoly * ypoly * zderiv;
+    }
+
+  Gradient grad = (grad_n - numer * grad_d / denom) / denom;
+
+  return grad;
+}
+
+
+
+
 template <Order order, FEFamily family, ElemType elem_type>
 class FETest : public CppUnit::TestCase {
 
@@ -86,15 +149,48 @@ public:
                                        0., 1., 0., ny, 0., nz,
                                        elem_type);
 
+    // Set rational weights so we can exactly match our test solution
     if (family == RATIONAL_BERNSTEIN)
-      for (auto node : _mesh->node_ptr_range())
-        node->set_extra_datum<Real>(0, 1.);
+      {
+        for (auto elem : _mesh->active_element_ptr_range())
+          {
+            const unsigned int nv = elem->n_vertices();
+            const unsigned int nn = elem->n_nodes();
+            // We want interiors in lower dimensional elements treated
+            // like edges or faces as appropriate.
+            const unsigned int n_edges =
+              (elem->type() == EDGE3) ? 1 : elem->n_edges();
+            const unsigned int n_faces =
+              (elem->type() == QUAD9) ? 1 : elem->n_faces();
+            const unsigned int nve = std::min(nv + n_edges, nn);
+            const unsigned int nvef = std::min(nve + n_faces, nn);
+
+            for (unsigned int i = 0; i != nv; ++i)
+              elem->node_ref(i).set_extra_datum<Real>(0, 1.);
+            for (unsigned int i = nv; i != nve; ++i)
+              elem->node_ref(i).set_extra_datum<Real>(0, rational_w);
+            const Real w2 = rational_w * rational_w;
+            for (unsigned int i = nve; i != nvef; ++i)
+              elem->node_ref(i).set_extra_datum<Real>(0, w2);
+            const Real w3 = rational_w * w2;
+            for (unsigned int i = nvef; i != nn; ++i)
+              elem->node_ref(i).set_extra_datum<Real>(0, w3);
+          }
+      }
 
     _es = new EquationSystems(*_mesh);
     _sys = &(_es->add_system<System> ("SimpleSystem"));
     _sys->add_variable("u", order, family);
     _es->init();
-    _sys->project_solution(linear_test, linear_test_grad, _es->parameters);
+
+    if (family == RATIONAL_BERNSTEIN && order > 1)
+      {
+        _sys->project_solution(rational_test, rational_test_grad, _es->parameters);
+      }
+    else
+      {
+        _sys->project_solution(linear_test, linear_test_grad, _es->parameters);
+      }
 
     FEType fe_type = _sys->variable_type(0);
     _fe = FEBase::build(_dim, fe_type).release();
@@ -131,6 +227,8 @@ public:
     if (!_elem)
       return;
 
+    Parameters dummy;
+
     // These tests require exceptions to be enabled because a
     // TypeTensor::solve() call down in Elem::contains_point()
     // actually throws a non-fatal exception for a certain Point which
@@ -159,10 +257,16 @@ public:
             for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               u += _fe->get_phi()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 
-            LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(u),
-               libmesh_real(x + 0.25*y + 0.0625*z),
-               TOLERANCE*TOLERANCE);
+            if (family == RATIONAL_BERNSTEIN && order > 1)
+              LIBMESH_ASSERT_FP_EQUAL
+                (libmesh_real(u),
+                 libmesh_real(rational_test(p, dummy, "", "")),
+                 TOLERANCE*TOLERANCE);
+            else
+              LIBMESH_ASSERT_FP_EQUAL
+                (libmesh_real(u),
+                 libmesh_real(x + 0.25*y + 0.0625*z),
+                 TOLERANCE*TOLERANCE);
           }
 #endif
   }
@@ -172,6 +276,8 @@ public:
     // Handle the "more processors than elements" case
     if (!_elem)
       return;
+
+    Parameters dummy;
 
     // These tests require exceptions to be enabled because a
     // TypeTensor::solve() call down in Elem::contains_point()
@@ -200,14 +306,34 @@ public:
             for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               grad_u += _fe->get_dphi()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 1.0,
-                                    TOLERANCE*sqrt(TOLERANCE));
-            if (_dim > 1)
-              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), 0.25,
-                                      TOLERANCE*sqrt(TOLERANCE));
-            if (_dim > 2)
-              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.0625,
-                                      TOLERANCE*sqrt(TOLERANCE));
+            if (family == RATIONAL_BERNSTEIN && order > 1)
+              {
+                const Gradient rat_grad =
+                  rational_test_grad(p, dummy, "", "");
+
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)),
+                                        libmesh_real(rat_grad(0)),
+                                        TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 1)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)),
+                                          libmesh_real(rat_grad(1)),
+                                          TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 2)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
+                                          libmesh_real(rat_grad(2)),
+                                          TOLERANCE*sqrt(TOLERANCE));
+              }
+            else
+              {
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 1.0,
+                                        TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 1)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), 0.25,
+                                          TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 2)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.0625,
+                                          TOLERANCE*sqrt(TOLERANCE));
+              }
           }
 #endif
   }
@@ -217,6 +343,8 @@ public:
     // Handle the "more processors than elements" case
     if (!_elem)
       return;
+
+    Parameters dummy;
 
     // These tests require exceptions to be enabled because a
     // TypeTensor::solve() call down in Elem::contains_point()
@@ -253,14 +381,34 @@ public:
 #endif
               }
 
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 1.0,
-                                    TOLERANCE*sqrt(TOLERANCE));
-            if (_dim > 1)
-              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), 0.25,
-                                      TOLERANCE*sqrt(TOLERANCE));
-            if (_dim > 2)
-              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.0625,
-                                      TOLERANCE*sqrt(TOLERANCE));
+            if (family == RATIONAL_BERNSTEIN && order > 1)
+              {
+                const Gradient rat_grad =
+                  rational_test_grad(p, dummy, "", "");
+
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x),
+                                        libmesh_real(rat_grad(0)),
+                                        TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 1)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y),
+                                          libmesh_real(rat_grad(1)),
+                                          TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 2)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z),
+                                          libmesh_real(rat_grad(2)),
+                                          TOLERANCE*sqrt(TOLERANCE));
+              }
+            else
+              {
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 1.0,
+                                        TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 1)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), 0.25,
+                                          TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 2)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.0625,
+                                          TOLERANCE*sqrt(TOLERANCE));
+              }
           }
 #endif
   }
