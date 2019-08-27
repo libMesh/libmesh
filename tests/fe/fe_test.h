@@ -103,8 +103,8 @@ public:
     _sys->get_dof_map().dof_indices(_elem, _dof_indices);
 
     _nx = 10;
-    _ny = _nx * (_dim > 1);
-    _nz = _nx * (_dim > 2);
+    _ny = (_dim > 1) ? _nx : 1;
+    _nz = (_dim > 2) ? _nx : 1;
   }
 
   void tearDown()
