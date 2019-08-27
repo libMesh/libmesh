@@ -135,7 +135,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
       return 0.;
 
     case 1:
-      return 1.;
+      return 1./max_distance;
 
     case 2:
       return 2.*dx/max_distance;
