@@ -30,6 +30,8 @@ void QConical::init_2D(const ElemType, unsigned int)
   switch (_type)
     {
     case TRI3:
+    case TRISHELL3:
+    case TRI3SUBDIVISION:
     case TRI6:
       {
         this->conical_product_tri();

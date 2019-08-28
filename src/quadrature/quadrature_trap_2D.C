@@ -58,6 +58,7 @@ void QTrap::init_2D(const ElemType, unsigned int)
       // Triangle quadrature rules
     case TRI3:
     case TRISHELL3:
+    case TRI3SUBDIVISION:
     case TRI6:
       {
         _points.resize(3);

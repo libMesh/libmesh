@@ -37,6 +37,8 @@ void QGrundmann_Moller::init_2D(const ElemType, unsigned int)
   switch (_type)
     {
     case TRI3:
+    case TRISHELL3:
+    case TRI3SUBDIVISION:
     case TRI6:
       {
         switch(get_order())
