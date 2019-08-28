@@ -139,7 +139,9 @@ public:
 
     if (family == RATIONAL_BERNSTEIN)
       {
+#ifndef NDEBUG
         unsigned int weight_index =
+#endif
           _mesh->add_node_datum<Real>("rational_weight");
         libmesh_assert_equal_to(weight_index, 0);
       }
