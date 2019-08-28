@@ -242,6 +242,7 @@ void init_fefamily_to_enum ()
       fefamily_to_enum["SCALAR"       ]=SCALAR;
       fefamily_to_enum["XYZ"          ]=XYZ;
       fefamily_to_enum["BERNSTEIN"    ]=BERNSTEIN;
+      fefamily_to_enum["RATIONAL_BERNSTEIN"]=RATIONAL_BERNSTEIN;
       fefamily_to_enum["SZABAB"       ]=SZABAB;
       fefamily_to_enum["INFINITE_MAP" ]=INFINITE_MAP;
       fefamily_to_enum["JACOBI_20_00" ]=JACOBI_20_00;
