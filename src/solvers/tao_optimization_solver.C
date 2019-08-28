@@ -25,6 +25,7 @@
 // C++ includes
 
 // Local Includes
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/dof_map.h"
