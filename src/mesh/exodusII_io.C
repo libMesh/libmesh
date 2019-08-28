@@ -374,8 +374,8 @@ void ExodusII_IO::read (const std::string & fname)
                                                cast_int<unsigned short>(mapped_side),
                                                cast_int<boundary_id_type>(exio_helper->id_list[e]));
           }
-      }
-  }
+      } // end for (elem_list)
+  } // end read sideset info
 
   // Read nodeset info
   {
@@ -1274,15 +1274,31 @@ void ExodusII_IO::write_timestep (const std::string & fname,
 
 
 void
-ExodusII_IO::write_sideset_data
-/**/(int timestep,
-     const std::vector<std::string> & var_names,
-     const std::vector<std::set<boundary_id_type>> & side_ids,
-     const std::vector<std::map<BCTuple, Real>> & bc_vals)
+ExodusII_IO::
+write_sideset_data(int timestep,
+                   const std::vector<std::string> & var_names,
+                   const std::vector<std::set<boundary_id_type>> & side_ids,
+                   const std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   exio_helper->write_sideset_data(mesh, timestep, var_names, side_ids, bc_vals);
 }
+
+
+
+void
+ExodusII_IO::
+read_sideset_data(int timestep,
+                  std::vector<std::string> & var_names,
+                  std::vector<std::set<boundary_id_type>> & side_ids,
+                  std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
+{
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  exio_helper->read_sideset_data(mesh, timestep, var_names, side_ids, bc_vals);
+}
+
+
+
 
 void ExodusII_IO::write (const std::string & fname)
 {

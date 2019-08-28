@@ -695,8 +695,8 @@ public:
    * (elem-id, side-id, bc-id) triplets and returns it to the user,
    * taking advantage of guaranteed RVO.
    */
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
-  build_side_list() const;
+  typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> BCTuple;
+  std::vector<BCTuple> build_side_list() const;
 
   /**
    * Creates a list of active element numbers, sides, and ids for those sides.

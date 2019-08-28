@@ -25,6 +25,7 @@
 // Local includes
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
+#include "libmesh/boundary_info.h" // BoundaryInfo::BCTuple
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -324,15 +325,24 @@ public:
   void write_timestep(int timestep, Real time);
 
   /**
-   * Writes sideset data time for the timestep
+   * Write sideset data for the requested timestep.
    */
-  typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> BCTuple;
-  void write_sideset_data
-  /**/(const MeshBase & mesh,
-       int timestep,
-       const std::vector<std::string> & var_names,
-       const std::vector<std::set<boundary_id_type>> & side_ids,
-       const std::vector<std::map<BCTuple, Real>> & bc_vals);
+  void
+  write_sideset_data (const MeshBase & mesh,
+                      int timestep,
+                      const std::vector<std::string> & var_names,
+                      const std::vector<std::set<boundary_id_type>> & side_ids,
+                      const std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
+
+  /**
+   * Read sideset variables, if any, into the provided data structures.
+   */
+  void
+  read_sideset_data (const MeshBase & mesh,
+                     int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<boundary_id_type>> & side_ids,
+                     std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
    * Writes the vector of values to the element variables.
@@ -623,6 +633,9 @@ public:
   // The names of the global variables stored in the Exodus file
   std::vector<std::string> global_var_names;
 
+  // The names of the sideset variables stored in the Exodus file
+  std::vector<std::string> sideset_var_names;
+
   // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
   std::map<int, std::string> id_to_ss_names;
@@ -653,9 +666,10 @@ public:
    * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
    * The enumeration controls whether nodal, elemental, or global
    * variable names are read and which class members are filled in.
-   * NODAL:     num_nodal_vars  nodal_var_names
-   * ELEMENTAL: num_elem_vars   elem_var_names
-   * GLOBAL:    num_global_vars global_var_names
+   * NODAL:     num_nodal_vars   nodal_var_names
+   * ELEMENTAL: num_elem_vars    elem_var_names
+   * GLOBAL:    num_global_vars  global_var_names
+   * SIDESET:   num_sideset_vars sideset_var_names
    */
   enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3};
   void read_var_names(ExodusVarType type);
