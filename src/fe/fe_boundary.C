@@ -118,6 +118,10 @@ SIDEMAP_ERROR(0, BERNSTEIN, side_map)   { libmesh_error_msg("ERROR: Cannot side_
 REINIT_ERROR(0, SZABAB, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D SZABAB elements!"); }
 REINIT_ERROR(0, SZABAB, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D SZABAB elements!"); }
 SIDEMAP_ERROR(0, SZABAB, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D SZABAB elements!"); }
+
+REINIT_ERROR(0, RATIONAL_BERNSTEIN, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D RATIONAL_BERNSTEIN elements!"); }
+REINIT_ERROR(0, RATIONAL_BERNSTEIN, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D RATIONAL_BERNSTEIN elements!"); }
+SIDEMAP_ERROR(0, RATIONAL_BERNSTEIN, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D RATIONAL_BERNSTEIN elements!"); }
 #endif
 
 // 1D error instantiations
@@ -138,6 +142,7 @@ SIDEMAP_ERROR(1, NEDELEC_ONE, side_map)     { libmesh_error_msg("ERROR: Cannot s
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 REINIT_ERROR(1, BERNSTEIN, edge_reinit)     { libmesh_error_msg("ERROR: Cannot edge_reinit 1D BERNSTEIN elements!"); }
 REINIT_ERROR(1, SZABAB, edge_reinit)        { libmesh_error_msg("ERROR: Cannot edge_reinit 1D SZABAB elements!"); }
+REINIT_ERROR(1, RATIONAL_BERNSTEIN, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 1D RATIONAL_BERNSTEIN elements!"); }
 #endif
 
 
@@ -1103,6 +1108,8 @@ template void FE<1,BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const st
 template void FE<1,BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<1,SZABAB>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<1,SZABAB>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template void FE<1,RATIONAL_BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<1,RATIONAL_BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 #endif
 template void FE<1,XYZ>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<1,XYZ>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
@@ -1144,6 +1151,9 @@ template void FE<2,BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, con
 template void FE<2,SZABAB>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<2,SZABAB>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<2,SZABAB>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<2,RATIONAL_BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<2,RATIONAL_BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template void FE<2,RATIONAL_BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 #endif
 template void FE<2,SUBDIVISION>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<2,XYZ>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
@@ -1193,6 +1203,9 @@ template void FE<3,BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, con
 template void FE<3,SZABAB>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<3,SZABAB>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<3,SZABAB>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<3,RATIONAL_BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template void FE<3,RATIONAL_BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template void FE<3,RATIONAL_BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 #endif
 template void FE<3,XYZ>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<3,XYZ>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);

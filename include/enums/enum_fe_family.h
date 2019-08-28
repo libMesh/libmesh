@@ -60,6 +60,8 @@ enum FEFamily : int {
                LAGRANGE_VEC = 41,
                NEDELEC_ONE  = 42,
                MONOMIAL_VEC = 43,
+               // Rational basis functions
+               RATIONAL_BERNSTEIN = 61,
                // Invalid
                INVALID_FE   = 99};
 

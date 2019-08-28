@@ -342,6 +342,53 @@ public:
                            const unsigned int j,
                            const Point & p);
 
+  /**
+   * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at the point \p p.
+   *
+   * \note Cross-derivatives are indexed according to:
+   * j = 0 ==> d^2 phi / dxi^2
+   * j = 1 ==> d^2 phi / dxi deta
+   * j = 2 ==> d^2 phi / deta^2
+   * j = 3 ==> d^2 phi / dxi dzeta
+   * j = 4 ==> d^2 phi / deta dzeta
+   * j = 5 ==> d^2 phi / dzeta^2
+   *
+   * This method allows you to specify the dimension,
+   * element type, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
+   */
+  static Real shape_second_deriv(const unsigned int dim,
+                                 const FEType & fe_t,
+                                 const ElemType t,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p);
+
+  /**
+   * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at the point \p p.
+   *
+   * \note Cross-derivatives are indexed according to:
+   * j = 0 ==> d^2 phi / dxi^2
+   * j = 1 ==> d^2 phi / dxi deta
+   * j = 2 ==> d^2 phi / deta^2
+   * j = 3 ==> d^2 phi / dxi dzeta
+   * j = 4 ==> d^2 phi / deta dzeta
+   * j = 5 ==> d^2 phi / dzeta^2
+   *
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
+   */
+  static Real shape_second_deriv (const unsigned int dim,
+                                  const FEType & fe_t,
+                                  const Elem *elem,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p);
 
   /**
    * Lets the appropriate child of \p FEBase compute the requested

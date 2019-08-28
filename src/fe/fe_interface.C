@@ -104,6 +104,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
       case SZABAB:                                                      \
         prefix FE<dim,SZABAB>::func_and_args suffix                     \
+      case RATIONAL_BERNSTEIN:                                          \
+        prefix FE<dim,RATIONAL_BERNSTEIN>::func_and_args suffix         \
       case XYZ:                                                         \
         prefix FEXYZ<dim>::func_and_args suffix                         \
       case SUBDIVISION:                                                 \
@@ -142,6 +144,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
       case SZABAB:                                                      \
         prefix FE<dim,SZABAB>::func_and_args suffix                     \
+      case RATIONAL_BERNSTEIN:                                          \
+        prefix FE<dim,RATIONAL_BERNSTEIN>::func_and_args suffix         \
       case XYZ:                                                         \
         prefix FEXYZ<dim>::func_and_args suffix                         \
       case SUBDIVISION:                                                 \
@@ -176,6 +180,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,SCALAR>::func_and_args suffix                     \
       case BERNSTEIN:                                                   \
         prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
+      case RATIONAL_BERNSTEIN:                                          \
+        prefix FE<dim,RATIONAL_BERNSTEIN>::func_and_args suffix         \
       case SZABAB:                                                      \
         prefix FE<dim,SZABAB>::func_and_args suffix                     \
       case XYZ:                                                         \
@@ -212,6 +218,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case SCALAR:                                                      \
       case BERNSTEIN:                                                   \
       case SZABAB:                                                      \
+      case RATIONAL_BERNSTEIN:                                          \
       case XYZ:                                                         \
       case SUBDIVISION:                                                 \
         libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::shape"); \
@@ -896,6 +903,70 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 }
 
 
+Real FEInterface::shape_second_deriv(const unsigned int dim,
+                                     const FEType & fe_t,
+                                     const ElemType t,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p)
+{
+  libmesh_assert_greater (dim*(dim-1),j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(t))
+    libmesh_not_implemented();
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_second_deriv(t, o, i, j, p), return , ;);
+    case 1:
+      fe_family_switch (1, shape_second_deriv(t, o, i, j, p), return , ;);
+    case 2:
+      fe_family_switch (2, shape_second_deriv(t, o, i, j, p), return  , ;);
+    case 3:
+      fe_family_switch (3, shape_second_deriv(t, o, i, j, p), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+  return 0;
+}
+
+
+Real FEInterface::shape_second_deriv(const unsigned int dim,
+                                     const FEType & fe_t,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p)
+{
+  libmesh_assert_greater (dim,j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    libmesh_not_implemented();
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_second_deriv(elem, o, i, j, p), return , ;);
+    case 1:
+      fe_family_switch (1, shape_second_deriv(elem, o, i, j, p), return , ;);
+    case 2:
+      fe_family_switch (2, shape_second_deriv(elem, o, i, j, p), return , ;);
+    case 3:
+      fe_family_switch (3, shape_second_deriv(elem, o, i, j, p), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+  return 0;
+}
+
+
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const FEType & fe_t,
@@ -1075,6 +1146,12 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                   variable_number,
                                                   elem); return;
 
+          case RATIONAL_BERNSTEIN:
+            FE<2,RATIONAL_BERNSTEIN>::compute_constraints (constraints,
+                                                           dof_map,
+                                                           variable_number,
+                                                           elem); return;
+
 #endif
           default:
             return;
@@ -1127,6 +1204,12 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                   dof_map,
                                                   variable_number,
                                                   elem); return;
+
+          case RATIONAL_BERNSTEIN:
+            FE<3,RATIONAL_BERNSTEIN>::compute_constraints (constraints,
+                                                           dof_map,
+                                                           variable_number,
+                                                           elem); return;
 
 #endif
           default:
@@ -1260,6 +1343,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
       break;
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
     case BERNSTEIN:
+    case RATIONAL_BERNSTEIN:
       switch (el_t)
         {
         case EDGE2:
@@ -1562,6 +1646,7 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
     case BERNSTEIN:
     case SZABAB:
+    case RATIONAL_BERNSTEIN:
 #endif
     default:
       return true;
@@ -1622,6 +1707,7 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
     case HIERARCHIC:
     case BERNSTEIN:
     case SZABAB:
+    case RATIONAL_BERNSTEIN:
     case INFINITE_MAP:
     case JACOBI_20_00:
     case JACOBI_30_00:
