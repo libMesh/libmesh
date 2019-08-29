@@ -1280,6 +1280,10 @@ write_sideset_data(int timestep,
                    const std::vector<std::set<boundary_id_type>> & side_ids,
                    const std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
 {
+  if (!exio_helper->opened_for_writing)
+    libmesh_error_msg("ERROR, ExodusII file must be opened for writing "
+                      "before calling ExodusII_IO::write_sideset_data()!");
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   exio_helper->write_sideset_data(mesh, timestep, var_names, side_ids, bc_vals);
 }
@@ -1293,6 +1297,10 @@ read_sideset_data(int timestep,
                   std::vector<std::set<boundary_id_type>> & side_ids,
                   std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
 {
+  if (!exio_helper->opened_for_reading)
+    libmesh_error_msg("ERROR, ExodusII file must be opened for reading "
+                      "before calling ExodusII_IO::read_sideset_data()!");
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   exio_helper->read_sideset_data(mesh, timestep, var_names, side_ids, bc_vals);
 }
