@@ -63,6 +63,7 @@ unit_tests_sources = \
   mesh/spatial_dimension_test.C \
   mesh/mapped_subdomain_partitioner_test.C \
   mesh/mesh_function_dfem.C \
+  mesh/write_sideset_data.C \
   mesh/write_vec_and_scalar.C \
   numerics/composite_function_test.C \
   numerics/coupling_matrix_test.C \
@@ -217,7 +218,8 @@ CLEANFILES = cube_mesh.xda \
              slit_mesh.xda slit_solution.xda \
 	     out.e \
 	     mesh_with_soln.e \
-	     elemental_from_nodal.e
+	     elemental_from_nodal.e \
+             write_sideset_data.e
 
 # CLEANFILES only applies to files, handle directories separately
 clean-local:
