@@ -2174,6 +2174,9 @@ write_sideset_data(const MeshBase & mesh,
                    const std::vector<std::set<boundary_id_type>> & side_ids,
                    const std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
 {
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
   // Write the sideset variable names to file. This function should
   // only be called once for SIDESET variables, repeated calls to
   // write_var_names overwrites/changes the order of names that were
