@@ -24,6 +24,7 @@
 // C++ includes
 
 // Local Includes
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/petsc_linear_solver.h"
