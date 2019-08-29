@@ -1625,6 +1625,30 @@ void ExodusII_IO::write_timestep (const std::string &,
 
 
 
+void
+ExodusII_IO::
+write_sideset_data (int,
+                    const std::vector<std::string> &,
+                    const std::vector<std::set<boundary_id_type>> &,
+                    const std::vector<std::map<BoundaryInfo::BCTuple, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
+void
+ExodusII_IO::
+read_sideset_data (int,
+                   std::vector<std::string> &,
+                   std::vector<std::set<boundary_id_type>> &,
+                   std::vector<std::map<BoundaryInfo::BCTuple, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
 void ExodusII_IO::write (const std::string &)
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
