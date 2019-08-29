@@ -83,9 +83,11 @@ public:
 #ifdef LIBMESH_HAVE_EXODUS_API
 
     // We write the file in the ExodusII format.
-    ExodusII_IO writer(mesh);
-    writer.write("write_sideset_data.e");
-    writer.write_sideset_data (/*timestep=*/1, var_names, side_ids, bc_vals);
+    {
+      ExodusII_IO writer(mesh);
+      writer.write("write_sideset_data.e");
+      writer.write_sideset_data (/*timestep=*/1, var_names, side_ids, bc_vals);
+    }
 
     // Make sure that the writing is done before the reading starts.
     TestCommWorld->barrier();
