@@ -297,8 +297,9 @@ void assemble_poisson(EquationSystems & es,
                   const Elem * neighbor = ltu_it->second;
 
                   std::vector<Point> qface_neighbor_points;
-                  FEInterface::inverse_map (elem->dim(), fe->get_fe_type(),
-                                            neighbor, qface_points, qface_neighbor_points);
+                  FEMap::inverse_map (elem->dim(), neighbor,
+                                      qface_points,
+                                      qface_neighbor_points);
                   fe_neighbor_face->reinit(neighbor, &qface_neighbor_points);
 
                   std::vector<dof_id_type> neighbor_dof_indices;

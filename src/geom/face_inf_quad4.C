@@ -30,6 +30,7 @@
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
+#include "libmesh/inf_fe_map.h"
 
 namespace libMesh
 {
@@ -126,7 +127,7 @@ bool InfQuad4::contains_point (const Point & p, Real tol) const
    * this is not exclusive: the point may be outside
    * the envelope, but contained in another infinite element.
    * Therefore, if the distance is greater, do fall back
-   * to the scheme of using FEInterface::inverse_map().
+   * to the scheme of using inverse_map().
    */
   const Point my_origin (this->origin());
 
@@ -154,19 +155,15 @@ bool InfQuad4::contains_point (const Point & p, Real tol) const
   else
     {
       /*
-       * cannot say anything, fall back to the FEInterface::inverse_map()
+       * cannot say anything, fall back to the inverse_map()
        *
        * Declare a basic FEType.  Will use default in the base,
        * and something else (not important) in radial direction.
        */
       FEType fe_type(default_order());
 
-      const Point mapped_point = FEInterface::inverse_map(dim(),
-                                                          fe_type,
-                                                          this,
-                                                          p,
-                                                          tol,
-                                                          false);
+      const Point mapped_point = InfFEMap::inverse_map(dim(), this, p,
+                                                       tol, false);
 
       return FEInterface::on_reference_element(mapped_point, this->type(), tol);
     }

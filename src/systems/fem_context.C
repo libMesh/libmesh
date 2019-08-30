@@ -1913,11 +1913,8 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
   Point master_point = this->has_elem() ?
-    FEInterface::inverse_map (elem_dim,
-                              fe_type,
-                              &this->get_elem(),
-                              p,
-                              tolerance) : Point(0);
+    FEMap::inverse_map (elem_dim, &this->get_elem(), p, tolerance) :
+    Point(0);
 
   std::vector<Point> coor(1, master_point);
 

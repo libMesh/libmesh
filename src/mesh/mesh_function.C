@@ -272,10 +272,8 @@ void MeshFunction::operator() (const Point & p,
          * Note that the fe_type can safely be used from the 0-variable,
          * since the inverse mapping is the same for all FEFamilies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
-                                                            this->_dof_map.variable_type(0),
-                                                            element,
-                                                            p));
+        const Point mapped_point (FEMap::inverse_map (dim, element,
+                                                      p));
 
         // loop over all vars
         for (auto index : index_range(this->_system_vars))
@@ -363,10 +361,7 @@ void MeshFunction::discontinuous_value (const Point & p,
        * Note that the fe_type can safely be used from the 0-variable,
        * since the inverse mapping is the same for all FEFamilies
        */
-      const Point mapped_point (FEInterface::inverse_map (dim,
-                                                          this->_dof_map.variable_type(0),
-                                                          element,
-                                                          p));
+      const Point mapped_point (FEMap::inverse_map (dim, element, p));
 
       // loop over all vars
       for (auto index : index_range(this->_system_vars))
@@ -451,10 +446,8 @@ void MeshFunction::gradient (const Point & p,
          * Note that the fe_type can safely be used from the 0-variable,
          * since the inverse mapping is the same for all FEFamilies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
-                                                            this->_dof_map.variable_type(0),
-                                                            element,
-                                                            p));
+        const Point mapped_point (FEMap::inverse_map (dim, element,
+                                                      p));
 
         std::vector<Point> point_list (1, mapped_point);
 
@@ -565,10 +558,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
        * Note that the fe_type can safely be used from the 0-variable,
        * since the inverse mapping is the same for all FEFamilies
        */
-      const Point mapped_point (FEInterface::inverse_map (dim,
-                                                          this->_dof_map.variable_type(0),
-                                                          element,
-                                                          p));
+      const Point mapped_point (FEMap::inverse_map (dim, element, p));
 
 
       // loop over all vars
@@ -687,10 +677,8 @@ void MeshFunction::hessian (const Point & p,
          * Note that the fe_type can safely be used from the 0-variable,
          * since the inverse mapping is the same for all FEFamilies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
-                                                            this->_dof_map.variable_type(0),
-                                                            element,
-                                                            p));
+        const Point mapped_point (FEMap::inverse_map (dim, element,
+                                                      p));
 
         std::vector<Point> point_list (1, mapped_point);
 

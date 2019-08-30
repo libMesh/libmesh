@@ -2185,12 +2185,11 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
   // To be on the safe side, we converge the inverse_map() iteration
   // to a slightly tighter tolerance than that requested by the
   // user...
-  const Point mapped_point = FEInterface::inverse_map(this->dim(),
-                                                      fe_type,
-                                                      this,
-                                                      p,
-                                                      0.1*map_tol, // <- this is |dx| tolerance, the Newton residual should be ~ |dx|^2
-                                                      /*secure=*/ false);
+  const Point mapped_point = FEMap::inverse_map(this->dim(),
+                                                this,
+                                                p,
+                                                0.1*map_tol, // <- this is |dx| tolerance, the Newton residual should be ~ |dx|^2
+                                                /*secure=*/ false);
 
   // Check that the refspace point maps back to p!  This is only necessary
   // for 1D and 2D elements, 3D elements always live in 3D.
@@ -2200,10 +2199,7 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
   // the linear element types.
   if (this->dim() < 3)
     {
-      Point xyz = FEInterface::map(this->dim(),
-                                   fe_type,
-                                   this,
-                                   mapped_point);
+      Point xyz = FEMap::map(this->dim(), this, mapped_point);
 
       // Compute the distance between the original point and the re-mapped point.
       // They should be in the same place.
@@ -2212,7 +2208,7 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
 
       // If dist is larger than some fraction of the tolerance, then return false.
       // This can happen when e.g. a 2D element is living in 3D, and
-      // FEInterface::inverse_map() maps p onto the projection of the element,
+      // FEMap::inverse_map() maps p onto the projection of the element,
       // effectively "tricking" FEInterface::on_reference_element().
       if (dist > this->hmax() * map_tol)
         return false;

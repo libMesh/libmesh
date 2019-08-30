@@ -364,11 +364,9 @@ void assemble_ellipticdg(EquationSystems & es,
                                                 qface.get_points(),
                                                 qface_neighbor_point);
                   else
-                    FEInterface::inverse_map (elem->dim(),
-                                              fe->get_fe_type(),
-                                              neighbor,
-                                              qface_point,
-                                              qface_neighbor_point);
+                    FEMap::inverse_map (elem->dim(), neighbor,
+                                        qface_point,
+                                        qface_neighbor_point);
 
                   // Calculate the neighbor element shape functions at those locations
                   fe_neighbor_face->reinit(neighbor, &qface_neighbor_point);

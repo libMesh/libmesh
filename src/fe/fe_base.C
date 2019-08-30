@@ -1009,8 +1009,8 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
             fe->edge_reinit (child, e);
             const unsigned int n_qp = qedgerule->n_points();
 
-            FEInterface::inverse_map (dim, fe_type, elem,
-                                      xyz_values, coarse_qpoints);
+            FEMap::inverse_map (dim, elem, xyz_values,
+                                coarse_qpoints);
 
             fe_coarse->reinit(elem, &coarse_qpoints);
 
@@ -1149,8 +1149,8 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
             fe->reinit (child, s);
             const unsigned int n_qp = qsiderule->n_points();
 
-            FEInterface::inverse_map (dim, fe_type, elem,
-                                      xyz_values, coarse_qpoints);
+            FEMap::inverse_map (dim, elem, xyz_values,
+                                coarse_qpoints);
 
             fe_coarse->reinit(elem, &coarse_qpoints);
 
@@ -1267,8 +1267,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
       fe->reinit (&child);
       const unsigned int n_qp = qrule->n_points();
 
-      FEInterface::inverse_map (dim, fe_type, elem,
-                                xyz_values, coarse_qpoints);
+      FEMap::inverse_map (dim, elem, xyz_values, coarse_qpoints);
 
       fe_coarse->reinit(elem, &coarse_qpoints);
 
@@ -1511,8 +1510,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
           const unsigned int n_qp = my_qface.n_points();
 
-          FEInterface::inverse_map (Dim, base_fe_type, neigh,
-                                    q_point, neigh_qface);
+          FEMap::inverse_map (Dim, neigh, q_point, neigh_qface);
 
           neigh_fe->reinit(neigh, &neigh_qface);
 
@@ -1853,8 +1851,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                   for (auto i : index_range(neigh_point))
                     neigh_point[i] = periodic->get_corresponding_pos(q_point[i]);
 
-                  FEInterface::inverse_map (Dim, base_fe_type, neigh,
-                                            neigh_point, neigh_qface);
+                  FEMap::inverse_map (Dim, neigh, neigh_point,
+                                      neigh_qface);
 
                   neigh_fe->reinit(neigh, &neigh_qface);
 

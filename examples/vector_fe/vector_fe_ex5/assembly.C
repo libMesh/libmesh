@@ -247,8 +247,8 @@ compute_residual(const NumericVector<Number> & X,
 
           // Make sure we have the matching quadrature points on face and neighbor
           std::vector<Point> neighbor_xyz;
-          FEInterface::inverse_map(
-              elem->dim(), fe->get_fe_type(), neighbor, face_xyz, neighbor_xyz);
+          FEMap::inverse_map(elem->dim(), neighbor, face_xyz,
+                             neighbor_xyz);
 
           fe_neighbor_face->reinit(neighbor, &neighbor_xyz);
 
@@ -481,8 +481,8 @@ compute_jacobian(const NumericVector<Number> &,
 
           // Make sure we have the matching quadrature points on face and neighbor
           std::vector<Point> neighbor_xyz;
-          FEInterface::inverse_map(
-              elem->dim(), fe->get_fe_type(), neighbor, face_xyz, neighbor_xyz);
+          FEMap::inverse_map(elem->dim(), neighbor, face_xyz,
+                             neighbor_xyz);
 
           fe_neighbor_face->reinit(neighbor, &neighbor_xyz);
 

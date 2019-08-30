@@ -26,6 +26,7 @@
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/inf_fe_map.h"
 #include "libmesh/enum_order.h"
 
 namespace libMesh
@@ -212,7 +213,7 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
   // envelope may be non-spherical, the physical point may lie
   // inside the envelope, outside the envelope, or even inside
   // this infinite element.  Therefore if this fails,
-  // fall back to the FEInterface::inverse_map()
+  // fall back to the inverse_map()
   const Point my_origin (this->origin());
 
   // determine the minimal distance of the base from the origin
@@ -270,12 +271,8 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
   // and something else (not important) in radial direction.
   FEType fe_type(default_order());
 
-  const Point mapped_point = FEInterface::inverse_map(dim(),
-                                                      fe_type,
-                                                      this,
-                                                      p,
-                                                      tol,
-                                                      false);
+  const Point mapped_point = InfFEMap::inverse_map(dim(), this, p,
+                                                   tol, false);
 
   return FEInterface::on_reference_element(mapped_point, this->type(), tol);
 }

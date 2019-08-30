@@ -97,11 +97,8 @@ void DGFEMContext::neighbor_side_fe_reinit ()
       FEAbstract * side_fe = _side_fe[this->get_dim()][neighbor_side_fe_type].get();
       qface_side_points = side_fe->get_xyz();
 
-      FEInterface::inverse_map (this->get_dim(),
-                                neighbor_side_fe_type,
-                                &get_neighbor(),
-                                qface_side_points,
-                                qface_neighbor_points);
+      FEMap::inverse_map (this->get_dim(), &get_neighbor(),
+                          qface_side_points, qface_neighbor_points);
 
       pr.second->reinit(&get_neighbor(), &qface_neighbor_points);
     }

@@ -349,7 +349,7 @@ void FE<Dim,T>::edge_reinit(const Elem * elem,
   // Find where the integration points are located on the
   // full element.
   std::vector<Point> qp;
-  this->inverse_map (elem, this->_fe_map->get_xyz(), qp, tolerance);
+  FEMap::inverse_map (Dim, elem, this->_fe_map->get_xyz(), qp, tolerance);
 
   // compute the shape function and derivative values
   // at the points qp
@@ -761,11 +761,11 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                 libmesh_assert(elem);
 
                 // Inverse map xyz[p] to a reference point on the parent...
-                Point reference_point = FE<2,LAGRANGE>::inverse_map(elem, this->xyz[p]);
+                Point reference_point = FEMap::inverse_map(2, elem, this->xyz[p]);
 
                 // Get dxyz/dxi and dxyz/deta from the parent map.
-                Point dx_dxi  = FE<2,LAGRANGE>::map_xi (elem, reference_point);
-                Point dx_deta = FE<2,LAGRANGE>::map_eta(elem, reference_point);
+                Point dx_dxi  = FEMap::map_deriv (2, elem, 0, reference_point);
+                Point dx_deta = FEMap::map_deriv (2, elem, 1, reference_point);
 
                 // The second tangent vector is formed by crossing these vectors.
                 tangents[p][1] = dx_dxi.cross(dx_deta).unit();

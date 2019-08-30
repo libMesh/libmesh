@@ -907,9 +907,9 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
               const Point & support_point = *my_node;
 
               // Figure out where my node lies on their reference element.
-              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                  parent_side.get(),
-                                                                  support_point);
+              const Point mapped_point = FEMap::inverse_map(Dim-1,
+                                                            parent_side.get(),
+                                                            support_point);
 
               // Compute the parent's side shape function values.
               for (unsigned int their_side_n=0;
@@ -1077,9 +1077,9 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                       // Figure out where my node lies on their reference element.
                       const Point neigh_point = periodic->get_corresponding_pos(*my_node);
 
-                      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                          neigh_side.get(),
-                                                                          neigh_point);
+                      const Point mapped_point =
+                        FEMap::inverse_map(Dim-1, neigh_side.get(),
+                                           neigh_point);
 
                       // If we've already got a constraint on this
                       // node, then the periodic constraint is
@@ -1145,9 +1145,9 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                       const Point neigh_point = periodic->get_corresponding_pos(*my_node);
 
                       // Figure out where my node lies on their reference element.
-                      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                          neigh_side.get(),
-                                                                          neigh_point);
+                      const Point mapped_point =
+                        FEMap::inverse_map(Dim-1, neigh_side.get(),
+                                           neigh_point);
 
                       for (unsigned int their_side_n=0;
                            their_side_n < n_side_nodes;

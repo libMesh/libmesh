@@ -440,9 +440,9 @@ JumpErrorEstimator::reinit_sides ()
 
   std::vector<Point> qp_coarse;
 
-  FEInterface::inverse_map
-    (coarse_context->get_elem().dim(), fe_coarse->get_fe_type(),
-     &coarse_context->get_elem(), qface_point, qp_coarse);
+  FEMap::inverse_map (coarse_context->get_elem().dim(),
+                      &coarse_context->get_elem(), qface_point,
+                      qp_coarse);
 
   // The number of variables in the system
   const unsigned int n_vars = fine_context->n_vars();
