@@ -2553,7 +2553,7 @@ Elem::RefinementState Elem::refinement_flag () const
 inline
 void Elem::set_refinement_flag(RefinementState rflag)
 {
-  _rflag = cast_int<RefinementState>(rflag);
+  _rflag = cast_int<unsigned char>(rflag);
 }
 
 
