@@ -87,7 +87,7 @@ void rational_nodal_soln(const Elem * elem,
         for (unsigned int n=0; n<n_nodes; n++)
           {
             std::vector<Real> weighted_shape(n_sf);
-            Real weighted_sum;
+            Real weighted_sum = 0;
 
             for (unsigned int i=0; i<n_sf; i++)
               {
