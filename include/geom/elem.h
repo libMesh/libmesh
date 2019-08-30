@@ -1140,6 +1140,34 @@ public:
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const = 0;
 
+  /**
+   * Enumeration of possible element master->physical mapping types
+   */
+  enum MappingType { LAGRANGE_MAP = 0,
+                     RATIONAL_BERNSTEIN_MAP,
+                     INVALID_MAP };
+
+  /**
+   * \returns The value of the mapping type for the element.
+   */
+  MappingType mapping_type () const;
+
+  /**
+   * Sets the value of the mapping type for the element.
+   */
+  void set_mapping_type (const MappingType type);
+
+  /**
+   * \returns The value of the mapping data for the element.
+   */
+  unsigned char mapping_data () const;
+
+  /**
+   * Sets the value of the mapping data for the element.
+   */
+  void set_mapping_data (const unsigned char data);
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -1762,6 +1790,18 @@ protected:
    */
   unsigned char _p_level;
 #endif
+
+  /**
+   * Mapping function type; currently either 0 (LAGRANGE) or 1
+   * (RATIONAL_BERNSTEIN).
+   */
+  unsigned char _map_type;
+
+  /**
+   * Mapping function data; currently used when needed to store the
+   * RATIONAL_BERNSTEIN nodal weight data index.
+   */
+  unsigned char _map_data;
 };
 
 
@@ -1845,13 +1885,14 @@ Elem::Elem(const unsigned int nn,
 #ifdef LIBMESH_ENABLE_AMR
   _children(nullptr),
 #endif
-  _sbd_id(0)
+  _sbd_id(0),
 #ifdef LIBMESH_ENABLE_AMR
-  ,
   _rflag(Elem::DO_NOTHING),
   _pflag(Elem::DO_NOTHING),
-  _p_level(0)
+  _p_level(0),
 #endif
+  _map_type(0),
+  _map_data(0)
 {
   this->processor_id() = DofObject::invalid_processor_id;
 
@@ -1881,6 +1922,8 @@ Elem::Elem(const unsigned int nn,
     {
       this->subdomain_id() = this->parent()->subdomain_id();
       this->processor_id() = this->parent()->processor_id();
+      _map_type = this->parent()->_map_type;
+      _map_data = this->parent()->_map_data;
     }
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -2480,6 +2523,38 @@ unsigned int Elem::p_level() const
 #else
   return 0;
 #endif
+}
+
+
+
+inline
+Elem::MappingType Elem::mapping_type () const
+{
+  return static_cast<MappingType>(_map_type);
+}
+
+
+
+inline
+void Elem::set_mapping_type(const Elem::MappingType type)
+{
+  _map_type = cast_int<unsigned char>(type);
+}
+
+
+
+inline
+unsigned char Elem::mapping_data () const
+{
+  return _map_data;
+}
+
+
+
+inline
+void Elem::set_mapping_data(const unsigned char data)
+{
+  _map_data = data;
 }
 
 
