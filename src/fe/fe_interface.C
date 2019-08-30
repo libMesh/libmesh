@@ -833,6 +833,16 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
   return;
 }
 
+
+FEInterface::shape_ptr
+FEInterface::shape_function(const unsigned int dim,
+                            const FEType & fe_t)
+{
+  fe_switch(shape);
+}
+
+
+
 Real FEInterface::shape_deriv(const unsigned int dim,
                               const FEType & fe_t,
                               const ElemType t,

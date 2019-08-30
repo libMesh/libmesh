@@ -293,6 +293,20 @@ public:
                     const Point & p,
                     OutputType & phi);
 
+  typedef Real (*shape_ptr) (const Elem * elem,
+                             const Order o,
+                             const unsigned int i,
+                             const Point & p);
+
+  /**
+   * \returns A function which evaluates shape for the
+   * requested FE type and dimension.
+   */
+  static shape_ptr
+  shape_function(const unsigned int dim,
+                 const FEType & fe_t);
+
+
   /**
    * \returns The \f$ j^{th} \f$ coordinate of the gradient of
    * the \f$ i^{th} \f$ shape function at point \p p.
