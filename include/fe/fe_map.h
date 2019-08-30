@@ -134,6 +134,59 @@ public:
                                  const Elem * edge);
 
   /**
+   * \returns The location (in physical space) of the point
+   * \p p located on the reference element.
+   */
+  static Point map (const unsigned int dim,
+                    const Elem * elem,
+                    const Point & reference_point);
+
+  /**
+   * \returns component \p j of d(xyz)/d(xi eta zeta) (in physical
+   * space) of the point \p p located on the reference element.
+   */
+  static Point map_deriv (const unsigned int dim,
+                          const Elem * elem,
+                          const unsigned int j,
+                          const Point & reference_point);
+
+  /**
+   * \returns The location (on the reference element) of the
+   * point \p p located in physical space.  This function requires
+   * inverting the (possibly nonlinear) transformation map, so
+   * it is not trivial. The optional parameter \p tolerance defines
+   * how close is "good enough."  The map inversion iteration
+   * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
+   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
+   * The parameter secure (always assumed false in non-debug mode)
+   * switches on integrity-checks on the mapped points.
+   */
+  static Point inverse_map (const unsigned int dim,
+                            const Elem * elem,
+                            const Point & p,
+                            const Real tolerance = TOLERANCE,
+                            const bool secure = true);
+
+  /**
+   * Takes a number points in physical space (in the \p
+   * physical_points vector) and finds their location on the reference
+   * element for the input element \p elem.  The values on the
+   * reference element are returned in the vector \p
+   * reference_points. The optional parameter \p tolerance defines how
+   * close is "good enough."  The map inversion iteration computes the
+   * sequence \f$ \{ p_n \} \f$, and the iteration is terminated when
+   * \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
+   * The parameter secure (always assumed false in non-debug mode)
+   * switches on integrity-checks on the mapped points.
+   */
+  static void inverse_map (unsigned int dim,
+                           const Elem * elem,
+                           const std::vector<Point> & physical_points,
+                           std::vector<Point> &       reference_points,
+                           const Real tolerance = TOLERANCE,
+                           const bool secure = true);
+
+  /**
    * \returns The \p xyz spatial locations of the quadrature
    * points on the element.
    */

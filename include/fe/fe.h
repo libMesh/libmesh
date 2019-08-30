@@ -295,39 +295,23 @@ public:
                            unsigned int e,
                            std::vector<unsigned int> & di);
 
-  /**
-   * \returns The location (on the reference element) of the
-   * point \p p located in physical space.  This function requires
-   * inverting the (possibly nonlinear) transformation map, so
-   * it is not trivial. The optional parameter \p tolerance defines
-   * how close is "good enough."  The map inversion iteration
-   * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
-   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
-   * The parameter secure (always assumed false in non-debug mode)
-   * switches on integrity-checks on the mapped points.
-   */
   static Point inverse_map (const Elem * elem,
                             const Point & p,
                             const Real tolerance = TOLERANCE,
-                            const bool secure = true);
+                            const bool secure = true) {
+    // libmesh_deprecated(); // soon
+    return FEMap::inverse_map(Dim, elem, p, tolerance, secure);
+  }
 
-  /**
-   * Takes a number points in physical space (in the \p
-   * physical_points vector) and finds their location on the reference
-   * element for the input element \p elem.  The values on the
-   * reference element are returned in the vector \p
-   * reference_points. The optional parameter \p tolerance defines how
-   * close is "good enough."  The map inversion iteration computes the
-   * sequence \f$ \{ p_n \} \f$, and the iteration is terminated when
-   * \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
-   * The parameter secure (always assumed false in non-debug mode)
-   * switches on integrity-checks on the mapped points.
-   */
   static void inverse_map (const Elem * elem,
                            const std::vector<Point> & physical_points,
                            std::vector<Point> &       reference_points,
                            const Real tolerance = TOLERANCE,
-                           const bool secure = true);
+                           const bool secure = true) {
+    // libmesh_deprecated(); // soon
+    FEMap::inverse_map(Dim, elem, physical_points, reference_points,
+                       tolerance, secure);
+  }
 
   /**
    * This is at the core of this class. Use this for each
@@ -418,33 +402,29 @@ public:
    */
   virtual bool shapes_need_reinit() const override;
 
-  /**
-   * \returns The location (in physical space) of the point
-   * \p p located on the reference element.
-   */
   static Point map (const Elem * elem,
-                    const Point & reference_point);
+                    const Point & reference_point) {
+    // libmesh_deprecated(); // soon
+    return FEMap::map(Dim, elem, reference_point);
+  }
 
-  /**
-   * \returns d(xyz)/dxi (in physical space) of the point
-   * \p p located on the reference element.
-   */
   static Point map_xi (const Elem * elem,
-                       const Point & reference_point);
+                       const Point & reference_point) {
+    // libmesh_deprecated(); // soon
+    return FEMap::map_deriv(Dim, elem, 0, reference_point);
+  }
 
-  /**
-   * \returns d(xyz)/deta (in physical space) of the point
-   * \p p located on the reference element.
-   */
   static Point map_eta (const Elem * elem,
-                        const Point & reference_point);
+                        const Point & reference_point) {
+    // libmesh_deprecated(); // soon
+    return FEMap::map_deriv(Dim, elem, 1, reference_point);
+  }
 
-  /**
-   * \returns d(xyz)/dzeta (in physical space) of the point
-   * \p p located on the reference element.
-   */
   static Point map_zeta (const Elem * elem,
-                         const Point & reference_point);
+                         const Point & reference_point) {
+    // libmesh_deprecated(); // soon
+    return FEMap::map_deriv(Dim, elem, 2, reference_point);
+  }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /**

@@ -26,9 +26,11 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/fe_macro.h"
 #include "libmesh/fe_map.h"
 #include "libmesh/fe_xyz_map.h"
+#include "libmesh/inf_fe_map.h"
 #include "libmesh/mesh_subdivision_support.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
@@ -1588,19 +1590,23 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::inverse_map (const Elem * elem,
-                              const Point & physical_point,
-                              const Real tolerance,
-                              const bool secure)
+Point FEMap::inverse_map (const unsigned int dim,
+                          const Elem * elem,
+                          const Point & physical_point,
+                          const Real tolerance,
+                          const bool secure)
 {
   libmesh_assert(elem);
   libmesh_assert_greater_equal (tolerance, 0.);
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    return InfFEMap::inverse_map(dim, elem, physical_point, tolerance,
+                                 secure);
+#endif
 
   // Start logging the map inversion.
-  LOG_SCOPE("inverse_map()", "FE");
+  LOG_SCOPE("inverse_map()", "FEMap");
 
   // How much did the point on the reference
   // element change by in this Newton step?
@@ -1633,7 +1639,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
   do
     {
       //  Where our current iterate \p p maps to.
-      const Point physical_guess = FE<Dim,T>::map (elem, p);
+      const Point physical_guess = map(dim, elem, p);
 
       //  How far our current iterate is from the actual point.
       const Point delta = physical_point - physical_guess;
@@ -1644,7 +1650,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
 
       //  The form of the map and how we invert it depends
       //  on the dimension that we are in.
-      switch (Dim)
+      switch (dim)
         {
           // ------------------------------------------------------------------
           //  0D map inversion is trivial
@@ -1664,7 +1670,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
           //  \p physical_point actually lives in 3D.
         case 1:
           {
-            const Point dxi = FE<Dim,T>::map_xi (elem, p);
+            const Point dxi = map_deriv (dim, elem, 0, p);
 
             //  Newton's method in this case looks like
             //
@@ -1711,8 +1717,8 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
           //  \p physical_point actually lives in 3D.
         case 2:
           {
-            const Point dxi  = FE<Dim,T>::map_xi  (elem, p);
-            const Point deta = FE<Dim,T>::map_eta (elem, p);
+            const Point dxi  = map_deriv (dim, elem, 0, p);
+            const Point deta = map_deriv (dim, elem, 1, p);
 
             //  Newton's method in this case looks like
             //
@@ -1773,9 +1779,9 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
           //  apply Newton's method directly.
         case 3:
           {
-            const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
-            const Point deta  = FE<Dim,T>::map_eta  (elem, p);
-            const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
+            const Point dxi   = map_deriv (dim, elem, 0, p);
+            const Point deta  = map_deriv (dim, elem, 1, p);
+            const Point dzeta = map_deriv (dim, elem, 2, p);
 
             //  Newton's method in this case looks like
             //
@@ -1818,7 +1824,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
                   }
                 else
                   {
-                    for (unsigned int i=0; i != Dim; ++i)
+                    for (unsigned int i=0; i != dim; ++i)
                       p(i) = 1e6;
                     return p;
                   }
@@ -1835,7 +1841,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
 
           //  Some other dimension?
         default:
-          libmesh_error_msg("Invalid Dim = " << Dim);
+          libmesh_error_msg("Invalid dim = " << dim);
         } // end switch(Dim), dp now computed
 
 
@@ -1916,7 +1922,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
           //  that's outside the element
           else
             {
-              for (unsigned int i=0; i != Dim; ++i)
+              for (unsigned int i=0; i != dim; ++i)
                 p(i) = 1e6;
 
               return p;
@@ -1935,7 +1941,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
       // Make sure the point \p p on the reference element actually
       // does map to the point \p physical_point within a tolerance.
 
-      const Point check = FE<Dim,T>::map (elem, p);
+      const Point check = map (dim, elem, p);
       const Point diff  = physical_point - check;
 
       if (diff.norm() > tolerance)
@@ -1972,14 +1978,22 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::inverse_map (const Elem * elem,
-                             const std::vector<Point> & physical_points,
-                             std::vector<Point> &       reference_points,
-                             const Real tolerance,
-                             const bool secure)
+void FEMap::inverse_map (const unsigned int dim,
+                         const Elem * elem,
+                         const std::vector<Point> & physical_points,
+                         std::vector<Point> &       reference_points,
+                         const Real tolerance,
+                         const bool secure)
 {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    {
+      InfFEMap::inverse_map(dim, elem, physical_points, reference_points, tolerance, secure);
+      return;
+      // libmesh_not_implemented();
+    }
+#endif
+
   // The number of points to find the
   // inverse map of
   const std::size_t n_points = physical_points.size();
@@ -1992,15 +2006,14 @@ void FE<Dim,T>::inverse_map (const Elem * elem,
   // element of each point in physical space
   for (std::size_t p=0; p<n_points; p++)
     reference_points[p] =
-      FE<Dim,T>::inverse_map (elem, physical_points[p], tolerance, secure);
+      inverse_map (dim, elem, physical_points[p], tolerance, secure);
 }
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map (const Elem * elem,
-                      const Point & reference_point)
+Point FEMap::map (const unsigned int dim,
+                  const Elem * elem,
+                  const Point & reference_point)
 {
   libmesh_assert(elem);
 
@@ -2008,15 +2021,14 @@ Point FE<Dim,T>::map (const Elem * elem,
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
+  const FEType fe_type (order, LAGRANGE);
+  const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape(type,
-                                          order,
-                                          i,
-                                          reference_point)
+                  FEInterface::shape(dim, fe_type, type, i,
+                                     reference_point)
                   );
 
   return p;
@@ -2024,10 +2036,10 @@ Point FE<Dim,T>::map (const Elem * elem,
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_xi (const Elem * elem,
-                         const Point & reference_point)
+Point FEMap::map_deriv (const unsigned int dim,
+                        const Elem * elem,
+                        const unsigned int j,
+                        const Point & reference_point)
 {
   libmesh_assert(elem);
 
@@ -2035,72 +2047,14 @@ Point FE<Dim,T>::map_xi (const Elem * elem,
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
+  const FEType fe_type (order, LAGRANGE);
+  const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape_deriv(type,
-                                                order,
-                                                i,
-                                                0,
-                                                reference_point)
-                  );
-
-  return p;
-}
-
-
-
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_eta (const Elem * elem,
-                          const Point & reference_point)
-{
-  libmesh_assert(elem);
-
-  Point p;
-
-  const ElemType type     = elem->type();
-  const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
-
-  // Lagrange basis functions are used for mapping
-  for (unsigned int i=0; i<n_sf; i++)
-    p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape_deriv(type,
-                                                order,
-                                                i,
-                                                1,
-                                                reference_point)
-                  );
-
-  return p;
-}
-
-
-
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_zeta (const Elem * elem,
-                           const Point & reference_point)
-{
-  libmesh_assert(elem);
-
-  Point p;
-
-  const ElemType type     = elem->type();
-  const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
-
-  // Lagrange basis functions are used for mapping
-  for (unsigned int i=0; i<n_sf; i++)
-    p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape_deriv(type,
-                                                order,
-                                                i,
-                                                2,
-                                                reference_point)
+                  FEInterface::shape_deriv(dim, fe_type, type, i, j,
+                                           reference_point)
                   );
 
   return p;

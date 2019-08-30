@@ -58,12 +58,13 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
                                                 const ElemType inf_elem_type)
 {
-  const ElemType base_et (Base::get_elem_type(inf_elem_type));
+  const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
   if (Dim > 1)
-    return FEInterface::n_dofs(Dim-1, fet, base_et) * Radial::n_dofs(fet.radial_order);
+    return FEInterface::n_dofs(Dim-1, fet, base_et) *
+      InfFERadial::n_dofs(fet.radial_order);
   else
-    return Radial::n_dofs(fet.radial_order);
+    return InfFERadial::n_dofs(fet.radial_order);
 }
 
 
@@ -76,7 +77,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
                                                         const ElemType inf_elem_type,
                                                         const unsigned int n)
 {
-  const ElemType base_et (Base::get_elem_type(inf_elem_type));
+  const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
   unsigned int n_base, n_radial;
   compute_node_indices(inf_elem_type, n, n_base, n_radial);
@@ -90,9 +91,9 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
 
   if (Dim > 1)
     return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base)
-      * Radial::n_dofs_at_node(fet.radial_order, n_radial);
+      * InfFERadial::n_dofs_at_node(fet.radial_order, n_radial);
   else
-    return Radial::n_dofs_at_node(fet.radial_order, n_radial);
+    return InfFERadial::n_dofs_at_node(fet.radial_order, n_radial);
 }
 
 
@@ -104,13 +105,13 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
                                                          const ElemType inf_elem_type)
 {
-  const ElemType base_et (Base::get_elem_type(inf_elem_type));
+  const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
   if (Dim > 1)
     return FEInterface::n_dofs_per_elem(Dim-1, fet, base_et)
-      * Radial::n_dofs_per_elem(fet.radial_order);
+      * InfFERadial::n_dofs_per_elem(fet.radial_order);
   else
-    return Radial::n_dofs_per_elem(fet.radial_order);
+    return InfFERadial::n_dofs_per_elem(fet.radial_order);
 }
 
 
@@ -173,7 +174,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
     }
 #endif
 
-  const ElemType     base_et  (Base::get_elem_type(inf_elem_type));
+  const ElemType     base_et  (InfFEBase::get_elem_type(inf_elem_type));
   const Order        o_radial (fet.radial_order);
   const Real         v        (p(Dim-1));
 
@@ -186,10 +187,10 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
   if (Dim > 1)
     return FEInterface::shape(Dim-1, fet, base_et, i_base, p)
       * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFERadial::decay(Dim,v);
   else
     return InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFERadial::decay(Dim,v);
 }
 
 
@@ -228,10 +229,10 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
   if (Dim > 1)
     return FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
       * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFERadial::decay(Dim,v);
   else
     return InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFERadial::decay(Dim,v);
 }
 
 
@@ -256,7 +257,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
     }
 #endif
 
-  const ElemType     base_et  (Base::get_elem_type(inf_elem_type));
+  const ElemType     base_et  (InfFEBase::get_elem_type(inf_elem_type));
   const Order o_radial (fe_t.radial_order);
   const Real v (p(Dim-1));
 
@@ -266,16 +267,16 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
   if (j== Dim -1)
     {
       Real RadialDeriv = InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+        * InfFERadial::decay(Dim,v)
         + InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v);
+        * InfFERadial::decay_deriv(v);
 
       return FEInterface::shape(Dim-1, fe_t, base_et, i_base, p)*RadialDeriv;
     }
 
   return FEInterface::shape_deriv(Dim-1, fe_t, base_et, i_base, j, p)
     * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-    * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+    * InfFERadial::decay(Dim,v);
 }
 
 
@@ -317,15 +318,15 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
   if (j== Dim -1)
     {
       Real RadialDeriv = InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+        * InfFERadial::decay(Dim,v)
         + InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v);
+        * InfFERadial::decay_deriv(v);
 
       return FEInterface::shape(Dim-1, fe_t, base_el.get(), i_base, p)*RadialDeriv;
     }
   return FEInterface::shape_deriv(Dim-1, fe_t, base_el.get(), i_base, j, p)
     * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-    * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+    * InfFERadial::decay(Dim,v);
 }
 
 
@@ -341,7 +342,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
   libmesh_assert_not_equal_to (Dim, 0);
 
   const Order        o_radial             (fet.radial_order);
-  const Order        radial_mapping_order (Radial::mapping_order());
+  const Order        radial_mapping_order (InfFERadial::mapping_order());
   const Point &      p                    (data.p);
   const Real         v                    (p(Dim-1));
   std::unique_ptr<const Elem> base_el (inf_elem->build_side_ptr(0));
@@ -467,7 +468,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           unsigned int i_base, i_radial;
           compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
 
-          data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
+          data.shape[i] = (InfFERadial::decay(Dim,v)                                    /* (1.-v)/2. in 3D          */
                            * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)   /* S_n(s,t)                 */
                            * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
                            * time_harmonic;                                             /* e^(i*k*phase(s,t,v)      */
@@ -475,21 +476,21 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           // use differentiation of the above equation
           if (data.need_derivative())
             {
-              data.dshape[i](0)     = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+              data.dshape[i](0)     = (InfFERadial::decay(Dim,v)
                                        * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 0, p)
                                        * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
                                        * time_harmonic;
 
               if (Dim > 2)
                 {
-                  data.dshape[i](1)   = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)
+                  data.dshape[i](1)   = (InfFERadial::decay(Dim,v)
                                          * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 1, p)
                                          * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
                                          * time_harmonic;
 
                 }
-              data.dshape[i](Dim-1)  = (InfFE<Dim,T_radial,T_map>::Radial::decay_deriv(v) * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-                                        +InfFE<Dim,T_radial,T_map>::Radial::decay(v) * InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial))
+              data.dshape[i](Dim-1)  = (InfFERadial::decay_deriv(v) * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+                                        +InfFERadial::decay(Dim,v) * InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial))
                                         * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p) * time_harmonic;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
@@ -870,7 +871,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
   const unsigned int radial_order       = static_cast<unsigned int>(fet.radial_order.get_order()); // 4
   const unsigned int radial_order_p_one = radial_order+1;                                          // 5
 
-  const ElemType base_elem_type           (Base::get_elem_type(inf_elem_type));                    // QUAD9
+  const ElemType base_elem_type           (InfFEBase::get_elem_type(inf_elem_type));               // QUAD9
 
   // assume that the number of dof is the same for all vertices
   unsigned int n_base_vertices         = libMesh::invalid_uint;                                    // 4

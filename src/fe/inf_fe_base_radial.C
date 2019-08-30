@@ -31,9 +31,8 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
-// InfFE::Base class members
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-Elem * InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem * inf_elem)
+// InfFEBase class members
+Elem * InfFEBase::build_elem (const Elem * inf_elem)
 {
   std::unique_ptr<const Elem> ape(inf_elem->build_side_ptr(0));
 
@@ -47,8 +46,7 @@ Elem * InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem * inf_elem)
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
+ElemType InfFEBase::get_elem_type (const ElemType type)
 {
   switch (type)
     {
@@ -94,23 +92,21 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType base_elem_type,
-                                                                  const Order base_mapping_order)
+unsigned int InfFEBase::n_base_mapping_sf (const Elem & base_elem,
+                                           const Order base_mapping_order)
 {
-  if (Dim == 1)
-    return 1;
-
-  else if (Dim == 2)
-    return FE<1,LAGRANGE>::n_shape_functions (base_elem_type,
-                                              base_mapping_order);
-  else if (Dim == 3)
-    return FE<2,LAGRANGE>::n_shape_functions (base_elem_type,
-                                              base_mapping_order);
-  else
+  switch (base_elem.dim())
     {
-      libmesh_error_msg("Unsupported Dim = " << Dim);
-      return 0;
+    case 0:
+      return 1;
+    case 1:
+      return FE<1,LAGRANGE>::n_shape_functions (base_elem.type(),
+                                                base_mapping_order);
+    case 2:
+      return FE<2,LAGRANGE>::n_shape_functions (base_elem.type(),
+                                                base_mapping_order);
+    default:
+      libmesh_error_msg("Unsupported base_elem dim = " << base_elem.dim());
     }
 }
 
@@ -119,10 +115,9 @@ unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType
 
 
 // ------------------------------------------------------------
-// InfFE::Radial class members
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_radial,
-                                                                const unsigned int n_onion)
+// InfFERadial class members
+unsigned int InfFERadial::n_dofs_at_node (const Order o_radial,
+                                          const unsigned int n_onion)
 {
   libmesh_assert_less (n_onion, 2);
 
@@ -140,25 +135,6 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_ra
     return static_cast<unsigned int>(o_radial);
 }
 
-
-
-
-
-
-//--------------------------------------------------------------
-// Explicit instantiations
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Elem *,Base::build_elem(const Elem *));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Elem *,Base::build_elem(const Elem *));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Elem *,Base::build_elem(const Elem *));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,Base::n_base_mapping_sf(const ElemType,const Order));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,Base::n_base_mapping_sf(const ElemType,const Order));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Base::n_base_mapping_sf(const ElemType,const Order));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
 
 } // namespace libMesh
 

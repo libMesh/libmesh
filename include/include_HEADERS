@@ -100,6 +100,7 @@ include_HEADERS =  \
         fe/inf_fe_instantiate_2D.h \
         fe/inf_fe_instantiate_3D.h \
         fe/inf_fe_macro.h \
+        fe/inf_fe_map.h \
         geom/bounding_box.h \
         geom/cell.h \
         geom/cell_hex.h \
