@@ -523,24 +523,24 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	fe_transformation_base.h fe_type.h fe_xyz_map.h \
 	h1_fe_transformation.h hcurl_fe_transformation.h inf_fe.h \
 	inf_fe_instantiate_1D.h inf_fe_instantiate_2D.h \
-	inf_fe_instantiate_3D.h inf_fe_macro.h bounding_box.h cell.h \
-	cell_hex.h cell_hex20.h cell_hex27.h cell_hex8.h cell_inf.h \
-	cell_inf_hex.h cell_inf_hex16.h cell_inf_hex18.h \
-	cell_inf_hex8.h cell_inf_prism.h cell_inf_prism12.h \
-	cell_inf_prism6.h cell_prism.h cell_prism15.h cell_prism18.h \
-	cell_prism6.h cell_pyramid.h cell_pyramid13.h cell_pyramid14.h \
-	cell_pyramid5.h cell_tet.h cell_tet10.h cell_tet4.h \
-	compare_elems_by_level.h edge.h edge_edge2.h edge_edge3.h \
-	edge_edge4.h edge_inf_edge2.h elem.h elem_cutter.h elem_hash.h \
-	elem_internal.h elem_quality.h elem_range.h face.h \
-	face_inf_quad.h face_inf_quad4.h face_inf_quad6.h face_quad.h \
-	face_quad4.h face_quad4_shell.h face_quad8.h \
-	face_quad8_shell.h face_quad9.h face_tri.h face_tri3.h \
-	face_tri3_shell.h face_tri3_subdivision.h face_tri6.h node.h \
-	node_elem.h node_range.h plane.h point.h reference_elem.h \
-	remote_elem.h side.h sphere.h stored_range.h surface.h \
-	abaqus_io.h boundary_info.h boundary_mesh.h checkpoint_io.h \
-	distributed_mesh.h ensight_io.h exodusII_io.h \
+	inf_fe_instantiate_3D.h inf_fe_macro.h inf_fe_map.h \
+	bounding_box.h cell.h cell_hex.h cell_hex20.h cell_hex27.h \
+	cell_hex8.h cell_inf.h cell_inf_hex.h cell_inf_hex16.h \
+	cell_inf_hex18.h cell_inf_hex8.h cell_inf_prism.h \
+	cell_inf_prism12.h cell_inf_prism6.h cell_prism.h \
+	cell_prism15.h cell_prism18.h cell_prism6.h cell_pyramid.h \
+	cell_pyramid13.h cell_pyramid14.h cell_pyramid5.h cell_tet.h \
+	cell_tet10.h cell_tet4.h compare_elems_by_level.h edge.h \
+	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
+	elem_cutter.h elem_hash.h elem_internal.h elem_quality.h \
+	elem_range.h face.h face_inf_quad.h face_inf_quad4.h \
+	face_inf_quad6.h face_quad.h face_quad4.h face_quad4_shell.h \
+	face_quad8.h face_quad8_shell.h face_quad9.h face_tri.h \
+	face_tri3.h face_tri3_shell.h face_tri3_subdivision.h \
+	face_tri6.h node.h node_elem.h node_range.h plane.h point.h \
+	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
+	surface.h abaqus_io.h boundary_info.h boundary_mesh.h \
+	checkpoint_io.h distributed_mesh.h ensight_io.h exodusII_io.h \
 	exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h \
 	inf_elem_builder.h matlab_io.h medit_io.h mesh.h mesh_base.h \
 	mesh_communication.h mesh_function.h mesh_generation.h \
@@ -1137,6 +1137,9 @@ inf_fe_instantiate_3D.h: $(top_srcdir)/include/fe/inf_fe_instantiate_3D.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe_macro.h: $(top_srcdir)/include/fe/inf_fe_macro.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+inf_fe_map.h: $(top_srcdir)/include/fe/inf_fe_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 bounding_box.h: $(top_srcdir)/include/geom/bounding_box.h
