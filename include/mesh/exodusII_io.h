@@ -26,8 +26,7 @@
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
 #include "libmesh/parallel_object.h"
-
-// C++ includes
+#include "libmesh/boundary_info.h" // BoundaryInfo::BCTuple
 
 namespace libMesh
 {
@@ -264,6 +263,38 @@ public:
                        const int timestep,
                        const Real time,
                        const std::set<std::string> * system_names=nullptr);
+
+  /**
+   * The Exodus format can also store values on sidesets. This can be
+   * thought of as an alternative to defining an elemental variable
+   * field on lower-dimensional elements making up a part of the
+   * boundary. The inputs to the function are:
+   * .) var_names[i] is the name of the ith sideset variable to be written to file.
+   * .) side_ids[i] is a set of side_ids where var_names[i] is active.
+   * .) bc_vals[i] is a map from (elem,side,id) BCTuple objects to the
+   *    corresponding real-valued data.
+   *
+   * \note You must have already written the mesh by calling
+   * e.g. write() before calling this function, because it uses the
+   * existing ordering of the Exodus sidesets.
+   */
+  void
+  write_sideset_data (int timestep,
+                      const std::vector<std::string> & var_names,
+                      const std::vector<std::set<boundary_id_type>> & side_ids,
+                      const std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
+
+  /**
+   * Similar to write_sideset_data(), this function is used to read
+   * the data at a particular timestep. TODO: currently _all_ the
+   * sideset variables are read, but we might want to change this to
+   * only read the requested ones.
+   */
+  void
+  read_sideset_data (int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<boundary_id_type>> & side_ids,
+                     std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
    * Sets the list of variable names to be included in the output.

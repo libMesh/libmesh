@@ -374,8 +374,8 @@ void ExodusII_IO::read (const std::string & fname)
                                                cast_int<unsigned short>(mapped_side),
                                                cast_int<boundary_id_type>(exio_helper->id_list[e]));
           }
-      }
-  }
+      } // end for (elem_list)
+  } // end read sideset info
 
   // Read nodeset info
   {
@@ -1273,6 +1273,41 @@ void ExodusII_IO::write_timestep (const std::string & fname,
 
 
 
+void
+ExodusII_IO::
+write_sideset_data(int timestep,
+                   const std::vector<std::string> & var_names,
+                   const std::vector<std::set<boundary_id_type>> & side_ids,
+                   const std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
+{
+  if (!exio_helper->opened_for_writing)
+    libmesh_error_msg("ERROR, ExodusII file must be opened for writing "
+                      "before calling ExodusII_IO::write_sideset_data()!");
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  exio_helper->write_sideset_data(mesh, timestep, var_names, side_ids, bc_vals);
+}
+
+
+
+void
+ExodusII_IO::
+read_sideset_data(int timestep,
+                  std::vector<std::string> & var_names,
+                  std::vector<std::set<boundary_id_type>> & side_ids,
+                  std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
+{
+  if (!exio_helper->opened_for_reading)
+    libmesh_error_msg("ERROR, ExodusII file must be opened for reading "
+                      "before calling ExodusII_IO::read_sideset_data()!");
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  exio_helper->read_sideset_data(mesh, timestep, var_names, side_ids, bc_vals);
+}
+
+
+
+
 void ExodusII_IO::write (const std::string & fname)
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -1592,6 +1627,30 @@ void ExodusII_IO::write_timestep (const std::string &,
                                   const int,
                                   const Real,
                                   const std::set<std::string> *)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
+void
+ExodusII_IO::
+write_sideset_data (int,
+                    const std::vector<std::string> &,
+                    const std::vector<std::set<boundary_id_type>> &,
+                    const std::vector<std::map<BoundaryInfo::BCTuple, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
+void
+ExodusII_IO::
+read_sideset_data (int,
+                   std::vector<std::string> &,
+                   std::vector<std::set<boundary_id_type>> &,
+                   std::vector<std::map<BoundaryInfo::BCTuple, Real>> &)
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
