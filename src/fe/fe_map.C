@@ -93,14 +93,19 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
 
   // The element type and order to use in
   // the map
+  const FEFamily mapping_family =
+    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
+    RATIONAL_BERNSTEIN : LAGRANGE;
   const Order    mapping_order     (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
+
+  FEType map_fe_type(mapping_order, mapping_family);
 
   // Number of shape functions used to construct the map
   // (Lagrange shape functions are used for mapping)
   const unsigned int n_mapping_shape_functions =
-    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-                                         mapping_order);
+    FEInterface::n_shape_functions (Dim, map_fe_type,
+                                    mapping_elem_type);
 
   if (calculate_xyz)
     this->phi_map.resize         (n_mapping_shape_functions);
@@ -179,9 +184,11 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   // Optimize for the *linear* geometric elements case:
   bool is_linear = elem->is_linear();
 
+  FEInterface::shape_ptr shape_ptr =
+    FEInterface::shape_function(Dim, map_fe_type);
+
   switch (Dim)
     {
-
       //------------------------------------------------------------
       // 0D
     case 0:
@@ -189,7 +196,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
         if (calculate_xyz)
           for (unsigned int i=0; i<n_mapping_shape_functions; i++)
             for (std::size_t p=0; p<n_qp; p++)
-              this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+              this->phi_map[i][p] =
+                shape_ptr(elem, mapping_order, i, qp[p], false);
 
         break;
       }
@@ -206,10 +214,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
               {
                 if (calculate_xyz)
                   this->phi_map[i][0] =
-                    FE<Dim,LAGRANGE>::shape(mapping_elem_type,
-                                            mapping_order,
-                                            i,
-                                            qp[0]);
+                    shape_ptr(elem, mapping_order, i, qp[0], false);
 
                 if (calculate_dxyz)
                   this->dphidxi_map[i][0] =
@@ -231,7 +236,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                 for (std::size_t p=1; p<n_qp; p++)
                   {
                     if (calculate_xyz)
-                      this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+                      this->phi_map[i][p] =
+                        shape_ptr(elem, mapping_order, i, qp[p], false);
                     if (calculate_dxyz)
                       this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -246,7 +252,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
             for (std::size_t p=0; p<n_qp; p++)
               {
                 if (calculate_xyz)
-                  this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+                  this->phi_map[i][p] =
+                    shape_ptr (elem, mapping_order, i, qp[p], false);
                 if (calculate_dxyz)
                   this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -268,7 +275,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
                 if (calculate_xyz)
-                  this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
+                  this->phi_map[i][0] =
+                    shape_ptr (elem, mapping_order, i, qp[0], false);
                 if (calculate_dxyz)
                   {
                     this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
@@ -285,7 +293,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                 for (std::size_t p=1; p<n_qp; p++)
                   {
                     if (calculate_xyz)
-                      this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+                      this->phi_map[i][p] =
+                        shape_ptr (elem, mapping_order, i, qp[p], false);
                     if (calculate_dxyz)
                       {
                         this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
@@ -307,7 +316,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
             for (std::size_t p=0; p<n_qp; p++)
               {
                 if (calculate_xyz)
-                  this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+                  this->phi_map[i][p] =
+                    shape_ptr(elem, mapping_order, i, qp[p], false);
                 if (calculate_dxyz)
                   {
                     this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
@@ -337,7 +347,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
                 if (calculate_xyz)
-                  this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
+                  this->phi_map[i][0] =
+                    shape_ptr (elem, mapping_order, i, qp[0], false);
                 if (calculate_dxyz)
                   {
                     this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
@@ -358,7 +369,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                 for (std::size_t p=1; p<n_qp; p++)
                   {
                     if (calculate_xyz)
-                      this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+                      this->phi_map[i][p] =
+                        shape_ptr (elem, mapping_order, i, qp[p], false);
                     if (calculate_dxyz)
                       {
                         this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
@@ -384,7 +396,8 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
             for (std::size_t p=0; p<n_qp; p++)
               {
                 if (calculate_xyz)
-                  this->phi_map[i][p]       = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+                  this->phi_map[i][p] =
+                    shape_ptr(elem, mapping_order, i, qp[p], false);
                 if (calculate_dxyz)
                   {
                     this->dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
