@@ -99,7 +99,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   const Order    mapping_order     (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
 
-  FEType map_fe_type(mapping_order, mapping_family);
+  const FEType map_fe_type(mapping_order, mapping_family);
 
   // Number of shape functions used to construct the map
   // (Lagrange shape functions are used for mapping)
