@@ -42,12 +42,13 @@ template <>
 RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
-                                      const Point & p)
+                                      const Point & p,
+                                      const bool add_p_level)
 {
 #if LIBMESH_DIM > 1
   libmesh_assert(elem);
 
-  const Order total_order = static_cast<Order>(order + elem->p_level());
+  const Order total_order = static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (total_order)
     {
@@ -179,13 +180,14 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                                             const Order order,
                                             const unsigned int i,
                                             const unsigned int j,
-                                            const Point &)
+                                            const Point &,
+                                            const bool add_p_level)
 {
 #if LIBMESH_DIM > 1
   libmesh_assert(elem);
   libmesh_assert_less (j, 2);
 
-  const Order total_order = static_cast<Order>(order + elem->p_level());
+  const Order total_order = static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (total_order)
     {
@@ -345,7 +347,8 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                                                    const Order order,
                                                    const unsigned int libmesh_dbg_var(i),
                                                    const unsigned int libmesh_dbg_var(j),
-                                                   const Point &)
+                                                   const Point &,
+                                                   const bool add_p_level)
 {
 #if LIBMESH_DIM > 1
   libmesh_assert(elem);
@@ -355,7 +358,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   // j = 2 ==> d^2 phi / deta^2
   libmesh_assert_less (j, 3);
 
-  const Order total_order = static_cast<Order>(order + elem->p_level());
+  const Order total_order = static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (total_order)
     {

@@ -189,7 +189,8 @@ template <>
 Real FE<1,HERMITE>::shape(const Elem * elem,
                           const Order libmesh_dbg_var(order),
                           const unsigned int i,
-                          const Point & p)
+                          const Point & p,
+                          const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
 
@@ -203,7 +204,8 @@ Real FE<1,HERMITE>::shape(const Elem * elem,
   const ElemType type = elem->type();
 
 #ifndef NDEBUG
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder =
+    order + add_p_level * elem->p_level();
 #endif
 
   switch (type)
@@ -253,7 +255,8 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
                                 const Order libmesh_dbg_var(order),
                                 const unsigned int i,
                                 const unsigned int,
-                                const Point & p)
+                                const Point & p,
+                                const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
 
@@ -267,7 +270,8 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
 #ifndef NDEBUG
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder =
+    order + add_p_level * elem->p_level();
 #endif
 
   switch (type)
@@ -317,7 +321,8 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
                                        const Order libmesh_dbg_var(order),
                                        const unsigned int i,
                                        const unsigned int,
-                                       const Point & p)
+                                       const Point & p,
+                                       const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
 
@@ -331,7 +336,8 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
 #ifndef NDEBUG
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder =
+    order + add_p_level * elem->p_level();
 #endif
 
   switch (type)

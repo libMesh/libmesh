@@ -79,11 +79,12 @@ template <>
 Real FE<1,SZABAB>::shape(const Elem * elem,
                          const Order order,
                          const unsigned int i,
-                         const Point & p)
+                         const Point & p,
+                         const bool add_p_level)
 {
   libmesh_assert(elem);
 
-  return FE<1,SZABAB>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  return FE<1,SZABAB>::shape(elem->type(), static_cast<Order>(order + add_p_level * add_p_level * elem->p_level()), i, p);
 }
 
 
@@ -139,12 +140,13 @@ Real FE<1,SZABAB>::shape_deriv(const Elem * elem,
                                const Order order,
                                const unsigned int i,
                                const unsigned int j,
-                               const Point & p)
+                               const Point & p,
+                               const bool add_p_level)
 {
   libmesh_assert(elem);
 
   return FE<1,SZABAB>::shape_deriv(elem->type(),
-                                   static_cast<Order>(order + elem->p_level()), i, j, p);
+                                   static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -175,7 +177,8 @@ Real FE<1,SZABAB>::shape_second_deriv(const Elem *,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
-                                      const Point &)
+                                      const Point &,
+                                      const bool)
 {
   static bool warning_given = false;
 

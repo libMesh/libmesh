@@ -296,7 +296,8 @@ public:
   typedef Real (*shape_ptr) (const Elem * elem,
                              const Order o,
                              const unsigned int i,
-                             const Point & p);
+                             const Point & p,
+                             const bool add_p_level);
 
   /**
    * \returns A function which evaluates shape for the

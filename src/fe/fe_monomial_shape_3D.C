@@ -186,12 +186,13 @@ template <>
 Real FE<3,MONOMIAL>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
-                           const Point & p)
+                           const Point & p,
+                           const bool add_p_level)
 {
   libmesh_assert(elem);
 
   // call the orientation-independent shape functions
-  return FE<3,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  return FE<3,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
 }
 
 
@@ -639,12 +640,13 @@ Real FE<3,MONOMIAL>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p)
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
-  return FE<3,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  return FE<3,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -1303,12 +1305,13 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point & p)
+                                        const Point & p,
+                                        const bool add_p_level)
 {
   libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
-  return FE<3,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  return FE<3,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 #endif

@@ -201,7 +201,8 @@ template <>
 Real FE<2,HERMITE>::shape(const Elem * elem,
                           const Order order,
                           const unsigned int i,
-                          const Point & p)
+                          const Point & p,
+                          const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -219,7 +220,8 @@ Real FE<2,HERMITE>::shape(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (type)
     {
@@ -265,7 +267,8 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
                                 const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
-                                const Point & p)
+                                const Point & p,
+                                const bool add_p_level)
 {
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1);
@@ -284,7 +287,8 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (type)
     {
@@ -342,7 +346,8 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
                                        const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
-                                       const Point & p)
+                                       const Point & p,
+                                       const bool add_p_level)
 {
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1 || j == 2);
@@ -361,7 +366,8 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (type)
     {

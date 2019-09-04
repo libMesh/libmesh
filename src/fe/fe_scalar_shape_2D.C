@@ -38,7 +38,8 @@ template <>
 Real FE<2,SCALAR>::shape(const Elem *,
                          const Order,
                          const unsigned int,
-                         const Point &)
+                         const Point &,
+                         const bool)
 {
   return 1.;
 }
@@ -59,7 +60,8 @@ Real FE<2,SCALAR>::shape_deriv(const Elem *,
                                const Order,
                                const unsigned int,
                                const unsigned int,
-                               const Point &)
+                               const Point &,
+                               const bool)
 {
   return 0.;
 }
@@ -81,7 +83,8 @@ Real FE<2,SCALAR>::shape_second_deriv(const Elem *,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
-                                      const Point &)
+                                      const Point &,
+                                      const bool)
 {
   return 0.;
 }

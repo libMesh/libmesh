@@ -409,10 +409,11 @@ RealVectorValue
 FE<0, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
-                           const Point & p)
+                           const Point & p,
+                           const bool add_p_level)
 {
   Real value =
-      FE<0, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+      FE<0, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
   return libMesh::RealVectorValue(value);
 }
 template <>
@@ -421,10 +422,11 @@ FE<0, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p)
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   Real value = FE<0, MONOMIAL>::shape_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
   return libMesh::RealVectorValue(value);
 }
 
@@ -436,10 +438,11 @@ FE<0, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point & p)
+                                        const Point & p,
+                                        const bool add_p_level)
 {
   Real value = FE<0, MONOMIAL>::shape_second_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
   return libMesh::RealVectorValue(value);
 }
 
@@ -451,10 +454,11 @@ RealVectorValue
 FE<1, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
-                           const Point & p)
+                           const Point & p,
+                           const bool add_p_level)
 {
   Real value =
-      FE<1, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+      FE<1, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
   return libMesh::RealVectorValue(value);
 }
 template <>
@@ -463,10 +467,11 @@ FE<1, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p)
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   Real value = FE<1, MONOMIAL>::shape_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
   return libMesh::RealVectorValue(value);
 }
 
@@ -477,10 +482,11 @@ FE<1, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point & p)
+                                        const Point & p,
+                                        const bool add_p_level)
 {
   Real value = FE<1, MONOMIAL>::shape_second_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
   return libMesh::RealVectorValue(value);
 }
 
@@ -492,10 +498,11 @@ RealVectorValue
 FE<2, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
-                           const Point & p)
+                           const Point & p,
+                           const bool add_p_level)
 {
   Real value =
-      FE<2, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i / 2, p);
+      FE<2, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 2, p);
 
   switch (i % 2)
   {
@@ -518,10 +525,11 @@ FE<2, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p)
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   Real value = FE<2, MONOMIAL>::shape_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i / 2, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 2, j, p);
 
   switch (i % 2)
   {
@@ -546,10 +554,11 @@ FE<2, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point & p)
+                                        const Point & p,
+                                        const bool add_p_level)
 {
   Real value = FE<2, MONOMIAL>::shape_second_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i / 2, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 2, j, p);
 
   switch (i % 2)
   {
@@ -575,10 +584,11 @@ RealVectorValue
 FE<3, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
-                           const Point & p)
+                           const Point & p,
+                           const bool add_p_level)
 {
   Real value =
-      FE<3, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i / 3, p);
+      FE<3, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 3, p);
 
   switch (i % 3)
   {
@@ -604,10 +614,11 @@ FE<3, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p)
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   Real value = FE<3, MONOMIAL>::shape_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i / 3, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 3, j, p);
 
   switch (i % 3)
   {
@@ -636,10 +647,11 @@ FE<3, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point & p)
+                                        const Point & p,
+                                        const bool add_p_level)
 {
   Real value = FE<3, MONOMIAL>::shape_second_deriv(
-      elem->type(), static_cast<Order>(order + elem->p_level()), i / 3, j, p);
+      elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 3, j, p);
 
   switch (i % 3)
   {

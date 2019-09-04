@@ -51,13 +51,14 @@ template <>
 Real FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
                                      const Order order,
                                      const unsigned int i,
-                                     const Point & p)
+                                     const Point & p,
+                                     const bool add_p_level)
 {
   libmesh_assert(elem);
 
   const ElemType elem_type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
 
   // FEType object to be passed to various FEInterface functions below.
   FEType fe_type(totalorder, _underlying_fe_family);
@@ -107,7 +108,8 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int libmesh_dbg_var(j),
-                                           const Point & p)
+                                           const Point & p,
+                                           const bool add_p_level)
 {
   // only d()/dxi in 1D!
   libmesh_assert_equal_to (j, 0);
@@ -116,7 +118,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
 
   const ElemType elem_type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
 
   // FEType object to be passed to various FEInterface functions below.
   FEType fe_type(totalorder, _underlying_fe_family);
@@ -176,7 +178,8 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
                                                   const Order order,
                                                   const unsigned int i,
                                                   const unsigned int libmesh_dbg_var(j),
-                                                  const Point & p)
+                                                  const Point & p,
+                                                  const bool add_p_level)
 {
   // Don't need to switch on j.  1D shape functions
   // depend on xi only!
@@ -186,7 +189,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
 
   const ElemType elem_type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
 
   // FEType object to be passed to various FEInterface functions below.
   FEType fe_type(totalorder, _underlying_fe_family);

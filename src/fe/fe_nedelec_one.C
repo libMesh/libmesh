@@ -592,7 +592,7 @@ template <>
 RealGradient FE<0,NEDELEC_ONE>::shape(const ElemType, const Order,const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<0,NEDELEC_ONE>::shape(const Elem *,const Order,const unsigned int,const Point &)
+RealGradient FE<0,NEDELEC_ONE>::shape(const Elem *,const Order,const unsigned int,const Point &,const bool)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<0,NEDELEC_ONE>::shape_deriv(const ElemType, const Order,const unsigned int,
@@ -600,7 +600,7 @@ RealGradient FE<0,NEDELEC_ONE>::shape_deriv(const ElemType, const Order,const un
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<0,NEDELEC_ONE>::shape_deriv(const Elem *,const Order,const unsigned int,
-                                            const unsigned int,const Point &)
+                                            const unsigned int,const Point &,const bool)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -610,7 +610,7 @@ RealGradient FE<0,NEDELEC_ONE>::shape_second_deriv(const ElemType, const Order,c
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<0,NEDELEC_ONE>::shape_second_deriv(const Elem *,const Order,const unsigned int,
-                                                   const unsigned int,const Point &)
+                                                   const unsigned int,const Point &,const bool)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 #endif
@@ -619,7 +619,7 @@ template <>
 RealGradient FE<1,NEDELEC_ONE>::shape(const ElemType, const Order,const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<1,NEDELEC_ONE>::shape(const Elem *,const Order,const unsigned int,const Point &)
+RealGradient FE<1,NEDELEC_ONE>::shape(const Elem *,const Order,const unsigned int,const Point &,const bool)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<1,NEDELEC_ONE>::shape_deriv(const ElemType, const Order,const unsigned int,
@@ -627,7 +627,7 @@ RealGradient FE<1,NEDELEC_ONE>::shape_deriv(const ElemType, const Order,const un
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<1,NEDELEC_ONE>::shape_deriv(const Elem *,const Order,const unsigned int,
-                                            const unsigned int,const Point &)
+                                            const unsigned int,const Point &,const bool)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -637,7 +637,7 @@ RealGradient FE<1,NEDELEC_ONE>::shape_second_deriv(const ElemType, const Order,c
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<1,NEDELEC_ONE>::shape_second_deriv(const Elem *,const Order,const unsigned int,
-                                                   const unsigned int,const Point &)
+                                                   const unsigned int,const Point &,const bool)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 #endif

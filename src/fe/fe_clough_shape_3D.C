@@ -45,7 +45,8 @@ template <>
 Real FE<3,CLOUGH>::shape(const Elem * libmesh_dbg_var(elem),
                          const Order,
                          const unsigned int,
-                         const Point &)
+                         const Point &,
+                         const bool)
 {
   libmesh_assert(elem);
 
@@ -73,7 +74,8 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem * libmesh_dbg_var(elem),
                                const Order,
                                const unsigned int,
                                const unsigned int,
-                               const Point &)
+                               const Point &,
+                               const bool)
 {
   libmesh_assert(elem);
   libmesh_not_implemented();
@@ -101,7 +103,8 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem * libmesh_dbg_var(elem),
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
-                                      const Point &)
+                                      const Point &,
+                                      const bool)
 {
   libmesh_assert(elem);
   libmesh_not_implemented();
