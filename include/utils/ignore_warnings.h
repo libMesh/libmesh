@@ -85,6 +85,7 @@
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #if (__GNUC__ > 7)
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif // GCC > 7
 #endif // GCC > 6
 #endif // GCC > 5
