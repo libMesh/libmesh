@@ -42,6 +42,24 @@
 namespace libMesh
 {
 
+inline
+FEFamily
+FEMap::map_fe_type(const Elem & elem)
+{
+  switch (elem.mapping_type())
+  {
+  case Elem::RATIONAL_BERNSTEIN_MAP:
+    return RATIONAL_BERNSTEIN;
+  case Elem::LAGRANGE_MAP:
+    return LAGRANGE;
+  default:
+    libmesh_error_msg("Unknown mapping type " << elem.mapping_type());
+  }
+  return LAGRANGE;
+}
+
+
+
 // Constructor
 FEMap::FEMap(Real jtol) :
   calculations_started(false),
@@ -93,9 +111,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
 
   // The element type and order to use in
   // the map
-  const FEFamily mapping_family =
-    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
-    RATIONAL_BERNSTEIN : LAGRANGE;
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const Order    mapping_order     (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
 
@@ -2030,10 +2046,7 @@ Point FEMap::map (const unsigned int dim,
 
   Point p;
 
-  const FEFamily mapping_family =
-    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
-    RATIONAL_BERNSTEIN : LAGRANGE;
-
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
   const FEType fe_type (order, mapping_family);
@@ -2061,10 +2074,7 @@ Point FEMap::map_deriv (const unsigned int dim,
 
   Point p;
 
-  const FEFamily mapping_family =
-    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
-    RATIONAL_BERNSTEIN : LAGRANGE;
-
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
   const FEType fe_type (order, mapping_family);

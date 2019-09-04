@@ -71,9 +71,7 @@ void clough_compute_coefs(const Elem * elem)
     return;
 #endif
 
-  const FEFamily mapping_family =
-    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
-    RATIONAL_BERNSTEIN : LAGRANGE;
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
 
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());

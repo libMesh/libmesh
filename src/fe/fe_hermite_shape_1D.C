@@ -31,9 +31,7 @@ using namespace libMesh;
 // Compute the static coefficients for an element
 void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
 {
-  const FEFamily mapping_family =
-    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
-    RATIONAL_BERNSTEIN : LAGRANGE;
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
 
