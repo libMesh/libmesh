@@ -856,8 +856,8 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
   if (elem->subactive())
     return;
 
-  // We currently always use LAGRANGE mappings for geometry
-  const FEType fe_type(elem->default_order(), LAGRANGE);
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
+  const FEType fe_type(elem->default_order(), mapping_family);
 
   // Pull objects out of the loop to reduce heap operations
   std::vector<const Node *> my_nodes, parent_nodes;
@@ -1004,8 +1004,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
 
   const unsigned int Dim = elem->dim();
 
-  // We currently always use LAGRANGE mappings for geometry
-  const FEType fe_type(elem->default_order(), LAGRANGE);
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
+  const FEType fe_type(elem->default_order(), mapping_family);
 
   // Pull objects out of the loop to reduce heap operations
   std::vector<const Node *> my_nodes, neigh_nodes;
