@@ -187,6 +187,12 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   FEInterface::shape_ptr shape_ptr =
     FEInterface::shape_function(Dim, map_fe_type);
 
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(Dim, map_fe_type);
+
+  FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
+    FEInterface::shape_second_deriv_function(Dim, map_fe_type);
+
   switch (Dim)
     {
       //------------------------------------------------------------
@@ -218,20 +224,12 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
 
                 if (calculate_dxyz)
                   this->dphidxi_map[i][0] =
-                    FE<Dim,LAGRANGE>::shape_deriv(mapping_elem_type,
-                                                  mapping_order,
-                                                  i,
-                                                  0,
-                                                  qp[0]);
+                    shape_deriv_ptr(elem, mapping_order, i, 0, qp[0], false);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   this->d2phidxi2_map[i][0] =
-                    FE<Dim,LAGRANGE>::shape_second_deriv(mapping_elem_type,
-                                                         mapping_order,
-                                                         i,
-                                                         0,
-                                                         qp[0]);
+                    shape_second_deriv_ptr(elem, mapping_order, i, 0, qp[0], false);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 for (std::size_t p=1; p<n_qp; p++)
                   {
@@ -255,10 +253,10 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                   this->phi_map[i][p] =
                     shape_ptr (elem, mapping_order, i, qp[p], false);
                 if (calculate_dxyz)
-                  this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+                  this->dphidxi_map[i][p]  = shape_deriv_ptr (elem, mapping_order, i, 0, qp[p], false);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
-                  this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+                  this->d2phidxi2_map[i][p] = shape_second_deriv_ptr (elem, mapping_order, i, 0, qp[p], false);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               }
 
@@ -279,15 +277,15 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                     shape_ptr (elem, mapping_order, i, qp[0], false);
                 if (calculate_dxyz)
                   {
-                    this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                    this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
+                    this->dphidxi_map[i][0]  = shape_deriv_ptr (elem, mapping_order, i, 0, qp[0], false);
+                    this->dphideta_map[i][0] = shape_deriv_ptr (elem, mapping_order, i, 1, qp[0], false);
                   }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   {
-                    this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                    this->d2phidxideta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-                    this->d2phideta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
+                    this->d2phidxi2_map[i][0]    = shape_second_deriv_ptr (elem, mapping_order, i, 0, qp[0], false);
+                    this->d2phidxideta_map[i][0] = shape_second_deriv_ptr (elem, mapping_order, i, 1, qp[0], false);
+                    this->d2phideta2_map[i][0]   = shape_second_deriv_ptr (elem, mapping_order, i, 2, qp[0], false);
                   }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 for (std::size_t p=1; p<n_qp; p++)
@@ -320,15 +318,15 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                     shape_ptr(elem, mapping_order, i, qp[p], false);
                 if (calculate_dxyz)
                   {
-                    this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                    this->dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
+                    this->dphidxi_map[i][p]  = shape_deriv_ptr (elem, mapping_order, i, 0, qp[p], false);
+                    this->dphideta_map[i][p] = shape_deriv_ptr (elem, mapping_order, i, 1, qp[p], false);
                   }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   {
-                    this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                    this->d2phidxideta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-                    this->d2phideta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
+                    this->d2phidxi2_map[i][p] = shape_second_deriv_ptr (elem, mapping_order, i, 0, qp[p], false);
+                    this->d2phidxideta_map[i][p] = shape_second_deriv_ptr (elem, mapping_order, i, 1, qp[p], false);
+                    this->d2phideta2_map[i][p] = shape_second_deriv_ptr (elem, mapping_order, i, 2, qp[p], false);
                   }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               }
@@ -351,19 +349,19 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                     shape_ptr (elem, mapping_order, i, qp[0], false);
                 if (calculate_dxyz)
                   {
-                    this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                    this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-                    this->dphidzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
+                    this->dphidxi_map[i][0]  = shape_deriv_ptr (elem, mapping_order, i, 0, qp[0], false);
+                    this->dphideta_map[i][0] = shape_deriv_ptr (elem, mapping_order, i, 1, qp[0], false);
+                    this->dphidzeta_map[i][0] = shape_deriv_ptr (elem, mapping_order, i, 2, qp[0], false);
                   }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   {
-                    this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                    this->d2phidxideta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-                    this->d2phideta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
-                    this->d2phidxidzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 3, qp[0]);
-                    this->d2phidetadzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 4, qp[0]);
-                    this->d2phidzeta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[0]);
+                    this->d2phidxi2_map[i][0]      = shape_second_deriv_ptr (elem, mapping_order, i, 0, qp[0], false);
+                    this->d2phidxideta_map[i][0]   = shape_second_deriv_ptr (elem, mapping_order, i, 1, qp[0], false);
+                    this->d2phideta2_map[i][0]     = shape_second_deriv_ptr (elem, mapping_order, i, 2, qp[0], false);
+                    this->d2phidxidzeta_map[i][0]  = shape_second_deriv_ptr (elem, mapping_order, i, 3, qp[0], false);
+                    this->d2phidetadzeta_map[i][0] = shape_second_deriv_ptr (elem, mapping_order, i, 4, qp[0], false);
+                    this->d2phidzeta2_map[i][0]    = shape_second_deriv_ptr (elem, mapping_order, i, 5, qp[0], false);
                   }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 for (std::size_t p=1; p<n_qp; p++)
@@ -400,19 +398,19 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                     shape_ptr(elem, mapping_order, i, qp[p], false);
                 if (calculate_dxyz)
                   {
-                    this->dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                    this->dphideta_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-                    this->dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
+                    this->dphidxi_map[i][p]   = shape_deriv_ptr (elem, mapping_order, i, 0, qp[p], false);
+                    this->dphideta_map[i][p]  = shape_deriv_ptr (elem, mapping_order, i, 1, qp[p], false);
+                    this->dphidzeta_map[i][p] = shape_deriv_ptr (elem, mapping_order, i, 2, qp[p], false);
                   }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   {
-                    this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                    this->d2phidxideta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-                    this->d2phideta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
-                    this->d2phidxidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 3, qp[p]);
-                    this->d2phidetadzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 4, qp[p]);
-                    this->d2phidzeta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[p]);
+                    this->d2phidxi2_map[i][p]      = shape_second_deriv_ptr (elem, mapping_order, i, 0, qp[p], false);
+                    this->d2phidxideta_map[i][p]   = shape_second_deriv_ptr (elem, mapping_order, i, 1, qp[p], false);
+                    this->d2phideta2_map[i][p]     = shape_second_deriv_ptr (elem, mapping_order, i, 2, qp[p], false);
+                    this->d2phidxidzeta_map[i][p]  = shape_second_deriv_ptr (elem, mapping_order, i, 3, qp[p], false);
+                    this->d2phidetadzeta_map[i][p] = shape_second_deriv_ptr (elem, mapping_order, i, 4, qp[p], false);
+                    this->d2phidzeta2_map[i][p]    = shape_second_deriv_ptr (elem, mapping_order, i, 5, qp[p], false);
                   }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               }
@@ -2032,9 +2030,14 @@ Point FEMap::map (const unsigned int dim,
 
   Point p;
 
+  const FEFamily mapping_family =
+    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
+    RATIONAL_BERNSTEIN : LAGRANGE;
+
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const FEType fe_type (order, LAGRANGE);
+  const FEType fe_type (order, mapping_family);
+
   const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
 
   // Lagrange basis functions are used for mapping
@@ -2058,9 +2061,13 @@ Point FEMap::map_deriv (const unsigned int dim,
 
   Point p;
 
+  const FEFamily mapping_family =
+    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
+    RATIONAL_BERNSTEIN : LAGRANGE;
+
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const FEType fe_type (order, LAGRANGE);
+  const FEType fe_type (order, mapping_family);
   const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
 
   // Lagrange basis functions are used for mapping
