@@ -494,7 +494,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
 
       unsigned int dim = get_mesh().mesh_dimension();
       FEType fe_type = p_elem_fe->get_fe_type();
-      Point p_master = FEInterface::inverse_map(dim, fe_type, &c.get_elem(), zero);
+      Point p_master = FEMap::inverse_map(dim, &c.get_elem(), zero);
 
       std::vector<Real> point_phi(n_p_dofs);
       for (unsigned int i=0; i != n_p_dofs; i++)

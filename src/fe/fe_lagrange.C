@@ -774,9 +774,9 @@ void lagrange_compute_constraints (DofConstraints & constraints,
               const Point & support_point = my_side->point(my_dof);
 
               // Figure out where my node lies on their reference element.
-              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                  parent_side.get(),
-                                                                  support_point);
+              const Point mapped_point = FEMap::inverse_map(Dim-1,
+                                                            parent_side.get(),
+                                                            support_point);
 
               // Compute the parent's side shape function values.
               for (unsigned int their_dof=0;

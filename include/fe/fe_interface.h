@@ -190,8 +190,7 @@ public:
                          std::vector<Number> & nodal_soln);
 
   /**
-   * \returns The point in physical space corresponding to the
-   * reference point \p p which is passed in.
+   * This is now deprecated; use FEMap::map instead.
    */
   static Point map(unsigned int dim,
                    const FEType & fe_t,
@@ -199,13 +198,7 @@ public:
                    const Point & p);
 
   /**
-   * \returns The location (on the reference element) of the
-   * point \p p located in physical space.  This function requires
-   * inverting the (probably nonlinear) transformation map, so
-   * it is not trivial. The optional parameter \p tolerance defines
-   * how close is "good enough."  The map inversion iteration
-   * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
-   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
+   * This is now deprecated; use FEMap::inverse_map instead.
    */
   static Point inverse_map (const unsigned int dim,
                             const FEType & fe_t,
@@ -215,15 +208,7 @@ public:
                             const bool secure = true);
 
   /**
-   * \returns The location (on the reference element) of the points \p
-   * physical_points located in physical space.  This function
-   * requires inverting the (probably nonlinear) transformation map,
-   * so it is not trivial. The location of each point on the reference
-   * element is returned in the vector \p reference_points. The
-   * optional parameter \p tolerance defines how close is "good
-   * enough."  The map inversion iteration computes the sequence \f$
-   * \{ p_n \} \f$, and the iteration is terminated when \f$ \|p -
-   * p_n\| < \mbox{\texttt{tolerance}} \f$
+   * This is now deprecated; use FEMap::inverse_map instead.
    */
   static void  inverse_map (const unsigned int dim,
                             const FEType & fe_t,

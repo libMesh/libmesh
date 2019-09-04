@@ -212,15 +212,14 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
     // The element type and order to use in the base map
     const Order    base_mapping_order     ( base_elem->default_order() );
-    const ElemType base_mapping_elem_type ( base_elem->type()          );
 
     // the number of mapping shape functions. For base side it is 1.
     // (Lagrange shape functions are used for mapping in the base)
     const unsigned int n_radial_mapping_sf =
       inf_side->infinite() ? cast_int<unsigned int>(radial_map.size()) : 1;
 
-    const unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
-                                                                                base_mapping_order);
+    const unsigned int n_base_mapping_shape_functions =
+      InfFEBase::n_base_mapping_sf(*base_elem, base_mapping_order);
 
     const unsigned int n_total_mapping_shape_functions =
       n_radial_mapping_sf * n_base_mapping_shape_functions;

@@ -61,7 +61,7 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int> & elements,
       for (unsigned int j=0; j<dim; j++)
         p(j) = coords[(j*num_values)+i];
 
-      const Point mapped_point(FEInterface::inverse_map(dim, dof_map.variable_type(0), elem, p));
+      const Point mapped_point(FEMap::inverse_map(dim, elem, p));
 
       FEComputeData data (es, mapped_point);
       FEInterface::compute_data (dim, fe_type, elem, data);

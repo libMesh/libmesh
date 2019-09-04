@@ -26,6 +26,7 @@
 
 // Local includes
 #include "libmesh/fe_base.h"
+#include "libmesh/inf_fe_map.h"
 
 // C++ includes
 #include <cstddef>
@@ -39,6 +40,146 @@ class Elem;
 class FEComputeData;
 
 
+/**
+ * Infinite elements are in some sense directional, compared
+ * to conventional finite elements.  All methods related
+ * to the radial part, which extends perpendicular from the base,
+ * are collected in this class.  This class offers static methods for
+ * use in \p InfFE and \p InfFEMap
+ *
+ * \author Daniel Dreyer
+ * \date 2003
+ */
+class InfFERadial
+{
+private:
+
+  /**
+   * Never use an object of this type.
+   */
+  InfFERadial() {}
+
+public:
+
+  /**
+   * \returns The decay in the radial direction of
+   * the \p Dim dimensional infinite element.
+   */
+  static Real decay (const unsigned int dim, const Real v);
+
+  /**
+   * \returns The first (local) derivative of the
+   * decay in radial direction of the infinite element.
+   *
+   * This is only valid for 3D?? - RHS
+   */
+  static Real decay_deriv (const Real) { return -.5; }
+
+  /**
+   * \returns The radial weight D, used as an additional weight
+   * for the test function, evaluated at local radial coordinate \p v.
+   */
+  static Real D (const Real v) { return (1.-v)*(1.-v)/4.; }
+
+  /**
+   * \returns The first (local) radial derivative of the radial weight D.
+   */
+  static Real D_deriv (const Real v) { return (v-1.)/2.; }
+
+  /**
+   * \returns The Order of the mapping functions
+   * in the radial direction. Currently, this is always \p FIRST.
+   */
+  static Order mapping_order() { return FIRST; }
+
+  /**
+   * \returns The number of shape functions in radial direction
+   * associated with this infinite element.
+   * Either way, if the modes are stored as nodal dofs (\p n_dofs_at_node)
+   * or as element dofs (\p n_dofs_per_elem), in each case we have the
+   * same number of modes in radial direction.
+   *
+   * \note For the case of 1D infinite elements, in the base the
+   * dof-per-node scheme is used.
+   *
+   * From the formulation of the infinite elements, we have
+   * 1 mode, when \p o_radial=CONST.
+   * Therefore, we have a total of \p o_radial+1 modes in radial direction.
+   */
+  static unsigned int n_dofs (const Order o_radial)
+  { return static_cast<unsigned int>(o_radial)+1; }
+
+  /**
+   * \returns The number of dofs in radial direction on "onion slice"
+   * \p n (either 0 or 1) for an infinite element of type \p inf_elem_type and
+   * radial order \p o_radial.
+   *
+   * Currently, the first radial mode is associated with the nodes in
+   * the base.  All higher radial modes are associated with
+   * the physically existing nodes further out.
+   */
+  static unsigned int n_dofs_at_node (const Order o_radial,
+                                      const unsigned int n_onion);
+
+  /**
+   * \returns The number of modes in radial direction interior to the element,
+   * not associated with any interior nodes.
+   *
+   * \note These modes are a discontinuous approximation, therefore
+   * we have no special formulation for coupling in the base, like in the
+   * case of associating (possibly) multiple dofs per (outer) node.
+   */
+  static unsigned int n_dofs_per_elem (const Order o_radial)
+  { return static_cast<unsigned int>(o_radial)+1; }
+
+};
+
+
+
+/**
+ * This nested class contains most of the static methods related
+ * to the base part of an infinite element.  Only static members
+ * are provided, for use within \p InfFE and \p InfFEMap.
+ *
+ * \author Daniel Dreyer
+ * \date 2003
+ */
+class InfFEBase
+{
+private:
+
+  /**
+   * Never use an object of this type.
+   */
+  InfFEBase() {}
+
+public:
+
+  /**
+   * Build the base element of an infinite element.  Be careful,
+   * this method allocates memory!  So be sure to delete the
+   * new element afterward.
+   */
+  static Elem * build_elem (const Elem * inf_elem);
+
+  /**
+   * \returns The base element associated to
+   * \p type.  This is, for example, \p TRI3 for
+   * \p INFPRISM6.
+   */
+  static ElemType get_elem_type (const ElemType type);
+
+  /**
+   * \returns The number of shape functions used in the
+   * mapping in the base element of type \p base_elem_type
+   * mapped with order \p base_mapping_order
+   */
+  static unsigned int n_base_mapping_sf (const Elem & base_elem,
+                                         const Order base_mapping_order);
+
+};
+
+
 
 /**
  * A specific instantiation of the \p FEBase class. This
@@ -47,9 +188,9 @@ class FEComputeData;
  * to the \p FE class.  \p InfFE builds a \p FE<Dim-1,T_base>,
  * and most of the requests related to the base are handed over
  * to this object.  All methods related to the radial part
- * are collected in the nested class \p Radial.  Similarly,
+ * are collected in the class \p InfFERadial.  Similarly,
  * most of the static methods concerning base approximation
- * are contained in \p Base.
+ * are contained in \p InfFEBase.
  *
  * Having different shape approximation families in radial direction
  * introduces the requirement for an additional \p Order in this
@@ -79,148 +220,6 @@ class InfFE : public FEBase
    * Protect the nested class
    */
 protected:
-
-  /**
-   * Infinite elements are in some sense directional, compared
-   * to conventional finite elements.  All methods related
-   * to the radial part, which extends perpendicular from the base,
-   * are collected in this nested class.  This class offers
-   * static methods, which are only available to \p InfFE members.
-   *
-   * \author Daniel Dreyer
-   * \date 2003
-   */
-  class Radial
-  {
-  private:
-
-    /**
-     * Never use an object of this type.
-     */
-    Radial() {}
-
-  public:
-
-    /**
-     * \returns The decay in the radial direction of
-     * the \p Dim dimensional infinite element.
-     */
-    static Real decay (const Real v);
-
-    /**
-     * \returns The first (local) derivative of the
-     * decay in radial direction of the infinite element.
-     */
-    static Real decay_deriv (const Real) { return -.5; }
-
-    /**
-     * \returns The radial weight D, used as an additional weight
-     * for the test function, evaluated at local radial coordinate \p v.
-     */
-    static Real D (const Real v) { return (1.-v)*(1.-v)/4.; }
-
-    /**
-     * \returns The first (local) radial derivative of the radial weight D.
-     */
-    static Real D_deriv (const Real v) { return (v-1.)/2.; }
-
-    /**
-     * \returns The Order of the mapping functions
-     * in the radial direction. Currently, this is always \p FIRST.
-     */
-    static Order mapping_order() { return FIRST; }
-
-    /**
-     * \returns The number of shape functions in radial direction
-     * associated with this infinite element.
-     * Either way, if the modes are stored as nodal dofs (\p n_dofs_at_node)
-     * or as element dofs (\p n_dofs_per_elem), in each case we have the
-     * same number of modes in radial direction.
-     *
-     * \note For the case of 1D infinite elements, in the base the
-     * dof-per-node scheme is used.
-     *
-     * From the formulation of the infinite elements, we have
-     * 1 mode, when \p o_radial=CONST.
-     * Therefore, we have a total of \p o_radial+1 modes in radial direction.
-     */
-    static unsigned int n_dofs (const Order o_radial)
-    { return static_cast<unsigned int>(o_radial)+1; }
-
-    /**
-     * \returns The number of dofs in radial direction on "onion slice"
-     * \p n (either 0 or 1) for an infinite element of type \p inf_elem_type and
-     * radial order \p o_radial.
-     *
-     * Currently, the first radial mode is associated with the nodes in
-     * the base.  All higher radial modes are associated with
-     * the physically existing nodes further out.
-     */
-    static unsigned int n_dofs_at_node (const Order o_radial,
-                                        const unsigned int n_onion);
-
-    /**
-     * \returns The number of modes in radial direction interior to the element,
-     * not associated with any interior nodes.
-     *
-     * \note These modes are a discontinuous approximation, therefore
-     * we have no special formulation for coupling in the base, like in the
-     * case of associating (possibly) multiple dofs per (outer) node.
-     */
-    static unsigned int n_dofs_per_elem (const Order o_radial)
-    { return static_cast<unsigned int>(o_radial)+1; }
-
-  };
-
-
-
-  /**
-   * This nested class contains most of the static methods related
-   * to the base part of an infinite element.  Only static members
-   * are provided, and these should only be accessible from within \p InfFE.
-   *
-   * \author Daniel Dreyer
-   * \date 2003
-   */
-  class Base
-  {
-  private:
-
-    /**
-     * Never use an object of this type.
-     */
-    Base() {}
-
-  public:
-
-    /**
-     * Build the base element of an infinite element.  Be careful,
-     * this method allocates memory!  So be sure to delete the
-     * new element afterward.
-     */
-    static Elem * build_elem (const Elem * inf_elem);
-
-    /**
-     * \returns The base element associated to
-     * \p type.  This is, for example, \p TRI3 for
-     * \p INFPRISM6.
-     */
-    static ElemType get_elem_type (const ElemType type);
-
-    /**
-     * \returns The number of shape functions used in the
-     * mapping in the base element of type \p base_elem_type
-     * mapped with order \p base_mapping_order
-     */
-    static unsigned int n_base_mapping_sf (const ElemType base_elem_type,
-                                           const Order base_mapping_order);
-
-  };
-
-
-
-
-
 
 
 public:
@@ -387,45 +386,32 @@ public:
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln);
 
-  /**
-   * \returns The location (in physical space) of the point
-   * \p p located on the reference element.
-   */
-  static Point map (const Elem * inf_elem,
-                    const Point & reference_point);
 
-  /**
-   * \returns The location (on the reference element) of the
-   * point \p p located in physical space.  First, the location
-   * in the base face is computed. This requires inverting the
-   * (possibly nonlinear) transformation map in the base, so it is
-   * not trivial. The optional parameter \p tolerance defines
-   * how close is "good enough."  The map inversion iteration
-   * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
-   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$.
-   * Once the base face point is determined, the radial local
-   * coordinate is directly evaluated.
-   * If \p interpolated is true, the interpolated distance from the
-   * base element to the infinite element origin is used for the map
-   * in radial direction.
-   */
+  static Point map (const Elem * inf_elem,
+                    const Point & reference_point) {
+    // libmesh_deprecated(); // soon
+    return InfFEMap::map(Dim, inf_elem, reference_point);
+  }
+
+
   static Point inverse_map (const Elem * elem,
                             const Point & p,
                             const Real tolerance = TOLERANCE,
-                            const bool secure = true);
+                            const bool secure = true) {
+    // libmesh_deprecated(); // soon
+    return InfFEMap::inverse_map(Dim, elem, p, tolerance, secure);
+  }
 
 
-  /**
-   * Takes a number points in physical space (in the \p physical_points
-   * vector) and finds their location on the reference element for the
-   * input element \p elem.  The values on the reference element are
-   * returned in the vector \p reference_points
-   */
   static void inverse_map (const Elem * elem,
                            const std::vector<Point> & physical_points,
                            std::vector<Point> &       reference_points,
                            const Real tolerance = TOLERANCE,
-                           const bool secure = true);
+                           const bool secure = true) {
+    // libmesh_deprecated(); // soon
+    return InfFEMap::inverse_map(Dim, elem, physical_points,
+                                 reference_points, tolerance, secure);
+  }
 
 
   // The workhorses of InfFE. These are often used during matrix assembly.
@@ -854,16 +840,16 @@ private:
   template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
   friend class InfFE;
 
+  friend class InfFEMap;
 };
 
 
 
-// InfFE::Radial class inline members
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+// InfFERadial class inline members
 inline
-Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
+Real InfFERadial::decay(const unsigned int dim, const Real v)
 {
-  switch (Dim)
+  switch (dim)
     //TODO:[DD] What decay do i have in 2D and 1D?
     {
     case 3:
@@ -876,7 +862,7 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
       return 0.;
 
     default:
-      libmesh_error_msg("Invalid Dim = " << Dim);
+      libmesh_error_msg("Invalid dim = " << dim);
     }
 }
 

@@ -24,10 +24,7 @@
 namespace libMesh
 {
 
-// Anonymous namespace for local helper functions
-namespace {
-
-Real infinite_map_eval(Real v, unsigned i)
+Real InfFEMap::eval(Real v, Order, unsigned i)
 {
   libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
@@ -45,7 +42,7 @@ Real infinite_map_eval(Real v, unsigned i)
 
 
 
-Real infinite_map_eval_deriv(Real v, unsigned i)
+Real InfFEMap::eval_deriv(Real v, Order, unsigned i)
 {
   libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
@@ -61,20 +58,18 @@ Real infinite_map_eval_deriv(Real v, unsigned i)
     }
 }
 
-} // anonymous namespace
-
-
-  // Specialize the eval() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
-  // to call the local helper function from the anonymous namespace.
-template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
-template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
-template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
+// Specialize the eval() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
+// to call the local helper function from the anonymous namespace.
+template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(Real v, Order o, unsigned i) { return InfFEMap::eval(v, o, i); }
+template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(Real v, Order o, unsigned i) { return InfFEMap::eval(v, o, i); }
+template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(Real v, Order o, unsigned i) { return InfFEMap::eval(v, o, i); }
 
 // Specialize the eval_deriv() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
 // to call the local helper function from the anonymous namespace.
-template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
-template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
-template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
+template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order o, unsigned i) { return InfFEMap::eval_deriv(v, o, i); }
+template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order o, unsigned i) { return InfFEMap::eval_deriv(v, o, i); }
+template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order o, unsigned i) { return InfFEMap::eval_deriv(v, o, i); }
+
 
 } // namespace libMesh
 

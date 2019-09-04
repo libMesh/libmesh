@@ -60,9 +60,6 @@ void HPCoarsenTest::add_projection(const System & system,
   // The DofMap for this system
   const DofMap & dof_map = system.get_dof_map();
 
-  // The type of finite element to use for this variable
-  const FEType & fe_type = dof_map.variable_type (var);
-
   const FEContinuity cont = fe->get_continuity();
 
   fe->reinit(elem);
@@ -72,8 +69,8 @@ void HPCoarsenTest::add_projection(const System & system,
   const unsigned int n_dofs =
     cast_int<unsigned int>(dof_indices.size());
 
-  FEInterface::inverse_map (system.get_mesh().mesh_dimension(),
-                            fe_type, coarse, *xyz_values, coarse_qpoints);
+  FEMap::inverse_map (system.get_mesh().mesh_dimension(), coarse,
+                      *xyz_values, coarse_qpoints);
 
   fe_coarse->reinit(coarse, &coarse_qpoints);
 
@@ -425,8 +422,8 @@ void HPCoarsenTest::select_refinement (System & system)
             }
           else
             {
-              FEInterface::inverse_map (dim, fe_type, coarse,
-                                        *xyz_values, coarse_qpoints);
+              FEMap::inverse_map (dim, coarse, *xyz_values,
+                                  coarse_qpoints);
 
               unsigned int old_parent_level = coarse->p_level();
               coarse->hack_p_level(elem->p_level());

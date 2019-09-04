@@ -2014,8 +2014,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
                 }
 
               std::vector<Point> fine_qp;
-              FEInterface::inverse_map (dim, base_fe_type, &elem,
-                                        fine_points, fine_qp);
+              FEMap::inverse_map (dim, &elem, fine_points, fine_qp);
 
               context.elem_fe_reinit(&fine_qp);
             }
@@ -2176,8 +2175,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
                 }
 
               std::vector<Point> fine_qp;
-              FEInterface::inverse_map (dim, base_fe_type, &elem,
-                                        fine_points, fine_qp);
+              FEMap::inverse_map (dim, &elem, fine_points, fine_qp);
 
               context.elem_fe_reinit(&fine_qp);
             }
@@ -2295,8 +2293,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectInte
                 }
 
               std::vector<Point> fine_qp;
-              FEInterface::inverse_map (dim, base_fe_type, elem,
-                                        fine_points, fine_qp);
+              FEMap::inverse_map (dim, elem, fine_points, fine_qp);
 
               context.elem_fe_reinit(&fine_qp);
             }

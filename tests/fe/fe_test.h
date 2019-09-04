@@ -251,7 +251,7 @@ public:
               continue;
 
             std::vector<Point> master_points
-              (1, FEInterface::inverse_map(_dim, _fe->get_fe_type(), _elem, p));
+              (1, FEMap::inverse_map(_dim, _elem, p));
 
             _fe->reinit(_elem, &master_points);
 
@@ -300,7 +300,7 @@ public:
               continue;
 
             std::vector<Point> master_points
-              (1, FEInterface::inverse_map(_dim, _fe->get_fe_type(), _elem, p));
+              (1, FEMap::inverse_map(_dim, _elem, p));
 
             _fe->reinit(_elem, &master_points);
 
@@ -367,7 +367,7 @@ public:
               continue;
 
             std::vector<Point> master_points
-              (1, FEInterface::inverse_map(_dim, _fe->get_fe_type(), _elem, p));
+              (1, FEMap::inverse_map(_dim, _elem, p));
 
             _fe->reinit(_elem, &master_points);
 
