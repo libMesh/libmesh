@@ -342,6 +342,21 @@ public:
                            const unsigned int j,
                            const Point & p);
 
+  typedef Real (*shape_deriv_ptr) (const Elem * elem,
+                                   const Order o,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point & p,
+                                   const bool add_p_level);
+
+  /**
+   * \returns A function which evaluates shape for the
+   * requested FE type and dimension.
+   */
+  static shape_deriv_ptr
+  shape_deriv_function(const unsigned int dim,
+                       const FEType & fe_t);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -391,6 +406,20 @@ public:
                                   const unsigned int j,
                                   const Point & p);
 
+  typedef Real (*shape_second_deriv_ptr) (const Elem * elem,
+                                          const Order o,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point & p,
+                                          const bool add_p_level);
+
+  /**
+   * \returns A function which evaluates shape for the
+   * requested FE type and dimension.
+   */
+  static shape_second_deriv_ptr
+  shape_second_deriv_function(const unsigned int dim,
+                              const FEType & fe_t);
 #endif
 
   /**

@@ -842,7 +842,6 @@ FEInterface::shape_function(const unsigned int dim,
 }
 
 
-
 Real FEInterface::shape_deriv(const unsigned int dim,
                               const FEType & fe_t,
                               const ElemType t,
@@ -914,6 +913,14 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+FEInterface::shape_deriv_ptr
+FEInterface::shape_deriv_function(const unsigned int dim,
+                                  const FEType & fe_t)
+{
+  fe_switch(shape_deriv);
+}
+
+
 Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const FEType & fe_t,
                                      const ElemType t,
@@ -978,6 +985,14 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
 }
 
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+FEInterface::shape_second_deriv_ptr
+FEInterface::shape_second_deriv_function(const unsigned int dim,
+                                         const FEType & fe_t)
+{
+  fe_switch(shape_second_deriv);
+}
+
 
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
