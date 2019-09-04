@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
 
 
 // Anonymous namespace for persistent variables.
@@ -82,11 +83,17 @@ void clough_compute_coefs(const Elem * elem)
     return;
 #endif
 
+  const FEFamily mapping_family =
+    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
+    RATIONAL_BERNSTEIN : LAGRANGE;
+
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
+
+  const FEType map_fe_type(mapping_order, mapping_family);
+
   const int n_mapping_shape_functions =
-    FE<2,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+    FEInterface::n_shape_functions(2, map_fe_type, mapping_elem_type);
 
   // Degrees of freedom are at vertices and edge midpoints
   std::vector<Point> dofpt;
@@ -101,15 +108,18 @@ void clough_compute_coefs(const Elem * elem)
   std::vector<Real> dxdxi(6), dxdeta(6), dydxi(6), dydeta(6);
   std::vector<Real> dxidx(6), detadx(6), dxidy(6), detady(6);
 
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(2, map_fe_type);
+
   for (int p = 0; p != 6; ++p)
     {
       //      libMesh::err << p << ' ' << dofpt[p];
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<2,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          const Real ddeta = FE<2,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
+          const Real ddxi = shape_deriv_ptr
+            (elem, mapping_order, i, 0, dofpt[p], false);
+          const Real ddeta = shape_deriv_ptr
+            (elem, mapping_order, i, 1, dofpt[p], false);
 
           //      libMesh::err << ddxi << ' ';
           //      libMesh::err << ddeta << std::endl;

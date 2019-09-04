@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/number_lookups.h"
 
 namespace
@@ -34,15 +35,24 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
 #endif
                            )
 {
+  const FEFamily mapping_family =
+    (elem->mapping_type() == Elem::RATIONAL_BERNSTEIN_MAP) ?
+    RATIONAL_BERNSTEIN : LAGRANGE;
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
+
+  const FEType map_fe_type(mapping_order, mapping_family);
+
   const int n_mapping_shape_functions =
-    FE<2,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+    FEInterface::n_shape_functions (2, map_fe_type,
+                                    mapping_elem_type);
 
   std::vector<Point> dofpt;
   dofpt.push_back(Point(-1,-1));
   dofpt.push_back(Point(1,1));
+
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(2, map_fe_type);
 
   for (int p = 0; p != 2; ++p)
     {
@@ -54,10 +64,10 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
 #endif
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<2,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          const Real ddeta = FE<2,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
+          const Real ddxi = shape_deriv_ptr
+            (elem, mapping_order, i, 0, dofpt[p], false);
+          const Real ddeta = shape_deriv_ptr
+            (elem, mapping_order, i, 1, dofpt[p], false);
 
           dxdxi[0][p] += elem->point(i)(0) * ddxi;
           dxdxi[1][p] += elem->point(i)(1) * ddeta;
