@@ -1141,7 +1141,9 @@ public:
                                 const unsigned int s) const = 0;
 
   /**
-   * Enumeration of possible element master->physical mapping types
+   * Enumeration of possible element master->physical mapping types.
+   * We don't just directly store FEType for this because we want to
+   * be certain our options all pack into a single char.
    */
   enum MappingType { LAGRANGE_MAP = 0,
                      RATIONAL_BERNSTEIN_MAP,
