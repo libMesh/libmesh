@@ -36,6 +36,7 @@
 #include "libmesh/quadrature_composite.h"
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/parallel.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
