@@ -685,7 +685,8 @@ void SlepcSolverConfiguration::configure_solver()
       // initialise the st with the default values and change the spectral transformation value.
       ST st;
       PetscErrorCode ierr = EPSGetST(_slepc_solver.eps(), &st);
-      LIBMESH_CHKERR(ierr);
+      if (ierr)
+        libmesh_error();
 
       // Set it to the desired type of spectral transformation.
       // The value of the respective shift is chosen to be the target
@@ -710,7 +711,8 @@ void SlepcSolverConfiguration::configure_solver()
           // print a warning but do nothing more.
           break;
         }
-      LIBMESH_CHKERR(ierr);
+      if (ierr)
+        libmesh_error();
 
       // since st is a reference to the particular object used by \p _slepc_solver,
       // we don't need to hand back the manipulated object. It will be applied before
