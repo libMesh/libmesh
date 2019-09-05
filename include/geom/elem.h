@@ -1893,8 +1893,8 @@ Elem::Elem(const unsigned int nn,
   _pflag(Elem::DO_NOTHING),
   _p_level(0),
 #endif
-  _map_type(0),
-  _map_data(0)
+  _map_type(p ? p->mapping_type() : 0),
+  _map_data(p ? p->mapping_data() : 0)
 {
   this->processor_id() = DofObject::invalid_processor_id;
 
