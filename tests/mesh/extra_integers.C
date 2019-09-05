@@ -21,12 +21,12 @@ public:
   CPPUNIT_TEST_SUITE( ExtraIntegersTest );
 
   CPPUNIT_TEST( testExtraIntegersEdge2 );
-
   CPPUNIT_TEST( testExtraIntegersTri6 );
 
+#ifdef LIBMESH_HAVE_XDR
   CPPUNIT_TEST( testExtraIntegersCheckpointEdge3 );
-
   CPPUNIT_TEST( testExtraIntegersCheckpointHex8 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
