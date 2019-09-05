@@ -25,6 +25,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
@@ -429,15 +430,16 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
 
   // The element type and order to use in
   // the map
+  const FEFamily mapping_family = FEMap::map_fe_type(*side);
   const Order    mapping_order     (side->default_order());
   const ElemType mapping_elem_type (side->type());
+  const FEType map_fe_type(mapping_order, mapping_family);
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
   const unsigned int n_mapping_shape_functions =
-    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-                                         mapping_order);
+    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -467,6 +469,15 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
 #endif
     }
 
+  FEInterface::shape_ptr shape_ptr =
+    FEInterface::shape_function(Dim-1, map_fe_type);
+
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(Dim-1, map_fe_type);
+
+  FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
+    FEInterface::shape_second_deriv_function(Dim-1, map_fe_type);
+
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
       // Allocate space to store the values of the shape functions
@@ -495,20 +506,21 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
 #endif
         }
 
+
       // Compute the value of shape function i, and its first and
       // second derivatives at quadrature point p
       // (Lagrange shape functions are used for the mapping)
       for (unsigned int p=0; p<n_qp; p++)
         {
           if (calculate_xyz)
-            this->psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+            this->psi_map[i][p]            = shape_ptr             (side, mapping_order, i,    qp[p], false);
           if (Dim > 1)
             {
               if (calculate_dxyz)
-                this->dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+                this->dpsidxi_map[i][p]    = shape_deriv_ptr       (side, mapping_order, i, 0, qp[p], false);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (calculate_d2xyz)
-                this->d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+                this->d2psidxi2_map[i][p]  = shape_second_deriv_ptr(side, mapping_order, i, 0, qp[p], false);
 #endif
             }
           // libMesh::out << "this->d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
@@ -519,12 +531,12 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
           if (Dim == 3)
             {
               if (calculate_dxyz)
-                this->dpsideta_map[i][p]     = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 1, qp[p]);
+                this->dpsideta_map[i][p]       = shape_deriv_ptr       (side, mapping_order, i, 1, qp[p], false);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (calculate_d2xyz)
                 {
-                  this->d2psidxideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 1, qp[p]);
-                  this->d2psideta2_map[i][p]   = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 2, qp[p]);
+                  this->d2psidxideta_map[i][p] = shape_second_deriv_ptr(side, mapping_order, i, 1, qp[p], false);
+                  this->d2psideta2_map[i][p]   = shape_second_deriv_ptr(side, mapping_order, i, 2, qp[p], false);
                 }
 #endif
             }
@@ -546,15 +558,16 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
 
   // The element type and order to use in
   // the map
+  const FEFamily mapping_family = FEMap::map_fe_type(*edge);
   const Order    mapping_order     (edge->default_order());
   const ElemType mapping_elem_type (edge->type());
+  const FEType map_fe_type(mapping_order, mapping_family);
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
   const unsigned int n_mapping_shape_functions =
-    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-                                         mapping_order);
+    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -566,6 +579,15 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
   if (calculate_d2xyz)
     this->d2psidxi2_map.resize  (n_mapping_shape_functions);
 #endif
+
+  FEInterface::shape_ptr shape_ptr =
+    FEInterface::shape_function(1, map_fe_type);
+
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(1, map_fe_type);
+
+  FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
+    FEInterface::shape_second_deriv_function(1, map_fe_type);
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
@@ -586,12 +608,12 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
       for (unsigned int p=0; p<n_qp; p++)
         {
           if (calculate_xyz)
-            this->psi_map[i][p]        = FE<1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+            this->psi_map[i][p]        = shape_ptr             (edge, mapping_order, i,    qp[p], false);
           if (calculate_dxyz)
-            this->dpsidxi_map[i][p]    = FE<1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+            this->dpsidxi_map[i][p]    = shape_deriv_ptr       (edge, mapping_order, i, 0, qp[p], false);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
-            this->d2psidxi2_map[i][p]  = FE<1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+            this->d2psidxi2_map[i][p]  = shape_second_deriv_ptr(edge, mapping_order, i, 0, qp[p], false);
 #endif
         }
     }
