@@ -1439,17 +1439,17 @@ void FEMContext::elem_position_get()
   // in a format that allows a direct copy
   libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().family
-                  == LAGRANGE &&
+                  == FEMap::map_fe_type(this->get_elem()) &&
                   this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().order.get_order()
                   == this->get_elem().default_order()));
   libmesh_assert(this->get_mesh_y_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().family
-                  == LAGRANGE &&
+                  == FEMap::map_fe_type(this->get_elem()) &&
                   this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().order.get_order()
                   == this->get_elem().default_order()));
   libmesh_assert(this->get_mesh_z_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().family
-                  == LAGRANGE &&
+                  == FEMap::map_fe_type(this->get_elem()) &&
                   this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().order.get_order()
                   == this->get_elem().default_order()));
 #endif
@@ -1520,15 +1520,15 @@ void FEMContext::_do_elem_position_set(Real)
   // in a format that allows a direct copy
   libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().family
-                  == LAGRANGE &&
+                  == FEMap::map_fe_type(this->get_elem()) &&
                   this->get_elem_solution(this->get_mesh_x_var()).size() == n_nodes));
   libmesh_assert(this->get_mesh_y_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().family
-                  == LAGRANGE &&
+                  == FEMap::map_fe_type(this->get_elem()) &&
                   this->get_elem_solution(this->get_mesh_y_var()).size() == n_nodes));
   libmesh_assert(this->get_mesh_z_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().family
-                  == LAGRANGE &&
+                  == FEMap::map_fe_type(this->get_elem()) &&
                   this->get_elem_solution(this->get_mesh_z_var()).size() == n_nodes));
 #endif
 
