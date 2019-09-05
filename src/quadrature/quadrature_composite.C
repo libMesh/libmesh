@@ -71,6 +71,10 @@ void QComposite<QSubCell>::init (const Elem & elem,
   libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
   libmesh_assert_equal_to (_dim, elem.dim());
 
+  // We already initialized a Lagrange map; we're not supporting
+  // others yet
+  libmesh_assert_equal_to (elem.mapping_type(), Elem::LAGRANGE_MAP);
+
   // if we are not cut, revert to simple base class init() method.
   if (!_elem_cutter.is_cut (elem, vertex_distance_func))
     {
