@@ -593,6 +593,13 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
+  const FEFamily mapping_family = FEMap::map_fe_type(*side);
+  const Order    mapping_order     (side->default_order());
+  const FEType map_fe_type(mapping_order, mapping_family);
+  const ElemType mapping_elem_type (side->type());
+  const unsigned int n_mapping_shape_functions =
+    FEInterface::n_shape_functions(dim, map_fe_type, mapping_elem_type);
+
   switch (dim)
     {
     case 1:
@@ -698,10 +705,6 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
               this->d2xyzdxi2_map[p].zero();
 #endif
           }
-
-        const unsigned int n_mapping_shape_functions =
-          FE<2,LAGRANGE>::n_shape_functions (side->type(),
-                                             side->default_order());
 
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<n_mapping_shape_functions; i++) // sum over the nodes
@@ -840,10 +843,6 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
               }
 #endif
           }
-
-        const unsigned int n_mapping_shape_functions =
-          FE<3,LAGRANGE>::n_shape_functions (side->type(),
-                                             side->default_order());
 
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<n_mapping_shape_functions; i++) // sum over the nodes
