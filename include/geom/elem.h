@@ -1141,23 +1141,14 @@ public:
                                 const unsigned int s) const = 0;
 
   /**
-   * Enumeration of possible element master->physical mapping types.
-   * We don't just directly store FEType for this because we want to
-   * be certain our options all pack into a single char.
-   */
-  enum MappingType { LAGRANGE_MAP = 0,
-                     RATIONAL_BERNSTEIN_MAP,
-                     INVALID_MAP };
-
-  /**
    * \returns The value of the mapping type for the element.
    */
-  MappingType mapping_type () const;
+  ElemMappingType mapping_type () const;
 
   /**
    * Sets the value of the mapping type for the element.
    */
-  void set_mapping_type (const MappingType type);
+  void set_mapping_type (const ElemMappingType type);
 
   /**
    * \returns The value of the mapping data for the element.
@@ -2530,15 +2521,15 @@ unsigned int Elem::p_level() const
 
 
 inline
-Elem::MappingType Elem::mapping_type () const
+ElemMappingType Elem::mapping_type () const
 {
-  return static_cast<MappingType>(_map_type);
+  return static_cast<ElemMappingType>(_map_type);
 }
 
 
 
 inline
-void Elem::set_mapping_type(const Elem::MappingType type)
+void Elem::set_mapping_type(const ElemMappingType type)
 {
   _map_type = cast_int<unsigned char>(type);
 }
