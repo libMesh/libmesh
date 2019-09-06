@@ -48,9 +48,9 @@ FEMap::map_fe_type(const Elem & elem)
 {
   switch (elem.mapping_type())
   {
-  case Elem::RATIONAL_BERNSTEIN_MAP:
+  case RATIONAL_BERNSTEIN_MAP:
     return RATIONAL_BERNSTEIN;
-  case Elem::LAGRANGE_MAP:
+  case LAGRANGE_MAP:
     return LAGRANGE;
   default:
     libmesh_error_msg("Unknown mapping type " << elem.mapping_type());
