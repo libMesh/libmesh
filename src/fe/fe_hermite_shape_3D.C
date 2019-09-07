@@ -646,6 +646,6 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
     }
 }
 
-#endif
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 } // namespace libMesh

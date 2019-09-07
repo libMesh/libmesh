@@ -276,6 +276,7 @@ Real FESubdivision::regular_shape_deriv(const unsigned int i,
 
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 Real FESubdivision::regular_shape_second_deriv(const unsigned int i,
                                                const unsigned int j,
                                                const Real v,
@@ -387,6 +388,7 @@ Real FESubdivision::regular_shape_second_deriv(const unsigned int i,
     }
 }
 
+#endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 void FESubdivision::loop_subdivision_mask(std::vector<Real> & weights,
@@ -773,6 +775,7 @@ Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<2,SUBDIVISION>::shape_second_deriv(const ElemType type,
@@ -812,7 +815,7 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
   return FE<2,SUBDIVISION>::shape_second_deriv(elem->type(), order, i, j, p);
 }
 
-
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 void FE<2,SUBDIVISION>::nodal_soln(const Elem * elem,
