@@ -583,6 +583,7 @@ TypeTensor<T>::TypeTensor (const T & xx,
   libmesh_assert_equal_to (xy, 0);
   libmesh_assert_equal_to (yx, 0);
   libmesh_assert_equal_to (yy, 0);
+  libmesh_ignore(xy, yx, yy);
 #endif
 
 #if LIBMESH_DIM == 3
@@ -600,6 +601,7 @@ TypeTensor<T>::TypeTensor (const T & xx,
   libmesh_assert_equal_to (zx, 0);
   libmesh_assert_equal_to (zy, 0);
   libmesh_assert_equal_to (zz, 0);
+  libmesh_ignore(xz, yz, zx, zy, zz);
 #endif
 }
 
@@ -625,6 +627,11 @@ TypeTensor<T>::TypeTensor (const Scalar & xx,
   _coords[1] = xy;
   _coords[2] = yx;
   _coords[3] = yy;
+#elif LIBMESH_DIM == 1
+  libmesh_assert_equal_to (xy, 0);
+  libmesh_assert_equal_to (yx, 0);
+  libmesh_assert_equal_to (yy, 0);
+  libmesh_ignore(xy, yx, yy);
 #endif
 
 #if LIBMESH_DIM == 3
@@ -636,6 +643,13 @@ TypeTensor<T>::TypeTensor (const Scalar & xx,
   _coords[6] = zx;
   _coords[7] = zy;
   _coords[8] = zz;
+#else
+  libmesh_assert_equal_to (xz, 0);
+  libmesh_assert_equal_to (yz, 0);
+  libmesh_assert_equal_to (zx, 0);
+  libmesh_assert_equal_to (zy, 0);
+  libmesh_assert_equal_to (zz, 0);
+  libmesh_ignore(xz, yz, zx, zy, zz);
 #endif
 }
 
