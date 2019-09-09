@@ -327,6 +327,7 @@ public:
                            const unsigned int j,
                            const Point & p);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at the point \p p.
@@ -374,6 +375,8 @@ public:
                                   const unsigned int i,
                                   const unsigned int j,
                                   const Point & p);
+
+#endif
 
   /**
    * Lets the appropriate child of \p FEBase compute the requested

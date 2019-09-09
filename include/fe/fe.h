@@ -157,6 +157,7 @@ public:
                                  const unsigned int j,
                                  const Point & p);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at the point \p p.
@@ -209,6 +210,7 @@ public:
                                         const unsigned int j,
                                         const Point & p);
 
+#endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Build the nodal soln from the element soln.
    * This is the solution that will be plotted.
@@ -519,11 +521,13 @@ public:
     FE<Dim,HERMITE> (fet)
   {}
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * 1D hermite functions on unit interval
    */
   static Real hermite_raw_shape_second_deriv(const unsigned int basis_num,
                                              const Real xi);
+#endif
   static Real hermite_raw_shape_deriv(const unsigned int basis_num,
                                       const Real xi);
   static Real hermite_raw_shape(const unsigned int basis_num,
@@ -551,6 +555,7 @@ Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
                                     const unsigned int j,
                                     const Point & p);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
 Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
                                            const Order order,
@@ -558,6 +563,7 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
                                            const unsigned int j,
                                            const Point & p);
 
+#endif
 
 class FESubdivision : public FE<2,SUBDIVISION>
 {
@@ -633,6 +639,7 @@ public:
                                   const Real v,
                                   const Real w);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the
    * \f$ i^{th} \f$ of the 12 quartic box splines interpolating
@@ -645,6 +652,7 @@ public:
                                          const Real w);
 
 
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVE
   /**
    * Fills the vector \p weights with the weight coefficients
    * of the Loop subdivision mask for evaluating the limit surface
