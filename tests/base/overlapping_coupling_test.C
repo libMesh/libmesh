@@ -450,7 +450,7 @@ private:
                                                        _mesh->active_subdomain_elements_end(2) );
 
     CPPUNIT_ASSERT_EQUAL( n_elems_subdomain_two, (dof_id_type) subdomain_one_couplings.size() );
-    CPPUNIT_ASSERT_EQUAL( 2*n_elems_subdomain_two, (dof_id_type) subdomain_two_couplings.size() );
+    CPPUNIT_ASSERT_EQUAL( dof_id_type(2*n_elems_subdomain_two), (dof_id_type) subdomain_two_couplings.size() );
   }
 
   void run_partitioner_test(unsigned int n_refinements)
