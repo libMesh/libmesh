@@ -1790,8 +1790,8 @@ void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
   // along and just figure out new max ids ourselves.
   dof_id_type parallel_max_elem_id = 0;
   for (const auto & elem : mesh.element_ptr_range())
-    parallel_max_elem_id = std::max(parallel_max_elem_id,
-                                    elem->id()+1);
+    parallel_max_elem_id = std::max<dof_id_type>(parallel_max_elem_id,
+                                                 elem->id()+1);
   mesh.comm().max(parallel_max_elem_id);
 
   // Check processor ids for consistency between processors
@@ -1843,8 +1843,8 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
   // ourselves.
   dof_id_type parallel_max_node_id = 0;
   for (const auto & node : mesh.node_ptr_range())
-    parallel_max_node_id = std::max(parallel_max_node_id,
-                                    node->id()+1);
+    parallel_max_node_id = std::max<dof_id_type>(parallel_max_node_id,
+                                                 node->id()+1);
   mesh.comm().max(parallel_max_node_id);
 
 
@@ -1932,8 +1932,8 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
   // ourselves.
   dof_id_type parallel_max_node_id = 0;
   for (const auto & node : mesh.node_ptr_range())
-    parallel_max_node_id = std::max(parallel_max_node_id,
-                                    node->id()+1);
+    parallel_max_node_id = std::max<dof_id_type>(parallel_max_node_id,
+                                                 node->id()+1);
   mesh.comm().max(parallel_max_node_id);
 
   std::vector<bool> node_touched_by_anyone(parallel_max_node_id, false);
