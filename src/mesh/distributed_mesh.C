@@ -1061,8 +1061,8 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
   auto this_it = ghost_objects_from_proc.find(this->processor_id());
   this->comm().allgather
-    ((this_it == ghost_objects_from_proc.end()) ? 0 : this_it->second,
-     objects_on_proc);
+    ((this_it == ghost_objects_from_proc.end()) ?
+     dof_id_type(0) : this_it->second, objects_on_proc);
 
 #ifndef NDEBUG
   libmesh_assert(this->comm().verify(unpartitioned_objects));
