@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector_base.h"
+#include "libmesh/dense_vector.h"
 
 // C++ includes
 #include <iomanip> // for std::setw()
@@ -30,7 +31,15 @@
 namespace libMesh
 {
 
-
+  template <typename T>
+  DenseVector<T>
+  DenseMatrixBase<T>::diagonal() const
+  {
+    DenseVector<T> ret;
+    for (decltype(_m) i = 0; i < _m; ++i)
+      ret(i) = el(i, i);
+    return ret;
+  }
 
   template<typename T>
   void DenseMatrixBase<T>::multiply (DenseMatrixBase<T> & M1,
