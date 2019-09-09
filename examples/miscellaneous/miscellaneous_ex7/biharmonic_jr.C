@@ -184,6 +184,8 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
                                            SparseMatrix<Number> * J,
                                            NonlinearImplicitSystem &)
 {
+  libmesh_ignore(u, R, J);  // if we don't use --enable-second
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (!R && !J)
     return;
