@@ -35,6 +35,7 @@ unit_tests_sources = \
   fe/fe_l2_lagrange_test.C \
   fe/fe_lagrange_test.C \
   fe/fe_monomial_test.C \
+  fe/fe_rational_map.C \
   fe/fe_rational_test.C \
   fe/fe_szabab_test.C \
   fe/fe_test.h \
