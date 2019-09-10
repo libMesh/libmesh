@@ -460,69 +460,6 @@ ExodusII_IO_Helper::MappedOutputVector::data()
   return const_cast<void *>(static_cast<const void *>(our_data.data()));
 }
 
-void * ExodusII_IO_Helper::create_output_buffer(const std::vector<Real> & our_data)
-{
-  // We should never do this multiple times at once
-  libmesh_assert(!mapped_vectors.count(&our_data));
-
-  if (_single_precision)
-    {
-      if (sizeof(Real) != sizeof(float))
-        {
-          std::vector<float> * vec =
-            new std::vector<float>(our_data.begin(), our_data.end());
-          void * vec_ptr = static_cast<void *>(vec);
-          mapped_vectors[&our_data] = vec_ptr;
-          return static_cast<void *>(vec->data());
-        }
-    }
-  else
-    {
-      if (sizeof(Real) != sizeof(double))
-        {
-          std::vector<double> * vec =
-            new std::vector<double>(our_data.begin(), our_data.end());
-          void * vec_ptr = static_cast<void *>(vec);
-          mapped_vectors[&our_data] = vec_ptr;
-          return static_cast<void *>(vec->data());
-        }
-    }
-  return const_cast<void *>(static_cast<const void *>(our_data.data()));
-}
-
-void ExodusII_IO_Helper::remove_output_buffer(const std::vector<Real> & our_data)
-{
-  if (_single_precision)
-    {
-      if (sizeof(Real) != sizeof(float))
-        {
-          libmesh_assert(mapped_vectors.count(&our_data));
-          auto it = mapped_vectors.find(&our_data);
-          void * vec_ptr = it->second;
-          std::vector<float> * vec =
-            static_cast<std::vector<float> *>(vec_ptr);
-          mapped_vectors.erase(it);
-          delete vec;
-        }
-    }
-  else
-    {
-      if (sizeof(Real) != sizeof(double))
-        {
-          libmesh_assert(mapped_vectors.count(&our_data));
-          auto it = mapped_vectors.find(&our_data);
-          void * vec_ptr = it->second;
-          std::vector<double> * vec =
-            static_cast<std::vector<double> *>(vec_ptr);
-          mapped_vectors.erase(it);
-          delete vec;
-        }
-    }
-  libmesh_assert(!mapped_vectors.count(&our_data));
-}
-
-
-
 void ExodusII_IO_Helper::open(const char * filename, bool read_only)
 {
   // Version of Exodus you are using

@@ -724,14 +724,6 @@ protected:
   // Exodus.
   void move_input_buffer_data(std::vector<Real> & our_data);
 
-  // Mapping of vector<Real> to vector<whatever-the-file-uses> data,
-  // which may just be the original vector
-  void * create_output_buffer(const std::vector<Real> & our_data);
-
-  // If our data buffer wasn't the original vector, then we need to
-  // free it after we've written it via Exodus.
-  void remove_output_buffer(const std::vector<Real> & our_data);
-
   std::map<const std::vector<Real> *, void *> mapped_vectors;
 
   // RAII-enabled version of the {create,move}_{input,output}_buffer() stuff.
