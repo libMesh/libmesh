@@ -734,6 +734,26 @@ protected:
 
   std::map<const std::vector<Real> *, void *> mapped_vectors;
 
+  // RAII-enabled version of the {create,move}_{input,output}_buffer() stuff.
+  struct MappedOutputVector
+  {
+    // Does the float copy if necessary, as in create_output_buffer()
+    MappedOutputVector(const std::vector<Real> & vec_in,
+                       bool single_precision_in);
+
+    // Deletes anything allocated, as in remove_output_buffer()
+    ~MappedOutputVector();
+
+    // returns void * pointer to the float-mapped data or the original
+    // data, as necessary
+    void * data();
+
+  private:
+    const std::vector<Real> & our_data;
+    bool single_precision;
+    void * mapped_vec;
+  };
+
 private:
 
   /**

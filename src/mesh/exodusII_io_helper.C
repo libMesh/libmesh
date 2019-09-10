@@ -398,6 +398,68 @@ void ExodusII_IO_Helper::move_input_buffer_data(std::vector<Real> & our_data)
   libmesh_assert(!mapped_vectors.count(&our_data));
 }
 
+ExodusII_IO_Helper::MappedOutputVector::
+MappedOutputVector(const std::vector<Real> & our_data_in,
+                   bool single_precision_in)
+  : our_data(our_data_in),
+    single_precision(single_precision_in),
+    mapped_vec(nullptr)
+{
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        mapped_vec = new std::vector<float>(our_data.begin(), our_data.end());
+    }
+
+  else if (sizeof(Real) != sizeof(double))
+    mapped_vec = new std::vector<double>(our_data.begin(), our_data.end());
+
+  // Note: we may have left mapped_vec untouched and that's fine,
+  // we just aren't using it in that case.
+}
+
+ExodusII_IO_Helper::MappedOutputVector::
+~MappedOutputVector()
+{
+  // Can't delete through void *, need to cast back to the original
+  // first and delete that.
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          auto vec = static_cast<std::vector<float> *>(mapped_vec);
+          delete vec;
+        }
+    }
+  else if (sizeof(Real) != sizeof(double))
+    {
+      auto vec =  static_cast<std::vector<double> *>(mapped_vec);
+      delete vec;
+    }
+}
+
+void *
+ExodusII_IO_Helper::MappedOutputVector::data()
+{
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          auto vec = static_cast<std::vector<float> *>(mapped_vec);
+          return static_cast<void*>(vec->data());
+        }
+    }
+
+  else if (sizeof(Real) != sizeof(double))
+    {
+      auto vec =  static_cast<std::vector<double> *>(mapped_vec);
+      return static_cast<void*>(vec->data());
+    }
+
+  // Otherwise return a (suitably casted) pointer to the original underlying data.
+  return const_cast<void *>(static_cast<const void *>(our_data.data()));
+}
+
 void * ExodusII_IO_Helper::create_output_buffer(const std::vector<Real> & our_data)
 {
   // We should never do this multiple times at once
@@ -1550,16 +1612,12 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
           }
     }
 
-  ex_err = exII::ex_put_coord(ex_id,
-                              x.empty() ? nullptr : create_output_buffer(x),
-                              y.empty() ? nullptr : create_output_buffer(y),
-                              z.empty() ? nullptr : create_output_buffer(z));
-  if (!x.empty())
-    remove_output_buffer(x);
-  if (!y.empty())
-    remove_output_buffer(y);
-  if (!z.empty())
-    remove_output_buffer(z);
+  ex_err = exII::ex_put_coord
+    (ex_id,
+     x.empty() ? nullptr : MappedOutputVector(x, _single_precision).data(),
+     y.empty() ? nullptr : MappedOutputVector(y, _single_precision).data(),
+     z.empty() ? nullptr : MappedOutputVector(z, _single_precision).data());
+
   EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
 
   if (!use_discontinuous)
@@ -2311,12 +2369,8 @@ write_sideset_data(const MeshBase & mesh,
                  var + 1, // 1-based variable index of current variable
                  ss_ids[ss],
                  num_sides_per_set[ss],
-                 create_output_buffer(sset_var_vals));
+                 MappedOutputVector(sset_var_vals, _single_precision).data());
               EX_CHECK_ERR(ex_err, "Error writing sideset vars.");
-
-              // Required: clean up any conversion to float that may
-              // have happened.
-              remove_output_buffer(sset_var_vals);
             }
         } // end for (var)
     } // end for (ss)
@@ -2520,14 +2574,13 @@ void ExodusII_IO_Helper::write_element_values
           for (unsigned int k=0; k<num_elems_this_block; ++k)
             data[k] = values[var_id*n_elem + elem_nums[k]];
 
-          ex_err = exII::ex_put_elem_var(ex_id,
-                                         timestep,
-                                         var_id+1,
-                                         this->get_block_id(j),
-                                         num_elems_this_block,
-                                         create_output_buffer(data));
-          if (!data.empty())
-            remove_output_buffer(data);
+          ex_err = exII::ex_put_elem_var
+            (ex_id,
+             timestep,
+             var_id+1,
+             this->get_block_id(j),
+             num_elems_this_block,
+             MappedOutputVector(data, _single_precision).data());
 
           EX_CHECK_ERR(ex_err, "Error writing element values.");
         }
@@ -2656,13 +2709,14 @@ void ExodusII_IO_Helper::write_element_values_element_major
           } // for elem
 
         // Now write 'data' to Exodus file, in single precision if requested.
-        ex_err = exII::ex_put_elem_var
-          (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx),
-           data.size(), create_output_buffer(data));
         if (!data.empty())
-          remove_output_buffer(data);
+          {
+            ex_err = exII::ex_put_elem_var
+              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), data.size(),
+               MappedOutputVector(data, _single_precision).data());
 
-        EX_CHECK_ERR(ex_err, "Error writing element values.");
+            EX_CHECK_ERR(ex_err, "Error writing element values.");
+          }
       } // for each var_id
 
   ex_err = exII::ex_update(ex_id);
@@ -2671,19 +2725,25 @@ void ExodusII_IO_Helper::write_element_values_element_major
 
 
 
-void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Real> & values, int timestep)
+void
+ExodusII_IO_Helper::write_nodal_values(int var_id,
+                                       const std::vector<Real> & values,
+                                       int timestep)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes,
-                                  create_output_buffer(values));
   if (!values.empty())
-    remove_output_buffer(values);
-  EX_CHECK_ERR(ex_err, "Error writing nodal values.");
+    {
+      ex_err = exII::ex_put_nodal_var
+        (ex_id, timestep, var_id, num_nodes,
+         MappedOutputVector(values, _single_precision).data());
 
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+      EX_CHECK_ERR(ex_err, "Error writing nodal values.");
+
+      ex_err = exII::ex_update(ex_id);
+      EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+    }
 }
 
 
@@ -2732,14 +2792,17 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars,
-                                  create_output_buffer(values));
   if (!values.empty())
-    remove_output_buffer(values);
-  EX_CHECK_ERR(ex_err, "Error writing global values.");
+    {
+      ex_err = exII::ex_put_glob_vars
+        (ex_id, timestep, num_global_vars,
+         MappedOutputVector(values, _single_precision).data());
 
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+      EX_CHECK_ERR(ex_err, "Error writing global values.");
+
+      ex_err = exII::ex_update(ex_id);
+      EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+    }
 }
 
 
