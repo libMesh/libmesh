@@ -560,7 +560,7 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
 	dense_matrix_base_impl.h dense_matrix_impl.h dense_submatrix.h \
 	dense_subvector.h dense_vector.h dense_vector_base.h \
-	distributed_vector.h eigen_core_support.h \
+	diagonal_matrix.h distributed_vector.h eigen_core_support.h \
 	eigen_preconditioner.h eigen_sparse_matrix.h \
 	eigen_sparse_vector.h fem_function_base.h function_base.h \
 	laspack_matrix.h laspack_vector.h numeric_vector.h \
@@ -1530,6 +1530,9 @@ dense_vector.h: $(top_srcdir)/include/numerics/dense_vector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_vector_base.h: $(top_srcdir)/include/numerics/dense_vector_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+diagonal_matrix.h: $(top_srcdir)/include/numerics/diagonal_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 distributed_vector.h: $(top_srcdir)/include/numerics/distributed_vector.h
