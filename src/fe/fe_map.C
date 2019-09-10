@@ -2053,12 +2053,13 @@ Point FEMap::map (const unsigned int dim,
 
   const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
 
+  FEInterface::shape_ptr shape_ptr =
+    FEInterface::shape_function(dim, fe_type);
+
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-                  FEInterface::shape(dim, fe_type, type, i,
-                                     reference_point)
-                  );
+                  shape_ptr(elem, order, i, reference_point, false));
 
   return p;
 }
@@ -2080,12 +2081,14 @@ Point FEMap::map_deriv (const unsigned int dim,
   const FEType fe_type (order, mapping_family);
   const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
 
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(dim, fe_type);
+
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-                  FEInterface::shape_deriv(dim, fe_type, type, i, j,
-                                           reference_point)
-                  );
+                  shape_deriv_ptr(elem, order, i, j, reference_point,
+                                  false));
 
   return p;
 }
