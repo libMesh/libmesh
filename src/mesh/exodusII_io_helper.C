@@ -2311,8 +2311,12 @@ write_sideset_data(const MeshBase & mesh,
                  var + 1, // 1-based variable index of current variable
                  ss_ids[ss],
                  num_sides_per_set[ss],
-                 sset_var_vals.data());
+                 create_output_buffer(sset_var_vals));
               EX_CHECK_ERR(ex_err, "Error writing sideset vars.");
+
+              // Required: clean up any conversion to float that may
+              // have happened.
+              remove_output_buffer(sset_var_vals);
             }
         } // end for (var)
     } // end for (ss)
