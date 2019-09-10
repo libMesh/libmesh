@@ -235,6 +235,7 @@ libmesh_SOURCES =  \
         src/numerics/dense_subvector.C \
         src/numerics/dense_vector.C \
         src/numerics/dense_vector_base.C \
+        src/numerics/diagonal_matrix.C \
         src/numerics/distributed_vector.C \
         src/numerics/eigen_preconditioner.C \
         src/numerics/eigen_sparse_matrix.C \
