@@ -755,6 +755,30 @@ protected:
     void * mapped_vec;
   };
 
+  /**
+   * This class facilitates reading in vectors from Exodus file that
+   * may be of a different floating point type than Real. It employs
+   * basically the same approach as the MappedOuputVector, just going
+   * in the opposite direction. For more information, see the
+   * MappedOutputVector class docs.
+   */
+  struct MappedInputVector
+  {
+    MappedInputVector(std::vector<Real> & vec_in,
+                      bool single_precision_in);
+    ~MappedInputVector();
+
+    // Returns void * pointer to either the mapped data or the
+    // original data, as necessary.
+    void * data();
+
+  private:
+    std::vector<Real> & our_data;
+    bool single_precision;
+    void * mapped_vec;
+  };
+
+
 private:
 
   /**

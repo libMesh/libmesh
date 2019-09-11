@@ -333,6 +333,74 @@ void ExodusII_IO_Helper::message(const std::string & msg, int i)
 }
 
 
+// The constructor maps roughly to the old create_input_buffer() function.
+ExodusII_IO_Helper::MappedInputVector::
+MappedInputVector(std::vector<Real> & our_data_in,
+                  bool single_precision_in)
+  : our_data(our_data_in),
+    single_precision(single_precision_in),
+    mapped_vec(nullptr)
+{
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          // Create enough space to store required floats
+          mapped_vec = new std::vector<float>(our_data.size());
+        }
+    }
+  else if (sizeof(Real) != sizeof(double))
+    {
+      // Create enough space to store required doubles
+      mapped_vec = new std::vector<double>(our_data.size());
+    }
+}
+
+// The destructor maps roughly to the old move_input_buffer_data() function.
+ExodusII_IO_Helper::MappedInputVector::
+~MappedInputVector()
+{
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          auto vec = static_cast<std::vector<float> *>(mapped_vec);
+          libmesh_assert_equal_to(vec->size(), our_data.size());
+          our_data.assign(vec->begin(), vec->end());
+          delete vec;
+        }
+    }
+  else if (sizeof(Real) != sizeof(double))
+    {
+      auto vec = static_cast<std::vector<double> *>(mapped_vec);
+      libmesh_assert_equal_to(vec->size(), our_data.size());
+      our_data.assign(vec->begin(), vec->end());
+      delete vec;
+    }
+}
+
+void *
+ExodusII_IO_Helper::MappedInputVector::data()
+{
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        {
+          auto vec = static_cast<std::vector<float> *>(mapped_vec);
+          return static_cast<void*>(vec->data());
+        }
+    }
+
+  else if (sizeof(Real) != sizeof(double))
+    {
+      auto vec =  static_cast<std::vector<double> *>(mapped_vec);
+      return static_cast<void*>(vec->data());
+    }
+
+  // Otherwise return a (suitably casted) pointer to the original underlying data.
+  return static_cast<void *>(our_data.data());
+}
+
 void * ExodusII_IO_Helper::create_input_buffer(std::vector<Real> & our_data)
 {
   // We should never do this multiple times at once
