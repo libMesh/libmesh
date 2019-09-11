@@ -724,15 +724,27 @@ protected:
   // Exodus.
   void move_input_buffer_data(std::vector<Real> & our_data);
 
-  // Mapping of vector<Real> to vector<whatever-the-file-uses> data,
-  // which may just be the original vector
-  void * create_output_buffer(const std::vector<Real> & our_data);
-
-  // If our data buffer wasn't the original vector, then we need to
-  // free it after we've written it via Exodus.
-  void remove_output_buffer(const std::vector<Real> & our_data);
-
   std::map<const std::vector<Real> *, void *> mapped_vectors;
+
+  // RAII-enabled version of the {create,move}_{input,output}_buffer() stuff.
+  struct MappedOutputVector
+  {
+    // Does the float copy if necessary, as in create_output_buffer()
+    MappedOutputVector(const std::vector<Real> & vec_in,
+                       bool single_precision_in);
+
+    // Deletes anything allocated, as in remove_output_buffer()
+    ~MappedOutputVector();
+
+    // returns void * pointer to the float-mapped data or the original
+    // data, as necessary
+    void * data();
+
+  private:
+    const std::vector<Real> & our_data;
+    bool single_precision;
+    void * mapped_vec;
+  };
 
 private:
 
