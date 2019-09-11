@@ -2178,10 +2178,6 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
         return false;
     }
 
-  // Declare a basic FEType.  Will be a Lagrange
-  // element by default.
-  FEType fe_type(this->default_order());
-
   // To be on the safe side, we converge the inverse_map() iteration
   // to a slightly tighter tolerance than that requested by the
   // user...
