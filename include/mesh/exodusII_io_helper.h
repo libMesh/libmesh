@@ -726,18 +726,27 @@ protected:
 
   std::map<const std::vector<Real> *, void *> mapped_vectors;
 
-  // RAII-enabled version of the {create,move}_{input,output}_buffer() stuff.
+  /**
+   * This class facilitates inline conversion of an input data vector
+   * to a different precision level, depending on the underlying type
+   * of Real and whether or not the single_precision flag is set. This
+   * should be used whenever floating point data is being written to
+   * the Exodus file. Note that if no precision conversion has to take
+   * place, there should be very little overhead involved in using
+   * this object.
+   */
   struct MappedOutputVector
   {
-    // Does the float copy if necessary, as in create_output_buffer()
+    // If necessary, allocates space to store a version of vec_in in a
+    // different precision than it was input with.
     MappedOutputVector(const std::vector<Real> & vec_in,
                        bool single_precision_in);
 
-    // Deletes anything allocated, as in remove_output_buffer()
+    // Cleans up any storage that was allocated by the constructor.
     ~MappedOutputVector();
 
-    // returns void * pointer to the float-mapped data or the original
-    // data, as necessary
+    // Returns void * pointer to either the mapped data or the
+    // original data, as necessary.
     void * data();
 
   private:
