@@ -715,17 +715,6 @@ protected:
   // If true, forces single precision I/O
   bool _single_precision;
 
-  // Mapping of vector<Real> to vector<whatever-the-file-uses> data,
-  // which may just be the original vector
-  void * create_input_buffer(std::vector<Real> & our_data);
-
-  // If our data buffer wasn't the original vector, then we need to
-  // copy its data into the original vector after we've filled it via
-  // Exodus.
-  void move_input_buffer_data(std::vector<Real> & our_data);
-
-  std::map<const std::vector<Real> *, void *> mapped_vectors;
-
   /**
    * This class facilitates inline conversion of an input data vector
    * to a different precision level, depending on the underlying type
