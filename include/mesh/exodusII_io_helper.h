@@ -764,7 +764,8 @@ protected:
   private:
     std::vector<Real> & our_data;
     bool single_precision;
-    void * mapped_vec;
+    std::vector<double> double_vec;
+    std::vector<float> float_vec;
   };
 
 

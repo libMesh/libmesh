@@ -333,30 +333,22 @@ void ExodusII_IO_Helper::message(const std::string & msg, int i)
 }
 
 
-// The constructor maps roughly to the old create_input_buffer() function.
 ExodusII_IO_Helper::MappedInputVector::
 MappedInputVector(std::vector<Real> & our_data_in,
                   bool single_precision_in)
   : our_data(our_data_in),
-    single_precision(single_precision_in),
-    mapped_vec(nullptr)
+    single_precision(single_precision_in)
 {
+  // Allocate temporary space to store enough floats/doubles, if required.
   if (single_precision)
     {
       if (sizeof(Real) != sizeof(float))
-        {
-          // Create enough space to store required floats
-          mapped_vec = new std::vector<float>(our_data.size());
-        }
+        float_vec.resize(our_data.size());
     }
   else if (sizeof(Real) != sizeof(double))
-    {
-      // Create enough space to store required doubles
-      mapped_vec = new std::vector<double>(our_data.size());
-    }
+    double_vec.resize(our_data.size());
 }
 
-// The destructor maps roughly to the old move_input_buffer_data() function.
 ExodusII_IO_Helper::MappedInputVector::
 ~MappedInputVector()
 {
@@ -364,18 +356,14 @@ ExodusII_IO_Helper::MappedInputVector::
     {
       if (sizeof(Real) != sizeof(float))
         {
-          auto vec = static_cast<std::vector<float> *>(mapped_vec);
-          libmesh_assert_equal_to(vec->size(), our_data.size());
-          our_data.assign(vec->begin(), vec->end());
-          delete vec;
+          libmesh_assert_equal_to(float_vec.size(), our_data.size());
+          our_data.assign(float_vec.begin(), float_vec.end());
         }
     }
   else if (sizeof(Real) != sizeof(double))
     {
-      auto vec = static_cast<std::vector<double> *>(mapped_vec);
-      libmesh_assert_equal_to(vec->size(), our_data.size());
-      our_data.assign(vec->begin(), vec->end());
-      delete vec;
+      libmesh_assert_equal_to(double_vec.size(), our_data.size());
+      our_data.assign(double_vec.begin(), double_vec.end());
     }
 }
 
@@ -385,17 +373,11 @@ ExodusII_IO_Helper::MappedInputVector::data()
   if (single_precision)
     {
       if (sizeof(Real) != sizeof(float))
-        {
-          auto vec = static_cast<std::vector<float> *>(mapped_vec);
-          return static_cast<void*>(vec->data());
-        }
+        return static_cast<void*>(float_vec.data());
     }
 
   else if (sizeof(Real) != sizeof(double))
-    {
-      auto vec =  static_cast<std::vector<double> *>(mapped_vec);
-      return static_cast<void*>(vec->data());
-    }
+    return static_cast<void*>(double_vec.data());
 
   // Otherwise return a (suitably casted) pointer to the original underlying data.
   return static_cast<void *>(our_data.data());
