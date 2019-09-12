@@ -82,6 +82,19 @@ public:
 
   void init() override;
 
+  /**
+   * Initialize with a NumericVector \p other, e.g. duplicate the storage
+   * allocation of \p other. This in general DOES NOT copy the vector entires
+   */
+  virtual void init(const NumericVector<T> & other, const bool fast = false);
+
+  /**
+   * Initialize with DiagonalMatrix \p other, e.g. duplicate the storage
+   * allocation of the underlying NumericVector in \p other. This in general
+   * DOES NOT copy the vector entires
+   */
+  virtual void init(const DiagonalMatrix<T> & other, const bool fast = false);
+
   void clear() override;
 
   void zero() override;
@@ -124,6 +137,8 @@ public:
   void get_transpose(SparseMatrix<T> & dest) const override;
 
   void zero_rows(std::vector<numeric_index_type> & rows, T val = 0) override;
+
+  const NumericVector<T> & diagonal() const;
 
 protected:
   /// Underlying diagonal matrix storage

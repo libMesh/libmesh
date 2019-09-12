@@ -41,7 +41,11 @@ template <typename T>
 DiagonalMatrix<T> &
 DiagonalMatrix<T>::operator=(NumericVector<T> && vec)
 {
-  *_diagonal = vec;
+  // Don't get confused by the &&: vec is an lvalue reference; the && just
+  // indicates that we are receiving an object that is safe to move from. Note
+  // that we are not going to use std::move here because we do not have
+  // (virtual) move assignment operations defined for NumericVector sub-classes
+  _diagonal->swap(vec);
   return *this;
 }
 
@@ -65,6 +69,20 @@ DiagonalMatrix<T>::init()
   libmesh_assert(this->_dof_map);
 
   _diagonal->init(this->_dof_map->n_dofs());
+}
+
+template <typename T>
+void
+DiagonalMatrix<T>::init(const NumericVector<T> & other, const bool fast)
+{
+  _diagonal->init(other, fast);
+}
+
+template <typename T>
+void
+DiagonalMatrix<T>::init(const DiagonalMatrix<T> & other, const bool fast)
+{
+  init(other.diagonal(), fast);
 }
 
 template <typename T>
@@ -163,9 +181,9 @@ template <typename T>
 void
 DiagonalMatrix<T>::add(const T a, const SparseMatrix<T> & X)
 {
-  auto & x_diagonal = *_diagonal->zero_clone();
-  X.get_diagonal(x_diagonal);
-  _diagonal->add(a, x_diagonal);
+  auto x_diagonal = _diagonal->zero_clone();
+  X.get_diagonal(*x_diagonal);
+  _diagonal->add(a, *x_diagonal);
 }
 
 template <typename T>
@@ -231,6 +249,13 @@ DiagonalMatrix<T>::zero_rows(std::vector<numeric_index_type> & rows, T val/*=0*/
 {
   for (auto row : rows)
     _diagonal->set(row, val);
+}
+
+template <typename T>
+const NumericVector<T> &
+DiagonalMatrix<T>::diagonal() const
+{
+  return *_diagonal;
 }
 
 template class DiagonalMatrix<Number>;

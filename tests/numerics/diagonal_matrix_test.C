@@ -7,6 +7,7 @@
 #include <libmesh/numeric_vector.h>
 
 #include "libmesh_cppunit.h"
+#include "test_comm.h"
 
 #include <memory>
 #include <numeric>
@@ -21,9 +22,9 @@ template <typename T>
 T
 termial(T n)
 {
-  if (n == 0)
+  if (n == 1)
     return 1;
-  return n * termial(n - 1);
+  return n + termial(n - 1);
 }
 }
 
@@ -47,7 +48,7 @@ public:
       _i.push_back(block_size);
     }
 
-    _matrix->init(global_size, UNUSED, local_size, UNUSED);
+    _matrix->init(_global_size, UNUSED, _local_size, UNUSED);
   }
 
   void tearDown() {}
@@ -94,10 +95,10 @@ private:
       // Also add to rank 0
       _matrix->add(0, 0, 1);
 
-      CPPUNIT_ASSERT(!_matrix->closed())
+      CPPUNIT_ASSERT(!_matrix->closed());
 
       _matrix->close();
-      CPPUNIT_ASSERT(_matrix->closed())
+      CPPUNIT_ASSERT(_matrix->closed());
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
       {
@@ -117,10 +118,10 @@ private:
       if (_comm->rank() == 0)
         _matrix->set(_global_size - 1, _global_size - 1, 0);
 
-      CPPUNIT_ASSERT(!_matrix->closed())
+      CPPUNIT_ASSERT(!_matrix->closed());
 
       _matrix->close();
-      CPPUNIT_ASSERT(_matrix->closed())
+      CPPUNIT_ASSERT(_matrix->closed());
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
       {
@@ -136,7 +137,7 @@ private:
 
     // Test dense matrix add, get diagonal, SparseMatrix add, get transpose
     {
-      DenseMatrix<Real> dense(_local_size);
+      DenseMatrix<Real> dense(_local_size, _local_size);
 
       for (numeric_index_type local_index = 0, global_index = beginning_index;
            local_index < _local_size;
@@ -155,13 +156,19 @@ private:
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
         LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), i, _tolerance);
 
-      auto diagonal = *NumericVector<Real>::build(*_comm);
-      _matrix->get_diagonal(vector);
+      // Build
+      auto diagonal = NumericVector<Real>::build(*_comm);
+      // Allocate storage
+      diagonal->init(_matrix->diagonal());
+      // Fill entries
+      _matrix->get_diagonal(*diagonal);
 
+      // Build
       DiagonalMatrix<Real> copy(*_comm);
-
-      // Move assignment from NumericVector
-      copy = std::move(diagonal);
+      // Allocate storage
+      copy.init(*_matrix);
+      // Fill entries from diagonal
+      copy = std::move(*diagonal);
 
       // Single dof-indices overload for DenseMatrix add
       _matrix->add_matrix(dense, rows);
@@ -176,7 +183,6 @@ private:
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
         LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), i, _tolerance);
 
-      copy.clear();
       _matrix->get_transpose(copy);
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
@@ -185,8 +191,8 @@ private:
 
     // Test norms
     {
-      LIBMESH_ASSERT_FP_EQUAL(_matrix->l1_norm(), termial(_global_size - 1), _tolerance);
-      LIBMESH_ASSERT_FP_EQUAL(_matrix->linfty_norm(), _global_size - 1, _tolerance);
+      LIBMESH_ASSERT_FP_EQUAL(termial(_global_size - 1), _matrix->l1_norm(), _tolerance);
+      LIBMESH_ASSERT_FP_EQUAL(_global_size - 1, _matrix->linfty_norm(), _tolerance);
     }
 
     // Test zero_rows

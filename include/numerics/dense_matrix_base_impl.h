@@ -35,7 +35,7 @@ namespace libMesh
   DenseVector<T>
   DenseMatrixBase<T>::diagonal() const
   {
-    DenseVector<T> ret;
+    DenseVector<T> ret(_m);
     for (decltype(_m) i = 0; i < _m; ++i)
       ret(i) = el(i, i);
     return ret;
