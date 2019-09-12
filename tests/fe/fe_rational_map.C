@@ -113,7 +113,7 @@ public:
     delete _mesh;
   }
 
-  void testMap()
+  void testContainsPoint()
   {
     // Handle the "more processors than elements" case
     if (!_elem)
@@ -153,7 +153,7 @@ public:
   class RationalMapTest_##elemtype : public RationalMapTest<elemtype> { \
   public:                                                               \
   CPPUNIT_TEST_SUITE( RationalMapTest_##elemtype );                     \
-  CPPUNIT_TEST( testMap );                                              \
+  CPPUNIT_TEST( testContainsPoint );                                    \
   CPPUNIT_TEST_SUITE_END();                                             \
   };                                                                    \
                                                                         \
