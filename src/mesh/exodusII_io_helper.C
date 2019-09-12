@@ -333,6 +333,38 @@ void ExodusII_IO_Helper::message(const std::string & msg, int i)
 }
 
 
+ExodusII_IO_Helper::MappedOutputVector::
+MappedOutputVector(const std::vector<Real> & our_data_in,
+                   bool single_precision_in)
+  : our_data(our_data_in),
+    single_precision(single_precision_in)
+{
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        float_vec.assign(our_data.begin(), our_data.end());
+    }
+
+  else if (sizeof(Real) != sizeof(double))
+    double_vec.assign(our_data.begin(), our_data.end());
+}
+
+void *
+ExodusII_IO_Helper::MappedOutputVector::data()
+{
+  if (single_precision)
+    {
+      if (sizeof(Real) != sizeof(float))
+        return static_cast<void*>(float_vec.data());
+    }
+
+  else if (sizeof(Real) != sizeof(double))
+    return static_cast<void*>(double_vec.data());
+
+  // Otherwise return a (suitably casted) pointer to the original underlying data.
+  return const_cast<void *>(static_cast<const void *>(our_data.data()));
+}
+
 ExodusII_IO_Helper::MappedInputVector::
 MappedInputVector(std::vector<Real> & our_data_in,
                   bool single_precision_in)
@@ -375,38 +407,6 @@ ExodusII_IO_Helper::MappedInputVector::data()
 
   // Otherwise return a (suitably casted) pointer to the original underlying data.
   return static_cast<void *>(our_data.data());
-}
-
-ExodusII_IO_Helper::MappedOutputVector::
-MappedOutputVector(const std::vector<Real> & our_data_in,
-                   bool single_precision_in)
-  : our_data(our_data_in),
-    single_precision(single_precision_in)
-{
-  if (single_precision)
-    {
-      if (sizeof(Real) != sizeof(float))
-        float_vec.assign(our_data.begin(), our_data.end());
-    }
-
-  else if (sizeof(Real) != sizeof(double))
-    double_vec.assign(our_data.begin(), our_data.end());
-}
-
-void *
-ExodusII_IO_Helper::MappedOutputVector::data()
-{
-  if (single_precision)
-    {
-      if (sizeof(Real) != sizeof(float))
-        return static_cast<void*>(float_vec.data());
-    }
-
-  else if (sizeof(Real) != sizeof(double))
-    return static_cast<void*>(double_vec.data());
-
-  // Otherwise return a (suitably casted) pointer to the original underlying data.
-  return const_cast<void *>(static_cast<const void *>(our_data.data()));
 }
 
 void ExodusII_IO_Helper::open(const char * filename, bool read_only)
