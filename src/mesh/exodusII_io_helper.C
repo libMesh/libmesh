@@ -355,16 +355,10 @@ ExodusII_IO_Helper::MappedInputVector::
   if (single_precision)
     {
       if (sizeof(Real) != sizeof(float))
-        {
-          libmesh_assert_equal_to(float_vec.size(), our_data.size());
-          our_data.assign(float_vec.begin(), float_vec.end());
-        }
+        our_data.assign(float_vec.begin(), float_vec.end());
     }
   else if (sizeof(Real) != sizeof(double))
-    {
-      libmesh_assert_equal_to(double_vec.size(), our_data.size());
-      our_data.assign(double_vec.begin(), double_vec.end());
-    }
+    our_data.assign(double_vec.begin(), double_vec.end());
 }
 
 void *
