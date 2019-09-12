@@ -715,36 +715,59 @@ protected:
   // If true, forces single precision I/O
   bool _single_precision;
 
-  // Mapping of vector<Real> to vector<whatever-the-file-uses> data,
-  // which may just be the original vector
-  void * create_input_buffer(std::vector<Real> & our_data);
-
-  // If our data buffer wasn't the original vector, then we need to
-  // copy its data into the original vector after we've filled it via
-  // Exodus.
-  void move_input_buffer_data(std::vector<Real> & our_data);
-
-  std::map<const std::vector<Real> *, void *> mapped_vectors;
-
-  // RAII-enabled version of the {create,move}_{input,output}_buffer() stuff.
+  /**
+   * This class facilitates inline conversion of an input data vector
+   * to a different precision level, depending on the underlying type
+   * of Real and whether or not the single_precision flag is set. This
+   * should be used whenever floating point data is being written to
+   * the Exodus file. Note that if no precision conversion has to take
+   * place, there should be very little overhead involved in using
+   * this object.
+   */
   struct MappedOutputVector
   {
-    // Does the float copy if necessary, as in create_output_buffer()
+    // If necessary, allocates space to store a version of vec_in in a
+    // different precision than it was input with.
     MappedOutputVector(const std::vector<Real> & vec_in,
                        bool single_precision_in);
 
-    // Deletes anything allocated, as in remove_output_buffer()
-    ~MappedOutputVector();
+    ~MappedOutputVector() = default;
 
-    // returns void * pointer to the float-mapped data or the original
-    // data, as necessary
+    // Returns void * pointer to either the mapped data or the
+    // original data, as necessary.
     void * data();
 
   private:
     const std::vector<Real> & our_data;
     bool single_precision;
-    void * mapped_vec;
+    std::vector<double> double_vec;
+    std::vector<float> float_vec;
   };
+
+  /**
+   * This class facilitates reading in vectors from Exodus file that
+   * may be of a different floating point type than Real. It employs
+   * basically the same approach as the MappedOuputVector, just going
+   * in the opposite direction. For more information, see the
+   * MappedOutputVector class docs.
+   */
+  struct MappedInputVector
+  {
+    MappedInputVector(std::vector<Real> & vec_in,
+                      bool single_precision_in);
+    ~MappedInputVector();
+
+    // Returns void * pointer to either the mapped data or the
+    // original data, as necessary.
+    void * data();
+
+  private:
+    std::vector<Real> & our_data;
+    bool single_precision;
+    std::vector<double> double_vec;
+    std::vector<float> float_vec;
+  };
+
 
 private:
 
