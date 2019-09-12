@@ -133,6 +133,12 @@ public:
   NumericVector & operator= (NumericVector &&) = default;
 
   /**
+   * While this class doesn't manage any memory, the derived class might and
+   * users may be deleting through a pointer to this base class
+   */
+  virtual ~NumericVector() = default;
+
+  /**
    * Builds a \p NumericVector on the processors in communicator
    * \p comm using the linear solver package specified by
    * \p solver_package
