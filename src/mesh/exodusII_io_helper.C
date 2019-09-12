@@ -405,40 +405,16 @@ ExodusII_IO_Helper::MappedOutputVector::
 MappedOutputVector(const std::vector<Real> & our_data_in,
                    bool single_precision_in)
   : our_data(our_data_in),
-    single_precision(single_precision_in),
-    mapped_vec(nullptr)
+    single_precision(single_precision_in)
 {
   if (single_precision)
     {
       if (sizeof(Real) != sizeof(float))
-        mapped_vec = new std::vector<float>(our_data.begin(), our_data.end());
+        float_vec.assign(our_data.begin(), our_data.end());
     }
 
   else if (sizeof(Real) != sizeof(double))
-    mapped_vec = new std::vector<double>(our_data.begin(), our_data.end());
-
-  // Note: we may have left mapped_vec untouched and that's fine,
-  // we just aren't using it in that case.
-}
-
-ExodusII_IO_Helper::MappedOutputVector::
-~MappedOutputVector()
-{
-  // Can't delete through void *, need to cast back to the original
-  // first and delete that.
-  if (single_precision)
-    {
-      if (sizeof(Real) != sizeof(float))
-        {
-          auto vec = static_cast<std::vector<float> *>(mapped_vec);
-          delete vec;
-        }
-    }
-  else if (sizeof(Real) != sizeof(double))
-    {
-      auto vec =  static_cast<std::vector<double> *>(mapped_vec);
-      delete vec;
-    }
+    double_vec.assign(our_data.begin(), our_data.end());
 }
 
 void *
@@ -447,17 +423,11 @@ ExodusII_IO_Helper::MappedOutputVector::data()
   if (single_precision)
     {
       if (sizeof(Real) != sizeof(float))
-        {
-          auto vec = static_cast<std::vector<float> *>(mapped_vec);
-          return static_cast<void*>(vec->data());
-        }
+        return static_cast<void*>(float_vec.data());
     }
 
   else if (sizeof(Real) != sizeof(double))
-    {
-      auto vec =  static_cast<std::vector<double> *>(mapped_vec);
-      return static_cast<void*>(vec->data());
-    }
+    return static_cast<void*>(double_vec.data());
 
   // Otherwise return a (suitably casted) pointer to the original underlying data.
   return const_cast<void *>(static_cast<const void *>(our_data.data()));
