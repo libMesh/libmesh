@@ -7,6 +7,7 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <array>
 
 using namespace libMesh;
 
