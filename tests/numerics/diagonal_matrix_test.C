@@ -22,14 +22,20 @@ template <typename T>
 T
 termial(T n)
 {
-  if (n == 1)
-    return 1;
-  return n + termial(n - 1);
+  return n * (n + 1) / 2;
 }
 }
 
 class DiagonalMatrixTest : public CppUnit::TestCase
 {
+public:
+  CPPUNIT_TEST_SUITE(DiagonalMatrixTest);
+
+  CPPUNIT_TEST(testSizes);
+  CPPUNIT_TEST(testNumerics);
+
+  CPPUNIT_TEST_SUITE_END();
+
 public:
   void setUp()
   {
@@ -45,7 +51,7 @@ public:
     {
       numeric_index_type block_size = root_block_size + static_cast<numeric_index_type>(p);
       _global_size += block_size;
-      _i.push_back(block_size);
+      _i.push_back(_global_size);
     }
 
     _matrix->init(_global_size, UNUSED, _local_size, UNUSED);
@@ -53,14 +59,6 @@ public:
 
   void tearDown() {}
 
-  CPPUNIT_TEST_SUITE(DiagonalMatrixTest);
-
-  CPPUNIT_TEST(testSizes);
-  CPPUNIT_TEST(testNumerics);
-
-  CPPUNIT_TEST_SUITE_END();
-
-private:
   void testSizes()
   {
     CPPUNIT_ASSERT_EQUAL(_global_size, _matrix->m());
@@ -208,6 +206,8 @@ private:
         }
     }
   }
+
+private:
 
   Parallel::Communicator * _comm;
   std::unique_ptr<DiagonalMatrix<Real>> _matrix;
