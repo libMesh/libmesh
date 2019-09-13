@@ -40,7 +40,7 @@ public:
   void setUp()
   {
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<DiagonalMatrix<Real>>(*_comm);
+    _matrix = libmesh_make_unique<DiagonalMatrix<Number>>(*_comm);
 
     numeric_index_type root_block_size = 2;
     _local_size = root_block_size + static_cast<numeric_index_type>(_comm->rank());
@@ -82,8 +82,8 @@ public:
     _matrix->set(beginning_index + 1, beginning_index, 1);
 
     // Test that off-diagonal elements are always zero
-    LIBMESH_ASSERT_FP_EQUAL((*_matrix)(beginning_index, beginning_index + 1), 0, _tolerance);
-    LIBMESH_ASSERT_FP_EQUAL((*_matrix)(beginning_index + 1, beginning_index), 0, _tolerance);
+    LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(beginning_index, beginning_index + 1)), 0, _tolerance);
+    LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(beginning_index + 1, beginning_index)), 0, _tolerance);
 
     // Test add
     {
@@ -101,9 +101,9 @@ public:
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
       {
         if (i)
-          LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), i, _tolerance);
+          LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), i, _tolerance);
         else
-          LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), _comm->size(), _tolerance);
+          LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), _comm->size(), _tolerance);
       }
     }
 
@@ -124,9 +124,9 @@ public:
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
       {
         if (i != _global_size - 1)
-          LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), i, _tolerance);
+          LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), i, _tolerance);
         else
-          LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), 0, _tolerance);
+          LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), 0, _tolerance);
       }
     }
 
@@ -135,7 +135,7 @@ public:
 
     // Test dense matrix add, get diagonal, SparseMatrix add, get transpose
     {
-      DenseMatrix<Real> dense(_local_size, _local_size);
+      DenseMatrix<Number> dense(_local_size, _local_size);
 
       for (numeric_index_type local_index = 0, global_index = beginning_index;
            local_index < _local_size;
@@ -152,17 +152,17 @@ public:
       _matrix->close();
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), i, _tolerance);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), i, _tolerance);
 
       // Build
-      auto diagonal = NumericVector<Real>::build(*_comm);
+      auto diagonal = NumericVector<Number>::build(*_comm);
       // Allocate storage
       diagonal->init(_matrix->diagonal());
       // Fill entries
       _matrix->get_diagonal(*diagonal);
 
       // Build
-      DiagonalMatrix<Real> copy(*_comm);
+      DiagonalMatrix<Number> copy(*_comm);
       // Allocate storage
       copy.init(*_matrix);
       // Fill entries from diagonal
@@ -173,18 +173,18 @@ public:
       _matrix->close();
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), 2 * i, _tolerance);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), 2 * i, _tolerance);
 
       // SparseMatrix add
       _matrix->add(-1, copy);
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, i), i, _tolerance);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), i, _tolerance);
 
       _matrix->get_transpose(copy);
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL(copy(i, i), i, _tolerance);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(copy(i, i)), i, _tolerance);
     }
 
     // Test norms
@@ -200,9 +200,9 @@ public:
         for (numeric_index_type j = beginning_index; j < end_index; ++j)
         {
           if (i == j)
-            LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, j), 1, _tolerance);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, j)), 1, _tolerance);
           else
-            LIBMESH_ASSERT_FP_EQUAL((*_matrix)(i, j), 0, _tolerance);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, j)), 0, _tolerance);
         }
     }
   }
@@ -210,7 +210,7 @@ public:
 private:
 
   Parallel::Communicator * _comm;
-  std::unique_ptr<DiagonalMatrix<Real>> _matrix;
+  std::unique_ptr<DiagonalMatrix<Number>> _matrix;
   numeric_index_type _local_size, _global_size;
   std::vector<numeric_index_type> _i;
   const Real _tolerance = TOLERANCE * TOLERANCE;
