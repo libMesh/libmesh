@@ -58,7 +58,7 @@ Point InfFEMap::map (const unsigned int dim,
       break;
     case 2:
     case 3:
-      base_point = FEMap::map (dim, base_elem.get(), reference_point);
+      base_point = FEMap::map (dim-1, base_elem.get(), reference_point);
       break;
     default:
 #ifdef DEBUG
