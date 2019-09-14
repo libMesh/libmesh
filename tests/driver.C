@@ -14,22 +14,35 @@
 #include <regex>
 
 // Add Tests to runner that match user-provided regex.
-void add_matching_tests_to_runner(CppUnit::Test * test, const std::regex & r, CppUnit::TextUi::TestRunner & runner)
+void add_matching_tests_to_runner(CppUnit::Test * test,
+                                  const std::regex & r,
+                                  CppUnit::TextUi::TestRunner & runner,
+                                  CppUnit::TestSuite & rejects)
 {
-  // If the regex matches and we don't have any "child" tests, add
-  // ourself. The exception is if the regex matches and this is the
-  // "All Tests" test, which isn't a leaf Test but still needs to be
-  // added.
-  if (std::regex_search(test->getName(), r) &&
-      (test->getChildTestCount() == 0 || test->getName() == "All Tests"))
+  // If we running all tests we just add the "All Tests" test and then return
+  if (test->getName() == "All Tests" && std::regex_search(test->getName(), r))
+  {
+    libMesh::out << test->getName() << std::endl;
+    runner.addTest(test);
+    return;
+  }
+
+  if (test->getChildTestCount() == 0)
+  {
+    // Add the test to the runner
+    if (std::regex_search(test->getName(), r))
     {
       libMesh::out << test->getName() << std::endl;
       runner.addTest(test);
     }
+    // Add the test to the rejects it can be cleaned up later
+    else
+      rejects.addTest(test);
+  }
 
   // Call this recursively on each of our children, if any.
   for (int i = 0; i < test->getChildTestCount(); i++)
-    add_matching_tests_to_runner(test->getChildTestAt(i), r, runner);
+    add_matching_tests_to_runner(test->getChildTestAt(i), r, runner, rejects);
 }
 
 #endif
@@ -72,13 +85,17 @@ int main(int argc, char ** argv)
   // The Cppunit registry object that knows about all the tests.
   CppUnit::TestFactoryRegistry & registry = CppUnit::TestFactoryRegistry::getRegistry();
 
+  // A test suite container for holding tests not matching the regex. When main's
+  // scope ends, this class's destructor will delete the rejected tests
+  CppUnit::TestSuite rejects("rejects");
+
 #ifdef LIBMESH_HAVE_CXX11_REGEX
   // Make regex object from user's input.
   std::regex the_regex(regex_string);
 
   // Add all tests which match the re to the runner object.
   libMesh::out << "Will run the following tests:" << std::endl;
-  add_matching_tests_to_runner(registry.makeTest(), the_regex, runner);
+  add_matching_tests_to_runner(registry.makeTest(), the_regex, runner, rejects);
 #else
   // If no C++11 <regex> just run all the tests.
   runner.addTest(registry.makeTest());
