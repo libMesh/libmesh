@@ -31,6 +31,7 @@ namespace libMesh
 
 // Forward declarations
 template <typename T> class DenseVectorBase;
+template <typename T> class DenseVector;
 
 /**
  * Defines an abstract dense matrix base class for use in Finite Element-type
@@ -138,6 +139,11 @@ public:
     ScalarTraits<T2>::value, void >::type
   add (const T2 factor,
        const DenseMatrixBase<T3> & mat);
+
+  /**
+   * Return the matrix diagonal
+   */
+  DenseVector<T> diagonal() const;
 
 protected:
 

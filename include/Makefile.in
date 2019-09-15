@@ -809,6 +809,7 @@ include_HEADERS = \
         numerics/dense_subvector.h \
         numerics/dense_vector.h \
         numerics/dense_vector_base.h \
+        numerics/diagonal_matrix.h \
         numerics/distributed_vector.h \
         numerics/eigen_core_support.h \
         numerics/eigen_preconditioner.h \

@@ -323,9 +323,7 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
   _vec.resize(n);
 
   this->_is_initialized = true;
-#ifndef NDEBUG
   this->_is_closed = true;
-#endif
 
   // Optionally zero out all components
   if (fast == false)
@@ -377,9 +375,7 @@ void EigenSparseVector<T>::close ()
 {
   libmesh_assert (this->initialized());
 
-#ifndef NDEBUG
   this->_is_closed = true;
-#endif
 }
 
 
@@ -391,9 +387,7 @@ void EigenSparseVector<T>::clear ()
   _vec.resize(0);
 
   this->_is_initialized = false;
-#ifndef NDEBUG
   this->_is_closed = false;
-#endif
 }
 
 
@@ -485,9 +479,7 @@ void EigenSparseVector<T>::set (const numeric_index_type i, const T value)
 
   _vec[static_cast<eigen_idx_type>(i)] = value;
 
-#ifndef NDEBUG
   this->_is_closed = false;
-#endif
 }
 
 
@@ -501,9 +493,7 @@ void EigenSparseVector<T>::add (const numeric_index_type i, const T value)
 
   _vec[static_cast<eigen_idx_type>(i)] += value;
 
-#ifndef NDEBUG
   this->_is_closed = false;
-#endif
 }
 
 

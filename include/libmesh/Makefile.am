@@ -221,6 +221,7 @@ BUILT_SOURCES = \
         dense_subvector.h \
         dense_vector.h \
         dense_vector_base.h \
+        diagonal_matrix.h \
         distributed_vector.h \
         eigen_core_support.h \
         eigen_preconditioner.h \
@@ -1185,6 +1186,9 @@ dense_vector.h: $(top_srcdir)/include/numerics/dense_vector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_vector_base.h: $(top_srcdir)/include/numerics/dense_vector_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+diagonal_matrix.h: $(top_srcdir)/include/numerics/diagonal_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 distributed_vector.h: $(top_srcdir)/include/numerics/distributed_vector.h

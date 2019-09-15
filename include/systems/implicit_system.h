@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/explicit_system.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>
@@ -312,7 +313,26 @@ public:
    * solution.  When not \p System but the user wants to
    * initialize the mayor matrix, then all the additional matrices,
    * if existent, have to be initialized by the user, too.
+   *
+   * This non-template method will add a derived matrix type corresponding to
+   * the solver package. If the user wishes to specify the matrix type to add,
+   * use the templated \p add_matrix method instead
    */
+  SparseMatrix<Number> & add_matrix (const std::string & mat_name);
+
+  /**
+   * Adds the additional matrix \p mat_name to this system.  Only
+   * allowed prior to \p assemble().  All additional matrices
+   * have the same sparsity pattern as the matrix used during
+   * solution.  When not \p System but the user wants to
+   * initialize the mayor matrix, then all the additional matrices,
+   * if existent, have to be initialized by the user, too.
+   *
+   * This method will create add a derived matrix of type
+   * \p MatrixType<Number>. One can use the non-templated \p add_matrix method to
+   * add a matrix corresponding to the default solver package
+   */
+  template <template <typename> class>
   SparseMatrix<Number> & add_matrix (const std::string & mat_name);
 
   /**
@@ -426,6 +446,27 @@ inline
 unsigned int ImplicitSystem::n_matrices () const
 {
   return cast_int<unsigned int>(_matrices.size());
+}
+
+template <template <typename> class MatrixType>
+inline
+SparseMatrix<Number> &
+ImplicitSystem::add_matrix (const std::string & mat_name)
+{
+  // only add matrices before initializing...
+  if (!_can_add_matrices)
+    libmesh_error_msg("ERROR: Too late.  Cannot add matrices to the system after initialization"
+                      << "\n any more.  You should have done this earlier.");
+
+  // Return the matrix if it is already there.
+  if (this->have_matrix(mat_name))
+    return *(_matrices[mat_name]);
+
+  // Otherwise build the matrix and return it.
+  SparseMatrix<Number> * buf = libmesh_make_unique<MatrixType<Number>>(this->comm()).release();
+  _matrices.insert (std::make_pair (mat_name, buf));
+
+  return *buf;
 }
 
 } // namespace libMesh

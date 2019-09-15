@@ -689,10 +689,11 @@ public:
   {
     Parallel::Communicator subcomm;
     unsigned int rank = TestCommWorld->rank();
-    Parallel::info i;
+    Parallel::info i = 0;
     int type = 0;
 #ifdef LIBMESH_HAVE_MPI
     type = MPI_COMM_TYPE_SHARED;
+    i = MPI_INFO_NULL;
 #endif
     TestCommWorld->split_by_type(type, rank, i, subcomm);
 

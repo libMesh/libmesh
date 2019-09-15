@@ -166,9 +166,7 @@ void EigenSparseVector<T>::add (const T v)
 {
   _vec += EigenSV::Constant(this->size(), v);
 
-#ifndef NDEBUG
   this->_is_closed = false;
-#endif
 }
 
 
@@ -308,9 +306,7 @@ EigenSparseVector<T>::operator = (const EigenSparseVector<T> & v)
 
   _vec = v._vec;
 
-#ifndef NDEBUG
   this->_is_closed = true;
-#endif
 
   return *this;
 }
@@ -389,9 +385,7 @@ void EigenSparseVector<T>::localize (const numeric_index_type libmesh_dbg_var(fi
 
   libmesh_assert_less_equal (send_list.size(), this->size());
 
-#ifndef NDEBUG
   this->_is_closed = true;
-#endif
 }
 
 
