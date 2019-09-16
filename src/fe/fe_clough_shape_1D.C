@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
 
 
 // Anonymous namespace for persistent variables.
@@ -70,11 +71,15 @@ void clough_compute_coefs(const Elem * elem)
     return;
 #endif
 
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
+
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
+
+  const FEType map_fe_type(mapping_order, mapping_family);
+
   const int n_mapping_shape_functions =
-    FE<1,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+    FEInterface::n_shape_functions(1, map_fe_type, mapping_elem_type);
 
   // Degrees of freedom are at vertices and edge midpoints
   std::vector<Point> dofpt;
@@ -85,12 +90,15 @@ void clough_compute_coefs(const Elem * elem)
   std::vector<Real> dxdxi(2);
   std::vector<Real> dxidx(2);
 
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(2, map_fe_type);
+
   for (int p = 0; p != 2; ++p)
     {
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<1,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
+          const Real ddxi = shape_deriv_ptr
+            (elem, mapping_order, i, 0, dofpt[p], false);
           dxdxi[p] += dofpt[p](0) * ddxi;
         }
     }
@@ -231,7 +239,8 @@ template <>
 Real FE<1,CLOUGH>::shape(const Elem * elem,
                          const Order order,
                          const unsigned int i,
-                         const Point & p)
+                         const Point & p,
+                         const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -239,7 +248,8 @@ Real FE<1,CLOUGH>::shape(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (totalorder)
     {
@@ -298,7 +308,8 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
                                const Order order,
                                const unsigned int i,
                                const unsigned int j,
-                               const Point & p)
+                               const Point & p,
+                               const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -306,7 +317,8 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (totalorder)
     {
@@ -364,7 +376,8 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
                                       const unsigned int j,
-                                      const Point & p)
+                                      const Point & p,
+                                      const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -372,7 +385,8 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (totalorder)
     {

@@ -316,6 +316,10 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
   // we've requested
   e->add_extra_integers(_elem_integer_names.size());
 
+  // And set mapping type and data on any new element
+  e->set_mapping_type(this->default_mapping_type());
+  e->set_mapping_data(this->default_mapping_data());
+
   return e;
 }
 
@@ -343,6 +347,10 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
   // Make sure any new element is given space for any extra integers
   // we've requested
   e->add_extra_integers(_elem_integer_names.size());
+
+  // And set mapping type and data on any new element
+  e->set_mapping_type(this->default_mapping_type());
+  e->set_mapping_data(this->default_mapping_data());
 
   return e;
 }

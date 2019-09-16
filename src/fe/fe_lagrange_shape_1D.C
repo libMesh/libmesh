@@ -78,11 +78,12 @@ template <>
 Real FE<1,LAGRANGE>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
-                           const Point & p)
+                           const Point & p,
+                           const bool add_p_level)
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  return fe_lagrange_1D_shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
 }
 
 
@@ -91,11 +92,12 @@ template <>
 Real FE<1,L2_LAGRANGE>::shape(const Elem * elem,
                               const Order order,
                               const unsigned int i,
-                              const Point & p)
+                              const Point & p,
+                              const bool add_p_level)
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  return fe_lagrange_1D_shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
 }
 
 
@@ -129,12 +131,13 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p)
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   libmesh_assert(elem);
 
   return fe_lagrange_1D_shape_deriv(elem->type(),
-                                    static_cast<Order>(order + elem->p_level()), i, j, p);
+                                    static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -144,12 +147,13 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const Elem * elem,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
-                                    const Point & p)
+                                    const Point & p,
+                                    const bool add_p_level)
 {
   libmesh_assert(elem);
 
   return fe_lagrange_1D_shape_deriv(elem->type(),
-                                    static_cast<Order>(order + elem->p_level()), i, j, p);
+                                    static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -185,12 +189,13 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point & p)
+                                        const Point & p,
+                                        const bool add_p_level)
 {
   libmesh_assert(elem);
 
   return fe_lagrange_1D_shape_second_deriv(elem->type(),
-                                           static_cast<Order>(order + elem->p_level()), i, j, p);
+                                           static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -200,12 +205,13 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
-                                           const Point & p)
+                                           const Point & p,
+                                           const bool add_p_level)
 {
   libmesh_assert(elem);
 
   return fe_lagrange_1D_shape_second_deriv(elem->type(),
-                                           static_cast<Order>(order + elem->p_level()), i, j, p);
+                                           static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES

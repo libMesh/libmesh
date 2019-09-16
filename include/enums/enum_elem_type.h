@@ -73,6 +73,17 @@ enum ElemType : int {
                QUADSHELL8 = 32,
                // Invalid
                INVALID_ELEM};   // should always be last
+
+/**
+ * Enumeration of possible element master->physical mapping types.
+ * We don't just directly store FEType for this because we want to
+ * be certain our options all pack into a single char in an Elem.
+ */
+enum ElemMappingType : unsigned char {
+  LAGRANGE_MAP = 0,
+  RATIONAL_BERNSTEIN_MAP,
+  INVALID_MAP };
+
 }
 
 #endif

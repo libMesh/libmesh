@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/utility.h"
 
 namespace
@@ -30,11 +31,15 @@ using namespace libMesh;
 // Compute the static coefficients for an element
 void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
 {
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
+
+  const FEType map_fe_type(mapping_order, mapping_family);
+
   const int n_mapping_shape_functions =
-    FE<1,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+    FEInterface::n_shape_functions (1, map_fe_type,
+                                    mapping_elem_type);
 
   // Degrees of freedom are at vertices and edge midpoints
   std::vector<Point> dofpt;
@@ -45,13 +50,16 @@ void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
   std::vector<Real> dxdxi(2);
   std::vector<Real> dxidx(2);
 
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(1, map_fe_type);
+
   for (int p = 0; p != 2; ++p)
     {
       dxdxi[p] = 0;
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<1,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
+          const Real ddxi = shape_deriv_ptr
+            (elem, mapping_order, i, 0, dofpt[p], false);
           dxdxi[p] += elem->point(i)(0) * ddxi;
         }
     }
@@ -189,7 +197,8 @@ template <>
 Real FE<1,HERMITE>::shape(const Elem * elem,
                           const Order libmesh_dbg_var(order),
                           const unsigned int i,
-                          const Point & p)
+                          const Point & p,
+                          const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
 
@@ -203,7 +212,8 @@ Real FE<1,HERMITE>::shape(const Elem * elem,
   const ElemType type = elem->type();
 
 #ifndef NDEBUG
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder =
+    order + add_p_level * elem->p_level();
 #endif
 
   switch (type)
@@ -253,7 +263,8 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
                                 const Order libmesh_dbg_var(order),
                                 const unsigned int i,
                                 const unsigned int,
-                                const Point & p)
+                                const Point & p,
+                                const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
 
@@ -267,7 +278,8 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
 #ifndef NDEBUG
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder =
+    order + add_p_level * elem->p_level();
 #endif
 
   switch (type)
@@ -317,7 +329,8 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
                                        const Order libmesh_dbg_var(order),
                                        const unsigned int i,
                                        const unsigned int,
-                                       const Point & p)
+                                       const Point & p,
+                                       const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
 
@@ -331,7 +344,8 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
 #ifndef NDEBUG
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder =
+    order + add_p_level * elem->p_level();
 #endif
 
   switch (type)

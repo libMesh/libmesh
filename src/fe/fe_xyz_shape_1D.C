@@ -44,10 +44,11 @@ template <>
 Real FE<1,XYZ>::shape(const Elem * elem,
                       const Order libmesh_dbg_var(order),
                       const unsigned int i,
-                      const Point & point_in)
+                      const Point & point_in,
+                      const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
-  libmesh_assert_less_equal (i, order + elem->p_level());
+  libmesh_assert_less_equal (i, order + add_p_level * elem->p_level());
 
   Point centroid = elem->centroid();
   Real max_distance = 0.;
@@ -107,10 +108,11 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
                             const Order libmesh_dbg_var(order),
                             const unsigned int i,
                             const unsigned int libmesh_dbg_var(j),
-                            const Point & point_in)
+                            const Point & point_in,
+                            const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
-  libmesh_assert_less_equal (i, order + elem->p_level());
+  libmesh_assert_less_equal (i, order + add_p_level * elem->p_level());
 
   // only d()/dxi in 1D!
 
@@ -175,10 +177,11 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
                                    const Order libmesh_dbg_var(order),
                                    const unsigned int i,
                                    const unsigned int libmesh_dbg_var(j),
-                                   const Point & point_in)
+                                   const Point & point_in,
+                                   const bool libmesh_dbg_var(add_p_level))
 {
   libmesh_assert(elem);
-  libmesh_assert_less_equal (i, order + elem->p_level());
+  libmesh_assert_less_equal (i, order + add_p_level * elem->p_level());
 
   // only d2()/dxi2 in 1D!
 

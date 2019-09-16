@@ -2178,10 +2178,6 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
         return false;
     }
 
-  // Declare a basic FEType.  Will be a Lagrange
-  // element by default.
-  FEType fe_type(this->default_order());
-
   // To be on the safe side, we converge the inverse_map() iteration
   // to a slightly tighter tolerance than that requested by the
   // user...
@@ -2620,7 +2616,8 @@ Real Elem::volume () const
   // order and sums up the JxW contributions.  This can be expensive,
   // so the various element types can overload this method and compute
   // the volume more efficiently.
-  FEType fe_type (this->default_order() , LAGRANGE);
+  const FEFamily mapping_family = FEMap::map_fe_type(*this);
+  const FEType fe_type(this->default_order(), mapping_family);
 
   std::unique_ptr<FEBase> fe (FEBase::build(this->dim(),
                                             fe_type));

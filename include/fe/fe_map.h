@@ -53,6 +53,8 @@ public:
 
   static std::unique_ptr<FEMap> build(FEType fe_type);
 
+  static FEFamily map_fe_type(const Elem & elem);
+
   template<unsigned int Dim>
   void init_reference_to_physical_map(const std::vector<Point> & qp,
                                       const Elem * elem);

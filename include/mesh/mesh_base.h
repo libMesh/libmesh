@@ -34,6 +34,7 @@
 namespace libMesh
 {
 enum ElemType : int;
+enum ElemMappingType : unsigned char;
 }
 #else
 #include "libmesh/enum_elem_type.h"
@@ -698,6 +699,38 @@ public:
    * with the id \p new_id should already exist.
    */
   virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id) = 0;
+
+  /**
+   * Returns the default master space to physical space mapping basis
+   * functions to be used on newly added elements.
+   */
+  ElemMappingType default_mapping_type () const {
+    return _default_mapping_type;
+  }
+
+  /**
+   * Set the default master space to physical space mapping basis
+   * functions to be used on newly added elements.
+   */
+  void set_default_mapping_type (const ElemMappingType type) {
+    _default_mapping_type = type;
+  }
+
+  /**
+   * Returns any default data value used by the master space to
+   * physical space mapping.
+   */
+  unsigned char default_mapping_data () const {
+    return _default_mapping_data;
+  }
+
+  /**
+   * Set the default master space to physical space mapping basis
+   * functions to be used on newly added elements.
+   */
+  void set_default_mapping_data (const unsigned char data) {
+    _default_mapping_data = data;
+  }
 
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
@@ -1558,6 +1591,19 @@ protected:
    * result in GMV.
    */
   unsigned int _n_parts;
+
+  /**
+   * The default mapping type (typically Lagrange) between master and
+   * physical space to assign to newly added elements.
+   */
+  ElemMappingType _default_mapping_type;
+
+  /**
+   * The default mapping data (unused with Lagrange, used for nodal
+   * weight lookup index with rational bases) to assign to newly added
+   * elements.
+   */
+  unsigned char _default_mapping_data;
 
   /**
    * Flag indicating if the mesh has been prepared for use.

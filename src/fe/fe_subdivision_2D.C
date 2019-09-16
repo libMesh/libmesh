@@ -728,10 +728,13 @@ template <>
 Real FE<2,SUBDIVISION>::shape(const Elem * elem,
                               const Order order,
                               const unsigned int i,
-                              const Point & p)
+                              const Point & p,
+                              const bool add_p_level)
 {
   libmesh_assert(elem);
-  return FE<2,SUBDIVISION>::shape(elem->type(), order, i, p);
+  const Order totalorder =
+    static_cast<Order>(order+add_p_level*elem->p_level());
+  return FE<2,SUBDIVISION>::shape(elem->type(), totalorder, i, p);
 }
 
 
@@ -768,10 +771,13 @@ Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
-                                    const Point & p)
+                                    const Point & p,
+                                    const bool add_p_level)
 {
   libmesh_assert(elem);
-  return FE<2,SUBDIVISION>::shape_deriv(elem->type(), order, i, j, p);
+  const Order totalorder =
+    static_cast<Order>(order+add_p_level*elem->p_level());
+  return FE<2,SUBDIVISION>::shape_deriv(elem->type(), totalorder, i, j, p);
 }
 
 
@@ -809,10 +815,13 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
-                                           const Point & p)
+                                           const Point & p,
+                                           const bool add_p_level)
 {
   libmesh_assert(elem);
-  return FE<2,SUBDIVISION>::shape_second_deriv(elem->type(), order, i, j, p);
+  const Order totalorder =
+    static_cast<Order>(order+add_p_level*elem->p_level());
+  return FE<2,SUBDIVISION>::shape_second_deriv(elem->type(), totalorder, i, j, p);
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES

@@ -48,7 +48,8 @@ template <>
 Real FE<3,BERNSTEIN>::shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
-                            const Point & p)
+                            const Point & p,
+                            const bool add_p_level)
 {
 
 #if LIBMESH_DIM == 3
@@ -56,7 +57,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (totalorder)
     {
@@ -1396,14 +1398,16 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
                                   const Order order,
                                   const unsigned int i,
                                   const unsigned int j,
-                                  const Point & p)
+                                  const Point & p,
+                                  const bool add_p_level)
 {
 
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   libmesh_assert_less (j, 3);
 
@@ -2987,7 +2991,8 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem *,
                                          const Order,
                                          const unsigned int,
                                          const unsigned int,
-                                         const Point &)
+                                         const Point &,
+                                         const bool)
 {
   static bool warning_given = false;
 

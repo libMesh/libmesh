@@ -25,6 +25,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
@@ -60,68 +61,29 @@ namespace libMesh
     libmesh_error_msg("ERROR: This method makes no sense for low-D elements!"); \
   }
 
-
 // 0D error instantiations
-REINIT_ERROR(0, CLOUGH, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D CLOUGH elements!");      }
-REINIT_ERROR(0, CLOUGH, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D CLOUGH elements!"); }
-SIDEMAP_ERROR(0, CLOUGH, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D CLOUGH elements!"); }
+#define ERRORS_IN_0D(_type) \
+REINIT_ERROR(0, _type, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D " #_type " elements!"); } \
+REINIT_ERROR(0, _type, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D " #_type " elements!"); } \
+SIDEMAP_ERROR(0, _type, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D " #_type " elements!"); }
 
-REINIT_ERROR(0, HERMITE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D HERMITE elements!"); }
-REINIT_ERROR(0, HERMITE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D HERMITE elements!"); }
-SIDEMAP_ERROR(0, HERMITE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D HERMITE elements!"); }
-
-REINIT_ERROR(0, HIERARCHIC, reinit)       { libmesh_error_msg("ERROR: Cannot reinit 0D HIERARCHIC elements!"); }
-REINIT_ERROR(0, HIERARCHIC, edge_reinit)  { libmesh_error_msg("ERROR: Cannot edge_reinit 0D HIERARCHIC elements!"); }
-SIDEMAP_ERROR(0, HIERARCHIC, side_map)    { libmesh_error_msg("ERROR: Cannot side_map 0D HIERARCHIC elements!"); }
-
-REINIT_ERROR(0, L2_HIERARCHIC, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D L2_HIERARCHIC elements!"); }
-REINIT_ERROR(0, L2_HIERARCHIC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D L2_HIERARCHIC elements!"); }
-SIDEMAP_ERROR(0, L2_HIERARCHIC, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D L2_HIERARCHIC elements!"); }
-
-REINIT_ERROR(0, LAGRANGE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D LAGRANGE elements!"); }
-REINIT_ERROR(0, LAGRANGE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D LAGRANGE elements!"); }
-SIDEMAP_ERROR(0, LAGRANGE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map LAGRANGE elements!"); }
-
-REINIT_ERROR(0, LAGRANGE_VEC, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D LAGRANGE_VEC elements!"); }
-REINIT_ERROR(0, LAGRANGE_VEC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D LAGRANGE_VEC elements!"); }
-SIDEMAP_ERROR(0, LAGRANGE_VEC, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D LAGRANGE_VEC elements!"); }
-
-REINIT_ERROR(0, L2_LAGRANGE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D L2_LAGRANGE elements!"); }
-REINIT_ERROR(0, L2_LAGRANGE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D L2_LAGRANGE elements!"); }
-SIDEMAP_ERROR(0, L2_LAGRANGE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D L2_LAGRANGE elements!"); }
-
-REINIT_ERROR(0, MONOMIAL, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D MONOMIAL elements!"); }
-REINIT_ERROR(0, MONOMIAL, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D MONOMIAL elements!"); }
-SIDEMAP_ERROR(0, MONOMIAL, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D MONOMIAL elements!"); }
-
-REINIT_ERROR(0, MONOMIAL_VEC, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D MONOMIAL_VEC elements!"); }
-REINIT_ERROR(0, MONOMIAL_VEC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D MONOMIAL_VEC elements!"); }
-SIDEMAP_ERROR(0, MONOMIAL_VEC, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D MONOMIAL_VEC elements!"); }
-
-REINIT_ERROR(0, SCALAR, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D SCALAR elements!"); }
-REINIT_ERROR(0, SCALAR, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D SCALAR elements!"); }
-SIDEMAP_ERROR(0, SCALAR, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D SCALAR elements!"); }
-
-REINIT_ERROR(0, XYZ, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D XYZ elements!"); }
-REINIT_ERROR(0, XYZ, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D XYZ elements!"); }
-SIDEMAP_ERROR(0, XYZ, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D XYZ elements!"); }
-
-REINIT_ERROR(0, NEDELEC_ONE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D NEDELEC_ONE elements!"); }
-REINIT_ERROR(0, NEDELEC_ONE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D NEDELEC_ONE elements!"); }
-SIDEMAP_ERROR(0, NEDELEC_ONE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D NEDELEC_ONE elements!"); }
+ERRORS_IN_0D(CLOUGH)
+ERRORS_IN_0D(HERMITE)
+ERRORS_IN_0D(HIERARCHIC)
+ERRORS_IN_0D(L2_HIERARCHIC)
+ERRORS_IN_0D(LAGRANGE)
+ERRORS_IN_0D(L2_LAGRANGE)
+ERRORS_IN_0D(LAGRANGE_VEC)
+ERRORS_IN_0D(MONOMIAL)
+ERRORS_IN_0D(MONOMIAL_VEC)
+ERRORS_IN_0D(NEDELEC_ONE)
+ERRORS_IN_0D(SCALAR)
+ERRORS_IN_0D(XYZ)
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-REINIT_ERROR(0, BERNSTEIN, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D BERNSTEIN elements!"); }
-REINIT_ERROR(0, BERNSTEIN, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D BERNSTEIN elements!"); }
-SIDEMAP_ERROR(0, BERNSTEIN, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D BERNSTEIN elements!"); }
-
-REINIT_ERROR(0, SZABAB, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D SZABAB elements!"); }
-REINIT_ERROR(0, SZABAB, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D SZABAB elements!"); }
-SIDEMAP_ERROR(0, SZABAB, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D SZABAB elements!"); }
-
-REINIT_ERROR(0, RATIONAL_BERNSTEIN, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D RATIONAL_BERNSTEIN elements!"); }
-REINIT_ERROR(0, RATIONAL_BERNSTEIN, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D RATIONAL_BERNSTEIN elements!"); }
-SIDEMAP_ERROR(0, RATIONAL_BERNSTEIN, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D RATIONAL_BERNSTEIN elements!"); }
+ERRORS_IN_0D(BERNSTEIN)
+ERRORS_IN_0D(SZABAB)
+ERRORS_IN_0D(RATIONAL_BERNSTEIN)
 #endif
 
 // 1D error instantiations
@@ -429,15 +391,16 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
 
   // The element type and order to use in
   // the map
+  const FEFamily mapping_family = FEMap::map_fe_type(*side);
   const Order    mapping_order     (side->default_order());
   const ElemType mapping_elem_type (side->type());
+  const FEType map_fe_type(mapping_order, mapping_family);
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
   const unsigned int n_mapping_shape_functions =
-    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-                                         mapping_order);
+    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -467,6 +430,15 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
 #endif
     }
 
+  FEInterface::shape_ptr shape_ptr =
+    FEInterface::shape_function(Dim-1, map_fe_type);
+
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(Dim-1, map_fe_type);
+
+  FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
+    FEInterface::shape_second_deriv_function(Dim-1, map_fe_type);
+
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
       // Allocate space to store the values of the shape functions
@@ -495,20 +467,20 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
 #endif
         }
 
-      // Compute the value of shape function i, and its first and
-      // second derivatives at quadrature point p
-      // (Lagrange shape functions are used for the mapping)
+
+      // Compute the value of mapping shape function i, and its first
+      // and second derivatives at quadrature point p
       for (unsigned int p=0; p<n_qp; p++)
         {
           if (calculate_xyz)
-            this->psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+            this->psi_map[i][p]            = shape_ptr             (side, mapping_order, i,    qp[p], false);
           if (Dim > 1)
             {
               if (calculate_dxyz)
-                this->dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+                this->dpsidxi_map[i][p]    = shape_deriv_ptr       (side, mapping_order, i, 0, qp[p], false);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (calculate_d2xyz)
-                this->d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+                this->d2psidxi2_map[i][p]  = shape_second_deriv_ptr(side, mapping_order, i, 0, qp[p], false);
 #endif
             }
           // libMesh::out << "this->d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
@@ -519,12 +491,12 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
           if (Dim == 3)
             {
               if (calculate_dxyz)
-                this->dpsideta_map[i][p]     = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 1, qp[p]);
+                this->dpsideta_map[i][p]       = shape_deriv_ptr       (side, mapping_order, i, 1, qp[p], false);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (calculate_d2xyz)
                 {
-                  this->d2psidxideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 1, qp[p]);
-                  this->d2psideta2_map[i][p]   = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 2, qp[p]);
+                  this->d2psidxideta_map[i][p] = shape_second_deriv_ptr(side, mapping_order, i, 1, qp[p], false);
+                  this->d2psideta2_map[i][p]   = shape_second_deriv_ptr(side, mapping_order, i, 2, qp[p], false);
                 }
 #endif
             }
@@ -546,15 +518,16 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
 
   // The element type and order to use in
   // the map
+  const FEFamily mapping_family = FEMap::map_fe_type(*edge);
   const Order    mapping_order     (edge->default_order());
   const ElemType mapping_elem_type (edge->type());
+  const FEType map_fe_type(mapping_order, mapping_family);
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
   const unsigned int n_mapping_shape_functions =
-    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-                                         mapping_order);
+    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -566,6 +539,15 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
   if (calculate_d2xyz)
     this->d2psidxi2_map.resize  (n_mapping_shape_functions);
 #endif
+
+  FEInterface::shape_ptr shape_ptr =
+    FEInterface::shape_function(1, map_fe_type);
+
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(1, map_fe_type);
+
+  FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
+    FEInterface::shape_second_deriv_function(1, map_fe_type);
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
@@ -580,18 +562,17 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
         this->d2psidxi2_map[i].resize  (n_qp);
 #endif
 
-      // Compute the value of shape function i, and its first and
-      // second derivatives at quadrature point p
-      // (Lagrange shape functions are used for the mapping)
+      // Compute the value of mapping shape function i, and its first
+      // and second derivatives at quadrature point p
       for (unsigned int p=0; p<n_qp; p++)
         {
           if (calculate_xyz)
-            this->psi_map[i][p]        = FE<1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+            this->psi_map[i][p]        = shape_ptr             (edge, mapping_order, i,    qp[p], false);
           if (calculate_dxyz)
-            this->dpsidxi_map[i][p]    = FE<1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+            this->dpsidxi_map[i][p]    = shape_deriv_ptr       (edge, mapping_order, i, 0, qp[p], false);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
-            this->d2psidxi2_map[i][p]  = FE<1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+            this->d2psidxi2_map[i][p]  = shape_second_deriv_ptr(edge, mapping_order, i, 0, qp[p], false);
 #endif
         }
     }
@@ -611,6 +592,13 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
+
+  const FEFamily mapping_family = FEMap::map_fe_type(*side);
+  const Order    mapping_order     (side->default_order());
+  const FEType map_fe_type(mapping_order, mapping_family);
+  const ElemType mapping_elem_type (side->type());
+  const unsigned int n_mapping_shape_functions =
+    FEInterface::n_shape_functions(dim, map_fe_type, mapping_elem_type);
 
   switch (dim)
     {
@@ -717,10 +705,6 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
               this->d2xyzdxi2_map[p].zero();
 #endif
           }
-
-        const unsigned int n_mapping_shape_functions =
-          FE<2,LAGRANGE>::n_shape_functions (side->type(),
-                                             side->default_order());
 
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<n_mapping_shape_functions; i++) // sum over the nodes
@@ -859,10 +843,6 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
               }
 #endif
           }
-
-        const unsigned int n_mapping_shape_functions =
-          FE<3,LAGRANGE>::n_shape_functions (side->type(),
-                                             side->default_order());
 
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<n_mapping_shape_functions; i++) // sum over the nodes
@@ -1083,138 +1063,45 @@ template void FEMap::init_edge_shape_functions<3>(const std::vector<Point> &, co
 
 //--------------------------------------------------------------
 // Explicit FE instantiations
-template void FE<1,LAGRANGE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,LAGRANGE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,LAGRANGE_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,LAGRANGE_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,L2_LAGRANGE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,L2_LAGRANGE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,HIERARCHIC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,HIERARCHIC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,L2_HIERARCHIC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,L2_HIERARCHIC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,CLOUGH>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,CLOUGH>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,HERMITE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,HERMITE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,MONOMIAL>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,MONOMIAL>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,MONOMIAL_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,MONOMIAL_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,SCALAR>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,SCALAR>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-template void FE<1,BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,SZABAB>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,SZABAB>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<1,RATIONAL_BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,RATIONAL_BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-#endif
-template void FE<1,XYZ>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<1,XYZ>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+#define REINIT_AND_SIDE_MAPS(_type) \
+template void FE<1,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template void FE<1,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template void FE<2,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template void FE<2,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template void FE<2,_type>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template void FE<3,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template void FE<3,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template void FE<3,_type>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const)
 
-template void FE<2,LAGRANGE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,LAGRANGE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,LAGRANGE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,LAGRANGE_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,LAGRANGE_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,LAGRANGE_VEC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,L2_LAGRANGE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,L2_LAGRANGE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,L2_LAGRANGE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,HIERARCHIC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,HIERARCHIC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,HIERARCHIC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,L2_HIERARCHIC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,L2_HIERARCHIC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,L2_HIERARCHIC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,CLOUGH>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,CLOUGH>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,CLOUGH>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,HERMITE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,HERMITE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,HERMITE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,MONOMIAL>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,MONOMIAL>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,MONOMIAL>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,MONOMIAL_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,MONOMIAL_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,MONOMIAL_VEC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,SCALAR>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,SCALAR>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,SCALAR>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+REINIT_AND_SIDE_MAPS(LAGRANGE);
+REINIT_AND_SIDE_MAPS(LAGRANGE_VEC);
+REINIT_AND_SIDE_MAPS(L2_LAGRANGE);
+REINIT_AND_SIDE_MAPS(HIERARCHIC);
+REINIT_AND_SIDE_MAPS(L2_HIERARCHIC);
+REINIT_AND_SIDE_MAPS(CLOUGH);
+REINIT_AND_SIDE_MAPS(HERMITE);
+REINIT_AND_SIDE_MAPS(MONOMIAL);
+REINIT_AND_SIDE_MAPS(MONOMIAL_VEC);
+REINIT_AND_SIDE_MAPS(SCALAR);
+REINIT_AND_SIDE_MAPS(XYZ);
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-template void FE<2,BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,SZABAB>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,SZABAB>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,SZABAB>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,RATIONAL_BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,RATIONAL_BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,RATIONAL_BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+REINIT_AND_SIDE_MAPS(BERNSTEIN);
+REINIT_AND_SIDE_MAPS(SZABAB);
+REINIT_AND_SIDE_MAPS(RATIONAL_BERNSTEIN);
 #endif
+
 template void FE<2,SUBDIVISION>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,XYZ>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,XYZ>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,XYZ>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<2,NEDELEC_ONE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<2,NEDELEC_ONE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<2,NEDELEC_ONE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 
-// Intel 9.1 complained it needed this in devel mode.
-//template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);
-
-template void FE<3,LAGRANGE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,LAGRANGE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,LAGRANGE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,LAGRANGE_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,LAGRANGE_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,LAGRANGE_VEC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,L2_LAGRANGE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,L2_LAGRANGE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,L2_LAGRANGE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,HIERARCHIC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,HIERARCHIC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,HIERARCHIC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,L2_HIERARCHIC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,L2_HIERARCHIC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,L2_HIERARCHIC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,CLOUGH>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,CLOUGH>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,CLOUGH>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,HERMITE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,HERMITE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,HERMITE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,MONOMIAL>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,MONOMIAL>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,MONOMIAL>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,MONOMIAL_VEC>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,MONOMIAL_VEC>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,MONOMIAL_VEC>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,SCALAR>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,SCALAR>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,SCALAR>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-template void FE<3,BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,SZABAB>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,SZABAB>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,SZABAB>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,RATIONAL_BERNSTEIN>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,RATIONAL_BERNSTEIN>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,RATIONAL_BERNSTEIN>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-#endif
-template void FE<3,XYZ>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,XYZ>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,XYZ>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<3,NEDELEC_ONE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template void FE<3,NEDELEC_ONE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template void FE<3,NEDELEC_ONE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 
 // Intel 9.1 complained it needed this in devel mode.
+//template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);
 //template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);
 
 } // namespace libMesh

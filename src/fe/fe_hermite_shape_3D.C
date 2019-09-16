@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/number_lookups.h"
 
 namespace
@@ -36,14 +37,20 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
 #endif
                            )
 {
-
+  const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
+
+  const FEType map_fe_type(mapping_order, mapping_family);
+
   const int n_mapping_shape_functions =
-    FE<3,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+    FEInterface::n_shape_functions (3, map_fe_type,
+                                    mapping_elem_type);
 
   static const Point dofpt[2] = {Point(-1,-1,-1), Point(1,1,1)};
+
+  FEInterface::shape_deriv_ptr shape_deriv_ptr =
+    FEInterface::shape_deriv_function(3, map_fe_type);
 
   for (int p = 0; p != 2; ++p)
     {
@@ -60,12 +67,12 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
 #endif
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<3,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          const Real ddeta = FE<3,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
-          const Real ddzeta = FE<3,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 2, dofpt[p]);
+          const Real ddxi = shape_deriv_ptr
+            (elem, mapping_order, i, 0, dofpt[p], false);
+          const Real ddeta = shape_deriv_ptr
+            (elem, mapping_order, i, 1, dofpt[p], false);
+          const Real ddzeta = shape_deriv_ptr
+            (elem, mapping_order, i, 2, dofpt[p], false);
 
           // dxdeta, dxdzeta, dydxi, dydzeta, dzdxi, dzdeta should all
           // be 0!
@@ -388,7 +395,8 @@ template <>
 Real FE<3,HERMITE>::shape(const Elem * elem,
                           const Order order,
                           const unsigned int i,
-                          const Point & p)
+                          const Point & p,
+                          const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -407,7 +415,8 @@ Real FE<3,HERMITE>::shape(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (totalorder)
     {
@@ -461,7 +470,8 @@ Real FE<3,HERMITE>::shape_deriv(const Elem * elem,
                                 const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
-                                const Point & p)
+                                const Point & p,
+                                const bool add_p_level)
 {
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1 || j == 2);
@@ -481,7 +491,8 @@ Real FE<3,HERMITE>::shape_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (totalorder)
     {
@@ -555,7 +566,8 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
                                        const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
-                                       const Point & p)
+                                       const Point & p,
+                                       const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -574,7 +586,8 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (totalorder)
     {

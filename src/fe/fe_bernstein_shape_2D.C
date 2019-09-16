@@ -46,13 +46,15 @@ template <>
 Real FE<2,BERNSTEIN>::shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
-                            const Point & p)
+                            const Point & p,
+                            const bool add_p_level)
 {
   libmesh_assert(elem);
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -400,13 +402,15 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
                                   const Order order,
                                   const unsigned int i,
                                   const unsigned int j,
-                                  const Point & p)
+                                  const Point & p,
+                                  const bool add_p_level)
 {
   libmesh_assert(elem);
 
   const ElemType type = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
 
   switch (type)
     {
@@ -585,7 +589,8 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem *,
                                          const Order,
                                          const unsigned int,
                                          const unsigned int,
-                                         const Point &)
+                                         const Point &,
+                                         const bool)
 {
   static bool warning_given = false;
 

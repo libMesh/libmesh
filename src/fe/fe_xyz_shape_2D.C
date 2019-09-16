@@ -44,7 +44,8 @@ template <>
 Real FE<2,XYZ>::shape(const Elem * elem,
                       const Order libmesh_dbg_var(order),
                       const unsigned int i,
-                      const Point & point_in)
+                      const Point & point_in,
+                      const bool libmesh_dbg_var(add_p_level))
 {
 #if LIBMESH_DIM > 1
 
@@ -71,7 +72,7 @@ Real FE<2,XYZ>::shape(const Elem * elem,
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
   // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder = order + add_p_level * elem->p_level();
 #endif
   libmesh_assert_less (i, (totalorder+1)*(totalorder+2)/2);
 
@@ -166,7 +167,8 @@ Real FE<2,XYZ>::shape_deriv(const Elem * elem,
                             const Order libmesh_dbg_var(order),
                             const unsigned int i,
                             const unsigned int j,
-                            const Point & point_in)
+                            const Point & point_in,
+                            const bool libmesh_dbg_var(add_p_level))
 {
 #if LIBMESH_DIM > 1
 
@@ -195,7 +197,7 @@ Real FE<2,XYZ>::shape_deriv(const Elem * elem,
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
   // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder = order + add_p_level * elem->p_level();
 #endif
   libmesh_assert_less (i, (totalorder+1)*(totalorder+2)/2);
 
@@ -371,7 +373,8 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem * elem,
                                    const Order libmesh_dbg_var(order),
                                    const unsigned int i,
                                    const unsigned int j,
-                                   const Point & point_in)
+                                   const Point & point_in,
+                                   const bool libmesh_dbg_var(add_p_level))
 {
 #if LIBMESH_DIM > 1
 
@@ -402,7 +405,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem * elem,
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
   // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = order + elem->p_level();
+  const unsigned int totalorder = order + add_p_level * elem->p_level();
 #endif
   libmesh_assert_less (i, (totalorder+1)*(totalorder+2)/2);
 

@@ -137,13 +137,20 @@ public:
     const unsigned int ny = _dim > 1;
     const unsigned int nz = _dim > 2;
 
+    unsigned char weight_index = 0;
+
     if (family == RATIONAL_BERNSTEIN)
       {
-#ifndef NDEBUG
-        unsigned int weight_index =
-#endif
-          _mesh->add_node_datum<Real>("rational_weight");
-        libmesh_assert_equal_to(weight_index, 0);
+        // Make sure we can handle non-zero weight indices
+        _mesh->add_node_integer("buffer integer");
+        weight_index = cast_int<unsigned char>
+          (_mesh->add_node_datum<Real>("rational_weight"));
+        libmesh_assert_not_equal_to(weight_index, 0);
+
+        // Set mapping data but not type, since here we're testing
+        // rational basis functions in the FE space but testing then
+        // with Lagrange bases for the mapping space.
+        _mesh->set_default_mapping_data(weight_index);
       }
 
     MeshTools::Generation::build_cube (*_mesh,
@@ -168,15 +175,15 @@ public:
             const unsigned int nvef = std::min(nve + n_faces, nn);
 
             for (unsigned int i = 0; i != nv; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(0, 1.);
+              elem->node_ref(i).set_extra_datum<Real>(weight_index, 1.);
             for (unsigned int i = nv; i != nve; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(0, rational_w);
+              elem->node_ref(i).set_extra_datum<Real>(weight_index, rational_w);
             const Real w2 = rational_w * rational_w;
             for (unsigned int i = nve; i != nvef; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(0, w2);
+              elem->node_ref(i).set_extra_datum<Real>(weight_index, w2);
             const Real w3 = rational_w * w2;
             for (unsigned int i = nvef; i != nn; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(0, w3);
+              elem->node_ref(i).set_extra_datum<Real>(weight_index, w3);
           }
       }
 

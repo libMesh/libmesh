@@ -125,12 +125,15 @@ public:
    * element type, and order directly.  This allows the method to
    * be static.
    *
-   * On a p-refined element, \p o should be the base order of the element.
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
    */
   static OutputShape shape(const Elem * elem,
                            const Order o,
                            const unsigned int i,
-                           const Point & p);
+                           const Point & p,
+                           const bool add_p_level = true);
 
   /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -149,13 +152,16 @@ public:
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function.  You must specify element type, and order directly.
    *
-   * On a p-refined element, \p o should be the base order of the element.
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
    */
   static OutputShape shape_deriv(const Elem * elem,
                                  const Order o,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p);
+                                 const Point & p,
+                                 const bool add_p_level = true);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -202,13 +208,16 @@ public:
    * All other element types return an error when asked for second
    * derivatives.
    *
-   * On a p-refined element, \p o should be the base order of the element.
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
    */
   static OutputShape shape_second_deriv(const Elem * elem,
                                         const Order o,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point & p);
+                                        const Point & p,
+                                        const bool add_p_level = true);
 
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -546,14 +555,16 @@ template <>
 Real FE<2,SUBDIVISION>::shape(const Elem * elem,
                               const Order order,
                               const unsigned int i,
-                              const Point & p);
+                              const Point & p,
+                              const bool add_p_level);
 
 template <>
 Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
-                                    const Point & p);
+                                    const Point & p,
+                                    const bool add_p_level);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
@@ -561,7 +572,8 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
-                                           const Point & p);
+                                           const Point & p,
+                                           const bool add_p_level);
 
 #endif
 
