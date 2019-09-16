@@ -113,7 +113,7 @@ public:
     delete _mesh;
   }
 
-  void testMap()
+  void testContainsPoint()
   {
     // Handle the "more processors than elements" case
     if (!_elem)
@@ -125,18 +125,25 @@ public:
     // is not in the Elem. When exceptions are not enabled, this test
     // simply aborts.
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
-    for (unsigned int i=0; i != _nx+1; ++i)
-      for (unsigned int j=0; j != _ny+1; ++j)
-        for (unsigned int k=0; k != _nz+1; ++k)
-          {
-            Real r = (Real(i)/_nx) + 0.5,
-                 theta = (Real(j)/_nx)*pi/2,
-                 z = (Real(k)/_nx);
-            Real x = -.5 + r * std::cos(theta),
-                 y = r * std::sin(theta);
-            Point p(x,y,z);
-            CPPUNIT_ASSERT(_elem->contains_point(p));
-          }
+    for (unsigned int j=0; j != _ny+1; ++j)
+      for (unsigned int k=0; k != _nz+1; ++k)
+        {
+          for (int i=-1; i != int(_nx+2); ++i)
+            {
+              Real r = (Real(i)/_nx) + 0.5,
+                   theta = (Real(j)/_nx)*pi/2,
+                   z = (Real(k)/_nx);
+              Real x = -.5 + r * std::cos(theta),
+                   y = r * std::sin(theta);
+              Point p(x,y,z);
+              // Test for false negatives
+              if (i >= 0 && i <= int(_nx))
+                CPPUNIT_ASSERT(_elem->contains_point(p));
+              // Also test for false positives
+              else
+                CPPUNIT_ASSERT(!_elem->contains_point(p));
+            }
+        }
 #endif
   }
 };
@@ -146,7 +153,7 @@ public:
   class RationalMapTest_##elemtype : public RationalMapTest<elemtype> { \
   public:                                                               \
   CPPUNIT_TEST_SUITE( RationalMapTest_##elemtype );                     \
-  CPPUNIT_TEST( testMap );                                              \
+  CPPUNIT_TEST( testContainsPoint );                                    \
   CPPUNIT_TEST_SUITE_END();                                             \
   };                                                                    \
                                                                         \
