@@ -1373,7 +1373,9 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
     default:
       libmesh_error_msg("Invalid totalorder = " << totalorder);
     }
-
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, p, add_p_level);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -2960,6 +2962,9 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
       libmesh_error_msg("Invalid totalorder = " << totalorder);
     }
 
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, j, p, add_p_level);
+  libmesh_not_implemented();
 #endif
 }
 

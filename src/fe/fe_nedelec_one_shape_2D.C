@@ -156,7 +156,8 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
     }
 #else // LIBMESH_DIM > 1
-  return RealGradient();
+  libmesh_ignore(elem, order, i, p, add_p_level);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -321,7 +322,8 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
     }
 #else // LIBMESH_DIM > 1
-  return RealGradient();
+  libmesh_ignore(elem, order, i, j, add_p_level);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -395,7 +397,8 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
     } // end switch (order)
 
 #else // LIBMESH_DIM > 1
-  return RealGradient();
+  libmesh_ignore(elem, order, i, j, add_p_level);
+  libmesh_not_implemented();
 #endif
 }
 

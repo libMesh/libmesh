@@ -745,8 +745,9 @@ Real fe_lagrange_3D_shape(const ElemType type,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
     }
 
-#else
-  return 0.;
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(type, order, i, p);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -2085,8 +2086,9 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
     }
 
-#else
-  return 0.;
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(type, order, i, j, p);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -3802,8 +3804,9 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
     }
 
-#else
-  return 0.;
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(type, order, i, j, p);
+  libmesh_not_implemented();
 #endif
 }
 

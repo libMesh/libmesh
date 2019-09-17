@@ -704,11 +704,11 @@ void MeshBase::cache_elem_dims()
   // If the mesh is x-aligned or x-y planar, we will end up checking
   // every node's coordinates and not breaking out of the loop
   // early...
+#if LIBMESH_DIM > 1
   if (_spatial_dimension < 3)
     {
       for (const auto & node : this->node_ptr_range())
         {
-#if LIBMESH_DIM > 1
           // Note: the exact floating point comparison is intentional,
           // we don't want to get tripped up by tolerances.
           if ((*node)(1) != 0.)
@@ -721,7 +721,6 @@ void MeshBase::cache_elem_dims()
               break;
 #endif
             }
-#endif
 
 #if LIBMESH_DIM > 2
           if ((*node)(2) != 0.)
@@ -734,6 +733,7 @@ void MeshBase::cache_elem_dims()
 #endif
         }
     }
+#endif // LIBMESH_DIM > 1
 }
 
 void MeshBase::detect_interior_parents()

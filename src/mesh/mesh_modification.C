@@ -226,6 +226,7 @@ void MeshTools::Modification::rotate (MeshBase & mesh,
                     ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
     }
 #else
+  libmesh_ignore(mesh, phi, theta, psi);
   libmesh_error_msg("MeshTools::Modification::rotate() requires libMesh to be compiled with LIBMESH_DIM==3");
 #endif
 }

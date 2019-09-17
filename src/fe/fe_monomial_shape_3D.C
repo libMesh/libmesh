@@ -175,8 +175,10 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
       return val;
     }
 
-#else
-  return 0.;
+#else // LIBMESH_DIM != 3
+  libmesh_assert(order);
+  libmesh_ignore(i, p);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -628,8 +630,10 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
       libmesh_error_msg("Invalid shape function derivative j = " << j);
     }
 
-#else
-  return 0.;
+#else // LIBMESH_DIM != 3
+  libmesh_assert(order);
+  libmesh_ignore(i, j, p);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -1293,8 +1297,10 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
       libmesh_error_msg("Invalid j = " << j);
     }
 
-#else
-  return 0.;
+#else // LIBMESH_DIM != 3
+  libmesh_assert(order);
+  libmesh_ignore(i, j, p);
+  libmesh_not_implemented();
 #endif
 }
 

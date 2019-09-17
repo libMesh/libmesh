@@ -415,6 +415,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                           Fx(i) += JxW[qp]*grad_u_h(0)*psi[i];
                         }
                     }
+#if LIBMESH_DIM > 1
                   else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
                     {
                       // Compute the gradient on the current patch element
@@ -433,6 +434,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                           Fy(i) += JxW[qp]*grad_u_h(1)*psi[i];
                         }
                     }
+#endif // LIBMESH_DIM > 1
+#if LIBMESH_DIM > 2
                   else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
                     {
                       // Compute the gradient on the current patch element
@@ -451,6 +454,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                           Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
                         }
                     }
+#endif // LIBMESH_DIM > 2
                   else if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
                            error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
                     {
@@ -701,6 +705,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
                       temperr[0] -= grad_u_h(0);
                     }
+#if LIBMESH_DIM > 1
                   else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
                     {
                       // Compute the gradient at the current sample point
@@ -719,6 +724,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
                       temperr[1] -= grad_u_h(1);
                     }
+#endif // LIBMESH_DIM > 1
+#if LIBMESH_DIM > 2
                   else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
                     {
                       // Compute the gradient at the current sample point
@@ -737,6 +744,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
                       temperr[2] -= grad_u_h(2);
                     }
+#endif // LIBMESH_DIM > 2
                   else if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
                            error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
                     {
