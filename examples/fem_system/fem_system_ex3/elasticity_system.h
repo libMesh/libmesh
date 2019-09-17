@@ -44,6 +44,7 @@ public:
       _rho(1.0)
   {}
 
+#if LIBMESH_DIM > 2
   // System initialization
   virtual void init_data ();
 
@@ -61,6 +62,7 @@ public:
   // Mass matrix part
   virtual bool mass_residual (bool request_jacobian,
                               DiffContext & context);
+#endif // LIBMESH_DIM > 2
 
 private:
 

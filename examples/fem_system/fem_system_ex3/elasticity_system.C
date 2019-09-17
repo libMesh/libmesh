@@ -27,6 +27,9 @@
 
 using namespace libMesh;
 
+
+#if LIBMESH_DIM > 2
+
 void ElasticitySystem::init_data()
 {
   _u_var = this->add_variable ("Ux", FIRST, LAGRANGE);
@@ -324,6 +327,7 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
   // If the Jacobian was requested, we computed it. Otherwise, we didn't.
   return request_jacobian;
 }
+#endif // LIBMESH_DIM > 2
 
 Real ElasticitySystem::elasticity_tensor(unsigned int i, unsigned int j, unsigned int k, unsigned int l)
 {
