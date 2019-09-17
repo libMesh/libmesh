@@ -16,9 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <fstream>
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/ucd_io.h"
@@ -37,6 +34,10 @@
 # include "gzstream.h" // For reading/writing compressed streams
 # include "libmesh/restore_warnings.h"
 #endif
+
+// C++ includes
+#include <array>
+#include <fstream>
 
 
 namespace libMesh
@@ -153,19 +154,31 @@ void UCDIO::read_implementation (std::istream & in)
   // however.  So, we read in x,y,z for each node and make a point
   // in the proper way based on what dimension we're in
   {
-    Point xyz;
-
     for (unsigned int i=0; i<nNodes; i++)
       {
         libmesh_assert (in.good());
 
+        std::array<Real, 3> xyz;
+
         in >> dummy   // Point number
-           >> xyz(0)  // x-coordinate value
-           >> xyz(1)  // y-coordinate value
-           >> xyz(2); // z-coordinate value
+           >> xyz[0]  // x-coordinate value
+           >> xyz[1]  // y-coordinate value
+           >> xyz[2]; // z-coordinate value
+
+        Point p(xyz[0]);
+#if LIBMESH_DIM > 1
+        p(1) = xyz[1];
+#else
+        libmesh_assert_equal_to(xyz[1], 0);
+#endif
+#if LIBMESH_DIM > 2
+        p(2) = xyz[2];
+#else
+        libmesh_assert_equal_to(xyz[2], 0);
+#endif
 
         // Build the node
-        mesh.add_point (xyz, i);
+        mesh.add_point (p, i);
       }
   }
 
