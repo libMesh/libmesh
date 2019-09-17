@@ -2315,7 +2315,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 
 
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#if defined(LIBMESH_HAVE_TRIANGLE) && LIBMESH_DIM > 1
 
 // Triangulates a 2D rectangular region with or without holes
 void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
@@ -2425,7 +2425,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
 
 } // end build_delaunay_square
 
-#endif // LIBMESH_HAVE_TRIANGLE
+#endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_DIM > 1
 
 
 

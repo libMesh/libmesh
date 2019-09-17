@@ -113,10 +113,14 @@ void MeshTools::Modification::distort (MeshBase & mesh,
                      ((mesh.mesh_dimension() == 3) ? static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX) : 0.));
 
           dir(0) = (dir(0)-.5)*2.;
+#if LIBMESH_DIM > 1
           if (mesh.mesh_dimension() > 1)
             dir(1) = (dir(1)-.5)*2.;
+#endif
+#if LIBMESH_DIM > 2
           if (mesh.mesh_dimension() == 3)
             dir(2) = (dir(2)-.5)*2.;
+#endif
 
           dir = dir.unit();
 
@@ -125,10 +129,14 @@ void MeshTools::Modification::distort (MeshBase & mesh,
             continue;
 
           (*node)(0) += dir(0)*factor*hmin[n];
+#if LIBMESH_DIM > 1
           if (mesh.mesh_dimension() > 1)
             (*node)(1) += dir(1)*factor*hmin[n];
+#endif
+#if LIBMESH_DIM > 2
           if (mesh.mesh_dimension() == 3)
             (*node)(2) += dir(2)*factor*hmin[n];
+#endif
         }
   }
 }
