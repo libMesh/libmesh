@@ -926,9 +926,14 @@ TypeVector<T>::cross(const TypeVector<T2> & p) const
   // |(*this)(0) (*this)(1) (*this)(2)|
   // |   p(0)       p(1)       p(2)   |
 
+#if LIBMESH_DIM == 3
   return TypeVector<TS>( _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
                          -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
                          _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
+#else
+  libmesh_ignore(p);
+  return TypeVector<TS>(0);
+#endif
 }
 
 
