@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_VSMOOTHER
+#if defined(LIBMESH_ENABLE_VSMOOTHER) && LIBMESH_DIM > 1
 
 // Local includes
 #include "libmesh/mesh_smoother_vsmoother.h"
@@ -4146,6 +4146,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
               } // end QUAD case
           } // end _dim==2
 
+#if LIBMESH_DIM > 2
         if (_dim == 3)
           {
             // 3D - tetr and hex
@@ -4305,6 +4306,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
                   } // end for ni
               } // end hex
           } // end dim==3
+#endif // LIBMESH_DIM > 2
       }
 
   // Done with the metric file
@@ -4374,4 +4376,4 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
 } // namespace libMesh
 
-#endif // LIBMESH_ENABLE_VSMOOTHER
+#endif // defined(LIBMESH_ENABLE_VSMOOTHER) && LIBMESH_DIM > 1
