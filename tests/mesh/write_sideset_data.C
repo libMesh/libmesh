@@ -3,6 +3,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
+#include "libmesh/parallel.h" // set_union
 #include "libmesh/string_to_enum.h"
 #include "libmesh/boundary_info.h"
 
@@ -78,6 +79,12 @@ public:
                 vals.insert(std::make_pair(t, val));
               }
           }
+
+        // If we have a distributed mesh, write_sideset_data wants our
+        // ghost data too; we'll just serialize everything here.
+        if (!mesh.is_serial())
+          TestCommWorld->set_union(vals);
+
       } // done constructing bc_vals
 
 #ifdef LIBMESH_HAVE_EXODUS_API
