@@ -397,7 +397,8 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
     } // end switch (order)
 
 #else // LIBMESH_DIM > 1
-  libmesh_ignore(elem, order, i, j, add_p_level);
+  libmesh_assert(true || i || j);
+  libmesh_ignore(elem, order, add_p_level);
   libmesh_not_implemented();
 #endif
 }

@@ -213,7 +213,8 @@ Real FE<3,XYZ>::shape(const Elem * elem,
     }
 
 #else // LIBMESH_DIM != 3
-  libmesh_ignore(elem, order, i, point_in, add_p_level);
+  libmesh_assert(true || order || add_p_level);
+  libmesh_ignore(elem, i, point_in);
   libmesh_not_implemented();
 #endif
 }
@@ -689,7 +690,8 @@ Real FE<3,XYZ>::shape_deriv(const Elem * elem,
     }
 
 #else // LIBMESH_DIM != 3
-  libmesh_ignore(elem, order, i, j, point_in, add_p_level);
+  libmesh_assert(true || order || add_p_level);
+  libmesh_ignore(elem, i, j, point_in);
   libmesh_not_implemented();
 #endif
 }
@@ -1384,7 +1386,8 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
     }
 
 #else // LIBMESH_DIM != 3
-  libmesh_ignore(elem, order, i, j, point_in, add_p_level);
+  libmesh_assert(true || order || add_p_level);
+  libmesh_ignore(elem, i, j, point_in);
   libmesh_not_implemented();
 #endif
 }
