@@ -145,7 +145,11 @@ Number Biharmonic::JR::InitialDensityRod(const Point & p,
   // Initialize with a rod in the middle so that we have a z-homogeneous system to model the 2D disk.
   Point center = parameters.get<Point>("center");
   Real width = parameters.get<Real>("width");
-  Real r = sqrt((p(0)-center(0))*(p(0)-center(0)) + (p(1)-center(1))*(p(1)-center(1)));
+  Point pc = p-center;
+#if LIBMESH_DIM > 2
+  pc(2) = 0;
+#endif
+  Real r = pc.norm();
   return (r < width) ? 1.0 : -0.5;
 }
 
