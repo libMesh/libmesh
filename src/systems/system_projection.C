@@ -1550,6 +1550,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                   Ue(current_dof) = grad(0);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
+#if LIBMESH_DIM > 1
                   if (dim > 1)
                     {
                       // We'll finite difference mixed derivatives
@@ -1573,6 +1574,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
 
+#if LIBMESH_DIM > 2
                       if (dim > 2)
                         {
                           // z derivative
@@ -1635,7 +1637,9 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                         }
+#endif // LIBMESH_DIM > 2
                     }
+#endif // LIBMESH_DIM > 1
                 }
               // Assume that other C_ONE elements have a single nodal
               // value shape function and nodal gradient component

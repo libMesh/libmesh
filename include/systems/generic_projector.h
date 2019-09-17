@@ -1756,6 +1756,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                   // x derivative
                   insert_id(first_id+1, grad(0),
                             vertex.processor_id());
+#if LIBMESH_DIM > 1
                   if (dim > 1)
                     {
                       // We'll finite difference mixed derivatives
@@ -1783,6 +1784,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                         (gxplus(1) - gxminus(1)) / 2. / delta_x,
                         vertex.processor_id());
 
+#if LIBMESH_DIM > 2
                       if (dim > 2)
                         {
                           // z derivative
@@ -1854,7 +1856,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                             (gxzplus - gxzminus) / 2. / delta_x,
                             vertex.processor_id());
                         }
+#endif // LIBMESH_DIM > 2
                     }
+#endif // LIBMESH_DIM > 1
                 }
               else
                 {
