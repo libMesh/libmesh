@@ -341,6 +341,7 @@ void assemble_stokes (EquationSystems & es,
   // the proper system.
   libmesh_assert_equal_to (system_name, "Navier-Stokes");
 
+#if LIBMESH_DIM > 1
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
 
@@ -656,6 +657,9 @@ void assemble_stokes (EquationSystems & es,
       navier_stokes_system.matrix->add_matrix (Ke, dof_indices);
       navier_stokes_system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
+#else
+  libmesh_ignore(es);
+#endif
 }
 
 
