@@ -436,8 +436,10 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(Dim-1, map_fe_type);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
     FEInterface::shape_second_deriv_function(Dim-1, map_fe_type);
+#endif
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
@@ -546,8 +548,10 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(1, map_fe_type);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
     FEInterface::shape_second_deriv_function(1, map_fe_type);
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
