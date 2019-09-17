@@ -680,10 +680,14 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
                           const TypeVector<T2> & vy)
 {
   libmesh_assert_equal_to (LIBMESH_DIM, 2);
+#if LIBMESH_DIM > 2
   _coords[0] = vx(0);
   _coords[1] = vx(1);
   _coords[2] = vy(0);
   _coords[3] = vy(1);
+#else
+  libmesh_ignore(vx, vy);
+#endif
 }
 
 template <typename T>
@@ -693,6 +697,7 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
                           const TypeVector<T2> & vz)
 {
   libmesh_assert_equal_to (LIBMESH_DIM, 3);
+#if LIBMESH_DIM > 2
   _coords[0] = vx(0);
   _coords[1] = vx(1);
   _coords[2] = vx(2);
@@ -702,6 +707,9 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
   _coords[6] = vz(0);
   _coords[7] = vz(1);
   _coords[8] = vz(2);
+#else
+  libmesh_ignore(vx, vy, vz);
+#endif
 }
 
 
