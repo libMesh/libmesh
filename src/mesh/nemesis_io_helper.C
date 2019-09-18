@@ -1880,7 +1880,7 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
 
     // We can't be connecting to more processors than exist outside
     // ourselves
-    libmesh_assert_less (static_cast<unsigned>(this->num_node_cmaps), this->n_processors());
+    libmesh_assert_less (this->num_node_cmaps, this->n_processors());
 
     if (verbose)
       {

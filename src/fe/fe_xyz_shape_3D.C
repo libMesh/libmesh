@@ -77,9 +77,8 @@ Real FE<3,XYZ>::shape(const Elem * elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + add_p_level * elem->p_level();
 #endif
-  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-                       (static_cast<unsigned int>(totalorder)+2)*
-                       (static_cast<unsigned int>(totalorder)+3)/6);
+  libmesh_assert_less (i, (totalorder+1) * (totalorder+2) *
+                       (totalorder+3)/6);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -274,9 +273,8 @@ Real FE<3,XYZ>::shape_deriv(const Elem * elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
 #endif
-  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-                       (static_cast<unsigned int>(totalorder)+2)*
-                       (static_cast<unsigned int>(totalorder)+3)/6);
+  libmesh_assert_less (i, (totalorder+1) * (totalorder+2) *
+                       (totalorder+3)/6);
 
   switch (j)
     {
@@ -758,9 +756,8 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
 #endif
-  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-                       (static_cast<unsigned int>(totalorder)+2)*
-                       (static_cast<unsigned int>(totalorder)+3)/6);
+  libmesh_assert_less (i, (totalorder+1) * (totalorder+2) *
+                       (totalorder+3)/6);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (j)

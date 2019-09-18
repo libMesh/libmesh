@@ -880,7 +880,7 @@ public:
    */
   int get_node_map(int i) const
   {
-    libmesh_assert_less (static_cast<size_t>(i), node_map_size);
+    libmesh_assert_less (i, node_map_size);
     return node_map[i];
   }
 
@@ -896,7 +896,7 @@ public:
    */
   int get_inverse_node_map(int i) const
   {
-    libmesh_assert_less (static_cast<size_t>(i), inverse_node_map_size);
+    libmesh_assert_less (i, inverse_node_map_size);
     return inverse_node_map[i];
   }
 
@@ -916,7 +916,7 @@ public:
    */
   int get_inverse_side_map(int i) const
   {
-    libmesh_assert_less (static_cast<size_t>(i), inverse_side_map_size);
+    libmesh_assert_less (i, inverse_side_map_size);
     return inverse_side_map[i];
   }
 
@@ -926,7 +926,7 @@ public:
    */
   int get_shellface_map(int i) const
   {
-    libmesh_assert_less (static_cast<size_t>(i), shellface_map_size);
+    libmesh_assert_less (i, shellface_map_size);
     return shellface_map[i];
   }
 
@@ -935,7 +935,7 @@ public:
    */
   int get_inverse_shellface_map(int i) const
   {
-    libmesh_assert_less (static_cast<size_t>(i), inverse_shellface_map_size);
+    libmesh_assert_less (i, inverse_shellface_map_size);
     return inverse_shellface_map[i];
   }
 

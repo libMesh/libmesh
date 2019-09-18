@@ -259,7 +259,7 @@ protected:
      */
     inline coord_t kdtree_get_pt(const size_t idx, int dim) const
     {
-      libmesh_assert_less (dim, (int) PLDim);
+      libmesh_assert_less (dim, PLDim);
       libmesh_assert_less (idx, _pts.size());
       libmesh_assert_less (dim, 3);
 
