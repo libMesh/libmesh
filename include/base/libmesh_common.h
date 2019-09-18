@@ -45,6 +45,7 @@
 #endif
 #include <complex>
 #include <typeinfo> // std::bad_cast
+#include <type_traits> // std::decay
 
 
 // Include the MPI definition
