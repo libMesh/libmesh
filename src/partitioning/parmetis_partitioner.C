@@ -379,7 +379,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
                          std::lower_bound(subdomain_bounds.begin(),
                                           subdomain_bounds.end(),
                                           global_index)));
-        libmesh_assert_less (subdomain_id, static_cast<unsigned int>(_pmetis->nparts));
+        libmesh_assert_less (subdomain_id, _pmetis->nparts);
         libmesh_assert_less (local_index, _pmetis->part.size());
 
         _pmetis->part[local_index] = subdomain_id;

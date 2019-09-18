@@ -26,6 +26,7 @@
 #include "libmesh/libmesh.h"
 
 #include "libmesh/boundary_info.h"
+#include "libmesh/bounding_box.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/getpot.h"
@@ -78,51 +79,56 @@ int main(int argc, char ** argv)
   boundary_id_type bcid = 0;
   bcid = cl.next(bcid);
 
-  Point minnormal(-std::numeric_limits<Real>::max(),
-                  -std::numeric_limits<Real>::max(),
-                  -std::numeric_limits<Real>::max());
-  Point maxnormal(std::numeric_limits<Real>::max(),
-                  std::numeric_limits<Real>::max(),
-                  std::numeric_limits<Real>::max());
-  Point minpoint(-std::numeric_limits<Real>::max(),
-                 -std::numeric_limits<Real>::max(),
-                 -std::numeric_limits<Real>::max());
-  Point maxpoint(std::numeric_limits<Real>::max(),
-                 std::numeric_limits<Real>::max(),
-                 std::numeric_limits<Real>::max());
+  Point minpt(-std::numeric_limits<Real>::max());
+#if LIBMESH_DIM > 1
+  minpt(1) = -std::numeric_limits<Real>::max();
+#endif
+#if LIBMESH_DIM > 2
+  minpt(2) = -std::numeric_limits<Real>::max();
+#endif
+  Point maxpt = -minpt;
+
+  BoundingBox normals(minpt, maxpt),
+              points(minpt, maxpt);
 
   if (cl.search("--minnormalx"))
-    minnormal(0) = cl.next(minnormal(0));
-  if (cl.search("--minnormalx"))
-    minnormal(0) = cl.next(minnormal(0));
+    normals.min()(0) = cl.next(normals.min()(0));
   if (cl.search("--maxnormalx"))
-    maxnormal(0) = cl.next(maxnormal(0));
-  if (cl.search("--minnormaly"))
-    minnormal(1) = cl.next(minnormal(1));
-  if (cl.search("--maxnormaly"))
-    maxnormal(1) = cl.next(maxnormal(1));
-  if (cl.search("--minnormalz"))
-    minnormal(2) = cl.next(minnormal(2));
-  if (cl.search("--maxnormalz"))
-    maxnormal(2) = cl.next(maxnormal(2));
+    normals.max()(0) = cl.next(normals.max()(0));
 
   if (cl.search("--minpointx"))
-    minpoint(0) = cl.next(minpoint(0));
+    points.min()(0) = cl.next(points.min()(0));
   if (cl.search("--maxpointx"))
-    maxpoint(0) = cl.next(maxpoint(0));
-  if (cl.search("--minpointy"))
-    minpoint(1) = cl.next(minpoint(1));
-  if (cl.search("--maxpointy"))
-    maxpoint(1) = cl.next(maxpoint(1));
-  if (cl.search("--minpointz"))
-    minpoint(2) = cl.next(minpoint(2));
-  if (cl.search("--maxpointz"))
-    maxpoint(2) = cl.next(maxpoint(2));
+    points.max()(0) = cl.next(points.max()(0));
 
-  libMesh::out << "min point = " << minpoint << std::endl;
-  libMesh::out << "max point = " << maxpoint << std::endl;
-  libMesh::out << "min normal = " << minnormal << std::endl;
-  libMesh::out << "max normal = " << maxnormal << std::endl;
+#if LIBMESH_DIM > 1
+  if (cl.search("--minnormaly"))
+    normals.min()(1) = cl.next(normals.min()(1));
+  if (cl.search("--maxnormaly"))
+    normals.max()(1) = cl.next(normals.max()(1));
+
+  if (cl.search("--minpointy"))
+    points.min()(1) = cl.next(points.min()(1));
+  if (cl.search("--maxpointy"))
+    points.max()(1) = cl.next(points.max()(1));
+#endif
+
+#if LIBMESH_DIM > 2
+  if (cl.search("--minnormalz"))
+    normals.min()(2) = cl.next(normals.min()(2));
+  if (cl.search("--maxnormalz"))
+    normals.max()(2) = cl.next(normals.max()(2));
+
+  if (cl.search("--minpointz"))
+    points.min()(2) = cl.next(points.min()(2));
+  if (cl.search("--maxpointz"))
+    points.max()(2) = cl.next(points.max()(2));
+#endif
+
+  libMesh::out << "min point = " << points.min() << std::endl;
+  libMesh::out << "max point = " << points.max() << std::endl;
+  libMesh::out << "min normal = " << normals.min() << std::endl;
+  libMesh::out << "max normal = " << normals.max() << std::endl;
 
   bool matcholdbcid = false;
   boundary_id_type oldbcid = 0;
@@ -161,12 +167,8 @@ int main(int argc, char ** argv)
           //libMesh::out << "p = " << p << std::endl;
           //libMesh::out << "n = " << n << std::endl;
 
-          if (p(0) > minpoint(0) && p(0) < maxpoint(0) &&
-              p(1) > minpoint(1) && p(1) < maxpoint(1) &&
-              p(2) > minpoint(2) && p(2) < maxpoint(2) &&
-              n(0) > minnormal(0) && n(0) < maxnormal(0) &&
-              n(1) > minnormal(1) && n(1) < maxnormal(1) &&
-              n(2) > minnormal(2) && n(2) < maxnormal(2))
+          if (points.contains_point(p) &&
+              normals.contains_point(n))
             {
               // Get the list of boundary ids for this side
               mesh.get_boundary_info().boundary_ids(elem, s, ids);

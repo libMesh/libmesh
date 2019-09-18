@@ -360,6 +360,10 @@ int main (int argc, char ** argv)
   // Make sure libMesh was compiled for 3D
   libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
 
+  // Make sure libMesh has normal boundary id sizes
+  libmesh_example_requires(sizeof(boundary_id_type) > 1, "boundary_id_size > 1");
+
+#if LIBMESH_BOUNDARY_ID_BYTES > 1
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm());
 
@@ -440,6 +444,7 @@ int main (int argc, char ** argv)
                                             equation_systems);
 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+#endif // #if LIBMESH_BOUNDARY_ID_BYTES > 1
 
   // All done.
   return 0;

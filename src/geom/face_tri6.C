@@ -383,6 +383,9 @@ Real Tri6::volume () const
   if (this->mapping_type() != LAGRANGE_MAP)
     return this->Elem::volume();
 
+  Real vol=0.;
+
+#if LIBMESH_DIM > 1
   // Make copies of our points.  It makes the subsequent calculations a bit
   // shorter and avoids dereferencing the same pointer multiple times.
   Point
@@ -421,10 +424,10 @@ Real Tri6::volume () const
   const static Real wts[N] = {Real(9)/80, w1, w1,     w1,     w2, w2,     w2};
 
   // Approximate the area with quadrature
-  Real vol=0.;
   for (unsigned int q=0; q<N; ++q)
     vol += wts[q] * cross_norm(xi[q]*a1 + eta[q]*b1 + c1,
                                xi[q]*b1 + eta[q]*b2 + c2);
+#endif // LIBMESH_DIM > 1
 
   return vol;
 }

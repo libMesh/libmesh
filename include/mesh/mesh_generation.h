@@ -129,7 +129,7 @@ void build_extrusion (UnstructuredMesh & mesh,
                       RealVectorValue extrusion_vector,
                       QueryElemSubdomainIDBase * elem_subdomain = nullptr);
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#if defined(LIBMESH_HAVE_TRIANGLE) && LIBMESH_DIM > 1
 /**
  * Meshes a rectangular (2D) region (with or without holes) with a
  * Delaunay triangulation.  This function internally calls the
@@ -142,7 +142,7 @@ void build_delaunay_square(UnstructuredMesh & mesh,
                            const Real ymin, const Real ymax,
                            const ElemType type,
                            const std::vector<TriangleInterface::Hole*> * holes=nullptr);
-#endif // #define LIBMESH_HAVE_TRIANGLE
+#endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_DIM > 1
 
 /**
  * Class for receiving the callback during extrusion generation and providing user-defined

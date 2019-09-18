@@ -1039,8 +1039,10 @@ SolverPackage default_solver_package ()
 
 
 //-------------------------------------------------------------------------------
+template unsigned char  command_line_value<unsigned char>  (const std::string &, unsigned char);
 template unsigned short command_line_value<unsigned short> (const std::string &, unsigned short);
 template unsigned int   command_line_value<unsigned int>   (const std::string &, unsigned int);
+template char           command_line_value<char>           (const std::string &, char);
 template short          command_line_value<short>          (const std::string &, short);
 template int            command_line_value<int>            (const std::string &, int);
 template float          command_line_value<float>          (const std::string &, float);
@@ -1048,8 +1050,10 @@ template double         command_line_value<double>         (const std::string &,
 template long double    command_line_value<long double>    (const std::string &, long double);
 template std::string    command_line_value<std::string>    (const std::string &, std::string);
 
+template unsigned char  command_line_value<unsigned char>  (const std::vector<std::string> &, unsigned char);
 template unsigned short command_line_value<unsigned short> (const std::vector<std::string> &, unsigned short);
 template unsigned int   command_line_value<unsigned int>   (const std::vector<std::string> &, unsigned int);
+template char           command_line_value<char>           (const std::vector<std::string> &, char);
 template short          command_line_value<short>          (const std::vector<std::string> &, short);
 template int            command_line_value<int>            (const std::vector<std::string> &, int);
 template float          command_line_value<float>          (const std::vector<std::string> &, float);
@@ -1057,8 +1061,10 @@ template double         command_line_value<double>         (const std::vector<st
 template long double    command_line_value<long double>    (const std::vector<std::string> &, long double);
 template std::string    command_line_value<std::string>    (const std::vector<std::string> &, std::string);
 
+template unsigned char  command_line_next<unsigned char>   (std::string, unsigned char);
 template unsigned short command_line_next<unsigned short>  (std::string, unsigned short);
 template unsigned int   command_line_next<unsigned int>    (std::string, unsigned int);
+template char           command_line_next<char>            (std::string, char);
 template short          command_line_next<short>           (std::string, short);
 template int            command_line_next<int>             (std::string, int);
 template float          command_line_next<float>           (std::string, float);
@@ -1066,8 +1072,10 @@ template double         command_line_next<double>          (std::string, double)
 template long double    command_line_next<long double>     (std::string, long double);
 template std::string    command_line_next<std::string>     (std::string, std::string);
 
+template void           command_line_vector<unsigned char> (const std::string &, std::vector<unsigned char> &);
 template void           command_line_vector<unsigned short>(const std::string &, std::vector<unsigned short> &);
 template void           command_line_vector<unsigned int>  (const std::string &, std::vector<unsigned int> &);
+template void           command_line_vector<char>          (const std::string &, std::vector<char> &);
 template void           command_line_vector<short>         (const std::string &, std::vector<short> &);
 template void           command_line_vector<int>           (const std::string &, std::vector<int> &);
 template void           command_line_vector<float>         (const std::string &, std::vector<float> &);

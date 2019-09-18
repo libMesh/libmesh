@@ -480,12 +480,14 @@ TypeVector<T>::TypeVector (const T & x,
 #if LIBMESH_DIM > 1
   _coords[1] = y;
 #else
+  libmesh_ignore(y);
   libmesh_assert_equal_to (y, 0);
 #endif
 
 #if LIBMESH_DIM > 2
   _coords[2] = z;
 #else
+  libmesh_ignore(z);
   libmesh_assert_equal_to (z, 0);
 #endif
 }
@@ -924,9 +926,14 @@ TypeVector<T>::cross(const TypeVector<T2> & p) const
   // |(*this)(0) (*this)(1) (*this)(2)|
   // |   p(0)       p(1)       p(2)   |
 
+#if LIBMESH_DIM == 3
   return TypeVector<TS>( _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
                          -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
                          _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
+#else
+  libmesh_ignore(p);
+  return TypeVector<TS>(0);
+#endif
 }
 
 
@@ -1106,6 +1113,7 @@ T triple_product(const TypeVector<T> & a,
     a(1)*(b(0)*c(2) - b(2)*c(0)) +
     a(2)*(b(0)*c(1) - b(1)*c(0));
 #else
+  libmesh_ignore(a, b, c);
   return 0;
 #endif
 }

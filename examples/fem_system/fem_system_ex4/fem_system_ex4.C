@@ -312,12 +312,12 @@ int main (int argc, char ** argv)
   exact_sol.attach_exact_value(0, &exact_func);
   exact_sol.compute_error("Heat", "T");
 
-  Number err = exact_sol.l2_error("Heat", "T");
+  Real err = exact_sol.l2_error("Heat", "T");
 
   // Print out the error value
   libMesh::out << "L2-Error is: " << err << std::endl;
 
-  libmesh_assert_less(libmesh_real(err), 2e-3);
+  libmesh_assert_less(err, 2e-3);
 
 #endif // #ifdef LIBMESH_HAVE_FPARSER
 

@@ -42,7 +42,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Partitioner static data
-const dof_id_type Partitioner::communication_blocksize = 1000000;
+const dof_id_type Partitioner::communication_blocksize =
+  dof_id_type(1000000);
 
 
 

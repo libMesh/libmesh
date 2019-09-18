@@ -1243,7 +1243,7 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
         std::distance (const_cast<PetscInt *>(petsc_cols),
                        const_cast<PetscInt *>(p.first));
 
-      libmesh_assert_less (static_cast<PetscInt>(j), ncols);
+      libmesh_assert_less (j, ncols);
       libmesh_assert_equal_to (petsc_cols[j], j_val);
 
       value = static_cast<T> (petsc_row[j]);

@@ -21,7 +21,7 @@
 #define LIBMESH_MESH_SMOOTHER_VSMOOTHER_H
 
 #include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_VSMOOTHER
+#if defined(LIBMESH_ENABLE_VSMOOTHER) && LIBMESH_DIM > 1
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -440,6 +440,6 @@ private:
 
 } // namespace libMesh
 
-#endif // LIBMESH_ENABLE_VSMOOTHER
+#endif // defined(LIBMESH_ENABLE_VSMOOTHER) && LIBMESH_DIM > 1
 
 #endif // LIBMESH_MESH_SMOOTHER_VSMOOTHER_H

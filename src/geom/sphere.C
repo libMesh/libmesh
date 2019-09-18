@@ -64,6 +64,7 @@ Sphere::Sphere(const Point & pa,
                const Point & pc,
                const Point & pd)
 {
+#if LIBMESH_DIM > 2
   Point pad = pa - pd;
   Point pbd = pb - pd;
   Point pcd = pc - pd;
@@ -98,6 +99,10 @@ Sphere::Sphere(const Point & pa,
   Real r = (c-pa).norm();
 
   this->create_from_center_radius(c,r);
+#else // LIBMESH_DIM > 2
+  libmesh_ignore(pa, pb, pc, pd);
+  libmesh_not_implemented();
+#endif
 }
 
 

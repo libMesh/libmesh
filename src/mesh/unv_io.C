@@ -34,6 +34,7 @@
 #include "libmesh/cell_prism6.h"
 
 // C++ includes
+#include <array>
 #include <iomanip>
 #include <algorithm> // for std::sort
 #include <fstream>
@@ -311,10 +312,6 @@ void UNVIO::nodes_in (std::istream & in_file)
   // node label, we use an int here so we can read in a -1
   int node_label;
 
-  // always 3 coordinates in the UNV file, no matter
-  // what LIBMESH_DIM is.
-  Point xyz;
-
   // We'll just read the floating point values as strings even when
   // there are no "D" characters in the file.  This will make parsing
   // the file a bit slower but the logic to do so will all be
@@ -359,10 +356,27 @@ void UNVIO::nodes_in (std::istream & in_file)
       // stream in the xyz values.
       coords_stream.str(line);
       coords_stream.clear(); // clear iostate bits!  Important!
-      coords_stream >> xyz(0) >> xyz(1) >> xyz(2);
+
+      // always 3 coordinates in the UNV file, no matter
+      // what LIBMESH_DIM is.
+      std::array<Real, 3> xyz;
+
+      coords_stream >> xyz[0] >> xyz[1] >> xyz[2];
+
+      Point p(xyz[0]);
+#if LIBMESH_DIM > 1
+      p(1) = xyz[1];
+#else
+      libmesh_assert_equal_to(xyz[1], 0);
+#endif
+#if LIBMESH_DIM > 2
+      p(2) = xyz[2];
+#else
+      libmesh_assert_equal_to(xyz[2], 0);
+#endif
 
       // Add node to the Mesh, bump the counter.
-      Node * added_node = mesh.add_point(xyz, ctr++);
+      Node * added_node = mesh.add_point(p, ctr++);
 
       // Maintain the mapping between UNV node ids and libmesh Node
       // pointers.

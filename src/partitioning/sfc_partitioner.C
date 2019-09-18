@@ -166,7 +166,7 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
 
     for (dof_id_type i=0; i<n_range_elem; i++)
       {
-        libmesh_assert_less (static_cast<unsigned int>(table[i] - 1), reverse_map.size());
+        libmesh_assert_less (table[i] - 1, reverse_map.size());
 
         Elem * elem = reverse_map[table[i] - 1];
 

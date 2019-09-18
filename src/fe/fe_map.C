@@ -206,8 +206,10 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(Dim, map_fe_type);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
     FEInterface::shape_second_deriv_function(Dim, map_fe_type);
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   switch (Dim)
     {

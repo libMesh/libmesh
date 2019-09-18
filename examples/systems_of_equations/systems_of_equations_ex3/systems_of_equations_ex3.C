@@ -336,6 +336,7 @@ void assemble_stokes (EquationSystems & es,
   // the proper system.
   libmesh_assert_equal_to (system_name, "Navier-Stokes");
 
+#if LIBMESH_DIM > 1
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
 
@@ -641,6 +642,9 @@ void assemble_stokes (EquationSystems & es,
   // We can set the mean of the pressure by setting Falpha.  Typically
   // a value of zero is chosen, but the value should be arbitrary.
   navier_stokes_system.rhs->add(navier_stokes_system.rhs->size()-1, 10.);
+#else
+  libmesh_ignore(es);
+#endif
 }
 
 

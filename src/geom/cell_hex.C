@@ -198,6 +198,7 @@ Real Hex::quality (const ElemQuality q) const
   switch (q)
     {
 
+#if LIBMESH_DIM >= 3
       /**
        * Compute the min/max diagonal ratio.
        * Source: CUBIT User's Manual.
@@ -406,6 +407,7 @@ Real Hex::quality (const ElemQuality q) const
             return (den == 0.) ? 0 : (8. / den);
           }
       }
+#endif // LIBMESH_DIM >= 3
 
       /**
        * I don't know what to do for this metric.

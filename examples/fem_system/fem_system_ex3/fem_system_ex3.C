@@ -66,6 +66,9 @@ int main (int argc, char ** argv)
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
+  // This example requires 3D calculations
+  libmesh_example_requires(LIBMESH_DIM > 2, "3D support");
+
   // Parse the input file
   GetPot infile("fem_system_ex3.in");
 

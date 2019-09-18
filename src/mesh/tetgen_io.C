@@ -16,14 +16,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <fstream>
-
 // Local includes
 #include "libmesh/tetgen_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
+
+// C++ includes
+#include <array>
+#include <fstream>
 
 namespace libMesh
 {
@@ -126,7 +127,6 @@ void TetGenIO::node_in (std::istream & node_stream)
 
   // Read the nodal coordinates from the node_stream (*.node file).
   unsigned int node_lab=0;
-  Point xyz;
   Real dummy;
 
   // If present, make room for node attributes to be stored.
@@ -140,10 +140,12 @@ void TetGenIO::node_in (std::istream & node_stream)
       // Check input buffer
       libmesh_assert (node_stream.good());
 
+      std::array<Real, 3> xyz;
+
       node_stream >> node_lab  // node number
-                  >> xyz(0)    // x-coordinate value
-                  >> xyz(1)    // y-coordinate value
-                  >> xyz(2);   // z-coordinate value
+                  >> xyz[0]    // x-coordinate value
+                  >> xyz[1]    // y-coordinate value
+                  >> xyz[2];   // z-coordinate value
 
       // Read and store attributes from the stream.
       for (unsigned int j=0; j<nAttributes; j++)
@@ -158,8 +160,20 @@ void TetGenIO::node_in (std::istream & node_stream)
       //_assign_nodes.insert (std::make_pair(node_lab,i));
       _assign_nodes[node_lab] = i;
 
+      Point p(xyz[0]);
+#if LIBMESH_DIM > 1
+      p(1) = xyz[1];
+#else
+      libmesh_assert_equal_to(xyz[1], 0);
+#endif
+#if LIBMESH_DIM > 2
+      p(2) = xyz[2];
+#else
+      libmesh_assert_equal_to(xyz[2], 0);
+#endif
+
       // Add this point to the Mesh.
-      mesh.add_point(xyz, i);
+      mesh.add_point(p, i);
     }
 }
 

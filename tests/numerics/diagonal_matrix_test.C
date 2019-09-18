@@ -72,7 +72,7 @@ public:
     numeric_index_type beginning_index = _matrix->row_start();
     numeric_index_type end_index = _matrix->row_stop();
 
-    CPPUNIT_ASSERT_EQUAL(_local_size, _matrix->row_stop() - _matrix->row_start());
+    CPPUNIT_ASSERT_EQUAL(_local_size, numeric_index_type(_matrix->row_stop() - _matrix->row_start()));
 
     _matrix->zero();
 

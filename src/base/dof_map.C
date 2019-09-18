@@ -622,7 +622,7 @@ void DofMap::reinit(MeshBase & mesh)
           if (elem->p_level() + base_fe_type.order >
               FEInterface::max_order(base_fe_type, type))
             {
-              libmesh_assert_less_msg(static_cast<unsigned int>(base_fe_type.order.get_order()),
+              libmesh_assert_less_msg(base_fe_type.order.get_order(),
                                       FEInterface::max_order(base_fe_type,type),
                                       "ERROR: Finite element "
                                       << Utility::enum_to_string(base_fe_type.family)

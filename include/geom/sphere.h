@@ -200,6 +200,7 @@ private:
 inline
 Point Sphere::surface_coords (const Point & cart) const
 {
+#if LIBMESH_DIM > 2
   // constant translation in the origin
   const Point c (cart-this->center());
 
@@ -209,6 +210,10 @@ Point Sphere::surface_coords (const Point & cart) const
   return Point(/* radius */ c.norm(),
                /* theta  */ std::atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
                /* phi    */ ( (phi < 0)  ?  2.*libMesh::pi+phi  :  phi ) );
+#else
+  libmesh_ignore(cart);
+  libmesh_not_implemented();
+#endif
 }
 
 

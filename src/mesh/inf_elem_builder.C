@@ -108,10 +108,14 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       // override default values, if necessary
       if (!origin_x.first)
         origin(0) = auto_origin(0);
+#if LIBMESH_DIM > 1
       if (!origin_y.first)
         origin(1) = auto_origin(1);
+#endif
+#if LIBMESH_DIM > 2
       if (!origin_z.first)
         origin(2) = auto_origin(2);
+#endif
 
       if (be_verbose)
         {

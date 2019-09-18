@@ -269,7 +269,7 @@ void Nemesis_IO::read (const std::string & base_filename)
     // mark each processor id we reference with a node cmap
     for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
       {
-        libmesh_assert_less (to_uint(nemhelper->node_cmap_ids[cmap]), this->n_processors());
+        libmesh_assert_less (nemhelper->node_cmap_ids[cmap], this->n_processors());
 
         pid_send_partner[nemhelper->node_cmap_ids[cmap]] = 1;
       }
@@ -347,7 +347,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       num_nodes_i_must_number++;
 
   // more error checking...
-  libmesh_assert_greater_equal (num_nodes_i_must_number, to_uint(nemhelper->num_internal_nodes));
+  libmesh_assert_greater_equal (num_nodes_i_must_number, nemhelper->num_internal_nodes);
   libmesh_assert (num_nodes_i_must_number <= to_uint(nemhelper->num_internal_nodes +
                                                      nemhelper->num_border_nodes));
   if (_verbose)
@@ -454,7 +454,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
       // an internal node we do not own? huh??
       libmesh_assert_equal_to (owning_pid_idx, this->processor_id());
-      libmesh_assert_less (my_next_node, to_uint(nemhelper->num_nodes_global));
+      libmesh_assert_less (my_next_node, nemhelper->num_nodes_global);
 
       // "Catch" the node pointer after addition, make sure the
       // ID matches the requested value.

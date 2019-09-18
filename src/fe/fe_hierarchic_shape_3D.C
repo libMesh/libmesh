@@ -52,6 +52,7 @@ Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+#if LIBMESH_DIM > 2
 Point get_min_point(const Elem * elem,
                     unsigned int a,
                     unsigned int b,
@@ -658,6 +659,7 @@ void cube_indices(const Elem * elem,
       i2 = cube_number_page[basisnum] + 2;
     }
 }
+#endif // LIBMESH_DIM > 2
 
 } // end anonymous namespace
 
@@ -869,6 +871,9 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
       libmesh_error_msg("Invalid element type = " << type);
     }
 
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, p, add_p_level);
+  libmesh_not_implemented();
 #endif
 }
 
@@ -922,6 +927,9 @@ Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
 
   return (FE<3,HIERARCHIC>::shape(elem, order, i, pp, add_p_level) -
           FE<3,HIERARCHIC>::shape(elem, order, i, pm, add_p_level))/2./eps;
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, j, p, add_p_level);
+  libmesh_not_implemented();
 #endif
 }
 
