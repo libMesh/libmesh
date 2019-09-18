@@ -312,6 +312,15 @@ public:
   double relative_residual_tolerance;
 
   /**
+   * The NonlinearSolver should exit if the residual becomes greater
+   * than the initial residual times the divergence_tolerance.
+   *
+   * Users should adjust this tolerances to prevent divergence of the
+   * NonlinearSolver.
+   */
+  double divergence_tolerance;
+
+  /**
    * The NonlinearSolver should exit after the full nonlinear step norm is
    * reduced to either less than absolute_step_tolerance
    * or less than relative_step_tolerance times the largest
@@ -407,6 +416,7 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
   relative_residual_tolerance(0),
+  divergence_tolerance(0),
   absolute_step_tolerance(0),
   relative_step_tolerance(0),
   max_linear_iterations(0),

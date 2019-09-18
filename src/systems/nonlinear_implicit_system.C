@@ -53,6 +53,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
 
   es.parameters.set<Real>("nonlinear solver absolute residual tolerance") = 1e-35;
   es.parameters.set<Real>("nonlinear solver relative residual tolerance") = 1e-8;
+  es.parameters.set<Real>("nonlinear solver divergence tolerance") = 1e+4;
   es.parameters.set<Real>("nonlinear solver absolute step tolerance") = 1e-8;
   es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-8;
 }
@@ -111,6 +112,9 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   const double rel_resid_tol =
     double(es.parameters.get<Real>("nonlinear solver relative residual tolerance"));
 
+  const double div_tol =
+    double(es.parameters.get<Real>("nonlinear solver divergence tolerance"));
+
   const double abs_step_tol =
     double(es.parameters.get<Real>("nonlinear solver absolute step tolerance"));
 
@@ -132,6 +136,7 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   nonlinear_solver->max_function_evaluations = maxfuncs;
   nonlinear_solver->absolute_residual_tolerance = abs_resid_tol;
   nonlinear_solver->relative_residual_tolerance = rel_resid_tol;
+  nonlinear_solver->divergence_tolerance = div_tol;
   nonlinear_solver->absolute_step_tolerance = abs_step_tol;
   nonlinear_solver->relative_step_tolerance = rel_step_tol;
   nonlinear_solver->max_linear_iterations = maxlinearits;

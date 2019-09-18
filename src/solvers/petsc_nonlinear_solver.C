@@ -857,6 +857,12 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
                            this->relative_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
   LIBMESH_CHKERR(ierr);
 
+  // Set the divergence tolerance for the non-linear solver
+#if !PETSC_VERSION_LESS_THAN(3,8,0)
+  ierr = SNESSetDivergenceTolerance(_snes, this->divergence_tolerance);
+  LIBMESH_CHKERR(ierr);
+#endif
+
   //Pull in command-line options
 #if PETSC_VERSION_LESS_THAN(3,7,0)
   KSPSetFromOptions(ksp);
