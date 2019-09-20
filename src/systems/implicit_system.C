@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
@@ -33,6 +31,7 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -262,26 +261,14 @@ SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string & mat_n
 
 const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string & mat_name) const
 {
-  // Make sure the matrix exists
-  const_matrices_iterator pos = _matrices.find (mat_name);
-
-  if (pos == _matrices.end())
-    libmesh_error_msg("ERROR: matrix " << mat_name << " does not exist in this system!");
-
-  return *(pos->second);
+  return *(Utility::map_find(_matrices, mat_name));
 }
 
 
 
 SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string & mat_name)
 {
-  // Make sure the matrix exists
-  matrices_iterator pos = _matrices.find (mat_name);
-
-  if (pos == _matrices.end())
-    libmesh_error_msg("ERROR: matrix " << mat_name << " does not exist in this system!");
-
-  return *(pos->second);
+  return *(Utility::map_find(_matrices, mat_name));
 }
 
 

@@ -32,6 +32,7 @@
 #include "libmesh/raw_accessor.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -208,25 +209,10 @@ void ExactSolution::attach_exact_hessian (unsigned int sys_num,
 std::vector<Real> & ExactSolution::_check_inputs(const std::string & sys_name,
                                                  const std::string & unknown_name)
 {
-  // If no exact solution function or fine grid solution has been
-  // attached, we now just compute the solution norm (i.e. the
-  // difference from an "exact solution" of zero
-
-  // Make sure the requested sys_name exists.
-  std::map<std::string, SystemErrorMap>::iterator sys_iter =
-    _errors.find(sys_name);
-
-  if (sys_iter == _errors.end())
-    libmesh_error_msg("Sorry, couldn't find the requested system '" << sys_name << "'.");
-
-  // Make sure the requested unknown_name exists.
-  SystemErrorMap::iterator var_iter = (*sys_iter).second.find(unknown_name);
-
-  if (var_iter == (*sys_iter).second.end())
-    libmesh_error_msg("Sorry, couldn't find the requested variable '" << unknown_name << "'.");
-
-  // Return a reference to the proper error entry
-  return (*var_iter).second;
+  // Return a reference to the proper error entry, or throw an error
+  // if it doesn't exist.
+  auto & system_error_map = Utility::map_find(_errors, sys_name);
+  return Utility::map_find(system_error_map, unknown_name);
 }
 
 

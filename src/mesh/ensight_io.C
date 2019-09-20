@@ -27,6 +27,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h" // map_find
 
 // C++ includes
 #include <sstream>
@@ -230,12 +231,10 @@ void EnsightIO::write_geometry_ascii()
   for (const auto & pr : ensight_parts_map)
     {
       // Look up this ElemType in the map, error if not present.
-      auto name_it = _element_map.find(pr.first);
-      if (name_it == _element_map.end())
-        libmesh_error_msg("Error: Unsupported ElemType " << pr.first << " for EnsightIO.");
+      std::string name = Utility::map_find(_element_map, pr.first);
 
       // Write element type
-      mesh_stream << "\n" << name_it->second << "\n";
+      mesh_stream << "\n" << name << "\n";
 
       const std::vector<const Elem *> & elem_ref = pr.second;
 

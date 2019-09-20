@@ -31,6 +31,7 @@
 #include "libmesh/gmsh_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h" // map_find
 
 namespace libMesh
 {
@@ -499,15 +500,9 @@ void GmshIO::read_mesh(std::istream & in)
                   }
                 }
 
-                // Consult the import element table to determine which element to build
-                auto eletypes_it = _element_maps.in.find(type);
-
-                // Make sure we actually found something
-                if (eletypes_it == _element_maps.in.end())
-                  libmesh_error_msg("Element type " << type << " not found!");
-
-                // Get a reference to the ElementDefinition
-                const GmshIO::ElementDefinition & eletype = eletypes_it->second;
+                // Get a reference to the ElementDefinition, throw an error if not found.
+                const GmshIO::ElementDefinition & eletype =
+                  Utility::map_find(_element_maps.in, type);
 
                 // If we read nnodes, make sure it matches the number in eletype.nnodes
                 if (nnodes != 0 && nnodes != eletype.nnodes)
@@ -598,19 +593,14 @@ void GmshIO::read_mesh(std::istream & in)
               // Loop over entity blocks
               for (std::size_t i = 0; i < num_entity_blocks; ++i)
               {
-                int entity_dim, entity_tag, element_type;
+                int entity_dim, entity_tag;
+                unsigned int element_type;
                 std::size_t num_elems_in_block = 0;
                 in >> entity_dim >> entity_tag >> element_type >> num_elems_in_block;
 
-                // Determine which element to build
-                auto eletypes_it = _element_maps.in.find(element_type);
-
-                // Make sure we actually found something
-                if (eletypes_it == _element_maps.in.end())
-                  libmesh_error_msg("Element type " << element_type << " not found!");
-
                 // Get a reference to the ElementDefinition
-                const GmshIO::ElementDefinition & eletype = eletypes_it->second;
+                const GmshIO::ElementDefinition & eletype =
+                  Utility::map_find(_element_maps.in, element_type);
 
                 // Don't add 0-dimensional "point" elements to the
                 // Mesh.  They should *always* be treated as boundary
@@ -907,19 +897,9 @@ void GmshIO::write_mesh (std::ostream & out_stream)
     // loop over the elements
     for (const auto & elem : mesh.active_element_ptr_range())
       {
-        // Make sure we have a valid entry for
-        // the current element type.
-        libmesh_assert (_element_maps.out.count(elem->type()));
-
-        // consult the export element table
-        auto def_it = _element_maps.out.find(elem->type());
-
-        // Assert that we found it
-        if (def_it == _element_maps.out.end())
-          libmesh_error_msg("Element type " << elem->type() << " not found in _element_maps.");
-
         // Get a reference to the ElementDefinition object
-        const ElementDefinition & eletype = def_it->second;
+        const ElementDefinition & eletype =
+          Utility::map_find(_element_maps.out, elem->type());
 
         // The element mapper better not require any more nodes
         // than are present in the current element!
@@ -975,15 +955,9 @@ void GmshIO::write_mesh (std::ostream & out_stream)
 
             std::unique_ptr<const Elem> side = elem.build_side_ptr(std::get<1>(t));
 
-            // Map from libmesh elem type to gmsh elem type.
-            auto def_it = _element_maps.out.find(side->type());
-
-            // If we didn't find it, that's an error
-            if (def_it == _element_maps.out.end())
-              libmesh_error_msg("Element type " << side->type() << " not found in _element_maps.");
-
             // consult the export element table
-            const GmshIO::ElementDefinition & eletype = def_it->second;
+            const GmshIO::ElementDefinition & eletype =
+              Utility::map_find(_element_maps.out, side->type());
 
             // The element mapper better not require any more nodes
             // than are present in the current element!

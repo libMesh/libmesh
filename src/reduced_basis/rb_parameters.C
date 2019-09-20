@@ -20,10 +20,9 @@
 // C++ includes
 #include <sstream>
 
-// rbOOmit includes
+// libmesh includes
 #include "libmesh/rb_parameters.h"
-
-
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -41,14 +40,8 @@ void RBParameters::clear()
 
 Real RBParameters::get_value(const std::string & param_name) const
 {
-  // find the parameter value
-  const_iterator it = _parameters.find(param_name);
-
-  // throw and error if the parameter doesn't exist
-  if (it == _parameters.end())
-    libmesh_error_msg("Error: parameter " << param_name << " does not exist in RBParameters object.");
-
-  return it->second;
+  // find the parameter value, throwing an error if it doesn't exist.
+  return Utility::map_find(_parameters, param_name);
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)
@@ -58,14 +51,8 @@ void RBParameters::set_value(const std::string & param_name, Real value)
 
 Real RBParameters::get_extra_value(const std::string & param_name) const
 {
-  // find the parameter value
-  const_iterator it = _extra_parameters.find(param_name);
-
-  // throw and error if the parameter doesn't exist
-  if (it == _extra_parameters.end())
-    libmesh_error_msg("Error: parameter " << param_name << " does not exist in extra parameters.");
-
-  return it->second;
+  // find the parameter value, throwing an error if it doesn't exist.
+  return Utility::map_find(_extra_parameters, param_name);
 }
 
 void RBParameters::set_extra_value(const std::string & param_name, Real value)

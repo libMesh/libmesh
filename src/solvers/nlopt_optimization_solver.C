@@ -22,14 +22,13 @@
 #if defined(LIBMESH_HAVE_NLOPT) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 
-// C++ includes
-
 // Local Includes
 #include "libmesh/dof_map.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/nlopt_optimization_solver.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -326,13 +325,8 @@ void NloptOptimizationSolver<T>::init ()
                                                            nlopt_algorithm_name);
 
       // Convert string to an nlopt algorithm type
-      auto it = _nlopt_algorithms.find(nlopt_algorithm_name);
-
-      if (it == _nlopt_algorithms.end())
-        libmesh_error_msg("Invalid nlopt algorithm requested on command line: " \
-                          << nlopt_algorithm_name);
-
-      _opt = nlopt_create(it->second, this->system().solution->size());
+      _opt = nlopt_create(Utility::map_find(_nlopt_algorithms, nlopt_algorithm_name),
+                          this->system().solution->size());
     }
 }
 

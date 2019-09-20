@@ -32,6 +32,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 #ifdef DEBUG
 #  include "libmesh/remote_elem.h"
@@ -917,24 +918,16 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
   // user in a std::vector.
   std::set<const Node *> neighbor_set;
 
-  // Iterators to iterate through the elements that include this node
-  auto my_elems_it = nodes_to_elem_map.find(global_id);
-  libmesh_assert(my_elems_it != nodes_to_elem_map.end());
-
-  std::vector<const Elem *>::const_iterator
-    el = my_elems_it->second.begin(),
-    end_el = my_elems_it->second.end();
+  // List of Elems attached to this node.
+  const auto & elem_vec = Utility::map_find(nodes_to_elem_map, global_id);
 
   // Look through the elements that contain this node
   // find the local node id... then find the side that
   // node lives on in the element
   // next, look for the _other_ node on that side
   // That other node is a "nodal_neighbor"... save it
-  for (; el != end_el; ++el)
+  for (const auto & elem : elem_vec)
     {
-      // Grab an Elem pointer to use in the subsequent loop
-      const Elem * elem = *el;
-
       // We only care about active elements...
       if (elem->active())
         {

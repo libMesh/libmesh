@@ -23,6 +23,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
+#include "libmesh/utility.h"
 
 #ifdef LIBMESH_HAVE_VTK
 // Ignore "deprecated...header" warning from strstream
@@ -194,23 +195,13 @@ private:
     // Find an entry in the writing map, or throw an error.
     vtkIdType find(ElemType libmesh_type)
     {
-      std::map<ElemType, vtkIdType>::iterator it = writing_map.find(libmesh_type);
-
-      if (it == writing_map.end())
-        libmesh_error_msg("Element type " << libmesh_type << " not available in VTK.");
-
-      return it->second;
+      return Utility::map_find(writing_map, libmesh_type);
     }
 
     // Find an entry in the reading map, or throw an error.
     ElemType find(vtkIdType vtk_type)
     {
-      std::map<vtkIdType, ElemType>::iterator it = reading_map.find(vtk_type);
-
-      if (it == reading_map.end())
-        libmesh_error_msg("Element type " << vtk_type << " not available in libMesh.");
-
-      return it->second;
+      return Utility::map_find(reading_map, vtk_type);
     }
 
     std::map<ElemType, vtkIdType> writing_map;
