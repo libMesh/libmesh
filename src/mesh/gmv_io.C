@@ -33,6 +33,7 @@
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 // Wrap everything in a GMVLib namespace and
 // use extern "C" to avoid name mangling.
@@ -1043,11 +1044,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           for (const auto & elem : mesh.active_element_ptr_range())
             {
               // Find the unique index for elem->subdomain_id(), print that to file
-              auto map_iter = sbdid_map.find(elem->subdomain_id());
-
-              libmesh_assert_msg(map_iter != sbdid_map.end(), "Entry for subdomain " << elem->subdomain_id() << " not found.");
-
-              unsigned gmv_mat_number = (*map_iter).second;
+              unsigned gmv_mat_number = Utility::map_find(sbdid_map, elem->subdomain_id());
 
               if (this->subdivide_second_order())
                 for (unsigned int se=0; se<elem->n_sub_elem(); se++)
@@ -2153,14 +2150,7 @@ ElemType GMVIO::gmv_elem_to_libmesh_elem(std::string elemname)
 {
   // Erase any whitespace padding in name coming from gmv before performing comparison.
   elemname.erase(std::remove_if(elemname.begin(), elemname.end(), isspace), elemname.end());
-
-  // Look up the string in our string->ElemType name.
-  auto it = _reading_element_map.find(elemname);
-
-  if (it == _reading_element_map.end())
-    libmesh_error_msg("Unknown/unsupported element: " << elemname << " was read.");
-
-  return it->second;
+  return Utility::map_find(_reading_element_map, elemname);
 }
 
 

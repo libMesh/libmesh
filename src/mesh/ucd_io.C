@@ -28,6 +28,7 @@
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "libmesh/ignore_warnings.h" // shadowing in gzstream.h
@@ -200,13 +201,11 @@ void UCDIO::read_implementation (std::istream & in)
            >> material_id  // We'll use this for the element subdomain id.
            >> type;        // string describing cell type
 
-        // Convert the UCD type string to a libmesh ElementType
-        auto it = _reading_element_map.find(type);
-        if (it == _reading_element_map.end())
-          libmesh_error_msg("Unsupported element type = " << type);
+        // Convert the UCD type string to a libmesh ElemType
+        ElemType et = Utility::map_find(_reading_element_map, type);
 
         // Build the required type and release it into our custody.
-        Elem * elem = Elem::build(it->second).release();
+        Elem * elem = Elem::build(et).release();
 
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
@@ -321,13 +320,10 @@ void UCDIO::write_interior_elems(std::ostream & out_stream,
       libmesh_assert (out_stream.good());
 
       // Look up the corresponding UCD element type in the static map.
-      const ElemType etype = elem->type();
-      auto it = _writing_element_map.find(etype);
-      if (it == _writing_element_map.end())
-        libmesh_error_msg("Error: Unsupported ElemType " << etype << " for UCDIO.");
+      std::string elem_string = Utility::map_find(_writing_element_map, elem->type());
 
       // Write the element's subdomain ID as the UCD "material_id".
-      out_stream << e++ << " " << elem->subdomain_id() << " " << it->second << "\t";
+      out_stream << e++ << " " << elem->subdomain_id() << " " << elem_string << "\t";
       elem->write_connectivity(out_stream, UCD);
     }
 }

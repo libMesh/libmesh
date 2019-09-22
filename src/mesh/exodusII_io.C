@@ -38,6 +38,7 @@
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/parallel.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -923,13 +924,13 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   for (auto derived_var_id : index_range(derived_var_names))
     {
       const auto & derived_name = derived_var_names[derived_var_id];
-      auto it = derived_name_to_orig_name_and_node_id.find(derived_name);
-      if (it == derived_name_to_orig_name_and_node_id.end())
-        libmesh_error_msg("Unmapped derived variable name: " << derived_name);
+      const auto & name_and_id =
+        Utility::map_find (derived_name_to_orig_name_and_node_id,
+                           derived_name);
 
       // Convenience variables for the map entry's contents.
-      const std::string & orig_name = it->second.first;
-      const unsigned int node_id = it->second.second;
+      const std::string & orig_name = name_and_id.first;
+      const unsigned int node_id = name_and_id.second;
 
       // For each subdomain, determine whether the current variable
       // should be active on that subdomain.
@@ -990,12 +991,12 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   for (auto & derived_var_name : derived_var_names)
     {
       // Get the original name associated with this derived name.
-      auto it = derived_name_to_orig_name_and_node_id.find(derived_var_name);
-      if (it == derived_name_to_orig_name_and_node_id.end())
-        libmesh_error_msg("Unmapped derived variable name: " << derived_var_name);
+      const auto & name_and_id =
+        Utility::map_find (derived_name_to_orig_name_and_node_id,
+                           derived_var_name);
 
       // Convenience variables for the map entry's contents.
-      const std::string & orig_name = it->second.first;
+      const std::string & orig_name = name_and_id.first;
 
       // Was the original name a constant monomial?
       if (std::count(monomial_var_names.begin(),

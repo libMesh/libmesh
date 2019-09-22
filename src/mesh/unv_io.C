@@ -32,6 +32,7 @@
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
+#include "libmesh/utility.h"
 
 // C++ includes
 #include <array>
@@ -844,11 +845,10 @@ void UNVIO::elements_in (std::istream & in_file)
       for (dof_id_type j=1; j<=n_nodes; j++)
         {
           // Map the UNV node ID to the libmesh node ID
-          auto it = _unv_node_id_to_libmesh_node_ptr.find(node_labels[j]);
-          if (it != _unv_node_id_to_libmesh_node_ptr.end())
-            elem->set_node(assign_elem_nodes[j]) = it->second;
-          else
-            libmesh_error_msg("ERROR: UNV node " << node_labels[j] << " not found!");
+          auto & node_ptr =
+            Utility::map_find(_unv_node_id_to_libmesh_node_ptr, node_labels[j]);
+
+          elem->set_node(assign_elem_nodes[j]) = node_ptr;
         }
 
       elems_of_dimension[elem->dim()] = true;
@@ -1307,16 +1307,14 @@ void UNVIO::read_dataset(std::string file_name)
                 } // end loop data_cnt
 
               // Get a pointer to the Node associated with the UNV node id.
-              auto it = _unv_node_id_to_libmesh_node_ptr.find(f_n_id);
-
-              if (it == _unv_node_id_to_libmesh_node_ptr.end())
-                libmesh_error_msg("UNV node id " << f_n_id << " was not found.");
+              auto & node_ptr = Utility::map_find
+                (_unv_node_id_to_libmesh_node_ptr, f_n_id);
 
               // Store the nodal values in our map which uses the
               // libMesh Node* as the key.  We use operator[] here
               // because we want to create an empty vector if the
               // entry does not already exist.
-              _node_data[it->second] = values;
+              _node_data[node_ptr] = values;
             } // end while (true)
         } // end if (news == "2414")
     } // end while (true)

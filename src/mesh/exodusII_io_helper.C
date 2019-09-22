@@ -34,6 +34,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 #ifdef DEBUG
 #include "libmesh/mesh_tools.h"  // for elem_types warning
@@ -1664,31 +1665,18 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                   // The global id for the current node in libmesh.
                   dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
 
-                  // Find the zero-based libmesh id in the map, this
-                  // should be faster than doing linear searches on
-                  // the node_num_map.
-                  std::map<int, int>::iterator pos =
-                    libmesh_node_num_to_exodus.find(cast_int<int>(libmesh_node_id));
-
-                  // Make sure it was found.
-                  if (pos == libmesh_node_num_to_exodus.end())
-                    libmesh_error_msg("libmesh node id " << libmesh_node_id << " not found in node_num_map.");
-
                   // Write the Exodus global node id associated with
                   // this libmesh node number to the connectivity
-                  // array.
-                  connect[connect_index] = pos->second;
+                  // array, or throw an error if it's not found.
+                  connect[connect_index] = Utility::map_find
+                    (libmesh_node_num_to_exodus, cast_int<int>(libmesh_node_id));
                 }
               else
                 {
-                  std::pair<dof_id_type,unsigned int> id_pair;
-                  id_pair.first = elem_id;
-                  id_pair.second = elem_node_index;
-                  auto node_it = discontinuous_node_indices.find(id_pair);
-
-                  libmesh_assert(node_it != discontinuous_node_indices.end());
-
-                  connect[connect_index] = node_it->second;
+                  // Look up the (elem_id, elem_node_index) pair in the map.
+                  connect[connect_index] = Utility::map_find
+                    (discontinuous_node_indices,
+                     std::make_pair(elem_id, elem_node_index));
                 }
             }
         }
@@ -2201,9 +2189,8 @@ write_sideset_data(const MeshBase & mesh,
 
               // Sanity check: make sure that the "off by one"
               // assumption we used above to set 'elem_id' is valid.
-              auto check_it = libmesh_elem_num_to_exodus.find(elem_id);
-              if (check_it == libmesh_elem_num_to_exodus.end() ||
-                  check_it->second != elem_list[i + offset])
+              if (Utility::map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id))
+                  != elem_list[i + offset])
                 libmesh_error_msg("Error mapping Exodus elem id to libmesh elem id.");
 
               // Map from Exodus side ids to libmesh side ids.
@@ -2226,17 +2213,9 @@ write_sideset_data(const MeshBase & mesh,
                  ss_ids[ss]);
 
               // Find the data for this (elem,side,id) tuple. Throw an
-              // error if not found.
-              auto it = data_map.find(key);
-
-              if (it == data_map.end())
-                libmesh_error_msg("Error: could not find data for variable "
-                                  << var_names[var] << ", elem " << elem_id
-                                  << ", side " << converted_side_id
-                                  << ", b_id " << ss_ids[ss]);
-
-              // Store value in vector which will be passed to Exodus.
-              sset_var_vals[i] = it->second;
+              // error if not found. Then store value in vector which
+              // will be passed to Exodus.
+              sset_var_vals[i] = Utility::map_find(data_map, key);
             } // end for (i)
 
           // As far as I can tell, there is no "concat" version of writing
@@ -2777,14 +2756,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
   // Do only upper-case comparisons
   std::transform(type_str.begin(), type_str.end(), type_str.begin(), ::toupper);
-
-  std::map<std::string, ElemType>::iterator it =
-    element_equivalence_map.find(type_str);
-
-  if (it != element_equivalence_map.end())
-    return assign_conversion( it->second );
-  else
-    libmesh_error_msg("ERROR! Unrecognized element type_str: " << type_str);
+  return assign_conversion (Utility::map_find(element_equivalence_map, type_str));
 }
 
 

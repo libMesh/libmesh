@@ -20,7 +20,6 @@
 // C++ includes
 #include <sstream>   // for std::ostringstream
 
-
 // Local includes
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
@@ -773,26 +772,14 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
 
 const NumericVector<Number> & System::get_vector (const std::string & vec_name) const
 {
-  // Make sure the vector exists
-  const_vectors_iterator pos = _vectors.find(vec_name);
-
-  if (pos == _vectors.end())
-    libmesh_error_msg("ERROR: vector " << vec_name << " does not exist in this system!");
-
-  return *(pos->second);
+  return *(Utility::map_find(_vectors, vec_name));
 }
 
 
 
 NumericVector<Number> & System::get_vector (const std::string & vec_name)
 {
-  // Make sure the vector exists
-  vectors_iterator pos = _vectors.find(vec_name);
-
-  if (pos == _vectors.end())
-    libmesh_error_msg("ERROR: vector " << vec_name << " does not exist in this system!");
-
-  return *(pos->second);
+  return *(Utility::map_find(_vectors, vec_name));
 }
 
 
@@ -1243,16 +1230,9 @@ bool System::has_variable (const std::string & var) const
 
 unsigned short int System::variable_number (const std::string & var) const
 {
-  // Make sure the variable exists
-  std::map<std::string, unsigned short int>::const_iterator
-    pos = _variable_numbers.find(var);
-
-  if (pos == _variable_numbers.end())
-    libmesh_error_msg("ERROR: variable " << var << " does not exist in this system!");
-
-  libmesh_assert_equal_to (_variables[pos->second].name(), var);
-
-  return pos->second;
+  auto var_num = Utility::map_find(_variable_numbers, var);
+  libmesh_assert_equal_to (_variables[var_num].name(), var);
+  return var_num;
 }
 
 
