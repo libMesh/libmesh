@@ -211,8 +211,8 @@ std::vector<Real> & ExactSolution::_check_inputs(const std::string & sys_name,
 {
   // Return a reference to the proper error entry, or throw an error
   // if it doesn't exist.
-  auto & system_error_map = Utility::map_find(_errors, sys_name);
-  return Utility::map_find(system_error_map, unknown_name);
+  auto & system_error_map = MAP_FIND(_errors, sys_name);
+  return MAP_FIND(system_error_map, unknown_name);
 }
 
 

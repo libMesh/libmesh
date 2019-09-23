@@ -202,7 +202,7 @@ void UCDIO::read_implementation (std::istream & in)
            >> type;        // string describing cell type
 
         // Convert the UCD type string to a libmesh ElemType
-        ElemType et = Utility::map_find(_reading_element_map, type);
+        ElemType et = MAP_FIND(_reading_element_map, type);
 
         // Build the required type and release it into our custody.
         Elem * elem = Elem::build(et).release();
@@ -320,7 +320,7 @@ void UCDIO::write_interior_elems(std::ostream & out_stream,
       libmesh_assert (out_stream.good());
 
       // Look up the corresponding UCD element type in the static map.
-      std::string elem_string = Utility::map_find(_writing_element_map, elem->type());
+      std::string elem_string = MAP_FIND(_writing_element_map, elem->type());
 
       // Write the element's subdomain ID as the UCD "material_id".
       out_stream << e++ << " " << elem->subdomain_id() << " " << elem_string << "\t";

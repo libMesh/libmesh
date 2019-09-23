@@ -51,7 +51,7 @@ void MappedSubdomainPartitioner::partition_range(MeshBase & /*mesh*/,
       subdomain_id_type sbd_id = elem->subdomain_id();
 
       // Find which processor id corresponds to this element's subdomain id.
-      elem->processor_id() = Utility::map_find(subdomain_to_proc, sbd_id);
+      elem->processor_id() = MAP_FIND(subdomain_to_proc, sbd_id);
     }
 }
 

@@ -978,13 +978,13 @@ void Nemesis_IO_Helper::compute_element_maps()
   {
     unsigned cnt = 0;
     for (const auto & id : this->internal_elem_ids)
-      this->elem_mapi[cnt++] = Utility::map_find(libmesh_elem_num_to_exodus, id);
+      this->elem_mapi[cnt++] = MAP_FIND(libmesh_elem_num_to_exodus, id);
   }
 
   {
     unsigned cnt = 0;
     for (const auto & id : this->border_elem_ids)
-      this->elem_mapb[cnt++] = Utility::map_find(libmesh_elem_num_to_exodus, id);
+      this->elem_mapb[cnt++] = MAP_FIND(libmesh_elem_num_to_exodus, id);
   }
 }
 
@@ -1025,7 +1025,7 @@ void Nemesis_IO_Helper::compute_elem_communication_maps()
         // Pack the vectors with elem IDs, side IDs, and processor IDs.
         for (std::size_t j=0; j<this->elem_cmap_elem_ids[cnt].size(); ++j, ++elem_set_iter)
           {
-            this->elem_cmap_elem_ids[cnt][j] = Utility::map_find(libmesh_elem_num_to_exodus, elem_set_iter->first);
+            this->elem_cmap_elem_ids[cnt][j] = MAP_FIND(libmesh_elem_num_to_exodus, elem_set_iter->first);
             this->elem_cmap_side_ids[cnt][j] = elem_set_iter->second;     // Side ID, this has already been converted above
             this->elem_cmap_proc_ids[cnt][j] = it->first; // All have the same processor ID
           }
@@ -1055,13 +1055,13 @@ void Nemesis_IO_Helper::compute_node_maps()
   {
     unsigned cnt = 0;
     for (const auto & id : this->internal_node_ids)
-      this->node_mapi[cnt++] = Utility::map_find(libmesh_node_num_to_exodus, id);
+      this->node_mapi[cnt++] = MAP_FIND(libmesh_node_num_to_exodus, id);
   }
 
   {
     unsigned cnt=0;
     for (const auto & id : this->border_node_ids)
-      this->node_mapb[cnt++] = Utility::map_find(libmesh_node_num_to_exodus, id);
+      this->node_mapb[cnt++] = MAP_FIND(libmesh_node_num_to_exodus, id);
   }
 }
 
@@ -1106,7 +1106,7 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
         for (std::size_t j=0; j<this->node_cmap_node_ids[cnt].size(); ++j, ++node_set_iter)
           {
             this->node_cmap_node_ids[cnt][j] =
-              Utility::map_find(libmesh_node_num_to_exodus, *node_set_iter);
+              MAP_FIND(libmesh_node_num_to_exodus, *node_set_iter);
             this->node_cmap_proc_ids[cnt][j] = it->first;
           }
 
@@ -1803,8 +1803,8 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
               const unsigned int elem_node_index = conv.get_node_map(j);
 
               current_block_connectivity[connect_index] =
-                Utility::map_find(libmesh_node_num_to_exodus,
-                                  elem.node_id(elem_node_index));
+                MAP_FIND(libmesh_node_num_to_exodus,
+                         elem.node_id(elem_node_index));
             }
         } // End loop over elems in this subdomain
     } // end loop over subdomain_map
@@ -2138,7 +2138,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
               //
               // We know the parent element is local, but let's be absolutely sure that all the children have been
               // actually mapped to Exodus IDs before we blindly try to add them...
-              local_elem_boundary_id_lists[ std::get<2>(t) ].push_back( Utility::map_find(libmesh_elem_num_to_exodus, f_id) );
+              local_elem_boundary_id_lists[ std::get<2>(t) ].push_back( MAP_FIND(libmesh_elem_num_to_exodus, f_id) );
               local_elem_boundary_id_side_lists[ std::get<2>(t) ].push_back(conv.get_inverse_side_map( std::get<1>(t) ));
             }
         }
@@ -2196,8 +2196,8 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 
               // Get reference to the vector of side IDs
               std::vector<int> & current_sideset_side_ids =
-                Utility::map_find(local_elem_boundary_id_side_lists,
-                                  cast_int<boundary_id_type>(exodus_id));
+                MAP_FIND(local_elem_boundary_id_side_lists,
+                         cast_int<boundary_id_type>(exodus_id));
 
               // Call the Exodus interface to write the parameters of this side set
               this->ex_err = exII::ex_put_side_set_param(this->ex_id,

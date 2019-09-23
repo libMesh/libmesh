@@ -846,7 +846,7 @@ void UNVIO::elements_in (std::istream & in_file)
         {
           // Map the UNV node ID to the libmesh node ID
           auto & node_ptr =
-            Utility::map_find(_unv_node_id_to_libmesh_node_ptr, node_labels[j]);
+            MAP_FIND(_unv_node_id_to_libmesh_node_ptr, node_labels[j]);
 
           elem->set_node(assign_elem_nodes[j]) = node_ptr;
         }
@@ -1307,8 +1307,7 @@ void UNVIO::read_dataset(std::string file_name)
                 } // end loop data_cnt
 
               // Get a pointer to the Node associated with the UNV node id.
-              auto & node_ptr = Utility::map_find
-                (_unv_node_id_to_libmesh_node_ptr, f_n_id);
+              auto & node_ptr = MAP_FIND(_unv_node_id_to_libmesh_node_ptr, f_n_id);
 
               // Store the nodal values in our map which uses the
               // libMesh Node* as the key.  We use operator[] here
