@@ -160,7 +160,7 @@ public:
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
-  StandardType(const StandardType<VectorValue<T>> & t)
+  StandardType(const StandardType<VectorValue<T>> & libmesh_mpi_var(t))
     : DataType()
   {
 #ifdef LIBMESH_HAVE_MPI
