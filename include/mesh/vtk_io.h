@@ -195,13 +195,13 @@ private:
     // Find an entry in the writing map, or throw an error.
     vtkIdType find(ElemType libmesh_type)
     {
-      return MAP_FIND(writing_map, libmesh_type);
+      return libmesh_map_find(writing_map, libmesh_type);
     }
 
     // Find an entry in the reading map, or throw an error.
     ElemType find(vtkIdType vtk_type)
     {
-      return MAP_FIND(reading_map, vtk_type);
+      return libmesh_map_find(reading_map, vtk_type);
     }
 
     std::map<ElemType, vtkIdType> writing_map;

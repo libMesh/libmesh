@@ -325,7 +325,7 @@ void NloptOptimizationSolver<T>::init ()
                                                            nlopt_algorithm_name);
 
       // Convert string to an nlopt algorithm type
-      _opt = nlopt_create(MAP_FIND(_nlopt_algorithms, nlopt_algorithm_name),
+      _opt = nlopt_create(libmesh_map_find(_nlopt_algorithms, nlopt_algorithm_name),
                           this->system().solution->size());
     }
 }
