@@ -502,7 +502,7 @@ void GmshIO::read_mesh(std::istream & in)
 
                 // Get a reference to the ElementDefinition, throw an error if not found.
                 const GmshIO::ElementDefinition & eletype =
-                  Utility::map_find(_element_maps.in, type);
+                  MAP_FIND(_element_maps.in, type);
 
                 // If we read nnodes, make sure it matches the number in eletype.nnodes
                 if (nnodes != 0 && nnodes != eletype.nnodes)
@@ -600,7 +600,7 @@ void GmshIO::read_mesh(std::istream & in)
 
                 // Get a reference to the ElementDefinition
                 const GmshIO::ElementDefinition & eletype =
-                  Utility::map_find(_element_maps.in, element_type);
+                  MAP_FIND(_element_maps.in, element_type);
 
                 // Don't add 0-dimensional "point" elements to the
                 // Mesh.  They should *always* be treated as boundary
@@ -899,7 +899,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
       {
         // Get a reference to the ElementDefinition object
         const ElementDefinition & eletype =
-          Utility::map_find(_element_maps.out, elem->type());
+          MAP_FIND(_element_maps.out, elem->type());
 
         // The element mapper better not require any more nodes
         // than are present in the current element!
@@ -957,7 +957,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
 
             // consult the export element table
             const GmshIO::ElementDefinition & eletype =
-              Utility::map_find(_element_maps.out, side->type());
+              MAP_FIND(_element_maps.out, side->type());
 
             // The element mapper better not require any more nodes
             // than are present in the current element!

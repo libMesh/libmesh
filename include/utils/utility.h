@@ -30,6 +30,12 @@
 namespace libMesh
 {
 
+/**
+ * Encapsulates the common "get value from map, otherwise error"
+ * idiom, which is similar to calling map.at(), but gives a more
+ * useful error message with a line number.
+ */
+#define MAP_FIND(map, key) Utility::map_find((map), (key), __FILE__, __LINE__)
 
 // ------------------------------------------------------------
 // The Utility namespace is for functions
@@ -46,37 +52,44 @@ std::string system_info();
 
 
 /**
- * Encapsulates the common "get value from map, otherwise error"
- * idiom, which is similar to calling map.at(), but gives a more
- * useful error message with a line number. Templated on the type
- * of map, so this will work with both std::map and std::unordered_map.
+ * This function should not be called directly (although it can be),
+ * instead see the MAP_FIND() macro.
+ *
+ * Calls find(key), and checks the result against end(). Returns the
+ * corresponding value if found, throws an error otherwise. Templated
+ * on the type of map, so this will work with both std::map and
+ * std::unordered_map.
  */
 template<typename Map>
 inline
 typename Map::mapped_type &
 map_find(Map & map,
-         const typename Map::key_type & key)
+         const typename Map::key_type & key,
+         const char * filename,
+         int line_number)
 {
   auto it = map.find(key);
   if (it == map.end())
-    libmesh_error_msg("map_find() error: required key not found.");
+    libmesh_error_msg("map_find() error: key not found in file "        \
+                      << filename << " on line " << line_number);
   return it->second;
 }
 
 /**
- * A const version of the function above. It would be better if we
- * only needed one version of the function that would work with const
- * and non-const, but I don't think that's possible.
+ * A version of the function above that works for const objects.
  */
 template<typename Map>
 inline
 const typename Map::mapped_type &
 map_find(const Map & map,
-         const typename Map::key_type & key)
+         const typename Map::key_type & key,
+         const char * filename,
+         int line_number)
 {
   auto it = map.find(key);
   if (it == map.end())
-    libmesh_error_msg("map_find() error: required key not found.");
+    libmesh_error_msg("map_find() error: key not found in file "        \
+                      << filename << " on line " << line_number);
   return it->second;
 }
 

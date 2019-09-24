@@ -387,7 +387,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                     // pointers, make sure they are the same.
                     if (queried_elem && queried_elem == neighbor)
                       csr_graph(elem_global_index, connection++) =
-                        Utility::map_find(global_index_map, neighbor->id());
+                        MAP_FIND(global_index_map, neighbor->id());
                   }
               }
 

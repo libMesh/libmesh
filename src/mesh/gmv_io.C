@@ -1044,7 +1044,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           for (const auto & elem : mesh.active_element_ptr_range())
             {
               // Find the unique index for elem->subdomain_id(), print that to file
-              unsigned gmv_mat_number = Utility::map_find(sbdid_map, elem->subdomain_id());
+              unsigned gmv_mat_number = MAP_FIND(sbdid_map, elem->subdomain_id());
 
               if (this->subdivide_second_order())
                 for (unsigned int se=0; se<elem->n_sub_elem(); se++)
@@ -2150,7 +2150,7 @@ ElemType GMVIO::gmv_elem_to_libmesh_elem(std::string elemname)
 {
   // Erase any whitespace padding in name coming from gmv before performing comparison.
   elemname.erase(std::remove_if(elemname.begin(), elemname.end(), isspace), elemname.end());
-  return Utility::map_find(_reading_element_map, elemname);
+  return MAP_FIND(_reading_element_map, elemname);
 }
 
 

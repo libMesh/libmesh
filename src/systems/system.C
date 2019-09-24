@@ -772,14 +772,14 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
 
 const NumericVector<Number> & System::get_vector (const std::string & vec_name) const
 {
-  return *(Utility::map_find(_vectors, vec_name));
+  return *(MAP_FIND(_vectors, vec_name));
 }
 
 
 
 NumericVector<Number> & System::get_vector (const std::string & vec_name)
 {
-  return *(Utility::map_find(_vectors, vec_name));
+  return *(MAP_FIND(_vectors, vec_name));
 }
 
 
@@ -1230,7 +1230,7 @@ bool System::has_variable (const std::string & var) const
 
 unsigned short int System::variable_number (const std::string & var) const
 {
-  auto var_num = Utility::map_find(_variable_numbers, var);
+  auto var_num = MAP_FIND(_variable_numbers, var);
   libmesh_assert_equal_to (_variables[var_num].name(), var);
   return var_num;
 }

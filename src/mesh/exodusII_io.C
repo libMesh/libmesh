@@ -925,8 +925,8 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
     {
       const auto & derived_name = derived_var_names[derived_var_id];
       const auto & name_and_id =
-        Utility::map_find (derived_name_to_orig_name_and_node_id,
-                           derived_name);
+        MAP_FIND (derived_name_to_orig_name_and_node_id,
+                  derived_name);
 
       // Convenience variables for the map entry's contents.
       const std::string & orig_name = name_and_id.first;
@@ -992,8 +992,8 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
     {
       // Get the original name associated with this derived name.
       const auto & name_and_id =
-        Utility::map_find (derived_name_to_orig_name_and_node_id,
-                           derived_var_name);
+        MAP_FIND (derived_name_to_orig_name_and_node_id,
+                  derived_var_name);
 
       // Convenience variables for the map entry's contents.
       const std::string & orig_name = name_and_id.first;
