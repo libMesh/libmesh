@@ -1883,9 +1883,9 @@ Communicator::receive_packed_range(const unsigned int,
  * Send-receive data from one processor.
  */
 template <typename T1, typename T2>
-inline void Communicator::send_receive (const unsigned int send_tgt,
+inline void Communicator::send_receive (const unsigned int libmesh_dbg_var(send_tgt),
                                         const T1 & send_val,
-                                        const unsigned int recv_source,
+                                        const unsigned int libmesh_dbg_var(recv_source),
                                         T2 & recv_val,
                                         const MessageTag &,
                                         const MessageTag &) const
