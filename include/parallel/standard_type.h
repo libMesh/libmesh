@@ -208,7 +208,7 @@ public:
 
   }
 
-  StandardType(const StandardType<std::pair<T1, T2>> & t)
+  StandardType(const StandardType<std::pair<T1, T2>> & libmesh_mpi_var(t))
   {
     libmesh_call_mpi
       (MPI_Type_dup (t._datatype, &_datatype));
@@ -345,7 +345,7 @@ public:
 
   }
 
-  StandardType(const StandardType<std::tuple<Types...>> & t)
+  StandardType(const StandardType<std::tuple<Types...>> & libmesh_mpi_var(t))
   {
     libmesh_call_mpi
       (MPI_Type_dup (t._datatype, &_datatype));
