@@ -540,13 +540,13 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	face_tri6.h node.h node_elem.h node_range.h plane.h point.h \
 	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
 	surface.h abaqus_io.h boundary_info.h boundary_mesh.h \
-	checkpoint_io.h distributed_mesh.h ensight_io.h exodusII_io.h \
-	exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h \
-	inf_elem_builder.h matlab_io.h medit_io.h mesh.h mesh_base.h \
-	mesh_communication.h mesh_function.h mesh_generation.h \
-	mesh_input.h mesh_inserter_iterator.h mesh_modification.h \
-	mesh_output.h mesh_refinement.h mesh_serializer.h \
-	mesh_smoother.h mesh_smoother_laplace.h \
+	checkpoint_io.h distributed_mesh.h dyna_io.h ensight_io.h \
+	exodusII_io.h exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h \
+	gnuplot_io.h inf_elem_builder.h matlab_io.h medit_io.h mesh.h \
+	mesh_base.h mesh_communication.h mesh_function.h \
+	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
+	mesh_modification.h mesh_output.h mesh_refinement.h \
+	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
 	mesh_smoother_vsmoother.h mesh_subdivision_support.h \
 	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
 	mesh_triangle_holes.h mesh_triangle_interface.h \
@@ -1344,6 +1344,9 @@ checkpoint_io.h: $(top_srcdir)/include/mesh/checkpoint_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 distributed_mesh.h: $(top_srcdir)/include/mesh/distributed_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dyna_io.h: $(top_srcdir)/include/mesh/dyna_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ensight_io.h: $(top_srcdir)/include/mesh/ensight_io.h
