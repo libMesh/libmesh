@@ -181,6 +181,7 @@ libmesh_SOURCES =  \
         src/mesh/boundary_mesh.C \
         src/mesh/checkpoint_io.C \
         src/mesh/distributed_mesh.C \
+        src/mesh/dyna_io.C \
         src/mesh/ensight_io.C \
         src/mesh/exodusII_io.C \
         src/mesh/exodusII_io_helper.C \
