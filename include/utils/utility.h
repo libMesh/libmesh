@@ -35,7 +35,7 @@ namespace libMesh
  * idiom, which is similar to calling map.at(), but gives a more
  * useful error message with a line number.
  */
-#define MAP_FIND(map, key) Utility::map_find((map), (key), __FILE__, __LINE__)
+#define libmesh_map_find(map, key) Utility::map_find((map), (key), __FILE__, __LINE__)
 
 // ------------------------------------------------------------
 // The Utility namespace is for functions
@@ -53,7 +53,7 @@ std::string system_info();
 
 /**
  * This function should not be called directly (although it can be),
- * instead see the MAP_FIND() macro.
+ * instead see the libmesh_map_find() macro.
  *
  * Calls find(key), and checks the result against end(). Returns the
  * corresponding value if found, throws an error otherwise. Templated

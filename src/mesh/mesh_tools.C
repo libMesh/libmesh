@@ -919,7 +919,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
   std::set<const Node *> neighbor_set;
 
   // List of Elems attached to this node.
-  const auto & elem_vec = MAP_FIND(nodes_to_elem_map, global_id);
+  const auto & elem_vec = libmesh_map_find(nodes_to_elem_map, global_id);
 
   // Look through the elements that contain this node
   // find the local node id... then find the side that

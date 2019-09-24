@@ -41,7 +41,7 @@ void RBParameters::clear()
 Real RBParameters::get_value(const std::string & param_name) const
 {
   // find the parameter value, throwing an error if it doesn't exist.
-  return MAP_FIND(_parameters, param_name);
+  return libmesh_map_find(_parameters, param_name);
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)
@@ -52,7 +52,7 @@ void RBParameters::set_value(const std::string & param_name, Real value)
 Real RBParameters::get_extra_value(const std::string & param_name) const
 {
   // find the parameter value, throwing an error if it doesn't exist.
-  return MAP_FIND(_extra_parameters, param_name);
+  return libmesh_map_find(_extra_parameters, param_name);
 }
 
 void RBParameters::set_extra_value(const std::string & param_name, Real value)

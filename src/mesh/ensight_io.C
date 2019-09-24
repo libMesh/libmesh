@@ -231,7 +231,7 @@ void EnsightIO::write_geometry_ascii()
   for (const auto & pr : ensight_parts_map)
     {
       // Look up this ElemType in the map, error if not present.
-      std::string name = MAP_FIND(_element_map, pr.first);
+      std::string name = libmesh_map_find(_element_map, pr.first);
 
       // Write element type
       mesh_stream << "\n" << name << "\n";

@@ -261,14 +261,14 @@ SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string & mat_n
 
 const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string & mat_name) const
 {
-  return *(MAP_FIND(_matrices, mat_name));
+  return *(libmesh_map_find(_matrices, mat_name));
 }
 
 
 
 SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string & mat_name)
 {
-  return *(MAP_FIND(_matrices, mat_name));
+  return *(libmesh_map_find(_matrices, mat_name));
 }
 
 

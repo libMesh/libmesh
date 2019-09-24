@@ -1669,15 +1669,15 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                   // this libmesh node number to the connectivity
                   // array, or throw an error if it's not found.
                   connect[connect_index] =
-                    MAP_FIND(libmesh_node_num_to_exodus,
-                             cast_int<int>(libmesh_node_id));
+                    libmesh_map_find(libmesh_node_num_to_exodus,
+                                     cast_int<int>(libmesh_node_id));
                 }
               else
                 {
                   // Look up the (elem_id, elem_node_index) pair in the map.
                   connect[connect_index] =
-                    MAP_FIND(discontinuous_node_indices,
-                             std::make_pair(elem_id, elem_node_index));
+                    libmesh_map_find(discontinuous_node_indices,
+                                     std::make_pair(elem_id, elem_node_index));
                 }
             }
         }
@@ -2190,7 +2190,7 @@ write_sideset_data(const MeshBase & mesh,
 
               // Sanity check: make sure that the "off by one"
               // assumption we used above to set 'elem_id' is valid.
-              if (MAP_FIND(libmesh_elem_num_to_exodus, cast_int<int>(elem_id))
+              if (libmesh_map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id))
                   != elem_list[i + offset])
                 libmesh_error_msg("Error mapping Exodus elem id to libmesh elem id.");
 
@@ -2216,7 +2216,7 @@ write_sideset_data(const MeshBase & mesh,
               // Find the data for this (elem,side,id) tuple. Throw an
               // error if not found. Then store value in vector which
               // will be passed to Exodus.
-              sset_var_vals[i] = MAP_FIND(data_map, key);
+              sset_var_vals[i] = libmesh_map_find(data_map, key);
             } // end for (i)
 
           // As far as I can tell, there is no "concat" version of writing
@@ -2757,7 +2757,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
   // Do only upper-case comparisons
   std::transform(type_str.begin(), type_str.end(), type_str.begin(), ::toupper);
-  return assign_conversion (MAP_FIND(element_equivalence_map, type_str));
+  return assign_conversion (libmesh_map_find(element_equivalence_map, type_str));
 }
 
 
