@@ -135,11 +135,12 @@ void DynaIO::read_mesh(std::istream & in)
   // Values to remember from section to section
   dyna_int_type patch_id, n_nodes, n_elem, n_coef_vec, weight_control_flag;
   dyna_int_type n_elem_blocks;
-  dyna_int_type block_elem_type, block_n_elem, block_n_nodes, block_n_coef_vec, block_p, block_dim;
+  dyna_int_type block_elem_type, block_n_elem, block_n_nodes, block_n_coef_vec, block_p,
+                block_dim = 1;
   dyna_int_type n_dense_coef_vec_blocks, n_coef_vecs_in_subblock, n_coef_comp;
-  unsigned char weight_index;
-  const ElementDefinition * current_elem_defn;
-  Elem * current_elem;
+  unsigned char weight_index = 0;
+  const ElementDefinition * current_elem_defn = nullptr;
+  Elem * current_elem = nullptr;
   dyna_int_type n_nodes_read = 0,
                 n_elem_blocks_read = 0,
                 n_elems_read = 0,
