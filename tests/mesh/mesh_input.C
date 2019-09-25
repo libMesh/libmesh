@@ -3,6 +3,7 @@
 #include <libmesh/mesh_communication.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
 #include <libmesh/dof_map.h>
 
@@ -37,6 +38,7 @@ public:
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif
 #endif
+  CPPUNIT_TEST( testDynaReadMesh );
 
   CPPUNIT_TEST( testMeshMoveConstructor );
 #endif // LIBMESH_DIM > 1
@@ -205,6 +207,39 @@ public:
 
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 #endif // LIBMESH_HAVE_EXODUS_API
+
+  void testDynaReadMesh ()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    DynaIO dyna(mesh);
+    if (mesh.processor_id() == 0)
+      dyna.read("1_quad.dyn");
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), 1u);
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), 9u);
+    if (mesh.query_elem_ptr(0))
+      {
+        const Elem & elem = mesh.elem_ref(0);
+        CPPUNIT_ASSERT_EQUAL(elem.point(0)(0), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem.point(0)(1), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem.point(1)(0), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(elem.point(1)(1), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem.point(2)(0), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(elem.point(2)(1), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(elem.point(3)(0), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem.point(3)(1), Real(1.5));
+        CPPUNIT_ASSERT(elem.has_affine_map());
+#if LIBMESH_DIM > 2
+        for (unsigned int v=0; v != 4; ++v)
+          CPPUNIT_ASSERT_EQUAL(elem.point(v)(2), Real(0));
+#endif
+      }
+  }
+
 
   void testMeshMoveConstructor ()
   {
