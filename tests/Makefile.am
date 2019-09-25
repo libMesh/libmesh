@@ -225,6 +225,8 @@ CLEANFILES = cube_mesh.xda \
 clean-local:
 	rm -rf checkpoint_splitter.cpr \
 	       checkpoint_splitter.cpa \
+               extra_integers.cpr \
+               extra_integers.cpa \
 	       .jitcache
 
 ######################################################################
