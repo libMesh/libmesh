@@ -243,7 +243,7 @@ void DynaIO::read_mesh(std::istream & in)
             if (!stream.fail())
               {
                 block_dim = 2; // Found a second dimension!
-                
+
                 if (block_other_p != block_p)
                   libmesh_not_implemented(); // We don't support p anisotropy
 
@@ -251,7 +251,7 @@ void DynaIO::read_mesh(std::istream & in)
                 if (!stream.fail())
                   {
                     block_dim = 3; // Found a third dimension!
-                
+
                     if (block_other_p != block_p)
                       libmesh_not_implemented();
                   }
@@ -282,7 +282,7 @@ void DynaIO::read_mesh(std::istream & in)
               }
             {
 
-              const int end_node_to_read = 
+              const int end_node_to_read =
                 std::min(block_n_nodes, n_elem_nodes_read + max_ints_per_line);
               for (int i = n_elem_nodes_read; i != end_node_to_read; ++i)
                 {
@@ -311,7 +311,7 @@ void DynaIO::read_mesh(std::istream & in)
             break;
           case ELEM_COEF_VEC_IDS:
             {
-              const int end_cvid_to_read = 
+              const int end_cvid_to_read =
                 std::min(block_n_nodes, n_elem_cvids_read + max_ints_per_line);
               for (int i = n_elem_cvids_read; i != end_cvid_to_read; ++i)
                 {
@@ -376,7 +376,7 @@ void DynaIO::read_mesh(std::istream & in)
               }
             {
 
-              const int end_coef_to_read = 
+              const int end_coef_to_read =
                 std::min(n_coef_comp, n_coef_comp_read + max_fps_per_line);
               for (int i = n_coef_comp_read; i != end_coef_to_read; ++i)
                 {
