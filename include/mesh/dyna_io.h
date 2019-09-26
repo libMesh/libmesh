@@ -112,28 +112,13 @@ private:
     ElementDefinition(ElemType type_in,
                       unsigned dyna_type_in,
                       unsigned dim_in,
-                      unsigned p_in) :
-      type(type_in),
-      dyna_type(dyna_type_in),
-      dim(dim_in),
-      p(p_in)
-    {
-      const unsigned int n_nodes = Elem::type_to_n_nodes_map[type_in];
-      nodes.resize(n_nodes);
-      std::iota(nodes.begin(), nodes.end(), 0);
-    }
+                      unsigned p_in);
 
     ElementDefinition(ElemType type_in,
                       unsigned dyna_type_in,
                       unsigned dim_in,
                       unsigned p_in,
-                      std::vector<unsigned int> && nodes_in) :
-      type(type_in),
-      dyna_type(dyna_type_in),
-      dim(dim_in),
-      p(p_in),
-      nodes(nodes_in)
-    {}
+                      std::vector<unsigned int> && nodes_in);
 
     ElemType type;
     unsigned int dyna_type;
