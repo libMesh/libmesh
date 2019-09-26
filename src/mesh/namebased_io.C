@@ -29,6 +29,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/namebased_io.h"
+#include "libmesh/dyna_io.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
@@ -235,11 +236,17 @@ void NameBasedIO::read (const std::string & name)
           else if (new_name.rfind(".inp") < new_name.size())
             AbaqusIO(mymesh).read(new_name);
 
+          else if ((new_name.rfind(".bext")  < new_name.size()) ||
+                   (new_name.rfind(".bxt")   < new_name.size()))
+            DynaIO(mymesh).read (new_name);
+
           else
             {
               libmesh_error_msg(" ERROR: Unrecognized file extension: " \
                                 << name                                 \
                                 << "\n   I understand the following:\n\n" \
+                                << "     *.bext -- Bezier files in DYNA format\n" \
+                                << "     *.bxt  -- Bezier files in DYNA format\n" \
                                 << "     *.e    -- Sandia's ExodusII format\n" \
                                 << "     *.exd  -- Sandia's ExodusII format\n" \
                                 << "     *.gmv  -- LANL's General Mesh Viewer format\n" \
