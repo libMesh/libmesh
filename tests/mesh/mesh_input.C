@@ -219,8 +219,8 @@ public:
 
     mesh.prepare_for_use();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), 1u);
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), 9u);
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(9));
 
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
