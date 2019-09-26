@@ -223,6 +223,17 @@ CLEANFILES = cube_mesh.xda \
 	     elemental_from_nodal.e \
              write_sideset_data.e
 
+# need to link any data files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+
+.linkstamp:
+	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += .linkstamp
+endif
+
 # CLEANFILES only applies to files, handle directories separately
 clean-local:
 	rm -rf checkpoint_splitter.cpr \

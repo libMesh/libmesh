@@ -159,6 +159,7 @@ BUILT_SOURCES = \
         boundary_mesh.h \
         checkpoint_io.h \
         distributed_mesh.h \
+        dyna_io.h \
         ensight_io.h \
         exodusII_io.h \
         exodusII_io_helper.h \
@@ -1000,6 +1001,9 @@ checkpoint_io.h: $(top_srcdir)/include/mesh/checkpoint_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 distributed_mesh.h: $(top_srcdir)/include/mesh/distributed_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dyna_io.h: $(top_srcdir)/include/mesh/dyna_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ensight_io.h: $(top_srcdir)/include/mesh/ensight_io.h

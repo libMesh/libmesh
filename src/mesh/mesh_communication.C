@@ -1105,6 +1105,18 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   if (mesh.processor_id() != 0)
     mesh.clear();
 
+  // We may have set extra data only on processor 0 in a read()
+  mesh.comm().broadcast(mesh._node_integer_names);
+  mesh.comm().broadcast(mesh._elem_integer_names);
+
+  // We may have set mapping data only on processor 0 in a read()
+  unsigned char map_type = mesh.default_mapping_type();
+  unsigned char map_data = mesh.default_mapping_data();
+  mesh.comm().broadcast(map_type);
+  mesh.comm().broadcast(map_data);
+  mesh.set_default_mapping_type(ElemMappingType(map_type));
+  mesh.set_default_mapping_data(map_data);
+
   // Broadcast nodes
   mesh.comm().broadcast_packed_range(&mesh,
                                      mesh.nodes_begin(),

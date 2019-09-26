@@ -1743,6 +1743,12 @@ protected:
    * it can create and interact with \p BoundaryMesh.
    */
   friend class BoundaryInfo;
+
+  /**
+   * Make the \p MeshCommunication class a friend so that
+   * it can directly broadcast *_integer_names
+   */
+  friend class MeshCommunication;
 };
 
 

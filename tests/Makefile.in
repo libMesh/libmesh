@@ -114,11 +114,12 @@ noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_3) $(am__EXEEXT_4) \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_9 = unit_tests-oprof
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_10 = unit_tests-oprof
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_11 = unit_tests-opt
+@LIBMESH_VPATH_BUILD_TRUE@am__append_12 = .linkstamp
 
 ######################################################################
 #
 # Don't leave code coverage outputs lying around
-@CODE_COVERAGE_ENABLED_TRUE@am__append_12 = */*.gcda */*.gcno
+@CODE_COVERAGE_ENABLED_TRUE@am__append_13 = */*.gcda */*.gcno
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -1744,8 +1745,12 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
-	$(am__append_12)
-all: all-am
+	$(am__append_12) $(am__append_13)
+
+# need to link any data files for VPATH builds
+@LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .C .lo .o .obj
@@ -8787,10 +8792,12 @@ distdir-am: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -8845,6 +8852,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libtool clean-local \
@@ -9694,7 +9702,7 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: check-am install-am install-strip
+.MAKE: all check check-am install install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-TESTS \
 	check-am clean clean-checkPROGRAMS clean-generic clean-libtool \
@@ -9743,6 +9751,10 @@ $(top_builddir)/libmesh_prof.la: FORCE
 
 $(top_builddir)/libmesh_oprof.la: FORCE
 	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
+
+@LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
+@LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # CLEANFILES only applies to files, handle directories separately
 clean-local:

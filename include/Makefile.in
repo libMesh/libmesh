@@ -748,6 +748,7 @@ include_HEADERS = \
         mesh/boundary_mesh.h \
         mesh/checkpoint_io.h \
         mesh/distributed_mesh.h \
+        mesh/dyna_io.h \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \
         mesh/exodusII_io_helper.h \
