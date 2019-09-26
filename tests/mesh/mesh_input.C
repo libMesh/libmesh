@@ -221,9 +221,22 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), 1u);
     CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), 9u);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
+                         RATIONAL_BERNSTEIN_MAP);
+
+    unsigned char weight_index = mesh.default_mapping_data();
+
     if (mesh.query_elem_ptr(0))
       {
         const Elem & elem = mesh.elem_ref(0);
+
+        CPPUNIT_ASSERT_EQUAL(elem.type(), QUAD9);
+        for (unsigned int n=0; n != 9; ++n)
+          CPPUNIT_ASSERT_EQUAL
+            (elem.node_ref(n).get_extra_datum<Real>(weight_index),
+             Real(0.75));
+
         CPPUNIT_ASSERT_EQUAL(elem.point(0)(0), Real(0.5));
         CPPUNIT_ASSERT_EQUAL(elem.point(0)(1), Real(0.5));
         CPPUNIT_ASSERT_EQUAL(elem.point(1)(0), Real(1.5));
