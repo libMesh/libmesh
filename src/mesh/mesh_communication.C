@@ -1140,6 +1140,14 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   // elements it can't locate.
   mesh.clear_point_locator();
 
+  // We may have set mapping data only on processor 0 in a read()
+  unsigned char map_type = mesh.default_mapping_type();
+  mesh.comm().broadcast(map_type);
+  mesh.set_default_mapping_type(ElemMappingType(map_type));
+  unsigned char map_data = mesh.default_mapping_data();
+  mesh.comm().broadcast(map_data);
+  mesh.set_default_mapping_data(map_data);
+
   libmesh_assert (mesh.comm().verify(mesh.n_elem()));
   libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
 
