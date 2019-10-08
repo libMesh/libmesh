@@ -17,8 +17,8 @@
 
 
 
-#ifndef LIBMESH_STRING_TO_ENUM_H
-#define LIBMESH_STRING_TO_ENUM_H
+#ifndef LIBMESH_ENUM_TO_STRING_H
+#define LIBMESH_ENUM_TO_STRING_H
 
 
 
@@ -32,13 +32,13 @@ namespace Utility
 {
 
 /**
- * \returns the enumeration of type \p T which matches the string \p s.
+ * \returns the \p string which matches the enumeration \p e of type \p T.
  */
 template <typename T>
-T string_to_enum (const std::string & s);
+std::string enum_to_string (const T e);
 
 } // namespace Utility
 } // namespace libMesh
 
 
-#endif // LIBMESH_STRING_TO_ENUM_H
+#endif // LIBMESH_ENUM_TO_STRING_H

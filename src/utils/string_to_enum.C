@@ -24,6 +24,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/enum_convergence_flags.h"
 #include "libmesh/enum_elem_quality.h"
 #include "libmesh/enum_elem_type.h"
