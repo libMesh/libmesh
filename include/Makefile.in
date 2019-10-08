@@ -1010,6 +1010,7 @@ include_HEADERS = \
         systems/system_subset_by_subdomain.h \
         systems/transient_system.h \
         utils/compare_types.h \
+        utils/enum_to_string.h \
         utils/error_vector.h \
         utils/hashword.h \
         utils/ignore_warnings.h \
