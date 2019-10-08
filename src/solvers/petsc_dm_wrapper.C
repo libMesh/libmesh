@@ -517,7 +517,11 @@ namespace libMesh
 
         // Build the PetscSection and attach it to the DM
         this->build_section(system, section);
+#if PETSC_VERSION_LESS_THAN(3,9,0)
         ierr = DMSetDefaultSection(dm, section);
+#else
+        ierr = DMSetSection(dm, section);
+#endif
         CHKERRABORT(system.comm().get(),ierr);
 
         // We only need to build the star forest if we're in a parallel environment
@@ -525,7 +529,11 @@ namespace libMesh
           {
             // Build the PetscSF and attach it to the DM
             this->build_sf(system, star_forest);
+#if PETSC_VERSION_LESS_THAN(3,12,0)
             ierr = DMSetDefaultSF(dm, star_forest);
+#else
+            ierr = DMSetSectionSF(dm, star_forest);
+#endif
             CHKERRABORT(system.comm().get(),ierr);
           }
 
