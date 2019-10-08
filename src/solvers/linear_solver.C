@@ -27,7 +27,7 @@
 #include "libmesh/trilinos_aztec_linear_solver.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/sparse_matrix.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_preconditioner_type.h"

@@ -29,7 +29,7 @@
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/sphere.h"
 #include "libmesh/threads.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"

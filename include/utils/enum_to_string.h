@@ -16,33 +16,29 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// Local includes
-#include "libmesh/quadrature_conical.h"
-#include "libmesh/enum_to_string.h"
+
+#ifndef LIBMESH_ENUM_TO_STRING_H
+#define LIBMESH_ENUM_TO_STRING_H
+
+
+
+// C++ includes
+#include <string>
 
 namespace libMesh
 {
 
-
-
-void QConical::init_2D(const ElemType, unsigned int)
+namespace Utility
 {
-  switch (_type)
-    {
-    case TRI3:
-    case TRISHELL3:
-    case TRI3SUBDIVISION:
-    case TRI6:
-      {
-        this->conical_product_tri();
-        return;
-      } // end case TRI3, TRI6
 
-      //---------------------------------------------
-      // Unsupported element type
-    default:
-      libmesh_error_msg("ERROR: Unsupported element type: " << Utility::enum_to_string(_type));
-    } // end switch (type_in)
-}
+/**
+ * \returns the \p string which matches the enumeration \p e of type \p T.
+ */
+template <typename T>
+std::string enum_to_string (const T e);
 
+} // namespace Utility
 } // namespace libMesh
+
+
+#endif // LIBMESH_ENUM_TO_STRING_H

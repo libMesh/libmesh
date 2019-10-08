@@ -24,7 +24,7 @@
 
 // Local Includes
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/trilinos_aztec_linear_solver.h"
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/trilinos_epetra_vector.h"

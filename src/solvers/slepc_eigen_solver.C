@@ -21,16 +21,13 @@
 
 #if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_PETSC)
 
-
-// C++ includes
-
 // Local Includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/shell_matrix.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/enum_eigen_solver_type.h"
 

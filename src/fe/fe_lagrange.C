@@ -24,14 +24,10 @@
 #include "libmesh/elem.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
-
-// ------------------------------------------------------------
-// Lagrange-specific implementations
-
 
 // Anonymous namespace for local helper functions
 namespace {

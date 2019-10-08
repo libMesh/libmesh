@@ -22,13 +22,17 @@
 
 
 
+// libMesh includes
+ #include "libmesh/enum_to_string.h" // backwards compatibility
+
 // C++ includes
 #include <string>
 
 namespace libMesh
 {
 
-namespace Utility {
+namespace Utility
+{
 
 /**
  * \returns the enumeration of type \p T which matches the string \p s.
@@ -36,15 +40,7 @@ namespace Utility {
 template <typename T>
 T string_to_enum (const std::string & s);
 
-
-
-/**
- * \returns the \p string which matches the enumeration \p e of type \p T.
- */
-template <typename T>
-std::string enum_to_string (const T e);
-}
-
+} // namespace Utility
 } // namespace libMesh
 
 

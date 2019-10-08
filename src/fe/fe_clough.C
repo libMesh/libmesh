@@ -21,8 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/string_to_enum.h"
-
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
