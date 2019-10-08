@@ -22,6 +22,9 @@
 
 
 
+// libMesh includes
+ #include "libmesh/enum_to_string.h" // backwards compatibility
+
 // C++ includes
 #include <string>
 
