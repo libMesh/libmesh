@@ -25,7 +25,7 @@
 // Local Includes
 #include "libmesh/laspack_linear_solver.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_convergence_flags.h"

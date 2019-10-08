@@ -18,7 +18,7 @@
 
 // Local includes
 #include "libmesh/quadrature_conical.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {

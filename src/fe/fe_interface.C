@@ -26,7 +26,7 @@
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_elem_type.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {

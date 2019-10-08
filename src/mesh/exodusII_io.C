@@ -33,7 +33,7 @@
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/exodusII_io_helper.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/dof_map.h"

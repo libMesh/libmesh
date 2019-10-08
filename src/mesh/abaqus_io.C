@@ -25,7 +25,7 @@
 #include "libmesh/abaqus_io.h"
 #include "libmesh/point.h"
 #include "libmesh/elem.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h"
 #include <unordered_map>

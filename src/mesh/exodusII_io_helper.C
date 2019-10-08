@@ -31,7 +31,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"

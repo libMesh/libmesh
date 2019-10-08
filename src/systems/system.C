@@ -31,7 +31,7 @@
 #include "libmesh/point.h"              // For point_value
 #include "libmesh/point_locator_base.h" // For point_value
 #include "libmesh/qoi_set.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/system.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/utility.h"

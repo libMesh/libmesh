@@ -23,7 +23,7 @@
 #include "libmesh/reference_elem.h"
 #include "libmesh/libmesh_singleton.h"
 #include "libmesh/threads.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/enum_elem_type.h"
 
 // C++ includes

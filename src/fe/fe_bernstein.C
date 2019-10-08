@@ -19,12 +19,13 @@
 
 // Local includes
 #include "libmesh/libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {

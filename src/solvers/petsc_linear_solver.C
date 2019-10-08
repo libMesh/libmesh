@@ -31,7 +31,7 @@
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/petsc_vector.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/system.h"
 #include "libmesh/petsc_auto_fieldsplit.h"
 #include "libmesh/solver_configuration.h"

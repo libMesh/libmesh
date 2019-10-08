@@ -21,7 +21,7 @@
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_conical.h"
 #include "libmesh/quadrature_gm.h"
-#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
