@@ -427,6 +427,7 @@ BUILT_SOURCES = \
         system_subset_by_subdomain.h \
         transient_system.h \
         compare_types.h \
+        enum_to_string.h \
         error_vector.h \
         hashword.h \
         ignore_warnings.h \
@@ -1805,6 +1806,9 @@ transient_system.h: $(top_srcdir)/include/systems/transient_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 compare_types.h: $(top_srcdir)/include/utils/compare_types.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 error_vector.h: $(top_srcdir)/include/utils/error_vector.h
