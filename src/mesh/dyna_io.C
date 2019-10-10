@@ -26,6 +26,7 @@
 // C++ includes
 #include <fstream>
 #include <cstddef>
+#include <array>
 
 namespace libMesh
 {
