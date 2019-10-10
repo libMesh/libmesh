@@ -64,6 +64,11 @@ public:
   {}
 
   /**
+   * Copy-assignment operator.
+   */
+  Point& operator=(const Point & p) = default;
+
+  /**
    * Disambiguate constructing from non-Real scalars
    */
   template <typename T,
