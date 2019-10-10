@@ -24,9 +24,10 @@
 #include "libmesh/int_range.h"
 
 // C++ includes
-#include <fstream>
-#include <cstddef>
 #include <array>
+#include <cstddef>
+#include <fstream>
+#include <iterator>
 
 namespace libMesh
 {
@@ -83,9 +84,9 @@ DynaIO::ElementMaps DynaIO::build_element_maps()
 
 DynaIO::ElementDefinition::ElementDefinition
   (ElemType type_in,
-   unsigned dyna_type_in,
-   unsigned dim_in,
-   unsigned p_in) :
+   dyna_int_type dyna_type_in,
+   dyna_int_type dim_in,
+   dyna_int_type p_in) :
   type(type_in),
   dyna_type(dyna_type_in),
   dim(dim_in),
@@ -99,9 +100,9 @@ DynaIO::ElementDefinition::ElementDefinition
 
 DynaIO::ElementDefinition::ElementDefinition
   (ElemType type_in,
-   unsigned dyna_type_in,
-   unsigned dim_in,
-   unsigned p_in,
+   dyna_int_type dyna_type_in,
+   dyna_int_type dim_in,
+   dyna_int_type p_in,
    std::vector<unsigned int> && nodes_in) :
   type(type_in),
   dyna_type(dyna_type_in),
@@ -147,43 +148,71 @@ void DynaIO::read_mesh(std::istream & in)
     FILE_HEADER,
     PATCH_HEADER,
     NODE_LINES,
-    // (repeat NODE_LINES for each node)
+    // (repeat for each node)
     N_ELEM_SUBBLOCKS,
     ELEM_SUBBLOCK_HEADER,
+    // (repeat for each subblock)
     ELEM_NODES_LINES,
     ELEM_COEF_VEC_IDS,
-    // (repeat nodes lines + coef vec ids as necessary)
-    // (repeat elem subblock as necessary)
+    // (repeat nodes lines + coef vec ids for each elem, subblock)
     N_COEF_BLOCKS, // number of coef vec blocks of each type
     N_VECS_PER_BLOCK, // number of coef vecs in each dense block
     COEF_VEC_COMPONENTS,
     //  (repeat coef vec components as necessary)
     //  (repeat coef blocks as necessary)
+    //
     //  reserved for sparse block stuff we don't support yet
     END_OF_FILE };
 
   FileSection section = FILE_HEADER;
 
   // Values to remember from section to section
-  dyna_int_type patch_id, n_nodes, n_elem, n_coef_vec, weight_control_flag;
-  dyna_int_type n_elem_blocks;
-  dyna_int_type block_elem_type, block_n_elem, block_n_nodes, block_n_coef_vec, block_p,
-                block_dim = 1;
-  dyna_int_type n_dense_coef_vec_blocks, n_coef_vecs_in_subblock, n_coef_comp;
+  dyna_int_type patch_id, n_spline_nodes, n_elem, n_coef_vec, weight_control_flag;
+  dyna_int_type n_elem_blocks, n_dense_coef_vec_blocks;
+  std::vector<dyna_int_type> // indexed from 0 to n_elem_blocks
+    block_elem_type,
+    block_n_elem, 
+    block_n_nodes,    // Number of *spline* nodes constraining elements
+    block_n_coef_vec, // Number of coefficient vectors for each elem
+    block_p,
+    block_dim;
+  std::vector<dyna_int_type> // indexed from 0 to n_dense_coef_vec_blocks
+    n_coef_vecs_in_subblock, n_coef_comp;
   unsigned char weight_index = 0;
-  const ElementDefinition * current_elem_defn = nullptr;
-  Elem * current_elem = nullptr;
   dyna_int_type n_nodes_read = 0,
                 n_elem_blocks_read = 0,
                 n_elems_read = 0,
                 n_elem_nodes_read = 0,
                 n_elem_cvids_read = 0,
+                n_coef_headers_read = 0,
                 n_coef_blocks_read = 0,
                 n_coef_comp_read = 0,
                 n_coef_vecs_read = 0;
 
   // For reading the file line by line
   std::string s;
+
+  // For storing global (spline) nodes and their weights, until we
+  // have enough data to use them for calculating local (Bezier
+  // element) nodes
+  std::vector<Point> spline_nodes;
+  std::vector<Real> spline_weights;
+
+  // For storing elements' constraint equations:
+  // Global node indices (1-based in file, 0-based in memory):
+  // elem_global_nodes[block_num][elem_num][local_index] = global_index
+  std::vector<std::vector<std::vector<dof_id_type>>> elem_global_nodes;
+
+  // Constraint vector indices (1-based in file, 0-based in memory):
+  // elem_constraint_rows[block_num][elem_num][row_num] = cv_index
+  std::vector<std::vector<std::vector<dof_id_type>>> elem_constraint_rows;
+
+  // Dense constraint vectors themselves
+  // When first read:
+  // dense_constraint_vecs[block_num][vec_in_block][column_num] = coef
+  // When used:
+  // dense_constraint_vecs[0][vec_num][column_num] = coef
+  std::vector<std::vector<std::vector<Real>>> dense_constraint_vecs;
 
   while (true)
     {
@@ -214,12 +243,15 @@ void DynaIO::read_mesh(std::istream & in)
           switch (section) {
           case PATCH_HEADER:
             stream >> patch_id;
-            stream >> n_nodes;
+            stream >> n_spline_nodes;
             stream >> n_elem;
             stream >> n_coef_vec;
             stream >> weight_control_flag;
             if (stream.fail())
               libmesh_error_msg("Failure to parse patch header\n");
+
+            spline_nodes.resize(n_spline_nodes);
+            spline_weights.resize(n_spline_nodes);
 
             if (weight_control_flag)
               {
@@ -239,90 +271,100 @@ void DynaIO::read_mesh(std::istream & in)
               stream >> xyzw[2];
               stream >> xyzw[3];
 
-              Point p(xyzw[0], xyzw[1], xyzw[2]);
-              Node *n = mesh.add_point(p, n_nodes_read);
+              spline_nodes[n_nodes_read] = Point(xyzw[0], xyzw[1], xyzw[2]);
               if (weight_control_flag)
-                n->set_extra_datum<Real>(weight_index, xyzw[3]);
+                spline_weights[n_nodes_read] = xyzw[3];
             }
             ++n_nodes_read;
 
             if (stream.fail())
               libmesh_error_msg("Failure to parse node line\n");
 
-            if (n_nodes_read >= n_nodes)
+            if (n_nodes_read >= n_spline_nodes)
               section = N_ELEM_SUBBLOCKS;
             break;
           case N_ELEM_SUBBLOCKS:
             stream >> n_elem_blocks;
             if (stream.fail())
               libmesh_error_msg("Failure to parse n_elem_blocks\n");
+
+            block_elem_type.resize(n_elem_blocks);
+            block_n_elem.resize(n_elem_blocks);
+            block_n_nodes.resize(n_elem_blocks);
+            block_n_coef_vec.resize(n_elem_blocks);
+            block_p.resize(n_elem_blocks);
+            block_dim.resize(n_elem_blocks);
+
+            elem_global_nodes.resize(n_elem_blocks);
+            elem_constraint_rows.resize(n_elem_blocks);
+
+            n_elem_blocks_read = 0;
             section = ELEM_SUBBLOCK_HEADER;
             break;
           case ELEM_SUBBLOCK_HEADER:
-            stream >> block_elem_type;
-            stream >> block_n_elem;
-            stream >> block_n_nodes;
-            stream >> block_n_coef_vec;
-            stream >> block_p;
+            stream >> block_elem_type[n_elem_blocks_read];
+            stream >> block_n_elem[n_elem_blocks_read];
+            stream >> block_n_nodes[n_elem_blocks_read];
+            stream >> block_n_coef_vec[n_elem_blocks_read];
+            stream >> block_p[n_elem_blocks_read];
 
             if (stream.fail())
               libmesh_error_msg("Failure to parse elem block\n");
 
-            block_dim = 1; // All blocks here are at least 1D
+            block_dim[n_elem_blocks_read] = 1; // All blocks here are at least 1D
 
             dyna_int_type block_other_p; // Check for isotropic p
             stream >> block_other_p;
             if (!stream.fail())
               {
-                block_dim = 2; // Found a second dimension!
+                block_dim[n_elem_blocks_read] = 2; // Found a second dimension!
 
-                if (block_other_p != block_p)
+                if (block_other_p != block_p[n_elem_blocks_read])
                   libmesh_not_implemented(); // We don't support p anisotropy
 
                 stream >> block_other_p;
                 if (!stream.fail())
                   {
-                    block_dim = 3; // Found a third dimension!
+                    block_dim[n_elem_blocks_read] = 3; // Found a third dimension!
 
-                    if (block_other_p != block_p)
+                    if (block_other_p != block_p[n_elem_blocks_read])
                       libmesh_not_implemented();
                   }
               }
+
+            {
+              auto & block_global_nodes = elem_global_nodes[n_elem_blocks_read];
+              auto & block_constraint_rows = elem_constraint_rows[n_elem_blocks_read];
+
+              block_global_nodes.resize(block_n_elem[n_elem_blocks_read]);
+              block_constraint_rows.resize(block_n_elem[n_elem_blocks_read]);
+
+              for (auto e : IntRange<dyna_int_type>
+                   (0, block_n_elem[n_elem_blocks_read]))
+                {
+                  block_global_nodes[e].resize(block_n_nodes[n_elem_blocks_read]);
+                  block_constraint_rows[e].resize(block_n_coef_vec[n_elem_blocks_read]);
+                }
+            }
+
             n_elem_blocks_read++;
-            n_elems_read = 0;
-            section = ELEM_NODES_LINES;
+            if (n_elem_blocks_read == n_elem_blocks)
+              {
+                n_elem_blocks_read = 0;
+                n_elems_read = 0;
+                section = ELEM_NODES_LINES;
+              }
             break;
           case ELEM_NODES_LINES:
-            // Start a new Elem with each new line of nodes
-            if (n_elem_nodes_read == 0)
-              {
-                // Consult the import element table to determine which element to build
-                auto eletypes_it = _element_maps.in.find(std::make_tuple(block_elem_type, block_dim, block_p));
-
-                // Make sure we actually found something
-                if (eletypes_it == _element_maps.in.end())
-                  libmesh_error_msg
-                    ("Element of type " << block_elem_type <<
-                     " dim " << block_dim <<
-                     " degree " << block_p << " not found!");
-
-                current_elem_defn = &(eletypes_it->second);
-                current_elem = Elem::build(current_elem_defn->type).release();
-                libmesh_assert_equal_to(current_elem->n_nodes(), (unsigned int)(block_n_nodes));
-                libmesh_assert_equal_to(current_elem->dim(), block_dim);
-                n_elem_cvids_read = 0;
-              }
             {
-
               const int end_node_to_read =
-                std::min(block_n_nodes, n_elem_nodes_read + max_ints_per_line);
-              for (int i = n_elem_nodes_read; i != end_node_to_read; ++i)
+                std::min(block_n_nodes[n_elem_blocks_read], n_elem_nodes_read + max_ints_per_line);
+              for (; n_elem_nodes_read != end_node_to_read; ++n_elem_nodes_read)
                 {
                   dyna_int_type node_id;
                   stream >> node_id;
                   node_id--;
-                  current_elem->set_node(current_elem_defn->nodes[i]) =
-                    mesh.node_ptr(node_id);
+                  elem_global_nodes[n_elem_blocks_read][n_elems_read][n_elem_nodes_read] = node_id;
 
                   // Let's assume that our *only* mid-line breaks are
                   // due to the max_ints_per_line limit.  This should be
@@ -330,29 +372,25 @@ void DynaIO::read_mesh(std::istream & in)
                   if (stream.fail())
                     libmesh_error_msg("Failure to parse elem nodes\n");
                 }
-              if (end_node_to_read == block_n_nodes)
+
+              if (n_elem_nodes_read == block_n_nodes[n_elem_blocks_read])
                 {
                   n_elem_nodes_read = 0;
                   section = ELEM_COEF_VEC_IDS;
-                }
-              else
-                {
-                  n_elem_nodes_read = end_node_to_read;
                 }
             }
             break;
           case ELEM_COEF_VEC_IDS:
             {
               const int end_cvid_to_read =
-                std::min(block_n_nodes, n_elem_cvids_read + max_ints_per_line);
-              for (int i = n_elem_cvids_read; i != end_cvid_to_read; ++i)
+                std::min(block_n_coef_vec[n_elem_blocks_read], n_elem_cvids_read + max_ints_per_line);
+              for (; n_elem_cvids_read != end_cvid_to_read; ++n_elem_cvids_read)
                 {
                   dyna_int_type node_cvid;
                   stream >> node_cvid;
                   node_cvid--;
 
-                  // FIXME - we need to store these somewhere to use for
-                  // constraint equations
+                  elem_constraint_rows[n_elem_blocks_read][n_elems_read][n_elem_cvids_read] = node_cvid;
 
                   // Let's assume that our *only* mid-line breaks are
                   // due to the max_ints_per_line limit.  This should be
@@ -360,19 +398,18 @@ void DynaIO::read_mesh(std::istream & in)
                   if (stream.fail())
                     libmesh_error_msg("Failure to parse elem cvids\n");
                 }
-              if (end_cvid_to_read == block_n_nodes)
+              if (n_elem_cvids_read == block_n_nodes[n_elem_blocks_read])
                 {
-                  current_elem->set_id(n_elems_read);
-                  mesh.add_elem(current_elem);
+                  n_elem_cvids_read = 0;
                   n_elems_read++;
-                  if (n_elems_read == block_n_elem)
-                    section = N_COEF_BLOCKS; // Move on to coefficient vectors
-                  else
-                    section = ELEM_COEF_VEC_IDS; // Read another elem
-                }
-              else
-                {
-                  n_elem_cvids_read = end_cvid_to_read;
+                  section = ELEM_NODES_LINES; // Read another elem, nodes first
+                  if (n_elems_read == block_n_elem[n_elem_blocks_read])
+                    {
+                      n_elems_read = 0;
+                      n_elem_blocks_read++;
+                      if (n_elem_blocks_read == n_elem_blocks)
+                        section = N_COEF_BLOCKS; // Move on to coefficient vectors
+                    }
                 }
             }
             break;
@@ -388,34 +425,47 @@ void DynaIO::read_mesh(std::istream & in)
               if (n_sparse_coef_vec_blocks != 0)
                 libmesh_not_implemented();
 
+              dense_constraint_vecs.resize(n_dense_coef_vec_blocks);
+              n_coef_vecs_in_subblock.resize(n_dense_coef_vec_blocks);
+              n_coef_comp.resize(n_dense_coef_vec_blocks);
+
               section = N_VECS_PER_BLOCK;
             }
             break;
           case N_VECS_PER_BLOCK:
-            stream >> n_coef_vecs_in_subblock;
-            stream >> n_coef_comp;
+            stream >> n_coef_vecs_in_subblock[n_coef_headers_read];
+            stream >> n_coef_comp[n_coef_headers_read];
 
             if (stream.fail())
               libmesh_error_msg("Failure to parse dense coef subblock header\n");
 
-            section = COEF_VEC_COMPONENTS;
+            dense_constraint_vecs[n_coef_headers_read].resize
+              (n_coef_vecs_in_subblock[n_coef_headers_read]);
+
+            for (auto & vec : dense_constraint_vecs[n_coef_headers_read])
+              vec.resize(n_coef_comp[n_coef_headers_read]);
+
+            n_coef_headers_read++;
+            if (n_coef_headers_read == n_dense_coef_vec_blocks)
+              {
+                n_coef_headers_read = 0;
+                section = COEF_VEC_COMPONENTS;
+              }
             break;
           case COEF_VEC_COMPONENTS:
-            // Start a new coefficient line
-            if (n_coef_comp_read == 0)
-              {
-                // FIXME: allocate coef storage
-              }
             {
-
+              auto & current_vec = 
+                dense_constraint_vecs[n_coef_blocks_read][n_coef_vecs_read];
+              
               const int end_coef_to_read =
-                std::min(n_coef_comp, n_coef_comp_read + max_fps_per_line);
-              for (int i = n_coef_comp_read; i != end_coef_to_read; ++i)
+                std::min(n_coef_comp[n_coef_blocks_read],
+                         n_coef_comp_read + max_fps_per_line);
+              for (; n_coef_comp_read != end_coef_to_read; ++n_coef_comp_read)
                 {
                   dyna_fp_type coef_comp;
                   stream >> coef_comp;
 
-                  // FIXME: store coef
+                  current_vec[n_coef_comp_read] = coef_comp;
 
                   // Let's assume that our *only* mid-line breaks are
                   // due to the max_fps_per_line limit.  This should be
@@ -423,21 +473,17 @@ void DynaIO::read_mesh(std::istream & in)
                   if (stream.fail())
                     libmesh_error_msg("Failure to parse coefficients\n");
                 }
-              if (end_coef_to_read == n_coef_comp)
+              if (n_coef_comp_read == n_coef_comp[n_coef_blocks_read])
                 {
                   n_coef_comp_read = 0;
                   n_coef_vecs_read++;
-                  if (n_coef_vecs_read == n_coef_vecs_in_subblock)
+                  if (n_coef_vecs_read == n_coef_vecs_in_subblock[n_coef_blocks_read])
                     {
                       n_coef_vecs_read = 0;
                       n_coef_blocks_read++;
                       if (n_coef_blocks_read == n_dense_coef_vec_blocks)
                         section = END_OF_FILE;
                     }
-                }
-              else
-                {
-                  n_coef_comp_read = end_coef_to_read;
                 }
             }
             break;
@@ -452,6 +498,161 @@ void DynaIO::read_mesh(std::istream & in)
         libmesh_error_msg("Premature end of file");
       else
         libmesh_error_msg("Input stream failure! Perhaps the file does not exist?");
+    }
+  
+  // Merge dense_constraint_vecs blocks
+  for (auto coef_vec_block :
+       IntRange<dyna_int_type>(0, n_dense_coef_vec_blocks))
+    {
+      auto & dcv0 = dense_constraint_vecs[0];
+      auto & dcvi = dense_constraint_vecs[coef_vec_block];
+      dcv0.insert(dcv0.end(),
+                  std::make_move_iterator(dcvi.begin()),
+                  std::make_move_iterator(dcvi.end()));
+    }
+  dense_constraint_vecs.resize(1);
+
+  // Constraint matrices:
+  // elem_constraint_mat[block_num][elem_num][local_node_index][elem_global_nodes_index] = c
+  std::vector<std::vector<std::vector<std::vector<Real>>>> elem_constraint_mat(n_elem_blocks);
+
+  // We need to calculate local nodes on the fly, and we'll be
+  // calculating them from constraint matrix columns, and we'll need
+  // to make sure that the same node is found each time it's
+  // calculated from multiple neighboring elements.
+  std::map<std::vector<std::pair<dof_id_type, Real>>, Node *> local_nodes;
+
+  for (auto block_num : IntRange<dyna_int_type>(0, n_elem_blocks))
+    {
+      elem_constraint_mat[block_num].resize(block_n_elem[block_num]);
+
+      for (auto elem_num :
+           IntRange<dyna_int_type>(0, block_n_elem[block_num]))
+        {
+          // Consult the import element table to determine which element to build
+          auto eletypes_it =
+            _element_maps.in.find(std::make_tuple(block_elem_type[block_num],
+                                                  block_dim[block_num],
+                                                  block_p[block_num]));
+
+          // Make sure we actually found something
+          if (eletypes_it == _element_maps.in.end())
+            libmesh_error_msg
+              ("Element of type " << block_elem_type[block_num] <<
+               " dim " << block_dim[block_num] <<
+               " degree " << block_p[block_num] << " not found!");
+
+          const ElementDefinition * elem_defn = &(eletypes_it->second);
+          Elem * elem = Elem::build(elem_defn->type).release();
+          libmesh_assert_equal_to(elem->dim(), block_dim[block_num]);
+
+          auto & my_constraint_rows = elem_constraint_rows[block_num][elem_num];
+          auto & my_global_nodes    = elem_global_nodes[block_num][elem_num];
+          auto & my_constraint_mat  = elem_constraint_mat[block_num][elem_num];
+
+          my_constraint_mat.resize(block_n_coef_vec[block_num]);
+          for (auto spline_node_index :
+               IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+            my_constraint_mat[spline_node_index].resize(elem->n_nodes());
+
+          for (auto spline_node_index :
+               IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+            {
+              // Find which coef block this elem's vectors are from
+              const dyna_int_type elem_coef_vec_index =
+                my_constraint_rows[spline_node_index];
+
+              dyna_int_type coef_block_num = 0;
+              dyna_int_type first_block_coef_vec = 0;
+              for (; elem_coef_vec_index >= first_block_coef_vec &&
+                   coef_block_num != n_dense_coef_vec_blocks; ++coef_block_num)
+                {
+                  first_block_coef_vec += n_coef_vecs_in_subblock[coef_block_num];
+                }
+
+              // Make sure we did find a valid coef block
+              if (coef_block_num == n_dense_coef_vec_blocks &&
+                  first_block_coef_vec <= elem_coef_vec_index)
+                libmesh_error_msg("Can't find valid constraint coef vector");
+
+              coef_block_num--;
+
+              if (dyna_int_type(elem->n_nodes()) !=
+                  n_coef_comp[coef_block_num])
+                libmesh_error_msg("Found " <<
+                                  n_coef_comp[coef_block_num] <<
+                                  " constraint coef vectors for " <<
+                                  elem->n_nodes() << " nodes");
+
+              for (auto elem_node_index :
+                   IntRange<dyna_int_type>(0, elem->n_nodes()))
+                my_constraint_mat[spline_node_index][elem_node_index] =
+                  dense_constraint_vecs[0][elem_coef_vec_index][elem_node_index];
+            }
+
+          for (auto elem_node_index :
+               IntRange<dyna_int_type>(0, elem->n_nodes()))
+            {
+              dof_id_type global_node_idx = DofObject::invalid_id;
+
+              // New finite element node data: dot product of
+              // constraint matrix columns with spline node data.
+              // Store that column as a key.
+              std::vector<std::pair<dof_id_type, Real>> key;
+
+              for (auto spline_node_index :
+                   IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+                {
+                  const dyna_int_type elem_coef_vec_index =
+                    my_constraint_rows[spline_node_index];
+
+                  const Real coef =
+                    dense_constraint_vecs[0][elem_coef_vec_index][elem_node_index];
+
+                  // Global nodes are supposed to be in sorted order
+                  if (global_node_idx != DofObject::invalid_id)
+                  libmesh_assert_greater(my_global_nodes[spline_node_index],
+                                         global_node_idx);
+                  global_node_idx = my_global_nodes[spline_node_index];
+
+                  key.push_back(std::make_pair(global_node_idx, coef));
+                }
+
+              auto local_node_it = local_nodes.find(key);
+
+              if (local_node_it != local_nodes.end())
+                elem->set_node(elem_defn->nodes[elem_node_index]) =
+                  local_node_it->second;
+              else
+                {
+                  Point p(0);
+                  Real w = 0;
+
+                  for (auto spline_node_index :
+                       IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+                    {
+                      const dof_id_type my_node_idx =
+                        my_global_nodes[spline_node_index];
+
+                      const dyna_int_type elem_coef_vec_index =
+                        my_constraint_rows[spline_node_index];
+
+                      const Real coef =
+                        dense_constraint_vecs[0][elem_coef_vec_index][elem_node_index];
+                      p.add_scaled(spline_nodes[my_node_idx], coef);
+                      w += coef * spline_weights[my_node_idx];
+                    }
+
+                  Node *n = mesh.add_point(p);
+                  if (weight_control_flag)
+                    n->set_extra_datum<Real>(weight_index, w);
+                  local_nodes[key] = n;
+                  elem->set_node(elem_defn->nodes[elem_node_index]) = n;
+                }
+            }
+
+          mesh.add_elem(elem);
+        }
     }
 }
 

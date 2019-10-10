@@ -110,20 +110,20 @@ private:
   struct ElementDefinition
   {
     ElementDefinition(ElemType type_in,
-                      unsigned dyna_type_in,
-                      unsigned dim_in,
-                      unsigned p_in);
+                      dyna_int_type dyna_type_in,
+                      dyna_int_type dim_in,
+                      dyna_int_type p_in);
 
     ElementDefinition(ElemType type_in,
-                      unsigned dyna_type_in,
-                      unsigned dim_in,
-                      unsigned p_in,
+                      dyna_int_type dyna_type_in,
+                      dyna_int_type dim_in,
+                      dyna_int_type p_in,
                       std::vector<unsigned int> && nodes_in);
 
     ElemType type;
-    unsigned int dyna_type;
-    unsigned int dim;
-    unsigned int p;
+    dyna_int_type dyna_type;
+    dyna_int_type dim;
+    dyna_int_type p;
     std::vector<unsigned int> nodes;
   };
 
@@ -141,7 +141,10 @@ private:
     }
 
     std::map<ElemType, ElementDefinition> out;
-    std::map<std::tuple<unsigned int, unsigned int, unsigned int>, ElementDefinition> in;
+
+    typedef std::tuple<dyna_int_type, dyna_int_type, dyna_int_type> Key;
+
+    std::map<Key, ElementDefinition> in;
   };
 
   /**
