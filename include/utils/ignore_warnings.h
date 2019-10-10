@@ -86,6 +86,9 @@
 #if (__GNUC__ > 7)
 #pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic ignored "-Wcast-function-type"
+#if (__GNUC__ > 8)
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif // GCC > 8
 #endif // GCC > 7
 #endif // GCC > 6
 #endif // GCC > 5
