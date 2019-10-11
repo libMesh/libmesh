@@ -84,6 +84,43 @@ int main (int argc, char** argv)
   // FIXME: This example currently segfaults with Trilinos?
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
+#if LIBMESH_HAVE_PETSC
+  // lets parse the input to check which set of arguments was provided.
+  // Skip the runs with wrong arguments:
+  GetPot input(argc, argv);
+
+  // skip if the specification of the solver-package is given in wrong syntax:
+#if PETSC_VERSION_LESS_THAN(3,9,0)
+  if (input.search("-pc_factor_mat_solver_type"))
+   {
+      out<<"LibMesh was configured with PETSc < 3.9, but comman-line options"<<std::endl;
+      out<<"use syntax understood by later vernions only. Skipping now."<<std::endl;
+      return 77;
+   }
+#else
+  if (input.search("-pc_factor_mat_solver_package"))
+    {
+      out<<"LibMesh was configured with PETSc >= 3.9, but comman-line options"<<std::endl;
+      out<<"use deprecated syntax. Skipping now."<<std::endl;
+      return 77;
+    }
+#endif
+
+  // check that we have the required solver:
+  std::string solver;
+#ifndef PETSC_HAVE_MUMPS
+  solver = input.next("mumps");
+  if (solver == "mumps")
+    libmesh_example_requires(false, "petsc having mumps");
+#endif
+#ifndef PETSC_HAVE_SUPERLU
+  solver = input.next("superlu");
+  if (solver == "superlu")
+    libmesh_example_requires(false, "petsc having superlu");
+#endif
+
+#endif //LIBMESH_HAVE_PETSC
+
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
