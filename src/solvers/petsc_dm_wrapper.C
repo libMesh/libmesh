@@ -517,7 +517,7 @@ namespace libMesh
 
         // Build the PetscSection and attach it to the DM
         this->build_section(system, section);
-#if PETSC_VERSION_LESS_THAN(3,9,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
         ierr = DMSetDefaultSection(dm, section);
 #else
         ierr = DMSetSection(dm, section);
