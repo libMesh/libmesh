@@ -1125,6 +1125,18 @@ public:
   static const std::vector<int> tet_inverse_face_map;
   static const std::vector<int> prism_inverse_face_map;
   static const std::vector<int> pyramid_inverse_face_map;
+
+  /**
+   * 3D element edge maps. These are used to map from 0-based Exodus
+   * edge ids to libmesh edge ids.
+   */
+  static const std::vector<int> hex_edge_map;
+
+  /**
+   * 3D element inverse edge maps. These are used to map from libmesh
+   * edge ids to 1-based Exodus edge ids.
+   */
+  static const std::vector<int> hex_inverse_edge_map;
 };
 
 

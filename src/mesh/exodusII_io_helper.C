@@ -250,6 +250,14 @@ const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_inverse_face_map =
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism_inverse_face_map = {4, 1, 2, 3, 5};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map = {1, 2, 3, 4, 5};
 
+// 3D element edge maps. Map 0-based Exodus id -> libMesh id.
+const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_edge_map =
+  {0,1,2,3,8,9,10,11,4,5,7,6};
+
+// 3D inverse element edge maps. Map libmesh edge ids to 1-based Exodus edge ids.
+const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_inverse_edge_map =
+  {1,2,3,4,9,10,12,11,5,6,7,8};
+
 // ExodusII_IO_Helper::Conversion static data
 const int ExodusII_IO_Helper::Conversion::invalid_id = std::numeric_limits<int>::max();
 
