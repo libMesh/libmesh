@@ -250,6 +250,14 @@ const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_inverse_face_map =
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism_inverse_face_map = {4, 1, 2, 3, 5};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map = {1, 2, 3, 4, 5};
 
+// 3D element edge maps. Map 0-based Exodus id -> libMesh id.
+const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_edge_map =
+  {0,1,2,3,8,9,10,11,4,5,7,6};
+
+// 3D inverse element edge maps. Map libmesh edge ids to 1-based Exodus edge ids.
+const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_inverse_edge_map =
+  {1,2,3,4,9,10,12,11,5,6,7,8};
+
 // ExodusII_IO_Helper::Conversion static data
 const int ExodusII_IO_Helper::Conversion::invalid_id = std::numeric_limits<int>::max();
 
@@ -1384,15 +1392,27 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       str_title.resize(MAX_LINE_LENGTH);
     }
 
-  ex_err = exII::ex_put_init(ex_id,
-                             str_title.c_str(),
-                             num_dim,
-                             num_nodes,
-                             n_active_elem,
-                             num_elem_blk,
-                             num_node_sets,
-                             num_side_sets);
+  // Build an ex_init_params() structure that is to be passed to the
+  // newer ex_put_init_ext() API. The new API will eventually allow us
+  // to store edge and face data in the Exodus file.
+  //
+  // Notes:
+  // * We use C++11 zero initialization syntax to make sure that all
+  //   members of the struct (including ones we aren't using) are
+  //   given sensible values.
+  // * For the "title" field, we manually do a null-terminated string
+  //   copy since std::string does not null-terminate but it does
+  //   return the number of characters successfully copied.
+  exII::ex_init_params params = {};
+  params.title[str_title.copy(params.title, MAX_LINE_LENGTH)] = '\0';
+  params.num_dim = num_dim;
+  params.num_nodes = num_nodes;
+  params.num_elem = n_active_elem;
+  params.num_elem_blk = num_elem_blk;
+  params.num_node_sets = num_node_sets;
+  params.num_side_sets = num_side_sets;
 
+  ex_err = exII::ex_put_init_ext(ex_id, &params);
   EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
 }
 
