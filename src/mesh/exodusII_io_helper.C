@@ -447,16 +447,24 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
 
 void ExodusII_IO_Helper::read_header()
 {
-  ex_err = exII::ex_get_init(ex_id,
-                             title.data(),
-                             &num_dim,
-                             &num_nodes,
-                             &num_elem,
-                             &num_elem_blk,
-                             &num_node_sets,
-                             &num_side_sets);
-
+  // Read init params using newer API that reads into a struct.  For
+  // backwards compatibility, assign local member values from struct
+  // afterwards. Note: using the new API allows us to automatically
+  // read edge and face block/set information if it's present in the
+  // file.
+  exII::ex_init_params params = {};
+  ex_err = exII::ex_get_init_ext(ex_id, &params);
   EX_CHECK_ERR(ex_err, "Error retrieving header info.");
+
+  // "title" has MAX_LINE_LENGTH+1 characters, but the last one is reserved
+  // for null termination so we only copy MAX_LINE_LENGTH chars.
+  title.assign(params.title, params.title + MAX_LINE_LENGTH);
+  num_dim = params.num_dim;
+  num_nodes = params.num_nodes;
+  num_elem = params.num_elem;
+  num_elem_blk = params.num_elem_blk;
+  num_node_sets = params.num_node_sets;
+  num_side_sets = params.num_side_sets;
 
   this->read_num_time_steps();
 
