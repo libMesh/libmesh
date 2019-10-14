@@ -575,8 +575,12 @@ void ExodusII_IO_Helper::read_node_num_map ()
 {
   node_num_map.resize(num_nodes);
 
-  ex_err = exII::ex_get_node_num_map (ex_id,
-                                      node_num_map.empty() ? nullptr : node_num_map.data());
+  // Note: we cannot use the exII::ex_get_num_map() here because it
+  // (apparently) does not behave like ex_get_node_num_map() when
+  // there is no node number map in the file: it throws an error
+  // instead of returning a default identity array (1,2,3,...).
+  ex_err = exII::ex_get_node_num_map
+    (ex_id, node_num_map.empty() ? nullptr : node_num_map.data());
 
   EX_CHECK_ERR(ex_err, "Error retrieving nodal number map.");
   message("Nodal numbering map retrieved successfully.");
@@ -725,8 +729,12 @@ void ExodusII_IO_Helper::read_elem_num_map ()
 {
   elem_num_map.resize(num_elem);
 
-  ex_err = exII::ex_get_elem_num_map (ex_id,
-                                      elem_num_map.empty() ? nullptr : elem_num_map.data());
+  // Note: we cannot use the exII::ex_get_num_map() here because it
+  // (apparently) does not behave like ex_get_elem_num_map() when
+  // there is no elem number map in the file: it throws an error
+  // instead of returning a default identity array (1,2,3,...).
+  ex_err = exII::ex_get_elem_num_map
+    (ex_id, elem_num_map.empty() ? nullptr : elem_num_map.data());
 
   EX_CHECK_ERR(ex_err, "Error retrieving element number map.");
   message("Element numbering map retrieved successfully.");
