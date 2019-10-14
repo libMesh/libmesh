@@ -1216,6 +1216,7 @@ with_ml
 with_tpetra
 with_dtk
 with_thread_model
+enable_openmp
 enable_pthreads
 enable_tbb
 with_tbb
@@ -2016,6 +2017,7 @@ Optional Features:
                           configure
   --disable-slepc         build without SLEPc eigen solver support
   --disable-trilinos      build without Trilinos support
+  --disable-openmp        build without OpenMP support
   --disable-pthreads      build without POSIX threading (pthreads) support
   --disable-tbb           build without threading support via Threading
                           Building Blocks
@@ -36983,6 +36985,22 @@ fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< User requested thread model: $requested_thread_model >>>" >&5
 $as_echo "<<< User requested thread model: $requested_thread_model >>>" >&6; }
 
+                                # Check whether --enable-openmp was given.
+if test "${enable_openmp+set}" = set; then :
+  enableval=$enable_openmp; case "${enableval}" in #(
+  yes) :
+    enableopenmp=yes ;; #(
+  no) :
+    enableopenmp=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-openmp" "$LINENO" 5 ;;
+esac
+else
+  enableopenmp=yes
+fi
+
+
+  if test "x$enableopenmp" = "xyes"; then :
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of C++ compiler" >&5
@@ -37054,36 +37072,36 @@ $as_echo "#define HAVE_OPENMP 1" >>confdefs.h
 
 fi
 
+                        if test "x$OPENMP_CXXFLAGS" != "x"; then :
 
-      if test "x$OPENMP_CXXFLAGS" != "x"; then :
-
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
 $as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
-          OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-          OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-          CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
-          CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
-          CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
-          CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
-          CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
-          CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
-          CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
-          CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
-          CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
-          FFLAGS="$FFLAGS $OPENMP_FFLAGS"
+                 OPENMP_CFLAGS=$OPENMP_CXXFLAGS
+                 OPENMP_FFLAGS=$OPENMP_CXXFLAGS
+                 CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
+                 CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
+                 CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
+                 CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
+                 CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
+                 CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
+                 CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
+                 CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
+                 CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
+                 CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
+                 FFLAGS="$FFLAGS $OPENMP_FFLAGS"
 
 
 
 
-fi
-
-        if test "x$requested_thread_model" = "xopenmp"; then :
-
-          if test "x$enableopenmp" = "xno"; then :
+else
+                                               if test "x$requested_thread_model" = "xopenmp"; then :
   as_fn_error $? "requested openmp threading model, but compiler does not support openmp." "$LINENO" 5
 fi
-
+fi
+else
+          if test "x$requested_thread_model" = "xopenmp"; then :
+  as_fn_error $? "requested openmp threading model, but --disable-openmp has been specified." "$LINENO" 5
+fi
 fi
 
     found_thread_model=none
