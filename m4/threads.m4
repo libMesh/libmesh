@@ -17,12 +17,12 @@ AC_DEFUN([ACX_BEST_THREAD],
 
   AC_MSG_RESULT([<<< User requested thread model: $requested_thread_model >>>])
 
-  dnl We *always* detect the compiler's OpenMP support, because libMesh
-  dnl is frequently compiled with other libraries that use OpenMP
-  dnl directives (it can also use a few itself [0]) and if you don't set
-  dnl OMP_NUM_THREADS in the environment or call omp_set_num_threads()
-  dnl programmatically, you get the questionable default of "1 thread
-  dnl per CPU" [1]. This can lead to drastic over-subscription of
+  dnl We *always* detect the compiler's OpenMP support unless explicitly told not
+  dnl to with --disable-openmp, because libMesh is frequently compiled with other
+  dnl libraries that use OpenMP directives (it can also use a few itself [0]) and
+  dnl if you don't set OMP_NUM_THREADS in the environment or call
+  dnl omp_set_num_threads() programmatically, you get the questionable default of
+  dnl "1 thread per CPU" [1]. This can lead to drastic over-subscription of
   dnl hardware. For example, an MPI code run with "mpiexec -np 4" on a
   dnl machine with 4 physical cores will try and spawn up to 16
   dnl simultaneous threads in this configuration.
@@ -32,39 +32,47 @@ AC_DEFUN([ACX_BEST_THREAD],
   dnl implementations.
   dnl
   dnl [1]: https://gcc.gnu.org/onlinedocs/libgomp/OMP_005fNUM_005fTHREADS.html
-  AX_OPENMP([],[enableopenmp=no])
+  AC_ARG_ENABLE(openmp,
+                AS_HELP_STRING([--disable-openmp],
+                               [build without OpenMP support]),
+                [AS_CASE("${enableval}",
+                         [yes], [enableopenmp=yes],
+                         [no],  [enableopenmp=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-openmp)])],
+                [enableopenmp=yes])
 
-  dnl The call to AX_OPENMP only sets OPENMP_CXXFLAGS, so if it worked,
-  dnl we also set it for C, Fortran, and all the METHODs.
-  AS_IF([test "x$OPENMP_CXXFLAGS" != "x"],
-        [
-          AC_MSG_RESULT(<<< Configuring library with OpenMP support >>>)
-          OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-          OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-          CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
-          CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
-          CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
-          CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
-          CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
-          CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
-          CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
-          CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
-          CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
-          FFLAGS="$FFLAGS $OPENMP_FFLAGS"
-          AC_SUBST(OPENMP_CXXFLAGS)
-          AC_SUBST(OPENMP_CFLAGS)
-          AC_SUBST(OPENMP_FFLAGS)
-        ])
-
-  dnl If the user explicitly requested the openmp threading model and
-  dnl this compiler doesn't support OpenMP for some reason, we throw an
-  dnl error instead of silently continuing.
-  AS_IF([test "x$requested_thread_model" = "xopenmp"],
-        [
-          AS_IF([test "x$enableopenmp" = "xno"],
-                [AC_MSG_ERROR([requested openmp threading model, but compiler does not support openmp.])])
-        ])
+  AS_IF([test "x$enableopenmp" = "xyes"],
+        [AX_OPENMP([],[enableopenmp=no])]
+        dnl The call to AX_OPENMP only sets OPENMP_CXXFLAGS, so if it worked,
+        dnl we also set it for C, Fortran, and all the METHODs.
+        [AS_IF([test "x$OPENMP_CXXFLAGS" != "x"],
+               [
+                 AC_MSG_RESULT(<<< Configuring library with OpenMP support >>>)
+                 OPENMP_CFLAGS=$OPENMP_CXXFLAGS
+                 OPENMP_FFLAGS=$OPENMP_CXXFLAGS
+                 CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
+                 CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
+                 CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
+                 CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
+                 CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
+                 CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
+                 CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
+                 CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
+                 CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
+                 CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
+                 FFLAGS="$FFLAGS $OPENMP_FFLAGS"
+                 AC_SUBST(OPENMP_CXXFLAGS)
+                 AC_SUBST(OPENMP_CFLAGS)
+                 AC_SUBST(OPENMP_FFLAGS)
+               ],
+               dnl If the user explicitly requested the openmp threading model and
+               dnl this compiler doesn't support OpenMP for some reason, we throw an
+               dnl error instead of silently continuing.
+               [AS_IF([test "x$requested_thread_model" = "xopenmp"],
+                      [AC_MSG_ERROR([requested openmp threading model, but compiler does not support openmp.])])])],
+        dnl Error if the user simultaneously requested --with-thread-model=openmp and --disable-openmp
+        [AS_IF([test "x$requested_thread_model" = "xopenmp"],
+               [AC_MSG_ERROR([requested openmp threading model, but --disable-openmp has been specified.])])])
 
   dnl Set this variable when a threading model is found
   found_thread_model=none
