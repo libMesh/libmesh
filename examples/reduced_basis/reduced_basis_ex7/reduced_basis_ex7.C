@@ -93,37 +93,40 @@ int main (int argc, char** argv)
 #if PETSC_VERSION_LESS_THAN(3,9,0)
   if (input.search("-pc_factor_mat_solver_type"))
    {
-      libMesh::out<<"LibMesh was configured with PETSc < 3.9, but command-line options"<<std::endl;
-      libMesh::out<<"use syntax understood by later vernions only. Skipping now."<<std::endl;
+      libMesh::out << "LibMesh was configured with PETSc < 3.9, but command-line options "
+                   << "use syntax understood by later versions only. Skipping this example."
+                   << std::endl;
       return 77;
    }
 #else
   if (input.search("-pc_factor_mat_solver_package"))
     {
-      out<<"LibMesh was configured with PETSc >= 3.9, but comman-line options"<<std::endl;
-      out<<"use deprecated syntax. Skipping now."<<std::endl;
+      libMesh::out << "LibMesh was configured with PETSc >= 3.9, but command-line options "
+                   << "use deprecated syntax. Skipping now."
+                   << std::endl;
       return 77;
     }
 #endif
 
   // check that we have the required solver:
   std::string solver;
-  solver=input.next("mumps");
+  solver = input.next(solver);
   if (solver == "mumps")
   {
 #ifndef LIBMESH_PETSC_HAVE_MUMPS
-    libmesh_example_requires(false, "petsc having mumps");
+    libmesh_example_requires(false, "PETSc compiled with MUMPS support");
 #endif
   }
-  if (solver == "superlu")
+  else if (solver == "superlu")
   {
 #ifndef LIBMESH_PETSC_HAVE_SUPERLU_DIST
-    libmesh_example_requires(false, "petsc having superlu");
+    libmesh_example_requires(false, "PETSc compiled with SuperLU support");
 #endif
   }
   else
   {
-     libMesh::err<<"Error: Solver "<<solver<<" is unknown. Exit now."<<std::endl;
+     libMesh::err << "Error: Solver " << solver << " is unknown."
+                  << std::endl;
      return 1;
   }
 
