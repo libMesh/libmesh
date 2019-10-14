@@ -1563,6 +1563,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   std::vector<int> elem_blk_id;
   std::vector<int> num_elem_this_blk_vec;
   std::vector<int> num_nodes_per_elem_vec;
+  std::vector<int> num_edges_per_elem_vec;
+  std::vector<int> num_faces_per_elem_vec;
   std::vector<int> num_attr_vec;
   NamesData elem_type_table(num_elem_blk, MAX_STR_LENGTH);
 
@@ -1595,18 +1597,32 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       num_elem_this_blk_vec.push_back(cast_int<int>(tmp_vec.size()));
       num_nodes_per_elem_vec.push_back(num_nodes_per_elem);
       num_attr_vec.push_back(0); // we don't currently use elem block attributes.
+      num_edges_per_elem_vec.push_back(0); // We don't currently store any edge blocks
+      num_faces_per_elem_vec.push_back(0); // We don't currently store any face blocks
       ++counter;
     }
 
-  // The "define_maps" parameter should be 0 if node_number_map and
-  // elem_number_map will not be written later, and nonzero otherwise.
-  ex_err = exII::ex_put_concat_elem_block(ex_id,
-                                          elem_blk_id.data(),
-                                          elem_type_table.get_char_star_star(),
-                                          num_elem_this_blk_vec.data(),
-                                          num_nodes_per_elem_vec.data(),
-                                          num_attr_vec.data(),
-                                          /*define_maps=*/0);
+  // Zero-initialize and then fill in an exII::ex_block_params struct
+  // with the data we have collected. This new API replaces the old
+  // exII::ex_put_concat_elem_block() API, and will eventually allow
+  // us to also allocate space for edge/face blocks if desired.
+  //
+  // TODO: It seems like we should be able to take advantage of the
+  // optimization where you set define_maps==1, but when I tried this
+  // I got the error: "failed to find node map size". I think the
+  // problem is that we need to first specify a nonzero number of
+  // node/elem maps during the call to ex_put_init_ext() in order for
+  // this to work correctly.
+  exII::ex_block_params params = {};
+  params.elem_blk_id = elem_blk_id.data();
+  params.elem_type = elem_type_table.get_char_star_star();
+  params.num_elem_this_blk = num_elem_this_blk_vec.data();
+  params.num_nodes_per_elem = num_nodes_per_elem_vec.data();
+  params.num_edges_per_elem = num_edges_per_elem_vec.data();
+  params.num_faces_per_elem = num_faces_per_elem_vec.data();
+  params.num_attr_elem = num_attr_vec.data();
+  params.define_maps = 0;
+  ex_err = exII::ex_put_concat_all_blocks(ex_id, &params);
   EX_CHECK_ERR(ex_err, "Error writing element blocks.");
 
   // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
