@@ -2813,7 +2813,8 @@ std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_ac
 
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::Conversion class members
-ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversion(std::string type_str)
+ExodusII_IO_Helper::Conversion
+ExodusII_IO_Helper::ElementMaps::assign_conversion(std::string type_str)
 {
   init_element_equivalence_map();
 
@@ -2824,222 +2825,249 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
 
 
-ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
+ExodusII_IO_Helper::Conversion
+ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
 {
+  Conversion conv;
+
   switch (type)
     {
     case NODEELEM:
       {
-        return Conversion(&nodeelem_node_map,
-                          &nodeelem_node_map, // inverse node map same as forward node map
-                          nullptr, // NODELEM doesn't have any edges
-                          nullptr, // We also don't inverse map NODEELEM edges
-                          NODEELEM, "SPHERE");
+        conv.node_map = &nodeelem_node_map;
+        conv.inverse_node_map = &nodeelem_node_map;
+        conv.canonical_type = NODEELEM;
+        conv.exodus_type = "SPHERE";
+        return conv;
       }
-
     case EDGE2:
       {
-        return Conversion(&edge2_node_map,
-                          &edge2_node_map, // inverse node map same as forward node map
-                          &edge_edge_map,
-                          &edge_inverse_edge_map,
-                          EDGE2, "EDGE2");
+        conv.node_map = &edge2_node_map;
+        conv.inverse_node_map = &edge2_node_map;
+        conv.side_map = &edge_edge_map;
+        conv.inverse_side_map = &edge_edge_map;
+        conv.canonical_type = EDGE2;
+        conv.exodus_type = "EDGE2";
+        return conv;
       }
     case EDGE3:
       {
-        return Conversion(&edge3_node_map,
-                          &edge3_node_map, // inverse node map same as forward node map
-                          &edge_edge_map,
-                          &edge_inverse_edge_map,
-                          EDGE3, "EDGE3");
+        conv.node_map = &edge3_node_map;
+        conv.inverse_node_map = &edge3_node_map;
+        conv.side_map = &edge_edge_map;
+        conv.inverse_side_map = &edge_edge_map;
+        conv.canonical_type = EDGE3;
+        conv.exodus_type = "EDGE3";
+        return conv;
       }
     case QUAD4:
       {
-        return Conversion(&quad4_node_map,
-                          &quad4_node_map, // inverse node map same as forward node map
-                          &quad_edge_map,
-                          &quad_inverse_edge_map,
-                          QUAD4, "QUAD4");
+        conv.node_map = &quad4_node_map;
+        conv.inverse_node_map = &quad4_node_map;
+        conv.side_map = &quad_edge_map;
+        conv.inverse_side_map = &quad_inverse_edge_map;
+        conv.canonical_type = QUAD4;
+        conv.exodus_type = "QUAD4";
+        return conv;
       }
-
     case QUADSHELL4:
       {
-        return Conversion(&quad4_node_map, // node mapping is the same as for quad4
-                          &quad4_node_map,
-                          &quadshell4_edge_map,
-                          &quadshell4_inverse_edge_map,
-                          &quadshell4_shellface_map,
-                          &quadshell4_inverse_shellface_map,
-                          2, // the side index offset for QUADSHELL4 is 2
-                          QUADSHELL4, "SHELL4");
+        conv.node_map = &quad4_node_map;
+        conv.inverse_node_map = &quad4_node_map;
+        conv.side_map = &quadshell4_edge_map;
+        conv.inverse_side_map = &quadshell4_inverse_edge_map;
+        conv.shellface_map = &quadshell4_shellface_map;
+        conv.inverse_shellface_map = &quadshell4_inverse_shellface_map;
+        conv.shellface_index_offset = 2;
+        conv.canonical_type = QUADSHELL4;
+        conv.exodus_type = "SHELL4";
+        return conv;
       }
-
     case QUAD8:
       {
-        return Conversion(&quad8_node_map,
-                          &quad8_node_map, // inverse node map same as forward node map
-                          &quad_edge_map,
-                          &quad_inverse_edge_map,
-                          QUAD8, "QUAD8");
+        conv.node_map = &quad8_node_map;
+        conv.inverse_node_map = &quad8_node_map;
+        conv.side_map = &quad_edge_map;
+        conv.inverse_side_map = &quad_inverse_edge_map;
+        conv.canonical_type = QUAD8;
+        conv.exodus_type = "QUAD8";
+        return conv;
       }
-
     case QUADSHELL8:
       {
-        return Conversion(&quad8_node_map, // node mapping is the same as for quad8
-                          &quad8_node_map,
-                          &quadshell4_edge_map,
-                          &quadshell4_inverse_edge_map,
-                          &quadshell4_shellface_map,
-                          &quadshell4_inverse_shellface_map,
-                          2, // the side index offset for QUADSHELL8 is 2
-                          QUADSHELL8, "SHELL8");
+        conv.node_map = &quad8_node_map;
+        conv.inverse_node_map = &quad8_node_map;
+        conv.side_map = &quadshell4_edge_map;
+        conv.inverse_side_map = &quadshell4_inverse_edge_map;
+        conv.shellface_map = &quadshell4_shellface_map;
+        conv.inverse_shellface_map = &quadshell4_inverse_shellface_map;
+        conv.shellface_index_offset = 2;
+        conv.canonical_type = QUADSHELL8;
+        conv.exodus_type = "SHELL8";
+        return conv;
       }
-
     case QUAD9:
       {
-        return Conversion(&quad9_node_map,
-                          &quad9_node_map, // inverse node map same as forward node map
-                          &quad_edge_map,
-                          &quad_inverse_edge_map,
-                          QUAD9, "QUAD9");
+        conv.node_map = &quad9_node_map;
+        conv.inverse_node_map = &quad9_node_map;
+        conv.side_map = &quad_edge_map;
+        conv.inverse_side_map = &quad_inverse_edge_map;
+        conv.canonical_type = QUAD9;
+        conv.exodus_type = "QUAD9";
+        return conv;
       }
-
     case TRI3:
       {
-        return Conversion(&tri3_node_map,
-                          &tri3_node_map, // inverse node map same as forward node map
-                          &tri_edge_map,
-                          &tri_inverse_edge_map,
-                          TRI3, "TRI3");
+        conv.node_map = &tri3_node_map;
+        conv.inverse_node_map = &tri3_node_map;
+        conv.side_map = &tri_edge_map;
+        conv.inverse_side_map = &tri_inverse_edge_map;
+        conv.canonical_type = TRI3;
+        conv.exodus_type = "TRI3";
+        return conv;
       }
-
     case TRISHELL3:
       {
-        return Conversion(&tri3_node_map, // node mapping is the same as for tri3
-                          &tri3_node_map,
-                          &trishell3_edge_map,
-                          &trishell3_inverse_edge_map,
-                          &trishell3_shellface_map,
-                          &trishell3_inverse_shellface_map,
-                          2, // the side index offset for TRISHELL4 is 2
-                          TRISHELL3, "TRISHELL3");
+        conv.node_map = &tri3_node_map;
+        conv.inverse_node_map = &tri3_node_map;
+        conv.side_map = &trishell3_edge_map;
+        conv.inverse_side_map = &trishell3_inverse_edge_map;
+        conv.shellface_map = &trishell3_shellface_map;
+        conv.inverse_shellface_map = &trishell3_inverse_shellface_map;
+        conv.shellface_index_offset = 2;
+        conv.canonical_type = TRISHELL3;
+        conv.exodus_type = "TRISHELL3";
+        return conv;
       }
-
     case TRI3SUBDIVISION:
       {
-        return Conversion(&tri3_node_map,
-                          &tri3_node_map, // inverse node map same as forward node map
-                          &tri_edge_map,
-                          &tri_inverse_edge_map,
-                          TRI3SUBDIVISION, "TRI3");
+        conv.node_map = &tri3_node_map;
+        conv.inverse_node_map = &tri3_node_map;
+        conv.side_map = &tri_edge_map;
+        conv.inverse_side_map = &tri_inverse_edge_map;
+        conv.canonical_type = TRI3SUBDIVISION;
+        conv.exodus_type = "TRI3";
+        return conv;
       }
-
     case TRI6:
       {
-        return Conversion(&tri6_node_map,
-                          &tri6_node_map, // inverse node map same as forward node map
-                          &tri_edge_map,
-                          &tri_inverse_edge_map,
-                          TRI6, "TRI6");
+        conv.node_map = &tri6_node_map;
+        conv.inverse_node_map = &tri6_node_map;
+        conv.side_map = &tri_edge_map;
+        conv.inverse_side_map = &tri_inverse_edge_map;
+        conv.canonical_type = TRI6;
+        conv.exodus_type = "TRI6";
+        return conv;
       }
-
     case HEX8:
       {
-        return Conversion(&hex8_node_map,
-                          &hex8_node_map, // inverse node map same as forward node map
-                          &hex_face_map,
-                          &hex_inverse_face_map,
-                          HEX8, "HEX8");
+        conv.node_map = &hex8_node_map;
+        conv.inverse_node_map = &hex8_node_map;
+        conv.side_map = &hex_face_map;
+        conv.inverse_side_map = &hex_inverse_face_map;
+        conv.canonical_type = HEX8;
+        conv.exodus_type = "HEX8";
+        return conv;
       }
-
     case HEX20:
       {
-        return Conversion(&hex20_node_map,
-                          &hex20_node_map, // inverse node map same as forward node map
-                          &hex_face_map,
-                          &hex_inverse_face_map,
-                          HEX20, "HEX20");
+        conv.node_map = &hex20_node_map;
+        conv.inverse_node_map = &hex20_node_map;
+        conv.side_map = &hex_face_map;
+        conv.inverse_side_map = &hex_inverse_face_map;
+        conv.canonical_type = HEX20;
+        conv.exodus_type = "HEX20";
+        return conv;
       }
-
     case HEX27:
       {
-        return Conversion(&hex27_node_map,
-                          &hex27_inverse_node_map, // different inverse node map for Hex27!
-                          &hex27_face_map,
-                          &hex27_inverse_face_map,
-                          HEX27, "HEX27");
+        conv.node_map = &hex27_node_map;
+        conv.inverse_node_map = &hex27_inverse_node_map;
+        conv.side_map = &hex27_face_map;
+        conv.inverse_side_map = &hex27_inverse_face_map;
+        conv.canonical_type = HEX27;
+        conv.exodus_type = "HEX27";
+        return conv;
       }
-
     case TET4:
       {
-        return Conversion(&tet4_node_map,
-                          &tet4_node_map, // inverse node map same as forward node map
-                          &tet_face_map,
-                          &tet_inverse_face_map,
-                          TET4, "TETRA4");
-      }
-
+        conv.node_map = &tet4_node_map;
+        conv.inverse_node_map = &tet4_node_map;
+        conv.side_map = &tet_face_map;
+        conv.inverse_side_map = &tet_inverse_face_map;
+        conv.canonical_type = TET4;
+        conv.exodus_type = "TETRA4";
+        return conv;
+    }
     case TET10:
       {
-        return Conversion(&tet10_node_map,
-                          &tet10_node_map, // inverse node map same as forward node map
-                          &tet_face_map,
-                          &tet_inverse_face_map,
-                          TET10, "TETRA10");
-      }
-
+        conv.node_map = &tet10_node_map;
+        conv.inverse_node_map = &tet10_node_map;
+        conv.side_map = &tet_face_map;
+        conv.inverse_side_map = &tet_inverse_face_map;
+        conv.canonical_type = TET10;
+        conv.exodus_type = "TETRA10";
+        return conv;
+    }
     case PRISM6:
       {
-        return Conversion(&prism6_node_map,
-                          &prism6_node_map, // inverse node map same as forward node map
-                          &prism_face_map,
-                          &prism_inverse_face_map,
-                          PRISM6, "WEDGE");
+        conv.node_map = &prism6_node_map;
+        conv.inverse_node_map = &prism6_node_map;
+        conv.side_map = &prism_face_map;
+        conv.inverse_side_map = &prism_inverse_face_map;
+        conv.canonical_type = PRISM6;
+        conv.exodus_type = "WEDGE";
+        return conv;
       }
-
     case PRISM15:
       {
-        return Conversion(&prism15_node_map,
-                          &prism15_node_map, // inverse node map same as forward node map
-                          &prism_face_map,
-                          &prism_inverse_face_map,
-                          PRISM15, "WEDGE15");
+        conv.node_map = &prism15_node_map;
+        conv.inverse_node_map = &prism15_node_map;
+        conv.side_map = &prism_face_map;
+        conv.inverse_side_map = &prism_inverse_face_map;
+        conv.canonical_type = PRISM15;
+        conv.exodus_type = "WEDGE15";
+        return conv;
       }
-
     case PRISM18:
       {
-        return Conversion(&prism18_node_map,
-                          &prism18_node_map, // inverse node map same as forward node map
-                          &prism_face_map,
-                          &prism_inverse_face_map,
-                          PRISM18, "WEDGE18");
+        conv.node_map = &prism18_node_map;
+        conv.inverse_node_map = &prism18_node_map;
+        conv.side_map = &prism_face_map;
+        conv.inverse_side_map = &prism_inverse_face_map;
+        conv.canonical_type = PRISM18;
+        conv.exodus_type = "WEDGE18";
+        return conv;
       }
-
     case PYRAMID5:
       {
-        return Conversion(&pyramid5_node_map,
-                          &pyramid5_node_map, // inverse node map same as forward node map
-                          &pyramid_face_map,
-                          &pyramid_inverse_face_map,
-                          PYRAMID5, "PYRAMID5");
+        conv.node_map = &pyramid5_node_map;
+        conv.inverse_node_map = &pyramid5_node_map;
+        conv.side_map = &pyramid_face_map;
+        conv.inverse_side_map = &pyramid_inverse_face_map;
+        conv.canonical_type = PYRAMID5;
+        conv.exodus_type = "PYRAMID5";
+        return conv;
       }
-
     case PYRAMID13:
       {
-        return Conversion(&pyramid13_node_map,
-                          &pyramid13_node_map, // inverse node map same as forward node map
-                          &pyramid_face_map,
-                          &pyramid_inverse_face_map,
-                          PYRAMID13, "PYRAMID13");
+        conv.node_map = &pyramid13_node_map;
+        conv.inverse_node_map = &pyramid13_node_map;
+        conv.side_map = &pyramid_face_map;
+        conv.inverse_side_map = &pyramid_inverse_face_map;
+        conv.canonical_type = PYRAMID13;
+        conv.exodus_type = "PYRAMID13";
+        return conv;
       }
-
     case PYRAMID14:
       {
-        return Conversion(&pyramid14_node_map,
-                          &pyramid14_node_map, // inverse node map same as forward node map
-                          &pyramid_face_map,
-                          &pyramid_inverse_face_map,
-                          PYRAMID14, "PYRAMID14");
+        conv.node_map = &pyramid14_node_map;
+        conv.inverse_node_map = &pyramid14_node_map;
+        conv.side_map = &pyramid_face_map;
+        conv.inverse_side_map = &pyramid_inverse_face_map;
+        conv.canonical_type = PYRAMID14;
+        conv.exodus_type = "PYRAMID14";
+        return conv;
       }
 
     default:
@@ -3049,8 +3077,28 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
 
 
+int ExodusII_IO_Helper::Conversion::get_node_map(int i) const
+{
+  libmesh_assert(node_map);
+  libmesh_assert_less (i, node_map->size());
+  return (*node_map)[i];
+}
+
+
+
+int ExodusII_IO_Helper::Conversion::get_inverse_node_map(int i) const
+{
+  libmesh_assert(inverse_node_map);
+  libmesh_assert_less (i, inverse_node_map->size());
+  return (*inverse_node_map)[i];
+}
+
+
+
 int ExodusII_IO_Helper::Conversion::get_side_map(int i) const
 {
+  libmesh_assert(side_map);
+
   // If we asked for a side that doesn't exist, return an invalid_id
   // and allow higher-level code to handle it.
   if (static_cast<size_t>(i) >= side_map->size())
@@ -3060,6 +3108,59 @@ int ExodusII_IO_Helper::Conversion::get_side_map(int i) const
 }
 
 
+
+int ExodusII_IO_Helper::Conversion::get_inverse_side_map(int i) const
+{
+  libmesh_assert(inverse_side_map);
+  libmesh_assert_less (i, inverse_side_map->size());
+  return (*inverse_side_map)[i];
+}
+
+
+
+/**
+ * \returns The ith component of the shellface map for this element.
+ * \note Nothing is currently using this.
+ */
+int ExodusII_IO_Helper::Conversion::get_shellface_map(int i) const
+{
+  libmesh_assert(shellface_map);
+  libmesh_assert_less (i, shellface_map->size());
+  return (*shellface_map)[i];
+}
+
+
+
+int ExodusII_IO_Helper::Conversion::get_inverse_shellface_map(int i) const
+{
+  libmesh_assert(inverse_shellface_map);
+  libmesh_assert_less (i, inverse_shellface_map->size());
+  return (*inverse_shellface_map)[i];
+}
+
+
+
+ElemType ExodusII_IO_Helper::Conversion::get_canonical_type() const
+{
+  return canonical_type;
+}
+
+
+
+std::string ExodusII_IO_Helper::Conversion::exodus_elem_type() const
+{
+  return exodus_type;
+}
+
+
+
+/**
+ * \returns The shellface index offset.
+ */
+std::size_t ExodusII_IO_Helper::Conversion::get_shellface_index_offset() const
+{
+  return shellface_index_offset;
+}
 
 ExodusII_IO_Helper::NamesData::NamesData(size_t n_strings, size_t string_length) :
   data_table(n_strings),

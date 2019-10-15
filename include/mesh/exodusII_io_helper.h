@@ -26,15 +26,7 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
 #include "libmesh/boundary_info.h" // BoundaryInfo::BCTuple
-
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemType : int;
-}
-#else
-#include "libmesh/enum_elem_type.h"
-#endif
+#include "libmesh/enum_elem_type.h" // INVALID_ELEM
 
 // C++ includes
 #include <iostream>
@@ -805,48 +797,18 @@ class ExodusII_IO_Helper::Conversion
 public:
 
   /**
-   * Constructor.  Initializes the const private member
-   * variables.
+   * Constructor. Zero initializes all variables.
    */
-  Conversion(const std::vector<int> * nm,
-             const std::vector<int> * inm,
-             const std::vector<int> * sm,
-             const std::vector<int> * ism,
-             const ElemType ct,   // "canonical" aka libmesh element type
-             std::string ex_type) // string representing the Exodus element type
-    : node_map(nm),
-      inverse_node_map(inm),
-      side_map(sm),
-      inverse_side_map(ism),
+  Conversion()
+    : node_map(nullptr),
+      inverse_node_map(nullptr),
+      side_map(nullptr),
+      inverse_side_map(nullptr),
       shellface_map(nullptr),
       inverse_shellface_map(nullptr),
       shellface_index_offset(0),
-      canonical_type(ct),
-      exodus_type(ex_type)
-  {}
-
-  /**
-   * Constructor.  Initializes the const private member
-   * variables.  In this case we also initialize shellface data.
-   */
-  Conversion(const std::vector<int> * nm,
-             const std::vector<int> * inm,
-             const std::vector<int> * sm,
-             const std::vector<int> * ism,
-             const std::vector<int> * sfm,
-             const std::vector<int> * isfm,
-             size_t sfi_offset,
-             const ElemType ct,   // "canonical" aka libmesh element type
-             std::string ex_type) // string representing the Exodus element type
-    : node_map(nm),
-      inverse_node_map(inm),
-      side_map(sm),
-      inverse_side_map(ism),
-      shellface_map(sfm),
-      inverse_shellface_map(isfm),
-      shellface_index_offset(sfi_offset),
-      canonical_type(ct),
-      exodus_type(ex_type)
+      canonical_type(INVALID_ELEM),
+      exodus_type("")
   {}
 
   /**
@@ -855,11 +817,7 @@ public:
    * The node map maps the exodusII node numbering format to this
    * library's format.
    */
-  int get_node_map(int i) const
-  {
-    libmesh_assert_less (i, node_map->size());
-    return (*node_map)[i];
-  }
+  int get_node_map(int i) const;
 
   /**
    * \returns The ith component of the inverse node map for this
@@ -871,11 +829,7 @@ public:
    * \note All elements except Hex27 currently have the same node
    * numbering as libmesh elements.
    */
-  int get_inverse_node_map(int i) const
-  {
-    libmesh_assert_less (i, inverse_node_map->size());
-    return (*inverse_node_map)[i];
-  }
+  int get_inverse_node_map(int i) const;
 
   /**
    * \returns The ith component of the side map for this element.
@@ -891,30 +845,18 @@ public:
    * The side map maps the libMesh side numbering format to this
    * exodus's format.
    */
-  int get_inverse_side_map(int i) const
-  {
-    libmesh_assert_less (i, inverse_side_map->size());
-    return (*inverse_side_map)[i];
-  }
+  int get_inverse_side_map(int i) const;
 
   /**
    * \returns The ith component of the shellface map for this element.
    * \note Nothing is currently using this.
    */
-  int get_shellface_map(int i) const
-  {
-    libmesh_assert_less (i, shellface_map->size());
-    return (*shellface_map)[i];
-  }
+  int get_shellface_map(int i) const;
 
   /**
    * \returns The ith component of the inverse shellface map for this element.
    */
-  int get_inverse_shellface_map(int i) const
-  {
-    libmesh_assert_less (i, inverse_shellface_map->size());
-    return (*inverse_shellface_map)[i];
-  }
+  int get_inverse_shellface_map(int i) const;
 
   /**
    * \returns The canonical element type for this element.
@@ -922,17 +864,17 @@ public:
    * The canonical element type is the standard element type
    * understood by this library.
    */
-  ElemType get_canonical_type()    const { return canonical_type; }
+  ElemType get_canonical_type() const;
 
   /**
    * \returns The string corresponding to the Exodus type for this element.
    */
-  std::string exodus_elem_type() const { return exodus_type; }
+  std::string exodus_elem_type() const;
 
   /**
    * \returns The shellface index offset.
    */
-  std::size_t get_shellface_index_offset() const { return shellface_index_offset; }
+  std::size_t get_shellface_index_offset() const;
 
   /**
    * An invalid_id that can be returned to signal failure in case
@@ -940,7 +882,6 @@ public:
    */
   static const int invalid_id;
 
-private:
   /**
    * Pointer to the node map for this element.
    */
@@ -986,12 +927,12 @@ private:
    * The canonical (i.e. standard for this library)
    * element type.
    */
-  const ElemType canonical_type;
+  ElemType canonical_type;
 
   /**
    * The string corresponding to the Exodus type for this element
    */
-  const std::string exodus_type;
+  std::string exodus_type;
 };
 
 
