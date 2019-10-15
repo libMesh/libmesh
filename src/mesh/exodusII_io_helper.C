@@ -726,9 +726,12 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 
   if (!connect.empty())
     {
-      ex_err = exII::ex_get_elem_conn(ex_id,
-                                      block_ids[block],
-                                      connect.data());
+      ex_err = exII::ex_get_conn(ex_id,
+                                 exII::EX_ELEM_BLOCK,
+                                 block_ids[block],
+                                 connect.data(), // node_conn
+                                 nullptr,        // elem_edge_conn (unused)
+                                 nullptr);       // elem_face_conn (unused)
 
       EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
       message("Connectivity retrieved successfully for block: ", block);
