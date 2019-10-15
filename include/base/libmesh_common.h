@@ -280,7 +280,7 @@ extern bool warned_about_auto_ptr;
 #else
 
 #define libmesh_assertion_types(expr1,expr2)                            \
-  typedef typename std::decay<decltype(expr1)>::type libmesh_type1;  \
+  typedef typename std::decay<decltype(expr1)>::type libmesh_type1;     \
   typedef typename std::decay<decltype(expr2)>::type libmesh_type2
 
 #define libmesh_assert_msg(asserted, msg)                               \
@@ -310,6 +310,8 @@ extern bool warned_about_auto_ptr;
       libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
+
+#if defined(__clang__) && (__clang_major__ > 3)
 
 #define libmesh_assert_less_msg(expr1,expr2, msg)                       \
   do {                                                                  \
@@ -346,6 +348,40 @@ extern bool warned_about_auto_ptr;
       libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
+
+// Older Clang has a parsing bug that can't seem to handle the handle the decay statement when
+// expanding these macros. We'll just fall back to the previous behavior with those older compilers
+#else
+
+#define libmesh_assert_less_msg(expr1,expr2, msg)                       \
+  do {                                                                  \
+    if (!((expr1) < (expr2))) {                                         \
+      libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+
+#define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
+  do {                                                                  \
+    if (!((expr1) > (expr2))) {                                         \
+      libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+
+#define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
+  do {                                                                  \
+    if (!((expr1) <= (expr2))) {                                        \
+      libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+
+#define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
+  do {                                                                  \
+    if (!((expr1) >= (expr2))) {                                        \
+      libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+#endif // clang <4.0
+
 #endif
 
 
