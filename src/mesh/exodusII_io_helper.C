@@ -1916,7 +1916,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
     {
       NamesData names_table(node_boundary_ids.size(), MAX_STR_LENGTH);
 
-      // Vectors to be filled and passed to exII::ex_put_concat_node_sets()
+      // Vectors to be filled and passed to exII::ex_put_concat_sets()
       // Use existing class members and avoid variable shadowing.
       nodeset_ids.clear();
       num_nodes_per_set.clear();
@@ -1952,21 +1952,18 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
           running_sum += pr.second;
         }
 
+      // Fill in an exII::ex_set_specs object which can then be passed to
+      // the ex_put_concat_sets() function.
+      exII::ex_set_specs set_data = {};
+      set_data.sets_ids = nodeset_ids.data();
+      set_data.num_entries_per_set = num_nodes_per_set.data();
+      set_data.num_dist_per_set = num_node_df_per_set.data(); // zeros
+      set_data.sets_entry_index = node_sets_node_index.data();
+      set_data.sets_dist_index = node_sets_node_index.data(); // dummy value
+      set_data.sets_entry_list = node_sets_node_list.data();
+
       // Write all nodesets together.
-      ex_err = exII::ex_put_concat_node_sets
-        (ex_id,
-         nodeset_ids.data(),
-         num_nodes_per_set.data(),
-         num_node_df_per_set.data(),
-         node_sets_node_index.data(),
-         // Note: we use a dummy value for "node_sets_dist_index"
-         // since we aren't writing any distribution factors. We
-         // correspondingly pass nullptr for the node_sets_dist_fact
-         // vector, since it will not be used for anything when there
-         // are 0 distribution factors.
-         node_sets_node_index.data(),
-         node_sets_node_list.data(),
-         /*node_sets_dist_fact*/nullptr);
+      ex_err = exII::ex_put_concat_sets(ex_id, exII::EX_NODE_SET, &set_data);
       EX_CHECK_ERR(ex_err, "Error writing concatenated nodesets");
 
       // Write out the nodeset names
