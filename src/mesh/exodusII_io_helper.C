@@ -605,27 +605,27 @@ void ExodusII_IO_Helper::print_nodes(std::ostream & out_stream)
 
 void ExodusII_IO_Helper::read_block_info()
 {
-  block_ids.resize(num_elem_blk);
-  // Get all element block IDs.
-  ex_err = exII::ex_get_elem_blk_ids(ex_id,
-                                     block_ids.empty() ? nullptr : block_ids.data());
-  // Usually, there is only one
-  // block since there is only
-  // one type of element.
-  // However, there could be more.
-
-  EX_CHECK_ERR(ex_err, "Error getting block IDs.");
-  message("All block IDs retrieved successfully.");
-
-  char name_buffer[MAX_STR_LENGTH+1];
-  for (int i=0; i<num_elem_blk; ++i)
+  if (num_elem_blk)
     {
-      ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_BLOCK,
-                                 block_ids[i], name_buffer);
-      EX_CHECK_ERR(ex_err, "Error getting block name.");
-      id_to_block_names[block_ids[i]] = name_buffer;
+      // Read all element block IDs.
+      block_ids.resize(num_elem_blk);
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_ELEM_BLOCK,
+                                block_ids.data());
+
+      EX_CHECK_ERR(ex_err, "Error getting block IDs.");
+      message("All block IDs retrieved successfully.");
+
+      char name_buffer[MAX_STR_LENGTH+1];
+      for (int i=0; i<num_elem_blk; ++i)
+        {
+          ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_BLOCK,
+                                     block_ids[i], name_buffer);
+          EX_CHECK_ERR(ex_err, "Error getting block name.");
+          id_to_block_names[block_ids[i]] = name_buffer;
+        }
+      message("All block names retrieved successfully.");
     }
-  message("All block names retrieved successfully.");
 }
 
 
@@ -769,8 +769,9 @@ void ExodusII_IO_Helper::read_sideset_info()
   ss_ids.resize(num_side_sets);
   if (num_side_sets > 0)
     {
-      ex_err = exII::ex_get_side_set_ids(ex_id,
-                                         ss_ids.data());
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_SIDE_SET,
+                                ss_ids.data());
       EX_CHECK_ERR(ex_err, "Error retrieving sideset information.");
       message("All sideset information retrieved successfully.");
 
@@ -803,8 +804,9 @@ void ExodusII_IO_Helper::read_nodeset_info()
   nodeset_ids.resize(num_node_sets);
   if (num_node_sets > 0)
     {
-      ex_err = exII::ex_get_node_set_ids(ex_id,
-                                         nodeset_ids.data());
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_NODE_SET,
+                                nodeset_ids.data());
       EX_CHECK_ERR(ex_err, "Error retrieving nodeset information.");
       message("All nodeset information retrieved successfully.");
 
