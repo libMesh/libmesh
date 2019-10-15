@@ -9753,6 +9753,7 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f 25_quad.bxt && $(LN_S) -f $(srcdir)/25_quad.bxt .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
