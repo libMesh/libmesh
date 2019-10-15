@@ -40,11 +40,6 @@
 #include "libmesh/mesh_tools.h"  // for elem_types warning
 #endif
 
-// This macro returns the length of the array a.  Don't
-// try using it on empty arrays, since it accesses the
-// zero'th element.
-#define ARRAY_LENGTH(a) (sizeof((a))/sizeof((a)[0]))
-
 // Anonymous namespace for file local data
 namespace
 {
