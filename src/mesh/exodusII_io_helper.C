@@ -837,10 +837,11 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
   libmesh_assert_less_equal (offset, elem_list.size());
   libmesh_assert_less_equal (offset, side_list.size());
 
-  ex_err = exII::ex_get_side_set_param(ex_id,
-                                       ss_ids[id],
-                                       &num_sides_per_set[id],
-                                       &num_df_per_set[id]);
+  ex_err = exII::ex_get_set_param(ex_id,
+                                  exII::EX_SIDE_SET,
+                                  ss_ids[id],
+                                  &num_sides_per_set[id],
+                                  &num_df_per_set[id]);
   EX_CHECK_ERR(ex_err, "Error retrieving sideset parameters.");
   message("Parameters retrieved successfully for sideset: ", id);
 
@@ -878,10 +879,11 @@ void ExodusII_IO_Helper::read_nodeset(int id)
   libmesh_assert_less (id, num_nodes_per_set.size());
   libmesh_assert_less (id, num_node_df_per_set.size());
 
-  ex_err = exII::ex_get_node_set_param(ex_id,
-                                       nodeset_ids[id],
-                                       &num_nodes_per_set[id],
-                                       &num_node_df_per_set[id]);
+  ex_err = exII::ex_get_set_param(ex_id,
+                                  exII::EX_NODE_SET,
+                                  nodeset_ids[id],
+                                  &num_nodes_per_set[id],
+                                  &num_node_df_per_set[id]);
   EX_CHECK_ERR(ex_err, "Error retrieving nodeset parameters.");
   message("Parameters retrieved successfully for nodeset: ", id);
 
