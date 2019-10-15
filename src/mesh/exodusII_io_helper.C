@@ -855,7 +855,7 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 #endif
 
 
-  // Don't call ex_get_side_set unless there are actually sides there to get.
+  // Don't call ex_get_set unless there are actually sides there to get.
   // Exodus prints an annoying warning in DEBUG mode otherwise...
   if (num_sides_per_set[id] > 0)
     {
@@ -890,7 +890,7 @@ void ExodusII_IO_Helper::read_nodeset(int id)
 
   node_list.resize(num_nodes_per_set[id]);
 
-  // Don't call ex_get_node_set unless there are actually nodes there to get.
+  // Don't call ex_get_set unless there are actually nodes there to get.
   // Exodus prints an annoying warning message in DEBUG mode otherwise...
   if (num_nodes_per_set[id] > 0)
     {
