@@ -1736,7 +1736,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
             }
         }
 
-      ex_err = exII::ex_put_elem_conn(ex_id, pr.first, connect.data());
+      ex_err = exII::ex_put_conn
+        (ex_id,
+         exII::EX_ELEM_BLOCK,
+         pr.first,
+         connect.data(), // node_conn
+         nullptr,        // elem_edge_conn (unused)
+         nullptr);       // elem_face_conn (unused)
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
       // This transform command stores its result in a range that begins at the third argument,
