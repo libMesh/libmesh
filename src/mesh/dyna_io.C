@@ -171,7 +171,7 @@ void DynaIO::read_mesh(std::istream & in)
   dyna_int_type n_elem_blocks, n_dense_coef_vec_blocks;
   std::vector<dyna_int_type> // indexed from 0 to n_elem_blocks
     block_elem_type,
-    block_n_elem, 
+    block_n_elem,
     block_n_nodes,    // Number of *spline* nodes constraining elements
     block_n_coef_vec, // Number of coefficient vectors for each elem
     block_p,
@@ -454,9 +454,9 @@ void DynaIO::read_mesh(std::istream & in)
             break;
           case COEF_VEC_COMPONENTS:
             {
-              auto & current_vec = 
+              auto & current_vec =
                 dense_constraint_vecs[n_coef_blocks_read][n_coef_vecs_read];
-              
+
               const int end_coef_to_read =
                 std::min(n_coef_comp[n_coef_blocks_read],
                          n_coef_comp_read + max_fps_per_line);
@@ -499,7 +499,7 @@ void DynaIO::read_mesh(std::istream & in)
       else
         libmesh_error_msg("Input stream failure! Perhaps the file does not exist?");
     }
-  
+
   // Merge dense_constraint_vecs blocks
   for (auto coef_vec_block :
        IntRange<dyna_int_type>(0, n_dense_coef_vec_blocks))
