@@ -397,16 +397,25 @@ AC_DEFUN([CONFIGURE_PETSC],
           AC_SUBST(PETSC_FC_INCLUDES)
           AC_SUBST(MPI_IMPL)
 
+          dnl if we are going to use MPI as used by PETSc, check that it has a suitable version:
           AS_IF([test "x$PETSC_MPI" != x],
-                [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])])
+                [
+                VERSION_MPI
+                dnl: see if we disabled mpi due to incompatible version:
+                AS_IF([test "x$enablempi" = xno],
+                      [
+                      AC_MSG_WARN([MPI is disabled. Disable PETSc as well.])
+                      enablepetsc=no])
+               ])
 
-          AS_IF([test $petsc_have_hypre -gt 0],
-                [AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])])
-
-          AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
-
-          AS_IF([test $petsc_have_tao != no],
-                [AC_DEFINE(HAVE_PETSC_TAO, 1, [Flag indicating whether or not the Toolkit for Advanced Optimization (TAO) is available via PETSc])])
+         AS_IF([test "x$enablepetsc" != xno],
+               [
+                AS_IF([test $petsc_have_hypre -gt 0],
+                      [AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])])
+                AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
+                AS_IF([test $petsc_have_tao != no],
+                      [AC_DEFINE(HAVE_PETSC_TAO, 1, [Flag indicating whether or not the Toolkit for Advanced Optimization (TAO) is available via PETSc])])
+               ])
         ])
 
   # If PETSc is not enabled, but it *was* required, error out now

@@ -189,6 +189,9 @@ AS_IF([test "x$MPI_IMPL" != x],
                     [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no])
       ])
 
+dnl check that we are using the correct version of MPI:
+VERSION_MPI
+
 dnl Save variables...
 AC_SUBST(MPI)
 AC_SUBST(MPI_IMPL)
@@ -197,4 +200,34 @@ AC_SUBST(MPI_LIBS_PATH)
 AC_SUBST(MPI_LIBS_PATHS)
 AC_SUBST(MPI_INCLUDES_PATH)
 AC_SUBST(MPI_INCLUDES_PATHS)
+
+])
+
+
+
+AC_DEFUN([VERSION_MPI], [
+
+  AS_IF([test "x$enablempi" != xno],
+  [
+        dnl AC_MSG_RESULT([Checking Version of MPI now:]) dnl TODO: should be not a 'result'!?
+        dnl check the version of available MPI via the API:
+        dnl with the *const* int i, only MPI > 2 will compile.
+        AC_LINK_IFELSE([AC_LANG_PROGRAM([@%:@include <mpi.h>],
+                                        [
+                                        const int i=1;
+                                        int position, j, a[2];
+                                        int myrank;
+                                        char buff@<:@ 10@:>@;
+                                        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+                                        MPI_Pack(&i, 1, MPI_INT, buff, 10, &position, MPI_COMM_WORLD)
+                                        ])],
+                       [
+                       AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                       dnl AC_MSG_RESULT([Have compatible MPI-version.])
+                       ],
+                       [
+                       AC_MSG_WARN(["MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now..."])
+                       enablempi=no
+                       ])
+  ])
 ])
