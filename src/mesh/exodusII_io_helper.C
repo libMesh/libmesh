@@ -859,10 +859,11 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
   // Exodus prints an annoying warning in DEBUG mode otherwise...
   if (num_sides_per_set[id] > 0)
     {
-      ex_err = exII::ex_get_side_set(ex_id,
-                                     ss_ids[id],
-                                     &elem_list[offset],
-                                     &side_list[offset]);
+      ex_err = exII::ex_get_set(ex_id,
+                                exII::EX_SIDE_SET,
+                                ss_ids[id],
+                                &elem_list[offset],
+                                &side_list[offset]);
       EX_CHECK_ERR(ex_err, "Error retrieving sideset data.");
       message("Data retrieved successfully for sideset: ", id);
 
@@ -893,9 +894,11 @@ void ExodusII_IO_Helper::read_nodeset(int id)
   // Exodus prints an annoying warning message in DEBUG mode otherwise...
   if (num_nodes_per_set[id] > 0)
     {
-      ex_err = exII::ex_get_node_set(ex_id,
-                                     nodeset_ids[id],
-                                     node_list.data());
+      ex_err = exII::ex_get_set(ex_id,
+                                exII::EX_NODE_SET,
+                                nodeset_ids[id],
+                                node_list.data(),
+                                nullptr); // set_extra_list, ignored for node sets
 
       EX_CHECK_ERR(ex_err, "Error retrieving nodeset data.");
       message("Data retrieved successfully for nodeset: ", id);
