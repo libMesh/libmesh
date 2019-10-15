@@ -689,22 +689,35 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 {
   libmesh_assert_less (block, block_ids.size());
 
-  ex_err = exII::ex_get_elem_block(ex_id,
-                                   block_ids[block],
-                                   elem_type.data(),
-                                   &num_elem_this_blk,
-                                   &num_nodes_per_elem,
-                                   &num_attr);
-  if (verbose)
-    libMesh::out << "Reading a block of " << num_elem_this_blk
-                 << " " << elem_type.data() << "(s)"
-                 << " having " << num_nodes_per_elem
-                 << " nodes per element." << std::endl;
+  // Unlike the other "extended" APIs, this one does not use a parameter struct.
+  int num_edges_per_elem = 0;
+  int num_faces_per_elem = 0;
+  ex_err = exII::ex_get_block(ex_id,
+                              exII::EX_ELEM_BLOCK,
+                              block_ids[block],
+                              elem_type.data(),
+                              &num_elem_this_blk,
+                              &num_nodes_per_elem,
+                              &num_edges_per_elem, // 0 or -1 if no "extended" block info
+                              &num_faces_per_elem, // 0 or -1 if no "extended" block info
+                              &num_attr);
 
   EX_CHECK_ERR(ex_err, "Error getting block info.");
   message("Info retrieved successfully for block: ", block);
 
+  // Warn that we don't currently support reading blocks with extended info.
+  // Note: the docs say -1 will be returned for this but I found that it was
+  // actually 0, so not sure which it will be in general.
+  if (!(num_edges_per_elem == 0) && !(num_edges_per_elem == -1))
+    libmesh_warning("Exodus files with extended edge connectivity not currently supported.");
+  if (!(num_faces_per_elem == 0) && !(num_faces_per_elem == -1))
+    libmesh_warning("Exodus files with extended face connectivity not currently supported.");
 
+  if (verbose)
+    libMesh::out << "Read a block of " << num_elem_this_blk
+                 << " " << elem_type.data() << "(s)"
+                 << " having " << num_nodes_per_elem
+                 << " nodes per element." << std::endl;
 
   // Read in the connectivity of the elements of this block,
   // watching out for the case where we actually have no
