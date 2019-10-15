@@ -615,7 +615,8 @@ void DynaIO::read_mesh(std::istream & in)
                                          global_node_idx);
                   global_node_idx = my_global_nodes[spline_node_index];
 
-                  key.push_back(std::make_pair(global_node_idx, coef));
+                  if (coef != 0) // Ignore irrelevant spline nodes
+                    key.push_back(std::make_pair(global_node_idx, coef));
                 }
 
               auto local_node_it = local_nodes.find(key);
