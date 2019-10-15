@@ -158,46 +158,14 @@ namespace libMesh
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::ElementMaps static data
 
-// 0D node map definitions
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::nodeelem_node_map = {0};
-
-// 1D node map definitions
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::edge2_node_map = {0, 1};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::edge3_node_map = {0, 1, 2};
-
-// 1D edge maps
-// FIXME: This notion may or may not be defined in ExodusII
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::edge_edge_map = {0, 1};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::edge_inverse_edge_map = {1, 2};
-
-// 2D node map definitions
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quad4_node_map = {0, 1, 2, 3};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quad8_node_map = {0, 1, 2, 3, 4, 5, 6, 7};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quad9_node_map = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tri3_node_map = {0, 1, 2};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tri6_node_map = {0, 1, 2, 3, 4, 5};
-
-// 2D edge map definitions
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tri_edge_map = {0, 1, 2};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quad_edge_map = {0, 1, 2, 3};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::trishell3_edge_map = {0, 1, 2};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quadshell4_edge_map = {0, 1, 2, 3};
-
 // 2D inverse face map definitions.
 // These take a libMesh ID and turn it into an Exodus ID
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tri_inverse_edge_map = {1, 2, 3};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quad_inverse_edge_map = {1, 2, 3, 4};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::trishell3_inverse_edge_map = {3, 4, 5};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::quadshell4_inverse_edge_map = {3, 4, 5, 6};
 
 // 3D node map definitions
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex8_node_map = {0, 1, 2, 3, 4, 5, 6, 7};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex20_node_map
-= { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
-    10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-
-// DRG: Using the newest exodus documentation available on sourceforge and using Table 2 to see
-// where all of the nodes over 21 are supposed to go... we come up with:
+// The hex27 appears to be the only element without an identity mapping between its
+// node numbering and libmesh's.
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -205,50 +173,22 @@ const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_node_map = {
   21, 25, 24, 26, 23, 22, 20};
 //20  21  22  23  24  25  26 // LibMesh indices
 
-// The hex27 appears to be the only element without a 1:1 map between its
-// node numbering and libmesh's.  Therefore when writing out hex27's we need
-// to invert this map...
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_inverse_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
   // Mid-face nodes and centroid
   26, 20, 25, 24, 22, 21, 23};
 //20  21  22  23  24  25  26
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tet4_node_map = {0, 1, 2, 3};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tet10_node_map =
-  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism6_node_map = {0, 1, 2, 3, 4, 5};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism15_node_map =
-  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism18_node_map =
-  {0, 1, 2, 3, 4, 5, 6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::pyramid5_node_map = {0, 1, 2, 3, 4};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::pyramid13_node_map =
-  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::pyramid14_node_map =
-  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-
-// Shell element face maps
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::trishell3_shellface_map = {0, 1};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quadshell4_shellface_map = {0, 1};
-
-// These take a libMesh ID and turn it into an Exodus ID
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::trishell3_inverse_shellface_map = {1, 2};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quadshell4_inverse_shellface_map = {1, 2};
 
 // 3D face map definitions
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::tet_face_map = {1, 2, 3, 0};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_face_map = {1, 2, 3, 4, 0, 5};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_face_map = {1, 2, 3, 4, 0, 5};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism_face_map = {1, 2, 3, 0, 4};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::pyramid_face_map = {0, 1, 2, 3, 4};
 
 // These take a libMesh ID and turn it into an Exodus ID
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::tet_inverse_face_map = {4, 1, 2, 3};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_inverse_face_map = {5, 1, 2, 3, 4, 6};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_inverse_face_map = {5, 1, 2, 3, 4, 6};
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism_inverse_face_map = {4, 1, 2, 3, 5};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map = {1, 2, 3, 4, 5};
 
 // 3D element edge maps. Map 0-based Exodus id -> libMesh id.
 const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_edge_map =
@@ -2834,50 +2774,31 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
     {
     case NODEELEM:
       {
-        conv.node_map = &nodeelem_node_map;
-        conv.inverse_node_map = &nodeelem_node_map;
         conv.canonical_type = NODEELEM;
         conv.exodus_type = "SPHERE";
         return conv;
       }
     case EDGE2:
       {
-        conv.node_map = &edge2_node_map;
-        conv.inverse_node_map = &edge2_node_map;
-        conv.side_map = &edge_edge_map;
-        conv.inverse_side_map = &edge_edge_map;
         conv.canonical_type = EDGE2;
         conv.exodus_type = "EDGE2";
         return conv;
       }
     case EDGE3:
       {
-        conv.node_map = &edge3_node_map;
-        conv.inverse_node_map = &edge3_node_map;
-        conv.side_map = &edge_edge_map;
-        conv.inverse_side_map = &edge_edge_map;
         conv.canonical_type = EDGE3;
         conv.exodus_type = "EDGE3";
         return conv;
       }
     case QUAD4:
       {
-        conv.node_map = &quad4_node_map;
-        conv.inverse_node_map = &quad4_node_map;
-        conv.side_map = &quad_edge_map;
-        conv.inverse_side_map = &quad_inverse_edge_map;
         conv.canonical_type = QUAD4;
         conv.exodus_type = "QUAD4";
         return conv;
       }
     case QUADSHELL4:
       {
-        conv.node_map = &quad4_node_map;
-        conv.inverse_node_map = &quad4_node_map;
-        conv.side_map = &quadshell4_edge_map;
         conv.inverse_side_map = &quadshell4_inverse_edge_map;
-        conv.shellface_map = &quadshell4_shellface_map;
-        conv.inverse_shellface_map = &quadshell4_inverse_shellface_map;
         conv.shellface_index_offset = 2;
         conv.canonical_type = QUADSHELL4;
         conv.exodus_type = "SHELL4";
@@ -2885,22 +2806,13 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       }
     case QUAD8:
       {
-        conv.node_map = &quad8_node_map;
-        conv.inverse_node_map = &quad8_node_map;
-        conv.side_map = &quad_edge_map;
-        conv.inverse_side_map = &quad_inverse_edge_map;
         conv.canonical_type = QUAD8;
         conv.exodus_type = "QUAD8";
         return conv;
       }
     case QUADSHELL8:
       {
-        conv.node_map = &quad8_node_map;
-        conv.inverse_node_map = &quad8_node_map;
-        conv.side_map = &quadshell4_edge_map;
         conv.inverse_side_map = &quadshell4_inverse_edge_map;
-        conv.shellface_map = &quadshell4_shellface_map;
-        conv.inverse_shellface_map = &quadshell4_inverse_shellface_map;
         conv.shellface_index_offset = 2;
         conv.canonical_type = QUADSHELL8;
         conv.exodus_type = "SHELL8";
@@ -2908,32 +2820,19 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       }
     case QUAD9:
       {
-        conv.node_map = &quad9_node_map;
-        conv.inverse_node_map = &quad9_node_map;
-        conv.side_map = &quad_edge_map;
-        conv.inverse_side_map = &quad_inverse_edge_map;
         conv.canonical_type = QUAD9;
         conv.exodus_type = "QUAD9";
         return conv;
       }
     case TRI3:
       {
-        conv.node_map = &tri3_node_map;
-        conv.inverse_node_map = &tri3_node_map;
-        conv.side_map = &tri_edge_map;
-        conv.inverse_side_map = &tri_inverse_edge_map;
         conv.canonical_type = TRI3;
         conv.exodus_type = "TRI3";
         return conv;
       }
     case TRISHELL3:
       {
-        conv.node_map = &tri3_node_map;
-        conv.inverse_node_map = &tri3_node_map;
-        conv.side_map = &trishell3_edge_map;
         conv.inverse_side_map = &trishell3_inverse_edge_map;
-        conv.shellface_map = &trishell3_shellface_map;
-        conv.inverse_shellface_map = &trishell3_inverse_shellface_map;
         conv.shellface_index_offset = 2;
         conv.canonical_type = TRISHELL3;
         conv.exodus_type = "TRISHELL3";
@@ -2941,28 +2840,18 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       }
     case TRI3SUBDIVISION:
       {
-        conv.node_map = &tri3_node_map;
-        conv.inverse_node_map = &tri3_node_map;
-        conv.side_map = &tri_edge_map;
-        conv.inverse_side_map = &tri_inverse_edge_map;
         conv.canonical_type = TRI3SUBDIVISION;
         conv.exodus_type = "TRI3";
         return conv;
       }
     case TRI6:
       {
-        conv.node_map = &tri6_node_map;
-        conv.inverse_node_map = &tri6_node_map;
-        conv.side_map = &tri_edge_map;
-        conv.inverse_side_map = &tri_inverse_edge_map;
         conv.canonical_type = TRI6;
         conv.exodus_type = "TRI6";
         return conv;
       }
     case HEX8:
       {
-        conv.node_map = &hex8_node_map;
-        conv.inverse_node_map = &hex8_node_map;
         conv.side_map = &hex_face_map;
         conv.inverse_side_map = &hex_inverse_face_map;
         conv.canonical_type = HEX8;
@@ -2971,8 +2860,6 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       }
     case HEX20:
       {
-        conv.node_map = &hex20_node_map;
-        conv.inverse_node_map = &hex20_node_map;
         conv.side_map = &hex_face_map;
         conv.inverse_side_map = &hex_inverse_face_map;
         conv.canonical_type = HEX20;
@@ -2983,16 +2870,14 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       {
         conv.node_map = &hex27_node_map;
         conv.inverse_node_map = &hex27_inverse_node_map;
-        conv.side_map = &hex27_face_map;
-        conv.inverse_side_map = &hex27_inverse_face_map;
+        conv.side_map = &hex_face_map;
+        conv.inverse_side_map = &hex_inverse_face_map;
         conv.canonical_type = HEX27;
         conv.exodus_type = "HEX27";
         return conv;
       }
     case TET4:
       {
-        conv.node_map = &tet4_node_map;
-        conv.inverse_node_map = &tet4_node_map;
         conv.side_map = &tet_face_map;
         conv.inverse_side_map = &tet_inverse_face_map;
         conv.canonical_type = TET4;
@@ -3001,8 +2886,6 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
     }
     case TET10:
       {
-        conv.node_map = &tet10_node_map;
-        conv.inverse_node_map = &tet10_node_map;
         conv.side_map = &tet_face_map;
         conv.inverse_side_map = &tet_inverse_face_map;
         conv.canonical_type = TET10;
@@ -3011,8 +2894,6 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
     }
     case PRISM6:
       {
-        conv.node_map = &prism6_node_map;
-        conv.inverse_node_map = &prism6_node_map;
         conv.side_map = &prism_face_map;
         conv.inverse_side_map = &prism_inverse_face_map;
         conv.canonical_type = PRISM6;
@@ -3021,8 +2902,6 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       }
     case PRISM15:
       {
-        conv.node_map = &prism15_node_map;
-        conv.inverse_node_map = &prism15_node_map;
         conv.side_map = &prism_face_map;
         conv.inverse_side_map = &prism_inverse_face_map;
         conv.canonical_type = PRISM15;
@@ -3031,8 +2910,6 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       }
     case PRISM18:
       {
-        conv.node_map = &prism18_node_map;
-        conv.inverse_node_map = &prism18_node_map;
         conv.side_map = &prism_face_map;
         conv.inverse_side_map = &prism_inverse_face_map;
         conv.canonical_type = PRISM18;
@@ -3041,30 +2918,18 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
       }
     case PYRAMID5:
       {
-        conv.node_map = &pyramid5_node_map;
-        conv.inverse_node_map = &pyramid5_node_map;
-        conv.side_map = &pyramid_face_map;
-        conv.inverse_side_map = &pyramid_inverse_face_map;
         conv.canonical_type = PYRAMID5;
         conv.exodus_type = "PYRAMID5";
         return conv;
       }
     case PYRAMID13:
       {
-        conv.node_map = &pyramid13_node_map;
-        conv.inverse_node_map = &pyramid13_node_map;
-        conv.side_map = &pyramid_face_map;
-        conv.inverse_side_map = &pyramid_inverse_face_map;
         conv.canonical_type = PYRAMID13;
         conv.exodus_type = "PYRAMID13";
         return conv;
       }
     case PYRAMID14:
       {
-        conv.node_map = &pyramid14_node_map;
-        conv.inverse_node_map = &pyramid14_node_map;
-        conv.side_map = &pyramid_face_map;
-        conv.inverse_side_map = &pyramid_inverse_face_map;
         conv.canonical_type = PYRAMID14;
         conv.exodus_type = "PYRAMID14";
         return conv;
@@ -3079,7 +2944,9 @@ ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
 
 int ExodusII_IO_Helper::Conversion::get_node_map(int i) const
 {
-  libmesh_assert(node_map);
+  if (!node_map)
+    return i;
+
   libmesh_assert_less (i, node_map->size());
   return (*node_map)[i];
 }
@@ -3088,7 +2955,9 @@ int ExodusII_IO_Helper::Conversion::get_node_map(int i) const
 
 int ExodusII_IO_Helper::Conversion::get_inverse_node_map(int i) const
 {
-  libmesh_assert(inverse_node_map);
+  if (!inverse_node_map)
+    return i;
+
   libmesh_assert_less (i, inverse_node_map->size());
   return (*inverse_node_map)[i];
 }
@@ -3097,7 +2966,8 @@ int ExodusII_IO_Helper::Conversion::get_inverse_node_map(int i) const
 
 int ExodusII_IO_Helper::Conversion::get_side_map(int i) const
 {
-  libmesh_assert(side_map);
+  if (!side_map)
+    return i;
 
   // If we asked for a side that doesn't exist, return an invalid_id
   // and allow higher-level code to handle it.
@@ -3111,7 +2981,10 @@ int ExodusII_IO_Helper::Conversion::get_side_map(int i) const
 
 int ExodusII_IO_Helper::Conversion::get_inverse_side_map(int i) const
 {
-  libmesh_assert(inverse_side_map);
+  // For identity side mappings, we our convention is to return a 1-based index.
+  if (!inverse_side_map)
+    return i + 1;
+
   libmesh_assert_less (i, inverse_side_map->size());
   return (*inverse_side_map)[i];
 }
@@ -3124,7 +2997,9 @@ int ExodusII_IO_Helper::Conversion::get_inverse_side_map(int i) const
  */
 int ExodusII_IO_Helper::Conversion::get_shellface_map(int i) const
 {
-  libmesh_assert(shellface_map);
+  if (!shellface_map)
+    return i;
+
   libmesh_assert_less (i, shellface_map->size());
   return (*shellface_map)[i];
 }
@@ -3133,7 +3008,9 @@ int ExodusII_IO_Helper::Conversion::get_shellface_map(int i) const
 
 int ExodusII_IO_Helper::Conversion::get_inverse_shellface_map(int i) const
 {
-  libmesh_assert(inverse_shellface_map);
+  if (!inverse_shellface_map)
+    return i + 1;
+
   libmesh_assert_less (i, inverse_shellface_map->size());
   return (*inverse_shellface_map)[i];
 }

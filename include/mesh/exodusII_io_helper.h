@@ -965,70 +965,18 @@ public:
   ExodusII_IO_Helper::Conversion assign_conversion(const ElemType type);
 
   /**
-   * 0D element node maps. The trivial map {0}.
-   */
-  static const std::vector<int> nodeelem_node_map;
-
-  /**
-   * 1D element node maps. These map from 0-based Exodus node ids
-   * to libmesh node ids, and in all cases use the identity mapping.
-   */
-  static const std::vector<int> edge2_node_map;
-  static const std::vector<int> edge3_node_map;
-
-  /**
-   * 1D element edge maps. The "edges" of 1D elements are nodes.
-   */
-  static const std::vector<int> edge_edge_map;
-  static const std::vector<int> edge_inverse_edge_map;
-
-  /**
-   * 2D element node maps. These map from 0-based Exodus node ids to
-   * libmesh node ids.
-   */
-  static const std::vector<int> quad4_node_map;
-  static const std::vector<int> quad8_node_map;
-  static const std::vector<int> quad9_node_map;
-  static const std::vector<int> tri3_node_map;
-  static const std::vector<int> tri6_node_map;
-
-  /**
-   * 2D element edge maps. These are used to map from 0-based Exodus
-   * edge ids to libmesh edge ids. For "shell" elements, the first two
-   * "sides" correspond to the 2D "front" and "back" faces of the
-   * element and are used for "shell face" boundary conditions.  The
-   * remaining three sides are used for standard BCs.
-   */
-  static const std::vector<int> tri_edge_map;
-  static const std::vector<int> quad_edge_map;
-  static const std::vector<int> trishell3_edge_map;
-  static const std::vector<int> quadshell4_edge_map;
-
-  /**
    * 2D element inverse edge maps. These are used to map from libmesh
    * edge ids to 1-based Exodus ids. For shell elements, these maps
    * always start with "3" because the first two sides are shellfaces.
    */
-  static const std::vector<int> tri_inverse_edge_map;
-  static const std::vector<int> quad_inverse_edge_map;
   static const std::vector<int> trishell3_inverse_edge_map;
   static const std::vector<int> quadshell4_inverse_edge_map;
 
   /**
-   * 3D element node maps. These are used to map from 0-based Exodus
-   * node ids to libmesh node ids.
+   * 3D element node maps. Only the Hex27 has a non-trivial forward
+   * and inverse node mapping.
    */
-  static const std::vector<int> hex8_node_map;
-  static const std::vector<int> hex20_node_map;
   static const std::vector<int> hex27_node_map;
-  static const std::vector<int> tet4_node_map;
-  static const std::vector<int> tet10_node_map;
-  static const std::vector<int> prism6_node_map;
-  static const std::vector<int> prism15_node_map;
-  static const std::vector<int> prism18_node_map;
-  static const std::vector<int> pyramid5_node_map;
-  static const std::vector<int> pyramid13_node_map;
-  static const std::vector<int> pyramid14_node_map;
 
   /**
    * 3D element inverse node maps. These are used to map from libmesh
@@ -1039,28 +987,12 @@ public:
   static const std::vector<int> hex27_inverse_node_map;
 
   /**
-   * Shell element face maps. These are used to map from 0-based
-   * exodus shellface ids to shell face ids.
-   */
-  static const std::vector<int> trishell3_shellface_map;
-  static const std::vector<int> quadshell4_shellface_map;
-
-  /**
-   * Shell element inverse face maps. These are used to map from
-   * libmesh shellface ids to 1-based Exodus ids.
-   */
-  static const std::vector<int> trishell3_inverse_shellface_map;
-  static const std::vector<int> quadshell4_inverse_shellface_map;
-
-  /**
    * 3D element face maps. These are used to map from 0-based exodus side
    * ids to libmesh side ids.
    */
   static const std::vector<int> hex_face_map;
-  static const std::vector<int> hex27_face_map;
   static const std::vector<int> tet_face_map;
   static const std::vector<int> prism_face_map;
-  static const std::vector<int> pyramid_face_map;
 
   /**
    * 3D element inverse face maps. These are used to map from libmesh
@@ -1069,10 +1001,8 @@ public:
    * the value you get out of the inverse face maps before using it.
    */
   static const std::vector<int> hex_inverse_face_map;
-  static const std::vector<int> hex27_inverse_face_map;
   static const std::vector<int> tet_inverse_face_map;
   static const std::vector<int> prism_inverse_face_map;
-  static const std::vector<int> pyramid_inverse_face_map;
 
   /**
    * 3D element edge maps. These are used to map from 0-based Exodus
