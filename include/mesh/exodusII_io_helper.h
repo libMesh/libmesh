@@ -100,8 +100,15 @@ public:
                      bool run_only_on_proc0=true,
                      bool single_precision=false);
   /**
-   * Destructor.
+   * Special functions. This class does not manage any dynamically
+   * allocated resources (file pointers, etc.) so it _should_ be
+   * default copy/move constructable and assignable, but I don't know
+   * if any existing code actually uses these operations.
    */
+  ExodusII_IO_Helper (const ExodusII_IO_Helper &) = default;
+  ExodusII_IO_Helper (ExodusII_IO_Helper &&) = default;
+  ExodusII_IO_Helper & operator= (const ExodusII_IO_Helper &) = default;
+  ExodusII_IO_Helper & operator= (ExodusII_IO_Helper &&) = default;
   virtual ~ExodusII_IO_Helper();
 
   /**

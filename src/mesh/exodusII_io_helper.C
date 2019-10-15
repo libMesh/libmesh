@@ -303,9 +303,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
 
 
 
-ExodusII_IO_Helper::~ExodusII_IO_Helper()
-{
-}
+ExodusII_IO_Helper::~ExodusII_IO_Helper() = default;
 
 
 
@@ -1748,17 +1746,16 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
          nullptr);       // elem_face_conn (unused)
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
-      // This transform command stores its result in a range that begins at the third argument,
-      // so this command is adding values to the elem_num_map vector starting from curr_elem_map_end.
-      curr_elem_map_end = std::transform(tmp_vec.begin(),
-                                         tmp_vec.end(),
-                                         curr_elem_map_end,
-                                         std::bind2nd(std::plus<subdomain_map_type::mapped_type::value_type>(), 1));  // Adds one to each id to make a 1-based exodus file!
-
-      // But if we don't want to add one, we just want to put the values
-      // of tmp_vec into elem_map in the right location, we can use
-      // std::copy().
-      // curr_elem_map_end = std::copy(tmp_vec.begin(), tmp_vec.end(), curr_elem_map_end);
+      // This transform command stores its result in a range that
+      // begins at the third argument, so this command is adding
+      // values to the elem_num_map vector starting from
+      // curr_elem_map_end.  Here we add 1 to each id to make a
+      // 1-based exodus file.
+      curr_elem_map_end = std::transform
+        (tmp_vec.begin(),
+         tmp_vec.end(),
+         curr_elem_map_end,
+         [](dof_id_type id){return id+1;});
     }
 
   // write out the element number map that we created
