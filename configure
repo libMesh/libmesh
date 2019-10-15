@@ -33969,6 +33969,48 @@ fi
 
 
 
+  if test "x$enablempi" != xno; then :
+
+                                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                        const int i=1;
+                                        int position, j, a2;
+                                        int myrank;
+                                        char buff[ 10];
+                                        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+                                        MPI_Pack(&i, 1, MPI_INT, buff, 10, &position, MPI_COMM_WORLD)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&2;}
+                       enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+
+
+
+
+
 
 
 
@@ -34671,6 +34713,48 @@ fi
 
 
 
+  if test "x$enablempi" != xno; then :
+
+                                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                        const int i=1;
+                                        int position, j, a2;
+                                        int myrank;
+                                        char buff[ 10];
+                                        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+                                        MPI_Pack(&i, 1, MPI_INT, buff, 10, &position, MPI_COMM_WORLD)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&2;}
+                       enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+
+
+
+
+
 
 
 
@@ -35187,6 +35271,48 @@ fi
 
 
 
+  if test "x$enablempi" != xno; then :
+
+                                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                        const int i=1;
+                                        int position, j, a2;
+                                        int myrank;
+                                        char buff[ 10];
+                                        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+                                        MPI_Pack(&i, 1, MPI_INT, buff, 10, &position, MPI_COMM_WORLD)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&2;}
+                       enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+
+
+
+
+
 
 
 
@@ -35702,6 +35828,48 @@ fi
 
 
 
+  if test "x$enablempi" != xno; then :
+
+                                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                        const int i=1;
+                                        int position, j, a2;
+                                        int myrank;
+                                        char buff[ 10];
+                                        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+                                        MPI_Pack(&i, 1, MPI_INT, buff, 10, &position, MPI_COMM_WORLD)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&2;}
+                       enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+
+
+
+
+
 
 
 
@@ -35810,25 +35978,72 @@ fi
 
 
 
-          if test "x$PETSC_MPI" != x; then :
+                    if test "x$PETSC_MPI" != x; then :
+
+
+
+  if test "x$enablempi" != xno; then :
+
+                                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+
+                                        const int i=1;
+                                        int position, j, a2;
+                                        int myrank;
+                                        char buff[ 10];
+                                        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+                                        MPI_Pack(&i, 1, MPI_INT, buff, 10, &position, MPI_COMM_WORLD)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
 
+
+else
+
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&5
+$as_echo "$as_me: WARNING: \"MPI-version seems to be too low: Need MPI 3.X or compatible. Disable MPI now...\"" >&2;}
+                       enablempi=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
 fi
 
-          if test $petsc_have_hypre -gt 0; then :
+                                if test "x$enablempi" = xno; then :
+
+                      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MPI is disabled. Disable PETSc as well." >&5
+$as_echo "$as_me: WARNING: MPI is disabled. Disable PETSc as well." >&2;}
+                      enablepetsc=no
+fi
+
+fi
+
+         if test "x$enablepetsc" != xno; then :
+
+                if test $petsc_have_hypre -gt 0; then :
 
 $as_echo "#define HAVE_PETSC_HYPRE 1" >>confdefs.h
 
 fi
 
-
 $as_echo "#define HAVE_PETSC 1" >>confdefs.h
 
-
-          if test $petsc_have_tao != no; then :
+                if test $petsc_have_tao != no; then :
 
 $as_echo "#define HAVE_PETSC_TAO 1" >>confdefs.h
+
+fi
 
 fi
 
