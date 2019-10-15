@@ -43,132 +43,24 @@
 // Anonymous namespace for file local data
 namespace
 {
-using namespace libMesh;
 
-// Define equivalence classes of Cubit/Exodus element types that map to
-// libmesh ElemTypes
-std::map<std::string, ElemType> element_equivalence_map;
-
-// This function initializes the element_equivalence_map the first time it
-// is called, and returns early all other times.
-void init_element_equivalence_map()
-{
-  if (element_equivalence_map.empty())
-    {
-      // We use an ExodusII SPHERE element to represent a NodeElem
-      element_equivalence_map["SPHERE"] = NODEELEM;
-
-      // EDGE2 equivalences
-      element_equivalence_map["EDGE"]   = EDGE2;
-      element_equivalence_map["EDGE2"]  = EDGE2;
-      element_equivalence_map["TRUSS"]  = EDGE2;
-      element_equivalence_map["BEAM"]   = EDGE2;
-      element_equivalence_map["BAR"]    = EDGE2;
-      element_equivalence_map["TRUSS2"] = EDGE2;
-      element_equivalence_map["BEAM2"]  = EDGE2;
-      element_equivalence_map["BAR2"]   = EDGE2;
-
-      // EDGE3 equivalences
-      element_equivalence_map["EDGE3"]  = EDGE3;
-      element_equivalence_map["TRUSS3"] = EDGE3;
-      element_equivalence_map["BEAM3"]  = EDGE3;
-      element_equivalence_map["BAR3"]   = EDGE3;
-
-      // QUAD4 equivalences
-      element_equivalence_map["QUAD"]   = QUAD4;
-      element_equivalence_map["QUAD4"]  = QUAD4;
-
-      // QUADSHELL4 equivalences
-      element_equivalence_map["SHELL"]  = QUADSHELL4;
-      element_equivalence_map["SHELL4"] = QUADSHELL4;
-
-      // QUAD8 equivalences
-      element_equivalence_map["QUAD8"]  = QUAD8;
-
-      // QUADSHELL8 equivalences
-      element_equivalence_map["SHELL8"] = QUADSHELL8;
-
-      // QUAD9 equivalences
-      element_equivalence_map["QUAD9"]  = QUAD9;
-      // element_equivalence_map["SHELL9"] = QUAD9;
-
-      // TRI3 equivalences
-      element_equivalence_map["TRI"]       = TRI3;
-      element_equivalence_map["TRI3"]      = TRI3;
-      element_equivalence_map["TRIANGLE"]  = TRI3;
-
-      // TRISHELL3 equivalences
-      element_equivalence_map["TRISHELL"]  = TRISHELL3;
-      element_equivalence_map["TRISHELL3"] = TRISHELL3;
-
-      // TRI6 equivalences
-      element_equivalence_map["TRI6"]      = TRI6;
-      // element_equivalence_map["TRISHELL6"] = TRI6;
-
-      // HEX8 equivalences
-      element_equivalence_map["HEX"]  = HEX8;
-      element_equivalence_map["HEX8"] = HEX8;
-
-      // HEX20 equivalences
-      element_equivalence_map["HEX20"] = HEX20;
-
-      // HEX27 equivalences
-      element_equivalence_map["HEX27"] = HEX27;
-
-      // TET4 equivalences
-      element_equivalence_map["TETRA"]  = TET4;
-      element_equivalence_map["TETRA4"] = TET4;
-
-      // TET10 equivalences
-      element_equivalence_map["TETRA10"] = TET10;
-
-      // PRISM6 equivalences
-      element_equivalence_map["WEDGE"] = PRISM6;
-
-      // PRISM15 equivalences
-      element_equivalence_map["WEDGE15"] = PRISM15;
-
-      // PRISM18 equivalences
-      element_equivalence_map["WEDGE18"] = PRISM18;
-
-      // PYRAMID5 equivalences
-      element_equivalence_map["PYRAMID"]  = PYRAMID5;
-      element_equivalence_map["PYRAMID5"] = PYRAMID5;
-
-      // PYRAMID13 equivalences
-      element_equivalence_map["PYRAMID13"] = PYRAMID13;
-
-      // PYRAMID14 equivalences
-      element_equivalence_map["PYRAMID14"] = PYRAMID14;
-    }
-}
-
-}
-
-
-
-namespace libMesh
-{
-
-// ------------------------------------------------------------
-// ExodusII_IO_Helper::ElementMaps static data
-
+// File scope constant node/edge/face mapping arrays.
 // 2D inverse face map definitions.
 // These take a libMesh ID and turn it into an Exodus ID
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::trishell3_inverse_edge_map = {3, 4, 5};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::quadshell4_inverse_edge_map = {3, 4, 5, 6};
+const std::vector<int> trishell3_inverse_edge_map = {3, 4, 5};
+const std::vector<int> quadshell4_inverse_edge_map = {3, 4, 5, 6};
 
 // 3D node map definitions
 // The hex27 appears to be the only element without an identity mapping between its
 // node numbering and libmesh's.
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_node_map = {
+const std::vector<int> hex27_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
   // Mid-face nodes and centroid
   21, 25, 24, 26, 23, 22, 20};
 //20  21  22  23  24  25  26 // LibMesh indices
 
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_inverse_node_map = {
+const std::vector<int> hex27_inverse_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
   // Mid-face nodes and centroid
@@ -176,28 +68,32 @@ const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex27_inverse_node_map =
 //20  21  22  23  24  25  26
 
 // 3D face map definitions
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tet_face_map = {1, 2, 3, 0};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_face_map = {1, 2, 3, 4, 0, 5};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism_face_map = {1, 2, 3, 0, 4};
+const std::vector<int> tet_face_map = {1, 2, 3, 0};
+const std::vector<int> hex_face_map = {1, 2, 3, 4, 0, 5};
+const std::vector<int> prism_face_map = {1, 2, 3, 0, 4};
 
 // These take a libMesh ID and turn it into an Exodus ID
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::tet_inverse_face_map = {4, 1, 2, 3};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_inverse_face_map = {5, 1, 2, 3, 4, 6};
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::prism_inverse_face_map = {4, 1, 2, 3, 5};
+const std::vector<int> tet_inverse_face_map = {4, 1, 2, 3};
+const std::vector<int> hex_inverse_face_map = {5, 1, 2, 3, 4, 6};
+const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
 
 // 3D element edge maps. Map 0-based Exodus id -> libMesh id.
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_edge_map =
+const std::vector<int> hex_edge_map =
   {0,1,2,3,8,9,10,11,4,5,7,6};
 
 // 3D inverse element edge maps. Map libmesh edge ids to 1-based Exodus edge ids.
-const std::vector<int> ExodusII_IO_Helper::ElementMaps::hex_inverse_edge_map =
+const std::vector<int> hex_inverse_edge_map =
   {1,2,3,4,9,10,12,11,5,6,7,8};
+
+} // end anonymous namespace
+
+
+
+namespace libMesh
+{
 
 // ExodusII_IO_Helper::Conversion static data
 const int ExodusII_IO_Helper::Conversion::invalid_id = std::numeric_limits<int>::max();
-
-// ------------------------------------------------------------
-// ExodusII_IO_Helper class members
 
 ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
                                        bool v,
@@ -234,6 +130,8 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
 {
   title.resize(MAX_LINE_LENGTH+1);
   elem_type.resize(MAX_STR_LENGTH);
+  init_element_equivalence_map();
+  init_conversion_map();
 }
 
 
@@ -241,6 +139,257 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
 ExodusII_IO_Helper::~ExodusII_IO_Helper() = default;
 
 
+
+// Initialization function for conversion_map object
+void ExodusII_IO_Helper::init_conversion_map()
+{
+  {
+    auto & conv = conversion_map[NODEELEM];
+    conv.canonical_type = NODEELEM;
+    conv.exodus_type = "SPHERE";
+  }
+  {
+    auto & conv = conversion_map[EDGE2];
+    conv.canonical_type = EDGE2;
+    conv.exodus_type = "EDGE2";
+  }
+  {
+    auto & conv = conversion_map[EDGE3];
+    conv.canonical_type = EDGE3;
+    conv.exodus_type = "EDGE3";
+  }
+  {
+    auto & conv = conversion_map[QUAD4];
+    conv.canonical_type = QUAD4;
+    conv.exodus_type = "QUAD4";
+  }
+  {
+    auto & conv = conversion_map[QUADSHELL4];
+    conv.inverse_side_map = &quadshell4_inverse_edge_map;
+    conv.shellface_index_offset = 2;
+    conv.canonical_type = QUADSHELL4;
+    conv.exodus_type = "SHELL4";
+  }
+  {
+    auto & conv = conversion_map[QUAD8];
+    conv.canonical_type = QUAD8;
+    conv.exodus_type = "QUAD8";
+  }
+  {
+    auto & conv = conversion_map[QUADSHELL8];
+    conv.inverse_side_map = &quadshell4_inverse_edge_map;
+    conv.shellface_index_offset = 2;
+    conv.canonical_type = QUADSHELL8;
+    conv.exodus_type = "SHELL8";
+  }
+  {
+    auto & conv = conversion_map[QUAD9];
+    conv.canonical_type = QUAD9;
+    conv.exodus_type = "QUAD9";
+  }
+  {
+    auto & conv = conversion_map[TRI3];
+    conv.canonical_type = TRI3;
+    conv.exodus_type = "TRI3";
+  }
+  {
+    auto & conv = conversion_map[TRISHELL3];
+    conv.inverse_side_map = &trishell3_inverse_edge_map;
+    conv.shellface_index_offset = 2;
+    conv.canonical_type = TRISHELL3;
+    conv.exodus_type = "TRISHELL3";
+  }
+  {
+    auto & conv = conversion_map[TRI3SUBDIVISION];
+    conv.canonical_type = TRI3SUBDIVISION;
+    conv.exodus_type = "TRI3";
+  }
+  {
+    auto & conv = conversion_map[TRI6];
+    conv.canonical_type = TRI6;
+    conv.exodus_type = "TRI6";
+  }
+  {
+    auto & conv = conversion_map[HEX8];
+    conv.side_map = &hex_face_map;
+    conv.inverse_side_map = &hex_inverse_face_map;
+    conv.canonical_type = HEX8;
+    conv.exodus_type = "HEX8";
+  }
+  {
+    auto & conv = conversion_map[HEX20];
+    conv.side_map = &hex_face_map;
+    conv.inverse_side_map = &hex_inverse_face_map;
+    conv.canonical_type = HEX20;
+    conv.exodus_type = "HEX20";
+  }
+  {
+    auto & conv = conversion_map[HEX27];
+    conv.node_map = &hex27_node_map;
+    conv.inverse_node_map = &hex27_inverse_node_map;
+    conv.side_map = &hex_face_map;
+    conv.inverse_side_map = &hex_inverse_face_map;
+    conv.canonical_type = HEX27;
+    conv.exodus_type = "HEX27";
+  }
+  {
+    auto & conv = conversion_map[TET4];
+    conv.side_map = &tet_face_map;
+    conv.inverse_side_map = &tet_inverse_face_map;
+    conv.canonical_type = TET4;
+    conv.exodus_type = "TETRA4";
+  }
+  {
+    auto & conv = conversion_map[TET10];
+    conv.side_map = &tet_face_map;
+    conv.inverse_side_map = &tet_inverse_face_map;
+    conv.canonical_type = TET10;
+    conv.exodus_type = "TETRA10";
+  }
+  {
+    auto & conv = conversion_map[PRISM6];
+    conv.side_map = &prism_face_map;
+    conv.inverse_side_map = &prism_inverse_face_map;
+    conv.canonical_type = PRISM6;
+    conv.exodus_type = "WEDGE";
+  }
+  {
+    auto & conv = conversion_map[PRISM15];
+    conv.side_map = &prism_face_map;
+    conv.inverse_side_map = &prism_inverse_face_map;
+    conv.canonical_type = PRISM15;
+    conv.exodus_type = "WEDGE15";
+  }
+  {
+    auto & conv = conversion_map[PRISM18];
+    conv.side_map = &prism_face_map;
+    conv.inverse_side_map = &prism_inverse_face_map;
+    conv.canonical_type = PRISM18;
+    conv.exodus_type = "WEDGE18";
+  }
+  {
+    auto & conv = conversion_map[PYRAMID5];
+    conv.canonical_type = PYRAMID5;
+    conv.exodus_type = "PYRAMID5";
+  }
+  {
+    auto & conv = conversion_map[PYRAMID13];
+    conv.canonical_type = PYRAMID13;
+    conv.exodus_type = "PYRAMID13";
+  }
+  {
+    auto & conv = conversion_map[PYRAMID14];
+    conv.canonical_type = PYRAMID14;
+    conv.exodus_type = "PYRAMID14";
+  }
+}
+
+
+
+// This function initializes the element_equivalence_map the first time it
+// is called, and returns early all other times.
+void ExodusII_IO_Helper::init_element_equivalence_map()
+{
+  // We use an ExodusII SPHERE element to represent a NodeElem
+  element_equivalence_map["SPHERE"] = NODEELEM;
+
+  // EDGE2 equivalences
+  element_equivalence_map["EDGE"]   = EDGE2;
+  element_equivalence_map["EDGE2"]  = EDGE2;
+  element_equivalence_map["TRUSS"]  = EDGE2;
+  element_equivalence_map["BEAM"]   = EDGE2;
+  element_equivalence_map["BAR"]    = EDGE2;
+  element_equivalence_map["TRUSS2"] = EDGE2;
+  element_equivalence_map["BEAM2"]  = EDGE2;
+  element_equivalence_map["BAR2"]   = EDGE2;
+
+  // EDGE3 equivalences
+  element_equivalence_map["EDGE3"]  = EDGE3;
+  element_equivalence_map["TRUSS3"] = EDGE3;
+  element_equivalence_map["BEAM3"]  = EDGE3;
+  element_equivalence_map["BAR3"]   = EDGE3;
+
+  // QUAD4 equivalences
+  element_equivalence_map["QUAD"]   = QUAD4;
+  element_equivalence_map["QUAD4"]  = QUAD4;
+
+  // QUADSHELL4 equivalences
+  element_equivalence_map["SHELL"]  = QUADSHELL4;
+  element_equivalence_map["SHELL4"] = QUADSHELL4;
+
+  // QUAD8 equivalences
+  element_equivalence_map["QUAD8"]  = QUAD8;
+
+  // QUADSHELL8 equivalences
+  element_equivalence_map["SHELL8"] = QUADSHELL8;
+
+  // QUAD9 equivalences
+  element_equivalence_map["QUAD9"]  = QUAD9;
+  // element_equivalence_map["SHELL9"] = QUAD9;
+
+  // TRI3 equivalences
+  element_equivalence_map["TRI"]       = TRI3;
+  element_equivalence_map["TRI3"]      = TRI3;
+  element_equivalence_map["TRIANGLE"]  = TRI3;
+
+  // TRISHELL3 equivalences
+  element_equivalence_map["TRISHELL"]  = TRISHELL3;
+  element_equivalence_map["TRISHELL3"] = TRISHELL3;
+
+  // TRI6 equivalences
+  element_equivalence_map["TRI6"]      = TRI6;
+  // element_equivalence_map["TRISHELL6"] = TRI6;
+
+  // HEX8 equivalences
+  element_equivalence_map["HEX"]  = HEX8;
+  element_equivalence_map["HEX8"] = HEX8;
+
+  // HEX20 equivalences
+  element_equivalence_map["HEX20"] = HEX20;
+
+  // HEX27 equivalences
+  element_equivalence_map["HEX27"] = HEX27;
+
+  // TET4 equivalences
+  element_equivalence_map["TETRA"]  = TET4;
+  element_equivalence_map["TETRA4"] = TET4;
+
+  // TET10 equivalences
+  element_equivalence_map["TETRA10"] = TET10;
+
+  // PRISM6 equivalences
+  element_equivalence_map["WEDGE"] = PRISM6;
+
+  // PRISM15 equivalences
+  element_equivalence_map["WEDGE15"] = PRISM15;
+
+  // PRISM18 equivalences
+  element_equivalence_map["WEDGE18"] = PRISM18;
+
+  // PYRAMID5 equivalences
+  element_equivalence_map["PYRAMID"]  = PYRAMID5;
+  element_equivalence_map["PYRAMID5"] = PYRAMID5;
+
+  // PYRAMID13 equivalences
+  element_equivalence_map["PYRAMID13"] = PYRAMID13;
+
+  // PYRAMID14 equivalences
+  element_equivalence_map["PYRAMID14"] = PYRAMID14;
+}
+
+ExodusII_IO_Helper::Conversion
+ExodusII_IO_Helper::assign_conversion(const ElemType type)
+{
+  return libmesh_map_find(conversion_map, type);
+}
+
+ExodusII_IO_Helper::Conversion
+ExodusII_IO_Helper::assign_conversion(std::string type_str)
+{
+  // Do only upper-case comparisons
+  std::transform(type_str.begin(), type_str.end(), type_str.begin(), ::toupper);
+  return assign_conversion (libmesh_map_find(element_equivalence_map, type_str));
+}
 
 const char * ExodusII_IO_Helper::get_elem_type() const
 {
@@ -1551,9 +1700,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
       // We are using that same assumption here!
-      ExodusII_IO_Helper::ElementMaps em;
       const ExodusII_IO_Helper::Conversion conv =
-        em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
+        assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
 
       elem_blk_id.push_back(pr.first);
@@ -1615,12 +1763,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Get a reference to a vector of element IDs for this subdomain.
       subdomain_map_type::mapped_type & tmp_vec = pr.second;
 
-      //Use the first element in this block to get representative information.
-      //Note that Exodus assumes all elements in a block are of the same type!
-      //We are using that same assumption here!
-      ExodusII_IO_Helper::ElementMaps em;
+      // Use the first element in this block to get representative information.
+      // Note that Exodus assumes all elements in a block are of the same type!
+      // We are using that same assumption here!
       const ExodusII_IO_Helper::Conversion conv =
-        em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
+        assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
 
       connect.resize(tmp_vec.size()*num_nodes_per_elem);
@@ -1719,8 +1866,6 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  ExodusII_IO_Helper::ElementMaps em;
-
   // Maps from sideset id to the element and sides
   std::map<int, std::vector<int>> elem;
   std::map<int, std::vector<int>> side;
@@ -1745,7 +1890,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
         for (const auto & f : family)
           {
             const ExodusII_IO_Helper::Conversion conv =
-              em.assign_conversion(mesh.elem_ptr(f->id())->type());
+              assign_conversion(mesh.elem_ptr(f->id())->type());
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
@@ -1777,7 +1922,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
         for (const auto & f : family)
           {
             const ExodusII_IO_Helper::Conversion conv =
-              em.assign_conversion(mesh.elem_ptr(f->id())->type());
+              assign_conversion(mesh.elem_ptr(f->id())->type());
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
@@ -2120,9 +2265,6 @@ write_sideset_data(const MeshBase & mesh,
   // Debugging:
   // libMesh::out << "File has " << num_side_sets << " side sets." << std::endl;
 
-  // We'll use this object to map Exodus side ids to libmesh side ids.
-  ExodusII_IO_Helper::ElementMaps em;
-
   // Write "truth" table for sideset variables.  The function
   // exII::ex_put_var_param() must be called before
   // exII::ex_put_sset_var_tab(). For us, this happens during the call
@@ -2193,7 +2335,7 @@ write_sideset_data(const MeshBase & mesh,
 
               // Map from Exodus side ids to libmesh side ids.
               ExodusII_IO_Helper::Conversion conv =
-                em.assign_conversion(mesh.elem_ptr(elem_id)->type());
+                assign_conversion(mesh.elem_ptr(elem_id)->type());
 
               // Map from Exodus side ids to libmesh side ids.
               unsigned int converted_side_id = conv.get_side_map(side_id);
@@ -2252,9 +2394,6 @@ read_sideset_data(const MeshBase & mesh,
                   std::vector<std::set<boundary_id_type>> & side_ids,
                   std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
 {
-  // We'll use this object to map Exodus side ids to libmesh side ids.
-  ExodusII_IO_Helper::ElementMaps em;
-
   // This reads the sideset variable names into the local
   // sideset_var_names data structure.
   this->read_var_names(SIDESET);
@@ -2333,7 +2472,7 @@ read_sideset_data(const MeshBase & mesh,
                       // Map Exodus side id to libmesh side id.
                       // Map from Exodus side ids to libmesh side ids.
                       ExodusII_IO_Helper::Conversion conv =
-                        em.assign_conversion(mesh.elem_ptr(converted_elem_id)->type());
+                        assign_conversion(mesh.elem_ptr(converted_elem_id)->type());
 
                       // Map from Exodus side id to libmesh side id.
                       // Note: the mapping is defined on 0-based indices, so subtract
@@ -2742,197 +2881,6 @@ std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_ac
     }
 
   return complex_vars_active_subdomains;
-}
-
-
-
-// ------------------------------------------------------------
-// ExodusII_IO_Helper::Conversion class members
-ExodusII_IO_Helper::Conversion
-ExodusII_IO_Helper::ElementMaps::assign_conversion(std::string type_str)
-{
-  init_element_equivalence_map();
-
-  // Do only upper-case comparisons
-  std::transform(type_str.begin(), type_str.end(), type_str.begin(), ::toupper);
-  return assign_conversion (libmesh_map_find(element_equivalence_map, type_str));
-}
-
-
-
-ExodusII_IO_Helper::Conversion
-ExodusII_IO_Helper::ElementMaps::assign_conversion(const ElemType type)
-{
-  Conversion conv;
-
-  switch (type)
-    {
-    case NODEELEM:
-      {
-        conv.canonical_type = NODEELEM;
-        conv.exodus_type = "SPHERE";
-        return conv;
-      }
-    case EDGE2:
-      {
-        conv.canonical_type = EDGE2;
-        conv.exodus_type = "EDGE2";
-        return conv;
-      }
-    case EDGE3:
-      {
-        conv.canonical_type = EDGE3;
-        conv.exodus_type = "EDGE3";
-        return conv;
-      }
-    case QUAD4:
-      {
-        conv.canonical_type = QUAD4;
-        conv.exodus_type = "QUAD4";
-        return conv;
-      }
-    case QUADSHELL4:
-      {
-        conv.inverse_side_map = &quadshell4_inverse_edge_map;
-        conv.shellface_index_offset = 2;
-        conv.canonical_type = QUADSHELL4;
-        conv.exodus_type = "SHELL4";
-        return conv;
-      }
-    case QUAD8:
-      {
-        conv.canonical_type = QUAD8;
-        conv.exodus_type = "QUAD8";
-        return conv;
-      }
-    case QUADSHELL8:
-      {
-        conv.inverse_side_map = &quadshell4_inverse_edge_map;
-        conv.shellface_index_offset = 2;
-        conv.canonical_type = QUADSHELL8;
-        conv.exodus_type = "SHELL8";
-        return conv;
-      }
-    case QUAD9:
-      {
-        conv.canonical_type = QUAD9;
-        conv.exodus_type = "QUAD9";
-        return conv;
-      }
-    case TRI3:
-      {
-        conv.canonical_type = TRI3;
-        conv.exodus_type = "TRI3";
-        return conv;
-      }
-    case TRISHELL3:
-      {
-        conv.inverse_side_map = &trishell3_inverse_edge_map;
-        conv.shellface_index_offset = 2;
-        conv.canonical_type = TRISHELL3;
-        conv.exodus_type = "TRISHELL3";
-        return conv;
-      }
-    case TRI3SUBDIVISION:
-      {
-        conv.canonical_type = TRI3SUBDIVISION;
-        conv.exodus_type = "TRI3";
-        return conv;
-      }
-    case TRI6:
-      {
-        conv.canonical_type = TRI6;
-        conv.exodus_type = "TRI6";
-        return conv;
-      }
-    case HEX8:
-      {
-        conv.side_map = &hex_face_map;
-        conv.inverse_side_map = &hex_inverse_face_map;
-        conv.canonical_type = HEX8;
-        conv.exodus_type = "HEX8";
-        return conv;
-      }
-    case HEX20:
-      {
-        conv.side_map = &hex_face_map;
-        conv.inverse_side_map = &hex_inverse_face_map;
-        conv.canonical_type = HEX20;
-        conv.exodus_type = "HEX20";
-        return conv;
-      }
-    case HEX27:
-      {
-        conv.node_map = &hex27_node_map;
-        conv.inverse_node_map = &hex27_inverse_node_map;
-        conv.side_map = &hex_face_map;
-        conv.inverse_side_map = &hex_inverse_face_map;
-        conv.canonical_type = HEX27;
-        conv.exodus_type = "HEX27";
-        return conv;
-      }
-    case TET4:
-      {
-        conv.side_map = &tet_face_map;
-        conv.inverse_side_map = &tet_inverse_face_map;
-        conv.canonical_type = TET4;
-        conv.exodus_type = "TETRA4";
-        return conv;
-    }
-    case TET10:
-      {
-        conv.side_map = &tet_face_map;
-        conv.inverse_side_map = &tet_inverse_face_map;
-        conv.canonical_type = TET10;
-        conv.exodus_type = "TETRA10";
-        return conv;
-    }
-    case PRISM6:
-      {
-        conv.side_map = &prism_face_map;
-        conv.inverse_side_map = &prism_inverse_face_map;
-        conv.canonical_type = PRISM6;
-        conv.exodus_type = "WEDGE";
-        return conv;
-      }
-    case PRISM15:
-      {
-        conv.side_map = &prism_face_map;
-        conv.inverse_side_map = &prism_inverse_face_map;
-        conv.canonical_type = PRISM15;
-        conv.exodus_type = "WEDGE15";
-        return conv;
-      }
-    case PRISM18:
-      {
-        conv.side_map = &prism_face_map;
-        conv.inverse_side_map = &prism_inverse_face_map;
-        conv.canonical_type = PRISM18;
-        conv.exodus_type = "WEDGE18";
-        return conv;
-      }
-    case PYRAMID5:
-      {
-        conv.canonical_type = PYRAMID5;
-        conv.exodus_type = "PYRAMID5";
-        return conv;
-      }
-    case PYRAMID13:
-      {
-        conv.canonical_type = PYRAMID13;
-        conv.exodus_type = "PYRAMID13";
-        return conv;
-      }
-    case PYRAMID14:
-      {
-        conv.canonical_type = PYRAMID14;
-        conv.exodus_type = "PYRAMID14";
-        return conv;
-      }
-
-    default:
-      libmesh_error_msg("Unsupported element type: " << type);
-    }
 }
 
 

@@ -453,14 +453,6 @@ public:
   class Conversion;
 
   /**
-   * This is the \p ExodusII_IO_Helper ElementMap class.
-   * It contains constant maps between the \p ExodusII naming/numbering
-   * schemes and the canonical schemes used in this code.  It's defined
-   * below.
-   */
-  class ElementMaps;
-
-  /**
    * This is the \p ExodusII_IO_Helper NamesData class.
    * It manages the C data structure necessary for writing out named
    * entities to ExodusII files.
@@ -673,6 +665,12 @@ public:
   enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3};
   void read_var_names(ExodusVarType type);
 
+  ExodusII_IO_Helper::Conversion
+  assign_conversion(const ElemType type);
+
+  ExodusII_IO_Helper::Conversion
+  assign_conversion(std::string type_str);
+
 protected:
   /**
    * When appending: during initialization, check that variable names
@@ -783,6 +781,20 @@ private:
   void write_var_names_impl(const char * var_type,
                             int & count,
                             const std::vector<std::string> & names);
+
+  /**
+   * Defines equivalence classes of Exodus element types that map to
+   * libmesh ElemTypes.
+   */
+  std::map<std::string, ElemType> element_equivalence_map;
+  void init_element_equivalence_map();
+
+  /**
+   * Associates libMesh ElemTypes with node/face/edge/etc. mappings
+   * of the corresponding Exodus element types.
+   */
+  std::map<ElemType, ExodusII_IO_Helper::Conversion> conversion_map;
+  void init_conversion_map();
 };
 
 
@@ -933,88 +945,6 @@ public:
    * The string corresponding to the Exodus type for this element
    */
   std::string exodus_type;
-};
-
-
-
-
-
-
-class ExodusII_IO_Helper::ElementMaps
-{
-public:
-
-  /**
-   * Constructor and special functions are all defaulted.
-   */
-  ElementMaps() = default;
-  ElementMaps (const ElementMaps &) = default;
-  ElementMaps (ElementMaps &&) = default;
-  ElementMaps & operator= (const ElementMaps &) = default;
-  ElementMaps & operator= (ElementMaps &&) = default;
-  ~ElementMaps() = default;
-
-  /**
-   * \returns A conversion object given an element type name.
-   */
-  ExodusII_IO_Helper::Conversion assign_conversion(std::string type_str);
-
-  /**
-   * \returns A conversion object given an element type.
-   */
-  ExodusII_IO_Helper::Conversion assign_conversion(const ElemType type);
-
-  /**
-   * 2D element inverse edge maps. These are used to map from libmesh
-   * edge ids to 1-based Exodus ids. For shell elements, these maps
-   * always start with "3" because the first two sides are shellfaces.
-   */
-  static const std::vector<int> trishell3_inverse_edge_map;
-  static const std::vector<int> quadshell4_inverse_edge_map;
-
-  /**
-   * 3D element node maps. Only the Hex27 has a non-trivial forward
-   * and inverse node mapping.
-   */
-  static const std::vector<int> hex27_node_map;
-
-  /**
-   * 3D element inverse node maps. These are used to map from libmesh
-   * node ids to 0-based Exodus node ids. The Hex27 is the only
-   * element that has a non-trivial inverse node map, all the other
-   * elements simply reuse the forward mapping.
-   */
-  static const std::vector<int> hex27_inverse_node_map;
-
-  /**
-   * 3D element face maps. These are used to map from 0-based exodus side
-   * ids to libmesh side ids.
-   */
-  static const std::vector<int> hex_face_map;
-  static const std::vector<int> tet_face_map;
-  static const std::vector<int> prism_face_map;
-
-  /**
-   * 3D element inverse face maps. These are used to map from libmesh
-   * side ids to 1-based Exodus ids. Note: this is a bit different
-   * from how the inverse node maps work: you don't have to add 1 to
-   * the value you get out of the inverse face maps before using it.
-   */
-  static const std::vector<int> hex_inverse_face_map;
-  static const std::vector<int> tet_inverse_face_map;
-  static const std::vector<int> prism_inverse_face_map;
-
-  /**
-   * 3D element edge maps. These are used to map from 0-based Exodus
-   * edge ids to libmesh edge ids.
-   */
-  static const std::vector<int> hex_edge_map;
-
-  /**
-   * 3D element inverse edge maps. These are used to map from libmesh
-   * edge ids to 1-based Exodus edge ids.
-   */
-  static const std::vector<int> hex_inverse_edge_map;
 };
 
 
