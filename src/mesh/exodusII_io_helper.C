@@ -1726,6 +1726,22 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       ++counter;
     }
 
+  // Reference to the BoundaryInfo object for convenience.
+  const BoundaryInfo & bi = mesh.get_boundary_info();
+
+  // Build list of (elem, edge, id) triples
+  std::vector<BoundaryInfo::BCTuple> edge_tuples = bi.build_edge_list();
+
+  // Count number of edges associated with each edge boundary id. These can be in
+  // any order in the data structure returned by bi.build_edge_list(), and Exodus
+  // needs to know exactly how many edges are in each block.
+  std::map<boundary_id_type, std::size_t> edge_id_to_count;
+  for (const auto & t : edge_tuples)
+    edge_id_to_count[std::get<2>(t)]++;
+
+  // Make sure we have the same number of edge ids that we thought we would.
+  libmesh_assert(static_cast<int>(edge_id_to_count.size()) == num_edge_blk);
+
   // Build data structures describing edge blocks. This information must be
   // be passed to exII::ex_put_concat_all_blocks() at the same time as the
   // information about elem blocks.
@@ -1735,27 +1751,20 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   std::vector<int> num_nodes_per_edge_vec;
   std::vector<int> num_attr_edge_vec;
 
-  // Reference to the BoundaryInfo object for convenience.
-  const BoundaryInfo & bi = mesh.get_boundary_info();
-
   // Note: We are going to use the edge **boundary** ids as **block** ids.
-  const std::set<boundary_id_type> & edge_boundary_ids = bi.get_edge_boundary_ids();
-  libmesh_assert(static_cast<int>(edge_boundary_ids.size()) == num_edge_blk);
-
-  // The _total_ number of edge boundary conditions over **all** ids
-  std::size_t total_edge_cond = bi.n_edge_conds();
-
-  for (const auto & id : edge_boundary_ids)
+  for (const auto & pr : edge_id_to_count)
     {
+      boundary_id_type id = pr.first;
+      std::size_t count = pr.second;
+
       edge_blk_id.push_back(id);
 
-      // Hard-coded at the moment for linear edges at the moment
+      // Hard-coded for linear edges at the moment.
       edge_type_table.push_back_entry("EDGE2");
       num_nodes_per_edge_vec.push_back(2);
 
-      // FIXME: This is supposed to be the number of edges in the
-      // *current* block, not the total number of edge conditions.
-      num_edge_this_blk_vec.push_back(total_edge_cond);
+      // The count that we determined earlier.
+      num_edge_this_blk_vec.push_back(count);
 
       // We don't store any attributes currently
       num_attr_edge_vec.push_back(0);
