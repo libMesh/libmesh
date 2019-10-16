@@ -107,6 +107,8 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_nodes(0),
   num_elem(0),
   num_elem_blk(0),
+  num_edge(0),
+  num_edge_blk(0),
   num_node_sets(0),
   num_side_sets(0),
   num_elem_this_blk(0),
@@ -1468,19 +1470,20 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
         num_nodes += elem->n_nodes();
     }
 
+  const BoundaryInfo & bi = mesh.get_boundary_info();
   std::vector<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
 
-  mesh.get_boundary_info().build_side_boundary_ids(unique_side_boundaries);
+  bi.build_side_boundary_ids(unique_side_boundaries);
   {
     // Add shell face boundaries to the list of side boundaries, since ExodusII
     // treats these the same way.
     std::vector<boundary_id_type> shellface_boundaries;
-    mesh.get_boundary_info().build_shellface_boundary_ids(shellface_boundaries);
+    bi.build_shellface_boundary_ids(shellface_boundaries);
     for (const auto & id : shellface_boundaries)
       unique_side_boundaries.push_back(id);
   }
-  mesh.get_boundary_info().build_node_boundary_ids(unique_node_boundaries);
+  bi.build_node_boundary_ids(unique_node_boundaries);
 
   num_side_sets = cast_int<int>(unique_side_boundaries.size());
   num_node_sets = cast_int<int>(unique_node_boundaries.size());
@@ -1512,6 +1515,15 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       str_title.resize(MAX_LINE_LENGTH);
     }
 
+  // Edge BCs are handled a bit differently than sidesets and nodesets.
+  // They are written as separate "edge blocks", and then edge variables
+  // can be defined on those blocks. That is, they are not written as
+  // edge sets, since edge sets must refer to edges stored elsewhere.
+  // We write a separate edge block for each unique boundary id that
+  // we have.
+  num_edge_blk = bi.get_edge_boundary_ids().size();
+  num_edge = bi.n_edge_conds();
+
   // Build an ex_init_params() structure that is to be passed to the
   // newer ex_put_init_ext() API. The new API will eventually allow us
   // to store edge and face data in the Exodus file.
@@ -1531,6 +1543,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   params.num_elem_blk = num_elem_blk;
   params.num_node_sets = num_node_sets;
   params.num_side_sets = num_side_sets;
+  params.num_edge_blk = num_edge_blk;
+  params.num_edge = num_edge;
 
   ex_err = exII::ex_put_init_ext(ex_id, &params);
   EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");

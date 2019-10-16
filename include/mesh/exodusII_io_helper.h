@@ -496,6 +496,13 @@ public:
   // Total number of element blocks
   int num_elem_blk;
 
+  // Total number of edges
+  int num_edge;
+
+  // Total number of edge blocks. The sum of the number of edges in
+  // each block must equal num_edge.
+  int num_edge_blk;
+
   // Total number of node sets
   int num_node_sets;
 
