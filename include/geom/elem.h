@@ -2484,7 +2484,12 @@ unsigned int Elem::level() const
   // or by the user, so I am a
   // level-0 element
   if (this->parent() == nullptr)
-    return 0;
+  {
+    if (this->interior_parent() == nullptr)
+      return 0;
+    else
+      return interior_parent()->level();
+  }
 
   // if the parent and this element are of different
   // dimensionality we are at the same level as
