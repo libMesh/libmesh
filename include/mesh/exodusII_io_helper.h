@@ -26,15 +26,7 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
 #include "libmesh/boundary_info.h" // BoundaryInfo::BCTuple
-
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemType : int;
-}
-#else
-#include "libmesh/enum_elem_type.h"
-#endif
+#include "libmesh/enum_elem_type.h" // INVALID_ELEM
 
 // C++ includes
 #include <iostream>
@@ -461,14 +453,6 @@ public:
   class Conversion;
 
   /**
-   * This is the \p ExodusII_IO_Helper ElementMap class.
-   * It contains constant maps between the \p ExodusII naming/numbering
-   * schemes and the canonical schemes used in this code.  It's defined
-   * below.
-   */
-  class ElementMaps;
-
-  /**
    * This is the \p ExodusII_IO_Helper NamesData class.
    * It manages the C data structure necessary for writing out named
    * entities to ExodusII files.
@@ -681,6 +665,12 @@ public:
   enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3};
   void read_var_names(ExodusVarType type);
 
+  const ExodusII_IO_Helper::Conversion &
+  get_conversion(const ElemType type) const;
+
+  const ExodusII_IO_Helper::Conversion &
+  get_conversion(std::string type_str) const;
+
 protected:
   /**
    * When appending: during initialization, check that variable names
@@ -791,6 +781,20 @@ private:
   void write_var_names_impl(const char * var_type,
                             int & count,
                             const std::vector<std::string> & names);
+
+  /**
+   * Defines equivalence classes of Exodus element types that map to
+   * libmesh ElemTypes.
+   */
+  std::map<std::string, ElemType> element_equivalence_map;
+  void init_element_equivalence_map();
+
+  /**
+   * Associates libMesh ElemTypes with node/face/edge/etc. mappings
+   * of the corresponding Exodus element types.
+   */
+  std::map<ElemType, ExodusII_IO_Helper::Conversion> conversion_map;
+  void init_conversion_map();
 };
 
 
@@ -805,48 +809,18 @@ class ExodusII_IO_Helper::Conversion
 public:
 
   /**
-   * Constructor.  Initializes the const private member
-   * variables.
+   * Constructor. Zero initializes all variables.
    */
-  Conversion(const std::vector<int> * nm,
-             const std::vector<int> * inm,
-             const std::vector<int> * sm,
-             const std::vector<int> * ism,
-             const ElemType ct,   // "canonical" aka libmesh element type
-             std::string ex_type) // string representing the Exodus element type
-    : node_map(nm),
-      inverse_node_map(inm),
-      side_map(sm),
-      inverse_side_map(ism),
+  Conversion()
+    : node_map(nullptr),
+      inverse_node_map(nullptr),
+      side_map(nullptr),
+      inverse_side_map(nullptr),
       shellface_map(nullptr),
       inverse_shellface_map(nullptr),
       shellface_index_offset(0),
-      canonical_type(ct),
-      exodus_type(ex_type)
-  {}
-
-  /**
-   * Constructor.  Initializes the const private member
-   * variables.  In this case we also initialize shellface data.
-   */
-  Conversion(const std::vector<int> * nm,
-             const std::vector<int> * inm,
-             const std::vector<int> * sm,
-             const std::vector<int> * ism,
-             const std::vector<int> * sfm,
-             const std::vector<int> * isfm,
-             size_t sfi_offset,
-             const ElemType ct,   // "canonical" aka libmesh element type
-             std::string ex_type) // string representing the Exodus element type
-    : node_map(nm),
-      inverse_node_map(inm),
-      side_map(sm),
-      inverse_side_map(ism),
-      shellface_map(sfm),
-      inverse_shellface_map(isfm),
-      shellface_index_offset(sfi_offset),
-      canonical_type(ct),
-      exodus_type(ex_type)
+      libmesh_type(INVALID_ELEM),
+      exodus_type("")
   {}
 
   /**
@@ -855,11 +829,7 @@ public:
    * The node map maps the exodusII node numbering format to this
    * library's format.
    */
-  int get_node_map(int i) const
-  {
-    libmesh_assert_less (i, node_map->size());
-    return (*node_map)[i];
-  }
+  int get_node_map(int i) const;
 
   /**
    * \returns The ith component of the inverse node map for this
@@ -871,11 +841,7 @@ public:
    * \note All elements except Hex27 currently have the same node
    * numbering as libmesh elements.
    */
-  int get_inverse_node_map(int i) const
-  {
-    libmesh_assert_less (i, inverse_node_map->size());
-    return (*inverse_node_map)[i];
-  }
+  int get_inverse_node_map(int i) const;
 
   /**
    * \returns The ith component of the side map for this element.
@@ -891,30 +857,18 @@ public:
    * The side map maps the libMesh side numbering format to this
    * exodus's format.
    */
-  int get_inverse_side_map(int i) const
-  {
-    libmesh_assert_less (i, inverse_side_map->size());
-    return (*inverse_side_map)[i];
-  }
+  int get_inverse_side_map(int i) const;
 
   /**
    * \returns The ith component of the shellface map for this element.
    * \note Nothing is currently using this.
    */
-  int get_shellface_map(int i) const
-  {
-    libmesh_assert_less (i, shellface_map->size());
-    return (*shellface_map)[i];
-  }
+  int get_shellface_map(int i) const;
 
   /**
    * \returns The ith component of the inverse shellface map for this element.
    */
-  int get_inverse_shellface_map(int i) const
-  {
-    libmesh_assert_less (i, inverse_shellface_map->size());
-    return (*inverse_shellface_map)[i];
-  }
+  int get_inverse_shellface_map(int i) const;
 
   /**
    * \returns The canonical element type for this element.
@@ -922,17 +876,17 @@ public:
    * The canonical element type is the standard element type
    * understood by this library.
    */
-  ElemType get_canonical_type()    const { return canonical_type; }
+  ElemType libmesh_elem_type() const;
 
   /**
    * \returns The string corresponding to the Exodus type for this element.
    */
-  std::string exodus_elem_type() const { return exodus_type; }
+  std::string exodus_elem_type() const;
 
   /**
    * \returns The shellface index offset.
    */
-  std::size_t get_shellface_index_offset() const { return shellface_index_offset; }
+  std::size_t get_shellface_index_offset() const;
 
   /**
    * An invalid_id that can be returned to signal failure in case
@@ -940,7 +894,6 @@ public:
    */
   static const int invalid_id;
 
-private:
   /**
    * Pointer to the node map for this element.
    */
@@ -986,164 +939,12 @@ private:
    * The canonical (i.e. standard for this library)
    * element type.
    */
-  const ElemType canonical_type;
+  ElemType libmesh_type;
 
   /**
    * The string corresponding to the Exodus type for this element
    */
-  const std::string exodus_type;
-};
-
-
-
-
-
-
-class ExodusII_IO_Helper::ElementMaps
-{
-public:
-
-  /**
-   * Constructor and special functions are all defaulted.
-   */
-  ElementMaps() = default;
-  ElementMaps (const ElementMaps &) = default;
-  ElementMaps (ElementMaps &&) = default;
-  ElementMaps & operator= (const ElementMaps &) = default;
-  ElementMaps & operator= (ElementMaps &&) = default;
-  ~ElementMaps() = default;
-
-  /**
-   * \returns A conversion object given an element type name.
-   */
-  ExodusII_IO_Helper::Conversion assign_conversion(std::string type_str);
-
-  /**
-   * \returns A conversion object given an element type.
-   */
-  ExodusII_IO_Helper::Conversion assign_conversion(const ElemType type);
-
-  /**
-   * 0D element node maps. The trivial map {0}.
-   */
-  static const std::vector<int> nodeelem_node_map;
-
-  /**
-   * 1D element node maps. These map from 0-based Exodus node ids
-   * to libmesh node ids, and in all cases use the identity mapping.
-   */
-  static const std::vector<int> edge2_node_map;
-  static const std::vector<int> edge3_node_map;
-
-  /**
-   * 1D element edge maps. The "edges" of 1D elements are nodes.
-   */
-  static const std::vector<int> edge_edge_map;
-  static const std::vector<int> edge_inverse_edge_map;
-
-  /**
-   * 2D element node maps. These map from 0-based Exodus node ids to
-   * libmesh node ids.
-   */
-  static const std::vector<int> quad4_node_map;
-  static const std::vector<int> quad8_node_map;
-  static const std::vector<int> quad9_node_map;
-  static const std::vector<int> tri3_node_map;
-  static const std::vector<int> tri6_node_map;
-
-  /**
-   * 2D element edge maps. These are used to map from 0-based Exodus
-   * edge ids to libmesh edge ids. For "shell" elements, the first two
-   * "sides" correspond to the 2D "front" and "back" faces of the
-   * element and are used for "shell face" boundary conditions.  The
-   * remaining three sides are used for standard BCs.
-   */
-  static const std::vector<int> tri_edge_map;
-  static const std::vector<int> quad_edge_map;
-  static const std::vector<int> trishell3_edge_map;
-  static const std::vector<int> quadshell4_edge_map;
-
-  /**
-   * 2D element inverse edge maps. These are used to map from libmesh
-   * edge ids to 1-based Exodus ids. For shell elements, these maps
-   * always start with "3" because the first two sides are shellfaces.
-   */
-  static const std::vector<int> tri_inverse_edge_map;
-  static const std::vector<int> quad_inverse_edge_map;
-  static const std::vector<int> trishell3_inverse_edge_map;
-  static const std::vector<int> quadshell4_inverse_edge_map;
-
-  /**
-   * 3D element node maps. These are used to map from 0-based Exodus
-   * node ids to libmesh node ids.
-   */
-  static const std::vector<int> hex8_node_map;
-  static const std::vector<int> hex20_node_map;
-  static const std::vector<int> hex27_node_map;
-  static const std::vector<int> tet4_node_map;
-  static const std::vector<int> tet10_node_map;
-  static const std::vector<int> prism6_node_map;
-  static const std::vector<int> prism15_node_map;
-  static const std::vector<int> prism18_node_map;
-  static const std::vector<int> pyramid5_node_map;
-  static const std::vector<int> pyramid13_node_map;
-  static const std::vector<int> pyramid14_node_map;
-
-  /**
-   * 3D element inverse node maps. These are used to map from libmesh
-   * node ids to 0-based Exodus node ids. The Hex27 is the only
-   * element that has a non-trivial inverse node map, all the other
-   * elements simply reuse the forward mapping.
-   */
-  static const std::vector<int> hex27_inverse_node_map;
-
-  /**
-   * Shell element face maps. These are used to map from 0-based
-   * exodus shellface ids to shell face ids.
-   */
-  static const std::vector<int> trishell3_shellface_map;
-  static const std::vector<int> quadshell4_shellface_map;
-
-  /**
-   * Shell element inverse face maps. These are used to map from
-   * libmesh shellface ids to 1-based Exodus ids.
-   */
-  static const std::vector<int> trishell3_inverse_shellface_map;
-  static const std::vector<int> quadshell4_inverse_shellface_map;
-
-  /**
-   * 3D element face maps. These are used to map from 0-based exodus side
-   * ids to libmesh side ids.
-   */
-  static const std::vector<int> hex_face_map;
-  static const std::vector<int> hex27_face_map;
-  static const std::vector<int> tet_face_map;
-  static const std::vector<int> prism_face_map;
-  static const std::vector<int> pyramid_face_map;
-
-  /**
-   * 3D element inverse face maps. These are used to map from libmesh
-   * side ids to 1-based Exodus ids. Note: this is a bit different
-   * from how the inverse node maps work: you don't have to add 1 to
-   * the value you get out of the inverse face maps before using it.
-   */
-  static const std::vector<int> hex_inverse_face_map;
-  static const std::vector<int> hex27_inverse_face_map;
-  static const std::vector<int> tet_inverse_face_map;
-  static const std::vector<int> prism_inverse_face_map;
-  static const std::vector<int> pyramid_inverse_face_map;
-
-  /**
-   * 3D element edge maps. These are used to map from 0-based Exodus
-   * edge ids to libmesh edge ids.
-   */
-  static const std::vector<int> hex_edge_map;
-
-  /**
-   * 3D element inverse edge maps. These are used to map from libmesh
-   * edge ids to 1-based Exodus edge ids.
-   */
-  static const std::vector<int> hex_inverse_edge_map;
+  std::string exodus_type;
 };
 
 
