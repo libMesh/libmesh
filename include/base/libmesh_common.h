@@ -312,7 +312,40 @@ extern bool warned_about_auto_ptr;
       libmesh_error();                                                  \
     } } while (0)
 
-#if defined(__clang__) && (__clang_major__ > 3)
+// Older Clang has a parsing bug that can't seem to handle the handle the decay statement when
+// expanding these macros. We'll just fall back to the previous behavior with those older compilers
+#if defined(__clang__) && (__clang_major__ <= 3)
+
+#define libmesh_assert_less_msg(expr1,expr2, msg)                       \
+  do {                                                                  \
+    if (!((expr1) < (expr2))) {                                         \
+      libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+
+#define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
+  do {                                                                  \
+    if (!((expr1) > (expr2))) {                                         \
+      libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+
+#define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
+  do {                                                                  \
+    if (!((expr1) <= (expr2))) {                                        \
+      libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+
+#define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
+  do {                                                                  \
+    if (!((expr1) >= (expr2))) {                                        \
+      libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
+      libmesh_error();                                                  \
+    } } while (0)
+
+// Newer clangs and all other supported compilers
+#else
 
 #define libmesh_assert_less_msg(expr1,expr2, msg)                       \
   do {                                                                  \
@@ -350,37 +383,6 @@ extern bool warned_about_auto_ptr;
       libmesh_error();                                                  \
     } } while (0)
 
-// Older Clang has a parsing bug that can't seem to handle the handle the decay statement when
-// expanding these macros. We'll just fall back to the previous behavior with those older compilers
-#else
-
-#define libmesh_assert_less_msg(expr1,expr2, msg)                       \
-  do {                                                                  \
-    if (!((expr1) < (expr2))) {                                         \
-      libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libmesh_error();                                                  \
-    } } while (0)
-
-#define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
-  do {                                                                  \
-    if (!((expr1) > (expr2))) {                                         \
-      libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libmesh_error();                                                  \
-    } } while (0)
-
-#define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
-  do {                                                                  \
-    if (!((expr1) <= (expr2))) {                                        \
-      libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libmesh_error();                                                  \
-    } } while (0)
-
-#define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
-  do {                                                                  \
-    if (!((expr1) >= (expr2))) {                                        \
-      libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libmesh_error();                                                  \
-    } } while (0)
 #endif // clang <4.0
 
 #endif
