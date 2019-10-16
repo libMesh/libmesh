@@ -227,13 +227,13 @@ void ExodusII_IO::read (const std::string & fname)
 
       // Set any relevant node/edge maps for this element
       const std::string type_str (exio_helper->get_elem_type());
-      const ExodusII_IO_Helper::Conversion conv = exio_helper->assign_conversion(type_str);
+      const auto & conv = exio_helper->get_conversion(type_str);
 
       // Loop over all the faces in this block
       int jmax = nelem_last_block+exio_helper->num_elem_this_blk;
       for (int j=nelem_last_block; j<jmax; j++)
         {
-          Elem * elem = Elem::build (conv.get_canonical_type()).release();
+          Elem * elem = Elem::build (conv.libmesh_elem_type()).release();
           libmesh_assert (elem);
           elem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id) ;
 
@@ -332,8 +332,7 @@ void ExodusII_IO::read (const std::string & fname)
         // Set any relevant node/edge maps for this element
         Elem & elem = mesh.elem_ref(libmesh_elem_id);
 
-        const ExodusII_IO_Helper::Conversion conv =
-          exio_helper->assign_conversion(elem.type());
+        const auto & conv = exio_helper->get_conversion(elem.type());
 
         // Map the zero-based Exodus side numbering to the libmesh side numbering
         unsigned int raw_side_index = exio_helper->side_list[e]-1;

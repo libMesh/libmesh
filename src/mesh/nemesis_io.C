@@ -830,8 +830,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       const std::string type_str ( nemhelper->elem_type.data() );
 
       // Set any relevant node/edge maps for this element
-      const ExodusII_IO_Helper::Conversion conv =
-        nemhelper->assign_conversion(type_str);
+      const auto & conv = nemhelper->get_conversion(type_str);
 
       if (_verbose)
         libMesh::out << "Reading a block of " << type_str << " elements." << std::endl;
@@ -839,7 +838,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       // Loop over all the elements in this block
       for (unsigned int j=0; j<to_uint(nemhelper->num_elem_this_blk); j++)
         {
-          Elem * elem = Elem::build (conv.get_canonical_type()).release();
+          Elem * elem = Elem::build (conv.libmesh_elem_type()).release();
           libmesh_assert (elem);
 
           // Assign subdomain and processor ID to the newly-created Elem.
@@ -1043,8 +1042,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       // The side numberings in libmesh and exodus are not 1:1, so we need to map
       // whatever side number is stored in Exodus into a libmesh side number using
       // a conv object...
-      const ExodusII_IO_Helper::Conversion conv =
-        nemhelper->assign_conversion(elem->type());
+      const auto & conv = nemhelper->get_conversion(elem->type());
 
       // Finally, we are ready to add the element and its side to the BoundaryInfo object.
       // Call the version of add_side which takes a pointer, since we have already gone to

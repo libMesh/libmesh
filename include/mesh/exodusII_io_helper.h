@@ -665,11 +665,11 @@ public:
   enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3};
   void read_var_names(ExodusVarType type);
 
-  ExodusII_IO_Helper::Conversion
-  assign_conversion(const ElemType type);
+  const ExodusII_IO_Helper::Conversion &
+  get_conversion(const ElemType type) const;
 
-  ExodusII_IO_Helper::Conversion
-  assign_conversion(std::string type_str);
+  const ExodusII_IO_Helper::Conversion &
+  get_conversion(std::string type_str) const;
 
 protected:
   /**
@@ -819,7 +819,7 @@ public:
       shellface_map(nullptr),
       inverse_shellface_map(nullptr),
       shellface_index_offset(0),
-      canonical_type(INVALID_ELEM),
+      libmesh_type(INVALID_ELEM),
       exodus_type("")
   {}
 
@@ -876,7 +876,7 @@ public:
    * The canonical element type is the standard element type
    * understood by this library.
    */
-  ElemType get_canonical_type() const;
+  ElemType libmesh_elem_type() const;
 
   /**
    * \returns The string corresponding to the Exodus type for this element.
@@ -939,7 +939,7 @@ public:
    * The canonical (i.e. standard for this library)
    * element type.
    */
-  ElemType canonical_type;
+  ElemType libmesh_type;
 
   /**
    * The string corresponding to the Exodus type for this element

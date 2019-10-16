@@ -22,7 +22,6 @@
 #ifdef LIBMESH_HAVE_EXODUS_API
 
 #include <algorithm>
-#include <functional>
 #include <sstream>
 #include <cstdlib> // std::strtol
 
@@ -145,82 +144,82 @@ void ExodusII_IO_Helper::init_conversion_map()
 {
   {
     auto & conv = conversion_map[NODEELEM];
-    conv.canonical_type = NODEELEM;
+    conv.libmesh_type = NODEELEM;
     conv.exodus_type = "SPHERE";
   }
   {
     auto & conv = conversion_map[EDGE2];
-    conv.canonical_type = EDGE2;
+    conv.libmesh_type = EDGE2;
     conv.exodus_type = "EDGE2";
   }
   {
     auto & conv = conversion_map[EDGE3];
-    conv.canonical_type = EDGE3;
+    conv.libmesh_type = EDGE3;
     conv.exodus_type = "EDGE3";
   }
   {
     auto & conv = conversion_map[QUAD4];
-    conv.canonical_type = QUAD4;
+    conv.libmesh_type = QUAD4;
     conv.exodus_type = "QUAD4";
   }
   {
     auto & conv = conversion_map[QUADSHELL4];
     conv.inverse_side_map = &quadshell4_inverse_edge_map;
     conv.shellface_index_offset = 2;
-    conv.canonical_type = QUADSHELL4;
+    conv.libmesh_type = QUADSHELL4;
     conv.exodus_type = "SHELL4";
   }
   {
     auto & conv = conversion_map[QUAD8];
-    conv.canonical_type = QUAD8;
+    conv.libmesh_type = QUAD8;
     conv.exodus_type = "QUAD8";
   }
   {
     auto & conv = conversion_map[QUADSHELL8];
     conv.inverse_side_map = &quadshell4_inverse_edge_map;
     conv.shellface_index_offset = 2;
-    conv.canonical_type = QUADSHELL8;
+    conv.libmesh_type = QUADSHELL8;
     conv.exodus_type = "SHELL8";
   }
   {
     auto & conv = conversion_map[QUAD9];
-    conv.canonical_type = QUAD9;
+    conv.libmesh_type = QUAD9;
     conv.exodus_type = "QUAD9";
   }
   {
     auto & conv = conversion_map[TRI3];
-    conv.canonical_type = TRI3;
+    conv.libmesh_type = TRI3;
     conv.exodus_type = "TRI3";
   }
   {
     auto & conv = conversion_map[TRISHELL3];
     conv.inverse_side_map = &trishell3_inverse_edge_map;
     conv.shellface_index_offset = 2;
-    conv.canonical_type = TRISHELL3;
+    conv.libmesh_type = TRISHELL3;
     conv.exodus_type = "TRISHELL3";
   }
   {
     auto & conv = conversion_map[TRI3SUBDIVISION];
-    conv.canonical_type = TRI3SUBDIVISION;
+    conv.libmesh_type = TRI3SUBDIVISION;
     conv.exodus_type = "TRI3";
   }
   {
     auto & conv = conversion_map[TRI6];
-    conv.canonical_type = TRI6;
+    conv.libmesh_type = TRI6;
     conv.exodus_type = "TRI6";
   }
   {
     auto & conv = conversion_map[HEX8];
     conv.side_map = &hex_face_map;
     conv.inverse_side_map = &hex_inverse_face_map;
-    conv.canonical_type = HEX8;
+    conv.libmesh_type = HEX8;
     conv.exodus_type = "HEX8";
   }
   {
     auto & conv = conversion_map[HEX20];
     conv.side_map = &hex_face_map;
     conv.inverse_side_map = &hex_inverse_face_map;
-    conv.canonical_type = HEX20;
+    conv.libmesh_type = HEX20;
     conv.exodus_type = "HEX20";
   }
   {
@@ -229,57 +228,57 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_node_map = &hex27_inverse_node_map;
     conv.side_map = &hex_face_map;
     conv.inverse_side_map = &hex_inverse_face_map;
-    conv.canonical_type = HEX27;
+    conv.libmesh_type = HEX27;
     conv.exodus_type = "HEX27";
   }
   {
     auto & conv = conversion_map[TET4];
     conv.side_map = &tet_face_map;
     conv.inverse_side_map = &tet_inverse_face_map;
-    conv.canonical_type = TET4;
+    conv.libmesh_type = TET4;
     conv.exodus_type = "TETRA4";
   }
   {
     auto & conv = conversion_map[TET10];
     conv.side_map = &tet_face_map;
     conv.inverse_side_map = &tet_inverse_face_map;
-    conv.canonical_type = TET10;
+    conv.libmesh_type = TET10;
     conv.exodus_type = "TETRA10";
   }
   {
     auto & conv = conversion_map[PRISM6];
     conv.side_map = &prism_face_map;
     conv.inverse_side_map = &prism_inverse_face_map;
-    conv.canonical_type = PRISM6;
+    conv.libmesh_type = PRISM6;
     conv.exodus_type = "WEDGE";
   }
   {
     auto & conv = conversion_map[PRISM15];
     conv.side_map = &prism_face_map;
     conv.inverse_side_map = &prism_inverse_face_map;
-    conv.canonical_type = PRISM15;
+    conv.libmesh_type = PRISM15;
     conv.exodus_type = "WEDGE15";
   }
   {
     auto & conv = conversion_map[PRISM18];
     conv.side_map = &prism_face_map;
     conv.inverse_side_map = &prism_inverse_face_map;
-    conv.canonical_type = PRISM18;
+    conv.libmesh_type = PRISM18;
     conv.exodus_type = "WEDGE18";
   }
   {
     auto & conv = conversion_map[PYRAMID5];
-    conv.canonical_type = PYRAMID5;
+    conv.libmesh_type = PYRAMID5;
     conv.exodus_type = "PYRAMID5";
   }
   {
     auto & conv = conversion_map[PYRAMID13];
-    conv.canonical_type = PYRAMID13;
+    conv.libmesh_type = PYRAMID13;
     conv.exodus_type = "PYRAMID13";
   }
   {
     auto & conv = conversion_map[PYRAMID14];
-    conv.canonical_type = PYRAMID14;
+    conv.libmesh_type = PYRAMID14;
     conv.exodus_type = "PYRAMID14";
   }
 }
@@ -377,18 +376,18 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
   element_equivalence_map["PYRAMID14"] = PYRAMID14;
 }
 
-ExodusII_IO_Helper::Conversion
-ExodusII_IO_Helper::assign_conversion(const ElemType type)
+const ExodusII_IO_Helper::Conversion &
+ExodusII_IO_Helper::get_conversion(const ElemType type) const
 {
   return libmesh_map_find(conversion_map, type);
 }
 
-ExodusII_IO_Helper::Conversion
-ExodusII_IO_Helper::assign_conversion(std::string type_str)
+const ExodusII_IO_Helper::Conversion &
+ExodusII_IO_Helper::get_conversion(std::string type_str) const
 {
   // Do only upper-case comparisons
   std::transform(type_str.begin(), type_str.end(), type_str.begin(), ::toupper);
-  return assign_conversion (libmesh_map_find(element_equivalence_map, type_str));
+  return get_conversion (libmesh_map_find(element_equivalence_map, type_str));
 }
 
 const char * ExodusII_IO_Helper::get_elem_type() const
@@ -1700,8 +1699,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
       // We are using that same assumption here!
-      const ExodusII_IO_Helper::Conversion conv =
-        assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
+      const auto & conv = get_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
 
       elem_blk_id.push_back(pr.first);
@@ -1766,8 +1764,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
       // We are using that same assumption here!
-      const ExodusII_IO_Helper::Conversion conv =
-        assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
+      const auto & conv = get_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
 
       connect.resize(tmp_vec.size()*num_nodes_per_elem);
@@ -1789,12 +1786,12 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           // This needs to be more than an assert so we don't fail
           // with a mysterious segfault while trying to write mixed
           // element meshes in optimized mode.
-          if (elem.type() != conv.get_canonical_type())
+          if (elem.type() != conv.libmesh_elem_type())
             libmesh_error_msg("Error: Exodus requires all elements with a given subdomain ID to be the same type.\n" \
                               << "Can't write both "                  \
                               << Utility::enum_to_string(elem.type()) \
                               << " and "                              \
-                              << Utility::enum_to_string(conv.get_canonical_type()) \
+                              << Utility::enum_to_string(conv.libmesh_elem_type()) \
                               << " in the same block!");
 
 
@@ -1889,8 +1886,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
         for (const auto & f : family)
           {
-            const ExodusII_IO_Helper::Conversion conv =
-              assign_conversion(mesh.elem_ptr(f->id())->type());
+            const auto & conv = get_conversion(mesh.elem_ptr(f->id())->type());
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
@@ -1921,8 +1917,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
         for (const auto & f : family)
           {
-            const ExodusII_IO_Helper::Conversion conv =
-              assign_conversion(mesh.elem_ptr(f->id())->type());
+            const auto & conv = get_conversion(mesh.elem_ptr(f->id())->type());
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
@@ -2334,8 +2329,7 @@ write_sideset_data(const MeshBase & mesh,
                 libmesh_error_msg("Error mapping Exodus elem id to libmesh elem id.");
 
               // Map from Exodus side ids to libmesh side ids.
-              ExodusII_IO_Helper::Conversion conv =
-                assign_conversion(mesh.elem_ptr(elem_id)->type());
+              const auto & conv = get_conversion(mesh.elem_ptr(elem_id)->type());
 
               // Map from Exodus side ids to libmesh side ids.
               unsigned int converted_side_id = conv.get_side_map(side_id);
@@ -2471,8 +2465,7 @@ read_sideset_data(const MeshBase & mesh,
 
                       // Map Exodus side id to libmesh side id.
                       // Map from Exodus side ids to libmesh side ids.
-                      ExodusII_IO_Helper::Conversion conv =
-                        assign_conversion(mesh.elem_ptr(converted_elem_id)->type());
+                      const auto & conv = get_conversion(mesh.elem_ptr(converted_elem_id)->type());
 
                       // Map from Exodus side id to libmesh side id.
                       // Note: the mapping is defined on 0-based indices, so subtract
@@ -2960,9 +2953,9 @@ int ExodusII_IO_Helper::Conversion::get_inverse_shellface_map(int i) const
 
 
 
-ElemType ExodusII_IO_Helper::Conversion::get_canonical_type() const
+ElemType ExodusII_IO_Helper::Conversion::libmesh_elem_type() const
 {
-  return canonical_type;
+  return libmesh_type;
 }
 
 

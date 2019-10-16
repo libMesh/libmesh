@@ -1244,8 +1244,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
 
       // Construct a conversion object for this Element.  This will help us map
       // Libmesh numberings into Nemesis numberings for sides.
-      ExodusII_IO_Helper::Conversion conv =
-        assign_conversion(elem->type());
+      const auto & conv = get_conversion(elem->type());
 
       // Add all this element's node IDs to the set of all node IDs.
       // The set of internal_node_ids will be the set difference between
@@ -1762,7 +1761,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
       // We are using that same assumption here!
-      const ExodusII_IO_Helper::Conversion conv = assign_conversion
+      const auto & conv = get_conversion
         (pmesh.elem_ref(elem_ids_this_subdomain[0]).type());
       this->num_nodes_per_elem =
         pmesh.elem_ref(elem_ids_this_subdomain[0]).n_nodes();
@@ -1787,11 +1786,11 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
           const Elem & elem = pmesh.elem_ref(elem_id);
 
           // Exodus/Nemesis want every block to have the same element type
-          // libmesh_assert_equal_to (elem->type(), conv.get_canonical_type());
+          // libmesh_assert_equal_to (elem->type(), conv.libmesh_elem_type());
 
           // But we can get away with writing e.g. HEX8 and INFHEX8 in
           // the same block...
-          libmesh_assert_equal_to (elem.n_nodes(), Elem::build(conv.get_canonical_type(), nullptr)->n_nodes());
+          libmesh_assert_equal_to (elem.n_nodes(), Elem::build(conv.libmesh_elem_type(), nullptr)->n_nodes());
 
           for (auto j : IntRange<int>(0, this->num_nodes_per_elem))
             {
@@ -2125,7 +2124,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
           // If element is local, process it
           if (f.processor_id() == this->processor_id())
             {
-              const ExodusII_IO_Helper::Conversion conv = assign_conversion(f.type());
+              const auto & conv = get_conversion(f.type());
 
               // Use the libmesh to exodus data structure map to get the proper sideset IDs
               // The data structure contains the "collapsed" contiguous ids.
@@ -2329,11 +2328,11 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
               std::vector<int> & this_block_connectivity = it->second;
               std::vector<dof_id_type> & elements_in_this_block = subdomain_map[block];
 
-              //Use the first element in this block to get representative information.
-              //Note that Exodus assumes all elements in a block are of the same type!
-              //We are using that same assumption here!
-              const ExodusII_IO_Helper::Conversion conv =
-                assign_conversion(mesh.elem_ref(elements_in_this_block[0]).type());
+              // Use the first element in this block to get representative information.
+              // Note that Exodus assumes all elements in a block are of the same type!
+              // We are using that same assumption here!
+              const auto & conv =
+                get_conversion(mesh.elem_ref(elements_in_this_block[0]).type());
 
               this->num_nodes_per_elem =
                 mesh.elem_ref(elements_in_this_block[0]).n_nodes();
