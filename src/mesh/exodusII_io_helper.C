@@ -1726,6 +1726,62 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       ++counter;
     }
 
+  // Build data structures describing edge blocks. This information must be
+  // be passed to exII::ex_put_concat_all_blocks() at the same time as the
+  // information about elem blocks.
+  std::vector<int> edge_blk_id;
+  NamesData edge_type_table(num_edge_blk, MAX_STR_LENGTH);
+  std::vector<int> num_edge_this_blk_vec;
+  std::vector<int> num_nodes_per_edge_vec;
+  std::vector<int> num_attr_edge_vec;
+
+  // Reference to the BoundaryInfo object for convenience.
+  const BoundaryInfo & bi = mesh.get_boundary_info();
+
+  // Note: We are going to use the edge **boundary** ids as **block** ids.
+  const std::set<boundary_id_type> & edge_boundary_ids = bi.get_edge_boundary_ids();
+  libmesh_assert(static_cast<int>(edge_boundary_ids.size()) == num_edge_blk);
+
+  // The _total_ number of edge boundary conditions over **all** ids
+  std::size_t total_edge_cond = bi.n_edge_conds();
+
+  for (const auto & id : edge_boundary_ids)
+    {
+      edge_blk_id.push_back(id);
+
+      // Hard-coded at the moment for linear edges at the moment
+      edge_type_table.push_back_entry("EDGE2");
+      num_nodes_per_edge_vec.push_back(2);
+
+      // FIXME: This is supposed to be the number of edges in the
+      // *current* block, not the total number of edge conditions.
+      num_edge_this_blk_vec.push_back(total_edge_cond);
+
+      // We don't store any attributes currently
+      num_attr_edge_vec.push_back(0);
+    }
+
+  // Debugging:
+  libMesh::out << "edge_blk_id = " << std::endl;
+  for (unsigned int i=0; i<edge_blk_id.size(); ++i)
+    libMesh::out << edge_blk_id[i] << " ";
+  libMesh::out << std::endl;
+
+  libMesh::out << "num_edge_this_blk_vec = " << std::endl;
+  for (unsigned int i=0; i<num_edge_this_blk_vec.size(); ++i)
+    libMesh::out << num_edge_this_blk_vec[i] << " ";
+  libMesh::out << std::endl;
+
+  libMesh::out << "num_nodes_per_edge_vec = " << std::endl;
+  for (unsigned int i=0; i<num_nodes_per_edge_vec.size(); ++i)
+    libMesh::out << num_nodes_per_edge_vec[i] << " ";
+  libMesh::out << std::endl;
+
+  libMesh::out << "num_attr_edge_vec = " << std::endl;
+  for (unsigned int i=0; i<num_attr_edge_vec.size(); ++i)
+    libMesh::out << num_attr_edge_vec[i] << " ";
+  libMesh::out << std::endl;
+
   // Zero-initialize and then fill in an exII::ex_block_params struct
   // with the data we have collected. This new API replaces the old
   // exII::ex_put_concat_elem_block() API, and will eventually allow
@@ -1738,6 +1794,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // node/elem maps during the call to ex_put_init_ext() in order for
   // this to work correctly.
   exII::ex_block_params params = {};
+
+  // Set pointers for information about elem blocks.
   params.elem_blk_id = elem_blk_id.data();
   params.elem_type = elem_type_table.get_char_star_star();
   params.num_elem_this_blk = num_elem_this_blk_vec.data();
@@ -1746,6 +1804,17 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   params.num_faces_per_elem = num_faces_per_elem_vec.data();
   params.num_attr_elem = num_attr_vec.data();
   params.define_maps = 0;
+
+  // Set pointers to edge block information only if we actually have some.
+  if (num_edge_blk)
+    {
+      params.edge_blk_id = edge_blk_id.data();
+      params.edge_type = edge_type_table.get_char_star_star();
+      params.num_edge_this_blk = num_edge_this_blk_vec.data();
+      params.num_nodes_per_edge = num_nodes_per_edge_vec.data();
+      params.num_attr_edge = num_attr_edge_vec.data();
+    }
+
   ex_err = exII::ex_put_concat_all_blocks(ex_id, &params);
   EX_CHECK_ERR(ex_err, "Error writing element blocks.");
 
