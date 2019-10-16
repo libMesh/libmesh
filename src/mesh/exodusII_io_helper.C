@@ -1732,15 +1732,43 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // Build list of (elem, edge, id) triples
   std::vector<BoundaryInfo::BCTuple> edge_tuples = bi.build_edge_list();
 
-  // Count number of edges associated with each edge boundary id. These can be in
-  // any order in the data structure returned by bi.build_edge_list(), and Exodus
-  // needs to know exactly how many edges are in each block.
-  std::map<boundary_id_type, std::size_t> edge_id_to_count;
+  // Build the connectivity array for each edge block. The connectivity array
+  // is a vector<int> with "num_edges * num_nodes_per_edge" entries. We write
+  // the Exodus node numbers to the connectivity arrays so that they can
+  // be used directly in the calls to exII::ex_put_conn() below.
+  std::map<boundary_id_type, std::vector<int>> edge_id_to_conn;
   for (const auto & t : edge_tuples)
-    edge_id_to_count[std::get<2>(t)]++;
+    {
+      dof_id_type elem_id = std::get<0>(t);
+      unsigned int edge_id = std::get<1>(t);
+      boundary_id_type b_id = std::get<2>(t);
+
+      // Build the edge in question
+      std::unique_ptr<const Elem> edge =
+        mesh.elem_ptr(elem_id)->build_edge_ptr(edge_id);
+
+      // Get reference to the connectivity array for this block
+      auto & conn = edge_id_to_conn[b_id];
+
+      // For each node on the edge, look up the exodus node id and
+      // store it in the conn array. Note: all edge types have
+      // identity node mappings so we don't bother with Conversion
+      // objects here.
+      for (auto n : edge->node_index_range())
+        {
+          dof_id_type libmesh_node_id = edge->node_ptr(n)->id();
+          // libMesh::out << libmesh_node_id << " ";
+
+          int exodus_node_id =
+            libmesh_map_find(libmesh_node_num_to_exodus,
+                             cast_int<int>(libmesh_node_id));
+
+          conn.push_back(exodus_node_id);
+        }
+    }
 
   // Make sure we have the same number of edge ids that we thought we would.
-  libmesh_assert(static_cast<int>(edge_id_to_count.size()) == num_edge_blk);
+  libmesh_assert(static_cast<int>(edge_id_to_conn.size()) == num_edge_blk);
 
   // Build data structures describing edge blocks. This information must be
   // be passed to exII::ex_put_concat_all_blocks() at the same time as the
@@ -1752,10 +1780,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   std::vector<int> num_attr_edge_vec;
 
   // Note: We are going to use the edge **boundary** ids as **block** ids.
-  for (const auto & pr : edge_id_to_count)
+  for (const auto & pr : edge_id_to_conn)
     {
       boundary_id_type id = pr.first;
-      std::size_t count = pr.second;
+
+      // FIXME: Instead of hard coding 2, divide by the number of
+      // nodes on an actual Edge.
+      std::size_t count = pr.second.size() / 2;
 
       edge_blk_id.push_back(id);
 
@@ -1945,6 +1976,18 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       EX_CHECK_ERR(ex_err, "Error writing element names");
     }
 
+  // Write out edge blocks if we have any
+  for (const auto & pr : edge_id_to_conn)
+    {
+      ex_err = exII::ex_put_conn
+        (ex_id,
+         exII::EX_EDGE_BLOCK,
+         pr.first,
+         pr.second.data(), // node_conn
+         nullptr,          // elem_edge_conn (unused)
+         nullptr);         // elem_face_conn (unused)
+      EX_CHECK_ERR(ex_err, "Error writing element connectivities");
+    }
 }
 
 
