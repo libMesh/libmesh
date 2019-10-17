@@ -877,12 +877,9 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
         vec.push_back(std::make_pair(elem->id(), e));
       }
 
-  // Debugging:
-  libMesh::out << "edge_map has " << edge_map.size() << " entries." << std::endl;
-  // for (const auto & pr : edge_map)
-  //   libMesh::out << "key = " << pr.first << ", "
-  //                << pr.second.size() << " entries."
-  //                << std::endl;
+  // Get reference to the mesh's BoundaryInfo object, as we will be
+  // adding edges to this below.
+  BoundaryInfo & bi = mesh.get_boundary_info();
 
   for (const auto & edge_block_id : edge_block_ids)
     {
@@ -907,15 +904,6 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
       EX_CHECK_ERR(ex_err, "Error getting edge block info.");
       message("Info retrieved successfully for block: ", edge_block_id);
 
-      // Debugging:
-      libMesh::out << "edge_block_id = " << edge_block_id << std::endl;
-      libMesh::out << "elem_type = " << elem_type.data() << std::endl;
-      libMesh::out << "num_edge_this_blk = " << num_edge_this_blk << std::endl;
-      libMesh::out << "num_nodes_per_edge = " << num_nodes_per_edge << std::endl;
-      libMesh::out << "num_edges_per_edge = " << num_edges_per_edge << std::endl;
-      libMesh::out << "num_faces_per_edge = " << num_faces_per_edge << std::endl;
-      libMesh::out << "num_attr_per_edge = " << num_attr_per_edge << std::endl;
-
       // Read in the connectivity of the edges of this block,
       // watching out for the case where we actually have no
       // elements in this block (possible with parallel files)
@@ -932,12 +920,6 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
           EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
           message("Connectivity retrieved successfully for block: ", edge_block_id);
-
-          // Debugging:
-          libMesh::out << "connect.size() = " << connect.size() << std::endl;
-          for (const auto & exodus_node_id : connect)
-            libMesh::out << exodus_node_id << " ";
-          libMesh::out << std::endl;
 
           // All edge types have an identity mapping from the corresponding
           // Exodus type, so we don't need to bother with mapping ids, but
@@ -960,7 +942,6 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
               // Compute key for the edge Elem we just built.
               dof_id_type edge_key = edge->key();
-              libMesh::out << "edge_key = " << edge_key << std::endl;
 
               // If this key is not found in the edge_map, which is
               // supposed to include every edge in the Mesh, then we
@@ -983,27 +964,27 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                     mesh.elem_ptr(elem_edge_pair.first)->
                     build_edge_ptr(elem_edge_pair.second);
 
+                  // Determine whether this candidate edge is a "real" match,
+                  // i.e. also has the same orientation.
                   bool is_match = true;
                   for (int n=0; n<num_nodes_per_edge; ++n)
-                    {
-                      if (candidate_edge->node_id(n) != edge->node_id(n))
-                        {
-                          is_match = false;
-                          break;
-                        }
-                    }
+                    if (candidate_edge->node_id(n) != edge->node_id(n))
+                      {
+                        is_match = false;
+                        break;
+                      }
 
                   if (is_match)
-                    // Debugging: print potential elem/edge pairs which have
-                    // the same key.
-                    libMesh::out << "Elem " << elem_edge_pair.first
-                                 << ", Edge " << elem_edge_pair.second
-                                 << " is a match."
-                                 << std::endl;
-                }
+                    {
+                      // Add this (elem, edge, id) combo to the BoundaryInfo object.
+                      bi.add_edge(elem_edge_pair.first,
+                                  elem_edge_pair.second,
+                                  edge_block_id);
+                    }
+                } // end loop over elem_edge_pairs
             } // end loop over connectivity array
-        }
-    } // end for edge_block_id : edge_block_ids)
+        } // end if !connect.empty()
+    } // end for edge_block_id : edge_block_ids
 }
 
 
