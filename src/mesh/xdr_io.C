@@ -878,6 +878,8 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   n_written = 0;
 
+  node_iter = mesh.local_nodes_begin();
+
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -891,13 +893,16 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       xfer_unique_ids.clear();
       xfer_unique_ids.reserve(tot_id_size);
 
-      for (const auto & node : mesh.local_node_ptr_range())
-        if ((node->id() >= first_node) && // node in [first_node, last_node)
-            (node->id() <  last_node))
-          {
-            xfer_ids.push_back(node->id());
-            xfer_unique_ids.push_back(node->unique_id());
-          }
+      for (; node_iter != nodes_end; ++node_iter)
+        {
+          const Node & node = **node_iter;
+          libmesh_assert_greater_equal(node.id(), first_node);
+          if (node.id() >= last_node)
+            break;
+
+          xfer_ids.push_back(node.id());
+          xfer_unique_ids.push_back(node.unique_id());
+        }
 
       //-------------------------------------
       // Send the xfer buffers to processor 0
