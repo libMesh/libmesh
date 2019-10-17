@@ -213,7 +213,7 @@ void ExodusII_IO::read (const std::string & fname)
   // Read in the element connectivity for each block.
   int nelem_last_block = 0;
 
-  // Loop over all the blocks
+  // Loop over all the element blocks
   for (int i=0; i<exio_helper->num_elem_blk; i++)
     {
       // Read the information for block i
@@ -287,12 +287,9 @@ void ExodusII_IO::read (const std::string & fname)
       nelem_last_block += exio_helper->num_elem_this_blk;
     }
 
-  // This assert isn't valid if the Exodus file's numbering doesn't
-  // start with 1!  For example, if Exodus's elem_num_map is 21, 22,
-  // 23, 24, 25, 26, 27, 28, 29, 30, ... 84, then by the time you are
-  // done with the loop above, mesh.n_elem() will report 84 and
-  // nelem_last_block will be 64.
-  // libmesh_assert_equal_to (static_cast<unsigned>(nelem_last_block), mesh.n_elem());
+  // Read in edge blocks, storing information in the BoundaryInfo object.
+  // Edge blocks are treated as BCs.
+  exio_helper->read_edge_blocks();
 
   // Set the mesh dimension to the largest encountered for an element
   for (unsigned char i=0; i!=4; ++i)

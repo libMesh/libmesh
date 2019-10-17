@@ -847,6 +847,43 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 
 
 
+void ExodusII_IO_Helper::read_edge_blocks()
+{
+  for (const auto & edge_block_id : edge_block_ids)
+    {
+      // exII::ex_get_block() output parameters.  Unlike the other
+      // "extended" APIs, exII::ex_get_block() does not use a
+      // parameter struct.
+      int num_edge_this_blk = 0;
+      int num_nodes_per_edge = 0;
+      int num_edges_per_edge = 0;
+      int num_faces_per_edge = 0;
+      int num_attr_per_edge = 0;
+      ex_err = exII::ex_get_block(ex_id,
+                                  exII::EX_EDGE_BLOCK,
+                                  edge_block_id,
+                                  elem_type.data(),
+                                  &num_edge_this_blk,
+                                  &num_nodes_per_edge,
+                                  &num_edges_per_edge, // 0 or -1 for edge blocks
+                                  &num_faces_per_edge, // 0 or -1 for edge blocks
+                                  &num_attr_per_edge);
+
+      EX_CHECK_ERR(ex_err, "Error getting edge block info.");
+      message("Info retrieved successfully for block: ", edge_block_id);
+
+      // Debugging:
+      libMesh::out << "edge_block_id = " << edge_block_id << std::endl;
+      libMesh::out << "elem_type = " << elem_type.data() << std::endl;
+      libMesh::out << "num_edge_this_blk = " << num_edge_this_blk << std::endl;
+      libMesh::out << "num_nodes_per_edge = " << num_nodes_per_edge << std::endl;
+      libMesh::out << "num_edges_per_edge = " << num_edges_per_edge << std::endl;
+      libMesh::out << "num_faces_per_edge = " << num_faces_per_edge << std::endl;
+      libMesh::out << "num_attr_per_edge = " << num_attr_per_edge << std::endl;
+    }
+}
+
+
 
 void ExodusII_IO_Helper::read_elem_num_map ()
 {

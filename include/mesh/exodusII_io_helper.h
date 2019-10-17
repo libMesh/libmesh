@@ -200,6 +200,11 @@ public:
   void read_elem_in_block(int block);
 
   /**
+   * Read in edge blocks, storing information in the BoundaryInfo object.
+   */
+  void read_edge_blocks();
+
+  /**
    * Reads the optional \p node_num_map from the \p ExodusII mesh
    * file.
    */
