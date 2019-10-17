@@ -1897,62 +1897,47 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
       dof_bc_data.clear();
       dof_bc_data.reserve (input_buffer.size()/3);
 
-      // convert the input_buffer to DofBCData to facilitate searching
-      for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
-        dof_bc_data.push_back
-          (DofBCData(cast_int<dof_id_type>(input_buffer[idx+0]),
-                     cast_int<unsigned short>(input_buffer[idx+1]),
-                     cast_int<boundary_id_type>(input_buffer[idx+2])));
-      input_buffer.clear();
-      // note that while the files *we* write should already be sorted by
-      // element id this is not necessarily guaranteed.
-      std::sort (dof_bc_data.begin(), dof_bc_data.end());
-
       // Look for BCs in this block for all the level-0 elements we have
       // (not just local ones).  Do this by finding all the entries
       // in dof_bc_data whose elem_id match the ID of the current element.
       // We cannot rely on nullptr neighbors at this point since the neighbor
       // data structure has not been initialized.
-      for (const auto & elem :
-             as_range(mesh.level_elements_begin(0),
-                      mesh.level_elements_end(0)))
+      for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
         {
-          auto bounds =
-            std::equal_range (dof_bc_data.begin(),
-                              dof_bc_data.end(),
-                              elem->id()
-#if defined(__SUNPRO_CC) || defined(__PGI)
-                              , CompareIntDofBCData()
-#endif
-                              );
+          const dof_id_type dof_id =
+            cast_int<dof_id_type>(input_buffer[idx+0]);
+          const unsigned short side =
+            cast_int<unsigned short>(input_buffer[idx+1]);
+          const boundary_id_type bc_id =
+            cast_int<boundary_id_type>(input_buffer[idx+2]);
 
-          for (const auto & data : as_range(bounds))
+          const Elem * elem = mesh.query_elem_ptr(dof_id);
+          if (!elem)
+            continue;
+
+          if (bc_type == "side")
             {
-              libmesh_assert_equal_to (data.dof_id, elem->id());
+              libmesh_assert_less (side, elem->n_sides());
+              boundary_info.add_side (elem, side, bc_id);
+            }
+          else if (bc_type == "edge")
+            {
+              libmesh_assert_less (side, elem->n_edges());
+              boundary_info.add_edge (elem, side, bc_id);
+            }
+          else if (bc_type == "shellface")
+            {
+              // Shell face IDs can only be 0 or 1.
+              libmesh_assert_less(side, 2);
 
-              if (bc_type == "side")
-                {
-                  libmesh_assert_less (data.side, elem->n_sides());
-                  boundary_info.add_side (elem, data.side, data.bc_id);
-                }
-              else if (bc_type == "edge")
-                {
-                  libmesh_assert_less (data.side, elem->n_edges());
-                  boundary_info.add_edge (elem, data.side, data.bc_id);
-                }
-              else if (bc_type == "shellface")
-                {
-                  // Shell face IDs can only be 0 or 1.
-                  libmesh_assert_less(data.side, 2);
-
-                  boundary_info.add_shellface (elem, data.side, data.bc_id);
-                }
-              else
-                {
-                  libmesh_error_msg("bc_type not recognized: " + bc_type);
-                }
+              boundary_info.add_shellface (elem, side, bc_id);
+            }
+          else
+            {
+              libmesh_error_msg("bc_type not recognized: " + bc_type);
             }
         }
+      input_buffer.clear();
     }
 }
 
