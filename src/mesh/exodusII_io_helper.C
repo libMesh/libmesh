@@ -1975,12 +1975,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // Note: We are going to use the edge **boundary** ids as **block** ids.
   for (const auto & pr : edge_id_to_conn)
     {
+      // Store the edge block id in the array to be passed to Exodus.
       boundary_id_type id = pr.first;
-
-      // FIXME: Instead of hard coding 2, divide by the number of
-      // nodes on an actual Edge.
-      std::size_t count = pr.second.size() / 2;
-
       edge_blk_id.push_back(id);
 
       // Set Exodus element type and number of nodes for this edge block.
@@ -1989,8 +1985,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       edge_type_table.push_back_entry(conv.exodus_type.c_str());
       num_nodes_per_edge_vec.push_back(elem_type_node_count.second);
 
-      // The count that we determined earlier.
-      num_edge_this_blk_vec.push_back(count);
+      // The number of edges is the number of entries in the connectivity
+      // array divided by the number of nodes per edge.
+      num_edge_this_blk_vec.push_back(pr.second.size() / elem_type_node_count.second);
 
       // We don't store any attributes currently
       num_attr_edge_vec.push_back(0);
