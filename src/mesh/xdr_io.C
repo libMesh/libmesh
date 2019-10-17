@@ -45,65 +45,6 @@ namespace libMesh
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
-struct DofBCData
-{
-  dof_id_type        dof_id;
-  unsigned short int side;
-  boundary_id_type   bc_id;
-
-  // Default constructor
-  DofBCData (dof_id_type        dof_id_in=0,
-             unsigned short int side_in=0,
-             boundary_id_type   bc_id_in=0) :
-    dof_id(dof_id_in),
-    side(side_in),
-    bc_id(bc_id_in)
-  {}
-
-  // comparison operator
-  bool operator < (const DofBCData & other) const
-  {
-    if (this->dof_id == other.dof_id)
-      return (this->side < other.side);
-
-    return this->dof_id < other.dof_id;
-  }
-};
-
-// comparison operator
-bool operator < (const unsigned int & other_dof_id,
-                 const DofBCData & dof_bc)
-{
-  return other_dof_id < dof_bc.dof_id;
-}
-
-bool operator < (const DofBCData & dof_bc,
-                 const unsigned int & other_dof_id)
-
-{
-  return dof_bc.dof_id < other_dof_id;
-}
-
-
-// For some reason SunStudio does not seem to accept the above
-// comparison functions for use in
-// std::equal_range (ElemBCData::iterator, ElemBCData::iterator, unsigned int);
-#if defined(__SUNPRO_CC) || defined(__PGI)
-struct CompareIntDofBCData
-{
-  bool operator()(const unsigned int & other_dof_id,
-                  const DofBCData & dof_bc)
-  {
-    return other_dof_id < dof_bc.dof_id;
-  }
-
-  bool operator()(const DofBCData & dof_bc,
-                  const unsigned int & other_dof_id)
-  {
-    return dof_bc.dof_id < other_dof_id;
-  }
-};
-#endif
 
 template <class T, class U>
 struct libmesh_type_is_same {
@@ -1865,7 +1806,6 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
   // Version 0.9.2+ introduces unique ids
   read_serialized_bc_names(io, boundary_info, true);  // sideset names
 
-  std::vector<DofBCData> dof_bc_data;
   std::vector<T> input_buffer;
 
   new_header_id_type n_bcs=0;
@@ -1894,8 +1834,6 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
-      dof_bc_data.clear();
-      dof_bc_data.reserve (input_buffer.size()/3);
 
       // Look for BCs in this block for all the level-0 elements we have
       // (not just local ones).  Do this by checking all entries for
@@ -1983,8 +1921,6 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
   // Version 0.9.2+ introduces unique ids
   read_serialized_bc_names(io, boundary_info, false); // nodeset names
 
-  // TODO: Make a data object that works with both the element and nodal bcs
-  std::vector<DofBCData> node_bc_data;
   std::vector<T> input_buffer;
 
   new_header_id_type n_nodesets=0;
@@ -2013,8 +1949,6 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
-      node_bc_data.clear();
-      node_bc_data.reserve (input_buffer.size()/2);
 
       // Look for BCs in this block for all nodes we have (not just
       // local ones).  Do this by checking all entries for
