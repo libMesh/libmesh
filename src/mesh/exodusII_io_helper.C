@@ -949,7 +949,7 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
           for (unsigned int i=0; i<connect.size(); i+=num_nodes_per_edge)
             {
               auto edge = Elem::build(conv.libmesh_elem_type());
-              for (unsigned int n=0; n<num_nodes_per_edge; ++n)
+              for (int n=0; n<num_nodes_per_edge; ++n)
                 {
                   int exodus_node_id = connect[i+n];
                   int exodus_node_id_zero_based = exodus_node_id - 1;
@@ -961,6 +961,21 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
               // Compute key for the edge Elem we just built.
               dof_id_type edge_key = edge->key();
               libMesh::out << "edge_key = " << edge_key << std::endl;
+
+              // If this key is not found in the edge_map, which is
+              // supposed to include every edge in the Mesh, then we
+              // need to throw an error.
+              auto & elem_edge_pair_vec =
+                libmesh_map_find(edge_map, edge_key);
+
+              // Debugging: print potential elem/edge pairs which have
+              // the same key.
+              for (const auto & elem_edge_pair : elem_edge_pair_vec)
+                {
+                  libMesh::out << "Elem " << elem_edge_pair.first
+                               << ", Edge " << elem_edge_pair.second
+                               << std::endl;
+                }
             } // end loop over connectivity array
         }
     } // end for edge_block_id : edge_block_ids)
