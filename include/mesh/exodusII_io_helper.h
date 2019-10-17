@@ -521,8 +521,11 @@ public:
   // Total number of elements in all side sets
   int num_elem_all_sidesets;
 
-  // Vector of the block identification numbers
+  // Vector of element block identification numbers
   std::vector<int> block_ids;
+
+  // Vector of edge block identification numbers
+  std::vector<int> edge_block_ids;
 
   // Vector of nodes in an element
   std::vector<int> connect;

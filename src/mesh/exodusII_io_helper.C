@@ -548,6 +548,12 @@ void ExodusII_IO_Helper::read_header()
   num_elem_blk = params.num_elem_blk;
   num_node_sets = params.num_node_sets;
   num_side_sets = params.num_side_sets;
+  num_edge_blk = params.num_edge_blk;
+  num_edge = params.num_edge;
+
+  // Debugging: make sure that the edge block information is there to be read.
+  libMesh::out << "num_edge_blk = " << num_edge_blk << std::endl;
+  libMesh::out << "num_edge = " << num_edge << std::endl;
 
   this->read_num_time_steps();
 
@@ -708,6 +714,24 @@ void ExodusII_IO_Helper::read_block_info()
           id_to_block_names[block_ids[i]] = name_buffer;
         }
       message("All block names retrieved successfully.");
+    }
+
+  if (num_edge_blk)
+    {
+      // Read all edge block IDs.
+      edge_block_ids.resize(num_edge_blk);
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_EDGE_BLOCK,
+                                edge_block_ids.data());
+
+      EX_CHECK_ERR(ex_err, "Error getting edge block IDs.");
+      message("All edge block IDs retrieved successfully.");
+
+      // Debugging:
+      libMesh::out << "edge_block_ids=" << std::endl;
+      for (const auto & id : edge_block_ids)
+        libMesh::out << id << " ";
+      libMesh::out << std::endl;
     }
 }
 

@@ -198,7 +198,7 @@ void ExodusII_IO::read (const std::string & fname)
   // sequentially starting from 1 in the Exodus file.
   // libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->num_nodes), mesh.n_nodes());
 
-  // Get information about all the blocks
+  // Get information about all the element and edge blocks
   exio_helper->read_block_info();
 
   // Reserve space for the elements
