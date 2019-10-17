@@ -1898,8 +1898,8 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
       dof_bc_data.reserve (input_buffer.size()/3);
 
       // Look for BCs in this block for all the level-0 elements we have
-      // (not just local ones).  Do this by finding all the entries
-      // in dof_bc_data whose elem_id match the ID of the current element.
+      // (not just local ones).  Do this by checking all entries for
+      // IDs matching an element we can query.
       // We cannot rely on nullptr neighbors at this point since the neighbor
       // data structure has not been initialized.
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
@@ -2017,8 +2017,8 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       node_bc_data.reserve (input_buffer.size()/2);
 
       // Look for BCs in this block for all nodes we have (not just
-      // local ones).  Do this by finding all entries whose
-      // dof_id (node_id) match the ID of a node we can query.
+      // local ones).  Do this by checking all entries for
+      // IDs matching a node we can query.
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=2)
         {
           const dof_id_type dof_id =
