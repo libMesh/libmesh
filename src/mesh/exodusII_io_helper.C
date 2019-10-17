@@ -879,10 +879,10 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
   // Debugging:
   libMesh::out << "edge_map has " << edge_map.size() << " entries." << std::endl;
-  for (const auto & pr : edge_map)
-    libMesh::out << "key = " << pr.first << ", "
-                 << pr.second.size() << " entries."
-                 << std::endl;
+  // for (const auto & pr : edge_map)
+  //   libMesh::out << "key = " << pr.first << ", "
+  //                << pr.second.size() << " entries."
+  //                << std::endl;
 
   for (const auto & edge_block_id : edge_block_ids)
     {
@@ -938,6 +938,30 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
           for (const auto & exodus_node_id : connect)
             libMesh::out << exodus_node_id << " ";
           libMesh::out << std::endl;
+
+          // All edge types have an identity mapping from the corresponding
+          // Exodus type, so we don't need to bother with mapping ids, but
+          // we do need to know what kind of elements to build.
+          const auto & conv = get_conversion(std::string(elem_type.data()));
+
+          // Loop over indices in connectivity array, build edge elements,
+          // look them up in the edge_map.
+          for (unsigned int i=0; i<connect.size(); i+=num_nodes_per_edge)
+            {
+              auto edge = Elem::build(conv.libmesh_elem_type());
+              for (unsigned int n=0; n<num_nodes_per_edge; ++n)
+                {
+                  int exodus_node_id = connect[i+n];
+                  int exodus_node_id_zero_based = exodus_node_id - 1;
+                  int libmesh_node_id = node_num_map[exodus_node_id_zero_based] - 1;
+
+                  edge->set_node(n) = mesh.node_ptr(libmesh_node_id);
+                }
+
+              // Compute key for the edge Elem we just built.
+              dof_id_type edge_key = edge->key();
+              libMesh::out << "edge_key = " << edge_key << std::endl;
+            } // end loop over connectivity array
         }
     } // end for edge_block_id : edge_block_ids)
 }
