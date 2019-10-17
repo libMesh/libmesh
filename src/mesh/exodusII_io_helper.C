@@ -968,13 +968,38 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
               auto & elem_edge_pair_vec =
                 libmesh_map_find(edge_map, edge_key);
 
-              // Debugging: print potential elem/edge pairs which have
-              // the same key.
               for (const auto & elem_edge_pair : elem_edge_pair_vec)
                 {
-                  libMesh::out << "Elem " << elem_edge_pair.first
-                               << ", Edge " << elem_edge_pair.second
-                               << std::endl;
+                  // We only want to match edges which have the same
+                  // orientation (node ordering) to the one in the
+                  // Exodus file, otherwise we ignore this elem_edge_pair.
+                  //
+                  // Note: this also handles the situation where two
+                  // edges have the same key (hash collision) as then
+                  // this check avoids a false positive.
+
+                  // Build edge indicated by elem_edge_pair
+                  auto candidate_edge =
+                    mesh.elem_ptr(elem_edge_pair.first)->
+                    build_edge_ptr(elem_edge_pair.second);
+
+                  bool is_match = true;
+                  for (int n=0; n<num_nodes_per_edge; ++n)
+                    {
+                      if (candidate_edge->node_id(n) != edge->node_id(n))
+                        {
+                          is_match = false;
+                          break;
+                        }
+                    }
+
+                  if (is_match)
+                    // Debugging: print potential elem/edge pairs which have
+                    // the same key.
+                    libMesh::out << "Elem " << elem_edge_pair.first
+                                 << ", Edge " << elem_edge_pair.second
+                                 << " is a match."
+                                 << std::endl;
                 }
             } // end loop over connectivity array
         }
