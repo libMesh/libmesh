@@ -1751,6 +1751,23 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       std::unique_ptr<const Elem> edge =
         mesh.elem_ptr(elem_id)->build_edge_ptr(edge_id);
 
+      // Error checking: make sure that all edges in this block are
+      // the same geometric type.
+      auto check_it = edge_id_to_elem_type.find(b_id);
+
+      if (check_it == edge_id_to_elem_type.end())
+        {
+          // Keep track of the ElemType and number of nodes in this boundary id.
+          edge_id_to_elem_type[b_id] = std::make_pair(edge->type(), edge->n_nodes());
+        }
+      else
+        {
+          // Make sure the existing data is consistent
+          auto & val_pair = check_it->second;
+          if (val_pair.first != edge->type() || val_pair.second != edge->n_nodes())
+            libmesh_error_msg("All edges in a block must have same geometric type.");
+        }
+
       // Get reference to the connectivity array for this block
       auto & conn = edge_id_to_conn[b_id];
 
@@ -1761,7 +1778,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       for (auto n : edge->node_index_range())
         {
           dof_id_type libmesh_node_id = edge->node_ptr(n)->id();
-          // libMesh::out << libmesh_node_id << " ";
 
           int exodus_node_id =
             libmesh_map_find(libmesh_node_num_to_exodus,
@@ -1769,9 +1785,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
           conn.push_back(exodus_node_id);
         }
-
-      // Keep track of the ElemType and number of nodes in this boundary id.
-      edge_id_to_elem_type[b_id] = std::make_pair(edge->type(), edge->n_nodes());
     }
 
   // Make sure we have the same number of edge ids that we thought we would.
