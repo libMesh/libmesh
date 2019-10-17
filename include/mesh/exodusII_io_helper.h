@@ -644,6 +644,7 @@ public:
 
   // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
+  std::map<int, std::string> id_to_edge_block_names;
   std::map<int, std::string> id_to_ss_names;
   std::map<int, std::string> id_to_ns_names;
 
