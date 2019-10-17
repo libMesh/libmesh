@@ -1799,6 +1799,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   std::vector<int> num_nodes_per_edge_vec;
   std::vector<int> num_attr_edge_vec;
 
+  // We also build a data structure of edge block names which can
+  // later be passed to exII::ex_put_names().
+  NamesData edge_block_names_table(num_edge_blk, MAX_STR_LENGTH);
+
   // Note: We are going to use the edge **boundary** ids as **block** ids.
   for (const auto & pr : edge_id_to_conn)
     {
@@ -1821,28 +1825,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
       // We don't store any attributes currently
       num_attr_edge_vec.push_back(0);
+
+      // Store the name of this edge block
+      edge_block_names_table.push_back_entry(bi.get_edgeset_name(id));
     }
-
-  // Debugging:
-  libMesh::out << "edge_blk_id = " << std::endl;
-  for (unsigned int i=0; i<edge_blk_id.size(); ++i)
-    libMesh::out << edge_blk_id[i] << " ";
-  libMesh::out << std::endl;
-
-  libMesh::out << "num_edge_this_blk_vec = " << std::endl;
-  for (unsigned int i=0; i<num_edge_this_blk_vec.size(); ++i)
-    libMesh::out << num_edge_this_blk_vec[i] << " ";
-  libMesh::out << std::endl;
-
-  libMesh::out << "num_nodes_per_edge_vec = " << std::endl;
-  for (unsigned int i=0; i<num_nodes_per_edge_vec.size(); ++i)
-    libMesh::out << num_nodes_per_edge_vec[i] << " ";
-  libMesh::out << std::endl;
-
-  libMesh::out << "num_attr_edge_vec = " << std::endl;
-  for (unsigned int i=0; i<num_attr_edge_vec.size(); ++i)
-    libMesh::out << num_attr_edge_vec[i] << " ";
-  libMesh::out << std::endl;
 
   // Zero-initialize and then fill in an exII::ex_block_params struct
   // with the data we have collected. This new API replaces the old
@@ -1995,7 +1981,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   if (num_elem_blk > 0)
     {
       ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_BLOCK, names_table.get_char_star_star());
-      EX_CHECK_ERR(ex_err, "Error writing element names");
+      EX_CHECK_ERR(ex_err, "Error writing element block names");
     }
 
   // Write out edge blocks if we have any
@@ -2009,6 +1995,16 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
          nullptr,          // elem_edge_conn (unused)
          nullptr);         // elem_face_conn (unused)
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
+    }
+
+  // Write out the edge block names, if any.
+  if (num_edge_blk > 0)
+    {
+      ex_err = exII::ex_put_names
+        (ex_id,
+         exII::EX_EDGE_BLOCK,
+         edge_block_names_table.get_char_star_star());
+      EX_CHECK_ERR(ex_err, "Error writing edge block names");
     }
 }
 
