@@ -880,7 +880,31 @@ void ExodusII_IO_Helper::read_edge_blocks()
       libMesh::out << "num_edges_per_edge = " << num_edges_per_edge << std::endl;
       libMesh::out << "num_faces_per_edge = " << num_faces_per_edge << std::endl;
       libMesh::out << "num_attr_per_edge = " << num_attr_per_edge << std::endl;
-    }
+
+      // Read in the connectivity of the edges of this block,
+      // watching out for the case where we actually have no
+      // elements in this block (possible with parallel files)
+      connect.resize(num_nodes_per_edge * num_edge_this_blk);
+
+      if (!connect.empty())
+        {
+          ex_err = exII::ex_get_conn(ex_id,
+                                     exII::EX_EDGE_BLOCK,
+                                     edge_block_id,
+                                     connect.data(), // node_conn
+                                     nullptr,        // elem_edge_conn (unused)
+                                     nullptr);       // elem_face_conn (unused)
+
+          EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
+          message("Connectivity retrieved successfully for block: ", edge_block_id);
+
+          // Debugging:
+          libMesh::out << "connect.size() = " << connect.size() << std::endl;
+          for (const auto & exodus_node_id : connect)
+            libMesh::out << exodus_node_id << " ";
+          libMesh::out << std::endl;
+        }
+    } // end for edge_block_id : edge_block_ids)
 }
 
 
