@@ -1518,6 +1518,7 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   _node_boundary_ids.erase(id);
   _ss_id_to_name.erase(id);
   _ns_id_to_name.erase(id);
+  _es_id_to_name.erase(id);
 
   // Erase pointers to geometric entities with this id.
   for (auto it = _boundary_node_id.begin(); it != _boundary_node_id.end(); /*below*/)
@@ -2390,6 +2391,23 @@ std::string & BoundaryInfo::nodeset_name(boundary_id_type id)
   return _ns_id_to_name[id];
 }
 
+const std::string & BoundaryInfo::get_edgeset_name(boundary_id_type id) const
+{
+  static const std::string empty_string;
+  std::map<boundary_id_type, std::string>::const_iterator it =
+    _es_id_to_name.find(id);
+  if (it == _es_id_to_name.end())
+    return empty_string;
+  else
+    return it->second;
+}
+
+
+std::string & BoundaryInfo::edgeset_name(boundary_id_type id)
+{
+  return _es_id_to_name[id];
+}
+
 boundary_id_type BoundaryInfo::get_id_by_name(const std::string & name) const
 {
   // Search sidesets
@@ -2402,8 +2420,13 @@ boundary_id_type BoundaryInfo::get_id_by_name(const std::string & name) const
     if (pr.second == name)
       return pr.first;
 
-  // If we made it here without returning, we don't have a sideset or
-  // nodeset by the requested name, so return invalid_id
+  // Search edgesets
+  for (const auto & pr : _es_id_to_name)
+    if (pr.second == name)
+      return pr.first;
+
+  // If we made it here without returning, we don't have a sideset,
+  // nodeset, or edgeset by the requested name, so return invalid_id
   return invalid_id;
 }
 

@@ -847,6 +847,16 @@ public:
   std::string & nodeset_name(boundary_id_type id);
 
   /**
+   * \returns A const reference to an optional edgeset name.
+   */
+  const std::string & get_edgeset_name(boundary_id_type id) const;
+
+  /**
+   * \returns A writable reference to an optional edgeset name.
+   */
+  std::string & edgeset_name(boundary_id_type id);
+
+  /**
    * \returns The id of the named boundary if it exists, \p invalid_id
    * otherwise.
    */
@@ -867,6 +877,14 @@ public:
   { return _ns_id_to_name; }
   const std::map<boundary_id_type, std::string> & get_nodeset_name_map () const
   { return _ns_id_to_name; }
+
+  /**
+   * \returns Writable/const reference to the edgeset name map.
+   */
+  std::map<boundary_id_type, std::string> & set_edgeset_name_map ()
+  { return _es_id_to_name; }
+  const std::map<boundary_id_type, std::string> & get_edgeset_name_map () const
+  { return _es_id_to_name; }
 
   /**
    * Number used for internal use. This is the return value
@@ -984,6 +1002,13 @@ private:
    * this is only implemented for ExodusII
    */
   std::map<boundary_id_type, std::string> _ns_id_to_name;
+
+  /**
+   * This structure maintains the mapping of named edge sets
+   * for file formats that support named blocks.  Currently
+   * this is only implemented for ExodusII
+   */
+  std::map<boundary_id_type, std::string> _es_id_to_name;
 };
 
 } // namespace libMesh
