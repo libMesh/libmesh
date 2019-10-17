@@ -1735,8 +1735,12 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // Build the connectivity array for each edge block. The connectivity array
   // is a vector<int> with "num_edges * num_nodes_per_edge" entries. We write
   // the Exodus node numbers to the connectivity arrays so that they can
-  // be used directly in the calls to exII::ex_put_conn() below.
+  // be used directly in the calls to exII::ex_put_conn() below. We also keep
+  // track of the ElemType and the number of nodes for each boundary_id. All
+  // edges with a given boundary_id must be of the same type.
   std::map<boundary_id_type, std::vector<int>> edge_id_to_conn;
+  std::map<boundary_id_type, std::pair<ElemType, unsigned int>> edge_id_to_elem_type;
+
   for (const auto & t : edge_tuples)
     {
       dof_id_type elem_id = std::get<0>(t);
@@ -1765,6 +1769,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
           conn.push_back(exodus_node_id);
         }
+
+      // Keep track of the ElemType and number of nodes in this boundary id.
+      edge_id_to_elem_type[b_id] = std::make_pair(edge->type(), edge->n_nodes());
     }
 
   // Make sure we have the same number of edge ids that we thought we would.
@@ -1790,9 +1797,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
       edge_blk_id.push_back(id);
 
-      // Hard-coded for linear edges at the moment.
-      edge_type_table.push_back_entry("EDGE2");
-      num_nodes_per_edge_vec.push_back(2);
+      // Set Exodus element type and number of nodes for this edge block.
+      const auto & elem_type_node_count = edge_id_to_elem_type[id];
+      const auto & conv = get_conversion(elem_type_node_count.first);
+      edge_type_table.push_back_entry(conv.exodus_type.c_str());
+      num_nodes_per_edge_vec.push_back(elem_type_node_count.second);
 
       // The count that we determined earlier.
       num_edge_this_blk_vec.push_back(count);
