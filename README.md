@@ -58,9 +58,9 @@ the same source tree by creating a subdirectory for each compiler build:
 
 
 ## Dependencies
-libMesh has no required dependencies other than a reasonably modern C
-& C++ compiler.  To run on distributed memory platforms in parallel,
-you will also need MPI.
+libMesh has no required dependencies other than a C++ compiler which
+fully supports the C++11 standard. To run on distributed memory
+platforms in parallel, you will also need MPI.
 
 ## Optional Packages
 We support a [large number](http://libmesh.github.io/externalsoftware.html) of
