@@ -2016,40 +2016,21 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       node_bc_data.clear();
       node_bc_data.reserve (input_buffer.size()/2);
 
-      // convert the input_buffer to DofBCData to facilitate searching
+      // Look for BCs in this block for all nodes we have (not just
+      // local ones).  Do this by finding all entries whose
+      // dof_id (node_id) match the ID of a node we can query.
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=2)
-        node_bc_data.push_back
-          (DofBCData(cast_int<dof_id_type>(input_buffer[idx+0]),
-                     0,
-                     cast_int<boundary_id_type>(input_buffer[idx+1])));
-      input_buffer.clear();
-      // note that while the files *we* write should already be sorted by
-      // node id this is not necessarily guaranteed.
-      std::sort (node_bc_data.begin(), node_bc_data.end());
-
-      // Look for BCs in this block for all nodes we have
-      // (not just local ones).  Do this by finding all the entries
-      // in node_bc_data whose dof_id(node_id)  match the ID of the current node.
-      for (auto & node : mesh.node_ptr_range())
         {
-          std::pair<std::vector<DofBCData>::iterator,
-                    std::vector<DofBCData>::iterator> bounds =
-            std::equal_range (node_bc_data.begin(),
-                              node_bc_data.end(),
-                              node->id()
-#if defined(__SUNPRO_CC) || defined(__PGI)
-                              , CompareIntDofBCData()
-#endif
-                              );
+          const dof_id_type dof_id =
+            cast_int<dof_id_type>(input_buffer[idx+0]);
+          const boundary_id_type bc_id =
+            cast_int<boundary_id_type>(input_buffer[idx+1]);
 
-          for (const auto & data : as_range(bounds))
-            {
-              // Note: dof_id from ElmeBCData is being used to hold node_id here
-              libmesh_assert_equal_to (data.dof_id, node->id());
-
-              boundary_info.add_node (node, data.bc_id);
-            }
+          const Node * node = mesh.query_node_ptr(dof_id);
+          if (node)
+            boundary_info.add_node (node, bc_id);
         }
+      input_buffer.clear();
     }
 }
 
