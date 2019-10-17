@@ -729,6 +729,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
 
   std::size_t n_written=0;
 
+  MeshBase::const_node_iterator       node_iter = mesh.local_nodes_begin();
+  const MeshBase::const_node_iterator nodes_end = mesh.local_nodes_end();
+
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -740,19 +743,22 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       xfer_ids.clear();
       xfer_coords.clear();
 
-      for (const auto & node : mesh.local_node_ptr_range())
-        if ((node->id() >= first_node) && // node in [first_node, last_node)
-            (node->id() <  last_node))
-          {
-            xfer_ids.push_back(node->id());
-            xfer_coords.push_back((*node)(0));
+      for (; node_iter != nodes_end; ++node_iter)
+        {
+          const Node & node = **node_iter;
+          libmesh_assert_greater_equal(node.id(), first_node);
+          if (node.id() >= last_node)
+            break;
+
+          xfer_ids.push_back(node.id());
+          xfer_coords.push_back(node(0));
 #if LIBMESH_DIM > 1
-            xfer_coords.push_back((*node)(1));
+          xfer_coords.push_back(node(1));
 #endif
 #if LIBMESH_DIM > 2
-            xfer_coords.push_back((*node)(2));
+          xfer_coords.push_back(node(2));
 #endif
-          }
+        }
 
       //-------------------------------------
       // Send the xfer buffers to processor 0
