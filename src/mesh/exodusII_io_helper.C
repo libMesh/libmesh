@@ -552,10 +552,6 @@ void ExodusII_IO_Helper::read_header()
   num_edge_blk = params.num_edge_blk;
   num_edge = params.num_edge;
 
-  // Debugging: make sure that the edge block information is there to be read.
-  libMesh::out << "num_edge_blk = " << num_edge_blk << std::endl;
-  libMesh::out << "num_edge = " << num_edge << std::endl;
-
   this->read_num_time_steps();
 
   ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
@@ -738,19 +734,6 @@ void ExodusII_IO_Helper::read_block_info()
           id_to_edge_block_names[edge_block_ids[i]] = name_buffer;
         }
       message("All edge block names retrieved successfully.");
-
-      // Debugging:
-      // libMesh::out << "edge_block_ids=" << std::endl;
-      // for (const auto & id : edge_block_ids)
-      //   libMesh::out << id << " ";
-      // libMesh::out << std::endl;
-
-      // Debugging:
-      libMesh::out << "edge block names=" << std::endl;
-      for (const auto & pr : id_to_edge_block_names)
-        libMesh::out << "Block id = " << pr.first
-                     << ", name = " << pr.second
-                     << std::endl;
     }
 }
 
@@ -1001,6 +984,9 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                     }
                 } // end loop over elem_edge_pairs
             } // end loop over connectivity array
+
+          // Set edgeset name in the BoundaryInfo object.
+          bi.edgeset_name(edge_block_id) = id_to_edge_block_names[edge_block_id];
         } // end if !connect.empty()
     } // end for edge_block_id : edge_block_ids
 }
