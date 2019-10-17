@@ -289,7 +289,7 @@ void ExodusII_IO::read (const std::string & fname)
 
   // Read in edge blocks, storing information in the BoundaryInfo object.
   // Edge blocks are treated as BCs.
-  exio_helper->read_edge_blocks();
+  exio_helper->read_edge_blocks(mesh);
 
   // Set the mesh dimension to the largest encountered for an element
   for (unsigned char i=0; i!=4; ++i)

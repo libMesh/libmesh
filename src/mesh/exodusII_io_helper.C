@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cstdlib> // std::strtol
+#include <unordered_map>
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/enum_elem_type.h"
@@ -847,8 +848,42 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 
 
 
-void ExodusII_IO_Helper::read_edge_blocks()
+void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 {
+  // Check for quick return if there are no edge blocks.
+  if (num_edge_blk == 0)
+    return;
+
+  // Build data structure that we can quickly search for edges
+  // and then add required BoundaryInfo information. This is a
+  // map from edge->key() to a list of (elem_id, edge_id) pairs
+  // for the Edge in question. Since edge->key() is edge orientation
+  // invariant, this map does not distinguish different orientations
+  // of the same Edge.
+  typedef std::pair<dof_id_type, unsigned int> ElemEdgePair;
+  std::unordered_map<dof_id_type, std::vector<ElemEdgePair>> edge_map;
+  for (const auto & elem : mesh.element_ptr_range())
+    for (auto e : elem->edge_index_range())
+      {
+        // TODO: Make various Elem::compute_key() functions
+        // unprotected, this would allow us to avoid calling
+        // build_edge_ptr() repeatedly in case that turns out to be
+        // a bottleneck.
+        std::unique_ptr<Elem> edge = elem->build_edge_ptr(e);
+        dof_id_type edge_key = edge->key();
+
+        // Creates vector if not already there
+        auto & vec = edge_map[edge_key];
+        vec.push_back(std::make_pair(elem->id(), e));
+      }
+
+  // Debugging:
+  libMesh::out << "edge_map has " << edge_map.size() << " entries." << std::endl;
+  for (const auto & pr : edge_map)
+    libMesh::out << "key = " << pr.first << ", "
+                 << pr.second.size() << " entries."
+                 << std::endl;
+
   for (const auto & edge_block_id : edge_block_ids)
     {
       // exII::ex_get_block() output parameters.  Unlike the other

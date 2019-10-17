@@ -202,7 +202,7 @@ public:
   /**
    * Read in edge blocks, storing information in the BoundaryInfo object.
    */
-  void read_edge_blocks();
+  void read_edge_blocks(MeshBase & mesh);
 
   /**
    * Reads the optional \p node_num_map from the \p ExodusII mesh
