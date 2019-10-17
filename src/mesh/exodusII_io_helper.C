@@ -1895,6 +1895,27 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       ++counter;
     }
 
+  // In the case of discontinuous plotting we initialize a map from
+  // (element, node) pairs to the corresponding discontinuous node index.
+  // This ordering must match the ordering used in write_nodal_coordinates.
+  //
+  // Note: This map takes the place of the libmesh_node_num_to_exodus map in
+  // the discontinuous case.
+  std::map<std::pair<dof_id_type, unsigned int>, dof_id_type> discontinuous_node_indices;
+  if (use_discontinuous)
+  {
+    dof_id_type node_counter = 1; // Exodus numbering is 1-based
+    for (const auto & elem : mesh.active_element_ptr_range())
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        {
+          std::pair<dof_id_type,unsigned int> id_pair;
+          id_pair.first = elem->id();
+          id_pair.second = n;
+          discontinuous_node_indices[id_pair] = node_counter;
+          node_counter++;
+        }
+  }
+
   // Reference to the BoundaryInfo object for convenience.
   const BoundaryInfo & bi = mesh.get_boundary_info();
 
@@ -1948,9 +1969,36 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         {
           dof_id_type libmesh_node_id = edge->node_ptr(n)->id();
 
-          int exodus_node_id =
-            libmesh_map_find(libmesh_node_num_to_exodus,
-                             cast_int<int>(libmesh_node_id));
+          // We look up Exodus node numbers differently if we are
+          // writing a discontinuous Exodus file.
+          int exodus_node_id = -1;
+
+          if (!use_discontinuous)
+            exodus_node_id = libmesh_map_find
+              (libmesh_node_num_to_exodus, cast_int<int>(libmesh_node_id));
+          else
+            {
+              // Find the node on the "parent" element containing this edge
+              // which matches libmesh_node_id. Then use that id to look up
+              // the exodus_node_id in the discontinuous_node_indices map.
+              //
+              // TODO: This should also be given by e.g.:
+              // Hex8::edge_nodes_map[edge_id][n]. Note: we have something
+              // like this for sides, Elem::which_node_am_i(), but nothing
+              // equivalent for edges.
+              const Elem * parent = mesh.elem_ptr(elem_id);
+              for (auto pn : parent->node_index_range())
+                if (parent->node_ptr(pn)->id() == libmesh_node_id)
+                  {
+                    exodus_node_id = libmesh_map_find
+                      (discontinuous_node_indices,
+                       std::make_pair(elem_id, pn));
+                    break;
+                  }
+            }
+
+          if (exodus_node_id == -1)
+            libmesh_error_msg("Unable to map edge's libMesh node id to its Exodus node id.");
 
           conn.push_back(exodus_node_id);
         }
@@ -2034,24 +2082,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
   // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
   unsigned libmesh_elem_num_to_exodus_counter = 0;
-
-  // In the case of discontinuous plotting we initialize a map from (element,node) pairs
-  // to the corresponding discontinuous node index. This ordering must match the ordering
-  // used in write_nodal_coordinates.
-  std::map< std::pair<dof_id_type,unsigned int>, dof_id_type > discontinuous_node_indices;
-  if (use_discontinuous)
-  {
-    dof_id_type node_counter = 1; // Exodus numbering is 1-based
-    for (const auto & elem : mesh.active_element_ptr_range())
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
-        {
-          std::pair<dof_id_type,unsigned int> id_pair;
-          id_pair.first = elem->id();
-          id_pair.second = n;
-          discontinuous_node_indices[id_pair] = node_counter;
-          node_counter++;
-        }
-  }
 
   for (auto & pr : subdomain_map)
     {
