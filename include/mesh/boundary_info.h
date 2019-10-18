@@ -175,24 +175,30 @@ public:
 
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
-   * information data structures.
+   * information data structures. \p from_side indicates whether
+   * this node is being added from a sideset
    */
   void add_node (const Node * node,
-                 const boundary_id_type id);
+                 const boundary_id_type id,
+                 bool from_side = false);
 
   /**
    * Add node number \p node with boundary id \p id to the boundary
-   * information data structures.
+   * information data structures. \p from_side indicates whether
+   * this node is being added from a sideset
    */
   void add_node (const dof_id_type node,
-                 const boundary_id_type id);
+                 const boundary_id_type id,
+                 bool from_side = false);
 
   /**
    * Add \p Node \p node with boundary ids \p ids to the boundary
-   * information data structure.
+   * information data structure. \p from_side indicates whether
+   * this node is being added from a sideset
    */
   void add_node (const Node * node,
-                 const std::vector<boundary_id_type> & ids);
+                 const std::vector<boundary_id_type> & ids,
+                 bool from_side = false);
 
   /**
    * Clears all the boundary information from all of the nodes in the mesh
@@ -920,6 +926,17 @@ private:
                 boundary_id_type> _boundary_node_id;
 
   /**
+   * Map from nodeset nodes to their boundary IDs
+   *
+   * \note Unlike \p _boundary_node_id, this structure only contains
+   * nodes coming from nodesets. E.g. this will
+   * not contain nodes coming from \p build_node_list_from_side_list
+   */
+  std::multimap<const Node *,
+                boundary_id_type> _boundary_node_id_from_nodeset;
+
+
+  /**
    * Data structure that maps edges of elements
    * to boundary ids. This is only relevant in 3D.
    */
@@ -978,6 +995,15 @@ private:
    * _shellface_boundary_ids.
    */
   std::set<boundary_id_type> _node_boundary_ids;
+
+  /**
+   * Set of user-specified boundary IDs for nodesets.
+   *
+   * \note Unlike \p _node_boundary_ids, this set only contains
+   * boundary IDs for nodes coming from nodesets. E.g. this will
+   * not contain IDs for nodes coming from \p build_node_list_from_side_list
+   */
+  std::set<boundary_id_type> _node_from_nodeset_boundary_ids;
 
   /**
    * Set of user-specified boundary IDs for shellfaces *only*.

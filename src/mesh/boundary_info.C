@@ -106,12 +106,14 @@ BoundaryInfo::~BoundaryInfo()
 void BoundaryInfo::clear()
 {
   _boundary_node_id.clear();
+  _boundary_node_id_from_nodeset.clear();
   _boundary_side_id.clear();
   _boundary_edge_id.clear();
   _boundary_shellface_id.clear();
   _boundary_ids.clear();
   _side_boundary_ids.clear();
   _node_boundary_ids.clear();
+  _node_from_nodeset_boundary_ids.clear();
   _edge_boundary_ids.clear();
   _shellface_boundary_ids.clear();
 }
@@ -581,7 +583,8 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
 
 void BoundaryInfo::add_node(const dof_id_type node_id,
-                            const boundary_id_type id)
+                            const boundary_id_type id,
+                            bool from_side)
 {
   const Node * node_ptr = _mesh.query_node_ptr(node_id);
 
@@ -590,13 +593,14 @@ void BoundaryInfo::add_node(const dof_id_type node_id,
   if (!node_ptr)
     libmesh_error_msg("BoundaryInfo::add_node(): Could not retrieve pointer for node " << node_id << ", no boundary id was added.");
 
-  this->add_node (node_ptr, id);
+  this->add_node (node_ptr, id, from_side);
 }
 
 
 
 void BoundaryInfo::add_node(const Node * node,
-                            const boundary_id_type id)
+                            const boundary_id_type id,
+                            bool from_side)
 {
   if (id == invalid_id)
     libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
@@ -611,12 +615,18 @@ void BoundaryInfo::add_node(const Node * node,
   _boundary_node_id.insert(std::make_pair(node, id));
   _boundary_ids.insert(id);
   _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
+  if (!from_side)
+  {
+    _boundary_node_id_from_nodeset.insert(std::make_pair(node, id));
+    _node_from_nodeset_boundary_ids.insert(id);
+  }
 }
 
 
 
 void BoundaryInfo::add_node(const Node * node,
-                            const std::vector<boundary_id_type> & ids)
+                            const std::vector<boundary_id_type> & ids,
+                            bool from_side)
 {
   if (ids.empty())
     return;
@@ -656,6 +666,11 @@ void BoundaryInfo::add_node(const Node * node,
       _boundary_node_id.insert(std::make_pair(node,id));
       _boundary_ids.insert(id);
       _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
+      if (!from_side)
+      {
+        _boundary_node_id_from_nodeset.insert(std::make_pair(node, id));
+        _node_from_nodeset_boundary_ids.insert(id);
+      }
     }
 }
 
@@ -664,6 +679,7 @@ void BoundaryInfo::add_node(const Node * node,
 void BoundaryInfo::clear_boundary_node_ids()
 {
   _boundary_node_id.clear();
+  _boundary_node_id_from_nodeset.clear();
 }
 
 void BoundaryInfo::add_edge(const dof_id_type e,
@@ -1323,6 +1339,8 @@ void BoundaryInfo::remove (const Node * node)
 
   // Erase everything associated with node
   _boundary_node_id.erase (node);
+  if (_boundary_node_id_from_nodeset.find(node) != _boundary_node_id_from_nodeset.end())
+    _boundary_node_id_from_nodeset.erase(node);
 }
 
 
@@ -1778,6 +1796,10 @@ BoundaryInfo::build_node_list() const
 void
 BoundaryInfo::build_node_list_from_side_list()
 {
+  // Reset the node data
+  _boundary_node_id = _boundary_node_id_from_nodeset;
+  _node_boundary_ids = _node_from_nodeset_boundary_ids;
+
   // If we're on a distributed mesh, even the owner of a node is not
   // guaranteed to be able to properly assign its new boundary id(s)!
   // Nodal neighbors are not always ghosted, and a nodal neighbor
@@ -1816,7 +1838,7 @@ BoundaryInfo::build_node_list_from_side_list()
           for (auto i : side->node_index_range())
             {
               const boundary_id_type bcid = pr.second.second;
-              this->add_node(side->node_ptr(i), bcid);
+              this->add_node(side->node_ptr(i), bcid, true);
               if (!mesh_is_serial)
                 {
                   const processor_id_type proc_id =
@@ -1862,7 +1884,7 @@ BoundaryInfo::build_node_list_from_side_list()
         (Parallel::any_source, received_nodes, node_pushes_tag);
 
       for (const auto & pr : received_nodes)
-        this->add_node(_mesh.node_ptr(pr.first), pr.second);
+        this->add_node(_mesh.node_ptr(pr.first), pr.second, true);
     }
 
   // At this point we should know all the BCs for our own nodes; now
@@ -1945,7 +1967,7 @@ BoundaryInfo::build_node_list_from_side_list()
         (source_pid, response, node_responses_tag);
 
       for (const auto & pr : response)
-        this->add_node(_mesh.node_ptr(pr.first), pr.second);
+        this->add_node(_mesh.node_ptr(pr.first), pr.second, true);
     }
 
   Parallel::wait (node_push_requests);
