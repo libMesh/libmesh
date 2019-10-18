@@ -65,6 +65,7 @@ unit_tests_sources = \
   mesh/mapped_subdomain_partitioner_test.C \
   mesh/mesh_function_dfem.C \
   mesh/write_sideset_data.C \
+  mesh/write_edgeset_data.C \
   mesh/write_vec_and_scalar.C \
   numerics/composite_function_test.C \
   numerics/coupling_matrix_test.C \
@@ -221,7 +222,8 @@ CLEANFILES = cube_mesh.xda \
 	     out.e \
 	     mesh_with_soln.e \
 	     elemental_from_nodal.e \
-             write_sideset_data.e
+             write_sideset_data.e \
+             write_edgeset_data.e
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
