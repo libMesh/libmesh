@@ -1610,8 +1610,12 @@ void ExodusII_IO_Helper::create(std::string filename)
 
 void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh, bool use_discontinuous)
 {
-  // n_active_elem() is a parallel_only function
+  // The majority of this function only executes on processor 0, so any functions
+  // which are collective, like n_active_elem() or n_edge_conds() must be called
+  // before the processors' execution paths diverge.
   unsigned int n_active_elem = mesh.n_active_elem();
+  const BoundaryInfo & bi = mesh.get_boundary_info();
+  num_edge = bi.n_edge_conds();
 
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1639,7 +1643,6 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
         num_nodes += elem->n_nodes();
     }
 
-  const BoundaryInfo & bi = mesh.get_boundary_info();
   std::vector<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
 
@@ -1691,7 +1694,6 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // We write a separate edge block for each unique boundary id that
   // we have.
   num_edge_blk = bi.get_edge_boundary_ids().size();
-  num_edge = bi.n_edge_conds();
 
   // Build an ex_init_params() structure that is to be passed to the
   // newer ex_put_init_ext() API. The new API will eventually allow us
