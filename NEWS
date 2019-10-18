@@ -1,3 +1,127 @@
+1.4.1 -> 1.5.0
+  * Write Exodus files in netCDF-4 format when HDF5 is available.
+  * Add left multiply (by vector) method to type_tensor
+  * Update bundled netCDF from version 4.4.1.1 to 4.6.2, remove netCDF-3 source.
+  * Handle different combinations of METIS/ParMETIS in PETSc.
+  * Add --enable-capnp-required configure option.
+  * Add surface-terms and gradients to misc_ex14.
+  * Infinite elements fixes
+    -Dimension of the local_transform object corrected
+    -Allow infinite elements in System::point_gradient()
+    -Fixed diagonal in InfHex::contains_point()
+    -Reorganisation in InfFE::init_face_shape_functions()
+    -Fix memory leak in inf_fe_boundary.C
+    -Replace unrolled loops in legendre_eval() and jacobi_eval().
+  * Add _extra_parameters map to RBParameters.
+  * Add support for PETSc GMG (Boris Boutkov).
+    -Support complex numbers.
+    -Unit test coverage.
+  * ReplicatedMesh::add_elem(): fix missing unique id update.
+  * Add ability to skip "non-critical" partitioning when updating mesh.
+  * configure:
+    -match PETSc 64/32-bit index sizes when possible instead of throwing an error.
+    -Support SLEPC installed by PETSc.
+  * Bug fix: Close residual/vector before applying constraints.
+  * Run fem_sys_ex1 with GMG+FS options.
+  * Add is_zero() to TypeVector and TypeTensor.
+  * Bug fix: FEInterface::get_continuity() should take a const reference.
+  * Add DofMap::swap_dof_constraints() API.
+  * Add subdomain iteration range objects
+    -active_subdomain_set_elements_ptr_range
+    -active_subdomain_elements_ptr_range
+    -active_local_subdomain_elements_ptr_range
+  * GmshIO:
+    -Add support for reading gmsh-4 files.
+    -Enable reading of meshes with a mix of 1, 2, and 3D elements.
+  * Drop VecScatterCreateWithData() workaround. This PETSc rename did not happen.
+  * Add non-blocking exchange (NBX) for pushing/pulling data.
+  * DenseMatrix:
+    -Add support for DualNumber.
+    -Add DenseMatrix::sub_matrix().
+  * Add outer product for TypeVectors.
+  * Fix remote_elem copying in UnstructuredMesh.
+  * Add OverlappingCoupling GhostingFunctor, unit tests.
+  * Fix 2006 bug with refinement within ES::reinit().
+  * Bug fix: Don't constrain hanging nodes at variable boundary.
+  * Rewrite GenericProjector
+    -Add Lagrange interpolation optimization.
+    -Fix threading.
+    -Add unit tests.
+  * Add "extra integers" support.
+    -MeshBase::get_*_integer_index API
+    -MeshBase::add_elem_integer() API
+    -MeshBase::add_node_integer() API
+    -Add Systems with extra integers.
+    -Unit tests
+    -CheckpointIO support
+  * Bug fix: Improve NodeElem support in ReplicatedMesh::stitch_meshes().
+  * Add FEMContext::interior_rate_gradient().
+  * Drop long-deprecated Elem APIs.
+    -Elem::node()
+    -Elem::get_node()
+    -Elem::neighbor()
+    -Elem::side()
+    -Elem::build_side()
+    -Elem::build_edge()
+    -Elem::child()
+  * Bug fix: DofMap::local_variable_indices().
+  * Several contrib/metaphysicl submodule updates (latest is 0.6.0)
+  * ExodusII_IO:
+    -Fix indexing issue in read_elemental_var_values().
+    -Improve support for scalar variables.
+    -Read/write all nodesets simultaneously.
+    -Use nodal map when reading nodal variables.
+    -Add read_sideset_data()
+    -Add write_sideset_data()
+  * Bug fix: avoid NaNs in block restricted vector variables when using PETSc 3.8.3
+  * Improve diagnostic message when cpr header can't be opened.
+  * Add Communicator::split_by_type(), unit tests.
+  * Add support for PETSc-3.11.x.
+  * Quadrature:
+    -Don't pass p_level and type as parameters, use class members.
+    -Use get_order() everywhere instead of passing p_level.
+    -Add QNodal quadrature class.
+    -Fix const correctness issue in QJacobi.
+    -Fix some hard-coded long double precision literals.
+    -More digits for SEVENTH-order quadrature on TRIs.
+  * Always add block size for petsc matrix.
+  * Bug fix: Explicitly call SubFunctor::join() in SortAndCopy::join().
+  * Re-enable misc ex9 on non-PETSc builds.
+  * Switch signs of on-diagonal and off-diagonal entries for constraints.
+  * Ignore -Wstack-protector warnings in 3rd party code.
+  * Add LOG_SCOPE_WITH macro, supports use of custom PerfLogs.
+  * Bug fix: Clear old SLEPc solver before solving again.
+  * Bug fix: PointLocatorTree had bad definition of is_planar_xy
+  * PetscMatrix:
+    -Add local_m()
+    -Add local_n()
+    -Add get_local_size()
+    -Add reset_preallocation()
+    -Make mallocs uniformly an error.
+  * NumericVector: Add component-wise multiplication operator *=
+  * TriangleIO improvements:
+    -Add functions with a unit test for creating a hole from a mesh
+    -Regions support, toggle Triangle prints
+    -Add boundary marker capability
+    -Support disconnected enclosures
+  * Bug fix: Elem::second_order_equivalent_type().
+  * Generalize subdomain comparison for var groups.
+  * Add FEMContext::set_jacobian_tolerance().
+  * Bug fix: Avoid dangling reference in SparsityPattern::Build
+  * Bug fix: In FEMap, set 'failing' back to false after print_info().
+  * Add libmesh_cppunit.h file with unit test boilerplate to unit tests directory.
+  * Add/improve support for Real == float128 via boost::multiprecision.
+  * Add MONOMIAL_VEC fe type and associated example.
+  * Add DofObject::get/set_extra_datum(), non-integer DofObject data.
+  * If we build METIS ourselves, then install metis.h.
+  * Bug fix: Set the correct MPI communicator in VTKIO.
+  * Pedantic debugging flags are now *disabled* by default, use
+    --enable-glibcxx-debugging to turn them back on.
+  * Big header file refactoring, reduce header dependencies as much as possible.
+  * Bug fix: FEXYZ::shape_deriv() of phi_1 in 1D was wrong.
+  * Add RATIONAL_BERNSTEIN FEType.
+  * Allow TRI3SUBDIVISION elements in more quadrature rules.
+
 1.4.0 -> 1.4.1
   * This is a bugfix release for 1.4.0.
   * Correctly identify automake 1.15 as too old
