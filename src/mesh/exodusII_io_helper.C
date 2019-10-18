@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cstdlib> // std::strtol
+#include <unordered_map>
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/enum_elem_type.h"
@@ -107,6 +108,8 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_nodes(0),
   num_elem(0),
   num_elem_blk(0),
+  num_edge(0),
+  num_edge_blk(0),
   num_node_sets(0),
   num_side_sets(0),
   num_elem_this_blk(0),
@@ -546,6 +549,8 @@ void ExodusII_IO_Helper::read_header()
   num_elem_blk = params.num_elem_blk;
   num_node_sets = params.num_node_sets;
   num_side_sets = params.num_side_sets;
+  num_edge_blk = params.num_edge_blk;
+  num_edge = params.num_edge;
 
   this->read_num_time_steps();
 
@@ -707,6 +712,29 @@ void ExodusII_IO_Helper::read_block_info()
         }
       message("All block names retrieved successfully.");
     }
+
+  if (num_edge_blk)
+    {
+      // Read all edge block IDs.
+      edge_block_ids.resize(num_edge_blk);
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_EDGE_BLOCK,
+                                edge_block_ids.data());
+
+      EX_CHECK_ERR(ex_err, "Error getting edge block IDs.");
+      message("All edge block IDs retrieved successfully.");
+
+      // Read in edge block names
+      char name_buffer[MAX_STR_LENGTH+1];
+      for (int i=0; i<num_edge_blk; ++i)
+        {
+          ex_err = exII::ex_get_name(ex_id, exII::EX_EDGE_BLOCK,
+                                     edge_block_ids[i], name_buffer);
+          EX_CHECK_ERR(ex_err, "Error getting block name.");
+          id_to_edge_block_names[edge_block_ids[i]] = name_buffer;
+        }
+      message("All edge block names retrieved successfully.");
+    }
 }
 
 
@@ -819,6 +847,149 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
     }
 }
 
+
+
+void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
+{
+  // Check for quick return if there are no edge blocks.
+  if (num_edge_blk == 0)
+    return;
+
+  // Build data structure that we can quickly search for edges
+  // and then add required BoundaryInfo information. This is a
+  // map from edge->key() to a list of (elem_id, edge_id) pairs
+  // for the Edge in question. Since edge->key() is edge orientation
+  // invariant, this map does not distinguish different orientations
+  // of the same Edge.
+  typedef std::pair<dof_id_type, unsigned int> ElemEdgePair;
+  std::unordered_map<dof_id_type, std::vector<ElemEdgePair>> edge_map;
+  for (const auto & elem : mesh.element_ptr_range())
+    for (auto e : elem->edge_index_range())
+      {
+        // TODO: Make various Elem::compute_key() functions
+        // unprotected, this would allow us to avoid calling
+        // build_edge_ptr() repeatedly in case that turns out to be
+        // a bottleneck.
+        std::unique_ptr<Elem> edge = elem->build_edge_ptr(e);
+        dof_id_type edge_key = edge->key();
+
+        // Creates vector if not already there
+        auto & vec = edge_map[edge_key];
+        vec.push_back(std::make_pair(elem->id(), e));
+      }
+
+  // Get reference to the mesh's BoundaryInfo object, as we will be
+  // adding edges to this below.
+  BoundaryInfo & bi = mesh.get_boundary_info();
+
+  for (const auto & edge_block_id : edge_block_ids)
+    {
+      // exII::ex_get_block() output parameters.  Unlike the other
+      // "extended" APIs, exII::ex_get_block() does not use a
+      // parameter struct.
+      int num_edge_this_blk = 0;
+      int num_nodes_per_edge = 0;
+      int num_edges_per_edge = 0;
+      int num_faces_per_edge = 0;
+      int num_attr_per_edge = 0;
+      ex_err = exII::ex_get_block(ex_id,
+                                  exII::EX_EDGE_BLOCK,
+                                  edge_block_id,
+                                  elem_type.data(),
+                                  &num_edge_this_blk,
+                                  &num_nodes_per_edge,
+                                  &num_edges_per_edge, // 0 or -1 for edge blocks
+                                  &num_faces_per_edge, // 0 or -1 for edge blocks
+                                  &num_attr_per_edge);
+
+      EX_CHECK_ERR(ex_err, "Error getting edge block info.");
+      message("Info retrieved successfully for block: ", edge_block_id);
+
+      // Read in the connectivity of the edges of this block,
+      // watching out for the case where we actually have no
+      // elements in this block (possible with parallel files)
+      connect.resize(num_nodes_per_edge * num_edge_this_blk);
+
+      if (!connect.empty())
+        {
+          ex_err = exII::ex_get_conn(ex_id,
+                                     exII::EX_EDGE_BLOCK,
+                                     edge_block_id,
+                                     connect.data(), // node_conn
+                                     nullptr,        // elem_edge_conn (unused)
+                                     nullptr);       // elem_face_conn (unused)
+
+          EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
+          message("Connectivity retrieved successfully for block: ", edge_block_id);
+
+          // All edge types have an identity mapping from the corresponding
+          // Exodus type, so we don't need to bother with mapping ids, but
+          // we do need to know what kind of elements to build.
+          const auto & conv = get_conversion(std::string(elem_type.data()));
+
+          // Loop over indices in connectivity array, build edge elements,
+          // look them up in the edge_map.
+          for (unsigned int i=0; i<connect.size(); i+=num_nodes_per_edge)
+            {
+              auto edge = Elem::build(conv.libmesh_elem_type());
+              for (int n=0; n<num_nodes_per_edge; ++n)
+                {
+                  int exodus_node_id = connect[i+n];
+                  int exodus_node_id_zero_based = exodus_node_id - 1;
+                  int libmesh_node_id = node_num_map[exodus_node_id_zero_based] - 1;
+
+                  edge->set_node(n) = mesh.node_ptr(libmesh_node_id);
+                }
+
+              // Compute key for the edge Elem we just built.
+              dof_id_type edge_key = edge->key();
+
+              // If this key is not found in the edge_map, which is
+              // supposed to include every edge in the Mesh, then we
+              // need to throw an error.
+              auto & elem_edge_pair_vec =
+                libmesh_map_find(edge_map, edge_key);
+
+              for (const auto & elem_edge_pair : elem_edge_pair_vec)
+                {
+                  // We only want to match edges which have the same
+                  // orientation (node ordering) to the one in the
+                  // Exodus file, otherwise we ignore this elem_edge_pair.
+                  //
+                  // Note: this also handles the situation where two
+                  // edges have the same key (hash collision) as then
+                  // this check avoids a false positive.
+
+                  // Build edge indicated by elem_edge_pair
+                  auto candidate_edge =
+                    mesh.elem_ptr(elem_edge_pair.first)->
+                    build_edge_ptr(elem_edge_pair.second);
+
+                  // Determine whether this candidate edge is a "real" match,
+                  // i.e. also has the same orientation.
+                  bool is_match = true;
+                  for (int n=0; n<num_nodes_per_edge; ++n)
+                    if (candidate_edge->node_id(n) != edge->node_id(n))
+                      {
+                        is_match = false;
+                        break;
+                      }
+
+                  if (is_match)
+                    {
+                      // Add this (elem, edge, id) combo to the BoundaryInfo object.
+                      bi.add_edge(elem_edge_pair.first,
+                                  elem_edge_pair.second,
+                                  edge_block_id);
+                    }
+                } // end loop over elem_edge_pairs
+            } // end loop over connectivity array
+
+          // Set edgeset name in the BoundaryInfo object.
+          bi.edgeset_name(edge_block_id) = id_to_edge_block_names[edge_block_id];
+        } // end if !connect.empty()
+    } // end for edge_block_id : edge_block_ids
+}
 
 
 
@@ -1439,8 +1610,12 @@ void ExodusII_IO_Helper::create(std::string filename)
 
 void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh, bool use_discontinuous)
 {
-  // n_active_elem() is a parallel_only function
+  // The majority of this function only executes on processor 0, so any functions
+  // which are collective, like n_active_elem() or n_edge_conds() must be called
+  // before the processors' execution paths diverge.
   unsigned int n_active_elem = mesh.n_active_elem();
+  const BoundaryInfo & bi = mesh.get_boundary_info();
+  num_edge = bi.n_edge_conds();
 
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1471,16 +1646,16 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   std::vector<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
 
-  mesh.get_boundary_info().build_side_boundary_ids(unique_side_boundaries);
+  bi.build_side_boundary_ids(unique_side_boundaries);
   {
     // Add shell face boundaries to the list of side boundaries, since ExodusII
     // treats these the same way.
     std::vector<boundary_id_type> shellface_boundaries;
-    mesh.get_boundary_info().build_shellface_boundary_ids(shellface_boundaries);
+    bi.build_shellface_boundary_ids(shellface_boundaries);
     for (const auto & id : shellface_boundaries)
       unique_side_boundaries.push_back(id);
   }
-  mesh.get_boundary_info().build_node_boundary_ids(unique_node_boundaries);
+  bi.build_node_boundary_ids(unique_node_boundaries);
 
   num_side_sets = cast_int<int>(unique_side_boundaries.size());
   num_node_sets = cast_int<int>(unique_node_boundaries.size());
@@ -1512,6 +1687,14 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       str_title.resize(MAX_LINE_LENGTH);
     }
 
+  // Edge BCs are handled a bit differently than sidesets and nodesets.
+  // They are written as separate "edge blocks", and then edge variables
+  // can be defined on those blocks. That is, they are not written as
+  // edge sets, since edge sets must refer to edges stored elsewhere.
+  // We write a separate edge block for each unique boundary id that
+  // we have.
+  num_edge_blk = bi.get_edge_boundary_ids().size();
+
   // Build an ex_init_params() structure that is to be passed to the
   // newer ex_put_init_ext() API. The new API will eventually allow us
   // to store edge and face data in the Exodus file.
@@ -1531,6 +1714,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   params.num_elem_blk = num_elem_blk;
   params.num_node_sets = num_node_sets;
   params.num_side_sets = num_side_sets;
+  params.num_edge_blk = num_edge_blk;
+  params.num_edge = num_edge;
 
   ex_err = exII::ex_put_init_ext(ex_id, &params);
   EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
@@ -1712,36 +1897,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       ++counter;
     }
 
-  // Zero-initialize and then fill in an exII::ex_block_params struct
-  // with the data we have collected. This new API replaces the old
-  // exII::ex_put_concat_elem_block() API, and will eventually allow
-  // us to also allocate space for edge/face blocks if desired.
+  // In the case of discontinuous plotting we initialize a map from
+  // (element, node) pairs to the corresponding discontinuous node index.
+  // This ordering must match the ordering used in write_nodal_coordinates.
   //
-  // TODO: It seems like we should be able to take advantage of the
-  // optimization where you set define_maps==1, but when I tried this
-  // I got the error: "failed to find node map size". I think the
-  // problem is that we need to first specify a nonzero number of
-  // node/elem maps during the call to ex_put_init_ext() in order for
-  // this to work correctly.
-  exII::ex_block_params params = {};
-  params.elem_blk_id = elem_blk_id.data();
-  params.elem_type = elem_type_table.get_char_star_star();
-  params.num_elem_this_blk = num_elem_this_blk_vec.data();
-  params.num_nodes_per_elem = num_nodes_per_elem_vec.data();
-  params.num_edges_per_elem = num_edges_per_elem_vec.data();
-  params.num_faces_per_elem = num_faces_per_elem_vec.data();
-  params.num_attr_elem = num_attr_vec.data();
-  params.define_maps = 0;
-  ex_err = exII::ex_put_concat_all_blocks(ex_id, &params);
-  EX_CHECK_ERR(ex_err, "Error writing element blocks.");
-
-  // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
-  unsigned libmesh_elem_num_to_exodus_counter = 0;
-
-  // In the case of discontinuous plotting we initialize a map from (element,node) pairs
-  // to the corresponding discontinuous node index. This ordering must match the ordering
-  // used in write_nodal_coordinates.
-  std::map< std::pair<dof_id_type,unsigned int>, dof_id_type > discontinuous_node_indices;
+  // Note: This map takes the place of the libmesh_node_num_to_exodus map in
+  // the discontinuous case.
+  std::map<std::pair<dof_id_type, unsigned int>, dof_id_type> discontinuous_node_indices;
   if (use_discontinuous)
   {
     dof_id_type node_counter = 1; // Exodus numbering is 1-based
@@ -1755,6 +1917,173 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           node_counter++;
         }
   }
+
+  // Reference to the BoundaryInfo object for convenience.
+  const BoundaryInfo & bi = mesh.get_boundary_info();
+
+  // Build list of (elem, edge, id) triples
+  std::vector<BoundaryInfo::BCTuple> edge_tuples = bi.build_edge_list();
+
+  // Build the connectivity array for each edge block. The connectivity array
+  // is a vector<int> with "num_edges * num_nodes_per_edge" entries. We write
+  // the Exodus node numbers to the connectivity arrays so that they can
+  // be used directly in the calls to exII::ex_put_conn() below. We also keep
+  // track of the ElemType and the number of nodes for each boundary_id. All
+  // edges with a given boundary_id must be of the same type.
+  std::map<boundary_id_type, std::vector<int>> edge_id_to_conn;
+  std::map<boundary_id_type, std::pair<ElemType, unsigned int>> edge_id_to_elem_type;
+
+  for (const auto & t : edge_tuples)
+    {
+      dof_id_type elem_id = std::get<0>(t);
+      unsigned int edge_id = std::get<1>(t);
+      boundary_id_type b_id = std::get<2>(t);
+
+      // Build the edge in question
+      std::unique_ptr<const Elem> edge =
+        mesh.elem_ptr(elem_id)->build_edge_ptr(edge_id);
+
+      // Error checking: make sure that all edges in this block are
+      // the same geometric type.
+      auto check_it = edge_id_to_elem_type.find(b_id);
+
+      if (check_it == edge_id_to_elem_type.end())
+        {
+          // Keep track of the ElemType and number of nodes in this boundary id.
+          edge_id_to_elem_type[b_id] = std::make_pair(edge->type(), edge->n_nodes());
+        }
+      else
+        {
+          // Make sure the existing data is consistent
+          auto & val_pair = check_it->second;
+          if (val_pair.first != edge->type() || val_pair.second != edge->n_nodes())
+            libmesh_error_msg("All edges in a block must have same geometric type.");
+        }
+
+      // Get reference to the connectivity array for this block
+      auto & conn = edge_id_to_conn[b_id];
+
+      // For each node on the edge, look up the exodus node id and
+      // store it in the conn array. Note: all edge types have
+      // identity node mappings so we don't bother with Conversion
+      // objects here.
+      for (auto n : edge->node_index_range())
+        {
+          dof_id_type libmesh_node_id = edge->node_ptr(n)->id();
+
+          // We look up Exodus node numbers differently if we are
+          // writing a discontinuous Exodus file.
+          int exodus_node_id = -1;
+
+          if (!use_discontinuous)
+            exodus_node_id = libmesh_map_find
+              (libmesh_node_num_to_exodus, cast_int<int>(libmesh_node_id));
+          else
+            {
+              // Find the node on the "parent" element containing this edge
+              // which matches libmesh_node_id. Then use that id to look up
+              // the exodus_node_id in the discontinuous_node_indices map.
+              //
+              // TODO: This should also be given by e.g.:
+              // Hex8::edge_nodes_map[edge_id][n]. Note: we have something
+              // like this for sides, Elem::which_node_am_i(), but nothing
+              // equivalent for edges.
+              const Elem * parent = mesh.elem_ptr(elem_id);
+              for (auto pn : parent->node_index_range())
+                if (parent->node_ptr(pn)->id() == libmesh_node_id)
+                  {
+                    exodus_node_id = libmesh_map_find
+                      (discontinuous_node_indices,
+                       std::make_pair(elem_id, pn));
+                    break;
+                  }
+            }
+
+          if (exodus_node_id == -1)
+            libmesh_error_msg("Unable to map edge's libMesh node id to its Exodus node id.");
+
+          conn.push_back(exodus_node_id);
+        }
+    }
+
+  // Make sure we have the same number of edge ids that we thought we would.
+  libmesh_assert(static_cast<int>(edge_id_to_conn.size()) == num_edge_blk);
+
+  // Build data structures describing edge blocks. This information must be
+  // be passed to exII::ex_put_concat_all_blocks() at the same time as the
+  // information about elem blocks.
+  std::vector<int> edge_blk_id;
+  NamesData edge_type_table(num_edge_blk, MAX_STR_LENGTH);
+  std::vector<int> num_edge_this_blk_vec;
+  std::vector<int> num_nodes_per_edge_vec;
+  std::vector<int> num_attr_edge_vec;
+
+  // We also build a data structure of edge block names which can
+  // later be passed to exII::ex_put_names().
+  NamesData edge_block_names_table(num_edge_blk, MAX_STR_LENGTH);
+
+  // Note: We are going to use the edge **boundary** ids as **block** ids.
+  for (const auto & pr : edge_id_to_conn)
+    {
+      // Store the edge block id in the array to be passed to Exodus.
+      boundary_id_type id = pr.first;
+      edge_blk_id.push_back(id);
+
+      // Set Exodus element type and number of nodes for this edge block.
+      const auto & elem_type_node_count = edge_id_to_elem_type[id];
+      const auto & conv = get_conversion(elem_type_node_count.first);
+      edge_type_table.push_back_entry(conv.exodus_type.c_str());
+      num_nodes_per_edge_vec.push_back(elem_type_node_count.second);
+
+      // The number of edges is the number of entries in the connectivity
+      // array divided by the number of nodes per edge.
+      num_edge_this_blk_vec.push_back(pr.second.size() / elem_type_node_count.second);
+
+      // We don't store any attributes currently
+      num_attr_edge_vec.push_back(0);
+
+      // Store the name of this edge block
+      edge_block_names_table.push_back_entry(bi.get_edgeset_name(id));
+    }
+
+  // Zero-initialize and then fill in an exII::ex_block_params struct
+  // with the data we have collected. This new API replaces the old
+  // exII::ex_put_concat_elem_block() API, and will eventually allow
+  // us to also allocate space for edge/face blocks if desired.
+  //
+  // TODO: It seems like we should be able to take advantage of the
+  // optimization where you set define_maps==1, but when I tried this
+  // I got the error: "failed to find node map size". I think the
+  // problem is that we need to first specify a nonzero number of
+  // node/elem maps during the call to ex_put_init_ext() in order for
+  // this to work correctly.
+  exII::ex_block_params params = {};
+
+  // Set pointers for information about elem blocks.
+  params.elem_blk_id = elem_blk_id.data();
+  params.elem_type = elem_type_table.get_char_star_star();
+  params.num_elem_this_blk = num_elem_this_blk_vec.data();
+  params.num_nodes_per_elem = num_nodes_per_elem_vec.data();
+  params.num_edges_per_elem = num_edges_per_elem_vec.data();
+  params.num_faces_per_elem = num_faces_per_elem_vec.data();
+  params.num_attr_elem = num_attr_vec.data();
+  params.define_maps = 0;
+
+  // Set pointers to edge block information only if we actually have some.
+  if (num_edge_blk)
+    {
+      params.edge_blk_id = edge_blk_id.data();
+      params.edge_type = edge_type_table.get_char_star_star();
+      params.num_edge_this_blk = num_edge_this_blk_vec.data();
+      params.num_nodes_per_edge = num_nodes_per_edge_vec.data();
+      params.num_attr_edge = num_attr_edge_vec.data();
+    }
+
+  ex_err = exII::ex_put_concat_all_blocks(ex_id, &params);
+  EX_CHECK_ERR(ex_err, "Error writing element blocks.");
+
+  // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
+  unsigned libmesh_elem_num_to_exodus_counter = 0;
 
   for (auto & pr : subdomain_map)
     {
@@ -1850,9 +2179,31 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   if (num_elem_blk > 0)
     {
       ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_BLOCK, names_table.get_char_star_star());
-      EX_CHECK_ERR(ex_err, "Error writing element names");
+      EX_CHECK_ERR(ex_err, "Error writing element block names");
     }
 
+  // Write out edge blocks if we have any
+  for (const auto & pr : edge_id_to_conn)
+    {
+      ex_err = exII::ex_put_conn
+        (ex_id,
+         exII::EX_EDGE_BLOCK,
+         pr.first,
+         pr.second.data(), // node_conn
+         nullptr,          // elem_edge_conn (unused)
+         nullptr);         // elem_face_conn (unused)
+      EX_CHECK_ERR(ex_err, "Error writing element connectivities");
+    }
+
+  // Write out the edge block names, if any.
+  if (num_edge_blk > 0)
+    {
+      ex_err = exII::ex_put_names
+        (ex_id,
+         exII::EX_EDGE_BLOCK,
+         edge_block_names_table.get_char_star_star());
+      EX_CHECK_ERR(ex_err, "Error writing edge block names");
+    }
 }
 
 

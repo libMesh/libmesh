@@ -198,7 +198,7 @@ void ExodusII_IO::read (const std::string & fname)
   // sequentially starting from 1 in the Exodus file.
   // libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->num_nodes), mesh.n_nodes());
 
-  // Get information about all the blocks
+  // Get information about all the element and edge blocks
   exio_helper->read_block_info();
 
   // Reserve space for the elements
@@ -213,7 +213,7 @@ void ExodusII_IO::read (const std::string & fname)
   // Read in the element connectivity for each block.
   int nelem_last_block = 0;
 
-  // Loop over all the blocks
+  // Loop over all the element blocks
   for (int i=0; i<exio_helper->num_elem_blk; i++)
     {
       // Read the information for block i
@@ -287,12 +287,9 @@ void ExodusII_IO::read (const std::string & fname)
       nelem_last_block += exio_helper->num_elem_this_blk;
     }
 
-  // This assert isn't valid if the Exodus file's numbering doesn't
-  // start with 1!  For example, if Exodus's elem_num_map is 21, 22,
-  // 23, 24, 25, 26, 27, 28, 29, 30, ... 84, then by the time you are
-  // done with the loop above, mesh.n_elem() will report 84 and
-  // nelem_last_block will be 64.
-  // libmesh_assert_equal_to (static_cast<unsigned>(nelem_last_block), mesh.n_elem());
+  // Read in edge blocks, storing information in the BoundaryInfo object.
+  // Edge blocks are treated as BCs.
+  exio_helper->read_edge_blocks(mesh);
 
   // Set the mesh dimension to the largest encountered for an element
   for (unsigned char i=0; i!=4; ++i)
@@ -1432,10 +1429,6 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
 
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
-
-          if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
-            libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
-                            "are not supported by the ExodusII format.");
 
           exio_helper->initialize_nodal_variables(names);
         }

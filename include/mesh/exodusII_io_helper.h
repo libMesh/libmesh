@@ -200,6 +200,11 @@ public:
   void read_elem_in_block(int block);
 
   /**
+   * Read in edge blocks, storing information in the BoundaryInfo object.
+   */
+  void read_edge_blocks(MeshBase & mesh);
+
+  /**
    * Reads the optional \p node_num_map from the \p ExodusII mesh
    * file.
    */
@@ -496,6 +501,13 @@ public:
   // Total number of element blocks
   int num_elem_blk;
 
+  // Total number of edges
+  int num_edge;
+
+  // Total number of edge blocks. The sum of the number of edges in
+  // each block must equal num_edge.
+  int num_edge_blk;
+
   // Total number of node sets
   int num_node_sets;
 
@@ -514,8 +526,11 @@ public:
   // Total number of elements in all side sets
   int num_elem_all_sidesets;
 
-  // Vector of the block identification numbers
+  // Vector of element block identification numbers
   std::vector<int> block_ids;
+
+  // Vector of edge block identification numbers
+  std::vector<int> edge_block_ids;
 
   // Vector of nodes in an element
   std::vector<int> connect;
@@ -629,6 +644,7 @@ public:
 
   // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
+  std::map<int, std::string> id_to_edge_block_names;
   std::map<int, std::string> id_to_ss_names;
   std::map<int, std::string> id_to_ns_names;
 
