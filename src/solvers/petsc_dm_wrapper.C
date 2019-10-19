@@ -130,7 +130,7 @@ namespace libMesh
             }
 #else
           PetscErrorCode (*interp)(DM,DM,Mat*,Vec*) = nullptr;
-          ierr = DMShellGetCreateInterpolation(*subdm, &interp);
+          ierr = DMShellGetCreateInterpolation(dm, &interp);
           CHKERRQ(ierr);
           if (interp)
             {
@@ -148,7 +148,7 @@ namespace libMesh
             }
 #else
           PetscErrorCode (*createrestriction)(DM,DM,Mat*) = nullptr;
-          ierr = DMShellGetCreateRestriction(*subdm, &createrestriction);
+          ierr = DMShellGetCreateRestriction(dm, &createrestriction);
           CHKERRQ(ierr);
           if (createrestriction)
             {
@@ -166,7 +166,7 @@ namespace libMesh
             }
 #else
           PetscErrorCode (*createsubdm)(DM,PetscInt,const PetscInt[],IS*,DM*) = nullptr;
-          ierr = DMShellGetCreateSubDM(*subdm, &createsubdm);
+          ierr = DMShellGetCreateSubDM(dm, &createsubdm);
           CHKERRQ(ierr);
           if (createsubdm)
             {
