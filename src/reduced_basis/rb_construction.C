@@ -80,6 +80,7 @@ RBConstruction::RBConstruction (EquationSystems & es,
     assert_convergence(true),
     rb_eval(nullptr),
     inner_product_assembly(nullptr),
+    use_energy_inner_product(false),
     rel_training_tolerance(1.e-4),
     abs_training_tolerance(1.e-12),
     normalize_rb_bound_in_greedy(false)
@@ -377,15 +378,25 @@ RBAssemblyExpansion & RBConstruction::get_rb_assembly_expansion()
 
 void RBConstruction::set_inner_product_assembly(ElemAssembly & inner_product_assembly_in)
 {
+  use_energy_inner_product = false;
   inner_product_assembly = &inner_product_assembly_in;
 }
 
 ElemAssembly & RBConstruction::get_inner_product_assembly()
 {
+  if (use_energy_inner_product)
+    libmesh_error_msg("Error: inner_product_assembly not available since we're using energy inner-product");
+
   if (!inner_product_assembly)
     libmesh_error_msg("Error: inner_product_assembly hasn't been initialized yet");
 
   return *inner_product_assembly;
+}
+
+void RBConstruction::set_energy_inner_product(const std::vector<Number> & energy_inner_product_coeffs_in)
+{
+  use_energy_inner_product = true;
+  energy_inner_product_coeffs = energy_inner_product_coeffs_in;
 }
 
 void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vector)
@@ -811,12 +822,35 @@ void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number> * input_
                                                    bool apply_dof_constraints)
 {
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1.,
-                               inner_product_assembly,
-                               input_matrix,
-                               nullptr,
-                               false, /* symmetrize */
-                               apply_dof_constraints);
+
+  if(!use_energy_inner_product)
+  {
+    add_scaled_matrix_and_vector(1.,
+                                 inner_product_assembly,
+                                 input_matrix,
+                                 nullptr,
+                                 false, /* symmetrize */
+                                 apply_dof_constraints);
+  }
+  else
+  {
+    if (energy_inner_product_coeffs.size() != get_rb_theta_expansion().get_n_A_terms())
+      {
+        libmesh_error_msg("Error: invalid number of entries in energy_inner_product_coeffs.");
+      }
+
+    // We symmetrize below so that we may use the energy inner-product even in cases
+    // where the A_q are not symmetric.
+    for (unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
+      {
+        add_scaled_matrix_and_vector(energy_inner_product_coeffs[q_a],
+                                     &rb_assembly_expansion->get_A_assembly(q_a),
+                                     input_matrix,
+                                     nullptr,
+                                     true, /* symmetrize */
+                                     apply_dof_constraints);
+      }
+  }
 }
 
 void RBConstruction::assemble_Aq_matrix(unsigned int q,
