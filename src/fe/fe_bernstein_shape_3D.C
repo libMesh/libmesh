@@ -2375,7 +2375,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             // default:
             // libmesh_error_msg("Invalid derivative index j = " << j);
             // }
-            //     }
 
 
           default:
@@ -2949,7 +2948,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             // default:
             //   libmesh_error_msg("Invalid derivative index j = " << j);
             // }
-            //    }
 
 
           default:
