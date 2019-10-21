@@ -2976,36 +2976,106 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const ElemType,
                                          const unsigned int,
                                          const Point &)
 {
-  static bool warning_given = false;
-
-  if (!warning_given)
-    libMesh::err << "Second derivatives for Bernstein elements "
-                 << "are not yet implemented!"
-                 << std::endl;
-
-  warning_given = true;
+  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge and face orientation is needed.");
   return 0.;
 }
 
 
 
 template <>
-Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem *,
-                                         const Order,
-                                         const unsigned int,
-                                         const unsigned int,
-                                         const Point &,
-                                         const bool)
+Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem * elem,
+                                         const Order order,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const Point & p,
+                                         const bool add_p_level)
 {
-  static bool warning_given = false;
 
-  if (!warning_given)
-    libMesh::err << "Second derivatives for Bernstein elements "
-                 << "are not yet implemented!"
-                 << std::endl;
+#if LIBMESH_DIM == 3
+  libmesh_assert(elem);
 
-  warning_given = true;
-  return 0.;
+  const Order totalorder =
+    static_cast<Order>(order + add_p_level * elem->p_level());
+
+  libmesh_assert_less (j, 6);
+
+  {
+    // I have been lazy here and am using finite differences
+    // to compute the derivatives!
+    const Real eps = 1.e-6;
+
+
+    switch (j)
+      {
+        //  d^2()/dxi^2
+      case 0:
+        {
+          const Point pp(p(0)+eps, p(1), p(2));
+          const Point pm(p(0)-eps, p(1), p(2));
+
+          return (FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 0, pp) -
+                  FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 0, pm))/2./eps;
+        }
+
+        // d^2()/dxideta
+      case 1:
+        {
+          const Point pp(p(0), p(1)+eps, p(2));
+          const Point pm(p(0), p(1)-eps, p(2));
+
+          return (FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 0, pp) -
+                  FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 0, pm))/2./eps;
+        }
+
+        // d^2()/deta^2
+      case 2:
+        {
+          const Point pp(p(0), p(1)+eps, p(2));
+          const Point pm(p(0), p(1)-eps, p(2));
+
+          return (FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 1, pp) -
+                  FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 1, pm))/2./eps;
+        }
+
+        // d^2()/dxidzeta
+      case 3:
+        {
+          const Point pp(p(0), p(1), p(2)+eps);
+          const Point pm(p(0), p(1), p(2)-eps);
+
+          return (FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 0, pp) -
+                  FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 0, pm))/2./eps;
+        }                  // d^2()/deta^2
+
+        // d^2()/detadzeta
+      case 4:
+        {
+          const Point pp(p(0), p(1), p(2)+eps);
+          const Point pm(p(0), p(1), p(2)-eps);
+
+          return (FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 1, pp) -
+                  FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 1, pm))/2./eps;
+        }
+
+        // d^2()/dzeta^2
+      case 5:
+        {
+          const Point pp(p(0), p(1), p(2)+eps);
+          const Point pm(p(0), p(1), p(2)-eps);
+
+          return (FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 2, pp) -
+                  FE<3,BERNSTEIN>::shape_deriv(elem, totalorder, i, 2, pm))/2./eps;
+        }
+
+      default:
+        libmesh_error_msg("Invalid derivative index j = " << j);
+      }
+  }
+
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, j, p, add_p_level);
+  libmesh_not_implemented();
+#endif
 }
 
 #endif
