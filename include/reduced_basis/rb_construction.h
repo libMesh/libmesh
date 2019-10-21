@@ -421,6 +421,12 @@ public:
   ElemAssembly & get_inner_product_assembly();
 
   /**
+   * Specify the coefficients of the A_q operators to be used in the
+   * energy inner-product.
+   */
+  void set_energy_inner_product(const std::vector<Number> & energy_inner_product_coeffs_in);
+
+  /**
    * It is sometimes useful to be able to zero vector entries
    * that correspond to constrained dofs.
    */
@@ -766,6 +772,24 @@ private:
    * Pointer to inner product assembly.
    */
   ElemAssembly * inner_product_assembly;
+
+  /**
+   * Boolean to indicate whether we're using the energy inner-product.
+   * If this is false then we use inner_product_assembly instead.
+   */
+  bool use_energy_inner_product;
+
+  /**
+   * We may optionally want to use the "energy inner-product" rather
+   * than the inner-product assembly specified in inner_product_assembly.
+   * In this case the inner-product will be defined by sum_q^Q k_q * A_q.
+   * Here we provide the k_q values that will be used.
+   * (Note that a true "energy-inner product" would obtain the k_q from
+   * the theta_q's, but this is different for each parameter choice so
+   * we just provide a fixed set of k_q's here to ensure that the
+   * inner-product is parameter independent)
+   */
+  std::vector<Number> energy_inner_product_coeffs;
 
   /**
    * Vector storing the Q_a matrices from the affine expansion
