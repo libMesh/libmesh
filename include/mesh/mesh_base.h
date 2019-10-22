@@ -1796,6 +1796,15 @@ protected:
   void size_node_extra_integers();
 
   /**
+   * Merge extra-integer arrays from an \p other mesh.  Returns two
+   * mappings from index values in \p other to (possibly newly created)
+   * index values with the same string name in \p this mesh, the first
+   * for element integers and the second for node integers.
+   */
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+    merge_extra_integer_names(const MeshBase & other);
+
+  /**
    * The default geometric GhostingFunctor, used to implement standard
    * libMesh element ghosting behavior.  We use a base class pointer
    * here to avoid dragging in more header dependencies.

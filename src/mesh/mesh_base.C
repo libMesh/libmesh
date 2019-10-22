@@ -939,4 +939,14 @@ void MeshBase::size_node_extra_integers()
 }
 
 
+std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+MeshBase::merge_extra_integer_names(const MeshBase & other)
+{
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>> returnval;
+  returnval.first = this->add_elem_integers(other._elem_integer_names);
+  returnval.second = this->add_node_integers(other._node_integer_names);
+  return returnval;
+}
+
+
 } // namespace libMesh
