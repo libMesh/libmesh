@@ -172,14 +172,50 @@ void MeshBase::set_spatial_dimension(unsigned char d)
 
 
 
-unsigned int MeshBase::add_elem_integer(const std::string & name)
+unsigned int MeshBase::add_elem_integer(const std::string & name,
+                                        bool allocate_data)
 {
   for (auto i : index_range(_elem_integer_names))
     if (_elem_integer_names[i] == name)
       return i;
 
   _elem_integer_names.push_back(name);
+  if (allocate_data)
+    this->size_elem_extra_integers();
   return _elem_integer_names.size()-1;
+}
+
+
+
+std::vector<unsigned int> MeshBase::add_elem_integers(const std::vector<std::string> & names,
+                                                      bool allocate_data)
+{
+  std::unordered_map<std::string, std::size_t> name_indices;
+  for (auto i : index_range(_elem_integer_names))
+    name_indices[_elem_integer_names[i]] = i;
+
+  std::vector<unsigned int> returnval(names.size());
+
+  bool added_an_integer = false;
+  for (auto i : index_range(names))
+    {
+      const std::string & name = names[i];
+      auto it = name_indices.find(name);
+      if (it != name_indices.end())
+        returnval[i] = it->second;
+      else
+        {
+          returnval[i] = _elem_integer_names.size();
+          name_indices[name] = returnval[i];
+          _elem_integer_names.push_back(name);
+          added_an_integer = true;
+        }
+    }
+
+  if (allocate_data && added_an_integer)
+    this->size_elem_extra_integers();
+
+  return returnval;
 }
 
 
@@ -207,14 +243,50 @@ bool MeshBase::has_elem_integer(const std::string & name) const
 
 
 
-unsigned int MeshBase::add_node_integer(const std::string & name)
+unsigned int MeshBase::add_node_integer(const std::string & name,
+                                        bool allocate_data)
 {
   for (auto i : index_range(_node_integer_names))
     if (_node_integer_names[i] == name)
       return i;
 
   _node_integer_names.push_back(name);
+  if (allocate_data)
+    this->size_node_extra_integers();
   return _node_integer_names.size()-1;
+}
+
+
+
+std::vector<unsigned int> MeshBase::add_node_integers(const std::vector<std::string> & names,
+                                                      bool allocate_data)
+{
+  std::unordered_map<std::string, std::size_t> name_indices;
+  for (auto i : index_range(_node_integer_names))
+    name_indices[_node_integer_names[i]] = i;
+
+  std::vector<unsigned int> returnval(names.size());
+
+  bool added_an_integer = false;
+  for (auto i : index_range(names))
+    {
+      const std::string & name = names[i];
+      auto it = name_indices.find(name);
+      if (it != name_indices.end())
+        returnval[i] = it->second;
+      else
+        {
+          returnval[i] = _node_integer_names.size();
+          name_indices[name] = returnval[i];
+          _node_integer_names.push_back(name);
+          added_an_integer = true;
+        }
+    }
+
+  if (allocate_data && added_an_integer)
+    this->size_node_extra_integers();
+
+  return returnval;
 }
 
 
@@ -846,6 +918,24 @@ void MeshBase::set_point_locator_close_to_point_tol(Real val)
 Real MeshBase::get_point_locator_close_to_point_tol() const
 {
   return _point_locator_close_to_point_tol;
+}
+
+
+
+void MeshBase::size_elem_extra_integers()
+{
+  const std::size_t new_size = _elem_integer_names.size();
+  for (auto elem : this->element_ptr_range())
+    elem->add_extra_integers(new_size);
+}
+
+
+
+void MeshBase::size_node_extra_integers()
+{
+  const std::size_t new_size = _node_integer_names.size();
+  for (auto node : this->node_ptr_range())
+    node->add_extra_integers(new_size);
 }
 
 

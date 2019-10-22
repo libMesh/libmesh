@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_object.h" // for invalid_processor_id
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/multi_predicates.h"
 #include "libmesh/point_locator_base.h"
@@ -776,10 +777,28 @@ public:
    * Register an integer datum (of type dof_id_type) to be added to
    * each element in the mesh.
    *
+   * If the mesh already has elements, data by default is allocated in
+   * each of them.  This may be expensive to do repeatedly; use
+   * add_elem_integers instead.
+   *
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
    */
-  unsigned int add_elem_integer(const std::string & name);
+  unsigned int add_elem_integer(const std::string & name,
+                                bool allocate_data = true);
+
+  /**
+   * Register integer data (of type dof_id_type) to be added to
+   * each element in the mesh, one string name for each new integer.
+   *
+   * If the mesh already has elements, data by default is allocated in
+   * each of them.
+   *
+   * \returns The index numbers for the new data, and/or for existing
+   * data if data by some of the same names has already been added.
+   */
+  std::vector<unsigned int> add_elem_integers(const std::vector<std::string> & names,
+                                              bool allocate_data = true);
 
   /*
    * \returns The index number for the named extra element integer
@@ -813,8 +832,12 @@ public:
    * Register a datum (of type T) to be added to each element in the
    * mesh.
    *
-   * \returns The starting index number for the new datum, or for the
-   * existing datum if one by the same name has already been added.
+   * If the mesh already has elements, data by default is allocated in
+   * each of them.  This may be expensive to do repeatedly; use
+   * add_elem_data instead.
+   *
+   * \returns The index numbers for the new data, and/or for existing
+   * data if data by some of the same names has already been added.
    *
    * If type T is larger than dof_id_type, its data will end up
    * spanning multiple index values, but will be queried with the
@@ -824,16 +847,55 @@ public:
    * type T, don't try to access it with a call specifying type U.
    */
   template <typename T>
-  unsigned int add_elem_datum(const std::string & name);
+  unsigned int add_elem_datum(const std::string & name,
+                              bool allocate_data = true);
+
+  /**
+   * Register data (of type T) to be added to each element in the
+   * mesh.
+   *
+   * If the mesh already has elements, data is allocated in each.
+   *
+   * \returns The starting index number for the new data, or for the
+   * existing data if one by the same name has already been added.
+   *
+   * If type T is larger than dof_id_type, each datum will end up
+   * spanning multiple index values, but will be queried with the
+   * starting index number.
+   *
+   * No type checking is done with this function!  If you add data of
+   * type T, don't try to access it with a call specifying type U.
+   */
+  template <typename T>
+  std::vector<unsigned int> add_elem_data(const std::vector<std::string> & names,
+                                          bool allocate_data = true);
 
   /**
    * Register an integer datum (of type dof_id_type) to be added to
    * each node in the mesh.
    *
+   * If the mesh already has nodes, data by default is allocated in
+   * each of them.  This may be expensive to do repeatedly; use
+   * add_node_integers instead.
+   *
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
    */
-  unsigned int add_node_integer(const std::string & name);
+  unsigned int add_node_integer(const std::string & name,
+                                bool allocate_data = true);
+
+  /**
+   * Register integer data (of type dof_id_type) to be added to
+   * each node in the mesh.
+   *
+   * If the mesh already has nodes, data by default is allocated in
+   * each.
+   *
+   * \returns The index numbers for the new data, and/or for existing
+   * data if data by some of the same names has already been added.
+   */
+  std::vector<unsigned int> add_node_integers(const std::vector<std::string> & names,
+                                              bool allocate_data = true);
 
   /*
    * \returns The index number for the named extra node integer
@@ -867,6 +929,10 @@ public:
    * Register a datum (of type T) to be added to each node in the
    * mesh.
    *
+   * If the mesh already has nodes, data by default is allocated in
+   * each of them.  This may be expensive to do repeatedly; use
+   * add_node_data instead.
+   *
    * \returns The starting index number for the new datum, or for the
    * existing datum if one by the same name has already been added.
    *
@@ -878,7 +944,28 @@ public:
    * type T, don't try to access it with a call specifying type U.
    */
   template <typename T>
-  unsigned int add_node_datum(const std::string & name);
+  unsigned int add_node_datum(const std::string & name,
+                              bool allocate_data = true);
+
+  /**
+   * Register data (of type T) to be added to each node in the
+   * mesh.
+   *
+   * If the mesh already has nodes, data by default is allocated in each.
+   *
+   * \returns The starting index number for the new data, or for the
+   * existing data if one by the same name has already been added.
+   *
+   * If type T is larger than dof_id_type, its data will end up
+   * spanning multiple index values, but will be queried with the
+   * starting index number.
+   *
+   * No type checking is done with this function!  If you add data of
+   * type T, don't try to access it with a call specifying type U.
+   */
+  template <typename T>
+  std::vector<unsigned int> add_node_data(const std::vector<std::string> & name,
+                                          bool allocate_data = true);
 
   /**
    * Prepare a newly ecreated (or read) mesh for use.
@@ -1699,6 +1786,16 @@ protected:
   std::vector<std::string> _node_integer_names;
 
   /**
+   * Size extra-integer arrays of all elements in the mesh
+   */
+  void size_elem_extra_integers();
+
+  /**
+   * Size extra-integer arrays of all nodes in the mesh
+   */
+  void size_node_extra_integers();
+
+  /**
    * The default geometric GhostingFunctor, used to implement standard
    * libMesh element ghosting behavior.  We use a base class pointer
    * here to avoid dragging in more header dependencies.
@@ -1864,26 +1961,79 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
 
 template <typename T>
 inline
-unsigned int MeshBase::add_elem_datum(const std::string & name)
+unsigned int MeshBase::add_elem_datum(const std::string & name,
+                                      bool allocate_data)
 {
-  unsigned int start_idx = this->add_elem_integer(name);
+  const std::size_t old_size = _elem_integer_names.size();
+
+  unsigned int start_idx = this->add_elem_integer(name, false);
   unsigned int n_more_integers = (sizeof(T)-1)/sizeof(dof_id_type);
   for (unsigned int i=0; i != n_more_integers; ++i)
     this->add_elem_integer(name+"__"+std::to_string(i));
+
+  if (allocate_data && old_size != _elem_integer_names.size())
+    this->size_elem_extra_integers();
+
   return start_idx;
 }
 
 
 template <typename T>
 inline
-unsigned int MeshBase::add_node_datum(const std::string & name)
+std::vector<unsigned int> MeshBase::add_elem_data(const std::vector<std::string> & names,
+                                                  bool allocate_data)
 {
-  unsigned int start_idx = this->add_node_integer(name);
+  std::vector<unsigned int> returnval(names.size());
+
+  const std::size_t old_size = _elem_integer_names.size();
+
+  for (auto i : index_range(names))
+    returnval[i] = this->add_elem_datum<T>(names[i], false);
+
+  if (allocate_data && old_size != _elem_integer_names.size())
+    this->size_elem_extra_integers();
+
+  return returnval;
+}
+
+
+template <typename T>
+inline
+unsigned int MeshBase::add_node_datum(const std::string & name,
+                                      bool allocate_data)
+{
+  const std::size_t old_size = _node_integer_names.size();
+
+  unsigned int start_idx = this->add_node_integer(name, false);
   unsigned int n_more_integers = (sizeof(T)-1)/sizeof(dof_id_type);
   for (unsigned int i=0; i != n_more_integers; ++i)
-    this->add_node_integer(name+"__"+std::to_string(i));
+    this->add_node_integer(name+"__"+std::to_string(i), false);
+
+  if (allocate_data && old_size != _node_integer_names.size())
+    this->size_node_extra_integers();
+
   return start_idx;
 }
+
+
+template <typename T>
+inline
+std::vector<unsigned int> MeshBase::add_node_data(const std::vector<std::string> & names,
+                                                  bool allocate_data)
+{
+  std::vector<unsigned int> returnval(names.size());
+
+  const std::size_t old_size = _node_integer_names.size();
+
+  for (auto i : index_range(names))
+    returnval[i] = this->add_node_datum<T>(names[i], false);
+
+  if (allocate_data && old_size != _node_integer_names.size())
+    this->size_node_extra_integers();
+
+  return returnval;
+}
+
 
 
 } // namespace libMesh
