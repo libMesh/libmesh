@@ -45,65 +45,6 @@ namespace libMesh
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
-struct DofBCData
-{
-  dof_id_type        dof_id;
-  unsigned short int side;
-  boundary_id_type   bc_id;
-
-  // Default constructor
-  DofBCData (dof_id_type        dof_id_in=0,
-             unsigned short int side_in=0,
-             boundary_id_type   bc_id_in=0) :
-    dof_id(dof_id_in),
-    side(side_in),
-    bc_id(bc_id_in)
-  {}
-
-  // comparison operator
-  bool operator < (const DofBCData & other) const
-  {
-    if (this->dof_id == other.dof_id)
-      return (this->side < other.side);
-
-    return this->dof_id < other.dof_id;
-  }
-};
-
-// comparison operator
-bool operator < (const unsigned int & other_dof_id,
-                 const DofBCData & dof_bc)
-{
-  return other_dof_id < dof_bc.dof_id;
-}
-
-bool operator < (const DofBCData & dof_bc,
-                 const unsigned int & other_dof_id)
-
-{
-  return dof_bc.dof_id < other_dof_id;
-}
-
-
-// For some reason SunStudio does not seem to accept the above
-// comparison functions for use in
-// std::equal_range (ElemBCData::iterator, ElemBCData::iterator, unsigned int);
-#if defined(__SUNPRO_CC) || defined(__PGI)
-struct CompareIntDofBCData
-{
-  bool operator()(const unsigned int & other_dof_id,
-                  const DofBCData & dof_bc)
-  {
-    return other_dof_id < dof_bc.dof_id;
-  }
-
-  bool operator()(const DofBCData & dof_bc,
-                  const unsigned int & other_dof_id)
-  {
-    return dof_bc.dof_id < other_dof_id;
-  }
-};
-#endif
 
 template <class T, class U>
 struct libmesh_type_is_same {
@@ -729,6 +670,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
 
   std::size_t n_written=0;
 
+  MeshBase::const_node_iterator       node_iter = mesh.local_nodes_begin();
+  const MeshBase::const_node_iterator nodes_end = mesh.local_nodes_end();
+
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -740,19 +684,22 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       xfer_ids.clear();
       xfer_coords.clear();
 
-      for (const auto & node : mesh.local_node_ptr_range())
-        if ((node->id() >= first_node) && // node in [first_node, last_node)
-            (node->id() <  last_node))
-          {
-            xfer_ids.push_back(node->id());
-            xfer_coords.push_back((*node)(0));
+      for (; node_iter != nodes_end; ++node_iter)
+        {
+          const Node & node = **node_iter;
+          libmesh_assert_greater_equal(node.id(), first_node);
+          if (node.id() >= last_node)
+            break;
+
+          xfer_ids.push_back(node.id());
+          xfer_coords.push_back(node(0));
 #if LIBMESH_DIM > 1
-            xfer_coords.push_back((*node)(1));
+          xfer_coords.push_back(node(1));
 #endif
 #if LIBMESH_DIM > 2
-            xfer_coords.push_back((*node)(2));
+          xfer_coords.push_back(node(2));
 #endif
-          }
+        }
 
       //-------------------------------------
       // Send the xfer buffers to processor 0
@@ -872,6 +819,8 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   n_written = 0;
 
+  node_iter = mesh.local_nodes_begin();
+
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -885,13 +834,16 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       xfer_unique_ids.clear();
       xfer_unique_ids.reserve(tot_id_size);
 
-      for (const auto & node : mesh.local_node_ptr_range())
-        if ((node->id() >= first_node) && // node in [first_node, last_node)
-            (node->id() <  last_node))
-          {
-            xfer_ids.push_back(node->id());
-            xfer_unique_ids.push_back(node->unique_id());
-          }
+      for (; node_iter != nodes_end; ++node_iter)
+        {
+          const Node & node = **node_iter;
+          libmesh_assert_greater_equal(node.id(), first_node);
+          if (node.id() >= last_node)
+            break;
+
+          xfer_ids.push_back(node.id());
+          xfer_unique_ids.push_back(node.unique_id());
+        }
 
       //-------------------------------------
       // Send the xfer buffers to processor 0
@@ -1854,7 +1806,6 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
   // Version 0.9.2+ introduces unique ids
   read_serialized_bc_names(io, boundary_info, true);  // sideset names
 
-  std::vector<DofBCData> dof_bc_data;
   std::vector<T> input_buffer;
 
   new_header_id_type n_bcs=0;
@@ -1883,65 +1834,48 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
-      dof_bc_data.clear();
-      dof_bc_data.reserve (input_buffer.size()/3);
-
-      // convert the input_buffer to DofBCData to facilitate searching
-      for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
-        dof_bc_data.push_back
-          (DofBCData(cast_int<dof_id_type>(input_buffer[idx+0]),
-                     cast_int<unsigned short>(input_buffer[idx+1]),
-                     cast_int<boundary_id_type>(input_buffer[idx+2])));
-      input_buffer.clear();
-      // note that while the files *we* write should already be sorted by
-      // element id this is not necessarily guaranteed.
-      std::sort (dof_bc_data.begin(), dof_bc_data.end());
 
       // Look for BCs in this block for all the level-0 elements we have
-      // (not just local ones).  Do this by finding all the entries
-      // in dof_bc_data whose elem_id match the ID of the current element.
+      // (not just local ones).  Do this by checking all entries for
+      // IDs matching an element we can query.
       // We cannot rely on nullptr neighbors at this point since the neighbor
       // data structure has not been initialized.
-      for (const auto & elem :
-             as_range(mesh.level_elements_begin(0),
-                      mesh.level_elements_end(0)))
+      for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
         {
-          auto bounds =
-            std::equal_range (dof_bc_data.begin(),
-                              dof_bc_data.end(),
-                              elem->id()
-#if defined(__SUNPRO_CC) || defined(__PGI)
-                              , CompareIntDofBCData()
-#endif
-                              );
+          const dof_id_type dof_id =
+            cast_int<dof_id_type>(input_buffer[idx+0]);
+          const unsigned short side =
+            cast_int<unsigned short>(input_buffer[idx+1]);
+          const boundary_id_type bc_id =
+            cast_int<boundary_id_type>(input_buffer[idx+2]);
 
-          for (const auto & data : as_range(bounds))
+          const Elem * elem = mesh.query_elem_ptr(dof_id);
+          if (!elem)
+            continue;
+
+          if (bc_type == "side")
             {
-              libmesh_assert_equal_to (data.dof_id, elem->id());
+              libmesh_assert_less (side, elem->n_sides());
+              boundary_info.add_side (elem, side, bc_id);
+            }
+          else if (bc_type == "edge")
+            {
+              libmesh_assert_less (side, elem->n_edges());
+              boundary_info.add_edge (elem, side, bc_id);
+            }
+          else if (bc_type == "shellface")
+            {
+              // Shell face IDs can only be 0 or 1.
+              libmesh_assert_less(side, 2);
 
-              if (bc_type == "side")
-                {
-                  libmesh_assert_less (data.side, elem->n_sides());
-                  boundary_info.add_side (elem, data.side, data.bc_id);
-                }
-              else if (bc_type == "edge")
-                {
-                  libmesh_assert_less (data.side, elem->n_edges());
-                  boundary_info.add_edge (elem, data.side, data.bc_id);
-                }
-              else if (bc_type == "shellface")
-                {
-                  // Shell face IDs can only be 0 or 1.
-                  libmesh_assert_less(data.side, 2);
-
-                  boundary_info.add_shellface (elem, data.side, data.bc_id);
-                }
-              else
-                {
-                  libmesh_error_msg("bc_type not recognized: " + bc_type);
-                }
+              boundary_info.add_shellface (elem, side, bc_id);
+            }
+          else
+            {
+              libmesh_error_msg("bc_type not recognized: " + bc_type);
             }
         }
+      input_buffer.clear();
     }
 }
 
@@ -1987,8 +1921,6 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
   // Version 0.9.2+ introduces unique ids
   read_serialized_bc_names(io, boundary_info, false); // nodeset names
 
-  // TODO: Make a data object that works with both the element and nodal bcs
-  std::vector<DofBCData> node_bc_data;
   std::vector<T> input_buffer;
 
   new_header_id_type n_nodesets=0;
@@ -2017,43 +1949,22 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
-      node_bc_data.clear();
-      node_bc_data.reserve (input_buffer.size()/2);
 
-      // convert the input_buffer to DofBCData to facilitate searching
+      // Look for BCs in this block for all nodes we have (not just
+      // local ones).  Do this by checking all entries for
+      // IDs matching a node we can query.
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=2)
-        node_bc_data.push_back
-          (DofBCData(cast_int<dof_id_type>(input_buffer[idx+0]),
-                     0,
-                     cast_int<boundary_id_type>(input_buffer[idx+1])));
-      input_buffer.clear();
-      // note that while the files *we* write should already be sorted by
-      // node id this is not necessarily guaranteed.
-      std::sort (node_bc_data.begin(), node_bc_data.end());
-
-      // Look for BCs in this block for all nodes we have
-      // (not just local ones).  Do this by finding all the entries
-      // in node_bc_data whose dof_id(node_id)  match the ID of the current node.
-      for (auto & node : mesh.node_ptr_range())
         {
-          std::pair<std::vector<DofBCData>::iterator,
-                    std::vector<DofBCData>::iterator> bounds =
-            std::equal_range (node_bc_data.begin(),
-                              node_bc_data.end(),
-                              node->id()
-#if defined(__SUNPRO_CC) || defined(__PGI)
-                              , CompareIntDofBCData()
-#endif
-                              );
+          const dof_id_type dof_id =
+            cast_int<dof_id_type>(input_buffer[idx+0]);
+          const boundary_id_type bc_id =
+            cast_int<boundary_id_type>(input_buffer[idx+1]);
 
-          for (const auto & data : as_range(bounds))
-            {
-              // Note: dof_id from ElmeBCData is being used to hold node_id here
-              libmesh_assert_equal_to (data.dof_id, node->id());
-
-              boundary_info.add_node (node, data.bc_id);
-            }
+          const Node * node = mesh.query_node_ptr(dof_id);
+          if (node)
+            boundary_info.add_node (node, bc_id);
         }
+      input_buffer.clear();
     }
 }
 
