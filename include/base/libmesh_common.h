@@ -347,38 +347,49 @@ extern bool warned_about_auto_ptr;
 // Newer clangs and all other supported compilers
 #else
 
+template <template <class> class Comp>
+struct libmesh_comparator {
+
+  template <typename T1, typename T2>
+  bool operator()(const T1 & e1, const T2 & e2) const
+  {
+    typedef typename std::decay<T1>::type DT1;
+    typedef typename std::decay<T2>::type DT2;
+    return (Comp<DT2>()(static_cast<DT2>(e1), e2) &&
+            Comp<DT1>()(e1, static_cast<DT1>(e2)));
+  }
+
+  template <typename T1>
+  bool operator()(const T1 & e1, const T1 & e2) const
+  {
+    return Comp<T1>()(e1, e2);
+  }
+};
+
 #define libmesh_assert_less_msg(expr1,expr2, msg)                       \
   do {                                                                  \
-    libmesh_assertion_types(expr1, expr2);                              \
-    if (!((static_cast<libmesh_type2>(expr1) < expr2) &&                \
-          (expr1 < static_cast<libmesh_type1>(expr2)))) {               \
+    if (!libmesh_comparator<std::less>()(expr1, expr2)) {                 \
       libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
   do {                                                                  \
-    libmesh_assertion_types(expr1, expr2);                              \
-    if (!((static_cast<libmesh_type2>(expr1) > expr2) &&                \
-          (expr1 > static_cast<libmesh_type1>(expr2)))) {               \
+    if (!libmesh_comparator<std::greater>()(expr1, expr2)) {            \
       libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
   do {                                                                  \
-    libmesh_assertion_types(expr1, expr2);                              \
-    if (!((static_cast<libmesh_type2>(expr1) <= expr2) &&               \
-          (expr1 <= static_cast<libmesh_type1>(expr2)))) {              \
+    if (!libmesh_comparator<std::less_equal>()(expr1, expr2)) {         \
       libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
 
 #define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
   do {                                                                  \
-    libmesh_assertion_types(expr1, expr2);                              \
-    if (!((static_cast<libmesh_type2>(expr1) >= expr2) &&               \
-          (expr1 >= static_cast<libmesh_type1>(expr2)))) {              \
+    if (!libmesh_comparator<std::greater_equal>()(expr1, expr2)) {      \
       libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while (0)
