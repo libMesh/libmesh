@@ -70,6 +70,14 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 {
   LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
 
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+    extra_int_maps = this->merge_extra_integer_names(other_mesh);
+
+  const unsigned int n_old_node_ints = extra_int_maps.second.size(),
+                     n_new_node_ints = _node_integer_names.size(),
+                     n_old_elem_ints = extra_int_maps.first.size(),
+                     n_new_elem_ints = _elem_integer_names.size();
+
   // If we are partitioned into fewer parts than the incoming mesh,
   // then we need to "wrap" the other Mesh's processor ids to fit
   // within our range. This can happen, for example, while stitching
@@ -104,6 +112,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
           this->add_point(*oldn,
                           oldn->id() + node_id_offset,
                           added_pid);
+
+        newn->add_extra_integers(n_new_node_ints);
+        for (unsigned int i = 0; i != n_old_node_ints; ++i)
+          newn->set_extra_integer(extra_int_maps.second[i],
+                                  oldn->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         newn->set_unique_id() =
@@ -167,6 +180,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
         // Give it the same element and unique ids
         el->set_id(old->id() + element_id_offset);
+
+        el->add_extra_integers(n_new_elem_ints);
+        for (unsigned int i = 0; i != n_old_elem_ints; ++i)
+          el->set_extra_integer(extra_int_maps.first[i],
+                                old->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         el->set_unique_id() =
@@ -712,6 +730,11 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
   // Container to catch boundary IDs handed back by BoundaryInfo
   std::vector<boundary_id_type> bc_ids;
 
+  // Put any extra integers on the new mesh too
+  new_mesh.merge_extra_integer_names(*this);
+  const unsigned int n_node_ints = _node_integer_names.size(),
+                     n_elem_ints = _elem_integer_names.size();
+
   for (const auto & old_elem : as_range(it, it_end))
     {
       // Add an equivalent element type to the new_mesh.
@@ -723,6 +746,10 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
 #endif
       new_elem->subdomain_id() = old_elem->subdomain_id();
       new_elem->processor_id() = old_elem->processor_id();
+
+      new_elem->add_extra_integers(n_elem_ints);
+      for (unsigned int i = 0; i != n_elem_ints; ++i)
+        new_elem->set_extra_integer(i, old_elem->get_extra_integer(i));
 
       new_mesh.add_elem (new_elem);
 
@@ -742,6 +769,10 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
                 new_mesh.add_point (old_elem->point(n),
                                     this_node_id,
                                     old_elem->node_ptr(n)->processor_id());
+
+        newn->add_extra_integers(n_node_ints);
+        for (unsigned int i = 0; i != n_node_ints; ++i)
+          newn->set_extra_integer(i, old_elem->node_ptr(n)->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
               newn->set_unique_id() = old_elem->node_ptr(n)->unique_id();

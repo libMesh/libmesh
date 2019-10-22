@@ -152,8 +152,15 @@ public:
 
 
   /**
-   * Deep copy of another unstructured mesh class (used by subclass
-   * copy constructors)
+   * Deep copy of nodes and elements from another unstructured mesh
+   * class (used by subclass copy constructors and by mesh merging
+   * operations)
+   *
+   * This will not copy most "high level" data in the mesh; that is
+   * done separately by constructors.  An exception is that, if the
+   * \p other_mesh has element or node extra_integer data, any names
+   * for that data which do not already exist on \p this mesh are
+   * added so that all such data can be copied.
    */
   virtual void copy_nodes_and_elements (const UnstructuredMesh & other_mesh,
                                         const bool skip_find_neighbors = false,
