@@ -1789,54 +1789,39 @@ void RBConstruction::load_rb_solution()
 
 // The slow (but simple, non-error prone) way to compute the residual dual norm
 // Useful for error checking
-//Real RBConstruction::compute_residual_dual_norm(const unsigned int N)
-//{
-//   LOG_SCOPE("compute_residual_dual_norm()", "RBConstruction");
-//
-//   // Put the residual in rhs in order to compute the norm of the Riesz representor
-//   // Note that this only works in serial since otherwise each processor will
-//   // have a different parameter value during the Greedy training.
-//
-//   std::unique_ptr<NumericVector<Number>> RB_sol = NumericVector<Number>::build();
-//   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-//
-//   std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build();
-//   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-//
-//   for (unsigned int i=0; i<N; i++)
-//   {
-//     RB_sol->add(RB_solution(i), get_rb_evaluation().get_basis_function(i));
-//   }
-//
-//   this->truth_assembly();
-//   matrix->vector_mult(*temp, *RB_sol);
-//   rhs->add(-1., *temp);
-//
-//   // Then solve to get the Reisz representor
-//   matrix->zero();
-//   matrix->add(1., *inner_product_matrix);
-//   if (constrained_problem)
-//     matrix->add(1., *constraint_matrix);
-//
-//   solution->zero();
-//   solve();
-//   // Make sure we didn't max out the number of iterations
-//   if ((this->n_linear_iterations() >=
-//        this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-//       (this->final_linear_residual() >
-//        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")))
-//   {
-//     libmesh_error_msg("Warning: Linear solver may not have converged! Final linear residual = "
-//                       << this->final_linear_residual() << ", number of iterations = "
-//                       << this->n_linear_iterations());
-//   }
-//
-//   get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *solution);
-//
-//   Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
-//
-//   return std::sqrt( libmesh_real(slow_residual_norm_sq) );
-//}
+Real RBConstruction::compute_residual_dual_norm_slow(const unsigned int N)
+{
+  LOG_SCOPE("compute_residual_dual_norm_slow()", "RBConstruction");
+
+  // Put the residual in rhs in order to compute the norm of the Riesz representor
+  // Note that this only works in serial since otherwise each processor will
+  // have a different parameter value during the Greedy training.
+
+  std::unique_ptr<NumericVector<Number>> RB_sol = NumericVector<Number>::build(comm());
+  RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
+
+  std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(comm());
+  temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
+
+  for (unsigned int i=0; i<N; i++)
+  {
+    RB_sol->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
+  }
+
+  this->truth_assembly();
+  matrix->vector_mult(*temp, *RB_sol);
+  rhs->add(-1., *temp);
+
+  // Then solve to get the Reisz representor
+  matrix->zero();
+  matrix->add(1., *inner_product_matrix);
+
+  solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
+  get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *solution);
+  Number slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
+
+  return std::sqrt( libmesh_real(slow_residual_norm_sq) );
+}
 
 SparseMatrix<Number> * RBConstruction::get_inner_product_matrix()
 {
