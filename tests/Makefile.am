@@ -57,6 +57,7 @@ unit_tests_sources = \
   mesh/extra_integers.C \
   mesh/mesh_input.C \
   mesh/mesh_function.C \
+  mesh/mesh_stitch.C \
   mesh/mixed_dim_mesh_test.C \
   mesh/nodal_neighbors.C \
   mesh/mesh_extruder.C \
