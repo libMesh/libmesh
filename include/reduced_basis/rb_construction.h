@@ -219,6 +219,12 @@ public:
   virtual void load_rb_solution();
 
   /**
+   * The slow (but simple, non-error prone) way to compute the residual dual norm.
+   * Useful for error checking.
+   */
+  Real compute_residual_dual_norm_slow(const unsigned int N);
+
+  /**
    * Get a pointer to inner_product_matrix. Accessing via this
    * function, rather than directly through the class member allows
    * us to do error checking (e.g. inner_product_matrix is not
