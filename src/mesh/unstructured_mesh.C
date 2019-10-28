@@ -106,9 +106,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
           (wrap_proc_ids ? oldn->processor_id() % _n_parts : oldn->processor_id());
 
         // Add new nodes in old node Point locations
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
         Node * newn =
-#endif
           this->add_point(*oldn,
                           oldn->id() + node_id_offset,
                           added_pid);
@@ -763,16 +761,14 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
           // Add this node to the new mesh if it's not there already
           if (!new_mesh.query_node_ptr(this_node_id))
             {
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
               Node * newn =
-#endif
                 new_mesh.add_point (old_elem->point(n),
                                     this_node_id,
                                     old_elem->node_ptr(n)->processor_id());
 
-        newn->add_extra_integers(n_node_ints);
-        for (unsigned int i = 0; i != n_node_ints; ++i)
-          newn->set_extra_integer(i, old_elem->node_ptr(n)->get_extra_integer(i));
+              newn->add_extra_integers(n_node_ints);
+              for (unsigned int i = 0; i != n_node_ints; ++i)
+                newn->set_extra_integer(i, old_elem->node_ptr(n)->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
               newn->set_unique_id() = old_elem->node_ptr(n)->unique_id();
