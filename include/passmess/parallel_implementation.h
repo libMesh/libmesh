@@ -19,9 +19,29 @@
 #ifndef LIBMESH_PARALLEL_IMPLEMENTATION_H
 #define LIBMESH_PARALLEL_IMPLEMENTATION_H
 
-// Local includes
-#include "parallel.h"
-#include "libmesh_logging.h"
+// Parallel includes
+#include "libmesh/attributes.h"
+#include "libmesh/communicator.h"
+#include "libmesh/data_type.h"
+#include "libmesh/libmesh_call_mpi.h"
+#include "libmesh/message_tag.h"
+#include "libmesh/op_function.h"
+#include "libmesh/packing.h"
+#include "libmesh/parallel_only.h"
+#include "libmesh/post_wait_copy_buffer.h"
+#include "libmesh/post_wait_delete_buffer.h"
+#include "libmesh/post_wait_dereference_shared_ptr.h"
+#include "libmesh/post_wait_dereference_tag.h"
+#include "libmesh/post_wait_free_buffer.h"
+#include "libmesh/post_wait_unpack_buffer.h"
+#include "libmesh/post_wait_work.h"
+#include "libmesh/request.h"
+#include "libmesh/status.h"
+#include "libmesh/standard_type.h"
+
+// libMesh Includes
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_logging.h"
 
 // C++ includes
 #include <complex>

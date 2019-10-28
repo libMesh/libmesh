@@ -21,7 +21,7 @@
 #define LIBMESH_PARALLEL_SYNC_H
 
 // Local Includes
-#include "libmesh/parallel.h"
+#include "libmesh/parallel_implementation.h"
 
 // C++ includes
 #include <map>
