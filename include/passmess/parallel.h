@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_PARALLEL_H
-#define LIBMESH_PARALLEL_H
+#ifndef PASSMESS_PARALLEL_H
+#define PASSMESS_PARALLEL_H
 
 // Parallel includes
 #include "libmesh/attributes.h"
@@ -51,4 +51,4 @@
 // it.  Attn: anyone-still-using-it - stop!
 #define LIBMESH_CAN_DEFAULT_TO_COMMWORLD
 
-#endif // LIBMESH_PARALLEL_H
+#endif // PASSMESS_PARALLEL_H

@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_OP_FUNCTION_H
-#define LIBMESH_OP_FUNCTION_H
+#ifndef PASSMESS_OP_FUNCTION_H
+#define PASSMESS_OP_FUNCTION_H
 
 #include "libmesh_config.h"
 
@@ -247,4 +247,4 @@ LIBMESH_PARALLEL_FLOAT_OPS(long double);
 
 } // namespace libMesh
 
-#endif // LIBMESH_OP_FUNCTION_H
+#endif // PASSMESS_OP_FUNCTION_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef LIBMESH_PARALLEL_SYNC_H
-#define LIBMESH_PARALLEL_SYNC_H
+#ifndef PASSMESS_PARALLEL_SYNC_H
+#define PASSMESS_PARALLEL_SYNC_H
 
 // Local Includes
 #include "libmesh/parallel_implementation.h"
@@ -563,4 +563,4 @@ void pull_parallel_vector_data(const Communicator & comm,
 
 } // namespace libMesh
 
-#endif // LIBMESH_PARALLEL_SYNC_H
+#endif // PASSMESS_PARALLEL_SYNC_H

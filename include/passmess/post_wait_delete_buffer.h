@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_POST_WAIT_DELETE_BUFFER_H
-#define LIBMESH_POST_WAIT_DELETE_BUFFER_H
+#ifndef PASSMESS_POST_WAIT_DELETE_BUFFER_H
+#define PASSMESS_POST_WAIT_DELETE_BUFFER_H
 
 // Parallel includes
 #include "libmesh/post_wait_work.h"
@@ -46,4 +46,4 @@ private:
 
 } // namespace libMesh
 
-#endif // LIBMESH_POST_WAIT_DELETE_BUFFER_H
+#endif // PASSMESS_POST_WAIT_DELETE_BUFFER_H

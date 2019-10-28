@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_REQUEST_H
-#define LIBMESH_REQUEST_H
+#ifndef PASSMESS_REQUEST_H
+#define PASSMESS_REQUEST_H
 
 // Parallel includes
 #include "libmesh/status.h"
@@ -144,4 +144,4 @@ std::size_t waitany (std::vector<Request> & r);
 
 } // namespace libMesh
 
-#endif // LIBMESH_REQUEST_H
+#endif // PASSMESS_REQUEST_H

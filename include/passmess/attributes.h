@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_ATTRIBUTES_H
-#define LIBMESH_ATTRIBUTES_H
+#ifndef PASSMESS_ATTRIBUTES_H
+#define PASSMESS_ATTRIBUTES_H
 
 // C++ includes
 #include <limits>
@@ -117,4 +117,4 @@ LIBMESH_CONTAINER_TYPE(std::vector<T LIBMESH_ATTRIBUTES_COMMA A>);
 
 } // namespace libMesh
 
-#endif // LIBMESH_ATTRIBUTES_H
+#endif // PASSMESS_ATTRIBUTES_H

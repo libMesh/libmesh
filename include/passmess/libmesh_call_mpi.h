@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_CALL_MPI_H
-#define LIBMESH_CALL_MPI_H
+#ifndef PASSMESS_CALL_MPI_H
+#define PASSMESS_CALL_MPI_H
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
@@ -87,4 +87,4 @@
 #endif // LIBMESH_HAVE_MPI
 
 
-#endif // LIBMESH_CALL_MPI_H
+#endif // PASSMESS_CALL_MPI_H

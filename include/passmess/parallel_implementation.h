@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_PARALLEL_IMPLEMENTATION_H
-#define LIBMESH_PARALLEL_IMPLEMENTATION_H
+#ifndef PASSMESS_PARALLEL_IMPLEMENTATION_H
+#define PASSMESS_PARALLEL_IMPLEMENTATION_H
 
 // Parallel includes
 #include "libmesh/attributes.h"
@@ -3173,4 +3173,4 @@ inline bool Communicator::possibly_receive (unsigned int & src_processor_id,
 
 } // namespace libMesh
 
-#endif // LIBMESH_PARALLEL_IMPLEMENTATION_H
+#endif // PASSMESS_PARALLEL_IMPLEMENTATION_H

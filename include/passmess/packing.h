@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_PACKING_H
-#define LIBMESH_PACKING_H
+#ifndef PASSMESS_PACKING_H
+#define PASSMESS_PACKING_H
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
@@ -217,4 +217,4 @@ inline void unpack_range (const std::vector<buffertype> & buffer,
 
 } // namespace libMesh
 
-#endif // LIBMESH_PACKING_H
+#endif // PASSMESS_PACKING_H

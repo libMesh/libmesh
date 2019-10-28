@@ -1,6 +1,6 @@
 
 // This file is only for use within communicator.h
-#ifdef LIBMESH_COMMUNICATOR_H
+#ifdef PASSMESS_COMMUNICATOR_H
 
 // Some of these specializations are defined in an MPI-independent way
 
@@ -360,4 +360,4 @@
                       const MessageTag &recv_tag = any_tag) const;
 #endif // LIBMESH_HAVE_MPI
 
-#endif // LIBMESH_COMMUNICATOR_H
+#endif // PASSMESS_COMMUNICATOR_H

@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_POST_WAIT_DEREFERENCE_SHARED_PTR_H
-#define LIBMESH_POST_WAIT_DEREFERENCE_SHARED_PTR_H
+#ifndef PASSMESS_POST_WAIT_DEREFERENCE_SHARED_PTR_H
+#define PASSMESS_POST_WAIT_DEREFERENCE_SHARED_PTR_H
 
 // Parallel includes
 #include "libmesh/message_tag.h"
@@ -51,4 +51,4 @@ private:
 
 } // namespace libMesh
 
-#endif // LIBMESH_POST_WAIT_DEREFERENCE_SHARED_PTR_H
+#endif // PASSMESS_POST_WAIT_DEREFERENCE_SHARED_PTR_H

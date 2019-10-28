@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_DATA_TYPE_H
-#define LIBMESH_DATA_TYPE_H
+#ifndef PASSMESS_DATA_TYPE_H
+#define PASSMESS_DATA_TYPE_H
 
 // Parallel includes
 #include "libmesh/libmesh_call_mpi.h"
@@ -121,4 +121,4 @@ protected:
 
 } // namespace libMesh
 
-#endif // LIBMESH_DATA_TYPE_H
+#endif // PASSMESS_DATA_TYPE_H

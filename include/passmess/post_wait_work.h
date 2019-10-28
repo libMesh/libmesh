@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_POST_WAIT_WORK_H
-#define LIBMESH_POST_WAIT_WORK_H
+#ifndef PASSMESS_POST_WAIT_WORK_H
+#define PASSMESS_POST_WAIT_WORK_H
 
 namespace libMesh
 {
@@ -51,4 +51,4 @@ struct PostWaitWork {
 
 } // namespace libMesh
 
-#endif // LIBMESH_POST_WAIT_WORK_H
+#endif // PASSMESS_POST_WAIT_WORK_H

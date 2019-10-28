@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_COMMUNICATOR_H
-#define LIBMESH_COMMUNICATOR_H
+#ifndef PASSMESS_COMMUNICATOR_H
+#define PASSMESS_COMMUNICATOR_H
 
 // Parallel includes
 #include "libmesh/data_type.h"
@@ -959,4 +959,4 @@ public:
 
 } // namespace libMesh
 
-#endif // LIBMESH_COMMUNICATOR_H
+#endif // PASSMESS_COMMUNICATOR_H

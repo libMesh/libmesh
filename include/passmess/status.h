@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_STATUS_H
-#define LIBMESH_STATUS_H
+#ifndef PASSMESS_STATUS_H
+#define PASSMESS_STATUS_H
 
 // Parallel includes
 #include "libmesh/data_type.h"
@@ -169,4 +169,4 @@ inline unsigned int Status::size () const
 
 } // namespace libMesh
 
-#endif // LIBMESH_STATUS_H
+#endif // PASSMESS_STATUS_H
