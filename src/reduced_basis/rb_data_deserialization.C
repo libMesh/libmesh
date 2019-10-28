@@ -88,14 +88,22 @@ void RBEvaluationDeserialization::read_from_file(const std::string & path,
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  capnp::StreamFdMessageReader message(fd, reader_options);
+  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  libmesh_try
+    {
+      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+    }
+  libmesh_catch(...)
+    {
+      libmesh_error_msg("Failed to open capnp buffer");
+    }
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   RBData::RBEvaluationReal::Reader rb_eval_reader =
-    message.getRoot<RBData::RBEvaluationReal>();
+    message->getRoot<RBData::RBEvaluationReal>();
 #else
   RBData::RBEvaluationComplex::Reader rb_eval_reader =
-    message.getRoot<RBData::RBEvaluationComplex>();
+    message->getRoot<RBData::RBEvaluationComplex>();
 #endif
 
   load_rb_evaluation_data(_rb_eval, rb_eval_reader, read_error_bound_data);
@@ -131,16 +139,24 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string & pa
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  capnp::StreamFdMessageReader message(fd, reader_options);
+  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  libmesh_try
+    {
+      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+    }
+  libmesh_catch(...)
+    {
+      libmesh_error_msg("Failed to open capnp buffer");
+    }
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   RBData::TransientRBEvaluationReal::Reader trans_rb_eval_reader =
-    message.getRoot<RBData::TransientRBEvaluationReal>();
+    message->getRoot<RBData::TransientRBEvaluationReal>();
   RBData::RBEvaluationReal::Reader rb_eval_reader =
     trans_rb_eval_reader.getRbEvaluation();
 #else
   RBData::TransientRBEvaluationComplex::Reader trans_rb_eval_reader =
-    message.getRoot<RBData::TransientRBEvaluationComplex>();
+    message->getRoot<RBData::TransientRBEvaluationComplex>();
   RBData::RBEvaluationComplex::Reader rb_eval_reader =
     trans_rb_eval_reader.getRbEvaluation();
 #endif
@@ -180,16 +196,24 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  capnp::StreamFdMessageReader message(fd, reader_options);
+  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  libmesh_try
+    {
+      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+    }
+  libmesh_catch(...)
+    {
+      libmesh_error_msg("Failed to open capnp buffer");
+    }
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   RBData::RBEIMEvaluationReal::Reader rb_eim_eval_reader =
-    message.getRoot<RBData::RBEIMEvaluationReal>();
+    message->getRoot<RBData::RBEIMEvaluationReal>();
   RBData::RBEvaluationReal::Reader rb_eval_reader =
     rb_eim_eval_reader.getRbEvaluation();
 #else
   RBData::RBEIMEvaluationComplex::Reader rb_eim_eval_reader =
-    message.getRoot<RBData::RBEIMEvaluationComplex>();
+    message->getRoot<RBData::RBEIMEvaluationComplex>();
   RBData::RBEvaluationComplex::Reader rb_eval_reader =
     rb_eim_eval_reader.getRbEvaluation();
 #endif
@@ -232,10 +256,18 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  capnp::StreamFdMessageReader message(fd, reader_options);
+  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  libmesh_try
+    {
+      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+    }
+  libmesh_catch(...)
+    {
+      libmesh_error_msg("Failed to open capnp buffer");
+    }
 
   RBData::RBSCMEvaluation::Reader rb_scm_eval_reader =
-    message.getRoot<RBData::RBSCMEvaluation>();
+    message->getRoot<RBData::RBSCMEvaluation>();
 
   load_rb_scm_evaluation_data(_rb_scm_eval,
                               rb_scm_eval_reader);
