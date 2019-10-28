@@ -263,14 +263,6 @@ BUILT_SOURCES = \
         wrapped_function.h \
         wrapped_functor.h \
         zero_function.h \
-        attributes.h \
-        communicator.h \
-        data_type.h \
-        libmesh_call_mpi.h \
-        message_tag.h \
-        op_function.h \
-        packing.h \
-        parallel.h \
         parallel_algebra.h \
         parallel_bin_sorter.h \
         parallel_conversion_utils.h \
@@ -278,22 +270,10 @@ BUILT_SOURCES = \
         parallel_ghost_sync.h \
         parallel_hilbert.h \
         parallel_histogram.h \
-        parallel_implementation.h \
         parallel_node.h \
         parallel_object.h \
         parallel_only.h \
         parallel_sort.h \
-        parallel_sync.h \
-        post_wait_copy_buffer.h \
-        post_wait_delete_buffer.h \
-        post_wait_dereference_shared_ptr.h \
-        post_wait_dereference_tag.h \
-        post_wait_free_buffer.h \
-        post_wait_unpack_buffer.h \
-        post_wait_work.h \
-        request.h \
-        standard_type.h \
-        status.h \
         threads.h \
         threads_allocators.h \
         threads_none.h \
@@ -311,6 +291,26 @@ BUILT_SOURCES = \
         partitioner.h \
         sfc_partitioner.h \
         subdomain_partitioner.h \
+        attributes.h \
+        communicator.h \
+        data_type.h \
+        libmesh_call_mpi.h \
+        message_tag.h \
+        op_function.h \
+        packing.h \
+        parallel.h \
+        parallel_implementation.h \
+        parallel_sync.h \
+        post_wait_copy_buffer.h \
+        post_wait_delete_buffer.h \
+        post_wait_dereference_shared_ptr.h \
+        post_wait_dereference_tag.h \
+        post_wait_free_buffer.h \
+        post_wait_unpack_buffer.h \
+        post_wait_work.h \
+        request.h \
+        standard_type.h \
+        status.h \
         diff_physics.h \
         diff_qoi.h \
         fem_physics.h \
@@ -1316,30 +1316,6 @@ wrapped_functor.h: $(top_srcdir)/include/numerics/wrapped_functor.h
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-attributes.h: $(top_srcdir)/include/parallel/attributes.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-communicator.h: $(top_srcdir)/include/parallel/communicator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-data_type.h: $(top_srcdir)/include/parallel/data_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-libmesh_call_mpi.h: $(top_srcdir)/include/parallel/libmesh_call_mpi.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-message_tag.h: $(top_srcdir)/include/parallel/message_tag.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-op_function.h: $(top_srcdir)/include/parallel/op_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-packing.h: $(top_srcdir)/include/parallel/packing.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-parallel.h: $(top_srcdir)/include/parallel/parallel.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 parallel_algebra.h: $(top_srcdir)/include/parallel/parallel_algebra.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1361,9 +1337,6 @@ parallel_hilbert.h: $(top_srcdir)/include/parallel/parallel_hilbert.h
 parallel_histogram.h: $(top_srcdir)/include/parallel/parallel_histogram.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-parallel_implementation.h: $(top_srcdir)/include/parallel/parallel_implementation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 parallel_node.h: $(top_srcdir)/include/parallel/parallel_node.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1374,39 +1347,6 @@ parallel_only.h: $(top_srcdir)/include/parallel/parallel_only.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-parallel_sync.h: $(top_srcdir)/include/parallel/parallel_sync.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_copy_buffer.h: $(top_srcdir)/include/parallel/post_wait_copy_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_delete_buffer.h: $(top_srcdir)/include/parallel/post_wait_delete_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_dereference_shared_ptr.h: $(top_srcdir)/include/parallel/post_wait_dereference_shared_ptr.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_dereference_tag.h: $(top_srcdir)/include/parallel/post_wait_dereference_tag.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_free_buffer.h: $(top_srcdir)/include/parallel/post_wait_free_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_unpack_buffer.h: $(top_srcdir)/include/parallel/post_wait_unpack_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_work.h: $(top_srcdir)/include/parallel/post_wait_work.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-request.h: $(top_srcdir)/include/parallel/request.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-standard_type.h: $(top_srcdir)/include/parallel/standard_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-status.h: $(top_srcdir)/include/parallel/status.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads.h: $(top_srcdir)/include/parallel/threads.h
@@ -1458,6 +1398,66 @@ sfc_partitioner.h: $(top_srcdir)/include/partitioning/sfc_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 subdomain_partitioner.h: $(top_srcdir)/include/partitioning/subdomain_partitioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+attributes.h: $(top_srcdir)/include/passmess/attributes.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+communicator.h: $(top_srcdir)/include/passmess/communicator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+data_type.h: $(top_srcdir)/include/passmess/data_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+libmesh_call_mpi.h: $(top_srcdir)/include/passmess/libmesh_call_mpi.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+message_tag.h: $(top_srcdir)/include/passmess/message_tag.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+op_function.h: $(top_srcdir)/include/passmess/op_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+packing.h: $(top_srcdir)/include/passmess/packing.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel.h: $(top_srcdir)/include/passmess/parallel.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_implementation.h: $(top_srcdir)/include/passmess/parallel_implementation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_sync.h: $(top_srcdir)/include/passmess/parallel_sync.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_copy_buffer.h: $(top_srcdir)/include/passmess/post_wait_copy_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_delete_buffer.h: $(top_srcdir)/include/passmess/post_wait_delete_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_dereference_shared_ptr.h: $(top_srcdir)/include/passmess/post_wait_dereference_shared_ptr.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_dereference_tag.h: $(top_srcdir)/include/passmess/post_wait_dereference_tag.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_free_buffer.h: $(top_srcdir)/include/passmess/post_wait_free_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_unpack_buffer.h: $(top_srcdir)/include/passmess/post_wait_unpack_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_work.h: $(top_srcdir)/include/passmess/post_wait_work.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+request.h: $(top_srcdir)/include/passmess/request.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+standard_type.h: $(top_srcdir)/include/passmess/standard_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+status.h: $(top_srcdir)/include/passmess/status.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_physics.h: $(top_srcdir)/include/physics/diff_physics.h
@@ -1904,6 +1904,6 @@ vectormap.h: $(top_srcdir)/include/utils/vectormap.h
 xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-parallel_communicator_specializations: $(top_srcdir)/include/parallel/parallel_communicator_specializations
+parallel_communicator_specializations: $(top_srcdir)/include/passmess/parallel_communicator_specializations
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 

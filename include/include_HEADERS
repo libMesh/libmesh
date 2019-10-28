@@ -270,36 +270,15 @@ include_HEADERS =  \
         numerics/wrapped_function.h \
         numerics/wrapped_functor.h \
         numerics/zero_function.h \
-        parallel/attributes.h \
-        parallel/communicator.h \
-        parallel/data_type.h \
-        parallel/libmesh_call_mpi.h \
-        parallel/message_tag.h \
-        parallel/op_function.h \
-        parallel/packing.h \
-        parallel/parallel.h \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
-        parallel/parallel_communicator_specializations \
         parallel/parallel_elem.h \
         parallel/parallel_ghost_sync.h \
         parallel/parallel_histogram.h \
-        parallel/parallel_implementation.h \
         parallel/parallel_node.h \
         parallel/parallel_object.h \
         parallel/parallel_only.h \
         parallel/parallel_sort.h \
-        parallel/parallel_sync.h \
-        parallel/post_wait_copy_buffer.h \
-        parallel/post_wait_delete_buffer.h \
-        parallel/post_wait_dereference_shared_ptr.h \
-        parallel/post_wait_dereference_tag.h \
-        parallel/post_wait_free_buffer.h \
-        parallel/post_wait_unpack_buffer.h \
-        parallel/post_wait_work.h \
-        parallel/request.h \
-        parallel/standard_type.h \
-        parallel/status.h \
         parallel/threads.h \
         parallel/threads_allocators.h \
         parallel/threads_none.h \
@@ -316,6 +295,27 @@ include_HEADERS =  \
         partitioning/partitioner.h \
         partitioning/sfc_partitioner.h \
         partitioning/subdomain_partitioner.h \
+        passmess/attributes.h \
+        passmess/communicator.h \
+        passmess/data_type.h \
+        passmess/libmesh_call_mpi.h \
+        passmess/message_tag.h \
+        passmess/op_function.h \
+        passmess/packing.h \
+        passmess/parallel.h \
+        passmess/parallel_communicator_specializations \
+        passmess/parallel_implementation.h \
+        passmess/parallel_sync.h \
+        passmess/post_wait_copy_buffer.h \
+        passmess/post_wait_delete_buffer.h \
+        passmess/post_wait_dereference_shared_ptr.h \
+        passmess/post_wait_dereference_tag.h \
+        passmess/post_wait_free_buffer.h \
+        passmess/post_wait_unpack_buffer.h \
+        passmess/post_wait_work.h \
+        passmess/request.h \
+        passmess/standard_type.h \
+        passmess/status.h \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \
