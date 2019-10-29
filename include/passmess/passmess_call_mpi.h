@@ -27,30 +27,30 @@
 /**
  * Macro to use arguments only when MPI is in use
  */
-#define libmesh_mpi_var(var) var
+#define passmess_mpi_var(var) var
 
 /**
  * Macros to test MPI return values
  */
 #ifndef NDEBUG
-#define libmesh_assert_mpi_success(error_code)                          \
+#define passmess_assert_mpi_success(error_code)                         \
   do                                                                    \
     {                                                                   \
       if (error_code != MPI_SUCCESS)                                    \
         {                                                               \
-          char libmesh_mpi_error_string[MPI_MAX_ERROR_STRING+1];        \
-          int libmesh_mpi_error_string_len;                             \
-          MPI_Error_string(error_code, libmesh_mpi_error_string,        \
-                           &libmesh_mpi_error_string_len);              \
+          char passmess_mpi_error_string[MPI_MAX_ERROR_STRING+1];       \
+          int passmess_mpi_error_string_len;                            \
+          MPI_Error_string(error_code, passmess_mpi_error_string,       \
+                           &passmess_mpi_error_string_len);             \
           libmesh_assert_equal_to_msg(error_code, MPI_SUCCESS,          \
-                                      libmesh_mpi_error_string);        \
+                                      passmess_mpi_error_string);       \
         }                                                               \
     }                                                                   \
   while (0)
 
 #else
 
-#define libmesh_assert_mpi_success(error_code)  ((void) 0)
+#define passmess_assert_mpi_success(error_code)  ((void) 0)
 
 #endif
 
@@ -58,17 +58,17 @@
 
 // Only catch MPI return values when asserts are active.
 #ifndef NDEBUG
-#define libmesh_call_mpi(mpi_call)                              \
+#define passmess_call_mpi(mpi_call)                             \
   do                                                            \
     {                                                           \
-      unsigned int libmesh_mpi_error_code = mpi_call;           \
-      libmesh_assert_mpi_success (libmesh_mpi_error_code);      \
+      unsigned int passmess_mpi_error_code = mpi_call;          \
+      passmess_assert_mpi_success (passmess_mpi_error_code);    \
     }                                                           \
   while (0)
 
 #else
 
-#define libmesh_call_mpi(mpi_call)              \
+#define passmess_call_mpi(mpi_call)             \
   do                                            \
     {                                           \
       mpi_call;                                 \
@@ -78,9 +78,9 @@
 
 #else // LIBMESH_HAVE_MPI
 
-#define libmesh_mpi_var(var)
+#define passmess_mpi_var(var)
 
-#define libmesh_call_mpi(mpi_call)              \
+#define passmess_call_mpi(mpi_call)             \
   do {}                                         \
   while (0)
 

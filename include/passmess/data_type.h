@@ -20,7 +20,7 @@
 #define PASSMESS_DATA_TYPE_H
 
 // Parallel includes
-#include "libmesh/libmesh_call_mpi.h"
+#include "libmesh/passmess_call_mpi.h"
 
 // libMesh includes
 #include "libmesh/libmesh_common.h"
@@ -67,7 +67,7 @@ public:
   {
     // FIXME - if we nest an inner type here will we run into bug
     // https://github.com/libMesh/libmesh/issues/631 again?
-    libmesh_call_mpi(MPI_Type_contiguous(count, other._datatype, &_datatype));
+    passmess_call_mpi(MPI_Type_contiguous(count, other._datatype, &_datatype));
     libMesh::libmesh_ignore(other, count); // ifndef LIBMESH_HAVE_MPI
     this->commit();
   }
@@ -92,13 +92,13 @@ public:
 
   void commit ()
   {
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_commit (&_datatype));
   }
 
   void free ()
   {
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_free (&_datatype));
   }
 

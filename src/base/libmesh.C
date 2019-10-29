@@ -391,7 +391,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // Check whether the calling program has already initialized
       // MPI, and avoid duplicate Init/Finalize
       int flag;
-      libmesh_call_mpi(MPI_Initialized (&flag));
+      passmess_call_mpi(MPI_Initialized (&flag));
 
       if (!flag)
         {
@@ -400,7 +400,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
             MPI_THREAD_FUNNELED :
             MPI_THREAD_SINGLE;
 
-          libmesh_call_mpi
+          passmess_call_mpi
             (MPI_Init_thread (&argc, const_cast<char ***>(&argv),
                               mpi_thread_requested, &mpi_thread_provided));
 
@@ -447,11 +447,11 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // into a debugger with a proper stack when an MPI error occurs.
       if (libMesh::on_command_line ("--handle-mpi-errors"))
         {
-          libmesh_call_mpi
+          passmess_call_mpi
             (MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler));
-          libmesh_call_mpi
+          passmess_call_mpi
             (MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler));
-          libmesh_call_mpi
+          passmess_call_mpi
             (MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler));
         }
     }

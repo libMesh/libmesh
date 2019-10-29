@@ -124,14 +124,14 @@ LIBMESH_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
   public:
     explicit
       StandardType(const Real * = nullptr) {
-        libmesh_call_mpi(MPI_Type_contiguous(2, MPI_DOUBLE, &_datatype));
+        passmess_call_mpi(MPI_Type_contiguous(2, MPI_DOUBLE, &_datatype));
         this->commit();
       }
 
     StandardType(const StandardType<Real> & t)
       : DataType()
     {
-      libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+      passmess_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
     }
 
     ~StandardType() {
@@ -167,13 +167,13 @@ public:
     int blocklengths[] = {1,1};
     MPI_Aint displs[2], start;
 
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Get_address (const_cast<std::pair<T1,T2> *>(example),
                         &start));
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Get_address (const_cast<T1*>(&example->first),
                         &displs[0]));
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Get_address (const_cast<T2*>(&example->second),
                         &displs[1]));
     displs[0] -= start;
@@ -181,18 +181,18 @@ public:
 
     // create a prototype structure
     MPI_Datatype tmptype;
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_create_struct (2, blocklengths, displs, types,
                                &tmptype));
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_commit (&tmptype));
 
     // resize the structure type to account for padding, if any
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_create_resized (tmptype, 0,
                                 sizeof(std::pair<T1,T2>),
                                 &_datatype));
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_free (&tmptype));
 
     this->commit();
@@ -201,9 +201,9 @@ public:
 
   }
 
-  StandardType(const StandardType<std::pair<T1, T2>> & libmesh_mpi_var(t))
+  StandardType(const StandardType<std::pair<T1, T2>> & passmess_mpi_var(t))
   {
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_dup (t._datatype, &_datatype));
   }
 
@@ -272,7 +272,7 @@ void FillDisplacementArray<n_minus_i>::fill
   (OutArray & out_vec,
    const std::tuple<Types...> & example)
 {
-  libmesh_call_mpi
+  passmess_call_mpi
     (MPI_Get_address
       (&std::get<sizeof...(Types)-n_minus_i>(example),
        &out_vec[sizeof...(Types)-n_minus_i]));
@@ -295,7 +295,7 @@ public:
 #ifdef LIBMESH_HAVE_MPI
     MPI_Aint start;
 
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Get_address (example, &start));
 
     const std::size_t tuplesize = sizeof...(Types);
@@ -318,18 +318,18 @@ public:
 
     // create a prototype structure
     MPI_Datatype tmptype;
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_create_struct (tuplesize, blocklengths.data(), displs.data(), types.data(),
                                &tmptype));
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_commit (&tmptype));
 
     // resize the structure type to account for padding, if any
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_create_resized (tmptype, 0,
                                 sizeof(std::tuple<Types...>),
                                 &_datatype));
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_free (&tmptype));
 
     this->commit();
@@ -338,9 +338,9 @@ public:
 
   }
 
-  StandardType(const StandardType<std::tuple<Types...>> & libmesh_mpi_var(t))
+  StandardType(const StandardType<std::tuple<Types...>> & passmess_mpi_var(t))
   {
-    libmesh_call_mpi
+    passmess_call_mpi
       (MPI_Type_dup (t._datatype, &_datatype));
   }
 

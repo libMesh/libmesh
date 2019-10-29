@@ -216,7 +216,7 @@ LIBMESH_PARALLEL_FLOAT_OPS(long double);
     static MPI_Op LIBMESH_MPI_##mpiname = MPI_OP_NULL; \
     if (LIBMESH_MPI_##mpiname == MPI_OP_NULL) \
       { \
-        libmesh_call_mpi \
+        passmess_call_mpi \
           (MPI_Op_create(libmesh_mpi_##funcname, true, &LIBMESH_MPI_##mpiname)); \
       } \
     return LIBMESH_MPI_##mpiname;  \

@@ -263,6 +263,7 @@ BUILT_SOURCES = \
         wrapped_function.h \
         wrapped_functor.h \
         zero_function.h \
+        libmesh_call_mpi.h \
         parallel_algebra.h \
         parallel_bin_sorter.h \
         parallel_conversion_utils.h \
@@ -294,13 +295,13 @@ BUILT_SOURCES = \
         attributes.h \
         communicator.h \
         data_type.h \
-        libmesh_call_mpi.h \
         message_tag.h \
         op_function.h \
         packing.h \
         parallel.h \
         parallel_implementation.h \
         parallel_sync.h \
+        passmess_call_mpi.h \
         post_wait_copy_buffer.h \
         post_wait_delete_buffer.h \
         post_wait_dereference_shared_ptr.h \
@@ -1316,6 +1317,9 @@ wrapped_functor.h: $(top_srcdir)/include/numerics/wrapped_functor.h
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+libmesh_call_mpi.h: $(top_srcdir)/include/parallel/libmesh_call_mpi.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 parallel_algebra.h: $(top_srcdir)/include/parallel/parallel_algebra.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1409,9 +1413,6 @@ communicator.h: $(top_srcdir)/include/passmess/communicator.h
 data_type.h: $(top_srcdir)/include/passmess/data_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-libmesh_call_mpi.h: $(top_srcdir)/include/passmess/libmesh_call_mpi.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 message_tag.h: $(top_srcdir)/include/passmess/message_tag.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1428,6 +1429,9 @@ parallel_implementation.h: $(top_srcdir)/include/passmess/parallel_implementatio
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sync.h: $(top_srcdir)/include/passmess/parallel_sync.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+passmess_call_mpi.h: $(top_srcdir)/include/passmess/passmess_call_mpi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_copy_buffer.h: $(top_srcdir)/include/passmess/post_wait_copy_buffer.h
