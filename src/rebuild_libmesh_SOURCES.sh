@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sources=`find base error_estimation fe geom mesh numerics parallel partitioning physics quadrature reduced_basis solution_transfer solvers systems utils -name "*.C" -o -name "*.c" -o -name "*.data" -type f | LC_COLLATE=POSIX sort`
+sources=`find base error_estimation fe geom mesh numerics parallel partitioning passmess physics quadrature reduced_basis solution_transfer solvers systems utils -name "*.C" -o -name "*.c" -o -name "*.data" -type f | LC_COLLATE=POSIX sort`
 
 echo "# Do not edit - automatically generated from $0" > libmesh_SOURCES
 printf '%s' "libmesh_SOURCES = " >> libmesh_SOURCES

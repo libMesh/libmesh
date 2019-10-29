@@ -258,15 +258,12 @@ libmesh_SOURCES =  \
         src/numerics/trilinos_preconditioner.C \
         src/numerics/type_tensor.C \
         src/numerics/type_vector.C \
-        src/parallel/communicator.C \
-        src/parallel/message_tag.C \
         src/parallel/parallel_bin_sorter.C \
         src/parallel/parallel_elem.C \
         src/parallel/parallel_ghost_sync.C \
         src/parallel/parallel_histogram.C \
         src/parallel/parallel_node.C \
         src/parallel/parallel_sort.C \
-        src/parallel/request.C \
         src/parallel/threads.C \
         src/partitioning/centroid_partitioner.C \
         src/partitioning/linear_partitioner.C \
@@ -277,6 +274,9 @@ libmesh_SOURCES =  \
         src/partitioning/partitioner_factory.C \
         src/partitioning/sfc_partitioner.C \
         src/partitioning/subdomain_partitioner.C \
+        src/passmess/communicator.C \
+        src/passmess/message_tag.C \
+        src/passmess/request.C \
         src/physics/diff_physics.C \
         src/physics/diff_qoi.C \
         src/physics/fem_physics.C \
