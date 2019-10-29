@@ -31,10 +31,7 @@
 #endif
 
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 //-------------------------------------------------------------------
 
@@ -113,8 +110,6 @@ LIBMESH_CONTAINER_TYPE(std::set<T LIBMESH_ATTRIBUTES_COMMA C LIBMESH_ATTRIBUTES_
 template <typename T, typename A>
 LIBMESH_CONTAINER_TYPE(std::vector<T LIBMESH_ATTRIBUTES_COMMA A>);
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_ATTRIBUTES_H

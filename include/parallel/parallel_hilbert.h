@@ -38,8 +38,7 @@
 // C++ includes
 #include <cstddef>
 
-namespace libMesh {
-namespace Parallel {
+namespace PassMess {
 
 #ifdef LIBMESH_HAVE_MPI
 // A StandardType<> specialization to return a derived MPI datatype
@@ -52,7 +51,7 @@ class StandardType<Hilbert::HilbertIndices> : public DataType
 public:
   explicit
   StandardType(const Hilbert::HilbertIndices * =nullptr) {
-    _datatype = DataType(Parallel::StandardType<Hilbert::inttype>(), 3);
+    _datatype = DataType(StandardType<Hilbert::inttype>(), 3);
   }
 
   StandardType(const StandardType<Hilbert::HilbertIndices> & t)
@@ -66,15 +65,20 @@ public:
 
 #endif // LIBMESH_HAVE_MPI
 
+} // namespace PassMess
+
+
+namespace libMesh {
+
+namespace Parallel {
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 typedef std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
 #else
 typedef Hilbert::HilbertIndices DofObjectKey;
 #endif
 
-
 } // namespace Parallel
-
 
 } // namespace libMesh
 

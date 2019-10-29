@@ -25,10 +25,7 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // PostWaitWork specialization for deleting no-longer-needed buffers.
@@ -42,8 +39,6 @@ private:
   Container * _buf;
 };
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_POST_WAIT_DELETE_BUFFER_H

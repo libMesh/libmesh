@@ -31,10 +31,7 @@
 
 
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 # ifdef LIBMESH_HAVE_MPI
@@ -243,8 +240,6 @@ LIBMESH_PARALLEL_FLOAT_OPS(long double);
 # endif
 #endif
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_OP_FUNCTION_H

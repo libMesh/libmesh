@@ -28,10 +28,7 @@
 // C++ includes
 #include <algorithm>
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // PostWaitWork specialization for copying from temporary to
@@ -48,8 +45,6 @@ private:
   OutputIter _out;
 };
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_POST_WAIT_COPY_BUFFER_H

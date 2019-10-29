@@ -73,6 +73,15 @@ public:
 };
 
 
+} // namespace Parallel
+
+} // namespace libMesh
+
+
+namespace PassMess {
+
+using libMesh::Parallel::Packing;
+
 /**
  * Decode a range of potentially-variable-size objects from a data
  * array.
@@ -126,7 +135,7 @@ inline std::size_t packed_range_size (const Context * context,
        range_count != range_end;
        ++range_count)
     {
-      buffer_size += Parallel::Packing<T>::packable_size(*range_count, context);
+      buffer_size += Packing<T>::packable_size(*range_count, context);
     }
   return buffer_size;
 }
@@ -156,7 +165,7 @@ inline Iter pack_range (const Context * context,
        ++range_stop)
     {
       std::size_t next_buffer_size =
-        Parallel::Packing<T>::packable_size(*range_stop, context);
+        Packing<T>::packable_size(*range_stop, context);
       buffer_size += next_buffer_size;
     }
   buffer.reserve(buffer.size() + buffer_size);
@@ -168,14 +177,14 @@ inline Iter pack_range (const Context * context,
       std::size_t old_size = buffer.size();
 #endif
 
-      Parallel::Packing<T>::pack
+      Packing<T>::pack
         (*range_begin, back_inserter(buffer), context);
 
 #ifndef NDEBUG
       unsigned int my_packable_size =
-        Parallel::Packing<T>::packable_size(*range_begin, context);
+        Packing<T>::packable_size(*range_begin, context);
       unsigned int my_packed_size =
-        Parallel::Packing<T>::packed_size (buffer.begin() + old_size);
+        Packing<T>::packed_size (buffer.begin() + old_size);
       libmesh_assert_equal_to (my_packable_size, my_packed_size);
       libmesh_assert_equal_to (buffer.size(), old_size + my_packable_size);
 #endif
@@ -203,18 +212,15 @@ inline void unpack_range (const std::vector<buffertype> & buffer,
 
   while (next_object_start < buffer.end())
     {
-      *out_iter++ = Parallel::Packing<T>::unpack(next_object_start, context);
+      *out_iter++ = Packing<T>::unpack(next_object_start, context);
       next_object_start +=
-        Parallel::Packing<T>::packed_size(next_object_start);
+        Packing<T>::packed_size(next_object_start);
     }
 
   // We should have used up the exact amount of data in the buffer
   libmesh_assert (next_object_start == buffer.end());
 }
 
-
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_PACKING_H

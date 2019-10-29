@@ -36,8 +36,14 @@
 #include <cstddef>
 #include <memory>
 
-namespace libMesh {
-namespace Parallel {
+namespace PassMess {
+
+using libMesh::TypeVector;
+using libMesh::TypeTensor;
+using libMesh::VectorValue;
+using libMesh::TensorValue;
+using libMesh::Point;
+
 // StandardType<> specializations to return a derived MPI datatype
 // to handle communication of LIBMESH_DIM-vectors.
 //
@@ -196,7 +202,7 @@ public:
         ex = temp.get();
       }
 
-    StandardType<Real> T_type(&((*ex)(0)));
+    StandardType<libMesh::Real> T_type(&((*ex)(0)));
 
     int blocklength = LIBMESH_DIM;
     MPI_Aint displs, start;
@@ -372,7 +378,6 @@ public:
 
   inline ~StandardType() { this->free(); }
 };
-} // namespace Parallel
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // LIBMESH_PARALLEL_ALGEBRA_H

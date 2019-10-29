@@ -30,6 +30,7 @@
 
 // C++ includes
 #include <map>
+#include <memory> // shared_ptr
 #include <string>
 #include <vector>
 
@@ -39,21 +40,17 @@
 #include <numeric> // complex
 #include <set>
 
-namespace libMesh
-{
-
-/**
- * The Parallel namespace is for wrapper functions
- * for common general parallel synchronization tasks.
- *
- * For MPI 1.1 compatibility, temporary buffers are used
- * instead of MPI 2's MPI_IN_PLACE
- */
-namespace Parallel
-{
-
+namespace libMesh {
+namespace Parallel {
 template <typename T>
 class Packing;
+}
+}
+
+namespace PassMess
+{
+
+using libMesh::Parallel::Packing;
 
 #ifdef LIBMESH_HAVE_MPI
 
@@ -67,6 +64,8 @@ typedef MPI_Comm communicator;
  * Info object used by some MPI-3 methods
  */
 typedef MPI_Info info;
+
+using libMesh::processor_id_type;
 
 /**
  * Processor id meaning "Accept from any source"
@@ -214,7 +213,7 @@ private:
   SendMode _send_mode;
 
   // mutable used_tag_values and tag_queue - not thread-safe, but then
-  // Parallel:: isn't thread-safe in general.
+  // PassMess:: isn't thread-safe in general.
   mutable std::map<int, unsigned int> used_tag_values;
   mutable int _next_tag;
 
@@ -359,8 +358,8 @@ public:
    * Template type must match the object type that will be in
    * the packed range
    *
-   * \param src_processor_id The processor the message is expected from or Parallel::any_source
-   * \param tag The message tag or Parallel::any_tag
+   * \param src_processor_id The processor the message is expected from or PassMess::any_source
+   * \param tag The message tag or PassMess::any_tag
    * \param flag Output.  True if a message exists.  False otherwise.
    */
   template <typename T>
@@ -502,10 +501,10 @@ public:
    * new objects at the other end whose contents match the objects
    * pointed to by the sender.
    *
-   * void Parallel::pack(const T *, vector<int> & data, const Context *)
+   * void PassMess::pack(const T *, vector<int> & data, const Context *)
    * is used to serialize type T onto the end of a data vector.
    *
-   * unsigned int Parallel::packable_size(const T *, const Context *) is
+   * unsigned int PassMess::packable_size(const T *, const Context *) is
    * used to allow data vectors to reserve memory, and for additional
    * error checking
    */
@@ -523,10 +522,10 @@ public:
    * new objects at the other end whose contents match the objects
    * pointed to by the sender.
    *
-   * void Parallel::pack(const T *, vector<int> & data, const Context *)
+   * void PassMess::pack(const T *, vector<int> & data, const Context *)
    * is used to serialize type T onto the end of a data vector.
    *
-   * unsigned int Parallel::packable_size(const T *, const Context *) is
+   * unsigned int PassMess::packable_size(const T *, const Context *) is
    * used to allow data vectors to reserve memory, and for additional
    * error checking
    */
@@ -572,7 +571,7 @@ public:
                                       Iter range_begin,
                                       const Iter range_end,
                                       Request & req,
-                                      std::shared_ptr<std::vector<typename Parallel::Packing<typename std::iterator_traits<Iter>::value_type>::buffer_type>> & buffer,
+                                      std::shared_ptr<std::vector<typename PassMess::Packing<typename std::iterator_traits<Iter>::value_type>::buffer_type>> & buffer,
                                       const MessageTag & tag=no_tag) const;
 
   /**
@@ -586,18 +585,18 @@ public:
    *
    * Using std::back_inserter as the output iterator allows receive to
    * fill any container type.  Using libMesh::null_output_iterator
-   * allows the receive to be dealt with solely by Parallel::unpack(),
+   * allows the receive to be dealt with solely by PassMess::unpack(),
    * for objects whose unpack() is written so as to not leak memory
    * when used in this fashion.
    *
    * A future version of this method should be created to preallocate
    * memory when receiving vectors...
    *
-   * void Parallel::unpack(vector<int>::iterator in, T ** out, Context *)
+   * void PassMess::unpack(vector<int>::iterator in, T ** out, Context *)
    * is used to unserialize type T, typically into a new
    * heap-allocated object whose pointer is returned as *out.
    *
-   * unsigned int Parallel::packed_size(const T *,
+   * unsigned int PassMess::packed_size(const T *,
    *                                    vector<int>::const_iterator)
    * is used to advance to the beginning of the next object's data.
    */
@@ -651,7 +650,7 @@ public:
                                          const T * output_type,
                                          Request & req,
                                          Status & stat,
-                                         std::shared_ptr<std::vector<typename Parallel::Packing<T>::buffer_type>> & buffer,
+                                         std::shared_ptr<std::vector<typename PassMess::Packing<T>::buffer_type>> & buffer,
                                          const MessageTag & tag=any_tag
                                          ) const;
 
@@ -680,27 +679,27 @@ public:
    * being received will be of type
    * T2 = iterator_traits<OutputIter>::value_type
    *
-   * void Parallel::pack(const T1*, vector<int> & data, const Context1*)
+   * void PassMess::pack(const T1*, vector<int> & data, const Context1*)
    * is used to serialize type T1 onto the end of a data vector.
    *
    * Using std::back_inserter as the output iterator allows
    * send_receive to fill any container type.  Using
    * libMesh::null_output_iterator allows the receive to be dealt with
-   * solely by Parallel::unpack(), for objects whose unpack() is
+   * solely by PassMess::unpack(), for objects whose unpack() is
    * written so as to not leak memory when used in this fashion.
    *
    * A future version of this method should be created to preallocate
    * memory when receiving vectors...
    *
-   * void Parallel::unpack(vector<int>::iterator in, T2** out, Context *)
+   * void PassMess::unpack(vector<int>::iterator in, T2** out, Context *)
    * is used to unserialize type T2, typically into a new
    * heap-allocated object whose pointer is returned as *out.
    *
-   * unsigned int Parallel::packable_size(const T1*, const Context1*)
+   * unsigned int PassMess::packable_size(const T1*, const Context1*)
    * is used to allow data vectors to reserve memory, and for
    * additional error checking.
    *
-   * unsigned int Parallel::packed_size(const T2*,
+   * unsigned int PassMess::packed_size(const T2*,
    *                                    vector<int>::const_iterator)
    * is used to advance to the beginning of the next object's data.
    */
@@ -924,14 +923,14 @@ public:
    * new objects at the other end whose contents match the objects
    * pointed to by the sender.
    *
-   * void Parallel::pack(const T *, vector<int> & data, const Context *)
+   * void PassMess::pack(const T *, vector<int> & data, const Context *)
    * is used to serialize type T onto the end of a data vector.
    *
-   * unsigned int Parallel::packable_size(const T *, const Context *) is
+   * unsigned int PassMess::packable_size(const T *, const Context *) is
    * used to allow data vectors to reserve memory, and for additional
    * error checking
    *
-   * unsigned int Parallel::packed_size(const T *,
+   * unsigned int PassMess::packed_size(const T *,
    *                                    vector<int>::const_iterator)
    * is used to advance to the beginning of the next object's data.
    */
@@ -955,8 +954,23 @@ public:
 }; // class Communicator
 
 
-} // namespace Parallel
+} // namespace PassMess
 
-} // namespace libMesh
+
+// Backwards compatibility for libMesh forward declarations
+namespace libMesh {
+namespace Parallel {
+class Communicator : public PassMess::Communicator {
+public:
+  Communicator () = default;
+  explicit Communicator (const communicator & comm) : PassMess::Communicator(comm) {}
+  Communicator (const Communicator &) = delete;
+  Communicator & operator= (const Communicator &) = delete;
+  Communicator (Communicator &&) = default;
+  Communicator & operator= (Communicator &&) = default;
+  ~Communicator () = default;
+};
+}
+}
 
 #endif // PASSMESS_COMMUNICATOR_H

@@ -25,14 +25,7 @@
 // C++ includes
 #include <climits> // INT_MIN
 
-namespace libMesh
-{
-
-/**
- * The Parallel namespace is for wrapper functions
- * for common general parallel synchronization tasks.
- */
-namespace Parallel
+namespace PassMess
 {
 //-------------------------------------------------------------------
 /**
@@ -119,8 +112,6 @@ const MessageTag any_tag = MessageTag(-1);
 
 const MessageTag no_tag = MessageTag(0);
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_MESSAGE_TAG_H

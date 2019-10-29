@@ -25,17 +25,7 @@
 // libMesh includes
 #include "libmesh/libmesh_common.h"
 
-namespace libMesh
-{
-
-/**
- * The Parallel namespace is for wrapper functions
- * for common general parallel synchronization tasks.
- *
- * For MPI 1.1 compatibility, temporary buffers are used
- * instead of MPI 2's MPI_IN_PLACE
- */
-namespace Parallel
+namespace PassMess
 {
 
 #ifdef LIBMESH_HAVE_MPI
@@ -78,7 +68,7 @@ public:
     // FIXME - if we nest an inner type here will we run into bug
     // https://github.com/libMesh/libmesh/issues/631 again?
     libmesh_call_mpi(MPI_Type_contiguous(count, other._datatype, &_datatype));
-    libmesh_ignore(other, count); // ifndef LIBMESH_HAVE_MPI
+    libMesh::libmesh_ignore(other, count); // ifndef LIBMESH_HAVE_MPI
     this->commit();
   }
 
@@ -117,8 +107,6 @@ protected:
   data_type _datatype;
 };
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_DATA_TYPE_H

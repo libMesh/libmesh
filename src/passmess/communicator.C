@@ -23,10 +23,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/parallel.h" // for inline max(int)
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 
@@ -282,7 +279,7 @@ status Communicator::probe (const unsigned int src_processor_id,
 
 #ifndef LIBMESH_HAVE_MPI
   libmesh_not_implemented();
-  libmesh_ignore(src_processor_id, tag);
+  libMesh::libmesh_ignore(src_processor_id, tag);
 #endif
 
   status stat;
@@ -387,7 +384,7 @@ void Communicator::minloc(bool & r,
       LOG_SCOPE("minloc(bool)", "Parallel");
 
       DataPlusInt<int> data_in;
-      libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;
@@ -429,7 +426,7 @@ void Communicator::maxloc(bool & r,
       LOG_SCOPE("maxloc(bool)", "Parallel");
 
       DataPlusInt<int> data_in;
-      libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;
@@ -447,7 +444,4 @@ void Communicator::maxloc(bool & r,
 }
 
 
-
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess

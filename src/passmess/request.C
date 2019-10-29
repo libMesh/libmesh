@@ -33,10 +33,7 @@
 #include <utility>
 
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // ------------------------------------------------------------
@@ -221,7 +218,7 @@ std::size_t waitany (std::vector<Request> & r)
   libmesh_assert(!r.empty());
 
   int index = 0;
-  int r_size = cast_int<int>(r.size());
+  int r_size = libMesh::cast_int<int>(r.size());
   std::vector<request> raw(r_size);
   for (int i=0; i != r_size; ++i)
     {
@@ -276,6 +273,4 @@ std::size_t waitany (std::vector<Request> & r)
   return index;
 }
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess

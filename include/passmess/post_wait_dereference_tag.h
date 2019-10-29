@@ -26,10 +26,7 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // PostWaitWork specialization for holding a MessageTag.  This
@@ -47,8 +44,6 @@ private:
   MessageTag _tag;
 };
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_POST_WAIT_DEREFERENCE_TAG_H

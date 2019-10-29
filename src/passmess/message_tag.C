@@ -22,10 +22,7 @@
 
 
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // ------------------------------------------------------------
@@ -84,6 +81,4 @@ MessageTag & MessageTag::operator= (MessageTag && other)
 }
 
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess

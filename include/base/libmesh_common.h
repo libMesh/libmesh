@@ -74,7 +74,6 @@
 namespace libMesh
 {
 
-
 // A namespace for functions used in the bodies of the macros below.
 // The macros generally call these functions with __FILE__, __LINE__,
 // __DATE__, and __TIME__ in the appropriate order.  These should not
@@ -659,6 +658,15 @@ inline Tnew libmesh_cast_int (Told oldvar)
 namespace libMeshEnums
 {
 using namespace libMesh;
+}
+
+// Backwards compatibility with pre-PassMess reference
+namespace PassMess {}
+
+namespace libMesh {
+  namespace Parallel {
+    using namespace PassMess;
+  }
 }
 
 

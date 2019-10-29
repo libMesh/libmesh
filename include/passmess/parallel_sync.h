@@ -30,13 +30,9 @@
 #include <list>
 
 
-namespace libMesh
-{
+namespace PassMess {
 
-
-
-//--------------------------------------------------------------------------
-namespace Parallel {
+using libMesh::cast_int;
 
 //------------------------------------------------------------------------
 /**
@@ -229,7 +225,7 @@ void push_parallel_vector_data(const Communicator & comm,
   while (true)
   {
     // Look for data from anywhere
-    current_src_proc = Parallel::any_source;
+    current_src_proc = any_source;
 
     // Check if there is a message and start receiving it
     if (comm.possibly_receive(current_src_proc, *current_incoming_data, datatype, *current_request, tag))
@@ -557,10 +553,6 @@ void pull_parallel_vector_data(const Communicator & comm,
   wait(response_reqs);
 }
 
-
-} // namespace Parallel
-
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_PARALLEL_SYNC_H

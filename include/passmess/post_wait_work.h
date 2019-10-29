@@ -19,10 +19,7 @@
 #ifndef PASSMESS_POST_WAIT_WORK_H
 #define PASSMESS_POST_WAIT_WORK_H
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 //-------------------------------------------------------------------
 /**
@@ -47,8 +44,6 @@ struct PostWaitWork {
   virtual void run() = 0;
 };
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_POST_WAIT_WORK_H

@@ -26,10 +26,7 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // PostWaitWork specialization for unpacking received buffers.
@@ -41,7 +38,7 @@ struct PostWaitUnpackBuffer : public PostWaitWork {
 
   virtual void run() override {
 
-    Parallel::unpack_range(_buf, _context, _out, (T*)nullptr);
+    unpack_range(_buf, _context, _out, (T*)nullptr);
   }
 
 private:
@@ -50,8 +47,6 @@ private:
   OutputIter _out;
 };
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_POST_WAIT_UNPACK_BUFFER_H

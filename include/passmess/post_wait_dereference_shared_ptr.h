@@ -29,10 +29,7 @@
 // System Includes
 #include <memory>
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // PostWaitWork specialization for holding a shared_ptr reference
@@ -47,8 +44,6 @@ private:
   const std::shared_ptr<T> _ptr;
 };
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_POST_WAIT_DEREFERENCE_SHARED_PTR_H

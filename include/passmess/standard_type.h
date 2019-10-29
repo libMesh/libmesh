@@ -36,14 +36,7 @@
 #include <utility>
 #include <vector>
 
-namespace libMesh
-{
-
-/**
- * The Parallel namespace is for wrapper functions
- * for common general parallel synchronization tasks.
- */
-namespace Parallel
+namespace PassMess
 {
 
 //-------------------------------------------------------------------
@@ -366,10 +359,6 @@ public:
   ~StandardType() { this->free(); }
 };
 
-
-
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_STANDARD_TYPE_H

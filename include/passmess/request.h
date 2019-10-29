@@ -30,10 +30,7 @@
 #include <vector>
 #include <utility>
 
-namespace libMesh
-{
-
-namespace Parallel
+namespace PassMess
 {
 
 // Forward declarations
@@ -140,8 +137,6 @@ void wait (std::vector<Request> & r);
 std::size_t waitany (std::vector<Request> & r);
 
 
-} // namespace Parallel
-
-} // namespace libMesh
+} // namespace PassMess
 
 #endif // PASSMESS_REQUEST_H
