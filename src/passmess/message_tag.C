@@ -18,6 +18,7 @@
 // Local includes
 #include "libmesh/message_tag.h"
 
+// PassMess includes
 #include "libmesh/communicator.h"
 
 

@@ -18,7 +18,7 @@
 // Local includes
 #include "libmesh/request.h"
 
-// Parallel includes
+// PassMess includes
 #include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/post_wait_work.h"
 #include "libmesh/status.h"
@@ -117,7 +117,7 @@ Request::~Request () {
 
 Status Request::wait ()
 {
-  LOG_SCOPE("wait()", "Parallel::Request");
+  LOG_SCOPE("wait()", "Request");
 
   if (_prior_request.get())
     {

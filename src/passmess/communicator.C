@@ -16,12 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// Parallel includes
+// Local includes
 #include "libmesh/communicator.h"
+
+// PassMess includes
+#include "libmesh/parallel.h" // for inline max(int)
 
 // libMesh includes
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/parallel.h" // for inline max(int)
 
 namespace PassMess
 {
@@ -218,7 +220,7 @@ void Communicator::barrier () const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("barrier()", "Parallel");
+      LOG_SCOPE("barrier()", "Communicator");
       libmesh_call_mpi(MPI_Barrier (this->get()));
     }
 }
@@ -231,7 +233,7 @@ void Communicator::nonblocking_barrier (Request & req) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("nonblocking_barrier()", "Parallel");
+      LOG_SCOPE("nonblocking_barrier()", "Communicator");
       libmesh_call_mpi(MPI_Ibarrier (this->get(), req.get()));
     }
 }
@@ -275,7 +277,7 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
 status Communicator::probe (const unsigned int src_processor_id,
                             const MessageTag & tag) const
 {
-  LOG_SCOPE("probe()", "Parallel");
+  LOG_SCOPE("probe()", "Communicator");
 
 #ifndef LIBMESH_HAVE_MPI
   libmesh_not_implemented();
@@ -363,7 +365,7 @@ void Communicator::min(bool & r) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("min(bool)", "Parallel");
+      LOG_SCOPE("min(bool)", "Communicator");
 
       unsigned int temp = r;
       libmesh_call_mpi
@@ -381,7 +383,7 @@ void Communicator::minloc(bool & r,
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("minloc(bool)", "Parallel");
+      LOG_SCOPE("minloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
       libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
@@ -405,7 +407,7 @@ void Communicator::max(bool & r) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("max(bool)", "Parallel");
+      LOG_SCOPE("max(bool)", "Communicator");
 
       unsigned int temp = r;
       libmesh_call_mpi
@@ -423,7 +425,7 @@ void Communicator::maxloc(bool & r,
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("maxloc(bool)", "Parallel");
+      LOG_SCOPE("maxloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
       libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
