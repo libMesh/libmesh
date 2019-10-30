@@ -68,7 +68,7 @@ public:
     // FIXME - if we nest an inner type here will we run into bug
     // https://github.com/libMesh/libmesh/issues/631 again?
     passmess_call_mpi(MPI_Type_contiguous(count, other._datatype, &_datatype));
-    libMesh::libmesh_ignore(other, count); // ifndef LIBMESH_HAVE_MPI
+    ignore(other, count); // ifndef LIBMESH_HAVE_MPI
     this->commit();
   }
 

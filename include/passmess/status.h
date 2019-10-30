@@ -149,7 +149,7 @@ inline int Status::tag () const
 
 inline unsigned int Status::size (const data_type & type) const
 {
-  libMesh::libmesh_ignore(type); // We don't use this ifndef LIBMESH_HAVE_MPI
+  ignore(type); // We don't use this ifndef LIBMESH_HAVE_MPI
   int msg_size = 1;
   passmess_call_mpi
     (MPI_Get_count (const_cast<MPI_Status*>(&_status), type,

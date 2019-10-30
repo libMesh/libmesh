@@ -282,7 +282,7 @@ status Communicator::probe (const unsigned int src_processor_id,
 
 #ifndef LIBMESH_HAVE_MPI
   passmess_not_implemented();
-  libMesh::libmesh_ignore(src_processor_id, tag);
+  ignore(src_processor_id, tag);
 #endif
 
   status stat;
@@ -387,7 +387,7 @@ void Communicator::minloc(bool & r,
       LOG_SCOPE("minloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
-      libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;
@@ -429,7 +429,7 @@ void Communicator::maxloc(bool & r,
       LOG_SCOPE("maxloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
-      libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;

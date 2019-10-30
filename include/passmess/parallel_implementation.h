@@ -2129,7 +2129,7 @@ inline void Communicator::minloc(T & r,
       LOG_SCOPE("minloc(scalar)", "Parallel");
 
       DataPlusInt<T> data_in;
-      libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
 
@@ -2284,7 +2284,7 @@ inline void Communicator::maxloc(T & r,
       LOG_SCOPE("maxloc(scalar)", "Parallel");
 
       DataPlusInt<T> data_in;
-      libMesh::libmesh_ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
 
@@ -2829,7 +2829,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
                            T & recv,
                            const unsigned int root_id) const
 {
-  libMesh::libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
+  ignore(root_id); // Only needed for MPI and/or dbg/devel
   passmess_assert_less (root_id, this->size());
 
   // Do not allow the root_id to scatter a nullptr vector.
@@ -2847,7 +2847,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
   LOG_SCOPE("scatter()", "Parallel");
 
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
-  libMesh::libmesh_ignore(data_ptr); // unused ifndef LIBMESH_HAVE_MPI
+  ignore(data_ptr); // unused ifndef LIBMESH_HAVE_MPI
 
   passmess_assert_less(root_id, this->size());
 
@@ -2887,7 +2887,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
 
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
-  libMesh::libmesh_ignore(data_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
+  ignore(data_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
 
   passmess_assert_less(root_id, this->size());
 
@@ -2941,7 +2941,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   int * count_ptr = const_cast<int*>(counts.empty() ? nullptr : counts.data());
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
-  libMesh::libmesh_ignore(data_ptr, count_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
+  ignore(data_ptr, count_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
 
   passmess_assert_less(root_id, this->size());
 
@@ -3014,7 +3014,7 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
   // using MPI_Alltoallv
   const int size_per_proc =
     cast_int<int>(buf.size()/this->size());
-  libMesh::libmesh_ignore(size_per_proc);
+  ignore(size_per_proc);
 
   passmess_assert_equal_to (buf.size()%this->size(), 0);
 
@@ -3032,7 +3032,7 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
 template <typename T>
 inline void Communicator::broadcast (T & passmess_mpi_var(data), const unsigned int root_id) const
 {
-  libMesh::libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
+  ignore(root_id); // Only needed for MPI and/or dbg/devel
   if (this->size() == 1)
     {
       passmess_assert (!this->rank());

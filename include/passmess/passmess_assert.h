@@ -48,6 +48,12 @@ namespace PassMess
 void report_here(const char * file, int line, const char * date, const char * time);
 void report_error(const char * file, int line, const char * date, const char * time);
 
+
+// A function template for ignoring unused variables.  This is a way
+// to shut up conditionally unused variable compiler warnings (as are
+// often created by assertions)
+template<class ...Args> inline void ignore( const Args&... ) { }
+
 // The passmess_assert() macro acts like C's assert(), but throws a
 // passmess_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
