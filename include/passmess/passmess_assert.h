@@ -144,29 +144,29 @@ struct casting_compare {
 };
 
 #define passmess_assert_less_msg(expr1,expr2, msg)                       \
-  do {                                                                  \
-    if (!libMesh::casting_compare<std::less>()(expr1, expr2)) {         \
+  do {                                                                   \
+    if (!PassMess::casting_compare<std::less>()(expr1, expr2)) {         \
       std::cerr << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       passmess_error();                                                  \
     } } while (0)
 
 #define passmess_assert_greater_msg(expr1,expr2, msg)                    \
-  do {                                                                  \
-    if (!libMesh::casting_compare<std::greater>()(expr1, expr2)) {      \
+  do {                                                                   \
+    if (!PassMess::casting_compare<std::greater>()(expr1, expr2)) {      \
       std::cerr << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       passmess_error();                                                  \
     } } while (0)
 
 #define passmess_assert_less_equal_msg(expr1,expr2, msg)                 \
-  do {                                                                  \
-    if (!libMesh::casting_compare<std::less_equal>()(expr1, expr2)) {   \
+  do {                                                                   \
+    if (!PassMess::casting_compare<std::less_equal>()(expr1, expr2)) {   \
       std::cerr << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       passmess_error();                                                  \
     } } while (0)
 
 #define passmess_assert_greater_equal_msg(expr1,expr2, msg)              \
-  do {                                                                  \
-    if (!libMesh::casting_compare<std::greater_equal>()(expr1, expr2)) { \
+  do {                                                                   \
+    if (!PassMess::casting_compare<std::greater_equal>()(expr1, expr2)) { \
       std::cerr << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       passmess_error();                                                  \
     } } while (0)
