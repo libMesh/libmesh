@@ -2103,13 +2103,6 @@ template void FEMap::init_reference_to_physical_map<1>( const std::vector<Point>
 template void FEMap::init_reference_to_physical_map<2>( const std::vector<Point> &, const Elem *);
 template void FEMap::init_reference_to_physical_map<3>( const std::vector<Point> &, const Elem *);
 
-//--------------------------------------------------------------
-// Explicit instantiations using the macro from fe_macro.h
-INSTANTIATE_ALL_MAPS(0);
-INSTANTIATE_ALL_MAPS(1);
-INSTANTIATE_ALL_MAPS(2);
-INSTANTIATE_ALL_MAPS(3);
-
 // subdivision elements are implemented only for 2D meshes & reimplement
 // the inverse_maps method separately
 INSTANTIATE_SUBDIVISION_MAPS;
