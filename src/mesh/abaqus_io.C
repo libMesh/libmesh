@@ -879,14 +879,9 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
             // Read another character (the 'S') and finally the side ID
             _in >> c >> side_id;
 
-            auto it = _elemset_ids.find(elset_name);
-            if (it == _elemset_ids.end())
-            libmesh_error_msg(
-                "The element set referred to by the surface definition does not exist.");
-            for (const auto & elem_id_in_elset : it->second)
-            {
-            id_storage.push_back( std::make_pair(elem_id_in_elset, side_id) );
-            }
+            const auto & vec = libmesh_map_find(_elemset_ids, elset_name);
+            for (const auto & elem_id_in_elset : vec)
+              id_storage.push_back( std::make_pair(elem_id_in_elset, side_id) );
         } // if-else
 
       // Extract remaining characters on line including newline
