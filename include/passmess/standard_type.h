@@ -24,7 +24,6 @@
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <array>
@@ -240,10 +239,9 @@ void BuildStandardTypeVector<n_minus_i>::build
     std::tuple_element<sizeof...(Types)-n_minus_i, std::tuple<Types...>>::type
     ith_type;
 
-  out_vec.push_back
-    (libmesh_make_unique<
-       StandardType<ith_type>
-     >(&std::get<sizeof...(Types)-n_minus_i>(example)));
+  out_vec.emplace_back
+    (new StandardType<ith_type>
+     (&std::get<sizeof...(Types)-n_minus_i>(example)));
 
   BuildStandardTypeVector<n_minus_i-1>::build(out_vec, example);
 }
