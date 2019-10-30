@@ -870,24 +870,24 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
         // Store this pair of data in the vector
         id_storage.push_back( std::make_pair(elem_id, side_id) );
       }
-      else
-      {
-          // For the form of "Elset_1, S3"
-          _in.clear();
-          std::getline(_in, elset_name, ',');
-
-        // Read another character (the 'S') and finally the side ID
-        _in >> c >> side_id;
-
-        auto it = _elemset_ids.find(elset_name);
-        if (it == _elemset_ids.end())
-          libmesh_error_msg(
-              "The element set referred to by the surface definition does not exist.");
-        for (const auto & elem_id : it->second)
+        else
         {
-          id_storage.push_back( std::make_pair(elem_id, side_id) );
-        }
-      } // if-else
+            // For the form of "Elset_1, S3"
+            _in.clear();
+            std::getline(_in, elset_name, ',');
+
+            // Read another character (the 'S') and finally the side ID
+            _in >> c >> side_id;
+
+            auto it = _elemset_ids.find(elset_name);
+            if (it == _elemset_ids.end())
+            libmesh_error_msg(
+                "The element set referred to by the surface definition does not exist.");
+            for (const auto & elem_id_in_elset : it->second)
+            {
+            id_storage.push_back( std::make_pair(elem_id_in_elset, side_id) );
+            }
+        } // if-else
 
       // Extract remaining characters on line including newline
       std::getline(_in, dummy);
