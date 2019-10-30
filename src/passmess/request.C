@@ -19,7 +19,7 @@
 #include "libmesh/request.h"
 
 // PassMess includes
-#include "libmesh/libmesh_call_mpi.h"
+#include "libmesh/passmess_call_mpi.h"
 #include "libmesh/passmess_assert.h"
 #include "libmesh/post_wait_work.h"
 #include "libmesh/status.h"
@@ -128,7 +128,7 @@ Status Request::wait ()
 
   Status stat;
 #ifdef LIBMESH_HAVE_MPI
-  libmesh_call_mpi
+  passmess_call_mpi
     (MPI_Wait (&_request, stat.get()));
 #endif
   if (post_wait_work)
@@ -153,7 +153,7 @@ bool Request::test ()
 #ifdef LIBMESH_HAVE_MPI
   int val=0;
 
-  libmesh_call_mpi
+  passmess_call_mpi
     (MPI_Test (&_request, &val, MPI_STATUS_IGNORE));
 
   if (val)
@@ -173,7 +173,7 @@ bool Request::test (status & stat)
 {
   int val=0;
 
-  libmesh_call_mpi
+  passmess_call_mpi
     (MPI_Test (&_request, &val, &stat));
 
   return val;
@@ -238,7 +238,7 @@ std::size_t waitany (std::vector<Request> & r)
   do
     {
 #ifdef LIBMESH_HAVE_MPI
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Waitany(r_size, raw.data(), &index, MPI_STATUS_IGNORE));
 #endif
 

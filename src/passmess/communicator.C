@@ -95,7 +95,7 @@ void Communicator::split(int color, int key, Communicator & target) const
 {
   target.clear();
   MPI_Comm newcomm;
-  libmesh_call_mpi
+  passmess_call_mpi
     (MPI_Comm_split(this->get(), color, key, &newcomm));
 
   target.assign(newcomm);
@@ -108,7 +108,7 @@ void Communicator::split_by_type(int split_type, int key, info i, Communicator &
 {
   target.clear();
   MPI_Comm newcomm;
-  libmesh_call_mpi
+  passmess_call_mpi
     (MPI_Comm_split_type(this->get(), split_type, key, i, &newcomm));
 
   target.assign(newcomm);
@@ -141,7 +141,7 @@ void Communicator::duplicate(const communicator & comm)
 {
   if (_communicator != MPI_COMM_NULL)
     {
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Comm_dup(comm, &_communicator));
 
       _I_duped_it = true;
@@ -158,7 +158,7 @@ void Communicator::clear() {
   if (_I_duped_it)
     {
       passmess_assert (_communicator != MPI_COMM_NULL);
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Comm_free(&_communicator));
 
       _communicator = MPI_COMM_NULL;
@@ -183,13 +183,13 @@ void Communicator::assign(const communicator & comm)
   if (_communicator != MPI_COMM_NULL)
     {
       int i;
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Comm_size(_communicator, &i));
 
       passmess_assert_greater_equal (i, 0);
       _size = cast_int<processor_id_type>(i);
 
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Comm_rank(_communicator, &i));
 
       passmess_assert_greater_equal (i, 0);
@@ -197,7 +197,7 @@ void Communicator::assign(const communicator & comm)
 
       int * maxTag;
       int flag = false;
-      libmesh_call_mpi(MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &maxTag, &flag));
+      passmess_call_mpi(MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &maxTag, &flag));
       passmess_assert(flag);
       _max_tag = *maxTag;
     }
@@ -222,7 +222,7 @@ void Communicator::barrier () const
   if (this->size() > 1)
     {
       LOG_SCOPE("barrier()", "Communicator");
-      libmesh_call_mpi(MPI_Barrier (this->get()));
+      passmess_call_mpi(MPI_Barrier (this->get()));
     }
 }
 #else
@@ -235,7 +235,7 @@ void Communicator::nonblocking_barrier (Request & req) const
   if (this->size() > 1)
     {
       LOG_SCOPE("nonblocking_barrier()", "Communicator");
-      libmesh_call_mpi(MPI_Ibarrier (this->get(), req.get()));
+      passmess_call_mpi(MPI_Ibarrier (this->get(), req.get()));
     }
 }
 #else
@@ -290,7 +290,7 @@ status Communicator::probe (const unsigned int src_processor_id,
   passmess_assert(src_processor_id < this->size() ||
                   src_processor_id == any_source);
 
-  libmesh_call_mpi
+  passmess_call_mpi
     (MPI_Probe (src_processor_id, tag.value(), this->get(), &stat));
 
   return stat;
@@ -369,7 +369,7 @@ void Communicator::min(bool & r) const
       LOG_SCOPE("min(bool)", "Communicator");
 
       unsigned int temp = r;
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &temp, 1,
                         StandardType<unsigned int>(),
                         OpFunction<unsigned int>::min(),
@@ -392,7 +392,7 @@ void Communicator::minloc(bool & r,
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;
 
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
                         dataplusint_type_acquire<int>().first,
                         OpFunction<int>::min_location(), this->get()));
@@ -411,7 +411,7 @@ void Communicator::max(bool & r) const
       LOG_SCOPE("max(bool)", "Communicator");
 
       unsigned int temp = r;
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &temp, 1,
                         StandardType<unsigned int>(),
                         OpFunction<unsigned int>::max(),
@@ -434,7 +434,7 @@ void Communicator::maxloc(bool & r,
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;
 
-      libmesh_call_mpi
+      passmess_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
                         dataplusint_type_acquire<int>().first,
                         OpFunction<int>::max_location(),
