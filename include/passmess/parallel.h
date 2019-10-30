@@ -48,8 +48,4 @@
 
 #include "libmesh/parallel_implementation.h"
 
-// Define a years-deprecated old macro to support anyone still using
-// it.  Attn: anyone-still-using-it - stop!
-#define LIBMESH_CAN_DEFAULT_TO_COMMWORLD
-
 #endif // PASSMESS_PARALLEL_H
