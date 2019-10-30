@@ -852,28 +852,47 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
   dof_id_type elem_id=0;
   unsigned side_id=0;
   char c;
-  std::string dummy;
+  std::string elset_name, dummy;
 
   // Read until the start of another section is detected, or EOF is encountered
   while (_in.peek() != '*' && _in.peek() != EOF)
     {
-      // The strings are of the form: "391, S2"
+      // The strings are either of the form: "391, S2" or "Elset_1, S3"
 
       // Read the element ID and the leading comma
       _in >> elem_id >> c;
+      if (_in)
+      {
+        // For the form of "391, S2"
+        // Read another character (the 'S') and finally the side ID
+        _in >> c >> side_id;
 
-      // Read another character (the 'S') and finally the side ID
-      _in >> c >> side_id;
+        // Store this pair of data in the vector
+        id_storage.push_back( std::make_pair(elem_id, side_id) );
+      }
+      else
+      {
+          // For the form of "Elset_1, S3"
+          _in.clear();
+          std::getline(_in, elset_name, ',');
 
-      // Store this pair of data in the vector
-      id_storage.push_back( std::make_pair(elem_id, side_id) );
+        // Read another character (the 'S') and finally the side ID
+        _in >> c >> side_id;
 
+        auto it = _elemset_ids.find(elset_name);
+        if (it == _elemset_ids.end())
+          libmesh_error_msg(
+              "The element set referred to by the surface definition does not exist.");
+        for (const auto & elem_id : it->second)
+        {
+          id_storage.push_back( std::make_pair(elem_id, side_id) );
+        }
+      } // if-else
+      
       // Extract remaining characters on line including newline
       std::getline(_in, dummy);
     } // while
 }
-
-
 
 
 void AbaqusIO::assign_subdomain_ids()
