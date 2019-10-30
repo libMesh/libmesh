@@ -78,20 +78,6 @@
   template class FE< (_dim), NEDELEC_ONE>;                              \
   template class FE< (_dim), MONOMIAL_VEC>
 
-#define INSTANTIATE_ALL_MAPS(_dim)              \
-  INSTANTIATE_MAPS(_dim,CLOUGH);                \
-  INSTANTIATE_MAPS(_dim,HERMITE);               \
-  INSTANTIATE_MAPS(_dim,HIERARCHIC);            \
-  INSTANTIATE_MAPS(_dim,L2_HIERARCHIC);         \
-  INSTANTIATE_MAPS(_dim,LAGRANGE);              \
-  INSTANTIATE_MAPS(_dim,LAGRANGE_VEC);          \
-  INSTANTIATE_MAPS(_dim,L2_LAGRANGE);           \
-  INSTANTIATE_MAPS(_dim,MONOMIAL);              \
-  INSTANTIATE_MAPS(_dim,SCALAR);                \
-  INSTANTIATE_MAPS(_dim,XYZ);                   \
-  INSTANTIATE_MAPS(_dim,NEDELEC_ONE);           \
-  INSTANTIATE_MAPS(_dim,MONOMIAL_VEC)
-
 #else //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>;      \
@@ -109,23 +95,6 @@
   template class FE< (_dim), RATIONAL_BERNSTEIN>;                       \
   template class FE< (_dim), NEDELEC_ONE>;                              \
   template class FE< (_dim), MONOMIAL_VEC>
-
-#define INSTANTIATE_ALL_MAPS(_dim)              \
-  INSTANTIATE_MAPS(_dim,CLOUGH);                \
-  INSTANTIATE_MAPS(_dim,HERMITE);               \
-  INSTANTIATE_MAPS(_dim,HIERARCHIC);            \
-  INSTANTIATE_MAPS(_dim,L2_HIERARCHIC);         \
-  INSTANTIATE_MAPS(_dim,LAGRANGE);              \
-  INSTANTIATE_MAPS(_dim,LAGRANGE_VEC);          \
-  INSTANTIATE_MAPS(_dim,L2_LAGRANGE);           \
-  INSTANTIATE_MAPS(_dim,MONOMIAL);              \
-  INSTANTIATE_MAPS(_dim,SCALAR);                \
-  INSTANTIATE_MAPS(_dim,BERNSTEIN);             \
-  INSTANTIATE_MAPS(_dim,SZABAB);                \
-  INSTANTIATE_MAPS(_dim,XYZ);                   \
-  INSTANTIATE_MAPS(_dim,RATIONAL_BERNSTEIN);    \
-  INSTANTIATE_MAPS(_dim,NEDELEC_ONE);           \
-  INSTANTIATE_MAPS(_dim,MONOMIAL_VEC)
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
