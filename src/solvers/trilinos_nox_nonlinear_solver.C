@@ -288,6 +288,8 @@ void NoxNonlinearSolver<T>::init (const char * /*name*/)
 
 
 
+#include <libmesh/ignore_warnings.h> // deprecated-copy in Epetra_Vector
+
 template <typename T>
 std::pair<unsigned int, Real>
 NoxNonlinearSolver<T>::solve (SparseMatrix<T> &  /* jac_in */,  // System Jacobian Matrix
@@ -422,6 +424,8 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T> &  /* jac_in */,  // System Jacobi
 
   return std::make_pair(total_iters, residual_norm);
 }
+
+#include <libmesh/restore_warnings.h>
 
 
 

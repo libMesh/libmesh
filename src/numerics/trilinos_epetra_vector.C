@@ -875,6 +875,7 @@ int EpetraVector<T>::GlobalAssemble(Epetra_CombineMode mode)
   return(0);
 }
 
+#include <libmesh/ignore_warnings.h> // deprecated-copy in Epetra_Vector
 
 //----------------------------------------------------------------------------
 template <typename T>
@@ -902,6 +903,7 @@ void EpetraVector<T>::FEoperatorequals(const EpetraVector & source)
   }
 }
 
+#include <libmesh/restore_warnings.h>
 
 //----------------------------------------------------------------------------
 template <typename T>
