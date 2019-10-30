@@ -77,42 +77,42 @@ private:
 
 #ifdef LIBMESH_HAVE_MPI
 
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                            \
-  class StandardType<cxxtype> : public DataType                         \
-  {                                                                     \
-  public:                                                               \
-    explicit                                                            \
+#define PASSMESS_STANDARD_TYPE(cxxtype,mpitype)                      \
+  template<>                                                         \
+  class StandardType<cxxtype> : public DataType                      \
+  {                                                                  \
+  public:                                                            \
+    explicit                                                         \
       StandardType(const cxxtype * = nullptr) : DataType(mpitype) {} \
   }
 
 #else
 
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                            \
-  class StandardType<cxxtype> : public DataType                         \
-  {                                                                     \
-  public:                                                               \
-    explicit                                                            \
-      StandardType(const cxxtype * = nullptr) : DataType() {}   \
+#define PASSMESS_STANDARD_TYPE(cxxtype,mpitype)               \
+  template<>                                                  \
+  class StandardType<cxxtype> : public DataType               \
+  {                                                           \
+  public:                                                     \
+    explicit                                                  \
+      StandardType(const cxxtype * = nullptr) : DataType() {} \
   }
 
 #endif
 
-LIBMESH_STANDARD_TYPE(char,MPI_CHAR);
-LIBMESH_STANDARD_TYPE(signed char,MPI_SIGNED_CHAR);
-LIBMESH_STANDARD_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
-LIBMESH_STANDARD_TYPE(short int,MPI_SHORT);
-LIBMESH_STANDARD_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
-LIBMESH_STANDARD_TYPE(int,MPI_INT);
-LIBMESH_STANDARD_TYPE(unsigned int,MPI_UNSIGNED);
-LIBMESH_STANDARD_TYPE(long,MPI_LONG);
-LIBMESH_STANDARD_TYPE(long long,MPI_LONG_LONG_INT);
-LIBMESH_STANDARD_TYPE(unsigned long,MPI_UNSIGNED_LONG);
-LIBMESH_STANDARD_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
-LIBMESH_STANDARD_TYPE(float,MPI_FLOAT);
-LIBMESH_STANDARD_TYPE(double,MPI_DOUBLE);
-LIBMESH_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
+PASSMESS_STANDARD_TYPE(char,MPI_CHAR);
+PASSMESS_STANDARD_TYPE(signed char,MPI_SIGNED_CHAR);
+PASSMESS_STANDARD_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
+PASSMESS_STANDARD_TYPE(short int,MPI_SHORT);
+PASSMESS_STANDARD_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
+PASSMESS_STANDARD_TYPE(int,MPI_INT);
+PASSMESS_STANDARD_TYPE(unsigned int,MPI_UNSIGNED);
+PASSMESS_STANDARD_TYPE(long,MPI_LONG);
+PASSMESS_STANDARD_TYPE(long long,MPI_LONG_LONG_INT);
+PASSMESS_STANDARD_TYPE(unsigned long,MPI_UNSIGNED_LONG);
+PASSMESS_STANDARD_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
+PASSMESS_STANDARD_TYPE(float,MPI_FLOAT);
+PASSMESS_STANDARD_TYPE(double,MPI_DOUBLE);
+PASSMESS_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
 
 // Quad and float128 types aren't standard C++, so only work with them
 // if configure and PETSc encapsulated the non-standard issues.
@@ -141,7 +141,7 @@ LIBMESH_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
 # endif
 #else
 # ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-  LIBMESH_STANDARD_TYPE(Real,);
+  PASSMESS_STANDARD_TYPE(Real,);
 # endif
 #endif
 

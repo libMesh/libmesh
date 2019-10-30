@@ -35,7 +35,7 @@ namespace PassMess
 {
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 # ifdef LIBMESH_HAVE_MPI
-# define LIBMESH_MPI_BINARY(funcname) \
+# define PASSMESS_MPI_BINARY(funcname) \
 inline void \
 libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
 { \
@@ -47,7 +47,7 @@ libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
     inout[i] = std::funcname(in[i],inout[i]); \
 }
 
-# define LIBMESH_MPI_LOCATOR(funcname) \
+# define PASSMESS_MPI_LOCATOR(funcname) \
 inline void \
 libmesh_mpi_##funcname##_location(void * a, void * b, int * len, MPI_Datatype *) \
 { \
@@ -67,7 +67,7 @@ libmesh_mpi_##funcname##_location(void * a, void * b, int * len, MPI_Datatype *)
 }
 
 
-# define LIBMESH_MPI_BINARY_FUNCTOR(funcname) \
+# define PASSMESS_MPI_BINARY_FUNCTOR(funcname) \
 inline void \
 libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
 { \
@@ -80,12 +80,12 @@ libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
 }
 
 
-LIBMESH_MPI_BINARY(max)
-LIBMESH_MPI_BINARY(min)
-LIBMESH_MPI_LOCATOR(max)
-LIBMESH_MPI_LOCATOR(min)
-LIBMESH_MPI_BINARY_FUNCTOR(plus)
-LIBMESH_MPI_BINARY_FUNCTOR(multiplies)
+PASSMESS_MPI_BINARY(max)
+PASSMESS_MPI_BINARY(min)
+PASSMESS_MPI_LOCATOR(max)
+PASSMESS_MPI_LOCATOR(min)
+PASSMESS_MPI_BINARY_FUNCTOR(plus)
+PASSMESS_MPI_BINARY_FUNCTOR(multiplies)
 
 # endif // LIBMESH_HAVE_MPI
 #endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
@@ -143,7 +143,7 @@ class OpFunction
 
 #ifdef LIBMESH_HAVE_MPI
 
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)           \
+#define PASSMESS_PARALLEL_INTEGER_OPS(cxxtype)          \
   template<>                                            \
   class OpFunction<cxxtype>                             \
   {                                                     \
@@ -162,7 +162,7 @@ class OpFunction
     static MPI_Op min_location() { return MPI_MINLOC; } \
   }
 
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)             \
+#define PASSMESS_PARALLEL_FLOAT_OPS(cxxtype)            \
   template<>                                            \
   class OpFunction<cxxtype>                             \
   {                                                     \
@@ -177,13 +177,13 @@ class OpFunction
 
 #else
 
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)   \
+#define PASSMESS_PARALLEL_INTEGER_OPS(cxxtype)  \
   template<>                                    \
   class OpFunction<cxxtype>                     \
   {                                             \
   }
 
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)     \
+#define PASSMESS_PARALLEL_FLOAT_OPS(cxxtype)    \
   template<>                                    \
   class OpFunction<cxxtype>                     \
   {                                             \
@@ -191,52 +191,52 @@ class OpFunction
 
 #endif
 
-LIBMESH_PARALLEL_INTEGER_OPS(char);
-LIBMESH_PARALLEL_INTEGER_OPS(signed char);
-LIBMESH_PARALLEL_INTEGER_OPS(unsigned char);
-LIBMESH_PARALLEL_INTEGER_OPS(short int);
-LIBMESH_PARALLEL_INTEGER_OPS(unsigned short int);
-LIBMESH_PARALLEL_INTEGER_OPS(int);
-LIBMESH_PARALLEL_INTEGER_OPS(unsigned int);
-LIBMESH_PARALLEL_INTEGER_OPS(long);
-LIBMESH_PARALLEL_INTEGER_OPS(long long);
-LIBMESH_PARALLEL_INTEGER_OPS(unsigned long);
-LIBMESH_PARALLEL_INTEGER_OPS(unsigned long long);                                \
+PASSMESS_PARALLEL_INTEGER_OPS(char);
+PASSMESS_PARALLEL_INTEGER_OPS(signed char);
+PASSMESS_PARALLEL_INTEGER_OPS(unsigned char);
+PASSMESS_PARALLEL_INTEGER_OPS(short int);
+PASSMESS_PARALLEL_INTEGER_OPS(unsigned short int);
+PASSMESS_PARALLEL_INTEGER_OPS(int);
+PASSMESS_PARALLEL_INTEGER_OPS(unsigned int);
+PASSMESS_PARALLEL_INTEGER_OPS(long);
+PASSMESS_PARALLEL_INTEGER_OPS(long long);
+PASSMESS_PARALLEL_INTEGER_OPS(unsigned long);
+PASSMESS_PARALLEL_INTEGER_OPS(unsigned long long);
 
-LIBMESH_PARALLEL_FLOAT_OPS(float);
-LIBMESH_PARALLEL_FLOAT_OPS(double);
-LIBMESH_PARALLEL_FLOAT_OPS(long double);
+PASSMESS_PARALLEL_FLOAT_OPS(float);
+PASSMESS_PARALLEL_FLOAT_OPS(double);
+PASSMESS_PARALLEL_FLOAT_OPS(long double);
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 # ifdef LIBMESH_HAVE_MPI
 
 // FIXME - we'll still need to free these to keep valgrind happy
-#define LIBMESH_MPI_OPFUNCTION(mpiname, funcname) \
+#define PASSMESS_MPI_OPFUNCTION(mpiname, funcname) \
   static MPI_Op mpiname() { \
-    static MPI_Op LIBMESH_MPI_##mpiname = MPI_OP_NULL; \
-    if (LIBMESH_MPI_##mpiname == MPI_OP_NULL) \
+    static MPI_Op PASSMESS_MPI_##mpiname = MPI_OP_NULL; \
+    if (PASSMESS_MPI_##mpiname == MPI_OP_NULL) \
       { \
         passmess_call_mpi \
-          (MPI_Op_create(libmesh_mpi_##funcname, true, &LIBMESH_MPI_##mpiname)); \
+          (MPI_Op_create(libmesh_mpi_##funcname, true, &PASSMESS_MPI_##mpiname)); \
       } \
-    return LIBMESH_MPI_##mpiname;  \
+    return PASSMESS_MPI_##mpiname;  \
   }
 
   template<>
   class OpFunction<Real>
   {
   public:
-    LIBMESH_MPI_OPFUNCTION(max, max)
-    LIBMESH_MPI_OPFUNCTION(min, min)
-    LIBMESH_MPI_OPFUNCTION(sum, plus)
-    LIBMESH_MPI_OPFUNCTION(product, multiplies)
+    PASSMESS_MPI_OPFUNCTION(max, max)
+    PASSMESS_MPI_OPFUNCTION(min, min)
+    PASSMESS_MPI_OPFUNCTION(sum, plus)
+    PASSMESS_MPI_OPFUNCTION(product, multiplies)
 
-    LIBMESH_MPI_OPFUNCTION(max_location, max_location)
-    LIBMESH_MPI_OPFUNCTION(min_location, min_location)
+    PASSMESS_MPI_OPFUNCTION(max_location, max_location)
+    PASSMESS_MPI_OPFUNCTION(min_location, min_location)
   };
 
 # else
-  LIBMESH_PARALLEL_FLOAT_OPS(Real);
+  PASSMESS_PARALLEL_FLOAT_OPS(Real);
 # endif
 #endif
 

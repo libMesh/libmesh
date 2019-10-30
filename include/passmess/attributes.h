@@ -52,63 +52,63 @@ struct Attributes
 // ------------------------------------------------------------
 // Declare Attributes specializations for C++ built-in types
 
-#define LIBMESH_INT_TYPE(cxxtype)                                       \
-  template<>                                                            \
-  struct Attributes<cxxtype>                                            \
-  {                                                                     \
-    static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype & x) { x = std::numeric_limits<cxxtype>::min(); } \
+#define PASSMESS_INT_TYPE(cxxtype)                                                    \
+  template<>                                                                          \
+  struct Attributes<cxxtype>                                                          \
+  {                                                                                   \
+    static const bool has_min_max = true;                                             \
+    static void set_lowest(cxxtype & x) { x = std::numeric_limits<cxxtype>::min(); }  \
     static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::max(); } \
   }
 
-#define LIBMESH_FLOAT_TYPE(cxxtype)                                     \
-  template<>                                                            \
-  struct Attributes<cxxtype>                                            \
-  {                                                                     \
-    static const bool has_min_max = true;                               \
+#define PASSMESS_FLOAT_TYPE(cxxtype)                                                       \
+  template<>                                                                               \
+  struct Attributes<cxxtype>                                                               \
+  {                                                                                        \
+    static const bool has_min_max = true;                                                  \
     static void set_lowest(cxxtype & x) { x = -std::numeric_limits<cxxtype>::infinity(); } \
     static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::infinity(); } \
   }
 
-#define LIBMESH_CONTAINER_TYPE(cxxtype)                                 \
-  struct Attributes<cxxtype>                                         \
-  {                                                                     \
-    static const bool has_min_max = Attributes<T>::has_min_max;         \
-    static void set_lowest(cxxtype & x) {                            \
-      for (auto & val : x)                                              \
-        Attributes<T>::set_lowest(val); }                               \
-    static void set_highest(cxxtype & x) {                           \
-      for (auto & val : x)                                              \
-        Attributes<T>::set_highest(val); }                              \
+#define PASSMESS_CONTAINER_TYPE(cxxtype)                        \
+  struct Attributes<cxxtype>                                    \
+  {                                                             \
+    static const bool has_min_max = Attributes<T>::has_min_max; \
+    static void set_lowest(cxxtype & x) {                       \
+      for (auto & val : x)                                      \
+        Attributes<T>::set_lowest(val); }                       \
+    static void set_highest(cxxtype & x) {                      \
+      for (auto & val : x)                                      \
+        Attributes<T>::set_highest(val); }                      \
   }
 
 
-LIBMESH_INT_TYPE(char);
-LIBMESH_INT_TYPE(signed char);
-LIBMESH_INT_TYPE(unsigned char);
-LIBMESH_INT_TYPE(short int);
-LIBMESH_INT_TYPE(unsigned short int);
-LIBMESH_INT_TYPE(int);
-LIBMESH_INT_TYPE(unsigned int);
-LIBMESH_INT_TYPE(long);
-LIBMESH_INT_TYPE(long long);
-LIBMESH_INT_TYPE(unsigned long);
-LIBMESH_INT_TYPE(unsigned long long);
+PASSMESS_INT_TYPE(char);
+PASSMESS_INT_TYPE(signed char);
+PASSMESS_INT_TYPE(unsigned char);
+PASSMESS_INT_TYPE(short int);
+PASSMESS_INT_TYPE(unsigned short int);
+PASSMESS_INT_TYPE(int);
+PASSMESS_INT_TYPE(unsigned int);
+PASSMESS_INT_TYPE(long);
+PASSMESS_INT_TYPE(long long);
+PASSMESS_INT_TYPE(unsigned long);
+PASSMESS_INT_TYPE(unsigned long long);
 
-LIBMESH_FLOAT_TYPE(float);
-LIBMESH_FLOAT_TYPE(double);
-LIBMESH_FLOAT_TYPE(long double);
+PASSMESS_FLOAT_TYPE(float);
+PASSMESS_FLOAT_TYPE(double);
+PASSMESS_FLOAT_TYPE(long double);
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-LIBMESH_FLOAT_TYPE(Real);
+PASSMESS_FLOAT_TYPE(Real);
 #endif
 
-#define LIBMESH_ATTRIBUTES_COMMA ,
+#define PASSMESS_ATTRIBUTES_COMMA ,
 
 template <typename T, typename C, typename A>
-LIBMESH_CONTAINER_TYPE(std::set<T LIBMESH_ATTRIBUTES_COMMA C LIBMESH_ATTRIBUTES_COMMA A>);
+PASSMESS_CONTAINER_TYPE(std::set<T PASSMESS_ATTRIBUTES_COMMA C PASSMESS_ATTRIBUTES_COMMA A>);
 
 template <typename T, typename A>
-LIBMESH_CONTAINER_TYPE(std::vector<T LIBMESH_ATTRIBUTES_COMMA A>);
+PASSMESS_CONTAINER_TYPE(std::vector<T PASSMESS_ATTRIBUTES_COMMA A>);
 
 } // namespace PassMess
 
