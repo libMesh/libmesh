@@ -888,7 +888,7 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
           id_storage.push_back( std::make_pair(elem_id, side_id) );
         }
       } // if-else
-      
+
       // Extract remaining characters on line including newline
       std::getline(_in, dummy);
     } // while
