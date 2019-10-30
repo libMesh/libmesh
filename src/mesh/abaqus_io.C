@@ -849,24 +849,43 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
   std::vector<std::pair<dof_id_type, unsigned>> & id_storage = container[sideset_name];
 
   // Variables for storing values read in from file
-  dof_id_type elem_id=0;
   unsigned side_id=0;
   char c;
-  std::string dummy;
+  std::string elem_id_or_set, dummy;
 
   // Read until the start of another section is detected, or EOF is encountered
   while (_in.peek() != '*' && _in.peek() != EOF)
     {
-      // The strings are of the form: "391, S2"
+      // This line is of the form: "391, S2" or "Elset_1, S3"
 
-      // Read the element ID and the leading comma
-      _in >> elem_id >> c;
+      // Read first string up to and including the comma, which is discarded.
+      std::getline(_in, elem_id_or_set, ',');
 
-      // Read another character (the 'S') and finally the side ID
+      // Read the character "S", followed by the side id. Note: the >> operator
+      // eats whitespace until it reaches a valid character, so this should work
+      // whether or not there is a space after the previous comma.
       _in >> c >> side_id;
 
-      // Store this pair of data in the vector
-      id_storage.push_back( std::make_pair(elem_id, side_id) );
+      // Try to convert first string to an integer.  If no conversion
+      // can be performed, strtol returns 0.  If endptr != nullptr,
+      // then it stores the address of the first invalid character
+      // found in the string.
+      char * endptr;
+      dof_id_type elem_id = cast_int<dof_id_type>
+        (std::strtol(elem_id_or_set.c_str(), &endptr, /*base=*/10));
+
+      if (elem_id != 0 || endptr != elem_id_or_set.c_str())
+        {
+          // if the side set is of the form of "391, S2"
+          id_storage.push_back( std::make_pair(elem_id, side_id) );
+        }
+      else
+        {
+          // if the side set is of the form of "Elset_1, S3"
+          const auto & vec = libmesh_map_find(_elemset_ids, elem_id_or_set);
+          for (const auto & elem_id_in_elset : vec)
+            id_storage.push_back( std::make_pair(elem_id_in_elset, side_id) );
+        }
 
       // Extract remaining characters on line including newline
       std::getline(_in, dummy);
