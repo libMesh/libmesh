@@ -22,6 +22,9 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
 
+// PassMess Includes
+#include "libmesh/passmess_assert.h"
+
 #ifdef LIBMESH_HAVE_MPI
 
 /**
@@ -42,8 +45,8 @@
           int passmess_mpi_error_string_len;                            \
           MPI_Error_string(error_code, passmess_mpi_error_string,       \
                            &passmess_mpi_error_string_len);             \
-          libmesh_assert_equal_to_msg(error_code, MPI_SUCCESS,          \
-                                      passmess_mpi_error_string);       \
+          passmess_assert_equal_to_msg(error_code, MPI_SUCCESS,         \
+                                       passmess_mpi_error_string);      \
         }                                                               \
     }                                                                   \
   while (0)

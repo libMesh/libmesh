@@ -22,6 +22,9 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
 
+// PassMess Includes
+#include "libmesh/passmess_assert.h"
+
 // C++ includes
 #include <cstddef>
 #include <iterator>
@@ -185,8 +188,8 @@ inline Iter pack_range (const Context * context,
         Packing<T>::packable_size(*range_begin, context);
       unsigned int my_packed_size =
         Packing<T>::packed_size (buffer.begin() + old_size);
-      libmesh_assert_equal_to (my_packable_size, my_packed_size);
-      libmesh_assert_equal_to (buffer.size(), old_size + my_packable_size);
+      passmess_assert_equal_to (my_packable_size, my_packed_size);
+      passmess_assert_equal_to (buffer.size(), old_size + my_packable_size);
 #endif
     }
 
@@ -218,7 +221,7 @@ inline void unpack_range (const std::vector<buffertype> & buffer,
     }
 
   // We should have used up the exact amount of data in the buffer
-  libmesh_assert (next_object_start == buffer.end());
+  passmess_assert (next_object_start == buffer.end());
 }
 
 } // namespace PassMess

@@ -21,6 +21,7 @@
 
 // PassMess includes
 #include "libmesh/parallel.h" // for inline max(int)
+#include "libmesh/passmess_assert.h"
 
 // libMesh includes
 #include "libmesh/libmesh_logging.h"
@@ -35,7 +36,7 @@ namespace PassMess
 void Communicator::reference_unique_tag(int tagvalue) const
 {
   // This had better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
+  passmess_assert(used_tag_values.count(tagvalue));
 
   used_tag_values[tagvalue]++;
 }
@@ -44,7 +45,7 @@ void Communicator::reference_unique_tag(int tagvalue) const
 void Communicator::dereference_unique_tag(int tagvalue) const
 {
   // This had better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
+  passmess_assert(used_tag_values.count(tagvalue));
 
   used_tag_values[tagvalue]--;
   // If we don't have any more outstanding references, we
@@ -156,7 +157,7 @@ void Communicator::clear() {
 #ifdef LIBMESH_HAVE_MPI
   if (_I_duped_it)
     {
-      libmesh_assert (_communicator != MPI_COMM_NULL);
+      passmess_assert (_communicator != MPI_COMM_NULL);
       libmesh_call_mpi
         (MPI_Comm_free(&_communicator));
 
@@ -185,19 +186,19 @@ void Communicator::assign(const communicator & comm)
       libmesh_call_mpi
         (MPI_Comm_size(_communicator, &i));
 
-      libmesh_assert_greater_equal (i, 0);
+      passmess_assert_greater_equal (i, 0);
       _size = cast_int<processor_id_type>(i);
 
       libmesh_call_mpi
         (MPI_Comm_rank(_communicator, &i));
 
-      libmesh_assert_greater_equal (i, 0);
+      passmess_assert_greater_equal (i, 0);
       _rank = cast_int<processor_id_type>(i);
 
       int * maxTag;
       int flag = false;
       libmesh_call_mpi(MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &maxTag, &flag));
-      libmesh_assert(flag);
+      passmess_assert(flag);
       _max_tag = *maxTag;
     }
   else
@@ -250,7 +251,7 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
       // Automatic tag values have to be requested in sync
       int maxval = _next_tag;
       this->max(maxval);
-      libmesh_assert_equal_to(_next_tag, maxval);
+      passmess_assert_equal_to(_next_tag, maxval);
 #endif
       tagvalue = _next_tag++;
     }
@@ -260,7 +261,7 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
       // Get the largest value in the used values, and pick one
       // larger
       tagvalue = used_tag_values.rbegin()->first+1;
-      libmesh_assert(!used_tag_values.count(tagvalue));
+      passmess_assert(!used_tag_values.count(tagvalue));
     }
   if (tagvalue >= _next_tag)
     _next_tag = tagvalue+1;
@@ -286,8 +287,8 @@ status Communicator::probe (const unsigned int src_processor_id,
 
   status stat;
 
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
+  passmess_assert(src_processor_id < this->size() ||
+                  src_processor_id == any_source);
 
   libmesh_call_mpi
     (MPI_Probe (src_processor_id, tag.value(), this->get(), &stat));

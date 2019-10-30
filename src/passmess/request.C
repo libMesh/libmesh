@@ -20,6 +20,7 @@
 
 // PassMess includes
 #include "libmesh/libmesh_call_mpi.h"
+#include "libmesh/passmess_assert.h"
 #include "libmesh/post_wait_work.h"
 #include "libmesh/status.h"
 
@@ -78,7 +79,7 @@ void Request::cleanup()
           // If we're done using this request, then we'd better have
           // done the work we waited for
           for (const auto & item : post_wait_work->first)
-            libmesh_assert(!item);
+            passmess_assert(!item);
 #endif
           delete post_wait_work;
           post_wait_work = nullptr;
@@ -136,7 +137,7 @@ Status Request::wait ()
         {
           // The user should never try to give us non-existent work or try
           // to wait() twice.
-          libmesh_assert (item);
+          passmess_assert (item);
           item->run();
           delete item;
           item = nullptr;
@@ -157,8 +158,8 @@ bool Request::test ()
 
   if (val)
     {
-      libmesh_assert          (_request == MPI_REQUEST_NULL);
-      libmesh_assert_equal_to (val, 1);
+      passmess_assert          (_request == MPI_REQUEST_NULL);
+      passmess_assert_equal_to (val, 1);
     }
 
   return val;
@@ -187,7 +188,7 @@ bool Request::test (status &)
 void Request::add_prior_request(const Request & req)
 {
   // We're making a chain of prior requests, not a tree
-  libmesh_assert(!req._prior_request.get());
+  passmess_assert(!req._prior_request.get());
 
   Request * new_prior_req = new Request(req);
 
@@ -215,7 +216,7 @@ void wait (std::vector<Request> & r)
 
 std::size_t waitany (std::vector<Request> & r)
 {
-  libmesh_assert(!r.empty());
+  passmess_assert(!r.empty());
 
   int index = 0;
   int r_size = libMesh::cast_int<int>(r.size());
@@ -259,7 +260,7 @@ std::size_t waitany (std::vector<Request> & r)
           {
             // The user should never try to give us non-existent work or try
             // to wait() twice.
-            libmesh_assert (item);
+            passmess_assert (item);
             item->run();
             delete item;
             item = nullptr;

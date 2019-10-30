@@ -32,8 +32,6 @@
 
 namespace PassMess {
 
-using libMesh::cast_int;
-
 //------------------------------------------------------------------------
 /**
  * Send and receive and act on vectors of data.
@@ -251,7 +249,7 @@ void push_parallel_vector_data(const Communicator & comm,
                                req->wait();
 
                                auto it = incoming_data.find(pid);
-                               libmesh_assert(it != incoming_data.end());
+                               passmess_assert(it != incoming_data.end());
 
                                act_on_data(pid, *it->second);
 
@@ -329,7 +327,7 @@ void push_parallel_vector_data(const Communicator & comm,
       processor_id_type destid = datapair.first % num_procs;
 
       // Don't give us empty vectors to send
-      libmesh_assert_greater(datapair.second.size(), 0);
+      passmess_assert_greater(datapair.second.size(), 0);
 
       will_send_to[destid]++;
     }
@@ -428,7 +426,7 @@ void pull_parallel_vector_data(const Communicator & comm,
       auto new_data_it =
         response_data.emplace(pid, std::vector<datum>());
       gather_data(pid, query, new_data_it->second);
-      libmesh_assert_equal_to(query.size(), new_data_it->second.size());
+      passmess_assert_equal_to(query.size(), new_data_it->second.size());
     };
 
   push_parallel_vector_data (comm, queries, gather_functor);
@@ -448,7 +446,7 @@ void pull_parallel_vector_data(const Communicator & comm,
     {
       auto q_pid_its = queries.equal_range(pid);
       auto query_it = q_pid_its.first;
-      libmesh_assert(query_it != q_pid_its.second);
+      passmess_assert(query_it != q_pid_its.second);
 
       // We rely on responses coming in the same order as queries
       const unsigned int nth_query = responses_acted_on[pid]++;
@@ -461,7 +459,7 @@ void pull_parallel_vector_data(const Communicator & comm,
                 {
                   pid += num_procs;
                   q_pid_its = queries.equal_range(pid);
-                  libmesh_assert_less_equal(pid, max_pid);
+                  passmess_assert_less_equal(pid, max_pid);
                 } while (q_pid_its.first == q_pid_its.second);
               query_it = q_pid_its.first;
             }
@@ -504,7 +502,7 @@ void pull_parallel_vector_data(const Communicator & comm,
     {
       std::vector<std::vector<datum,A>> response;
       gather_data(pid, query, response);
-      libmesh_assert_equal_to(query.size(),
+      passmess_assert_equal_to(query.size(),
                               response.size());
 
       // Just act on data if the user requested a send-to-self
@@ -544,9 +542,9 @@ void pull_parallel_vector_data(const Communicator & comm,
       std::vector<std::vector<datum,A>> received_data;
       comm.receive(proc_id, received_data, tag);
 
-      libmesh_assert(queries.count(proc_id));
+      passmess_assert(queries.count(proc_id));
       auto & querydata = queries.at(proc_id);
-      libmesh_assert_equal_to(querydata.size(), received_data.size());
+      passmess_assert_equal_to(querydata.size(), received_data.size());
       act_on_data(proc_id, querydata, received_data);
     }
 

@@ -19,7 +19,7 @@
 #ifndef PASSMESS_PARALLEL_IMPLEMENTATION_H
 #define PASSMESS_PARALLEL_IMPLEMENTATION_H
 
-// Parallel includes
+// PassMess includes
 #include "libmesh/attributes.h"
 #include "libmesh/communicator.h"
 #include "libmesh/data_type.h"
@@ -28,6 +28,7 @@
 #include "libmesh/op_function.h"
 #include "libmesh/packing.h"
 #include "libmesh/parallel_only.h"
+#include "libmesh/passmess_assert.h"
 #include "libmesh/post_wait_copy_buffer.h"
 #include "libmesh/post_wait_delete_buffer.h"
 #include "libmesh/post_wait_dereference_shared_ptr.h"
@@ -57,8 +58,6 @@
 #include <type_traits>
 
 namespace PassMess {
-
-using libMesh::cast_int;
 
 using libMesh::Parallel::Packing;
 
@@ -120,7 +119,7 @@ inline void unpack_vector_bool(const std::vector<T,A1> & vec_in,
   unsigned int data_bits = 8*sizeof(T);
   // We need the output vector to already be properly sized
   std::size_t out_size = vec_out.size();
-  libmesh_assert_equal_to
+  passmess_assert_equal_to
     (out_size/data_bits + (out_size%data_bits?1:0), vec_in.size());
 
   for (std::size_t i=0; i != out_size; ++i)
@@ -221,8 +220,8 @@ inline Status Communicator::packed_range_probe (const unsigned int src_processor
 
   int int_flag;
 
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
+  passmess_assert(src_processor_id < this->size() ||
+                  src_processor_id == any_source);
 
   passmess_call_mpi(MPI_Iprobe(src_processor_id,
                                tag.value(),
@@ -245,7 +244,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
 
-  libmesh_assert_less(dest_processor_id, this->size());
+  passmess_assert_less(dest_processor_id, this->size());
 
   passmess_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -269,7 +268,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
 
-  libmesh_assert_less(dest_processor_id, this->size());
+  passmess_assert_less(dest_processor_id, this->size());
 
   passmess_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -297,7 +296,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T * dataptr = const_cast<T*> (&buf);
 
-  libmesh_assert_less(dest_processor_id, this->size());
+  passmess_assert_less(dest_processor_id, this->size());
 
   passmess_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -321,7 +320,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T * dataptr = const_cast<T*>(&buf);
 
-  libmesh_assert_less(dest_processor_id, this->size());
+  passmess_assert_less(dest_processor_id, this->size());
 
   passmess_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -452,7 +451,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 {
   LOG_SCOPE("send()", "Parallel");
 
-  libmesh_assert_less(dest_processor_id, this->size());
+  passmess_assert_less(dest_processor_id, this->size());
 
   passmess_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -555,7 +554,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
       sendsize += packedsize;
     }
 
-  libmesh_assert (sendsize /* should at least be 1! */);
+  passmess_assert (sendsize /* should at least be 1! */);
   sendbuf->resize (sendsize);
 
   // Pack the send buffer
@@ -586,7 +585,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                      sendbuf->data(), sendsize, &pos, this->get()));
     }
 
-  libmesh_assert_equal_to (pos, sendsize);
+  passmess_assert_equal_to (pos, sendsize);
 
   req.add_post_wait_work
     (new PostWaitDeleteBuffer<std::vector<char>> (sendbuf));
@@ -617,14 +616,14 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
   while (range_begin != range_end)
     {
-      libmesh_assert_greater (std::distance(range_begin, range_end), 0);
+      passmess_assert_greater (std::distance(range_begin, range_end), 0);
 
       std::vector<typename Packing<T>::buffer_type> buffer;
 
       const Iter next_range_begin = pack_range
         (context, range_begin, range_end, buffer);
 
-      libmesh_assert_greater (std::distance(range_begin, next_range_begin), 0);
+      passmess_assert_greater (std::distance(range_begin, next_range_begin), 0);
 
       range_begin = next_range_begin;
 
@@ -637,7 +636,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
     }
 
 #ifdef DEBUG
-  libmesh_assert_equal_to(used_buffer_size, total_buffer_size);
+  passmess_assert_equal_to(used_buffer_size, total_buffer_size);
 #endif
 }
 
@@ -680,7 +679,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
   while (range_begin != range_end)
     {
-      libmesh_assert_greater (std::distance(range_begin, range_end), 0);
+      passmess_assert_greater (std::distance(range_begin, range_end), 0);
 
       std::vector<buffer_t> * buffer = new std::vector<buffer_t>();
 
@@ -688,7 +687,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
         pack_range(context, range_begin, range_end,
                              *buffer);
 
-      libmesh_assert_greater (std::distance(range_begin, next_range_begin), 0);
+      passmess_assert_greater (std::distance(range_begin, next_range_begin), 0);
 
       range_begin = next_range_begin;
 
@@ -815,8 +814,8 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   // datatype so we can later query the size
   Status stat(this->probe(src_processor_id, tag), StandardType<T>(&buf));
 
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
+  passmess_assert(src_processor_id < this->size() ||
+                  src_processor_id == any_source);
 
   passmess_call_mpi
     (MPI_Recv (&buf, 1, StandardType<T>(&buf), src_processor_id,
@@ -835,8 +834,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 {
   LOG_SCOPE("receive()", "Parallel");
 
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
+  passmess_assert(src_processor_id < this->size() ||
+                  src_processor_id == any_source);
 
   passmess_call_mpi
     (MPI_Irecv (&buf, 1, StandardType<T>(&buf), src_processor_id,
@@ -972,8 +971,8 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
   buf.resize(stat.size());
 
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
+  passmess_assert(src_processor_id < this->size() ||
+                  src_processor_id == any_source);
 
   // Use stat.source() and stat.tag() in the receive - if
   // src_processor_id is or tag is "any" then we want to be sure we
@@ -983,7 +982,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                cast_int<int>(buf.size()), type, stat.source(),
                stat.tag(), this->get(), stat.get()));
 
-  libmesh_assert_equal_to (stat.size(), buf.size());
+  passmess_assert_equal_to (stat.size(), buf.size());
 
   return stat;
 }
@@ -999,8 +998,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 {
   LOG_SCOPE("receive()", "Parallel");
 
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
+  passmess_assert(src_processor_id < this->size() ||
+                  src_processor_id == any_source);
 
   passmess_call_mpi
     (MPI_Irecv (buf.empty() ? nullptr : buf.data(),
@@ -1053,7 +1052,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   Status stat = this->receive (src_processor_id, recvbuf, MPI_PACKED, tag);
 
   // We should at least have one header datum, for outer vector size
-  libmesh_assert (!recvbuf.empty());
+  passmess_assert (!recvbuf.empty());
 
   // Unpack the received buffer
   int bufsize = libMesh::cast_int<int>(recvbuf.size());
@@ -1240,9 +1239,9 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
       return;
     }
 
-  libmesh_assert_less(dest_processor_id, this->size());
-  libmesh_assert(source_processor_id < this->size() ||
-                 source_processor_id == any_source);
+  passmess_assert_less(dest_processor_id, this->size());
+  passmess_assert(source_processor_id < this->size() ||
+                  source_processor_id == any_source);
 
   // MPI_STATUS_IGNORE is from MPI-2; using it with some versions of
   // MPICH may cause a crash:
@@ -1430,7 +1429,7 @@ inline void Communicator::allgather(const std::basic_string<T> & sendval,
 {
   LOG_SCOPE ("allgather()","Parallel");
 
-  libmesh_assert(this->size());
+  passmess_assert(this->size());
   recv.assign(this->size(), "");
 
   // serial case
@@ -1488,12 +1487,12 @@ inline void Communicator::broadcast (bool & data, const unsigned int root_id) co
 {
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1501,7 +1500,7 @@ inline void Communicator::broadcast (bool & data, const unsigned int root_id) co
   // MPI::BOOL available
   char char_data = data;
 
-  libmesh_assert_less(root_id, this->size());
+  passmess_assert_less(root_id, this->size());
 
   // Spread data to remote processors.
   passmess_call_mpi
@@ -1518,12 +1517,12 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
 {
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1545,7 +1544,7 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
 
 #ifndef NDEBUG
   if (this->rank() == root_id)
-    libmesh_assert_equal_to (data, orig);
+    passmess_assert_equal_to (data, orig);
 #endif
 }
 
@@ -1557,12 +1556,12 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
 {
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1570,7 +1569,7 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
   // Pass nullptr if our vector is empty.
   T * data_ptr = data.empty() ? nullptr : data.data();
 
-  libmesh_assert_less(root_id, this->size());
+  passmess_assert_less(root_id, this->size());
 
   passmess_call_mpi
     (MPI_Bcast (data_ptr, cast_int<int>(data.size()),
@@ -1584,12 +1583,12 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T>,A> & data,
 {
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1646,12 +1645,12 @@ inline void Communicator::broadcast (std::set<T,C,A> & data,
 {
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1680,12 +1679,12 @@ inline void Communicator::broadcast(std::map<T1,T2,C,A> & data,
 {
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1712,7 +1711,7 @@ inline void Communicator::broadcast(std::map<T1,T2,C,A> & data,
   this->broadcast(pair_first, root_id);
   this->broadcast(pair_second, root_id);
 
-  libmesh_assert(pair_first.size() == pair_first.size());
+  passmess_assert(pair_first.size() == pair_first.size());
 
   if (this->rank() != root_id)
     {
@@ -1908,8 +1907,8 @@ inline void Communicator::send_receive (const unsigned int libmesh_dbg_var(send_
                                         const MessageTag &,
                                         const MessageTag &) const
 {
-  libmesh_assert_equal_to (send_tgt, 0);
-  libmesh_assert_equal_to (recv_source, 0);
+  passmess_assert_equal_to (send_tgt, 0);
+  passmess_assert_equal_to (recv_source, 0);
   recv_val = send_val;
 }
 
@@ -1936,8 +1935,8 @@ Communicator::send_receive_packed_range
 {
   // This makes no sense on one processor unless we're deliberately
   // sending to ourself.
-  libmesh_assert_equal_to(dest_processor_id, 0);
-  libmesh_assert_equal_to(source_processor_id, 0);
+  passmess_assert_equal_to(dest_processor_id, 0);
+  passmess_assert_equal_to(source_processor_id, 0);
 
   // On one processor, we just need to pack the range and then unpack
   // it again.
@@ -1946,7 +1945,7 @@ Communicator::send_receive_packed_range
 
   while (send_begin != send_end)
     {
-      libmesh_assert_greater (std::distance(send_begin, send_end), 0);
+      passmess_assert_greater (std::distance(send_begin, send_end), 0);
 
       // We will serialize variable size objects from *range_begin to
       // *range_end as a sequence of ints in this buffer
@@ -1955,7 +1954,7 @@ Communicator::send_receive_packed_range
       const RangeIter next_send_begin = pack_range
         (context1, send_begin, send_end, buffer);
 
-      libmesh_assert_greater (std::distance(send_begin, next_send_begin), 0);
+      passmess_assert_greater (std::distance(send_begin, next_send_begin), 0);
 
       send_begin = next_send_begin;
 
@@ -2087,7 +2086,7 @@ inline void Communicator::min(std::vector<T,A> & r) const
     {
       LOG_SCOPE("min(vector)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, r.data(),
@@ -2106,7 +2105,7 @@ inline void Communicator::min(std::vector<bool,A> & r) const
     {
       LOG_SCOPE("min(vector<bool>)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       std::vector<unsigned int> ruint;
       pack_vector_bool(r, ruint);
@@ -2154,7 +2153,7 @@ inline void Communicator::minloc(std::vector<T,A1> & r,
     {
       LOG_SCOPE("minloc(vector)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       std::vector<DataPlusInt<T>> data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
@@ -2191,7 +2190,7 @@ inline void Communicator::minloc(std::vector<bool,A1> & r,
     {
       LOG_SCOPE("minloc(vector<bool>)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       std::vector<DataPlusInt<int>> data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
@@ -2242,7 +2241,7 @@ inline void Communicator::max(std::vector<T,A> & r) const
     {
       LOG_SCOPE("max(vector)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, r.data(),
@@ -2261,7 +2260,7 @@ inline void Communicator::max(std::vector<bool,A> & r) const
     {
       LOG_SCOPE("max(vector<bool>)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       std::vector<unsigned int> ruint;
       pack_vector_bool(r, ruint);
@@ -2309,7 +2308,7 @@ inline void Communicator::maxloc(std::vector<T,A1> & r,
     {
       LOG_SCOPE("maxloc(vector)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       std::vector<DataPlusInt<T>> data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
@@ -2347,7 +2346,7 @@ inline void Communicator::maxloc(std::vector<bool,A1> & r,
     {
       LOG_SCOPE("maxloc(vector<bool>)", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       std::vector<DataPlusInt<int>> data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
@@ -2399,7 +2398,7 @@ inline void Communicator::sum(std::vector<T,A> & r) const
     {
       LOG_SCOPE("sum()", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, r.data(),
@@ -2436,7 +2435,7 @@ inline void Communicator::sum(std::vector<std::complex<T>,A> & r) const
     {
       LOG_SCOPE("sum()", "Parallel");
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, r.data(),
@@ -2509,7 +2508,7 @@ inline void Communicator::gather(const unsigned int root_id,
                                  const T & sendval,
                                  std::vector<T,A> & recv) const
 {
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   if (this->rank() == root_id)
     recv.resize(this->size());
@@ -2520,7 +2519,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
       StandardType<T> send_type(&sendval);
 
-      libmesh_assert_less(root_id, this->size());
+      passmess_assert_less(root_id, this->size());
 
       passmess_call_mpi
         (MPI_Gather(const_cast<T*>(&sendval), 1, send_type,
@@ -2539,12 +2538,12 @@ inline void Communicator::gather(const unsigned int root_id,
 {
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   std::vector<int>
     sendlengths  (this->size(), 0),
@@ -2576,7 +2575,7 @@ inline void Communicator::gather(const unsigned int root_id,
   if (root_id == this->rank())
     r.resize(globalsize);
 
-  libmesh_assert_less(root_id, this->size());
+  passmess_assert_less(root_id, this->size());
 
   // and get the data from the remote processors
   passmess_call_mpi
@@ -2594,7 +2593,7 @@ inline void Communicator::gather(const unsigned int root_id,
                                  std::vector<std::basic_string<T>,A> & recv,
                                  const bool identical_buffer_sizes) const
 {
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   if (this->rank() == root_id)
     recv.resize(this->size());
@@ -2629,7 +2628,7 @@ inline void Communicator::gather(const unsigned int root_id,
       if (this->rank() == root_id)
         r.resize(globalsize, 0);
 
-      libmesh_assert_less(root_id, this->size());
+      passmess_assert_less(root_id, this->size());
 
       // and get the data from the remote processors.
       passmess_call_mpi
@@ -2656,7 +2655,7 @@ inline void Communicator::allgather(const T & sendval,
 {
   LOG_SCOPE ("allgather()","Parallel");
 
-  libmesh_assert(this->size());
+  passmess_assert(this->size());
   recv.resize(this->size());
 
   unsigned int comm_size = this->size();
@@ -2688,7 +2687,7 @@ inline void Communicator::allgather(std::vector<T,A> & r,
       if (r.empty())
         return;
 
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       std::vector<T,A> r_src(r.size()*this->size());
       r_src.swap(r);
@@ -2698,7 +2697,7 @@ inline void Communicator::allgather(std::vector<T,A> & r,
         (MPI_Allgather (r_src.data(), cast_int<int>(r_src.size()),
                         send_type, r.data(), cast_int<int>(r_src.size()),
                         send_type, this->get()));
-      // libmesh_assert(this->verify(r));
+      // passmess_assert(this->verify(r));
       return;
     }
 
@@ -2749,7 +2748,7 @@ inline void Communicator::allgather(std::vector<std::basic_string<T>,A> & r,
 
   if (identical_buffer_sizes)
     {
-      libmesh_assert(this->verify(r.size()));
+      passmess_assert(this->verify(r.size()));
 
       // identical_buffer_sizes doesn't buy us much since we have to
       // communicate the lengths of strings within each buffer anyway
@@ -2831,16 +2830,16 @@ void Communicator::scatter(const std::vector<T,A> & data,
                            const unsigned int root_id) const
 {
   libMesh::libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   // Do not allow the root_id to scatter a nullptr vector.
   // That would leave recv in an indeterminate state.
-  libmesh_assert (this->rank() != root_id || this->size() == data.size());
+  passmess_assert (this->rank() != root_id || this->size() == data.size());
 
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       recv = data[0];
       return;
     }
@@ -2850,7 +2849,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   libMesh::libmesh_ignore(data_ptr); // unused ifndef LIBMESH_HAVE_MPI
 
-  libmesh_assert_less(root_id, this->size());
+  passmess_assert_less(root_id, this->size());
 
   passmess_call_mpi
     (MPI_Scatter (data_ptr, 1, StandardType<T>(data_ptr),
@@ -2864,12 +2863,12 @@ void Communicator::scatter(const std::vector<T,A> & data,
                            std::vector<T,A> & recv,
                            const unsigned int root_id) const
 {
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       recv.assign(data.begin(), data.end());
       return;
     }
@@ -2879,7 +2878,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
   int recv_buffer_size = 0;
   if (this->rank() == root_id)
     {
-      libmesh_assert(data.size() % this->size() == 0);
+      passmess_assert(data.size() % this->size() == 0);
       recv_buffer_size = cast_int<int>(data.size() / this->size());
     }
 
@@ -2890,7 +2889,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
   libMesh::libmesh_ignore(data_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
 
-  libmesh_assert_less(root_id, this->size());
+  passmess_assert_less(root_id, this->size());
 
   passmess_call_mpi
     (MPI_Scatter (data_ptr, recv_buffer_size, StandardType<T>(data_ptr),
@@ -2905,13 +2904,13 @@ void Communicator::scatter(const std::vector<T,A1> & data,
                            std::vector<T,A1> & recv,
                            const unsigned int root_id) const
 {
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      libmesh_assert (counts.size() == this->size());
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
+      passmess_assert (counts.size() == this->size());
       recv.assign(data.begin(), data.begin() + counts[0]);
       return;
     }
@@ -2919,7 +2918,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   std::vector<int,A2> displacements(this->size(), 0);
   if (root_id == this->rank())
     {
-      libmesh_assert(counts.size() == this->size());
+      passmess_assert(counts.size() == this->size());
 
       // Create a displacements vector from the incoming counts vector
       unsigned int globalsize = 0;
@@ -2929,7 +2928,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
           globalsize += counts[i];
         }
 
-      libmesh_assert(data.size() == globalsize);
+      passmess_assert(data.size() == globalsize);
     }
 
   LOG_SCOPE("scatter()", "Parallel");
@@ -2944,7 +2943,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
   libMesh::libmesh_ignore(data_ptr, count_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
 
-  libmesh_assert_less(root_id, this->size());
+  passmess_assert_less(root_id, this->size());
 
   // Scatter the non-uniform chunks
   passmess_call_mpi
@@ -2960,13 +2959,13 @@ void Communicator::scatter(const std::vector<std::vector<T,A1>,A2> & data,
                            const unsigned int root_id,
                            const bool identical_buffer_sizes) const
 {
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      libmesh_assert (data.size() == this->size());
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
+      passmess_assert (data.size() == this->size());
       recv.assign(data[0].begin(), data[0].end());
       return;
     }
@@ -2976,7 +2975,7 @@ void Communicator::scatter(const std::vector<std::vector<T,A1>,A2> & data,
 
   if (root_id == this->rank())
     {
-      libmesh_assert (data.size() == this->size());
+      passmess_assert (data.size() == this->size());
 
       if (!identical_buffer_sizes)
         counts.resize(this->size());
@@ -2988,7 +2987,7 @@ void Communicator::scatter(const std::vector<std::vector<T,A1>,A2> & data,
 #ifndef NDEBUG
           else
             // Check that buffer sizes are indeed equal
-            libmesh_assert(!i || data[i-1].size() == data[i].size());
+            passmess_assert(!i || data[i-1].size() == data[i].size());
 #endif
           std::copy(data[i].begin(), data[i].end(), std::back_inserter(stacked_data));
         }
@@ -3017,9 +3016,9 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
     cast_int<int>(buf.size()/this->size());
   libMesh::libmesh_ignore(size_per_proc);
 
-  libmesh_assert_equal_to (buf.size()%this->size(), 0);
+  passmess_assert_equal_to (buf.size()%this->size(), 0);
 
-  libmesh_assert(this->verify(size_per_proc));
+  passmess_assert(this->verify(size_per_proc));
 
   StandardType<T> send_type(buf.data());
 
@@ -3036,12 +3035,12 @@ inline void Communicator::broadcast (T & passmess_mpi_var(data), const unsigned 
   libMesh::libmesh_ignore(root_id); // Only needed for MPI and/or dbg/devel
   if (this->size() == 1)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
+      passmess_assert (!this->rank());
+      passmess_assert (!root_id);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  passmess_assert_less (root_id, this->size());
 
   LOG_SCOPE("broadcast()", "Parallel");
 
@@ -3109,7 +3108,7 @@ inline void Communicator::allgather_packed_range(Context * context,
 
       this->allgather(buffer, false);
 
-      libmesh_assert(buffer.size());
+      passmess_assert(buffer.size());
 
       unpack_range
         (buffer, context, out_iter, (T*)nullptr);
@@ -3134,8 +3133,8 @@ inline bool Communicator::possibly_receive (unsigned int & src_processor_id,
 
   int int_flag = 0;
 
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
+  passmess_assert(src_processor_id < this->size() ||
+                  src_processor_id == any_source);
 
   passmess_call_mpi(MPI_Iprobe(src_processor_id,
                                tag.value(),

@@ -19,8 +19,9 @@
 #ifndef PASSMESS_STATUS_H
 #define PASSMESS_STATUS_H
 
-// Parallel includes
+// PassMess includes
 #include "libmesh/data_type.h"
+#include "libmesh/passmess_assert.h"
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
@@ -154,7 +155,7 @@ inline unsigned int Status::size (const data_type & type) const
     (MPI_Get_count (const_cast<MPI_Status*>(&_status), type,
                     &msg_size));
 
-  libmesh_assert_greater_equal (msg_size, 0);
+  passmess_assert_greater_equal (msg_size, 0);
   return msg_size;
 }
 
