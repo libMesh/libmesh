@@ -22,9 +22,6 @@
 // Parallel includes
 #include "libmesh/post_wait_work.h"
 
-// libMesh Includes
-#include "libmesh/libmesh_common.h"
-
 namespace PassMess
 {
 

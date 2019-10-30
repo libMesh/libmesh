@@ -22,9 +22,6 @@
 // Parallel includes
 #include "libmesh/passmess_call_mpi.h"
 
-// libMesh includes
-#include "libmesh/libmesh_common.h"
-
 namespace PassMess
 {
 

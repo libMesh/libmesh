@@ -22,8 +22,12 @@
 // Parallel includes
 #include "libmesh/status.h"
 
-// libMesh Includes
-#include "libmesh/libmesh_common.h"
+// libMesh includes
+#include "libmesh/libmesh_config.h"
+
+#ifdef LIBMESH_HAVE_MPI
+#  include "mpi.h"
+#endif // LIBMESH_HAVE_MPI
 
 // C++ includes
 #include <memory>

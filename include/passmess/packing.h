@@ -19,9 +19,6 @@
 #ifndef PASSMESS_PACKING_H
 #define PASSMESS_PACKING_H
 
-// libMesh Includes
-#include "libmesh/libmesh_common.h"
-
 // PassMess Includes
 #include "libmesh/passmess_assert.h"
 

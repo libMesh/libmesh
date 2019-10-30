@@ -25,8 +25,8 @@
 #include "libmesh/request.h"
 #include "libmesh/status.h"
 
-// libMesh Includes
-#include "libmesh/libmesh_common.h"
+// libMesh includes
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <map>
@@ -37,7 +37,7 @@
 // C++ includes needed for parallel_communicator_specializations
 //
 // These could be forward declarations if only that wasn't illegal
-#include <numeric> // complex
+#include <complex> // for specializations
 #include <set>
 
 namespace libMesh {
@@ -963,7 +963,7 @@ namespace Parallel {
 class Communicator : public PassMess::Communicator {
 public:
   Communicator () = default;
-  explicit Communicator (const communicator & comm) : PassMess::Communicator(comm) {}
+  explicit Communicator (const PassMess::communicator & comm) : PassMess::Communicator(comm) {}
   Communicator (const Communicator &) = delete;
   Communicator & operator= (const Communicator &) = delete;
   Communicator (Communicator &&) = default;

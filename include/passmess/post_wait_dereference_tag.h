@@ -23,9 +23,6 @@
 #include "libmesh/message_tag.h"
 #include "libmesh/post_wait_work.h"
 
-// libMesh Includes
-#include "libmesh/libmesh_common.h"
-
 namespace PassMess
 {
 

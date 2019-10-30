@@ -20,12 +20,13 @@
 #define PASSMESS_CALL_MPI_H
 
 // libMesh Includes
-#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_config.h"
 
 // PassMess Includes
 #include "libmesh/passmess_assert.h"
 
 #ifdef LIBMESH_HAVE_MPI
+#  include "mpi.h"
 
 /**
  * Macro to use arguments only when MPI is in use

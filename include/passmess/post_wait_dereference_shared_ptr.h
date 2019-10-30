@@ -20,11 +20,7 @@
 #define PASSMESS_POST_WAIT_DEREFERENCE_SHARED_PTR_H
 
 // Parallel includes
-#include "libmesh/message_tag.h"
 #include "libmesh/post_wait_work.h"
-
-// libMesh Includes
-#include "libmesh/libmesh_common.h"
 
 // System Includes
 #include <memory>

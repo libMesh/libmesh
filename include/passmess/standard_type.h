@@ -23,7 +23,11 @@
 #include "libmesh/data_type.h"
 
 // libMesh Includes
-#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_config.h"
+
+#ifdef LIBMESH_HAVE_MPI
+#  include "mpi.h"
+#endif // LIBMESH_HAVE_MPI
 
 // C++ includes
 #include <array>
