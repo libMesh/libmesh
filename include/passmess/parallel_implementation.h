@@ -1811,21 +1811,21 @@ template <typename T>
 inline void Communicator::send (const unsigned int,
                                 const T &,
                                 const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 template <typename T>
 inline void Communicator::send (const unsigned int,
                                 const T &,
                                 Request &,
                                 const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 template <typename T>
 inline void Communicator::send (const unsigned int,
                                 const T &,
                                 const DataType &,
                                 const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 template <typename T>
 inline void Communicator::send (const unsigned int,
@@ -1833,7 +1833,7 @@ inline void Communicator::send (const unsigned int,
                                 const DataType &,
                                 Request &,
                                 const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range(const unsigned int,
@@ -1841,7 +1841,7 @@ inline void Communicator::send_packed_range(const unsigned int,
                                             Iter,
                                             const Iter,
                                             const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range (const unsigned int,
@@ -1850,7 +1850,7 @@ inline void Communicator::send_packed_range (const unsigned int,
                                              const Iter,
                                              Request &,
                                              const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 /**
  * We do not currently support receives on one processor without MPI.
@@ -1859,21 +1859,21 @@ template <typename T>
 inline Status Communicator::receive (const unsigned int,
                                      T &,
                                      const MessageTag &) const
-{ libmesh_not_implemented(); return Status(); }
+{ passmess_not_implemented(); return Status(); }
 
 template <typename T>
 inline void Communicator::receive(const unsigned int,
                                   T &,
                                   Request &,
                                   const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 template <typename T>
 inline Status Communicator::receive(const unsigned int,
                                     T &,
                                     const DataType &,
                                     const MessageTag &) const
-{ libmesh_not_implemented(); return Status(); }
+{ passmess_not_implemented(); return Status(); }
 
 template <typename T>
 inline void Communicator::receive(const unsigned int,
@@ -1881,7 +1881,7 @@ inline void Communicator::receive(const unsigned int,
                                   const DataType &,
                                   Request &,
                                   const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 template <typename Context, typename OutputIter, typename T>
 inline void
@@ -1890,11 +1890,11 @@ Communicator::receive_packed_range(const unsigned int,
                                    OutputIter,
                                    const T *,
                                    const MessageTag &) const
-{ libmesh_not_implemented(); }
+{ passmess_not_implemented(); }
 
 // template <typename Context, typename OutputIter>
 // inline void Communicator::receive_packed_range(const unsigned int, Context *, OutputIter, Request &, const MessageTag &) const
-// { libmesh_not_implemented(); }
+// { passmess_not_implemented(); }
 
 /**
  * Send-receive data from one processor.

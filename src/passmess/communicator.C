@@ -281,7 +281,7 @@ status Communicator::probe (const unsigned int src_processor_id,
   LOG_SCOPE("probe()", "Communicator");
 
 #ifndef LIBMESH_HAVE_MPI
-  libmesh_not_implemented();
+  passmess_not_implemented();
   libMesh::libmesh_ignore(src_processor_id, tag);
 #endif
 

@@ -142,7 +142,7 @@ inline int Status::tag () const
 #ifdef LIBMESH_HAVE_MPI
   return _status.MPI_TAG;
 #else
-  libmesh_not_implemented();
+  passmess_not_implemented();
   return 0;
 #endif
 }
