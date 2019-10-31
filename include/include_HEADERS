@@ -271,6 +271,7 @@ include_HEADERS =  \
         numerics/wrapped_functor.h \
         numerics/zero_function.h \
         parallel/libmesh_call_mpi.h \
+        parallel/parallel.h \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
         parallel/parallel_elem.h \
@@ -302,10 +303,10 @@ include_HEADERS =  \
         passmess/message_tag.h \
         passmess/op_function.h \
         passmess/packing.h \
-        passmess/parallel.h \
         passmess/parallel_communicator_specializations \
         passmess/parallel_implementation.h \
         passmess/parallel_sync.h \
+        passmess/passmess.h \
         passmess/passmess_assert.h \
         passmess/passmess_call_mpi.h \
         passmess/post_wait_copy_buffer.h \

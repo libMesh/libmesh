@@ -23,7 +23,7 @@
 #include "libmesh/attributes.h"
 #include "libmesh/communicator.h"
 #include "libmesh/data_type.h"
-#include "libmesh/libmesh_call_mpi.h"
+#include "libmesh/passmess_call_mpi.h"
 #include "libmesh/message_tag.h"
 #include "libmesh/op_function.h"
 #include "libmesh/packing.h"
@@ -39,9 +39,6 @@
 #include "libmesh/request.h"
 #include "libmesh/status.h"
 #include "libmesh/standard_type.h"
-
-// libMesh Includes
-#include "libmesh/libmesh_common.h"
 
 // Define all the implementations separately; users might want to look
 // through this file for APIs, and it's long enough already.
