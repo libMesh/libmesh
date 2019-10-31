@@ -191,6 +191,19 @@ struct casting_compare {
 #define passmess_assert_less_equal(expr1,expr2) passmess_assert_less_equal_msg(expr1,expr2, "")
 #define passmess_assert_greater_equal(expr1,expr2) passmess_assert_greater_equal_msg(expr1,expr2, "")
 
+
+// Macro to notate and debug functions which should only be called in
+// parallel on every processor at once
+
+#ifndef NDEBUG
+#define passmess_parallel_only(comm_obj) do {                            \
+    passmess_assert((comm_obj).verify(std::string(__FILE__)));           \
+    passmess_assert((comm_obj).verify(std::to_string(__LINE__))); } while (0)
+#else
+#define passmess_parallel_only(comm_obj)  ((void) 0)
+#endif
+
+
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #define PASSMESS_THROW(e) do { throw e; } while (0)
 #else

@@ -142,7 +142,7 @@ void push_parallel_vector_data(const Communicator & comm,
                                const ActionFunctor & act_on_data)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(comm);
+  passmess_parallel_only(comm);
 
   // This function implements the "NBX" algorithm from
   // https://htor.inf.ethz.ch/publications/img/hoefler-dsde-protocols.pdf
@@ -314,7 +314,7 @@ void push_parallel_vector_data(const Communicator & comm,
                                const ActionFunctor & act_on_data)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(comm);
+  passmess_parallel_only(comm);
 
   processor_id_type num_procs = comm.size();
 

@@ -27,7 +27,6 @@
 #include "libmesh/message_tag.h"
 #include "libmesh/op_function.h"
 #include "libmesh/packing.h"
-#include "libmesh/parallel_only.h"
 #include "libmesh/passmess_assert.h"
 #include "libmesh/post_wait_copy_buffer.h"
 #include "libmesh/post_wait_delete_buffer.h"
