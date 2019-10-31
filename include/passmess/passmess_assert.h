@@ -24,7 +24,11 @@
 #include "libmesh/libmesh_config.h"
 
 // C++ includes
+#include <functional> // std::less, etc
 #include <iostream>
+#include <sstream>
+#include <type_traits> // std::decay
+
 
 // Use actual timestamps or constant dummies (to aid ccache)
 #ifdef LIBMESH_ENABLE_TIMESTAMPS
@@ -34,9 +38,6 @@
 #  define  PASSMESS_TIME "notime"
 #  define  PASSMESS_DATE "nodate"
 #endif
-
-#include <type_traits> // std::decay
-#include <functional> // std::less, etc
 
 namespace PassMess
 {

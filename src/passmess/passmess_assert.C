@@ -18,33 +18,27 @@
 
 // PassMess includes
 #include "libmesh/passmess_assert.h"
+#include "libmesh/communicator.h"
 
 // libMesh includes
-#include "libmesh/libmesh_common.h"
-
-// C/C++ includes
-#ifdef LIBMESH_HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#ifdef LIBMESH_HAVE_UNISTD_H
-#include <unistd.h>  // needed for getpid()
-#endif
-
-#ifdef LIBMESH_HAVE_CSIGNAL
-#  include <csignal>
-#endif
+#include "libmesh/libmesh_config.h"
 
 namespace PassMess
 {
 
 void report_here(const char * file, int line, const char * date, const char * time)
 {
-  std::cerr << "[" << static_cast<std::size_t>(libMesh::global_processor_id()) << "] "
-            << file
-            << ", line " << line
-            << ", compiled " << date
-            << " at " << time
-            << std::endl;
+  std::ostringstream here_msg; // Build in one buffer to reduce interleaving
+#ifdef LIBMESH_HAVE_MPI
+  PassMess::Communicator commworld(MPI_COMM_WORLD);
+  const std::size_t proc_id = commworld.rank();
+  here_msg << "[" << proc_id << "] ";
+#else
+  const std::size_t proc_id = 0;
+#endif
+  here_msg << file << ", line " << line << ", compiled "
+           << date << " at " << time << std::endl;
+  std::cerr << here_msg.str();
 }
 
 
