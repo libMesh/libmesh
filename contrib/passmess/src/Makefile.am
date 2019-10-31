@@ -13,7 +13,13 @@ libpassmess_la_LDFLAGS = -version-info 0:0:0
 #----------------------------------------------
 libpassmess_la_SOURCES =
 
+# parallel
+libpassmess_la_SOURCES += parallel/src/communicator.C
+libpassmess_la_SOURCES += parallel/src/message_tag.C
+libpassmess_la_SOURCES += parallel/src/request.C
+
 # utilities
+libpassmess_la_SOURCES += utilities/src/passmess_assert.C
 libpassmess_la_SOURCES += utilities/src/passmess_version.C
 
 #----------------------------
