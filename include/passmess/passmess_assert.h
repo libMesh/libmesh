@@ -22,7 +22,6 @@
 
 // The library configuration options
 #include "libmesh/libmesh_config.h"
-#include "libmesh/libmesh_exceptions.h"
 
 // C++ includes
 #include <iostream>
@@ -191,6 +190,12 @@ struct casting_compare {
 #define passmess_assert_less_equal(expr1,expr2) passmess_assert_less_equal_msg(expr1,expr2, "")
 #define passmess_assert_greater_equal(expr1,expr2) passmess_assert_greater_equal_msg(expr1,expr2, "")
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+#define PASSMESS_THROW(e) do { throw e; } while (0)
+#else
+#define PASSMESS_THROW(e) do { std::abort(); } while (0)
+#endif
+
 // The passmess_error() macro prints a message and throws a LogicError
 // exception
 //
@@ -203,7 +208,7 @@ struct casting_compare {
     std::stringstream msg_stream;                                             \
     msg_stream << msg;                                                        \
     PassMess::report_error(__FILE__, __LINE__, PASSMESS_DATE, PASSMESS_TIME); \
-    LIBMESH_THROW(libMesh::LogicError(msg_stream.str()));                     \
+    PASSMESS_THROW(std::logic_error(msg_stream.str()));                       \
   } while (0)
 
 #define passmess_error() passmess_error_msg("")
@@ -212,7 +217,7 @@ struct casting_compare {
   do {                                                                        \
     std::cerr << msg << std::endl;                                            \
     PassMess::report_error(__FILE__, __LINE__, PASSMESS_DATE, PASSMESS_TIME); \
-    LIBMESH_THROW(libMesh::NotImplemented());                                 \
+    PASSMESS_THROW(std::logic_error("Error: not implemented!");               \
   } while (0)
 
 #define passmess_not_implemented() passmess_not_implemented_msg("")
