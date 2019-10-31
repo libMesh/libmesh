@@ -852,7 +852,7 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
   dof_id_type elem_id=0;
   unsigned side_id=0;
   char c;
-  std::string elset_name, dummy;
+  std::string elem_id_or_set, elset_name, dummy;
 
   // Read until the start of another section is detected, or EOF is encountered
   while (_in.peek() != '*' && _in.peek() != EOF)
