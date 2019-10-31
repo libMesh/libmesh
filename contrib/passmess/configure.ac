@@ -5,9 +5,9 @@ AC_PREREQ(2.61)
 AC_INIT(passmess, 0.0.0, roystgnr@ices.utexas.edu)
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_CONFIG_HEADER(passmess_config.h.tmp)
+AC_CONFIG_HEADER(src/utilities/include/passmess/passmess_config.h.tmp)
 dnl Prefixes everything in the temporary file with PASSMESS_
-AX_PREFIX_CONFIG_H(passmess_config.h,PASSMESS,passmess_config.h.tmp)
+AX_PREFIX_CONFIG_H(src/utilities/include/passmess/passmess_config.h,PASSMESS,src/utilities/include/passmess/passmess_config.h.tmp)
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CANONICAL_TARGET()

@@ -38,7 +38,6 @@ install-data-hook:
 
 # Additional files to be deleted by 'make distclean'
 DISTCLEANFILES  = _configs.sed
-DISTCLEANFILES += passmess_config.h
 
 # Files to be deleted by 'make maintainer-clean'
 MAINTAINERCLEANFILES  = aclocal.m4
@@ -49,8 +48,6 @@ MAINTAINERCLEANFILES += config.log
 MAINTAINERCLEANFILES += config.status
 MAINTAINERCLEANFILES += config.sub
 MAINTAINERCLEANFILES += configure
-MAINTAINERCLEANFILES += passmess_config.h.tmp.in
-MAINTAINERCLEANFILES += passmess_config.h.tmp.in~
 MAINTAINERCLEANFILES += Makefile.in
 MAINTAINERCLEANFILES += src/Makefile.in
 MAINTAINERCLEANFILES += m4/libtool.m4
