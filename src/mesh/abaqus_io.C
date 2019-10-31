@@ -859,25 +859,25 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
     {
       // The strings are either of the form: "391, S2" or "Elset_1, S3"
 
-      // Read the element ID and the leading comma
-      _in >> elem_id >> c;
-      if (_in)
-      {
-        // For the form of "391, S2"
-        // Read another character (the 'S') and finally the side ID
-        _in >> c >> side_id;
+      // Read the first string (either elem_id or elset_name) as elem_id_or_set
+      std::getline(_in, elem_id_or_set, ',');
+      // Read the second string (side_id)
+      _in >> c >> side_id;
 
-        // Store this pair of data in the vector
+      std::istringstream iss_elem_id_or_set (elem_id_or_set);
+      // Assume the side set is of the form of "391, S2"
+      iss_elem_id_or_set >> elem_id;
+
+      if (iss_elem_id_or_set.eof())
+      {
+        // if the side set is of the form of "391, S2"
         id_storage.push_back( std::make_pair(elem_id, side_id) );
       }
         else
         {
-            // For the form of "Elset_1, S3"
-            _in.clear();
-            std::getline(_in, elset_name, ',');
-
-            // Read another character (the 'S') and finally the side ID
-            _in >> c >> side_id;
+            // if the side set is of the form of "Elset_1, S3"
+            iss_elem_id_or_set.clear();
+            iss_elem_id_or_set >> elset_name;
 
             const auto & vec = libmesh_map_find(_elemset_ids, elset_name);
             for (const auto & elem_id_in_elset : vec)
