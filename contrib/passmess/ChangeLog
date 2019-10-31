@@ -1,0 +1,5 @@
+To see recent changes, run
+
+$ git log
+
+To see older changes, visit http://github.com/libMesh/libmesh/commits/master

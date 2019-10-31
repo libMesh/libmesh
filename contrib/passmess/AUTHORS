@@ -1,0 +1,13 @@
+This is the output of "git shortlog -s | sort -nr", updated periodically.
+
+   313	Roy H. Stogner
+   105	John W. Peterson
+    34	Benjamin S. Kirk
+    19	Derek Gaston
+    11	Cody Permann
+     3	Daniel Schwen
+     2	Alexander Lindsay
+     1	Hannah Rittich
+     1	David Andrs
+     1	Boris Boutkov
+     1	Andrew E Slaughter
