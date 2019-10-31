@@ -3,7 +3,7 @@
 AUTOMAKE_OPTIONS = gnu
 ACLOCAL_AMFLAGS  = -I m4
 
-SUBDIRS          = src
+SUBDIRS          = src test
 EXTRA_DIST       = COPYING
 
 # Tools in the auxiliary directory
@@ -50,6 +50,7 @@ MAINTAINERCLEANFILES += config.sub
 MAINTAINERCLEANFILES += configure
 MAINTAINERCLEANFILES += Makefile.in
 MAINTAINERCLEANFILES += src/Makefile.in
+MAINTAINERCLEANFILES += test/Makefile.in
 MAINTAINERCLEANFILES += m4/libtool.m4
 MAINTAINERCLEANFILES += m4/ltoptions.m4
 MAINTAINERCLEANFILES += m4/ltsugar.m4

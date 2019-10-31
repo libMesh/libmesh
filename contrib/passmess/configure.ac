@@ -75,6 +75,7 @@ AC_CONFIG_FILES([
   Makefile
   passmess.pc
   src/Makefile
+  test/Makefile
   ])
 
 # Must still call AC_OUTPUT() after generating all the files
