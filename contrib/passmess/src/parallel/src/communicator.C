@@ -17,11 +17,11 @@
 
 
 // Local includes
-#include "libmesh/communicator.h"
+#include "passmess/communicator.h"
 
 // PassMess includes
-#include "libmesh/parallel.h" // for inline max(int)
-#include "libmesh/passmess_assert.h"
+#include "passmess/parallel_implementation.h" // for inline max(int)
+#include "passmess/passmess_assert.h"
 
 // Disable libMesh logging until we decide how to port it best
 // #include "libmesh/libmesh_logging.h"

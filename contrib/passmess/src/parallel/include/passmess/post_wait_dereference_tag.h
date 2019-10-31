@@ -20,8 +20,8 @@
 #define PASSMESS_POST_WAIT_DEREFERENCE_TAG_H
 
 // Parallel includes
-#include "libmesh/message_tag.h"
-#include "libmesh/post_wait_work.h"
+#include "passmess/message_tag.h"
+#include "passmess/post_wait_work.h"
 
 namespace PassMess
 {

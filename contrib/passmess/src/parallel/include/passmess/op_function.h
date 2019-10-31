@@ -19,7 +19,7 @@
 #ifndef PASSMESS_OP_FUNCTION_H
 #define PASSMESS_OP_FUNCTION_H
 
-#include "libmesh_config.h"
+#include "passmess_config.h"
 
 #ifdef LIBMESH_HAVE_MPI
 #  include "mpi.h"

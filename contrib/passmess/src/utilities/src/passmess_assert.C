@@ -17,11 +17,11 @@
 
 
 // PassMess includes
-#include "libmesh/passmess_assert.h"
-#include "libmesh/communicator.h"
+#include "passmess/passmess_assert.h"
+#include "passmess/communicator.h"
 
 // libMesh includes
-#include "libmesh/libmesh_config.h"
+#include "passmess/passmess_config.h"
 
 namespace PassMess
 {

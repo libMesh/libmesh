@@ -20,10 +20,10 @@
 #define PASSMESS_CALL_MPI_H
 
 // libMesh Includes
-#include "libmesh/libmesh_config.h"
+#include "passmess/passmess_config.h"
 
 // PassMess Includes
-#include "libmesh/passmess_assert.h"
+#include "passmess/passmess_assert.h"
 
 #ifdef LIBMESH_HAVE_MPI
 #  include "mpi.h"

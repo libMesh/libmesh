@@ -20,8 +20,8 @@
 #define PASSMESS_POST_WAIT_UNPACK_BUFFER_H
 
 // Parallel includes
-#include "libmesh/post_wait_work.h"
-#include "libmesh/packing.h"
+#include "passmess/post_wait_work.h"
+#include "passmess/packing.h"
 
 namespace PassMess
 {

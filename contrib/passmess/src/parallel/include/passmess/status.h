@@ -20,11 +20,11 @@
 #define PASSMESS_STATUS_H
 
 // PassMess includes
-#include "libmesh/data_type.h"
-#include "libmesh/passmess_assert.h"
+#include "passmess/data_type.h"
+#include "passmess/passmess_assert.h"
 
 // libMesh Includes
-#include "libmesh/libmesh_config.h"
+#include "passmess/passmess_config.h"
 
 #ifdef LIBMESH_HAVE_MPI
 #  include "mpi.h"

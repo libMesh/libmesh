@@ -20,7 +20,7 @@
 #define PASSMESS_MESSAGE_TAG_H
 
 // libMesh Includes
-#include "libmesh/libmesh_config.h"
+#include "passmess/passmess_config.h"
 
 #ifdef LIBMESH_HAVE_MPI
 #  include "mpi.h"

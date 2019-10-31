@@ -20,10 +20,10 @@
 #define PASSMESS_STANDARD_TYPE_H
 
 // Parallel includes
-#include "libmesh/data_type.h"
+#include "passmess/data_type.h"
 
 // libMesh Includes
-#include "libmesh/libmesh_config.h"
+#include "passmess/passmess_config.h"
 
 #ifdef LIBMESH_HAVE_MPI
 #  include "mpi.h"

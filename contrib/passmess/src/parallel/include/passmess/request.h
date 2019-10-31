@@ -20,10 +20,10 @@
 #define PASSMESS_REQUEST_H
 
 // Parallel includes
-#include "libmesh/status.h"
+#include "passmess/status.h"
 
 // libMesh includes
-#include "libmesh/libmesh_config.h"
+#include "passmess/passmess_config.h"
 
 #ifdef LIBMESH_HAVE_MPI
 #  include "mpi.h"

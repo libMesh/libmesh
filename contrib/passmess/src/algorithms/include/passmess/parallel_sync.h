@@ -21,7 +21,7 @@
 #define PASSMESS_PARALLEL_SYNC_H
 
 // Local Includes
-#include "libmesh/parallel_implementation.h"
+#include "passmess/parallel_implementation.h"
 
 // C++ includes
 #include <map>

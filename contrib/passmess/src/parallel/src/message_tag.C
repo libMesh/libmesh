@@ -16,10 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh/message_tag.h"
+#include "passmess/message_tag.h"
 
 // PassMess includes
-#include "libmesh/communicator.h"
+#include "passmess/communicator.h"
 
 
 

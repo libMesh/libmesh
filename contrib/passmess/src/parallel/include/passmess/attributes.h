@@ -25,9 +25,9 @@
 #include <vector>
 
 
-#include "libmesh_config.h"
+#include "passmess_config.h"
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-#include "libmesh_common.h" // Real
+#include "passmess_common.h" // Real
 #endif
 
 

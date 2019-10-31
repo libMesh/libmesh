@@ -21,7 +21,7 @@
 #define PASSMESS_PASSMESS_ASSERT_H
 
 // The library configuration options
-#include "libmesh/libmesh_config.h"
+#include "passmess/passmess_config.h"
 
 // C++ includes
 #include <functional> // std::less, etc

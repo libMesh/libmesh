@@ -20,13 +20,13 @@
 #define PASSMESS_COMMUNICATOR_H
 
 // Parallel includes
-#include "libmesh/data_type.h"
-#include "libmesh/message_tag.h"
-#include "libmesh/request.h"
-#include "libmesh/status.h"
+#include "passmess/data_type.h"
+#include "passmess/message_tag.h"
+#include "passmess/request.h"
+#include "passmess/status.h"
 
 // libMesh includes
-#include "libmesh/id_types.h"
+#include "passmess/id_types.h"
 
 // C++ includes
 #include <map>
@@ -949,7 +949,7 @@ public:
    * do so in a separate file so that users don't have to look at
    * the redundancy.
    */
-#include "libmesh/parallel_communicator_specializations"
+#include "passmess/parallel_communicator_specializations"
 
 }; // class Communicator
 

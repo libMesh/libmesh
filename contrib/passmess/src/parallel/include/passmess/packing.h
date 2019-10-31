@@ -20,7 +20,7 @@
 #define PASSMESS_PACKING_H
 
 // PassMess Includes
-#include "libmesh/passmess_assert.h"
+#include "passmess/passmess_assert.h"
 
 // C++ includes
 #include <cstddef>

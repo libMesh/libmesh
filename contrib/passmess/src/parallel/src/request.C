@@ -16,13 +16,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh/request.h"
+#include "passmess/request.h"
 
 // PassMess includes
-#include "libmesh/passmess_call_mpi.h"
-#include "libmesh/passmess_assert.h"
-#include "libmesh/post_wait_work.h"
-#include "libmesh/status.h"
+#include "passmess/passmess_call_mpi.h"
+#include "passmess/passmess_assert.h"
+#include "passmess/post_wait_work.h"
+#include "passmess/status.h"
 
 // Disable libMesh logging until we decide how to port it best
 // #include "libmesh/libmesh_logging.h"
