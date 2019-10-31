@@ -237,8 +237,8 @@ struct casting_compare {
 // The passmess_warning macro outputs a file/line/time stamped warning
 // message, if warnings are enabled.
 #ifdef LIBMESH_ENABLE_WARNINGS
-#define passmess_warning(message)                                        \
-  passmess_do_once(libMesh::out << message                               \
+#define passmess_warning(message)       \
+  passmess_do_once(std::cout << message \
                    << __FILE__ << ", line " << __LINE__ << ", compiled " << PASSMESS_DATE << " at " << PASSMESS_TIME << " ***" << std::endl;)
 #else
 #define passmess_warning(message)  ((void) 0)
