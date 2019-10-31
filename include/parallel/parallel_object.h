@@ -22,6 +22,7 @@
 
 
 // Local includes
+#include "libmesh/libmesh_common.h" // libmesh_dbg_var
 #include "libmesh/communicator.h"
 #include "libmesh/parallel_only.h"
 
