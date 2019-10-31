@@ -23,8 +23,9 @@
 #include "libmesh/parallel.h" // for inline max(int)
 #include "libmesh/passmess_assert.h"
 
-// libMesh includes
-#include "libmesh/libmesh_logging.h"
+// Disable libMesh logging until we decide how to port it best
+// #include "libmesh/libmesh_logging.h"
+#define PASSMESS_LOG_SCOPE(f,c)
 
 namespace PassMess
 {
@@ -221,7 +222,7 @@ void Communicator::barrier () const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("barrier()", "Communicator");
+      PASSMESS_LOG_SCOPE("barrier()", "Communicator");
       passmess_call_mpi(MPI_Barrier (this->get()));
     }
 }
@@ -234,7 +235,7 @@ void Communicator::nonblocking_barrier (Request & req) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("nonblocking_barrier()", "Communicator");
+      PASSMESS_LOG_SCOPE("nonblocking_barrier()", "Communicator");
       passmess_call_mpi(MPI_Ibarrier (this->get(), req.get()));
     }
 }
@@ -278,7 +279,7 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
 status Communicator::probe (const unsigned int src_processor_id,
                             const MessageTag & tag) const
 {
-  LOG_SCOPE("probe()", "Communicator");
+  PASSMESS_LOG_SCOPE("probe()", "Communicator");
 
 #ifndef LIBMESH_HAVE_MPI
   passmess_not_implemented();
@@ -366,7 +367,7 @@ void Communicator::min(bool & r) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("min(bool)", "Communicator");
+      PASSMESS_LOG_SCOPE("min(bool)", "Communicator");
 
       unsigned int temp = r;
       passmess_call_mpi
@@ -384,7 +385,7 @@ void Communicator::minloc(bool & r,
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("minloc(bool)", "Communicator");
+      PASSMESS_LOG_SCOPE("minloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
       ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
@@ -408,7 +409,7 @@ void Communicator::max(bool & r) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("max(bool)", "Communicator");
+      PASSMESS_LOG_SCOPE("max(bool)", "Communicator");
 
       unsigned int temp = r;
       passmess_call_mpi
@@ -426,7 +427,7 @@ void Communicator::maxloc(bool & r,
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("maxloc(bool)", "Communicator");
+      PASSMESS_LOG_SCOPE("maxloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
       ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI

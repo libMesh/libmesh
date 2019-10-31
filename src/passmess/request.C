@@ -24,8 +24,9 @@
 #include "libmesh/post_wait_work.h"
 #include "libmesh/status.h"
 
-// libMesh Includes
-#include "libmesh/libmesh_logging.h"
+// Disable libMesh logging until we decide how to port it best
+// #include "libmesh/libmesh_logging.h"
+#define PASSMESS_LOG_SCOPE(f,c)
 
 // C++ includes
 #include <memory>
@@ -117,7 +118,7 @@ Request::~Request () {
 
 Status Request::wait ()
 {
-  LOG_SCOPE("wait()", "Request");
+  PASSMESS_LOG_SCOPE("wait()", "Request");
 
   if (_prior_request.get())
     {

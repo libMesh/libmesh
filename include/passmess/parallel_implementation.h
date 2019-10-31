@@ -39,8 +39,9 @@
 #include "libmesh/status.h"
 #include "libmesh/standard_type.h"
 
-// libMesh Includes
-#include "libmesh/libmesh_logging.h"
+// Disable libMesh logging until we decide how to port it best
+// #include "libmesh/libmesh_logging.h"
+#define PASSMESS_LOG_SCOPE(f,c)
 
 // C++ includes
 #include <complex>
@@ -141,7 +142,7 @@ inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
                                     const PassMess::MessageTag & recv_tag,
                                     const PassMess::Communicator & comm)
 {
-  LOG_SCOPE("send_receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("send_receive()", "Parallel");
 
   if (dest_processor_id   == comm.rank() &&
       source_processor_id == comm.rank())
@@ -210,7 +211,7 @@ inline Status Communicator::packed_range_probe (const unsigned int src_processor
                                                 const MessageTag & tag,
                                                 bool & flag) const
 {
-  LOG_SCOPE("packed_range_probe()", "Parallel");
+  PASSMESS_LOG_SCOPE("packed_range_probe()", "Parallel");
 
   passmess_experimental();
 
@@ -238,7 +239,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const std::basic_string<T> & buf,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
 
@@ -262,7 +263,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
 
@@ -290,7 +291,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const T & buf,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = const_cast<T*> (&buf);
 
@@ -314,7 +315,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = const_cast<T*>(&buf);
 
@@ -366,7 +367,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const DataType & type,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   std::vector<T> vecbuf(buf.begin(), buf.end());
   this->send(dest_processor_id, vecbuf, type, tag);
@@ -381,7 +382,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   // Allocate temporary buffer on the heap so it lives until after
   // the non-blocking send completes
@@ -426,7 +427,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const DataType & type,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   passmess_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -447,7 +448,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  PASSMESS_LOG_SCOPE("send()", "Parallel");
 
   passmess_assert_less(dest_processor_id, this->size());
 
@@ -806,7 +807,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                                      T & buf,
                                      const MessageTag & tag) const
 {
-  LOG_SCOPE("receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("receive()", "Parallel");
 
   // Get the status of the message, explicitly provide the
   // datatype so we can later query the size
@@ -830,7 +831,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    Request & req,
                                    const MessageTag & tag) const
 {
-  LOG_SCOPE("receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("receive()", "Parallel");
 
   passmess_assert(src_processor_id < this->size() ||
                   src_processor_id == any_source);
@@ -882,7 +883,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                                      const DataType & type,
                                      const MessageTag & tag) const
 {
-  LOG_SCOPE("receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("receive()", "Parallel");
 
   std::vector<T> vecbuf;
   Status stat = this->receive(src_processor_id, vecbuf, type, tag);
@@ -906,7 +907,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    Request & req,
                                    const MessageTag & tag) const
 {
-  LOG_SCOPE("receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("receive()", "Parallel");
 
   // Allocate temporary buffer on the heap so it lives until after
   // the non-blocking send completes
@@ -961,7 +962,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                                      const DataType & type,
                                      const MessageTag & tag) const
 {
-  LOG_SCOPE("receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("receive()", "Parallel");
 
   // Get the status of the message, explicitly provide the
   // datatype so we can later query the size
@@ -994,7 +995,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    Request & req,
                                    const MessageTag & tag) const
 {
-  LOG_SCOPE("receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("receive()", "Parallel");
 
   passmess_assert(src_processor_id < this->size() ||
                   src_processor_id == any_source);
@@ -1200,7 +1201,7 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
                                        const MessageTag & send_tag,
                                        const MessageTag & recv_tag) const
 {
-  LOG_SCOPE("send_receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("send_receive()", "Parallel");
 
   if (dest_processor_id   == this->rank() &&
       source_processor_id == this->rank())
@@ -1228,7 +1229,7 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
                                        const MessageTag & send_tag,
                                        const MessageTag & recv_tag) const
 {
-  LOG_SCOPE("send_receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("send_receive()", "Parallel");
 
   if (dest_processor_id   == this->rank() &&
       source_processor_id == this->rank())
@@ -1271,7 +1272,7 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
   if (dest_processor_id   == this->rank() &&
       source_processor_id == this->rank())
     {
-      LOG_SCOPE("send_receive()", "Parallel");
+      PASSMESS_LOG_SCOPE("send_receive()", "Parallel");
       recv = sendvec;
       return;
     }
@@ -1360,7 +1361,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
                                          const MessageTag & send_tag,
                                          const MessageTag & recv_tag) const
 {
-  LOG_SCOPE("send_receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("send_receive()", "Parallel");
 
   Request req;
 
@@ -1425,7 +1426,7 @@ inline void Communicator::allgather(const std::basic_string<T> & sendval,
                                     std::vector<std::basic_string<T>,A> & recv,
                                     const bool identical_buffer_sizes) const
 {
-  LOG_SCOPE ("allgather()","Parallel");
+  PASSMESS_LOG_SCOPE ("allgather()","Parallel");
 
   passmess_assert(this->size());
   recv.assign(this->size(), "");
@@ -1492,7 +1493,7 @@ inline void Communicator::broadcast (bool & data, const unsigned int root_id) co
 
   passmess_assert_less (root_id, this->size());
 
-  LOG_SCOPE("broadcast()", "Parallel");
+  PASSMESS_LOG_SCOPE("broadcast()", "Parallel");
 
   // We don't want to depend on MPI-2 or C++ MPI, so we don't have
   // MPI::BOOL available
@@ -1522,7 +1523,7 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
 
   passmess_assert_less (root_id, this->size());
 
-  LOG_SCOPE("broadcast()", "Parallel");
+  PASSMESS_LOG_SCOPE("broadcast()", "Parallel");
 
   std::size_t data_size = data.size();
   this->broadcast(data_size, root_id);
@@ -1561,7 +1562,7 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
 
   passmess_assert_less (root_id, this->size());
 
-  LOG_SCOPE("broadcast()", "Parallel");
+  PASSMESS_LOG_SCOPE("broadcast()", "Parallel");
 
   // and get the data from the remote processors.
   // Pass nullptr if our vector is empty.
@@ -1588,7 +1589,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T>,A> & data,
 
   passmess_assert_less (root_id, this->size());
 
-  LOG_SCOPE("broadcast()", "Parallel");
+  PASSMESS_LOG_SCOPE("broadcast()", "Parallel");
 
   std::size_t bufsize=0;
   if (root_id == this->rank())
@@ -1650,7 +1651,7 @@ inline void Communicator::broadcast (std::set<T,C,A> & data,
 
   passmess_assert_less (root_id, this->size());
 
-  LOG_SCOPE("broadcast()", "Parallel");
+  PASSMESS_LOG_SCOPE("broadcast()", "Parallel");
 
   std::vector<T> vecdata;
   if (this->rank() == root_id)
@@ -1684,7 +1685,7 @@ inline void Communicator::broadcast(std::map<T1,T2,C,A> & data,
 
   passmess_assert_less (root_id, this->size());
 
-  LOG_SCOPE("broadcast()", "Parallel");
+  PASSMESS_LOG_SCOPE("broadcast()", "Parallel");
 
   std::size_t data_size=data.size();
   this->broadcast(data_size, root_id);
@@ -2066,7 +2067,7 @@ inline void Communicator::min(T & passmess_mpi_var(r)) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("min(scalar)", "Parallel");
+      PASSMESS_LOG_SCOPE("min(scalar)", "Parallel");
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &r, 1,
@@ -2082,7 +2083,7 @@ inline void Communicator::min(std::vector<T,A> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("min(vector)", "Parallel");
+      PASSMESS_LOG_SCOPE("min(vector)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2101,7 +2102,7 @@ inline void Communicator::min(std::vector<bool,A> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("min(vector<bool>)", "Parallel");
+      PASSMESS_LOG_SCOPE("min(vector<bool>)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2124,7 +2125,7 @@ inline void Communicator::minloc(T & r,
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("minloc(scalar)", "Parallel");
+      PASSMESS_LOG_SCOPE("minloc(scalar)", "Parallel");
 
       DataPlusInt<T> data_in;
       ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
@@ -2149,7 +2150,7 @@ inline void Communicator::minloc(std::vector<T,A1> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("minloc(vector)", "Parallel");
+      PASSMESS_LOG_SCOPE("minloc(vector)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2186,7 +2187,7 @@ inline void Communicator::minloc(std::vector<bool,A1> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("minloc(vector<bool>)", "Parallel");
+      PASSMESS_LOG_SCOPE("minloc(vector<bool>)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2221,7 +2222,7 @@ inline void Communicator::max(T & passmess_mpi_var(r)) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("max(scalar)", "Parallel");
+      PASSMESS_LOG_SCOPE("max(scalar)", "Parallel");
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &r, 1,
@@ -2237,7 +2238,7 @@ inline void Communicator::max(std::vector<T,A> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("max(vector)", "Parallel");
+      PASSMESS_LOG_SCOPE("max(vector)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2256,7 +2257,7 @@ inline void Communicator::max(std::vector<bool,A> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("max(vector<bool>)", "Parallel");
+      PASSMESS_LOG_SCOPE("max(vector<bool>)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2279,7 +2280,7 @@ inline void Communicator::maxloc(T & r,
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("maxloc(scalar)", "Parallel");
+      PASSMESS_LOG_SCOPE("maxloc(scalar)", "Parallel");
 
       DataPlusInt<T> data_in;
       ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
@@ -2304,7 +2305,7 @@ inline void Communicator::maxloc(std::vector<T,A1> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("maxloc(vector)", "Parallel");
+      PASSMESS_LOG_SCOPE("maxloc(vector)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2342,7 +2343,7 @@ inline void Communicator::maxloc(std::vector<bool,A1> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("maxloc(vector<bool>)", "Parallel");
+      PASSMESS_LOG_SCOPE("maxloc(vector<bool>)", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2378,7 +2379,7 @@ inline void Communicator::sum(T & passmess_mpi_var(r)) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("sum()", "Parallel");
+      PASSMESS_LOG_SCOPE("sum()", "Parallel");
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &r, 1,
@@ -2394,7 +2395,7 @@ inline void Communicator::sum(std::vector<T,A> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("sum()", "Parallel");
+      PASSMESS_LOG_SCOPE("sum()", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2415,7 +2416,7 @@ inline void Communicator::sum(std::complex<T> & passmess_mpi_var(r)) const
 {
   if (this->size() > 1)
     {
-      LOG_SCOPE("sum()", "Parallel");
+      PASSMESS_LOG_SCOPE("sum()", "Parallel");
 
       passmess_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &r, 2,
@@ -2431,7 +2432,7 @@ inline void Communicator::sum(std::vector<std::complex<T>,A> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      LOG_SCOPE("sum()", "Parallel");
+      PASSMESS_LOG_SCOPE("sum()", "Parallel");
 
       passmess_assert(this->verify(r.size()));
 
@@ -2513,7 +2514,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
   if (this->size() > 1)
     {
-      LOG_SCOPE("gather()", "Parallel");
+      PASSMESS_LOG_SCOPE("gather()", "Parallel");
 
       StandardType<T> send_type(&sendval);
 
@@ -2550,7 +2551,7 @@ inline void Communicator::gather(const unsigned int root_id,
   const int mysize = static_cast<int>(r.size());
   this->allgather(mysize, sendlengths);
 
-  LOG_SCOPE("gather()", "Parallel");
+  PASSMESS_LOG_SCOPE("gather()", "Parallel");
 
   // Find the total size of the final array and
   // set up the displacement offsets for each processor.
@@ -2598,7 +2599,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
   if (this->size() > 1)
     {
-      LOG_SCOPE ("gather()","Parallel");
+      PASSMESS_LOG_SCOPE ("gather()","Parallel");
 
       std::vector<int>
         sendlengths  (this->size(), 0),
@@ -2651,7 +2652,7 @@ template <typename T, typename A>
 inline void Communicator::allgather(const T & sendval,
                                     std::vector<T,A> & recv) const
 {
-  LOG_SCOPE ("allgather()","Parallel");
+  PASSMESS_LOG_SCOPE ("allgather()","Parallel");
 
   passmess_assert(this->size());
   recv.resize(this->size());
@@ -2678,7 +2679,7 @@ inline void Communicator::allgather(std::vector<T,A> & r,
   if (this->size() < 2)
     return;
 
-  LOG_SCOPE("allgather()", "Parallel");
+  PASSMESS_LOG_SCOPE("allgather()", "Parallel");
 
   if (identical_buffer_sizes)
     {
@@ -2742,7 +2743,7 @@ inline void Communicator::allgather(std::vector<std::basic_string<T>,A> & r,
   if (this->size() < 2)
     return;
 
-  LOG_SCOPE("allgather()", "Parallel");
+  PASSMESS_LOG_SCOPE("allgather()", "Parallel");
 
   if (identical_buffer_sizes)
     {
@@ -2842,7 +2843,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
       return;
     }
 
-  LOG_SCOPE("scatter()", "Parallel");
+  PASSMESS_LOG_SCOPE("scatter()", "Parallel");
 
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   ignore(data_ptr); // unused ifndef LIBMESH_HAVE_MPI
@@ -2871,7 +2872,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
       return;
     }
 
-  LOG_SCOPE("scatter()", "Parallel");
+  PASSMESS_LOG_SCOPE("scatter()", "Parallel");
 
   int recv_buffer_size = 0;
   if (this->rank() == root_id)
@@ -2929,7 +2930,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
       passmess_assert(data.size() == globalsize);
     }
 
-  LOG_SCOPE("scatter()", "Parallel");
+  PASSMESS_LOG_SCOPE("scatter()", "Parallel");
 
   // Scatter the buffer sizes to size remote buffers
   int recv_buffer_size = 0;
@@ -3005,7 +3006,7 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
   if (this->size() < 2 || buf.empty())
     return;
 
-  LOG_SCOPE("alltoall()", "Parallel");
+  PASSMESS_LOG_SCOPE("alltoall()", "Parallel");
 
   // the per-processor size.  this is the same for all
   // processors using MPI_Alltoall, could be variable
@@ -3040,7 +3041,7 @@ inline void Communicator::broadcast (T & passmess_mpi_var(data), const unsigned 
 
   passmess_assert_less (root_id, this->size());
 
-  LOG_SCOPE("broadcast()", "Parallel");
+  PASSMESS_LOG_SCOPE("broadcast()", "Parallel");
 
   // Spread data to remote processors.
   passmess_call_mpi
@@ -3125,7 +3126,7 @@ inline bool Communicator::possibly_receive (unsigned int & src_processor_id,
                                             Request & req,
                                             const MessageTag & tag) const
 {
-  LOG_SCOPE("possibly_receive()", "Parallel");
+  PASSMESS_LOG_SCOPE("possibly_receive()", "Parallel");
 
   Status stat(type);
 
