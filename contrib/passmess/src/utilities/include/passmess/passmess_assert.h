@@ -231,7 +231,7 @@ struct casting_compare {
   do {                                                                        \
     std::cerr << msg << std::endl;                                            \
     PassMess::report_error(__FILE__, __LINE__, PASSMESS_DATE, PASSMESS_TIME); \
-    PASSMESS_THROW(std::logic_error("Error: not implemented!");               \
+    PASSMESS_THROW(std::logic_error("Error: not implemented!"));              \
   } while (0)
 
 #define passmess_not_implemented() passmess_not_implemented_msg("")
