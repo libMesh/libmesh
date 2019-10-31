@@ -37,7 +37,7 @@ namespace PassMess
 # ifdef LIBMESH_HAVE_MPI
 # define PASSMESS_MPI_BINARY(funcname) \
 inline void \
-libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
+passmess_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
 { \
   const int size = *len; \
  \
@@ -49,7 +49,7 @@ libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
 
 # define PASSMESS_MPI_LOCATOR(funcname) \
 inline void \
-libmesh_mpi_##funcname##_location(void * a, void * b, int * len, MPI_Datatype *) \
+passmess_mpi_##funcname##_location(void * a, void * b, int * len, MPI_Datatype *) \
 { \
   const int size = *len; \
  \
@@ -69,7 +69,7 @@ libmesh_mpi_##funcname##_location(void * a, void * b, int * len, MPI_Datatype *)
 
 # define PASSMESS_MPI_BINARY_FUNCTOR(funcname) \
 inline void \
-libmesh_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
+passmess_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
 { \
   const int size = *len; \
  \
@@ -217,7 +217,7 @@ PASSMESS_PARALLEL_FLOAT_OPS(long double);
     if (PASSMESS_MPI_##mpiname == MPI_OP_NULL) \
       { \
         passmess_call_mpi \
-          (MPI_Op_create(libmesh_mpi_##funcname, true, &PASSMESS_MPI_##mpiname)); \
+          (MPI_Op_create(passmess_mpi_##funcname, true, &PASSMESS_MPI_##mpiname)); \
       } \
     return PASSMESS_MPI_##mpiname;  \
   }
