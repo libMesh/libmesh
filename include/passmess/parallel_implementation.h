@@ -547,7 +547,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
       // The data for each inner buffer
       passmess_call_mpi
-        (MPI_Pack_size (libMesh::cast_int<int>(send_vecs[i].size()), type,
+        (MPI_Pack_size (cast_int<int>(send_vecs[i].size()), type,
                         this->get(), &packedsize));
 
       sendsize += packedsize;
@@ -560,7 +560,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   int pos=0;
 
   // ... the size of the outer buffer
-  const int mpi_n_vecs = libMesh::cast_int<int>(n_vecs);
+  const int mpi_n_vecs = cast_int<int>(n_vecs);
 
   passmess_call_mpi
     (MPI_Pack (&mpi_n_vecs, 1,
@@ -570,7 +570,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   for (std::size_t i = 0; i != n_vecs; ++i)
     {
       // ... the size of the ith inner buffer
-      const int subvec_size = libMesh::cast_int<int>(send_vecs[i].size());
+      const int subvec_size = cast_int<int>(send_vecs[i].size());
 
       passmess_call_mpi
         (MPI_Pack (&subvec_size, 1, StandardType<unsigned int>(),
@@ -580,7 +580,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
       if (!send_vecs[i].empty())
         passmess_call_mpi
           (MPI_Pack (const_cast<T*>(send_vecs[i].data()),
-                     libMesh::cast_int<int>(subvec_size), type,
+                     cast_int<int>(subvec_size), type,
                      sendbuf->data(), sendsize, &pos, this->get()));
     }
 
@@ -1054,7 +1054,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   passmess_assert (!recvbuf.empty());
 
   // Unpack the received buffer
-  int bufsize = libMesh::cast_int<int>(recvbuf.size());
+  int bufsize = cast_int<int>(recvbuf.size());
   int recvsize, pos=0;
   passmess_call_mpi
     (MPI_Unpack (recvbuf.data(), bufsize, &pos,
