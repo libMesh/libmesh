@@ -745,7 +745,7 @@ inline void Communicator::nonblocking_send_packed_range (const unsigned int dest
                    std::numeric_limits<int>::max());
 
       if (range_begin != range_end)
-        libmesh_error_msg("Non-blocking packed range sends cannot exceed " << std::numeric_limits<int>::max() << "in size");
+        passmess_error_msg("Non-blocking packed range sends cannot exceed " << std::numeric_limits<int>::max() << "in size");
 
       // Make the Request::wait() handle deleting the buffer
       req.add_post_wait_work
@@ -1408,7 +1408,7 @@ inline void Communicator::nonblocking_send_packed_range (const unsigned int dest
                    std::numeric_limits<int>::max());
 
       if (range_begin != range_end)
-        libmesh_error_msg("Non-blocking packed range sends cannot exceed " << std::numeric_limits<int>::max() << "in size");
+        passmess_error_msg("Non-blocking packed range sends cannot exceed " << std::numeric_limits<int>::max() << "in size");
 
       // Make it dereference the shared pointer (possibly freeing the buffer)
       req.add_post_wait_work
