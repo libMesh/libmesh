@@ -1,4 +1,4 @@
-// The libMesh Finite Element Library.
+// The PassMess Message-Passing Parallelism Library.
 // Copyright (C) 2002-2019 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
