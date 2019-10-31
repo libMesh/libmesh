@@ -1,0 +1,46 @@
+// The PassMess Message-Passing Parallelism Library.
+// Copyright (C) 2002-2019 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#ifndef PASSMESS_VERSION_H
+#define PASSMESS_VERSION_H
+
+#define PASSMESS_MAJOR_VERSION  @GENERIC_MAJOR_VERSION@
+#define PASSMESS_MINOR_VERSION  @GENERIC_MINOR_VERSION@
+#define PASSMESS_MICRO_VERSION  @GENERIC_MICRO_VERSION@
+
+#define PASSMESS_BUILD_USER     "@BUILD_USER@"
+#define PASSMESS_BUILD_ARCH     "@BUILD_ARCH@"
+#define PASSMESS_BUILD_HOST     "@BUILD_HOST@"
+#define PASSMESS_BUILD_DATE     "@BUILD_DATE@"
+#define PASSMESS_BUILD_VERSION  "@BUILD_VERSION@"
+
+#define PASSMESS_LIB_VERSION    "@VERSION@"
+#define PASSMESS_LIB_RELEASE    "@BUILD_DEVSTATUS@"
+
+#define PASSMESS_CXX            "@CXX@"
+#define PASSMESS_CXXFLAGS       "@CXXFLAGS@"
+
+#include <iostream>
+#include <iomanip>
+
+namespace PassMess
+{
+  void passmess_version_stdout();
+  int  get_passmess_version();
+} // end namespace PassMess
+
+#endif // PASSMESS_VERISON_H
