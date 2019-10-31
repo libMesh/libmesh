@@ -861,6 +861,13 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
       // Read first string up to and including the comma, which is discarded.
       std::getline(_in, elem_id_or_set, ',');
 
+      // Strip any leading or trailing trailing whitespace from this
+      // string, since some Abaqus files may have this.
+      elem_id_or_set.erase
+        (std::remove_if(elem_id_or_set.begin(),
+                        elem_id_or_set.end(), isspace),
+         elem_id_or_set.end());
+
       // Read the character "S", followed by the side id. Note: the >> operator
       // eats whitespace until it reaches a valid character, so this should work
       // whether or not there is a space after the previous comma.
