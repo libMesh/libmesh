@@ -25,9 +25,6 @@
 #include "passmess/request.h"
 #include "passmess/status.h"
 
-// libMesh includes
-#include "passmess/id_types.h"
-
 // C++ includes
 #include <map>
 #include <memory> // shared_ptr
@@ -52,6 +49,8 @@ namespace PassMess
 
 using libMesh::Parallel::Packing;
 
+typedef unsigned short int processor_id_type;
+
 #ifdef LIBMESH_HAVE_MPI
 
 //-------------------------------------------------------------------
@@ -64,8 +63,6 @@ typedef MPI_Comm communicator;
  * Info object used by some MPI-3 methods
  */
 typedef MPI_Info info;
-
-using libMesh::processor_id_type;
 
 /**
  * Processor id meaning "Accept from any source"
