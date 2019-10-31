@@ -1899,9 +1899,9 @@ Communicator::receive_packed_range(const unsigned int,
  * Send-receive data from one processor.
  */
 template <typename T1, typename T2>
-inline void Communicator::send_receive (const unsigned int libmesh_dbg_var(send_tgt),
+inline void Communicator::send_receive (const unsigned int passmess_dbg_var(send_tgt),
                                         const T1 & send_val,
-                                        const unsigned int libmesh_dbg_var(recv_source),
+                                        const unsigned int passmess_dbg_var(recv_source),
                                         T2 & recv_val,
                                         const MessageTag &,
                                         const MessageTag &) const
@@ -1921,11 +1921,11 @@ template <typename Context1, typename RangeIter,
           typename Context2, typename OutputIter, typename T>
 inline void
 Communicator::send_receive_packed_range
-  (const unsigned int libmesh_dbg_var(dest_processor_id),
+  (const unsigned int passmess_dbg_var(dest_processor_id),
    const Context1 * context1,
    RangeIter send_begin,
    const RangeIter send_end,
-   const unsigned int libmesh_dbg_var(source_processor_id),
+   const unsigned int passmess_dbg_var(source_processor_id),
    Context2 * context2,
    OutputIter out_iter,
    const T * output_type,
