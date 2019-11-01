@@ -33,8 +33,6 @@ void report_here(const char * file, int line, const char * date, const char * ti
   PassMess::Communicator commworld(MPI_COMM_WORLD);
   const std::size_t proc_id = commworld.rank();
   here_msg << "[" << proc_id << "] ";
-#else
-  const std::size_t proc_id = 0;
 #endif
   here_msg << file << ", line " << line << ", compiled "
            << date << " at " << time << std::endl;
