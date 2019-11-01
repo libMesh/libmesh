@@ -51,6 +51,15 @@ bool string_to_num(const std::string & input, dof_id_type & output)
 }
 
 /**
+ * Removes all whitespace characters from "line". Simpler than trying
+ * to remember the erase-remove-if idiom.
+ */
+void strip_ws(std::string & line)
+{
+  line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+}
+
+/**
  * Data structure used for mapping Abaqus IDs to libMesh IDs, and
  * eventually (possibly) vice-versa.
  */
