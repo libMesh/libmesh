@@ -662,12 +662,10 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
           std::string cell;
           while (std::getline(line_stream, cell, ','))
             {
-              // FIXME: factor out this strtol stuff into a utility function.
-              char * endptr;
-              dof_id_type abaqus_global_node_id = cast_int<dof_id_type>
-                (std::strtol(cell.c_str(), &endptr, /*base=*/10));
+              dof_id_type abaqus_global_node_id;
+              bool success = string_to_num(cell, abaqus_global_node_id);
 
-              if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
+              if (success)
                 {
                   // Use the global node number mapping to determine the corresponding libmesh global node id
                   dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
@@ -692,7 +690,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
                   // Increment the count of IDs read for this element
                   id_count++;
-                } // end if strtol success
+                } // end if (success)
             } // end while getline(',')
         } // end while (id_count)
 
@@ -794,26 +792,14 @@ void AbaqusIO::read_ids(std::string set_name, container_t & container)
       std::stringstream line_stream(csv_line);
       while (std::getline(line_stream, cell, ','))
         {
-          // If no conversion can be performed by strtol, 0 is returned.
-          //
-          // If endptr is not nullptr, strtol() stores the address of the
-          // first invalid character in *endptr.  If there were no
-          // digits at all, however, strtol() stores the original
-          // value of str in *endptr.
-          char * endptr;
-
-          // FIXME - this needs to be updated for 64-bit inputs
-          dof_id_type id = cast_int<dof_id_type>
-            (std::strtol(cell.c_str(), &endptr, /*base=*/10));
+          dof_id_type id;
+          bool success = string_to_num(cell, id);
 
           // Note that lists of comma-separated values in abaqus also
           // *end* with a comma, so the last call to getline on a given
           // line will get an empty string, which we must detect.
-          if (id != 0 || cell.c_str() != endptr)
-            {
-              // 'cell' is now a string with an integer id in it
-              id_storage.push_back( id );
-            }
+          if (success)
+            id_storage.push_back(id);
         }
     }
 }
@@ -888,15 +874,11 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
       // whether or not there is a space after the previous comma.
       _in >> c >> side_id;
 
-      // Try to convert first string to an integer.  If no conversion
-      // can be performed, strtol returns 0.  If endptr != nullptr,
-      // then it stores the address of the first invalid character
-      // found in the string.
-      char * endptr;
-      dof_id_type elem_id = cast_int<dof_id_type>
-        (std::strtol(elem_id_or_set.c_str(), &endptr, /*base=*/10));
+      // Try to convert first string to an integer.
+      dof_id_type elem_id;
+      bool success = string_to_num(elem_id_or_set, elem_id);
 
-      if (elem_id != 0 || endptr != elem_id_or_set.c_str())
+      if (success)
         {
           // if the side set is of the form of "391, S2"
           id_storage.push_back( std::make_pair(elem_id, side_id) );
