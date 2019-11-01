@@ -481,7 +481,7 @@ void AbaqusIO::read_nodes(std::string nset_name)
       // Remove all whitespace characters from the line.  This way we
       // can do the remaining parsing without worrying about tabs,
       // different numbers of spaces, etc.
-      line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+      strip_ws(line);
 
       // Make a stream out of the modified line so we can stream values
       // from it in the usual way.
@@ -733,7 +733,7 @@ std::string AbaqusIO::parse_label(std::string line, std::string label_name) cons
   // just remove all the space characters, which should include all
   // kinds of remaining newlines.  (I don't think Abaqus allows
   // whitespace in label names.)
-  line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+  strip_ws(line);
 
   // Do all string comparisons in upper-case
   std::string
@@ -769,7 +769,7 @@ std::string AbaqusIO::parse_label(std::string line, std::string label_name) cons
 bool AbaqusIO::detect_generated_set(std::string upper) const
 {
   // Avoid issues with weird line endings, spaces before commas, etc.
-  upper.erase(std::remove_if(upper.begin(), upper.end(), isspace), upper.end());
+  strip_ws(upper);
 
   // Check each comma-separated value in "upper" to see if it is the generate flag.
   std::string cell;
@@ -831,7 +831,7 @@ void AbaqusIO::generate_ids(std::string set_name, container_t & container)
       std::getline(_in, csv_line);
 
       // Remove all whitespaces from csv_line.
-      csv_line.erase(std::remove_if(csv_line.begin(), csv_line.end(), isspace), csv_line.end());
+      strip_ws(csv_line);
 
       // Create a new stringstream object from the string, and stream
       // in the comma-separated values.
@@ -873,10 +873,7 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
 
       // Strip any leading or trailing trailing whitespace from this
       // string, since some Abaqus files may have this.
-      elem_id_or_set.erase
-        (std::remove_if(elem_id_or_set.begin(),
-                        elem_id_or_set.end(), isspace),
-         elem_id_or_set.end());
+      strip_ws(elem_id_or_set);
 
       // Read the character "S", followed by the side id. Note: the >> operator
       // eats whitespace until it reaches a valid character, so this should work
