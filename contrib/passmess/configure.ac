@@ -18,8 +18,6 @@ dnl Turn off AM_MAINTAINER_MODE for bootstrapped release by
 dnl uncommenting this:
 AM_MAINTAINER_MODE # git trashes timestamps, forcing autoreconf needlessly
 
-LT_INIT
-
 dnl Release versioning
 AX_SPLIT_VERSION
 GENERIC_MAJOR_VERSION=$AX_MAJOR_VERSION
@@ -52,11 +50,22 @@ dnl------------------------------
 dnl Checks for compilers
 dnl------------------------------
 
-AC_PROG_CC
-AC_PROG_CXX
+PASSMESS_SET_COMPILERS
 
 dnl -Wall warnings, -Wall the time.
 AX_CXXFLAGS_WARN_ALL
+
+dnl---------------------------------------------------------
+dnl Checks for library prerequisites for other libraries...
+dnl---------------------------------------------------------
+
+ACX_MPI
+
+dnl-----------------------------------------------------
+dnl Initialize libtool.  By default, we will build
+dnl only shared libraries on platforms that support them
+dnl-----------------------------------------------------
+LT_INIT([disable-static])
 
 dnl---------------------------------
 dnl Query configuration environment
