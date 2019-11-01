@@ -36,6 +36,21 @@ namespace
 using namespace libMesh;
 
 /**
+ * Attempts to convert the input string to a numerical value using
+ * strtol.  If the conversion fails, 0 will be stored in the output,
+ * so you must check the return value, which will be true if the
+ * conversion succeeded, and false if it failed for any reason.
+ */
+bool string_to_num(const std::string & input, dof_id_type & output)
+{
+  char * endptr;
+  output = cast_int<dof_id_type>
+    (std::strtol(input.c_str(), &endptr, /*base=*/10));
+
+  return (output != 0 || endptr != input.c_str());
+}
+
+/**
  * Data structure used for mapping Abaqus IDs to libMesh IDs, and
  * eventually (possibly) vice-versa.
  */
