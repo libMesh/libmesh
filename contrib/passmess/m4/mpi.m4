@@ -150,7 +150,10 @@ AS_IF([test "x$MPI_IMPL" != x],
                 AC_LANG_CPLUSPLUS
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 AC_CHECK_HEADER([mpi.h],
-                                [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
+                                [
+                                  AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                                  enablempi=yes
+                                ],
                                 [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no])
                 MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
                 AC_LANG_RESTORE
@@ -165,7 +168,10 @@ AS_IF([test "x$MPI_IMPL" != x],
                 AC_LANG_CPLUSPLUS
                 CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
                 AC_CHECK_HEADER([mpi.h],
-                                [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
+                                [
+                                  AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                                  enablempi=yes
+                                ],
                                 [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no] )
                 MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
                 AC_LANG_RESTORE
@@ -179,14 +185,18 @@ AS_IF([test "x$MPI_IMPL" != x],
       [
         dnl no MPI install found, see if the compiler "natively" supports it by
         dnl attempting to link a test application without any special flags.
+        AC_LANG_SAVE
+        AC_LANG_CPLUSPLUS
         AC_TRY_LINK([@%:@include <mpi.h>],
                     [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
                     [
                        MPI_IMPL="built-in"
                        AC_MSG_RESULT( [$CXX Compiler Supports MPI] )
                        AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                       enablempi=yes
                     ],
                     [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no])
+        AC_LANG_RESTORE
       ])
 
 dnl Save variables...

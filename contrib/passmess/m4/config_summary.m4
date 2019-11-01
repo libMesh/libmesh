@@ -33,7 +33,7 @@ echo
 echo '-------------------------------------------------------------------------------'
 
 echo Optional Packages for Testing:
-if test "x$enable_mpi" = "x1"; then
+if test "x$enablempi" = "xyes"; then
   echo '  'MPI......................... : yes
   echo '  'MPI_INCLUDES_PATH........... : $MPI_INCLUDES_PATH
   echo '  'MPI_LIBS_PATH............... : $MPI_LIBS_PATH
