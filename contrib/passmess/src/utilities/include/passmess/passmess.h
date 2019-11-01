@@ -28,6 +28,7 @@
 #include "passmess/op_function.h"
 #include "passmess/packing.h"
 #include "passmess/passmess_call_mpi.h"
+#include "passmess/passmess_init.h"
 #include "passmess/post_wait_copy_buffer.h"
 #include "passmess/post_wait_delete_buffer.h"
 #include "passmess/post_wait_dereference_shared_ptr.h"
