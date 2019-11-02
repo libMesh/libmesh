@@ -57,7 +57,7 @@ void Communicator::dereference_unique_tag(int tagvalue) const
 
 
 Communicator::Communicator () :
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   _communicator(MPI_COMM_SELF),
 #endif
   _rank(0),
@@ -70,7 +70,7 @@ Communicator::Communicator () :
 
 
 Communicator::Communicator (const communicator & comm) :
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   _communicator(MPI_COMM_SELF),
 #endif
   _rank(0),
@@ -91,7 +91,7 @@ Communicator::~Communicator ()
 }
 
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 void Communicator::split(int color, int key, Communicator & target) const
 {
   target.clear();
@@ -137,7 +137,7 @@ void Communicator::duplicate(const Communicator & comm)
 }
 
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 void Communicator::duplicate(const communicator & comm)
 {
   if (_communicator != MPI_COMM_NULL)
@@ -155,7 +155,7 @@ void Communicator::duplicate(const communicator &) { }
 
 
 void Communicator::clear() {
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   if (_I_duped_it)
     {
       passmess_assert (_communicator != MPI_COMM_NULL);
@@ -180,7 +180,7 @@ Communicator & Communicator::operator= (const communicator & comm)
 void Communicator::assign(const communicator & comm)
 {
   _communicator = comm;
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   if (_communicator != MPI_COMM_NULL)
     {
       int i;
@@ -217,7 +217,7 @@ void Communicator::assign(const communicator & comm)
 /**
  * Pause execution until all processors reach a certain point.
  */
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 void Communicator::barrier () const
 {
   if (this->size() > 1)
@@ -230,7 +230,7 @@ void Communicator::barrier () const
 void Communicator::barrier () const {}
 #endif
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 void Communicator::nonblocking_barrier (Request & req) const
 {
   if (this->size() > 1)
@@ -281,7 +281,7 @@ status Communicator::probe (const unsigned int src_processor_id,
 {
   PASSMESS_LOG_SCOPE("probe()", "Communicator");
 
-#ifndef LIBMESH_HAVE_MPI
+#ifndef PASSMESS_HAVE_MPI
   passmess_not_implemented();
   ignore(src_processor_id, tag);
 #endif
@@ -388,7 +388,7 @@ void Communicator::minloc(bool & r,
       PASSMESS_LOG_SCOPE("minloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
-      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef PASSMESS_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;
@@ -430,7 +430,7 @@ void Communicator::maxloc(bool & r,
       PASSMESS_LOG_SCOPE("maxloc(bool)", "Communicator");
 
       DataPlusInt<int> data_in;
-      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef PASSMESS_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
       DataPlusInt<int> data_out = data_in;

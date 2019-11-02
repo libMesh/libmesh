@@ -23,14 +23,6 @@
 #include "passmess/communicator.h"
 #include "passmess/passmess_assert.h"
 
-// C/C++ includes
-
-#ifdef PASSMESS_HAVE_MPI
-# include "passmess/ignore_warnings.h"
-# include <mpi.h>
-# include "passmess/restore_warnings.h"
-#endif // #ifdef PASSMESS_HAVE_MPI
-
 
 
 #ifdef PASSMESS_HAVE_MPI
@@ -132,7 +124,7 @@ PassMessInit::~PassMessInit()
   // one processor to try to exit until all others are done working.
   this->comm().barrier();
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   if (err_handler_set)
     {
       passmess_call_mpi

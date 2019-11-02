@@ -25,9 +25,11 @@
 // libMesh Includes
 #include "passmess/passmess_config.h"
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
+#  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
-#endif // LIBMESH_HAVE_MPI
+#  include "passmess/restore_warnings.h"
+#endif // PASSMESS_HAVE_MPI
 
 // C++ includes
 #include <array>
@@ -78,7 +80,7 @@ private:
 // ------------------------------------------------------------
 // Declare StandardType specializations for C++ built-in types
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 
 #define PASSMESS_STANDARD_TYPE(cxxtype,mpitype)                      \
   template<>                                                         \
@@ -119,7 +121,7 @@ PASSMESS_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
 
 // Quad and float128 types aren't standard C++, so only work with them
 // if configure and PETSc encapsulated the non-standard issues.
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 # ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
   template<>
   class StandardType<Real> : public DataType
@@ -159,7 +161,7 @@ public:
     if (!example)
       example = &p;
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 
     // Get the sub-data-types, and make sure they live long enough
     // to construct the derived type
@@ -200,7 +202,7 @@ public:
 
     this->commit();
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
   }
 
@@ -294,7 +296,7 @@ public:
     if (!example)
       example = &t;
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
     MPI_Aint start;
 
     passmess_call_mpi
@@ -336,7 +338,7 @@ public:
 
     this->commit();
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
   }
 

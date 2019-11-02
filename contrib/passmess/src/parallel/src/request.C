@@ -40,7 +40,7 @@ namespace PassMess
 // ------------------------------------------------------------
 // Request member functions
 Request::Request () :
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   _request(MPI_REQUEST_NULL),
 #else
   _request(),
@@ -127,7 +127,7 @@ Status Request::wait ()
     }
 
   Status stat;
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   passmess_call_mpi
     (MPI_Wait (&_request, stat.get()));
 #endif
@@ -150,7 +150,7 @@ Status Request::wait ()
 
 bool Request::test ()
 {
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   int val=0;
 
   passmess_call_mpi
@@ -168,7 +168,7 @@ bool Request::test ()
 #endif
 }
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 bool Request::test (status & stat)
 {
   int val=0;
@@ -237,7 +237,7 @@ std::size_t waitany (std::vector<Request> & r)
 
   do
     {
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
       passmess_call_mpi
         (MPI_Waitany(r_size, raw.data(), &index, MPI_STATUS_IGNORE));
 #endif

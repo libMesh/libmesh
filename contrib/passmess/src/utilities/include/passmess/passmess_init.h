@@ -24,7 +24,13 @@
 // Local includes
 #include "passmess/passmess_config.h"
 
-// C++ includes
+// C/C++ includes
+
+#ifdef PASSMESS_HAVE_MPI
+# include "passmess/ignore_warnings.h"
+# include <mpi.h>
+# include "passmess/restore_warnings.h"
+#endif // #ifdef PASSMESS_HAVE_MPI
 
 namespace PassMess
 {

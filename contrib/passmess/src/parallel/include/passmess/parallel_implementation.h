@@ -60,7 +60,7 @@ namespace PassMess {
 
 using libMesh::Parallel::Packing;
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 
 /**
  * Templated function to return the appropriate MPI datatype
@@ -70,7 +70,7 @@ using libMesh::Parallel::Packing;
 template <typename T>
 inline data_type dataplusint_type();
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 /**
  * Types combined with an int
@@ -130,7 +130,7 @@ inline void unpack_vector_bool(const std::vector<T,A1> & vec_in,
 }
 
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 // We use a helper function here to avoid ambiguity when calling
 // send_receive of (vector<vector<T>>,vector<vector<T>>)
 template <typename T1, typename T2, typename A1, typename A2, typename A3, typename A4>
@@ -157,7 +157,7 @@ inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
   request.wait();
 }
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 } // Anonymous namespace
 
@@ -166,7 +166,7 @@ inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
 namespace PassMess
 {
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 template<>
 inline data_type dataplusint_type<short int>() { return MPI_SHORT_INT; }
 
@@ -1801,7 +1801,7 @@ inline void Communicator::nonblocking_receive_packed_range (const unsigned int s
 }
 
 
-#else // LIBMESH_HAVE_MPI
+#else // PASSMESS_HAVE_MPI
 
 /**
  * We do not currently support sends on one processor without MPI.
@@ -1962,7 +1962,7 @@ Communicator::send_receive_packed_range
     }
 }
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 // Some of our methods are implemented indirectly via other
 // MPI-encapsulated methods and the implementation works with or
@@ -2128,7 +2128,7 @@ inline void Communicator::minloc(T & r,
       PASSMESS_LOG_SCOPE("minloc(scalar)", "Parallel");
 
       DataPlusInt<T> data_in;
-      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef PASSMESS_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
 
@@ -2283,7 +2283,7 @@ inline void Communicator::maxloc(T & r,
       PASSMESS_LOG_SCOPE("maxloc(scalar)", "Parallel");
 
       DataPlusInt<T> data_in;
-      ignore(data_in); // unused ifndef LIBMESH_HAVE_MPI
+      ignore(data_in); // unused ifndef PASSMESS_HAVE_MPI
       data_in.val = r;
       data_in.rank = this->rank();
 
@@ -2846,7 +2846,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
   PASSMESS_LOG_SCOPE("scatter()", "Parallel");
 
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
-  ignore(data_ptr); // unused ifndef LIBMESH_HAVE_MPI
+  ignore(data_ptr); // unused ifndef PASSMESS_HAVE_MPI
 
   passmess_assert_less(root_id, this->size());
 
@@ -2886,7 +2886,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
 
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
-  ignore(data_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
+  ignore(data_ptr, recv_ptr); // unused ifndef PASSMESS_HAVE_MPI
 
   passmess_assert_less(root_id, this->size());
 
@@ -2940,7 +2940,7 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   T * data_ptr = const_cast<T*>(data.empty() ? nullptr : data.data());
   int * count_ptr = const_cast<int*>(counts.empty() ? nullptr : counts.data());
   T * recv_ptr = recv.empty() ? nullptr : recv.data();
-  ignore(data_ptr, count_ptr, recv_ptr); // unused ifndef LIBMESH_HAVE_MPI
+  ignore(data_ptr, count_ptr, recv_ptr); // unused ifndef PASSMESS_HAVE_MPI
 
   passmess_assert_less(root_id, this->size());
 

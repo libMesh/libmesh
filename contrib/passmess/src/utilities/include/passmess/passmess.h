@@ -23,7 +23,6 @@
 #include "passmess/attributes.h"
 #include "passmess/communicator.h"
 #include "passmess/data_type.h"
-#include "passmess/passmess_call_mpi.h"
 #include "passmess/message_tag.h"
 #include "passmess/op_function.h"
 #include "passmess/packing.h"

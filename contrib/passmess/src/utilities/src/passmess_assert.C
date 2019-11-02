@@ -29,7 +29,7 @@ namespace PassMess
 void report_here(const char * file, int line, const char * date, const char * time)
 {
   std::ostringstream here_msg; // Build in one buffer to reduce interleaving
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   PassMess::Communicator commworld(MPI_COMM_WORLD);
   const std::size_t proc_id = commworld.rank();
   here_msg << "[" << proc_id << "] ";

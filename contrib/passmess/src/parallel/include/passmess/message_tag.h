@@ -22,9 +22,11 @@
 // libMesh Includes
 #include "passmess/passmess_config.h"
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
+#  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
-#endif // LIBMESH_HAVE_MPI
+#  include "passmess/restore_warnings.h"
+#endif // PASSMESS_HAVE_MPI
 
 // C++ includes
 #include <climits> // INT_MIN
@@ -108,7 +110,7 @@ private:
 /**
  * Default message tag ids
  */
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 const MessageTag any_tag = MessageTag(MPI_ANY_TAG);
 #else
 const MessageTag any_tag = MessageTag(-1);

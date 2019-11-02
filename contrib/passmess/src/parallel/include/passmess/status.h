@@ -26,14 +26,16 @@
 // libMesh Includes
 #include "passmess/passmess_config.h"
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
+#  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
-#endif // LIBMESH_HAVE_MPI
+#  include "passmess/restore_warnings.h"
+#endif // PASSMESS_HAVE_MPI
 
 namespace PassMess
 {
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 
 //-------------------------------------------------------------------
 
@@ -49,7 +51,7 @@ typedef MPI_Status status;
 // properly.
 struct status       { /* unsigned int s; */ };
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 
 
@@ -134,7 +136,7 @@ inline Status::Status (const Status    & stat,
 
 inline int Status::source () const
 {
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   return _status.MPI_SOURCE;
 #else
   return 0;
@@ -143,7 +145,7 @@ inline int Status::source () const
 
 inline int Status::tag () const
 {
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
   return _status.MPI_TAG;
 #else
   passmess_not_implemented();
@@ -153,7 +155,7 @@ inline int Status::tag () const
 
 inline unsigned int Status::size (const data_type & type) const
 {
-  ignore(type); // We don't use this ifndef LIBMESH_HAVE_MPI
+  ignore(type); // We don't use this ifndef PASSMESS_HAVE_MPI
   int msg_size = 1;
   passmess_call_mpi
     (MPI_Get_count (const_cast<MPI_Status*>(&_status), type,

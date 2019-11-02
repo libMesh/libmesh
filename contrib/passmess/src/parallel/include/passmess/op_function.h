@@ -21,9 +21,11 @@
 
 #include "passmess_config.h"
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
+#  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
-#endif // LIBMESH_HAVE_MPI
+#  include "passmess/restore_warnings.h"
+#endif // PASSMESS_HAVE_MPI
 
 // C++ includes
 #include <functional>
@@ -34,7 +36,7 @@
 namespace PassMess
 {
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-# ifdef LIBMESH_HAVE_MPI
+# ifdef PASSMESS_HAVE_MPI
 # define PASSMESS_MPI_BINARY(funcname) \
 inline void \
 passmess_mpi_##funcname(void * a, void * b, int * len, MPI_Datatype *) \
@@ -87,7 +89,7 @@ PASSMESS_MPI_LOCATOR(min)
 PASSMESS_MPI_BINARY_FUNCTOR(plus)
 PASSMESS_MPI_BINARY_FUNCTOR(multiplies)
 
-# endif // LIBMESH_HAVE_MPI
+# endif // PASSMESS_HAVE_MPI
 #endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 
 
@@ -141,7 +143,7 @@ class OpFunction
 // ------------------------------------------------------------
 // Declare OpFunction specializations for C++ built-in types
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 
 #define PASSMESS_PARALLEL_INTEGER_OPS(cxxtype)          \
   template<>                                            \
@@ -208,7 +210,7 @@ PASSMESS_PARALLEL_FLOAT_OPS(double);
 PASSMESS_PARALLEL_FLOAT_OPS(long double);
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-# ifdef LIBMESH_HAVE_MPI
+# ifdef PASSMESS_HAVE_MPI
 
 // FIXME - we'll still need to free these to keep valgrind happy
 #define PASSMESS_MPI_OPFUNCTION(mpiname, funcname) \

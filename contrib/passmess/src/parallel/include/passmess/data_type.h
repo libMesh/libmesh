@@ -25,7 +25,7 @@
 namespace PassMess
 {
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 //-------------------------------------------------------------------
 /**
  * Data types for communication
@@ -39,7 +39,7 @@ typedef MPI_Datatype data_type;
 // properly.
 struct data_type    { /* unsigned int t; */ };
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 
 
@@ -65,7 +65,7 @@ public:
     // FIXME - if we nest an inner type here will we run into bug
     // https://github.com/libMesh/libmesh/issues/631 again?
     passmess_call_mpi(MPI_Type_contiguous(count, other._datatype, &_datatype));
-    ignore(other, count); // ifndef LIBMESH_HAVE_MPI
+    ignore(other, count); // ifndef PASSMESS_HAVE_MPI
     this->commit();
   }
 

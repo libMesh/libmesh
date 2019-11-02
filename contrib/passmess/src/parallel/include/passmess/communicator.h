@@ -51,7 +51,7 @@ using libMesh::Parallel::Packing;
 
 typedef unsigned short int processor_id_type;
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 
 //-------------------------------------------------------------------
 /**
@@ -81,7 +81,7 @@ typedef int info;
 
 const unsigned int any_source=0;
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 //-------------------------------------------------------------------
 /**

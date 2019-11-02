@@ -25,9 +25,11 @@
 // libMesh includes
 #include "passmess/passmess_config.h"
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
+#  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
-#endif // LIBMESH_HAVE_MPI
+#  include "passmess/restore_warnings.h"
+#endif // PASSMESS_HAVE_MPI
 
 // C++ includes
 #include <memory>
@@ -40,7 +42,7 @@ namespace PassMess
 // Forward declarations
 struct PostWaitWork;
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
 
 //-------------------------------------------------------------------
 /**
@@ -54,7 +56,7 @@ typedef MPI_Request request;
 // a unique type for function overloading to work
 // properly.
 struct request      { /* unsigned int r; */ };
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 
 //-------------------------------------------------------------------

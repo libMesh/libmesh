@@ -25,8 +25,10 @@
 // PassMess Includes
 #include "passmess/passmess_assert.h"
 
-#ifdef LIBMESH_HAVE_MPI
+#ifdef PASSMESS_HAVE_MPI
+#  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
+#  include "passmess/restore_warnings.h"
 
 /**
  * Macro to use arguments only when MPI is in use
@@ -80,7 +82,7 @@
   while (0)
 #endif
 
-#else // LIBMESH_HAVE_MPI
+#else // PASSMESS_HAVE_MPI
 
 #define passmess_mpi_var(var)
 
@@ -88,7 +90,7 @@
   do {}                                         \
   while (0)
 
-#endif // LIBMESH_HAVE_MPI
+#endif // PASSMESS_HAVE_MPI
 
 
 #endif // PASSMESS_CALL_MPI_H
