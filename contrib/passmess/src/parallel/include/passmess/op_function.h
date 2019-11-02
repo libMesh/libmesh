@@ -35,7 +35,7 @@
 
 namespace PassMess
 {
-#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#ifdef PASSMESS_DEFAULT_QUADRUPLE_PRECISION
 # ifdef PASSMESS_HAVE_MPI
 # define PASSMESS_MPI_BINARY(funcname) \
 inline void \
@@ -90,7 +90,7 @@ PASSMESS_MPI_BINARY_FUNCTOR(plus)
 PASSMESS_MPI_BINARY_FUNCTOR(multiplies)
 
 # endif // PASSMESS_HAVE_MPI
-#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#endif // PASSMESS_DEFAULT_QUADRUPLE_PRECISION
 
 
 //-------------------------------------------------------------------
@@ -209,7 +209,7 @@ PASSMESS_PARALLEL_FLOAT_OPS(float);
 PASSMESS_PARALLEL_FLOAT_OPS(double);
 PASSMESS_PARALLEL_FLOAT_OPS(long double);
 
-#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#ifdef PASSMESS_DEFAULT_QUADRUPLE_PRECISION
 # ifdef PASSMESS_HAVE_MPI
 
 // FIXME - we'll still need to free these to keep valgrind happy
@@ -240,7 +240,7 @@ PASSMESS_PARALLEL_FLOAT_OPS(long double);
 # else
   PASSMESS_PARALLEL_FLOAT_OPS(Real);
 # endif
-#endif
+#endif // PASSMESS_DEFAULT_QUADRUPLE_PRECISION
 
 } // namespace PassMess
 

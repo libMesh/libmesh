@@ -19,16 +19,13 @@
 #ifndef PASSMESS_ATTRIBUTES_H
 #define PASSMESS_ATTRIBUTES_H
 
+// PassMess includes
+#include "passmess_config.h"
+
 // C++ includes
 #include <limits>
 #include <set>
 #include <vector>
-
-
-#include "passmess_config.h"
-#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-#include "passmess_common.h" // Real
-#endif
 
 
 namespace PassMess
@@ -98,7 +95,7 @@ PASSMESS_INT_TYPE(unsigned long long);
 PASSMESS_FLOAT_TYPE(float);
 PASSMESS_FLOAT_TYPE(double);
 PASSMESS_FLOAT_TYPE(long double);
-#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#ifdef PASSMESS_DEFAULT_QUADRUPLE_PRECISION
 PASSMESS_FLOAT_TYPE(Real);
 #endif
 

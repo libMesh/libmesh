@@ -185,7 +185,7 @@ inline data_type dataplusint_type<double>() { return MPI_DOUBLE_INT; }
 template<>
 inline data_type dataplusint_type<long double>() { return MPI_LONG_DOUBLE_INT; }
 
-#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#ifdef PASSMESS_DEFAULT_QUADRUPLE_PRECISION
 template<>
 inline data_type dataplusint_type<Real>() { return MPI_DATATYPE_NULL; }
 #endif

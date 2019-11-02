@@ -122,7 +122,7 @@ PASSMESS_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
 // Quad and float128 types aren't standard C++, so only work with them
 // if configure and PETSc encapsulated the non-standard issues.
 #ifdef PASSMESS_HAVE_MPI
-# ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# ifdef PASSMESS_DEFAULT_QUADRUPLE_PRECISION
   template<>
   class StandardType<Real> : public DataType
   {
@@ -145,7 +145,7 @@ PASSMESS_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
   };
 # endif
 #else
-# ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+# ifdef PASSMESS_DEFAULT_QUADRUPLE_PRECISION
   PASSMESS_STANDARD_TYPE(Real,);
 # endif
 #endif
