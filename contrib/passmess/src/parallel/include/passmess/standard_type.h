@@ -19,19 +19,17 @@
 #ifndef PASSMESS_STANDARD_TYPE_H
 #define PASSMESS_STANDARD_TYPE_H
 
-// Parallel includes
+// PassMess includes
 #include "passmess/data_type.h"
-
-// libMesh Includes
 #include "passmess/passmess_config.h"
 
+// C/C++ includes
 #ifdef PASSMESS_HAVE_MPI
 #  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
 #  include "passmess/restore_warnings.h"
 #endif // PASSMESS_HAVE_MPI
 
-// C++ includes
 #include <array>
 #include <complex>
 #include <memory>

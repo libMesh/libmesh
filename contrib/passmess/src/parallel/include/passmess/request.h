@@ -19,19 +19,17 @@
 #ifndef PASSMESS_REQUEST_H
 #define PASSMESS_REQUEST_H
 
-// Parallel includes
+// PassMess includes
+#include "passmess/passmess_config.h"
 #include "passmess/status.h"
 
-// libMesh includes
-#include "passmess/passmess_config.h"
-
+// C/C++ includes
 #ifdef PASSMESS_HAVE_MPI
 #  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
 #  include "passmess/restore_warnings.h"
 #endif // PASSMESS_HAVE_MPI
 
-// C++ includes
 #include <memory>
 #include <vector>
 #include <utility>

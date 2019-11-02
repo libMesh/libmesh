@@ -22,10 +22,9 @@
 // PassMess includes
 #include "passmess/data_type.h"
 #include "passmess/passmess_assert.h"
-
-// libMesh Includes
 #include "passmess/passmess_config.h"
 
+// C/C++ includes
 #ifdef PASSMESS_HAVE_MPI
 #  include "passmess/ignore_warnings.h"
 #  include "mpi.h"

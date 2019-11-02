@@ -37,6 +37,8 @@
 #include <complex> // for specializations
 #include <set>
 
+// FIXME: This *should* be in PassMess namespace but we have libMesh
+// users which already partially specialized it
 namespace libMesh {
 namespace Parallel {
 template <typename T>
@@ -581,7 +583,7 @@ public:
    * T = iterator_traits<OutputIter>::value_type.
    *
    * Using std::back_inserter as the output iterator allows receive to
-   * fill any container type.  Using libMesh::null_output_iterator
+   * fill any container type.  Using some null_output_iterator
    * allows the receive to be dealt with solely by PassMess::unpack(),
    * for objects whose unpack() is written so as to not leak memory
    * when used in this fashion.
@@ -680,8 +682,8 @@ public:
    * is used to serialize type T1 onto the end of a data vector.
    *
    * Using std::back_inserter as the output iterator allows
-   * send_receive to fill any container type.  Using
-   * libMesh::null_output_iterator allows the receive to be dealt with
+   * send_receive to fill any container type.  Using some
+   * null_output_iterator allows the receive to be dealt with
    * solely by PassMess::unpack(), for objects whose unpack() is
    * written so as to not leak memory when used in this fashion.
    *

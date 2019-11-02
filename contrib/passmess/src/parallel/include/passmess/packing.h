@@ -27,6 +27,9 @@
 #include <iterator>
 #include <vector>
 
+
+// FIXME: This *should* be in PassMess namespace but we have libMesh
+// users which already partially specialized it
 namespace libMesh
 {
 

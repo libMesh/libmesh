@@ -16,12 +16,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// PassMess includes
+// Local includes
 #include "passmess/passmess_assert.h"
-#include "passmess/communicator.h"
 
-// libMesh includes
+// PassMess includes
 #include "passmess/passmess_config.h"
+#include "passmess/communicator.h"
 
 namespace PassMess
 {

@@ -19,16 +19,16 @@
 #ifndef PASSMESS_MESSAGE_TAG_H
 #define PASSMESS_MESSAGE_TAG_H
 
-// libMesh Includes
+// PassMess Includes
 #include "passmess/passmess_config.h"
 
+// C/C++ includes
 #ifdef PASSMESS_HAVE_MPI
 #  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
 #  include "passmess/restore_warnings.h"
 #endif // PASSMESS_HAVE_MPI
 
-// C++ includes
 #include <climits> // INT_MIN
 
 namespace PassMess

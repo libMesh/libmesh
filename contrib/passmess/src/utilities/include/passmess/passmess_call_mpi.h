@@ -19,12 +19,11 @@
 #ifndef PASSMESS_CALL_MPI_H
 #define PASSMESS_CALL_MPI_H
 
-// libMesh Includes
+// PassMess includes
+#include "passmess/passmess_assert.h"
 #include "passmess/passmess_config.h"
 
-// PassMess Includes
-#include "passmess/passmess_assert.h"
-
+// C/C++ includes
 #ifdef PASSMESS_HAVE_MPI
 #  include "passmess/ignore_warnings.h"
 #  include "mpi.h"
