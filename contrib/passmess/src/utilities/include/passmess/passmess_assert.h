@@ -31,7 +31,7 @@
 
 
 // Use actual timestamps or constant dummies (to aid ccache)
-#ifdef LIBMESH_ENABLE_TIMESTAMPS
+#ifdef PASSMESS_ENABLE_TIMESTAMPS
 #  define  PASSMESS_TIME __TIME__
 #  define  PASSMESS_DATE __DATE__
 #else
