@@ -204,7 +204,7 @@ struct casting_compare {
 #endif
 
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
+#ifdef PASSMESS_ENABLE_EXCEPTIONS
 #define PASSMESS_THROW(e) do { throw e; } while (0)
 #else
 #define PASSMESS_THROW(e) do { std::abort(); } while (0)
@@ -250,7 +250,7 @@ struct casting_compare {
 
 // The passmess_warning macro outputs a file/line/time stamped warning
 // message, if warnings are enabled.
-#ifdef LIBMESH_ENABLE_WARNINGS
+#ifdef PASSMESS_ENABLE_WARNINGS
 #define passmess_warning(message)       \
   passmess_do_once(std::cout << message \
                    << __FILE__ << ", line " << __LINE__ << ", compiled " << PASSMESS_DATE << " at " << PASSMESS_TIME << " ***" << std::endl;)
@@ -267,7 +267,7 @@ struct casting_compare {
 
 // The passmess_deprecated macro warns that you are using obsoleted code
 #undef passmess_deprecated
-#ifndef LIBMESH_ENABLE_DEPRECATED
+#ifndef PASSMESS_ENABLE_DEPRECATED
 #define passmess_deprecated()                                            \
   passmess_error_msg("*** Error, This code is deprecated, and likely to be removed in future library versions! ");
 #else
