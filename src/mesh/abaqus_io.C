@@ -36,6 +36,30 @@ namespace
 using namespace libMesh;
 
 /**
+ * Attempts to convert the input string to a numerical value using
+ * strtol.  If the conversion fails, 0 will be stored in the output,
+ * so you must check the return value, which will be true if the
+ * conversion succeeded, and false if it failed for any reason.
+ */
+bool string_to_num(const std::string & input, dof_id_type & output)
+{
+  char * endptr;
+  output = cast_int<dof_id_type>
+    (std::strtol(input.c_str(), &endptr, /*base=*/10));
+
+  return (output != 0 || endptr != input.c_str());
+}
+
+/**
+ * Removes all whitespace characters from "line". Simpler than trying
+ * to remember the erase-remove-if idiom.
+ */
+void strip_ws(std::string & line)
+{
+  line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+}
+
+/**
  * Data structure used for mapping Abaqus IDs to libMesh IDs, and
  * eventually (possibly) vice-versa.
  */
@@ -457,7 +481,7 @@ void AbaqusIO::read_nodes(std::string nset_name)
       // Remove all whitespace characters from the line.  This way we
       // can do the remaining parsing without worrying about tabs,
       // different numbers of spaces, etc.
-      line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+      strip_ws(line);
 
       // Make a stream out of the modified line so we can stream values
       // from it in the usual way.
@@ -647,12 +671,10 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
           std::string cell;
           while (std::getline(line_stream, cell, ','))
             {
-              // FIXME: factor out this strtol stuff into a utility function.
-              char * endptr;
-              dof_id_type abaqus_global_node_id = cast_int<dof_id_type>
-                (std::strtol(cell.c_str(), &endptr, /*base=*/10));
+              dof_id_type abaqus_global_node_id;
+              bool success = string_to_num(cell, abaqus_global_node_id);
 
-              if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
+              if (success)
                 {
                   // Use the global node number mapping to determine the corresponding libmesh global node id
                   dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
@@ -677,7 +699,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
                   // Increment the count of IDs read for this element
                   id_count++;
-                } // end if strtol success
+                } // end if (success)
             } // end while getline(',')
         } // end while (id_count)
 
@@ -711,7 +733,7 @@ std::string AbaqusIO::parse_label(std::string line, std::string label_name) cons
   // just remove all the space characters, which should include all
   // kinds of remaining newlines.  (I don't think Abaqus allows
   // whitespace in label names.)
-  line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+  strip_ws(line);
 
   // Do all string comparisons in upper-case
   std::string
@@ -747,7 +769,7 @@ std::string AbaqusIO::parse_label(std::string line, std::string label_name) cons
 bool AbaqusIO::detect_generated_set(std::string upper) const
 {
   // Avoid issues with weird line endings, spaces before commas, etc.
-  upper.erase(std::remove_if(upper.begin(), upper.end(), isspace), upper.end());
+  strip_ws(upper);
 
   // Check each comma-separated value in "upper" to see if it is the generate flag.
   std::string cell;
@@ -779,26 +801,14 @@ void AbaqusIO::read_ids(std::string set_name, container_t & container)
       std::stringstream line_stream(csv_line);
       while (std::getline(line_stream, cell, ','))
         {
-          // If no conversion can be performed by strtol, 0 is returned.
-          //
-          // If endptr is not nullptr, strtol() stores the address of the
-          // first invalid character in *endptr.  If there were no
-          // digits at all, however, strtol() stores the original
-          // value of str in *endptr.
-          char * endptr;
-
-          // FIXME - this needs to be updated for 64-bit inputs
-          dof_id_type id = cast_int<dof_id_type>
-            (std::strtol(cell.c_str(), &endptr, /*base=*/10));
+          dof_id_type id;
+          bool success = string_to_num(cell, id);
 
           // Note that lists of comma-separated values in abaqus also
           // *end* with a comma, so the last call to getline on a given
           // line will get an empty string, which we must detect.
-          if (id != 0 || cell.c_str() != endptr)
-            {
-              // 'cell' is now a string with an integer id in it
-              id_storage.push_back( id );
-            }
+          if (success)
+            id_storage.push_back(id);
         }
     }
 }
@@ -821,7 +831,7 @@ void AbaqusIO::generate_ids(std::string set_name, container_t & container)
       std::getline(_in, csv_line);
 
       // Remove all whitespaces from csv_line.
-      csv_line.erase(std::remove_if(csv_line.begin(), csv_line.end(), isspace), csv_line.end());
+      strip_ws(csv_line);
 
       // Create a new stringstream object from the string, and stream
       // in the comma-separated values.
@@ -863,25 +873,18 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
 
       // Strip any leading or trailing trailing whitespace from this
       // string, since some Abaqus files may have this.
-      elem_id_or_set.erase
-        (std::remove_if(elem_id_or_set.begin(),
-                        elem_id_or_set.end(), isspace),
-         elem_id_or_set.end());
+      strip_ws(elem_id_or_set);
 
       // Read the character "S", followed by the side id. Note: the >> operator
       // eats whitespace until it reaches a valid character, so this should work
       // whether or not there is a space after the previous comma.
       _in >> c >> side_id;
 
-      // Try to convert first string to an integer.  If no conversion
-      // can be performed, strtol returns 0.  If endptr != nullptr,
-      // then it stores the address of the first invalid character
-      // found in the string.
-      char * endptr;
-      dof_id_type elem_id = cast_int<dof_id_type>
-        (std::strtol(elem_id_or_set.c_str(), &endptr, /*base=*/10));
+      // Try to convert first string to an integer.
+      dof_id_type elem_id;
+      bool success = string_to_num(elem_id_or_set, elem_id);
 
-      if (elem_id != 0 || endptr != elem_id_or_set.c_str())
+      if (success)
         {
           // if the side set is of the form of "391, S2"
           id_storage.push_back( std::make_pair(elem_id, side_id) );
