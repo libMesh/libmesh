@@ -19,9 +19,10 @@
 #ifndef PASSMESS_COMMUNICATOR_H
 #define PASSMESS_COMMUNICATOR_H
 
-// Parallel includes
+// PassMess includes
 #include "passmess/data_type.h"
 #include "passmess/message_tag.h"
+#include "passmess/passmess_config.h"
 #include "passmess/request.h"
 #include "passmess/status.h"
 
@@ -51,7 +52,21 @@ namespace PassMess
 
 using libMesh::Parallel::Packing;
 
-typedef unsigned short int processor_id_type;
+// Define processor id storage type.
+#if PASSMESS_PROCESSOR_ID_BYTES == 1
+typedef uint8_t processor_id_type;
+#elif PASSMESS_PROCESSOR_ID_BYTES == 2
+typedef uint16_t processor_id_type;
+#elif PASSMESS_PROCESSOR_ID_BYTES == 4
+typedef uint32_t processor_id_type; // default
+#elif PASSMESS_PROCESSOR_ID_BYTES == 8
+typedef uint64_t processor_id_type;
+#else
+// We should not get here: it's not currently possible to set any
+// other size.
+DIE A HORRIBLE DEATH HERE...
+#endif
+
 
 #ifdef PASSMESS_HAVE_MPI
 

@@ -1,6 +1,6 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-AC_DEFUN([PASSMESS_COMPILER_FEATURES],
+AC_DEFUN([PASSMESS_OPTIONAL_FEATURES],
 [
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(------- Configuring optional features -------)
@@ -84,6 +84,30 @@ AS_IF([test "$enablewarnings" != yes],
         AC_DEFINE(ENABLE_WARNINGS, 1, [Flag indicating if the library should have warnings enabled])
       ])
 # --------------------------------------------------------------
+
+
+# -------------------------------------------------------------
+# size of processor_id_type -- default 4 bytes
+# -------------------------------------------------------------
+AC_ARG_WITH([processor_id_bytes],
+            AS_HELP_STRING([--with-processor-id-bytes=<1|2|4|8>],
+                           [bytes used for processor id [4]]),
+            [processor_bytes="$withval"],
+            [processor_bytes=4])
+
+AS_CASE("$processor_bytes",
+        [1], [AC_DEFINE(PROCESSOR_ID_BYTES, 1, [size of processor_id])],
+        [2], [AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])],
+        [4], [AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id])],
+        [8], [AC_DEFINE(PROCESSOR_ID_BYTES, 8, [size of processor_id])],
+        [
+          AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...4])
+          AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id])
+          processor_bytes=4
+        ])
+
+AC_MSG_RESULT([configuring size of processor_id... $processor_bytes])
+# -------------------------------------------------------------
 
 
 AC_MSG_RESULT(---------------------------------------------)

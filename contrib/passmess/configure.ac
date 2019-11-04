@@ -66,6 +66,12 @@ dnl---------------------------------------------------------
 
 ACX_MPI
 
+dnl---------------------------------------------------------
+dnl Sets library options
+dnl---------------------------------------------------------
+
+PASSMESS_OPTIONAL_FEATURES
+
 dnl-----------------------------------------------------
 dnl Initialize libtool.  By default, we will build
 dnl only shared libraries on platforms that support them
