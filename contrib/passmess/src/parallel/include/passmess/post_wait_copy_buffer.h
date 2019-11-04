@@ -19,7 +19,7 @@
 #ifndef PASSMESS_POST_WAIT_COPY_BUFFER_H
 #define PASSMESS_POST_WAIT_COPY_BUFFER_H
 
-// Parallel includes
+// PassMess includes
 #include "passmess/post_wait_work.h"
 
 // C++ includes

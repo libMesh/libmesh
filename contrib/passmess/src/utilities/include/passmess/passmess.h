@@ -19,7 +19,7 @@
 #ifndef PASSMESS_PARALLEL_H
 #define PASSMESS_PARALLEL_H
 
-// Parallel includes
+// PassMess includes
 #include "passmess/attributes.h"
 #include "passmess/communicator.h"
 #include "passmess/data_type.h"

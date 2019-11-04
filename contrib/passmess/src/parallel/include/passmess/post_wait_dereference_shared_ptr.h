@@ -19,7 +19,7 @@
 #ifndef PASSMESS_POST_WAIT_DEREFERENCE_SHARED_PTR_H
 #define PASSMESS_POST_WAIT_DEREFERENCE_SHARED_PTR_H
 
-// Parallel includes
+// PassMess includes
 #include "passmess/post_wait_work.h"
 
 // System Includes

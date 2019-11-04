@@ -19,7 +19,7 @@
 #ifndef PASSMESS_DATA_TYPE_H
 #define PASSMESS_DATA_TYPE_H
 
-// Parallel includes
+// PassMess includes
 #include "passmess/passmess_call_mpi.h"
 
 namespace PassMess

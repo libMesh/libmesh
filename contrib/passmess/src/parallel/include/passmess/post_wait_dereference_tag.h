@@ -19,7 +19,7 @@
 #ifndef PASSMESS_POST_WAIT_DEREFERENCE_TAG_H
 #define PASSMESS_POST_WAIT_DEREFERENCE_TAG_H
 
-// Parallel includes
+// PassMess includes
 #include "passmess/message_tag.h"
 #include "passmess/post_wait_work.h"
 
