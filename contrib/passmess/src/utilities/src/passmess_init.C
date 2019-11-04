@@ -127,8 +127,14 @@ PassMessInit::~PassMessInit()
 #ifdef PASSMESS_HAVE_MPI
   if (err_handler_set)
     {
-      passmess_call_mpi
-        (MPI_Errhandler_free(&my_errhandler));
+      unsigned int error_code =
+        MPI_Errhandler_free(&my_errhandler);
+      if (error_code != MPI_SUCCESS)
+        {
+          std::cerr <<
+            "Failure when freeing MPI_Errhandler! Continuing..." <<
+            std::endl;
+        }
     }
 
   this->comm().clear();
