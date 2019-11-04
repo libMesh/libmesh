@@ -220,6 +220,13 @@ if LIBMESH_ENABLE_METAPHYSICL
   # header-only library for the parts we use - no library dependencies
 endif
 
+SUBDIRS += passmess
+opt_libs   += passmess/src/libpassmess_opt.la
+dbg_libs   += passmess/src/libpassmess_dbg.la
+devel_libs += passmess/src/libpassmess_devel.la
+prof_libs  += passmess/src/libpassmess_prof.la
+oprof_libs += passmess/src/libpassmess_oprof.la
+
 
 
 ######################################################################
