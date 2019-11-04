@@ -1,27 +1,66 @@
-#----------------------------------------
-# Programs and libraries we want to build
-#----------------------------------------
 
-bin_PROGRAMS    = passmess_version
-
-lib_LTLIBRARIES = libpassmess.la
-
-libpassmess_la_LDFLAGS = -version-info 0:0:0
+AM_LDFLAGS = -version-info 0:0:0
 
 #----------------------------------------------
 # List of source files to build dynamic library
 #----------------------------------------------
-libpassmess_la_SOURCES =
+passmess_SOURCES =
 
 # parallel
-libpassmess_la_SOURCES += parallel/src/communicator.C
-libpassmess_la_SOURCES += parallel/src/message_tag.C
-libpassmess_la_SOURCES += parallel/src/request.C
+passmess_SOURCES += parallel/src/communicator.C
+passmess_SOURCES += parallel/src/message_tag.C
+passmess_SOURCES += parallel/src/request.C
 
 # utilities
-libpassmess_la_SOURCES += utilities/src/passmess_assert.C
-libpassmess_la_SOURCES += utilities/src/passmess_init.C
-libpassmess_la_SOURCES += utilities/src/passmess_version.C
+passmess_SOURCES += utilities/src/passmess_assert.C
+passmess_SOURCES += utilities/src/passmess_init.C
+passmess_SOURCES += utilities/src/passmess_version.C
+
+#------------------------------------------
+# List of library configurations to compile
+#------------------------------------------
+
+lib_LTLIBRARIES =
+bin_PROGRAMS    =
+
+if BUILD_DBG_MODE
+  lib_LTLIBRARIES            += libpassmess_dbg.la
+  libpassmess_dbg_la_SOURCES  = $(passmess_SOURCES)
+  libpassmess_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+  libpassmess_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
+  bin_PROGRAMS               += passmess_version-dbg
+endif
+
+if BUILD_DEVEL_MODE
+  lib_LTLIBRARIES              += libpassmess_devel.la
+  libpassmess_devel_la_SOURCES  = $(passmess_SOURCES)
+  libpassmess_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+  libpassmess_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
+  bin_PROGRAMS                 += passmess_version-devel
+endif
+
+if BUILD_OPT_MODE
+  lib_LTLIBRARIES            += libpassmess_opt.la
+  libpassmess_opt_la_SOURCES  = $(passmess_SOURCES)
+  libpassmess_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+  libpassmess_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+  bin_PROGRAMS               += passmess_version-opt
+endif
+
+if BUILD_PROF_MODE
+  lib_LTLIBRARIES             += libpassmess_prof.la
+  libpassmess_prof_la_SOURCES  = $(passmess_SOURCES)
+  libpassmess_prof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+  libpassmess_prof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+endif
+
+if BUILD_OPROF_MODE
+  lib_LTLIBRARIES              += libpassmess_oprof.la
+  libpassmess_oprof_la_SOURCES  = $(passmess_SOURCES)
+  libpassmess_oprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+  libpassmess_oprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+endif
+
 
 #----------------------------
 # INCLUDES we want distributed
@@ -65,8 +104,14 @@ include_HEADERS += $(top_builddir)/src/utilities/include/passmess/passmess_versi
 include_HEADERS += $(top_builddir)/src/utilities/include/passmess/passmess_config.h
 
 # Version app
-passmess_version_SOURCES = apps/version.C
-passmess_version_LDADD = libpassmess.la
+passmess_version_opt_SOURCES = apps/version.C
+passmess_version_opt_LDADD = libpassmess_opt.la
+
+passmess_version_devel_SOURCES = apps/version.C
+passmess_version_devel_LDADD = libpassmess_devel.la
+
+passmess_version_dbg_SOURCES = apps/version.C
+passmess_version_dbg_LDADD = libpassmess_dbg.la
 
 #--------------------------------------
 #Local Directories to include for build

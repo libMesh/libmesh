@@ -55,6 +55,11 @@ PASSMESS_SET_COMPILERS
 dnl -Wall warnings, -Wall the time.
 AX_CXXFLAGS_WARN_ALL
 
+#-----------------------------------------------------
+# Set compiler flags for devel, opt, etc. methods
+#-----------------------------------------------------
+SET_BUILD_METHODS
+
 dnl---------------------------------------------------------
 dnl Checks for library prerequisites for other libraries...
 dnl---------------------------------------------------------
