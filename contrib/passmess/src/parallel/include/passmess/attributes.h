@@ -20,7 +20,7 @@
 #define PASSMESS_ATTRIBUTES_H
 
 // PassMess includes
-#include "passmess_config.h"
+#include "passmess/passmess_config.h"
 
 // C++ includes
 #include <limits>

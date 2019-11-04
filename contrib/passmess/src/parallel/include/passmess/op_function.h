@@ -19,7 +19,7 @@
 #ifndef PASSMESS_OP_FUNCTION_H
 #define PASSMESS_OP_FUNCTION_H
 
-#include "passmess_config.h"
+#include "passmess/passmess_config.h"
 
 #ifdef PASSMESS_HAVE_MPI
 #  include "passmess/ignore_warnings.h"
