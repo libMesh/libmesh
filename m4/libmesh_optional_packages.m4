@@ -32,6 +32,15 @@ libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
+# Use of PassMess is required
+# --------------------------------------------------------------
+libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/passmess/src/algorithms/include $libmesh_contrib_INCLUDES"
+libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/passmess/src/parallel/include $libmesh_contrib_INCLUDES"
+libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/passmess/src/utilities/include $libmesh_contrib_INCLUDES"
+# Including passmess_config.h
+libmesh_contrib_INCLUDES="-I\$(top_builddir)/contrib/passmess/src/utilities/include $libmesh_contrib_INCLUDES"
+
+# --------------------------------------------------------------
 # Allow for disable-optional
 # --------------------------------------------------------------
 AC_ARG_ENABLE(optional,
