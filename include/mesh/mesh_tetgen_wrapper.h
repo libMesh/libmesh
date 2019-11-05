@@ -22,7 +22,10 @@
 #ifdef LIBMESH_HAVE_TETGEN
 
 // TetGen include file
+// tetgen.h triggers -Werror=switch-default
+#include "libmesh/ignore_warnings.h"
 #include "tetgen.h"  // Defines REAL and other Tetgen types
+#include "libmesh/restore_warnings.h"
 
 // C++ includes
 #include <string>
