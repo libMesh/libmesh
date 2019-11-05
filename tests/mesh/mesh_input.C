@@ -38,7 +38,8 @@ public:
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif
 #endif
-  CPPUNIT_TEST( testDynaReadMesh );
+  CPPUNIT_TEST( testDynaReadElem );
+  CPPUNIT_TEST( testDynaReadPatch );
 
   CPPUNIT_TEST( testMeshMoveConstructor );
 #endif // LIBMESH_DIM > 1
@@ -208,7 +209,7 @@ public:
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 #endif // LIBMESH_HAVE_EXODUS_API
 
-  void testDynaReadMesh ()
+  void testDynaReadElem ()
   {
     Mesh mesh(*TestCommWorld);
 
@@ -250,6 +251,50 @@ public:
         for (unsigned int v=0; v != 4; ++v)
           CPPUNIT_ASSERT_EQUAL(elem.point(v)(2), Real(0));
 #endif
+      }
+  }
+
+
+  void testDynaReadPatch ()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    DynaIO dyna(mesh);
+    if (mesh.processor_id() == 0)
+      dyna.read("25_quad.bxt");
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(25));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(121));
+
+    CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
+                         RATIONAL_BERNSTEIN_MAP);
+
+    unsigned char weight_index = mesh.default_mapping_data();
+
+    for (const auto & elem : mesh.active_element_ptr_range())
+      {
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(0.04), elem->volume(), TOLERANCE);
+
+        for (unsigned int n=0; n != 9; ++n)
+          CPPUNIT_ASSERT_EQUAL
+            (elem->node_ref(n).get_extra_datum<Real>(weight_index),
+             Real(1.0));
+
+        unsigned int n_neighbors = 0, n_neighbors_expected = 2;
+        for (unsigned int side=0; side != 4; ++side)
+          if (elem->neighbor_ptr(side))
+            n_neighbors++;
+        Point c = elem->centroid();
+
+        if (c(0) > 0.2 && c(0) < 0.8)
+          n_neighbors_expected++;
+        if (c(1) > 0.2 && c(1) < 0.8)
+          n_neighbors_expected++;
+
+        CPPUNIT_ASSERT_EQUAL(n_neighbors, n_neighbors_expected);
       }
   }
 

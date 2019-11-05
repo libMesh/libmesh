@@ -231,6 +231,7 @@ if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 
 .linkstamp:
+	-rm -f 25_quad.bxt && $(LN_S) -f $(srcdir)/25_quad.bxt .
 	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
 	$(AM_V_GEN)touch .linkstamp
 

@@ -235,28 +235,28 @@ public:
    * points on the element.
    */
   const std::vector<Point> & get_xyz() const
-  { return this->_fe_map->get_xyz(); }
+  { calculate_map = true; return this->_fe_map->get_xyz(); }
 
   /**
    * \returns The element Jacobian times the quadrature weight for
    * each quadrature point.
    */
   const std::vector<Real> & get_JxW() const
-  { return this->_fe_map->get_JxW(); }
+  { calculate_map = true; return this->_fe_map->get_JxW(); }
 
   /**
    * \returns The element tangents in xi-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient> & get_dxyzdxi() const
-  { return this->_fe_map->get_dxyzdxi(); }
+  { calculate_map = true; return this->_fe_map->get_dxyzdxi(); }
 
   /**
    * \returns The element tangents in eta-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient> & get_dxyzdeta() const
-  { return this->_fe_map->get_dxyzdeta(); }
+  { calculate_map = true; return this->_fe_map->get_dxyzdeta(); }
 
   /**
    * \returns The element tangents in zeta-direction at the quadrature
@@ -271,37 +271,37 @@ public:
    * \returns The second partial derivatives in xi.
    */
   const std::vector<RealGradient> & get_d2xyzdxi2() const
-  { return this->_fe_map->get_d2xyzdxi2(); }
+  { calculate_map = true; return this->_fe_map->get_d2xyzdxi2(); }
 
   /**
    * \returns The second partial derivatives in eta.
    */
   const std::vector<RealGradient> & get_d2xyzdeta2() const
-  { return this->_fe_map->get_d2xyzdeta2(); }
+  { calculate_map = true; return this->_fe_map->get_d2xyzdeta2(); }
 
   /**
    * \returns The second partial derivatives in zeta.
    */
   const std::vector<RealGradient> & get_d2xyzdzeta2() const
-  { return this->_fe_map->get_d2xyzdzeta2(); }
+  { calculate_map = true; return this->_fe_map->get_d2xyzdzeta2(); }
 
   /**
    * \returns The second partial derivatives in xi-eta.
    */
   const std::vector<RealGradient> & get_d2xyzdxideta() const
-  { return this->_fe_map->get_d2xyzdxideta(); }
+  { calculate_map = true; return this->_fe_map->get_d2xyzdxideta(); }
 
   /**
    * \returns The second partial derivatives in xi-zeta.
    */
   const std::vector<RealGradient> & get_d2xyzdxidzeta() const
-  { return this->_fe_map->get_d2xyzdxidzeta(); }
+  { calculate_map = true; return this->_fe_map->get_d2xyzdxidzeta(); }
 
   /**
    * \returns The second partial derivatives in eta-zeta.
    */
   const std::vector<RealGradient> & get_d2xyzdetadzeta() const
-  { return this->_fe_map->get_d2xyzdetadzeta(); }
+  { calculate_map = true; return this->_fe_map->get_d2xyzdetadzeta(); }
 
 #endif
 
@@ -310,82 +310,82 @@ public:
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dxidx() const
-  { return this->_fe_map->get_dxidx(); }
+  { calculate_map = true; return this->_fe_map->get_dxidx(); }
 
   /**
    * \returns The dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dxidy() const
-  { return this->_fe_map->get_dxidy(); }
+  { calculate_map = true; return this->_fe_map->get_dxidy(); }
 
   /**
    * \returns The dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dxidz() const
-  { return this->_fe_map->get_dxidz(); }
+  { calculate_map = true; return this->_fe_map->get_dxidz(); }
 
   /**
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_detadx() const
-  { return this->_fe_map->get_detadx(); }
+  { calculate_map = true; return this->_fe_map->get_detadx(); }
 
   /**
    * \returns The deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_detady() const
-  { return this->_fe_map->get_detady(); }
+  { calculate_map = true; return this->_fe_map->get_detady(); }
 
   /**
    * \returns The deta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_detadz() const
-  { return this->_fe_map->get_detadz(); }
+  { calculate_map = true; return this->_fe_map->get_detadz(); }
 
   /**
    * \returns The dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dzetadx() const
-  { return this->_fe_map->get_dzetadx(); }
+  { calculate_map = true; return this->_fe_map->get_dzetadx(); }
 
   /**
    * \returns The dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dzetady() const
-  { return this->_fe_map->get_dzetady(); }
+  { calculate_map = true; return this->_fe_map->get_dzetady(); }
 
   /**
    * \returns The dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dzetadz() const
-  { return this->_fe_map->get_dzetadz(); }
+  { calculate_map = true; return this->_fe_map->get_dzetadz(); }
 
   /**
    * \returns The tangent vectors for face integration.
    */
   const std::vector<std::vector<Point>> & get_tangents() const
-  { return this->_fe_map->get_tangents(); }
+  { calculate_map = true; return this->_fe_map->get_tangents(); }
 
   /**
    * \returns The outward pointing normal vectors for face integration.
    */
   const std::vector<Point> & get_normals() const
-  { return this->_fe_map->get_normals(); }
+  { calculate_map = true; return this->_fe_map->get_normals(); }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The curvatures for use in face integration.
    */
   const std::vector<Real> & get_curvatures() const
-  { return this->_fe_map->get_curvatures();}
+  { calculate_map = true; return this->_fe_map->get_curvatures();}
 
 #endif
 
@@ -534,6 +534,11 @@ protected:
    * Then all get_* functions should already have been called.
    */
   mutable bool calculations_started;
+
+  /**
+   * Are we calculating mapping functions?
+   */
+  mutable bool calculate_map;
 
   /**
    * Should we calculate shape functions?

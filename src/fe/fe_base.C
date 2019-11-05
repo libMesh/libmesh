@@ -756,8 +756,9 @@ void FEGenericBase<OutputType>::determine_calculations()
   // If the user forgot to request anything, we'll be safe and
   // calculate everything:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi
-      && !this->calculate_curl_phi && !this->calculate_div_phi)
+  if (!this->calculate_phi && !this->calculate_dphi &&
+      !this->calculate_d2phi && !this->calculate_curl_phi &&
+      !this->calculate_div_phi && !this->calculate_map)
     {
       this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
       if (FEInterface::field_type(fe_type.family) == TYPE_VECTOR)
@@ -767,7 +768,9 @@ void FEGenericBase<OutputType>::determine_calculations()
         }
     }
 #else
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_curl_phi && !this->calculate_div_phi)
+  if (!this->calculate_phi && !this->calculate_dphi &&
+      !this->calculate_curl_phi && !this->calculate_div_phi &&
+      !this->calculate_map)
     {
       this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
       if (FEInterface::field_type(fe_type.family) == TYPE_VECTOR)
