@@ -21,10 +21,13 @@
 #define LIBMESH_PARALLEL_OBJECT_H
 
 
-// Local includes
+// libMesh includes
 #include "libmesh/libmesh_common.h" // libmesh_dbg_var
-#include "libmesh/communicator.h"
 #include "libmesh/parallel_only.h"
+
+// PassMess includes
+#include "passmess/communicator.h"
+
 
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once

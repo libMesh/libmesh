@@ -19,7 +19,7 @@
 // Local includes
 #include "libmesh/libmesh.h"
 
-#include "libmesh/communicator.h"
+// libMesh includes
 #include "libmesh/getpot.h"
 #include "libmesh/reference_counter.h"
 #include "libmesh/libmesh_singleton.h"
@@ -28,6 +28,9 @@
 #include "libmesh/print_trace.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/perf_log.h"
+
+// PassMess includes
+#include "passmess/communicator.h"
 
 // C/C++ includes
 #include <iostream>

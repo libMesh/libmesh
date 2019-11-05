@@ -1,6 +1,10 @@
-#include <libmesh/parallel_sync.h>
+
+// libMesh includes
 #include <libmesh/int_range.h>
 #include <libmesh/simple_range.h>
+
+// Using a *shim* here to test backwards compatibility
+#include <libmesh/parallel_sync.h>
 
 #include <algorithm>
 

@@ -19,33 +19,33 @@
 #ifndef LIBMESH_PARALLEL_H
 #define LIBMESH_PARALLEL_H
 
-// Parallel includes
-#include "libmesh/attributes.h"
-#include "libmesh/communicator.h"
-#include "libmesh/data_type.h"
-#include "libmesh/libmesh_call_mpi.h"
-#include "libmesh/message_tag.h"
-#include "libmesh/op_function.h"
-#include "libmesh/packing.h"
-#include "libmesh/parallel_only.h"
-#include "libmesh/passmess_call_mpi.h"
-#include "libmesh/post_wait_copy_buffer.h"
-#include "libmesh/post_wait_delete_buffer.h"
-#include "libmesh/post_wait_dereference_shared_ptr.h"
-#include "libmesh/post_wait_dereference_tag.h"
-#include "libmesh/post_wait_free_buffer.h"
-#include "libmesh/post_wait_unpack_buffer.h"
-#include "libmesh/post_wait_work.h"
-#include "libmesh/request.h"
-#include "libmesh/status.h"
-#include "libmesh/standard_type.h"
-
 // libMesh Includes
+#include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/parallel_only.h"
+
+// PassMess includes
+#include "passmess/attributes.h"
+#include "passmess/communicator.h"
+#include "passmess/data_type.h"
+#include "passmess/message_tag.h"
+#include "passmess/op_function.h"
+#include "passmess/packing.h"
+#include "passmess/passmess_call_mpi.h"
+#include "passmess/post_wait_copy_buffer.h"
+#include "passmess/post_wait_delete_buffer.h"
+#include "passmess/post_wait_dereference_shared_ptr.h"
+#include "passmess/post_wait_dereference_tag.h"
+#include "passmess/post_wait_free_buffer.h"
+#include "passmess/post_wait_unpack_buffer.h"
+#include "passmess/post_wait_work.h"
+#include "passmess/request.h"
+#include "passmess/status.h"
+#include "passmess/standard_type.h"
 
 // Define all the implementations separately; users might want to look
 // through this file for APIs, and it's long enough already.
 
-#include "libmesh/parallel_implementation.h"
+#include "passmess/parallel_implementation.h"
 
 #endif // LIBMESH_PARALLEL_H

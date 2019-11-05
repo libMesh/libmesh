@@ -20,13 +20,15 @@
 #ifndef LIBMESH_PARALLEL_GHOST_SYNC_H
 #define LIBMESH_PARALLEL_GHOST_SYNC_H
 
-// Local Includes
-#include "libmesh/communicator.h"
+// libMesh includes
 #include "libmesh/elem.h"
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel_algebra.h"
-#include "libmesh/parallel_sync.h"
+
+// PassMess includes
+#include "passmess/communicator.h"
+#include "passmess/parallel_sync.h"
 
 
 namespace libMesh

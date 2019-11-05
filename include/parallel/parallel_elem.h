@@ -19,11 +19,13 @@
 #ifndef LIBMESH_PARALLEL_ELEM_H
 #define LIBMESH_PARALLEL_ELEM_H
 
-// Local Includes
+// libMesh includes
+#include "libmesh/id_types.h"
 #include "libmesh/libmesh_config.h"
 
-#include "libmesh/id_types.h"
-#include "libmesh/packing.h"
+// PassMess includes
+#include "passmess/packing.h"
+
 
 namespace libMesh
 {

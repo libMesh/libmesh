@@ -17,21 +17,25 @@
 
 
 
+// Local includes
+#include "libmesh/distributed_vector.h"
+
+// libMesh includes
+#include "libmesh/dense_vector.h"
+#include "libmesh/dense_subvector.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/tensor_tools.h"
+
+// PassMess includes
+#include "passmess/parallel_implementation.h"
+#include "passmess/parallel_sync.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath> // for std::abs
 #include <limits> // std::numeric_limits<T>::min()
 
-// Local Includes
-#include "libmesh/distributed_vector.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/dense_subvector.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_sync.h"
-#include "libmesh/tensor_tools.h"
-#include "libmesh/int_range.h"
 
 namespace libMesh
 {

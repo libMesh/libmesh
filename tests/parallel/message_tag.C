@@ -1,3 +1,6 @@
+
+// libMesh includes
+// Using *shims* here to test backwards compatibility via those
 #include <libmesh/communicator.h>
 #include <libmesh/message_tag.h>
 

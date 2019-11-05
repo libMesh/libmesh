@@ -17,23 +17,30 @@
 
 
 
-// Local Includes
+// Local includes
+#include "libmesh/mesh_communication.h"
+
+// libMesh includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
-#include "libmesh/mesh_communication.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_hilbert.h"
 #include "libmesh/parallel_sort.h"
-#include "libmesh/parallel_sync.h"
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
 #include "libmesh/node_range.h"
+
+// PassMess includes
+#include "passmess/parallel_implementation.h"
+#include "passmess/parallel_sync.h"
+
+// C/C++ includes
 #ifdef LIBMESH_HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
+
 
 #ifdef LIBMESH_HAVE_LIBHILBERT
 namespace { // anonymous namespace for helper functions

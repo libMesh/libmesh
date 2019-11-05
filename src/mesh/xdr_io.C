@@ -17,6 +17,25 @@
 
 
 
+// Local includes
+#include "libmesh/xdr_io.h"
+
+// libMesh includes
+#include "libmesh/boundary_info.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/node.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/xdr_cxx.h"
+
+// PassMess includes
+#include "passmess/parallel_implementation.h"
+#include "passmess/parallel_sync.h"
+
 // C++ includes
 #include <iostream>
 #include <iomanip>
@@ -24,20 +43,6 @@
 #include <vector>
 #include <string>
 
-// Local includes
-#include "libmesh/xdr_io.h"
-#include "libmesh/xdr_cxx.h"
-#include "libmesh/enum_xdr_mode.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/node.h"
-#include "libmesh/elem.h"
-#include "libmesh/boundary_info.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_sync.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/int_range.h"
 
 namespace libMesh
 {

@@ -24,10 +24,12 @@
 
 #if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
 
-// Local includes
+// libMesh includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
-#include "libmesh/communicator.h"
+
+// PassMess includes
+#include "passmess/communicator.h"
 
 // C++ includes
 #include <vector>

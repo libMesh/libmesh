@@ -16,18 +16,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// System Includes
+// Local includes
+#include "libmesh/parallel_sort.h"
+
+// libMesh includes
+#include "libmesh/libmesh_common.h"
+#include "libmesh/parallel_bin_sorter.h"
+#include "libmesh/parallel_hilbert.h"
+
+// PassMess includes
+#include "passmess/parallel_implementation.h"
+#include "passmess/parallel_sync.h"
+
+// C++ includes
 #include <algorithm>
 #include <iostream>
 
-// Local Includes
-#include "libmesh/parallel_sort.h"
-
-#include "libmesh/libmesh_common.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_bin_sorter.h"
-#include "libmesh/parallel_hilbert.h"
-#include "libmesh/parallel_sync.h"
 
 namespace libMesh
 {

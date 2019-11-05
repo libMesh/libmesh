@@ -18,14 +18,19 @@
 
 
 // Local includes
-#include "libmesh/boundary_info.h"
 #include "libmesh/distributed_mesh.h"
+
+// libMesh includes
+#include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_sync.h"
 #include "libmesh/parmetis_partitioner.h"
+
+// PassMess includes
+#include "passmess/parallel_implementation.h"
+#include "passmess/parallel_sync.h"
+
 
 namespace libMesh
 {

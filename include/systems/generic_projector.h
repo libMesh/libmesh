@@ -23,7 +23,7 @@
 // C++ includes
 #include <vector>
 
-// Local includes
+// libMesh includes
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/dof_map.h"
@@ -33,10 +33,13 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/parallel_sync.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/threads.h"
+
+// PassMess includes
+#include "passmess/parallel_sync.h"
+
 
 namespace libMesh
 {

@@ -27,15 +27,16 @@
 
 #if defined(LIBMESH_HAVE_LIBHILBERT)
 
-// Local includes
+// PassMess includes
+#include "passmess/standard_type.h"
+
+// C/C++ includes
+
 // So many implicit-fallthrough warnings in crazy libHilbert macros...
 #include "libmesh/ignore_warnings.h"
 #include "hilbert.h"
 #include "libmesh/restore_warnings.h"
 
-#include "libmesh/standard_type.h"
-
-// C++ includes
 #include <cstddef>
 
 namespace PassMess {
