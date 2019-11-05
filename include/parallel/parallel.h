@@ -20,6 +20,7 @@
 #define LIBMESH_PARALLEL_H
 
 // libMesh Includes
+#include "libmesh/auto_ptr.h" // for backwards compatibility, not internal use
 #include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel_only.h"
