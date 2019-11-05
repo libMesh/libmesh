@@ -301,9 +301,6 @@ BUILT_SOURCES = \
         packing.h \
         parallel_implementation.h \
         parallel_sync.h \
-        passmess.h \
-        passmess_assert.h \
-        passmess_call_mpi.h \
         post_wait_copy_buffer.h \
         post_wait_delete_buffer.h \
         post_wait_dereference_shared_ptr.h \
@@ -1431,15 +1428,6 @@ parallel_implementation.h: $(top_srcdir)/include/passmess/parallel_implementatio
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sync.h: $(top_srcdir)/include/passmess/parallel_sync.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-passmess.h: $(top_srcdir)/include/passmess/passmess.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-passmess_assert.h: $(top_srcdir)/include/passmess/passmess_assert.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-passmess_call_mpi.h: $(top_srcdir)/include/passmess/passmess_call_mpi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_copy_buffer.h: $(top_srcdir)/include/passmess/post_wait_copy_buffer.h
