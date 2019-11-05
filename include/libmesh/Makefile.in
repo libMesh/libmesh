@@ -586,14 +586,14 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	parmetis_helper.h parmetis_partitioner.h partitioner.h \
 	sfc_partitioner.h subdomain_partitioner.h attributes.h \
 	communicator.h data_type.h message_tag.h op_function.h \
-	packing.h parallel_implementation.h parallel_sync.h passmess.h \
-	passmess_assert.h passmess_call_mpi.h post_wait_copy_buffer.h \
-	post_wait_delete_buffer.h post_wait_dereference_shared_ptr.h \
-	post_wait_dereference_tag.h post_wait_free_buffer.h \
-	post_wait_unpack_buffer.h post_wait_work.h request.h \
-	standard_type.h status.h diff_physics.h diff_qoi.h \
-	fem_physics.h quadrature.h quadrature_clough.h \
-	quadrature_composite.h quadrature_conical.h quadrature_gauss.h \
+	packing.h parallel_implementation.h parallel_sync.h \
+	post_wait_copy_buffer.h post_wait_delete_buffer.h \
+	post_wait_dereference_shared_ptr.h post_wait_dereference_tag.h \
+	post_wait_free_buffer.h post_wait_unpack_buffer.h \
+	post_wait_work.h request.h standard_type.h status.h \
+	diff_physics.h diff_qoi.h fem_physics.h quadrature.h \
+	quadrature_clough.h quadrature_composite.h \
+	quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
 	quadrature_jacobi.h quadrature_monomial.h quadrature_nodal.h \
 	quadrature_simpson.h quadrature_trap.h rb_assembly_expansion.h \
@@ -1771,15 +1771,6 @@ parallel_implementation.h: $(top_srcdir)/include/passmess/parallel_implementatio
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sync.h: $(top_srcdir)/include/passmess/parallel_sync.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-passmess.h: $(top_srcdir)/include/passmess/passmess.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-passmess_assert.h: $(top_srcdir)/include/passmess/passmess_assert.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-passmess_call_mpi.h: $(top_srcdir)/include/passmess/passmess_call_mpi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_copy_buffer.h: $(top_srcdir)/include/passmess/post_wait_copy_buffer.h

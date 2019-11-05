@@ -885,9 +885,6 @@ include_HEADERS = \
         passmess/parallel_communicator_specializations \
         passmess/parallel_implementation.h \
         passmess/parallel_sync.h \
-        passmess/passmess.h \
-        passmess/passmess_assert.h \
-        passmess/passmess_call_mpi.h \
         passmess/post_wait_copy_buffer.h \
         passmess/post_wait_delete_buffer.h \
         passmess/post_wait_dereference_shared_ptr.h \
