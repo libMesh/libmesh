@@ -222,6 +222,11 @@ public:
     return _target;
   }
 
+  /**
+   * Returns the position of the character in the current stream.
+   */
+  std::streampos tellp() { return _target->tellp(); }
+
 private:
   /**
    * The pointer to the "real" ostream we send everything to.
