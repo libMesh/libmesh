@@ -29,13 +29,13 @@
 #include <cstddef>
 #include <vector>
 
-// Forward declarations
-class DifferentiablePhysics;
-
 #ifdef LIBMESH_ENABLE_AMR
 
 namespace libMesh
 {
+
+// Forward declarations
+class DifferentiablePhysics;
 
 /**
  * This class implements a "brute force" goal-oriented error
