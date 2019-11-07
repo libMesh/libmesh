@@ -1,7 +1,7 @@
 // Basic include files
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
-#include "libmesh/mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/parallel.h" // set_union
 #include "libmesh/string_to_enum.h"
@@ -30,7 +30,7 @@ public:
 
   void testWrite()
   {
-    Mesh mesh(*TestCommWorld);
+    ReplicatedMesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_cube (mesh,
                                        5, 5, 5,
@@ -79,7 +79,7 @@ public:
     TestCommWorld->barrier();
 
     // Now read it back in
-    Mesh read_mesh(*TestCommWorld);
+    ReplicatedMesh read_mesh(*TestCommWorld);
     ExodusII_IO reader(read_mesh);
     reader.read("write_edgeset_data.e");
 
