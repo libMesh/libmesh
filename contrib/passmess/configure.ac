@@ -64,7 +64,19 @@ dnl---------------------------------------------------------
 dnl Checks for library prerequisites for other libraries...
 dnl---------------------------------------------------------
 
-ACX_MPI
+dnl------------------------------------------------------
+dnl If the user didn't --disable-mpi, try hard to find it
+dnl------------------------------------------------------
+AS_IF([test "x$enablempi" = xyes],
+      [
+        ACX_MPI
+        AS_IF([test "x$enablempi" = xno],
+              [
+dnl Double-check for MPI via PETSc; libMesh users are accustomed to
+dnl being able to autodetect MPI support this way.
+                CONFIGURE_PETSC_MPI
+              ])
+      ])
 
 dnl---------------------------------------------------------
 dnl Sets library options
