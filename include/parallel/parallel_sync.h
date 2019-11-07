@@ -351,20 +351,6 @@ void push_parallel_packed_range(const Communicator & comm,
   // This function implements the "NBX" algorithm from
   // https://htor.inf.ethz.ch/publications/img/hoefler-dsde-protocols.pdf
 
-  // This function only works for "flat" data that we can pre-size
-  // receive buffers for: a map to vectors-of-standard-types, not e.g.
-  // vectors-of-vectors.
-  //
-  // Trying to instantiate a StandardType<T> gives us a compiler error
-  // where otherwise we would have had a runtime error.
-  //
-  // Creating a StandardType<T> manually also saves our APIs from
-  // having to do a bunch of automatic creations later.
-  //
-  // This object will be free'd before all non-blocking communications
-  // complete, but the MPI standard for MPI_Type_free specifies "Any
-  // communication that is currently using this datatype will
-  // complete normally." so we're cool.
   typedef decltype(data.begin()->second.front()) ref_type;
   typedef typename std::remove_reference<ref_type>::type nonref_type;
   typedef typename std::remove_const<nonref_type>::type nonconst_nonref_type;

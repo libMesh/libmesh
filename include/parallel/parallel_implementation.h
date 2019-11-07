@@ -1168,10 +1168,6 @@ inline void Communicator::nonblocking_receive_packed_range (const unsigned int s
   // Make the Request::wait() then handle deleting the buffer
   req.add_post_wait_work
     (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t>>(buffer));
-
-  // The MessageTag should stay registered for the Request lifetime
-  req.add_post_wait_work
-    (new Parallel::PostWaitDereferenceTag(tag));
 }
 
 
@@ -3315,20 +3311,14 @@ inline bool Communicator::possibly_receive_packed_range (unsigned int & src_proc
 {
   LOG_SCOPE("possibly_receive_packed_range()", "Parallel");
 
-  Status stat((StandardType<typename Packing<T>::buffer_type>()));
+  bool int_flag = 0;
 
-  int int_flag = 0;
-
-  libmesh_assert(src_processor_id < this->size() ||
-                 src_processor_id == any_source);
-
-  libmesh_call_mpi(MPI_Iprobe(src_processor_id,
-                              tag.value(),
-                              this->get(),
-                              &int_flag,
-                              stat.get()));
+  auto stat = packed_range_probe<T>(src_processor_id, tag, int_flag);
 
   if (int_flag)
+  {
+    src_processor_id = stat.source();
+
     nonblocking_receive_packed_range(src_processor_id,
                                      context,
                                      out,
@@ -3336,6 +3326,15 @@ inline bool Communicator::possibly_receive_packed_range (unsigned int & src_proc
                                      req,
                                      stat,
                                      tag);
+
+     // The MessageTag should stay registered for the Request lifetime
+     req.add_post_wait_work
+       (new Parallel::PostWaitDereferenceTag(tag));
+  }
+
+  libmesh_assert(!int_flag || (int_flag &&
+                               src_processor_id < this->size() &&
+                               src_processor_id != any_source));
 
   return int_flag;
 }
