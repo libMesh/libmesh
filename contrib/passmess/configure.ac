@@ -67,6 +67,9 @@ dnl---------------------------------------------------------
 dnl------------------------------------------------------
 dnl If the user didn't --disable-mpi, try hard to find it
 dnl------------------------------------------------------
+passmess_optional_INCLUDES=""
+passmess_optional_LIBS=""
+
 AS_IF([test "x$enablempi" = xyes],
       [
         ACX_MPI
@@ -75,8 +78,21 @@ AS_IF([test "x$enablempi" = xyes],
 dnl Double-check for MPI via PETSc; libMesh users are accustomed to
 dnl being able to autodetect MPI support this way.
                 CONFIGURE_PETSC_MPI
+
+                AS_IF([test $enablepetsc != no],
+                      [
+                        passmess_optional_INCLUDES="$PETSCINCLUDEDIRS $passmess_optional_INCLUDES"
+                        passmess_optional_LIBS="$PETSCLINKLIBS $passmess_optional_LIBS"
+                      ])
+              ],
+              [
+                passmess_optional_INCLUDES="-I$MPI_INCLUDES_PATH $passmess_optional_INCLUDES"
+                passmess_optional_LIBS="-L$MPI_LIBS_PATH $LIBS $passmess_optional_LIBS"
               ])
       ])
+
+AC_SUBST(passmess_optional_INCLUDES)
+AC_SUBST(passmess_optional_LIBS)
 
 dnl---------------------------------------------------------
 dnl Sets library options

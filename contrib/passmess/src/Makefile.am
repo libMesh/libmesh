@@ -116,8 +116,10 @@ passmess_version_dbg_LDADD = libpassmess_dbg.la
 #--------------------------------------
 #Local Directories to include for build
 #--------------------------------------
-AM_CPPFLAGS  =
+AM_CPPFLAGS  = $(passmess_optional_INCLUDES)
 AM_CPPFLAGS += -I$(top_srcdir)/src/algorithms/include
 AM_CPPFLAGS += -I$(top_srcdir)/src/parallel/include
 AM_CPPFLAGS += -I$(top_srcdir)/src/utilities/include
 AM_CPPFLAGS += -I$(top_builddir)/src/utilities/include #passmess_version.h
+
+LIBS         = $(passmess_optional_LIBS)
