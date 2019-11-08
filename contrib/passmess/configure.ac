@@ -52,19 +52,19 @@ dnl------------------------------
 
 PASSMESS_SET_COMPILERS
 
-dnl -Wall warnings, -Wall the time.
-AX_CXXFLAGS_WARN_ALL
-
 # --------------------------------------------------------------
 # Standard autoconf macro for determining the proper -std=c++11
 # flag for the current compiler.  Adds the result to CXXFLAGS if
 # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
 # --------------------------------------------------------------
+enablecxx11=yes
 AX_CXX_COMPILE_STDCXX_11([],[mandatory])
 
 #-----------------------------------------------------
 # Set compiler flags for devel, opt, etc. methods
 #-----------------------------------------------------
+PASSMESS_SET_CXX_FLAGS
+
 SET_BUILD_METHODS
 
 dnl---------------------------------------------------------
