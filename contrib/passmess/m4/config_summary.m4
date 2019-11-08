@@ -16,35 +16,51 @@
 AC_DEFUN([AX_SUMMARIZE_CONFIG],
 [
 
-echo
-echo '----------------------------------- SUMMARY -----------------------------------'
-echo
-echo Package version............... : $PACKAGE-$VERSION
-echo
-echo C++ compiler.................. : $CXX
-echo C++ compiler flags............ : $CXXFLAGS
-echo Install dir................... : $prefix 
-echo Build user.................... : $USER
-echo Build host.................... : $BUILD_HOST
-echo Configure date................ : $BUILD_DATE
-echo Build architecture............ : $BUILD_ARCH
-echo Git revision number........... : $BUILD_VERSION
-echo
-echo '-------------------------------------------------------------------------------'
+AS_ECHO([])
+AS_ECHO(["----------------------------------- SUMMARY -----------------------------------"])
+AS_ECHO([])
+AS_ECHO(["Package version............... : $PACKAGE-$VERSION"])
+AS_ECHO([])
+AS_ECHO(["C++ compiler.................. : $CXX"])
+AS_ECHO(["Build Methods...................... : $METHODS"])
+for method in ${METHODS}; do
+     AS_CASE("${method}",
+             [opt],   [AS_ECHO(["CPPFLAGS...(opt)................... : $CPPFLAGS_OPT $CPPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(opt)................... : $CXXFLAGS_OPT $CXXFLAGS"])],
+             [devel], [AS_ECHO(["CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL $CPPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(devel)................. : $CXXFLAGS_DEVEL $CXXFLAGS"])],
+             [dbg],   [AS_ECHO(["CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG $CPPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(dbg)................... : $CXXFLAGS_DBG $CXXFLAGS"])],
+             [prof],  [AS_ECHO(["CPPFLAGS...(prof).................. : $CPPFLAGS_PROF $CPPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(prof).................. : $CXXFLAGS_PROF $CXXFLAGS"])],
+             [oprof], [AS_ECHO(["CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF $CPPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(oprof)................. : $CXXFLAGS_OPROF $CXXFLAGS"])])
+     AS_ECHO([])
+done
 
-echo Optional Packages for Testing:
-if test "x$enablempi" = "xyes"; then
-  echo '  'MPI......................... : yes
-  echo '  'MPI_INCLUDES_PATH........... : $MPI_INCLUDES_PATH
-  echo '  'MPI_LIBS_PATH............... : $MPI_LIBS_PATH
-  echo '  'MPI_LIBS.................... : $MPI_LIBS
-else
-  echo '  'MPI......................... : no
-fi
+AS_ECHO(["Install dir................... : $prefix"])
+AS_ECHO(["Build user.................... : $USER"])
+AS_ECHO(["Build host.................... : $BUILD_HOST"])
+AS_ECHO(["Configure date................ : $BUILD_DATE"])
+AS_ECHO(["Build architecture............ : $BUILD_ARCH"])
+AS_ECHO(["Git revision number........... : $BUILD_VERSION"])
+AS_ECHO([])
+AS_ECHO(["-------------------------------------------------------------------------------"])
 
+AS_ECHO([Optional Packages for Testing:])
+AS_IF([test "x$enablempi" = "xyes"],
+      [
+        AS_ECHO(["  MPI......................... : yes"])
+        AS_ECHO(["  MPI_INCLUDES_PATH........... : $MPI_INCLUDES_PATH"])
+        AS_ECHO(["  MPI_LIBS_PATH............... : $MPI_LIBS_PATH"])
+        AS_ECHO(["  MPI_LIBS.................... : $MPI_LIBS"])
+      ],
+      [
+        AS_ECHO(["  MPI......................... : no"])
+      ])
 
-echo
-echo Configure complete, now type \'make\' and then \'make install\'.
-echo
+AS_ECHO([])
+AS_ECHO(["Configure complete, now type \'make\' and then \'make install\'."])
+AS_ECHO([])
 
 ])
