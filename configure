@@ -46286,23 +46286,23 @@ $as_echo
 for method in ${METHODS}; do
      case "${method}" in #(
   opt) :
-    $as_echo "CPPFLAGS...(opt)................... : $CPPFLAGS_OPT $CPFLAGS"
+    $as_echo "CPPFLAGS...(opt)................... : $CPPFLAGS_OPT $CPPFLAGS"
                        $as_echo "CXXFLAGS...(opt)................... : $CXXFLAGS_OPT $CXXFLAGS"
                        $as_echo "CFLAGS.....(opt)................... : $CFLAGS_OPT $CFLAGS" ;; #(
   devel) :
-    $as_echo "CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL $CPFLAGS"
+    $as_echo "CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL $CPPFLAGS"
                        $as_echo "CXXFLAGS...(devel)................. : $CXXFLAGS_DEVEL $CXXFLAGS"
                        $as_echo "CFLAGS.....(devel)................. : $CFLAGS_DEVEL $CFLAGS" ;; #(
   dbg) :
-    $as_echo "CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG $CPFLAGS"
+    $as_echo "CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG $CPPFLAGS"
                        $as_echo "CXXFLAGS...(dbg)................... : $CXXFLAGS_DBG $CXXFLAGS"
                        $as_echo "CFLAGS.....(dbg)................... : $CFLAGS_DBG $CFLAGS" ;; #(
   prof) :
-    $as_echo "CPPFLAGS...(prof).................. : $CPPFLAGS_PROF $CPFLAGS"
+    $as_echo "CPPFLAGS...(prof).................. : $CPPFLAGS_PROF $CPPFLAGS"
                        $as_echo "CXXFLAGS...(prof).................. : $CXXFLAGS_PROF $CXXFLAGS"
                        $as_echo "CFLAGS.....(prof).................. : $CFLAGS_PROF $CFLAGS" ;; #(
   oprof) :
-    $as_echo "CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF $CPFLAGS"
+    $as_echo "CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF $CPPFLAGS"
                        $as_echo "CXXFLAGS...(oprof)................. : $CXXFLAGS_OPROF $CXXFLAGS"
                        $as_echo "CFLAGS.....(oprof)................. : $CFLAGS_OPROF $CFLAGS" ;; #(
   *) :
