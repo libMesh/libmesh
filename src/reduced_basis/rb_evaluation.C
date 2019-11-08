@@ -30,8 +30,8 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/utility.h"
 
-// PassMess includes
-#include "passmess/communicator.h"
+// TIMPI includes
+#include "timpi/communicator.h"
 
 // C/C++ includes
 #include <sys/types.h>

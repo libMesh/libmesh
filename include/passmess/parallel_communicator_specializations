@@ -1,2 +1,0 @@
-// Shim to subpackage header
-#include "passmess/parallel_communicator_specializations"

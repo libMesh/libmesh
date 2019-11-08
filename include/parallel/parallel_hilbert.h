@@ -27,8 +27,8 @@
 
 #if defined(LIBMESH_HAVE_LIBHILBERT)
 
-// PassMess includes
-#include "passmess/standard_type.h"
+// TIMPI includes
+#include "timpi/standard_type.h"
 
 // C/C++ includes
 
@@ -39,7 +39,7 @@
 
 #include <cstddef>
 
-namespace PassMess {
+namespace TIMPI {
 
 #ifdef LIBMESH_HAVE_MPI
 // A StandardType<> specialization to return a derived MPI datatype
@@ -58,7 +58,7 @@ public:
   StandardType(const StandardType<Hilbert::HilbertIndices> & t)
     : DataType()
   {
-    passmess_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
   }
 
   ~StandardType() { this->free(); }
@@ -66,7 +66,7 @@ public:
 
 #endif // LIBMESH_HAVE_MPI
 
-} // namespace PassMess
+} // namespace TIMPI
 
 
 namespace libMesh {

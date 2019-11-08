@@ -876,25 +876,25 @@ include_HEADERS = \
         partitioning/partitioner.h \
         partitioning/sfc_partitioner.h \
         partitioning/subdomain_partitioner.h \
-        passmess/attributes.h \
-        passmess/communicator.h \
-        passmess/data_type.h \
-        passmess/message_tag.h \
-        passmess/op_function.h \
-        passmess/packing.h \
-        passmess/parallel_communicator_specializations \
-        passmess/parallel_implementation.h \
-        passmess/parallel_sync.h \
-        passmess/post_wait_copy_buffer.h \
-        passmess/post_wait_delete_buffer.h \
-        passmess/post_wait_dereference_shared_ptr.h \
-        passmess/post_wait_dereference_tag.h \
-        passmess/post_wait_free_buffer.h \
-        passmess/post_wait_unpack_buffer.h \
-        passmess/post_wait_work.h \
-        passmess/request.h \
-        passmess/standard_type.h \
-        passmess/status.h \
+        timpi/attributes.h \
+        timpi/communicator.h \
+        timpi/data_type.h \
+        timpi/message_tag.h \
+        timpi/op_function.h \
+        timpi/packing.h \
+        timpi/parallel_communicator_specializations \
+        timpi/parallel_implementation.h \
+        timpi/parallel_sync.h \
+        timpi/post_wait_copy_buffer.h \
+        timpi/post_wait_delete_buffer.h \
+        timpi/post_wait_dereference_shared_ptr.h \
+        timpi/post_wait_dereference_tag.h \
+        timpi/post_wait_free_buffer.h \
+        timpi/post_wait_unpack_buffer.h \
+        timpi/post_wait_work.h \
+        timpi/request.h \
+        timpi/standard_type.h \
+        timpi/status.h \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \

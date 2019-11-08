@@ -25,28 +25,28 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel_only.h"
 
-// PassMess includes
-#include "passmess/attributes.h"
-#include "passmess/communicator.h"
-#include "passmess/data_type.h"
-#include "passmess/message_tag.h"
-#include "passmess/op_function.h"
-#include "passmess/packing.h"
-#include "passmess/passmess_call_mpi.h"
-#include "passmess/post_wait_copy_buffer.h"
-#include "passmess/post_wait_delete_buffer.h"
-#include "passmess/post_wait_dereference_shared_ptr.h"
-#include "passmess/post_wait_dereference_tag.h"
-#include "passmess/post_wait_free_buffer.h"
-#include "passmess/post_wait_unpack_buffer.h"
-#include "passmess/post_wait_work.h"
-#include "passmess/request.h"
-#include "passmess/status.h"
-#include "passmess/standard_type.h"
+// TIMPI includes
+#include "timpi/attributes.h"
+#include "timpi/communicator.h"
+#include "timpi/data_type.h"
+#include "timpi/message_tag.h"
+#include "timpi/op_function.h"
+#include "timpi/packing.h"
+#include "timpi/timpi_call_mpi.h"
+#include "timpi/post_wait_copy_buffer.h"
+#include "timpi/post_wait_delete_buffer.h"
+#include "timpi/post_wait_dereference_shared_ptr.h"
+#include "timpi/post_wait_dereference_tag.h"
+#include "timpi/post_wait_free_buffer.h"
+#include "timpi/post_wait_unpack_buffer.h"
+#include "timpi/post_wait_work.h"
+#include "timpi/request.h"
+#include "timpi/status.h"
+#include "timpi/standard_type.h"
 
 // Define all the implementations separately; users might want to look
 // through this file for APIs, and it's long enough already.
 
-#include "passmess/parallel_implementation.h"
+#include "timpi/parallel_implementation.h"
 
 #endif // LIBMESH_PARALLEL_H

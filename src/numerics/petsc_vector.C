@@ -33,10 +33,10 @@
 #include "libmesh/int_range.h"
 #include "libmesh/petsc_macro.h"
 
-// PassMess includes
-#include "passmess/op_function.h"
-#include "passmess/parallel_implementation.h"
-#include "passmess/standard_type.h"
+// TIMPI includes
+#include "timpi/op_function.h"
+#include "timpi/parallel_implementation.h"
+#include "timpi/standard_type.h"
 
 namespace libMesh
 {

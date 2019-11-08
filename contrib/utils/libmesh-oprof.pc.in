@@ -7,7 +7,7 @@ Name: libmesh
 Description: The libMesh Finite Element Library
 Requires: @libmesh_pkgconfig_requires@
 Version: @VERSION@
-Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_oprof -lpassmess_oprof \
+Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_oprof -ltimpi_oprof \
       @libmesh_installed_LIBS@ @libmesh_optional_LIBS@
 Libs.private: 
 Cflags: @CPPFLAGS_OPROF@ @CXXFLAGS_OPROF@ \

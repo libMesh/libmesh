@@ -29,8 +29,8 @@
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/parallel.h"
 
-// PassMess includes
-#include "passmess/communicator.h"
+// TIMPI includes
+#include "timpi/communicator.h"
 
 
 namespace libMesh

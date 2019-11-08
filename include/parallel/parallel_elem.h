@@ -23,8 +23,8 @@
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_config.h"
 
-// PassMess includes
-#include "passmess/packing.h"
+// TIMPI includes
+#include "timpi/packing.h"
 
 
 namespace libMesh

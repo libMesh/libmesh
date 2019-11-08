@@ -32,9 +32,9 @@
 #include "libmesh/elem_range.h"
 #include "libmesh/node_range.h"
 
-// PassMess includes
-#include "passmess/parallel_implementation.h"
-#include "passmess/parallel_sync.h"
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 
 // C/C++ includes
 #ifdef LIBMESH_HAVE_LIBHILBERT

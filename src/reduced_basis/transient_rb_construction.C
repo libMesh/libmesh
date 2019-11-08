@@ -37,8 +37,8 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/timestamp.h"
 
-// PassMess includes
-#include "passmess/communicator.h"
+// TIMPI includes
+#include "timpi/communicator.h"
 
 // For checking for the existence of files
 #include <sys/stat.h>

@@ -28,8 +28,8 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
 
-// PassMess includes
-#include "passmess/communicator.h"
+// TIMPI includes
+#include "timpi/communicator.h"
 
 // C++ includes
 #include <vector>

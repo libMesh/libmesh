@@ -32,8 +32,8 @@
 #include "libmesh/elem.h"
 #include "libmesh/parmetis_helper.h"
 
-// PassMess includes
-#include "passmess/communicator.h"    // also includes mpi.h
+// TIMPI includes
+#include "timpi/communicator.h"    // also includes mpi.h
 
 // Include the ParMETIS header file.
 #ifdef LIBMESH_HAVE_PARMETIS

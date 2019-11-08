@@ -32,9 +32,9 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/xdr_cxx.h"
 
-// PassMess includes
-#include "passmess/parallel_implementation.h"
-#include "passmess/parallel_sync.h"
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 
 // C++ includes
 #include <iostream>

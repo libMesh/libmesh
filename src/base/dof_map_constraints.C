@@ -50,9 +50,9 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/threads.h"
 
-// PassMess includes
-#include "passmess/parallel_implementation.h"
-#include "passmess/parallel_sync.h"
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 
 // C++ Includes
 #include <set>

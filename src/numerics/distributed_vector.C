@@ -27,9 +27,9 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/tensor_tools.h"
 
-// PassMess includes
-#include "passmess/parallel_implementation.h"
-#include "passmess/parallel_sync.h"
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC

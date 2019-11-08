@@ -29,9 +29,9 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_ghost_sync.h"
 
-// PassMess includes
-#include "passmess/parallel_implementation.h"
-#include "passmess/parallel_sync.h"
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 
 // C/C++ includes
 #ifdef LIBMESH_HAVE_PETSC

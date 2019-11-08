@@ -25,8 +25,8 @@
 #include "libmesh/libmesh_common.h" // libmesh_dbg_var
 #include "libmesh/parallel_only.h"
 
-// PassMess includes
-#include "passmess/communicator.h"
+// TIMPI includes
+#include "timpi/communicator.h"
 
 
 // Macro to identify and debug functions which should only be called in

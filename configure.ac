@@ -639,7 +639,7 @@ AS_IF([test "x$enablenested" = "xyes"],
         ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
       ])
 
-AC_CONFIG_SUBDIRS([contrib/passmess])
+AC_CONFIG_SUBDIRS([contrib/timpi])
 
 # Create output files. Also configures any subpackages
 AC_OUTPUT

@@ -660,12 +660,12 @@ namespace libMeshEnums
 using namespace libMesh;
 }
 
-// Backwards compatibility with pre-PassMess reference
-namespace PassMess {}
+// Backwards compatibility with pre-TIMPI reference
+namespace TIMPI {}
 
 namespace libMesh {
   namespace Parallel {
-    using namespace PassMess;
+    using namespace TIMPI;
   }
 }
 

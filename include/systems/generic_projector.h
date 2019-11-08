@@ -37,8 +37,8 @@
 #include "libmesh/system.h"
 #include "libmesh/threads.h"
 
-// PassMess includes
-#include "passmess/parallel_sync.h"
+// TIMPI includes
+#include "timpi/parallel_sync.h"
 
 
 namespace libMesh
