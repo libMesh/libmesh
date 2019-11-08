@@ -628,6 +628,27 @@ protected:
                                     bool apply_dof_constraints=true);
 
   /**
+   * This function is called from add_scaled_matrix_and_vector()
+   * before each element matrix and vector are assembled into their
+   * global counterparts. By default it is a no-op, but it could be
+   * used to apply any user-defined transformations immediately prior
+   * to assembly. We use DGFEMContext since it allows for both DG and
+   * continuous Galerkin formulations.
+   */
+  virtual void post_process_elem_matrix_and_vector
+  (DGFEMContext & /*context*/) {}
+
+  /**
+   * Similarly, provide an opportunity to post-process the truth
+   * solution after the solve is complete. By default this is a no-op,
+   * but it could be used to apply any required user-defined post
+   * processing to the solution vector. Note: the truth solution is
+   * stored in the "solution" member of this class, which is inherited
+   * from the parent System class several levels up.
+   */
+  virtual void post_process_truth_solution() {}
+
+  /**
    * Set current_local_solution = vec so that we can access vec
    * from FEMContext during assembly. Override in subclasses if
    * different behavior is required.
