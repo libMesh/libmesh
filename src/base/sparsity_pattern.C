@@ -65,6 +65,7 @@ Build::Build (Build & other, Threads::split) :
   coupling_functors(other.coupling_functors),
   implicit_neighbor_dofs(other.implicit_neighbor_dofs),
   need_full_sparsity_pattern(other.need_full_sparsity_pattern),
+  hashed_dof_sets(other.hashed_dof_sets),
   sparsity_pattern(),
   nonlocal_pattern(),
   n_nz(),
@@ -455,6 +456,10 @@ void Build::join (const SparsityPattern::Build & other)
           my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
         }
     }
+
+  // Combine the other thread's hashed_dof_sets with ours.
+  hashed_dof_sets.insert(other.hashed_dof_sets.begin(),
+                         other.hashed_dof_sets.end());
 }
 
 
