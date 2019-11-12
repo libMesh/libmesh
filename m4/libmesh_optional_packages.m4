@@ -570,6 +570,22 @@ AM_CONDITIONAL(LIBMESH_ENABLE_CAPNPROTO, test x$enablecapnproto = xyes)
 AC_CONFIG_FILES([contrib/capnproto/Makefile])
 # -------------------------------------------------------------
 
+# -------------------------------------------------------------
+# libcurl -- enabled by default
+# Note: I tried to use the m4 files ax_lib_curl.m4 and
+# ax_path_generic.m4 from the autoconf-archive for this, but they
+# would not work (bootstrap failed!) on either Linux or OSX.
+# -------------------------------------------------------------
+CONFIGURE_CURL
+AS_IF([test x$enablecurl = xyes],
+      [
+        libmesh_optional_INCLUDES="$CURL_INCLUDE $libmesh_optional_INCLUDES"
+        libmesh_optional_LIBS="$CURL_LIBRARY $libmesh_optional_LIBS"
+      ])
+AM_CONDITIONAL(LIBMESH_ENABLE_CURL, test x$enablecurl = xyes)
+# -------------------------------------------------------------
+
+
 
 # --------------------------------------------------------------
 # HDF5 -- enabled by default
@@ -697,21 +713,6 @@ AM_CONDITIONAL(LIBMESH_ENABLE_METAPHYSICL, test x$enablemetaphysicl = xyes)
 # -------------------------------------------------------------
 
 
-
-# -------------------------------------------------------------
-# libcurl -- enabled by default
-# Note: I tried to use the m4 files ax_lib_curl.m4 and
-# ax_path_generic.m4 from the autoconf-archive for this, but they
-# would not work (bootstrap failed!) on either Linux or OSX.
-# -------------------------------------------------------------
-CONFIGURE_CURL
-AS_IF([test x$enablecurl = xyes],
-      [
-        libmesh_optional_INCLUDES="$CURL_INCLUDE $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$CURL_LIBRARY $libmesh_optional_LIBS"
-      ])
-AM_CONDITIONAL(LIBMESH_ENABLE_CURL, test x$enablecurl = xyes)
-# -------------------------------------------------------------
 
 
 AS_IF([test "$enableoptional" != no],
