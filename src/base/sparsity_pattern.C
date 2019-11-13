@@ -26,7 +26,7 @@
 #include "libmesh/communicator.h"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/parallel.h"
-
+#include "libmesh/hashword.h"
 
 namespace libMesh
 {
@@ -65,6 +65,7 @@ Build::Build (Build & other, Threads::split) :
   coupling_functors(other.coupling_functors),
   implicit_neighbor_dofs(other.implicit_neighbor_dofs),
   need_full_sparsity_pattern(other.need_full_sparsity_pattern),
+  hashed_dof_sets(other.hashed_dof_sets),
   sparsity_pattern(),
   nonlocal_pattern(),
   n_nz(),
@@ -112,10 +113,28 @@ void Build::handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
   const unsigned int n_dofs_on_element_j =
     cast_int<unsigned int>(element_dofs_j.size());
 
+  // It only makes sense to compute hashes and see if we can skip
+  // doing work when there are a "large" amount of DOFs for a given
+  // element. The cutoff for "large" is somewhat arbitrarily chosen
+  // based on a test case with a spider node that resulted in O(10^3)
+  // entries in element_dofs_i for O(10^3) elements. Making this
+  // number larger will disable the hashing optimization in more
+  // cases.
+  bool dofs_seen = false;
+  if (n_dofs_on_element_j > 0 && n_dofs_on_element_i > 256)
+    {
+      auto hash_i = Utility::hashword(element_dofs_i);
+      auto hash_j = Utility::hashword(element_dofs_j);
+      auto final_hash = Utility::hashword2(hash_i, hash_j);
+      auto result = hashed_dof_sets.insert(final_hash);
+      // if insert failed, we have already seen these dofs
+      dofs_seen = !result.second;
+    }
+
   // there might be 0 dofs for the other variable on the same element
   // (when subdomain variables do not overlap) and that's when we do
   // not do anything
-  if (n_dofs_on_element_j > 0)
+  if (n_dofs_on_element_j > 0 && !dofs_seen)
     {
       for (unsigned int i=0; i<n_dofs_on_element_i; i++)
         {
@@ -437,6 +456,10 @@ void Build::join (const SparsityPattern::Build & other)
           my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
         }
     }
+
+  // Combine the other thread's hashed_dof_sets with ours.
+  hashed_dof_sets.insert(other.hashed_dof_sets.begin(),
+                         other.hashed_dof_sets.end());
 }
 
 
