@@ -15,28 +15,30 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// Local Includes
+// Local includes
+#include "libmesh/dof_map.h"
+
+// libMesh includes
 #include "libmesh/boundary_info.h" // needed for dirichlet constraints
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/dirichlet_boundaries.h"
-#include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/function_base.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_inserter_iterator.h"
 #include "libmesh/mesh_tools.h" // for libmesh_assert_valid_boundary_ids()
+#include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/parallel_elem.h"
 #include "libmesh/parallel_node.h"
-#include "libmesh/parallel_sync.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 #include "libmesh/periodic_boundary_base.h"
@@ -45,10 +47,12 @@
 #include "libmesh/raw_accessor.h"
 #include "libmesh/sparse_matrix.h" // needed to constrain adjoint rhs
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
-#include "libmesh/int_range.h"
+#include "libmesh/threads.h"
+
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 
 // C++ Includes
 #include <set>

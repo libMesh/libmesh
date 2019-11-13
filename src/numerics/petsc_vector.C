@@ -22,6 +22,8 @@
 
 // Local Includes
 #include "libmesh/petsc_vector.h"
+
+// libMesh includes
 #include "libmesh/petsc_matrix.h"
 
 #ifdef LIBMESH_HAVE_PETSC
@@ -29,10 +31,12 @@
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/int_range.h"
-#include "libmesh/op_function.h"
-#include "libmesh/parallel.h"
 #include "libmesh/petsc_macro.h"
-#include "libmesh/standard_type.h"
+
+// TIMPI includes
+#include "timpi/op_function.h"
+#include "timpi/parallel_implementation.h"
+#include "timpi/standard_type.h"
 
 namespace libMesh
 {

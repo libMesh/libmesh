@@ -17,16 +17,21 @@
 
 
 
-// Local Includes
+// Local includes
+#include "libmesh/sparsity_pattern.h"
+
+// libMesh includes
 #include "libmesh/coupling_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/ghosting_functor.h"
-#include "libmesh/sparsity_pattern.h"
-#include "libmesh/communicator.h"
+#include "libmesh/hashword.h"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/parallel.h"
-#include "libmesh/hashword.h"
+
+// TIMPI includes
+#include "timpi/communicator.h"
+
 
 namespace libMesh
 {

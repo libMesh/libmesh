@@ -19,8 +19,8 @@
 #ifndef LIBMESH_PARALLEL_ONLY_H
 #define LIBMESH_PARALLEL_ONLY_H
 
-// libMesh includes
-#include <libmesh/communicator.h>
+// TIMPI includes
+#include <timpi/communicator.h>
 
 // C++ includes
 #include <string>

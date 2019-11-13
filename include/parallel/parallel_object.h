@@ -21,9 +21,13 @@
 #define LIBMESH_PARALLEL_OBJECT_H
 
 
-// Local includes
-#include "libmesh/communicator.h"
+// libMesh includes
+#include "libmesh/libmesh_common.h" // libmesh_dbg_var
 #include "libmesh/parallel_only.h"
+
+// TIMPI includes
+#include "timpi/communicator.h"
+
 
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once

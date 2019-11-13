@@ -24,20 +24,28 @@
 // type of iterator you will be using.
 
 
-// Local Includes
+// libMesh includes
 #include "libmesh/libmesh_config.h"
-#include "libmesh/op_function.h"
-#include "libmesh/standard_type.h"
 #include "libmesh/point.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/vector_value.h"
+
+// TIMPI includes
+#include "timpi/op_function.h"
+#include "timpi/standard_type.h"
 
 // C++ includes
 #include <cstddef>
 #include <memory>
 
-namespace libMesh {
-namespace Parallel {
+namespace TIMPI {
+
+using libMesh::TypeVector;
+using libMesh::TypeTensor;
+using libMesh::VectorValue;
+using libMesh::TensorValue;
+using libMesh::Point;
+
 // StandardType<> specializations to return a derived MPI datatype
 // to handle communication of LIBMESH_DIM-vectors.
 //
@@ -69,38 +77,38 @@ public:
     MPI_Aint displs, start;
     MPI_Datatype tmptype, type = T_type;
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Get_address (ex, &start));
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Get_address (&((*ex)(0)), &displs));
 
     // subtract off offset to first value from the beginning of the structure
     displs -= start;
 
     // create a prototype structure
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_create_struct (1, &blocklength, &displs, &type,
                                &tmptype));
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_commit (&tmptype));
 
     // resize the structure type to account for padding, if any
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_create_resized (tmptype, 0, sizeof(TypeVector<T>),
                                 &_datatype));
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_commit (&_datatype));
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_free (&tmptype));
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
-  StandardType(const StandardType<TypeVector<T>> & libmesh_mpi_var(t))
+  StandardType(const StandardType<TypeVector<T>> & timpi_mpi_var(t))
     : DataType()
   {
-    libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
   }
 
   ~StandardType() { this->free(); }
@@ -131,40 +139,40 @@ public:
     MPI_Aint displs, start;
     MPI_Datatype tmptype, type = T_type;
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Get_address (ex, &start));
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Get_address (&((*ex)(0)), &displs));
 
     // subtract off offset to first value from the beginning of the structure
     displs -= start;
 
     // create a prototype structure
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_create_struct (1, &blocklength, &displs, &type,
                                &tmptype));
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_commit (&tmptype));
 
     // resize the structure type to account for padding, if any
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_create_resized (tmptype, 0,
                                 sizeof(VectorValue<T>),
                                 &_datatype));
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_commit (&_datatype));
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_free (&tmptype));
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
-  StandardType(const StandardType<VectorValue<T>> & libmesh_mpi_var(t))
+  StandardType(const StandardType<VectorValue<T>> & timpi_mpi_var(t))
     : DataType()
   {
 #ifdef LIBMESH_HAVE_MPI
-    libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
 #endif
   }
 
@@ -196,44 +204,44 @@ public:
         ex = temp.get();
       }
 
-    StandardType<Real> T_type(&((*ex)(0)));
+    StandardType<libMesh::Real> T_type(&((*ex)(0)));
 
     int blocklength = LIBMESH_DIM;
     MPI_Aint displs, start;
     MPI_Datatype tmptype, type = T_type;
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Get_address (ex, &start));
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Get_address (&((*ex)(0)), &displs));
 
     // subtract off offset to first value from the beginning of the structure
     displs -= start;
 
     // create a prototype structure
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_create_struct (1, &blocklength, &displs, &type,
                                &tmptype));
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_commit (&tmptype));
 
     // resize the structure type to account for padding, if any
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_create_resized (tmptype, 0, sizeof(Point),
                                 &_datatype));
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_commit (&_datatype));
 
-    libmesh_call_mpi
+    timpi_call_mpi
       (MPI_Type_free (&tmptype));
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
-  StandardType(const StandardType<Point> & libmesh_mpi_var(t))
+  StandardType(const StandardType<Point> & timpi_mpi_var(t))
     : DataType()
   {
-    libmesh_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
   }
 
   ~StandardType() { this->free(); }
@@ -291,7 +299,7 @@ public:
     static bool _is_initialized = false;
     if (!_is_initialized)
       {
-        libmesh_call_mpi
+        timpi_call_mpi
           (MPI_Op_create (vector_max, /*commute=*/ true,
                           &_static_op));
 
@@ -308,7 +316,7 @@ public:
     static bool _is_initialized = false;
     if (!_is_initialized)
       {
-        libmesh_call_mpi
+        timpi_call_mpi
           (MPI_Op_create (vector_min, /*commute=*/ true,
                           &_static_op));
 
@@ -325,7 +333,7 @@ public:
     static bool _is_initialized = false;
     if (!_is_initialized)
       {
-        libmesh_call_mpi
+        timpi_call_mpi
           (MPI_Op_create (vector_sum, /*commute=*/ true,
                           &_static_op));
 
@@ -372,7 +380,6 @@ public:
 
   inline ~StandardType() { this->free(); }
 };
-} // namespace Parallel
-} // namespace libMesh
+} // namespace TIMPI
 
 #endif // LIBMESH_PARALLEL_ALGEBRA_H

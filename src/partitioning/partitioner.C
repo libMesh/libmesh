@@ -17,18 +17,23 @@
 
 
 
-// Local Includes
-#include "libmesh/elem.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_sync.h"
+// Local includes
 #include "libmesh/partitioner.h"
+
+// libMesh includes
+#include "libmesh/elem.h"
+#include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/parallel_ghost_sync.h"
-#include "libmesh/int_range.h"
 
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
+
+// C/C++ includes
 #ifdef LIBMESH_HAVE_PETSC
 #include "libmesh/ignore_warnings.h"
 #include "petscmat.h"

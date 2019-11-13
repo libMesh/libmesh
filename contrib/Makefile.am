@@ -220,6 +220,13 @@ if LIBMESH_ENABLE_METAPHYSICL
   # header-only library for the parts we use - no library dependencies
 endif
 
+SUBDIRS += timpi
+opt_libs   += timpi/src/libtimpi_opt.la
+dbg_libs   += timpi/src/libtimpi_dbg.la
+devel_libs += timpi/src/libtimpi_devel.la
+prof_libs  += timpi/src/libtimpi_prof.la
+oprof_libs += timpi/src/libtimpi_oprof.la
+
 
 
 ######################################################################

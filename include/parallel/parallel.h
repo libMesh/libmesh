@@ -19,36 +19,34 @@
 #ifndef LIBMESH_PARALLEL_H
 #define LIBMESH_PARALLEL_H
 
-// Parallel includes
-#include "libmesh/attributes.h"
-#include "libmesh/communicator.h"
-#include "libmesh/data_type.h"
-#include "libmesh/libmesh_call_mpi.h"
-#include "libmesh/message_tag.h"
-#include "libmesh/op_function.h"
-#include "libmesh/packing.h"
-#include "libmesh/parallel_only.h"
-#include "libmesh/post_wait_copy_buffer.h"
-#include "libmesh/post_wait_delete_buffer.h"
-#include "libmesh/post_wait_dereference_shared_ptr.h"
-#include "libmesh/post_wait_dereference_tag.h"
-#include "libmesh/post_wait_free_buffer.h"
-#include "libmesh/post_wait_unpack_buffer.h"
-#include "libmesh/post_wait_work.h"
-#include "libmesh/request.h"
-#include "libmesh/status.h"
-#include "libmesh/standard_type.h"
-
 // libMesh Includes
+#include "libmesh/auto_ptr.h" // for backwards compatibility, not internal use
+#include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/parallel_only.h"
+
+// TIMPI includes
+#include "timpi/attributes.h"
+#include "timpi/communicator.h"
+#include "timpi/data_type.h"
+#include "timpi/message_tag.h"
+#include "timpi/op_function.h"
+#include "timpi/packing.h"
+#include "timpi/timpi_call_mpi.h"
+#include "timpi/post_wait_copy_buffer.h"
+#include "timpi/post_wait_delete_buffer.h"
+#include "timpi/post_wait_dereference_shared_ptr.h"
+#include "timpi/post_wait_dereference_tag.h"
+#include "timpi/post_wait_free_buffer.h"
+#include "timpi/post_wait_unpack_buffer.h"
+#include "timpi/post_wait_work.h"
+#include "timpi/request.h"
+#include "timpi/status.h"
+#include "timpi/standard_type.h"
 
 // Define all the implementations separately; users might want to look
 // through this file for APIs, and it's long enough already.
 
-#include "libmesh/parallel_implementation.h"
-
-// Define a years-deprecated old macro to support anyone still using
-// it.  Attn: anyone-still-using-it - stop!
-#define LIBMESH_CAN_DEFAULT_TO_COMMWORLD
+#include "timpi/parallel_implementation.h"
 
 #endif // LIBMESH_PARALLEL_H

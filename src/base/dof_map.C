@@ -17,31 +17,35 @@
 
 
 
-// Local Includes
+// Local includes
+#include "libmesh/dof_map.h"
+
+// libMesh includes
 #include "libmesh/coupling_matrix.h"
 #include "libmesh/default_coupling.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector_base.h"
 #include "libmesh/dirichlet_boundaries.h"
-#include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_base.h" // FEBase::build() for continuity test
 #include "libmesh/ghosting_functor.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_subdivision_support.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_sync.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
-#include "libmesh/mesh_subdivision_support.h"
-#include "libmesh/int_range.h"
-#include "libmesh/enum_to_string.h"
+
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 
 // C++ Includes
 #include <set>

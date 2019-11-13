@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <fstream>
 #include <iterator>
+#include <numeric> // iota
 
 namespace libMesh
 {

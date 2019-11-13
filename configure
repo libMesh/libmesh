@@ -1303,7 +1303,8 @@ HDF5_DIR
 YACC
 YFLAGS'
 ac_subdirs_all='contrib/netcdf/v4
-contrib/metaphysicl'
+contrib/metaphysicl
+contrib/timpi'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -32365,6 +32366,15 @@ libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
+# Use of TIMPI is required
+# --------------------------------------------------------------
+libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
+libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
+libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
+# Including timpi_config.h
+libmesh_contrib_INCLUDES="-I\$(top_builddir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
+
+# --------------------------------------------------------------
 # Allow for disable-optional
 # --------------------------------------------------------------
 # Check whether --enable-optional was given.
@@ -42518,6 +42528,9 @@ if test "x$enablenested" = "xyes"; then :
         ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
 
 fi
+
+subdirs="$subdirs contrib/timpi"
+
 
 # Create output files. Also configures any subpackages
 cat >confcache <<\_ACEOF
