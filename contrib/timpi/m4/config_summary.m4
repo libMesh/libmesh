@@ -47,7 +47,7 @@ AS_ECHO(["Git revision number........... : $BUILD_VERSION"])
 AS_ECHO([])
 AS_ECHO(["-------------------------------------------------------------------------------"])
 
-AS_ECHO([Optional Packages for Testing:])
+AS_ECHO(["Optional Packages for Testing:"])
 AS_IF([test "x$enablempi" = "xyes"],
       [
         AS_ECHO(["  MPI......................... : yes"])
