@@ -7744,6 +7744,8 @@ fi
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
 
+                 enablempi=yes
+
 fi
 
 fi
@@ -25007,7 +25009,7 @@ $as_echo "Git revision number........... : $BUILD_VERSION"
 $as_echo
 $as_echo "-------------------------------------------------------------------------------"
 
-$as_echo Optional Packages for Testing:
+$as_echo "Optional Packages for Testing:"
 if test "x$enablempi" = "xyes"; then :
 
         $as_echo "  MPI......................... : yes"
