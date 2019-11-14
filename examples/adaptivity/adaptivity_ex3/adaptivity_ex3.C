@@ -76,6 +76,8 @@
 #include "libmesh/elem.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/wrapped_function.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -242,12 +244,22 @@ int main(int argc, char ** argv)
   // Adds the variable "u" to "Laplace", using
   // the finite element type and order specified
   // in the config file
-  system.add_variable("u", static_cast<Order>(approx_order),
-                      Utility::string_to_enum<FEFamily>(approx_type));
+  unsigned int u_var =
+    system.add_variable("u", static_cast<Order>(approx_order),
+                        Utility::string_to_enum<FEFamily>(approx_type));
 
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_laplace);
+
+  // Add Dirichlet boundary conditions
+  std::set<boundary_id_type> all_bdys { 0 };
+  std::vector<unsigned int> u_only(1, u_var);
+
+  WrappedFunction<Number> exact_val(system, exact_solution);
+  WrappedFunction<Gradient> exact_grad(system, exact_derivative);
+  DirichletBoundary exact_bc(all_bdys, u_only, exact_val, exact_grad);
+  system.get_dof_map().add_dirichlet_boundary(exact_bc);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -676,7 +688,6 @@ void assemble_laplace(EquationSystems & es,
   // We begin with the element Jacobian * quadrature weight at each
   // integration point.
   const std::vector<Real> & JxW      = fe->get_JxW();
-  const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
   // These might be useful for evaluating spatially varying material
@@ -684,17 +695,11 @@ void assemble_laplace(EquationSystems & es,
   const std::vector<Point> & q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
-  // For this simple problem we usually only need them on element
-  // boundaries.
   const std::vector<std::vector<Real>> & phi = fe->get_phi();
-  const std::vector<std::vector<Real>> & psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
-
-  // The XY locations of the quadrature points used for face integration
-  const std::vector<Point> & qface_points = fe_face->get_xyz();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -781,54 +786,6 @@ void assemble_laplace(EquationSystems & es,
       // Stop logging the matrix computation
       perf_log.pop ("Ke");
 
-
-      // At this point the interior element integration has
-      // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this example we will only
-      // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method.
-      //
-      // This approach adds the L2 projection of the boundary
-      // data in penalty form to the weak statement.  This is
-      // a more generic approach for applying Dirichlet BCs
-      // which is applicable to non-Lagrange finite element
-      // discretizations.
-      {
-        // Start logging the boundary condition computation.  We use a
-        // macro to log everything in this scope.
-        LOG_SCOPE_WITH("BCs", "", perf_log);
-
-        // The penalty value.
-        const Real penalty = 1.e10;
-
-        // The following loops over the sides of the element.
-        // If the element has no neighbor on a side then that
-        // side MUST live on a boundary of the domain.
-        for (auto s : elem->side_index_range())
-          if (elem->neighbor_ptr(s) == nullptr)
-            {
-              fe_face->reinit(elem, s);
-
-              for (unsigned int qp=0; qp<qface->n_points(); qp++)
-                {
-                  const Number value = exact_solution (qface_points[qp],
-                                                       es.parameters,
-                                                       "null",
-                                                       "void");
-
-                  // RHS contribution
-                  for (unsigned int i=0; i != n_dofs; i++)
-                    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
-
-                  // Matrix contribution
-                  for (unsigned int i=0; i != n_dofs; i++)
-                    for (unsigned int j=0; j != n_dofs; j++)
-                      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
-                }
-            }
-      }
-
-
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The SparseMatrix::add_matrix()
@@ -837,7 +794,9 @@ void assemble_laplace(EquationSystems & es,
       // matrix and vector into the global matrix and vector
       LOG_SCOPE_WITH("matrix insertion", "", perf_log);
 
-      dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
+      // Use heterogenously here to handle Dirichlet as well as AMR
+      // constraints.
+      dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
