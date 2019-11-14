@@ -1,7 +1,7 @@
 libMesh-0.9.6+
 3	 # number of elements
 8	 # number of nodes
-n/a	 # boundary condition specification file
+.  	 # boundary condition specification file
 .	 # subdomain id specification file
 n/a	 # processor id specification file
 n/a	 # p-level specification file
@@ -28,6 +28,14 @@ n/a	 # p-level specification file
 0.0000000000000000e+00 -1.0000000000000000e+00 0.0000000000000000e+00
 0	 # presence of unique ids
 0	 # sideset id to name map
-0	 # number of boundary conditions
+8	 # number of boundary conditions
+0 2 0
+0 3 0
+1 0 0
+1 1 0
+1 2 0
+2 0 0
+2 1 0
+2 3 0
 0	 # nodeset id to name map
 0	 # number of nodesets
