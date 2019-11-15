@@ -69,6 +69,7 @@ class OverlappingCouplingFunctor : public GhostingFunctor
    processor_id_type p,
    std::unordered_map<const Elem *,const CouplingMatrix*> & coupled_elements) override
   {
+    std::unique_ptr<PointLocatorBase> sub_point_locator = _mesh.sub_point_locator();
 
     for( const auto & elem : as_range(range_begin,range_end) )
       {
@@ -99,7 +100,7 @@ class OverlappingCouplingFunctor : public GhostingFunctor
 
         for ( const auto & qp : qpoints )
           {
-            const Elem * overlapping_elem = (*_point_locator)( qp, &allowed_subdomains );
+            const Elem * overlapping_elem = (*sub_point_locator)( qp, &allowed_subdomains );
 
             if( overlapping_elem && overlapping_elem->processor_id() != p )
               coupled_elements.insert( std::make_pair(overlapping_elem,_coupling_matrix.get()) );
