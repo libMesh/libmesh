@@ -496,7 +496,7 @@ public:
    *
    * @param src_processor_id The pid to receive from or "any".
    * will be set to the actual src being receieved from
-   * @param buf THe buffer to receive into
+   * @param buf The buffer to receive into
    * @param type The intrinsic datatype to receive
    * @param req The request to use
    * @param tag The tag to use
@@ -508,6 +508,38 @@ public:
                          const DataType & type,
                          Request & req,
                          const MessageTag & tag) const;
+
+ /**
+  * Nonblocking packed range receive from one processor with
+  * user-defined type.
+  *
+  * Checks to see if a message can be received from the
+  * src_processor_id .  If so, it starts a nonblocking
+  * packed range receive using the passed in request and
+  * returns true
+  *
+  * Otherwise - if there is no message to receive it returns false
+  *
+  * void Parallel::unpack(const T *, OutputIter data, const Context *)
+  * is used to unserialize type T
+  *
+  * @param src_processor_id The pid to receive from or "any".
+  * will be set to the actual src being receieved from
+  * @param context Context pointer that will be passed into
+  * the unpack functions
+  * @param out The output iterator
+  * @param buf The buffer to receive into
+  * @param type The intrinsic datatype to receive
+  * @param req The request to use
+  * @param tag The tag to use
+  */
+  template <typename Context, typename OutputIter, typename T>
+  bool possibly_receive_packed_range (unsigned int & src_processor_id,
+                                      Context * context,
+                                      OutputIter out,
+                                      const T * output_type,
+                                      Request & req,
+                                      const MessageTag & tag) const;
 
   /**
    * Blocking-send range-of-pointers to one processor.  This
