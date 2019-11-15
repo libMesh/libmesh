@@ -86,9 +86,7 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
 
 MeshFunction::~MeshFunction ()
 {
-  // only delete the point locator when we are the master
-  if (this->_master == nullptr)
-    delete this->_point_locator;
+  delete this->_point_locator;
 }
 
 
@@ -107,36 +105,12 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
     }
 
   /*
-   * set up the PointLocator: either someone else
-   * is the master (go and get the address of his
-   * point locator) or this object is the master
-   * (build the point locator  on our own).
+   * set up the PointLocator: currently we always get this from the
+   * MeshBase we're associated with.
    */
-  if (this->_master != nullptr)
-    {
-      // we aren't the master
-      const MeshFunction * master =
-        cast_ptr<const MeshFunction *>(this->_master);
+  const MeshBase & mesh = this->_eqn_systems.get_mesh();
 
-      if (master->_point_locator == nullptr)
-        libmesh_error_msg("ERROR: When the master-servant concept is used, the master has to be initialized first!");
-
-      else
-        {
-          this->_point_locator = master->_point_locator;
-        }
-    }
-  else
-    {
-      // we are the master: build the point locator
-
-      // constant reference to the other mesh
-      const MeshBase & mesh = this->_eqn_systems.get_mesh();
-
-      // Get PointLocator object from the Mesh. We are responsible for
-      // deleting this only if we are the master.
-      this->_point_locator = mesh.sub_point_locator().release();
-    }
+  this->_point_locator = mesh.sub_point_locator().release();
 
   // ready for use
   this->_initialized = true;
