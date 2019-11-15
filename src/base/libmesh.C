@@ -922,8 +922,8 @@ T command_line_value (const std::string & name, T value)
   libmesh_assert(command_line.get());
 
   // only if the variable exists in the file
-  if (command_line->have_variable(name.c_str()))
-    value = (*command_line)(name.c_str(), value);
+  if (command_line->have_variable(name))
+    value = (*command_line)(name, value);
 
   return value;
 }
@@ -936,9 +936,9 @@ T command_line_value (const std::vector<std::string> & name, T value)
 
   // Check for multiple options (return the first that matches)
   for (const auto & entry : name)
-    if (command_line->have_variable(entry.c_str()))
+    if (command_line->have_variable(entry))
       {
-        value = (*command_line)(entry.c_str(), value);
+        value = (*command_line)(entry, value);
         break;
       }
 
@@ -967,13 +967,13 @@ void command_line_vector (const std::string & name, std::vector<T> & vec)
   libmesh_assert(command_line.get());
 
   // only if the variable exists on the command line
-  if (command_line->have_variable(name.c_str()))
+  if (command_line->have_variable(name))
     {
-      unsigned size = command_line->vector_variable_size(name.c_str());
+      unsigned size = command_line->vector_variable_size(name);
       vec.resize(size);
 
       for (unsigned i=0; i<size; ++i)
-        vec[i] = (*command_line)(name.c_str(), vec[i], i);
+        vec[i] = (*command_line)(name, vec[i], i);
     }
 }
 
