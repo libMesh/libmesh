@@ -1634,6 +1634,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
   merge_multimaps(edges, other.edges);
   merge_multimaps(sides, other.sides);
 
+  std::sort(interiors.begin(), interiors.end());
+  std::vector<const Elem *> other_interiors = other.interiors;
+  std::sort(other_interiors.begin(), other_interiors.end());
+  std::vector<const Elem *> merged_interiors;
+  std::set_union(interiors.begin(), interiors.end(),
+                 other_interiors.begin(), other_interiors.end(),
+                 std::back_inserter(merged_interiors));
+  interiors.swap(merged_interiors);
+
   SubFunctor::join(other);
 }
 
