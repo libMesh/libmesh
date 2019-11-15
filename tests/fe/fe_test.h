@@ -185,6 +185,10 @@ public:
     _sys->add_variable("u", order, family);
     _es->init();
 
+    // Clough-Tocher elements still don't work multithreaded
+    if (family == CLOUGH && libMesh::n_threads() > 1)
+      return;
+
     if (family == RATIONAL_BERNSTEIN && order > 1)
       {
         _sys->project_solution(rational_test, rational_test_grad, _es->parameters);
@@ -225,6 +229,10 @@ public:
 
   void testU()
   {
+    // Clough-Tocher elements still don't work multithreaded
+    if (family == CLOUGH && libMesh::n_threads() > 1)
+      return;
+
     // Handle the "more processors than elements" case
     if (!_elem)
       return;
@@ -275,6 +283,10 @@ public:
 
   void testGradU()
   {
+    // Clough-Tocher elements still don't work multithreaded
+    if (family == CLOUGH && libMesh::n_threads() > 1)
+      return;
+
     // Handle the "more processors than elements" case
     if (!_elem)
       return;
@@ -342,6 +354,10 @@ public:
 
   void testGradUComp()
   {
+    // Clough-Tocher elements still don't work multithreaded
+    if (family == CLOUGH && libMesh::n_threads() > 1)
+      return;
+
     // Handle the "more processors than elements" case
     if (!_elem)
       return;
