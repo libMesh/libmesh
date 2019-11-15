@@ -359,7 +359,17 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     n_threads[0] = "--n_threads";
     n_threads[1] = "--n-threads";
     libMesh::libMeshPrivateData::_n_threads =
-      libMesh::command_line_value (n_threads, 1);
+      libMesh::command_line_value (n_threads, -1);
+
+    if (libMesh::libMeshPrivateData::_n_threads == -1)
+      {
+        for (auto & option : n_threads)
+          if (command_line->search(option))
+            libmesh_error_msg("Detected option " << option <<
+                              " with no value.  Did you forget '='?");
+
+        libMesh::libMeshPrivateData::_n_threads = 1;
+      }
 
     // If there's no threading model active, force _n_threads==1
 #if !LIBMESH_USING_THREADS
