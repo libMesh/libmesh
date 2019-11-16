@@ -359,7 +359,17 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     n_threads[0] = "--n_threads";
     n_threads[1] = "--n-threads";
     libMesh::libMeshPrivateData::_n_threads =
-      libMesh::command_line_value (n_threads, 1);
+      libMesh::command_line_value (n_threads, -1);
+
+    if (libMesh::libMeshPrivateData::_n_threads == -1)
+      {
+        for (auto & option : n_threads)
+          if (command_line->search(option))
+            libmesh_error_msg("Detected option " << option <<
+                              " with no value.  Did you forget '='?");
+
+        libMesh::libMeshPrivateData::_n_threads = 1;
+      }
 
     // If there's no threading model active, force _n_threads==1
 #if !LIBMESH_USING_THREADS
@@ -922,8 +932,8 @@ T command_line_value (const std::string & name, T value)
   libmesh_assert(command_line.get());
 
   // only if the variable exists in the file
-  if (command_line->have_variable(name.c_str()))
-    value = (*command_line)(name.c_str(), value);
+  if (command_line->have_variable(name))
+    value = (*command_line)(name, value);
 
   return value;
 }
@@ -936,9 +946,9 @@ T command_line_value (const std::vector<std::string> & name, T value)
 
   // Check for multiple options (return the first that matches)
   for (const auto & entry : name)
-    if (command_line->have_variable(entry.c_str()))
+    if (command_line->have_variable(entry))
       {
-        value = (*command_line)(entry.c_str(), value);
+        value = (*command_line)(entry, value);
         break;
       }
 
@@ -967,13 +977,13 @@ void command_line_vector (const std::string & name, std::vector<T> & vec)
   libmesh_assert(command_line.get());
 
   // only if the variable exists on the command line
-  if (command_line->have_variable(name.c_str()))
+  if (command_line->have_variable(name))
     {
-      unsigned size = command_line->vector_variable_size(name.c_str());
+      unsigned size = command_line->vector_variable_size(name);
       vec.resize(size);
 
       for (unsigned i=0; i<size; ++i)
-        vec[i] = (*command_line)(name.c_str(), vec[i], i);
+        vec[i] = (*command_line)(name, vec[i], i);
     }
 }
 
