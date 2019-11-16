@@ -55,5 +55,9 @@ void LaplaceSystem::side_postprocess(DiffContext & context)
 
     } // end of the quadrature point qp-loop
 
-  computed_QoI[1] = computed_QoI[1] + dQoI_1;
+  {
+    // Keep this thread-safe.
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    computed_QoI[1] = computed_QoI[1] + dQoI_1;
+  }
 }
