@@ -50,6 +50,11 @@ void LaplaceSystem::element_postprocess (DiffContext & context)
         }
     }
 
-  // Update the computed value of the global functional R, by adding the contribution from this element
-  computed_QoI[0] = computed_QoI[0] + dQoI_0;
+  // Update the computed value of the global functional R, by adding
+  // the contribution from this element.
+  {
+    // Keep this thread-safe.
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    computed_QoI[0] = computed_QoI[0] + dQoI_0;
+  }
 }
