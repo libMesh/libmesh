@@ -22,6 +22,7 @@
 #include <sstream>
 
 // Libmesh headers
+#include "libmesh/equation_systems.h"
 #include "libmesh/nemesis_io_helper.h"
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
@@ -2516,27 +2517,21 @@ Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
 
 void
 Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
-                                        const NumericVector<Number> & parallel_soln,
-                                        const std::vector<std::string> & names,
+                                        const EquationSystems & es,
+                                        const std::vector<std::pair<unsigned int, unsigned int>> &var_nums,
                                         int timestep,
                                         const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
-  // The total number of elements in the mesh. We need this for
-  // indexing into parallel_soln.
-  dof_id_type parallel_n_elem = mesh.parallel_n_elem();
-
   // For each variable in names,
   //   For each subdomain in subdomain_map,
   //     If this (subdomain, variable) combination is active
   //       Extract our values into local_soln (localize is a collective)
   //       Write local_soln to file
-  for (auto v : index_range(names))
+  for (auto v : index_range(var_nums))
     {
       // Get list of active subdomains for variable v
       const auto & active_subdomains = vars_active_subdomains[v];
 
-      // Loop over all subdomain blocks, even ones for which we have
-      // no elements, so we localize in sync
       for (const int sbd_id_int : global_elem_blk_ids)
         {
           const subdomain_id_type sbd_id =
@@ -2552,11 +2547,16 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
               std::vector<numeric_index_type> required_indices;
               required_indices.reserve(elem_ids.size());
 
+              const unsigned int sys_num = var_nums[v].first;
+
               for (const auto & id : elem_ids)
-                required_indices.push_back(v * parallel_n_elem + id);
+                required_indices.push_back
+                  (mesh.elem_ref(id).dof_number
+                    (sys_num, var_nums[v].second, 0));
 
               std::vector<Number> local_soln;
-              parallel_soln.localize(local_soln, required_indices);
+              es.get_system(sys_num).current_local_solution->get
+                (required_indices, local_soln);
 
               // It's possible that there's nothing for us to write:
               // we may not be responsible for any elements on the

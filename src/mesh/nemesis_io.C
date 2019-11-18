@@ -1389,16 +1389,15 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
           names.push_back(var);
     }
 
-  // Build the parallel elemental solution vector. The 'names' vector
-  // will also be updated with the variable's names that were actually
-  // written to the vector.
-  std::unique_ptr<NumericVector<Number>> parallel_soln =
-    es.build_parallel_elemental_solution_vector(names);
+  // The 'names' vector will here be updated with the variable's names
+  // that are actually eligible to write
+  std::vector<std::pair<unsigned int, unsigned int>> var_nums =
+    es.find_element_variable_numbers (names);
 
   // build_parallel_elemental_solution_vector() can return a nullptr,
   // in which case there are no constant monomial variables to write,
   // and we can just return.
-  if (!parallel_soln)
+  if (var_nums.empty())
     {
       if (_verbose)
         libMesh::out << "No CONSTANT, MONOMIAL data to be written." << std::endl;
@@ -1426,8 +1425,8 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // sequence and is not virtual or an override.
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   nemhelper->write_element_values(mesh,
-                                  *parallel_soln,
-                                  names,
+                                  es,
+                                  var_nums,
                                   _timestep,
                                   vars_active_subdomains);
 }

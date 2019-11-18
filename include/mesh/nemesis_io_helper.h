@@ -32,7 +32,8 @@
 namespace libMesh
 {
 
-// Forward declaration
+// Forward declarations
+class EquationSystems;
 template <typename T> class NumericVector;
 
 // The Nemesis API header file.  Should already be
@@ -334,8 +335,8 @@ public:
    * one subdomain at a time.
    */
   void write_element_values(const MeshBase & mesh,
-                            const NumericVector<Number> & parallel_soln,
-                            const std::vector<std::string> & names,
+                            const EquationSystems & es,
+                            const std::vector<std::pair<unsigned int, unsigned int>> &var_nums,
                             int timestep,
                             const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
 
