@@ -355,6 +355,15 @@ public:
                                         std::vector<std::string> & names) const;
 
   /**
+   * Finds system and variable numbers for any CONSTANT MONOMIAL
+   * variables corresponding to the entries in the input 'names'
+   * vector.  This is useful as a helper function for
+   * build_parallel_elemental_solution_vector as well as direct use.
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  find_element_variable_numbers (std::vector<std::string> & names) const;
+
+  /**
    * Builds a parallel vector of CONSTANT MONOMIAL solution values
    * corresponding to the entries in the input 'names' vector.  This
    * vector is approximately uniformly distributed across all of the
