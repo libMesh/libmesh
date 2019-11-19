@@ -82,6 +82,7 @@ unit_tests_sources = \
   numerics/vector_value_test.C \
   numerics/type_tensor_test.C \
   numerics/dense_matrix_test.C \
+  numerics/petsc_matrix_test.C \
   numerics/diagonal_matrix_test.C \
   parallel/message_tag.C \
   parallel/packed_range_test.C \
