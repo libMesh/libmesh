@@ -276,6 +276,9 @@ public:
    */
   Mat mat () { libmesh_assert (_mat); return _mat; }
 
+  void get_row(numeric_index_type i,
+               std::vector<numeric_index_type> & indices,
+               std::vector<T> & values) const override;
 protected:
 
   /**

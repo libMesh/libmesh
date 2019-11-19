@@ -1256,7 +1256,45 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
   return value;
 }
 
+template <typename T>
+void PetscMatrix<T>::get_row (numeric_index_type i_in,
+                              std::vector<numeric_index_type> & indices,
+                              std::vector<T> & values) const
+{
+  libmesh_assert (this->initialized());
 
+  // PETSc 2.2.1 & newer
+  const PetscScalar * petsc_row;
+  const PetscInt    * petsc_cols;
+
+  PetscErrorCode ierr=0;
+  PetscInt
+    ncols=0,
+    i_val = static_cast<PetscInt>(i_in);
+
+  // the matrix needs to be closed for this to work
+  // this->close();
+  // but closing it is a semiparallel operation; we want operator()
+  // to run on one processor.
+  libmesh_assert(this->closed());
+
+  ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
+  LIBMESH_CHKERR(ierr);
+
+  // Copy the data
+  indices.resize(static_cast<std::size_t>(ncols));
+  values.resize(static_cast<std::size_t>(ncols));
+
+  for (std::size_t i = 0; i < indices.size(); ++i)
+  {
+    indices[i] = static_cast<numeric_index_type>(petsc_cols[i]);
+    values[i] = static_cast<T>(petsc_row[i]);
+  }
+
+  ierr  = MatRestoreRow(_mat, i_val,
+                        &ncols, &petsc_cols, &petsc_row);
+  LIBMESH_CHKERR(ierr);
+}
 
 
 template <typename T>
