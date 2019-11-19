@@ -108,11 +108,21 @@ void TriangleInterface::triangulate()
   // If the holes vector is non-nullptr (and non-empty) we need to determine
   // the number of additional points which the holes will add to the
   // triangulation.
+  // Note that the number of points is always equal to the number of segments
+  // that form the holes.
   unsigned int n_hole_points = 0;
 
   if (have_holes)
     for (const auto & hole : *_holes)
+    {
       n_hole_points += hole->n_points();
+      // A hole at least has one enclosure.
+      // Points on enclosures are ordered so that we can add segments implicitly.
+      // Elements in segment_indices() indicates the starting points of all enclosures.
+      // The last element in segment_indices() is the number of total points.
+      libmesh_assert_greater(hole->segment_indices().size(), 1);
+      libmesh_assert_equal_to(hole->segment_indices().back(), hole->n_points());
+    }
 
   // Triangle data structure for the mesh
   TriangleWrapper::triangulateio initial;
@@ -135,7 +145,7 @@ void TriangleInterface::triangulate()
 
       // User-defined segment ordering: One segment per entry in the segments vector
       else
-        initial.numberofsegments = this->segments.size();
+        initial.numberofsegments = this->segments.size() + n_hole_points;
     }
 
   else if (_triangulation_type==GENERATE_CONVEX_HULL)
