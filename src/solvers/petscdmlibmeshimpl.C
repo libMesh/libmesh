@@ -1203,7 +1203,7 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
   dm->ops->getinjection       = 0; // DMGetInjection_libMesh;
   dm->ops->getaggregates      = 0; // DMGetAggregates_libMesh;
 #else
-  //dm->ops->createinjection = 0;
+  dm->ops->createinjection = 0;
 #endif
 
 
