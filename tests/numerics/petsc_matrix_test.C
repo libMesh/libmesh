@@ -9,8 +9,10 @@
 #include "test_comm.h"
 
 #include <vector>
+#ifdef LIBMESH_HAVE_CXX11_THREAD
 #include <thread>
 #include <algorithm>
+#endif
 
 using namespace libMesh;
 
@@ -89,6 +91,7 @@ public:
       }
     };
 
+#ifdef LIBMESH_HAVE_CXX11_THREAD
     auto num_threads = std::min(unsigned(2),
                                 std::max(
                                   std::thread::hardware_concurrency(),
@@ -98,6 +101,9 @@ public:
       threads[thread] = std::thread(functor);
     std::for_each(threads.begin(), threads.end(),
                   [](std::thread & x){x.join();});
+#else
+    functor();
+#endif
   }
 
 private:
