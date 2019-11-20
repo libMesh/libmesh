@@ -624,6 +624,17 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                                               *this,
                                               node);
 
+              // Perform any required user-defined postprocessing on
+              // the matrix and rhs.
+              //
+              // TODO: We need to postprocess node matrices and vectors
+              // in some cases (e.g. when rotations are applied to
+              // nodes), but since we don't have a FEMContext at this
+              // point we would need to have a different interface
+              // taking the DenseMatrix, DenseVector, and probably the
+              // current node that we are on...
+              // this->post_process_elem_matrix_and_vector(nodal_matrix, nodal_rhs);
+
               if (!nodal_dof_indices.empty())
                 {
                   if (assemble_vector)
@@ -702,6 +713,12 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                                         context.get_neighbor_dof_indices());
             }
         }
+
+      // Do any required user post-processing before symmetrizing
+      // and/or applying constraints. Only do the post processing
+      // if we are applying the dof constraints.
+      if (apply_dof_constraints)
+        this->post_process_elem_matrix_and_vector(context);
 
       // Need to symmetrize before imposing
       // periodic constraints
@@ -1155,6 +1172,9 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
             check_convergence(*get_linear_solver());
         }
 
+      // Call user-defined post-processing routines on the truth solution.
+      post_process_truth_solution();
+
       // Add orthogonal part of the snapshot to the RB space
       libMesh::out << "Enriching the RB space" << std::endl;
       enrich_RB_space();
@@ -1237,7 +1257,8 @@ Real RBConstruction::truth_solve(int plot_solution)
         check_convergence(*get_linear_solver());
     }
 
-
+  // Call user-defined post-processing routines on the truth solution.
+  post_process_truth_solution();
 
   const RBParameters & mu = get_parameters();
 
