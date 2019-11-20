@@ -317,6 +317,14 @@ public:
                             const std::vector<std::string> & output_names);
 
   /**
+   * Outputs EquationSystems current_local_solution nodal values.
+   */
+  void write_nodal_solution(const EquationSystems & es,
+                            const std::vector<std::pair<unsigned int, unsigned int>> & var_nums,
+                            int timestep,
+                            const std::vector<std::string> & output_names);
+
+  /**
    * Takes a solution vector containing the solution for all variables and outputs it to the files
    */
   void write_nodal_solution(const std::vector<Number> & values,

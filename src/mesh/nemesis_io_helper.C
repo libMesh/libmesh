@@ -22,6 +22,7 @@
 #include <sstream>
 
 // Libmesh headers
+#include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/nemesis_io_helper.h"
 #include "libmesh/node.h"
@@ -2464,6 +2465,82 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
     }
 }
 
+
+
+void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
+                                             const std::vector<std::pair<unsigned int, unsigned int>> & var_nums,
+                                             int timestep,
+                                             const std::vector<std::string> & output_names)
+{
+  const MeshBase & mesh = es.get_mesh();
+
+  for (auto & var_num : var_nums)
+    {
+      const unsigned int sys_num = var_num.first;
+      const unsigned int var = var_num.second;
+
+      const System & sys = es.get_system(sys_num);
+      const std::string & name = sys.variable_name(var);
+
+      auto pos = std::find(output_names.begin(), output_names.end(), name);
+
+      // Skip this name if it's not supposed to be output.
+      if (pos == output_names.end())
+        continue;
+
+      // Compute the (zero-based) index which determines which
+      // variable this will be as far as Nemesis is concerned.  This
+      // will be used below in the write_nodal_values() call.
+      int variable_name_position =
+        cast_int<int>(std::distance(output_names.begin(), pos));
+
+      // Fill up a std::vector with the dofs for the current variable
+      std::vector<numeric_index_type> required_indices(num_nodes);
+
+      const FEType type = sys.variable_type(var);
+      if (type.family == SCALAR)
+        {
+          std::vector<numeric_index_type> scalar_indices;
+          sys.get_dof_map().SCALAR_dof_indices(scalar_indices, var);
+          for (int i=0; i<num_nodes; i++)
+            required_indices[i] = scalar_indices[0];
+        }
+      else
+        for (int i=0; i<num_nodes; i++)
+          {
+            const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]);
+            required_indices[i] = node.dof_number(sys_num, var, 0);
+          }
+
+      // Get the dof values required to write just our local part of
+      // the solution vector.
+      std::vector<Number> local_soln;
+      sys.current_local_solution->get(required_indices, local_soln);
+
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+      // Call the ExodusII_IO_Helper function to write the data.
+      write_nodal_values(variable_name_position + 1, local_soln, timestep);
+#else
+      // We have the local (complex) values. Now extract the real,
+      // imaginary, and magnitude values from them.
+      std::vector<Real> real_parts(num_nodes);
+      std::vector<Real> imag_parts(num_nodes);
+      std::vector<Real> magnitudes(num_nodes);
+
+      for (int i=0; i<num_nodes; ++i)
+        {
+          real_parts[i] = local_soln[i].real();
+          imag_parts[i] = local_soln[i].imag();
+          magnitudes[i] = std::abs(local_soln[i]);
+        }
+
+      // Write the real, imaginary, and magnitude values to file.
+      write_nodal_values(3 * variable_name_position + 1, real_parts, timestep);
+      write_nodal_values(3 * variable_name_position + 2, imag_parts, timestep);
+      write_nodal_values(3 * variable_name_position + 3, magnitudes, timestep);
+#endif
+    }
+}
 
 
 

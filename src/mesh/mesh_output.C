@@ -158,6 +158,21 @@ void MeshOutput<MT>::write_nodal_data (const std::string & fname,
   this->write_nodal_data(fname, soln, names);
 }
 
+template <class MT>
+void MeshOutput<MT>::write_nodal_data (const std::string & fname,
+                                       const EquationSystems & es,
+                                       const std::set<std::string> * system_names)
+{
+  std::vector<std::string> names;
+  es.build_variable_names  (names, nullptr, system_names);
+
+  std::unique_ptr<NumericVector<Number>> parallel_soln =
+    es.build_parallel_solution_vector(system_names);
+
+  this->write_nodal_data (fname, *parallel_soln, names);
+}
+
+
 
 
 // Instantiate for our Mesh types.  If this becomes too cumbersome later,
