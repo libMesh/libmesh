@@ -112,6 +112,9 @@ Gradient exact_derivative(const Point & p,
 // Set the dimensionality of the mesh
 unsigned int dim = 2;
 
+// Set the number of variables to solve for
+unsigned int n_vars = 1;
+
 // Choose whether or not to use the singular solution
 bool singularity = true;
 
@@ -148,6 +151,7 @@ int main(int argc, char ** argv)
   const std::string refine_type     = input_file("refinement_type", "h");
   const std::string approx_type     = input_file("approx_type", "LAGRANGE");
   const unsigned int approx_order   = input_file("approx_order", 1);
+  n_vars                            = input_file("n_vars", n_vars);
   const std::string element_type    = input_file("element_type", "tensor");
   const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
   const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
@@ -248,17 +252,30 @@ int main(int argc, char ** argv)
     system.add_variable("u", static_cast<Order>(approx_order),
                         Utility::string_to_enum<FEFamily>(approx_type));
 
+  std::vector<unsigned int> all_vars(1, u_var);
+
+  // For benchmarking purposes, add more variables if requested.
+  for (unsigned int var_num=1; var_num < n_vars; ++var_num)
+    {
+      std::ostringstream var_name;
+      var_name << "u" << var_num;
+      unsigned int next_var =
+        system.add_variable(var_name.str(),
+                            static_cast<Order>(approx_order),
+                            Utility::string_to_enum<FEFamily>(approx_type));
+      all_vars.push_back(next_var);
+    }
+
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_laplace);
 
   // Add Dirichlet boundary conditions
   std::set<boundary_id_type> all_bdys { 0 };
-  std::vector<unsigned int> u_only(1, u_var);
 
   WrappedFunction<Number> exact_val(system, exact_solution);
   WrappedFunction<Gradient> exact_grad(system, exact_derivative);
-  DirichletBoundary exact_bc(all_bdys, u_only, exact_val, exact_grad);
+  DirichletBoundary exact_bc(all_bdys, all_vars, exact_val, exact_grad);
   system.get_dof_map().add_dirichlet_boundary(exact_bc);
 
   // Initialize the data structures for the equation system.
@@ -282,6 +299,17 @@ int main(int argc, char ** argv)
 
   // Use higher quadrature order for more accurate error results
   exact_sol.extra_quadrature_order(extra_error_quadrature);
+
+  // Compute the initial error
+  exact_sol.compute_error("Laplace", "u");
+
+  // Print out the error values
+  libMesh::out << "Initial L2-Error is: "
+               << exact_sol.l2_error("Laplace", "u")
+               << std::endl;
+  libMesh::out << "Initial H1-Error is: "
+               << exact_sol.h1_error("Laplace", "u")
+               << std::endl;
 
   // A refinement loop.
   for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
@@ -665,7 +693,7 @@ void assemble_laplace(EquationSystems & es,
   const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
-  // for the first (and only) variable in the system.
+  // for the first (and only) variable type in the system.
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
@@ -743,7 +771,6 @@ void assemble_laplace(EquationSystems & es,
 
       const unsigned int n_dofs =
         cast_int<unsigned int>(dof_indices.size());
-      libmesh_assert_equal_to (n_dofs, phi.size());
 
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
@@ -761,27 +788,45 @@ void assemble_laplace(EquationSystems & es,
       perf_log.pop("elem init");
 
       // Now we will build the element matrix.  This involves
-      // a double loop to integrate the test functions (i) against
-      // the trial functions (j).
+      // a quadruple loop to integrate the test functions (i) against
+      // the trial functions (j) for each variable (v) at each
+      // quadrature point (qp).
       //
       // Now start logging the element matrix computation
       perf_log.push ("Ke");
 
-      for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-        for (unsigned int i=0; i != n_dofs; i++)
-          for (unsigned int j=0; j != n_dofs; j++)
-            Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+      std::vector<dof_id_type> dof_indices_u;
+      dof_map.dof_indices (elem, dof_indices_u, 0);
+      const unsigned int n_u_dofs = dof_indices_u.size();
+      libmesh_assert_equal_to (n_u_dofs, phi.size());
+      libmesh_assert_equal_to (n_u_dofs, dphi.size());
 
-      // We need a forcing function to make the 1D case interesting
-      if (mesh_dim == 1)
-        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-          {
-            Real x = q_point[qp](0);
-            Real f = singularity ? sqrt(3.)/9.*pow(-x, -4./3.) :
-              cos(x);
-            for (unsigned int i=0; i != n_dofs; ++i)
-              Fe(i) += JxW[qp]*phi[i][qp]*f;
-          }
+      for (unsigned int v=0; v != n_vars; ++v)
+        {
+          DenseSubMatrix<Number> Kuu(Ke);
+          Kuu.reposition (v*n_u_dofs, v*n_u_dofs, n_u_dofs, n_u_dofs);
+
+          for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+            for (unsigned int i=0; i != n_u_dofs; i++)
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+
+          // We need a forcing function to make the 1D case interesting
+          if (mesh_dim == 1)
+            {
+              DenseSubVector<Number> Fu(Fe);
+              Fu.reposition (v*n_u_dofs, n_u_dofs);
+
+              for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+                {
+                  Real x = q_point[qp](0);
+                  Real f = singularity ? sqrt(3.)/9.*pow(-x, -4./3.) :
+                    cos(x);
+                  for (unsigned int i=0; i != n_u_dofs; ++i)
+                    Fu(i) += JxW[qp]*phi[i][qp]*f;
+                }
+            }
+        }
 
       // Stop logging the matrix computation
       perf_log.pop ("Ke");
