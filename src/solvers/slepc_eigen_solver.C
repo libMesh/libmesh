@@ -30,6 +30,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/enum_eigen_solver_type.h"
+#include "libmesh/petsc_shell_matrix.h"
 
 namespace libMesh
 {
@@ -119,7 +120,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
   if (this->_close_matrix_before_solve)
     matrix_A->close ();
 
-  return _solve_standard_helper(matrix_A->mat(), nev, ncv, tol, m_its);
+  return _solve_standard_helper(matrix_A->mat(), nullptr, nev, ncv, tol, m_its);
 }
 
 
@@ -156,12 +157,34 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
   ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERR(ierr);
 
-  return _solve_standard_helper(mat, nev, ncv, tol, m_its);
+  return _solve_standard_helper(mat, nullptr, nev, ncv, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, unsigned int>
+SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
+                                     SparseMatrix<T> & precond_in,
+                                     int nev,                  // number of requested eigenpairs
+                                     int ncv,                  // number of basis vectors
+                                     const double tol,         // solver tolerance
+                                     const unsigned int m_its) // maximum number of iterations
+{
+  this->clear ();
+
+  this->init ();
+
+  // Make sure the SparseMatrix passed in is really a PetscMatrix
+  PetscMatrix<T> * precond = dynamic_cast<PetscMatrix<T> *>(&precond_in);
+
+  PetscShellMatrix<T> * matrix = static_cast<PetscShellMatrix<T> *> (&shell_matrix);
+
+  return _solve_standard_helper(matrix->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
+                                            Mat precond,
                                             int nev,                  // number of requested eigenpairs
                                             int ncv,                  // number of basis vectors
                                             const double tol,         // solver tolerance
@@ -174,6 +197,7 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
   // converged eigen pairs and number of iterations
   PetscInt nconv=0;
   PetscInt its=0;
+  ST st=nullptr;
 
 #ifdef  DEBUG
   // The relative error.
@@ -209,6 +233,12 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
   // other customization routines.
   ierr = EPSSetFromOptions (_eps);
   LIBMESH_CHKERR(ierr);
+
+  // Set a preconditioning matrix to ST
+  if (precond) {
+    ierr = EPSGetST(_eps,&st);LIBMESH_CHKERR(ierr);
+    ierr = STPrecondSetMatForPC(st,precond);LIBMESH_CHKERR(ierr);
+  }
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
@@ -313,7 +343,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
       matrix_B->close ();
     }
 
-  return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), nev, ncv, tol, m_its);
+  return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), nullptr, nev, ncv, tol, m_its);
 }
 
 template <typename T>
@@ -359,7 +389,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
   ierr = MatShellSetOperation(mat_A,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERR(ierr);
 
-  return _solve_generalized_helper (mat_A, matrix_B->mat(), nev, ncv, tol, m_its);
+  return _solve_generalized_helper (mat_A, matrix_B->mat(), nullptr, nev, ncv, tol, m_its);
 }
 
 template <typename T>
@@ -406,7 +436,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
   ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERR(ierr);
 
-  return _solve_generalized_helper (matrix_A->mat(), mat_B, nev, ncv, tol, m_its);
+  return _solve_generalized_helper (matrix_A->mat(), mat_B, nullptr, nev, ncv, tol, m_its);
 }
 
 template <typename T>
@@ -458,15 +488,38 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
   ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERR(ierr);
 
-  return _solve_generalized_helper (mat_A, mat_B, nev, ncv, tol, m_its);
+  return _solve_generalized_helper (mat_A, mat_B, nullptr, nev, ncv, tol, m_its);
 }
 
+template <typename T>
+std::pair<unsigned int, unsigned int>
+SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
+                                        ShellMatrix<T> & shell_matrix_B,
+                                        SparseMatrix<T> & precond_in,
+                                        int nev,                  // number of requested eigenpairs
+                                        int ncv,                  // number of basis vectors
+                                        const double tol,         // solver tolerance
+                                        const unsigned int m_its) // maximum number of iterations
+{
+  this->clear();
 
+  this->init ();
+
+  // Make sure the SparseMatrix passed in is really a PetscMatrix
+  PetscMatrix<T> * precond = static_cast<PetscMatrix<T> *>(&precond_in);
+
+  PetscShellMatrix<T> * matrix_A = static_cast<PetscShellMatrix<T> *> (&shell_matrix_A);
+
+  PetscShellMatrix<T> * matrix_B = static_cast<PetscShellMatrix<T> *> (&shell_matrix_B);
+
+  return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), precond->mat(), nev, ncv, tol, m_its);
+}
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
                                                 Mat mat_B,
+                                                Mat precond,
                                                 int nev,                  // number of requested eigenpairs
                                                 int ncv,                  // number of basis vectors
                                                 const double tol,         // solver tolerance
@@ -479,6 +532,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   // converged eigen pairs and number of iterations
   PetscInt nconv=0;
   PetscInt its=0;
+  ST st;
 
 #ifdef  DEBUG
   // The relative error.
@@ -516,6 +570,12 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   // other customization routines.
   ierr = EPSSetFromOptions (_eps);
   LIBMESH_CHKERR(ierr);
+
+  // Set a preconditioning matrix to ST
+  if (precond) {
+    ierr = EPSGetST(_eps,&st);LIBMESH_CHKERR(ierr);
+    ierr = STPrecondSetMatForPC(st,precond);LIBMESH_CHKERR(ierr);
+  }
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
