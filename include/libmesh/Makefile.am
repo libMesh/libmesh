@@ -240,6 +240,7 @@ BUILT_SOURCES = \
         petsc_macro.h \
         petsc_matrix.h \
         petsc_preconditioner.h \
+        petsc_shell_matrix.h \
         petsc_solver_exception.h \
         petsc_vector.h \
         preconditioner.h \
@@ -293,24 +294,6 @@ BUILT_SOURCES = \
         partitioner.h \
         sfc_partitioner.h \
         subdomain_partitioner.h \
-        attributes.h \
-        communicator.h \
-        data_type.h \
-        message_tag.h \
-        op_function.h \
-        packing.h \
-        parallel_implementation.h \
-        parallel_sync.h \
-        post_wait_copy_buffer.h \
-        post_wait_delete_buffer.h \
-        post_wait_dereference_shared_ptr.h \
-        post_wait_dereference_tag.h \
-        post_wait_free_buffer.h \
-        post_wait_unpack_buffer.h \
-        post_wait_work.h \
-        request.h \
-        standard_type.h \
-        status.h \
         diff_physics.h \
         diff_qoi.h \
         fem_physics.h \
@@ -426,6 +409,24 @@ BUILT_SOURCES = \
         system_subset.h \
         system_subset_by_subdomain.h \
         transient_system.h \
+        attributes.h \
+        communicator.h \
+        data_type.h \
+        message_tag.h \
+        op_function.h \
+        packing.h \
+        parallel_implementation.h \
+        parallel_sync.h \
+        post_wait_copy_buffer.h \
+        post_wait_delete_buffer.h \
+        post_wait_dereference_shared_ptr.h \
+        post_wait_dereference_tag.h \
+        post_wait_free_buffer.h \
+        post_wait_unpack_buffer.h \
+        post_wait_work.h \
+        request.h \
+        standard_type.h \
+        status.h \
         compare_types.h \
         enum_to_string.h \
         error_vector.h \
@@ -1247,6 +1248,9 @@ petsc_matrix.h: $(top_srcdir)/include/numerics/petsc_matrix.h
 petsc_preconditioner.h: $(top_srcdir)/include/numerics/petsc_preconditioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+petsc_shell_matrix.h: $(top_srcdir)/include/numerics/petsc_shell_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 petsc_solver_exception.h: $(top_srcdir)/include/numerics/petsc_solver_exception.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1404,60 +1408,6 @@ sfc_partitioner.h: $(top_srcdir)/include/partitioning/sfc_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 subdomain_partitioner.h: $(top_srcdir)/include/partitioning/subdomain_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-attributes.h: $(top_srcdir)/include/timpi/attributes.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-communicator.h: $(top_srcdir)/include/timpi/communicator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-data_type.h: $(top_srcdir)/include/timpi/data_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-message_tag.h: $(top_srcdir)/include/timpi/message_tag.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-op_function.h: $(top_srcdir)/include/timpi/op_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-packing.h: $(top_srcdir)/include/timpi/packing.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-parallel_implementation.h: $(top_srcdir)/include/timpi/parallel_implementation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-parallel_sync.h: $(top_srcdir)/include/timpi/parallel_sync.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_copy_buffer.h: $(top_srcdir)/include/timpi/post_wait_copy_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_delete_buffer.h: $(top_srcdir)/include/timpi/post_wait_delete_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_dereference_shared_ptr.h: $(top_srcdir)/include/timpi/post_wait_dereference_shared_ptr.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_dereference_tag.h: $(top_srcdir)/include/timpi/post_wait_dereference_tag.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_free_buffer.h: $(top_srcdir)/include/timpi/post_wait_free_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_unpack_buffer.h: $(top_srcdir)/include/timpi/post_wait_unpack_buffer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-post_wait_work.h: $(top_srcdir)/include/timpi/post_wait_work.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-request.h: $(top_srcdir)/include/timpi/request.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-standard_type.h: $(top_srcdir)/include/timpi/standard_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-status.h: $(top_srcdir)/include/timpi/status.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_physics.h: $(top_srcdir)/include/physics/diff_physics.h
@@ -1803,6 +1753,60 @@ system_subset_by_subdomain.h: $(top_srcdir)/include/systems/system_subset_by_sub
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_system.h: $(top_srcdir)/include/systems/transient_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+attributes.h: $(top_srcdir)/include/timpi/attributes.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+communicator.h: $(top_srcdir)/include/timpi/communicator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+data_type.h: $(top_srcdir)/include/timpi/data_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+message_tag.h: $(top_srcdir)/include/timpi/message_tag.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+op_function.h: $(top_srcdir)/include/timpi/op_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+packing.h: $(top_srcdir)/include/timpi/packing.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_implementation.h: $(top_srcdir)/include/timpi/parallel_implementation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_sync.h: $(top_srcdir)/include/timpi/parallel_sync.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_copy_buffer.h: $(top_srcdir)/include/timpi/post_wait_copy_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_delete_buffer.h: $(top_srcdir)/include/timpi/post_wait_delete_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_dereference_shared_ptr.h: $(top_srcdir)/include/timpi/post_wait_dereference_shared_ptr.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_dereference_tag.h: $(top_srcdir)/include/timpi/post_wait_dereference_tag.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_free_buffer.h: $(top_srcdir)/include/timpi/post_wait_free_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_unpack_buffer.h: $(top_srcdir)/include/timpi/post_wait_unpack_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_work.h: $(top_srcdir)/include/timpi/post_wait_work.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+request.h: $(top_srcdir)/include/timpi/request.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+standard_type.h: $(top_srcdir)/include/timpi/standard_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+status.h: $(top_srcdir)/include/timpi/status.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 compare_types.h: $(top_srcdir)/include/utils/compare_types.h
