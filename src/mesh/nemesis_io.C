@@ -1372,12 +1372,14 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // To be (possibly) filled with a filtered list of variable names to output.
   std::vector<std::string> names;
 
+  // All of which should be low order monomials for now
+  const FEType type(CONSTANT, MONOMIAL);
+
   // If _output_variables is populated, only output the monomials which are
   // also in the _output_variables vector.
   if (_output_variables.size() > 0)
     {
       std::vector<std::string> monomials;
-      const FEType type(CONSTANT, MONOMIAL);
 
       // Create a list of monomial variable names
       es.build_variable_names(monomials, &type);
@@ -1392,7 +1394,7 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // The 'names' vector will here be updated with the variable's names
   // that are actually eligible to write
   std::vector<std::pair<unsigned int, unsigned int>> var_nums =
-    es.find_element_variable_numbers (names);
+    es.find_variable_numbers (names, &type);
 
   // build_parallel_elemental_solution_vector() can return a nullptr,
   // in which case there are no constant monomial variables to write,

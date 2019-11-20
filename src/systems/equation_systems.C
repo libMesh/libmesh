@@ -900,8 +900,8 @@ EquationSystems::build_elemental_solution_vector (std::vector<Number> & soln,
 
 
 std::vector<std::pair<unsigned int, unsigned int>>
-EquationSystems::find_element_variable_numbers
-  (std::vector<std::string> & names) const
+EquationSystems::find_variable_numbers
+  (std::vector<std::string> & names, const FEType * type) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -917,8 +917,6 @@ EquationSystems::find_element_variable_numbers
 
   names.clear();
 
-  const FEType type(CONSTANT, MONOMIAL);
-
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
   unsigned sys_ctr = 0;
@@ -931,7 +929,7 @@ EquationSystems::find_element_variable_numbers
       for (unsigned int var=0; var < nv_sys; ++var)
         {
           const std::string & name = system.variable_name(var);
-          if (system.variable_type(var) != type ||
+          if ((type && system.variable_type(var) != *type) ||
               (is_filter_names && std::find(filter_names.begin(), filter_names.end(), name) == filter_names.end()))
             continue;
 
@@ -958,8 +956,9 @@ EquationSystems::find_element_variable_numbers
 std::unique_ptr<NumericVector<Number>>
 EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::string> & names) const
 {
+  FEType type(CONSTANT, MONOMIAL);
   std::vector<std::pair<unsigned int, unsigned int>> var_nums =
-    this->find_element_variable_numbers(names);
+    this->find_variable_numbers(names, &type);
 
   const std::size_t nv = var_nums.size();
   const dof_id_type ne = _mesh.n_elem();
