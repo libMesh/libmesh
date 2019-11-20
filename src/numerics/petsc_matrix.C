@@ -1278,6 +1278,23 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
   // to run on one processor.
   libmesh_assert(this->closed());
 
+  // PETSc makes no effort at being thread safe. Helgrind complains about
+  // possible data races even just in PetscFunctionBegin (due to things
+  // like stack counter incrementing). Perhaps we could ignore
+  // this, but there are legitimate data races for Mat data members like
+  // mat->getrowactive between MatGetRow and MatRestoreRow. Moreover,
+  // there could be a write into mat->rowvalues during MatGetRow from
+  // one thread while we are attempting to read from mat->rowvalues
+  // (through petsc_cols) during data copy in another thread. So
+  // the safe thing to do is to lock the whole method
+
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  std::lock_guard<std::mutex>
+#else
+  Threads::spin_mutex::scoped_lock
+#endif
+    lock(_petsc_matrix_mutex);
+
   ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
   LIBMESH_CHKERR(ierr);
 

@@ -9,6 +9,8 @@
 #include "test_comm.h"
 
 #include <vector>
+#include <thread>
+#include <algorithm>
 
 using namespace libMesh;
 
@@ -69,18 +71,33 @@ public:
 
     index = _i[_comm->rank()], count = 0;
 
-    std::vector<Number> values;
-    for (; count < _local_size; ++count, ++index)
+    auto functor = [this]()
     {
-      _matrix->get_row(index, cols, values);
-      for (numeric_index_type j = 0; j < _local_size; ++j)
+      std::vector<numeric_index_type> cols_to_get;
+      std::vector<Number> values;
+      numeric_index_type local_index = _i[_comm->rank()], local_count = 0;
+      for (; local_count < _local_size; ++local_count, ++local_index)
       {
-        LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(values[j]),
-                                (count + 1) * (j + 1) * (_comm->rank() + 1),
-                                _tolerance);
-        CPPUNIT_ASSERT_EQUAL(cols[count], index);
+        _matrix->get_row(local_index, cols_to_get, values);
+        for (numeric_index_type j = 0; j < _local_size; ++j)
+        {
+          LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(values[j]),
+                                  (local_count + 1) * (j + 1) * (_comm->rank() + 1),
+                                  _tolerance);
+          CPPUNIT_ASSERT_EQUAL(cols_to_get[local_count], local_index);
+        }
       }
-    }
+    };
+
+    auto num_threads = std::min(unsigned(2),
+                                std::max(
+                                  std::thread::hardware_concurrency(),
+                                  unsigned(1)));
+    std::vector<std::thread> threads(num_threads);
+    for (unsigned int thread = 0; thread < num_threads; ++thread)
+      threads[thread] = std::thread(functor);
+    std::for_each(threads.begin(), threads.end(),
+                  [](std::thread & x){x.join();});
   }
 
 private:

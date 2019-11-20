@@ -30,6 +30,10 @@
 
 // C++ includes
 #include <algorithm>
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+#include <atomic>
+#include <mutex>
+#endif
 
 // Macro to identify and debug functions which should be called in
 // parallel on parallel matrices but which may be called in serial on
@@ -310,6 +314,12 @@ private:
   bool _destroy_mat_on_exit;
 
   PetscMatrixType _mat_type;
+
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  mutable std::mutex _petsc_matrix_mutex;
+#else
+  mutable Threads::spin_mutex _petsc_matrix_mutex;
+#endif
 };
 
 } // namespace libMesh
