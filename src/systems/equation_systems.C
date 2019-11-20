@@ -535,8 +535,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
 
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
         {
-          std::string var_name = pos->second->variable_name(vn);
-          FEType fe_type = pos->second->variable_type(vn);
+          const std::string & var_name = pos->second->variable_name(vn);
+          const FEType & fe_type = pos->second->variable_type(vn);
 
           unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
 
@@ -853,7 +853,7 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
     {
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
         {
-          std::string var_name = pos->second->variable_name(vn);
+          const std::string & var_name = pos->second->variable_name(vn);
 
           auto names_it = std::find(names.begin(), names.end(), var_name);
           if(names_it != names.end())
