@@ -19,6 +19,7 @@
 
 // Local Includes
 #include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"

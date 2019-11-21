@@ -20,6 +20,7 @@
 // Local includes
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_tools.h"
