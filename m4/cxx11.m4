@@ -965,6 +965,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
 
       std::atomic_thread_fence(std::memory_order_acquire);
       std::atomic_thread_fence(std::memory_order_release);
+
+      // We use this function in one of our unit tests now.
+      unsigned int n_threads = std::thread::hardware_concurrency();
     ]])],[
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_THREAD, 1, [Flag indicating whether compiler supports std::thread])
