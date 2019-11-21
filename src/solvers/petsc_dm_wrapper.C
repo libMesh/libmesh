@@ -31,6 +31,7 @@
 #include "libmesh/restore_warnings.h"
 
 #include "libmesh/petsc_dm_wrapper.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/system.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_base.h"
