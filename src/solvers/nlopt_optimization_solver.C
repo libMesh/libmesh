@@ -26,6 +26,7 @@
 
 // Local Includes
 #include "libmesh/dof_map.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/nlopt_optimization_solver.h"
 #include "libmesh/sparse_matrix.h"

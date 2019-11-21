@@ -28,6 +28,7 @@
 
 // Local includes
 #include "libmesh/boundary_info.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/ghost_point_neighbors.h"
 #include "libmesh/mesh_base.h"

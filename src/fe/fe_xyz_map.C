@@ -17,6 +17,7 @@
 
 #include "libmesh/fe_xyz_map.h"
 #include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {

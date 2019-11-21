@@ -22,7 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_config.h"
-
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"

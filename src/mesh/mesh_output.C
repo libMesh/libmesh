@@ -19,6 +19,7 @@
 // Local includes
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_output.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/numeric_vector.h"
