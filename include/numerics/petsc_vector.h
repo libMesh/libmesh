@@ -643,8 +643,6 @@ void PetscVector<T>::init (const numeric_index_type n,
 
   PetscErrorCode ierr=0;
   PetscInt petsc_n=static_cast<PetscInt>(n);
-  PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
-
 
   // Clear initialized vectors
   if (this->initialized())
@@ -676,6 +674,7 @@ void PetscVector<T>::init (const numeric_index_type n,
   else if (this->_type == PARALLEL)
     {
 #ifdef LIBMESH_HAVE_MPI
+      PetscInt petsc_n_local=cast_int<PetscInt>(n_local);
       libmesh_assert_less_equal (n_local, n);
       ierr = VecCreateMPI (this->comm().get(), petsc_n_local, petsc_n,
                            &_vec);

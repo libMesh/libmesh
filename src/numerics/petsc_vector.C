@@ -979,15 +979,14 @@ void PetscVector<T>::localize (std::vector<T> & v_local) const
 
 template <>
 void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
-                                         const processor_id_type pid) const
+                                         const processor_id_type
+                                         timpi_mpi_var(pid)) const
 {
   this->_restore_array();
 
   PetscErrorCode ierr=0;
   const PetscInt n  = size();
-  const PetscInt nl = local_size();
   PetscScalar * values;
-
 
   // only one processor
   if (n_processors() == 1)
@@ -1052,6 +1051,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
             ierr = VecGetArray (_vec, &values);
             LIBMESH_CHKERR(ierr);
 
+            const PetscInt nl = local_size();
             for (PetscInt i=0; i<nl; i++)
               local_values[i+ioff] = static_cast<Real>(values[i]);
 
