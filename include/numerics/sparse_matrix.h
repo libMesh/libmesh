@@ -406,6 +406,20 @@ public:
    */
   virtual void get_transpose (SparseMatrix<T> & dest) const = 0;
 
+  /**
+   * Get a row from the matrix
+   * @param i The matrix row to get
+   * @param indices A container that will be filled with the column indices
+   *                corresponding to (possibly) non-zero values
+   * @param values A container holding the column values
+   */
+  virtual void get_row(numeric_index_type /*i*/,
+                       std::vector<numeric_index_type> & /*indices*/,
+                       std::vector<T> & /*values*/) const
+  {
+    libmesh_not_implemented();
+  }
+
 protected:
 
   /**
