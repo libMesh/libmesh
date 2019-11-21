@@ -83,6 +83,12 @@ std::unique_ptr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
     }
 }
 
+Real PointLocatorBase::get_close_to_point_tol () const
+{
+  return _close_to_point_tol;
+}
+
+
 void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)
 {
   _use_close_to_point_tol = true;
