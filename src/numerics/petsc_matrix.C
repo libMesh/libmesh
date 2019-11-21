@@ -1263,7 +1263,6 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
 {
   libmesh_assert (this->initialized());
 
-  // PETSc 2.2.1 & newer
   const PetscScalar * petsc_row;
   const PetscInt    * petsc_cols;
 
