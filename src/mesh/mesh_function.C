@@ -133,11 +133,13 @@ MeshFunction::clear ()
 
 std::unique_ptr<FunctionBase<Number>> MeshFunction::clone () const
 {
-  FunctionBase<Number> * mf_clone =
+  MeshFunction * mf_clone =
     new MeshFunction(_eqn_systems, _vector, _dof_map, _system_vars, this);
 
   if (this->initialized())
     mf_clone->init();
+  mf_clone->set_point_locator_tolerance(
+    this->get_point_locator().get_close_to_point_tol());
 
   return std::unique_ptr<FunctionBase<Number>>(mf_clone);
 }

@@ -156,6 +156,11 @@ public:
   virtual void disable_out_of_mesh_mode () = 0;
 
   /**
+   * Get the close-to-point tolerance.
+   */
+  Real get_close_to_point_tol() const;
+
+  /**
    * Set a tolerance to use when determining
    * if a point is contained within the mesh.
    */
