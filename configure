@@ -10874,6 +10874,9 @@ main ()
       std::atomic_thread_fence(std::memory_order_acquire);
       std::atomic_thread_fence(std::memory_order_release);
 
+      // We use this function in one of our unit tests now.
+      unsigned int n_threads = std::thread::hardware_concurrency();
+
   ;
   return 0;
 }
