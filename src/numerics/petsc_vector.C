@@ -1001,6 +1001,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
     }
 
   // otherwise multiple processors
+#ifdef LIBMESH_HAVE_MPI
   else
     {
       if (pid == 0) // optimized version for localizing to 0
@@ -1061,6 +1062,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
                       this->comm().get());
         }
     }
+#endif // LIBMESH_HAVE_MPI
 }
 
 #endif
