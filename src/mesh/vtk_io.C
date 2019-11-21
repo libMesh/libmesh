@@ -268,7 +268,6 @@ void VTKIO::write_nodal_data (const std::string & fname,
   // Get a reference to the mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-
   // we only use Unstructured grids
   _vtk_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
   vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
@@ -328,9 +327,9 @@ void VTKIO::write_nodal_data (const std::string & fname,
 
   // Tell the writer how many partitions exist and on which processor
   // we are currently
-  writer->SetNumberOfPieces(MeshOutput<MeshBase>::mesh().n_processors());
-  writer->SetStartPiece(MeshOutput<MeshBase>::mesh().processor_id());
-  writer->SetEndPiece(MeshOutput<MeshBase>::mesh().processor_id());
+  writer->SetNumberOfPieces(mesh.n_processors());
+  writer->SetStartPiece(mesh.processor_id());
+  writer->SetEndPiece(mesh.processor_id());
 
   // partitions overlap by one node
   // FIXME: According to this document
