@@ -1373,13 +1373,14 @@ void BoundaryInfo::remove_edge (const Elem * elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Get range of potential matches, erase those requested.
-  auto e = _boundary_edge_id.equal_range(elem);
-  while (e.first != e.second)
+  auto rng = _boundary_edge_id.equal_range(elem);
+  auto it = rng.first;
+  while (it != rng.second)
     {
-      if (e.first->second.first == edge)
-        e.first = _boundary_edge_id.erase(e.first);
+      if (it->second.first == edge)
+        it = _boundary_edge_id.erase(it);
       else
-        ++e.first;
+        ++it;
     }
 }
 
@@ -1395,13 +1396,14 @@ void BoundaryInfo::remove_edge (const Elem * elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Get range of potential matches, erase those requested.
-  auto e = _boundary_edge_id.equal_range(elem);
-  while (e.first != e.second)
+  auto rng = _boundary_edge_id.equal_range(elem);
+  auto it = rng.first;
+  while (it != rng.second)
     {
-      if (e.first->second.first == edge && e.first->second.second == id)
-        e.first = _boundary_edge_id.erase(e.first);
+      if (it->second.first == edge && it->second.second == id)
+        it = _boundary_edge_id.erase(it);
       else
-        ++e.first;
+        ++it;
     }
 }
 
@@ -1418,13 +1420,14 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
   libmesh_assert_less(shellface, 2);
 
   // Get range of potential matches, erase those requested.
-  auto e = _boundary_shellface_id.equal_range(elem);
-  while (e.first != e.second)
+  auto rng = _boundary_shellface_id.equal_range(elem);
+  auto it = rng.first;
+  while (it != rng.second)
     {
-      if (e.first->second.first == shellface)
-        e.first = _boundary_shellface_id.erase(e.first);
+      if (it->second.first == shellface)
+        it = _boundary_shellface_id.erase(it);
       else
-        ++e.first;
+        ++it;
     }
 }
 
@@ -1443,16 +1446,17 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
   libmesh_assert_less(shellface, 2);
 
   // Get range of potential matches, erase those requested.
-  auto e = _boundary_shellface_id.equal_range(elem);
-  while (e.first != e.second)
+  auto rng = _boundary_shellface_id.equal_range(elem);
+  auto it = rng.first;
+  while (it != rng.second)
     {
-      if (e.first->second.first == shellface &&
-          e.first->second.second == id)
+      if (it->second.first == shellface &&
+          it->second.second == id)
         {
-          e.first = _boundary_shellface_id.erase(e.first);
+          it = _boundary_shellface_id.erase(it);
         }
       else
-        ++e.first;
+        ++it;
     }
 }
 
@@ -1465,13 +1469,14 @@ void BoundaryInfo::remove_side (const Elem * elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Get range of potential matches, erase those requested.
-  auto e = _boundary_side_id.equal_range(elem);
-  while (e.first != e.second)
+  auto rng = _boundary_side_id.equal_range(elem);
+  auto it = rng.first;
+  while (it != rng.second)
     {
-      if (e.first->second.first == side)
-        e.first = _boundary_side_id.erase(e.first);
+      if (it->second.first == side)
+        it = _boundary_side_id.erase(it);
       else
-        ++e.first;
+        ++it;
     }
 }
 
@@ -1484,13 +1489,14 @@ void BoundaryInfo::remove_side (const Elem * elem,
   libmesh_assert(elem);
 
   // Get range of potential matches, erase those requested.
-  auto e = _boundary_side_id.equal_range(elem);
-  while (e.first != e.second)
+  auto rng = _boundary_side_id.equal_range(elem);
+  auto it = rng.first;
+  while (it != rng.second)
     {
-      if (e.first->second.first == side && e.first->second.second == id)
-        e.first = _boundary_side_id.erase(e.first);
+      if (it->second.first == side && it->second.second == id)
+        it = _boundary_side_id.erase(it);
       else
-        ++e.first;
+        ++it;
     }
 }
 
