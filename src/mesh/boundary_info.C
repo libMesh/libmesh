@@ -33,6 +33,43 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 
+namespace
+{
+
+// Templated helper function for removing a subset of keys from a
+// multimap that further satisfy a given predicate on the
+// corresponding values.
+template <class Key, class T, class Pred>
+void erase_if(std::multimap<Key,T> & map, Key k, Pred pred)
+{
+  auto rng = map.equal_range(k);
+  auto it = rng.first;
+  while (it != rng.second)
+    {
+      if (pred(it->second))
+        it = map.erase(it);
+      else
+        ++it;
+    }
+}
+
+// Similar to the helper function above but doesn't take a key,
+// instead it applies the predicate to every value in the map.
+template <class Key, class T, class Pred>
+void erase_if(std::multimap<Key,T> & map, Pred pred)
+{
+  auto it = map.begin();
+  while (it != map.end())
+    {
+      if (pred(it->second))
+        it = map.erase(it);
+      else
+        ++it;
+    }
+}
+
+}
+
 namespace libMesh
 {
 
@@ -1333,21 +1370,10 @@ void BoundaryInfo::remove_node (const Node * node,
 {
   libmesh_assert(node);
 
-  auto rng = _boundary_node_id.equal_range(node);
-
-  // Check each entry in the range, if its boundary matches the
-  // specified id, remove it from the map. Note: in C++20, there will
-  // be a specialization of std::erase_if for std::multimaps, which is
-  // exactly what we need here.
-  auto it = rng.first;
-
-  while (it != rng.second)
-    {
-      if (it->second == id)
-        it = _boundary_node_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (node, id) entry from map.
+  erase_if(_boundary_node_id, node,
+           [id](decltype(_boundary_node_id)::mapped_type & val)
+           {return val == id;});
 }
 
 
@@ -1372,16 +1398,10 @@ void BoundaryInfo::remove_edge (const Elem * elem,
   // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  // Get range of potential matches, erase those requested.
-  auto rng = _boundary_edge_id.equal_range(elem);
-  auto it = rng.first;
-  while (it != rng.second)
-    {
-      if (it->second.first == edge)
-        it = _boundary_edge_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (elem, edge, *) entries from map.
+  erase_if(_boundary_edge_id, elem,
+           [edge](decltype(_boundary_edge_id)::mapped_type & pr)
+           {return pr.first == edge;});
 }
 
 
@@ -1395,16 +1415,10 @@ void BoundaryInfo::remove_edge (const Elem * elem,
   // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  // Get range of potential matches, erase those requested.
-  auto rng = _boundary_edge_id.equal_range(elem);
-  auto it = rng.first;
-  while (it != rng.second)
-    {
-      if (it->second.first == edge && it->second.second == id)
-        it = _boundary_edge_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (elem, edge, id) entries from map.
+  erase_if(_boundary_edge_id, elem,
+           [edge, id](decltype(_boundary_edge_id)::mapped_type & pr)
+           {return pr.first == edge && pr.second == id;});
 }
 
 
@@ -1419,16 +1433,10 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
 
-  // Get range of potential matches, erase those requested.
-  auto rng = _boundary_shellface_id.equal_range(elem);
-  auto it = rng.first;
-  while (it != rng.second)
-    {
-      if (it->second.first == shellface)
-        it = _boundary_shellface_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (elem, shellface, *) entries from map.
+  erase_if(_boundary_shellface_id, elem,
+           [shellface](decltype(_boundary_shellface_id)::mapped_type & pr)
+           {return pr.first == shellface;});
 }
 
 
@@ -1445,19 +1453,10 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
 
-  // Get range of potential matches, erase those requested.
-  auto rng = _boundary_shellface_id.equal_range(elem);
-  auto it = rng.first;
-  while (it != rng.second)
-    {
-      if (it->second.first == shellface &&
-          it->second.second == id)
-        {
-          it = _boundary_shellface_id.erase(it);
-        }
-      else
-        ++it;
-    }
+  // Erase (elem, shellface, id) entries from map.
+  erase_if(_boundary_shellface_id, elem,
+           [shellface, id](decltype(_boundary_shellface_id)::mapped_type & pr)
+           {return pr.first == shellface && pr.second == id;});
 }
 
 void BoundaryInfo::remove_side (const Elem * elem,
@@ -1468,16 +1467,10 @@ void BoundaryInfo::remove_side (const Elem * elem,
   // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  // Get range of potential matches, erase those requested.
-  auto rng = _boundary_side_id.equal_range(elem);
-  auto it = rng.first;
-  while (it != rng.second)
-    {
-      if (it->second.first == side)
-        it = _boundary_side_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (elem, side, *) entries from map.
+  erase_if(_boundary_side_id, elem,
+           [side](decltype(_boundary_side_id)::mapped_type & pr)
+           {return pr.first == side;});
 }
 
 
@@ -1488,16 +1481,10 @@ void BoundaryInfo::remove_side (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Get range of potential matches, erase those requested.
-  auto rng = _boundary_side_id.equal_range(elem);
-  auto it = rng.first;
-  while (it != rng.second)
-    {
-      if (it->second.first == side && it->second.second == id)
-        it = _boundary_side_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (elem, side, id) entries from map.
+  erase_if(_boundary_side_id, elem,
+           [side, id](decltype(_boundary_side_id)::mapped_type & pr)
+           {return pr.first == side && pr.second == id;});
 }
 
 
@@ -1514,38 +1501,25 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   _ns_id_to_name.erase(id);
   _es_id_to_name.erase(id);
 
-  // Erase pointers to geometric entities with this id.
-  for (auto it = _boundary_node_id.begin(); it != _boundary_node_id.end(); /*below*/)
-    {
-      if (it->second == id)
-        it = _boundary_node_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (*, id) entries from map.
+  erase_if(_boundary_node_id,
+           [id](decltype(_boundary_node_id)::mapped_type & val)
+           {return val == id;});
 
-  for (auto it = _boundary_edge_id.begin(); it != _boundary_edge_id.end(); /*below*/)
-    {
-      if (it->second.second == id)
-        it = _boundary_edge_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (*, *, id) entries from map.
+  erase_if(_boundary_edge_id,
+           [id](decltype(_boundary_edge_id)::mapped_type & pr)
+           {return pr.second == id;});
 
-  for (auto it = _boundary_shellface_id.begin(); it != _boundary_shellface_id.end(); /*below*/)
-    {
-      if (it->second.second == id)
-        it = _boundary_shellface_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (*, *, id) entries from map.
+  erase_if(_boundary_shellface_id,
+           [id](decltype(_boundary_shellface_id)::mapped_type & pr)
+           {return pr.second == id;});
 
-  for (auto it = _boundary_side_id.begin(); it != _boundary_side_id.end(); /*below*/)
-    {
-      if (it->second.second == id)
-        it = _boundary_side_id.erase(it);
-      else
-        ++it;
-    }
+  // Erase (*, *, id) entries from map.
+  erase_if(_boundary_side_id,
+           [id](decltype(_boundary_side_id)::mapped_type & pr)
+           {return pr.second == id;});
 }
 
 
