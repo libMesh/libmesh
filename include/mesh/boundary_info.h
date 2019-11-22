@@ -290,6 +290,12 @@ public:
   void remove (const Elem * elem);
 
   /**
+   * Removes boundary id \p id from node \p node, if it exists.
+   */
+  void remove_node (const Node * node,
+                    const boundary_id_type id);
+
+  /**
    * Removes all boundary conditions associated with edge \p edge of
    * element \p elem, if any exist.
    */

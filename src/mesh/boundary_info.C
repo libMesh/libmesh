@@ -1328,6 +1328,30 @@ void BoundaryInfo::remove (const Node * node)
 
 
 
+void BoundaryInfo::remove_node (const Node * node,
+                                const boundary_id_type id)
+{
+  libmesh_assert(node);
+
+  auto rng = _boundary_node_id.equal_range(node);
+
+  // Check each entry in the range, if its boundary matches the
+  // specified id, remove it from the map. Note: in C++20, there will
+  // be a specialization of std::erase_if for std::multimaps, which is
+  // exactly what we need here.
+  auto it = rng.first;
+
+  while (it != rng.second)
+    {
+      if (it->second == id)
+        it = _boundary_node_id.erase(it);
+      else
+        ++it;
+    }
+}
+
+
+
 void BoundaryInfo::remove (const Elem * elem)
 {
   libmesh_assert(elem);
