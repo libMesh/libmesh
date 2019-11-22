@@ -1369,19 +1369,13 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // The user shouldn't be trying to remove only one child's boundary
-  // id
+  // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  // Some older compilers don't support erasing from a map with
-  // const_iterators, so we explicitly use non-const iterators here.
+  // Get range of potential matches, erase those requested.
   auto e = _boundary_edge_id.equal_range(elem);
-
-  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
-      // if this is true we found the requested edge
-      // of the element and want to erase the id
       if (e.first->second.first == edge)
         e.first = _boundary_edge_id.erase(e.first);
       else
@@ -1397,19 +1391,13 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // The user shouldn't be trying to remove only one child's boundary
-  // id
+  // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  // Some older compilers don't support erasing from a map with
-  // const_iterators, so we explicitly use non-const iterators here.
+  // Get range of potential matches, erase those requested.
   auto e = _boundary_edge_id.equal_range(elem);
-
-  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
-      // if this is true we found the requested edge
-      // of the element and want to erase the requested id
       if (e.first->second.first == edge && e.first->second.second == id)
         e.first = _boundary_edge_id.erase(e.first);
       else
@@ -1423,22 +1411,16 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // The user shouldn't be trying to remove only one child's boundary
-  // id
+  // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
 
-  // Some older compilers don't support erasing from a map with
-  // const_iterators, so we explicitly use non-const iterators here.
+  // Get range of potential matches, erase those requested.
   auto e = _boundary_shellface_id.equal_range(elem);
-
-  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
-      // if this is true we found the requested shellface
-      // of the element and want to erase the id
       if (e.first->second.first == shellface)
         e.first = _boundary_shellface_id.erase(e.first);
       else
@@ -1454,26 +1436,19 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // The user shouldn't be trying to remove only one child's boundary
-  // id
+  // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
 
-  // Some older compilers don't support erasing from a map with
-  // const_iterators, so we explicitly use non-const iterators here.
+  // Get range of potential matches, erase those requested.
   auto e = _boundary_shellface_id.equal_range(elem);
-
-  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
-      // if this is true we found the requested shellface
-      // of the element and want to erase the requested id
       if (e.first->second.first == shellface &&
           e.first->second.second == id)
         {
-          // (postfix++ - increment the iterator before it's invalid)
           e.first = _boundary_shellface_id.erase(e.first);
         }
       else
@@ -1486,19 +1461,13 @@ void BoundaryInfo::remove_side (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // The user shouldn't be trying to remove only one child's boundary
-  // id
+  // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  // Some older compilers don't support erasing from a map with
-  // const_iterators, so we explicitly use non-const iterators here.
+  // Get range of potential matches, erase those requested.
   auto e = _boundary_side_id.equal_range(elem);
-
-  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
-      // if this is true we found the requested side
-      // of the element and want to erase the id
       if (e.first->second.first == side)
         e.first = _boundary_side_id.erase(e.first);
       else
@@ -1514,15 +1483,10 @@ void BoundaryInfo::remove_side (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Some older compilers don't support erasing from a map with
-  // const_iterators, so we explicitly use non-const iterators here.
+  // Get range of potential matches, erase those requested.
   auto e = _boundary_side_id.equal_range(elem);
-
-  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
-      // if this is true we found the requested side
-      // of the element and want to erase the requested id
       if (e.first->second.first == side && e.first->second.second == id)
         e.first = _boundary_side_id.erase(e.first);
       else
