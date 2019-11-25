@@ -1482,6 +1482,15 @@ void DistributedMesh::add_extra_ghost_elem(Elem * e)
   _extra_ghost_elems.insert(e);
 }
 
+void
+DistributedMesh::clear_extra_ghost_elems(const std::set<Elem *> & extra_ghost_elems)
+{
+  std::set<Elem *> tmp;
+  std::set_difference(_extra_ghost_elems.begin(), _extra_ghost_elems.end(),
+                      extra_ghost_elems.begin(), extra_ghost_elems.end(),
+                      std::inserter(tmp, tmp.begin()));
+  _extra_ghost_elems = tmp;
+}
 
 void DistributedMesh::allgather()
 {
