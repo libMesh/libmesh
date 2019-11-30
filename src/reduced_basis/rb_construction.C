@@ -1152,7 +1152,10 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
       *rhs = *get_Fq(q_f);
 
       if (rhs->l2_norm() == 0)
-        libmesh_error_msg("RHS norm should be non-zero");
+      {
+        // Skip enrichment if the rhs is zero
+        continue;
+      }
 
       // truth_assembly assembles into matrix and rhs, so use those for the solve
       if (extra_linear_solver)
