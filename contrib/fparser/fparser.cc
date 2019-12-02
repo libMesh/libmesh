@@ -1649,16 +1649,13 @@ inline void FunctionParserBase<Value_t>::AddFunctionOpcode(unsigned opcode)
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 0
 
-#ifdef __clang__
-#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wc99-extensions"
-#endif
-
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #include "extrasrc/fp_opcode_add.inc"
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
@@ -1672,16 +1669,13 @@ inline void FunctionParserBase<long>::AddFunctionOpcode(unsigned opcode)
 #define FP_FLOAT_VERSION 0
 #define FP_COMPLEX_VERSION 0
 
-#ifdef __clang__
-#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wc99-extensions"
-#endif
-
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #include "extrasrc/fp_opcode_add.inc"
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
@@ -1696,16 +1690,13 @@ inline void FunctionParserBase<GmpInt>::AddFunctionOpcode(unsigned opcode)
 #define FP_FLOAT_VERSION 0
 #define FP_COMPLEX_VERSION 0
 
-#ifdef __clang__
-#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wc99-extensions"
-#endif
-
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #include "extrasrc/fp_opcode_add.inc"
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
@@ -1720,16 +1711,13 @@ inline void FunctionParserBase<std::complex<double> >::AddFunctionOpcode(unsigne
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 1
 
-#ifdef __clang__
-#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wc99-extensions"
-#endif
-
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #include "extrasrc/fp_opcode_add.inc"
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
@@ -1744,16 +1732,13 @@ inline void FunctionParserBase<std::complex<float> >::AddFunctionOpcode(unsigned
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 1
 
-#ifdef __clang__
-#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wc99-extensions"
-#endif
-
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #include "extrasrc/fp_opcode_add.inc"
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
@@ -1768,16 +1753,13 @@ inline void FunctionParserBase<std::complex<long double> >::AddFunctionOpcode(un
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 1
 
-#ifdef __clang__
-#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wc99-extensions"
-#endif
-
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #include "extrasrc/fp_opcode_add.inc"
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
