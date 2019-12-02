@@ -22,6 +22,8 @@
 #include <sstream>
 
 // Libmesh headers
+#include "libmesh/dof_map.h"
+#include "libmesh/equation_systems.h"
 #include "libmesh/nemesis_io_helper.h"
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
@@ -2465,6 +2467,82 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 
 
+void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
+                                             const std::vector<std::pair<unsigned int, unsigned int>> & var_nums,
+                                             int timestep,
+                                             const std::vector<std::string> & output_names)
+{
+  const MeshBase & mesh = es.get_mesh();
+
+  for (auto & var_num : var_nums)
+    {
+      const unsigned int sys_num = var_num.first;
+      const unsigned int var = var_num.second;
+
+      const System & sys = es.get_system(sys_num);
+      const std::string & name = sys.variable_name(var);
+
+      auto pos = std::find(output_names.begin(), output_names.end(), name);
+
+      // Skip this name if it's not supposed to be output.
+      if (pos == output_names.end())
+        continue;
+
+      // Compute the (zero-based) index which determines which
+      // variable this will be as far as Nemesis is concerned.  This
+      // will be used below in the write_nodal_values() call.
+      int variable_name_position =
+        cast_int<int>(std::distance(output_names.begin(), pos));
+
+      // Fill up a std::vector with the dofs for the current variable
+      std::vector<numeric_index_type> required_indices(num_nodes);
+
+      const FEType type = sys.variable_type(var);
+      if (type.family == SCALAR)
+        {
+          std::vector<numeric_index_type> scalar_indices;
+          sys.get_dof_map().SCALAR_dof_indices(scalar_indices, var);
+          for (int i=0; i<num_nodes; i++)
+            required_indices[i] = scalar_indices[0];
+        }
+      else
+        for (int i=0; i<num_nodes; i++)
+          {
+            const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]);
+            required_indices[i] = node.dof_number(sys_num, var, 0);
+          }
+
+      // Get the dof values required to write just our local part of
+      // the solution vector.
+      std::vector<Number> local_soln;
+      sys.current_local_solution->get(required_indices, local_soln);
+
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+      // Call the ExodusII_IO_Helper function to write the data.
+      write_nodal_values(variable_name_position + 1, local_soln, timestep);
+#else
+      // We have the local (complex) values. Now extract the real,
+      // imaginary, and magnitude values from them.
+      std::vector<Real> real_parts(num_nodes);
+      std::vector<Real> imag_parts(num_nodes);
+      std::vector<Real> magnitudes(num_nodes);
+
+      for (int i=0; i<num_nodes; ++i)
+        {
+          real_parts[i] = local_soln[i].real();
+          imag_parts[i] = local_soln[i].imag();
+          magnitudes[i] = std::abs(local_soln[i]);
+        }
+
+      // Write the real, imaginary, and magnitude values to file.
+      write_nodal_values(3 * variable_name_position + 1, real_parts, timestep);
+      write_nodal_values(3 * variable_name_position + 2, imag_parts, timestep);
+      write_nodal_values(3 * variable_name_position + 3, magnitudes, timestep);
+#endif
+    }
+}
+
+
 
 void
 Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
@@ -2516,27 +2594,21 @@ Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
 
 void
 Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
-                                        const NumericVector<Number> & parallel_soln,
-                                        const std::vector<std::string> & names,
+                                        const EquationSystems & es,
+                                        const std::vector<std::pair<unsigned int, unsigned int>> &var_nums,
                                         int timestep,
                                         const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
-  // The total number of elements in the mesh. We need this for
-  // indexing into parallel_soln.
-  dof_id_type parallel_n_elem = mesh.parallel_n_elem();
-
   // For each variable in names,
   //   For each subdomain in subdomain_map,
   //     If this (subdomain, variable) combination is active
   //       Extract our values into local_soln (localize is a collective)
   //       Write local_soln to file
-  for (auto v : index_range(names))
+  for (auto v : index_range(var_nums))
     {
       // Get list of active subdomains for variable v
       const auto & active_subdomains = vars_active_subdomains[v];
 
-      // Loop over all subdomain blocks, even ones for which we have
-      // no elements, so we localize in sync
       for (const int sbd_id_int : global_elem_blk_ids)
         {
           const subdomain_id_type sbd_id =
@@ -2552,11 +2624,16 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
               std::vector<numeric_index_type> required_indices;
               required_indices.reserve(elem_ids.size());
 
+              const unsigned int sys_num = var_nums[v].first;
+
               for (const auto & id : elem_ids)
-                required_indices.push_back(v * parallel_n_elem + id);
+                required_indices.push_back
+                  (mesh.elem_ref(id).dof_number
+                    (sys_num, var_nums[v].second, 0));
 
               std::vector<Number> local_soln;
-              parallel_soln.localize(local_soln, required_indices);
+              es.get_system(sys_num).current_local_solution->get
+                (required_indices, local_soln);
 
               // It's possible that there's nothing for us to write:
               // we may not be responsible for any elements on the

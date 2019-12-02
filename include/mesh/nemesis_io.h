@@ -99,11 +99,18 @@ public:
                             bool allow_empty = true);
 
   /**
-   * Output a nodal solution.
+   * Output a nodal solution from data in \p soln
    */
   virtual void write_nodal_data (const std::string & fname,
                                  const std::vector<Number> & soln,
                                  const std::vector<std::string> & names) override;
+
+  /**
+   * Output a nodal solution from EquationSystems current_local_solutions
+   */
+  virtual void write_nodal_data (const std::string & fname,
+                                 const EquationSystems & es,
+                                 const std::set<std::string> * system_names);
 
   /**
    * Output a nodal solution in parallel, without localizing the soln vector.

@@ -355,6 +355,14 @@ public:
                                         std::vector<std::string> & names) const;
 
   /**
+   * Finds system and variable numbers for any variables of \p type
+   * corresponding to the entries in the input 'names' vector.
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  find_variable_numbers (std::vector<std::string> & names,
+                         const FEType * type=nullptr) const;
+
+  /**
    * Builds a parallel vector of CONSTANT MONOMIAL solution values
    * corresponding to the entries in the input 'names' vector.  This
    * vector is approximately uniformly distributed across all of the

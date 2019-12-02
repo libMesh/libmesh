@@ -1349,11 +1349,44 @@ void Nemesis_IO::write_nodal_data (const std::string & base_filename,
   nemhelper->write_nodal_solution(parallel_soln, names, _timestep, output_names);
 }
 
+
+
+void Nemesis_IO::write_nodal_data (const std::string & base_filename,
+                                   const EquationSystems & es,
+                                   const std::set<std::string> * system_names)
+{
+  LOG_SCOPE("write_nodal_data(parallel)", "Nemesis_IO");
+
+  // Only prepare and write nodal variables that are also in
+  // _output_variables, unless _output_variables is empty. This is the
+  // same logic that is in ExodusII_IO::write_nodal_data().
+  std::vector<std::string> output_names;
+
+  if (_allow_empty_variables || !_output_variables.empty())
+    output_names = _output_variables;
+  else
+    es.build_variable_names  (output_names, nullptr, system_names);
+
+  this->prepare_to_write_nodal_data(base_filename, output_names);
+
+  std::vector<std::pair<unsigned int, unsigned int>> var_nums =
+    es.find_variable_numbers(output_names);
+
+  nemhelper->write_nodal_solution(es, var_nums, _timestep, output_names);
+}
+
 #else
 
 void Nemesis_IO::write_nodal_data (const std::string &,
                                    const NumericVector<Number> &,
                                    const std::vector<std::string> &)
+{
+  libmesh_error_msg("ERROR, Nemesis API is not defined.");
+}
+
+void Nemesis_IO::write_nodal_data (const std::string &,
+                                   const EquationSystems &,
+                                   const std::set<std::string> *)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }
@@ -1372,12 +1405,14 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // To be (possibly) filled with a filtered list of variable names to output.
   std::vector<std::string> names;
 
+  // All of which should be low order monomials for now
+  const FEType type(CONSTANT, MONOMIAL);
+
   // If _output_variables is populated, only output the monomials which are
   // also in the _output_variables vector.
   if (_output_variables.size() > 0)
     {
       std::vector<std::string> monomials;
-      const FEType type(CONSTANT, MONOMIAL);
 
       // Create a list of monomial variable names
       es.build_variable_names(monomials, &type);
@@ -1389,16 +1424,15 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
           names.push_back(var);
     }
 
-  // Build the parallel elemental solution vector. The 'names' vector
-  // will also be updated with the variable's names that were actually
-  // written to the vector.
-  std::unique_ptr<NumericVector<Number>> parallel_soln =
-    es.build_parallel_elemental_solution_vector(names);
+  // The 'names' vector will here be updated with the variable's names
+  // that are actually eligible to write
+  std::vector<std::pair<unsigned int, unsigned int>> var_nums =
+    es.find_variable_numbers (names, &type);
 
   // build_parallel_elemental_solution_vector() can return a nullptr,
   // in which case there are no constant monomial variables to write,
   // and we can just return.
-  if (!parallel_soln)
+  if (var_nums.empty())
     {
       if (_verbose)
         libMesh::out << "No CONSTANT, MONOMIAL data to be written." << std::endl;
@@ -1426,8 +1460,8 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // sequence and is not virtual or an override.
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   nemhelper->write_element_values(mesh,
-                                  *parallel_soln,
-                                  names,
+                                  es,
+                                  var_nums,
                                   _timestep,
                                   vars_active_subdomains);
 }
