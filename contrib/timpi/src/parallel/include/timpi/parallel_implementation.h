@@ -1495,15 +1495,15 @@ inline void Communicator::broadcast (bool & data, const unsigned int root_id) co
       return;
     }
 
-  timpi_assert_less (root_id, this->size());
+  timpi_assert (root_id < this->size() ||
+                root_id == (unsigned int)MPI_PROC_NULL ||
+                root_id == (unsigned int)MPI_ROOT);
 
   TIMPI_LOG_SCOPE("broadcast()", "Parallel");
 
   // We don't want to depend on MPI-2 or C++ MPI, so we don't have
   // MPI::BOOL available
   char char_data = data;
-
-  timpi_assert_less(root_id, this->size());
 
   // Spread data to remote processors.
   timpi_call_mpi
@@ -1525,7 +1525,9 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
       return;
     }
 
-  timpi_assert_less (root_id, this->size());
+  timpi_assert (root_id < this->size() ||
+                root_id == (unsigned int)MPI_PROC_NULL ||
+                root_id == (unsigned int)MPI_ROOT);
 
   TIMPI_LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1564,15 +1566,15 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
       return;
     }
 
-  timpi_assert_less (root_id, this->size());
+  timpi_assert (root_id < this->size() ||
+                root_id == (unsigned int)MPI_PROC_NULL ||
+                root_id == (unsigned int)MPI_ROOT);
 
   TIMPI_LOG_SCOPE("broadcast()", "Parallel");
 
   // and get the data from the remote processors.
   // Pass nullptr if our vector is empty.
   T * data_ptr = data.empty() ? nullptr : data.data();
-
-  timpi_assert_less(root_id, this->size());
 
   timpi_call_mpi
     (MPI_Bcast (data_ptr, cast_int<int>(data.size()),
@@ -1591,7 +1593,9 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T>,A> & data,
       return;
     }
 
-  timpi_assert_less (root_id, this->size());
+  timpi_assert (root_id < this->size() ||
+                root_id == (unsigned int)MPI_PROC_NULL ||
+                root_id == (unsigned int)MPI_ROOT);
 
   TIMPI_LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1653,7 +1657,9 @@ inline void Communicator::broadcast (std::set<T,C,A> & data,
       return;
     }
 
-  timpi_assert_less (root_id, this->size());
+  timpi_assert (root_id < this->size() ||
+                root_id == (unsigned int)MPI_PROC_NULL ||
+                root_id == (unsigned int)MPI_ROOT);
 
   TIMPI_LOG_SCOPE("broadcast()", "Parallel");
 
@@ -1687,7 +1693,9 @@ inline void Communicator::broadcast(std::map<T1,T2,C,A> & data,
       return;
     }
 
-  timpi_assert_less (root_id, this->size());
+  timpi_assert (root_id < this->size() ||
+                root_id == (unsigned int)MPI_PROC_NULL ||
+                root_id == (unsigned int)MPI_ROOT);
 
   TIMPI_LOG_SCOPE("broadcast()", "Parallel");
 

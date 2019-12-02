@@ -956,6 +956,12 @@ public:
    * Take a local value and broadcast it to all processors.
    * Optionally takes the \p root_id processor, which specifies
    * the processor initiating the broadcast.
+   *
+   * \p root_id can be set to MPI_PROC_NULL for processors receiving
+   * the broadcast and MPI_ROOT for the processor initiating the
+   * broadcast, which eliminates the need to communicate a root
+   * processor before the broadcast.
+   *
    * If \p data is a vector, the user is responsible for resizing it
    * on all processors, except in the case when \p data is a vector
    * of strings.

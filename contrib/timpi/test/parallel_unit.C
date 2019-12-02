@@ -112,7 +112,7 @@ std::vector<std::string> pt_number;
 
 
 
-  void testBroadcast()
+  void testBroadcast(const bool use_proc_null)
   {
     std::vector<unsigned int> src(3), dest(3);
 
@@ -123,7 +123,13 @@ std::vector<std::string> pt_number;
     if (TestCommWorld->rank() == 0)
       dest = src;
 
-    TestCommWorld->broadcast(dest);
+    unsigned int root_id = 0;
+#ifdef LIBMESH_HAVE_MPI
+    if (use_proc_null)
+      root_id = (unsigned int)(TestCommWorld->rank() == 0 ? MPI_ROOT : MPI_PROC_NULL);
+#endif
+
+    TestCommWorld->broadcast(dest, root_id);
 
     for (std::size_t i=0; i<src.size(); i++)
       TIMPI_UNIT_ASSERT( src[i]  == dest[i] );
@@ -131,7 +137,7 @@ std::vector<std::string> pt_number;
 
 
 
-  void testBroadcastNestedType()
+  void testBroadcastNestedType(const bool use_proc_null)
   {
     using std::pair;
     typedef pair<pair<pair<pair<int, int>, int>, int>, int> pppp;
@@ -153,7 +159,13 @@ std::vector<std::string> pt_number;
     if (TestCommWorld->rank() == 0)
       dest = src;
 
-    TestCommWorld->broadcast(dest);
+    unsigned int root_id = 0;
+  #ifdef LIBMESH_HAVE_MPI
+      if (use_proc_null)
+        root_id = (unsigned int)(TestCommWorld->rank() == 0 ? MPI_ROOT : MPI_PROC_NULL);
+  #endif
+
+    TestCommWorld->broadcast(dest, root_id);
 
     for (std::size_t i=0; i<src.size(); i++)
       {
@@ -679,8 +691,10 @@ int main(int argc, const char * const * argv)
   testAllGatherVectorString();
   testAllGatherEmptyVectorString();
   testAllGatherHalfEmptyVectorString();
-  testBroadcast();
-  testBroadcastNestedType();
+  testBroadcast(/* use_proc_null = */ false);
+  testBroadcast(/* use_proc_null = */ true);
+  testBroadcastNestedType(/* use_proc_null = */ false);
+  testBroadcastNestedType(/* use_proc_null = */ true);
   testScatter();
   testBarrier();
   testMin();
