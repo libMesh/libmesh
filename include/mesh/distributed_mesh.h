@@ -215,6 +215,16 @@ public:
    */
   virtual void clear_extra_ghost_elems() { _extra_ghost_elems.clear(); }
 
+  /**
+   * Clears specified extra ghost elements
+   */
+  virtual void clear_extra_ghost_elems(const std::set<Elem *> & extra_ghost_elems);
+
+  /**
+   * Const accessor to the ghosted elements
+   */
+  const std::set<Elem *> & extra_ghost_elems() const { return _extra_ghost_elems; }
+
   // Cached methods that can be called in serial
   virtual dof_id_type n_nodes () const override { return _n_nodes; }
   virtual dof_id_type max_node_id () const override { return _max_node_id; }
