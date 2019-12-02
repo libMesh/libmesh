@@ -1306,7 +1306,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   // partitioning of new nodes may not be well balanced.
   //
   // make_nodes_parallel_consistent() will fix all this.
-  if (!this->is_serial())
+  if (!this->is_replicated())
     MeshCommunication().make_nodes_parallel_consistent (*this);
 
   // renumber nodes, elements etc
