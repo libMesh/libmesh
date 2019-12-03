@@ -78,7 +78,28 @@ public:
    */
   virtual void read (const std::string & name) override;
 
+  /**
+   * Constrains finite element degrees of freedom in terms of spline
+   * degrees of freedom by adding user-defined constraint rows to \p
+   * sys
+   */
+  void add_spline_constraints(DofMap & dof_map,
+                              unsigned int sys_num,
+                              unsigned int var_num);
+
 private:
+  // Keep track of spline node indexing, so as to enable adding
+  // constraint rows easily later.
+  std::vector<Node *> spline_node_ptrs;
+
+  // Keep track of the constraint equations associated with each FE
+  // node.
+  //
+  // constraint_rows[FE_node][i].first is the constraining spline
+  // node, and .second is the constraining coefficient.
+  std::map<const Node *, std::vector<std::pair<const Node *, Real>>>
+    constraint_rows;
+
   /**
    * Implementation of the read() function.  This function
    * is called by the public interface function and implements
