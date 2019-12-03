@@ -69,6 +69,12 @@ public:
    *
    * The patch ids defined in the Dyna file are stored as subdomain
    * ids.
+   *
+   * The spline nodes defined in the Dyna file are added to the mesh
+   * with type NodeElem.  The only connection between spline nodes and
+   * finite element nodes will be user constraint equations, so using
+   * a space-filling-curve partitioner for these meshes might be a
+   * good idea.
    */
   virtual void read (const std::string & name) override;
 

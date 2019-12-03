@@ -275,6 +275,14 @@ void DynaIO::read_mesh(std::istream & in)
               spline_nodes[n_nodes_read] = Point(xyzw[0], xyzw[1], xyzw[2]);
               if (weight_control_flag)
                 spline_weights[n_nodes_read] = xyzw[3];
+
+              // We'll use the spline nodes via NodeElem as the "true"
+              // degrees of freedom, to which other Elem degrees of
+              // freedom will be tied via constraint equations.
+              Node *n = mesh.add_point(spline_nodes[n_nodes_read]);
+              Elem * elem = Elem::build(NODEELEM).release();
+              elem->set_node(0) = n;
+              mesh.add_elem(elem);
             }
             ++n_nodes_read;
 

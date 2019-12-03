@@ -220,17 +220,19 @@ public:
 
     mesh.prepare_for_use();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(9));
+    // We have 1 QUAD9 finite element, attached via a trivial map to 9
+    // spline Node+NodeElem objects
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(10));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(18));
 
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
 
     unsigned char weight_index = mesh.default_mapping_data();
 
-    if (mesh.query_elem_ptr(0))
+    if (mesh.query_elem_ptr(9))
       {
-        const Elem & elem = mesh.elem_ref(0);
+        const Elem & elem = mesh.elem_ref(9);
 
         CPPUNIT_ASSERT_EQUAL(elem.type(), QUAD9);
         for (unsigned int n=0; n != 9; ++n)
@@ -266,8 +268,10 @@ public:
 
     mesh.prepare_for_use();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(25));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(121));
+    // We have 5^2 QUAD9 elements, with 11^2 nodes,
+    // tied to 49 Node/NodeElem spline nodes
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(25+49));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(121+49));
 
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
@@ -276,6 +280,8 @@ public:
 
     for (const auto & elem : mesh.active_element_ptr_range())
       {
+        if (elem->type() == NODEELEM)
+          continue;
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(0.04), elem->volume(), TOLERANCE);
 
         for (unsigned int n=0; n != 9; ++n)
