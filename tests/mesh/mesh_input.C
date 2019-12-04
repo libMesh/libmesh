@@ -1,4 +1,5 @@
 #include <libmesh/equation_systems.h>
+#include <libmesh/implicit_system.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_communication.h>
 #include <libmesh/mesh_generation.h>
@@ -311,6 +312,13 @@ public:
 
         CPPUNIT_ASSERT_EQUAL(n_neighbors, n_neighbors_expected);
       }
+
+    // Now test whether we can assign the desired constraint equations
+    EquationSystems es(mesh);
+    ImplicitSystem & sys = es.add_system<ImplicitSystem>("test");
+    sys.add_variable("u", SECOND); // to match QUAD9
+    es.init();
+    dyna.add_spline_constraints(sys.get_dof_map(), 0, 0);
   }
 
 
