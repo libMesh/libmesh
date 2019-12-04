@@ -1580,6 +1580,7 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
 }
 
 
+
 template <typename T, typename A>
 inline void Communicator::broadcast (std::vector<std::basic_string<T>,A> & data,
                                      const unsigned int root_id) const
@@ -1635,6 +1636,65 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T>,A> & data,
           std::size_t curr_len = *iter++;
           data.push_back(std::basic_string<T>(iter, iter+curr_len));
           iter += curr_len;
+        }
+    }
+}
+
+
+
+template <typename T, typename A1, typename A2>
+inline void Communicator::broadcast (std::vector<std::vector<T,A1>,A2> & data,
+                                     const unsigned int root_id) const
+{
+  if (this->size() == 1)
+    {
+      timpi_assert (!this->rank());
+      timpi_assert (!root_id);
+      return;
+    }
+
+  timpi_assert_less (root_id, this->size());
+
+  TIMPI_LOG_SCOPE("broadcast()", "Parallel");
+
+  std::size_t size_sizes = data.size();
+  this->broadcast(size_sizes, root_id);
+  std::vector<std::size_t> sizes(size_sizes);
+
+  if (root_id == this->rank())
+    for (std::size_t i=0; i<size_sizes; ++i)
+      sizes[i] = data[i].size();
+
+  this->broadcast(sizes, root_id);
+
+  std::size_t bufsize = 0;
+  for (std::size_t i=0; i<size_sizes; ++i)
+    bufsize += sizes[i];
+
+  std::vector<T> temp; temp.reserve(bufsize);
+  // Pack the vectors
+  if (root_id == this->rank())
+    {
+      // The data will be packed in one long array
+      for (std::size_t i=0; i<size_sizes; ++i)
+        temp.insert(temp.end(), data[i].begin(), data[i].end());
+    }
+  else
+    temp.resize(bufsize);
+
+  // broad cast the packed data
+  this->broadcast(temp, root_id);
+
+  // Unpack the data
+  if (root_id != this->rank())
+    {
+      data.clear();
+      data.resize(size_sizes);
+      typename std::vector<T>::const_iterator iter = temp.begin();
+      for (std::size_t i=0; i<size_sizes; ++i)
+        {
+          data[i].insert(data[i].end(), iter, iter+sizes[i]);
+          iter += sizes[i];
         }
     }
 }

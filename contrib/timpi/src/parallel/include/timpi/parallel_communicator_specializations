@@ -315,6 +315,11 @@
     void broadcast(std::vector<std::basic_string<T>,A> &data,
                    const unsigned int root_id=0) const;
 
+    template <typename T, typename A1, typename A2>
+    inline
+    void broadcast(std::vector<std::vector<T,A1>,A2> &data,
+                   const unsigned int root_id=0) const;
+
     template <typename T, typename C, typename A>
     inline
     void broadcast(std::set<T,C,A> &data,
