@@ -110,7 +110,7 @@ public:
    */
   virtual void write_nodal_data (const std::string & fname,
                                  const EquationSystems & es,
-                                 const std::set<std::string> * system_names);
+                                 const std::set<std::string> * system_names) override;
 
   /**
    * Output a nodal solution in parallel, without localizing the soln vector.
