@@ -67,6 +67,11 @@ public:
    * \note The user is responsible for calling Mesh::prepare_for_use()
    * after reading the mesh and before using it.
    *
+   * \note To safely use DynaIO::add_spline_constraints with a
+   * DistributedMesh, currently the user must
+   * allow_remote_element_removal(false) and allow_renumbering(false)
+   * before the mesh is read.
+   *
    * The patch ids defined in the Dyna file are stored as subdomain
    * ids.
    *
@@ -97,8 +102,11 @@ private:
   //
   // constraint_rows[FE_node][i].first is the constraining spline
   // node, and .second is the constraining coefficient.
-  std::map<const Node *, std::vector<std::pair<const Node *, Real>>>
+  std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>>
     constraint_rows;
+
+  // Have we broadcast the constraint_rows to non-root procs yet?
+  bool constraint_rows_broadcast;
 
   /**
    * Implementation of the read() function.  This function

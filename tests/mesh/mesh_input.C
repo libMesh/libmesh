@@ -214,6 +214,11 @@ public:
     Mesh mesh(*TestCommWorld);
 
     DynaIO dyna(mesh);
+
+    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    mesh.allow_renumbering(false);
+    mesh.allow_remote_element_removal(false);
+
     if (mesh.processor_id() == 0)
       dyna.read("1_quad.dyn");
     MeshCommunication().broadcast (mesh);
@@ -260,6 +265,10 @@ public:
   void testDynaReadPatch ()
   {
     Mesh mesh(*TestCommWorld);
+
+    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    mesh.allow_renumbering(false);
+    mesh.allow_remote_element_removal(false);
 
     DynaIO dyna(mesh);
     if (mesh.processor_id() == 0)
