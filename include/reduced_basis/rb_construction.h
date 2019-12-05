@@ -438,11 +438,13 @@ public:
    */
   void zero_constrained_dofs_on_vector(NumericVector<Number> & vector);
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   /**
    * It's helpful to be able to generate a DirichletBoundary that stores a ZeroFunction in order
    * to impose Dirichlet boundary conditions.
    */
   static std::unique_ptr<DirichletBoundary> build_zero_dirichlet_boundary_object();
+#endif
 
   /**
    * Setter for the flag determining if convergence should be

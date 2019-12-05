@@ -1188,6 +1188,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
         (elem_data[4] == static_cast<largest_id_type>(-1) ||
          (file_is_broken && elem_data[4] == 65535)) ?
         nullptr : mesh.elem_ptr(cast_int<dof_id_type>(elem_data[4]));
+
       const unsigned short int child_num   =
         (elem_data[5] == static_cast<largest_id_type>(-1) ||
          (file_is_broken && elem_data[5] == 65535)) ?
@@ -1263,6 +1264,8 @@ void CheckpointIO::read_connectivity (Xdr & io)
               // skipped adding any preceding remote_elem children
               parent->add_child(elem, child_num);
             }
+#else
+          libmesh_ignore(child_num);
 #endif
 
           libmesh_assert(elem->n_nodes() == conn_data.size());

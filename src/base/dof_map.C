@@ -1689,10 +1689,12 @@ void DofMap::reinit_send_list (MeshBase & mesh)
   this->clear_send_list();
   this->add_neighbors_to_send_list(mesh);
 
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   // This is assuming that we only need to recommunicate
   // the constraints and no new ones have been added since
   // a previous call to reinit_constraints.
   this->process_constraints(mesh);
+#endif
   this->prepare_send_list();
 }
 

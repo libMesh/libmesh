@@ -401,6 +401,7 @@ void RBConstruction::set_energy_inner_product(const std::vector<Number> & energy
 
 void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vector)
 {
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   const DofMap & dof_map = get_dof_map();
 
   for (dof_id_type i=dof_map.first_dof(); i<dof_map.end_dof(); i++)
@@ -410,6 +411,8 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vec
           vector.set(i, 0.);
         }
     }
+#endif
+
   vector.close();
 }
 
@@ -2010,6 +2013,8 @@ void RBConstruction::get_output_vectors(std::map<std::string, NumericVector<Numb
       }
 }
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
+
 std::unique_ptr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
 {
   ZeroFunction<> zf;
@@ -2020,6 +2025,8 @@ std::unique_ptr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary
   // The DirichletBoundary constructor clones zf, so it's OK that zf is only in local scope
   return libmesh_make_unique<DirichletBoundary>(dirichlet_ids, variables, &zf);
 }
+
+#endif
 
 void RBConstruction::write_riesz_representors_to_files(const std::string & riesz_representors_dir,
                                                        const bool write_binary_residual_representors)

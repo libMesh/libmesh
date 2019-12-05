@@ -45,6 +45,8 @@ namespace
 {
 using namespace libMesh;
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+
 // Find the "primary" element around a boundary point:
 const Elem * primary_boundary_point_neighbor(const Elem * elem,
                                              const Point & p,
@@ -167,6 +169,8 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
 
   return primary;
 }
+
+#endif // LIBMESH_ENABLE_PERIODIC
 
 }
 

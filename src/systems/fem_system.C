@@ -304,6 +304,8 @@ void add_element_system(const FEMSystem & _sys,
                                                      _femcontext.get_dof_indices(),
                                                      false);
     }
+#else
+  libmesh_ignore(_constrain_heterogeneously, _no_constraints);
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
   if (_get_residual && _sys.print_element_residuals)
@@ -490,13 +492,14 @@ public:
       {
         _femcontext.pre_fe_reinit(_sys, elem);
 
+        // We might have some heterogenous dofs here; let's see for
+        // certain
+        bool elem_has_some_heterogenous_qoi_bc = false;
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
         const unsigned int n_dofs =
           cast_int<unsigned int>(_femcontext.get_dof_indices().size());
 
-        // We might have some heterogenous dofs here; let's see for
-        // certain
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-        bool elem_has_some_heterogenous_qoi_bc = false;
         std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.n_qois(), false);
         if (have_some_heterogenous_qoi_bc)
           {
@@ -626,13 +629,14 @@ public:
       {
         _femcontext.pre_fe_reinit(_sys, elem);
 
+        // We might have some heterogenous dofs here; let's see for
+        // certain
+        bool elem_has_some_heterogenous_qoi_bc = false;
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
         const unsigned int n_dofs =
           cast_int<unsigned int>(_femcontext.get_dof_indices().size());
 
-        // We might have some heterogenous dofs here; let's see for
-        // certain
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-        bool elem_has_some_heterogenous_qoi_bc = false;
         std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.n_qois(), false);
         if (have_some_heterogenous_qoi_bc)
           {

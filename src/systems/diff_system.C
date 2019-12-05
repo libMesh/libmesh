@@ -217,13 +217,16 @@ void DifferentiableSystem::add_second_order_dot_vars()
           // The new velocities are time evolving variables of first order
           this->time_evolving( v_var_idx, 1 );
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
           // And if there are any boundary conditions set on the second order
           // variable, we also need to set it on its velocity variable.
           this->add_dot_var_dirichlet_bcs(var_id, v_var_idx);
+#endif
         }
     }
 }
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
 void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
                                                       unsigned int dot_var_idx )
 {
@@ -302,6 +305,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
 
     } // if (all_dbcs)
 }
+#endif // LIBMESH_ENABLE_DIRICHLET
 
 unsigned int DifferentiableSystem::get_second_order_dot_var( unsigned int var ) const
 {

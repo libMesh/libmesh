@@ -396,6 +396,7 @@ protected:
    */
   void add_second_order_dot_vars();
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   /**
    * Helper function to and Dirichlet boundary conditions to "dot" variable
    * cousins of second order variables in the system. The function takes the
@@ -405,6 +406,7 @@ protected:
    * functors for the var_idx DirichletBoundary.
    */
   void add_dot_var_dirichlet_bcs( unsigned int var_idx, unsigned int dot_var_idx);
+#endif
 
 };
 

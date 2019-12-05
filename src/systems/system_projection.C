@@ -269,11 +269,7 @@ void System::project_vector (NumericVector<Number> & vector,
  */
 void System::project_vector (const NumericVector<Number> & old_v,
                              NumericVector<Number> & new_v,
-                             int
-#ifdef LIBMESH_ENABLE_AMR
-                             is_adjoint
-#endif
-                             ) const
+                             int is_adjoint) const
 {
   LOG_SCOPE ("project_vector(old,new)", "System");
 
@@ -448,6 +444,8 @@ void System::project_vector (const NumericVector<Number> & old_v,
 
   // AMR is disabled: simply copy the vector
   new_v = old_v;
+
+  libmesh_ignore(is_adjoint);
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 }
@@ -1097,6 +1095,8 @@ void System::project_vector (NumericVector<Number> & new_vector,
   else if (is_adjoint >= 0)
     this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
                                                             is_adjoint);
+#else
+  libmesh_ignore(is_adjoint);
 #endif
 }
 
@@ -1187,6 +1187,8 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
   else if (is_adjoint >= 0)
     this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
                                                             is_adjoint);
+#else
+  libmesh_ignore(is_adjoint);
 #endif
 }
 
