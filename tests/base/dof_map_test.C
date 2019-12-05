@@ -10,6 +10,7 @@
 
 using namespace libMesh;
 
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 // This class is used by testConstraintLoopDetection
 class MyConstraint : public System::Constraint
 {
@@ -39,6 +40,7 @@ public:
     }
   }
 };
+#endif
 
 
 class DofMapTest : public CppUnit::TestCase {
