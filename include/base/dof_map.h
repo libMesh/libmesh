@@ -2036,10 +2036,20 @@ inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> &,
                                                          std::vector<dof_id_type> &,
                                                          bool) const {}
 
+inline void DofMap::heterogenously_constrain_element_matrix_and_vector
+  (DenseMatrix<Number> &, DenseVector<Number> &,
+   std::vector<dof_id_type> &, bool, int) const {}
+
+inline void DofMap::heterogenously_constrain_element_vector
+  (const DenseMatrix<Number> &, DenseVector<Number> &,
+   std::vector<dof_id_type> &, bool, int) const {}
+
 inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number> &,
                                                    DenseVector<Number> &,
                                                    std::vector<dof_id_type> &,
                                                    bool) const {}
+
+inline void DofMap::constrain_nothing (std::vector<dof_id_type> &) const {}
 
 inline void DofMap::enforce_constraints_exactly (const System &,
                                                  NumericVector<Number> *,
