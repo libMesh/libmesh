@@ -313,12 +313,17 @@ public:
         CPPUNIT_ASSERT_EQUAL(n_neighbors, n_neighbors_expected);
       }
 
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
     // Now test whether we can assign the desired constraint equations
     EquationSystems es(mesh);
     ImplicitSystem & sys = es.add_system<ImplicitSystem>("test");
     sys.add_variable("u", SECOND); // to match QUAD9
     es.init();
     dyna.add_spline_constraints(sys.get_dof_map(), 0, 0);
+
+    // We should have a constraint on every FE dof
+    CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), dof_id_type(121));
+#endif // LIBMESH_ENABLE_CONSTRAINTS
   }
 
 
