@@ -686,6 +686,7 @@ void DynaIO::add_spline_constraints(DofMap & dof_map,
                                     unsigned int sys_num,
                                     unsigned int var_num)
 {
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   const MeshBase & mesh = this->mesh();
 
   // We have some strict compatibility requirements here still
@@ -702,7 +703,6 @@ void DynaIO::add_spline_constraints(DofMap & dof_map,
       constraint_rows_broadcast = true;
     }
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (auto & node_row : constraint_rows)
     {
       DofConstraintRow dc_row;
@@ -721,6 +721,7 @@ void DynaIO::add_spline_constraints(DofMap & dof_map,
       dof_map.add_constraint_row(constrained_id, dc_row);
     }
 #else
+  libmesh_ignore(dof_map, sys_num, var_num);
   libmesh_not_implemented();
 #endif
 }
