@@ -63,11 +63,13 @@ void HeatSystem::init_data ()
 
   ZeroFunction<Number> zero;
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
   this->get_dof_map().add_dirichlet_boundary
     (DirichletBoundary (all_bdys, T_only, zero,
                         LOCAL_VARIABLE_ORDER));
+#endif
 
   FEMSystem::init_data();
 }

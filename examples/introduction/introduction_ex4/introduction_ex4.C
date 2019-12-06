@@ -159,6 +159,11 @@ int main (int argc, char ** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // Create a mesh with user-defined dimension.
   // Read number of elements from command line
   int ps = 15;
@@ -274,6 +279,7 @@ int main (int argc, char ** argv)
   // This function just calls the function exact_solution via exact_solution_wrapper
   AnalyticFunction<> exact_solution_object(exact_solution_wrapper);
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // In general, when reusing a system-indexed exact solution, we want
   // to use the default system-ordering constructor for
   // DirichletBoundary, so we demonstrate that here.  In this case,
@@ -285,7 +291,7 @@ int main (int argc, char ** argv)
   // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
-
+#endif
 
   // Initialize the data structures for the equation system.
   equation_systems.init();

@@ -531,6 +531,11 @@ int main (int argc, char ** argv)
   // We use a 3D domain.
   libmesh_example_requires(LIBMESH_DIM > 2, "--disable-1D-only --disable-2D-only");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   GetPot infile("systems_of_equations_ex7.in");
   const Real x_length = infile("x_length", 0.);
   const Real y_length = infile("y_length", 0.);
@@ -607,6 +612,7 @@ int main (int argc, char ** argv)
   equation_systems.parameters.set<Real>("poisson_ratio") = poisson_ratio;
   equation_systems.parameters.set<Real>("forcing_magnitude") = forcing_magnitude;
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Attach Dirichlet boundary conditions
   std::set<boundary_id_type> clamped_boundaries;
   clamped_boundaries.insert(BOUNDARY_ID_MIN_X);
@@ -623,6 +629,9 @@ int main (int argc, char ** argv)
   system.get_dof_map().add_dirichlet_boundary
     (DirichletBoundary (clamped_boundaries, uvw, zero,
                         LOCAL_VARIABLE_ORDER));
+#else
+  libmesh_ignore(u_var, v_var, w_var);
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   equation_systems.init();
   equation_systems.print_info();

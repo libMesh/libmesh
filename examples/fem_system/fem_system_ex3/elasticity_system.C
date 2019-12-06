@@ -40,6 +40,7 @@ void ElasticitySystem::init_data()
   this->time_evolving(_v_var,2);
   this->time_evolving(_w_var,2);
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   std::set<boundary_id_type> boundary_ids;
   boundary_ids.insert(BOUNDARY_ID_MIN_X);
   boundary_ids.insert(NODE_BOUNDARY_ID);
@@ -58,6 +59,8 @@ void ElasticitySystem::init_data()
                                  LOCAL_VARIABLE_ORDER);
 
   this->get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Do the parent's initialization after variables and boundary constraints are defined
   FEMSystem::init_data();

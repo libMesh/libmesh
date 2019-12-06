@@ -113,6 +113,10 @@ int main(int argc, char ** argv)
   const unsigned int dim = 3;
   libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
 
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#else
+
   std::string parameters_filename = "reduced_basis_ex5.in";
   GetPot infile(parameters_filename);
 
@@ -307,8 +311,12 @@ int main(int argc, char ** argv)
         }
     }
 
+#endif // LIBMESH_ENABLE_DIRICHLET
+
   return 0;
 }
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
 
 void scale_mesh_and_plot(EquationSystems & es,
                          const RBParameters & mu,
@@ -445,3 +453,6 @@ void compute_stresses(EquationSystems & es)
   stress_system.solution->close();
   stress_system.update();
 }
+
+#endif // LIBMESH_ENABLE_DIRICHLET
+

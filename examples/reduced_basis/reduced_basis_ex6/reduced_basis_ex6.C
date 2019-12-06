@@ -135,6 +135,10 @@ int main (int argc, char ** argv)
   // This is a 3D example
   libmesh_example_requires(3 == LIBMESH_DIM, "3D support");
 
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#else
+
   // Parse the input file using GetPot
   std::string eim_parameters = "eim.in";
   std::string rb_parameters  = "rb.in";
@@ -293,8 +297,12 @@ int main (int argc, char ** argv)
         }
     }
 
+#endif // LIBMESH_ENABLE_DIRICHLET
+
   return 0;
 }
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
 
 void transform_mesh_and_plot(EquationSystems & es,
                              Real curvature,
@@ -316,3 +324,5 @@ void transform_mesh_and_plot(EquationSystems & es,
   ExodusII_IO(mesh).write_equation_systems(filename, es);
 #endif
 }
+
+#endif // LIBMESH_ENABLE_DIRICHLET

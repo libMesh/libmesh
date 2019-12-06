@@ -74,6 +74,11 @@ int main (int argc, char ** argv)
   // We use a 3D domain.
   libmesh_example_requires(LIBMESH_DIM > 2, "--disable-1D-only --disable-2D-only");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // This example requires the PETSc nonlinear solvers
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
@@ -139,6 +144,7 @@ int main (int argc, char ** argv)
   equation_systems.parameters.set<Real>("young_modulus") = young_modulus;
   equation_systems.parameters.set<Real>("poisson_ratio") = poisson_ratio;
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Attach Dirichlet boundary conditions
   {
     std::set<boundary_id_type> clamped_boundaries;
@@ -184,6 +190,9 @@ int main (int argc, char ** argv)
       (DirichletBoundary (clamped_boundaries, w, neg_one,
                           LOCAL_VARIABLE_ORDER));
   }
+#else
+  libmesh_ignore(u_var, v_var, w_var);
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   le.initialize_contact_load_paths();
 

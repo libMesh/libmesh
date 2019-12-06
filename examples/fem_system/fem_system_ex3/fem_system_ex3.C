@@ -69,6 +69,11 @@ int main (int argc, char ** argv)
   // This example requires 3D calculations
   libmesh_example_requires(LIBMESH_DIM > 2, "3D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // Parse the input file
   GetPot infile("fem_system_ex3.in");
 

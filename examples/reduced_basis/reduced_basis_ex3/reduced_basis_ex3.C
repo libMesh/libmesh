@@ -74,6 +74,10 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#else
+
   // Parse the input file (reduced_basis_ex3.in) using GetPot
   std::string parameters_filename = "reduced_basis_ex3.in";
   GetPot infile(parameters_filename);
@@ -202,6 +206,8 @@ int main (int argc, char** argv)
 #endif
         }
     }
+
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   return 0;
 

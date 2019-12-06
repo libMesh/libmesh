@@ -95,6 +95,11 @@ int main (int argc, char ** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // Create a 2D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
   MeshTools::Generation::build_square (mesh,
@@ -114,6 +119,7 @@ int main (int argc, char ** argv)
   LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Elasticity");
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Add two displacement variables, u and v, to the system
   unsigned int u_var = system.add_variable("u", SECOND, LAGRANGE);
   unsigned int v_var = system.add_variable("v", SECOND, LAGRANGE);
@@ -145,6 +151,7 @@ int main (int argc, char ** argv)
   // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Initialize the data structures for the equation system.
   equation_systems.init();

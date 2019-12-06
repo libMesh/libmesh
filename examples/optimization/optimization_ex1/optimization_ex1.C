@@ -175,6 +175,7 @@ void AssembleOptimization::assemble_A_and_F()
             }
         }
 
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
       // This will zero off-diagonal entries of Ke corresponding to
       // Dirichlet dofs.
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
@@ -188,6 +189,7 @@ void AssembleOptimization::assemble_A_and_F()
               Ke(local_dof_index, local_dof_index) = 0.;
             }
         }
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
       A_matrix->add_matrix (Ke, dof_indices);
       F_vector->add_vector (Fe, dof_indices);
@@ -258,6 +260,11 @@ int main (int argc, char ** argv)
   // We use a 2D domain.
   libmesh_example_requires(LIBMESH_DIM > 1, "--disable-1D-only");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   if (libMesh::on_command_line ("--use-eigen"))
     {
       libMesh::err << "This example requires an OptimizationSolver, and therefore does not "
@@ -304,10 +311,6 @@ int main (int argc, char ** argv)
 
   AssembleOptimization assemble_opt(system);
 
-  unsigned int u_var = system.add_variable("u",
-                                           Utility::string_to_enum<Order>   (approx_order),
-                                           Utility::string_to_enum<FEFamily>(fe_family));
-
   system.optimization_solver->objective_object = &assemble_opt;
   system.optimization_solver->gradient_object  = &assemble_opt;
   system.optimization_solver->hessian_object   = &assemble_opt;
@@ -320,6 +323,11 @@ int main (int argc, char ** argv)
   system.add_vector("F_vector");
   assemble_opt.A_matrix = &system.get_matrix("A_matrix");
   assemble_opt.F_vector = &system.get_vector("F_vector");
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  unsigned int u_var = system.add_variable("u",
+                                           Utility::string_to_enum<Order>   (approx_order),
+                                           Utility::string_to_enum<FEFamily>(fe_family));
 
   // Apply Dirichlet constraints. This will be used to apply constraints
   // to the objective function, gradient and Hessian.
@@ -337,7 +345,7 @@ int main (int argc, char ** argv)
   DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
                                  LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
-
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   equation_systems.init();
   equation_systems.print_info();

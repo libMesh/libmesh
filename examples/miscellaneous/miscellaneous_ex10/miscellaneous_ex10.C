@@ -103,6 +103,11 @@ int main (int argc, char ** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "3D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // Read number of elements used in each cube from command line
   int ps = 10;
   if (command_line.search(1, "-n"))
@@ -179,6 +184,7 @@ void assemble_and_solve(MeshBase & mesh,
   LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
 
   system.attach_assemble_function (assemble_poisson);
@@ -199,6 +205,7 @@ void assemble_and_solve(MeshBase & mesh,
   DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
                                  LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   equation_systems.init();
   equation_systems.print_info();
