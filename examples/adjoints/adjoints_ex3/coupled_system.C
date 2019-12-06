@@ -148,6 +148,7 @@ void CoupledSystem::init_data ()
   BdyFunction inflow_left(u_var, v_var, -velocity_sign);
   BdyFunction inflow_right(u_var, v_var, velocity_sign);
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // On the walls we will apply the no slip and no penetration boundary condition, u=0, v=0
   this->get_dof_map().add_dirichlet_boundary
     (DirichletBoundary (wall_bdy, uv, &zero));
@@ -165,6 +166,7 @@ void CoupledSystem::init_data ()
     (DirichletBoundary (right_inlet_bdy, uv, &inflow_right));
   this->get_dof_map().add_dirichlet_boundary
     (DirichletBoundary (right_inlet_bdy, C_only, &zero));
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Note that the remaining boundary conditions are the natural boundary conditions for the concentration
   // on the wall (grad(c) dot n = 0) and natural boundary conditions for the velocity and the concentration

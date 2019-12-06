@@ -89,6 +89,11 @@ int main (int argc, char ** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // This example NaNs with the Eigen sparse linear solvers and
   // Trilinos solvers, but should work OK with either PETSc or
   // Laspack.
@@ -651,6 +656,7 @@ void assemble_stokes (EquationSystems & es,
 
 void set_lid_driven_bcs(TransientLinearImplicitSystem & system)
 {
+#ifdef LIBMESH_ENABLE_DIRICHLET
   unsigned short int
     u_var = system.variable_number("vel_x"),
     v_var = system.variable_number("vel_y");
@@ -697,4 +703,7 @@ void set_lid_driven_bcs(TransientLinearImplicitSystem & system)
                                                      variables,
                                                      ZeroFunction<Number>()));
   }
+#else
+  libmesh_ignore(system);
+#endif
 }

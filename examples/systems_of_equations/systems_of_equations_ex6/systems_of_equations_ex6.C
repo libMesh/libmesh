@@ -431,6 +431,11 @@ int main (int argc, char ** argv)
   // Make sure libMesh was compiled for 3D
   libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
   MeshTools::Generation::build_cube (mesh,
@@ -523,13 +528,14 @@ int main (int argc, char ** argv)
   petsc_linear_solver->set_solver_configuration(petsc_solver_config);
 #endif
 
+  LinearElasticity le(equation_systems);
+  system.attach_assemble_object(le);
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Add three displacement variables, u and v, to the system
   unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
   unsigned int v_var = system.add_variable("v", FIRST, LAGRANGE);
   unsigned int w_var = system.add_variable("w", FIRST, LAGRANGE);
-
-  LinearElasticity le(equation_systems);
-  system.attach_assemble_object(le);
 
   std::set<boundary_id_type> boundary_ids;
   boundary_ids.insert(BOUNDARY_ID_MIN_X);
@@ -553,6 +559,7 @@ int main (int argc, char ** argv)
   // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Also, initialize an ExplicitSystem to store stresses
   ExplicitSystem & stress_system =

@@ -220,6 +220,7 @@ void set_system_parameters(HeatSystem & system,
     param.deltat_reductions;
   system.time_solver->quiet           = param.time_solver_quiet;
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Create any Dirichlet boundary conditions
   typedef
     std::map<boundary_id_type, FunctionBase<Number> *>::
@@ -241,6 +242,7 @@ void set_system_parameters(HeatSystem & system,
         libMesh::out << param.dirichlet_condition_variables[b][vi];
       libMesh::out << std::endl;
     }
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Set the time stepping options
   system.deltat = param.deltat;
@@ -294,6 +296,11 @@ int main (int argc, char ** argv)
 #else
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
+
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
 
   // Initialize libMesh.
   LibMeshInit init (argc, argv);

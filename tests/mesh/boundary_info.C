@@ -24,7 +24,9 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+# ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
+# endif
 #endif
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testEdgeBoundaryConditions );
@@ -238,6 +240,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(n_elem), bi.n_edge_conds());
   }
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   void testShellFaceConstraints()
   {
     // Make a simple two element mesh that we can use to test constraints
@@ -333,6 +336,7 @@ public:
           }
       }
   }
+#endif // LIBMESH_ENABLE_DIRICHLET
 
 };
 

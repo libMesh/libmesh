@@ -728,6 +728,11 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-amr");
 #else
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // This doesn't converge with Eigen BICGSTAB or with Trilinos for some reason...
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 

@@ -46,6 +46,8 @@ using libMesh::Real;
 // local include
 #include "assembly.h"
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
+
 // A simple subclass of RBEvaluation. We also store the theta expansion object
 // for the affine expansion of the PDE as a member variable.
 class SimpleRBEvaluation : public RBEvaluation
@@ -174,6 +176,8 @@ public:
   std::unique_ptr<DirichletBoundary> dirichlet_bc;
 
 };
+
+#endif // LIBMESH_ENABLE_DIRICHLET
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 

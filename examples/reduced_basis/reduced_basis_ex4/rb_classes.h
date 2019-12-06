@@ -23,6 +23,8 @@
 #include "libmesh/rb_construction.h"
 #include "assembly.h"
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
+
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
 using libMesh::DirichletBoundary;
@@ -145,5 +147,7 @@ public:
    */
   std::unique_ptr<DirichletBoundary> dirichlet_bc;
 };
+
+#endif // LIBMESH_ENABLE_DIRICHLET
 
 #endif

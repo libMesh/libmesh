@@ -17,6 +17,8 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/node.h"
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
+
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
 using libMesh::ElemAssembly;
@@ -372,3 +374,5 @@ void InnerProductAssembly::interior_assembly(FEMContext & c)
           Kww(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
     }
 }
+
+#endif // LIBMESH_ENABLE_DIRICHLET

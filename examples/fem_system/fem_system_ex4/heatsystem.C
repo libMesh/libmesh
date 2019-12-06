@@ -19,6 +19,7 @@ void HeatSystem::init_data ()
   T_var = this->add_variable("T", static_cast<Order>(_fe_order),
                              Utility::string_to_enum<FEFamily>(_fe_family));
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
   // Add dirichlet boundaries on all but the boundary element side
@@ -34,6 +35,7 @@ void HeatSystem::init_data ()
   // indexed" functor
   this->get_dof_map().add_dirichlet_boundary
     (DirichletBoundary (nonyplus_bdys, T_only, zero, LOCAL_VARIABLE_ORDER));
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();

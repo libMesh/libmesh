@@ -66,6 +66,7 @@ void PoissonSystem::init_data ()
   // The temperature is evolving, with a first order time derivative
   this->time_evolving(T_var, 1);
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Now we will set the Dirichlet boundary conditions
 
   // Get boundary ids for all the boundaries
@@ -88,6 +89,7 @@ void PoissonSystem::init_data ()
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary (all_bdy, T_only, &zero));
 
   this->get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary (bottom_bdry, T_only, &bottom_adjoint), 0);
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();

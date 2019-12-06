@@ -124,6 +124,7 @@ void NavierSystem::init_data ()
   this->print_element_jacobians = infile("print_element_jacobians", false);
 
   // Set Dirichlet boundary conditions
+#ifdef LIBMESH_ENABLE_DIRICHLET
   const boundary_id_type top_id = (dim==3) ? 5 : 2;
 
   std::set<boundary_id_type> top_bdys;
@@ -169,6 +170,7 @@ void NavierSystem::init_data ()
       this->get_dof_map().add_dirichlet_boundary
         (DirichletBoundary (all_bdys, uvw, &bdy));
     }
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Do the parent's initialization after variables and boundary constraints are defined
   FEMSystem::init_data();

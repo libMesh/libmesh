@@ -14,6 +14,7 @@
 
 using namespace libMesh;
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
 
 class ElasticityRBEvaluation : public RBEvaluation
 {
@@ -137,5 +138,7 @@ public:
    */
   std::unique_ptr<DirichletBoundary> dirichlet_bc;
 };
+
+#endif // LIBMESH_ENABLE_DIRICHLET
 
 #endif

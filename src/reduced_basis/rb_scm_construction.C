@@ -233,6 +233,7 @@ void RBSCMConstruction::perform_SCM_greedy()
   // initialize rb_scm_eval's parameters
   rb_scm_eval->initialize_parameters(*this);
 
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   // Get a list of constrained dofs from rb_system
   std::set<dof_id_type> constrained_dofs_set;
   EquationSystems & es = this->get_equation_systems();
@@ -249,6 +250,7 @@ void RBSCMConstruction::perform_SCM_greedy()
   // Use these constrained dofs to identify which dofs we want to "get rid of"
   // (i.e. condense) in our eigenproblems.
   this->initialize_condensed_dofs(constrained_dofs_set);
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
   // Copy the inner product matrix over from rb_system to be used as matrix_B
   load_matrix_B();

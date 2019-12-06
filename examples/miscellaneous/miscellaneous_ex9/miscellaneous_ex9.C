@@ -108,6 +108,11 @@ int main (int argc, char ** argv)
   // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
   libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   GetPot command_line (argc, argv);
 
   Real R = 2.;
@@ -126,6 +131,7 @@ int main (int argc, char ** argv)
   // lower_to_upper, hence set assemble_before_solve = false
   system.assemble_before_solve = false;
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // Impose zero Dirichlet boundary condition on MAX_Z_BOUNDARY
   std::set<boundary_id_type> boundary_ids;
   boundary_ids.insert(MAX_Z_BOUNDARY);
@@ -138,6 +144,7 @@ int main (int argc, char ** argv)
   DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
                                  LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Attach an object to the DofMap that will augment the sparsity pattern
   // due to the degrees-of-freedom on the "crack"

@@ -90,6 +90,11 @@ int main (int argc, char ** argv)
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
 
+  // We use Dirichlet boundary conditions here
+#ifndef LIBMESH_ENABLE_DIRICHLET
+  libmesh_example_requires(false, "--enable-dirichlet");
+#endif
+
   // Our input mesh here is in ExodusII format
 #ifndef LIBMESH_HAVE_EXODUS_API
   libmesh_example_requires (false, "ExodusII support");
@@ -181,6 +186,7 @@ int main (int argc, char ** argv)
   // Edge AD is the actual edge of the cylinder and is rigid in the xz-plane.
   // Other edges have symmetric boundary conditions.
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
   // AB w, theta_x, theta_y
   {
     std::set<boundary_id_type> boundary_ids;
@@ -235,6 +241,7 @@ int main (int argc, char ** argv)
        LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
+#endif // LIBMESH_ENABLE_DIRICHLET
 
   // Initialize the data structures for the equation system.
   equation_systems.init();

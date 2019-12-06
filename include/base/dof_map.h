@@ -1264,10 +1264,9 @@ public:
                                         NumericVector<Number> * rhs,
                                         NumericVector<Number> const * solution,
                                         bool homogeneous = true) const;
+
   void enforce_constraints_on_jacobian (const NonlinearImplicitSystem & system,
                                         SparseMatrix<Number> * jac) const;
-
-
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
@@ -1940,6 +1939,8 @@ const FEType & DofMap::variable_group_type (const unsigned int vg) const
 }
 
 
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+
 
 inline
 bool DofMap::is_constrained_node (const Node *
@@ -1956,7 +1957,6 @@ bool DofMap::is_constrained_node (const Node *
   return false;
 }
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
 
 inline
 bool DofMap::is_constrained_dof (const dof_id_type dof) const
@@ -2036,17 +2036,38 @@ inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> &,
                                                          std::vector<dof_id_type> &,
                                                          bool) const {}
 
+inline void DofMap::heterogenously_constrain_element_matrix_and_vector
+  (DenseMatrix<Number> &, DenseVector<Number> &,
+   std::vector<dof_id_type> &, bool, int) const {}
+
+inline void DofMap::heterogenously_constrain_element_vector
+  (const DenseMatrix<Number> &, DenseVector<Number> &,
+   std::vector<dof_id_type> &, bool, int) const {}
+
 inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number> &,
                                                    DenseVector<Number> &,
                                                    std::vector<dof_id_type> &,
                                                    bool) const {}
 
+inline void DofMap::constrain_nothing (std::vector<dof_id_type> &) const {}
+
 inline void DofMap::enforce_constraints_exactly (const System &,
                                                  NumericVector<Number> *,
-                                                 bool = false) const {}
+                                                 bool) const {}
 
 inline void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> &,
                                                          unsigned int) const {}
+
+
+inline void DofMap::enforce_constraints_on_residual
+  (const NonlinearImplicitSystem &,
+   NumericVector<Number> *,
+   NumericVector<Number> const *,
+   bool) const {}
+
+inline void DofMap::enforce_constraints_on_jacobian
+  (const NonlinearImplicitSystem &,
+   SparseMatrix<Number> *) const {}
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 

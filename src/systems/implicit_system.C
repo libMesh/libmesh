@@ -430,9 +430,11 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
 
   // FIXME: The derivation here does not yet take adjoint boundary
   // conditions into account.
+#ifdef LIBMESH_ENABLE_DIRICHLET
   for (unsigned int i=0; i != this->n_qois(); ++i)
     if (qoi_indices.has_index(i))
       libmesh_assert(!this->get_dof_map().has_adjoint_dirichlet_boundaries(i));
+#endif
 
   // We'll assemble the rhs first, because the R'' term will require
   // perturbing the jacobian
