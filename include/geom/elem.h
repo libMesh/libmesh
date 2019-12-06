@@ -521,12 +521,12 @@ public:
   void make_links_to_me_remote ();
 
   /**
-   * Resets the appropriate neighbor pointers of our nth neighbor (and
+   * Resets the \p neighbor_side pointers of our nth neighbor (and
    * its descendants, if appropriate) to point to this Elem instead of
    * to the global remote_elem.  Used by the library when a formerly
    * remote element is being added to the local processor.
    */
-  void make_links_to_me_local (unsigned int n);
+  void make_links_to_me_local (unsigned int n, unsigned int neighbor_side);
 
   /**
    * \returns \p true if this element is remote, false otherwise.
