@@ -18,10 +18,14 @@
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/dyna_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/int_range.h"
+
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
 
 // C++ includes
 #include <array>
@@ -115,7 +119,8 @@ DynaIO::ElementDefinition::ElementDefinition
 
 
 DynaIO::DynaIO (MeshBase & mesh) :
-  MeshInput<MeshBase>  (mesh)
+  MeshInput<MeshBase>  (mesh),
+  constraint_rows_broadcast (false)
 {
 }
 
@@ -141,6 +146,11 @@ void DynaIO::read_mesh(std::istream & in)
   // clear any data in the mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
   mesh.clear();
+
+  // clear any of our own data
+  spline_node_ptrs.clear();
+  constraint_rows.clear();
+  constraint_rows_broadcast = false;
 
   // Expect different sections, in this order, perhaps with blank
   // lines and/or comments in between:
@@ -193,10 +203,8 @@ void DynaIO::read_mesh(std::istream & in)
   // For reading the file line by line
   std::string s;
 
-  // For storing global (spline) nodes and their weights, until we
-  // have enough data to use them for calculating local (Bezier
-  // element) nodes
-  std::vector<Point> spline_nodes;
+  // For storing global (spline) weights, until we have enough data to
+  // use them for calculating local (Bezier element) nodes
   std::vector<Real> spline_weights;
 
   // For storing elements' constraint equations:
@@ -204,16 +212,16 @@ void DynaIO::read_mesh(std::istream & in)
   // elem_global_nodes[block_num][elem_num][local_index] = global_index
   std::vector<std::vector<std::vector<dof_id_type>>> elem_global_nodes;
 
-  // Constraint vector indices (1-based in file, 0-based in memory):
-  // elem_constraint_rows[block_num][elem_num][row_num] = cv_index
-  std::vector<std::vector<std::vector<dof_id_type>>> elem_constraint_rows;
-
-  // Dense constraint vectors themselves
+  // Dense constraint vectors in the Dyna file
   // When first read:
   // dense_constraint_vecs[block_num][vec_in_block][column_num] = coef
   // When used:
   // dense_constraint_vecs[0][vec_num][column_num] = coef
   std::vector<std::vector<std::vector<Real>>> dense_constraint_vecs;
+
+  // Constraint vector indices (1-based in file, 0-based in memory):
+  // elem_constraint_rows[block_num][elem_num][row_num] = cv_index
+  std::vector<std::vector<std::vector<dof_id_type>>> elem_constraint_rows;
 
   while (true)
     {
@@ -251,7 +259,7 @@ void DynaIO::read_mesh(std::istream & in)
             if (stream.fail())
               libmesh_error_msg("Failure to parse patch header\n");
 
-            spline_nodes.resize(n_spline_nodes);
+            spline_node_ptrs.resize(n_spline_nodes);
             spline_weights.resize(n_spline_nodes);
 
             if (weight_control_flag)
@@ -272,9 +280,17 @@ void DynaIO::read_mesh(std::istream & in)
               stream >> xyzw[2];
               stream >> xyzw[3];
 
-              spline_nodes[n_nodes_read] = Point(xyzw[0], xyzw[1], xyzw[2]);
               if (weight_control_flag)
                 spline_weights[n_nodes_read] = xyzw[3];
+
+              // We'll use the spline nodes via NodeElem as the "true"
+              // degrees of freedom, to which other Elem degrees of
+              // freedom will be tied via constraint equations.
+              Node *n = spline_node_ptrs[n_nodes_read] =
+                mesh.add_point(Point(xyzw[0], xyzw[1], xyzw[2]));
+              Elem * elem = Elem::build(NODEELEM).release();
+              elem->set_node(0) = n;
+              mesh.add_elem(elem);
             }
             ++n_nodes_read;
 
@@ -629,6 +645,7 @@ void DynaIO::read_mesh(std::istream & in)
                 {
                   Point p(0);
                   Real w = 0;
+                  std::vector<std::pair<dof_id_type, Real>> constraint_row;
 
                   for (auto spline_node_index :
                        IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
@@ -639,10 +656,14 @@ void DynaIO::read_mesh(std::istream & in)
                       const dyna_int_type elem_coef_vec_index =
                         my_constraint_rows[spline_node_index];
 
+                      const Node * spline_node = spline_node_ptrs[my_node_idx];
+
                       const Real coef =
                         dense_constraint_vecs[0][elem_coef_vec_index][elem_node_index];
-                      p.add_scaled(spline_nodes[my_node_idx], coef);
+                      p.add_scaled(*spline_node, coef);
                       w += coef * spline_weights[my_node_idx];
+
+                      constraint_row.push_back(std::make_pair(spline_node->id(), coef));
                     }
 
                   Node *n = mesh.add_point(p);
@@ -650,12 +671,59 @@ void DynaIO::read_mesh(std::istream & in)
                     n->set_extra_datum<Real>(weight_index, w);
                   local_nodes[key] = n;
                   elem->set_node(elem_defn->nodes[elem_node_index]) = n;
+
+                  constraint_rows[n->id()] = constraint_row;
                 }
             }
 
           mesh.add_elem(elem);
         }
     }
+}
+
+
+void DynaIO::add_spline_constraints(DofMap & dof_map,
+                                    unsigned int sys_num,
+                                    unsigned int var_num)
+{
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  const MeshBase & mesh = this->mesh();
+
+  // We have some strict compatibility requirements here still
+  if (mesh.allow_renumbering() ||
+      (!mesh.is_replicated() &&
+       mesh.allow_remote_element_removal()))
+    libmesh_not_implemented();
+
+  // We do mesh reads in serial, and the mesh broadcast doesn't
+  // broadcast our internal data, so we may need to do that now
+  if (!constraint_rows_broadcast)
+    {
+      mesh.comm().broadcast(constraint_rows);
+      constraint_rows_broadcast = true;
+    }
+
+  for (auto & node_row : constraint_rows)
+    {
+      DofConstraintRow dc_row;
+      const Node * node = mesh.query_node_ptr(node_row.first);
+      if (!node)
+        continue;
+      const dof_id_type constrained_id =
+        node->dof_number(sys_num, var_num, 0);
+      for (auto pr : node_row.second)
+        {
+          const Node & spline_node = mesh.node_ref(pr.first);
+          const dof_id_type spline_dof_id =
+            spline_node.dof_number(sys_num, var_num, 0);
+          dc_row[spline_dof_id] = pr.second;
+        }
+      dof_map.add_constraint_row(constrained_id, dc_row);
+    }
+#else
+  libmesh_ignore(dof_map, sys_num, var_num);
+  libmesh_not_implemented();
+#endif
 }
 
 

@@ -1,4 +1,5 @@
 #include <libmesh/equation_systems.h>
+#include <libmesh/implicit_system.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_communication.h>
 #include <libmesh/mesh_generation.h>
@@ -214,23 +215,30 @@ public:
     Mesh mesh(*TestCommWorld);
 
     DynaIO dyna(mesh);
+
+    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    mesh.allow_renumbering(false);
+    mesh.allow_remote_element_removal(false);
+
     if (mesh.processor_id() == 0)
       dyna.read("1_quad.dyn");
     MeshCommunication().broadcast (mesh);
 
     mesh.prepare_for_use();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(9));
+    // We have 1 QUAD9 finite element, attached via a trivial map to 9
+    // spline Node+NodeElem objects
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(10));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(18));
 
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
 
     unsigned char weight_index = mesh.default_mapping_data();
 
-    if (mesh.query_elem_ptr(0))
+    if (mesh.query_elem_ptr(9))
       {
-        const Elem & elem = mesh.elem_ref(0);
+        const Elem & elem = mesh.elem_ref(9);
 
         CPPUNIT_ASSERT_EQUAL(elem.type(), QUAD9);
         for (unsigned int n=0; n != 9; ++n)
@@ -259,6 +267,10 @@ public:
   {
     Mesh mesh(*TestCommWorld);
 
+    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    mesh.allow_renumbering(false);
+    mesh.allow_remote_element_removal(false);
+
     DynaIO dyna(mesh);
     if (mesh.processor_id() == 0)
       dyna.read("25_quad.bxt");
@@ -266,8 +278,10 @@ public:
 
     mesh.prepare_for_use();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(25));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(121));
+    // We have 5^2 QUAD9 elements, with 11^2 nodes,
+    // tied to 49 Node/NodeElem spline nodes
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(25+49));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(121+49));
 
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
@@ -276,6 +290,8 @@ public:
 
     for (const auto & elem : mesh.active_element_ptr_range())
       {
+        if (elem->type() == NODEELEM)
+          continue;
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(0.04), elem->volume(), TOLERANCE);
 
         for (unsigned int n=0; n != 9; ++n)
@@ -296,6 +312,18 @@ public:
 
         CPPUNIT_ASSERT_EQUAL(n_neighbors, n_neighbors_expected);
       }
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+    // Now test whether we can assign the desired constraint equations
+    EquationSystems es(mesh);
+    ImplicitSystem & sys = es.add_system<ImplicitSystem>("test");
+    sys.add_variable("u", SECOND); // to match QUAD9
+    es.init();
+    dyna.add_spline_constraints(sys.get_dof_map(), 0, 0);
+
+    // We should have a constraint on every FE dof
+    CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), dof_id_type(121));
+#endif // LIBMESH_ENABLE_CONSTRAINTS
   }
 
 

@@ -67,12 +67,47 @@ public:
    * \note The user is responsible for calling Mesh::prepare_for_use()
    * after reading the mesh and before using it.
    *
+   * \note To safely use DynaIO::add_spline_constraints with a
+   * DistributedMesh, currently the user must
+   * allow_remote_element_removal(false) and allow_renumbering(false)
+   * before the mesh is read.
+   *
    * The patch ids defined in the Dyna file are stored as subdomain
    * ids.
+   *
+   * The spline nodes defined in the Dyna file are added to the mesh
+   * with type NodeElem.  The only connection between spline nodes and
+   * finite element nodes will be user constraint equations, so using
+   * a space-filling-curve partitioner for these meshes might be a
+   * good idea.
    */
   virtual void read (const std::string & name) override;
 
+  /**
+   * Constrains finite element degrees of freedom in terms of spline
+   * degrees of freedom by adding user-defined constraint rows to \p
+   * sys
+   */
+  void add_spline_constraints(DofMap & dof_map,
+                              unsigned int sys_num,
+                              unsigned int var_num);
+
 private:
+  // Keep track of spline node indexing, so as to enable adding
+  // constraint rows easily later.
+  std::vector<Node *> spline_node_ptrs;
+
+  // Keep track of the constraint equations associated with each FE
+  // node.
+  //
+  // constraint_rows[FE_node][i].first is the constraining spline
+  // node, and .second is the constraining coefficient.
+  std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>>
+    constraint_rows;
+
+  // Have we broadcast the constraint_rows to non-root procs yet?
+  bool constraint_rows_broadcast;
+
   /**
    * Implementation of the read() function.  This function
    * is called by the public interface function and implements
