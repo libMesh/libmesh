@@ -1024,13 +1024,19 @@ void Elem::make_links_to_me_local(unsigned int n)
     return;
 
   // What side of neigh are we on?  We can't use the usual Elem
-  // method because we're in the middle of restoring topology
+  // method because we're in the middle of restoring topology.  We
+  // can't compare side_ptr nodes because users want to abuse
+  // neighbor_ptr to point to not-technically-neighbors across mesh
+  // slits.  Let's try side centroids.
   const std::unique_ptr<Elem> my_side = this->side_ptr(n);
+  const Point my_centroid = my_side->centroid();
+  const Real my_tol = TOLERANCE * this->hmin();
   unsigned int nn = 0;
   for (; nn != neigh->n_sides(); ++nn)
     {
       const std::unique_ptr<Elem> neigh_side = neigh->side_ptr(nn);
-      if (*my_side == *neigh_side)
+      const Real centroid_distance = (neigh_side->centroid() - my_centroid).norm();
+      if (centroid_distance < my_tol)
         break;
     }
 
