@@ -184,6 +184,20 @@ public:
                                                                 const double tol,
                                                                 const unsigned int m_its) = 0;
 
+   /**
+    * Solves the standard eigenproblem involving the ShellMatrix \p matrix_A and
+    * the preconditioning matrix \p precond.
+    *
+    * \returns The number of converged eigenpairs and the number of
+    * iterations.
+    */
+   virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> & matrix_A,
+                                                                 SparseMatrix<T> & precond,
+                                                                 int nev,
+                                                                 int ncv,
+                                                                 const double tol,
+                                                                 const unsigned int m_its) = 0;
+
 
   /**
    * Solves the generalized eigenproblem involving SparseMatrices \p matrix_A
@@ -240,6 +254,21 @@ public:
                                                                    int ncv,
                                                                    const double tol,
                                                                    const unsigned int m_its) = 0;
+
+   /**
+    * Solves the generalized eigenproblem involving ShellMatrices \p
+    * matrix_A, \p matrix_B and the SparseMatrix precond.
+    *
+    * \returns The number of converged eigenpairs and the number of
+    * iterations.
+    */
+   virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
+                                                                    ShellMatrix<T> & matrix_B,
+                                                                    SparseMatrix<T> & precond,
+                                                                    int nev,
+                                                                    int ncv,
+                                                                    const double tol,
+                                                                    const unsigned int m_its) = 0;
 
 
   /**

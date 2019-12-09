@@ -826,6 +826,7 @@ include_HEADERS = \
         numerics/petsc_macro.h \
         numerics/petsc_matrix.h \
         numerics/petsc_preconditioner.h \
+        numerics/petsc_shell_matrix.h \
         numerics/petsc_solver_exception.h \
         numerics/petsc_vector.h \
         numerics/preconditioner.h \
@@ -876,25 +877,6 @@ include_HEADERS = \
         partitioning/partitioner.h \
         partitioning/sfc_partitioner.h \
         partitioning/subdomain_partitioner.h \
-        timpi/attributes.h \
-        timpi/communicator.h \
-        timpi/data_type.h \
-        timpi/message_tag.h \
-        timpi/op_function.h \
-        timpi/packing.h \
-        timpi/parallel_communicator_specializations \
-        timpi/parallel_implementation.h \
-        timpi/parallel_sync.h \
-        timpi/post_wait_copy_buffer.h \
-        timpi/post_wait_delete_buffer.h \
-        timpi/post_wait_dereference_shared_ptr.h \
-        timpi/post_wait_dereference_tag.h \
-        timpi/post_wait_free_buffer.h \
-        timpi/post_wait_unpack_buffer.h \
-        timpi/post_wait_work.h \
-        timpi/request.h \
-        timpi/standard_type.h \
-        timpi/status.h \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \
@@ -1009,6 +991,25 @@ include_HEADERS = \
         systems/system_subset.h \
         systems/system_subset_by_subdomain.h \
         systems/transient_system.h \
+        timpi/attributes.h \
+        timpi/communicator.h \
+        timpi/data_type.h \
+        timpi/message_tag.h \
+        timpi/op_function.h \
+        timpi/packing.h \
+        timpi/parallel_communicator_specializations \
+        timpi/parallel_implementation.h \
+        timpi/parallel_sync.h \
+        timpi/post_wait_copy_buffer.h \
+        timpi/post_wait_delete_buffer.h \
+        timpi/post_wait_dereference_shared_ptr.h \
+        timpi/post_wait_dereference_tag.h \
+        timpi/post_wait_free_buffer.h \
+        timpi/post_wait_unpack_buffer.h \
+        timpi/post_wait_work.h \
+        timpi/request.h \
+        timpi/standard_type.h \
+        timpi/status.h \
         utils/compare_types.h \
         utils/enum_to_string.h \
         utils/error_vector.h \

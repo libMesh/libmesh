@@ -333,6 +333,8 @@ public:
    */
   Vec vec () { libmesh_assert (_vec); return _vec; }
 
+  Vec vec () const { libmesh_assert (_vec); return _vec; }
+
 
 private:
 

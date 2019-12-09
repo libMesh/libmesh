@@ -34,6 +34,7 @@ namespace libMesh
 
 // Forward Declarations
 template <typename T> class SparseMatrix;
+template <typename T> class ShellMatrix;
 
 
 /**
@@ -149,6 +150,16 @@ public:
   bool generalized () const { return _is_generalized_eigenproblem; }
 
   /**
+   * \returns \p true if the shell matrices are used
+   */
+  bool use_shell_matrices() const { return _use_shell_matrices; }
+
+  /**
+   * Set a flag to use shell matrices
+   */
+  void use_shell_matrices(bool use_shell_matrices) { _use_shell_matrices = use_shell_matrices; }
+
+  /**
    * The system matrix for standard eigenvalue problems.
    */
   std::unique_ptr<SparseMatrix<Number>> matrix_A;
@@ -157,6 +168,21 @@ public:
    * A second system matrix for generalized eigenvalue problems.
    */
   std::unique_ptr<SparseMatrix<Number>> matrix_B;
+
+  /**
+   * The system shell matrix for standard eigenvalue problems.
+   */
+  std::unique_ptr<ShellMatrix<Number>> shell_matrix_A;
+
+  /**
+   * A second system shell matrix for generalized eigenvalue problems.
+   */
+  std::unique_ptr<ShellMatrix<Number>> shell_matrix_B;
+
+  /**
+   * A preconditioning matrix
+   */
+  std::unique_ptr<SparseMatrix<Number>> precond_matrix;
 
   /**
    * The EigenSolver, defining which interface, i.e solver
@@ -216,6 +242,11 @@ private:
    * The type of the eigenvalue problem.
    */
   EigenProblemType _eigen_problem_type;
+
+  /**
+   * A boolean flag to indicate whether or not to use shell matrices
+   */
+  bool _use_shell_matrices;
 };
 
 

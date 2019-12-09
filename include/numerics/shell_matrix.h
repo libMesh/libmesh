@@ -27,6 +27,10 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/id_types.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/parallel.h"
 
 namespace libMesh
 {
@@ -52,6 +56,14 @@ public:
    * Constructor; does nothing.
    */
   ShellMatrix (const Parallel::Communicator & comm_in);
+
+  /**
+   * Builds a \p ShellMatrix<T> using the linear solver package specified by
+   * \p solver_package
+   */
+  static std::unique_ptr<ShellMatrix<T>>
+  build(const Parallel::Communicator & comm,
+        const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * Destructor.
@@ -87,6 +99,23 @@ public:
    * Copies the diagonal part of the matrix into \p dest.
    */
   virtual void get_diagonal (NumericVector<T> & dest) const = 0;
+
+  /**
+   * Get a pointer to the \p DofMap to use.
+   */
+  void attach_dof_map (const DofMap & dof_map)
+  { _dof_map = &dof_map; }
+
+
+  virtual void clear () { libmesh_error_msg ("Not implemented yet"); }
+
+  virtual void init () { libmesh_error_msg ("Not implemented yet"); }
+
+protected:
+  /**
+   * The \p DofMap object associated with this object.
+   */
+  DofMap const * _dof_map;
 };
 
 
@@ -96,9 +125,9 @@ public:
 template <typename T>
 inline
 ShellMatrix<T>::ShellMatrix (const Parallel::Communicator & comm_in) :
-  ParallelObject(comm_in)
+  ParallelObject(comm_in),
+  _dof_map(nullptr)
 {}
-
 
 
 template <typename T>
