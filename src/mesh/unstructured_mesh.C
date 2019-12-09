@@ -1102,6 +1102,16 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   std::vector<dof_id_type> adjacent_vertices_ids;
 
   /**
+   * On distributed meshes we currently only support unpartitioned
+   * meshes (where we'll add every node in sync) or
+   * completely-partitioned meshes (where we'll sync nodes later);
+   * let's keep track to make sure we're not in any in-between state.
+   */
+  dof_id_type n_unpartitioned_elem = 0,
+              n_partitioned_elem = 0;
+  const processor_id_type my_pid = this->processor_id();
+
+  /**
    * Loop over the low-ordered elements in the _elements vector.
    * First make sure they _are_ indeed low-order, and then replace
    * them with an equivalent second-order element.  Don't
@@ -1124,6 +1134,13 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
       // this does _not_ work for refined elements
       libmesh_assert_equal_to (lo_elem->level (), 0);
+
+      const processor_id_type lo_pid = lo_elem->processor_id();
+
+      if (lo_pid == DofObject::invalid_processor_id)
+        ++n_unpartitioned_elem;
+      else
+        ++n_partitioned_elem;
 
       /*
        * build the second-order equivalent, add to
@@ -1212,8 +1229,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
                * we'll update that later if appropriate.
                */
               Node * so_node = this->add_point
-                (new_location, DofObject::invalid_id,
-                 lo_elem->processor_id());
+                (new_location, DofObject::invalid_id, lo_pid);
 
               /*
                * insert the new node with its defining vertex
@@ -1241,15 +1257,14 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
               // which may not yet be authoritative, we still have to
               // use a dumb-but-id-independent partitioning heuristic.
               processor_id_type chosen_pid =
-                std::min (so_node->processor_id(),
-                          lo_elem->processor_id());
+                std::min (so_node->processor_id(), lo_pid);
 
               // Plus, if we just discovered that we own this node,
               // then on a distributed mesh we need to make sure to
               // give it a valid id, not just a placeholder id!
               if (!this->is_replicated() &&
-                  so_node->processor_id() != this->processor_id() &&
-                  chosen_pid == this->processor_id())
+                  so_node->processor_id() != my_pid &&
+                  chosen_pid == my_pid)
                 this->own_node(*so_node);
 
               so_node->processor_id() = chosen_pid;
@@ -1289,7 +1304,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       so_elem->set_unique_id() = lo_elem->unique_id();
 #endif
-      so_elem->processor_id() = lo_elem->processor_id();
+      so_elem->processor_id() = lo_pid;
       so_elem->subdomain_id() = lo_elem->subdomain_id();
       this->insert_elem(so_elem);
     }
@@ -1307,7 +1322,24 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   //
   // make_nodes_parallel_consistent() will fix all this.
   if (!this->is_replicated())
-    MeshCommunication().make_nodes_parallel_consistent (*this);
+    {
+      dof_id_type max_unpartitioned_elem = n_unpartitioned_elem;
+      this->comm().max(max_unpartitioned_elem);
+      if (max_unpartitioned_elem)
+        {
+          // We'd better be effectively serialized here.  In theory we
+          // could support more complicated cases but in practice we
+          // only support "completely partitioned" and/or "serialized"
+          if (!this->comm().verify(n_unpartitioned_elem) ||
+              !this->comm().verify(n_partitioned_elem) ||
+              !this->is_serial())
+            libmesh_not_implemented();
+        }
+      else
+        {
+          MeshCommunication().make_nodes_parallel_consistent (*this);
+        }
+    }
 
   // renumber nodes, elements etc
   this->prepare_for_use(/*skip_renumber =*/ false);
