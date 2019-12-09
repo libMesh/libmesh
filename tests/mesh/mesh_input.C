@@ -236,28 +236,29 @@ public:
 
     unsigned char weight_index = mesh.default_mapping_data();
 
-    if (mesh.query_elem_ptr(9))
+    for (auto & elem : mesh.element_ptr_range())
       {
-        const Elem & elem = mesh.elem_ref(9);
+        if (elem->type() == NODEELEM)
+          continue;
 
-        CPPUNIT_ASSERT_EQUAL(elem.type(), QUAD9);
+        CPPUNIT_ASSERT_EQUAL(elem->type(), QUAD9);
         for (unsigned int n=0; n != 9; ++n)
           CPPUNIT_ASSERT_EQUAL
-            (elem.node_ref(n).get_extra_datum<Real>(weight_index),
+            (elem->node_ref(n).get_extra_datum<Real>(weight_index),
              Real(0.75));
 
-        CPPUNIT_ASSERT_EQUAL(elem.point(0)(0), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem.point(0)(1), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem.point(1)(0), Real(1.5));
-        CPPUNIT_ASSERT_EQUAL(elem.point(1)(1), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem.point(2)(0), Real(1.5));
-        CPPUNIT_ASSERT_EQUAL(elem.point(2)(1), Real(1.5));
-        CPPUNIT_ASSERT_EQUAL(elem.point(3)(0), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem.point(3)(1), Real(1.5));
-        CPPUNIT_ASSERT(elem.has_affine_map());
+        CPPUNIT_ASSERT_EQUAL(elem->point(0)(0), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem->point(0)(1), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem->point(1)(0), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(elem->point(1)(1), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem->point(2)(0), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(elem->point(2)(1), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(elem->point(3)(0), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(elem->point(3)(1), Real(1.5));
+        CPPUNIT_ASSERT(elem->has_affine_map());
 #if LIBMESH_DIM > 2
         for (unsigned int v=0; v != 4; ++v)
-          CPPUNIT_ASSERT_EQUAL(elem.point(v)(2), Real(0));
+          CPPUNIT_ASSERT_EQUAL(elem->point(v)(2), Real(0));
 #endif
       }
   }
