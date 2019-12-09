@@ -35,6 +35,7 @@ enum FEMNormType : int;
 #include <map>
 #include <vector>
 #include <memory>
+#include <set>
 
 namespace libMesh
 {
@@ -97,6 +98,14 @@ public:
    */
   ExactSolution(ExactSolution &&);
   ~ExactSolution();
+
+  /**
+   * The user can indicate that elements in certain subdomains should be
+   * excluded from the error calculation by passing in a set of subdomain
+   * ids to ignore. By default, all subdomains are considered in the error
+   * calculation.
+   */
+  void set_excluded_subdomains(const std::set<subdomain_id_type> & excluded);
 
   /**
    * Attach function similar to system.h which
@@ -359,6 +368,12 @@ private:
    * Extra order to use for quadrature rule
    */
   int _extra_order;
+
+  /**
+   * Elements in a subdomain from this set are skipped during the
+   * error computation.
+   */
+  std::set<subdomain_id_type> _excluded_subdomains;
 };
 
 
