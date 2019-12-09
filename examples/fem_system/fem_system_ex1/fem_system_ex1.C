@@ -120,9 +120,9 @@ int main (int argc, char ** argv)
   std::shared_ptr<UnstructuredMesh> mesh;
 
   if (mesh_type == "distributed")
-    mesh.reset(new DistributedMesh(init.comm()));
+    mesh = std::make_shared<DistributedMesh>(init.comm());
   else if (mesh_type == "replicated")
-    mesh.reset(new ReplicatedMesh(init.comm()));
+    mesh = std::make_shared<ReplicatedMesh>(init.comm());
   else
     libmesh_error_msg("Error: specified mesh_type not understood");
 
