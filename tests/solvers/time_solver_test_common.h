@@ -4,6 +4,7 @@
 #include <libmesh/enum_solver_type.h>
 #include <libmesh/enum_preconditioner_type.h>
 #include <libmesh/parallel.h>
+#include <libmesh/auto_ptr.h> // libmesh_make_unique
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -30,7 +31,7 @@ protected:
     EquationSystems es(mesh);
     SystemType & system = es.add_system<SystemType>("ScalarSystem");
 
-    system.time_solver.reset(new TimeSolverType(system));
+    system.time_solver = libmesh_make_unique<TimeSolverType>(system);
 
     es.init();
 

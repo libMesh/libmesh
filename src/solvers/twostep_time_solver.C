@@ -20,6 +20,7 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/euler_solver.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -31,7 +32,7 @@ TwostepTimeSolver::TwostepTimeSolver (sys_type & s)
 
 {
   // We start with a reasonable time solver: implicit Euler
-  core_time_solver.reset(new EulerSolver(s));
+  core_time_solver = libmesh_make_unique<EulerSolver>(s);
 }
 
 

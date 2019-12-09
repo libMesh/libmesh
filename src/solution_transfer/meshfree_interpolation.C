@@ -26,7 +26,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
-
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -159,9 +159,10 @@ void InverseDistanceInterpolation<KDDim>::construct_kd_tree ()
 
   // Initialize underlying KD tree
   if (_kd_tree.get() == nullptr)
-    _kd_tree.reset (new kd_tree_t (KDDim,
-                                   _point_list_adaptor,
-                                   nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)));
+    _kd_tree = libmesh_make_unique<kd_tree_t>
+      (KDDim,
+       _point_list_adaptor,
+       nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
 
   libmesh_assert (_kd_tree.get() != nullptr);
 

@@ -2,6 +2,7 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/replicated_mesh.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Example includes
 #include "biharmonic.h"
@@ -155,7 +156,7 @@ Biharmonic::Biharmonic(ReplicatedMesh & mesh) :
         }
     }
   _ofile = _ofile_base + ".e";
-  _exio.reset(new ExodusII_IO(_mesh));
+  _exio = libmesh_make_unique<ExodusII_IO>(_mesh);
   _o_dt = command_line_value("output_dt", 0.0);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 } // constructor

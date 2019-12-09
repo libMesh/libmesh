@@ -28,6 +28,7 @@
 #include "libmesh/print_trace.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/perf_log.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/communicator.h"
@@ -341,7 +342,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   libmesh_assert (!libMesh::initialized());
 
   // Build a command-line parser.
-  command_line.reset (new GetPot (argc, argv));
+  command_line = libmesh_make_unique<GetPot>(argc, argv);
 
   // Disable performance logging upon request
   {
@@ -386,7 +387,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     omp_set_num_threads(libMesh::libMeshPrivateData::_n_threads);
 #endif
 
-    task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
+    task_scheduler = libmesh_make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
   }
 
   // Construct singletons who may be at risk of the
@@ -436,7 +437,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
               // anyway.
 
               // libMesh::libMeshPrivateData::_n_threads = 1;
-              // task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
+              // task_scheduler = libmesh_make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
             }
           libmesh_initialized_mpi = true;
         }
@@ -554,7 +555,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // plus we were doing it wrong for many years and not clearing the
   // existing GetPot object before re-parsing the command line, so all
   // the command line arguments appeared twice in the GetPot object...
-  command_line.reset (new GetPot (argc, argv));
+  command_line = libmesh_make_unique<GetPot>(argc, argv);
 
   // The following line is an optimization when simultaneous
   // C and C++ style access to output streams is not required.
@@ -617,7 +618,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
       std::ostringstream filename;
       filename << basename << ".processor." << libMesh::global_processor_id();
-      _ofstream.reset (new std::ofstream (filename.str().c_str()));
+      _ofstream = libmesh_make_unique<std::ofstream>(filename.str().c_str());
 
       // Redirect, saving the original streambufs!
       out_buf = libMesh::out.rdbuf (_ofstream->rdbuf());

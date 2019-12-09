@@ -36,6 +36,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/threads.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/parallel_sync.h"
@@ -1095,7 +1096,7 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::Su
   SubFunctor(p)
 {
   if (p.master_g)
-    g.reset(new GFunctor(*p.master_g));
+    g = libmesh_make_unique<GFunctor>(*p.master_g);
 
 #ifndef NDEBUG
   // Our C1 elements need gradient information

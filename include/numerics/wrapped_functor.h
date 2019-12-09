@@ -24,6 +24,7 @@
 #include "libmesh/fem_function_base.h"
 #include "libmesh/function_base.h"
 #include "libmesh/point.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <cstddef>
@@ -69,8 +70,7 @@ public:
 
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const override
   {
-    return std::unique_ptr<FEMFunctionBase<Output>>
-      (new WrappedFunctor<Output> (*_func));
+    return libmesh_make_unique<WrappedFunctor<Output>>(*_func);
   }
 
   virtual Output operator() (const FEMContext &,

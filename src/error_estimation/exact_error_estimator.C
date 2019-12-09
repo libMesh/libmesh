@@ -39,6 +39,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -258,11 +259,11 @@ void ExactErrorEstimator::estimate_error (const System & system,
              SERIAL);
           (*fine_soln) = global_soln;
 
-          fine_values = std::unique_ptr<MeshFunction>
-            (new MeshFunction(*_equation_systems_fine,
-                              *fine_soln,
-                              fine_system.get_dof_map(),
-                              fine_system.variable_number(var_name)));
+          fine_values = libmesh_make_unique<MeshFunction>
+            (*_equation_systems_fine,
+             *fine_soln,
+             fine_system.get_dof_map(),
+             fine_system.variable_number(var_name));
           fine_values->init();
         } else {
         // Initialize functors if we're using them

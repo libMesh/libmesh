@@ -33,6 +33,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/utility.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -478,11 +479,11 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       comparison_soln->init(comparison_system.solution->size(), true, SERIAL);
       (*comparison_soln) = global_soln;
 
-      coarse_values = std::unique_ptr<MeshFunction>
-        (new MeshFunction(_equation_systems,
-                          *comparison_soln,
-                          comparison_system.get_dof_map(),
-                          comparison_system.variable_number(unknown_name)));
+      coarse_values = libmesh_make_unique<MeshFunction>
+        (_equation_systems,
+         *comparison_soln,
+         comparison_system.get_dof_map(),
+         comparison_system.variable_number(unknown_name));
       coarse_values->init();
     }
 

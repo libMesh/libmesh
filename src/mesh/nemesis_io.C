@@ -35,6 +35,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/int_range.h"
+#include "libmesh/auto_ptr.h"
 
 namespace libMesh
 {
@@ -97,7 +98,7 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  nemhelper(new Nemesis_IO_Helper(*this, false, single_precision)),
+  nemhelper(libmesh_make_unique<Nemesis_IO_Helper>(*this, false, single_precision)),
   _timestep(1),
 #endif
   _verbose (false),

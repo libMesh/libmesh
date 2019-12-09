@@ -28,12 +28,11 @@
 #include "libmesh/libmesh_version.h"
 #include "libmesh/system.h"
 #include "libmesh/mesh_base.h"
-//#include "libmesh/mesh_tools.h"
 #include "libmesh/elem.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dof_map.h"
-
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 
 // Anonymous namespace for implementation details.
@@ -2072,7 +2071,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
 
           // output_vals buffer is now filled for this block.
           // write it to disk
-          async_io.reset(new Threads::Thread(threaded_io));
+          async_io = libmesh_make_unique<Threads::Thread>(threaded_io);
           written_length += output_vals.size();
         }
 

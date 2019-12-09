@@ -39,6 +39,7 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -79,7 +80,7 @@ System::System (EquationSystems & es,
   _qoi_evaluate_object              (nullptr),
   _qoi_evaluate_derivative_function (nullptr),
   _qoi_evaluate_derivative_object   (nullptr),
-  _dof_map                          (new DofMap(number_in, es.get_mesh())),
+  _dof_map                          (libmesh_make_unique<DofMap>(number_in, es.get_mesh())),
   _equation_systems                 (es),
   _mesh                             (es.get_mesh()),
   _sys_name                         (name_in),

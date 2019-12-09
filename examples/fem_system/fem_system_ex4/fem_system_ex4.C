@@ -233,7 +233,7 @@ int main (int argc, char ** argv)
           // not in H1 - if we were doing more than a few
           // timesteps we'd need to turn off or limit the
           // maximum level of our adaptivity eventually
-          error_estimator.reset(new KellyErrorEstimator);
+          error_estimator = libmesh_make_unique<KellyErrorEstimator>();
         }
 
       error_estimator->estimate_error(system, error);

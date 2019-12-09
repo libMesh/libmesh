@@ -38,6 +38,7 @@
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/enum_convergence_flags.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -590,7 +591,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 
       if (this->_preconditioner)
         {
-          subprecond_matrix.reset(new PetscMatrix<Number>(subprecond, this->comm()));
+          subprecond_matrix = libmesh_make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -857,7 +858,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
 
       if (this->_preconditioner)
         {
-          subprecond_matrix.reset(new PetscMatrix<Number>(subprecond, this->comm()));
+          subprecond_matrix = libmesh_make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -1424,7 +1425,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 
       if (this->_preconditioner)
         {
-          subprecond_matrix.reset(new PetscMatrix<Number>(subprecond, this->comm()));
+          subprecond_matrix = libmesh_make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }

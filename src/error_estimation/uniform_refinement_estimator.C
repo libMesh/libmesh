@@ -21,7 +21,6 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>    // for sqrt
 
-
 // Local Includes
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
@@ -41,6 +40,7 @@
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -125,9 +125,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   // Get a vector of the Systems we're going to work on,
   // and set up a error_norms map if necessary
   std::vector<System *> system_list;
-  std::unique_ptr<std::map<const System *, SystemNorm>> error_norms =
-    std::unique_ptr<std::map<const System *, SystemNorm>>
-    (new std::map<const System *, SystemNorm>);
+  auto error_norms = libmesh_make_unique<std::map<const System *, SystemNorm>>();
 
   if (_es)
     {
