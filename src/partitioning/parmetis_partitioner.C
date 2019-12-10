@@ -34,6 +34,7 @@
 
 // TIMPI includes
 #include "timpi/communicator.h"    // also includes mpi.h
+#include "timpi/parallel_implementation.h"    // for min()
 
 // Include the ParMETIS header file.
 #ifdef LIBMESH_HAVE_PARMETIS
@@ -155,19 +156,28 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
   // Initialize the data structures required by ParMETIS
   this->initialize (mesh, n_sbdmns);
 
-  // Make sure all processors have enough active local elements.
-  // Parmetis tends to crash when it's given only a couple elements
-  // per partition.
+  // build the graph corresponding to the mesh
+  this->build_graph (mesh);
+
+  // Make sure all processors have enough active local elements and
+  // enough connectivity among them.
+  // Parmetis tends to die when it's given only a couple elements
+  // per partition or when it can't reach elements from each other.
   {
-    bool all_have_enough_elements = true;
+    bool ready_for_parmetis = true;
     for (const auto & nelem : _n_active_elem_on_proc)
       if (nelem < MIN_ELEM_PER_PROC)
-        all_have_enough_elements = false;
+        ready_for_parmetis = false;
+
+    std::size_t my_adjacency = _pmetis->adjncy.size();
+    mesh.comm().min(my_adjacency);
+    if (!my_adjacency)
+      ready_for_parmetis = false;
 
     // Parmetis will not work unless each processor has some
     // elements. Specifically, it will abort when passed a nullptr
-    // partition array on *any* of the processors.
-    if (!all_have_enough_elements)
+    // partition or adjacency array on *any* of the processors.
+    if (!ready_for_parmetis)
       {
         // FIXME: revert to METIS, although this requires a serial mesh
         MeshSerializer serialize(mesh);
@@ -176,9 +186,6 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
         return;
       }
   }
-
-  // build the graph corresponding to the mesh
-  this->build_graph (mesh);
 
 
   // Partition the graph
