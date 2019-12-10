@@ -72,6 +72,12 @@ ExactSolution::ExactSolution(ExactSolution &&) = default;
 ExactSolution::~ExactSolution() = default;
 
 
+void ExactSolution::
+set_excluded_subdomains(const std::set<subdomain_id_type> & excluded)
+{
+  _excluded_subdomains = excluded;
+}
+
 void ExactSolution::attach_reference_solution (const EquationSystems * es_fine)
 {
   libmesh_assert(es_fine);
@@ -503,10 +509,10 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // Get a reference to the dofmap and mesh for that system
   const DofMap & computed_dof_map = computed_system.get_dof_map();
 
-  const MeshBase & _mesh = computed_system.get_mesh();
+  const MeshBase & mesh = computed_system.get_mesh();
 
   // Grab which element dimensions are present in the mesh
-  const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
+  const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
 
   // Zero the error before summation
   // 0 - sum of square of function error (L2)
@@ -521,7 +527,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // Construct Quadrature rule based on default quadrature order
   const FEType & fe_type  = computed_dof_map.variable_type(var);
 
-  unsigned int n_vec_dim = FEInterface::n_vec_dim( _mesh, fe_type );
+  unsigned int n_vec_dim = FEInterface::n_vec_dim( mesh, fe_type );
 
   // FIXME: MeshFunction needs to be updated to support vector-valued
   //        elements before we can use a reference solution.
@@ -562,13 +568,16 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // TODO: this ought to be threaded (and using subordinate
   // MeshFunction objects in each thread rather than a single
   // master)
-  for (const auto & elem : _mesh.active_local_element_ptr_range())
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      // Store a pointer to the element we are currently
-      // working on.  This allows for nicer syntax later.
-      const unsigned int dim = elem->dim();
-
+      // Skip this element if it is in a subdomain excluded by the user.
       const subdomain_id_type elem_subid = elem->subdomain_id();
+      if (_excluded_subdomains.count(elem_subid))
+        continue;
+
+      // The spatial dimension of the current Elem. FEs and other data
+      // are indexed on dim.
+      const unsigned int dim = elem->dim();
 
       // If the variable is not active on this subdomain, don't bother
       if (!computed_system.variable(var).active_on_subdomain(elem_subid))
