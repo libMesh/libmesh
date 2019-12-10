@@ -266,7 +266,7 @@ void VTKIO::write_nodal_data (const std::string & fname,
     libmesh_error_msg("Empty soln vector in VTKIO::write_nodal_data().");
 
   // Get a reference to the mesh
-  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // we only use Unstructured grids
   _vtk_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
