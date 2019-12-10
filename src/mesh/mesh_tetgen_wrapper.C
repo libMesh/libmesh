@@ -24,12 +24,13 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_tetgen_wrapper.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
 
 TetGenWrapper::TetGenWrapper() :
-  tetgen_output(new tetgenio)
+  tetgen_output(libmesh_make_unique<tetgenio>())
 {
   this->tetgen_data.mesh_dim                = 3;
   this->tetgen_data.numberofpointattributes = 0;

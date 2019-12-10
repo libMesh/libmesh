@@ -12,7 +12,7 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/partitioner.h>
 #include <libmesh/sparse_matrix.h>
-
+#include <libmesh/auto_ptr.h> // libmesh_make_unique
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -240,7 +240,7 @@ protected:
     // We are making assumptions in various places about the presence
     // of the elements on the current processor so we're restricting to
     // ReplicatedMesh for now.
-    _mesh.reset(new ReplicatedMesh(*TestCommWorld));
+    _mesh = libmesh_make_unique<ReplicatedMesh>(*TestCommWorld);
 
     _mesh->set_mesh_dimension(2);
 
@@ -288,7 +288,7 @@ protected:
       elem->set_node(3) = _mesh->node_ptr(9);
     }
 
-    _mesh->partitioner() = std::unique_ptr<Partitioner>(new OverlappingTestPartitioner);
+    _mesh->partitioner() = libmesh_make_unique<OverlappingTestPartitioner>();
 
     _mesh->prepare_for_use();
 
@@ -303,7 +303,7 @@ protected:
 
   void init(MeshBase & mesh)
   {
-    _es.reset( new EquationSystems(*_mesh) );
+    _es = libmesh_make_unique<EquationSystems>(*_mesh);
     LinearImplicitSystem & sys = _es->add_system<LinearImplicitSystem> ("SimpleSystem");
 
     std::set<subdomain_id_type> sub_one;
@@ -331,8 +331,7 @@ protected:
   {
     System & system = _es->get_system("SimpleSystem");
 
-
-    coupling.reset( new CouplingMatrix(system.n_vars()) );
+    coupling = libmesh_make_unique<CouplingMatrix>(system.n_vars());
 
     const unsigned int u_var = system.variable_number("U");
     const unsigned int l_var = system.variable_number("L");

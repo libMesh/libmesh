@@ -27,6 +27,7 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <iostream>
@@ -41,8 +42,8 @@ namespace libMesh
 AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
   ErrorEstimator(),
   error_plot_suffix(),
-  _primal_error_estimator(new PatchRecoveryErrorEstimator()),
-  _dual_error_estimator(new PatchRecoveryErrorEstimator()),
+  _primal_error_estimator(libmesh_make_unique<PatchRecoveryErrorEstimator>()),
+  _dual_error_estimator(libmesh_make_unique<PatchRecoveryErrorEstimator>()),
   _qoi_set(QoISet())
 {
 }

@@ -40,7 +40,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_point_locator_type.h"
-
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -68,7 +68,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_renumber_nodes_and_elements(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
-  _default_ghosting(new GhostPointNeighbors(*this)),
+  _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(0.)
 {
   _elem_dims.insert(d);
@@ -99,7 +99,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _allow_remote_element_removal(true),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
-  _default_ghosting(new GhostPointNeighbors(*this)),
+  _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
   _ghosting_functors(other_mesh._ghosting_functors),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {

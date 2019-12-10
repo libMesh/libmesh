@@ -3,6 +3,7 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/auto_ptr.h> // libmesh_make_unique
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -33,10 +34,10 @@ protected:
 
   void build_mesh()
   {
-    _mesh.reset(new Mesh(*TestCommWorld));
-    _all_boundary_mesh.reset(new Mesh(*TestCommWorld));
-    _left_boundary_mesh.reset(new Mesh(*TestCommWorld));
-    _internal_boundary_mesh.reset(new Mesh(*TestCommWorld));
+    _mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    _all_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    _left_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    _internal_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
 
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.2, 0.8, 0.2, 0.7, QUAD9);

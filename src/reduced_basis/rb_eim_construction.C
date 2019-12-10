@@ -41,6 +41,7 @@
 #include "libmesh/fem_context.h"
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
+#include "libmesh/auto_ptr.h"
 
 // rbOOmit includes
 #include "libmesh/rb_eim_construction.h"
@@ -177,10 +178,11 @@ void RBEIMConstruction::initialize_rb_construction(bool skip_matrix_assembly,
   // solution vector at quadrature points
   std::vector<unsigned int> vars;
   get_explicit_system().get_all_variable_numbers(vars);
-  _mesh_function.reset(new MeshFunction(get_equation_systems(),
-                                        *_ghosted_meshfunction_vector,
-                                        get_explicit_system().get_dof_map(),
-                                        vars));
+  _mesh_function = libmesh_make_unique<MeshFunction>
+    (get_equation_systems(),
+     *_ghosted_meshfunction_vector,
+     get_explicit_system().get_dof_map(),
+     vars);
   _mesh_function->init();
 
   // inner_product_solver performs solves with the same matrix every time

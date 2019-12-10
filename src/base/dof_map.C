@@ -42,6 +42,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -86,13 +87,13 @@ DofMap::build_sparsity (const MeshBase & mesh) const
   // Even better, if the full sparsity pattern is not needed then
   // the number of nonzeros per row can be estimated from the
   // sparsity patterns created on each thread.
-  std::unique_ptr<SparsityPattern::Build> sp
-    (new SparsityPattern::Build (mesh,
-                                 *this,
-                                 this->_dof_coupling,
-                                 this->_coupling_functors,
-                                 implicit_neighbor_dofs,
-                                 need_full_sparsity_pattern));
+  auto sp = libmesh_make_unique<SparsityPattern::Build>
+    (mesh,
+     *this,
+     this->_dof_coupling,
+     this->_coupling_functors,
+     implicit_neighbor_dofs,
+     need_full_sparsity_pattern);
 
   Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
                                             mesh.active_local_elements_end()), *sp);
@@ -152,8 +153,8 @@ DofMap::DofMap(const unsigned int number,
   _augment_send_list(nullptr),
   _extra_send_list_function(nullptr),
   _extra_send_list_context(nullptr),
-  _default_coupling(new DefaultCoupling()),
-  _default_evaluating(new DefaultCoupling()),
+  _default_coupling(libmesh_make_unique<DefaultCoupling>()),
+  _default_evaluating(libmesh_make_unique<DefaultCoupling>()),
   need_full_sparsity_pattern(false),
   _n_nz(nullptr),
   _n_oz(nullptr),
@@ -175,10 +176,10 @@ DofMap::DofMap(const unsigned int number,
   , _node_constraints()
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
-  , _periodic_boundaries(new PeriodicBoundaries)
+  , _periodic_boundaries(libmesh_make_unique<PeriodicBoundaries>())
 #endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  , _dirichlet_boundaries(new DirichletBoundaries)
+  , _dirichlet_boundaries(libmesh_make_unique<DirichletBoundaries>())
   , _adjoint_dirichlet_boundaries()
 #endif
   , _implicit_neighbor_dofs_initialized(false),

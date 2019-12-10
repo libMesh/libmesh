@@ -641,6 +641,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
         std::shared_ptr<int> p2 (new int);
         std::shared_ptr<int> p3 (p2);
         p3.reset(new int);
+        p3 = std::make_shared<int>(5);
     ]])],[
         have_cxx11_shared_ptr=yes
         AC_MSG_RESULT(yes)

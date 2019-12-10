@@ -39,6 +39,7 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // The systems and solvers we may use
 #include "elasticity_system.h"
@@ -195,26 +196,26 @@ int main (int argc, char ** argv)
       a_system->add_variable("w_accel", FIRST, LAGRANGE);
     }
 
-  if( time_solver == std::string("newmark"))
-    system.time_solver.reset(new NewmarkSolver(system));
+  if (time_solver == std::string("newmark"))
+    system.time_solver = libmesh_make_unique<NewmarkSolver>(system);
 
   else if( time_solver == std::string("euler") )
     {
-      system.time_solver.reset(new EulerSolver(system));
+      system.time_solver = libmesh_make_unique<EulerSolver>(system);
       EulerSolver & euler_solver = cast_ref<EulerSolver &>(*(system.time_solver.get()));
       euler_solver.theta = infile("theta", 1.0);
     }
 
   else if( time_solver == std::string("euler2") )
     {
-      system.time_solver.reset(new Euler2Solver(system));
+      system.time_solver = libmesh_make_unique<Euler2Solver>(system);
       Euler2Solver & euler_solver = cast_ref<Euler2Solver &>(*(system.time_solver.get()));
       euler_solver.theta = infile("theta", 1.0);
     }
 
   else if( time_solver == std::string("steady"))
     {
-      system.time_solver.reset(new SteadySolver(system));
+      system.time_solver = libmesh_make_unique<SteadySolver>(system);
       libmesh_assert_equal_to (n_timesteps, 1);
     }
   else

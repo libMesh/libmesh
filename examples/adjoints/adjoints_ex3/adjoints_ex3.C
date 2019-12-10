@@ -538,7 +538,7 @@ void set_system_parameters(FEMSystem & system,
         system.time_solver.reset(innersolver);
     }
   else
-    system.time_solver.reset(new SteadySolver(system));
+    system.time_solver = libmesh_make_unique<SteadySolver>(system);
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
     param.deltat_reductions;

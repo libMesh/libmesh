@@ -6,6 +6,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parsed_fem_function.h"
 #include "libmesh/system.h"
+#include <libmesh/auto_ptr.h> // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 
@@ -24,9 +25,9 @@ class ParsedFEMFunctionTest : public CppUnit::TestCase
 public:
   void setUp() {
 #if LIBMESH_DIM > 2
-    mesh.reset(new Mesh(*TestCommWorld));
+    mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
     MeshTools::Generation::build_cube(*mesh, 1, 1, 1);
-    es.reset(new EquationSystems(*mesh));
+    es = libmesh_make_unique<EquationSystems>(*mesh);
     sys = &(es->add_system<System> ("SimpleSystem"));
     sys->add_variable("x2");
     sys->add_variable("x3");
@@ -86,8 +87,8 @@ public:
     sol.close();
     sys->update();
 
-    c.reset(new FEMContext(*sys));
-    s.reset(new FEMContext(*sys));
+    c = libmesh_make_unique<FEMContext>(*sys);
+    s = libmesh_make_unique<FEMContext>(*sys);
     if (elem && elem->processor_id() == TestCommWorld->rank())
       {
         c->pre_fe_reinit(*sys, elem);

@@ -20,11 +20,10 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/time_solver.h"
 #include "libmesh/no_solution_history.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
-
-
 
 TimeSolver::TimeSolver (sys_type & s)
   : quiet (true),
@@ -32,7 +31,7 @@ TimeSolver::TimeSolver (sys_type & s)
     _diff_solver (),
     _linear_solver (),
     _system (s),
-    solution_history(new NoSolutionHistory()), // Default setting for solution_history
+    solution_history(libmesh_make_unique<NoSolutionHistory>()),
     _is_adjoint (false)
 {
 }

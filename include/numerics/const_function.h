@@ -23,6 +23,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/function_base.h"
 #include "libmesh/point.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <string>
@@ -73,8 +74,7 @@ public:
 
   virtual std::unique_ptr<FunctionBase<Output>> clone() const override
   {
-    return std::unique_ptr<FunctionBase<Output>>
-      (new ConstFunction<Output>(_c));
+    return libmesh_make_unique<ConstFunction<Output>>(_c);
   }
 
 private:

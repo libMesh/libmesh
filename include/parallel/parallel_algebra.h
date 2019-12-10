@@ -29,6 +29,7 @@
 #include "libmesh/point.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/vector_value.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/op_function.h"
@@ -65,7 +66,7 @@ public:
       ex = const_cast<TypeVector<T> *>(example);
     else
       {
-        temp.reset(new TypeVector<T>());
+        temp = libmesh_make_unique<TypeVector<T>>();
         ex = temp.get();
       }
 
@@ -128,7 +129,7 @@ public:
       ex = const_cast<VectorValue<T> *>(example);
     else
       {
-        temp.reset(new VectorValue<T>());
+        temp = libmesh_make_unique<VectorValue<T>>();
         ex = temp.get();
       }
 
@@ -200,7 +201,7 @@ public:
       ex = const_cast<Point *>(example);
     else
       {
-        temp.reset(new Point());
+        temp = libmesh_make_unique<Point>();
         ex = temp.get();
       }
 

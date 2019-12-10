@@ -26,6 +26,7 @@
 #include "libmesh/fem_function_base.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 // FParser includes
@@ -386,8 +387,8 @@ inline
 std::unique_ptr<FEMFunctionBase<Output>>
 ParsedFEMFunction<Output>::clone () const
 {
-  return std::unique_ptr<FEMFunctionBase<Output>>
-    (new ParsedFEMFunction(_sys, _expression, &_additional_vars, &_initial_vals));
+  return libmesh_make_unique<ParsedFEMFunction>
+    (_sys, _expression, &_additional_vars, &_initial_vals);
 }
 
 template <typename Output>

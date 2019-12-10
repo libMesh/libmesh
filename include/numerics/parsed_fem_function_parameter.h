@@ -24,6 +24,7 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -87,8 +88,7 @@ public:
    * \returns A new copy of the accessor.
    */
   virtual std::unique_ptr<ParameterAccessor<T>> clone() const {
-    return std::unique_ptr<ParameterAccessor<T>>
-      (new ParsedFEMFunctionParameter<T>(_func, _name));
+    return libmesh_make_unique<ParsedFEMFunctionParameter<T>>(_func, _name);
   }
 
 private:

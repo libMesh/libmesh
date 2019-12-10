@@ -27,6 +27,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <cstddef>
@@ -135,9 +136,8 @@ inline
 std::unique_ptr<FunctionBase<Output>>
 WrappedFunction<Output>::clone () const
 {
-  return std::unique_ptr<FunctionBase<Output>>
-    (new WrappedFunction<Output>
-     (_sys, _fptr, _parameters, _varnum));
+  return libmesh_make_unique<WrappedFunction<Output>>
+    (_sys, _fptr, _parameters, _varnum);
 }
 
 
