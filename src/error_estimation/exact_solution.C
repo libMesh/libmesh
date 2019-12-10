@@ -509,10 +509,10 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // Get a reference to the dofmap and mesh for that system
   const DofMap & computed_dof_map = computed_system.get_dof_map();
 
-  const MeshBase & _mesh = computed_system.get_mesh();
+  const MeshBase & mesh = computed_system.get_mesh();
 
   // Grab which element dimensions are present in the mesh
-  const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
+  const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
 
   // Zero the error before summation
   // 0 - sum of square of function error (L2)
@@ -527,7 +527,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // Construct Quadrature rule based on default quadrature order
   const FEType & fe_type  = computed_dof_map.variable_type(var);
 
-  unsigned int n_vec_dim = FEInterface::n_vec_dim( _mesh, fe_type );
+  unsigned int n_vec_dim = FEInterface::n_vec_dim( mesh, fe_type );
 
   // FIXME: MeshFunction needs to be updated to support vector-valued
   //        elements before we can use a reference solution.
@@ -568,7 +568,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // TODO: this ought to be threaded (and using subordinate
   // MeshFunction objects in each thread rather than a single
   // master)
-  for (const auto & elem : _mesh.active_local_element_ptr_range())
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       // Skip this element if it is in a subdomain excluded by the user.
       const subdomain_id_type elem_subid = elem->subdomain_id();
