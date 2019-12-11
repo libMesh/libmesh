@@ -68,6 +68,7 @@ unit_tests_sources = \
   mesh/write_sideset_data.C \
   mesh/write_edgeset_data.C \
   mesh/write_vec_and_scalar.C \
+  mesh/all_second_order.C \
   numerics/composite_function_test.C \
   numerics/coupling_matrix_test.C \
   numerics/distributed_vector_test.C \
