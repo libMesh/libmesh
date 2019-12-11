@@ -346,10 +346,12 @@ Point Elem::centroid() const
 {
   Point cp;
 
-  for (unsigned int n=0; n<this->n_vertices(); n++)
+  const auto n_vertices = this->n_vertices();
+
+  for (unsigned int n=0; n<n_vertices; n++)
     cp.add (this->point(n));
 
-  return (cp /= static_cast<Real>(this->n_vertices()));
+  return (cp /= static_cast<Real>(n_vertices));
 }
 
 
@@ -358,10 +360,13 @@ Real Elem::hmin() const
 {
   Real h_min=std::numeric_limits<Real>::max();
 
-  for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
-    for (unsigned int n_inner=n_outer+1; n_inner<this->n_vertices(); n_inner++)
+  // Avoid calling a virtual a lot of times
+  const auto n_vertices = this->n_vertices();
+
+  for (unsigned int n_outer=0; n_outer<n_vertices; n_outer++)
+    for (unsigned int n_inner=n_outer+1; n_inner<n_vertices; n_inner++)
       {
-        const Point diff = (this->point(n_outer) - this->point(n_inner));
+        const auto diff = (this->point(n_outer) - this->point(n_inner));
 
         h_min = std::min(h_min, diff.norm_sq());
       }
@@ -375,10 +380,13 @@ Real Elem::hmax() const
 {
   Real h_max=0;
 
-  for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
-    for (unsigned int n_inner=n_outer+1; n_inner<this->n_vertices(); n_inner++)
+  // Avoid calling a virtual a lot of times
+  const auto n_vertices = this->n_vertices();
+
+  for (unsigned int n_outer=0; n_outer<n_vertices; n_outer++)
+    for (unsigned int n_inner=n_outer+1; n_inner<n_vertices; n_inner++)
       {
-        const Point diff = (this->point(n_outer) - this->point(n_inner));
+        const auto diff = (this->point(n_outer) - this->point(n_inner));
 
         h_max = std::max(h_max, diff.norm_sq());
       }
