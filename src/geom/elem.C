@@ -1004,7 +1004,7 @@ void Elem::libmesh_assert_valid_neighbors() const
 
 
 
-void Elem::make_links_to_me_local(unsigned int n)
+void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
 {
   Elem * neigh = this->neighbor_ptr(n);
 
@@ -1031,26 +1031,22 @@ void Elem::make_links_to_me_local(unsigned int n)
   if (neigh->level() != this->level())
     return;
 
-  // What side of neigh are we on?  We can't use the usual Elem
-  // method because we're in the middle of restoring topology
-  const std::unique_ptr<Elem> my_side = this->side_ptr(n);
-  unsigned int nn = 0;
-  for (; nn != neigh->n_sides(); ++nn)
-    {
-      const std::unique_ptr<Elem> neigh_side = neigh->side_ptr(nn);
-      if (*my_side == *neigh_side)
-        break;
-    }
-
-  // we had better be on *some* side of neigh
-  libmesh_assert_less (nn, neigh->n_sides());
+  // What side of neigh are we on?  nn.
+  //
+  // We can't use the usual Elem method because we're in the middle of
+  // restoring topology.  We can't compare side_ptr nodes because
+  // users want to abuse neighbor_ptr to point to
+  // not-technically-neighbors across mesh slits.  We can't compare
+  // node locations because users want to move those
+  // not-technically-neighbors until they're
+  // not-even-geometrically-neighbors.
 
   // Find any elements that ought to point to elem
   std::vector<Elem *> neigh_family;
 #ifdef LIBMESH_ENABLE_AMR
   if (this->active())
     neigh->family_tree_by_side(neigh_family, nn);
-  else if (neigh->subactive())
+  else
 #endif
     neigh_family.push_back(neigh);
 

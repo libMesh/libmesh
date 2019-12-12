@@ -83,7 +83,7 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
     Elem::type_to_n_edges_map[type];
 
   const unsigned int pre_indexing_size =
-    header_size + n_nodes + n_sides;
+    header_size + n_nodes + n_sides*2;
 
   const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
@@ -168,7 +168,7 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
 #ifndef NDEBUG
     1 + // add an int for the magic header when testing
 #endif
-    header_size + elem->n_nodes() + n_sides +
+    header_size + elem->n_nodes() + n_sides*2 +
     elem->packed_indexing_size() + total_packed_bcs;
 }
 
@@ -267,12 +267,22 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     *data_out++ = (elem->node_id(n));
 
+  // Add the id of and the side for any return link from each neighbor
   for (auto neigh : elem->neighbor_ptr_range())
     {
       if (neigh)
+      {
         *data_out++ = (neigh->id());
+        if (neigh == remote_elem)
+          *data_out++ = (DofObject::invalid_id);
+        else
+          *data_out++ = neigh->which_neighbor_am_i(elem);
+      }
       else
+      {
         *data_out++ = (DofObject::invalid_id);
+        *data_out++ = (DofObject::invalid_id);
+      }
     }
 
   // Add any DofObject indices
@@ -549,6 +559,9 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
             const dof_id_type neighbor_id =
               cast_int<dof_id_type>(*in++);
 
+            const dof_id_type neighbor_side =
+              cast_int<dof_id_type>(*in++);
+
             // If the sending processor sees a domain boundary here,
             // we'd better agree.
             if (neighbor_id == DofObject::invalid_id)
@@ -592,8 +605,11 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
               {
                 elem->set_neighbor(n, neigh);
 
-                elem->make_links_to_me_local(n);
+                elem->make_links_to_me_local(n, neighbor_side);
               }
+            else
+              libmesh_assert(neigh->level() < elem->level() ||
+                             neigh->neighbor_ptr(neighbor_side) == elem);
           }
 
       // Our p level and refinement flags should be "close to" correct
@@ -716,6 +732,9 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           const dof_id_type neighbor_id =
             cast_int<dof_id_type>(*in++);
 
+            const dof_id_type neighbor_side =
+              cast_int<dof_id_type>(*in++);
+
           if (neighbor_id == DofObject::invalid_id)
             continue;
 
@@ -740,11 +759,11 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
             }
 
           // If we have the neighbor element, then link to it, and
-          // make sure the appropriate parts of its family link back
+          // make sure any appropriate parts of its family link back
           // to us.
           elem->set_neighbor(n, neigh);
 
-          elem->make_links_to_me_local(n);
+          elem->make_links_to_me_local(n, neighbor_side);
         }
 
       elem->unpack_indexing(in);
