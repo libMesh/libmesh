@@ -1452,7 +1452,7 @@ void DofMap::print_dof_constraints(std::ostream & os,
       os << "Processor 0:\n";
       os << local_constraints;
 
-      for (processor_id_type p=1, np=this->n_processors(); p != np; ++p)
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
         {
           this->comm().receive(p, local_constraints);
           os << "Processor " << p << ":\n";
@@ -1601,7 +1601,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
         // If the DOF is constrained
         if (this->is_constrained_dof(elem_dofs[i]))
           {
-            for (unsigned int j=0; j<matrix.n(); j++)
+            for (auto j : IntRange<unsigned int>(0, matrix.n()))
               matrix(i,j) = 0.;
 
             matrix(i,i) = 1.;
@@ -1672,7 +1672,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
            i != n_elem_dofs; i++)
         if (this->is_constrained_dof(elem_dofs[i]))
           {
-            for (unsigned int j=0; j<matrix.n(); j++)
+            for (auto j : IntRange<unsigned int>(0, matrix.n()))
               matrix(i,j) = 0.;
 
             // If the DOF is constrained
@@ -1775,7 +1775,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
 
           if (this->is_constrained_dof(dof_id))
             {
-              for (unsigned int j=0; j<matrix.n(); j++)
+              for (auto j : IntRange<unsigned int>(0, matrix.n()))
                 matrix(i,j) = 0.;
 
               // If the DOF is constrained
@@ -1955,7 +1955,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
            i != n_row_dofs; i++)
         if (this->is_constrained_dof(row_dofs[i]))
           {
-            for (unsigned int j=0; j<matrix.n(); j++)
+            for (auto j : IntRange<unsigned int>(0, matrix.n()))
               {
                 if (row_dofs[i] != col_dofs[j])
                   matrix(i,j) = 0.;
@@ -2406,7 +2406,7 @@ DofMap::max_constraint_error (const System & system,
       libmesh_assert_equal_to (C.m(), raw_dof_indices.size());
       libmesh_assert_equal_to (C.n(), local_dof_indices.size());
 
-      for (unsigned int i=0; i!=C.m(); ++i)
+      for (auto i : IntRange<unsigned int>(0, C.m()))
         {
           // Recalculate any constrained dof owned by this processor
           dof_id_type global_dof = raw_dof_indices[i];
@@ -2427,7 +2427,7 @@ DofMap::max_constraint_error (const System & system,
               if (rhsit != _primal_constraint_values.end())
                 exact_value = rhsit->second;
 
-              for (unsigned int j=0; j!=C.n(); ++j)
+              for (auto j : IntRange<unsigned int>(0, C.n()))
                 {
                   if (local_dof_indices[j] != global_dof)
                     exact_value += C(i,j) *
@@ -3128,9 +3128,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
           node_ids_on_proc[node->processor_id()]++;
         }
 
-      for (processor_id_type p = 0; p != this->n_processors(); ++p)
-        if (node_ids_on_proc.count(p))
-          requested_node_ids[p].reserve(node_ids_on_proc[p]);
+      for (auto pair : node_ids_on_proc)
+        requested_node_ids[pair.first].reserve(pair.second);
 
       // Prepare each processor's request set
       for (const auto & node : node_request_set)
