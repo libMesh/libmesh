@@ -1383,7 +1383,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
       DenseVector<Number> Usub;
 
       coarsened_dof_values(old_vector, dof_map, elem, Usub,
-                           use_old_dof_indices);
+                           v, use_old_dof_indices);
 
       Ue.append (Usub);
     }
