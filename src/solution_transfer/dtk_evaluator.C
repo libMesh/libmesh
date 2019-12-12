@@ -71,7 +71,7 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int> & elements,
 
       Number value = 0;
 
-      for (std::size_t j=0; j<dof_indices.size(); j++)
+      for (auto j : index_range(dof_indices))
         value += current_local_solution(dof_indices[j]) * data.shape[j];
 
       values[i] = value;

@@ -263,14 +263,13 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
   if (!src_dist_sqr.empty())
     {
       Real min_dist = src_dist_sqr.front();
-      std::vector<Real>::const_iterator it = src_dist_sqr.begin();
 
-      for (++it; it!= src_dist_sqr.end(); ++it)
+      for (auto i : src_dist_sqr)
         {
-          if (*it < min_dist)
-            libmesh_error_msg(*it << " was less than min_dist = " << min_dist);
+          if (i < min_dist)
+            libmesh_error_msg(i << " was less than min_dist = " << min_dist);
 
-          min_dist = *it;
+          min_dist = i;
         }
     }
 #endif
