@@ -20,11 +20,6 @@
 #ifndef LIBMESH_PARAMETERS_H
 #define LIBMESH_PARAMETERS_H
 
-// C++ includes
-#include <typeinfo>
-#include <string>
-#include <map>
-
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/reference_counted_object.h"
@@ -33,9 +28,10 @@
 // C++ includes
 #include <cstddef>
 #include <map>
+#include <sstream>
 #include <string>
 #include <typeinfo>
-#include <sstream>
+#include <vector>
 
 namespace libMesh
 {
