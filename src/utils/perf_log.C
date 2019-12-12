@@ -17,6 +17,10 @@
 
 #include "libmesh/perf_log.h"
 
+// Local includes
+#include "libmesh/int_range.h"
+#include "libmesh/timestamp.h"
+
 // C++ includes
 #include <algorithm>
 #include <iostream>
@@ -35,9 +39,6 @@
 #ifdef LIBMESH_HAVE_PWD_H
 #include <pwd.h>
 #endif
-
-// Local includes
-#include "libmesh/timestamp.h"
 
 namespace libMesh
 {
@@ -271,16 +272,15 @@ std::string PerfLog::get_info_header() const
 
       // Find the longest string in all the streams
       unsigned int max_length = 0;
-      for (std::size_t i=0; i<v.size(); ++i)
-        if (v[i]->str().size() > max_length)
+      for (auto & v_i : v)
+        if (v_i->str().size() > max_length)
           max_length = cast_int<unsigned int>
-            (v[i]->str().size());
+            (v_i->str().size());
 
       // Find the longest string in the parsed_libmesh_configure_info
-      for (std::size_t i=0; i<parsed_libmesh_configure_info.size(); ++i)
-        if (parsed_libmesh_configure_info[i].size() > max_length)
-          max_length = cast_int<unsigned int>
-            (parsed_libmesh_configure_info[i].size());
+      for (auto & plci_i : parsed_libmesh_configure_info)
+        if (plci_i.size() > max_length)
+          max_length = cast_int<unsigned int> (plci_i.size());
 
       // Print dashed line for the header
       oss << ' '
@@ -288,12 +288,12 @@ std::string PerfLog::get_info_header() const
           << '\n';
 
       // Loop over all the strings and add end formatting
-      for (std::size_t i=0; i<v.size(); ++i)
+      for (auto & v_i : v)
         {
-          if (v[i]->str().size())
-            oss << v[i]->str()
+          if (v_i->str().size())
+            oss << v_i->str()
                 << std::setw (cast_int<int>
-                              (max_length + 4 - v[i]->str().size()))
+                              (max_length + 4 - v_i->str().size()))
                 << std::right
                 << "|\n";
         }
@@ -311,7 +311,7 @@ std::string PerfLog::get_info_header() const
 
       // Loop over the parsed_libmesh_configure_info and add end formatting.  The magic
       // number 3 below accounts for the leading 'pipe' character and indentation
-      for (std::size_t i=1; i<parsed_libmesh_configure_info.size(); ++i)
+      for (auto i : IntRange<std::size_t>(1, parsed_libmesh_configure_info.size()))
         {
           oss << "|  "
               << parsed_libmesh_configure_info[i]
