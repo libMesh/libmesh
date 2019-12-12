@@ -766,9 +766,11 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           Parallel::wait (id_request_handles);
           Parallel::wait (coord_request_handles);
 
+#ifndef NDEBUG
           for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
             libmesh_assert_equal_to(recv_coords[pid].size(),
                                     recv_ids[pid].size()*LIBMESH_DIM);
+#endif
 
           // Write the coordinates in this block.
           // Some of these coordinates may correspond to ids for which
@@ -910,16 +912,16 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           Parallel::wait (id_request_handles);
           Parallel::wait (unique_id_request_handles);
 
-          // Write the unique ids in this block.
+#ifndef NDEBUG
           for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
-            {
-              libmesh_assert_equal_to
-                (recv_ids[pid].size(), recv_unique_ids[pid].size());
-            }
+            libmesh_assert_equal_to
+              (recv_ids[pid].size(), recv_unique_ids[pid].size());
+#endif
 
           libmesh_assert_less_equal
             (tot_id_size, std::min(io_blksize, std::size_t(max_node_id)));
 
+          // Write the unique ids in this block.
           unique_ids.clear();
           unique_ids.resize(tot_id_size, unique_id_type(-1));
 
