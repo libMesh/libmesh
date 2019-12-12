@@ -725,10 +725,10 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
 
   Point centroid = elem->centroid();
   Point max_distance = Point(0.,0.,0.);
-  for (unsigned int p = 0; p < elem->n_nodes(); p++)
+  for (const Point & p : elem->node_ref_range())
     for (unsigned int d = 0; d < 3; d++)
       {
-        const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+        const Real distance = std::abs(centroid(d) - p(d));
         max_distance(d) = std::max(distance, max_distance(d));
       }
 

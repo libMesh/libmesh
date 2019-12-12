@@ -191,10 +191,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
               if (this->shapes_need_reinit())
                 {
                   cached_nodes.resize(elem->n_nodes());
-                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
-                    {
-                      cached_nodes[n] = elem->point(n);
-                    }
+                  for (auto n : elem->node_index_range())
+                    cached_nodes[n] = elem->point(n);
                 }
             }
           else
@@ -205,7 +203,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
               if (cached_nodes.size() != elem->n_nodes())
                 cached_nodes_still_fit = false;
               else
-                for (unsigned int n = 1; n < elem->n_nodes(); ++n)
+                for (auto n : IntRange<unsigned int>(1, elem->n_nodes()))
                   {
                     if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals
                         ((cached_nodes[n] - cached_nodes[0]), 1e-13))
@@ -221,7 +219,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
                     (this->qrule->get_points(), elem);
                   this->init_shape_functions (this->qrule->get_points(), elem);
                   cached_nodes.resize(elem->n_nodes());
-                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                  for (auto n : elem->node_index_range())
                     cached_nodes[n] = elem->point(n);
                 }
             }

@@ -52,9 +52,9 @@ Real FE<1,XYZ>::shape(const Elem * elem,
 
   Point centroid = elem->centroid();
   Real max_distance = 0.;
-  for (unsigned int p = 0; p < elem->n_nodes(); p++)
+  for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+      const Real distance = std::abs(centroid(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
@@ -120,9 +120,9 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
 
   Point centroid = elem->centroid();
   Real max_distance = 0.;
-  for (unsigned int p = 0; p < elem->n_nodes(); p++)
+  for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+      const Real distance = std::abs(centroid(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
@@ -189,9 +189,9 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
 
   Point centroid = elem->centroid();
   Real max_distance = 0.;
-  for (unsigned int p = 0; p < elem->n_nodes(); p++)
+  for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+      const Real distance = std::abs(centroid(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 

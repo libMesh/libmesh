@@ -118,9 +118,9 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   // somewhere else...
   if (s==0)
     {
-      for (unsigned int p=0; p<qp.size(); p++)
+      for (auto & p : qp)
         {
-          qp[p](Dim-1)=-1.;
+          p(Dim-1)=-1.;
         }
     }
 
