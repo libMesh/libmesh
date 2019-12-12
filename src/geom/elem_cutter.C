@@ -156,7 +156,7 @@ void ElemCutter::find_intersection_points(const Elem & elem,
 {
   _intersection_pts.clear();
 
-  for (unsigned int e=0; e<elem.n_edges(); e++)
+  for (auto e : elem.edge_index_range())
     {
       std::unique_ptr<const Elem> edge (elem.build_edge_ptr(e));
 
@@ -235,7 +235,7 @@ void ElemCutter::cut_2D (const Elem & elem,
   _inside_mesh_2D->clear();
   _outside_mesh_2D->clear();
 
-  for (unsigned int v=0; v<elem.n_vertices(); v++)
+  for (auto v : IntRange<unsigned int>(0, elem.n_vertices()))
     {
       if (vertex_distance_func[v] >= 0.)
         _outside_mesh_2D->add_point (elem.point(v));
@@ -315,7 +315,7 @@ void ElemCutter::cut_3D (const Elem & elem,
   _inside_mesh_3D->clear();
   _outside_mesh_3D->clear();
 
-  for (unsigned int v=0; v<elem.n_vertices(); v++)
+  for (auto v : IntRange<unsigned int>(0, elem.n_vertices()))
     {
       if (vertex_distance_func[v] >= 0.)
         _outside_mesh_3D->add_point (elem.point(v));

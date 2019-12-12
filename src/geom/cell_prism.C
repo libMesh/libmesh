@@ -130,7 +130,7 @@ std::unique_ptr<Elem> Prism::side_ptr (const unsigned int i)
     }
 
   // Set the nodes
-  for (unsigned n=0; n<face->n_nodes(); ++n)
+  for (auto n : face->node_index_range())
     face->set_node(n) = this->node_ptr(Prism6::side_nodes_map[i][n]);
 
   return face;
