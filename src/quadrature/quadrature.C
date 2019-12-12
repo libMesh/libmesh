@@ -41,7 +41,7 @@ void QBase::print_info(std::ostream & os) const
 
   Real summed_weights=0;
   os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
-  for (unsigned int qpoint=0; qpoint<this->n_points(); qpoint++)
+  for (auto qpoint: index_range(_points))
     {
       os << " Point " << qpoint << ":\n"
          << "  "
