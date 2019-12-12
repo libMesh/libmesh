@@ -370,11 +370,8 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                 std::set<const Elem *> neighbor_set;
                 elem->find_interior_neighbors(neighbor_set);
 
-                std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-                for (; n_it != neighbor_set.end(); ++n_it)
+                for (const Elem * neighbor : neighbor_set)
                   {
-                    const Elem * neighbor = *n_it;
-
                     // Not all interior neighbors are necessarily in
                     // the same Mesh (hence not in the global_index_map).
                     // This will be the case when partitioning a
