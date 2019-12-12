@@ -298,7 +298,7 @@ Real EigenSparseMatrix<T>::l1_norm () const
 
   // For a row-major Eigen SparseMatrix like we're using, the
   // InnerIterator iterates over the non-zero entries of rows.
-  for (unsigned row=0; row<this->m(); ++row)
+  for (auto row : IntRange<unsigned int>(0, this->m()))
     {
       EigenSM::InnerIterator it(_mat, row);
       for (; it; ++it)
@@ -317,7 +317,7 @@ Real EigenSparseMatrix<T>::linfty_norm () const
 
   // For a row-major Eigen SparseMatrix like we're using, the
   // InnerIterator iterates over the non-zero entries of rows.
-  for (unsigned row=0; row<this->m(); ++row)
+  for (auto row : IntRange<numeric_index_type>(0, this->m()))
     {
       Real current_abs_row_sum = 0.;
       EigenSM::InnerIterator it(_mat, row);

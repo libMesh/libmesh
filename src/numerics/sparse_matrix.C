@@ -103,17 +103,17 @@ void SparseMatrix<Complex>::print(std::ostream & os, const bool sparse) const
     }
 
   os << "Real part:" << std::endl;
-  for (numeric_index_type i=0; i<this->m(); i++)
+  for (auto i : IntRange<numeric_index_type>(0, this->m()))
     {
-      for (numeric_index_type j=0; j<this->n(); j++)
+      for (auto j : IntRange<numeric_index_type>(0, this->n()))
         os << std::setw(8) << (*this)(i,j).real() << " ";
       os << std::endl;
     }
 
   os << std::endl << "Imaginary part:" << std::endl;
-  for (numeric_index_type i=0; i<this->m(); i++)
+  for (auto i : IntRange<numeric_index_type>(0, this->m()))
     {
-      for (numeric_index_type j=0; j<this->n(); j++)
+      for (auto j : IntRange<numeric_index_type>(0, this->n()))
         os << std::setw(8) << (*this)(i,j).imag() << " ";
       os << std::endl;
     }
@@ -216,7 +216,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
         {
           if (sparse)
             {
-              for (numeric_index_type j=0; j<this->n(); j++)
+              for (auto j : IntRange<numeric_index_type>(0, this->n()))
                 {
                   T c = (*this)(i,j);
                   if (c != static_cast<T>(0.0))
@@ -227,7 +227,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
             }
           else
             {
-              for (numeric_index_type j=0; j<this->n(); j++)
+              for (auto j : IntRange<numeric_index_type>(0, this->n()))
                 os << (*this)(i,j) << " ";
               os << std::endl;
             }
@@ -236,7 +236,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
       std::vector<numeric_index_type> ibuf, jbuf;
       std::vector<T> cbuf;
       numeric_index_type currenti = this->_dof_map->end_dof();
-      for (processor_id_type p=1; p < this->n_processors(); ++p)
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
         {
           this->comm().receive(p, ibuf);
           this->comm().receive(p, jbuf);
@@ -267,7 +267,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
                 }
               else
                 {
-                  for (numeric_index_type j=0; j<this->n(); j++)
+                  for (auto j : IntRange<numeric_index_type>(0, this->n()))
                     {
                       if (currentb < ibuf.size() &&
                           ibuf[currentb] == currenti &&
@@ -303,7 +303,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
       for (numeric_index_type i=this->_dof_map->first_dof();
            i!=this->_dof_map->end_dof(); ++i)
         {
-          for (numeric_index_type j=0; j<this->n(); j++)
+          for (auto j : IntRange<numeric_index_type>(0, this->n()))
             {
               T c = (*this)(i,j);
               if (c != static_cast<T>(0.0))

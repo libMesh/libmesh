@@ -384,7 +384,7 @@ DistributedVector<T>::operator = (const std::vector<T> & v)
     _values = v;
 
   else if (v.size() == size())
-    for (std::size_t i=first_local_index(); i<last_local_index(); i++)
+    for (auto i : index_range(*this))
       _values[i-first_local_index()] = v[i];
 
   else
