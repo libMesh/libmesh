@@ -102,7 +102,9 @@ void MemorySolutionHistory::store()
   std::map<std::string, std::unique_ptr<NumericVector<Number>>> & saved_vectors = stored_sols->second;
 
   // Loop over all the system vectors
-  for (System::vectors_iterator vec = _system.vectors_begin(); vec != _system.vectors_end(); ++vec)
+  for (System::vectors_iterator vec     = _system.vectors_begin(),
+                                vec_end = _system.vectors_end();
+       vec != vec_end; ++vec)
     {
       // The name of this vector
       const std::string & vec_name = vec->first;
