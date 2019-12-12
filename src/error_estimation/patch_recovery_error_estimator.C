@@ -451,8 +451,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                   const unsigned int psi_size = cast_int<unsigned int>(psi.size());
 
                   // Patch matrix contribution
-                  for (unsigned int i=0; i<Kp.m(); i++)
-                    for (unsigned int j=0; j<Kp.n(); j++)
+                  const unsigned int m = Kp.m(), n = Kp.n();
+                  for (unsigned int i=0; i<m; i++)
+                    for (unsigned int j=0; j<n; j++)
                       Kp(i,j) += JxW[qp]*psi[i]*psi[j];
 
                   if (error_estimator.error_norm.type(var) == L2 ||

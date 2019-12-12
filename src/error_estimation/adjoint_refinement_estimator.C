@@ -251,7 +251,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Copy the projected coarse grid solutions, which will be
   // overwritten by solve()
   std::vector<std::unique_ptr<NumericVector<Number>>> coarse_adjoints;
-  for (unsigned int j=0; j != system.n_qois(); j++)
+  for (auto j : IntRange<unsigned int>(0, system.n_qois()))
     {
       if (_qoi_set.has_index(j))
         {
@@ -304,7 +304,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Loop over all the adjoint solutions and get the QoI error
   // contributions from all of them.  While we're looping anyway we'll
   // pull off the coarse adjoints
-  for (unsigned int j=0; j != system.n_qois(); j++)
+  for (auto j : IntRange<unsigned int>(0, system.n_qois()))
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
@@ -350,7 +350,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // stabilized/non-stabilized formulations, except for the case where we not using a
   // heterogenous adjoint bc and have a stabilized formulation.
   // Then, R(u^h_s, z^h_s)  != 0 (no Galerkin orthogonality w.r.t the non-stabilized residual)
-  for (unsigned int j=0; j != system.n_qois(); j++)
+  for (auto j : IntRange<unsigned int>(0, system.n_qois()))
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
@@ -399,11 +399,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // We will be iterating over all the active elements in the fine mesh that live on
   // this processor.
   for (const auto & elem : mesh.active_local_element_ptr_range())
-    for (unsigned int n=0; n != elem->n_nodes(); ++n)
+    for (const Node & node : elem->node_ref_range())
       {
-        // Get a reference to the current node
-        const Node & node = elem->node_ref(n);
-
         // Get the id of this node
         dof_id_type node_id = node.id();
 
@@ -437,7 +434,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                 std::size_t j = 0;
 
                 // If the set already contains this element break out of the loop
-                for (; j != coarse_grid_neighbors.size(); j++)
+                for (std::size_t cgns = coarse_grid_neighbors.size(); j != cgns; j++)
                   if (coarse_grid_neighbors[j] == coarse_id)
                     break;
 
@@ -476,7 +473,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // We will loop over each adjoint solution, localize that adjoint
   // solution and then loop over local elements
-  for (unsigned int i=0; i != system.n_qois(); i++)
+  for (auto i : IntRange<unsigned int>(0, system.n_qois()))
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(i))
