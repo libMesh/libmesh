@@ -24,6 +24,7 @@
 
 // Local Includes
 #include "libmesh/fem_function_base.h"
+#include "libmesh/int_range.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
@@ -338,7 +339,7 @@ ParsedFEMFunction<Output>::reparse (const std::string & expression)
   unsigned int offset = LIBMESH_DIM + 1 + _n_requested_vars +
     _n_requested_grad_components + _n_requested_hess_components;
 
-  for (std::size_t i=0; i < _additional_vars.size(); ++i)
+  for (auto i : index_range(_additional_vars))
     {
       variables += "," + _additional_vars[i];
       // Initialize extra variables to the vector passed in or zero
@@ -450,9 +451,8 @@ ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name)
 #endif
   Output old_var_value(0.);
 
-  for (std::size_t s=0; s != _subexpressions.size(); ++s)
+  for (const std::string & subexpression : _subexpressions)
     {
-      const std::string & subexpression = _subexpressions[s];
       const std::size_t varname_i =
         find_name(inline_var_name, subexpression);
       if (varname_i == std::string::npos)
@@ -523,7 +523,7 @@ ParsedFEMFunction<Output>::set_inline_value (const std::string & inline_var_name
 #ifndef NDEBUG
   bool found_var_name = false;
 #endif
-  for (std::size_t s=0; s != _subexpressions.size(); ++s)
+  for (auto s : index_range(_subexpressions))
     {
       const std::string & subexpression = _subexpressions[s];
       const std::size_t varname_i =
@@ -567,10 +567,10 @@ ParsedFEMFunction<Output>::set_inline_value (const std::string & inline_var_name
 
   std::string new_expression;
 
-  for (std::size_t s=0; s != _subexpressions.size(); ++s)
+  for (const auto & subexpression : _subexpressions)
     {
       new_expression += '{';
-      new_expression += _subexpressions[s];
+      new_expression += subexpression;
       new_expression += '}';
     }
 
@@ -770,7 +770,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
 #ifndef NDEBUG
       bool at_quadrature_point = false;
 #endif
-      for (std::size_t qp = 0; qp != normals.size(); ++qp)
+      for (auto qp : index_range(normals))
         {
           if (p == xyz[qp])
             {
@@ -814,8 +814,8 @@ ParsedFEMFunction<Output>::eval (FunctionParserBase<Output> & parser,
                    << " of expression '"
                    << function_name
                    << "' with arguments:\n";
-      for (std::size_t j=0; j<_spacetime.size(); ++j)
-        libMesh::err << '\t' << _spacetime[j] << '\n';
+      for (const auto & st : _spacetime)
+        libMesh::err << '\t' << st << '\n';
       libMesh::err << '\n';
 
       // Currently no API to report error messages, we'll do it manually
