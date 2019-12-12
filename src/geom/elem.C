@@ -1038,8 +1038,7 @@ void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
 #ifdef LIBMESH_ENABLE_AMR
   if (this->active())
     neigh->family_tree_by_side(neigh_family, nn);
-  else if (neigh->subactive() ||
-           neigh->ancestor())
+  else
 #endif
     neigh_family.push_back(neigh);
 
