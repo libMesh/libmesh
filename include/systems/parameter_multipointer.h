@@ -79,12 +79,12 @@ public:
     // Compare other values to the last one we'll change
     const T & val = *_ptrs.back();
 #endif
-    for (std::size_t i=0; i != _ptrs.size(); ++i)
+    for (auto & ptr : _ptrs)
       {
         // If you're already using inconsistent parameters we can't
         // help you.
-        libmesh_assert_equal_to(*_ptrs[i], val);
-        *_ptrs[i] = new_value;
+        libmesh_assert_equal_to(*ptr, val);
+        *ptr = new_value;
       }
   }
 
@@ -98,8 +98,8 @@ public:
 #ifndef NDEBUG
     // If you're already using inconsistent parameters we can't help
     // you.
-    for (std::size_t i=1; i < _ptrs.size(); ++i)
-      libmesh_assert_equal_to(*_ptrs[i], val);
+    for (auto ptr : _ptrs)
+      libmesh_assert_equal_to(*ptr, val);
 #endif
     return val;
   }

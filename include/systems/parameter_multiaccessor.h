@@ -107,8 +107,8 @@ public:
 #ifndef NDEBUG
     // If you're already using inconsistent parameters we can't help
     // you.
-    for (std::size_t i=1; i < _accessors.size(); ++i)
-      libmesh_assert_equal_to(_accessors[i]->get(), val);
+    for (const auto & accessor : _accessors)
+      libmesh_assert_equal_to(accessor->get(), val);
 #endif
     return val;
   }
