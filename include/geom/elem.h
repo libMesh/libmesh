@@ -1988,7 +1988,7 @@ dof_id_type Elem::node_id (const unsigned int i) const
 inline
 unsigned int Elem::local_node (const dof_id_type i) const
 {
-  for (unsigned int n=0; n != this->n_nodes(); ++n)
+  for (auto n : IntRange<unsigned int>(0, this->n_nodes()))
     if (this->node_id(n) == i)
       return n;
 
@@ -2046,7 +2046,7 @@ Node & Elem::node_ref (const unsigned int i)
 inline
 unsigned int Elem::get_node_index (const Node * node_ptr) const
 {
-  for (unsigned int n=0; n != this->n_nodes(); ++n)
+  for (auto n : IntRange<unsigned int>(0, this->n_nodes()))
     if (this->_nodes[n] == node_ptr)
       return n;
 
@@ -2332,7 +2332,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
       libmesh_assert(eparent);
     }
 
-  for (unsigned int s=0, n_s = this->n_sides(); s != n_s; ++s)
+  for (auto s : IntRange<unsigned int>(0, this->n_sides()))
     if (this->neighbor_ptr(s) == eparent)
       return s;
 
