@@ -65,19 +65,19 @@ DofObject::DofObject (const DofObject & dof_obj) :
 
   libmesh_assert_equal_to (this->n_systems(), dof_obj.n_systems());
 
-  for (unsigned int s=0; s<this->n_systems(); s++)
+  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
     {
       libmesh_assert_equal_to (this->n_vars(s),       dof_obj.n_vars(s));
       libmesh_assert_equal_to (this->n_var_groups(s), dof_obj.n_var_groups(s));
 
-      for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
+      for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(s)))
         libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
 
-      for (unsigned int v=0; v<this->n_vars(s); v++)
+      for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
         {
           libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
 
-          for (unsigned int c=0; c<this->n_comp(s,v); c++)
+          for (auto c : IntRange<unsigned int>(0, this->n_comp(s,v)))
             libmesh_assert_equal_to (this->dof_number(s,v,c), dof_obj.dof_number(s,v,c));
         }
     }
@@ -111,19 +111,19 @@ DofObject & DofObject::operator= (const DofObject & dof_obj)
 
   libmesh_assert_equal_to (this->n_systems(), dof_obj.n_systems());
 
-  for (unsigned int s=0; s<this->n_systems(); s++)
+  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
     {
       libmesh_assert_equal_to (this->n_vars(s),       dof_obj.n_vars(s));
       libmesh_assert_equal_to (this->n_var_groups(s), dof_obj.n_var_groups(s));
 
-      for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
+      for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(s)))
         libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
 
-      for (unsigned int v=0; v<this->n_vars(s); v++)
+      for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
         {
           libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
 
-          for (unsigned int c=0; c<this->n_comp(s,v); c++)
+          for (auto c : IntRange<unsigned int>(0, this->n_comp(s,v)))
             libmesh_assert_equal_to (this->dof_number(s,v,c), dof_obj.dof_number(s,v,c));
         }
     }
@@ -195,7 +195,7 @@ void DofObject::set_n_systems (const unsigned int ns)
 
   // check that all systems now exist and that they have 0 size
   libmesh_assert_equal_to (ns, this->n_systems());
-  for (unsigned int s=0; s<this->n_systems(); s++)
+  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
     {
       libmesh_assert_equal_to (this->n_vars(s),       0);
       libmesh_assert_equal_to (this->n_var_groups(s), 0);
@@ -328,7 +328,7 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
 
   // Make sure we didn't screw up any of our sizes!
 #ifdef DEBUG
-  for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
+  for (auto s_ctr : IntRange<unsigned int>(0, this->n_systems()))
     if (s_ctr != s)
       libmesh_assert_equal_to (this->n_var_groups(s_ctr), old_system_sizes[s_ctr]);
 
@@ -371,17 +371,17 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
 
   libmesh_assert_equal_to (this->n_var_groups(s), nvpg.size());
 
-  for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
+  for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(s)))
     {
       libmesh_assert_equal_to (this->n_vars(s,vg), nvpg[vg]);
       libmesh_assert_equal_to (this->n_comp_group(s,vg), 0);
     }
 
-  for (unsigned int v=0; v<this->n_vars(s); v++)
+  for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
     libmesh_assert_equal_to (this->n_comp(s,v), 0);
 
   // again, all other system sizes should be unchanged!
-  for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
+  for (auto s_ctr : IntRange<unsigned int>(0, this->n_systems()))
     if (s_ctr != s)
       libmesh_assert_equal_to (this->n_var_groups(s_ctr), old_system_sizes[s_ctr]);
 
@@ -665,13 +665,13 @@ void DofObject::print_dof_info() const
 {
   libMesh::out << this->id() << " [ ";
 
-  for (unsigned int s=0; s<this->n_systems(); s++)
+  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
     {
       libMesh::out << "s:" << s << " ";
-      for (unsigned int var=0; var<this->n_vars(s); var++)
+      for (auto var : IntRange<unsigned int>(0, this->n_vars(s)))
         {
           libMesh::out << "v:" << var << " ";
-          for (unsigned int comp=0; comp<this->n_comp(s,var); comp++)
+          for (auto comp : IntRange<unsigned int>(0, this->n_comp(s,var)))
             {
               libMesh::out << "c:" << comp << " dof:" << this->dof_number(s,var,comp) << " ";
             }
