@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/int_range.h"
 
 #ifdef LIBMESH_HAVE_LIBHILBERT
 #include "hilbert.h"
@@ -53,7 +54,7 @@ bool is_sorted (const std::vector<KeyType> & v)
   if (v.empty())
     return true;
 
-  for (std::size_t i=1; i<v.size(); i++)
+  for (auto i : IntRange<std::size_t>(1, v.size()))
     if (v[i] < v[i-1])
       return false;
 
