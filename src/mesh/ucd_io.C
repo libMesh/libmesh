@@ -207,7 +207,7 @@ void UCDIO::read_implementation (std::istream & in)
         // Build the required type and release it into our custody.
         Elem * elem = Elem::build(et).release();
 
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
+        for (auto n : elem->node_index_range())
           {
             libmesh_assert (in.good());
 
@@ -372,7 +372,7 @@ void UCDIO::write_soln(std::ostream & out_stream,
 
   // First write out how many variables and how many components per variable
   out_stream << names.size();
-  for (std::size_t i = 0; i < names.size(); i++)
+  for (std::size_t i = 0, ns = names.size(); i < ns; i++)
     {
       libmesh_assert (out_stream.good());
       // Each named variable has only 1 component
@@ -391,7 +391,7 @@ void UCDIO::write_soln(std::ostream & out_stream,
   // Now, for each node, write out the solution variables.
   // We use a 1-based node numbering for UCD.
   std::size_t nv = names.size();
-  for (std::size_t n = 1; n <= mesh.n_nodes(); n++)
+  for (auto n : IntRange<std::size_t>(1, mesh.n_nodes()))
     {
       libmesh_assert (out_stream.good());
       out_stream << n;

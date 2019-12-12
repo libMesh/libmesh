@@ -207,8 +207,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
           std::unique_ptr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
           // insert all the node numbers in inner_boundary_node_numbers
-          for (unsigned int n=0; n<side->n_nodes(); n++)
-            inner_boundary_node_numbers.push_back(side->node_id(n));
+          for (const Node & node : side->node_ref_range())
+            inner_boundary_node_numbers.push_back(node.id());
         }
 
 
@@ -342,10 +342,11 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
           // Loop over the nodes to check whether they are on the symmetry planes,
           // and therefore sufficient to use a non-full-ordered side element
-          for (unsigned int n=0; n<side->n_nodes(); n++)
+          for (const Node & node : side->node_ref_range())
             {
+              const dof_id_type node_id = node.id();
               const Point dist_from_origin =
-                this->_mesh.point(side->node_id(n)) - origin;
+                this->_mesh.point(node_id) - origin;
 
               if (x_sym)
                 if (std::abs(dist_from_origin(0)) > 1.e-3)
@@ -377,7 +378,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
               if (r > max_r)
                 {
                   max_r = r;
-                  max_r_node=side->node_id(n);
+                  max_r_node=node_id;
                 }
 
             }
@@ -420,8 +421,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       std::unique_ptr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
       bool found=false;
-      for (unsigned int sn=0; sn<side->n_nodes(); sn++)
-        if (onodes.count(side->node_id(sn)))
+      for (const Node & node : side->node_ref_range())
+        if (onodes.count(node.id()))
           {
             found=true;
             break;
@@ -430,8 +431,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       // If a new oface is found, include its nodes in onodes
       if (found)
         {
-          for (unsigned int sn=0; sn<side->n_nodes(); sn++)
-            onodes.insert(side->node_id(sn));
+          for (const Node & node : side->node_ref_range())
+            onodes.insert(node.id());
 
           ofaces.insert(p);
           face_it = faces.erase(face_it); // increment is done here

@@ -929,7 +929,7 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
           // Loop over indices in connectivity array, build edge elements,
           // look them up in the edge_map.
-          for (unsigned int i=0; i<connect.size(); i+=num_nodes_per_edge)
+          for (unsigned int i=0, sz=connect.size(); i<sz; i+=num_nodes_per_edge)
             {
               auto edge = Elem::build(conv.libmesh_elem_type());
               for (int n=0; n<num_nodes_per_edge; ++n)
@@ -1783,16 +1783,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
   else
     {
       for (const auto & elem : mesh.active_element_ptr_range())
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
+        for (const Node & node : elem->node_ref_range())
           {
-            x.push_back(elem->point(n)(0));
+            x.push_back(node(0));
 #if LIBMESH_DIM > 1
-            y.push_back(elem->point(n)(1));
+            y.push_back(node(1));
 #else
             y.push_back(0.);
 #endif
 #if LIBMESH_DIM > 2
-            z.push_back(elem->point(n)(2));
+            z.push_back(node(2));
 #else
             z.push_back(0.);
 #endif
@@ -1908,7 +1908,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   {
     dof_id_type node_counter = 1; // Exodus numbering is 1-based
     for (const auto & elem : mesh.active_element_ptr_range())
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      for (auto n : elem->node_index_range())
         {
           std::pair<dof_id_type,unsigned int> id_pair;
           id_pair.first = elem->id();
@@ -2639,7 +2639,7 @@ write_sideset_data(const MeshBase & mesh,
 
       // For each variable in var_names, write the values for the
       // current sideset, if any.
-      for (unsigned int var=0; var<var_names.size(); ++var)
+      for (auto var : index_range(var_names))
         {
           // If this var has no values on this sideset, go to the next one.
           if (!side_ids[var].count(ss_ids[ss]))

@@ -311,7 +311,7 @@ void TecplotIO::write_ascii (const std::string & fname,
 
   } // finished writing header
 
-  for (unsigned int i=0; i<the_mesh.n_nodes(); i++)
+  for (auto i : IntRange<unsigned int>(0, the_mesh.n_nodes()))
     {
       // Print the point without a newline
       the_mesh.point(i).write_unformatted(out_stream, false);
@@ -460,7 +460,7 @@ void TecplotIO::write_binary (const std::string & fname,
   // Copy the nodes and data to the TecplotMacros class. Note that we store
   // everything as a float here since the eye doesn't require a double to
   // understand what is going on
-  for (unsigned int v=0; v<the_mesh.n_nodes(); v++)
+  for (auto v : IntRange<unsigned int>(0, the_mesh.n_nodes()))
     {
       tm.nd(0,v) = static_cast<float>(the_mesh.point(v)(0));
       tm.nd(1,v) = static_cast<float>(the_mesh.point(v)(1));
@@ -521,7 +521,7 @@ void TecplotIO::write_binary (const std::string & fname,
                         the_mesh.active_subdomain_elements_end(sbd_id)))
           {
             std::vector<dof_id_type> conn;
-            for (unsigned int se=0; se<elem->n_sub_elem(); se++)
+            for (auto se : IntRange<unsigned int>(0, elem->n_sub_elem()))
               {
                 elem->connectivity(se, TECPLOT, conn);
 
@@ -712,7 +712,7 @@ void TecplotIO::write_binary (const std::string & fname,
   // Copy the nodes and data to the TecplotMacros class. Note that we store
   // everything as a float here since the eye doesn't require a double to
   // understand what is going on
-  for (unsigned int v=0; v<the_mesh.n_nodes(); v++)
+  for (auto v : IntRange<unsigned int>(0, the_mesh.n_nodes()))
     {
       tm.nd(0,v) = static_cast<float>(the_mesh.point(v)(0));
       tm.nd(1,v) = static_cast<float>(the_mesh.point(v)(1));
@@ -745,7 +745,7 @@ void TecplotIO::write_binary (const std::string & fname,
     for (const auto & elem : the_mesh.active_element_ptr_range())
       {
         std::vector<dof_id_type> conn;
-        for (unsigned int se=0; se<elem->n_sub_elem(); se++)
+        for (auto se : IntRange<unsigned int>(0, elem->n_sub_elem()))
           {
             elem->connectivity(se, TECPLOT, conn);
 

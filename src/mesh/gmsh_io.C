@@ -882,7 +882,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
   out_stream << "$Nodes\n";
   out_stream << mesh.n_nodes() << '\n';
 
-  for (unsigned int v=0; v<mesh.n_nodes(); v++)
+  for (auto v : IntRange<unsigned int>(0, mesh.n_nodes()))
     out_stream << mesh.node_ref(v).id()+1 << " "
                << mesh.node_ref(v)(0) << " "
                << mesh.node_ref(v)(1) << " "
@@ -1175,10 +1175,11 @@ void GmshIO::write_post (const std::string & fname,
           // Loop over the elements and write out the data
           for (const auto & elem : mesh.active_element_ptr_range())
             {
+              const unsigned int nv = elem->n_vertices();
               // this is quite crappy, but I did not invent that file format!
               for (unsigned int d=0; d<3; d++)  // loop over the dimensions
                 {
-                  for (unsigned int n=0; n < elem->n_vertices(); n++)   // loop over vertices
+                  for (unsigned int n=0; n < nv; n++)   // loop over vertices
                     {
                       const Point & vertex = elem->point(n);
                       if (this->binary())
@@ -1198,7 +1199,7 @@ void GmshIO::write_post (const std::string & fname,
                 }
 
               // now finally write out the data
-              for (unsigned int i=0; i < elem->n_vertices(); i++)   // loop over vertices
+              for (unsigned int i=0; i < nv; i++)   // loop over vertices
                 if (this->binary())
                   {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS

@@ -589,7 +589,7 @@ void ExodusII_IO::copy_scalar_solution(System & system,
   {
     const DofMap & dof_map = system.get_dof_map();
 
-    for (std::size_t i = 0; i < system_var_names.size(); i++)
+    for (auto i : index_range(system_var_names))
     {
       const unsigned int var_num = system.variable_scalar_number(system_var_names[i], 0);
 

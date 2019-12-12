@@ -64,7 +64,7 @@ void FroIO::write (const std::string & fname)
                  << the_mesh.get_boundary_info().n_boundary_ids()  << " 1\n";
 
       // Write the nodes -- 1-based!
-      for (unsigned int n=0; n<the_mesh.n_nodes(); n++)
+      for (auto n : IntRange<unsigned int>(0, the_mesh.n_nodes()))
         out_stream << n+1 << " \t"
                    << std::scientific
                    << std::setprecision(this->ascii_precision())
@@ -83,8 +83,8 @@ void FroIO::write (const std::string & fname)
 
           out_stream << ++e << " \t";
 
-          for (unsigned int n=0; n<elem->n_nodes(); n++)
-            out_stream << elem->node_id(n)+1 << " \t";
+          for (const Node & node : elem->node_ref_range())
+            out_stream << node.id()+1 << " \t";
 
           //   // LHS -> RHS Mapping, for inverted triangles
           //   out_stream << elem->node_id(0)+1 << " \t";

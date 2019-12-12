@@ -515,7 +515,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           // then we share that vertex with our parent, with
           // the same local index.
           bool found_child = false;
-          for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
+          for (auto v : IntRange<unsigned int>(0, new_elem->n_vertices()))
             if (new_elem->node_ptr(v) == side_parent->node_ptr(v))
               {
                 side_parent->add_child(new_elem, v);

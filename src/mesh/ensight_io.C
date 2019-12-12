@@ -203,8 +203,8 @@ void EnsightIO::write_geometry_ascii()
     {
       ensight_parts_map[elem->type()].push_back(elem);
 
-      for (unsigned int i = 0; i < elem->n_nodes(); i++)
-        mesh_nodes_map[elem->node_id(i)] = elem->point(i);
+      for (const Node & node : elem->node_ref_range())
+        mesh_nodes_map[node.id()] = node;
     }
 
   // Write number of local points
@@ -391,7 +391,7 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
       libmesh_error_msg("Complex-valued Ensight output not yet supported");
 #endif
 
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      for (auto n : elem->node_index_range())
         local_soln[elem->node_id(n)] = libmesh_real(nodal_soln[n]);
     }
 

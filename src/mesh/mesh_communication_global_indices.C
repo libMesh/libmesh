@@ -313,7 +313,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
     // Be careful here.  The *_upper_bounds will be used to find the processor
     // a given object belongs to.  So, if a processor contains no objects (possible!)
     // then copy the bound from the lower processor id.
-    for (processor_id_type p=0; p<communicator.size(); p++)
+    for (auto p : IntRange<processor_id_type>(0, communicator.size()))
       {
         node_upper_bounds[p] = my_max[2*p+0];
         elem_upper_bounds[p] = my_max[2*p+1];
@@ -367,7 +367,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 
       // The offset of my first global index
       dof_id_type my_offset = 0;
-      for (processor_id_type pid=0; pid<communicator.rank(); pid++)
+      for (auto pid : IntRange<processor_id_type>(0, communicator.rank()))
         my_offset += node_bin_sizes[pid];
 
       auto gather_functor =
@@ -483,7 +483,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 
       // The offset of my first global index
       dof_id_type my_offset = 0;
-      for (processor_id_type pid=0; pid<communicator.rank(); pid++)
+      for (auto pid : IntRange<processor_id_type>(0, communicator.rank()))
         my_offset += elem_bin_sizes[pid];
 
       auto gather_functor =
@@ -538,7 +538,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       {
         std::vector<std::vector<dof_id_type>::const_iterator>
           next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
-        for (processor_id_type pid=0; pid<communicator.size(); pid++)
+        for (auto pid : IntRange<processor_id_type>(0, communicator.size()))
           next_obj_on_proc.push_back(filled_request[pid].begin());
 
         for (auto & elem : mesh.element_ptr_range())
@@ -770,7 +770,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
 
   // The offset of my first global index
   unsigned int my_offset = 0;
-  for (unsigned int pid=0; pid<communicator.rank(); pid++)
+  for (auto pid : IntRange<processor_id_type>(0, communicator.rank()))
     my_offset += bin_sizes[pid];
 
   //-------------------------------------------------------------
@@ -786,7 +786,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
   // Be careful here.  The *_upper_bounds will be used to find the processor
   // a given object belongs to.  So, if a processor contains no objects (possible!)
   // then copy the bound from the lower processor id.
-  for (unsigned int p=1; p<communicator.size(); p++)
+  for (auto p : IntRange<processor_id_type>(1, communicator.size()))
     if (!bin_sizes[p]) upper_bounds[p] = upper_bounds[p-1];
 
 
@@ -940,7 +940,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
     {
       std::vector<std::vector<dof_id_type>::const_iterator>
         next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
-      for (processor_id_type pid=0; pid<communicator.size(); pid++)
+      for (auto pid : IntRange<processor_id_type>(0, communicator.size()))
         next_obj_on_proc.push_back(filled_request[pid].begin());
 
       unsigned int cnt=0;
