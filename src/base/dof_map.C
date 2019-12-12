@@ -262,7 +262,7 @@ void DofMap::add_variable_group (const VariableGroup & var_group)
 
   VariableGroup & new_var_group = _variable_groups.back();
 
-  for (unsigned int var=0; var<new_var_group.n_variables(); var++)
+  for (auto var : IntRange<unsigned int>(0, new_var_group.n_variables()))
     {
       _variables.push_back (new_var_group(var));
       _variable_group_numbers.push_back (vg);
@@ -363,14 +363,12 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
-  auto ghost_end = ghost_objects_from_proc.end();
-  for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
-    if (p != this->processor_id())
-      {
-        auto ghost_it = ghost_objects_from_proc.find(p);
-        if (ghost_it != ghost_end)
-          requested_ids[p].reserve(ghost_it->second);
-      }
+  for (auto pair : ghost_objects_from_proc)
+    {
+      const processor_id_type p = pair.first;
+      if (p != this->processor_id())
+        requested_ids[p].reserve(pair.second);
+    }
 
   for (it = objects_begin; it != objects_end; ++it)
     {
@@ -379,7 +377,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         requested_ids[obj->processor_id()].push_back(obj->id());
     }
 #ifdef DEBUG
-  for (processor_id_type p=0, np = this->n_processors(); p != np; ++p)
+  for (auto p : IntRange<processor_id_type>(0, this->n_processors()))
     {
       if (ghost_objects_from_proc.count(p))
         libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
@@ -551,14 +549,10 @@ void DofMap::reinit(MeshBase & mesh)
       if (elem->refinement_flag() == Elem::JUST_REFINED)
         continue;
 
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
-        {
-          Node & node = elem->node_ref(n);
-
-          if (node.old_dof_object == nullptr)
-            if (node.has_dofs(sys_num))
-              node.set_old_dof_object();
-        }
+      for (Node & node : elem->node_ref_range())
+        if (node.old_dof_object == nullptr)
+          if (node.has_dofs(sys_num))
+            node.set_old_dof_object();
 
       libmesh_assert (!elem->old_dof_object);
 
@@ -656,7 +650,7 @@ void DofMap::reinit(MeshBase & mesh)
                                              elem->p_level());
 
           // Allocate the vertex DOFs
-          for (unsigned int n=0; n<elem->n_nodes(); n++)
+          for (auto n : elem->node_index_range())
             {
               Node & node = elem->node_ref(n);
 
@@ -713,7 +707,7 @@ void DofMap::reinit(MeshBase & mesh)
                                              elem->p_level());
 
           // Allocate the edge and face DOFs
-          for (unsigned int n=0; n<elem->n_nodes(); n++)
+          for (auto n : elem->node_index_range())
             {
               Node & node = elem->node_ref(n);
 
@@ -1015,8 +1009,8 @@ void DofMap::distribute_dofs (MeshBase & mesh)
         DofObject const * const dofobj = node;
         const processor_id_type obj_proc_id = dofobj->processor_id();
 
-        for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
-          for (unsigned int c=0; c != dofobj->n_comp(sys_num,v); ++c)
+        for (auto v : IntRange<unsigned int>(0, dofobj->n_vars(sys_num)))
+          for (auto c : IntRange<unsigned int>(0, dofobj->n_comp(sys_num,v)))
             {
               const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
               libmesh_assert_greater_equal (dofid, this->first_dof(obj_proc_id));
@@ -1029,8 +1023,8 @@ void DofMap::distribute_dofs (MeshBase & mesh)
         DofObject const * const dofobj = elem;
         const processor_id_type obj_proc_id = dofobj->processor_id();
 
-        for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
-          for (unsigned int c=0; c != dofobj->n_comp(sys_num,v); ++c)
+        for (auto v : IntRange<unsigned int>(0, dofobj->n_vars(sys_num)))
+          for (auto c : IntRange<unsigned int>(0, dofobj->n_comp(sys_num,v)))
             {
               const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
               libmesh_assert_greater_equal (dofid, this->first_dof(obj_proc_id));
@@ -1055,7 +1049,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
   // This is an O(N_vars) calculation so we want to do it once per
   // renumbering rather than once per SCALAR_dof_indices() call
 
-  for (unsigned int v=0; v<this->n_variables(); v++)
+  for (auto v : IntRange<unsigned int>(0, this->n_variables()))
     if (this->variable(v).type().family == SCALAR)
       {
         _first_scalar_df[v] = current_SCALAR_dof_index;
@@ -1749,7 +1743,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
   {
     bool all_discontinuous_dofs = true;
 
-    for (unsigned int var=0; var<this->n_variables(); var++)
+    for (auto var : IntRange<unsigned int>(0, this->n_variables()))
       if (FEAbstract::build (mesh.mesh_dimension(),
                              this->variable_type(var))->get_continuity() !=  DISCONTINUOUS)
         all_discontinuous_dofs = false;
