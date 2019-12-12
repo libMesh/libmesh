@@ -361,90 +361,89 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   for (auto & elem : as_range(send_elems_begin, send_elems_end))
     send_to_pid[elem->processor_id()].push_back(elem);
 
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
-    if (pid != mesh.processor_id()) // don't send to ourselves!!
-      {
-        // Build up a list of nodes and elements to send to processor pid.
-        // We will certainly send all the elements assigned to this processor,
-        // but we will also ship off any elements which are required
-        // to be ghosted and any nodes which are used by any of the
-        // above.
+  // If we don't have any just-coarsened elements to send to a
+  // pid, then there won't be any nodes or any elements pulled
+  // in by ghosting either, and we're done with this pid.
+  for (auto pair : send_to_pid)
+    {
+      const processor_id_type pid = pair.first;
+      // don't send to ourselves!!
+      if (pid == mesh.processor_id())
+        continue;
 
-        const auto elements_vec_it = send_to_pid.find(pid);
+      // Build up a list of nodes and elements to send to processor pid.
+      // We will certainly send all the elements assigned to this processor,
+      // but we will also ship off any elements which are required
+      // to be ghosted and any nodes which are used by any of the
+      // above.
 
-        // If we don't have any just-coarsened elements to send to
-        // pid, then there won't be any nodes or any elements pulled
-        // in by ghosting either, and we're done with this pid.
-        if (elements_vec_it == send_to_pid.end())
-          continue;
+      const auto & p_elements = pair.second;
+      libmesh_assert(!p_elements.empty());
 
-        const auto & p_elements = elements_vec_it->second;
-        libmesh_assert(!p_elements.empty());
-
-        Elem * const * elempp = p_elements.data();
-        Elem * const * elemend = elempp + p_elements.size();
+      Elem * const * elempp = p_elements.data();
+      Elem * const * elemend = elempp + p_elements.size();
 
 #ifndef LIBMESH_ENABLE_AMR
-        // This parameter is not used when !LIBMESH_ENABLE_AMR.
-        libmesh_ignore(newly_coarsened_only);
-        libmesh_assert(!newly_coarsened_only);
+      // This parameter is not used when !LIBMESH_ENABLE_AMR.
+      libmesh_ignore(newly_coarsened_only);
+      libmesh_assert(!newly_coarsened_only);
 #endif
 
-        MeshBase::const_element_iterator elem_it =
-          MeshBase::const_element_iterator
-            (elempp, elemend, Predicates::NotNull<Elem * const *>());
+      MeshBase::const_element_iterator elem_it =
+        MeshBase::const_element_iterator
+          (elempp, elemend, Predicates::NotNull<Elem * const *>());
 
-        const MeshBase::const_element_iterator elem_end =
-          MeshBase::const_element_iterator
-            (elemend, elemend, Predicates::NotNull<Elem * const *>());
+      const MeshBase::const_element_iterator elem_end =
+        MeshBase::const_element_iterator
+          (elemend, elemend, Predicates::NotNull<Elem * const *>());
 
-        std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
+      std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 
-        // See which to-be-ghosted elements we need to send
-        query_ghosting_functors (mesh, pid, elem_it, elem_end,
-                                 elements_to_send);
+      // See which to-be-ghosted elements we need to send
+      query_ghosting_functors (mesh, pid, elem_it, elem_end,
+                               elements_to_send);
 
-        // The inactive elements we need to send should have their
-        // immediate children present.
-        connect_children(mesh, mesh.pid_elements_begin(pid),
-                         mesh.pid_elements_end(pid),
-                         elements_to_send);
+      // The inactive elements we need to send should have their
+      // immediate children present.
+      connect_children(mesh, mesh.pid_elements_begin(pid),
+                       mesh.pid_elements_end(pid),
+                       elements_to_send);
 
-        // The elements we need should have their ancestors and their
-        // subactive children present too.
-        connect_families(elements_to_send);
+      // The elements we need should have their ancestors and their
+      // subactive children present too.
+      connect_families(elements_to_send);
 
-        std::set<const Node *> connected_nodes;
-        reconnect_nodes(elements_to_send, connected_nodes);
+      std::set<const Node *> connected_nodes;
+      reconnect_nodes(elements_to_send, connected_nodes);
 
-        // the number of nodes we will ship to pid
-        send_n_nodes_and_elem_per_proc[2*pid+0] =
-          cast_int<dof_id_type>(connected_nodes.size());
+      // the number of nodes we will ship to pid
+      send_n_nodes_and_elem_per_proc[2*pid+0] =
+        cast_int<dof_id_type>(connected_nodes.size());
 
-        // send any nodes off to the destination processor
-        libmesh_assert (!connected_nodes.empty());
-        node_send_requests.push_back(Parallel::request());
+      // send any nodes off to the destination processor
+      libmesh_assert (!connected_nodes.empty());
+      node_send_requests.push_back(Parallel::request());
 
-        mesh.comm().send_packed_range (pid, &mesh,
-                                       connected_nodes.begin(),
-                                       connected_nodes.end(),
-                                       node_send_requests.back(),
-                                       nodestag);
+      mesh.comm().send_packed_range (pid, &mesh,
+                                     connected_nodes.begin(),
+                                     connected_nodes.end(),
+                                     node_send_requests.back(),
+                                     nodestag);
 
-        // the number of elements we will send to this processor
-        send_n_nodes_and_elem_per_proc[2*pid+1] =
-          cast_int<dof_id_type>(elements_to_send.size());
+      // the number of elements we will send to this processor
+      send_n_nodes_and_elem_per_proc[2*pid+1] =
+        cast_int<dof_id_type>(elements_to_send.size());
 
-        // send the elements off to the destination processor
-        libmesh_assert (!elements_to_send.empty());
-        element_send_requests.push_back(Parallel::request());
+      // send the elements off to the destination processor
+      libmesh_assert (!elements_to_send.empty());
+      element_send_requests.push_back(Parallel::request());
 
-        mesh.comm().send_packed_range (pid, &mesh,
-                                       elements_to_send.begin(),
-                                       elements_to_send.end(),
-                                       element_send_requests.back(),
-                                       elemstag);
-      }
+      mesh.comm().send_packed_range (pid, &mesh,
+                                     elements_to_send.begin(),
+                                     elements_to_send.end(),
+                                     element_send_requests.back(),
+                                     elemstag);
+    }
 
   std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
 
@@ -461,7 +460,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
     n_send_node_pairs=0,      n_send_elem_pairs=0,
     n_recv_node_pairs=0,      n_recv_elem_pairs=0;
 
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
     {
       if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
         {
@@ -602,7 +601,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   // A list of all the processors which *may* contain neighboring elements.
   // (for development simplicity, just make this the identity map)
   std::vector<processor_id_type> adjacent_processors;
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
     if (pid != mesh.processor_id())
       adjacent_processors.push_back (pid);
 
@@ -636,7 +635,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                 {
                   elem->build_side_ptr(side, s);
 
-                  for (unsigned int n=0; n<side->n_vertices(); n++)
+                  for (auto n : IntRange<unsigned int>(0, side->n_vertices()))
                     my_interface_node_set.insert (side->node_id(n));
                 }
           }
@@ -790,7 +789,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             {
               std::size_t n_shared_nodes = 0;
 
-              for (unsigned int n=0; n<elem->n_vertices(); n++)
+              for (auto n : IntRange<unsigned int>(0, elem->n_vertices()))
                 if (std::binary_search (common_interface_node_list.begin(),
                                         common_interface_node_list.end(),
                                         elem->node_id(n)))
