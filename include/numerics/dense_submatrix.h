@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_subvector.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 
@@ -190,8 +191,8 @@ template<typename T>
 inline
 void DenseSubMatrix<T>::zero()
 {
-  for (unsigned int i=0; i<this->m(); i++)
-    for (unsigned int j=0; j<this->n(); j++)
+  for (auto i : IntRange<unsigned int>(0, this->m()))
+    for (auto j : IntRange<unsigned int>(0, this->n()))
       _parent_matrix(i + this->i_off(),
                      j + this->j_off()) = 0.;
 }

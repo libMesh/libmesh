@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 
@@ -186,7 +187,7 @@ template<typename T>
 inline
 void DenseSubVector<T>::zero()
 {
-  for (unsigned int i=0; i<this->size(); i++)
+  for (auto i : index_range(*this))
     _parent_vector (i + this->i_off()) = 0.;
 }
 
@@ -220,7 +221,7 @@ Real DenseSubVector<T>::min () const
   libmesh_assert (this->size());
   Real my_min = libmesh_real(_parent_vector (this->i_off()));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  for (auto i : IntRange<unsigned int>(1, this->size()))
     {
       Real current = libmesh_real(_parent_vector (i + this->i_off()));
       my_min = (my_min < current? my_min : current);
@@ -237,7 +238,7 @@ Real DenseSubVector<T>::max () const
   libmesh_assert (this->size());
   Real my_max = libmesh_real(_parent_vector (this->i_off()));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  for (auto i : IntRange<unsigned int>(1, this->size()))
     {
       Real current = libmesh_real(_parent_vector (i + this->i_off()));
       my_max = (my_max > current? my_max : current);
@@ -252,7 +253,7 @@ inline
 Real DenseSubVector<T>::l1_norm () const
 {
   Real my_norm = 0.;
-  for (unsigned int i=0; i!=this->size(); i++)
+  for (auto i : index_range(*this))
     {
       my_norm += std::abs(_parent_vector (i + this->i_off()));
     }
@@ -266,7 +267,7 @@ inline
 Real DenseSubVector<T>::l2_norm () const
 {
   Real my_norm = 0.;
-  for (unsigned int i=0; i!=this->size(); i++)
+  for (auto i : index_range(*this))
     {
       my_norm += TensorTools::norm_sq(_parent_vector (i + this->i_off()));
     }
@@ -283,7 +284,7 @@ Real DenseSubVector<T>::linfty_norm () const
     return 0.;
   Real my_norm = TensorTools::norm_sq(_parent_vector (this->i_off()));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  for (auto i : IntRange<unsigned int>(1, this->size()))
     {
       Real current = TensorTools::norm_sq(_parent_vector (i + this->i_off()));
       my_norm = (my_norm > current? my_norm : current);
