@@ -454,7 +454,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
           // than are present in the current element!
           libmesh_assert_less_equal (ele.node_map.size(), elem->n_nodes());
 
-          for (auto i : index_range(ele.node_map))
+          for (std::size_t i=0, enms=ele.node_map.size(); i < enms; i++)
             out_stream << elem->p_level() << " ";
         }
       out_stream << "\n\n";
