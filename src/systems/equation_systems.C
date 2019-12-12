@@ -498,7 +498,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
         if (!use_current_system || pos->second->hide_output())
           continue;
 
-        for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+        for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
           {
             if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
@@ -533,7 +533,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
       if (!use_current_system || pos->second->hide_output())
         continue;
 
-      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
         {
           const std::string & var_name = pos->second->variable_name(vn);
           const FEType & fe_type = pos->second->variable_type(vn);
@@ -626,7 +626,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         if (!use_current_system || pos->second->hide_output())
           continue;
 
-        for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+        for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
           {
             if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
@@ -697,7 +697,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
       //Could this be replaced by a/some convenience methods?[PB]
       unsigned int n_scalar_vars = 0;
       unsigned int n_vector_vars = 0;
-      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
         {
           if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
             n_vector_vars++;
@@ -746,7 +746,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
                   elem_soln.resize(dof_indices.size());
 
-                  for (std::size_t i=0; i<dof_indices.size(); i++)
+                  for (auto i : index_range(dof_indices))
                     elem_soln[i] = sys_soln(dof_indices[i]);
 
                   FEInterface::nodal_soln (dim,
@@ -762,7 +762,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                     {
                       libmesh_assert_equal_to (nodal_soln.size(), n_vec_dim*elem->n_nodes());
 
-                      for (unsigned int n=0; n<elem->n_nodes(); n++)
+                      for (auto n : elem->node_index_range())
                         {
                           for (unsigned int d=0; d < n_vec_dim; d++)
                             {
@@ -777,11 +777,11 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                     }
                 }
               else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
-                for (unsigned int n=0; n<elem->n_nodes(); n++)
+                for (const Node & node : elem->node_ref_range())
                   // Only do this if this variable has NO DoFs at this node... it might have some from an adjoining element...
-                  if (!elem->node_ptr(n)->n_dofs(sys_num, var))
+                  if (!node.n_dofs(sys_num, var))
                     for (unsigned int d=0; d < n_vec_dim; d++)
-                      repeat_count.add(nv*(elem->node_id(n)) + (var_inc+d + var_num), 1);
+                      repeat_count.add(nv*node.id() + (var_inc+d + var_num), 1);
 
             } // end loop over elements
           var_inc += n_vec_dim;
@@ -851,7 +851,7 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
 
   for (; pos != end; ++pos)
     {
-      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
         {
           const std::string & var_name = pos->second->variable_name(vn);
 
@@ -1074,7 +1074,7 @@ EquationSystems::build_discontinuous_solution_vector
 
       // Loop over all variables in this System and check whether we
       // are supposed to use each one.
-      for (unsigned int var_id=0; var_id<system->n_vars(); ++var_id)
+      for (auto var_id : IntRange<unsigned int>(0, system->n_vars()))
         {
           bool use_current_var = (var_names == nullptr);
           if (!use_current_var)
@@ -1164,7 +1164,7 @@ EquationSystems::build_discontinuous_solution_vector
 
                       soln_coeffs.resize(dof_indices.size());
 
-                      for (std::size_t i=0; i<dof_indices.size(); i++)
+                      for (auto i : index_range(dof_indices))
                         soln_coeffs[i] = sys_soln[dof_indices[i]];
 
                       // Compute the FE solution at all the nodes, but

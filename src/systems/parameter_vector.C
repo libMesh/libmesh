@@ -29,8 +29,8 @@ ParameterVector::ParameterVector(const std::vector<Number *> &params)
 {
   _params.reserve(params.size());
 
-  for (std::size_t i=0; i != params.size(); ++i)
-    _params.push_back(new ParameterPointer<Number>(params[i]));
+  for (auto p : params)
+    _params.push_back(new ParameterPointer<Number>(p));
 }
 
 
