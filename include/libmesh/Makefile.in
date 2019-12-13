@@ -519,7 +519,8 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	patch_recovery_error_estimator.h \
 	uniform_refinement_estimator.h \
 	weighted_patch_recovery_error_estimator.h fe.h fe_abstract.h \
-	fe_base.h fe_compute_data.h fe_interface.h fe_macro.h fe_map.h \
+	fe_base.h fe_compute_data.h fe_interface.h \
+	fe_lagrange_shape_1D.h fe_macro.h fe_map.h \
 	fe_transformation_base.h fe_type.h fe_xyz_map.h \
 	h1_fe_transformation.h hcurl_fe_transformation.h inf_fe.h \
 	inf_fe_instantiate_1D.h inf_fe_instantiate_2D.h \
@@ -1103,6 +1104,9 @@ fe_compute_data.h: $(top_srcdir)/include/fe/fe_compute_data.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_interface.h: $(top_srcdir)/include/fe/fe_interface.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_shape_1D.h: $(top_srcdir)/include/fe/fe_lagrange_shape_1D.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_macro.h: $(top_srcdir)/include/fe/fe_macro.h
