@@ -306,18 +306,39 @@ public:
    * \returns The default quadrature order for this \p FEType.  The
    * default quadrature order is calculated assuming a polynomial of
    * degree \p order and is based on integrating the mass matrix for
-   * such an element exactly.
+   * such an element exactly on affine elements.
    */
   Order default_quadrature_order () const;
 
   /**
    * \returns A quadrature rule of appropriate type and order for this \p
    * FEType.  The default quadrature rule is based on integrating the mass
-   * matrix for such an element exactly.  Higher or lower degree rules can
-   * be chosen by changing the extraorder parameter.
+   * matrix for such an element exactly, with an additional power on
+   * the basis order to help account for nonlinearities and/or
+   * nonuniform coefficients.  Higher or lower degree rules can be
+   * chosen by changing the extraorder parameter.
    */
   std::unique_ptr<QBase> default_quadrature_rule (const unsigned int dim,
                                                   const int extraorder=0) const;
+
+  /**
+   * \returns The default quadrature order for integrating unweighted
+   * basis functions of this \p FEType.
+   * The unweighted quadrature order is calculated assuming a
+   * polynomial of degree \p order and is based on integrating the
+   * shape functions for such an element exactly on affine elements.
+   */
+  Order unweighted_quadrature_order () const;
+
+  /**
+   * \returns A quadrature rule of appropriate type and order for
+   * unweighted integration of this \p FEType.  The default quadrature
+   * rule is based on integrating the shape functions on an affine
+   * element exactly.  Higher or lower degree rules can be chosen by
+   * changing the extraorder parameter.
+   */
+  std::unique_ptr<QBase> unweighted_quadrature_rule (const unsigned int dim,
+                                                     const int extraorder=0) const;
 
 
 private:
@@ -332,6 +353,12 @@ inline
 Order FEType::default_quadrature_order () const
 {
   return static_cast<Order>(2*static_cast<unsigned int>(order.get_order()) + 1);
+}
+
+inline
+Order FEType::unweighted_quadrature_order () const
+{
+  return order;
 }
 
 } // namespace libMesh
