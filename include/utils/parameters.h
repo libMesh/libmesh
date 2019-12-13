@@ -552,7 +552,7 @@ void print_helper(std::ostream & os, const unsigned char * param)
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<P> * param)
 {
-  for (const auto & p : param)
+  for (const auto & p : *param)
     os << p << " ";
 }
 
