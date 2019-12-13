@@ -2611,9 +2611,9 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                 {
                   // d^2()/dxi^2
                 case 0:
-                  return (fe_lagrange_1D_shape_second_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          fe_lagrange_1D_quadratic_shape(i1[i], eta)*
-                          fe_lagrange_1D_quadratic_shape(i2[i], zeta));
+                  return (fe_lagrange_1D_quadratic_shape_second_deriv(i0[i], 0, xi)*
+                          fe_lagrange_1D_quadratic_shape             (i1[i], eta)*
+                          fe_lagrange_1D_quadratic_shape             (i2[i], zeta));
 
                   // d^2()/dxideta
                 case 1:
@@ -2623,9 +2623,9 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
 
                   // d^2()/deta^2
                 case 2:
-                  return (fe_lagrange_1D_quadratic_shape(i0[i], xi)*
-                          fe_lagrange_1D_shape_second_deriv(EDGE3, SECOND, i1[i], 0, eta)*
-                          fe_lagrange_1D_quadratic_shape(i2[i], zeta));
+                  return (fe_lagrange_1D_quadratic_shape             (i0[i], xi)*
+                          fe_lagrange_1D_quadratic_shape_second_deriv(i1[i], 0, eta)*
+                          fe_lagrange_1D_quadratic_shape             (i2[i], zeta));
 
                   // d^2()/dxidzeta
                 case 3:
@@ -2641,9 +2641,9 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
 
                   // d^2()/dzeta^2
                 case 5:
-                  return (fe_lagrange_1D_quadratic_shape(i0[i], xi)*
-                          fe_lagrange_1D_quadratic_shape(i1[i], eta)*
-                          fe_lagrange_1D_shape_second_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+                  return (fe_lagrange_1D_quadratic_shape             (i0[i], xi)*
+                          fe_lagrange_1D_quadratic_shape             (i1[i], eta)*
+                          fe_lagrange_1D_quadratic_shape_second_deriv(i2[i], 0, zeta));
 
                 default:
                   libmesh_error_msg("Invalid j = " << j);
@@ -2981,7 +2981,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                   // d^2()/dzeta^2
                 case 5:
                   return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
-                          fe_lagrange_1D_shape_second_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+                          fe_lagrange_1D_quadratic_shape_second_deriv(i0[i], 0, p1d));
 
                 default:
                   libmesh_error_msg("Invalid shape function derivative j = " << j);
