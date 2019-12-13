@@ -26,6 +26,7 @@
 // Local Includes
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -612,8 +613,8 @@ void DenseMatrix<T>::get_transpose (DenseMatrix<T> & dest) const
 {
   dest.resize(this->n(), this->m());
 
-  for (unsigned int i=0; i<dest.m(); i++)
-    for (unsigned int j=0; j<dest.n(); j++)
+  for (auto i : IntRange<unsigned int>(0, dest.m()))
+    for (auto j : IntRange<unsigned int>(0, dest.n()))
       dest(i,j) = (*this)(j,i);
 }
 
@@ -915,7 +916,7 @@ T DenseMatrix<T>::det ()
   // the power (of 10) of the determinant in a separate variable
   // and maintain an order 1 value for the determinant itself.
   unsigned int n_interchanges = 0;
-  for (unsigned int i=0; i<this->m(); i++)
+  for (auto i : IntRange<unsigned int>(0, this->m()))
     {
       if (this->_decomposition_type==LU)
         if (_pivots[i] != static_cast<pivot_index_t>(i))

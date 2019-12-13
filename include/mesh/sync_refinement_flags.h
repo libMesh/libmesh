@@ -28,6 +28,7 @@
 
 // libMesh includes
 #include "libmesh/elem.h"
+#include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
 
 // C++ includes
@@ -61,7 +62,7 @@ struct SyncRefinementFlags
   {
     flags.resize(ids.size());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         // Look for this element in the mesh
         // We'd better find every element we're asked for
@@ -75,7 +76,7 @@ struct SyncRefinementFlags
   void act_on_data (const std::vector<dof_id_type> & ids,
                     const std::vector<datum> & flags)
   {
-    for (std::size_t i=0; i != ids.size(); ++i)
+    for (auto i : index_range(ids))
       {
         Elem & elem = mesh.elem_ref(ids[i]);
 

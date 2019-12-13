@@ -477,7 +477,7 @@ void MeshFunction::gradient (const Point & p,
                 FEInterface::compute_data (dim, fe_type, element, data);
                 //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
                 // sum over all indices
-                for (std::size_t i=0; i<dof_indices.size(); i++)
+                for (auto i : index_range(dof_indices))
                   {
                     // local coordinates
                     for (std::size_t v=0; v<dim; v++)

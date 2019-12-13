@@ -277,8 +277,8 @@ void
 DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
 {
   for (const auto & elem : as_range(mesh.local_elements_begin(), mesh.local_elements_end()))
-    for (unsigned int j=0; j<elem->n_nodes(); j++)
-      semi_local_nodes.insert(elem->node_id(j));
+    for (const Node & node : elem->node_ref_range())
+      semi_local_nodes.insert(node.id());
 }
 
 } // namespace libMesh

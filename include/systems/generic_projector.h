@@ -30,6 +30,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
@@ -511,7 +512,7 @@ public:
     c.set_algebraic_type(FEMContext::DOFS_ONLY);
 
     // Loop over variables, to prerequest
-    for (unsigned int var=0; var!=sys.n_vars(); ++var)
+    for (auto var : IntRange<unsigned int>(0, sys.n_vars()))
       {
         FEBase * fe = nullptr;
         const std::set<unsigned char> & elem_dims =

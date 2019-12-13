@@ -528,7 +528,7 @@ unsigned int Elem::which_side_am_i (const Elem * e) const
 bool Elem::contains_vertex_of(const Elem * e) const
 {
   // Our vertices are the first numbered nodes
-  for (unsigned int n = 0; n != e->n_vertices(); ++n)
+  for (auto n : IntRange<unsigned int>(0, e->n_vertices()))
     if (this->contains_point(e->point(n)))
       return true;
   return false;
@@ -541,7 +541,7 @@ bool Elem::contains_edge_of(const Elem * e) const
   unsigned int num_contained_edges = 0;
 
   // Our vertices are the first numbered nodes
-  for (unsigned int n = 0; n != e->n_vertices(); ++n)
+  for (auto n : IntRange<unsigned int>(0, e->n_vertices()))
     {
       if (this->contains_point(e->point(n)))
         {
@@ -923,7 +923,7 @@ bool Elem::has_topological_neighbor (const Elem * elem,
 void Elem::libmesh_assert_valid_node_pointers() const
 {
   libmesh_assert(this->valid_id());
-  for (unsigned int n=0; n != this->n_nodes(); ++n)
+  for (auto n : this->node_index_range())
     {
       libmesh_assert(this->node_ptr(n));
       libmesh_assert(this->node_ptr(n)->valid_id());
@@ -1294,7 +1294,7 @@ void Elem::write_connectivity (std::ostream & out_stream,
         // This connectivity vector will be used repeatedly instead
         // of being reconstructed inside the loop.
         std::vector<dof_id_type> conn;
-        for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
+        for (auto sc : IntRange<unsigned int>(0, this->n_sub_elem()))
           {
             this->connectivity(sc, TECPLOT, conn);
 
@@ -2037,7 +2037,7 @@ Elem::bracketing_nodes(unsigned int child,
           // This only doesn't break horribly because we add children
           // and nodes in straightforward + hierarchical orders...
           for (unsigned int c=0; c <= child; ++c)
-            for (unsigned int n=0; n != this->n_nodes_in_child(c); ++n)
+            for (auto n : IntRange<unsigned int>(0, this->n_nodes_in_child(c)))
               {
                 if (c == child && n == child_node)
                   break;
@@ -2256,12 +2256,12 @@ std::string Elem::get_info () const
       << "   dim()="     << this->dim()                            << '\n'
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
 
-  for (unsigned int n=0; n != this->n_nodes(); ++n)
+  for (auto n : this->node_index_range())
     oss << "    " << n << this->node_ref(n);
 
   oss << "   n_sides()=" << this->n_sides()                        << '\n';
 
-  for (unsigned int s=0; s != this->n_sides(); ++s)
+  for (auto s : this->side_index_range())
     {
       oss << "    neighbor(" << s << ")=";
       if (this->neighbor_ptr(s))
@@ -2303,9 +2303,9 @@ std::string Elem::get_info () const
       ;
 
   oss << "   DoFs=";
-  for (unsigned int s=0; s != this->n_systems(); ++s)
-    for (unsigned int v=0; v != this->n_vars(s); ++v)
-      for (unsigned int c=0; c != this->n_comp(s,v); ++c)
+  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
+    for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
+      for (auto c : IntRange<unsigned int>(0, this->n_comp(s,v)))
         oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
 
 
@@ -2637,8 +2637,8 @@ Real Elem::volume () const
   fe->reinit(this);
 
   Real vol=0.;
-  for (unsigned int qp=0; qp<qrule.n_points(); ++qp)
-    vol += JxW[qp];
+  for (auto jxw : JxW)
+    vol += jxw;
 
   return vol;
 

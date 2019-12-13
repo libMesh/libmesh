@@ -212,7 +212,7 @@ std::unique_ptr<Elem> Tri6::build_side_ptr (const unsigned int i,
       edge->subdomain_id() = this->subdomain_id();
 
       // Set the nodes
-      for (unsigned n=0; n<edge->n_nodes(); ++n)
+      for (auto n : edge->node_index_range())
         edge->set_node(n) = this->node_ptr(Tri6::side_nodes_map[i][n]);
 
       return edge;

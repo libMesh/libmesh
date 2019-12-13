@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/id_types.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
@@ -688,17 +689,18 @@ DofObject::~DofObject ()
 inline
 void DofObject::invalidate_dofs (const unsigned int sys_num)
 {
+  const unsigned int n_sys = this->n_systems();
   // If the user does not specify the system number...
-  if (sys_num >= this->n_systems())
+  if (sys_num >= n_sys)
     {
-      for (unsigned int s=0; s<this->n_systems(); s++)
-        for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
+      for (auto s : IntRange<unsigned int>(0, n_sys))
+        for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(s)))
           if (this->n_comp_group(s,vg))
             this->set_vg_dof_base(s,vg,invalid_id);
     }
   // ...otherwise invalidate the dofs for all systems
   else
-    for (unsigned int vg=0; vg<this->n_var_groups(sys_num); vg++)
+    for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(sys_num)))
       if (this->n_comp_group(sys_num,vg))
         this->set_vg_dof_base(sys_num,vg,invalid_id);
 }
@@ -749,7 +751,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 
   // Count all variables
   if (var == libMesh::invalid_uint)
-    for (unsigned int v=0; v<this->n_vars(s); v++)
+    for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
       num += this->n_comp(s,v);
 
   // Only count specified variable
@@ -1137,7 +1139,7 @@ bool DofObject::has_dofs (const unsigned int sys) const
 {
   if (sys == libMesh::invalid_uint)
     {
-      for (unsigned int s=0; s<this->n_systems(); s++)
+      for (auto s : IntRange<unsigned int>(0, this->n_systems()))
         if (this->n_vars(s))
           return true;
     }
@@ -1237,8 +1239,8 @@ dof_id_type DofObject::vg_dof_base(const unsigned int s,
 
   // #ifdef DEBUG
   //   std::cout << " [ ";
-  //   for (std:size_t i=0; i<_idx_buf.size(); i++)
-  //     std::cout << _idx_buf[i] << " ";
+  //   for (auto i : _idx_buf)
+  //     std::cout << i << " ";
   //   std::cout << "]\n";
   // #endif
 

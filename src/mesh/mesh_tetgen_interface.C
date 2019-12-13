@@ -97,7 +97,7 @@ void TetGenMeshInterface::triangulate_pointset ()
       Elem * elem = new Tet4;
 
       // Get the nodes associated with this element
-      for (unsigned int j=0; j<elem->n_nodes(); ++j)
+      for (auto j : elem->node_index_range())
         node_labels[j] = tetgen_wrapper.get_element_node(i,j);
 
       // Associate the nodes with this element
@@ -148,7 +148,7 @@ void TetGenMeshInterface::pointset_convexhull ()
       Elem * elem = new Tri3;
 
       // Get node labels associated with this element
-      for (unsigned int j=0; j<elem->n_nodes(); ++j)
+      for (auto j : elem->node_index_range())
         node_labels[j] = tetgen_wrapper.get_triface_node(i,j);
 
       this->assign_nodes_to_elem(node_labels, elem);
@@ -206,7 +206,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
         tetgen_wrapper.allocate_facet_polygonlist(insertnum, 1);
         tetgen_wrapper.allocate_polygon_vertexlist(insertnum, 0, 3);
 
-        for (unsigned int j=0; j<elem->n_nodes(); ++j)
+        for (auto j : elem->node_index_range())
           {
             // We need to get the sequential index of elem->node_ptr(j), but
             // it should already be stored in _sequential_to_libmesh_node_map...
@@ -249,13 +249,12 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   // fill hole list (if there are holes):
   if (holes.size() > 0)
     {
-      std::vector<Point>::const_iterator ihole;
       unsigned hole_index = 0;
-      for (ihole=holes.begin(); ihole!=holes.end(); ++ihole)
+      for (Point ihole : holes)
         tetgen_wrapper.set_hole(hole_index++,
-                                REAL((*ihole)(0)),
-                                REAL((*ihole)(1)),
-                                REAL((*ihole)(2)));
+                                REAL(ihole(0)),
+                                REAL(ihole(1)),
+                                REAL(ihole(2)));
     }
 
 
@@ -328,7 +327,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
       Elem * elem = new Tet4;
 
       // Fill up the the node_labels vector
-      for (unsigned int j=0; j<elem->n_nodes(); j++)
+      for (auto j : elem->node_index_range())
         node_labels[j] = tetgen_wrapper.get_element_node(i,j);
 
       // Associate nodes with this element
@@ -377,7 +376,7 @@ void TetGenMeshInterface::fill_pointlist(TetGenWrapper & wrapper)
 
 void TetGenMeshInterface::assign_nodes_to_elem(unsigned * node_labels, Elem * elem)
 {
-  for (unsigned int j=0; j<elem->n_nodes(); ++j)
+  for (auto j : elem->node_index_range())
     {
       // Get the mapped node index to ask the Mesh for
       unsigned mapped_node_id = _sequential_to_libmesh_node_map[ node_labels[j] ];

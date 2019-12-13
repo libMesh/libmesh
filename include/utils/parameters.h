@@ -20,11 +20,6 @@
 #ifndef LIBMESH_PARAMETERS_H
 #define LIBMESH_PARAMETERS_H
 
-// C++ includes
-#include <typeinfo>
-#include <string>
-#include <map>
-
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/reference_counted_object.h"
@@ -33,9 +28,10 @@
 // C++ includes
 #include <cstddef>
 #include <map>
+#include <sstream>
 #include <string>
 #include <typeinfo>
-#include <sstream>
+#include <vector>
 
 namespace libMesh
 {
@@ -556,17 +552,17 @@ void print_helper(std::ostream & os, const unsigned char * param)
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<P> * param)
 {
-  for (std::size_t i=0; i<param->size(); ++i)
-    os << (*param)[i] << " ";
+  for (const auto & p : *param)
+    os << p << " ";
 }
 
 //non-member vector<vector> print function
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<std::vector<P>> * param)
 {
-  for (std::size_t i=0; i<param->size(); ++i)
-    for (std::size_t j=0; j<(*param)[i].size(); ++j)
-      os << (*param)[i][j] << " ";
+  for (const auto & pv : *param)
+    for (const auto & p : pv)
+      os << p << " ";
 }
 
 } // namespace libMesh

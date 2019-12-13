@@ -29,6 +29,7 @@
 // Local includes
 #include "libmesh/numeric_vector.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/petsc_solver_exception.h"
 #include "libmesh/parallel_only.h"
@@ -753,7 +754,7 @@ void PetscVector<T>::init (const numeric_index_type n,
   this->_type = GHOSTED;
 
   /* Make the global-to-local ghost cell map.  */
-  for (numeric_index_type i=0; i<ghost.size(); i++)
+  for (auto i : index_range(ghost))
     {
       _global_to_local_map[ghost[i]] = i;
     }

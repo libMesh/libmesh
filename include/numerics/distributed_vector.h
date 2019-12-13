@@ -25,6 +25,7 @@
 #define LIBMESH_DISTRIBUTED_VECTOR_H
 
 // Local includes
+#include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
 
@@ -357,7 +358,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
-  for (processor_id_type p=0; p!=this->processor_id(); p++)
+  for (auto p : IntRange<processor_id_type>(0, this->processor_id()))
     _first_local_index += local_sizes[p];
 
 
@@ -366,7 +367,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
   // size, otherwise there is big trouble!
   numeric_index_type dbg_sum=0;
 
-  for (processor_id_type p=0; p!=this->n_processors(); p++)
+  for (auto p : IntRange<processor_id_type>(0, this->n_processors()))
     dbg_sum += local_sizes[p];
 
   libmesh_assert_equal_to (dbg_sum, n);
@@ -602,10 +603,9 @@ Real DistributedVector<T>::min () const
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  Real local_min = _values.size() ?
-    libmesh_real(_values[0]) : std::numeric_limits<Real>::max();
-  for (numeric_index_type i = 1; i < _values.size(); ++i)
-    local_min = std::min(libmesh_real(_values[i]), local_min);
+  Real local_min = std::numeric_limits<Real>::max();
+  for (auto v : _values)
+    local_min = std::min(libmesh_real(v), local_min);
 
   this->comm().min(local_min);
 
@@ -625,10 +625,9 @@ Real DistributedVector<T>::max() const
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  Real local_max = _values.size() ?
-    libmesh_real(_values[0]) : -std::numeric_limits<Real>::max();
-  for (numeric_index_type i = 1; i < _values.size(); ++i)
-    local_max = std::max(libmesh_real(_values[i]), local_max);
+  Real local_max = -std::numeric_limits<Real>::max();
+  for (auto v : _values)
+    local_max = std::max(libmesh_real(v), local_max);
 
   this->comm().max(local_max);
 

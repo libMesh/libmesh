@@ -186,8 +186,8 @@ void Partitioner::single_partition_range (MeshBase::element_iterator it,
       elem->processor_id() = 0;
 
       // Assign all this element's nodes to processor 0 as well.
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        elem->node_ptr(n)->processor_id() = 0;
+      for (Node & node : elem->node_ref_range())
+        node.processor_id() = 0;
     }
 }
 
@@ -214,7 +214,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
   // find the target subdomain sizes
   std::vector<dof_id_type> subdomain_bounds(mesh.n_processors());
 
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
     {
       dof_id_type tgt_subdomain_size = 0;
 
@@ -491,13 +491,14 @@ void Partitioner::set_interface_node_processor_ids_linear(MeshBase & mesh)
     {
       std::size_t n_own_nodes = pmap.second.size()/2, i = 0;
 
-      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+      for (dof_id_type id : pmap.second)
         {
-          auto & node = mesh.node_ref(*it);
+          auto & node = mesh.node_ref(id);
           if (i <= n_own_nodes)
             node.processor_id() = pmap.first.first;
           else
             node.processor_id() = pmap.first.second;
+          i++;
         }
     }
 }
@@ -526,20 +527,20 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
       std::size_t n_own_nodes = pmap.second.size()/2;
 
       // Initialize node assignment
-      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
-        mesh.node_ref(*it).processor_id() = pmap.first.second;
+      for (dof_id_type id : pmap.second)
+        mesh.node_ref(id).processor_id() = pmap.first.second;
 
       visted_nodes.clear();
-      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+      for (dof_id_type id : pmap.second)
         {
-          mesh.node_ref(*it).processor_id() = pmap.first.second;
+          mesh.node_ref(id).processor_id() = pmap.first.second;
 
-          if (visted_nodes.find(*it) != visted_nodes.end())
+          if (visted_nodes.find(id) != visted_nodes.end())
             continue;
           else
             {
-              nodes_queue.push(*it);
-              visted_nodes.insert(*it);
+              nodes_queue.push(id);
+              visted_nodes.insert(id);
               if (visted_nodes.size() >= n_own_nodes)
                 break;
             }
@@ -611,13 +612,13 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
       rows.clear();
       rows.resize(pmap.second.size()+1);
       cols.clear();
-      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
-        global_to_local[*it] = i++;
+      for (dof_id_type id : pmap.second)
+        global_to_local[id] = i++;
 
       i = 0;
-      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+      for (auto id : pmap.second)
         {
-          auto & node = mesh.node_ref(*it);
+          auto & node = mesh.node_ref(id);
           neighbors.clear();
           MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
           neighbors_order.clear();
@@ -633,6 +634,8 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
 
           for (auto c_node : common_nodes)
             cols.push_back(global_to_local[c_node]);
+
+          i++;
         }
 
       Mat adj;
@@ -666,13 +669,15 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
       ISGetLocalSize(is, &local_size);
       ISGetIndices(is, &indices);
       i = 0;
-      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+      for (auto id : pmap.second)
         {
-          auto & node = mesh.node_ref(*it);
+          auto & node = mesh.node_ref(id);
           if (indices[i])
             node.processor_id() = pmap.first.second;
           else
             node.processor_id() = pmap.first.first;
+
+          i++;
         }
       ISRestoreIndices(is, &indices);
       ISDestroy(&is);
@@ -714,7 +719,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
     requested_node_ids;
 
   // Loop over all the nodes, count the ones on each processor.  We can skip ourself
-  std::vector<dof_id_type> ghost_nodes_from_proc(mesh.n_processors(), 0);
+  std::map<processor_id_type, dof_id_type> ghost_nodes_from_proc;
 
   for (auto & node : mesh.node_ptr_range())
     {
@@ -723,16 +728,15 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       if (current_pid != mesh.processor_id() &&
           current_pid != DofObject::invalid_processor_id)
         {
-          libmesh_assert_less (current_pid, ghost_nodes_from_proc.size());
+          libmesh_assert_less (current_pid, mesh.n_processors());
           ghost_nodes_from_proc[current_pid]++;
         }
     }
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type pid=0; pid != mesh.n_processors(); ++pid)
-    if (ghost_nodes_from_proc[pid])
-      requested_node_ids[pid].reserve(ghost_nodes_from_proc[pid]);
+  for (auto pair : ghost_nodes_from_proc)
+    requested_node_ids[pair.first].reserve(pair.second);
 
   // We need to get the new pid for each node from the processor
   // which *currently* owns the node.  We can safely skip ourself
@@ -760,9 +764,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
 
       // Consider updating the processor id on this element's nodes
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+      for (Node & node : elem->node_ref_range())
         {
-          Node & node = elem->node_ref(n);
           processor_id_type & pid = node.processor_id();
           pid = node.choose_processor_id(pid, elem->processor_id());
         }
@@ -795,9 +798,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
 
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        if (elem->node_ptr(n)->processor_id() == DofObject::invalid_processor_id)
-          elem->node_ptr(n)->processor_id() = elem->processor_id();
+      for (Node & node : elem->node_ref_range())
+        if (node.processor_id() == DofObject::invalid_processor_id)
+          node.processor_id() = elem->processor_id();
     }
 
   // Same for the inactive elements -- we will have already gotten most of these
@@ -811,9 +814,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
 
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        if (elem->node_ptr(n)->processor_id() == DofObject::invalid_processor_id)
-          elem->node_ptr(n)->processor_id() = elem->processor_id();
+      for (Node & node : elem->node_ref_range())
+        if (node.processor_id() == DofObject::invalid_processor_id)
+          node.processor_id() = elem->processor_id();
     }
 
   // We can't assert that all nodes are connected to elements, because
@@ -940,7 +943,7 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
       (mesh.comm(), mesh.active_elements_begin(), mesh.active_elements_end(), sync);
 
   dof_id_type pid_offset=0;
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
     {
       for (const auto & elem : as_range(mesh.active_pid_elements_begin(pid),
                                         mesh.active_pid_elements_end(pid)))
@@ -986,14 +989,14 @@ void Partitioner::build_graph (const MeshBase & mesh)
   std::vector<const Elem *> neighbors_offspring;
 #endif
 
-   // This is costly, and we only need to do it if the mesh has
-   // changed since we last partitioned... but the mesh probably has
-   // changed since we last partitioned, and if it hasn't we don't
-   // have a reliable way to be sure of that.
-   _find_global_index_by_pid_map(mesh);
+  // This is costly, and we only need to do it if the mesh has
+  // changed since we last partitioned... but the mesh probably has
+  // changed since we last partitioned, and if it hasn't we don't
+  // have a reliable way to be sure of that.
+  _find_global_index_by_pid_map(mesh);
 
-   dof_id_type first_local_elem = 0;
-   for (processor_id_type pid=0; pid < mesh.processor_id(); pid++)
+  dof_id_type first_local_elem = 0;
+  for (auto pid : IntRange<processor_id_type>(0, mesh.processor_id()))
      first_local_elem += _n_active_elem_on_proc[pid];
 
   _dual_graph.clear();
@@ -1122,7 +1125,7 @@ void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<
   libmesh_parallel_only(mesh.comm());
 
   dof_id_type first_local_elem = 0;
-  for (processor_id_type pid=0; pid < mesh.processor_id(); pid++)
+  for (auto pid : IntRange<processor_id_type>(0, mesh.processor_id()))
     first_local_elem += _n_active_elem_on_proc[pid];
 
 #ifndef NDEBUG

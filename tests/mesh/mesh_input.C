@@ -3,6 +3,7 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_communication.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/numeric_vector.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>

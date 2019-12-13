@@ -476,7 +476,7 @@ public:
     bool have_some_heterogenous_qoi_bc = false;
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
     std::vector<bool> have_heterogenous_qoi_bc(_sys.n_qois(), false);
-    for (unsigned int q=0; q != _sys.n_qois(); ++q)
+    for (auto q : IntRange<unsigned int>(0, _sys.n_qois()))
       if (_qoi_indices.has_index(q) &&
           _sys.get_dof_map().has_heterogenous_adjoint_constraints(q))
         {
@@ -503,7 +503,7 @@ public:
         std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.n_qois(), false);
         if (have_some_heterogenous_qoi_bc)
           {
-            for (unsigned int q=0; q != _sys.n_qois(); ++q)
+            for (auto q : IntRange<unsigned int>(0, _sys.n_qois()))
               {
                 if (have_heterogenous_qoi_bc[q])
                   {
@@ -535,7 +535,7 @@ public:
           {
             _sys.time_solver->element_residual(false, _femcontext);
 
-            for (unsigned int q=0; q != _sys.n_qois(); ++q)
+            for (auto q : IntRange<unsigned int>(0, _sys.n_qois()))
               {
                 if (elem_has_heterogenous_qoi_bc[q])
                   {
@@ -613,7 +613,7 @@ public:
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
     std::vector<bool> have_heterogenous_qoi_bc(_sys.n_qois(), false);
     if (_include_liftfunc || _apply_constraints)
-      for (unsigned int q=0; q != _sys.n_qois(); ++q)
+      for (auto q : IntRange<unsigned int>(0, _sys.n_qois()))
         if (_qoi_indices.has_index(q) &&
             _sys.get_dof_map().has_heterogenous_adjoint_constraints(q))
           {
@@ -640,7 +640,7 @@ public:
         std::vector<bool> elem_has_heterogenous_qoi_bc(_sys.n_qois(), false);
         if (have_some_heterogenous_qoi_bc)
           {
-            for (unsigned int q=0; q != _sys.n_qois(); ++q)
+            for (auto q : IntRange<unsigned int>(0, _sys.n_qois()))
               {
                 if (have_heterogenous_qoi_bc[q])
                   {
@@ -694,7 +694,7 @@ public:
         // may handle integrating
         if (_include_liftfunc && elem_has_some_heterogenous_qoi_bc)
           {
-            for (unsigned int q=0; q != _sys.n_qois(); ++q)
+            for (auto q : IntRange<unsigned int>(0, _sys.n_qois()))
               {
                 if (elem_has_heterogenous_qoi_bc[q])
                   {
@@ -751,7 +751,7 @@ public:
             _sys.get_dof_map().constrain_nothing(_femcontext.get_dof_indices());
 #endif
 
-          for (unsigned int i=0; i != _sys.n_qois(); ++i)
+          for (auto i : IntRange<unsigned int>(0, _sys.n_qois()))
             if (_qoi_indices.has_index(i))
               {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -921,7 +921,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
   // Check and see if we have SCALAR variables
   bool have_scalar = false;
-  for (unsigned int i=0; i != this->n_variable_groups(); ++i)
+  for (auto i : IntRange<unsigned int>(0, this->n_variable_groups()))
     {
       if (this->variable_group(i).type().family == SCALAR)
         {
@@ -1156,7 +1156,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
 
   // The quantity of interest derivative assembly accumulates on
   // initially zero vectors
-  for (unsigned int i=0; i != this->n_qois(); ++i)
+  for (auto i : IntRange<unsigned int>(0, this->n_qois()))
     if (qoi_indices.has_index(i))
       this->add_adjoint_rhs(i).zero();
 
@@ -1168,7 +1168,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
                                                     include_liftfunc,
                                                     apply_constraints));
 
-  for (unsigned int i=0; i != this->n_qois(); ++i)
+  for (auto i : IntRange<unsigned int>(0, this->n_qois()))
     if (qoi_indices.has_index(i))
       this->diff_qoi->finalize_derivative(this->get_adjoint_rhs(i),i);
 }
@@ -1195,7 +1195,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
   const unsigned int n_dofs =
     cast_int<unsigned int>(context.get_dof_indices().size());
 
-  for (unsigned int v = 0; v != context.n_vars(); ++v)
+  for (auto v : IntRange<unsigned int>(0, context.n_vars()))
     {
       const Real my_h = this->numerical_jacobian_h_for_var(v);
 
@@ -1352,7 +1352,7 @@ void FEMSystem::init_context(DiffContext & c)
   FEMContext & context = cast_ref<FEMContext &>(c);
 
   // Make sure we're prepared to do mass integration
-  for (unsigned int var = 0; var != this->n_vars(); ++var)
+  for (auto var : IntRange<unsigned int>(0, this->n_vars()))
     if (this->get_physics()->is_time_evolving(var))
       {
         // Request shape functions based on FEType

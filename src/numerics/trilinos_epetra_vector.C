@@ -461,7 +461,7 @@ void EpetraVector<T>::localize (std::vector<T> & v_local,
   // Get a pointer to the list of global elements for the map, and set
   // all the values from indices.
   int * import_map_global_elements = import_map.MyGlobalElements();
-  for (int i=0; i<import_map.NumMyElements(); ++i)
+  for (auto i : index_range(indices))
     import_map_global_elements[i] = indices[i];
 
   // Create a new EpetraVector to import values into.

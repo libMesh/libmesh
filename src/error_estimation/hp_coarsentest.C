@@ -89,7 +89,7 @@ void HPCoarsenTest::add_projection(const System & system,
   libmesh_assert_equal_to (Uc.size(), phi_coarse->size());
 
   // Loop over the quadrature points
-  for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+  for (auto qp : IntRange<unsigned int>(0, qrule->n_points()))
     {
       // The solution value at the quadrature point
       Number val = libMesh::zero;
@@ -108,7 +108,7 @@ void HPCoarsenTest::add_projection(const System & system,
         }
 
       // The projection matrix and vector
-      for (unsigned int i=0; i != Fe.size(); ++i)
+      for (auto i : index_range(Fe))
         {
           Fe(i) += (*JxW)[qp] *
             (*phi_coarse)[i][qp]*val;
@@ -119,7 +119,7 @@ void HPCoarsenTest::add_projection(const System & system,
             Fe(i) += (*JxW)[qp] *
               hess.contract((*d2phi_coarse)[i][qp]);
 
-          for (unsigned int j=0; j != Fe.size(); ++j)
+          for (auto j : index_range(Fe))
             {
               Ke(i,j) += (*JxW)[qp] *
                 (*phi_coarse)[i][qp]*(*phi_coarse)[j][qp];
@@ -318,7 +318,7 @@ void HPCoarsenTest::select_refinement (System & system)
               Fe.zero();
 
               // Loop over the quadrature points
-              for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+              for (auto qp : IntRange<unsigned int>(0, qrule->n_points()))
                 {
                   // The solution value at the quadrature point
                   Number val = libMesh::zero;
@@ -337,7 +337,7 @@ void HPCoarsenTest::select_refinement (System & system)
                     }
 
                   // The projection matrix and vector
-                  for (unsigned int i=0; i != Fe.size(); ++i)
+                  for (auto i : index_range(Fe))
                     {
                       Fe(i) += (*JxW)[qp] *
                         (*phi_coarse)[i][qp]*val;
@@ -348,7 +348,7 @@ void HPCoarsenTest::select_refinement (System & system)
                         Fe(i) += (*JxW)[qp] *
                           hess.contract((*d2phi_coarse)[i][qp]);
 
-                      for (unsigned int j=0; j != Fe.size(); ++j)
+                      for (auto j : index_range(Fe))
                         {
                           Ke(i,j) += (*JxW)[qp] *
                             (*phi_coarse)[i][qp]*(*phi_coarse)[j][qp];
@@ -388,7 +388,7 @@ void HPCoarsenTest::select_refinement (System & system)
                 }
               else
                 {
-                  for (unsigned int i=0; i<Up.size(); i++)
+                  for (auto i : index_range(Up))
                     {
                       value_error -= (*phi_coarse)[i][qp] * Up(i);
                       if (cont == C_ZERO || cont == C_ONE)

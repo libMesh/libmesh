@@ -934,7 +934,7 @@ void UnstructuredMesh::all_first_order ()
        * second order element are identically numbered.
        * transfer these.
        */
-      for (unsigned int v=0; v < so_elem->n_vertices(); v++)
+      for (unsigned int v=0, snv=so_elem->n_vertices(); v < snv; v++)
         {
           lo_elem->set_node(v) = so_elem->node_ptr(v);
           node_touched_by_me[lo_elem->node_id(v)] = true;
@@ -1162,7 +1162,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * second order element are identically numbered.
        * transfer these.
        */
-      for (unsigned int v=0; v < lo_elem->n_vertices(); v++)
+      for (unsigned int v=0, lnv=lo_elem->n_vertices(); v < lnv; v++)
         so_elem->set_node(v) = lo_elem->node_ptr(v);
 
       /*

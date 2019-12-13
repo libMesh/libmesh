@@ -295,7 +295,7 @@ void TetGenIO::write (const std::string & fname)
                << mesh.n_nodes() << " 3 0 0\n";
 
     // write the nodes:
-    for (dof_id_type v=0; v<mesh.n_nodes(); v++)
+    for (auto v : IntRange<dof_id_type>(0, mesh.n_nodes()))
       out_stream << v << " "
                  << mesh.point(v)(0) << " "
                  << mesh.point(v)(1) << " "

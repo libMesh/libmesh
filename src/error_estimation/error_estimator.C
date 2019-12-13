@@ -53,7 +53,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
   SystemNorm old_error_norm = this->error_norm;
 
   // Sum the error values from each system
-  for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
+  for (auto s : IntRange<unsigned int>(0, equation_systems.n_systems()))
     {
       ErrorVector system_error_per_cell;
       const System & sys = equation_systems.get_system(s);
@@ -98,7 +98,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
   SystemNorm old_error_norm = this->error_norm;
 
   // Find the requested error values from each system
-  for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
+  for (auto s : IntRange<unsigned int>(0, equation_systems.n_systems()))
     {
       const System & sys = equation_systems.get_system(s);
 

@@ -1080,7 +1080,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 
   // We'll renumber objects in blocks by processor id
   std::vector<dof_id_type> first_object_on_proc(this->n_processors());
-  for (processor_id_type i=1; i != this->n_processors(); ++i)
+  for (processor_id_type i=1, np=this->n_processors(); i != np; ++i)
     first_object_on_proc[i] = first_object_on_proc[i-1] +
       objects_on_proc[i-1];
   dof_id_type next_id = first_object_on_proc[this->processor_id()];
@@ -1099,7 +1099,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   // We know how many objects live on each processor, so reserve() space for
   // each.
   auto ghost_end = ghost_objects_from_proc.end();
-  for (processor_id_type p=0; p != this->n_processors(); ++p)
+  for (auto p : IntRange<processor_id_type>(0, this->n_processors()))
     if (p != this->processor_id())
       {
         const auto p_it = ghost_objects_from_proc.find(p);
@@ -1224,7 +1224,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 
   // Next set unpartitioned object ids
   next_id = 0;
-  for (processor_id_type i=0; i != this->n_processors(); ++i)
+  for (auto i : IntRange<processor_id_type>(0, this->n_processors()))
     next_id += objects_on_proc[i];
   for (it = objects.begin(); it != end; ++it)
     {
@@ -1293,8 +1293,8 @@ void DistributedMesh::renumber_nodes_and_elements ()
 
   // flag the nodes we need
   for (auto & elem : this->element_ptr_range())
-    for (unsigned int n=0; n != elem->n_nodes(); ++n)
-      used_nodes.insert(elem->node_id(n));
+    for (const Node & node : elem->node_ref_range())
+      used_nodes.insert(node.id());
 
   // Nodes not connected to any local elements, and nullptr node entries
   // in our container, are deleted

@@ -175,7 +175,7 @@ std::unique_ptr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
       face->subdomain_id() = this->subdomain_id();
 
       // Set the nodes
-      for (unsigned n=0; n<face->n_nodes(); ++n)
+      for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Pyramid5::side_nodes_map[i][n]);
 
       return face;

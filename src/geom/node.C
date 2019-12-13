@@ -65,9 +65,9 @@ std::string Node::get_info () const
     ", Point=" << *static_cast<const Point *>(this) << '\n';
 
   oss << "    DoFs=";
-  for (unsigned int s=0; s != this->n_systems(); ++s)
-    for (unsigned int v=0; v != this->n_vars(s); ++v)
-      for (unsigned int c=0; c != this->n_comp(s,v); ++c)
+  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
+    for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
+      for (auto c : IntRange<unsigned int>(0, this->n_comp(s,v)))
         oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
 
   return oss.str();

@@ -282,7 +282,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
                            cast_int<std::size_t>(mesh.n_processors()+1));
   libmesh_assert_equal_to (_pmetis->vtxdist[0], 0);
 
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
     {
       _pmetis->vtxdist[pid+1] = _pmetis->vtxdist[pid] + _n_active_elem_on_proc[pid];
       n_active_elem += _n_active_elem_on_proc[pid];
@@ -340,7 +340,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
     const dof_id_type first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
 
-    for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+    for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
       {
         dof_id_type tgt_subdomain_size = 0;
 

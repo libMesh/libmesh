@@ -65,7 +65,7 @@ bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
 {
   FEMContext & context = cast_ref<FEMContext &>(c);
 
-  for (unsigned int var = 0; var != context.n_vars(); ++var)
+  for (auto var : IntRange<unsigned int>(0, context.n_vars()))
     {
       if (!this->is_time_evolving(var))
         continue;

@@ -264,8 +264,8 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   else
     *data_out++ =(DofObject::invalid_id);
 
-  for (unsigned int n=0; n<elem->n_nodes(); n++)
-    *data_out++ = (elem->node_id(n));
+  for (const Node & node : elem->node_ref_range())
+    *data_out++ = node.id();
 
   // Add the id of and the side for any return link from each neighbor
   for (auto neigh : elem->neighbor_ptr_range())

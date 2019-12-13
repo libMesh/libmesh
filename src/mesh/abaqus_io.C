@@ -928,8 +928,8 @@ void AbaqusIO::assign_subdomain_ids()
     unsigned char max_dim = this->max_elem_dimension_seen();
 
     // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
-    container_t::iterator it = _elemset_ids.begin();
-    for (unsigned elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
+    container_t::iterator it = _elemset_ids.begin(), end = _elemset_ids.end();
+    for (unsigned elemset_id=0; it != end; ++it, ++elemset_id)
       {
         // Grab a reference to the vector of IDs
         std::vector<dof_id_type> & id_vector = it->second;
@@ -980,8 +980,8 @@ void AbaqusIO::assign_boundary_node_ids()
   MeshBase & the_mesh = MeshInput<MeshBase>::mesh();
 
   // Iterate over the container of nodesets
-  container_t::iterator it = _nodeset_ids.begin();
-  for (unsigned short current_id=0; it != _nodeset_ids.end(); ++it, ++current_id)
+  container_t::iterator it = _nodeset_ids.begin(), end = _nodeset_ids.end();
+  for (unsigned short current_id=0; it != end; ++it, ++current_id)
     {
       // Associate current_id with the name we determined earlier
       the_mesh.get_boundary_info().nodeset_name(current_id) = it->first;
@@ -1020,8 +1020,8 @@ void AbaqusIO::assign_sideset_ids()
 
   // Iterate over the container of sidesets
   {
-    sideset_container_t::iterator it = _sideset_ids.begin();
-    for (unsigned short current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
+    sideset_container_t::iterator it = _sideset_ids.begin(), end = _sideset_ids.end();
+    for (unsigned short current_id=0; it != end; ++it, ++current_id)
       {
         // Associate current_id with the name we determined earlier
         the_mesh.get_boundary_info().sideset_name(current_id) = it->first;
@@ -1084,8 +1084,8 @@ void AbaqusIO::assign_sideset_ids()
     // The elemset_id counter assigns a logical numbering to the
     // _elemset_ids keys.  We are going to use these ids as boundary
     // ids, so elemset_id is of type boundary_id_type.
-    container_t::iterator it = _elemset_ids.begin();
-    for (boundary_id_type elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
+    container_t::iterator it = _elemset_ids.begin(), end = _elemset_ids.end();
+    for (boundary_id_type elemset_id=0; it != end; ++it, ++elemset_id)
       {
         // Grab a reference to the vector of IDs
         std::vector<dof_id_type> & id_vector = it->second;

@@ -424,7 +424,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   std::vector<unsigned int>
     all_num_nodes_i_must_number (this->n_processors());
 
-  for (unsigned int pid=0; pid<this->n_processors(); pid++)
+  for (auto pid : IntRange<unsigned int>(0, this->n_processors()))
     all_num_nodes_i_must_number[pid] = all_loadbal_data[8*pid + 7];
 
   // The sum of all the entries in this vector should sum to the number of global nodes
@@ -433,7 +433,7 @@ void Nemesis_IO::read (const std::string & base_filename)
                                   0) == nemhelper->num_nodes_global);
 
   unsigned int my_next_node = 0;
-  for (unsigned int pid=0; pid<this->processor_id(); pid++)
+  for (auto pid : IntRange<unsigned int>(0, this->processor_id()))
     my_next_node += all_num_nodes_i_must_number[pid];
 
   const unsigned int my_node_offset = my_next_node;
@@ -640,7 +640,7 @@ void Nemesis_IO::read (const std::string & base_filename)
           libmesh_assert_less_equal (needed_node_idxs[cmap].size(),
                                      nemhelper->node_cmap_node_ids[cmap].size());
 
-          for (std::size_t i=0, j=0; i<nemhelper->node_cmap_node_ids[cmap].size(); i++)
+          for (std::size_t i=0, j=0, ncnis=nemhelper->node_cmap_node_ids[cmap].size(); i < ncnis; i++)
             {
               const unsigned int
                 local_node_idx  = nemhelper->node_cmap_node_ids[cmap][i]-1,
@@ -768,7 +768,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // Compute my_elem_offset, the amount by which to offset the local elem numbering
   // on my processor.
   unsigned int my_next_elem = 0;
-  for (unsigned int pid=0; pid<this->processor_id(); ++pid)
+  for (auto pid : IntRange<unsigned int>(0, this->processor_id()))
     my_next_elem += (all_loadbal_data[8*pid + 3]+  // num_internal_elems, proc pid
                      all_loadbal_data[8*pid + 4]); // num_border_elems, proc pid
   const unsigned int my_elem_offset = my_next_elem;

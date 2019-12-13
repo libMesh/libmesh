@@ -21,6 +21,7 @@
 // libMesh includes
 #include "libmesh/dense_vector.h"
 #include "libmesh/fem_function_base.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/point.h"
 
@@ -87,7 +88,7 @@ public:
         (max_index+1, std::make_pair(libMesh::invalid_uint,
                                      libMesh::invalid_uint));
 
-    for (std::size_t j=0; j != index_map.size(); ++j)
+    for (auto j : index_range(index_map))
       {
         libmesh_assert_less(index_map[j], reverse_index_map.size());
         libmesh_assert_equal_to(reverse_index_map[index_map[j]].first,
@@ -119,11 +120,11 @@ public:
     output.zero();
 
     DenseVector<Output> temp;
-    for (std::size_t i=0; i != subfunctions.size(); ++i)
+    for (auto i : index_range(subfunctions))
       {
         temp.resize(cast_int<unsigned int>(index_maps[i].size()));
         (*subfunctions[i])(c, p, time, temp);
-        for (unsigned int j=0; j != temp.size(); ++j)
+        for (auto j : index_range(temp))
           output(index_maps[i][j]) = temp(j);
       }
   }
@@ -148,7 +149,7 @@ public:
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone() const override
   {
     CompositeFEMFunction * returnval = new CompositeFEMFunction();
-    for (std::size_t i=0; i != subfunctions.size(); ++i)
+    for (auto i : index_range(subfunctions))
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
     return std::unique_ptr<FEMFunctionBase<Output>> (returnval);
   }

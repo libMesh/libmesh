@@ -679,7 +679,7 @@ void Xdr::do_read(std::string & a)
 
   a = "";
 
-  for (unsigned int c=0; c<std::strlen(comm); c++)
+  for (unsigned int c=0, sl=std::strlen(comm); c!=sl; c++)
     {
       if (comm[c] == '\t')
         break;
@@ -694,11 +694,11 @@ void Xdr::do_read(std::vector<T> & a)
   data(length, "# vector length");
   a.resize(length);
 
-  for (std::size_t i=0; i<a.size(); i++)
+  for (T & a_i : a)
     {
       libmesh_assert(in.get());
       libmesh_assert (in->good());
-      *in >> a[i];
+      *in >> a_i;
     }
   in->getline(comm, comm_len);
 }
@@ -710,13 +710,13 @@ void Xdr::do_read(std::vector<std::complex<T>> & a)
   data(length, "# vector length x 2 (complex)");
   a.resize(length);
 
-  for (std::size_t i=0; i<a.size(); i++)
+  for (std::complex<T> & a_i : a)
     {
       T r, im;
       libmesh_assert(in.get());
       libmesh_assert (in->good());
       *in >> r >> im;
-      a[i] = std::complex<T>(r,im);
+      a_i = std::complex<T>(r,im);
     }
   in->getline(comm, comm_len);
 }
@@ -736,11 +736,11 @@ void Xdr::do_write(std::vector<T> & a)
   std::size_t length = a.size();
   data(length, "# vector length");
 
-  for (std::size_t i=0; i<a.size(); i++)
+  for (T & a_i : a)
     {
       libmesh_assert(out.get());
       libmesh_assert (out->good());
-      this->do_write(a[i]);
+      this->do_write(a_i);
       *out << "\t ";
     }
 }
@@ -751,11 +751,11 @@ void Xdr::do_write(std::vector<std::complex<T>> & a)
   std::size_t length=a.size();
   data(length, "# vector length x 2 (complex)");
 
-  for (std::size_t i=0; i<a.size(); i++)
+  for (std::complex<T> & a_i : a)
     {
       libmesh_assert(out.get());
       libmesh_assert (out->good());
-      this->do_write(a[i]);
+      this->do_write(a_i);
       *out << "\t ";
     }
 }

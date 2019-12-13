@@ -364,7 +364,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
   this->comm().gather (0, my_size,      xfer_buf_sizes);
 
   processor_offsets[0] = 0;
-  for (unsigned int pid=1; pid<this->n_processors(); pid++)
+  for (auto pid : IntRange<processor_id_type>(1, this->n_processors()))
     processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
   // All processors send their xfer buffers to processor 0.
@@ -387,7 +387,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
         io.data (n_global_elem_at_level[0], comment.c_str());
       }
 
-      for (unsigned int pid=0; pid<this->n_processors(); pid++)
+      for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
         {
           recv_conn.resize(xfer_buf_sizes[pid]);
           if (pid == 0)
@@ -509,7 +509,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
             io.data (n_global_elem_at_level[level], comment.c_str());
           }
 
-          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
             {
               recv_conn.resize(xfer_buf_sizes[pid]);
               if (pid == 0)
@@ -584,7 +584,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
       // update the processor_offsets
       processor_offsets[0] = processor_offsets.back() + n_elem_on_proc.back();
       this->comm().gather (0, my_n_elem_written_at_level, n_elem_on_proc);
-      for (unsigned int pid=1; pid<this->n_processors(); pid++)
+      for (auto pid : IntRange<processor_id_type>(1, this->n_processors()))
         processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
       // Now, at the next level we will again iterate over local parents.  However,
@@ -728,7 +728,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       // Post the receives -- do this on processor 0 only.
       if (this->processor_id() == 0)
         {
-          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
             {
               recv_ids[pid].resize(ids_size[pid]);
               recv_coords[pid].resize(ids_size[pid]*LIBMESH_DIM);
@@ -766,9 +766,11 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           Parallel::wait (id_request_handles);
           Parallel::wait (coord_request_handles);
 
-          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+#ifndef NDEBUG
+          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
             libmesh_assert_equal_to(recv_coords[pid].size(),
                                     recv_ids[pid].size()*LIBMESH_DIM);
+#endif
 
           // Write the coordinates in this block.
           // Some of these coordinates may correspond to ids for which
@@ -779,7 +781,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           coords.clear();
           coords.resize (3*tot_id_size, std::numeric_limits<Real>::quiet_NaN());
 
-          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
             for (auto idx : index_range(recv_ids[pid]))
               {
                 libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
@@ -872,7 +874,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       // Post the receives -- do this on processor 0 only.
       if (this->processor_id() == 0)
         {
-          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
             {
               recv_ids[pid].resize(ids_size[pid]);
               recv_unique_ids[pid].resize(ids_size[pid]);
@@ -910,20 +912,20 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           Parallel::wait (id_request_handles);
           Parallel::wait (unique_id_request_handles);
 
-          // Write the unique ids in this block.
-          for (unsigned int pid=0; pid<this->n_processors(); pid++)
-            {
-              libmesh_assert_equal_to
-                (recv_ids[pid].size(), recv_unique_ids[pid].size());
-            }
+#ifndef NDEBUG
+          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+            libmesh_assert_equal_to
+              (recv_ids[pid].size(), recv_unique_ids[pid].size());
+#endif
 
           libmesh_assert_less_equal
             (tot_id_size, std::min(io_blksize, std::size_t(max_node_id)));
 
+          // Write the unique ids in this block.
           unique_ids.clear();
           unique_ids.resize(tot_id_size, unique_id_type(-1));
 
-          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
             for (auto idx : index_range(recv_ids[pid]))
               {
                 libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
@@ -1043,7 +1045,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
   if (this->processor_id() == 0)
     {
       dof_id_type elem_offset = 0;
-      for (unsigned int pid=0; pid<this->n_processors(); pid++)
+      for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
         {
           recv_bcs.resize(bc_sizes[pid]);
           if (pid == 0)
@@ -1055,7 +1057,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
             = cast_int<dof_id_type>(recv_bcs.back());
           recv_bcs.pop_back();
 
-          for (std::size_t idx=0; idx<recv_bcs.size(); idx += 3, n_bcs_out++)
+          for (std::size_t idx=0, rbs=recv_bcs.size(); idx<rbs; idx += 3, n_bcs_out++)
             recv_bcs[idx+0] += elem_offset;
 
           io.data_stream (recv_bcs.empty() ? nullptr : recv_bcs.data(),
@@ -1138,7 +1140,7 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const new_header_id_type n_node
   if (this->processor_id() == 0)
     {
       dof_id_type node_offset = 0;
-      for (unsigned int pid=0; pid<this->n_processors(); pid++)
+      for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
         {
           recv_bcs.resize(bc_sizes[pid]);
           if (pid == 0)
@@ -1150,7 +1152,7 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const new_header_id_type n_node
             cast_int<dof_id_type>(recv_bcs.back());
           recv_bcs.pop_back();
 
-          for (std::size_t idx=0; idx<recv_bcs.size(); idx += 2, n_nodesets_out++)
+          for (std::size_t idx=0, rbs=recv_bcs.size(); idx<rbs; idx += 2, n_nodesets_out++)
             recv_bcs[idx+0] += node_offset;
 
           io.data_stream (recv_bcs.empty() ? nullptr : recv_bcs.data(),
@@ -1845,7 +1847,7 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
       // IDs matching an element we can query.
       // We cannot rely on nullptr neighbors at this point since the neighbor
       // data structure has not been initialized.
-      for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
+      for (std::size_t idx=0, ibs=input_buffer.size(); idx<ibs; idx+=3)
         {
           const dof_id_type dof_id =
             cast_int<dof_id_type>(input_buffer[idx+0]);
@@ -1958,7 +1960,7 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       // Look for BCs in this block for all nodes we have (not just
       // local ones).  Do this by checking all entries for
       // IDs matching a node we can query.
-      for (std::size_t idx=0; idx<input_buffer.size(); idx+=2)
+      for (std::size_t idx=0, ibs=input_buffer.size(); idx<ibs; idx+=2)
         {
           const dof_id_type dof_id =
             cast_int<dof_id_type>(input_buffer[idx+0]);

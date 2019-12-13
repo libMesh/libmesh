@@ -35,7 +35,7 @@ bool FirstOrderUnsteadySolver::compute_second_order_eqns(bool compute_jacobian, 
 
   unsigned int n_qpoints = context.get_element_qrule().n_points();
 
-  for (unsigned int var = 0; var != context.n_vars(); ++var)
+  for (auto var : IntRange<unsigned int>(0, context.n_vars()))
     {
       if (!this->_system.is_second_order_var(var))
         continue;

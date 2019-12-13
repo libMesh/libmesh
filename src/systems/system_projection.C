@@ -386,7 +386,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (unsigned int var=0; var<this->n_vars(); var++)
+          for (auto var : IntRange<unsigned int>(0, this->n_vars()))
             if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
@@ -412,7 +412,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
-      for (dof_id_type i=0; i!=dist_v->size(); i++)
+      for (auto i : IntRange<dof_id_type>(0, dist_v->size()))
         if (new_vector(i) != 0.0)
           dist_v->set(i, new_vector(i));
 
@@ -428,7 +428,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       // We may have to set dof values that this processor doesn't
       // own in certain special cases, like LAGRANGE FIRST or
       // HERMITE THIRD elements on second-order meshes
-      for (dof_id_type i=0; i!=new_v.size(); i++)
+      for (auto i : IntRange<dof_id_type>(0, new_v.size()))
         if (new_vector(i) != 0.0)
           new_v.set(i, new_vector(i));
       new_v.close();
@@ -905,7 +905,7 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (unsigned int var=0; var<this->n_vars(); var++)
+          for (auto var : IntRange<unsigned int>(0, this->n_vars()))
             if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
@@ -1063,7 +1063,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
       FEMContext context( *this );
 
       const DofMap & dof_map = this->get_dof_map();
-      for (unsigned int var=0; var<this->n_vars(); var++)
+      for (auto var : IntRange<unsigned int>(0, this->n_vars()))
         if (this->variable(var).type().family == SCALAR)
           {
             // FIXME: We reinit with an arbitrary element in case the user
@@ -1303,9 +1303,9 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
       else
         dof_map.old_dof_indices (elem, di);
 
-      for (std::size_t i=0; i != di.size(); ++i)
-        if (di[i] < first_old_dof || di[i] >= end_old_dof)
-          this->send_list.push_back(di[i]);
+      for (auto di_i : di)
+        if (di_i < first_old_dof || di_i >= end_old_dof)
+          this->send_list.push_back(di_i);
     }  // end elem loop
 }
 
@@ -1355,7 +1355,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
 
   // Loop over all the variables we've been requested to project
-  for (std::size_t v=0; v!=variables.size(); v++)
+  for (auto v : IntRange<std::size_t>(0, variables.size()))
     {
       const unsigned int var = variables[v];
 

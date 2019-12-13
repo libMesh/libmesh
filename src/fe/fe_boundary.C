@@ -359,8 +359,8 @@ void FE<Dim,T>::side_map (const Elem * elem,
 
   std::vector<unsigned int> elem_nodes_map;
   elem_nodes_map.resize(side->n_nodes());
-  for (unsigned int j = 0; j < side->n_nodes(); j++)
-    for (unsigned int i = 0; i < elem->n_nodes(); i++)
+  for (auto j : side->node_index_range())
+    for (auto i : elem->node_index_range())
       if (side->node_id(j) == elem->node_id(i))
         elem_nodes_map[j] = i;
   std::vector<Point> refspace_nodes;

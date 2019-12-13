@@ -67,7 +67,7 @@ void transform_preallocation_arrays (const PetscInt blocksize,
   b_n_nz.clear(); /**/ b_n_nz.reserve(n_nz.size()/blocksize);
   b_n_oz.clear(); /**/ b_n_oz.reserve(n_oz.size()/blocksize);
 
-  for (std::size_t nn=0; nn<n_nz.size(); nn += blocksize)
+  for (std::size_t nn=0, nnzs=n_nz.size(); nn<nnzs; nn += blocksize)
     {
       b_n_nz.push_back (n_nz[nn]/blocksize);
       b_n_oz.push_back (n_oz[nn]/blocksize);
@@ -1301,7 +1301,7 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
   indices.resize(static_cast<std::size_t>(ncols));
   values.resize(static_cast<std::size_t>(ncols));
 
-  for (std::size_t i = 0; i < indices.size(); ++i)
+  for (auto i : index_range(indices))
   {
     indices[i] = static_cast<numeric_index_type>(petsc_cols[i]);
     values[i] = static_cast<T>(petsc_row[i]);

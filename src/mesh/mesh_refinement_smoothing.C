@@ -59,9 +59,9 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
                                 ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
       // Set the max_level at each node
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      for (const Node & node : elem->node_ref_range())
         {
-          const dof_id_type node_number = elem->node_id(n);
+          const dof_id_type node_number = node.id();
 
           libmesh_assert_less (node_number, max_level_at_node.size());
 
@@ -91,9 +91,9 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
         continue;
 
       // Loop over the nodes, check for possible mismatch
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      for (const Node & node : elem->node_ref_range())
         {
-          const dof_id_type node_number = elem->node_id(n);
+          const dof_id_type node_number = node.id();
 
           // Flag the element for refinement if it violates
           // the requested level mismatch
@@ -148,7 +148,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
                                 ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
       // Set the max_level at each edge
-      for (unsigned int n=0; n<elem->n_edges(); n++)
+      for (auto n : elem->edge_index_range())
         {
           std::unique_ptr<const Elem> edge = elem->build_edge_ptr(n);
           dof_id_type childnode0 = edge->node_id(0);
@@ -212,7 +212,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         continue;
 
       // Loop over the nodes, check for possible mismatch
-      for (unsigned int n=0; n<elem->n_edges(); n++)
+      for (auto n : elem->edge_index_range())
         {
           std::unique_ptr<Elem> edge = elem->build_edge_ptr(n);
           dof_id_type node0 = edge->node_id(0);
@@ -326,13 +326,8 @@ bool MeshRefinement::limit_underrefined_boundary(const signed char max_mismatch)
       std::set<const Elem *> neighbor_set;
       elem->find_interior_neighbors(neighbor_set);
 
-      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-      for (; n_it != neighbor_set.end(); ++n_it)
+      for (const Elem * neighbor : neighbor_set)
         {
-          // FIXME - non-const versions of the Elem set methods
-          // would be nice
-          const Elem * neighbor = *n_it;
-
           const unsigned char neighbor_level =
             cast_int<unsigned char>(neighbor->level() +
                                     ((neighbor->refinement_flag() == Elem::REFINE) ? 1 : 0));

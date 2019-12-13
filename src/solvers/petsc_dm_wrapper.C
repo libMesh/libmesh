@@ -739,7 +739,7 @@ namespace libMesh
     CHKERRABORT(system.comm().get(),ierr);
 
     // Set the actual names of all the field variables
-    for( unsigned int v = 0; v < system.n_vars(); v++ )
+    for (auto v : IntRange<unsigned int>(0, system.n_vars()))
       {
         ierr = PetscSectionSetFieldName( section, v, system.variable_name(v).c_str() );
         CHKERRABORT(system.comm().get(),ierr);
@@ -819,7 +819,7 @@ namespace libMesh
     // http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PetscSF/PetscSFNode.html
     std::vector<PetscSFNode> sf_nodes(send_list.size());
 
-    for( unsigned int i = 0; i < send_list.size(); i++ )
+    for (auto i : index_range(send_list))
       {
         dof_id_type incoming_dof = send_list[i];
 
@@ -905,10 +905,9 @@ namespace libMesh
         // that aren't active on this level.
         for (const auto & elem : mesh.active_local_element_ptr_range())
           {
-            for (unsigned int n = 0; n < elem->n_nodes(); n++)
+            for (const Node & node : elem->node_ref_range())
               {
                 // get the global id number of local node n
-                const Node & node = elem->node_ref(n);
 
                 // Only register nodes with the PetscSection if they have dofs that belong to
                 // this processor. Even though we're active local elements, the dofs associated
@@ -954,7 +953,7 @@ namespace libMesh
             // Loop through all the variables and cache the scalar ones. We cache the
             // SCALAR variable index along with the local point to make it easier when
             // we have to register dofs with the PetscSection
-            for( unsigned int v = 0; v < system.n_vars(); v++ )
+            for (auto v : IntRange<unsigned int>(0, system.n_vars()))
               {
                 if( system.variable(v).type().family == SCALAR )
                   {
@@ -1045,7 +1044,7 @@ namespace libMesh
     unsigned int total_n_dofs_at_dofobject = 0;
 
     // We are assuming variables are also numbered 0 to n_vars()-1
-    for( unsigned int v = 0; v < system.n_vars(); v++ )
+    for (auto v : IntRange<unsigned int>(0, system.n_vars()))
       {
         unsigned int n_dofs_at_dofobject = dof_object.n_dofs(system.number(), v);
 

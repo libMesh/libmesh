@@ -1472,7 +1472,7 @@ void FEMap::compute_map(const unsigned int dim,
     {
       // All other FE use only the nodes of elem itself
       _elem_nodes.resize(elem->n_nodes(), nullptr);
-      for (unsigned int i=0; i<elem->n_nodes(); i++)
+      for (auto i : elem->node_index_range())
         _elem_nodes[i] = elem->node_ptr(i);
     }
 

@@ -91,7 +91,7 @@ void TriangleInterface::triangulate()
       // Insert a new point on each PSLG at some random location
       // np=index into new points vector
       // n =index into original points vector
-      for (std::size_t np=0, n=0; np<2*original_points.size(); ++np)
+      for (std::size_t np=0, n=0, tops=2*original_points.size(); np<tops; ++np)
         {
           // the even entries are the original points
           if (np%2==0)
@@ -169,7 +169,7 @@ void TriangleInterface::triangulate()
   if (have_holes)
     for (const auto & hole : *_holes)
       {
-        for (unsigned int ctr=0, h=0, i=0; i<hole->segment_indices().size()-1; ++i)
+        for (unsigned int ctr=0, h=0, i=0, hsism=hole->segment_indices().size()-1; i<hsism; ++i)
           {
             unsigned int begp = hole_offset + hole->segment_indices()[i];
             unsigned int endp = hole->segment_indices()[i+1];
@@ -230,7 +230,7 @@ void TriangleInterface::triangulate()
 
 
   // If the user provided it, use his ordering to define the segments
-  for (std::size_t ctr=0, s=0; s<this->segments.size(); ctr+=2, ++s)
+  for (std::size_t ctr=0, s=0, ss=this->segments.size(); s<ss; ctr+=2, ++s)
     {
       const unsigned int index0 = 2*hole_offset+ctr;
       const unsigned int index1 = 2*hole_offset+ctr+1;
@@ -248,7 +248,7 @@ void TriangleInterface::triangulate()
     {
       initial.numberofholes = _holes->size();
       initial.holelist      = static_cast<REAL*>(std::malloc(initial.numberofholes * 2 * sizeof(REAL)));
-      for (std::size_t i=0, ctr=0; i<_holes->size(); ++i, ctr+=2)
+      for (std::size_t i=0, ctr=0, hs=_holes->size(); i<hs; ++i, ctr+=2)
         {
           Point inside_point = (*_holes)[i]->inside();
           initial.holelist[ctr]   = inside_point(0);
@@ -260,7 +260,7 @@ void TriangleInterface::triangulate()
     {
       initial.numberofregions = _regions->size();
       initial.regionlist      = static_cast<REAL*>(std::malloc(initial.numberofregions * 4 * sizeof(REAL)));
-      for (std::size_t i=0, ctr=0; i<_regions->size(); ++i, ctr+=4)
+      for (std::size_t i=0, ctr=0, rs=_regions->size(); i<rs; ++i, ctr+=4)
         {
           Point inside_point = (*_regions)[i]->inside();
           initial.regionlist[ctr]   = inside_point(0);

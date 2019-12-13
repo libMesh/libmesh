@@ -209,7 +209,7 @@ void VTKIO::read (const std::string & name)
       Elem * elem = Elem::build(libmesh_elem_type).release();
 
       // get the straightforward numbering from the VTK cells
-      for (unsigned int j=0; j<elem->n_nodes(); ++j)
+      for (auto j : elem->node_index_range())
         elem->set_node(j) =
           mesh.node_ptr(cast_int<dof_id_type>(cell->GetPointId(j)));
 
@@ -510,7 +510,7 @@ void VTKIO::node_values_to_vtk(const std::string & name,
   data->SetNumberOfValues(_local_node_map.size());
 
   // copy values into vtk
-  for (size_t i=0; i<local_values.size(); ++i) {
+  for (auto i : index_range(local_values)) {
     data->SetValue(i, local_values[i]);
   }
 

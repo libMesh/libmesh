@@ -78,7 +78,7 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
   const std::vector<std::vector<Real>>     & psi =
     context.element_fe_var[mesh_xyz_var]->get_phi();
 
-  for (unsigned int var = 0; var != context.n_vars(); ++var)
+  for (auto var : IntRange<unsigned int>(0, context.n_vars()))
     {
       // Mesh motion only affects time-evolving variables
       if (this->is_time_evolving(var))
@@ -204,7 +204,7 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
 
   unsigned int n_qpoints = context.get_element_qrule().n_points();
 
-  for (unsigned int var = 0; var != context.n_vars(); ++var)
+  for (auto var : IntRange<unsigned int>(0, context.n_vars()))
     {
       if (!this->is_time_evolving(var))
         continue;

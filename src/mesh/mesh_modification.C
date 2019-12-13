@@ -104,7 +104,7 @@ void MeshTools::Modification::distort (MeshBase & mesh,
     // then we should not move it.
     // [Note: Testing for (in)equality might be wrong
     // (different types, namely float and double)]
-    for (unsigned int n=0; n<mesh.max_node_id(); n++)
+    for (auto n : IntRange<unsigned int>(0, mesh.max_node_id()))
       if ((perturb_boundary || !boundary_node_ids.count(n)) && hmin[n] < 1.e20)
         {
           // the direction, random but unit normalized
@@ -1229,7 +1229,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
             /*
              * finally reposition the vertex nodes
              */
-            for (unsigned int nid=0; nid<mesh.n_nodes(); ++nid)
+            for (auto nid : IntRange<unsigned int>(0, mesh.n_nodes()))
               if (!boundary_node_ids.count(nid) && weight[nid] > 0.)
                 mesh.node_ref(nid) = new_positions[nid]/weight[nid];
           }

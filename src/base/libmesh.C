@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_singleton.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
+#include "libmesh/parallel_only.h"
 #include "libmesh/print_trace.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/perf_log.h"

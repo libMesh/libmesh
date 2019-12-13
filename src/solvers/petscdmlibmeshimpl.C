@@ -106,7 +106,7 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem & sys)
   DofMap & dofmap = dlm->sys->get_dof_map();
   dlm->varids->clear();
   dlm->varnames->clear();
-  for (unsigned int v = 0; v < dofmap.n_variables(); ++v) {
+  for (auto v : IntRange<unsigned int>(0, dofmap.n_variables())) {
     std::string vname = dofmap.variable(v).name();
     dlm->varids->insert(std::pair<std::string,unsigned int>(vname,v));
     dlm->varnames->insert(std::pair<unsigned int,std::string>(v,vname));
@@ -231,10 +231,13 @@ PetscErrorCode DMlibMeshSetUpName_Private(DM dm)
     dnames = dlm->blocknames;
   }
   if (dnames) {
-    for (unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
-      for (std::set<unsigned int>::iterator dit = (*dlm->decomposition)[d].begin(); dit != (*dlm->decomposition)[d].end(); ++dit) {
+    for (auto decomp : *dlm->decomposition) {
+      for (std::set<unsigned int>::iterator dit_begin = decomp.begin(),
+                                            dit = dit_begin,
+                                            dit_end   = decomp.end();
+           dit != dit_end; ++dit) {
         unsigned int id = *dit;
-        if (dit != (*dlm->decomposition)[d].begin())
+        if (dit != dit_begin)
           name += ",";
         name += (*dnames)[id];
       }
@@ -250,8 +253,9 @@ PetscErrorCode DMlibMeshSetUpName_Private(DM dm)
     enames = dlm->blocknames;
   }
   if (enames) {
-    for (std::map<unsigned int, std::string>::iterator eit = enames->begin(); eit != enames->end(); ++eit) {
-      std::string ename = eit->second;
+    for (auto eit     = enames->begin(),
+              eit_end = enames->end(); eit != eit_end; ++eit) {
+      std::string & ename = eit->second;
       if (eit != enames->begin())
         name += ",";
       name += ename;
@@ -279,7 +283,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len,
   if (islist)   {ierr = PetscMalloc(*len*sizeof(IS),    islist);    CHKERRQ(ierr);}
   if (dmlist)   {ierr = PetscMalloc(*len*sizeof(DM),    dmlist);    CHKERRQ(ierr);}
   DofMap & dofmap = dlm->sys->get_dof_map();
-  for (unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
+  for (auto d : index_range(*dlm->decomposition)) {
     std::set<numeric_index_type>         dindices;
     std::string                          dname;
     std::map<std::string, unsigned int>  dvarids;
@@ -303,8 +307,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len,
           std::vector<numeric_index_type> evindices;
           // Get the degree of freedom indices for the given variable off the current element.
           dofmap.dof_indices(elem, evindices, v);
-          for (unsigned int i = 0; i < evindices.size(); ++i) {
-            numeric_index_type dof = evindices[i];
+          for (numeric_index_type dof : evindices) {
             if (dof >= dofmap.first_dof() && dof < dofmap.end_dof()) // might want to use variable_first/last_local_dof instead
               dindices.insert(dof);
           }
@@ -385,7 +388,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt * len
   if (innerislist)   {ierr = PetscMalloc(*len*sizeof(IS),    innerislist);    CHKERRQ(ierr);}
   if (outerislist)   *outerislist = PETSC_NULL; /* FIX: allow mesh-based overlap. */
   if (dmlist)        {ierr = PetscMalloc(*len*sizeof(DM),    dmlist);    CHKERRQ(ierr);}
-  for (unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
+  for (auto d : index_range(*dlm->decomposition)) {
     std::set<numeric_index_type>               dindices;
     std::string                          dname;
     std::map<std::string, unsigned int>  dblockids;
@@ -1080,7 +1083,7 @@ static PetscErrorCode  DMView_libMesh(DM dm, PetscViewer viewer)
       }
       else SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Unexpected decomposition type: %D", dlm->decomposition_type);
       /* FIX: decompositions might have different sizes and components on different ranks. */
-      for (unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
+      for (auto d : index_range(*dlm->decomposition)) {
         std::set<unsigned int>::iterator dbegin  = (*dlm->decomposition)[d].begin();
         std::set<unsigned int>::iterator dit     = (*dlm->decomposition)[d].begin();
         std::set<unsigned int>::iterator dend    = (*dlm->decomposition)[d].end();

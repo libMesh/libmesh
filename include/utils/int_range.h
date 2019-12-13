@@ -22,14 +22,16 @@
 
 #include "libmesh/libmesh_common.h" // cast_int
 
-// libMesh includes
-#include "numeric_vector.h"
-
 // C++ includes
 #include <vector>
 
 namespace libMesh
 {
+
+// Forward declarations
+template <typename T> class DenseSubVector;
+template <typename T> class DenseVector;
+template <typename T> class NumericVector;
 
 /**
  * The \p IntRange templated class is intended to make it easy to
@@ -104,6 +106,26 @@ template <typename T>
 IntRange<std::size_t> index_range(const std::vector<T> & vec)
 {
   return IntRange<std::size_t>(0, vec.size());
+}
+
+
+/**
+ * Same thing but for DenseVector
+ */
+template <typename T>
+IntRange<unsigned int> index_range(const DenseVector<T> & vec)
+{
+  return {0, vec.size()};
+}
+
+
+/**
+ * Same thing but for DenseSubVector
+ */
+template <typename T>
+IntRange<unsigned int> index_range(const DenseSubVector<T> & vec)
+{
+  return {0, vec.size()};
 }
 
 

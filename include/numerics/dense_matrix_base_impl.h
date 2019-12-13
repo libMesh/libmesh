@@ -24,6 +24,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector_base.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 #include <iomanip> // for std::setw()
@@ -80,14 +81,14 @@ namespace libMesh
 
     // move the known value into the RHS
     // and zero the column
-    for (unsigned int i=0; i<this->m(); i++)
+    for (auto i : IntRange<unsigned int>(0, this->m()))
       {
         rhs.el(i) -= this->el(i,jv)*val;
         this->el(i,jv) = 0.;
       }
 
     // zero the row
-    for (unsigned int j=0; j<this->n(); j++)
+    for (auto j : IntRange<unsigned int>(0, this->n()))
       this->el(iv,j) = 0.;
 
     this->el(iv,jv) = 1.;
@@ -103,9 +104,9 @@ namespace libMesh
     std::ios_base::fmtflags os_flags = os.flags();
 
     // Print the matrix entries.
-    for (unsigned int i=0; i<this->m(); i++)
+    for (auto i : IntRange<unsigned int>(0, this->m()))
       {
-        for (unsigned int j=0; j<this->n(); j++)
+        for (auto j : IntRange<unsigned int>(0, this->n()))
           os << std::setw(15)
              << std::scientific
              << std::setprecision(precision)
@@ -123,9 +124,9 @@ namespace libMesh
   template<typename T>
   void DenseMatrixBase<T>::print (std::ostream & os) const
   {
-    for (unsigned int i=0; i<this->m(); i++)
+    for (auto i : IntRange<unsigned int>(0, this->m()))
       {
-        for (unsigned int j=0; j<this->n(); j++)
+        for (auto j : IntRange<unsigned int>(0, this->n()))
           os << std::setw(8)
              << this->el(i,j) << " ";
 

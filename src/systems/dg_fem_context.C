@@ -127,7 +127,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;
-    for (unsigned int i=0; i != get_system().n_vars(); ++i)
+    for (auto i : IntRange<unsigned int>(0, get_system().n_vars()))
       {
         get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices_var[i], i);
 

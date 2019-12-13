@@ -264,7 +264,7 @@ void System::init_data ()
   MeshBase & mesh = this->get_mesh();
 
   // Add all variable groups to our underlying DofMap
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  for (auto vg : IntRange<unsigned int>(0, this->n_variable_groups()))
     _dof_map->add_variable_group(this->variable_group(vg));
 
   // Distribute the degrees of freedom on the mesh
@@ -1074,7 +1074,7 @@ unsigned int System::add_variable (const std::string & var,
 
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
-  for (unsigned int v=0; v<this->n_vars(); v++)
+  for (auto v : IntRange<unsigned int>(0, this->n_vars()))
     if (this->variable_name(v) == var)
       {
         if (this->variable_type(v) == type)
@@ -1165,14 +1165,14 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
 
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
-  for (std::size_t ov=0; ov<vars.size(); ov++)
-    for (unsigned int v=0; v<this->n_vars(); v++)
-      if (this->variable_name(v) == vars[ov])
+  for (auto ovar : vars)
+    for (auto v : IntRange<unsigned int>(0, this->n_vars()))
+      if (this->variable_name(v) == ovar)
         {
           if (this->variable_type(v) == type)
             return _variables[v].number();
 
-          libmesh_error_msg("ERROR: incompatible variable " << vars[ov] << " has already been added for this system!");
+          libmesh_error_msg("ERROR: incompatible variable " << ovar << " has already been added for this system!");
         }
 
   const unsigned short curr_n_vars = cast_int<unsigned short>
@@ -1273,14 +1273,10 @@ void System::local_dof_indices(const unsigned int var,
     {
       this->get_dof_map().dof_indices (elem, dof_indices, var);
 
-      for (std::size_t i=0; i<dof_indices.size(); i++)
-        {
-          dof_id_type dof = dof_indices[i];
-
-          //If the dof is owned by the local processor
-          if (first_local <= dof && dof < end_local)
-            var_indices.insert(dof_indices[i]);
-        }
+      for (dof_id_type dof : dof_indices)
+        //If the dof is owned by the local processor
+        if (first_local <= dof && dof < end_local)
+          var_indices.insert(dof);
     }
 
   // we may have missed assigning DOFs to nodes that we own
@@ -1395,8 +1391,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
     {
       //Check to see if all weights are 1.0 and all types are equal
       FEMNormType norm_type0 = norm.type(0);
-      unsigned int check_var = 0;
-      for (; check_var != this->n_vars(); ++check_var)
+      unsigned int check_var = 0, check_end = this->n_vars();
+      for (; check_var != check_end; ++check_var)
         if ((norm.weight(check_var) != 1.0) || (norm.type(check_var) != norm_type0))
           break;
 
@@ -1413,7 +1409,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
             libmesh_error_msg("Invalid norm_type0 = " << norm_type0);
         }
 
-      for (unsigned int var=0; var != this->n_vars(); ++var)
+      for (auto var : IntRange<unsigned int>(0, this->n_vars()))
         {
           // Skip any variables we don't need to integrate
           if (norm.weight(var) == 0.0)
@@ -1438,7 +1434,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
     using_nonhilbert_norm = true;
 
   // Loop over all variables
-  for (unsigned int var=0; var != this->n_vars(); ++var)
+  for (auto var : IntRange<unsigned int>(0, this->n_vars()))
     {
       // Skip any variables we don't need to integrate
       Real norm_weight_sq = norm.weight_sq(var);
@@ -1648,12 +1644,12 @@ std::string System::get_info() const
       << "    Type \""  << this->system_type() << "\"\n"
       << "    Variables=";
 
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  for (auto vg : IntRange<unsigned int>(0, this->n_variable_groups()))
     {
       const VariableGroup & vg_description (this->variable_group(vg));
 
       if (vg_description.n_variables() > 1) oss << "{ ";
-      for (unsigned int vn=0; vn<vg_description.n_variables(); vn++)
+      for (auto vn : IntRange<unsigned int>(0, vg_description.n_variables()))
         oss << "\"" << vg_description.name(vn) << "\" ";
       if (vg_description.n_variables() > 1) oss << "} ";
     }
@@ -1662,12 +1658,12 @@ std::string System::get_info() const
 
   oss << "    Finite Element Types=";
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  for (auto vg : IntRange<unsigned int>(0, this->n_variable_groups()))
     oss << "\""
         << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
         << "\" ";
 #else
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  for (auto vg : IntRange<unsigned int>(0, this->n_variable_groups()))
     {
       oss << "\""
           << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
@@ -1677,7 +1673,7 @@ std::string System::get_info() const
     }
 
   oss << '\n' << "    Infinite Element Mapping=";
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  for (auto vg : IntRange<unsigned int>(0, this->n_variable_groups()))
     oss << "\""
         << Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_group(vg).type().inf_map)
         << "\" ";
@@ -1686,7 +1682,7 @@ std::string System::get_info() const
   oss << '\n';
 
   oss << "    Approximation Orders=";
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  for (auto vg : IntRange<unsigned int>(0, this->n_variable_groups()))
     {
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
       oss << "\""

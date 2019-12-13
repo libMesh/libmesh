@@ -824,7 +824,7 @@ void MeshBase::detect_interior_parents()
   for (const auto & elem : this->active_element_ptr_range())
     {
       // Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
-      for (unsigned int n=0; n<elem->n_vertices(); n++)
+      for (auto n : IntRange<unsigned int>(0, elem->n_vertices()))
         {
           libmesh_assert_less (elem->id(), this->max_elem_id());
 
@@ -847,7 +847,7 @@ void MeshBase::detect_interior_parents()
 
       bool found_interior_parents = false;
 
-      for (dof_id_type n=0; n < element->n_vertices(); n++)
+      for (auto n : IntRange<unsigned int>(0, element->n_vertices()))
         {
           std::vector<dof_id_type> & element_ids = node_to_elem[element->node_id(n)];
           for (const auto & eid : element_ids)
@@ -878,7 +878,7 @@ void MeshBase::detect_interior_parents()
           for (const auto & interior_parent_id : neighbors_0)
             {
               found_interior_parents = false;
-              for (dof_id_type n=1; n < element->n_vertices(); n++)
+              for (auto n : IntRange<unsigned int>(1, element->n_vertices()))
                 {
                   if (neighbors[n].find(interior_parent_id)!=neighbors[n].end())
                     {

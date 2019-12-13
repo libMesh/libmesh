@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/enum_parallel_type.h"
 #include "libmesh/id_types.h"
+#include "libmesh/int_range.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
@@ -917,7 +918,7 @@ void NumericVector<Complex>::print(std::ostream & os) const
 
   // std::complex<>::operator<<() is defined, but use this form
   os << "#\tReal part\t\tImaginary part" << std::endl;
-  for (numeric_index_type i=this->first_local_index(); i<this->last_local_index(); i++)
+  for (auto i : index_range(*this))
     os << i << "\t"
        << (*this)(i).real() << "\t\t"
        << (*this)(i).imag() << std::endl;
@@ -934,7 +935,7 @@ void NumericVector<T>::print(std::ostream & os) const
      << "\t\tlocal =  " << this->local_size() << std::endl;
 
   os << "#\tValue" << std::endl;
-  for (numeric_index_type i=this->first_local_index(); i<this->last_local_index(); i++)
+  for (auto i : index_range(*this))
     os << i << "\t" << (*this)(i) << std::endl;
 }
 
@@ -955,7 +956,7 @@ void NumericVector<Complex>::print_global(std::ostream & os) const
 
   os << "Size\tglobal =  " << this->size() << std::endl;
   os << "#\tReal part\t\tImaginary part" << std::endl;
-  for (numeric_index_type i=0; i!=v.size(); i++)
+  for (auto i : IntRange<numeric_index_type>(0, v.size()))
     os << i << "\t"
        << v[i].real() << "\t\t"
        << v[i].imag() << std::endl;
@@ -977,7 +978,7 @@ void NumericVector<T>::print_global(std::ostream & os) const
 
   os << "Size\tglobal =  " << this->size() << std::endl;
   os << "#\tValue" << std::endl;
-  for (numeric_index_type i=0; i!=v.size(); i++)
+  for (auto i : IntRange<numeric_index_type>(0, v.size()))
     os << i << "\t" << v[i] << std::endl;
 }
 

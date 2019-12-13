@@ -26,6 +26,7 @@
 
 // Local includes
 #include "libmesh/dense_vector.h"
+#include "libmesh/int_range.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/point.h"
 
@@ -241,7 +242,7 @@ ParsedFunction<Output,OutputGradient>::reparse (const std::string & expression)
   // If additional vars were passed, append them to the string
   // that we send to the function parser. Also add them to the
   // end of our spacetime vector
-  for (std::size_t i=0; i < _additional_vars.size(); ++i)
+  for (auto i : index_range(_additional_vars))
     {
       variables += "," + _additional_vars[i];
       // Initialize extra variables to the vector passed in or zero

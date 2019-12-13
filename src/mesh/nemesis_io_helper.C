@@ -1025,7 +1025,7 @@ void Nemesis_IO_Helper::compute_elem_communication_maps()
         std::set<std::pair<unsigned,unsigned>>::iterator elem_set_iter = elem_set.begin();
 
         // Pack the vectors with elem IDs, side IDs, and processor IDs.
-        for (std::size_t j=0; j<this->elem_cmap_elem_ids[cnt].size(); ++j, ++elem_set_iter)
+        for (std::size_t j=0, eceis=this->elem_cmap_elem_ids[cnt].size(); j<eceis; ++j, ++elem_set_iter)
           {
             this->elem_cmap_elem_ids[cnt][j] =
               libmesh_map_find(libmesh_elem_num_to_exodus, elem_set_iter->first);
@@ -1106,7 +1106,7 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
         std::set<unsigned>::iterator node_set_iter = node_set.begin();
 
         // Pack the vectors with node IDs and processor IDs.
-        for (std::size_t j=0; j<this->node_cmap_node_ids[cnt].size(); ++j, ++node_set_iter)
+        for (std::size_t j=0, nceis=this->node_cmap_node_ids[cnt].size(); j<nceis; ++j, ++node_set_iter)
           {
             this->node_cmap_node_ids[cnt][j] =
               libmesh_map_find(libmesh_node_num_to_exodus, *node_set_iter);

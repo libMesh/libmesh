@@ -107,7 +107,7 @@ void Elem::refine (MeshRefinement & mesh_refinement)
           current_child->set_p_level(parent_p_level);
           current_child->set_p_refinement_flag(this->p_refinement_flag());
 
-          for (unsigned int cnode=0; cnode != current_child->n_nodes(); ++cnode)
+          for (auto cnode : current_child->node_index_range())
             {
               Node * node =
                 mesh_refinement.add_node(*this, c, cnode,
@@ -171,18 +171,20 @@ void Elem::coarsen()
 
   unsigned int parent_p_level = 0;
 
+  const unsigned int n_n = this->n_nodes();
+
   // re-compute hanging node nodal locations
   for (unsigned int c = 0, nc = this->n_children(); c != nc; ++c)
     {
       Elem * mychild = this->child_ptr(c);
       if (mychild == remote_elem)
         continue;
-      for (unsigned int cnode=0; cnode != mychild->n_nodes(); ++cnode)
+      for (auto cnode : mychild->node_index_range())
         {
           Point new_pos;
           bool calculated_new_pos = false;
 
-          for (unsigned int n=0; n<this->n_nodes(); n++)
+          for (unsigned int n=0; n<n_n; n++)
             {
               // The value from the embedding matrix
               const float em_val = this->embedding_matrix(c,cnode,n);

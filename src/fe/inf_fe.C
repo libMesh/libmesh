@@ -225,7 +225,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           radial_pts.push_back(Point(radius));
           unsigned int n_radial_pts=1;
           unsigned int n_angular_pts=1;
-          for (std::size_t p=1; p < pts->size(); ++p)
+          for (auto p : IntRange<std::size_t>(1, pts->size()))
             {
               radius = (*pts)[p](Dim-1);
               // check for repetition of radius: The max. allowed distance is somewhat arbitrary
@@ -263,7 +263,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
       std::vector<Point> base_pts;
       base_pts.reserve(base_pts_size);
-      for (std::size_t p=0; p != pts->size(); p += radial_pts_size)
+      for (std::size_t p=0, ps=pts->size(); p != ps; p += radial_pts_size)
         {
           Point pt = (*pts)[p];
           pt(Dim-1) = 0;

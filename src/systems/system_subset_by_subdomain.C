@@ -104,10 +104,8 @@ set_var_nums (const std::set<unsigned int> * const var_nums)
     _var_nums = *var_nums;
 
   else
-    {
-      for (unsigned int i=0; i<_system.n_vars(); i++)
-        _var_nums.insert(i);
-    }
+    for (auto i : IntRange<unsigned int>(0, _system.n_vars()))
+      _var_nums.insert(i);
 }
 
 void
@@ -129,7 +127,7 @@ init (const SubdomainSelection & subdomain_selection)
           {
             dof_map.dof_indices (elem, dof_indices, var_num);
             for (const auto & dof : dof_indices)
-              for (processor_id_type proc=0; proc<this->n_processors(); proc++)
+              for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
                 if ((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
                   dof_ids_per_processor[proc].push_back(dof);
           }
@@ -137,26 +135,17 @@ init (const SubdomainSelection & subdomain_selection)
 
   /* Distribute information among processors.  */
   std::vector<Parallel::Request> request_per_processor(this->n_processors());
-  for (unsigned int proc=0; proc<this->n_processors(); proc++)
-    {
-      if (proc!=this->processor_id())
-        {
-          this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
-        }
-    }
-  for (unsigned int proc=0; proc<this->n_processors(); proc++)
+  for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
+    if (proc!=this->processor_id())
+      this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
+  for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
     {
       std::vector<dof_id_type> received_dofs;
       if (proc==this->processor_id())
-        {
-          received_dofs = dof_ids_per_processor[proc];
-        }
+        received_dofs = dof_ids_per_processor[proc];
       else
-        {
-          this->comm().receive(proc,received_dofs);
-        }
-      for (std::size_t i=0; i<received_dofs.size(); i++)
-        _dof_ids.push_back(received_dofs[i]);
+        this->comm().receive(proc,received_dofs);
+      _dof_ids.insert(_dof_ids.end(), received_dofs.begin(), received_dofs.end());
     }
 
   /* Sort and unique the vector (using the same mechanism as in \p
@@ -166,7 +155,7 @@ init (const SubdomainSelection & subdomain_selection)
   std::vector<unsigned int> (_dof_ids.begin(), new_end).swap (_dof_ids);
 
   /* Wait for sends to be complete.  */
-  for (unsigned int proc=0; proc<this->n_processors(); proc++)
+  for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
     {
       if (proc!=this->processor_id())
         {

@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 
@@ -197,8 +198,8 @@ DenseMatrixBase<T>::add (const T2 factor,
   libmesh_assert_equal_to (this->m(), mat.m());
   libmesh_assert_equal_to (this->n(), mat.n());
 
-  for (unsigned int j=0; j<this->n(); j++)
-    for (unsigned int i=0; i<this->m(); i++)
+  for (auto j : IntRange<unsigned int>(0, this->n()))
+    for (auto i : IntRange<unsigned int>(0, this->m()))
       this->el(i,j) += factor*mat.el(i,j);
 }
 

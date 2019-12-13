@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix_base.h"
+#include "libmesh/int_range.h"
 
 // For the definition of PetscBLASInt.
 #if (LIBMESH_HAVE_PETSC)
@@ -911,8 +912,8 @@ template<typename T>
 inline
 void DenseMatrix<T>::scale (const T factor)
 {
-  for (std::size_t i=0; i<_val.size(); i++)
-    _val[i] *= factor;
+  for (auto & v : _val)
+    v *= factor;
 }
 
 
@@ -920,7 +921,7 @@ template<typename T>
 inline
 void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
 {
-  for (unsigned int i=0; i<this->m(); i++)
+  for (auto i : IntRange<unsigned int>(0, this->m()))
     (*this)(i, col) *= factor;
 }
 
@@ -947,8 +948,8 @@ DenseMatrix<T>::add (const T2 factor,
   libmesh_assert_equal_to (this->m(), mat.m());
   libmesh_assert_equal_to (this->n(), mat.n());
 
-  for (unsigned int i=0; i<this->m(); i++)
-    for (unsigned int j=0; j<this->n(); j++)
+  for (auto i : IntRange<unsigned int>(0, this->m()))
+    for (auto j : IntRange<unsigned int>(0, this->n()))
       (*this)(i,j) += factor * mat(i,j);
 }
 
@@ -958,7 +959,7 @@ template<typename T>
 inline
 bool DenseMatrix<T>::operator == (const DenseMatrix<T> & mat) const
 {
-  for (std::size_t i=0; i<_val.size(); i++)
+  for (auto i : index_range(_val))
     if (_val[i] != mat._val[i])
       return false;
 
@@ -971,7 +972,7 @@ template<typename T>
 inline
 bool DenseMatrix<T>::operator != (const DenseMatrix<T> & mat) const
 {
-  for (std::size_t i=0; i<_val.size(); i++)
+  for (auto i : index_range(_val))
     if (_val[i] != mat._val[i])
       return true;
 
@@ -984,7 +985,7 @@ template<typename T>
 inline
 DenseMatrix<T> & DenseMatrix<T>::operator += (const DenseMatrix<T> & mat)
 {
-  for (std::size_t i=0; i<_val.size(); i++)
+  for (auto i : index_range(_val))
     _val[i] += mat._val[i];
 
   return *this;
@@ -996,7 +997,7 @@ template<typename T>
 inline
 DenseMatrix<T> & DenseMatrix<T>::operator -= (const DenseMatrix<T> & mat)
 {
-  for (std::size_t i=0; i<_val.size(); i++)
+  for (auto i : index_range(_val))
     _val[i] -= mat._val[i];
 
   return *this;
@@ -1126,14 +1127,14 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 //   // move the known value into the RHS
 //   // and zero the column
-//   for (unsigned int i=0; i<this->m(); i++)
+//   for (auto i : IntRange<unsigned int>(0, this->m()))
 //     {
 //       rhs(i) -= ((*this)(i,jv))*val;
 //       (*this)(i,jv) = 0.;
 //     }
 
 //   // zero the row
-//   for (unsigned int j=0; j<this->n(); j++)
+//   for (auto j : IntRange<unsigned int>(0, this->n()))
 //     (*this)(iv,j) = 0.;
 
 //   (*this)(iv,jv) = 1.;

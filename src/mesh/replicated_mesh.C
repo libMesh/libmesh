@@ -1047,8 +1047,9 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
           // Create the dataset needed to build the kd tree with nanoflann
           std::vector<std::pair<Point, dof_id_type>> this_mesh_nodes(this_boundary_node_ids.size());
-          std::set<dof_id_type>::iterator current_node = this_boundary_node_ids.begin();
-          for (unsigned int ctr = 0; current_node != this_boundary_node_ids.end(); ++current_node, ++ctr)
+          std::set<dof_id_type>::iterator current_node = this_boundary_node_ids.begin(),
+                                          node_ids_end = this_boundary_node_ids.end();
+          for (unsigned int ctr = 0; current_node != node_ids_end; ++current_node, ++ctr)
           {
             this_mesh_nodes[ctr].first = this->point(*current_node);
             this_mesh_nodes[ctr].second = *current_node;
@@ -1550,7 +1551,7 @@ ReplicatedMesh::get_boundary_points() const
       boundary_elements.erase(side);
 
       // push all nodes on the side except the node on the other end of the side (index 1)
-      for (unsigned int i = 0; i < local_side_nodes.size(); ++i)
+      for (auto i : index_range(local_side_nodes))
         if (i != 1)
           bpoints.push_back(*static_cast<const Point *>(elem->node_ptr(local_side_nodes[i])));
 

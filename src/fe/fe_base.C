@@ -1383,7 +1383,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
       DenseVector<Number> Usub;
 
       coarsened_dof_values(old_vector, dof_map, elem, Usub,
-                           use_old_dof_indices);
+                           v, use_old_dof_indices);
 
       Ue.append (Usub);
     }
@@ -1986,7 +1986,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                   // Container to catch boundary IDs handed back by BoundaryInfo.
                   std::vector<boundary_id_type> new_bc_ids;
 
-                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                  for (auto n : elem->node_index_range())
                     {
                       if (!elem->is_node_on_side(n,s))
                         continue;
@@ -2100,8 +2100,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                       else if (elem->is_edge(n))
                         {
                           // Find which edge we're on
-                          unsigned int e=0;
-                          for (; e != elem->n_edges(); ++e)
+                          unsigned int e=0, ne = elem->n_edges();
+                          for (; e != ne; ++e)
                             {
                               if (elem->is_node_on_edge(n,e))
                                 break;
@@ -2112,7 +2112,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                           const Node
                             * e1 = nullptr,
                             * e2 = nullptr;
-                          for (unsigned int nn = 0; nn != elem->n_nodes(); ++nn)
+                          for (auto nn : elem->node_index_range())
                             {
                               if (nn == n)
                                 continue;

@@ -22,6 +22,7 @@
 
 // libMesh includes
 #include "libmesh/elem.h"
+#include "libmesh/int_range.h"
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel_algebra.h"
@@ -268,7 +269,7 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type p=0; p != comm.size(); ++p)
+  for (auto p : IntRange<processor_id_type>(0, comm.size()))
     if (p != comm.rank() && ghost_objects_from_proc[p])
       {
         requested_objs_pt[p].reserve(ghost_objects_from_proc[p]);
@@ -379,7 +380,7 @@ void sync_dofobject_data_by_id(const Communicator & comm,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type p=0; p != comm.size(); ++p)
+  for (auto p : IntRange<processor_id_type>(0, comm.size()))
     if (p != comm.rank() && ghost_objects_from_proc[p])
       requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
 
@@ -463,7 +464,7 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type p=0; p != comm.size(); ++p)
+  for (auto p : IntRange<processor_id_type>(0, comm.size()))
     if (p != comm.rank() && ghost_objects_from_proc[p])
       {
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
@@ -608,7 +609,7 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type p=0; p != comm.size(); ++p)
+  for (auto p : IntRange<processor_id_type>(0, comm.size()))
     if (p != comm.rank() && ghost_objects_from_proc[p])
       {
         requested_objs_elem_id_node_num[p].reserve(ghost_objects_from_proc[p]);

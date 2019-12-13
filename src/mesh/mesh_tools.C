@@ -1605,9 +1605,8 @@ void libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnu
   // Figure out what our local dof id range is
   for (const auto * node : mesh.local_node_ptr_range())
     {
-      for (unsigned int v=0, nvars = node->n_vars(sysnum);
-           v != nvars; ++v)
-        for (unsigned int c=0; c != node->n_comp(sysnum, v); ++c)
+      for (auto v : IntRange<unsigned int>(0, node->n_vars(sysnum)))
+        for (auto c : IntRange<unsigned int>(0, node->n_comp(sysnum, v)))
           {
             dof_id_type id = node->dof_number(sysnum, v, c);
             min_dof_id = std::min (min_dof_id, id);
@@ -1620,9 +1619,8 @@ void libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnu
     {
       if (node->processor_id() == mesh.processor_id())
         continue;
-      for (unsigned int v=0, nvars = node->n_vars(sysnum);
-           v != nvars; ++v)
-        for (unsigned int c=0; c != node->n_comp(sysnum, v); ++c)
+      for (auto v : IntRange<unsigned int>(0, node->n_vars(sysnum)))
+        for (auto c : IntRange<unsigned int>(0, node->n_comp(sysnum, v)))
           {
             dof_id_type id = node->dof_number(sysnum, v, c);
             libmesh_assert (id < min_dof_id ||
