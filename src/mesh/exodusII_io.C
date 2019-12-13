@@ -401,6 +401,14 @@ void ExodusII_IO::read (const std::string & fname)
           {
             int exodus_id = exio_helper->node_sets_node_list[i + offset];
 
+            // It's possible for nodesets to have invalid ids in them
+            // by accident.  Instead of possibly accessing past the
+            // end of node_num_map, let's make sure we have that many
+            // entries.
+            if (static_cast<std::size_t>(exodus_id - 1) >= exio_helper->node_num_map.size())
+              libmesh_error_msg("Invalid Exodus node id " << exodus_id
+                                << " found in nodeset " << nodeset_id);
+
             // As before, the entries in 'node_list' are 1-based
             // indices into the node_num_map array, so we have to map
             // them.  See comment above.
