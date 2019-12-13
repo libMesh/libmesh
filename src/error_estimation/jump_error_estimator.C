@@ -142,6 +142,11 @@ void JumpErrorEstimator::estimate_error (const System & system,
   fine_context = libmesh_make_unique<FEMContext>(system);
   coarse_context = libmesh_make_unique<FEMContext>(system);
 
+  // Don't overintegrate - we're evaluating differences of FE values,
+  // not products of them.
+  if (this->use_unweighted_quadrature_rules)
+    fine_context->use_unweighted_quadrature_rules(system.extra_quadrature_order);
+
   // Loop over all the variables we've been requested to find jumps in, to
   // pre-request
   for (var=0; var<n_vars; var++)
