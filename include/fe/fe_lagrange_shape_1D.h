@@ -125,85 +125,104 @@ Real fe_lagrange_1D_shape(const Order order,
 
 
 inline
-Real fe_lagrange_1D_shape_deriv(const ElemType,
-                                const Order order,
-                                const unsigned int i,
-                                const unsigned int libmesh_dbg_var(j),
-                                const Point & p)
+Real fe_lagrange_1D_linear_shape_deriv(const unsigned int i,
+                                       const unsigned int libmesh_dbg_var(j),
+                                       const Real)
 {
   // only d()/dxi in 1D!
-
   libmesh_assert_equal_to (j, 0);
 
-  const Real xi = p(0);
+  libmesh_assert_less (i, 2);
 
+  switch (i)
+    {
+    case 0:
+      return -.5;
+
+    case 1:
+      return .5;
+
+    default:
+      libmesh_error_msg("Invalid shape function index i = " << i);
+    }
+}
+
+
+inline
+Real fe_lagrange_1D_quadratic_shape_deriv(const unsigned int i,
+                                          const unsigned int libmesh_dbg_var(j),
+                                          const Real xi)
+{
+  // only d()/dxi in 1D!
+  libmesh_assert_equal_to (j, 0);
+
+  libmesh_assert_less (i, 3);
+
+  switch (i)
+    {
+    case 0:
+      return xi-.5;
+
+    case 1:
+      return xi+.5;
+
+    case 2:
+      return -2.*xi;
+
+    default:
+      libmesh_error_msg("Invalid shape function index i = " << i);
+    }
+}
+
+
+inline
+Real fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
+                                      const unsigned int libmesh_dbg_var(j),
+                                      const Real xi)
+{
+  // only d()/dxi in 1D!
+  libmesh_assert_equal_to (j, 0);
+
+  libmesh_assert_less (i, 4);
+
+  switch (i)
+    {
+    case 0:
+      return -9./16.*(3.*xi*xi-2.*xi-1./9.);
+
+    case 1:
+      return -9./16.*(-3.*xi*xi-2.*xi+1./9.);
+
+    case 2:
+      return 27./16.*(3.*xi*xi-2./3.*xi-1.);
+
+    case 3:
+      return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
+
+    default:
+      libmesh_error_msg("Invalid shape function index i = " << i);
+    }
+}
+
+
+
+inline
+Real fe_lagrange_1D_shape_deriv(const Order order,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Real xi)
+{
   switch (order)
     {
       // Lagrange linear shape function derivatives
     case FIRST:
-      {
-        libmesh_assert_less (i, 2);
+      return fe_lagrange_1D_linear_shape_deriv(i, j, xi);
 
-        switch (i)
-          {
-          case 0:
-            return -.5;
-
-          case 1:
-            return .5;
-
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
-          }
-      }
-
-
-      // Lagrange quadratic shape function derivatives
     case SECOND:
-      {
-        libmesh_assert_less (i, 3);
+      return fe_lagrange_1D_quadratic_shape_deriv(i, j, xi);
 
-        switch (i)
-          {
-          case 0:
-            return xi-.5;
-
-          case 1:
-            return xi+.5;
-
-          case 2:
-            return -2.*xi;
-
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
-          }
-      }
-
-
-      // Lagrange cubic shape function derivatives
     case THIRD:
-      {
-        libmesh_assert_less (i, 4);
-
-        switch (i)
-          {
-          case 0:
-            return -9./16.*(3.*xi*xi-2.*xi-1./9.);
-
-          case 1:
-            return -9./16.*(-3.*xi*xi-2.*xi+1./9.);
-
-          case 2:
-            return 27./16.*(3.*xi*xi-2./3.*xi-1.);
-
-          case 3:
-            return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
-
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
-          }
-      }
-
+      return fe_lagrange_1D_cubic_shape_deriv(i, j, xi);
 
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);

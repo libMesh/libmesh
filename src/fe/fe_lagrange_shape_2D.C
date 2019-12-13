@@ -446,13 +446,13 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
                 {
                   // d()/dxi
                 case 0:
-                  return (fe_lagrange_1D_shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
-                          fe_lagrange_1D_linear_shape(i1[i], eta));
+                  return (fe_lagrange_1D_linear_shape_deriv(i0[i], 0, xi)*
+                          fe_lagrange_1D_linear_shape      (i1[i], eta));
 
                   // d()/deta
                 case 1:
-                  return (fe_lagrange_1D_linear_shape(i0[i], xi)*
-                          fe_lagrange_1D_shape_deriv(EDGE2, FIRST, i1[i], 0, eta));
+                  return (fe_lagrange_1D_linear_shape      (i0[i], xi)*
+                          fe_lagrange_1D_linear_shape_deriv(i1[i], 0, eta));
 
                 default:
                   libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
@@ -630,13 +630,13 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
                 {
                   // d()/dxi
                 case 0:
-                  return (fe_lagrange_1D_shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          fe_lagrange_1D_quadratic_shape(i1[i], eta));
+                  return (fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, xi)*
+                          fe_lagrange_1D_quadratic_shape      (i1[i], eta));
 
                   // d()/deta
                 case 1:
-                  return (fe_lagrange_1D_quadratic_shape(i0[i], xi)*
-                          fe_lagrange_1D_shape_deriv(EDGE3, SECOND, i1[i], 0, eta));
+                  return (fe_lagrange_1D_quadratic_shape      (i0[i], xi)*
+                          fe_lagrange_1D_quadratic_shape_deriv(i1[i], 0, eta));
 
                 default:
                   libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
@@ -782,8 +782,8 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
 
                   // d^2() / dxi deta
                 case 1:
-                  return (fe_lagrange_1D_shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
-                          fe_lagrange_1D_shape_deriv(EDGE2, FIRST, i1[i], 0, eta));
+                  return (fe_lagrange_1D_linear_shape_deriv(i0[i], 0, xi)*
+                          fe_lagrange_1D_linear_shape_deriv(i1[i], 0, eta));
 
                   // d^2() / deta^2
                 case 2:
@@ -940,8 +940,8 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
 
                   // d^2() / dxi deta
                 case 1:
-                  return (fe_lagrange_1D_shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          fe_lagrange_1D_shape_deriv(EDGE3, SECOND, i1[i], 0, eta));
+                  return (fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, xi)*
+                          fe_lagrange_1D_quadratic_shape_deriv(i1[i], 0, eta));
 
                   // d^2() / deta^2
                 case 2:

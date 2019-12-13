@@ -72,25 +72,25 @@ Real FE<1,L2_LAGRANGE>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape_deriv(const ElemType elem_type,
+Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
                                  const Point & p)
 {
-  return fe_lagrange_1D_shape_deriv(elem_type, order, i, j, p);
+  return fe_lagrange_1D_shape_deriv(order, i, j, p(0));
 }
 
 
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType elem_type,
+Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
                                     const Point & p)
 {
-  return fe_lagrange_1D_shape_deriv(elem_type, order, i, j, p);
+  return fe_lagrange_1D_shape_deriv(order, i, j, p(0));
 }
 
 
@@ -105,8 +105,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape_deriv(elem->type(),
-                                    static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return fe_lagrange_1D_shape_deriv(static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p(0));
 }
 
 
@@ -121,8 +120,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape_deriv(elem->type(),
-                                    static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return fe_lagrange_1D_shape_deriv(static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p(0));
 }
 
 
