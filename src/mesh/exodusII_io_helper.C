@@ -3184,25 +3184,18 @@ void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 }
 
 
-std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names) const
+std::vector<std::string>
+ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names) const
 {
-  std::vector<std::string>::const_iterator names_it = names.begin();
-  std::vector<std::string>::const_iterator names_end = names.end();
-
   std::vector<std::string> complex_names;
 
   // This will loop over all names and create new "complex" names
   // (i.e. names that start with r_, i_ or a_
-  for (; names_it != names_end; ++names_it)
+  for (const auto & name : names)
     {
-      std::stringstream name_real, name_imag, name_abs;
-      name_real << "r_" << *names_it;
-      name_imag << "i_" << *names_it;
-      name_abs << "a_" << *names_it;
-
-      complex_names.push_back(name_real.str());
-      complex_names.push_back(name_imag.str());
-      complex_names.push_back(name_abs.str());
+      complex_names.push_back("r_" + name);
+      complex_names.push_back("i_" + name);
+      complex_names.push_back("a_" + name);
     }
 
   return complex_names;
