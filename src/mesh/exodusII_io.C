@@ -1073,6 +1073,37 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
     derived_vars_active_subdomains.swap(derived_vars_active_subdomains_edited);
   }
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  // Build complex variable names "r_foo", "i_foo", "a_foo" and the lists of
+  // subdomains on which they are active.
+  auto complex_var_names =
+    exio_helper->get_complex_names(derived_var_names);
+  auto complex_vars_active_subdomains =
+    exio_helper->get_complex_vars_active_subdomains(derived_vars_active_subdomains);
+  auto complex_subdomain_to_var_names =
+    exio_helper->get_complex_subdomain_to_var_names(subdomain_to_var_names);
+
+  // Make expanded version of vector "v" in which each entry in the
+  // original expands to an ("r_", "i_", "a_") triple.
+  std::vector<Real> complex_v;
+  complex_v.reserve(3 * v.size());
+  for (const auto & val : v)
+    {
+      complex_v.push_back(val.real());
+      complex_v.push_back(val.imag());
+      complex_v.push_back(std::abs(val));
+    }
+
+  // Finally, initialize storage for the variables and write them to file.
+  exio_helper->initialize_element_variables
+    (complex_var_names, complex_vars_active_subdomains);
+  exio_helper->write_element_values_element_major
+    (mesh, complex_v, _timestep,
+     complex_vars_active_subdomains,
+     complex_var_names,
+     complex_subdomain_to_var_names);
+#else
+
   // Call function which writes the derived variable names to the
   // Exodus file.
   exio_helper->initialize_element_variables(derived_var_names, derived_vars_active_subdomains);
@@ -1080,14 +1111,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   // ES::build_discontinuous_solution_vector() creates a vector with
   // an element-major ordering, so call Helper::write_element_values()
   // passing false for the last argument.
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  // TODO: Make this work when complex variables are enabled by
-  // writing the real and complex parts separately. See
-  // ExodusII_IO::write_element_data() for details.
-  libmesh_not_implemented_msg
-    ("write_element_data_from_discontinuous_nodal_data() is not "
-     "yet supported when complex variables are enabled.");
-#else
   exio_helper->write_element_values_element_major
     (mesh, v, _timestep,
      derived_vars_active_subdomains,

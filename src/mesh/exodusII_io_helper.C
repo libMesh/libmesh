@@ -3222,6 +3222,40 @@ std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_ac
 
 
 
+std::map<subdomain_id_type, std::vector<std::string>>
+ExodusII_IO_Helper::
+get_complex_subdomain_to_var_names(
+  const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names) const
+{
+  // Eventual return value
+  std::map<subdomain_id_type, std::vector<std::string>> ret;
+
+  for (const auto & pr : subdomain_to_var_names)
+    {
+      // Initialize entry for current subdomain
+      auto & vec = ret[pr.first];
+
+      // Get list of non-complex variable names active on this subdomain.
+      const auto & varnames = pr.second;
+
+      // Allocate space for 3x the number of entries
+      vec.reserve(3 * varnames.size());
+
+      // For each varname in the input map, write three variable names
+      // to the output formed by prepending "r_", "i_", and "a_",
+      // respectively.
+      for (const auto & varname : varnames)
+        {
+          vec.push_back("r_" + varname);
+          vec.push_back("i_" + varname);
+          vec.push_back("a_" + varname);
+        }
+    }
+  return ret;
+}
+
+
+
 int ExodusII_IO_Helper::Conversion::get_node_map(int i) const
 {
   if (!node_map)
