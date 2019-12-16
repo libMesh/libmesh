@@ -146,6 +146,18 @@ Tree<N>::find_element (const Point & p,
 
 
 template <unsigned int N>
+void
+Tree<N>::find_elements (const Point & p,
+                        std::set<const Elem *> & candidate_elements,
+                        const std::set<subdomain_id_type> * allowed_subdomains,
+                        Real relative_tol) const
+{
+  return root.find_elements(p, candidate_elements, allowed_subdomains, relative_tol);
+}
+
+
+
+template <unsigned int N>
 const Elem *
 Tree<N>::operator() (const Point & p,
                      const std::set<subdomain_id_type> * allowed_subdomains,

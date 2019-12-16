@@ -101,6 +101,18 @@ public:
                                     const std::set<subdomain_id_type> * allowed_subdomains = nullptr,
                                     Real relative_tol = TOLERANCE) const = 0;
 
+  /**
+   * Fills \p candidate_elements with any elements containing the
+   * specified point \p p,
+   * optionally restricted to a set of allowed subdomains,
+   * optionally using a non-default relative tolerance for searches.
+   */
+  virtual void find_elements(const Point & p,
+                             std::set<const Elem *> & candidate_elements,
+                             const std::set<subdomain_id_type> * allowed_subdomains = nullptr,
+                             Real relative_tol = TOLERANCE) const = 0;
+
+
 protected:
 
   /**

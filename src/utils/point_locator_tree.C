@@ -261,8 +261,8 @@ void PointLocatorTree::operator() (const Point & p,
 
   LOG_SCOPE("operator() - Version 2", "PointLocatorTree");
 
-  // forward call to perform_linear_search
-  candidate_elements = this->perform_fuzzy_linear_search(p, allowed_subdomains, _close_to_point_tol);
+  // ask the tree
+  this->_tree->find_elements (p, candidate_elements, allowed_subdomains, _close_to_point_tol);
 }
 
 
