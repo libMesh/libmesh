@@ -1514,6 +1514,10 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 {
   LOG_SCOPE("add_neighbors_to_send_list()", "DofMap");
 
+  // Return immediately if there's no ghost data
+  if (this->n_processors() == 1)
+    return;
+
   const unsigned int n_var  = this->n_variables();
 
   MeshBase::const_element_iterator       local_elem_it
@@ -1653,6 +1657,10 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 void DofMap::prepare_send_list ()
 {
   LOG_SCOPE("prepare_send_list()", "DofMap");
+
+  // Return immediately if there's no ghost data
+  if (this->n_processors() == 1)
+    return;
 
   // Check to see if we have any extra stuff to add to the send_list
   if (_extra_send_list_function)
