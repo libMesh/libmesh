@@ -76,6 +76,103 @@ FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
   init_internal_data(sys);
 }
 
+
+FEType FEMContext::find_hardest_fe_type()
+{
+  const System & sys = this->get_system();
+  FEType hardest_fe_type = sys.variable_type(0);
+
+  for (auto i : IntRange<unsigned int>(0, sys.n_vars()))
+    {
+      FEType fe_type = sys.variable_type(i);
+
+      // Make sure we find a non-SCALAR FE family, even in the case
+      // where the first variable(s) weren't
+      if (hardest_fe_type.family == SCALAR)
+        {
+          hardest_fe_type.family = fe_type.family;
+          hardest_fe_type.order = fe_type.order;
+        }
+
+      // FIXME - we don't yet handle mixed finite elements from
+      // different families which require different quadrature rules
+      // libmesh_assert_equal_to (fe_type.family, hardest_fe_type.family);
+
+      // We need to detect SCALAR's so we can prepare FE objects for
+      // them, and so we don't mistake high order scalars as a reason
+      // to crank up the quadrature order on other types.
+      if (fe_type.family != SCALAR && fe_type.order > hardest_fe_type.order)
+        hardest_fe_type = fe_type;
+    }
+
+  return hardest_fe_type;
+}
+
+
+void FEMContext::attach_quadrature_rules()
+{
+  const System & sys = this->get_system();
+  const unsigned int nv = sys.n_vars();
+
+  for (const auto & dim : _elem_dims)
+    {
+      for (unsigned int i=0; i != nv; ++i)
+        {
+          FEType fe_type = sys.variable_type(i);
+
+          _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim].get());
+          _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim].get());
+
+          if (dim == 3)
+            _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule.get());
+        }
+    }
+}
+
+
+
+void FEMContext::use_default_quadrature_rules(int extra_quadrature_order)
+{
+  _extra_quadrature_order = extra_quadrature_order;
+
+  FEType hardest_fe_type = this->find_hardest_fe_type();
+
+  for (const auto & dim : _elem_dims)
+    {
+      // Create an adequate quadrature rule
+      _element_qrule[dim] =
+        hardest_fe_type.default_quadrature_rule(dim, _extra_quadrature_order);
+      _side_qrule[dim] =
+        hardest_fe_type.default_quadrature_rule(dim-1, _extra_quadrature_order);
+      if (dim == 3)
+        _edge_qrule = hardest_fe_type.default_quadrature_rule(1, _extra_quadrature_order);
+    }
+
+  this->attach_quadrature_rules();
+}
+
+
+void FEMContext::use_unweighted_quadrature_rules(int extra_quadrature_order)
+{
+  _extra_quadrature_order = extra_quadrature_order;
+
+  FEType hardest_fe_type = this->find_hardest_fe_type();
+
+  for (const auto & dim : _elem_dims)
+    {
+      // Create an adequate quadrature rule
+      _element_qrule[dim] =
+        hardest_fe_type.unweighted_quadrature_rule(dim, _extra_quadrature_order);
+      _side_qrule[dim] =
+        hardest_fe_type.unweighted_quadrature_rule(dim-1, _extra_quadrature_order);
+      if (dim == 3)
+        _edge_qrule = hardest_fe_type.unweighted_quadrature_rule(1, _extra_quadrature_order);
+    }
+
+  this->attach_quadrature_rules();
+}
+
+
 void FEMContext::init_internal_data(const System & sys)
 {
   // Reserve space for the FEAbstract and QBase objects for each
@@ -101,36 +198,16 @@ void FEMContext::init_internal_data(const System & sys)
   // shape functions to numerically integrate.
 
   unsigned int nv = sys.n_vars();
-
   libmesh_assert (nv);
-  FEType hardest_fe_type = sys.variable_type(0);
 
   bool have_scalar = false;
 
   for (unsigned int i=0; i != nv; ++i)
-    {
-      FEType fe_type = sys.variable_type(i);
-
-      // Make sure we find a non-SCALAR FE family, even in the case
-      // where the first variable(s) weren't
-      if (hardest_fe_type.family == SCALAR)
-        {
-          hardest_fe_type.family = fe_type.family;
-          hardest_fe_type.order = fe_type.order;
-        }
-
-      // FIXME - we don't yet handle mixed finite elements from
-      // different families which require different quadrature rules
-      // libmesh_assert_equal_to (fe_type.family, hardest_fe_type.family);
-
-      // We need to detect SCALAR's so we can prepare FE objects for
-      // them, and so we don't mistake high order scalars as a reason
-      // to crank up the quadrature order on other types.
-      if (fe_type.family == SCALAR)
+    if (sys.variable_type(i).family == SCALAR)
+      {
         have_scalar = true;
-      else if (fe_type.order > hardest_fe_type.order)
-        hardest_fe_type = fe_type;
-    }
+        break;
+      }
 
   if (have_scalar)
     // SCALAR FEs have dimension 0 by assumption
@@ -138,15 +215,7 @@ void FEMContext::init_internal_data(const System & sys)
 
   for (const auto & dim : _elem_dims)
     {
-      // Create an adequate quadrature rule
-      _element_qrule[dim] =
-        hardest_fe_type.default_quadrature_rule(dim, _extra_quadrature_order);
-      _side_qrule[dim] =
-        hardest_fe_type.default_quadrature_rule(dim-1, _extra_quadrature_order);
-      if (dim == 3)
-        _edge_qrule = hardest_fe_type.default_quadrature_rule(1, _extra_quadrature_order);
-
-      // Next, create finite element objects
+      // Create finite element objects
       _element_fe_var[dim].resize(nv);
       _side_fe_var[dim].resize(nv);
       if (dim == 3)
@@ -160,24 +229,20 @@ void FEMContext::init_internal_data(const System & sys)
           if (_element_fe[dim][fe_type] == nullptr)
             {
               _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
-              _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim].get());
               _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
-              _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim].get());
 
               if (dim == 3)
-                {
-                  _edge_fe[fe_type] = FEAbstract::build(dim, fe_type);
-                  _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule.get());
-                }
+                _edge_fe[fe_type] = FEAbstract::build(dim, fe_type);
             }
 
           _element_fe_var[dim][i] = _element_fe[dim][fe_type].get();
           _side_fe_var[dim][i] = _side_fe[dim][fe_type].get();
           if ((dim) == 3)
             _edge_fe_var[i] = _edge_fe[fe_type].get();
-
         }
     }
+
+  this->use_default_quadrature_rules(_extra_quadrature_order);
 }
 
 FEMContext::~FEMContext()

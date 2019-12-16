@@ -387,6 +387,13 @@ int main(int argc, char ** argv)
               ErrorVector error;
               LaplacianErrorEstimator error_estimator;
 
+              // This is another subclass of JumpErrorEstimator, based
+              // on measuring discontinuities across sides between
+              // elements, and we can tell it to use a cheaper
+              // "unweighted" quadrature rule when numerically
+              // integrating those discontinuities.
+              error_estimator.use_unweighted_quadrature_rules = true;
+
               error_estimator.estimate_error(system, error);
               mesh_refinement.flag_elements_by_elem_fraction (error);
 

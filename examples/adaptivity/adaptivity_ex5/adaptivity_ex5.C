@@ -450,6 +450,13 @@ int main (int argc, char ** argv)
               // and which to coarsen.
               KellyErrorEstimator error_estimator;
 
+              // This is a subclass of JumpErrorEstimator, based
+              // on measuring discontinuities across sides between
+              // elements, and we can tell it to use a cheaper
+              // "unweighted" quadrature rule when numerically
+              // integrating those discontinuities.
+              error_estimator.use_unweighted_quadrature_rules = true;
+
               // Compute the error for each active element using the provided
               // flux_jump indicator.  Note in general you will need to
               // provide an error estimator specifically designed for your

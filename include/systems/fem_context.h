@@ -82,6 +82,18 @@ public:
   virtual ~FEMContext ();
 
   /**
+   * Use quadrature rules designed to over-integrate a mass matrix,
+   * plus \p extra_quadrature_order.
+   */
+  void use_default_quadrature_rules(int extra_quadrature_order=0);
+
+  /**
+   * Use quadrature rules designed to exactly integrate unweighted
+   * undistorted basis functions, plus \p extra_quadrature_order.
+   */
+  void use_unweighted_quadrature_rules(int extra_quadrature_order=0);
+
+  /**
    * Reports if the boundary id is found on the current side
    */
   bool has_side_boundary_id(boundary_id_type id) const;
@@ -1001,6 +1013,16 @@ public:
    * Current edge for edge_* to examine
    */
   unsigned char edge;
+
+  /**
+   * Helper function for creating quadrature rules
+   */
+  FEType find_hardest_fe_type();
+
+  /**
+   * Helper function for attaching quadrature rules
+   */
+  void attach_quadrature_rules();
 
   /**
    * Helper function to reduce some code duplication in the *_point_* methods.

@@ -136,6 +136,7 @@ int main(int argc, char ** argv)
           // Error estimation objects, see Adaptivity Example 2 for details
           ErrorVector error;
           KellyErrorEstimator error_estimator;
+          error_estimator.use_unweighted_quadrature_rules = true;
 
           // Compute the error for each active element
           error_estimator.estimate_error(system, error);
