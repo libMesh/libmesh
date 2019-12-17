@@ -451,6 +451,17 @@ public:
     const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const;
 
   /**
+   * Takes a map from subdomain id -> vector of active variable names
+   * as input and returns a corresponding map where the original
+   * variable names have been replaced by their complex counterparts.
+   * Used by the ExodusII_IO::write_element_data_from_discontinuous_nodal_data()
+   * function.
+   */
+  std::map<subdomain_id_type, std::vector<std::string>>
+  get_complex_subdomain_to_var_names(
+    const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names) const;
+
+  /**
    * This is the \p ExodusII_IO_Helper Conversion class.  It provides
    * a data structure which contains \p ExodusII node/edge maps and
    * name conversions.  It's defined below.

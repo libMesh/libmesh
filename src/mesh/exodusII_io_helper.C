@@ -3184,25 +3184,18 @@ void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 }
 
 
-std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names) const
+std::vector<std::string>
+ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names) const
 {
-  std::vector<std::string>::const_iterator names_it = names.begin();
-  std::vector<std::string>::const_iterator names_end = names.end();
-
   std::vector<std::string> complex_names;
 
   // This will loop over all names and create new "complex" names
   // (i.e. names that start with r_, i_ or a_
-  for (; names_it != names_end; ++names_it)
+  for (const auto & name : names)
     {
-      std::stringstream name_real, name_imag, name_abs;
-      name_real << "r_" << *names_it;
-      name_imag << "i_" << *names_it;
-      name_abs << "a_" << *names_it;
-
-      complex_names.push_back(name_real.str());
-      complex_names.push_back(name_imag.str());
-      complex_names.push_back(name_abs.str());
+      complex_names.push_back("r_" + name);
+      complex_names.push_back("i_" + name);
+      complex_names.push_back("a_" + name);
     }
 
   return complex_names;
@@ -3225,6 +3218,40 @@ std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_ac
     }
 
   return complex_vars_active_subdomains;
+}
+
+
+
+std::map<subdomain_id_type, std::vector<std::string>>
+ExodusII_IO_Helper::
+get_complex_subdomain_to_var_names(
+  const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names) const
+{
+  // Eventual return value
+  std::map<subdomain_id_type, std::vector<std::string>> ret;
+
+  for (const auto & pr : subdomain_to_var_names)
+    {
+      // Initialize entry for current subdomain
+      auto & vec = ret[pr.first];
+
+      // Get list of non-complex variable names active on this subdomain.
+      const auto & varnames = pr.second;
+
+      // Allocate space for 3x the number of entries
+      vec.reserve(3 * varnames.size());
+
+      // For each varname in the input map, write three variable names
+      // to the output formed by prepending "r_", "i_", and "a_",
+      // respectively.
+      for (const auto & varname : varnames)
+        {
+          vec.push_back("r_" + varname);
+          vec.push_back("i_" + varname);
+          vec.push_back("a_" + varname);
+        }
+    }
+  return ret;
 }
 
 
