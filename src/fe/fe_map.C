@@ -2046,6 +2046,11 @@ Point FEMap::map (const unsigned int dim,
 {
   libmesh_assert(elem);
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    return InfFEMap::map(dim, elem, reference_point);
+#endif
+
   Point p;
 
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
@@ -2074,6 +2079,11 @@ Point FEMap::map_deriv (const unsigned int dim,
                         const Point & reference_point)
 {
   libmesh_assert(elem);
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    libmesh_not_implemented();
+#endif
 
   Point p;
 
