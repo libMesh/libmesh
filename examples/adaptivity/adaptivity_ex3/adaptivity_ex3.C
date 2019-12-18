@@ -440,6 +440,13 @@ int main(int argc, char ** argv)
                   // driving adaptive refinement in many problems
                   KellyErrorEstimator error_estimator;
 
+                  // This is a subclass of JumpErrorEstimator, based on
+                  // measuring discontinuities across sides between
+                  // elements, and we can tell it to use a cheaper
+                  // "unweighted" quadrature rule when numerically
+                  // integrating those discontinuities.
+                  error_estimator.use_unweighted_quadrature_rules = true;
+
                   error_estimator.estimate_error (system, error);
                 }
 
