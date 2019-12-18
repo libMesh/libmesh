@@ -79,22 +79,19 @@ timpi_optional_LIBS=""
 
 AS_IF([test "x$enablempi" = xyes],
       [
-        ACX_MPI
-        AS_IF([test "x$enablempi" = xno],
+        CONFIGURE_PETSC_MPI
+        AS_IF([test $enablepetsc = yes],
               [
-dnl Double-check for MPI via PETSc; libMesh users are accustomed to
-dnl being able to autodetect MPI support this way.
-                CONFIGURE_PETSC_MPI
-
-                AS_IF([test $enablepetsc != no],
-                      [
-                        timpi_optional_INCLUDES="$PETSCINCLUDEDIRS $timpi_optional_INCLUDES"
-                        timpi_optional_LIBS="$PETSCLINKLIBS $timpi_optional_LIBS"
-                      ])
+                timpi_optional_INCLUDES="$PETSCINCLUDEDIRS $timpi_optional_INCLUDES"
+                timpi_optional_LIBS="$PETSCLINKLIBS $timpi_optional_LIBS"
               ],
               [
-                timpi_optional_INCLUDES="-I$MPI_INCLUDES_PATH $timpi_optional_INCLUDES"
-                timpi_optional_LIBS="-L$MPI_LIBS_PATH $LIBS $timpi_optional_LIBS"
+                ACX_MPI
+                AS_IF([test "x$enablempi" = xyes],
+                      [
+                        timpi_optional_INCLUDES="-I$MPI_INCLUDES_PATH $timpi_optional_INCLUDES"
+                        timpi_optional_LIBS="-L$MPI_LIBS_PATH $LIBS $timpi_optional_LIBS"
+                      ])
               ])
       ])
 
