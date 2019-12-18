@@ -1759,58 +1759,58 @@ system_subset_by_subdomain.h: $(top_srcdir)/include/systems/system_subset_by_sub
 transient_system.h: $(top_srcdir)/include/systems/transient_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-attributes.h: $(top_srcdir)/include/timpi/attributes.h
+attributes.h: $(top_srcdir)/include/timpi_shims/attributes.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-communicator.h: $(top_srcdir)/include/timpi/communicator.h
+communicator.h: $(top_srcdir)/include/timpi_shims/communicator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-data_type.h: $(top_srcdir)/include/timpi/data_type.h
+data_type.h: $(top_srcdir)/include/timpi_shims/data_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-message_tag.h: $(top_srcdir)/include/timpi/message_tag.h
+message_tag.h: $(top_srcdir)/include/timpi_shims/message_tag.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-op_function.h: $(top_srcdir)/include/timpi/op_function.h
+op_function.h: $(top_srcdir)/include/timpi_shims/op_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-packing.h: $(top_srcdir)/include/timpi/packing.h
+packing.h: $(top_srcdir)/include/timpi_shims/packing.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-parallel_implementation.h: $(top_srcdir)/include/timpi/parallel_implementation.h
+parallel_implementation.h: $(top_srcdir)/include/timpi_shims/parallel_implementation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-parallel_sync.h: $(top_srcdir)/include/timpi/parallel_sync.h
+parallel_sync.h: $(top_srcdir)/include/timpi_shims/parallel_sync.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-post_wait_copy_buffer.h: $(top_srcdir)/include/timpi/post_wait_copy_buffer.h
+post_wait_copy_buffer.h: $(top_srcdir)/include/timpi_shims/post_wait_copy_buffer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-post_wait_delete_buffer.h: $(top_srcdir)/include/timpi/post_wait_delete_buffer.h
+post_wait_delete_buffer.h: $(top_srcdir)/include/timpi_shims/post_wait_delete_buffer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-post_wait_dereference_shared_ptr.h: $(top_srcdir)/include/timpi/post_wait_dereference_shared_ptr.h
+post_wait_dereference_shared_ptr.h: $(top_srcdir)/include/timpi_shims/post_wait_dereference_shared_ptr.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-post_wait_dereference_tag.h: $(top_srcdir)/include/timpi/post_wait_dereference_tag.h
+post_wait_dereference_tag.h: $(top_srcdir)/include/timpi_shims/post_wait_dereference_tag.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-post_wait_free_buffer.h: $(top_srcdir)/include/timpi/post_wait_free_buffer.h
+post_wait_free_buffer.h: $(top_srcdir)/include/timpi_shims/post_wait_free_buffer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-post_wait_unpack_buffer.h: $(top_srcdir)/include/timpi/post_wait_unpack_buffer.h
+post_wait_unpack_buffer.h: $(top_srcdir)/include/timpi_shims/post_wait_unpack_buffer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-post_wait_work.h: $(top_srcdir)/include/timpi/post_wait_work.h
+post_wait_work.h: $(top_srcdir)/include/timpi_shims/post_wait_work.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-request.h: $(top_srcdir)/include/timpi/request.h
+request.h: $(top_srcdir)/include/timpi_shims/request.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-standard_type.h: $(top_srcdir)/include/timpi/standard_type.h
+standard_type.h: $(top_srcdir)/include/timpi_shims/standard_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-status.h: $(top_srcdir)/include/timpi/status.h
+status.h: $(top_srcdir)/include/timpi_shims/status.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 compare_types.h: $(top_srcdir)/include/utils/compare_types.h
@@ -1912,6 +1912,6 @@ vectormap.h: $(top_srcdir)/include/utils/vectormap.h
 xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-parallel_communicator_specializations: $(top_srcdir)/include/timpi/parallel_communicator_specializations
+parallel_communicator_specializations: $(top_srcdir)/include/timpi_shims/parallel_communicator_specializations
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
