@@ -992,25 +992,25 @@ include_HEADERS = \
         systems/system_subset.h \
         systems/system_subset_by_subdomain.h \
         systems/transient_system.h \
-        timpi/attributes.h \
-        timpi/communicator.h \
-        timpi/data_type.h \
-        timpi/message_tag.h \
-        timpi/op_function.h \
-        timpi/packing.h \
-        timpi/parallel_communicator_specializations \
-        timpi/parallel_implementation.h \
-        timpi/parallel_sync.h \
-        timpi/post_wait_copy_buffer.h \
-        timpi/post_wait_delete_buffer.h \
-        timpi/post_wait_dereference_shared_ptr.h \
-        timpi/post_wait_dereference_tag.h \
-        timpi/post_wait_free_buffer.h \
-        timpi/post_wait_unpack_buffer.h \
-        timpi/post_wait_work.h \
-        timpi/request.h \
-        timpi/standard_type.h \
-        timpi/status.h \
+        timpi_shims/attributes.h \
+        timpi_shims/communicator.h \
+        timpi_shims/data_type.h \
+        timpi_shims/message_tag.h \
+        timpi_shims/op_function.h \
+        timpi_shims/packing.h \
+        timpi_shims/parallel_communicator_specializations \
+        timpi_shims/parallel_implementation.h \
+        timpi_shims/parallel_sync.h \
+        timpi_shims/post_wait_copy_buffer.h \
+        timpi_shims/post_wait_delete_buffer.h \
+        timpi_shims/post_wait_dereference_shared_ptr.h \
+        timpi_shims/post_wait_dereference_tag.h \
+        timpi_shims/post_wait_free_buffer.h \
+        timpi_shims/post_wait_unpack_buffer.h \
+        timpi_shims/post_wait_work.h \
+        timpi_shims/request.h \
+        timpi_shims/standard_type.h \
+        timpi_shims/status.h \
         utils/compare_types.h \
         utils/enum_to_string.h \
         utils/error_vector.h \
