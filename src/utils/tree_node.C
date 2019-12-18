@@ -531,6 +531,30 @@ TreeNode<N>::find_element (const Point & p,
 
 
 
+template <unsigned int N>
+void
+TreeNode<N>::find_elements (const Point & p,
+                            std::set<const Elem *> & candidate_elements,
+                            const std::set<subdomain_id_type> * allowed_subdomains,
+                            Real relative_tol) const
+{
+  if (this->active())
+    {
+      // Only check our children if the point is in our bounding box
+      // or if the node contains infinite elements
+      if (this->bounds_point(p, relative_tol) || this->contains_ifems)
+        // Search the active elements in the active TreeNode.
+        for (const auto & elem : elements)
+          if (!allowed_subdomains || allowed_subdomains->count(elem->subdomain_id()))
+            if (elem->active() && elem->contains_point(p, relative_tol))
+              candidate_elements.insert(elem);
+    }
+  else
+    this->find_elements_in_children(p, candidate_elements,
+                                    allowed_subdomains, relative_tol);
+}
+
+
 
 template <unsigned int N>
 const Elem * TreeNode<N>::find_element_in_children (const Point & p,
@@ -584,6 +608,24 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
   // success.  So, we should return nullptr since at this point
   // _no_ elements in the tree claim to contain point p.
   return nullptr;
+}
+
+
+
+template <unsigned int N>
+void TreeNode<N>::find_elements_in_children (const Point & p,
+                                             std::set<const Elem *> & candidate_elements,
+                                             const std::set<subdomain_id_type> * allowed_subdomains,
+                                             Real relative_tol) const
+{
+  libmesh_assert (!this->active());
+
+  // First only look in the children whose bounding box
+  // contain the point p.
+  for (std::size_t c=0; c<children.size(); c++)
+    if (children[c]->bounds_point(p, relative_tol))
+      children[c]->find_elements(p, candidate_elements,
+                                 allowed_subdomains, relative_tol);
 }
 
 

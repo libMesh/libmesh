@@ -87,6 +87,17 @@ public:
                                     Real relative_tol = TOLERANCE) const override;
 
   /**
+   * Fills \p candidate_elements with any elements containing the
+   * specified point \p p,
+   * optionally restricted to a set of allowed subdomains,
+   * optionally using a non-zero relative tolerance for searches.
+   */
+  virtual void find_elements(const Point & p,
+                             std::set<const Elem *> & candidate_elements,
+                             const std::set<subdomain_id_type> * allowed_subdomains = nullptr,
+                             Real relative_tol = TOLERANCE) const override;
+
+  /**
    * \returns A pointer to the element containing point p,
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
