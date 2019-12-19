@@ -38712,6 +38712,7 @@ ac_config_files="$ac_config_files contrib/metis/Makefile"
 # -------------------------------------------------------------
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
+if test $enablemetis = yes; then :
 
   # Check whether --enable-parmetis was given.
 if test "${enable_parmetis+set}" = set; then :
@@ -38788,6 +38789,9 @@ fi
 
 
 
+else
+  enableparmetis=no
+fi
 if test $enableparmetis = yes; then :
   libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
 fi
