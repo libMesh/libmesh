@@ -51,13 +51,19 @@ AS_ECHO(["Optional Packages for Testing:"])
 AS_IF([test "x$enablempi" = "xyes"],
       [
         AS_ECHO(["  MPI......................... : yes"])
-        AS_ECHO(["  MPI_INCLUDES_PATH........... : $MPI_INCLUDES_PATH"])
-        AS_ECHO(["  MPI_LIBS_PATH............... : $MPI_LIBS_PATH"])
-        AS_ECHO(["  MPI_LIBS.................... : $MPI_LIBS"])
       ],
       [
         AS_ECHO(["  MPI......................... : no"])
       ])
+AS_IF([test "x$timpi_optional_INCLUDES" != "x"],
+      [
+        AS_ECHO(["  timpi_optional_INCLUDES..... : $timpi_optional_INCLUDES"])
+      ])
+AS_IF([test "x$timpi_optional_LIBS" != "x"],
+      [
+        AS_ECHO(["  timpi_optional_LIBS......... : $timpi_optional_LIBS"])
+      ])
+
 
 AS_ECHO([])
 AS_ECHO(["Configure complete, now type \'make\' and then \'make install\'."])
