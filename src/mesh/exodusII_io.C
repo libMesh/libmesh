@@ -1141,8 +1141,8 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
     output_names = names;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+  std::vector<std::string> complex_names =
+    exio_helper->get_complex_names(output_names);
 
   // Call helper function for opening/initializing data, giving it the
   // complex variable names
