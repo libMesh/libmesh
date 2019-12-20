@@ -928,7 +928,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
-  libmesh_assert_greater (dim*(dim-1),j);
+  libmesh_assert_greater_equal (dim*(dim-1),j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
     libmesh_not_implemented();
@@ -960,7 +960,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
-  libmesh_assert_greater (dim,j);
+  libmesh_assert_greater_equal (dim*(dim-1),j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
     libmesh_not_implemented();
