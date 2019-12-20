@@ -1,3 +1,6 @@
 [submodule "contrib/metaphysicl"]
 	path = contrib/metaphysicl
 	url = ../../roystgnr/MetaPhysicL
+[submodule "contrib/timpi"]
+	path = contrib/timpi
+	url = git@github.com:libMesh/TIMPI
