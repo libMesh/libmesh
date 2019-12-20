@@ -1429,7 +1429,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               const Real eps = 1.e-6;
 
               libmesh_assert_less (i, 4);
-              libmesh_assert_less (j, 3);
 
 
               switch (j)
@@ -1535,7 +1534,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               const Real eps = 1.e-6;
 
               libmesh_assert_less (i, 10);
-              libmesh_assert_less (j, 3);
 
 
               switch (j)
@@ -1820,7 +1818,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               const Real eps = 1.e-6;
 
               libmesh_assert_less (i, 64);
-              libmesh_assert_less (j, 3);
 
               switch (j)
                 {
@@ -2394,7 +2391,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               const Real eps = 1.e-6;
 
               libmesh_assert_less (i, 125);
-              libmesh_assert_less (j, 3);
 
               switch (j)
                 {
