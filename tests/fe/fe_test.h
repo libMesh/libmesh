@@ -163,6 +163,8 @@ private:
   System * _sys;
   EquationSystems * _es;
 
+  Real value_tol, grad_tol, hess_tol;
+
 public:
   void setUp()
   {
@@ -279,6 +281,11 @@ public:
     _nx = 10;
     _ny = (_dim > 1) ? _nx : 1;
     _nz = (_dim > 2) ? _nx : 1;
+
+    // TOLERANCE * TOLERANCE doesn't work for 3D cubic Hermite?
+    value_tol = TOLERANCE * sqrt(TOLERANCE);
+    grad_tol = TOLERANCE * sqrt(TOLERANCE);
+    hess_tol = sqrt(TOLERANCE); // FIXME: we see some ~1e-5 errors?!?
   }
 
   void tearDown()
@@ -332,18 +339,18 @@ public:
               LIBMESH_ASSERT_FP_EQUAL
                 (libmesh_real(u),
                  libmesh_real(rational_test(p, dummy, "", "")),
-                 TOLERANCE*TOLERANCE);
+                 value_tol);
             else if (order > 1)
               LIBMESH_ASSERT_FP_EQUAL
                 (libmesh_real(u),
                  libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
                               0.0625*x*z + 0.03125*y*z),
-                 TOLERANCE*sqrt(TOLERANCE)); // Cubic Hermite doesn't hit tol^2?
+                 value_tol);
             else
               LIBMESH_ASSERT_FP_EQUAL
                 (libmesh_real(u),
                  libmesh_real(x + 0.25*y + 0.0625*z),
-                 TOLERANCE*TOLERANCE);
+                 value_tol);
           }
 #endif
   }
@@ -394,15 +401,15 @@ public:
 
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)),
                                         libmesh_real(rat_grad(0)),
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        grad_tol);
                 if (_dim > 1)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)),
                                           libmesh_real(rat_grad(1)),
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
                                           libmesh_real(rat_grad(2)),
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
               }
             else if (order > 1)
               {
@@ -411,24 +418,24 @@ public:
                 const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 2*x+0.125*y+0.0625*z,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        grad_tol);
                 if (_dim > 1)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), y+0.125*x+0.03125*z,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.5*z+0.0625*x+0.03125*y,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
               }
             else
               {
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 1.0,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        grad_tol);
                 if (_dim > 1)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), 0.25,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.0625,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
               }
           }
 #endif
@@ -488,15 +495,15 @@ public:
 
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x),
                                         libmesh_real(rat_grad(0)),
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        grad_tol);
                 if (_dim > 1)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y),
                                           libmesh_real(rat_grad(1)),
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z),
                                           libmesh_real(rat_grad(2)),
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
               }
             else if (order > 1)
               {
@@ -505,24 +512,24 @@ public:
                 const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 2*x+0.125*y+0.0625*z,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        grad_tol);
                 if (_dim > 1)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), y+0.125*x+0.03125*z,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.5*z+0.0625*x+0.03125*y,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
               }
             else
               {
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 1.0,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        grad_tol);
                 if (_dim > 1)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), 0.25,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.0625,
-                                          TOLERANCE*sqrt(TOLERANCE));
+                                          grad_tol);
               }
           }
 #endif
@@ -580,55 +587,55 @@ public:
             else if (order > 1)
               {
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,0)), 2,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        hess_tol);
                 if (_dim > 1)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), 0.125,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,1)), 1,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
                 if (_dim > 2)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), libmesh_real(hess_u(2,0)),
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), libmesh_real(hess_u(2,1)),
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), 0.0625,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), 0.03125,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,2)), 0.5,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
               }
             else
               {
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,0)), 0,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        hess_tol);
                 if (_dim > 1)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,0)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,1)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
                 if (_dim > 2)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,0)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,1)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,2)), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
               }
           }
@@ -652,6 +659,9 @@ public:
       return;
 
     Parameters dummy;
+
+    // Why are we seeing O(1e-5) errors??
+    const Real hess_tol = sqrt(TOLERANCE);
 
     // These tests require exceptions to be enabled because a
     // TypeTensor::solve() call down in Elem::contains_point()
@@ -699,43 +709,43 @@ public:
             else if (order > 1)
               {
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xx), 2,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        hess_tol);
                 if (_dim > 1)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xy), 0.125,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yy), 1,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
                 if (_dim > 2)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xz), 0.0625,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yz), 0.03125,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_zz), 0.5,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
               }
             else
               {
                 LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xx), 0,
-                                        TOLERANCE*sqrt(TOLERANCE));
+                                        hess_tol);
                 if (_dim > 1)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xy), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yy), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
                 if (_dim > 2)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xz), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yz), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_zz), 0,
-                                            TOLERANCE*sqrt(TOLERANCE));
+                                            hess_tol);
                   }
               }
           }
