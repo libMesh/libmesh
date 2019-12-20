@@ -53,6 +53,39 @@ Gradient linear_test_grad (const Point&,
 }
 
 
+inline
+Number quadratic_test (const Point& p,
+                       const Parameters&,
+                       const std::string&,
+                       const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+  return x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y + 0.0625*x*z + 0.03125*y*z;
+}
+
+inline
+Gradient quadratic_test_grad (const Point & p,
+                              const Parameters&,
+                              const std::string&,
+                              const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+  Gradient grad = 2*x + 0.125*y + 0.0625*z;
+  if (LIBMESH_DIM > 1)
+    grad(1) = y + 0.125*x + 0.03125*z;
+  if (LIBMESH_DIM > 2)
+    grad(2) = 0.5*z + 0.0625*x + 0.03125*y;
+
+  return grad;
+}
+
+
 // Higher order rational bases need uniform weights to exactly
 // represent linears; we can easily try out other functions on
 // tensor product elements.
@@ -200,6 +233,10 @@ public:
       {
         _sys->project_solution(rational_test, rational_test_grad, _es->parameters);
       }
+    else if (order > 1)
+      {
+        _sys->project_solution(quadratic_test, quadratic_test_grad, _es->parameters);
+      }
     else
       {
         _sys->project_solution(linear_test, linear_test_grad, _es->parameters);
@@ -279,6 +316,12 @@ public:
                 (libmesh_real(u),
                  libmesh_real(rational_test(p, dummy, "", "")),
                  TOLERANCE*TOLERANCE);
+            else if (order > 1)
+              LIBMESH_ASSERT_FP_EQUAL
+                (libmesh_real(u),
+                 libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
+                              0.0625*x*z + 0.03125*y*z),
+                 TOLERANCE*sqrt(TOLERANCE)); // Cubic Hermite doesn't hit tol^2?
             else
               LIBMESH_ASSERT_FP_EQUAL
                 (libmesh_real(u),
@@ -342,6 +385,21 @@ public:
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
                                           libmesh_real(rat_grad(2)),
+                                          TOLERANCE*sqrt(TOLERANCE));
+              }
+            else if (order > 1)
+              {
+                const Real & x = p(0);
+                const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+                const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 2*x+0.125*y+0.0625*z,
+                                        TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 1)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), y+0.125*x+0.03125*z,
+                                          TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 2)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.5*z+0.0625*x+0.03125*y,
                                           TOLERANCE*sqrt(TOLERANCE));
               }
             else
@@ -421,6 +479,21 @@ public:
                 if (_dim > 2)
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z),
                                           libmesh_real(rat_grad(2)),
+                                          TOLERANCE*sqrt(TOLERANCE));
+              }
+            else if (order > 1)
+              {
+                const Real & x = p(0);
+                const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+                const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 2*x+0.125*y+0.0625*z,
+                                        TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 1)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), y+0.125*x+0.03125*z,
+                                          TOLERANCE*sqrt(TOLERANCE));
+                if (_dim > 2)
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.5*z+0.0625*x+0.03125*y,
                                           TOLERANCE*sqrt(TOLERANCE));
               }
             else
