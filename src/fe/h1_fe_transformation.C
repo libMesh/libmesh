@@ -466,7 +466,7 @@ void H1FETransformation<OutputShape>::map_d2phi(const unsigned int dim,
                 d2zetadxyz2[p][1]*dphidzeta[i][p];                                                   // zeta_{x y} * phi_{zeta}
 
               // phi_{x z}
-              d2phi[i][p].slice(0).slice(2) = d2phi[i][p].slice(2).slice(0) = d2phidy2[i][p] =
+              d2phi[i][p].slice(0).slice(2) = d2phi[i][p].slice(2).slice(0) = d2phidxdz[i][p] =
                 d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +                                          // xi_x * xi_z * phi_{xi xi}
                 d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +                                       // eta_x * eta_z * phi_{eta eta}
                 d2phidzeta2[i][p]*dzetadx_map[p]*dzetadz_map[p] +                                    // zeta_x * zeta_z * phi_{zeta zeta}
@@ -478,7 +478,7 @@ void H1FETransformation<OutputShape>::map_d2phi(const unsigned int dim,
                 d2zetadxyz2[p][2]*dphidzeta[i][p];                                                   // zeta_{x z} * phi_{zeta}
 
               // phi_{y y}
-              d2phi[i][p].slice(1).slice(1) = d2phidxdz[i][p] =
+              d2phi[i][p].slice(1).slice(1) = d2phidy2[i][p] =
                 d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +           // (xi_y)^2 * phi_{xi xi}
                 d2phideta2[i][p]*detady_map[p]*detady_map[p] +        // (eta_y)^2 * phi_{eta eta}
                 d2phidzeta2[i][p]*dzetady_map[p]*dzetady_map[p] +     // (zeta_y)^2 * phi_{zeta zeta}
