@@ -3,4 +3,4 @@
 	url = ../../roystgnr/MetaPhysicL
 [submodule "contrib/timpi"]
 	path = contrib/timpi
-	url = git@github.com:libMesh/TIMPI
+	url = ../../libMesh/TIMPI
