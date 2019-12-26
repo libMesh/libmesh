@@ -83,7 +83,8 @@ RBConstruction::RBConstruction (EquationSystems & es,
     use_energy_inner_product(false),
     rel_training_tolerance(1.e-4),
     abs_training_tolerance(1.e-12),
-    normalize_rb_bound_in_greedy(false)
+    normalize_rb_bound_in_greedy(false),
+    RB_training_type("Greedy")
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -212,6 +213,8 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
   const bool normalize_rb_bound_in_greedy_in = infile("normalize_rb_bound_in_greedy",
                                                       false);
 
+  const std::string RB_training_type_in = infile("RB_training_type", "Greedy");
+
   // Read in the parameters from the input file too
   unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
   RBParameters mu_min_in;
@@ -263,6 +266,7 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
                                  rel_training_tolerance_in,
                                  abs_training_tolerance_in,
                                  normalize_rb_bound_in_greedy_in,
+                                 RB_training_type_in,
                                  mu_min_in,
                                  mu_max_in,
                                  discrete_parameter_values_in,
@@ -278,6 +282,7 @@ void RBConstruction::set_rb_construction_parameters(
                                                     Real rel_training_tolerance_in,
                                                     Real abs_training_tolerance_in,
                                                     bool normalize_rb_bound_in_greedy_in,
+                                                    const std::string & RB_training_type_in,
                                                     RBParameters mu_min_in,
                                                     RBParameters mu_max_in,
                                                     std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
@@ -299,6 +304,8 @@ void RBConstruction::set_rb_construction_parameters(
 
   set_normalize_rb_bound_in_greedy(normalize_rb_bound_in_greedy_in);
 
+  set_RB_training_type(RB_training_type_in);
+
   // Initialize the parameter ranges and the parameters themselves
   initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
@@ -318,6 +325,7 @@ void RBConstruction::print_info()
   libMesh::out << "Greedy relative error tolerance: " << get_rel_training_tolerance() << std::endl;
   libMesh::out << "Greedy absolute error tolerance: " << get_abs_training_tolerance() << std::endl;
   libMesh::out << "Do we normalize RB error bound in greedy? " << get_normalize_rb_bound_in_greedy() << std::endl;
+  libMesh::out << "RB training type: " << get_RB_training_type() << std::endl;
   if (is_rb_eval_initialized())
     {
       libMesh::out << "Aq operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
@@ -1023,7 +1031,26 @@ void RBConstruction::assemble_all_output_vectors()
 
 Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 {
-  LOG_SCOPE("train_reduced_basis()", "RBConstruction");
+  if(get_RB_training_type() == "Greedy")
+    {
+      return train_reduced_basis_with_greedy(resize_rb_eval_data);
+    }
+  else if (get_RB_training_type() == "POD")
+    {
+      train_reduced_basis_with_POD();
+      return 0.;
+    }
+  else
+    {
+      libmesh_error_msg("RB training type not recognized: " + get_RB_training_type());
+    }
+
+  return 0.;
+}
+
+Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_data)
+{
+  LOG_SCOPE("train_reduced_basis_with_greedy()", "RBConstruction");
 
   int count = 0;
 
@@ -1189,6 +1216,116 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
     }
 }
 
+void RBConstruction::train_reduced_basis_with_POD()
+{
+  if(!serial_training_set)
+    {
+      // We need to use the same training set on all processes so that
+      // the truth solves below work correctly in parallel.
+      libmesh_error_msg("We must use a serial training set with POD");
+    }
+
+  if(get_rb_evaluation().get_n_basis_functions() > 0)
+    {
+      libmesh_error_msg("Basis should not already be initialized");
+    }
+
+  get_rb_evaluation().initialize_parameters(*this);
+  get_rb_evaluation().resize_data_structures(get_Nmax());
+
+  // Storage for the POD snapshots
+  const unsigned int n_snapshots = get_n_training_samples();
+  std::vector<std::unique_ptr<NumericVector<Number>>> POD_snapshots(n_snapshots);
+  for (unsigned int i=0; i<n_snapshots; i++)
+    {
+      POD_snapshots[i] = NumericVector<Number>::build(this->comm());
+      POD_snapshots[i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
+    }
+
+  // We use the same training set on all processes
+  libMesh::out << std::endl;
+  for (unsigned int i=0; i<n_snapshots; i++)
+    {
+      set_params_from_training_set(i);
+
+      libMesh::out << "Truth solve " << (i+1) << " of " << n_snapshots << std::endl;
+
+      truth_solve(-1);
+
+      *POD_snapshots[i] = *solution;
+    }
+  libMesh::out << std::endl;
+
+  // Set up the "correlation matrix"
+  DenseMatrix<Number> correlation_matrix(n_snapshots,n_snapshots);
+  for (unsigned int i=0; i<n_snapshots; i++)
+    {
+      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(
+        *inner_product_storage_vector, *POD_snapshots[i]);
+
+      for (unsigned int j=0; j<=i; j++)
+        {
+          Number inner_prod = (POD_snapshots[j]->dot(*inner_product_storage_vector));
+
+          correlation_matrix(i,j) = inner_prod;
+          if(i != j)
+            {
+              correlation_matrix(j,i) = libmesh_conj(inner_prod);
+            }
+        }
+    }
+
+  // compute SVD of correlation matrix
+  DenseVector<Real> sigma( n_snapshots );
+  DenseMatrix<Number> U( n_snapshots, n_snapshots );
+  DenseMatrix<Number> VT( n_snapshots, n_snapshots );
+  correlation_matrix.svd(sigma, U, VT );
+
+  // Add dominant vectors from the POD as basis functions.
+  unsigned int j = 0;
+  while (true)
+  {
+    // The "energy" error in the POD approximation is determined by the first omitted
+    // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
+    // "energy", in order to obtain a relative error.
+    const Real rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+
+    if (j >= get_Nmax() || j >= n_snapshots)
+    {
+      break;
+    }
+
+    if (rel_err < this->rel_training_tolerance)
+    {
+      break;
+    }
+
+    if(sigma(j) == 0.)
+      {
+        libmesh_error_msg("Zero singular value encountered in POD construction");
+      }
+
+    std::cout << "Adding basis function " << j << ", POD error norm: " << rel_err << std::endl;
+
+    std::unique_ptr< NumericVector<Number> > v = POD_snapshots[j]->zero_clone();
+    for ( unsigned int i=0; i<n_snapshots; ++i )
+    {
+      v->add( U.el(i, j), *POD_snapshots[i] );
+    }
+
+    Real norm_v = std::sqrt(sigma(j));
+    v->scale( 1./norm_v );
+
+    get_rb_evaluation().basis_functions.emplace_back( std::move(v) );
+
+    j++;
+  }
+  libMesh::out << std::endl;
+
+  this->delta_N = get_rb_evaluation().get_n_basis_functions();
+  update_system();
+}
+
 bool RBConstruction::greedy_termination_test(Real abs_greedy_error,
                                              Real initial_error,
                                              int)
@@ -1295,6 +1432,23 @@ Real RBConstruction::truth_solve(int plot_solution)
   Number truth_X_norm = std::sqrt(inner_product_storage_vector->dot(*solution));
 
   return libmesh_real(truth_X_norm);
+}
+
+void RBConstruction::set_RB_training_type(const std::string & RB_training_type_in)
+{
+  this->RB_training_type = RB_training_type_in;
+
+  if(this->RB_training_type == "POD")
+    {
+      // We need to use a serial training set (so that the training
+      // set is the same on all processes) if we're using POD
+      this->serial_training_set = true;
+    }
+}
+
+const std::string & RBConstruction::get_RB_training_type() const
+{
+  return RB_training_type;
 }
 
 void RBConstruction::set_Nmax(unsigned int Nmax_in)
