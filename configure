@@ -700,8 +700,10 @@ LIBMESH_ENABLE_NETCDF_V4_FALSE
 LIBMESH_ENABLE_NETCDF_V4_TRUE
 LIBMESH_ENABLE_NETCDF_FALSE
 LIBMESH_ENABLE_NETCDF_TRUE
-NETCDF_INCLUDE
+NETCDF_LIBRARY
 subdirs
+NETCDF_DIR
+NETCDF_INCLUDE
 LIBMESH_ENABLE_HDF5_FALSE
 LIBMESH_ENABLE_HDF5_TRUE
 HDF5_PREFIX
@@ -1256,7 +1258,10 @@ with_curl_include
 with_curl_lib
 enable_hdf5
 with_hdf5
+with_netcdf
+with_netcdf_lib
 enable_netcdf
+enable_netcdf_required
 enable_exodus
 enable_exodus_fortran
 enable_nemesis
@@ -1300,6 +1305,8 @@ TRILINOS_DIR
 VTK_INCLUDE
 VTK_DIR
 HDF5_DIR
+NETCDF_INCLUDE
+NETCDF_DIR
 YACC
 YFLAGS'
 ac_subdirs_all='contrib/netcdf/v4
@@ -2052,6 +2059,8 @@ Optional Features:
   --enable-hdf5           build libmesh with HDF5 support, the selected HDF5
                           must be compatible with contrib/netcdf
   --disable-netcdf        build without netCDF binary I/O
+  --enable-netcdf-required
+                          Error if NETCDF is not detected by configure
   --disable-exodus        build without ExodusII API support
   --enable-exodus-fortran build with ExodusII Fortran API support
   --disable-nemesis       build without NemesisII API support
@@ -2142,6 +2151,9 @@ Optional Packages:
   --with-curl-lib=PATH    Specify the path for CURL libs
   --with-hdf5=DIR         root directory of HDF5 installation (default =
                           HDF5_DIR)
+  --with-netcdf-include=PATH
+                          Specify the path for NETCDF header files
+  --with-netcdf-lib=PATH  Specify the path for NETCDF libs
   --with-fparser=<release|none|devel>
                           Determine which version of the C++ function parser
                           to use
@@ -2183,6 +2195,9 @@ Some influential environment variables:
   VTK_INCLUDE path to VTK header files
   VTK_DIR     path to VTK installation
   HDF5_DIR    root directory of HDF5 installation
+  NETCDF_INCLUDE
+              path to NETCDF header files
+  NETCDF_DIR  path to NETCDF installation
   YACC        The `Yet Another Compiler Compiler' implementation to use.
               Defaults to the first program found out of: `bison -y', `byacc',
               `yacc'.
@@ -41241,80 +41256,252 @@ fi
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
 
+
+# Check whether --with-netcdf was given.
+if test "${with_netcdf+set}" = set; then :
+  withval=$with_netcdf; withnetcdfinc=$withval
+else
+  withnetcdfinc=no
+fi
+
+
+
+# Check whether --with-netcdf-lib was given.
+if test "${with_netcdf_lib+set}" = set; then :
+  withval=$with_netcdf_lib; withnetcdflib=$withval
+else
+  withnetcdflib=no
+fi
+
+
+
+
+
   # Check whether --enable-netcdf was given.
 if test "${enable_netcdf+set}" = set; then :
   enableval=$enable_netcdf; case "${enableval}" in #(
   yes|new|v4) :
     enablenetcdf=yes
-                                 netcdfversion=4 ;; #(
+                                 netcdfmajor=4 ;; #(
   old|v3) :
     enablenetcdf=yes
-                                 netcdfversion=3 ;; #(
+                                 netcdfmajor=3 ;; #(
   no) :
     enablenetcdf=no
-                                 netcdfversion=no ;; #(
+                                 netcdfmajor=no ;; #(
   *) :
     as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
 esac
 else
-  enablenetcdf=$enableoptional; netcdfversion=4
+  enablenetcdf=$enableoptional; netcdfmajor=4
 fi
 
 
-    if test "x$enablenetcdf" = "xno"; then :
-  netcdfversion=no
+              # Check whether --enable-netcdf-required was given.
+if test "${enable_netcdf_required+set}" = set; then :
+  enableval=$enable_netcdf_required; case "${enableval}" in #(
+  yes) :
+    netcdfrequired=yes ;; #(
+  no) :
+    netcdfrequired=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-netcdf-required" "$LINENO" 5 ;;
+esac
+else
+  netcdfrequired=no
 fi
 
-    if test "x$netcdfversion" = "x3"; then :
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using netCDF 3.x is no longer supported, using version 4.x instead. >>>" >&5
+  if test "$enablenetcdf" = "yes"; then :
+
+        if test "$withnetcdfinc" != "no"; then :
+  NETCDF_INC="$withnetcdfinc"
+fi
+        if test "$withnetcdflib" != "no"; then :
+  NETCDF_LIB="$withnetcdflib"
+fi
+
+                if test "x$NETCDF_DIR" = "x"; then :
+  NETCDF_DIR=${top_srcdir}/contrib/netcdf/v4
+fi
+
+                NETCDF_LS_CHECK=$(dirname $(ls -d $NETCDF_DIR/include/netcdf.h 2>/dev/null | tail -n 1) 2>/dev/null)
+        if test "x$NETCDF_INC" = "x"; then :
+
+                if test "x$NETCDF_INCLUDE" != "x"; then :
+  if test -d $NETCDF_INCLUDE; then :
+  NETCDF_INC=$NETCDF_INCLUDE
+fi
+elif test -d $NETCDF_LS_CHECK; then :
+  NETCDF_INC=$NETCDF_LS_CHECK
+elif test "x$NETCDF_DIR" != "x"; then :
+  NETCDF_INC=$NETCDF_DIR/include
+else
+  NETCDF_INC="/usr/include"
+fi
+
+fi
+
+        if test "x$NETCDF_LIB" = "x"; then :
+
+                if test "x$NETCDF_DIR" != x; then :
+  NETCDF_LIB=$NETCDF_DIR/lib
+else
+  NETCDF_LIB="/usr/lib"
+fi
+
+fi
+
+
+                netcdfincFound=no;
+
+        for ac_header in $NETCDF_INC/netcdf.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+ netcdfincFound=yes
+fi
+
+done
+
+
+        if test "$netcdfincFound" = "no"; then :
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: NETCDF header files not found!" >&5
+$as_echo "NETCDF header files not found!" >&6; }
+                enablenetcdf=no;
+
+fi
+
+                        if test "x$enablenetcdf" = "xyes"; then :
+
+                                if test -r $NETCDF_INC/netcdf_meta.h; then :
+
+                      netcdfmajor=`grep "define NC_VERSION_MAJOR" /usr/include/netcdf_meta.h | sed -e "s/.*define NC_VERSION_MAJOR *\(.\) .*/\1/g"`
+                      netcdfminor=`grep "define NC_VERSION_MINOR" /usr/include/netcdf_meta.h | sed -e "s/.*define NC_VERSION_MINOR *\(.\) .*/\1/g"`
+                      netcdfpatch=`grep "define NC_VERSION_PATCH" /usr/include/netcdf_meta.h | sed -e "s/.*define NC_VERSION_PATCH *\(.\) .*/\1/g"`
+
+fi
+                netcdfversion=$netcdfmajor.$netcdfminor.$netcdfpatch
+                netcdfmajorminor=$netcdfmajor.$netcdfminor
+
+fi
+
+                if test "x$enablenetcdf" = "xno"; then :
+  netcdfmajor=no
+fi
+
+                if test "x$netcdfmajor" = "x3"; then :
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using netCDF 3.x is no longer supported, using version 4.x instead. >>>" >&5
 $as_echo "<<< Using netCDF 3.x is no longer supported, using version 4.x instead. >>>" >&6; }
-          netcdfversion=4
+                netcdfmajor=4
 
 fi
 
-  case "${netcdfversion}" in #(
+        case "${netcdfmajor}" in #(
   3) :
 
-                                  as_fn_error $? ">>> Error: netCDF3 is no longer distributed with libMesh <<<" "$LINENO" 5
-                ;; #(
+                                              as_fn_error $? ">>> Error: netCDF3 is no longer distributed with libMesh <<<" "$LINENO" 5
+                      ;; #(
   4) :
-    NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
+    NETCDF_INCLUDE=$NETCDF_INC
+
+                                            old_LIBS="$LIBS"
+                      old_CPPFLAGS="$CPPFLAGS"
+
+                      NETCDF_INCLUDE="-I$NETCDF_INC"
+
+                      # If this compiler supports -rpath commands, create a
+                      # variable for them now that can be used in $LIBS below.  We
+                      # ran across an issue where GCC's linker actually needed
+                      # -rpath flags in order to *link* a test program.  From the
+                      # man page for GNU ld:
+                      #   The -rpath option is also used when locating shared objects
+                      #   which are needed by shared objects explicitly included in
+                      #   the link; see the description of the -rpath-link option.
+                      if test "x$RPATHFLAG" != "x" && test -d $NETCDF_LIB; then :
+  NETCDF_RPATH_FLAGS="${RPATHFLAG}${NETCDF_LIB}"
+                             NETCDF_LIBRARY="${RPATHFLAG}${NETCDF_LIB} $NETCDF_LIBRARY"
+
+else
+  NETCDF_LIBRARY="-L${NETCDF_LIB} -lnetcdf $NETCDF_LIBRARY"
+fi
+                                                                  LIBS="$LIBS -lnetcdf -L/usr/lib"
+                      CPPFLAGS="$CPPFLAGS -I/usr/include"
+
+                                                                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+            #include "netcdf.h"
+
+int
+main ()
+{
+
+              static int ncid;
+              nc_create("test.nc", NC_NETCDF4|NC_CLOBBER, &ncid);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
 
 $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
-                                if test "x$enablenested" = "xno"; then :
+else
+  as_fn_error $? "*** Linking a test program against the NETCDF libraries failed" "$LINENO" 5
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+                                            if test "$NETCDF_INCLUDE" = "xno"; then :
   as_fn_error $? "NetCDF v4 requires nested subpackages, try --enable-nested" "$LINENO" 5
 fi
 
-                                if test "x$enablehdf5" = "xno"; then :
+                                            if test "x$enablehdf5" = "xno"; then :
   libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 fi
 
-                                libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
-$as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; } ;; #(
+                                            libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
+                      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version $netcdfversion support >>>" >&5
+$as_echo "<<< Configuring library with NetCDF version $netcdfversion support >>>" >&6; } ;; #(
   *) :
 
-            NETCDF_INCLUDE=""
-            enablenetcdf=no
-           ;;
+                  NETCDF_INCLUDE=""
+                  enablenetcdf=no
+                 ;;
 esac
 
-    if test "x$enablenested" = "xyes"; then :
+                if test "x$enablenested" = "xyes"; then :
 
-                    if test "x$enablecurl" = "xyes"; then :
+                              if test "x$enablecurl" = "xyes"; then :
   libmesh_subpackage_arguments="$libmesh_subpackage_arguments --enable-dap"
 else
   libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-dap --disable-curl"
 fi
-                    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-testsets"
-          subdirs="$subdirs contrib/netcdf/v4"
+                              libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-testsets"
+               if test "$NETCDF_INC" = contrib/netcdf/v4/include; then :
+  subdirs="$subdirs contrib/netcdf/v4"
+
+fi
+
+fi
 
 
 fi
 
 
+
+
+      if test "$enablenetcdf" = "no" && test "$netcdfrequired" = "yes"; then :
+                                  as_fn_error 4 "*** NETCDF was not found, but --enable-netcdf-required was specified." "$LINENO" 5
+fi
 
 if test $enablenetcdf = yes; then :
   libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"
