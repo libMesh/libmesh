@@ -141,8 +141,17 @@ public:
   virtual Real truth_solve(int plot_solution);
 
   /**
-   * Train the reduced basis. This is the crucial function in the Offline
-   * stage: it generates the reduced basis using the "Greedy algorithm."
+   * Train the reduced basis. This can use different approaches, e.g. Greedy
+   * or POD, which are chosen using the RB_training_type member variable.
+   *
+   * In the case that we use Greedy training, this function returns the
+   * final maximum a posteriori error bound on the training set.
+   */
+  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true);
+
+  /**
+   * Train the reduced basis using the "Greedy algorithm."
+   *
    * Each stage of the Greedy algorithm involves solving the reduced basis
    * over a large training set and selecting the parameter at which the
    * reduced basis error bound is largest, then performing a truth_solve
@@ -156,7 +165,7 @@ public:
    *
    * \returns The final maximum a posteriori error bound on the training set.
    */
-  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true);
+  Real train_reduced_basis_with_greedy(const bool resize_rb_eval_data);
 
   /**
    * This function computes one basis function for each rhs term. This is
@@ -164,6 +173,23 @@ public:
    * that we do not have any "left-hand side" parameters, for example.
    */
   void enrich_basis_from_rhs_terms(const bool resize_rb_eval_data=true);
+
+  /**
+   * Train the reduced basis using Proper Orthogonal Decomposition (POD).
+   * This is an alternative to train_reduced_basis(), which uses the RB greedy
+   * algorithm. In contrast to the RB greedy algorithm, POD requires us to
+   * perform truth solves at all training samples, which can be computationally
+   * intensive.
+   *
+   * The main advantage of using POD is that it does not rely on the RB error
+   * indicator. The RB error indicator typically stagnates due to rounding
+   * error at approximately square-root of machine precision, since it involves
+   * taking the square-root of a sum of terms that cancel. This error indicator
+   * stagnation puts a limit on the accuracy level that can be achieved with
+   * the RB greedy algorithm, so for cases where we need higher accuracy, the
+   * POD approach is a good alternative.
+   */
+  void train_reduced_basis_with_POD();
 
   /**
    * (i) Compute the a posteriori error bound for each set of parameters
@@ -198,6 +224,12 @@ public:
   void set_normalize_rb_bound_in_greedy(bool normalize_rb_bound_in_greedy_in)
   {this->normalize_rb_bound_in_greedy = normalize_rb_bound_in_greedy_in; }
   bool get_normalize_rb_bound_in_greedy() { return normalize_rb_bound_in_greedy; }
+
+  /**
+   * Get/set the string that determines the training type.
+   */
+  void set_RB_training_type(const std::string & RB_training_type_in);
+  const std::string & get_RB_training_type() const;
 
   /**
    * Get/set Nmax, the maximum number of RB
@@ -390,6 +422,7 @@ public:
                                       Real rel_training_tolerance_in,
                                       Real abs_training_tolerance_in,
                                       bool normalize_rb_error_bound_in_greedy_in,
+                                      const std::string & RB_training_type_in,
                                       RBParameters mu_min_in,
                                       RBParameters mu_max_in,
                                       std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
@@ -859,6 +892,14 @@ private:
    * RBEvaluation::get_error_bound_normalization().
    */
   bool normalize_rb_bound_in_greedy;
+
+  /**
+   * This string indicates the type of training that we will use.
+   * Options are:
+   *  - Greedy: Reduced basis greedy algorithm
+   *  - POD: Proper Orthogonal Decomposition
+   */
+  std::string RB_training_type;
 
 };
 
