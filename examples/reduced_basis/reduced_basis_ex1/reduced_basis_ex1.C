@@ -116,10 +116,6 @@ int main (int argc, char ** argv)
   if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
 
-  int use_POD_training = 0;
-  if (command_line.search(1, "-use_POD_training"))
-    use_POD_training = command_line.next(use_POD_training);
-
   // Build a mesh on the default MPI communicator.
   Mesh mesh (init.comm(), dim);
   MeshTools::Generation::build_square (mesh,
