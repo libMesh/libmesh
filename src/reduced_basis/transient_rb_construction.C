@@ -823,7 +823,7 @@ void TransientRBConstruction::enrich_RB_space()
 
       // Perform the matrix multiplication of temporal data with
       // the next POD eigenvector
-      for (int i=0; i<n_snapshots; i++)
+      for (unsigned int i=0; i<n_snapshots; i++)
         {
           current_bf.add( U.el(i,j), *temporal_data[i] );
         }
