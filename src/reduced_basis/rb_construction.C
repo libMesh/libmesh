@@ -1284,42 +1284,42 @@ void RBConstruction::train_reduced_basis_with_POD()
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
   while (true)
-  {
-    // The "energy" error in the POD approximation is determined by the first omitted
-    // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
-    // "energy", in order to obtain a relative error.
-    const Real rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
-
-    if (j >= get_Nmax() || j >= n_snapshots)
     {
-      break;
+      // The "energy" error in the POD approximation is determined by the first omitted
+      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
+      // "energy", in order to obtain a relative error.
+      const Real rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+
+      if (j >= get_Nmax() || j >= n_snapshots)
+        {
+          break;
+        }
+
+      if (rel_err < this->rel_training_tolerance)
+        {
+          break;
+        }
+
+      if(sigma(j) == 0.)
+        {
+          libmesh_error_msg("Zero singular value encountered in POD construction");
+        }
+
+      std::cout << "Adding basis function " << j << ", POD error norm: " << rel_err << std::endl;
+
+      std::unique_ptr< NumericVector<Number> > v = POD_snapshots[j]->zero_clone();
+      for ( unsigned int i=0; i<n_snapshots; ++i )
+        {
+          v->add( U.el(i, j), *POD_snapshots[i] );
+        }
+
+      Real norm_v = std::sqrt(sigma(j));
+      v->scale( 1./norm_v );
+
+      get_rb_evaluation().basis_functions.emplace_back( std::move(v) );
+
+      j++;
     }
-
-    if (rel_err < this->rel_training_tolerance)
-    {
-      break;
-    }
-
-    if(sigma(j) == 0.)
-      {
-        libmesh_error_msg("Zero singular value encountered in POD construction");
-      }
-
-    std::cout << "Adding basis function " << j << ", POD error norm: " << rel_err << std::endl;
-
-    std::unique_ptr< NumericVector<Number> > v = POD_snapshots[j]->zero_clone();
-    for ( unsigned int i=0; i<n_snapshots; ++i )
-    {
-      v->add( U.el(i, j), *POD_snapshots[i] );
-    }
-
-    Real norm_v = std::sqrt(sigma(j));
-    v->scale( 1./norm_v );
-
-    get_rb_evaluation().basis_functions.emplace_back( std::move(v) );
-
-    j++;
-  }
   libMesh::out << std::endl;
 
   this->delta_N = get_rb_evaluation().get_n_basis_functions();
