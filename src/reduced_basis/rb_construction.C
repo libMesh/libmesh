@@ -1285,6 +1285,11 @@ void RBConstruction::train_reduced_basis_with_POD()
   unsigned int j = 0;
   while (true)
     {
+      if(sigma(j) == 0.)
+        {
+          libmesh_error_msg("Zero singular value encountered in POD construction");
+        }
+
       // The "energy" error in the POD approximation is determined by the first omitted
       // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
       // "energy", in order to obtain a relative error.
@@ -1298,11 +1303,6 @@ void RBConstruction::train_reduced_basis_with_POD()
       if (rel_err < this->rel_training_tolerance)
         {
           break;
-        }
-
-      if(sigma(j) == 0.)
-        {
-          libmesh_error_msg("Zero singular value encountered in POD construction");
         }
 
       std::cout << "Adding basis function " << j << ", POD error norm: " << rel_err << std::endl;
