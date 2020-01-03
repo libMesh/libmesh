@@ -260,11 +260,13 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 
   // Run TetGen triangulation method
 
-  // Assemble switches: we append the user's switches (if any) to 'p',
-  // which tetrahedralizes a piecewise linear complex (see definition
-  // in user manual)
+  // Assemble switches: we append the user's switches (if any) to
+  //  - 'p'  tetrahedralize a piecewise linear complex
+  //  - 'C'  check consistency of mesh (avoid inverted elements)
+  //  (see definition and further options in user manual
+  //  http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual005.html )
   std::ostringstream oss;
-  oss << "p";
+  oss << "pC";
   oss << _switches;
 
   if (quality_constraint != 0)
