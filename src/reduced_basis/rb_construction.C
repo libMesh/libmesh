@@ -1234,7 +1234,18 @@ void RBConstruction::train_reduced_basis_with_POD()
   get_rb_evaluation().resize_data_structures(get_Nmax());
 
   // Storage for the POD snapshots
-  const unsigned int n_snapshots = get_n_training_samples();
+  unsigned int n_snapshots = get_n_training_samples();
+
+  if (get_n_params() == 0)
+    {
+      // In this case we should have generated an empty training set
+      // so assert this
+      libmesh_assert(n_snapshots == 0);
+
+      // If we have no parameters, then we should do exactly one "truth solve"
+      n_snapshots = 1;
+    }
+
   std::vector<std::unique_ptr<NumericVector<Number>>> POD_snapshots(n_snapshots);
   for (unsigned int i=0; i<n_snapshots; i++)
     {
@@ -1246,7 +1257,10 @@ void RBConstruction::train_reduced_basis_with_POD()
   libMesh::out << std::endl;
   for (unsigned int i=0; i<n_snapshots; i++)
     {
-      set_params_from_training_set(i);
+      if (get_n_params() > 0)
+        {
+          set_params_from_training_set(i);
+        }
 
       libMesh::out << "Truth solve " << (i+1) << " of " << n_snapshots << std::endl;
 
@@ -1290,22 +1304,25 @@ void RBConstruction::train_reduced_basis_with_POD()
           libmesh_error_msg("Zero singular value encountered in POD construction");
         }
 
+      if (j >= get_Nmax() || j >= n_snapshots)
+        {
+          libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
+          break;
+        }
+
       // The "energy" error in the POD approximation is determined by the first omitted
       // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
       // "energy", in order to obtain a relative error.
       const Real rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
 
-      if (j >= get_Nmax() || j >= n_snapshots)
-        {
-          break;
-        }
+      libMesh::out << "Number of basis functions: " << j
+                   << ", POD error norm: " << rel_err << std::endl;
 
       if (rel_err < this->rel_training_tolerance)
         {
+          libMesh::out << "Training tolerance reached." << std::endl;
           break;
         }
-
-      std::cout << "Adding basis function " << j << ", POD error norm: " << rel_err << std::endl;
 
       std::unique_ptr< NumericVector<Number> > v = POD_snapshots[j]->zero_clone();
       for ( unsigned int i=0; i<n_snapshots; ++i )
