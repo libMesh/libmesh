@@ -1773,8 +1773,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
 #if LIBMESH_DIM > 1
                   if (dim > 1)
                     {
-                      // We'll finite difference mixed derivatives
-                      Real delta_x = TOLERANCE * elem.hmin();
+                      // We'll finite difference mixed derivatives.
+                      // This delta_x used to be TOLERANCE*hmin, but
+                      // the factor of 10 improved the accuracy in
+                      // some unit test projections
+                      Real delta_x = TOLERANCE * 10 * elem.hmin();
 
                       Point nxminus = elem.point(n),
                             nxplus = elem.point(n);

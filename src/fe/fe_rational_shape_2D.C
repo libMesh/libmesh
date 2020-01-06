@@ -216,8 +216,10 @@ Real FE<2,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
 
   std::vector<Real> node_weights(n_nodes);
 
+  const unsigned char datum_index = elem->mapping_data();
   for (unsigned int n=0; n<n_nodes; n++)
-    node_weights[n] = elem->node_ref(n).get_extra_datum<Real>(0);
+    node_weights[n] =
+      elem->node_ref(n).get_extra_datum<Real>(datum_index);
 
   Real weighted_shape_i = 0, weighted_sum = 0,
        weighted_grada_i = 0, weighted_grada_sum = 0,

@@ -29,6 +29,13 @@ namespace
 {
 using namespace libMesh;
 
+Real fe_triangle_helper (const Elem & elem,
+                         const Real edgenumerator,
+                         const Real crossval,
+                         const unsigned int basisorder,
+                         const Order totalorder,
+                         const unsigned int noden);
+
 Real fe_hierarchic_2D_shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
@@ -222,6 +229,37 @@ namespace
 {
 using namespace libMesh;
 
+Real fe_triangle_helper (const Elem & elem,
+                         const Real edgenumerator,
+                         const Real crossval,
+                         const unsigned int basisorder,
+                         const Order totalorder,
+                         const unsigned int noden)
+{
+  // Get factors to account for edge-flipping
+  Real flip = 1;
+  if (basisorder%2 && (elem.point(noden) > elem.point((noden+1)%3)))
+    flip = -1.;
+
+  // Avoid NaN around vertices!
+  if (crossval == 0.)
+    {
+      unsigned int basisfactorial = 1.;
+      for (unsigned int n=2; n <= basisorder; ++n)
+        basisfactorial *= n;
+
+      return std::pow(edgenumerator, basisorder) / basisfactorial;
+    }
+  // FIXME - what happens with roundoff when 0 < crossval < O(epsilon)?
+
+  const Real edgeval = edgenumerator / crossval;
+  const Real crossfunc = std::pow(crossval, basisorder);
+
+  return flip * crossfunc *
+    FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
+                            basisorder, edgeval);
+}
+
 Real fe_hierarchic_2D_shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
@@ -257,66 +295,33 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
         // Edge DoFs
         else if (i < totalorder + 2u)
           {
-            // Avoid returning NaN on vertices!
-            if (zeta0 + zeta1 == 0.)
-              return 0.;
-
             const unsigned int basisorder = i - 1;
-            // Get factors to account for edge-flipping
-            Real f0 = 1;
-            if (basisorder%2 && (elem->point(0) > elem->point(1)))
-              f0 = -1.;
 
-            Real edgeval = (zeta1 - zeta0) / (zeta1 + zeta0);
-            Real crossfunc = zeta0 + zeta1;
-            for (unsigned int n=1; n != basisorder; ++n)
-              crossfunc *= (zeta0 + zeta1);
+            const Real crossval = zeta0 + zeta1;
+            const Real edgenumerator = zeta1 - zeta0;
 
-            return f0 * crossfunc *
-              FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
-                                      basisorder, edgeval);
+            return fe_triangle_helper(*elem, edgenumerator, crossval,
+                                      basisorder, totalorder, 0);
           }
         else if (i < 2u*totalorder + 1)
           {
-            // Avoid returning NaN on vertices!
-            if (zeta1 + zeta2 == 0.)
-              return 0.;
-
             const unsigned int basisorder = i - totalorder;
-            // Get factors to account for edge-flipping
-            Real f1 = 1;
-            if (basisorder%2 && (elem->point(1) > elem->point(2)))
-              f1 = -1.;
 
-            Real edgeval = (zeta2 - zeta1) / (zeta2 + zeta1);
-            Real crossfunc = zeta2 + zeta1;
-            for (unsigned int n=1; n != basisorder; ++n)
-              crossfunc *= (zeta2 + zeta1);
+            const Real crossval = zeta2 + zeta1;
+            const Real edgenumerator = zeta2 - zeta1;
 
-            return f1 * crossfunc *
-              FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
-                                      basisorder, edgeval);
+            return fe_triangle_helper(*elem, edgenumerator, crossval,
+                                      basisorder, totalorder, 1);
           }
         else if (i < 3u*totalorder)
           {
-            // Avoid returning NaN on vertices!
-            if (zeta0 + zeta2 == 0.)
-              return 0.;
-
             const unsigned int basisorder = i - (2u*totalorder) + 1;
-            // Get factors to account for edge-flipping
-            Real f2 = 1;
-            if (basisorder%2 && (elem->point(2) > elem->point(0)))
-              f2 = -1.;
 
-            Real edgeval = (zeta0 - zeta2) / (zeta0 + zeta2);
-            Real crossfunc = zeta0 + zeta2;
-            for (unsigned int n=1; n != basisorder; ++n)
-              crossfunc *= (zeta0 + zeta2);
+            const Real crossval = zeta0 + zeta2;
+            const Real edgenumerator = zeta0 - zeta2;
 
-            return f2 * crossfunc *
-              FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
-                                      basisorder, edgeval);
+            return fe_triangle_helper(*elem, edgenumerator, crossval,
+                                      basisorder, totalorder, 2);
           }
         // Interior DoFs
         else
