@@ -1306,7 +1306,7 @@ void RBConstruction::train_reduced_basis_with_POD()
 
       if (j >= get_Nmax() || j >= n_snapshots)
         {
-          std::cout << "Maximum number of basis functions (" << j << ") reached." << std::endl;
+          libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
           break;
         }
 
@@ -1315,12 +1315,12 @@ void RBConstruction::train_reduced_basis_with_POD()
       // "energy", in order to obtain a relative error.
       const Real rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
 
-      std::cout << "Number of basis functions: " << j
-        << ", POD error norm: " << rel_err << std::endl;
+      libMesh::out << "Number of basis functions: " << j
+                   << ", POD error norm: " << rel_err << std::endl;
 
       if (rel_err < this->rel_training_tolerance)
         {
-          std::cout << "Training tolerance reached." << std::endl;
+          libMesh::out << "Training tolerance reached." << std::endl;
           break;
         }
 
