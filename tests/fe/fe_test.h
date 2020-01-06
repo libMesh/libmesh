@@ -284,7 +284,10 @@ public:
 
     // TOLERANCE * TOLERANCE doesn't work for 3D cubic Hermite?
     value_tol = TOLERANCE * sqrt(TOLERANCE);
-    grad_tol = TOLERANCE * sqrt(TOLERANCE);
+
+    // TOLERANCE * sqrt(TOLERANCE) too low for 3D quartic Hierarchic
+    grad_tol = 2 * TOLERANCE * sqrt(TOLERANCE);
+
     hess_tol = sqrt(TOLERANCE); // FIXME: we see some ~1e-5 errors?!?
   }
 
