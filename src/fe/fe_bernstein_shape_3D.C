@@ -1426,7 +1426,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             {
               // I have been lazy here and am using finite differences
               // to compute the derivatives!
-              const Real eps = 1.e-6;
+              const Real eps = 1.e-4;
 
               libmesh_assert_less (i, 4);
 
@@ -1531,7 +1531,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             {
               // I have been lazy here and am using finite differences
               // to compute the derivatives!
-              const Real eps = 1.e-6;
+              const Real eps = 1.e-4;
 
               libmesh_assert_less (i, 10);
 
@@ -1767,7 +1767,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             //     {
             //       // I have been lazy here and am using finite differences
             //       // to compute the derivatives!
-            //       const Real eps = 1.e-6;
+            //       const Real eps = 1.e-4;
 
             //       libmesh_assert_less (i, 20);
             //       libmesh_assert_less (j, 3);
@@ -1815,7 +1815,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             {
               // I have been lazy here and am using finite differences
               // to compute the derivatives!
-              const Real eps = 1.e-6;
+              const Real eps = 1.e-4;
 
               libmesh_assert_less (i, 64);
 
@@ -2388,7 +2388,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             // Bernstein shape functions derivatives on the hexahedral.
           case HEX27:
             {
-              const Real eps = 1.e-6;
+              const Real eps = 1.e-4;
 
               libmesh_assert_less (i, 125);
 
@@ -2998,7 +2998,7 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem * elem,
   {
     // I have been lazy here and am using finite differences
     // to compute the derivatives!
-    const Real eps = 1.e-6;
+    const Real eps = 1.e-4;
 
 
     switch (j)

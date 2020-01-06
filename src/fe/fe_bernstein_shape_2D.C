@@ -526,7 +526,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
       {
         // I have been lazy here and am using finite differences
         // to compute the derivatives!
-        const Real eps = 1.e-6;
+        const Real eps = 1.e-4;
 
         switch (j)
           {
@@ -675,7 +675,7 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem * elem,
       {
         // I have been lazy here and am using finite differences
         // to compute the derivatives!
-        const Real eps = 1.e-6;
+        const Real eps = 1.e-4;
 
         switch (j)
           {
