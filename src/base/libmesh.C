@@ -499,7 +499,12 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     {
       int ierr=0;
 
+#ifdef LIBMESH_HAVE_MPI
       PETSC_COMM_WORLD = libMesh::GLOBAL_COMM_WORLD;
+#else
+      // PETSc --with-mpi=0 doesn't like our default "communicator" 0
+      this->_comm->get() = PETSC_COMM_SELF;
+#endif
 
       // Check whether the calling program has already initialized
       // PETSc, and avoid duplicate Initialize/Finalize
