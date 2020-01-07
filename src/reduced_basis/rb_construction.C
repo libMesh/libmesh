@@ -1295,15 +1295,15 @@ void RBConstruction::train_reduced_basis_with_POD()
   DenseMatrix<Number> VT( n_snapshots, n_snapshots );
   correlation_matrix.svd(sigma, U, VT );
 
+  if(sigma(0) == 0.)
+    {
+      libmesh_error_msg("Zero singular value encountered in POD construction");
+    }
+
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
   while (true)
     {
-      if(sigma(j) == 0.)
-        {
-          libmesh_error_msg("Zero singular value encountered in POD construction");
-        }
-
       if (j >= get_Nmax() || j >= n_snapshots)
         {
           libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
