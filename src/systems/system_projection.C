@@ -509,7 +509,53 @@ public:
   DSNA eval_at_point(const FEMContext & c,
                      unsigned int i,
                      const Point & p,
-                     Real /* time */ = 0.);
+                     Real time,
+                     bool skip_context_check);
+
+  void eval_mixed_derivatives (const FEMContext & libmesh_dbg_var(c),
+                               unsigned int i,
+                               unsigned int dim,
+                               const Node & n,
+                               std::vector<DSNA> & derivs)
+  {
+    LOG_SCOPE ("eval_mixed_derivatives", "OldSolutionCoefs");
+
+    // This should only be called on vertices
+    libmesh_assert_less(c.get_elem().get_node_index(&n),
+                        c.get_elem().n_vertices());
+
+    // Handle offset from non-scalar components in previous variables
+    libmesh_assert_less(i, this->component_to_var.size());
+    unsigned int var = this->component_to_var[i];
+
+    // We have 1 mixed derivative in 2D, 4 in 3D
+    const unsigned int n_mixed = (dim-1) * (dim-1);
+    derivs.resize(n_mixed);
+
+    // Be sure to handle cases where the variable wasn't defined on
+    // this node (e.g. due to changing subdomain support)
+    if (n.old_dof_object &&
+        n.old_dof_object->n_vars(this->sys.number()) &&
+        n.old_dof_object->n_comp(this->sys.number(), var))
+      {
+        const dof_id_type first_old_id =
+          n.old_dof_object->dof_number(this->sys.number(), var, dim);
+        std::vector<dof_id_type> old_ids(n_mixed);
+        std::iota(old_ids.begin(), old_ids.end(), first_old_id);
+
+        for (auto d_i : index_range(derivs))
+          {
+            derivs[d_i].resize(1);
+            derivs[d_i].raw_at(0) = 1;
+            derivs[d_i].raw_index(0) = old_ids[d_i];
+          }
+      }
+    else
+      {
+        std::fill(derivs.begin(), derivs.end(), 0);
+      }
+  }
+
 
   void eval_old_dofs (const Elem & elem,
                       unsigned int node_num,
@@ -611,12 +657,14 @@ OldSolutionCoefs<Real, &FEMContext::point_value>::
 eval_at_point(const FEMContext & c,
               unsigned int i,
               const Point & p,
-              Real /* time */)
+              Real /* time */,
+              bool skip_context_check)
 {
   LOG_SCOPE ("eval_at_point()", "OldSolutionCoefs");
 
-  if (!this->check_old_context(c, p))
-    return 0;
+  if (!skip_context_check)
+    if (!this->check_old_context(c, p))
+      return 0;
 
   // Get finite element object
   FEGenericBase<Real> * fe = nullptr;
@@ -656,12 +704,14 @@ OldSolutionCoefs<RealGradient, &FEMContext::point_gradient>::
 eval_at_point(const FEMContext & c,
               unsigned int i,
               const Point & p,
-              Real /* time */)
+              Real /* time */,
+              bool skip_context_check)
 {
   LOG_SCOPE ("eval_at_point()", "OldSolutionCoefs");
 
-  if (!this->check_old_context(c, p))
-    return 0;
+  if (!skip_context_check)
+    if (!this->check_old_context(c, p))
+      return 0;
 
   // Get finite element object
   FEGenericBase<Real> * fe = nullptr;
@@ -737,7 +787,7 @@ eval_at_node(const FEMContext & c,
       return returnval;
     }
 
-  return this->eval_at_point(c, i, n, 0);
+  return this->eval_at_point(c, i, n, 0, false);
 }
 
 
@@ -786,7 +836,7 @@ eval_at_node(const FEMContext & c,
       return g;
     }
 
-  return this->eval_at_point(c, i, n, 0);
+  return this->eval_at_point(c, i, n, 0, false);
 }
 
 
