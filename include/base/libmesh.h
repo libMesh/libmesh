@@ -98,9 +98,9 @@ public:
    * parameter to use a user-specified MPI communicator.
    */
   LibMeshInit(int argc, const char * const * argv,
-              MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
+              MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD, int n_threads=-1);
 #else
-  LibMeshInit(int argc, const char * const * argv);
+  LibMeshInit(int argc, const char * const * argv, int n_threads=-1);
 #endif
 
   /**
