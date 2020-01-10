@@ -11,8 +11,6 @@ using namespace FUNCTIONPARSERTYPES;
 #include "fpoptimizer/codetree.hh"
 using namespace FPoptimizer_CodeTree;
 
-#include <iostream>
-#include <fstream>
 #include <cstdio>
 #include <sys/stat.h>
 #include <errno.h>
@@ -504,7 +502,9 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
              * renaming. The link call will not do anything if the file cachename
              * has already been created by a different rank.
              */
-            link(cachetmpname, cachename.c_str());
+            int status = link(cachetmpname, cachename.c_str());
+            if (status != 0)
+              std::cerr << "Warning: unable to write derivative cache file.\n";
             std::remove(cachetmpname);
           }
         }
@@ -624,86 +624,94 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
   else
     return (*compiledFunction)(Vars, pImmed, Epsilon<Value_t>::value);
 }
+#endif // LIBMESH_HAVE_FPARSER_JIT
+
+template<typename Value_t>
+std::string FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
+{
+  FParserJIT::Hash hasher;
+  hasher.addData(this->mData->mByteCode);
+  hasher.addData(Value_t_name);
+  return hasher.get();
+}
 
 template<typename Value_t>
 bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name)
 {
-  // use the file cache for compiled functions?
-  const bool cacheFunction = mADFlags & ADJITCache;
-
   // set compiled function pointer to zero to avoid stale values if JIT compilation fails
   compiledFunction = NULL;
 
   // get a pointer to the mImmed values
   pImmed = this->mData->mImmed.empty() ? NULL : &(this->mData->mImmed[0]);
 
+  // drop out if the ByteCode is empty
+  if (isEmpty())
+    return false;
+
+  // compute SHA1 hash of the function
+  std::string hash = JITCodeHash(Value_t_name);
+#ifndef NDEBUG
+  hash += "_dbg";
+#endif
+
+  // function name
+  std::string fname = "f_";
+  fname += hash;
+
+  // setup compiler wrapper (with or without cache)
+  FParserJIT::Compiler compiler((mADFlags & ADJITCache) ? hash : "");
+
+  // attempt to open the cache file
+  if (compiler.probeCache())
+  {
+    // fetch function pointer (may need to catch exceptions here)
+    try {
+      *(void **) (&compiledFunction) = compiler.getFunction(fname);
+    } catch(std::exception &e) {}
+
+    if (compiledFunction)
+      return true;
+  }
+
+  // opening the cached file did not work. (re)build it.
+  compiler.source()  << "#define _USE_MATH_DEFINES\n#include <cmath>\n";
+  if (!JITCodeGen(compiler.source(), fname, Value_t_name))
+    return false;
+
+  // run compiler
+#ifndef NDEBUG
+  if (!compiler.run("-g"))
+#else
+  if (!compiler.run(""))
+#endif
+    return false;
+
+  // fetch function pointer
+  try {
+    *(void **) (&compiledFunction) = compiler.getFunction(fname);
+  } catch(std::exception &e) {
+    std::cerr << "Error binding JIT compiled function\n" << e.what() << '\n';
+    return false;
+  }
+
+  // clear evalerror (this will not get set again by the JIT code)
+  this->mData->mEvalErrorType = 0;
+
+  return true;
+}
+
+template<typename Value_t>
+bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::string & fname, const std::string & Value_t_name)
+{
   // get a reference to the stored bytecode
   const std::vector<unsigned>& ByteCode = this->mData->mByteCode;
 
-  // drop out if the ByteCode is empty
-  if (ByteCode.empty())
-    return false;
-
-  // generate a sha1 hash of the current program and the Value type name
-  SHA1 *sha1 = new SHA1();
-  char result[41];
-  sha1->addBytes(reinterpret_cast<const char *>(&ByteCode[0]), ByteCode.size() * sizeof(unsigned));
-  sha1->addBytes(Value_t_name.c_str(), Value_t_name.size());
-  unsigned char* digest = sha1->getDigest();
-  for (unsigned int i = 0; i<20; ++i)
-    sprintf(&(result[i*2]), "%02x", digest[i]);
-  free(digest);
-  delete sha1;
-
-  // function name
-  std::string fnname = "f_";
-  fnname += result;
-
-  // cache file name
-  std::string jitdir = ".jitcache";
-  std::string libname = jitdir + "/" + result + ".so";
-
-  // attempt to open the cache file
-  void * lib;
-  if (cacheFunction)
-  {
-    lib = dlopen(libname.c_str(), RTLD_NOW);
-    if (lib != NULL) {
-      // fetch function pointer
-      *(void **) (&compiledFunction) = dlsym(lib, fnname.c_str());
-      if (dlerror() == NULL)  {
-        // success
-        return true;
-      }
-    }
-  }
-  // opening the cached file did not work. (re)build it.
-
-  // tmp filenames
-  char ccname[] = "./tmp_jit_XXXXXX";
-  int ccfile = mkstemp(ccname);
-  if (ccfile == -1)
-  {
-    std::cerr << "Error creating JIT tmp file " << ccname << ".\n";
-    return false;
-  }
-  close(ccfile); // close file. We reopen this using an ofstream below.
-
-  char objectname[] = "./tmp_jit_XXXXXX";
-  int objectfile = mkstemp(objectname);
-  if (objectfile == -1)
-  {
-    std::cerr << "Error creating JIT tmp file " << objectname << ".\n";
-    std::remove(ccname);
-    return false;
-  }
-  close(objectfile); // close file. Will be reopened by the compiler.
-
-  int status;
-  std::vector<bool> jumpTarget(ByteCode.size());
-  for (unsigned int i = 0; i < ByteCode.size(); ++i) jumpTarget[i] = false;
+  ccout << "extern \"C\" " << Value_t_name << ' '
+        << fname << "(const " << Value_t_name << " *params, const double *immed, const double eps) {\n"
+        << Value_t_name << " r, s[" << this->mData->mStackSize << "];\n";
 
   // determine all jump targets in the current program
+  std::vector<bool> jumpTarget(ByteCode.size(), false);
   unsigned long ip;
   for (unsigned int i = 0; i < ByteCode.size(); ++i)
     switch (ByteCode[i])
@@ -727,14 +735,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   std::vector<int> stackAtTarget(ByteCode.size());
   for (unsigned int i = 0; i < ByteCode.size(); ++i) stackAtTarget[i] = -2;
 
-  // save source
-  std::ofstream ccout;
-  ccout.open(ccname);
-  ccout << "#define _USE_MATH_DEFINES\n";
-  ccout << "#include <cmath>\n";
-  ccout << "extern \"C\" " << Value_t_name << ' '
-         << fnname << "(const " << Value_t_name << " *params, const " << Value_t_name << " *immed, const " << Value_t_name << " eps) {\n";
-  ccout << Value_t_name << " r, s[" << this->mData->mStackSize << "];\n";
+  // stream C++ code for function body, return statement, and closing parens
   int nImmed = 0, sp = -1, op;
   for (unsigned int i = 0; i < ByteCode.size(); ++i)
   {
@@ -899,16 +900,12 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
           ccout << "s[" << sp << "] = std::erf(s[" << sp << "]);\n";
 #else
           std::cerr << "Libmesh is not compiled with c++11 so std::erf is not supported by JIT.\n";
-          ccout.close();
-          std::remove(ccname);
           return false;
 #endif
         }
         else
         {
           std::cerr << "Function call not supported by JIT.\n";
-          ccout.close();
-          std::remove(ccname);
           return false;
         }
         break;
@@ -934,13 +931,13 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
       case cSqrt:
         ccout << "s[" << sp << "] = std::sqrt(s[" << sp << "]);\n"; break;
       case cRSqrt:
-        ccout << "s[" << sp << "] = std::pow(s[" << sp << "], " << Value_t_name << "(-0.5));\n"; break;
+        ccout << "s[" << sp << "] = std::pow(s[" << sp << "], (-0.5));\n"; break;
       case cPow:
         --sp; ccout << "s[" << sp << "] = std::pow(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
       case cExp:
         ccout << "s[" << sp << "] = std::exp(s[" << sp << "]);\n"; break;
       case cExp2:
-        ccout << "s[" << sp << "] = std::pow(" << Value_t_name << "(2.0), s[" << sp << "]);\n"; break;
+        ccout << "s[" << sp << "] = std::pow(2.0, s[" << sp << "]);\n"; break;
       case cCbrt:
 #ifdef FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS
         ccout << "s[" << sp << "] = std::cbrt(s[" << sp << "]);\n"; break;
@@ -980,23 +977,138 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
         else
         {
           std::cerr << "Opcode not supported by JIT.\n";
-          ccout.close();
-          std::remove(ccname);
           return false;
         }
     }
   }
   ccout << "return s[" << sp << "]; }\n";
-  ccout.close();
+  return true;
+}
+
+// Helper tools for the just in time compilation process
+namespace FParserJIT
+{
+
+Hash::Hash()
+  : _sha1(new SHA1())
+{
+}
+
+std::string Hash::get()
+{
+  char result[41];
+  unsigned char* digest = _sha1->getDigest();
+  for (unsigned int i = 0; i<20; ++i)
+    sprintf(&(result[i*2]), "%02x", digest[i]);
+  free(digest);
+  return result;
+}
+
+void Hash::addDataHelper(const char * start, std::size_t size)
+{
+  _sha1->addBytes(start, size);
+}
+
+Hash::~Hash()
+{
+  delete _sha1;
+}
+
+Compiler::Compiler(const std::string & master_hash)
+  : _jitdir(".jitcache"),
+    _success(false),
+    _master_hash(master_hash),
+    _use_cache(master_hash != "")
+{
+  // tmp filenames
+  char ccname[] = "./tmp_jit_XXXXXX";
+  int ccfile = mkstemp(ccname);
+  _ccname = ccname;
+  if (ccfile == -1)
+    throw std::runtime_error("Error creating JIT tmp file " + _ccname);
+  close(ccfile); // close file. We reopen this using an ofstream below.
+
+  char objectname[] = "./tmp_jit_XXXXXX";
+  int objectfile = mkstemp(objectname);
+  _objectname = objectname;
+  if (objectfile == -1)
+  {
+    std::remove(ccname);
+    throw std::runtime_error("Error creating JIT tmp file " + _objectname);
+  }
+  close(objectfile); // close file. Will be reopened by the compiler.
+
+  // open source stream
+  _ccout.open(ccname);
+}
+
+Compiler::~Compiler()
+{
+  _ccout.close();
+  std::remove(_ccname.c_str());
+  std::remove(_objectname.c_str());
+
+  // did the compilation result in a .so file?
+  if (_object_so != "")
+  {
+    // hard link successfully compiled obj to final cache file
+    if (_success && _use_cache && (mkdir(_jitdir.c_str(), 0700) == 0 || errno == EEXIST)) {
+      // the directory was either successfully created, or it already exists
+
+      // cache file name
+      std::string libname = _jitdir + "/" + _master_hash + ".so";
+
+      int status = link(_object_so.c_str(), libname.c_str());
+      if (status != 0)
+      {
+        std::remove(_object_so.c_str());
+
+        if  (errno != EEXIST) // other than file exists
+          std::cerr << "Warning: unable to write JIT cache file. [" << errno << "]\n";
+      }
+    }
+
+    // remove temporary object
+    std::remove(_object_so.c_str());
+  }
+}
+
+std::ostream & Compiler::source()
+{
+  if (_ccout.is_open())
+    return _ccout;
+
+  throw std::runtime_error("JIT source stream closed (did you already compile?)");
+}
+
+bool Compiler::probeCache()
+{
+  if (!_use_cache)
+    return false;
+
+  // cache file name
+  std::string libname = _jitdir + "/" + _master_hash + ".so";
+
+  // attempt to open the cache file
+  _lib = dlopen(libname.c_str(), RTLD_NOW);
+  return (_lib != NULL);
+}
+
+bool Compiler::run(const std::string & compiler_options)
+{
+  // close file
+  if (_ccout.is_open())
+    _ccout.close();
+
+  int status;
 
   // add a .cc extension to the source (needed by the compiler)
-  std::string ccname_cc = ccname;
+  std::string ccname_cc = _ccname;
   ccname_cc += ".cc";
-  status = std::rename(ccname, ccname_cc.c_str());
+  status = std::rename(_ccname.c_str(), ccname_cc.c_str());
   if (status != 0)
   {
     std::cerr << "Unable to rename JIT source code file\n";
-    std::remove(ccname);
     return false;
   }
 
@@ -1007,57 +1119,60 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
 #else
   std::string command = FPARSER_JIT_COMPILER" -O2 -shared -rdynamic -fPIC ";
 #endif
-  command += ccname_cc + " -o " + objectname;
+  command += ccname_cc + " " + compiler_options + " -o " + _objectname;
   status = system(command.c_str());
+#ifndef NDEBUG
+  std::cerr << "Keeping file '" << ccname_cc << "' in debug mode.\n";
+#else
   std::remove(ccname_cc.c_str());
+#endif
   if (status != 0) {
     std::cerr << "JIT compile failed.\n";
+#ifndef NDEBUG
+    std::cerr << command << '\n';
+#endif
     return false;
   }
 
   // add a .so extension to the object (needed by dlopen on mac)
-  std::string object_so = objectname;
-  object_so += ".so";
-  status = std::rename(objectname, object_so.c_str());
+  _object_so = _objectname + ".so";
+  status = std::rename(_objectname.c_str(), _object_so.c_str());
   if (status != 0)
   {
     std::cerr << "Unable to rename JIT compiled function object\n";
-    std::remove(objectname);
     return false;
   }
 
   // load compiled object
-  lib = dlopen(object_so.c_str(), RTLD_NOW);
-  if (lib == NULL) {
+  _lib = dlopen(_object_so.c_str(), RTLD_NOW);
+  if (_lib == NULL) {
     std::cerr << "JIT object load failed.\n";
-    std::remove(object_so.c_str());
+    std::remove(_object_so.c_str());
     return false;
   }
 
-  // fetch function pointer
-  *(void **) (&compiledFunction) = dlsym(lib, fnname.c_str());
-  const char * error = dlerror();
-  if (error != NULL)  {
-    std::cerr << "Error binding JIT compiled function\n" << error << '\n';
-    compiledFunction = NULL;
-    std::remove(object_so.c_str());
-    return false;
-  }
+  // minimum requirement for success is that the compilation went all the way through
+  _success = true;
 
-  // clear evalerror (this will not get set again by the JIT code)
-  this->mData->mEvalErrorType = 0;
-
-  // hard link successfully compiled obj to final cache file
-  if (cacheFunction && (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)) {
-    // the directory was either successfully created, or it already exists
-    link(object_so.c_str(), libname.c_str());
-  }
-
-  // remove temporary object
-  std::remove(object_so.c_str());
   return true;
 }
-#endif
+
+void * Compiler::getFunction(const std::string & fname)
+{
+  // fetch function pointer
+  void * func = dlsym(_lib, fname.c_str());
+
+  // check for error
+  const char * error = dlerror();
+  if (error == NULL)
+    return func;
+
+  // setting this to false will prevent this function from getting cached on disk
+  _success = false;
+
+  throw std::runtime_error(error);
+}
+}
 
 template<typename Value_t>
 void FunctionParserADBase<Value_t>::Serialize(std::ostream & ostr)

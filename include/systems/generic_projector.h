@@ -435,8 +435,16 @@ public:
   Output eval_at_point (const FEMContext & c,
                         unsigned int i,
                         const Point & n,
-                        const Real time)
+                        const Real time,
+                        bool /*skip_context_check*/)
   { return _f->component(c, i, n, time); }
+
+  void eval_mixed_derivatives (const FEMContext & /*c*/,
+                               unsigned int /*i*/,
+                               unsigned int /*dim*/,
+                               const Node & /*n*/,
+                               std::vector<Output> & /*derivs*/)
+  { libmesh_error(); } // this is only for grid projections
 
   bool is_grid_projection() { return false; }
 
@@ -683,12 +691,14 @@ public:
   Output eval_at_point(const FEMContext & c,
                        unsigned int i,
                        const Point & p,
-                       Real /* time */ =0.)
+                       Real /* time */,
+                       bool skip_context_check)
   {
     LOG_SCOPE ("eval_at_point()", "OldSolutionValue");
 
-    if (!this->check_old_context(c, p))
-      return 0;
+    if (!skip_context_check)
+      if (!this->check_old_context(c, p))
+        return 0;
 
     // Handle offset from non-scalar components in previous variables
     libmesh_assert_less(i, this->component_to_var.size());
@@ -697,6 +707,44 @@ public:
     Output n;
     (this->old_context.*point_output)(var, p, n, this->out_of_elem_tol);
     return n;
+  }
+
+  void eval_mixed_derivatives (const FEMContext & libmesh_dbg_var(c),
+                               unsigned int i,
+                               unsigned int dim,
+                               const Node & n,
+                               std::vector<Output> & derivs)
+  {
+    LOG_SCOPE ("eval_mixed_derivatives", "OldSolutionValue");
+
+    // This should only be called on vertices
+    libmesh_assert_less(c.get_elem().get_node_index(&n),
+                        c.get_elem().n_vertices());
+
+    // Handle offset from non-scalar components in previous variables
+    libmesh_assert_less(i, this->component_to_var.size());
+    unsigned int var = this->component_to_var[i];
+
+    // We have 1 mixed derivative in 2D, 4 in 3D
+    const unsigned int n_mixed = (dim-1) * (dim-1);
+    derivs.resize(n_mixed);
+
+    // Be sure to handle cases where the variable wasn't defined on
+    // this node (e.g. due to changing subdomain support)
+    if (n.old_dof_object &&
+        n.old_dof_object->n_vars(this->sys.number()) &&
+        n.old_dof_object->n_comp(this->sys.number(), var))
+      {
+        const dof_id_type first_old_id =
+          n.old_dof_object->dof_number(this->sys.number(), var, dim);
+        std::vector<dof_id_type> old_ids(n_mixed);
+        std::iota(old_ids.begin(), old_ids.end(), first_old_id);
+        old_solution.get(old_ids, derivs);
+      }
+    else
+      {
+        std::fill(derivs.begin(), derivs.end(), 0);
+      }
   }
 
   void eval_old_dofs (const Elem & elem,
@@ -863,7 +911,7 @@ eval_at_node(const FEMContext & c,
       return old_solution(old_id);
     }
 
-  return this->eval_at_point(c, i, n, 0);
+  return this->eval_at_point(c, i, n, 0, false);
 }
 
 
@@ -918,7 +966,7 @@ eval_at_node(const FEMContext & c,
       return g;
     }
 
-  return this->eval_at_point(c, i, n, 0);
+  return this->eval_at_point(c, i, n, 0, false);
 }
 
 
@@ -1731,16 +1779,16 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                 }
 #endif
 #ifdef LIBMESH_ENABLE_AMR
-              bool is_parent_vertex = false;
-              if (elem.parent())
+              bool is_old_vertex = true;
+              if (elem.refinement_flag() == Elem::JUST_REFINED)
                 {
                   const int i_am_child =
                     elem.parent()->which_child_am_i(&elem);
-                  is_parent_vertex =
+                  is_old_vertex =
                     elem.parent()->is_vertex_on_parent(i_am_child, n);
                 }
 #else
-              const bool is_parent_vertex = false;
+              const bool is_old_vertex = false;
 #endif
 
               // The hermite element vertex shape functions are weird
@@ -1756,7 +1804,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                   insert_id(first_id, val, vertex.processor_id());
 
                   VectorValue<FValue> grad =
-                    is_parent_vertex ?
+                    is_old_vertex ?
                     g->eval_at_node(context,
                                     var_component,
                                     dim,
@@ -1766,12 +1814,27 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                     g->eval_at_point(context,
                                      var_component,
                                      vertex,
-                                     system.time);
+                                     system.time,
+                                     false);
                   // x derivative
                   insert_id(first_id+1, grad(0),
                             vertex.processor_id());
 #if LIBMESH_DIM > 1
-                  if (dim > 1)
+                  if (dim > 1 && is_old_vertex && f.is_grid_projection())
+                    {
+                      for (int i = 1; i < dim; ++i)
+                        insert_id(first_id+i+1, grad(i),
+                                  vertex.processor_id());
+
+                      // We can directly copy everything else too
+                      std::vector<FValue> derivs;
+                      f.eval_mixed_derivatives
+                        (context, var_component, dim, vertex, derivs);
+                      for (auto i : index_range(derivs))
+                        insert_id(first_id+dim+1+i, derivs[i],
+                                  vertex.processor_id());
+                    }
+                  else if (dim > 1)
                     {
                       // We'll finite difference mixed derivatives.
                       // This delta_x used to be TOLERANCE*hmin, but
@@ -1787,12 +1850,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                         g->eval_at_point(context,
                                          var_component,
                                          nxminus,
-                                         system.time);
+                                         system.time,
+                                         true);
                       VectorValue<FValue> gxplus =
                         g->eval_at_point(context,
                                          var_component,
                                          nxplus,
-                                         system.time);
+                                         system.time,
+                                         true);
                       // y derivative
                       insert_id(first_id+2, grad(1),
                                 vertex.processor_id());
@@ -1821,12 +1886,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                             g->eval_at_point(context,
                                              var_component,
                                              nyminus,
-                                             system.time);
+                                             system.time,
+                                             true);
                           VectorValue<FValue> gyplus =
                             g->eval_at_point(context,
                                              var_component,
                                              nyplus,
-                                             system.time);
+                                             system.time,
+                                             true);
                           // yz derivative
                           insert_id(first_id+6,
                             (gyplus(2) - gyminus(2)) / 2. / delta_x,
@@ -1848,22 +1915,26 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                             g->eval_at_point(context,
                                              var_component,
                                              nxmym,
-                                             system.time);
+                                             system.time,
+                                             true);
                           VectorValue<FValue> gxmyp =
                             g->eval_at_point(context,
                                              var_component,
                                              nxmyp,
-                                             system.time);
+                                             system.time,
+                                             true);
                           VectorValue<FValue> gxpym =
                             g->eval_at_point(context,
                                              var_component,
                                              nxpym,
-                                             system.time);
+                                             system.time,
+                                             true);
                           VectorValue<FValue> gxpyp =
                             g->eval_at_point(context,
                                              var_component,
                                              nxpyp,
-                                             system.time);
+                                             system.time,
+                                             true);
                           FValue gxzplus = (gxpyp(2) - gxmyp(2))
                             / 2. / delta_x;
                           FValue gxzminus = (gxpym(2) - gxmym(2))
@@ -1893,12 +1964,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                                    system.time);
                   insert_id(first_id, val, vertex.processor_id());
                   VectorValue<FValue> grad =
-                    is_parent_vertex ?
+                    is_old_vertex ?
                     g->eval_at_node(context, var_component, dim,
                                     vertex, extra_hanging_dofs[var],
                                     system.time) :
                     g->eval_at_point(context, var_component, vertex,
-                                     system.time);
+                                     system.time, false);
                   for (int i=0; i!= dim; ++i)
                     insert_id(first_id + i + 1, grad(i),
                               vertex.processor_id());
@@ -1976,7 +2047,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
                   const processor_id_type pid =
                     edge_node.processor_id();
                   FValue fval = f.eval_at_point
-                    (context, var_component, edge_node, system.time);
+                    (context, var_component, edge_node, system.time,
+                     false);
                   insert_id(dof_id, fval, pid);
                 }
               continue;
@@ -2137,7 +2209,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
                   const processor_id_type pid =
                     side_node.processor_id();
                   FValue fval = f.eval_at_point
-                    (context, var_component, side_node, system.time);
+                    (context, var_component, side_node, system.time,
+                     false);
                   insert_id(dof_id, fval, pid);
                 }
               continue;
@@ -2283,7 +2356,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectInte
                       const processor_id_type pid =
                         interior_node.processor_id();
                       FValue fval = f.eval_at_point
-                        (context, var_component, interior_node, system.time);
+                        (context, var_component, interior_node,
+                         system.time, false);
                       insert_id(dof_id, fval, pid);
                     }
                 }
@@ -2563,14 +2637,16 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::co
       FValue fineval = f.eval_at_point(context,
                                        var_component,
                                        xyz_values[qp],
-                                       system.time);
+                                       system.time,
+                                       false);
       // solution grad at the quadrature point
       VectorValue<FValue> finegrad;
       if (cont == C_ONE)
         finegrad = g->eval_at_point(context,
                                     var_component,
                                     xyz_values[qp],
-                                    system.time);
+                                    system.time,
+                                    false);
 
       // Form edge projection matrix
       for (unsigned int sidei=0, freei=0;

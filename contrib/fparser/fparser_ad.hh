@@ -3,6 +3,8 @@
 
 #include "fparser.hh"
 #include <exception>
+#include <iostream>
+#include <fstream>
 
 template<typename Value_t>
 class ADImplementation;
@@ -41,6 +43,11 @@ public:
    * function to be optimized.
    */
   bool isZero();
+
+  /**
+   * check if the function's byte code is empty.
+   */
+  bool isEmpty() { return this->mData->mByteCode.empty(); }
 
   /**
    * set the bytecode of this function to return constant zero.
@@ -127,7 +134,13 @@ public:
    */
   void RegisterDerivative(const std::string & a, const std::string & b, const std::string & c);
 
-private:
+protected:
+  /// return a SHA1 hash for the current bytecode and value type name
+  std::string JITCodeHash(const std::string & value_type_name);
+
+  /// write generated C++ code to stream
+  bool JITCodeGen(std::ostream & ccout, const std::string & fname, const std::string & Value_t_name);
+
   /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
   bool JITCompileHelper(const std::string &);
 
@@ -173,6 +186,65 @@ private:
   } UnknownSerializationVersionException;
 };
 
+/// Forward declare SHA1 hash object
+class SHA1;
+
+/// Namespacing the utility classes (rather than nesting them in a templated class)
+namespace FParserJIT
+{
+/// Simplified C++ interface to lib SHA1
+class Hash
+{
+public:
+  Hash();
+  ~Hash();
+
+  template <typename T>
+  void addData(const T & v);
+
+  std::string get();
+
+protected:
+  /// the actual lib SHA1 call is in the helper so that we don't need to make lib/sha1.h available
+  void addDataHelper(const char * start, std::size_t size);
+
+  SHA1 * _sha1;
+};
+
+template <typename T>
+void Hash::addData(const T & v)
+{
+  auto start = v.data();
+  std::size_t size = v.size() * sizeof(*start);
+  if (size > 0)
+    addDataHelper(reinterpret_cast<const char *>(start), size);
+}
+
+/// Handle compilation, caching, and temporary files
+class Compiler
+{
+public:
+  Compiler(const std::string & master_hash = "");
+  ~Compiler();
+  std::ostream & source();
+
+  bool probeCache();
+  bool run(const std::string & compiler_options = "");
+  void * getFunction(const std::string & fname);
+
+protected:
+  std::ofstream _ccout;
+  void * _lib;
+  const std::string _jitdir;
+  std::string _ccname;
+  std::string _objectname;
+  std::string _object_so;
+  bool _success;
+
+  const std::string _master_hash;
+  const bool _use_cache;
+};
+} // namespace FParserJIT
 
 class FunctionParserAD: public FunctionParserADBase<double> {};
 class FunctionParserAD_f: public FunctionParserADBase<float> {};
