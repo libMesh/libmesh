@@ -207,7 +207,11 @@ const Elem * PointLocatorTree::operator() (const Point & p,
   if (this->_element==nullptr || !(this->_element->contains_point(p)))
     {
       // ask the tree
-      this->_element = this->_tree->find_element (p,allowed_subdomains);
+      if (_use_find_element_tol) {
+        this->_element = this->_tree->find_element (p, allowed_subdomains, _find_element_tol);
+      } else {
+        this->_element = this->_tree->find_element (p, allowed_subdomains);
+      }
 
       if (this->_element == nullptr)
         {
@@ -225,7 +229,7 @@ const Elem * PointLocatorTree::operator() (const Point & p,
               this->_element =
                 this->perform_linear_search(p,
                                             allowed_subdomains,
-                                            /*use_close_to_point*/ true,
+                                            true,
                                             _close_to_point_tol);
 
               return this->_element;
@@ -274,6 +278,10 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
 {
   LOG_SCOPE("perform_linear_search", "PointLocatorTree");
 
+  if (use_close_to_point) {
+    return perform_linear_search(p, allowed_subdomains, close_to_point_tolerance);
+  }
+
   // The type of iterator depends on the Trees::BuildType
   // used for this PointLocator.  If it's
   // TREE_LOCAL_ELEMENTS, we only want to double check
@@ -288,16 +296,7 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
       if (!allowed_subdomains ||
           allowed_subdomains->count(elem->subdomain_id()))
         {
-          if (!use_close_to_point)
-            {
-              if (elem->contains_point(p))
-                return elem;
-            }
-          else
-            {
-              if (elem->close_to_point(p, close_to_point_tolerance))
-                return elem;
-            }
+          if (elem->contains_point(p)) { return elem; }
         }
     }
 

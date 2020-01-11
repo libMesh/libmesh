@@ -173,6 +173,24 @@ public:
   virtual void unset_close_to_point_tol();
 
   /**
+   * Set a tolerance to use when checking
+   * if a point is within an element in the mesh.
+   */
+  virtual void set_find_element_tol(Real find_element_tol);
+
+  /**
+   * Specify that we do not want to use a user-specified tolerance to
+   * determine if a point is inside an element in the mesh.
+   */
+  virtual void unset_find_element_tol();
+
+  /**
+   * Get the tolerance for determining element containment
+   * in the point locator.
+   */
+  virtual Real get_find_element_tol() const;
+
+  /**
    * Get a const reference to this PointLocator's mesh.
    */
   const MeshBase & get_mesh() const;
@@ -202,7 +220,7 @@ protected:
 
   /**
    * \p true if we will use a user-specified tolerance for locating
-   * the element.
+   * the element in an exhaustive search.
    */
   bool _use_close_to_point_tol;
 
@@ -210,6 +228,17 @@ protected:
    * The tolerance to use.
    */
   Real _close_to_point_tol;
+
+  /**
+   * \p true if we will use a user-specified tolerance for locating
+   * the element.
+   */
+  bool _use_find_element_tol;
+
+  /**
+   * The tolerance to use when locating an element in the tree.
+   */
+  Real _find_element_tol;
 };
 
 } // namespace libMesh

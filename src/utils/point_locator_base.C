@@ -95,13 +95,27 @@ void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)
   _close_to_point_tol = close_to_point_tol;
 }
 
-
 void PointLocatorBase::unset_close_to_point_tol ()
 {
   _use_close_to_point_tol = false;
   _close_to_point_tol = TOLERANCE;
 }
 
+void PointLocatorBase::set_find_element_tol(Real find_element_tol)
+{
+  _use_find_element_tol = true;
+  _find_element_tol = find_element_tol;
+}
+
+void PointLocatorBase::unset_find_element_tol()
+{
+  _use_find_element_tol = false;
+  _find_element_tol = TOLERANCE;
+}
+
+Real PointLocatorBase::get_find_element_tol() const {
+    return _find_element_tol;
+}
 
 const MeshBase & PointLocatorBase::get_mesh () const
 {
