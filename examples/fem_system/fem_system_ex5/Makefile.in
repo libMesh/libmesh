@@ -89,15 +89,18 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = fem_system_ex3.in .linkstamp
+
+# also need to link files for VPATH builds
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = fem_system_ex5.in .linkstamp
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
-@LIBMESH_DBG_MODE_TRUE@am__append_2 = example-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = example-devel
-@LIBMESH_OPT_MODE_TRUE@am__append_4 = example-opt
-@LIBMESH_PROF_MODE_TRUE@am__append_5 = example-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_6 = example-oprof
-subdir = examples/fem_system/fem_system_ex3
+@LIBMESH_DBG_MODE_TRUE@am__append_3 = example-dbg
+@LIBMESH_DEVEL_MODE_TRUE@am__append_4 = example-devel
+@LIBMESH_OPT_MODE_TRUE@am__append_5 = example-opt
+@LIBMESH_PROF_MODE_TRUE@am__append_6 = example-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_7 = example-oprof
+subdir = examples/fem_system/fem_system_ex5
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/all_static.m4 \
@@ -157,10 +160,12 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_3 = example-opt$(EXEEXT)
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
-am__example_dbg_SOURCES_DIST = fem_system_ex3.C fem_system_ex3.in \
-	elasticity_system.C elasticity_system.h run.sh
-am__objects_1 = example_dbg-fem_system_ex3.$(OBJEXT) \
-	example_dbg-elasticity_system.$(OBJEXT)
+am__example_dbg_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	../fem_system_ex3/elasticity_system.C elasticity_system.h \
+	run.sh
+am__dirstamp = $(am__leading_dot)dirstamp
+am__objects_1 = example_dbg-fem_system_ex5.$(OBJEXT) \
+	../fem_system_ex3/example_dbg-elasticity_system.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_2)
 example_dbg_OBJECTS = $(am_example_dbg_OBJECTS)
@@ -173,10 +178,11 @@ am__v_lt_1 =
 example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am__example_devel_SOURCES_DIST = fem_system_ex3.C fem_system_ex3.in \
-	elasticity_system.C elasticity_system.h run.sh
-am__objects_3 = example_devel-fem_system_ex3.$(OBJEXT) \
-	example_devel-elasticity_system.$(OBJEXT)
+am__example_devel_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	../fem_system_ex3/elasticity_system.C elasticity_system.h \
+	run.sh
+am__objects_3 = example_devel-fem_system_ex5.$(OBJEXT) \
+	../fem_system_ex3/example_devel-elasticity_system.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_4)
 example_devel_OBJECTS = $(am_example_devel_OBJECTS)
@@ -186,10 +192,11 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__example_oprof_SOURCES_DIST = fem_system_ex3.C fem_system_ex3.in \
-	elasticity_system.C elasticity_system.h run.sh
-am__objects_5 = example_oprof-fem_system_ex3.$(OBJEXT) \
-	example_oprof-elasticity_system.$(OBJEXT)
+am__example_oprof_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	../fem_system_ex3/elasticity_system.C elasticity_system.h \
+	run.sh
+am__objects_5 = example_oprof-fem_system_ex5.$(OBJEXT) \
+	../fem_system_ex3/example_oprof-elasticity_system.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
 @LIBMESH_OPROF_MODE_TRUE@am_example_oprof_OBJECTS = $(am__objects_6)
 example_oprof_OBJECTS = $(am_example_oprof_OBJECTS)
@@ -199,10 +206,11 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__example_opt_SOURCES_DIST = fem_system_ex3.C fem_system_ex3.in \
-	elasticity_system.C elasticity_system.h run.sh
-am__objects_7 = example_opt-fem_system_ex3.$(OBJEXT) \
-	example_opt-elasticity_system.$(OBJEXT)
+am__example_opt_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	../fem_system_ex3/elasticity_system.C elasticity_system.h \
+	run.sh
+am__objects_7 = example_opt-fem_system_ex5.$(OBJEXT) \
+	../fem_system_ex3/example_opt-elasticity_system.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
 @LIBMESH_OPT_MODE_TRUE@am_example_opt_OBJECTS = $(am__objects_8)
 example_opt_OBJECTS = $(am_example_opt_OBJECTS)
@@ -211,10 +219,11 @@ example_opt_OBJECTS = $(am_example_opt_OBJECTS)
 example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am__example_prof_SOURCES_DIST = fem_system_ex3.C fem_system_ex3.in \
-	elasticity_system.C elasticity_system.h run.sh
-am__objects_9 = example_prof-fem_system_ex3.$(OBJEXT) \
-	example_prof-elasticity_system.$(OBJEXT)
+am__example_prof_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	../fem_system_ex3/elasticity_system.C elasticity_system.h \
+	run.sh
+am__objects_9 = example_prof-fem_system_ex5.$(OBJEXT) \
+	../fem_system_ex3/example_prof-elasticity_system.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
 @LIBMESH_PROF_MODE_TRUE@am_example_prof_OBJECTS = $(am__objects_10)
 example_prof_OBJECTS = $(am_example_prof_OBJECTS)
@@ -238,16 +247,17 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/example_dbg-elasticity_system.Po \
-	./$(DEPDIR)/example_dbg-fem_system_ex3.Po \
-	./$(DEPDIR)/example_devel-elasticity_system.Po \
-	./$(DEPDIR)/example_devel-fem_system_ex3.Po \
-	./$(DEPDIR)/example_oprof-elasticity_system.Po \
-	./$(DEPDIR)/example_oprof-fem_system_ex3.Po \
-	./$(DEPDIR)/example_opt-elasticity_system.Po \
-	./$(DEPDIR)/example_opt-fem_system_ex3.Po \
-	./$(DEPDIR)/example_prof-elasticity_system.Po \
-	./$(DEPDIR)/example_prof-fem_system_ex3.Po
+am__depfiles_remade =  \
+	../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Po \
+	../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Po \
+	../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Po \
+	../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Po \
+	../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Po \
+	./$(DEPDIR)/example_dbg-fem_system_ex5.Po \
+	./$(DEPDIR)/example_devel-fem_system_ex5.Po \
+	./$(DEPDIR)/example_oprof-fem_system_ex5.Po \
+	./$(DEPDIR)/example_opt-fem_system_ex5.Po \
+	./$(DEPDIR)/example_prof-fem_system_ex5.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -683,21 +693,22 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-example_name = fem_system_ex3
-check_SCRIPTS = run.sh
-install_dir = $(examples_install_path)/fem_system/ex3
-data = fem_system_ex3.C fem_system_ex3.in elasticity_system.C elasticity_system.h run.sh
-sources = $(data) run.sh
+
+# need to link sources from other example
+BUILT_SOURCES = elasticity_system.C $(am__append_1)
+DISTCLEANFILES = $(BUILT_SOURCES)
 
 ######################################################################
 #
 # how to make documentation
 #
-CLEANFILES = out.e* out.newmark.* out.steady.* $(am__append_1) \
-	$(example_name).html stdout.log
-
-# also need to link files for VPATH builds
-@LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
+CLEANFILES = $(BUILT_SOURCES) out.e* out.newmark.* out.steady.* \
+	$(am__append_2) $(example_name).html stdout.log
+example_name = fem_system_ex5
+check_SCRIPTS = run.sh
+install_dir = $(examples_install_path)/fem_system/ex5
+data = fem_system_ex5.C fem_system_ex5.in ../fem_system_ex3/elasticity_system.C elasticity_system.h run.sh
+sources = $(data) run.sh
 
 ######################################################################
 #
@@ -773,9 +784,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/fem_system/fem_system_ex3/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/fem_system/fem_system_ex5/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu examples/fem_system/fem_system_ex3/Makefile
+	  $(AUTOMAKE) --gnu examples/fem_system/fem_system_ex5/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -803,22 +814,43 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+../fem_system_ex3/$(am__dirstamp):
+	@$(MKDIR_P) ../fem_system_ex3
+	@: > ../fem_system_ex3/$(am__dirstamp)
+../fem_system_ex3/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../fem_system_ex3/$(DEPDIR)
+	@: > ../fem_system_ex3/$(DEPDIR)/$(am__dirstamp)
+../fem_system_ex3/example_dbg-elasticity_system.$(OBJEXT):  \
+	../fem_system_ex3/$(am__dirstamp) \
+	../fem_system_ex3/$(DEPDIR)/$(am__dirstamp)
 
 example-dbg$(EXEEXT): $(example_dbg_OBJECTS) $(example_dbg_DEPENDENCIES) $(EXTRA_example_dbg_DEPENDENCIES) 
 	@rm -f example-dbg$(EXEEXT)
 	$(AM_V_CXXLD)$(example_dbg_LINK) $(example_dbg_OBJECTS) $(example_dbg_LDADD) $(LIBS)
+../fem_system_ex3/example_devel-elasticity_system.$(OBJEXT):  \
+	../fem_system_ex3/$(am__dirstamp) \
+	../fem_system_ex3/$(DEPDIR)/$(am__dirstamp)
 
 example-devel$(EXEEXT): $(example_devel_OBJECTS) $(example_devel_DEPENDENCIES) $(EXTRA_example_devel_DEPENDENCIES) 
 	@rm -f example-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(example_devel_LINK) $(example_devel_OBJECTS) $(example_devel_LDADD) $(LIBS)
+../fem_system_ex3/example_oprof-elasticity_system.$(OBJEXT):  \
+	../fem_system_ex3/$(am__dirstamp) \
+	../fem_system_ex3/$(DEPDIR)/$(am__dirstamp)
 
 example-oprof$(EXEEXT): $(example_oprof_OBJECTS) $(example_oprof_DEPENDENCIES) $(EXTRA_example_oprof_DEPENDENCIES) 
 	@rm -f example-oprof$(EXEEXT)
 	$(AM_V_CXXLD)$(example_oprof_LINK) $(example_oprof_OBJECTS) $(example_oprof_LDADD) $(LIBS)
+../fem_system_ex3/example_opt-elasticity_system.$(OBJEXT):  \
+	../fem_system_ex3/$(am__dirstamp) \
+	../fem_system_ex3/$(DEPDIR)/$(am__dirstamp)
 
 example-opt$(EXEEXT): $(example_opt_OBJECTS) $(example_opt_DEPENDENCIES) $(EXTRA_example_opt_DEPENDENCIES) 
 	@rm -f example-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(example_opt_LINK) $(example_opt_OBJECTS) $(example_opt_LDADD) $(LIBS)
+../fem_system_ex3/example_prof-elasticity_system.$(OBJEXT):  \
+	../fem_system_ex3/$(am__dirstamp) \
+	../fem_system_ex3/$(DEPDIR)/$(am__dirstamp)
 
 example-prof$(EXEEXT): $(example_prof_OBJECTS) $(example_prof_DEPENDENCIES) $(EXTRA_example_prof_DEPENDENCIES) 
 	@rm -f example-prof$(EXEEXT)
@@ -826,20 +858,21 @@ example-prof$(EXEEXT): $(example_prof_OBJECTS) $(example_prof_DEPENDENCIES) $(EX
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../fem_system_ex3/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-elasticity_system.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-fem_system_ex3.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-elasticity_system.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-fem_system_ex3.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-elasticity_system.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-fem_system_ex3.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-elasticity_system.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-fem_system_ex3.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-elasticity_system.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-fem_system_ex3.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-fem_system_ex5.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-fem_system_ex5.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-fem_system_ex5.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-fem_system_ex5.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-fem_system_ex5.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -871,145 +904,145 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-example_dbg-fem_system_ex3.o: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-fem_system_ex3.o -MD -MP -MF $(DEPDIR)/example_dbg-fem_system_ex3.Tpo -c -o example_dbg-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-fem_system_ex3.Tpo $(DEPDIR)/example_dbg-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_dbg-fem_system_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_dbg-fem_system_ex5.o: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-fem_system_ex5.o -MD -MP -MF $(DEPDIR)/example_dbg-fem_system_ex5.Tpo -c -o example_dbg-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-fem_system_ex5.Tpo $(DEPDIR)/example_dbg-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_dbg-fem_system_ex5.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
 
-example_dbg-fem_system_ex3.obj: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-fem_system_ex3.obj -MD -MP -MF $(DEPDIR)/example_dbg-fem_system_ex3.Tpo -c -o example_dbg-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-fem_system_ex3.Tpo $(DEPDIR)/example_dbg-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_dbg-fem_system_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_dbg-fem_system_ex5.obj: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-fem_system_ex5.obj -MD -MP -MF $(DEPDIR)/example_dbg-fem_system_ex5.Tpo -c -o example_dbg-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-fem_system_ex5.Tpo $(DEPDIR)/example_dbg-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_dbg-fem_system_ex5.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
 
-example_dbg-elasticity_system.o: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-elasticity_system.o -MD -MP -MF $(DEPDIR)/example_dbg-elasticity_system.Tpo -c -o example_dbg-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-elasticity_system.Tpo $(DEPDIR)/example_dbg-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_dbg-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_dbg-elasticity_system.o: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_dbg-elasticity_system.o -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Tpo -c -o ../fem_system_ex3/example_dbg-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_dbg-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_dbg-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
 
-example_dbg-elasticity_system.obj: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-elasticity_system.obj -MD -MP -MF $(DEPDIR)/example_dbg-elasticity_system.Tpo -c -o example_dbg-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-elasticity_system.Tpo $(DEPDIR)/example_dbg-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_dbg-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_dbg-elasticity_system.obj: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_dbg-elasticity_system.obj -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Tpo -c -o ../fem_system_ex3/example_dbg-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_dbg-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_dbg-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
 
-example_devel-fem_system_ex3.o: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-fem_system_ex3.o -MD -MP -MF $(DEPDIR)/example_devel-fem_system_ex3.Tpo -c -o example_devel-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-fem_system_ex3.Tpo $(DEPDIR)/example_devel-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_devel-fem_system_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_devel-fem_system_ex5.o: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-fem_system_ex5.o -MD -MP -MF $(DEPDIR)/example_devel-fem_system_ex5.Tpo -c -o example_devel-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-fem_system_ex5.Tpo $(DEPDIR)/example_devel-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_devel-fem_system_ex5.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
 
-example_devel-fem_system_ex3.obj: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-fem_system_ex3.obj -MD -MP -MF $(DEPDIR)/example_devel-fem_system_ex3.Tpo -c -o example_devel-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-fem_system_ex3.Tpo $(DEPDIR)/example_devel-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_devel-fem_system_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_devel-fem_system_ex5.obj: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-fem_system_ex5.obj -MD -MP -MF $(DEPDIR)/example_devel-fem_system_ex5.Tpo -c -o example_devel-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-fem_system_ex5.Tpo $(DEPDIR)/example_devel-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_devel-fem_system_ex5.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
 
-example_devel-elasticity_system.o: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-elasticity_system.o -MD -MP -MF $(DEPDIR)/example_devel-elasticity_system.Tpo -c -o example_devel-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-elasticity_system.Tpo $(DEPDIR)/example_devel-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_devel-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_devel-elasticity_system.o: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_devel-elasticity_system.o -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Tpo -c -o ../fem_system_ex3/example_devel-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_devel-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_devel-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
 
-example_devel-elasticity_system.obj: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-elasticity_system.obj -MD -MP -MF $(DEPDIR)/example_devel-elasticity_system.Tpo -c -o example_devel-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-elasticity_system.Tpo $(DEPDIR)/example_devel-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_devel-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_devel-elasticity_system.obj: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_devel-elasticity_system.obj -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Tpo -c -o ../fem_system_ex3/example_devel-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_devel-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_devel-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
 
-example_oprof-fem_system_ex3.o: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-fem_system_ex3.o -MD -MP -MF $(DEPDIR)/example_oprof-fem_system_ex3.Tpo -c -o example_oprof-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-fem_system_ex3.Tpo $(DEPDIR)/example_oprof-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_oprof-fem_system_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_oprof-fem_system_ex5.o: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-fem_system_ex5.o -MD -MP -MF $(DEPDIR)/example_oprof-fem_system_ex5.Tpo -c -o example_oprof-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-fem_system_ex5.Tpo $(DEPDIR)/example_oprof-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_oprof-fem_system_ex5.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
 
-example_oprof-fem_system_ex3.obj: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-fem_system_ex3.obj -MD -MP -MF $(DEPDIR)/example_oprof-fem_system_ex3.Tpo -c -o example_oprof-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-fem_system_ex3.Tpo $(DEPDIR)/example_oprof-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_oprof-fem_system_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_oprof-fem_system_ex5.obj: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-fem_system_ex5.obj -MD -MP -MF $(DEPDIR)/example_oprof-fem_system_ex5.Tpo -c -o example_oprof-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-fem_system_ex5.Tpo $(DEPDIR)/example_oprof-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_oprof-fem_system_ex5.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
 
-example_oprof-elasticity_system.o: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-elasticity_system.o -MD -MP -MF $(DEPDIR)/example_oprof-elasticity_system.Tpo -c -o example_oprof-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-elasticity_system.Tpo $(DEPDIR)/example_oprof-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_oprof-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_oprof-elasticity_system.o: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_oprof-elasticity_system.o -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Tpo -c -o ../fem_system_ex3/example_oprof-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_oprof-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_oprof-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
 
-example_oprof-elasticity_system.obj: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-elasticity_system.obj -MD -MP -MF $(DEPDIR)/example_oprof-elasticity_system.Tpo -c -o example_oprof-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-elasticity_system.Tpo $(DEPDIR)/example_oprof-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_oprof-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_oprof-elasticity_system.obj: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_oprof-elasticity_system.obj -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Tpo -c -o ../fem_system_ex3/example_oprof-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_oprof-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_oprof-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
 
-example_opt-fem_system_ex3.o: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-fem_system_ex3.o -MD -MP -MF $(DEPDIR)/example_opt-fem_system_ex3.Tpo -c -o example_opt-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-fem_system_ex3.Tpo $(DEPDIR)/example_opt-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_opt-fem_system_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_opt-fem_system_ex5.o: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-fem_system_ex5.o -MD -MP -MF $(DEPDIR)/example_opt-fem_system_ex5.Tpo -c -o example_opt-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-fem_system_ex5.Tpo $(DEPDIR)/example_opt-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_opt-fem_system_ex5.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
 
-example_opt-fem_system_ex3.obj: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-fem_system_ex3.obj -MD -MP -MF $(DEPDIR)/example_opt-fem_system_ex3.Tpo -c -o example_opt-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-fem_system_ex3.Tpo $(DEPDIR)/example_opt-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_opt-fem_system_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_opt-fem_system_ex5.obj: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-fem_system_ex5.obj -MD -MP -MF $(DEPDIR)/example_opt-fem_system_ex5.Tpo -c -o example_opt-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-fem_system_ex5.Tpo $(DEPDIR)/example_opt-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_opt-fem_system_ex5.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
 
-example_opt-elasticity_system.o: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-elasticity_system.o -MD -MP -MF $(DEPDIR)/example_opt-elasticity_system.Tpo -c -o example_opt-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-elasticity_system.Tpo $(DEPDIR)/example_opt-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_opt-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_opt-elasticity_system.o: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_opt-elasticity_system.o -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Tpo -c -o ../fem_system_ex3/example_opt-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_opt-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_opt-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
 
-example_opt-elasticity_system.obj: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-elasticity_system.obj -MD -MP -MF $(DEPDIR)/example_opt-elasticity_system.Tpo -c -o example_opt-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-elasticity_system.Tpo $(DEPDIR)/example_opt-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_opt-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_opt-elasticity_system.obj: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_opt-elasticity_system.obj -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Tpo -c -o ../fem_system_ex3/example_opt-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_opt-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_opt-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
 
-example_prof-fem_system_ex3.o: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-fem_system_ex3.o -MD -MP -MF $(DEPDIR)/example_prof-fem_system_ex3.Tpo -c -o example_prof-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-fem_system_ex3.Tpo $(DEPDIR)/example_prof-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_prof-fem_system_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_prof-fem_system_ex5.o: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-fem_system_ex5.o -MD -MP -MF $(DEPDIR)/example_prof-fem_system_ex5.Tpo -c -o example_prof-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-fem_system_ex5.Tpo $(DEPDIR)/example_prof-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_prof-fem_system_ex5.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-fem_system_ex3.o `test -f 'fem_system_ex3.C' || echo '$(srcdir)/'`fem_system_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-fem_system_ex5.o `test -f 'fem_system_ex5.C' || echo '$(srcdir)/'`fem_system_ex5.C
 
-example_prof-fem_system_ex3.obj: fem_system_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-fem_system_ex3.obj -MD -MP -MF $(DEPDIR)/example_prof-fem_system_ex3.Tpo -c -o example_prof-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-fem_system_ex3.Tpo $(DEPDIR)/example_prof-fem_system_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex3.C' object='example_prof-fem_system_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_prof-fem_system_ex5.obj: fem_system_ex5.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-fem_system_ex5.obj -MD -MP -MF $(DEPDIR)/example_prof-fem_system_ex5.Tpo -c -o example_prof-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-fem_system_ex5.Tpo $(DEPDIR)/example_prof-fem_system_ex5.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fem_system_ex5.C' object='example_prof-fem_system_ex5.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-fem_system_ex3.obj `if test -f 'fem_system_ex3.C'; then $(CYGPATH_W) 'fem_system_ex3.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-fem_system_ex5.obj `if test -f 'fem_system_ex5.C'; then $(CYGPATH_W) 'fem_system_ex5.C'; else $(CYGPATH_W) '$(srcdir)/fem_system_ex5.C'; fi`
 
-example_prof-elasticity_system.o: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-elasticity_system.o -MD -MP -MF $(DEPDIR)/example_prof-elasticity_system.Tpo -c -o example_prof-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-elasticity_system.Tpo $(DEPDIR)/example_prof-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_prof-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_prof-elasticity_system.o: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_prof-elasticity_system.o -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Tpo -c -o ../fem_system_ex3/example_prof-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_prof-elasticity_system.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-elasticity_system.o `test -f 'elasticity_system.C' || echo '$(srcdir)/'`elasticity_system.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_prof-elasticity_system.o `test -f '../fem_system_ex3/elasticity_system.C' || echo '$(srcdir)/'`../fem_system_ex3/elasticity_system.C
 
-example_prof-elasticity_system.obj: elasticity_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-elasticity_system.obj -MD -MP -MF $(DEPDIR)/example_prof-elasticity_system.Tpo -c -o example_prof-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-elasticity_system.Tpo $(DEPDIR)/example_prof-elasticity_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='elasticity_system.C' object='example_prof-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
+../fem_system_ex3/example_prof-elasticity_system.obj: ../fem_system_ex3/elasticity_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT ../fem_system_ex3/example_prof-elasticity_system.obj -MD -MP -MF ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Tpo -c -o ../fem_system_ex3/example_prof-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Tpo ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../fem_system_ex3/elasticity_system.C' object='../fem_system_ex3/example_prof-elasticity_system.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-elasticity_system.obj `if test -f 'elasticity_system.C'; then $(CYGPATH_W) 'elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/elasticity_system.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o ../fem_system_ex3/example_prof-elasticity_system.obj `if test -f '../fem_system_ex3/elasticity_system.C'; then $(CYGPATH_W) '../fem_system_ex3/elasticity_system.C'; else $(CYGPATH_W) '$(srcdir)/../fem_system_ex3/elasticity_system.C'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1254,6 +1287,9 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../fem_system_ex3/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../fem_system_ex3/$(am__dirstamp)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1265,16 +1301,16 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/example_dbg-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_dbg-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_devel-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_devel-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_oprof-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_oprof-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_opt-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_opt-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_prof-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_prof-fem_system_ex3.Po
+		-rm -f ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Po
+	-rm -f ./$(DEPDIR)/example_dbg-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_devel-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_oprof-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_opt-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_prof-fem_system_ex5.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1318,16 +1354,16 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/example_dbg-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_dbg-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_devel-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_devel-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_oprof-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_oprof-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_opt-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_opt-fem_system_ex3.Po
-	-rm -f ./$(DEPDIR)/example_prof-elasticity_system.Po
-	-rm -f ./$(DEPDIR)/example_prof-fem_system_ex3.Po
+		-rm -f ../fem_system_ex3/$(DEPDIR)/example_dbg-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_devel-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_oprof-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_opt-elasticity_system.Po
+	-rm -f ../fem_system_ex3/$(DEPDIR)/example_prof-elasticity_system.Po
+	-rm -f ./$(DEPDIR)/example_dbg-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_devel-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_oprof-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_opt-fem_system_ex5.Po
+	-rm -f ./$(DEPDIR)/example_prof-fem_system_ex5.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1365,8 +1401,11 @@ uninstall-am: uninstall-dataDATA
 
 .PRECIOUS: Makefile
 
+
+elasticity_system.C : $(top_srcdir)/examples/fem_system/fem_system_ex3/elasticity_system.C
+	$(AM_V_GEN)$(LN_S) -f $< $@
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f fem_system_ex3.in && $(LN_S) -f $(srcdir)/fem_system_ex3.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f fem_system_ex5.in && $(LN_S) -f $(srcdir)/fem_system_ex5.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
