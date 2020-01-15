@@ -36,6 +36,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
@@ -457,6 +458,7 @@ namespace libMesh
     mesh.partitioner() = nullptr;
 
     // First walk over the active local elements and see how many maximum MG levels we can construct
+/*
     unsigned int n_levels = 0;
     for ( auto & elem : mesh.active_local_element_ptr_range() )
       {
@@ -467,6 +469,9 @@ namespace libMesh
     // these processors shouldnt make projections
     if (n_levels >= 1)
       n_levels += 1;
+*/
+
+    unsigned int n_levels = MeshTools::n_levels(mesh);
 
     // How many MG levels did the user request?
     unsigned int usr_requested_mg_lvls = 0;
