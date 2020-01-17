@@ -294,8 +294,7 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
         {
           if (!use_close_to_point)
             {
-              if (elem->contains_point(p, _contains_point_tol))
-                return elem;
+              if (elem->contains_point(p, _contains_point_tol)) { return elem; }
             }
           else
             {
