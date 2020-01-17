@@ -38,7 +38,9 @@ PointLocatorBase::PointLocatorBase (const MeshBase & mesh,
   _mesh                    (mesh),
   _initialized             (false),
   _use_close_to_point_tol  (false),
-  _close_to_point_tol      (TOLERANCE)
+  _close_to_point_tol      (TOLERANCE),
+  _use_contains_point_tol  (false),
+  _contains_point_tol      (TOLERANCE)
 {
   // If we have a non-nullptr master, inherit its close-to-point tolerances.
   if (_master)
@@ -95,13 +97,28 @@ void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)
   _close_to_point_tol = close_to_point_tol;
 }
 
-
 void PointLocatorBase::unset_close_to_point_tol ()
 {
   _use_close_to_point_tol = false;
   _close_to_point_tol = TOLERANCE;
 }
 
+void PointLocatorBase::set_contains_point_tol(Real contains_point_tol)
+{
+  _use_contains_point_tol = true;
+  _contains_point_tol = contains_point_tol;
+}
+
+void PointLocatorBase::unset_contains_point_tol()
+{
+  _use_contains_point_tol = false;
+  _contains_point_tol = TOLERANCE;
+}
+
+Real PointLocatorBase::get_contains_point_tol() const
+{
+  return _contains_point_tol;
+}
 
 const MeshBase & PointLocatorBase::get_mesh () const
 {
