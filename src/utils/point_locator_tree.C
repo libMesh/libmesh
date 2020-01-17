@@ -207,11 +207,10 @@ const Elem * PointLocatorTree::operator() (const Point & p,
   if (this->_element==nullptr || !(this->_element->contains_point(p)))
     {
       // ask the tree
-      if (_use_contains_point_tol) {
+      if (_use_contains_point_tol)
         this->_element = this->_tree->find_element(p, allowed_subdomains, _contains_point_tol);
-      } else {
+      else
         this->_element = this->_tree->find_element(p, allowed_subdomains);
-      }
 
       if (this->_element == nullptr)
         {

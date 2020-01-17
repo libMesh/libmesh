@@ -115,8 +115,9 @@ void PointLocatorBase::unset_contains_point_tol()
   _contains_point_tol = TOLERANCE;
 }
 
-Real PointLocatorBase::get_contains_point_tol() const {
-    return _contains_point_tol;
+Real PointLocatorBase::get_contains_point_tol() const
+{
+  return _contains_point_tol;
 }
 
 const MeshBase & PointLocatorBase::get_mesh () const
