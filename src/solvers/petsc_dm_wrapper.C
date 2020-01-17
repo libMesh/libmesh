@@ -933,7 +933,7 @@ namespace libMesh
                     dof_id_type node_id = node.id();
                     if( node_map.count(node_id) == 0 )
                       {
-                        node_map.insert(std::make_pair(node_id,pend));
+                        node_map.emplace(node_id, pend);
                         pend++;
                       }
                   }
@@ -947,7 +947,7 @@ namespace libMesh
             if( elem->n_dofs(system.number()) > 0 )
               {
                 dof_id_type elem_id = elem->id();
-                elem_map.insert(std::make_pair(elem_id,pend));
+                elem_map.emplace(elem_id, pend);
                 pend++;
               }
           }
@@ -962,7 +962,7 @@ namespace libMesh
               {
                 if( system.variable(v).type().family == SCALAR )
                   {
-                    scalar_map.insert(std::make_pair(pend,v));
+                    scalar_map.emplace(pend, v);
                     pend++;
                   }
               }

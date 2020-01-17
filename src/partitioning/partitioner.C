@@ -982,7 +982,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
       elem->find_interior_neighbors(neighbor_set);
 
       for (const auto & neighbor : neighbor_set)
-        interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
+        interior_to_boundary_map.emplace(neighbor, elem);
     }
 
 #ifdef LIBMESH_ENABLE_AMR

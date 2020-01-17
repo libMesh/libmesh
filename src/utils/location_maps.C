@@ -87,7 +87,7 @@ void LocationMap<T>::init(MeshBase & mesh)
 template <typename T>
 void LocationMap<T>::insert(T & t)
 {
-  this->_map.insert(std::make_pair(this->key(this->point_of(t)), &t));
+  this->_map.emplace(this->key(this->point_of(t)), &t);
 }
 
 

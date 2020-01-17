@@ -1288,7 +1288,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
                   // Add this element's ID and the ID of the side which is on the boundary
                   // to the set of border elements for this processor.
                   // Note: if the set does not already exist, this creates it.
-                  this->proc_border_elem_sets[ neighbor_proc_id ].insert( std::make_pair(elem->id(), nemesis_side_id) );
+                  this->proc_border_elem_sets[ neighbor_proc_id ].emplace(elem->id(), nemesis_side_id);
                 }
             }
         } // end for loop over neighbors

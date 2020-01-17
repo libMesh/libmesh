@@ -954,8 +954,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                         // A reference to the constraint row.
                         NodeConstraintRow & constraint_row = constraints[my_node].first;
 
-                        constraint_row.insert(std::make_pair (their_node,
-                                                              0.));
+                        constraint_row.emplace(their_node, 0.);
                       }
                   // To get nodal coordinate constraints right, only
                   // add non-zero and non-identity values for Lagrange
@@ -970,8 +969,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                         // A reference to the constraint row.
                         NodeConstraintRow & constraint_row = constraints[my_node].first;
 
-                        constraint_row.insert(std::make_pair (their_node,
-                                                              their_value));
+                        constraint_row.emplace(their_node, their_value);
                       }
                 }
             }
@@ -1174,8 +1172,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                             NodeConstraintRow & constraint_row =
                               constraints[my_node].first;
 
-                            constraint_row.insert(std::make_pair(their_node,
-                                                                 their_value));
+                            constraint_row.emplace(their_node, their_value);
                           }
                         }
                     }

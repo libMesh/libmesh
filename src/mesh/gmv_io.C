@@ -1024,7 +1024,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 
           // Try to insert with dummy value
           for (const auto & elem : mesh.active_element_ptr_range())
-            sbdid_map.insert(std::make_pair(elem->subdomain_id(), 0));
+            sbdid_map.emplace(elem->subdomain_id(), 0);
 
           // Map is created, iterate through it to set indices.  They will be
           // used repeatedly below.
@@ -2032,8 +2032,8 @@ void GMVIO::_read_var()
 #ifdef LIBMESH_HAVE_GMV
 
   // Copy all the variable's values into a local storage vector.
-  _nodal_data.insert ( std::make_pair(std::string(GMVLib::gmv_data.name1),
-                                      std::vector<Number>(GMVLib::gmv_data.doubledata1, GMVLib::gmv_data.doubledata1+GMVLib::gmv_data.num) ) );
+  _nodal_data.emplace(std::string(GMVLib::gmv_data.name1),
+                      std::vector<Number>(GMVLib::gmv_data.doubledata1, GMVLib::gmv_data.doubledata1+GMVLib::gmv_data.num));
 #endif
 }
 

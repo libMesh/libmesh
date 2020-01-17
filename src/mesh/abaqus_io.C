@@ -1113,9 +1113,7 @@ void AbaqusIO::assign_sideset_ids()
               libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem.dim());
 
             // Insert the current (key, pair(elem,id)) into the multimap.
-            provide_bcs.insert(std::make_pair(elem.key(),
-                                              std::make_pair(&elem,
-                                                             elemset_id)));
+            provide_bcs.emplace(elem.key(), std::make_pair(&elem, elemset_id));
 
             // Associate the name of this sideset with the ID we've
             // chosen.  It's not necessary to do this for every

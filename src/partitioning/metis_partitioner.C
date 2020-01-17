@@ -142,7 +142,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
       elem->find_interior_neighbors(neighbor_set);
 
       for (auto & neighbor : neighbor_set)
-        interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
+        interior_to_boundary_map.emplace(neighbor, elem);
     }
 
   // Data structure that Metis will fill up on processor 0 and broadcast.

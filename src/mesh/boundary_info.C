@@ -106,23 +106,19 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
 
   // Copy node boundary info
   for (const auto & pr : other_boundary_info._boundary_node_id)
-    _boundary_node_id.insert(std::make_pair(_mesh.node_ptr(pr.first->id()),
-                                            pr.second));
+    _boundary_node_id.emplace(_mesh.node_ptr(pr.first->id()), pr.second);
 
   // Copy edge boundary info
   for (const auto & pr : other_boundary_info._boundary_edge_id)
-    _boundary_edge_id.insert(std::make_pair(_mesh.elem_ptr(pr.first->id()),
-                                            pr.second));
+    _boundary_edge_id.emplace(_mesh.elem_ptr(pr.first->id()), pr.second);
 
   // Copy shellface boundary info
   for (const auto & pr : other_boundary_info._boundary_shellface_id)
-    _boundary_shellface_id.insert(std::make_pair(_mesh.elem_ptr(pr.first->id()),
-                                                 pr.second));
+    _boundary_shellface_id.emplace(_mesh.elem_ptr(pr.first->id()), pr.second);
 
   // Copy side boundary info
   for (const auto & pr : other_boundary_info._boundary_side_id)
-    _boundary_side_id.insert(std::make_pair(_mesh.elem_ptr(pr.first->id()),
-                                            pr.second));
+    _boundary_side_id.emplace(_mesh.elem_ptr(pr.first->id()), pr.second);
 
   _boundary_ids = other_boundary_info._boundary_ids;
   _side_boundary_ids = other_boundary_info._side_boundary_ids;
@@ -646,7 +642,7 @@ void BoundaryInfo::add_node(const Node * node,
     if (pr.second == id)
       return;
 
-  _boundary_node_id.insert(std::make_pair(node, id));
+  _boundary_node_id.emplace(node, id);
   _boundary_ids.insert(id);
   _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
 }
@@ -691,7 +687,7 @@ void BoundaryInfo::add_node(const Node * node,
       if (already_inserted)
         continue;
 
-      _boundary_node_id.insert(std::make_pair(node,id));
+      _boundary_node_id.emplace(node, id);
       _boundary_ids.insert(id);
       _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
     }
@@ -733,7 +729,7 @@ void BoundaryInfo::add_edge(const Elem * elem,
         pr.second.second == id)
       return;
 
-  _boundary_edge_id.insert(std::make_pair(elem, std::make_pair(edge, id)));
+  _boundary_edge_id.emplace(elem, std::make_pair(edge, id));
   _boundary_ids.insert(id);
   _edge_boundary_ids.insert(id); // Also add this ID to the set of edge boundary IDs
 }
@@ -783,7 +779,7 @@ void BoundaryInfo::add_edge(const Elem * elem,
       if (already_inserted)
         continue;
 
-      _boundary_edge_id.insert(std::make_pair(elem, std::make_pair(edge, id)));
+      _boundary_edge_id.emplace(elem, std::make_pair(edge, id));
       _boundary_ids.insert(id);
       _edge_boundary_ids.insert(id); // Also add this ID to the set of edge boundary IDs
     }
@@ -823,7 +819,7 @@ void BoundaryInfo::add_shellface(const Elem * elem,
         pr.second.second == id)
       return;
 
-  _boundary_shellface_id.insert(std::make_pair(elem, std::make_pair(shellface, id)));
+  _boundary_shellface_id.emplace(elem, std::make_pair(shellface, id));
   _boundary_ids.insert(id);
   _shellface_boundary_ids.insert(id); // Also add this ID to the set of shellface boundary IDs
 }
@@ -876,7 +872,7 @@ void BoundaryInfo::add_shellface(const Elem * elem,
       if (already_inserted)
         continue;
 
-      _boundary_shellface_id.insert(std::make_pair(elem, std::make_pair(shellface, id)));
+      _boundary_shellface_id.emplace(elem, std::make_pair(shellface, id));
       _boundary_ids.insert(id);
       _shellface_boundary_ids.insert(id); // Also add this ID to the set of shellface boundary IDs
     }
@@ -912,7 +908,7 @@ void BoundaryInfo::add_side(const Elem * elem,
         pr.second.second == id)
       return;
 
-  _boundary_side_id.insert(std::make_pair(elem, std::make_pair(side, id)));
+  _boundary_side_id.emplace(elem, std::make_pair(side, id));
   _boundary_ids.insert(id);
   _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
 }
@@ -961,7 +957,7 @@ void BoundaryInfo::add_side(const Elem * elem,
       if (already_inserted)
         continue;
 
-      _boundary_side_id.insert(std::make_pair(elem, std::make_pair(side, id)));
+      _boundary_side_id.emplace(elem, std::make_pair(side, id));
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
     }
@@ -1791,8 +1787,7 @@ BoundaryInfo::build_node_list_from_side_list()
                   const processor_id_type proc_id =
                     side->node_ptr(i)->processor_id();
                   if (proc_id != my_proc_id)
-                    nodes_to_push[proc_id].insert
-                      (std::make_pair(side->node_id(i), bcid));
+                    nodes_to_push[proc_id].emplace(side->node_id(i), bcid);
                 }
             }
         }

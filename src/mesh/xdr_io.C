@@ -1455,7 +1455,7 @@ void XdrIO::read_serialized_subdomain_names(Xdr & io)
       std::map<subdomain_id_type, std::string> & subdomain_map = mesh.set_subdomain_name_map();
 
       for (unsigned int i=0; i<n_subdomain_names; ++i)
-        subdomain_map.insert(std::make_pair(subdomain_ids[i], subdomain_names[i]));
+        subdomain_map.emplace(subdomain_ids[i], subdomain_names[i]);
     }
 }
 
@@ -2030,7 +2030,7 @@ void XdrIO::read_serialized_bc_names(Xdr & io, BoundaryInfo & info, bool is_side
         info.set_sideset_name_map() : info.set_nodeset_name_map();
 
       for (unsigned int i=0; i<n_boundary_names; ++i)
-        boundary_map.insert(std::make_pair(cast_int<boundary_id_type>(boundary_ids[i]), boundary_names[i]));
+        boundary_map.emplace(cast_int<boundary_id_type>(boundary_ids[i]), boundary_names[i]);
     }
 }
 

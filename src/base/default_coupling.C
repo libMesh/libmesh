@@ -94,7 +94,7 @@ void DefaultCoupling::operator()
     {
       for (const auto & elem : as_range(range_begin, range_end))
         if (elem->processor_id() != p)
-          coupled_elements.insert (std::make_pair(elem,_dof_coupling));
+          coupled_elements.emplace(elem, _dof_coupling);
       return;
     }
 
@@ -114,7 +114,7 @@ void DefaultCoupling::operator()
           std::vector<const Elem *> active_neighbors;
 
           if (elem->processor_id() != p)
-            coupled_elements.insert (std::make_pair(elem,_dof_coupling));
+            coupled_elements.emplace(elem, _dof_coupling);
 
           for (auto s : elem->side_index_range())
             {
@@ -167,8 +167,7 @@ void DefaultCoupling::operator()
                     next_elements_to_check.insert(neighbor);
 
                   if (neighbor->processor_id() != p)
-                    coupled_elements.insert
-                      (std::make_pair(neighbor, _dof_coupling));
+                    coupled_elements.emplace(neighbor, _dof_coupling);
                 }
             }
         }

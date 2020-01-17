@@ -139,10 +139,10 @@ void FroIO::write (const std::string & fname)
                     n1 = side->node_id(1);
 
                   // insert into forward-edge set
-                  forward_edges.insert (std::make_pair(n0, n1));
+                  forward_edges.emplace(n0, n1);
 
                   // insert into backward-edge set
-                  backward_edges.insert (std::make_pair(n1, n0));
+                  backward_edges.emplace(n1, n0);
 
                   // go ahead and add one edge to the list -- this will give us the beginning of a
                   // chain to work from!

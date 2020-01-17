@@ -68,7 +68,7 @@ void build_reverse_map (MapIter it, MapIter end, MapType & reverse)
       // corresponding to an enum.
       typename MapType::iterator preimage = reverse.find(it->second);
       if (preimage == reverse.end())
-        reverse.insert (std::make_pair(it->second, it->first));
+        reverse.emplace (it->second, it->first);
       else if (preimage->second < it->first)
         preimage->second = it->first;
     }

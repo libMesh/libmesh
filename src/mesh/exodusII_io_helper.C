@@ -2840,7 +2840,7 @@ read_sideset_data(const MeshBase & mesh,
                          ss_ids[ss]);
 
                       // Store (elem, side, b_id) tuples in bc_vals[var]
-                      bc_vals[var].insert(std::make_pair(key, sset_var_vals[i]));
+                      bc_vals[var].emplace(key, sset_var_vals[i]);
                     } // end for (i)
                 } // end if (present)
             } // end for (var)

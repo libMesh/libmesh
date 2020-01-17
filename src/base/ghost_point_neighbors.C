@@ -62,7 +62,7 @@ void GhostPointNeighbors::operator()
   for (const auto & elem : as_range(range_begin, range_end))
     {
       if (elem->processor_id() != p)
-        coupled_elements.insert (std::make_pair(elem,nullcm));
+        coupled_elements.emplace(elem, nullcm);
 
       for (auto neigh : elem->neighbor_ptr_range())
         {
@@ -76,14 +76,12 @@ void GhostPointNeighbors::operator()
 
                   for (const Elem * f : family)
                     if (f->processor_id() != p)
-                      coupled_elements.insert
-                        (std::make_pair(f, nullcm));
+                      coupled_elements.emplace(f, nullcm);
                 }
               else
 #endif
                 if (neigh->processor_id() != p)
-                  coupled_elements.insert
-                    (std::make_pair(neigh, nullcm));
+                  coupled_elements.emplace(neigh, nullcm);
             }
         }
 
@@ -113,8 +111,7 @@ void GhostPointNeighbors::operator()
 
       if (ip_it != interior_parents.end())
         {
-          coupled_elements.insert
-            (std::make_pair(elem, nullcm));
+          coupled_elements.emplace(elem, nullcm);
 
           // Shrink the set ASAP to speed up subsequent searches
           interior_parents.erase(ip_it);
@@ -128,7 +125,7 @@ void GhostPointNeighbors::operator()
     if (elem->processor_id() != p)
       for (auto & n : elem->node_ref_range())
         if (connected_nodes.count(&n))
-          coupled_elements.insert(std::make_pair(elem, nullcm));
+          coupled_elements.emplace(elem, nullcm);
 }
 
 } // namespace libMesh

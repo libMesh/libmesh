@@ -281,8 +281,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     // data structures -- Use the hash_multimap if available
     typedef unsigned int                    key_type;
     typedef std::pair<Elem *, unsigned char> val_type;
-    typedef std::pair<key_type, val_type>   key_val_pair;
-
     typedef std::unordered_multimap<key_type, val_type> map_type;
 
     // A map from side keys to corresponding elements & side numbers
@@ -373,12 +371,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
                 // didn't find a match...
                 // Build the map entry for this element
-                key_val_pair kvp;
-
-                kvp.first         = key;
-                kvp.second.first  = element;
-                kvp.second.second = cast_int<unsigned char>(ms);
-                side_to_elem_map.insert (kvp);
+                side_to_elem_map.emplace
+                  (key, std::make_pair(element, cast_int<unsigned char>(ms)));
               }
           }
       }
