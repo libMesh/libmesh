@@ -357,6 +357,10 @@ LIBMESH_TEST_CXX11_CONTAINER_ERASE
 AS_IF([test "x$have_cxx11_container_erase" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 support for std container erase() functions returning iterators])])
 
+LIBMESH_TEST_CXX11_CONTAINER_EMPLACE
+AS_IF([test "x$have_cxx11_container_emplace" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 support for std container emplace() functions])])
+
 LIBMESH_TEST_CXX11_IOTA
 AS_IF([test "x$have_cxx11_iota" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 support for std::iota])])

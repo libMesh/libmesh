@@ -180,6 +180,49 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONTAINER_ERASE],
     AC_LANG_POP([C++])
   ])
 
+dnl Test C++11 std::map,set,multimap,multiset emplace APIs.
+AC_DEFUN([LIBMESH_TEST_CXX11_CONTAINER_EMPLACE],
+  [
+    have_cxx11_container_emplace=no
+
+    AC_MSG_CHECKING(for C++11 std container emplace() functions)
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <map>
+    @%:@include <set>
+    ]], [[
+    {
+      std::map<int, int> m;
+      m.emplace(1,2);
+    }
+    {
+      std::set<int> s;
+      s.emplace(1);
+    }
+    {
+      std::multimap<int, int> m;
+      m.emplace(1,2);
+    }
+    {
+      std::multiset<int> s;
+      s.emplace(1);
+    }
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx11_container_emplace=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+  ])
+
 dnl Test C++11 std::tuple and several related helper functions.
 AC_DEFUN([LIBMESH_TEST_CXX11_BEGIN_END],
   [
