@@ -317,7 +317,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
           libmesh_assert_less (cnt, global_index.size());
           libmesh_assert_less (global_index[cnt], n_active_elem);
 
-          global_index_map.insert(std::make_pair(elem->id(), global_index[cnt++]));
+          global_index_map.emplace(elem->id(), global_index[cnt++]);
         }
     }
     // really, shouldn't be close!

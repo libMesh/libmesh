@@ -48,7 +48,7 @@ GmshIO::ElementMaps GmshIO::build_element_maps()
   ElementMaps em;
 
   // POINT (import only)
-  em.in.insert(std::make_pair(15, ElementDefinition(NODEELEM, 15, 0, 1)));
+  em.in.emplace(15, ElementDefinition(NODEELEM, 15, 0, 1));
 
   // Add elements with trivial node mappings
   em.add_def(ElementDefinition(EDGE2, 1, 1, 2));
@@ -765,7 +765,7 @@ void GmshIO::read_mesh(std::istream & in)
                   // Store this elem in a quickly-searchable
                   // container to use it to assign boundary
                   // conditions later.
-                  provide_bcs.insert(std::make_pair(elem->key(), elem));
+                  provide_bcs.emplace(elem->key(), elem);
                 }
 
               // 2nd loop over active elements - use lower dimensional element data to set BCs for higher dimensional elements

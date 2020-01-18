@@ -386,7 +386,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           sym_side = (x_sym && on_x_sym) || (y_sym && on_y_sym) || (z_sym && on_z_sym);
 
           if (!sym_side)
-            faces.insert( std::make_pair(elem->id(), s) );
+            faces.emplace(elem->id(), s);
 
         } // neighbor(s) == nullptr
 

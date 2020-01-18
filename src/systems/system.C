@@ -668,13 +668,12 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
 
   // Otherwise build the vector
   NumericVector<Number> * buf = NumericVector<Number>::build(this->comm()).release();
-  _vectors.insert (std::make_pair (vec_name, buf));
-  _vector_projections.insert (std::make_pair (vec_name, projections));
-
-  _vector_types.insert (std::make_pair (vec_name, type));
+  _vectors.emplace(vec_name, buf);
+  _vector_projections.emplace(vec_name, projections);
+  _vector_types.emplace(vec_name, type);
 
   // Vectors are primal by default
-  _vector_is_adjoint.insert (std::make_pair (vec_name, -1));
+  _vector_is_adjoint.emplace(vec_name, -1);
 
   // Initialize it if necessary
   if (_is_initialized)

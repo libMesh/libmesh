@@ -458,8 +458,7 @@ void nedelec_one_compute_constraints (DofConstraints & /*constraints*/,
   // A reference to the constraint row.
   DofConstraintRow & constraint_row = constraints[my_dof_g].first;
 
-  constraint_row.insert(std::make_pair (their_dof_g,
-  their_dof_value));
+  constraint_row.emplace(their_dof_g, their_dof_value);
   }
   #ifdef DEBUG
   // Protect for the case u_i = 0.999 u_j,

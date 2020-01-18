@@ -528,7 +528,7 @@ void UNVIO::groups_in (std::istream & in_file)
                       cast_int<subdomain_id_type>(group_number);
 
                     // Store the lower-dimensional element in the provide_bcs container.
-                    provide_bcs.insert(std::make_pair(group_elem->key(), group_elem));
+                    provide_bcs.emplace(group_elem->key(), group_elem);
                   }
 
                 // dim == max_dim means this group defines a subdomain ID

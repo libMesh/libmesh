@@ -73,8 +73,8 @@ void TopologyMap::add_node(const Node & mid_node,
         libmesh_assert_equal_to (it->second, mid_node_id);
 #endif
 
-      this->_map.insert(std::make_pair(std::make_pair(lower_id, upper_id),
-                                       mid_node_id));
+      this->_map.emplace(std::make_pair(lower_id, upper_id),
+                         mid_node_id);
 
     }
 }

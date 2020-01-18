@@ -623,7 +623,7 @@ void ExodusII_IO::read_elemental_variable(std::string elemental_var_name,
   for (auto & pr : elem_var_value_map)
     {
       const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(pr.first);
-      unique_id_to_value_map.insert(std::make_pair(elem->top_parent()->unique_id(), pr.second));
+      unique_id_to_value_map.emplace(elem->top_parent()->unique_id(), pr.second);
     }
 }
 
@@ -845,8 +845,8 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
       // matches. It shouldn't actually be possible for this to fail
       // (since if the Mesh was like this it would have already
       // failed) but it doesn't hurt to be on the safe side.
-      auto pr2 = subdomain_id_to_vertices_per_elem.insert
-        (std::make_pair(elem->subdomain_id(), elem->n_vertices()));
+      auto pr2 = subdomain_id_to_vertices_per_elem.emplace
+        (elem->subdomain_id(), elem->n_vertices());
       if (!pr2.second && pr2.first->second != elem->n_vertices())
         libmesh_error_msg("Elem with different number of vertices found.");
     }

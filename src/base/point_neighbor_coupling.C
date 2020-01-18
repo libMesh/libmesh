@@ -74,7 +74,7 @@ void PointNeighborCoupling::operator()
     {
       for (const auto & elem : as_range(range_begin, range_end))
         if (elem->processor_id() != p)
-          coupled_elements.insert (std::make_pair(elem,_dof_coupling));
+          coupled_elements.emplace(elem, _dof_coupling);
 
       return;
     }
@@ -95,7 +95,7 @@ void PointNeighborCoupling::operator()
           std::set<const Elem *> point_neighbors;
 
           if (elem->processor_id() != p)
-            coupled_elements.insert (std::make_pair(elem,_dof_coupling));
+            coupled_elements.emplace(elem, _dof_coupling);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
           // We might have a periodic neighbor here
@@ -115,8 +115,7 @@ void PointNeighborCoupling::operator()
                 next_elements_to_check.insert(neighbor);
 
               if (neighbor->processor_id() != p)
-                coupled_elements.insert
-                  (std::make_pair(neighbor, _dof_coupling));
+                coupled_elements.emplace(neighbor, _dof_coupling);
             }
         }
     }

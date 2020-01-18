@@ -2316,7 +2316,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
           const dof_id_type id = node.id();
           const proc_id_map_type::iterator it = new_proc_ids.find(id);
           if (it == new_proc_ids.end())
-            new_proc_ids.insert(std::make_pair(id,pid));
+            new_proc_ids.emplace(id, pid);
           else
             it->second = node.choose_processor_id(it->second, pid);
         }
@@ -2348,7 +2348,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
           const processor_id_type pid = p.second;
           const proc_id_map_type::iterator it = new_proc_ids.find(id);
           if (it == new_proc_ids.end())
-            new_proc_ids.insert(std::make_pair(id,pid));
+            new_proc_ids.emplace(id, pid);
           else
             {
               const Node & node = mesh.node_ref(id);

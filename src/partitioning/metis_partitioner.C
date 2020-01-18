@@ -117,7 +117,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
     std::size_t cnt=0;
     for (const auto & elem : as_range(beg, end))
-      global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
+      global_index_map.emplace(elem->id(), global_index[cnt++]);
 
     libmesh_assert_equal_to (global_index_map.size(), n_range_elem);
   }
@@ -142,7 +142,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
       elem->find_interior_neighbors(neighbor_set);
 
       for (auto & neighbor : neighbor_set)
-        interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
+        interior_to_boundary_map.emplace(neighbor, elem);
     }
 
   // Data structure that Metis will fill up on processor 0 and broadcast.

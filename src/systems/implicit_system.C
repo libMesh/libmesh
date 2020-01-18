@@ -212,7 +212,7 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name)
 
   // Otherwise build the matrix and return it.
   SparseMatrix<Number> * buf = SparseMatrix<Number>::build(this->comm()).release();
-  _matrices.insert (std::make_pair (mat_name, buf));
+  _matrices.emplace(mat_name, buf);
 
   return *buf;
 }

@@ -157,7 +157,7 @@ void TetGenIO::node_in (std::istream & node_stream)
         node_stream >> dummy;
 
       // Store the new position of the node under its label.
-      //_assign_nodes.insert (std::make_pair(node_lab,i));
+      //_assign_nodes.emplace(node_lab,i);
       _assign_nodes[node_lab] = i;
 
       Point p(xyz[0]);

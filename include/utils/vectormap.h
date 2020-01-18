@@ -120,6 +120,17 @@ public:
   }
 
   /**
+   * Inserts \p x into the vector map, using "args" to construct it
+   * in-place.
+   */
+  template<class... Args>
+  void emplace(Args&&... args)
+  {
+    _sorted = false;
+    this->emplace_back(args...);
+  }
+
+  /**
    * Sort & unique the vectormap, preparing for use.
    */
   void sort()

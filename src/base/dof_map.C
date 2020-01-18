@@ -1569,9 +1569,8 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
           // If we didn't find it, then we need to create it.
           if (column_variable_list == column_variable_lists.end())
             {
-              std::pair<std::map<const CouplingMatrix *, std::vector<unsigned int>>::iterator, bool>
-                inserted_variable_list_pair = column_variable_lists.insert(std::make_pair(ghost_coupling,
-                                                                                          std::vector<unsigned int>()));
+              auto inserted_variable_list_pair =
+                column_variable_lists.emplace(ghost_coupling, std::vector<unsigned int>());
               column_variable_list = inserted_variable_list_pair.first;
 
               std::vector<unsigned int> & new_variable_list =

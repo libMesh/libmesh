@@ -1379,12 +1379,12 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
 
   // We don't get insert_or_assign until C++17 so we make do.
   std::pair<DofConstraints::iterator, bool> it =
-    _dof_constraints.insert(std::make_pair(dof_number, constraint_row));
+    _dof_constraints.emplace(dof_number, constraint_row);
   if (!it.second)
     it.first->second = constraint_row;
 
   std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
-    _primal_constraint_values.insert(std::make_pair(dof_number, constraint_rhs));
+    _primal_constraint_values.emplace(dof_number, constraint_rhs);
   if (!rhs_it.second)
     rhs_it.first->second = constraint_rhs;
 }
@@ -1426,8 +1426,7 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
 
   // We don't get insert_or_assign until C++17 so we make do.
   std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
-    _adjoint_constraint_values[qoi_index].insert(std::make_pair(dof_number,
-                                                                constraint_rhs));
+    _adjoint_constraint_values[qoi_index].emplace(dof_number, constraint_rhs);
   if (!rhs_it.second)
     rhs_it.first->second = constraint_rhs;
 }
@@ -3000,8 +2999,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                       continue;
 
                     if (adjoint_map_it == _adjoint_constraint_values.end())
-                      adjoint_map_it = _adjoint_constraint_values.insert
-                        (std::make_pair(q,DofConstraintValueMap())).first;
+                      adjoint_map_it = _adjoint_constraint_values.emplace
+                        (q, DofConstraintValueMap()).first;
 
                     DofConstraintValueMap & constraint_map =
                       adjoint_map_it->second;
@@ -4241,8 +4240,8 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                         continue;
 
                       if (adjoint_map_it == _adjoint_constraint_values.end())
-                        adjoint_map_it = _adjoint_constraint_values.insert
-                          (std::make_pair(q,DofConstraintValueMap())).first;
+                        adjoint_map_it = _adjoint_constraint_values.emplace
+                          (q, DofConstraintValueMap()).first;
 
                       DofConstraintValueMap & constraint_map =
                         adjoint_map_it->second;
