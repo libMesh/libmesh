@@ -194,22 +194,32 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONTAINER_EMPLACE],
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <map>
     @%:@include <set>
+    @%:@include <vector>
     ]], [[
     {
       std::map<int, int> m;
       m.emplace(1,2);
+      m.emplace_hint(m.begin(), 0, 3);
     }
     {
       std::set<int> s;
       s.emplace(1);
+      s.emplace_hint(s.begin(), 0);
     }
     {
       std::multimap<int, int> m;
       m.emplace(1,2);
+      m.emplace_hint(m.begin(), 0, 3);
     }
     {
       std::multiset<int> s;
       s.emplace(1);
+      s.emplace_hint(s.begin(), 0);
+    }
+    {
+      std::vector<int> v;
+      v.emplace(v.begin(), 0);
+      v.emplace_back(1);
     }
     ]])],[
         AC_MSG_RESULT(yes)
