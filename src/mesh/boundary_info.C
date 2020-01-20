@@ -453,7 +453,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
             add_this_side = true;
 
           if (add_this_side)
-            sides_to_add.push_back(std::make_pair(elem->id(), s));
+            sides_to_add.emplace_back(elem->id(), s);
         }
     }
 
@@ -1888,7 +1888,7 @@ BoundaryInfo::build_node_list_from_side_list()
           this->boundary_ids(_mesh.node_ptr(id), bcids);
 
           for (const auto & b : bcids)
-            responses[p-1].push_back(std::make_pair(id, b));
+            responses[p-1].emplace_back(id, b);
         }
 
       this->comm().send

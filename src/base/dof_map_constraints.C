@@ -2904,8 +2904,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
               node_keys_vals.back();
             this_node_kv.reserve(row_size);
             for (const auto & j : row)
-              this_node_kv.push_back
-                (std::make_pair(j.first->id(), j.second));
+              this_node_kv.emplace_back(j.first->id(), j.second);
 
             offsets.push_back(_node_constraints[node].second);
           }
@@ -3172,7 +3171,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                   for (const auto & j : row)
                     {
                       const Node * node = j.first;
-                      data[i].push_back(std::make_pair(node->id(), j.second));
+                      data[i].emplace_back(node->id(), j.second);
 
                       // If we're not sure whether our send
                       // destination already has this node, let's give
@@ -3193,8 +3192,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                   // constraining nodes" (e.g. due to user node
                   // constraint equations) from "no constraint".
                   // We'll use invalid_id for the latter.
-                  data[i].push_back
-                    (std::make_pair(DofObject::invalid_id, Real(0)));
+                  data[i].emplace_back(DofObject::invalid_id, Real(0));
                 }
             }
 
@@ -3777,8 +3775,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
             {
               const Node * constraining = j.first;
 
-              keys_vals[push_i].push_back
-                (std::make_pair(constraining->id(), j.second));
+              keys_vals[push_i].emplace_back(constraining->id(), j.second);
 
               if (constraining->processor_id() != pid)
                 nodes.insert(constraining);
@@ -4120,8 +4117,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                   // constraining dofs" (e.g. due to Dirichlet
                   // constraint equations) from "no constraint".
                   // We'll use invalid_id for the latter.
-                  data[i].push_back
-                    (std::make_pair(DofObject::invalid_id, Real(0)));
+                  data[i].emplace_back(DofObject::invalid_id, Real(0));
                 }
             }
         };
@@ -4518,8 +4514,8 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & periodic_bounda
       PeriodicBoundaryBase * inverse_boundary = periodic_boundary.clone(PeriodicBoundaryBase::INVERSE).release();
 
       // _periodic_boundaries takes ownership of the pointers
-      _periodic_boundaries->insert(std::make_pair(boundary->myboundary, boundary));
-      _periodic_boundaries->insert(std::make_pair(inverse_boundary->myboundary, inverse_boundary));
+      _periodic_boundaries->emplace(boundary->myboundary, boundary);
+      _periodic_boundaries->emplace(inverse_boundary->myboundary, inverse_boundary);
     }
   else
     {
@@ -4557,8 +4553,8 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
 
   // Add the periodic boundary and its inverse to the PeriodicBoundaries data structure.  The
   // PeriodicBoundaries data structure takes ownership of the pointers.
-  _periodic_boundaries->insert(std::make_pair(p_boundary->myboundary, p_boundary));
-  _periodic_boundaries->insert(std::make_pair(p_inverse_boundary->myboundary, p_inverse_boundary));
+  _periodic_boundaries->emplace(p_boundary->myboundary, p_boundary);
+  _periodic_boundaries->emplace(p_inverse_boundary->myboundary, p_inverse_boundary);
 }
 
 

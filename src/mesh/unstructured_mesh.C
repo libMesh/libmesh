@@ -1231,9 +1231,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
                * new entry, so that the so_elem can use
                * \p pos for inserting the node
                */
-              adj_vertices_to_so_nodes.insert(pos.first,
-                                              std::make_pair(adjacent_vertices_ids,
-                                                             so_node));
+              adj_vertices_to_so_nodes.emplace_hint
+                (pos.first, adjacent_vertices_ids, so_node);
 
               so_elem->set_node(son) = so_node;
             }

@@ -2334,7 +2334,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
         continue;
       const processor_id_type pid = it->second;
       if (node->processor_id() != DofObject::invalid_processor_id)
-        ids_to_push[node->processor_id()].push_back(std::make_pair(id, pid));
+        ids_to_push[node->processor_id()].emplace_back(id, pid);
     }
 
   auto action_functor =

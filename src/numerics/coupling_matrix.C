@@ -86,8 +86,8 @@ CouplingMatrix & CouplingMatrix::operator&= (const CouplingMatrix & other)
       // but that's okay; the only iterator we need is for the newly
       // inserted range.
       else
-        start_range = lb = this->_ranges.insert
-          (next, std::make_pair(other_range_start, other_range_end));
+        start_range = lb = this->_ranges.emplace
+          (next, other_range_start, other_range_end);
 
       // At this point we have a range lb that may potentially overlap
       // subsequent existing ranges, in which case we need to merge

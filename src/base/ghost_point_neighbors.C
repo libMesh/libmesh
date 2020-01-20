@@ -24,7 +24,6 @@
 
 // C++ Includes
 #include <unordered_set>
-#include <utility> // std::make_pair
 
 namespace libMesh
 {

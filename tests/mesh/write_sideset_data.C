@@ -76,7 +76,7 @@ public:
                 Real val = static_cast<Real>(b_id);
 
                 // Insert into the vals map.
-                vals.insert(std::make_pair(t, val));
+                vals.emplace(t, val);
               }
           }
 

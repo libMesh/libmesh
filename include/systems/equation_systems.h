@@ -668,7 +668,7 @@ T_sys & EquationSystems::add_system (const std::string & name)
       const unsigned int sys_num = this->n_systems();
       ptr = new T_sys(*this, name, sys_num);
 
-      _systems.insert (std::make_pair(name, ptr));
+      _systems.emplace(name, ptr);
 
       if (!_enable_default_ghosting)
         this->_remove_default_ghosting(sys_num);

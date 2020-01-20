@@ -504,8 +504,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
           // we will number it, and create a mapping from its old global index to
           // the new global index, for lookup purposes when neighbors come calling
-          old_global_to_new_global_map.push_back(std::make_pair(global_node_idx,
-                                                                my_next_node));
+          old_global_to_new_global_map.emplace_back(global_node_idx, my_next_node);
 
           // "Catch" the node pointer after addition, make sure the
           // ID matches the requested value.

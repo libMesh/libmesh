@@ -887,14 +887,14 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
       if (success)
         {
           // if the side set is of the form of "391, S2"
-          id_storage.push_back( std::make_pair(elem_id, side_id) );
+          id_storage.emplace_back(elem_id, side_id);
         }
       else
         {
           // if the side set is of the form of "Elset_1, S3"
           const auto & vec = libmesh_map_find(_elemset_ids, elem_id_or_set);
           for (const auto & elem_id_in_elset : vec)
-            id_storage.push_back( std::make_pair(elem_id_in_elset, side_id) );
+            id_storage.emplace_back(elem_id_in_elset, side_id);
         }
 
       // Extract remaining characters on line including newline

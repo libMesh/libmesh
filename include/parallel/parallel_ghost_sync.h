@@ -483,11 +483,8 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
         continue;
 
       requested_objs_id[obj_procid].push_back(elem->id());
-      requested_objs_parent_id_child_num[obj_procid].push_back
-        (std::make_pair
-         (parent->id(),
-          cast_int<unsigned char>
-            (parent->which_child_am_i(elem))));
+      requested_objs_parent_id_child_num[obj_procid].emplace_back
+        (parent->id(), cast_int<unsigned char>(parent->which_child_am_i(elem)));
     }
 
   auto gather_functor =
@@ -648,20 +645,16 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
             {
               libmesh_assert_not_equal_to
                 (node_pid, DofObject::invalid_processor_id);
-              requested_objs_elem_id_node_num[node_pid].push_back
-                (std::make_pair
-                 (elem_id,
-                  cast_int<unsigned char>(n)));
+              requested_objs_elem_id_node_num[node_pid].emplace_back
+                (elem_id, cast_int<unsigned char>(n));
             }
           else
             {
               const processor_id_type request_pid =
                 (node_pid == DofObject::invalid_processor_id) ?
                  proc_id : node_pid;
-              requested_objs_elem_id_node_num[request_pid].push_back
-                (std::make_pair
-                 (elem_id,
-                  cast_int<unsigned char>(n)));
+              requested_objs_elem_id_node_num[request_pid].emplace_back
+                (elem_id,cast_int<unsigned char>(n));
             }
         }
     }

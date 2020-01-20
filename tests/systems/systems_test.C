@@ -67,22 +67,22 @@ public:
           {
             if (elem->processor_id() != p)
               {
-                coupled_elements.insert (std::make_pair(elem, null_mat));
+                coupled_elements.emplace(elem, null_mat);
 
                 const Elem * neighbor = _mesh.elem_ptr(node_elem_id_2);
                 if (neighbor->processor_id() != p)
-                  coupled_elements.insert (std::make_pair(neighbor, null_mat));
+                  coupled_elements.emplace(neighbor, null_mat);
               }
           }
         if (elem->id() == node_elem_id_2)
           {
             if (elem->processor_id() != p)
               {
-                coupled_elements.insert (std::make_pair(elem, null_mat));
+                coupled_elements.emplace(elem, null_mat);
 
                 const Elem * neighbor = _mesh.elem_ptr(node_elem_id_1);
                 if (neighbor->processor_id() != p)
-                  coupled_elements.insert (std::make_pair(neighbor, null_mat));
+                  coupled_elements.emplace(neighbor, null_mat);
               }
           }
       }

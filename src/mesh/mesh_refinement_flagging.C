@@ -291,8 +291,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
         const dof_id_type eid = elem->id();
         is_active[eid] = true;
         libmesh_assert_less (eid, error_per_cell.size());
-        sorted_error.push_back
-          (std::make_pair(error_per_cell[eid], eid));
+        sorted_error.emplace_back(error_per_cell[eid], eid);
       }
 
     this->comm().max(is_active);
@@ -319,7 +318,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   // non-coarsenable parents to -1.  Get rid of them.
   for (auto i : index_range(error_per_parent))
     if (error_per_parent[i] != -1)
-      sorted_parent_error.push_back(std::make_pair(error_per_parent[i], i));
+      sorted_parent_error.emplace_back(error_per_parent[i], i);
 
   std::sort (sorted_parent_error.begin(), sorted_parent_error.end());
 

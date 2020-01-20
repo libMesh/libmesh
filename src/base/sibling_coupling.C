@@ -48,8 +48,7 @@ void SiblingCoupling::operator()
 
       for (const Elem * sibling : active_siblings)
         if (sibling->processor_id() != p)
-          coupled_elements.insert
-            (std::make_pair(sibling, _dof_coupling));
+          coupled_elements.emplace(sibling, _dof_coupling);
     }
 }
 

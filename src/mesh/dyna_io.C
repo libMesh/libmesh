@@ -633,7 +633,7 @@ void DynaIO::read_mesh(std::istream & in)
                   global_node_idx = my_global_nodes[spline_node_index];
 
                   if (coef != 0) // Ignore irrelevant spline nodes
-                    key.push_back(std::make_pair(global_node_idx, coef));
+                    key.emplace_back(global_node_idx, coef);
                 }
 
               auto local_node_it = local_nodes.find(key);
@@ -663,7 +663,7 @@ void DynaIO::read_mesh(std::istream & in)
                       p.add_scaled(*spline_node, coef);
                       w += coef * spline_weights[my_node_idx];
 
-                      constraint_row.push_back(std::make_pair(spline_node->id(), coef));
+                      constraint_row.emplace_back(spline_node->id(), coef);
                     }
 
                   Node *n = mesh.add_point(p);
