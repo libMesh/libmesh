@@ -9982,6 +9982,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
     #include <map>
     #include <set>
+    #include <vector>
 
 int
 main ()
@@ -9990,18 +9991,27 @@ main ()
     {
       std::map<int, int> m;
       m.emplace(1,2);
+      m.emplace_hint(m.begin(), 0, 3);
     }
     {
       std::set<int> s;
       s.emplace(1);
+      s.emplace_hint(s.begin(), 0);
     }
     {
       std::multimap<int, int> m;
       m.emplace(1,2);
+      m.emplace_hint(m.begin(), 0, 3);
     }
     {
       std::multiset<int> s;
       s.emplace(1);
+      s.emplace_hint(s.begin(), 0);
+    }
+    {
+      std::vector<int> v;
+      v.emplace(v.begin(), 0);
+      v.emplace_back(1);
     }
 
   ;
@@ -30568,6 +30578,7 @@ main ()
   if (m.size() != 2) return 1;
   std::unordered_multimap<int, int>::iterator it = m.erase(m.begin());
   m.emplace(1, 4);
+  m.emplace_hint(m.begin(), 0, 5);
 
   ;
   return 0;
@@ -30631,6 +30642,7 @@ main ()
   m.insert(std::make_pair(1, 2));
   m.emplace(3, 4);
   std::unordered_map<int, int>::iterator it = m.erase(m.begin());
+  m.emplace_hint(m.begin(), 0, 5);
 
   ;
   return 0;
@@ -30696,6 +30708,7 @@ main ()
   if (s.size() != 2) return 1;
   std::unordered_multiset<int>::iterator it = s.erase(s.begin());
   s.emplace(1);
+  s.emplace_hint(s.begin(), 0);
 
   ;
   return 0;
@@ -30760,6 +30773,7 @@ main ()
   s.insert(2);
   std::unordered_set<int>::iterator it = s.erase(s.begin());
   s.emplace(3);
+  s.emplace_hint(s.begin(), 0);
 
   ;
   return 0;
