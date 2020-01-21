@@ -30,6 +30,8 @@
 
 using namespace libMesh;
 
+const boundary_id_type traction_boundary_id = BOUNDARY_ID_MAX_X;
+
 // The Navier-Stokes system class.
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
@@ -41,10 +43,10 @@ public:
                    const std::string & name_in,
                    const unsigned int number_in)
     : FEMSystem(es, name_in, number_in),
+      _dim(3),
       _rho(1.0)
   {}
 
-#if LIBMESH_DIM > 2
   // System initialization
   virtual void init_data ();
 
@@ -62,9 +64,12 @@ public:
   // Mass matrix part
   virtual bool mass_residual (bool request_jacobian,
                               DiffContext & context);
-#endif // LIBMESH_DIM > 2
+
+  void set_dim(unsigned int dim) { _dim = dim; }
 
 private:
+
+  unsigned int _dim;
 
   // Indices for each variable;
   unsigned int _u_var, _v_var, _w_var;

@@ -90,21 +90,20 @@ int main (int argc, char ** argv)
 #endif
 
   // Initialize the cantilever mesh
-  const unsigned int dim = 3;
+  const unsigned int dim = infile("dim", 3);
 
-  // Make sure libMesh was compiled for 3D
-  libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
+  // Make sure libMesh was compiled for 2D/3D
+  libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
-  // Create a 3D mesh distributed across the default MPI communicator.
+  // Create a mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
-  MeshTools::Generation::build_cube (mesh,
-                                     32,
-                                     8,
-                                     4,
-                                     0., 1.*x_scaling,
-                                     0., 0.3,
-                                     0., 0.1,
-                                     HEX8);
+  if (dim == 3)
+    MeshTools::Generation::build_cube
+      (mesh, 32, 8, 4, 0., 1.*x_scaling, 0., 0.3, 0., 0.1, HEX8);
+  else if (dim == 2)
+    MeshTools::Generation::build_square
+      (mesh, 8, 4, 0., 1.*x_scaling, 0., 0.3, QUAD4); else
+    libmesh_error_msg("Unsupported dim = " << dim);
 
 
   // Print information about the mesh to the screen.
@@ -141,7 +140,8 @@ int main (int argc, char ** argv)
               found_side_max_y = true;
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z)
+              || dim == 2)
             {
               side_max_z = side;
               found_side_max_z = true;
@@ -155,7 +155,7 @@ int main (int argc, char ** argv)
         for (auto n : elem->node_index_range())
           if (elem->is_node_on_side(n, side_max_x) &&
               elem->is_node_on_side(n, side_max_y) &&
-              elem->is_node_on_side(n, side_max_z))
+              (dim == 3 && elem->is_node_on_side(n, side_max_z)))
             mesh.get_boundary_info().add_node(elem->node_ptr(n), NODE_BOUNDARY_ID);
 
       // If elem has sides on boundaries
@@ -171,9 +171,11 @@ int main (int argc, char ** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // Declare the system "Navier-Stokes" and its variables.
+  // Declare the system "Linear Elasticity" and its variables.
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
+
+  system.set_dim(dim);
 
   // Solve this as a time-dependent or steady system
   std::string time_solver = infile("time_solver","DIE!");
@@ -187,13 +189,15 @@ int main (int argc, char ** argv)
       v_system = &equation_systems.add_system<ExplicitSystem> ("Velocity");
       v_system->add_variable("u_vel", FIRST, LAGRANGE);
       v_system->add_variable("v_vel", FIRST, LAGRANGE);
-      v_system->add_variable("w_vel", FIRST, LAGRANGE);
+      if (dim == 3)
+        v_system->add_variable("w_vel", FIRST, LAGRANGE);
 
       // Create ExplicitSystem to help output acceleration
       a_system = &equation_systems.add_system<ExplicitSystem> ("Acceleration");
       a_system->add_variable("u_accel", FIRST, LAGRANGE);
       a_system->add_variable("v_accel", FIRST, LAGRANGE);
-      a_system->add_variable("w_accel", FIRST, LAGRANGE);
+      if (dim == 3)
+        a_system->add_variable("w_accel", FIRST, LAGRANGE);
     }
 
   if (time_solver == std::string("newmark"))
