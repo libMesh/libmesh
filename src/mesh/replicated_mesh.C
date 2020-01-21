@@ -1025,6 +1025,14 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
             }
         }
 
+      // At this point, if h_min==0 it means that there were at least two coincident
+      // nodes on the surfaces being stitched, and we don't currently support that case.
+      // (It might be possible to support, but getting it exactly right would be tricky
+      // and probably not worth the extra complications to the "normal" case.)
+      if (h_min < std::numeric_limits<Real>::epsilon())
+        libmesh_error_msg("Coincident nodes detected on source and/or target "
+                          "surface, stitching meshes is not possible.");
+
       // We require nanoflann for the "binary search" (really kd-tree)
       // option to work. If it's not available, turn that option off,
       // warn the user, and fall back on the N^2 search algorithm.
