@@ -103,7 +103,7 @@ class OverlappingCouplingFunctor : public GhostingFunctor
             const Elem * overlapping_elem = (*sub_point_locator)( qp, &allowed_subdomains );
 
             if( overlapping_elem && overlapping_elem->processor_id() != p )
-              coupled_elements.insert( std::make_pair(overlapping_elem,_coupling_matrix.get()) );
+              coupled_elements.emplace(overlapping_elem, _coupling_matrix.get());
           }
       }
   }

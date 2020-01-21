@@ -283,7 +283,7 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
           std::unique_ptr<Elem> side = elem->side_ptr(s);
 
           for (auto n : side->node_index_range())
-            node_id_map.insert(std::make_pair(side->node_id(n), /*dummy_value=*/0));
+            node_id_map.emplace(side->node_id(n), /*dummy_value=*/0);
         }
 
   // For each node in the map, insert it into the input mesh and keep

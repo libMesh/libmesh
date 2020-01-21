@@ -303,7 +303,7 @@ void EquationSystems::_read_impl (const std::string & name,
                                 read_additional_data,
                                 read_legacy_format);
 
-        xda_systems.push_back(std::make_pair(sys_name, &new_system));
+        xda_systems.emplace_back(sys_name, &new_system);
 
         // If we're only creating "basic" systems, we need to tell
         // each system that before we call init() later.

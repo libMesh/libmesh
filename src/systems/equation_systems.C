@@ -934,8 +934,7 @@ EquationSystems::find_variable_numbers
             continue;
 
           // Otherwise, this variable should be output
-          var_nums.push_back
-            (std::make_pair(system.number(), var));
+          var_nums.emplace_back(system.number(), var);
         }
     }
 

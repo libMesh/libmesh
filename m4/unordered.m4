@@ -13,6 +13,7 @@ ac_cv_cxx_unordered_map,
   m.insert(std::make_pair(1, 2));
   m.emplace(3, 4);
   std::unordered_map<int, int>::iterator it = m.erase(m.begin());
+  m.emplace_hint(m.begin(), 0, 5);
 ],
  ac_cv_cxx_unordered_map=yes, ac_cv_cxx_unordered_map=no)
  AC_LANG_RESTORE
@@ -46,6 +47,7 @@ ac_cv_cxx_unordered_multimap,
   if (m.size() != 2) return 1;
   std::unordered_multimap<int, int>::iterator it = m.erase(m.begin());
   m.emplace(1, 4);
+  m.emplace_hint(m.begin(), 0, 5);
 ],
  ac_cv_cxx_unordered_multimap=yes, ac_cv_cxx_unordered_multimap=no)
  AC_LANG_RESTORE
@@ -79,6 +81,7 @@ ac_cv_cxx_unordered_multiset,
   if (s.size() != 2) return 1;
   std::unordered_multiset<int>::iterator it = s.erase(s.begin());
   s.emplace(1);
+  s.emplace_hint(s.begin(), 0);
 ],
  ac_cv_cxx_unordered_multiset=yes,
  ac_cv_cxx_unordered_multiset=no)
@@ -112,6 +115,7 @@ ac_cv_cxx_unordered_set,
   s.insert(2);
   std::unordered_set<int>::iterator it = s.erase(s.begin());
   s.emplace(3);
+  s.emplace_hint(s.begin(), 0);
 ],
  ac_cv_cxx_unordered_set=yes, ac_cv_cxx_unordered_set=no)
  AC_LANG_RESTORE

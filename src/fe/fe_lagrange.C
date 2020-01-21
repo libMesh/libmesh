@@ -795,8 +795,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                   if ((std::abs(their_dof_value) > 1.e-5) &&
                       (std::abs(their_dof_value) < .999))
                     {
-                      constraint_row->insert(std::make_pair (their_dof_g,
-                                                             their_dof_value));
+                      constraint_row->emplace(their_dof_g, their_dof_value);
                     }
 #ifdef DEBUG
                   // Protect for the case u_i = 0.999 u_j,

@@ -1926,8 +1926,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
 
                           if (pmid == bracketed_pt)
                             {
-                              cached_bracketing_nodes[em_vers][c][n].push_back
-                                (std::make_pair(parent_n1,parent_n2));
+                              cached_bracketing_nodes[em_vers][c][n].emplace_back(parent_n1, parent_n2);
                               break;
                             }
                           else
@@ -1978,8 +1977,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
 
                           if (pmid == bracketed_pt)
                             {
-                              cached_bracketing_nodes[em_vers][c][n].push_back
-                                (std::make_pair(n1,n2));
+                              cached_bracketing_nodes[em_vers][c][n].emplace_back(n1, n2);
                               break;
                             }
                           else
@@ -2008,8 +2006,7 @@ Elem::bracketing_nodes(unsigned int child,
     {
       const unsigned short n_n = this->n_nodes();
       if (pb.first < n_n && pb.second < n_n)
-        returnval.push_back(std::make_pair(this->node_id(pb.first),
-                                           this->node_id(pb.second)));
+        returnval.emplace_back(this->node_id(pb.first), this->node_id(pb.second));
       else
         {
           // We must be on a non-full-order higher order element...
@@ -2080,7 +2077,7 @@ Elem::bracketing_nodes(unsigned int child,
 
           if (pt1 != DofObject::invalid_id &&
               pt2 != DofObject::invalid_id)
-            returnval.push_back(std::make_pair(pt1, pt2));
+            returnval.emplace_back(pt1, pt2);
         }
     }
 

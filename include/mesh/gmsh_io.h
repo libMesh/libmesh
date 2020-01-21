@@ -185,8 +185,8 @@ private:
     // Helper function to add a (key, value) pair to both maps
     void add_def(const ElementDefinition & eledef)
     {
-      out.insert(std::make_pair(eledef.type, eledef));
-      in.insert(std::make_pair(eledef.gmsh_type, eledef));
+      out.emplace(eledef.type, eledef);
+      in.emplace(eledef.gmsh_type, eledef);
     }
 
     std::map<ElemType, ElementDefinition> out;

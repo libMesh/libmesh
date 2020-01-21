@@ -71,7 +71,7 @@ void MemorySolutionHistory::store()
   // In an empty history we create the first entry
   if (stored_solutions.begin() == stored_solutions.end())
     {
-      stored_solutions.push_back(std::make_pair(_system.time, map_type()));
+      stored_solutions.emplace_back(_system.time, map_type());
       stored_sols = stored_solutions.begin();
     }
 
@@ -82,7 +82,7 @@ void MemorySolutionHistory::store()
       ++stored_sols;
       libmesh_assert (stored_sols == stored_solutions.end());
 #endif
-      stored_solutions.push_back(std::make_pair(_system.time, map_type()));
+      stored_solutions.emplace_back(_system.time, map_type());
       stored_sols = stored_solutions.end();
       --stored_sols;
     }
@@ -91,7 +91,7 @@ void MemorySolutionHistory::store()
   else if (stored_sols->first - _system.time > TOLERANCE)
     {
       libmesh_assert (stored_sols == stored_solutions.begin());
-      stored_solutions.push_front(std::make_pair(_system.time, map_type()));
+      stored_solutions.emplace_front(_system.time, map_type());
       stored_sols = stored_solutions.begin();
     }
 

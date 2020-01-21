@@ -875,7 +875,7 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
         // Creates vector if not already there
         auto & vec = edge_map[edge_key];
-        vec.push_back(std::make_pair(elem->id(), e));
+        vec.emplace_back(elem->id(), e);
       }
 
   // Get reference to the mesh's BoundaryInfo object, as we will be

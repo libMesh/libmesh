@@ -1655,8 +1655,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
                   if (std::abs(their_dof_value) < 10*TOLERANCE)
                     continue;
 
-                  constraint_row->insert(std::make_pair(their_dof_g,
-                                                        their_dof_value));
+                  constraint_row->emplace(their_dof_g, their_dof_value);
                 }
             }
 
@@ -2384,8 +2383,7 @@ compute_periodic_constraints (DofConstraints & constraints,
 
                           if(!periodic->has_transformation_matrix())
                             {
-                              constraint_row->insert(std::make_pair(their_dof_g,
-                                                                    their_dof_value));
+                              constraint_row->emplace(their_dof_g, their_dof_value);
                             }
                           else
                             {
@@ -2403,8 +2401,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                                   libmesh_assert_msg(base_fe_type == dof_map.variable_type(other_var), "FE types must match for all variables involved in constraint");
 
                                   Real var_weighting = periodic->get_transformation_matrix()(variable_number, other_var);
-                                  constraint_row->insert(std::make_pair(neigh_dof_indices_all_variables[index][i],
-                                                                        var_weighting*their_dof_value));
+                                  constraint_row->emplace(neigh_dof_indices_all_variables[index][i],
+                                                          var_weighting*their_dof_value);
                                   index++;
                                 }
                             }
