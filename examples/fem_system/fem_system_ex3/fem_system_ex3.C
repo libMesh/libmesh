@@ -123,25 +123,25 @@ int main (int argc, char ** argv)
         found_side_min_y = false, found_side_max_z = false;
       for (auto side : elem->side_index_range())
         {
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_x))
             {
               side_max_x = side;
               found_side_max_x = true;
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_min_y))
             {
               side_min_y = side;
               found_side_min_y = true;
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_y))
             {
               side_max_y = side;
               found_side_max_y = true;
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_z))
             {
               side_max_z = side;
               found_side_max_z = true;
@@ -156,7 +156,7 @@ int main (int argc, char ** argv)
           if (elem->is_node_on_side(n, side_max_x) &&
               elem->is_node_on_side(n, side_max_y) &&
               elem->is_node_on_side(n, side_max_z))
-            mesh.get_boundary_info().add_node(elem->node_ptr(n), NODE_BOUNDARY_ID);
+            mesh.get_boundary_info().add_node(elem->node_ptr(n), node_boundary_id);
 
       // If elem has sides on boundaries
       // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
@@ -165,7 +165,7 @@ int main (int argc, char ** argv)
         for (auto e : elem->edge_index_range())
           if (elem->is_edge_on_side(e, side_max_x) &&
               elem->is_edge_on_side(e, side_min_y))
-            mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
+            mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
     }
 
   // Create an equation systems object.

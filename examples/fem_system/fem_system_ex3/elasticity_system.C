@@ -27,6 +27,12 @@
 
 using namespace libMesh;
 
+boundary_id_type boundary_id_min_z = 0;
+boundary_id_type boundary_id_min_y = 1;
+boundary_id_type boundary_id_max_x = 2;
+boundary_id_type boundary_id_max_y = 3;
+boundary_id_type boundary_id_min_x = 4;
+boundary_id_type boundary_id_max_z = 5;
 
 #if LIBMESH_DIM > 2
 
@@ -48,9 +54,9 @@ void ElasticitySystem::init_data()
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
   std::set<boundary_id_type> boundary_ids;
-  boundary_ids.insert(BOUNDARY_ID_MIN_X);
-  boundary_ids.insert(NODE_BOUNDARY_ID);
-  boundary_ids.insert(EDGE_BOUNDARY_ID);
+  boundary_ids.insert(boundary_id_min_x);
+  boundary_ids.insert(node_boundary_id);
+  boundary_ids.insert(edge_boundary_id);
 
   std::vector<unsigned int> variables;
   variables.push_back(_u_var);

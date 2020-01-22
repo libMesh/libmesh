@@ -18,19 +18,16 @@
 // DiffSystem framework files
 #include "libmesh/fem_system.h"
 
-// boundary IDs
-#define BOUNDARY_ID_MIN_Z 0
-#define BOUNDARY_ID_MIN_Y 1
-#define BOUNDARY_ID_MAX_X 2
-#define BOUNDARY_ID_MAX_Y 3
-#define BOUNDARY_ID_MIN_X 4
-#define BOUNDARY_ID_MAX_Z 5
-#define NODE_BOUNDARY_ID 10
-#define EDGE_BOUNDARY_ID 20
-
 using namespace libMesh;
 
-const boundary_id_type traction_boundary_id = BOUNDARY_ID_MAX_X;
+// boundary IDs
+extern boundary_id_type
+  boundary_id_min_x, boundary_id_max_x,
+  boundary_id_min_y, boundary_id_max_y,
+  boundary_id_min_z, boundary_id_max_z;
+const boundary_id_type node_boundary_id = 10;
+const boundary_id_type edge_boundary_id = 20;
+static const boundary_id_type & traction_boundary_id = boundary_id_max_x;
 
 // The Navier-Stokes system class.
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
