@@ -90,7 +90,7 @@ int main (int argc, char ** argv)
 #endif
 
   // Initialize the cantilever mesh
-  const unsigned int dim = infile("dim", 3);
+  const unsigned int dim = infile("dim", 2);
 
   // Make sure libMesh was compiled for 2D/3D
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
@@ -124,12 +124,10 @@ int main (int argc, char ** argv)
   // see, so we loop over all elements, not just local elements.
   for (const auto & elem : mesh.element_ptr_range())
     {
-      unsigned int
-        side_max_x = 0, side_min_y = 0,
-        side_max_y = 0, side_max_z = 0;
+      unsigned int side_max_x = 0, side_max_y = 0, side_min_z = 0;
       bool
         found_side_max_x = false, found_side_max_y = false,
-        found_side_min_y = false, found_side_max_z = false;
+        found_side_min_z = false;
       for (auto side : elem->side_index_range())
         {
           if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_x))
@@ -138,43 +136,37 @@ int main (int argc, char ** argv)
               found_side_max_x = true;
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_min_y))
-            {
-              side_min_y = side;
-              found_side_min_y = true;
-            }
-
           if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_y))
             {
               side_max_y = side;
               found_side_max_y = true;
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_z)
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_min_z)
               || dim == 2)
             {
-              side_max_z = side;
-              found_side_max_z = true;
+              side_min_z = side;
+              found_side_min_z = true;
             }
         }
 
       // If elem has sides on boundaries
-      // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
+      // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MIN_Z
       // then let's set a node boundary condition
-      if (found_side_max_x && found_side_max_y && found_side_max_z)
+      if (found_side_max_x && found_side_max_y && found_side_min_z)
         for (auto n : elem->node_index_range())
           if (elem->is_node_on_side(n, side_max_x) &&
               elem->is_node_on_side(n, side_max_y) &&
-              (dim == 3 && elem->is_node_on_side(n, side_max_z)))
+              (dim == 2 || elem->is_node_on_side(n, side_min_z)))
             mesh.get_boundary_info().add_node(elem->node_ptr(n), node_boundary_id);
 
       // If elem has sides on boundaries
-      // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
+      // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Z
       // then let's set an edge boundary condition
-      if (found_side_max_x && found_side_min_y)
+      if (found_side_max_x && found_side_min_z)
         for (auto e : elem->edge_index_range())
           if (elem->is_edge_on_side(e, side_max_x) &&
-              elem->is_edge_on_side(e, side_min_y))
+              (dim == 2 || elem->is_edge_on_side(e, side_min_z)))
             mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
     }
 
