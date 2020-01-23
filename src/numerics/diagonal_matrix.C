@@ -68,7 +68,7 @@ DiagonalMatrix<T>::init()
 {
   libmesh_assert(this->_dof_map);
 
-  _diagonal->init(this->_dof_map->n_dofs());
+  _diagonal->init(this->_dof_map->n_dofs(), this->_dof_map->n_dofs_on_processor(this->processor_id()));
 }
 
 template <typename T>
