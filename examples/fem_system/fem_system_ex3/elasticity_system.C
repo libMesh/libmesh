@@ -265,7 +265,8 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
 
       unsigned int n_qpoints = c.get_side_qrule().n_points();
 
-      Gradient traction(0.0, 0.0, -1.0);
+      Gradient traction;
+      traction(_dim-1) = -1;
 
       for (unsigned int qp=0; qp != n_qpoints; qp++)
         {
