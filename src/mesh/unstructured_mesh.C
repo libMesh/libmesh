@@ -130,7 +130,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
     // Declare a map linking old and new elements, needed to copy the neighbor lists
     typedef std::unordered_map<const Elem *, Elem *> map_type;
-    map_type old_elems_to_new_elems;
+    map_type old_elems_to_new_elems, ip_map;
 
     // Loop over the elements
     for (const auto & old : other_mesh.element_ptr_range())
@@ -143,6 +143,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         Elem * el = ap.release();
 
         el->subdomain_id() = old->subdomain_id();
+
+        // Hold off on trying to set the interior parent because we may actually
+        // add lower dimensional elements before their interior parents
+        if (el->dim() < other_mesh.mesh_dimension() && old->interior_parent())
+          ip_map[old] = el;
 
 #ifdef LIBMESH_ENABLE_AMR
         if (old->has_children())
@@ -203,6 +208,10 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
             old_elems_to_new_elems[old] = new_el;
           }
       }
+
+    for (auto & elem_pair : ip_map)
+      elem_pair.second->set_interior_parent(
+        this->elem_ptr(elem_pair.first->interior_parent()->id() + element_id_offset));
 
     // Loop (again) over the elements to fill in the neighbors
     if (skip_find_neighbors)
