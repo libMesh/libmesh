@@ -219,28 +219,28 @@ public:
     BoundingBox unit(Point(0.,0.,0.), Point(1.,1.,1.));
 
     // Test points inside the box
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.5, 0.5, 0.5)), -0.5, TOLERANCE * TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.5, 0.6, 0.5)), -0.4, TOLERANCE * TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.4, 0.5, 0.5)), -0.4, TOLERANCE * TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.1, 0.1, 0.1)), -0.1, TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(-0.5, unit.signed_distance(Point(0.5, 0.5, 0.5)), TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(-0.4, unit.signed_distance(Point(0.5, 0.6, 0.5)), TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(-0.4, unit.signed_distance(Point(0.4, 0.5, 0.5)), TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(-0.1, unit.signed_distance(Point(0.1, 0.1, 0.1)), TOLERANCE * TOLERANCE);
 
     // Test points on the box
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.0, 0.5, 0.5)), 0., TOLERANCE * TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.0, 0., 0.)), 0., TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(0., unit.signed_distance(Point(1.0, 0.5, 0.5)), TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(0., unit.signed_distance(Point(1.0, 0., 0.)), TOLERANCE * TOLERANCE);
 
     // Test points outside the box
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.5, 0.5, 0.5)), 0.5, TOLERANCE * TOLERANCE);  // right
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(-0.5, 0.5, 0.5)), 0.5, TOLERANCE * TOLERANCE); // left
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.5, 0.5, 1.5)), 0.5, TOLERANCE * TOLERANCE);  // above
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.5, 0.5, -0.5)), 0.5, TOLERANCE * TOLERANCE); // below
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.5, -0.5, 0.5)), 0.5, TOLERANCE * TOLERANCE); // front
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(0.5, 1.5, 0.5)), 0.5, TOLERANCE * TOLERANCE);  // back
+    LIBMESH_ASSERT_FP_EQUAL(0.5, unit.signed_distance(Point(1.5, 0.5, 0.5)), TOLERANCE * TOLERANCE);  // right
+    LIBMESH_ASSERT_FP_EQUAL(0.5, unit.signed_distance(Point(-0.5, 0.5, 0.5)), TOLERANCE * TOLERANCE); // left
+    LIBMESH_ASSERT_FP_EQUAL(0.5, unit.signed_distance(Point(0.5, 0.5, 1.5)), TOLERANCE * TOLERANCE);  // above
+    LIBMESH_ASSERT_FP_EQUAL(0.5, unit.signed_distance(Point(0.5, 0.5, -0.5)), TOLERANCE * TOLERANCE); // below
+    LIBMESH_ASSERT_FP_EQUAL(0.5, unit.signed_distance(Point(0.5, -0.5, 0.5)), TOLERANCE * TOLERANCE); // front
+    LIBMESH_ASSERT_FP_EQUAL(0.5, unit.signed_distance(Point(0.5, 1.5, 0.5)), TOLERANCE * TOLERANCE);  // back
 
     // Outside the box, closest to a corner.
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(2., 2., 2.)), std::sqrt(Real(3)), TOLERANCE * TOLERANCE);    // Point along line (0,0,0) -> (1,1,1)
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(-1., -1., -1.)), std::sqrt(Real(3)), TOLERANCE * TOLERANCE); // Point along line (0,0,0) -> (1,1,1)
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.5, 1.5, -0.5)), std::sqrt(Real(3))/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,1,0)
-    LIBMESH_ASSERT_FP_EQUAL(unit.signed_distance(Point(1.5, -0.5, -0.5)), std::sqrt(Real(3))/2., TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,0,0)
+    LIBMESH_ASSERT_FP_EQUAL(std::sqrt(Real(3)), unit.signed_distance(Point(2., 2., 2.)), TOLERANCE * TOLERANCE);    // Point along line (0,0,0) -> (1,1,1)
+    LIBMESH_ASSERT_FP_EQUAL(std::sqrt(Real(3)), unit.signed_distance(Point(-1., -1., -1.)), TOLERANCE * TOLERANCE); // Point along line (0,0,0) -> (1,1,1)
+    LIBMESH_ASSERT_FP_EQUAL(std::sqrt(Real(3))/2., unit.signed_distance(Point(1.5, 1.5, -0.5)), TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,1,0)
+    LIBMESH_ASSERT_FP_EQUAL(std::sqrt(Real(3))/2., unit.signed_distance(Point(1.5, -0.5, -0.5)), TOLERANCE * TOLERANCE); // Point along line (0.5,0.5,0.5) -> (1,0,0)
   }
 };
 

@@ -45,7 +45,7 @@ private:
     ParsedFunction<Number> x2_copy(x2);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(x2_copy(Point(0.5,1.5,2.5))), 1.0, TOLERANCE*TOLERANCE);
+      (1.0, libmesh_real(x2_copy(Point(0.5,1.5,2.5))), TOLERANCE*TOLERANCE);
 
     ParsedFunction<Number> xy8("x*y*8");
 
@@ -53,7 +53,7 @@ private:
     ParsedFunction<Number> xy8_stolen(std::move(xy8));
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(xy8_stolen(Point(0.5,1.5,2.5))), 6.0, TOLERANCE*TOLERANCE);
+      (6.0, libmesh_real(xy8_stolen(Point(0.5,1.5,2.5))), TOLERANCE*TOLERANCE);
   }
 
   void testInlineGetter()
@@ -65,22 +65,22 @@ private:
     ax2_stolen = std::move(ax2);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(ax2_stolen(Point(0.25,0.25,0.25))), 2.25, TOLERANCE*TOLERANCE);
+      (2.25, libmesh_real(ax2_stolen(Point(0.25,0.25,0.25))), TOLERANCE*TOLERANCE);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(ax2_stolen.get_inline_value("a")), 4.5, TOLERANCE*TOLERANCE);
+      (4.5, libmesh_real(ax2_stolen.get_inline_value("a")), TOLERANCE*TOLERANCE);
 
     ParsedFunction<Number> cxy8
       ("a := 4 ; b := a/2+1; c:=b-a+3.5; c*x*2*y*4");
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(cxy8(Point(0.5,0.5,0.5))), 5.0, TOLERANCE*TOLERANCE);
+      (5.0, libmesh_real(cxy8(Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(cxy8.get_inline_value("b")), 3.0, TOLERANCE*TOLERANCE);
+      (3.0, libmesh_real(cxy8.get_inline_value("b")), TOLERANCE*TOLERANCE);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(cxy8.get_inline_value("c")), 2.5, TOLERANCE*TOLERANCE);
+      (2.5, libmesh_real(cxy8.get_inline_value("c")), TOLERANCE*TOLERANCE);
   }
 
   void testInlineSetter()
@@ -89,23 +89,23 @@ private:
     ax2.set_inline_value("a", 2.5);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(ax2(Point(0.25,0.25,0.25))), 1.25, TOLERANCE*TOLERANCE);
+      (1.25, libmesh_real(ax2(Point(0.25,0.25,0.25))), TOLERANCE*TOLERANCE);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(ax2.get_inline_value("a")), 2.5, TOLERANCE*TOLERANCE);
+      (2.5, libmesh_real(ax2.get_inline_value("a")), TOLERANCE*TOLERANCE);
 
     ParsedFunction<Number> cxy8
       ("a := 4 ; b := a/2+1; c:=b-a+3.5; c*x*2*y*4");
     cxy8.set_inline_value("a", 2);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(cxy8(Point(0.5,0.5,0.5))), 7.0, TOLERANCE*TOLERANCE);
+      (7.0, libmesh_real(cxy8(Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(cxy8.get_inline_value("b")), 2.0, TOLERANCE*TOLERANCE);
+      (2.0, libmesh_real(cxy8.get_inline_value("b")), TOLERANCE*TOLERANCE);
 
     LIBMESH_ASSERT_FP_EQUAL
-      (libmesh_real(cxy8.get_inline_value("c")), 3.5, TOLERANCE*TOLERANCE);
+      (3.5, libmesh_real(cxy8.get_inline_value("c")), TOLERANCE*TOLERANCE);
   }
 
   void testTimeDependence()

@@ -83,8 +83,8 @@ public:
         _matrix->get_row(local_index, cols_to_get, values);
         for (numeric_index_type j = 0; j < _local_size; ++j)
         {
-          LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(values[j]),
-                                  (local_count + 1) * (j + 1) * (_comm->rank() + 1),
+          LIBMESH_ASSERT_FP_EQUAL((local_count + 1) * (j + 1) * (_comm->rank() + 1),
+                                  libMesh::libmesh_real(values[j]),
                                   _tolerance);
           CPPUNIT_ASSERT_EQUAL(cols_to_get[local_count], local_index);
         }

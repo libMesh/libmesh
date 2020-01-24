@@ -340,19 +340,19 @@ public:
 
             if (family == RATIONAL_BERNSTEIN && order > 1)
               LIBMESH_ASSERT_FP_EQUAL
-                (libmesh_real(u),
-                 libmesh_real(rational_test(p, dummy, "", "")),
+                (libmesh_real(rational_test(p, dummy, "", "")),
+                 libmesh_real(u),
                  value_tol);
             else if (order > 1)
               LIBMESH_ASSERT_FP_EQUAL
-                (libmesh_real(u),
-                 libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
+                (libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
                               0.0625*x*z + 0.03125*y*z),
+                 libmesh_real(u),
                  value_tol);
             else
               LIBMESH_ASSERT_FP_EQUAL
-                (libmesh_real(u),
-                 libmesh_real(x + 0.25*y + 0.0625*z),
+                (libmesh_real(x + 0.25*y + 0.0625*z),
+                 libmesh_real(u),
                  value_tol);
           }
 #endif
@@ -420,24 +420,24 @@ public:
                 const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
                 const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 2*x+0.125*y+0.0625*z,
+                LIBMESH_ASSERT_FP_EQUAL(2*x+0.125*y+0.0625*z, libmesh_real(grad_u(0)),
                                         grad_tol);
                 if (_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), y+0.125*x+0.03125*z,
+                  LIBMESH_ASSERT_FP_EQUAL(y+0.125*x+0.03125*z, libmesh_real(grad_u(1)),
                                           grad_tol);
                 if (_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.5*z+0.0625*x+0.03125*y,
+                  LIBMESH_ASSERT_FP_EQUAL(0.5*z+0.0625*x+0.03125*y, libmesh_real(grad_u(2)),
                                           grad_tol);
               }
             else
               {
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)), 1.0,
+                LIBMESH_ASSERT_FP_EQUAL(1.0, libmesh_real(grad_u(0)),
                                         grad_tol);
                 if (_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)), 0.25,
+                  LIBMESH_ASSERT_FP_EQUAL(0.25, libmesh_real(grad_u(1)),
                                           grad_tol);
                 if (_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)), 0.0625,
+                  LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(grad_u(2)),
                                           grad_tol);
               }
           }
@@ -514,24 +514,24 @@ public:
                 const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
                 const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 2*x+0.125*y+0.0625*z,
+                LIBMESH_ASSERT_FP_EQUAL(2*x+0.125*y+0.0625*z, libmesh_real(grad_u_x),
                                         grad_tol);
                 if (_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), y+0.125*x+0.03125*z,
+                  LIBMESH_ASSERT_FP_EQUAL(y+0.125*x+0.03125*z, libmesh_real(grad_u_y),
                                           grad_tol);
                 if (_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.5*z+0.0625*x+0.03125*y,
+                  LIBMESH_ASSERT_FP_EQUAL(0.5*z+0.0625*x+0.03125*y, libmesh_real(grad_u_z),
                                           grad_tol);
               }
             else
               {
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x), 1.0,
+                LIBMESH_ASSERT_FP_EQUAL(1.0, libmesh_real(grad_u_x),
                                         grad_tol);
                 if (_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y), 0.25,
+                  LIBMESH_ASSERT_FP_EQUAL(0.25, libmesh_real(grad_u_y),
                                           grad_tol);
                 if (_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z), 0.0625,
+                  LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(grad_u_z),
                                           grad_tol);
               }
           }
@@ -589,15 +589,15 @@ public:
               }
             else if (order > 1)
               {
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,0)), 2,
+                LIBMESH_ASSERT_FP_EQUAL(2, libmesh_real(hess_u(0,0)),
                                         hess_tol);
                 if (_dim > 1)
                   {
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), 0.125,
+                    LIBMESH_ASSERT_FP_EQUAL(0.125, libmesh_real(hess_u(0,1)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,1)), 1,
+                    LIBMESH_ASSERT_FP_EQUAL(1, libmesh_real(hess_u(1,1)),
                                             hess_tol);
                   }
                 if (_dim > 2)
@@ -606,38 +606,38 @@ public:
                                             hess_tol);
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), libmesh_real(hess_u(2,1)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), 0.0625,
+                    LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(hess_u(0,2)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), 0.03125,
+                    LIBMESH_ASSERT_FP_EQUAL(0.03125, libmesh_real(hess_u(1,2)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,2)), 0.5,
+                    LIBMESH_ASSERT_FP_EQUAL(0.5, libmesh_real(hess_u(2,2)),
                                             hess_tol);
                   }
               }
             else
               {
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,0)), 0,
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,0)),
                                         hess_tol);
                 if (_dim > 1)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,1)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,0)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,0)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,1)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,1)),
                                             hess_tol);
                   }
                 if (_dim > 2)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,2)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,2)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,0)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,0)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,1)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,1)),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(2,2)), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,2)),
                                             hess_tol);
                   }
               }
@@ -711,43 +711,43 @@ public:
               }
             else if (order > 1)
               {
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xx), 2,
+                LIBMESH_ASSERT_FP_EQUAL(2, libmesh_real(hess_u_xx),
                                         hess_tol);
                 if (_dim > 1)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xy), 0.125,
+                    LIBMESH_ASSERT_FP_EQUAL(0.125, libmesh_real(hess_u_xy),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yy), 1,
+                    LIBMESH_ASSERT_FP_EQUAL(1, libmesh_real(hess_u_yy),
                                             hess_tol);
                   }
                 if (_dim > 2)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xz), 0.0625,
-                                            hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yz), 0.03125,
-                                            hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_zz), 0.5,
-                                            hess_tol);
+                    LIBMESH_ASSERT_FP_EQUAL( 0.0625, libmesh_real(hess_u_xz),
+                                             hess_tol);
+                    LIBMESH_ASSERT_FP_EQUAL( 0.03125, libmesh_real(hess_u_yz),
+                                             hess_tol);
+                    LIBMESH_ASSERT_FP_EQUAL( 0.5, libmesh_real(hess_u_zz),
+                                             hess_tol);
                   }
               }
             else
               {
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xx), 0,
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xx),
                                         hess_tol);
                 if (_dim > 1)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xy), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xy),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yy), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_yy),
                                             hess_tol);
                   }
                 if (_dim > 2)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_xz), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xz),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_yz), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_yz),
                                             hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u_zz), 0,
+                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_zz),
                                             hess_tol);
                   }
               }

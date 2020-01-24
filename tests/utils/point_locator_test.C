@@ -92,13 +92,13 @@ public:
 
                 if (node)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL((*node)(0), i*h,
+                    LIBMESH_ASSERT_FP_EQUAL(i*h, (*node)(0),
                                             TOLERANCE*TOLERANCE);
                     if (LIBMESH_DIM > 1)
-                      LIBMESH_ASSERT_FP_EQUAL((*node)(1), j*h,
+                      LIBMESH_ASSERT_FP_EQUAL(j*h, (*node)(1),
                                               TOLERANCE*TOLERANCE);
                     if (LIBMESH_DIM > 2)
-                      LIBMESH_ASSERT_FP_EQUAL((*node)(2), k*h,
+                      LIBMESH_ASSERT_FP_EQUAL(k*h, (*node)(2),
                                               TOLERANCE*TOLERANCE);
                   }
               }

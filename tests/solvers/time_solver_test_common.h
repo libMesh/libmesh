@@ -75,8 +75,8 @@ protected:
         system.comm().max(rel_error);
 
         // Using relative error for comparison, so "exact" is 0
-        LIBMESH_ASSERT_FP_EQUAL( 0.0,
-                                 rel_error,
+        LIBMESH_ASSERT_FP_EQUAL( rel_error,
+                                 0.0,
                                  std::numeric_limits<Real>::epsilon()*10 );
       }
   }
