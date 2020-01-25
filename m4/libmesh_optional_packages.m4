@@ -32,13 +32,19 @@ libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
-# Use of TIMPI is required
+# TIMPI is required
 # --------------------------------------------------------------
-libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
-libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
-libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
-# Including timpi_config.h
-libmesh_contrib_INCLUDES="-I\$(top_builddir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
+AS_IF([test -r $top_srcdir/contrib/timpi/README],
+[
+  libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
+  libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
+  libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
+  # Including timpi_config.h
+  libmesh_contrib_INCLUDES="-I\$(top_builddir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
+],
+[
+  AC_MSG_ERROR([You must run "git submodule update --init contrib/timpi" before configuring libmesh])
+])
 
 # --------------------------------------------------------------
 # Allow for disable-optional
