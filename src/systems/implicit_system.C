@@ -137,7 +137,7 @@ void ImplicitSystem::init_matrices ()
 
   // Initialize matrices
   for (auto & pr : _matrices)
-    pr.second->init ();
+    pr.second->init (_matrix_types[pr.first]);
 
   // Set the additional matrices to 0.
   for (auto & pr : _matrices)
@@ -199,7 +199,8 @@ void ImplicitSystem::assemble ()
 
 
 
-SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name)
+SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name,
+                                                   const ParallelType type)
 {
   // only add matrices before initializing...
   if (!_can_add_matrices)
@@ -213,6 +214,7 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name)
   // Otherwise build the matrix and return it.
   SparseMatrix<Number> * buf = SparseMatrix<Number>::build(this->comm()).release();
   _matrices.emplace(mat_name, buf);
+  _matrix_types.emplace(mat_name, type);
 
   return *buf;
 }

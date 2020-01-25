@@ -27,6 +27,7 @@
 #include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/enum_parallel_type.h"
 
 // C++ includes
 #include <cstddef>
@@ -149,8 +150,9 @@ public:
 
   /**
    * Initialize this matrix using the sparsity structure computed by \p dof_map.
+   * @param type The serial/parallel/ghosted type of the matrix
    */
-  virtual void init () = 0;
+  virtual void init (ParallelType type = PARALLEL) = 0;
 
   /**
    * Restores the \p SparseMatrix<T> to a pristine state.

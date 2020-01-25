@@ -144,7 +144,7 @@ void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
 
 
 template <typename T>
-void LaspackMatrix<T>::init ()
+void LaspackMatrix<T>::init (const ParallelType)
 {
   // Ignore calls on initialized objects
   if (this->initialized())

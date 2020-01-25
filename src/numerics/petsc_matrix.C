@@ -355,7 +355,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
 
 template <typename T>
-void PetscMatrix<T>::init ()
+void PetscMatrix<T>::init (const ParallelType)
 {
   libmesh_assert(this->_dof_map);
 

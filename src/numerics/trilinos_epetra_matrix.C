@@ -174,7 +174,7 @@ void EpetraMatrix<T>::init (const numeric_index_type m,
 
 
 template <typename T>
-void EpetraMatrix<T>::init ()
+void EpetraMatrix<T>::init (const ParallelType)
 {
   libmesh_assert(this->_dof_map);
 

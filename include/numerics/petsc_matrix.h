@@ -151,7 +151,7 @@ public:
              const std::vector<numeric_index_type> & n_oz,
              const numeric_index_type blocksize=1);
 
-  virtual void init () override;
+  virtual void init (ParallelType = PARALLEL) override;
 
   /**
    * Update the sparsity pattern based on \p dof_map, and set the matrix

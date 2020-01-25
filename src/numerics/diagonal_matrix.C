@@ -64,11 +64,14 @@ DiagonalMatrix<T>::init(const numeric_index_type m,
 
 template <typename T>
 void
-DiagonalMatrix<T>::init()
+DiagonalMatrix<T>::init(const ParallelType type)
 {
   libmesh_assert(this->_dof_map);
 
-  _diagonal->init(this->_dof_map->n_dofs(), this->_dof_map->n_dofs_on_processor(this->processor_id()));
+  _diagonal->init(this->_dof_map->n_dofs(),
+                  this->_dof_map->n_dofs_on_processor(this->processor_id()),
+                  /*fast=*/false,
+                  type);
 }
 
 template <typename T>
