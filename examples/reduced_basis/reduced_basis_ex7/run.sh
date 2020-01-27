@@ -20,7 +20,7 @@ example_dir=examples/reduced_basis/$example_name
 # both options and skip the runs with incompatible arguments.
 
 options="-online_mode 0 -ksp_type preonly -pc_type lu"
-for solver in "-pc_factor_mat_solver_type mumps" "-pc_factor_mat_solver_package mumps" #"-pc_factor_mat_solver_type superlu" "-pc_factor_mat_solver_package superlu"
+for solver in "-pc_factor_mat_solver_type mumps" "-pc_factor_mat_solver_package mumps" "-pc_factor_mat_solver_type superlu" "-pc_factor_mat_solver_package superlu"
 do
    run_example_no_extra_options "$example_name" "$options $solver"
 
