@@ -123,12 +123,12 @@ public:
 
   void testNorm()
   {
-    LIBMESH_ASSERT_FP_EQUAL( std::sqrt(Real(LIBMESH_DIM)) , m_1_1_1->norm() , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_FP_EQUAL(m_1_1_1->norm() ,  std::sqrt(Real(LIBMESH_DIM)) , TOLERANCE*TOLERANCE );
   }
 
   void testNormSq()
   {
-    LIBMESH_ASSERT_FP_EQUAL( Real(LIBMESH_DIM) , m_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_FP_EQUAL(m_1_1_1->norm_sq() ,  Real(LIBMESH_DIM) , TOLERANCE*TOLERANCE );
   }
 
   void testEquality()

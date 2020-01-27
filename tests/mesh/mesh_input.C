@@ -203,7 +203,7 @@ public:
           {
             Real read_val = sys.point_value(i, elem->centroid());
             LIBMESH_ASSERT_FP_EQUAL
-              (read_val, expected_values[i], TOLERANCE*TOLERANCE);
+              (expected_values[i], read_val, TOLERANCE*TOLERANCE);
           }
     } // end second scope
   } // end testExodusWriteElementDataFromDiscontinuousNodalData

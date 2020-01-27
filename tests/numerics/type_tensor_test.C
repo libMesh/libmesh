@@ -56,10 +56,10 @@ private:
     VectorValue<Real> vector(5, 6, 0);
     auto left_mult = vector * tensor;
     auto right_mult = tensor * vector;
-    LIBMESH_ASSERT_FP_EQUAL(left_mult(0), 23, 1e-12);
-    LIBMESH_ASSERT_FP_EQUAL(left_mult(1), 34, 1e-12);
-    LIBMESH_ASSERT_FP_EQUAL(right_mult(0), 17, 1e-12);
-    LIBMESH_ASSERT_FP_EQUAL(right_mult(1), 39, 1e-12);
+    LIBMESH_ASSERT_FP_EQUAL(23, left_mult(0), 1e-12);
+    LIBMESH_ASSERT_FP_EQUAL(34, left_mult(1), 1e-12);
+    LIBMESH_ASSERT_FP_EQUAL(17, right_mult(0), 1e-12);
+    LIBMESH_ASSERT_FP_EQUAL(39, right_mult(1), 1e-12);
   }
 
   void testOuterProduct()
@@ -68,15 +68,15 @@ private:
     VectorValue<Real> a(2, 3, 4);
     VectorValue<Real> b(5, 6, 7);
     auto product = outer_product(a, b);
-    LIBMESH_ASSERT_FP_EQUAL(product(0, 0), 10, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(0, 1), 12, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(0, 2), 14, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(1, 0), 15, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(1, 1), 18, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(1, 2), 21, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(2, 0), 20, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(2, 1), 24, tol);
-    LIBMESH_ASSERT_FP_EQUAL(product(2, 2), 28, tol);
+    LIBMESH_ASSERT_FP_EQUAL(10, product(0, 0), tol);
+    LIBMESH_ASSERT_FP_EQUAL(12, product(0, 1), tol);
+    LIBMESH_ASSERT_FP_EQUAL(14, product(0, 2), tol);
+    LIBMESH_ASSERT_FP_EQUAL(15, product(1, 0), tol);
+    LIBMESH_ASSERT_FP_EQUAL(18, product(1, 1), tol);
+    LIBMESH_ASSERT_FP_EQUAL(21, product(1, 2), tol);
+    LIBMESH_ASSERT_FP_EQUAL(20, product(2, 0), tol);
+    LIBMESH_ASSERT_FP_EQUAL(24, product(2, 1), tol);
+    LIBMESH_ASSERT_FP_EQUAL(28, product(2, 2), tol);
   }
 
   void testIsZero()

@@ -49,13 +49,13 @@ public:
 
     // Check the values through the interface
     for (unsigned int i=0; i<local_size; i++)
-      LIBMESH_ASSERT_FP_EQUAL(std::abs(v(my_offset + i)), i, TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(i, std::abs(v(my_offset + i)), TOLERANCE*TOLERANCE);
 
     // Check that we can see the same thing with get_array_read
     const PetscScalar * read_only_values = v.get_array_read();
 
     for (unsigned int i=0; i<local_size; i++)
-      LIBMESH_ASSERT_FP_EQUAL(std::abs(read_only_values[i]), i, TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(i, std::abs(read_only_values[i]), TOLERANCE*TOLERANCE);
 
     v.restore_array();
 

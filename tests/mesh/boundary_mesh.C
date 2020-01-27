@@ -207,7 +207,7 @@ public:
             CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
             // We only added right edges
-            LIBMESH_ASSERT_FP_EQUAL(elem->centroid()(0), 0.8,
+            LIBMESH_ASSERT_FP_EQUAL(0.8, elem->centroid()(0),
                                     TOLERANCE*TOLERANCE);
           }
         else
@@ -236,7 +236,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
         // We only added left edges
-        LIBMESH_ASSERT_FP_EQUAL(elem->centroid()(0), 0.2,
+        LIBMESH_ASSERT_FP_EQUAL(0.2, elem->centroid()(0),
                                 TOLERANCE*TOLERANCE);
       }
 

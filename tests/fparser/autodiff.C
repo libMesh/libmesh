@@ -163,9 +163,9 @@ public:
       for (a = -1.0; a < 1.0; a+=0.2642)
         for (y = -1.0; y < 1.0; y+=0.3156)
           {
-            LIBMESH_ASSERT_FP_EQUAL(R.Eval(p), x*a, 1.e-12);
-            LIBMESH_ASSERT_FP_EQUAL(dR.Eval(p), a+x*y, 1.e-12);
-            LIBMESH_ASSERT_FP_EQUAL(d2R.Eval(p), 2*y, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(x*a, R.Eval(p),  1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(a+x*y, dR.Eval(p), 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(2*y, d2R.Eval(p), 1.e-12);
           }
   }
 
@@ -205,9 +205,9 @@ public:
       for (a = -1.0; a < 1.0; a+=0.2642)
         for (y = -1.0; y < 1.0; y+=0.3156)
           {
-            LIBMESH_ASSERT_FP_EQUAL(R.Eval(p), x*a, 1.e-12);
-            LIBMESH_ASSERT_FP_EQUAL(dR.Eval(p), a+x*a, 1.e-12);
-            LIBMESH_ASSERT_FP_EQUAL(d2R.Eval(p), 2*a+x*a, 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(x*a, R.Eval(p), 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(a+x*a, dR.Eval(p), 1.e-12);
+            LIBMESH_ASSERT_FP_EQUAL(2*a+x*a, d2R.Eval(p), 1.e-12);
           }
   }
 };

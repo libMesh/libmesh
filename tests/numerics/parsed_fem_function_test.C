@@ -140,7 +140,7 @@ private:
         ParsedFEMFunction<Number> x2_copy(x2);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(x2_copy(*c,Point(0.5,0.5,0.5))), 1.0, TOLERANCE*TOLERANCE);
+          (1.0, libmesh_real(x2_copy(*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
 
@@ -148,7 +148,7 @@ private:
         ParsedFEMFunction<Number> xy8_stolen(std::move(xy8));
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(xy8_stolen(*c,Point(0.5,0.5,0.5))), 2.0, TOLERANCE*TOLERANCE);
+          (2.0, libmesh_real(xy8_stolen(*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
       }
   }
 
@@ -167,17 +167,17 @@ private:
         // c2_assigned = c2;
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(c2(*c,Point(0.35,0.45,0.55))), 2.0, TOLERANCE*TOLERANCE);
+          (2.0, libmesh_real(c2(*c,Point(0.35,0.45,0.55))), TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xz(*sys, "grad_y_xyz");
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(xz(*c,Point(0.25,0.35,0.75))), 0.1875, TOLERANCE*TOLERANCE);
+          (0.1875, libmesh_real(xz(*c,Point(0.25,0.35,0.75))), TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xyz(*sys, "grad_y_xyz*grad_x_xy");
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(xyz(*c,Point(0.25,0.5,0.75))), 0.09375, TOLERANCE*TOLERANCE);
+          (0.09375, libmesh_real(xyz(*c,Point(0.25,0.5,0.75))), TOLERANCE*TOLERANCE);
       }
   }
 
@@ -190,17 +190,17 @@ private:
         ParsedFEMFunction<Number> c1(*sys, "hess_xy_xy");
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(c1(*c,Point(0.35,0.45,0.55))), 1.0, TOLERANCE*TOLERANCE);
+          (1.0, libmesh_real(c1(*c,Point(0.35,0.45,0.55))), TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> x(*sys, "hess_yz_xyz");
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(x(*c,Point(0.25,0.35,0.55))), 0.25, TOLERANCE*TOLERANCE);
+          (0.25, libmesh_real(x(*c,Point(0.25,0.35,0.55))), TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xz(*sys, "hess_yz_xyz*grad_y_yz");
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(xz(*c,Point(0.25,0.4,0.75))), 0.1875, TOLERANCE*TOLERANCE);
+          (0.1875, libmesh_real(xz(*c,Point(0.25,0.4,0.75))), TOLERANCE*TOLERANCE);
       }
   }
 
@@ -212,22 +212,22 @@ private:
         ParsedFEMFunction<Number> ax2(*sys, "a:=4.5;a*x2");
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(ax2(*c,Point(0.25,0.25,0.25))), 2.25, TOLERANCE*TOLERANCE);
+          (2.25, libmesh_real(ax2(*c,Point(0.25,0.25,0.25))), TOLERANCE*TOLERANCE);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(ax2.get_inline_value("a")), 4.5, TOLERANCE*TOLERANCE);
+          (4.5, libmesh_real(ax2.get_inline_value("a")), TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> cxy8
           (*sys, "a := 4 ; b := a/2+1; c:=b-a+3.5; c*x2*y4");
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(cxy8(*c,Point(0.5,0.5,0.5))), 5.0, TOLERANCE*TOLERANCE);
+          (5.0, libmesh_real(cxy8(*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(cxy8.get_inline_value("b")), 3.0, TOLERANCE*TOLERANCE);
+          (3.0, libmesh_real(cxy8.get_inline_value("b")), TOLERANCE*TOLERANCE);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(cxy8.get_inline_value("c")), 2.5, TOLERANCE*TOLERANCE);
+          (2.5, libmesh_real(cxy8.get_inline_value("c")), TOLERANCE*TOLERANCE);
       }
   }
 
@@ -240,10 +240,10 @@ private:
         ax2.set_inline_value("a", 2.5);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(ax2(*c,Point(0.25,0.25,0.25))), 1.25, TOLERANCE*TOLERANCE);
+          (1.25, libmesh_real(ax2(*c,Point(0.25,0.25,0.25))), TOLERANCE*TOLERANCE);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(ax2.get_inline_value("a")), 2.5, TOLERANCE*TOLERANCE);
+          (2.5, libmesh_real(ax2.get_inline_value("a")), TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> cxy8
           (*sys, "a := 4 ; b := a/2+1; c:=b-a+3.5; c*x2*y4");
@@ -251,13 +251,13 @@ private:
         cxy8.set_inline_value("a", 2);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(cxy8(*c,Point(0.5,0.5,0.5))), 7.0, TOLERANCE*TOLERANCE);
+          (7.0, libmesh_real(cxy8(*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(cxy8.get_inline_value("b")), 2.0, TOLERANCE*TOLERANCE);
+          (2.0, libmesh_real(cxy8.get_inline_value("b")), TOLERANCE*TOLERANCE);
 
         LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(cxy8.get_inline_value("c")), 3.5, TOLERANCE*TOLERANCE);
+          (3.5, libmesh_real(cxy8.get_inline_value("c")), TOLERANCE*TOLERANCE);
 
       }
   }
@@ -279,11 +279,11 @@ private:
         for (std::size_t qp=0; qp != xyz.size(); ++qp)
           {
             LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(nx(*s,xyz[qp])), 0.0, TOLERANCE*TOLERANCE);
+              (0.0, libmesh_real(nx(*s,xyz[qp])), TOLERANCE*TOLERANCE);
             LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(ny(*s,xyz[qp])), 1.0, TOLERANCE*TOLERANCE);
+              (1.0, libmesh_real(ny(*s,xyz[qp])), TOLERANCE*TOLERANCE);
             LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(nz(*s,xyz[qp])), 0.0, TOLERANCE*TOLERANCE);
+              (0.0, libmesh_real(nz(*s,xyz[qp])), TOLERANCE*TOLERANCE);
           }
       }
   }
