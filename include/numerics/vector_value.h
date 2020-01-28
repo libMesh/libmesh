@@ -41,6 +41,13 @@ template <typename T>
 class VectorValue : public TypeVector<T>
 {
 public:
+  typedef T value_type;
+
+  template <typename T2>
+  struct rebind
+  {
+    typedef VectorValue<T2> other;
+  };
 
   /**
    * Empty constructor.

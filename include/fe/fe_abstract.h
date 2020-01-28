@@ -504,6 +504,15 @@ public:
    */
   friend std::ostream & operator << (std::ostream & os, const FEAbstract & fe);
 
+  /**
+   * request phi calculations
+   */
+  virtual void request_phi() const = 0;
+
+  /**
+   * request dphi calculations
+   */
+  virtual void request_dphi() const = 0;
 
 protected:
 

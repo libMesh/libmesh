@@ -119,6 +119,7 @@ void convert_from_receive (SendT & received,
 #include "libmesh/threads.h"
 #include "libmesh/wrapped_function.h"
 #include "libmesh/wrapped_functor.h"
+#include "libmesh/fe_interface.h"
 
 
 
@@ -366,6 +367,14 @@ void System::project_vector (const NumericVector<Number> & old_v,
     {
       std::vector<unsigned int> vars(n_variables);
       std::iota(vars.begin(), vars.end(), 0);
+      std::vector<unsigned int> regular_vars, vector_vars;
+      for (auto var : vars)
+      {
+        if (FEInterface::field_type(this->variable_type(var)) == TYPE_SCALAR)
+          regular_vars.push_back(var);
+        else
+          vector_vars.push_back(var);
+      }
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
       typedef
@@ -377,8 +386,19 @@ void System::project_vector (const NumericVector<Number> & old_v,
       OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector);
       VectorSetAction<Number> setter(new_vector);
 
-      FEMProjector projector(*this, f, &g, setter, vars);
+      FEMProjector projector(*this, f, &g, setter, regular_vars);
       projector.project(active_local_elem_range);
+
+      typedef
+        GenericProjector<OldSolutionValue<Gradient,   &FEMContext::point_value>,
+                         OldSolutionValue<Tensor, &FEMContext::point_gradient>,
+                         Gradient, VectorSetAction<Number>> FEMVectorProjector;
+
+      OldSolutionValue<Gradient, &FEMContext::point_value> f_vector(*this, old_vector);
+      OldSolutionValue<Tensor, &FEMContext::point_gradient> g_vector(*this, old_vector);
+
+      FEMVectorProjector vector_projector(*this, f_vector, &g_vector, setter, vector_vars);
+      vector_projector.project(active_local_elem_range);
 
       // Copy the SCALAR dofs from old_vector to new_vector
       // Note: We assume that all SCALAR dofs are on the
@@ -486,6 +506,8 @@ class OldSolutionCoefs : public OldSolutionBase<Output, point_output>
 {
 public:
   typedef typename DSNAOutput<Output>::type DSNA;
+  typedef DSNA ValuePushType;
+  typedef DSNA FunctorValue;
 
   OldSolutionCoefs(const libMesh::System & sys_in) :
     OldSolutionBase<Output, point_output>(sys_in)
@@ -852,6 +874,8 @@ eval_at_node(const FEMContext & c,
 template <typename ValIn, typename ValOut>
 class MatrixFillAction
 {
+public:
+  typedef DynamicSparseNumberArray<ValIn, dof_id_type> InsertInput;
 private:
   SparseMatrix<ValOut> & target_matrix;
 

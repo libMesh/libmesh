@@ -41,6 +41,13 @@ template <typename T>
 class TensorValue : public TypeTensor<T>
 {
 public:
+  typedef T value_type;
+
+  template <typename T2>
+  struct rebind
+  {
+    typedef TensorValue<T2> other;
+  };
 
   /**
    * Empty constructor.
