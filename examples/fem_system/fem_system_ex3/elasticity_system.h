@@ -28,6 +28,7 @@ extern boundary_id_type
 const boundary_id_type node_boundary_id = 10;
 const boundary_id_type edge_boundary_id = 20;
 static const boundary_id_type & traction_boundary_id = boundary_id_max_x;
+const boundary_id_type pressure_boundary_id = 30;
 
 // The Navier-Stokes system class.
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,

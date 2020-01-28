@@ -92,7 +92,7 @@ target_triplet = @target@
 
 # also need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@am__append_1 = .linkstamp
-@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = fem_system_ex5.in .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = PressurizedCyl_Patch6_256Elem.bxt fem_system_ex5.in .linkstamp
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
 @LIBMESH_DBG_MODE_TRUE@am__append_3 = example-dbg
@@ -161,6 +161,7 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	PressurizedCyl_Patch6_256Elem.bxt \
 	../fem_system_ex3/elasticity_system.C elasticity_system.h \
 	run.sh
 am__dirstamp = $(am__leading_dot)dirstamp
@@ -179,6 +180,7 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	PressurizedCyl_Patch6_256Elem.bxt \
 	../fem_system_ex3/elasticity_system.C elasticity_system.h \
 	run.sh
 am__objects_3 = example_devel-fem_system_ex5.$(OBJEXT) \
@@ -193,6 +195,7 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_oprof_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	PressurizedCyl_Patch6_256Elem.bxt \
 	../fem_system_ex3/elasticity_system.C elasticity_system.h \
 	run.sh
 am__objects_5 = example_oprof-fem_system_ex5.$(OBJEXT) \
@@ -207,6 +210,7 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_opt_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	PressurizedCyl_Patch6_256Elem.bxt \
 	../fem_system_ex3/elasticity_system.C elasticity_system.h \
 	run.sh
 am__objects_7 = example_opt-fem_system_ex5.$(OBJEXT) \
@@ -220,6 +224,7 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = fem_system_ex5.C fem_system_ex5.in \
+	PressurizedCyl_Patch6_256Elem.bxt \
 	../fem_system_ex3/elasticity_system.C elasticity_system.h \
 	run.sh
 am__objects_9 = example_prof-fem_system_ex5.$(OBJEXT) \
@@ -707,7 +712,7 @@ CLEANFILES = $(BUILT_SOURCES) out.e* out.newmark.* out.steady.* \
 example_name = fem_system_ex5
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/fem_system/ex5
-data = fem_system_ex5.C fem_system_ex5.in ../fem_system_ex3/elasticity_system.C elasticity_system.h run.sh
+data = fem_system_ex5.C fem_system_ex5.in PressurizedCyl_Patch6_256Elem.bxt ../fem_system_ex3/elasticity_system.C elasticity_system.h run.sh
 sources = $(data) run.sh
 
 ######################################################################
@@ -1406,6 +1411,7 @@ elasticity_system.C : $(top_srcdir)/examples/fem_system/fem_system_ex3/elasticit
 	$(AM_V_GEN)$(LN_S) -f $< $@
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f fem_system_ex5.in && $(LN_S) -f $(srcdir)/fem_system_ex5.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f PressurizedCyl_Patch6_256Elem.bxt && $(LN_S) -f $(srcdir)/PressurizedCyl_Patch6_256Elem.bxt .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

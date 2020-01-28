@@ -33,9 +33,11 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/getpot.h"
+#include "libmesh/dyna_io.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/mesh.h"
+#include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
@@ -89,21 +91,38 @@ int main (int argc, char ** argv)
   const unsigned int write_interval    = infile("write_interval", 1);
 #endif
 
-  // Initialize the cantilever mesh
+  // Initialize the mesh
   const unsigned int dim = infile("dim", 2);
-
-  // Make sure libMesh was compiled for 2D/3D
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
   // Create a mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
-  if (dim == 3)
-    MeshTools::Generation::build_cube
-      (mesh, 32, 8, 4, 0., 1.*x_scaling, 0., 0.3, 0., 0.1, HEX8);
-  else if (dim == 2)
-    MeshTools::Generation::build_square
-      (mesh, 8, 4, 0., 1.*x_scaling, 0., 0.3, QUAD4); else
-    libmesh_error_msg("Unsupported dim = " << dim);
+
+  // Use an IsoGeometricAnalysis mesh?
+  const bool use_iga = infile("use_iga", true);
+
+  // Declare DynaIO here so we can use its constraint equations later
+  DynaIO dyna_io(mesh);
+
+  // Load an IGA pressurized cylinder mesh or build a cantilever mesh
+  if (use_iga)
+    {
+      if (mesh.processor_id() == 0)
+        dyna_io.read("PressurizedCyl_Patch6_256Elem.bxt");
+      MeshCommunication().broadcast (mesh);
+      mesh.prepare_for_use();
+    }
+  else
+    {
+      if (dim == 3)
+        MeshTools::Generation::build_cube
+          (mesh, 32, 8, 4, 0., 1.*x_scaling, 0., 0.3, 0., 0.1, HEX8);
+      else if (dim == 2)
+        MeshTools::Generation::build_square
+          (mesh, 8, 4, 0., 1.*x_scaling, 0., 0.3, QUAD4);
+      else
+        libmesh_error_msg("Unsupported dim = " << dim);
+    }
 
   // Print information about the mesh to the screen.
   mesh.print_info();

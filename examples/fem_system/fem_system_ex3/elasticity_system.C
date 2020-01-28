@@ -18,12 +18,14 @@
 #include "elasticity_system.h"
 
 #include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/unsteady_solver.h"
+#include "libmesh/parallel_implementation.h" // set_union
 
 using namespace libMesh;
 
@@ -53,10 +55,17 @@ void ElasticitySystem::init_data()
   this->time_evolving(_w_var,2);
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  std::set<boundary_id_type> boundary_ids;
-  boundary_ids.insert(boundary_id_min_x);
-  boundary_ids.insert(node_boundary_id);
-  boundary_ids.insert(edge_boundary_id);
+
+  std::set<boundary_id_type> all_boundary_ids, dirichlet_boundary_ids;
+  all_boundary_ids = this->get_mesh().get_boundary_info().get_boundary_ids();
+  this->comm().set_union(all_boundary_ids);
+
+  if (all_boundary_ids.count(boundary_id_min_x))
+    dirichlet_boundary_ids.insert(boundary_id_min_x);
+  if (all_boundary_ids.count(node_boundary_id))
+    dirichlet_boundary_ids.insert(node_boundary_id);
+  if (all_boundary_ids.count(edge_boundary_id))
+    dirichlet_boundary_ids.insert(edge_boundary_id);
 
   std::vector<unsigned int> variables;
   variables.push_back(_u_var);
@@ -69,8 +78,8 @@ void ElasticitySystem::init_data()
 
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
-  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
-                                 LOCAL_VARIABLE_ORDER);
+  DirichletBoundary dirichlet_bc(dirichlet_boundary_ids, variables,
+                                 zf, LOCAL_VARIABLE_ORDER);
 
   this->get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 
@@ -98,6 +107,9 @@ void ElasticitySystem::init_context(DiffContext & context)
 
   u_side_fe->get_JxW();
   u_side_fe->get_phi();
+
+  // We might want to apply traction perpendicular to some boundaries.
+  u_side_fe->get_normals();
 }
 
 bool ElasticitySystem::element_time_derivative(bool request_jacobian,
@@ -232,7 +244,8 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
   FEMContext & c = cast_ref<FEMContext &>(context);
 
   // If we're on the correct side, apply the traction
-  if (c.has_side_boundary_id(traction_boundary_id))
+  if (c.has_side_boundary_id(traction_boundary_id) ||
+      c.has_side_boundary_id(pressure_boundary_id))
     {
       // If we have an unsteady solver, then we need to extract the corresponding
       // velocity variable. This allows us to use either a FirstOrderUnsteadySolver
@@ -263,13 +276,22 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
 
       const std::vector<std::vector<Real>> & phi = u_side_fe->get_phi();
 
+      const std::vector<Point> & normals = u_side_fe->get_normals();
+
       unsigned int n_qpoints = c.get_side_qrule().n_points();
 
+      Real pressure = 1;
       Gradient traction;
       traction(_dim-1) = -1;
 
+      const bool pressureforce =
+        c.has_side_boundary_id(pressure_boundary_id);
+
       for (unsigned int qp=0; qp != n_qpoints; qp++)
         {
+          if (pressureforce)
+            traction = pressure * normals[qp];
+
           for (unsigned int i=0; i != n_u_dofs; i++)
             {
               Fu(i) -= traction(0)*phi[i][qp]*JxW[qp];
