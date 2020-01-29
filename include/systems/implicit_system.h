@@ -317,8 +317,11 @@ public:
    * This non-template method will add a derived matrix type corresponding to
    * the solver package. If the user wishes to specify the matrix type to add,
    * use the templated \p add_matrix method instead
+   *
+   * @param type The serial/parallel/ghosted type of the matrix
+   *
    */
-  SparseMatrix<Number> & add_matrix (const std::string & mat_name);
+  SparseMatrix<Number> & add_matrix (const std::string & mat_name, ParallelType type = PARALLEL);
 
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
@@ -331,9 +334,11 @@ public:
    * This method will create add a derived matrix of type
    * \p MatrixType<Number>. One can use the non-templated \p add_matrix method to
    * add a matrix corresponding to the default solver package
+   *
+   * @param type The serial/parallel/ghosted type of the matrix
    */
   template <template <typename> class>
-  SparseMatrix<Number> & add_matrix (const std::string & mat_name);
+  SparseMatrix<Number> & add_matrix (const std::string & mat_name, ParallelType = PARALLEL);
 
   /**
    * Removes the additional matrix \p mat_name from this system
@@ -426,6 +431,11 @@ private:
   std::map<std::string, SparseMatrix<Number> *> _matrices;
 
   /**
+   * Holds the types of the matrices
+   */
+  std::map<std::string, ParallelType> _matrix_types;
+
+  /**
    * \p true when additional matrices may still be added, \p false otherwise.
    */
   bool _can_add_matrices;
@@ -451,7 +461,8 @@ unsigned int ImplicitSystem::n_matrices () const
 template <template <typename> class MatrixType>
 inline
 SparseMatrix<Number> &
-ImplicitSystem::add_matrix (const std::string & mat_name)
+ImplicitSystem::add_matrix (const std::string & mat_name,
+                            const ParallelType type)
 {
   // only add matrices before initializing...
   if (!_can_add_matrices)
@@ -465,6 +476,7 @@ ImplicitSystem::add_matrix (const std::string & mat_name)
   // Otherwise build the matrix and return it.
   SparseMatrix<Number> * buf = libmesh_make_unique<MatrixType<Number>>(this->comm()).release();
   _matrices.emplace(mat_name, buf);
+  _matrix_types.emplace(mat_name, type);
 
   return *buf;
 }

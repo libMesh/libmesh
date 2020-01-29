@@ -80,7 +80,7 @@ public:
             const numeric_index_type noz = 10,
             const numeric_index_type blocksize = 1) override;
 
-  void init() override;
+  void init(ParallelType type = PARALLEL) override;
 
   /**
    * Initialize with a NumericVector \p other, e.g. duplicate the storage

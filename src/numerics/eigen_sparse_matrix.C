@@ -60,7 +60,7 @@ void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
 
 
 template <typename T>
-void EigenSparseMatrix<T>::init ()
+void EigenSparseMatrix<T>::init (const ParallelType)
 {
   // Ignore calls on initialized objects
   if (this->initialized())

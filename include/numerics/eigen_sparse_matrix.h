@@ -91,7 +91,7 @@ public:
                      const numeric_index_type noz=10,
                      const numeric_index_type blocksize=1) override;
 
-  virtual void init () override;
+  virtual void init (ParallelType = PARALLEL) override;
 
   virtual void clear () override;
 
