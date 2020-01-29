@@ -968,9 +968,14 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
     ierr = MatTranspose(_mat,&petsc_dest._mat);
   LIBMESH_CHKERR(ierr);
 #else
-  // FIXME - we can probably use MAT_REUSE_MATRIX in more situations
   if (&petsc_dest == this)
+    // The MAT_REUSE_MATRIX flag was replaced by MAT_INPLACE_MATRIX
+    // in PETSc 3.7.0
+#if PETSC_VERSION_LESS_THAN(3,7,0)
     ierr = MatTranspose(_mat,MAT_REUSE_MATRIX,&petsc_dest._mat);
+#else
+    ierr = MatTranspose(_mat, MAT_INPLACE_MATRIX, &petsc_dest._mat);
+#endif
   else
     ierr = MatTranspose(_mat,MAT_INITIAL_MATRIX,&petsc_dest._mat);
   LIBMESH_CHKERR(ierr);
