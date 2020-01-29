@@ -98,6 +98,7 @@ int main (int argc, char** argv)
                    << std::endl;
       return 77;
    }
+  input.search("-pc_factor_mat_solver_package");
 #else
   if (input.search("-pc_factor_mat_solver_package"))
     {
@@ -106,11 +107,12 @@ int main (int argc, char** argv)
                    << std::endl;
       return 77;
     }
+  input.search("-pc_factor_mat_solver_type");
 #endif
 
   // check that we have the required solver:
   std::string solver;
-  solver = input.next(solver);
+  solver = input.next("invalid_solver");
   if (solver == "mumps")
   {
 #ifndef LIBMESH_PETSC_HAVE_MUMPS
