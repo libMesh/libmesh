@@ -290,6 +290,7 @@ void DynaIO::read_mesh(std::istream & in)
                 mesh.add_point(Point(xyzw[0], xyzw[1], xyzw[2]));
               Elem * elem = mesh.add_elem(Elem::build(NODEELEM));
               elem->set_node(0) = n;
+              elem->subdomain_id() = 1; // Separate id to ease Exodus output
             }
             ++n_nodes_read;
 
