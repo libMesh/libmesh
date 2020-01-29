@@ -266,25 +266,21 @@ public:
   /**
    * Accessor for interior finite element object for variable var for
    * the largest dimension in the mesh. We default to the largest mesh dim
-   * because this method may be called before the Elem * is set in the FEMContext,
+   * if this method is called before the Elem * is set in the FEMContext,
    * e.g. in FEMSystem::init_context (or a subclass).
-   * If you have lower dimensional elements in the mesh and need to query for
-   * those FE objects, use the alternative get_element_fe method.
    */
   template<typename OutputShape>
   void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
-  { this->get_element_fe<OutputShape>(var,fe,this->get_dim()); }
+  { this->get_element_fe<OutputShape>(var,fe,this->get_elem_dim()); }
 
   /**
    * Accessor for interior finite element object for scalar-valued variable var
    * for the largest dimension in the mesh. We default to the largest mesh dim
-   * because this method may be called before the Elem * is set in the FEMContext,
+   * if this method is called before the Elem * is set in the FEMContext,
    * e.g. in FEMSystem::init_context (or a subclass).
-   * If you have lower dimensional elements in the mesh and need to query for
-   * those FE objects, use the alternative get_element_fe method.
    */
   FEBase * get_element_fe( unsigned int var ) const
-  { return this->get_element_fe(var,this->get_dim()); }
+  { return this->get_element_fe(var,this->get_elem_dim()); }
 
   /**
    * Accessor for interior finite element object for variable var for
@@ -310,25 +306,21 @@ public:
   /**
    * Accessor for edge/face (2D/3D) finite element object for variable var
    * for the largest dimension in the mesh. We default to the largest mesh dim
-   * because this method may be called before the Elem * is set in the FEMContext,
+   * if this method is called before the Elem * is set in the FEMContext,
    * e.g. in FEMSystem::init_context (or a subclass).
-   * If you have lower dimensional elements in the mesh and need to query for
-   * those FE objects, use the alternative get_side_fe method.
    */
   template<typename OutputShape>
   void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
-  { this->get_side_fe<OutputShape>(var,fe,this->get_dim()); }
+  { this->get_side_fe<OutputShape>(var,fe,this->get_elem_dim()); }
 
   /**
    * Accessor for side finite element object for scalar-valued variable var
    * for the largest dimension in the mesh. We default to the largest mesh dim
-   * because this method may be called before the Elem * is set in the FEMContext,
+   * if this method is called before the Elem * is set in the FEMContext,
    * e.g. in FEMSystem::init_context (or a subclass).
-   * If you have lower dimensional elements in the mesh and need to query for
-   * those FE objects, use the alternative get_side_fe method.
    */
   FEBase * get_side_fe( unsigned int var ) const
-  { return this->get_side_fe(var,this->get_dim()); }
+  { return this->get_side_fe(var,this->get_elem_dim()); }
 
   /**
    * Accessor for edge/face (2D/3D) finite element object for variable var
@@ -942,10 +934,11 @@ public:
 
   /**
    * \returns The dimension of this->_elem. For mixed dimension meshes, this
-   * may be different from get_dim().
+   * may be different from get_dim().  If no element init has happened
+   * yet, fall back on get_dim().
    */
   unsigned char get_elem_dim() const
-  { return _elem_dim; }
+  { return this->_elem ? this->_elem_dim : this->_dim; }
 
   /**
    * \returns Set of dimensions of elements present in the mesh at
