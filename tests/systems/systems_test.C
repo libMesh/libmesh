@@ -21,6 +21,15 @@
 #include <libmesh/enum_preconditioner_type.h>
 #include <libmesh/linear_solver.h>
 #include <libmesh/parallel.h>
+#include <libmesh/face_quad4.h>
+#include <libmesh/face_quad9.h>
+#include <libmesh/face_quad8.h>
+#include <libmesh/face_tri3.h>
+#include <libmesh/face_tri6.h>
+#include <libmesh/cell_hex8.h>
+#include <libmesh/cell_hex20.h>
+#include <libmesh/cell_hex27.h>
+#include <libmesh/cell_tet10.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -421,6 +430,11 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testProjectHierarchicQuad9 );
   CPPUNIT_TEST( testProjectHierarchicTri6 );
+  CPPUNIT_TEST( test2DProjectVectorFETri3 );
+  CPPUNIT_TEST( test2DProjectVectorFEQuad4 );
+  CPPUNIT_TEST( test2DProjectVectorFETri6 );
+  CPPUNIT_TEST( test2DProjectVectorFEQuad8 );
+  CPPUNIT_TEST( test2DProjectVectorFEQuad9 );
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testBlockRestrictedVarNDofs );
 #endif
@@ -429,6 +443,11 @@ public:
   CPPUNIT_TEST( testProjectHierarchicHex27 );
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
+  CPPUNIT_TEST( test3DProjectVectorFETet4 );
+  CPPUNIT_TEST( test3DProjectVectorFEHex8 );
+  CPPUNIT_TEST( test3DProjectVectorFETet10 );
+  CPPUNIT_TEST( test3DProjectVectorFEHex20 );
+  CPPUNIT_TEST( test3DProjectVectorFEHex27 );
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testAssemblyWithDgFemContext );
 #endif
@@ -565,6 +584,109 @@ public:
                       u_subdomains, v_subdomains, w_subdomains,
                       es.parameters);
 #endif
+  }
+
+  void test2DProjectVectorFE(const ElemType elem_type)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    EquationSystems es(mesh);
+    TransientExplicitSystem &sys =
+      es.add_system<TransientExplicitSystem> ("SimpleSystem");
+
+    auto generic_elem = Elem::build(elem_type);
+
+    auto u_var = sys.add_variable("u", generic_elem->default_order(), LAGRANGE_VEC);
+
+    MeshTools::Generation::build_square (mesh,
+                                         1, 1,
+                                         0., 1., 0., 1.,
+                                         elem_type);
+
+    es.init();
+
+    // Manually set-up the solution because I'm too lazy to set-up all the generic
+    // function projection code right now
+    for (const auto & node : mesh.local_node_ptr_range())
+    {
+      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      {
+        auto dof_index = node->dof_number(sys.number(), u_var, i);
+        sys.solution->set(dof_index, (*node)(i));
+      }
+    }
+
+    // After setting values, we need to assemble
+    sys.solution->close();
+
+
+#ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+#endif
+
+    for (const auto & node : mesh.local_node_ptr_range())
+    {
+      // 2D element here
+      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      {
+        auto dof_index = node->dof_number(sys.number(), u_var, i);
+        auto value = (*sys.solution)(dof_index);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(value), (*node)(i), TOLERANCE*TOLERANCE);
+      }
+    }
+  }
+
+  void test3DProjectVectorFE(const ElemType elem_type)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    EquationSystems es(mesh);
+    TransientExplicitSystem &sys =
+      es.add_system<TransientExplicitSystem> ("SimpleSystem");
+
+    auto generic_elem = Elem::build(elem_type);
+
+    auto u_var = sys.add_variable("u", generic_elem->default_order(), LAGRANGE_VEC);
+
+    MeshTools::Generation::build_cube (mesh,
+                                       1, 1, 1,
+                                       0., 1., 0., 1., 0., 1.,
+                                       elem_type);
+
+    es.init();
+
+    // Manually set-up the solution because I'm too lazy to set-up all the generic
+    // function projection code right now
+    for (const auto & node : mesh.local_node_ptr_range())
+    {
+      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      {
+        auto dof_index = node->dof_number(sys.number(), u_var, i);
+        sys.solution->set(dof_index, (*node)(i));
+      }
+    }
+
+    // After setting values, we need to assemble
+    sys.solution->close();
+
+
+#ifdef LIBMESH_ENABLE_AMR
+    for (auto & elem : mesh.element_ptr_range())
+        elem->set_refinement_flag(Elem::REFINE);
+    es.reinit();
+#endif
+
+    for (const auto & node : mesh.local_node_ptr_range())
+    {
+      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      {
+        auto dof_index = node->dof_number(sys.number(), u_var, i);
+        auto value = (*sys.solution)(dof_index);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(value), (*node)(i), TOLERANCE*TOLERANCE);
+      }
+    }
   }
 
   void testProjectSquare(const ElemType elem_type)
@@ -1506,6 +1628,16 @@ public:
   void testProjectHierarchicTri6()  { testProjectSquare(TRI6); }
   void testProjectHierarchicHex27() { testProjectCube(HEX27); }
   void testProjectMeshFunctionHex27() { testProjectCubeWithMeshFunction(HEX27); }
+  void test2DProjectVectorFETri3() { test2DProjectVectorFE(TRI3); }
+  void test2DProjectVectorFEQuad4() { test2DProjectVectorFE(QUAD4); }
+  void test2DProjectVectorFETri6() { test2DProjectVectorFE(TRI6); }
+  void test2DProjectVectorFEQuad8() { test2DProjectVectorFE(QUAD8); }
+  void test2DProjectVectorFEQuad9() { test2DProjectVectorFE(QUAD9); }
+  void test3DProjectVectorFETet4() { test3DProjectVectorFE(TET4); }
+  void test3DProjectVectorFEHex8() { test3DProjectVectorFE(HEX8); }
+  void test3DProjectVectorFETet10() { test3DProjectVectorFE(TET10); }
+  void test3DProjectVectorFEHex20() { test3DProjectVectorFE(HEX20); }
+  void test3DProjectVectorFEHex27() { test3DProjectVectorFE(HEX27); }
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
