@@ -50,6 +50,20 @@ namespace Utility
  */
 std::string system_info();
 
+/**
+ * Helper struct for enabling template metaprogramming/SFINAE.
+ */
+template <typename T>
+class is_streamable
+{
+  template <typename U> // must be template to get SFINAE fall-through...
+  static auto test(const U* u) -> decltype(std::cout << *u);
+
+  static auto test(...) -> std::false_type;
+
+public:
+  enum { value = !std::is_same<decltype(test((T*)0)), std::false_type>::value };
+};
 
 /**
  * This function should not be called directly (although it can be),
@@ -60,11 +74,12 @@ std::string system_info();
  * on the type of map, so this will work with both std::map and
  * std::unordered_map.
  */
-template<typename Map>
+template<typename Map, typename Key,
+         typename std::enable_if<!is_streamable<Key>::value, Key>::type* = nullptr>
 inline
 typename Map::mapped_type &
 map_find(Map & map,
-         const typename Map::key_type & key,
+         const Key & key,
          const char * filename,
          int line_number)
 {
@@ -78,11 +93,12 @@ map_find(Map & map,
 /**
  * A version of the function above that works for const objects.
  */
-template<typename Map>
+template<typename Map, typename Key,
+         typename std::enable_if<!is_streamable<Key>::value, Key>::type* = nullptr>
 inline
 const typename Map::mapped_type &
 map_find(const Map & map,
-         const typename Map::key_type & key,
+         const Key & key,
          const char * filename,
          int line_number)
 {
@@ -93,6 +109,44 @@ map_find(const Map & map,
   return it->second;
 }
 
+/**
+ * A version of the map_find() utility which can only be used if
+ * the map key is printable via std::stream.
+ */
+template<typename Map, typename Key,
+         typename std::enable_if<is_streamable<Key>::value, Key>::type* = nullptr>
+inline
+typename Map::mapped_type &
+map_find(Map & map,
+         const Key & key,
+         const char * filename,
+         int line_number)
+{
+  auto it = map.find(key);
+  if (it == map.end())
+    libmesh_error_msg("map_find() error: key \"" << key << "\" not found in file " \
+                      << filename << " on line " << line_number);
+  return it->second;
+}
+
+/**
+ * A version of the function above that works for const objects.
+ */
+template<typename Map, typename Key,
+         typename std::enable_if<is_streamable<Key>::value, Key>::type* = nullptr>
+inline
+const typename Map::mapped_type &
+map_find(const Map & map,
+         const Key & key,
+         const char * filename,
+         int line_number)
+{
+  auto it = map.find(key);
+  if (it == map.end())
+    libmesh_error_msg("map_find() error: key \"" << key << "\" not found in file " \
+                      << filename << " on line " << line_number);
+  return it->second;
+}
 
 /**
  * \p Utility::iota is a duplication of the SGI STL extension
