@@ -674,6 +674,16 @@ public:
   virtual Elem * add_elem (Elem * e) = 0;
 
   /**
+   * Version of add_elem() taking a std::unique_ptr by value. The version
+   * taking a dumb pointer will eventually be deprecated in favor of this
+   * version. This API is intended to indicate that ownership of the Elem
+   * is transferred to the Mesh when this function is called, and it should
+   * play more nicely with the Elem::build() API which has always returned
+   * a std::unique_ptr.
+   */
+  virtual Elem * add_elem (std::unique_ptr<Elem> e) = 0;
+
+  /**
    * Insert elem \p e to the element array, preserving its id
    * and replacing/deleting any existing element with the same id.
    *

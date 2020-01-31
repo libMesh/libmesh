@@ -323,6 +323,14 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
   return e;
 }
 
+Elem * ReplicatedMesh::add_elem (std::unique_ptr<Elem> e)
+{
+  // The mesh now takes ownership of the Elem. Eventually the guts of
+  // add_elem() will get moved to a private helper function, and
+  // calling add_elem() directly will be deprecated.
+  return add_elem(e.release());
+}
+
 
 
 Elem * ReplicatedMesh::insert_elem (Elem * e)
