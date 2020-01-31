@@ -101,8 +101,18 @@ int main (int argc, char ** argv)
   // Use an IsoGeometricAnalysis mesh?
   const bool use_iga = infile("use_iga", true);
 
+  // Make DynaIO::add_spline_constraints work on DistributedMesh
+  if (use_iga)
+    {
+      mesh.allow_renumbering(false);
+      mesh.allow_remote_element_removal(false);
+    }
+
   // Declare DynaIO here so we can use its constraint equations later
   DynaIO dyna_io(mesh);
+
+  // Declare a default FEType here to override if needed for IGA later
+  FEType fe_type;
 
   // Load an IGA pressurized cylinder mesh or build a cantilever mesh
   if (use_iga)
@@ -111,6 +121,9 @@ int main (int argc, char ** argv)
         dyna_io.read("PressurizedCyl_Patch6_256Elem.bxt");
       MeshCommunication().broadcast (mesh);
       mesh.prepare_for_use();
+
+      fe_type.order = 2;
+      fe_type.family = RATIONAL_BERNSTEIN;
     }
   else
     {
@@ -198,6 +211,8 @@ int main (int argc, char ** argv)
 
   system.set_dim(dim);
 
+  system.set_fe_type(fe_type);
+
   // Solve this as a time-dependent or steady system
   std::string time_solver = infile("time_solver","DIE!");
 
@@ -208,17 +223,17 @@ int main (int argc, char ** argv)
     {
       // Create ExplicitSystem to help output velocity
       v_system = &equation_systems.add_system<ExplicitSystem> ("Velocity");
-      v_system->add_variable("u_vel", FIRST, LAGRANGE);
-      v_system->add_variable("v_vel", FIRST, LAGRANGE);
+      v_system->add_variable("u_vel", fe_type);
+      v_system->add_variable("v_vel", fe_type);
       if (dim == 3)
-        v_system->add_variable("w_vel", FIRST, LAGRANGE);
+        v_system->add_variable("w_vel", fe_type);
 
       // Create ExplicitSystem to help output acceleration
       a_system = &equation_systems.add_system<ExplicitSystem> ("Acceleration");
-      a_system->add_variable("u_accel", FIRST, LAGRANGE);
-      a_system->add_variable("v_accel", FIRST, LAGRANGE);
+      a_system->add_variable("u_accel", fe_type);
+      a_system->add_variable("v_accel", fe_type);
       if (dim == 3)
-        a_system->add_variable("w_accel", FIRST, LAGRANGE);
+        a_system->add_variable("w_accel", fe_type);
     }
 
   if (time_solver == std::string("newmark"))
@@ -248,6 +263,15 @@ int main (int argc, char ** argv)
 
   // Initialize the system
   equation_systems.init ();
+
+  // Add any spline constraints for IGA problems
+  if (use_iga)
+    {
+      for (unsigned int n = 0; n != system.n_vars(); ++n)
+        dyna_io.add_spline_constraints(system.get_dof_map(),
+                                       system.number(), n);
+      system.reinit_constraints();
+    }
 
   // Set the time stepping options
   system.deltat = deltat;

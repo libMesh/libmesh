@@ -42,6 +42,7 @@ public:
                    const unsigned int number_in)
     : FEMSystem(es, name_in, number_in),
       _dim(3),
+      _fe_type(),
       _rho(1.0)
   {}
 
@@ -65,9 +66,13 @@ public:
 
   void set_dim(unsigned int dim) { _dim = dim; }
 
+  void set_fe_type(const FEType & fe_type) { _fe_type = fe_type; }
+
 private:
 
   unsigned int _dim;
+
+  FEType _fe_type;
 
   // Indices for each variable;
   unsigned int _u_var, _v_var, _w_var;

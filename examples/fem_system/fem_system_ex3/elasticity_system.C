@@ -40,13 +40,13 @@ boundary_id_type boundary_id_max_z = 5;
 
 void ElasticitySystem::init_data()
 {
-  _u_var = this->add_variable ("Ux", FIRST, LAGRANGE);
+  _u_var = this->add_variable ("Ux", _fe_type);
   if (_dim > 1)
-    _v_var = this->add_variable ("Uy", FIRST, LAGRANGE);
+    _v_var = this->add_variable ("Uy", _fe_type);
   else
     _v_var = _u_var;
   if (_dim > 2)
-    _w_var = this->add_variable ("Uz", FIRST, LAGRANGE);
+    _w_var = this->add_variable ("Uz", _fe_type);
   else
     _w_var = _v_var;
 
