@@ -269,13 +269,13 @@ public:
     mesh.add_point( Point(0.0, 1.0), 3 );
     mesh.add_point( Point(0.0, 0.0), 0 );
 
-    Elem* elem_top = mesh.add_elem( new QuadShell4 );
+    Elem * elem_top = mesh.add_elem(Elem::build(QUADSHELL4));
     elem_top->set_node(0) = mesh.node_ptr(0);
     elem_top->set_node(1) = mesh.node_ptr(1);
     elem_top->set_node(2) = mesh.node_ptr(2);
     elem_top->set_node(3) = mesh.node_ptr(3);
 
-    Elem* elem_bottom = mesh.add_elem( new QuadShell4 );
+    Elem * elem_bottom = mesh.add_elem(Elem::build(QUADSHELL4));
     elem_bottom->set_node(0) = mesh.node_ptr(4);
     elem_bottom->set_node(1) = mesh.node_ptr(5);
     elem_bottom->set_node(2) = mesh.node_ptr(1);

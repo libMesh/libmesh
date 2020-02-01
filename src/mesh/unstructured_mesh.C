@@ -139,15 +139,14 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         Elem * newparent = old->parent() ?
           this->elem_ptr(old->parent()->id() + element_id_offset) :
           nullptr;
-        std::unique_ptr<Elem> ap = Elem::build(old->type(), newparent);
-        Elem * el = ap.release();
+        auto el = Elem::build(old->type(), newparent);
 
         el->subdomain_id() = old->subdomain_id();
 
         // Hold off on trying to set the interior parent because we may actually
         // add lower dimensional elements before their interior parents
         if (el->dim() < other_mesh.mesh_dimension() && old->interior_parent())
-          ip_map[old] = el;
+          ip_map[old] = el.get();
 
 #ifdef LIBMESH_ENABLE_AMR
         if (old->has_children())
@@ -159,7 +158,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         if (newparent)
           {
             unsigned int oldc = old->parent()->which_child_am_i(old);
-            newparent->add_child(el, oldc);
+            newparent->add_child(el.get(), oldc);
           }
 
         // Copy the refinement flags
@@ -200,11 +199,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
             for (auto s : old->side_index_range())
               if (old->neighbor_ptr(s) == remote_elem)
                 el->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
-            this->add_elem(el);
+            this->add_elem(std::move(el));
           }
         else
           {
-            Elem * new_el = this->add_elem(el);
+            Elem * new_el = this->add_elem(std::move(el));
             old_elems_to_new_elems[old] = new_el;
           }
       }
@@ -740,19 +739,19 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
     {
       // Add an equivalent element type to the new_mesh.
       // Copy ids for this element.
-      Elem * new_elem = Elem::build(old_elem->type()).release();
-      new_elem->set_id() = old_elem->id();
+      auto uelem = Elem::build(old_elem->type());
+      uelem->set_id() = old_elem->id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      new_elem->set_unique_id() = old_elem->unique_id();
+      uelem->set_unique_id() = old_elem->unique_id();
 #endif
-      new_elem->subdomain_id() = old_elem->subdomain_id();
-      new_elem->processor_id() = old_elem->processor_id();
+      uelem->subdomain_id() = old_elem->subdomain_id();
+      uelem->processor_id() = old_elem->processor_id();
 
-      new_elem->add_extra_integers(n_elem_ints);
+      uelem->add_extra_integers(n_elem_ints);
       for (unsigned int i = 0; i != n_elem_ints; ++i)
-        new_elem->set_extra_integer(i, old_elem->get_extra_integer(i));
+        uelem->set_extra_integer(i, old_elem->get_extra_integer(i));
 
-      new_mesh.add_elem (new_elem);
+      Elem * new_elem = new_mesh.add_elem(std::move(uelem));
 
       libmesh_assert(new_elem);
 

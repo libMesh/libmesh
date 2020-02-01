@@ -119,12 +119,10 @@ public:
     MeshTools::Generation::build_line (mesh, 10, 0., 1., EDGE2);
     es.init();
 
-    Elem* e = Elem::build(EDGE2).release();
-    e->set_id(mesh.max_elem_id());
+    Elem * e = mesh.add_elem(Elem::build_with_id(EDGE2, mesh.max_elem_id()));
     e->processor_id() = 0;
     e->set_node(0) = mesh.node_ptr(2);
     e->set_node(1) = mesh.node_ptr(8);
-    mesh.add_elem(e);
     mesh.prepare_for_use();
 
     es.reinit();
@@ -135,7 +133,7 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_line (mesh, 10, 0., 1., EDGE2);
-    Elem* node_elem = mesh.add_elem (new NodeElem);
+    auto node_elem = mesh.add_elem(Elem::build(NODEELEM));
     node_elem->set_node(0) = mesh.node_ptr(0);
     mesh.prepare_for_use();
 

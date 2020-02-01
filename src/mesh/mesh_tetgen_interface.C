@@ -94,17 +94,17 @@ void TetGenMeshInterface::triangulate_pointset ()
 
   for (unsigned int i=0; i<num_elements; ++i)
     {
-      Elem * elem = new Tet4;
+      auto elem = Elem::build(TET4);
 
       // Get the nodes associated with this element
       for (auto j : elem->node_index_range())
         node_labels[j] = tetgen_wrapper.get_element_node(i,j);
 
       // Associate the nodes with this element
-      this->assign_nodes_to_elem(node_labels, elem);
+      this->assign_nodes_to_elem(node_labels, elem.get());
 
       // Finally, add this element to the mesh.
-      this->_mesh.add_elem(elem);
+      this->_mesh.add_elem(std::move(elem));
     }
 }
 
@@ -145,16 +145,16 @@ void TetGenMeshInterface::pointset_convexhull ()
 
   for (unsigned int i=0; i<num_elements; ++i)
     {
-      Elem * elem = new Tri3;
+      auto elem = Elem::build(TRI3);
 
       // Get node labels associated with this element
       for (auto j : elem->node_index_range())
         node_labels[j] = tetgen_wrapper.get_triface_node(i,j);
 
-      this->assign_nodes_to_elem(node_labels, elem);
+      this->assign_nodes_to_elem(node_labels, elem.get());
 
       // Finally, add this element to the mesh.
-      this->_mesh.add_elem(elem);
+      this->_mesh.add_elem(std::move(elem));
     }
 }
 
@@ -326,17 +326,17 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   for (unsigned int i=0; i<num_elements; i++)
     {
       // TetGen only supports Tet4 elements.
-      Elem * elem = new Tet4;
+      auto elem = Elem::build(TET4);
 
       // Fill up the the node_labels vector
       for (auto j : elem->node_index_range())
         node_labels[j] = tetgen_wrapper.get_element_node(i,j);
 
       // Associate nodes with this element
-      this->assign_nodes_to_elem(node_labels, elem);
+      this->assign_nodes_to_elem(node_labels, elem.get());
 
       // Finally, add this element to the mesh
-      this->_mesh.add_elem(elem);
+      this->_mesh.add_elem(std::move(elem));
     }
 
   // Delete original convex hull elements.  Is there ever a case where

@@ -68,19 +68,19 @@ protected:
     _mesh->add_point( Point(0.0, 0.0), 0 );
 
     {
-      Elem* elem_top = _mesh->add_elem( new Quad4 );
+      Elem * elem_top = _mesh->add_elem(Elem::build(QUAD4));
       elem_top->set_node(0) = _mesh->node_ptr(0);
       elem_top->set_node(1) = _mesh->node_ptr(1);
       elem_top->set_node(2) = _mesh->node_ptr(2);
       elem_top->set_node(3) = _mesh->node_ptr(3);
 
-      Elem* elem_bottom = _mesh->add_elem( new Quad4 );
+      Elem * elem_bottom = _mesh->add_elem(Elem::build(QUAD4));
       elem_bottom->set_node(0) = _mesh->node_ptr(4);
       elem_bottom->set_node(1) = _mesh->node_ptr(5);
       elem_bottom->set_node(2) = _mesh->node_ptr(1);
       elem_bottom->set_node(3) = _mesh->node_ptr(0);
 
-      Elem* edge = _mesh->add_elem( new Edge2 );
+      Elem * edge = _mesh->add_elem(Elem::build(EDGE2));
       edge->set_node(0) = _mesh->node_ptr(0);
       edge->set_node(1) = _mesh->node_ptr(1);
 
@@ -444,31 +444,31 @@ protected:
 
 
     {
-      Elem* quad0 = _mesh->add_elem( new Quad4 );
+      Elem * quad0 = _mesh->add_elem(Elem::build(QUAD4));
       quad0->set_node(0) = _mesh->node_ptr(0);
       quad0->set_node(1) = _mesh->node_ptr(1);
       quad0->set_node(2) = _mesh->node_ptr(2);
       quad0->set_node(3) = _mesh->node_ptr(3);
 
-      Elem* quad1 = _mesh->add_elem( new Quad4 );
+      Elem * quad1 = _mesh->add_elem(Elem::build(QUAD4));
       quad1->set_node(0) = _mesh->node_ptr(3);
       quad1->set_node(1) = _mesh->node_ptr(2);
       quad1->set_node(2) = _mesh->node_ptr(5);
       quad1->set_node(3) = _mesh->node_ptr(4);
 
-      Elem* quad2 = _mesh->add_elem( new Quad4 );
+      Elem * quad2 = _mesh->add_elem(Elem::build(QUAD4));
       quad2->set_node(0) = _mesh->node_ptr(6);
       quad2->set_node(1) = _mesh->node_ptr(7);
       quad2->set_node(2) = _mesh->node_ptr(1);
       quad2->set_node(3) = _mesh->node_ptr(0);
 
-      Elem* quad3 = _mesh->add_elem( new Quad4 );
+      Elem * quad3 = _mesh->add_elem(Elem::build(QUAD4));
       quad3->set_node(0) = _mesh->node_ptr(9);
       quad3->set_node(1) = _mesh->node_ptr(8);
       quad3->set_node(2) = _mesh->node_ptr(7);
       quad3->set_node(3) = _mesh->node_ptr(6);
 
-      Elem* edge = _mesh->add_elem( new Edge2 );
+      Elem * edge = _mesh->add_elem(Elem::build(EDGE2));
       edge->set_node(0) = _mesh->node_ptr(0);
       edge->set_node(1) = _mesh->node_ptr(1);
 
@@ -678,27 +678,27 @@ protected:
     _mesh->add_point( Point(0.0, 0.0), 0 );
 
     {
-      Elem* elem0 = _mesh->add_elem( new Tri3 );
+      Elem * elem0 = _mesh->add_elem(Elem::build(TRI3));
       elem0->set_node(0) = _mesh->node_ptr(0);
       elem0->set_node(1) = _mesh->node_ptr(1);
       elem0->set_node(2) = _mesh->node_ptr(2);
 
-      Elem* elem1 = _mesh->add_elem( new Tri3 );
+      Elem * elem1 = _mesh->add_elem(Elem::build(TRI3));
       elem1->set_node(0) = _mesh->node_ptr(2);
       elem1->set_node(1) = _mesh->node_ptr(3);
       elem1->set_node(2) = _mesh->node_ptr(0);
 
-      Elem* elem2 = _mesh->add_elem( new Tri3 );
+      Elem * elem2 = _mesh->add_elem(Elem::build(TRI3));
       elem2->set_node(0) = _mesh->node_ptr(1);
       elem2->set_node(1) = _mesh->node_ptr(0);
       elem2->set_node(2) = _mesh->node_ptr(4);
 
-      Elem* elem3 = _mesh->add_elem( new Tri3 );
+      Elem * elem3 = _mesh->add_elem(Elem::build(TRI3));
       elem3->set_node(0) = _mesh->node_ptr(4);
       elem3->set_node(1) = _mesh->node_ptr(5);
       elem3->set_node(2) = _mesh->node_ptr(1);
 
-      Elem* edge = _mesh->add_elem( new Edge2 );
+      Elem * edge = _mesh->add_elem(Elem::build(EDGE2));
       edge->set_node(0) = _mesh->node_ptr(0);
       edge->set_node(1) = _mesh->node_ptr(1);
 
@@ -914,7 +914,7 @@ protected:
             {
               for (unsigned int x = 0; x < 3; x++)
                 {
-                  Elem* hex = _mesh->add_elem( new Hex8 );
+                  Elem * hex = _mesh->add_elem(Elem::build(HEX8));
                   hex->set_node(0) = _mesh->node_ptr(x+4*y    +16*z        );
                   hex->set_node(1) = _mesh->node_ptr(x+4*y    +16*z     + 1);
                   hex->set_node(2) = _mesh->node_ptr(x+4*(y+1)+16*z     + 1);
@@ -926,7 +926,7 @@ protected:
                 }
             }
         }
-      Elem* quad = _mesh->add_elem( new Quad4 );
+      Elem * quad = _mesh->add_elem(Elem::build(QUAD4));
       unsigned int x=1,y=1,z=2;
       quad->set_node(0) = _mesh->node_ptr(x+4*y    +16*z    );
       quad->set_node(1) = _mesh->node_ptr(x+4*y    +16*z + 1);

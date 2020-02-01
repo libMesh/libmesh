@@ -217,20 +217,17 @@ void TetGenIO::element_in (std::istream & ele_stream)
       libmesh_assert (ele_stream.good());
 
       // TetGen only supports Tet4 and Tet10 elements.
-      Elem * elem;
+      Elem * elem = nullptr;
 
       if (n_nodes==4)
-        elem = new Tet4;
+        elem = mesh.add_elem(Elem::build_with_id(TET4, i));
 
       else if (n_nodes==10)
-        elem = new Tet10;
+        elem = mesh.add_elem(Elem::build_with_id(TET10, i));
 
       else
-        libmesh_error_msg("Elements with " << n_nodes << " nodes are not supported in the LibMesh tetgen module.");
-
-      elem->set_id(i);
-
-      mesh.add_elem (elem);
+        libmesh_error_msg("Elements with " << n_nodes <<
+                          " nodes are not supported in the LibMesh tetgen module.");
 
       libmesh_assert(elem);
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);

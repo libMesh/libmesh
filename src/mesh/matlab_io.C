@@ -89,9 +89,8 @@ void MatlabIO::read_stream(std::istream & in)
 
     for (unsigned int i=0; i<nElem; i++)
       {
-        Elem * elem = new Tri3; // Always build a triangle
-        elem->set_id(i);
-        the_mesh.add_elem (elem);
+        // Always build a triangle
+        Elem * elem = the_mesh.add_elem(Elem::build_with_id(TRI3, i));
 
         for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
           {

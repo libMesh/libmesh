@@ -284,7 +284,8 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                       ghost_nodes.push_back(node);
                     }
 
-                  Tri3Subdivision * newelem = new Tri3Subdivision();
+                  auto uelem = Elem::build(TRI3SUBDIVISION);
+                  auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
 
                   // add the first new ghost element to the list just as in the non-corner case
                   if (l == 0)
@@ -299,17 +300,18 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                     newelem->set_neighbor(2, nullptr);
                   nelem->set_neighbor(k, newelem);
 
-                  mesh.add_elem(newelem);
+                  Elem * added_elem = mesh.add_elem(std::move(uelem));
                   mesh.get_boundary_info().add_node(nelem->node_ptr(k), 1);
                   mesh.get_boundary_info().add_node(nelem->node_ptr(next[k]), 1);
                   mesh.get_boundary_info().add_node(nelem->node_ptr(prev[k]), 1);
                   mesh.get_boundary_info().add_node(node, 1);
 
-                  nelem = newelem;
+                  nelem = added_elem;
                   k = 2 ;
                 }
 
-              Tri3Subdivision * newelem = new Tri3Subdivision();
+              auto uelem = Elem::build(TRI3SUBDIVISION);
+              auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
 
               newelem->set_node(0) = elem->node_ptr(next[i]);
               newelem->set_node(1) = nelem->node_ptr(2);
@@ -320,7 +322,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               newelem->set_neighbor(2, elem);
               elem->set_neighbor(next[i],newelem);
 
-              mesh.add_elem(newelem);
+              mesh.add_elem(std::move(uelem));
 
               break;
             }
@@ -354,7 +356,9 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   ghost_nodes.push_back(node);
                 }
 
-              Tri3Subdivision * newelem = new Tri3Subdivision();
+              auto uelem = Elem::build(TRI3SUBDIVISION);
+              auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
+
               ghost_elems.push_back(newelem);
 
               newelem->set_node(0) = elem->node_ptr(next[i]);
@@ -364,7 +368,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               newelem->set_ghost(true);
               elem->set_neighbor(i, newelem);
 
-              mesh.add_elem(newelem);
+              mesh.add_elem(std::move(uelem));
               mesh.get_boundary_info().add_node(elem->node_ptr(i), 1);
               mesh.get_boundary_info().add_node(elem->node_ptr(next[i]), 1);
               mesh.get_boundary_info().add_node(elem->node_ptr(prev[i]), 1);
@@ -374,7 +378,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
     }
 
   // add the missing ghost elements (connecting new ghost nodes)
-  std::vector<Tri3Subdivision *> missing_ghost_elems;
+  std::vector<std::unique_ptr<Elem>> missing_ghost_elems;
   for (auto & elem : ghost_elems)
     {
       libmesh_assert(elem->is_ghost());
@@ -433,7 +437,8 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                       ghost_nodes.push_back(node);
                     }
 
-                  Tri3Subdivision * newelem = new Tri3Subdivision();
+                  auto uelem = Elem::build(TRI3SUBDIVISION);
+                  auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
 
                   newelem->set_node(0) = nb2->node_ptr(j);
                   newelem->set_node(1) = nb2->node_ptr(prev[j]);
@@ -443,16 +448,18 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   newelem->set_ghost(true);
                   nb2->set_neighbor(prev[j], newelem);
 
-                  mesh.add_elem(newelem);
+                  Elem * added_elem = mesh.add_elem(std::move(uelem));
                   mesh.get_boundary_info().add_node(nb2->node_ptr(j), 1);
                   mesh.get_boundary_info().add_node(nb2->node_ptr(prev[j]), 1);
                   mesh.get_boundary_info().add_node(node, 1);
 
-                  nb2 = newelem;
+                  nb2 = cast_ptr<Tri3Subdivision *>(added_elem);
                   j = nb2->local_node_number(elem->node_id(i));
                 }
 
-              Tri3Subdivision * newelem = new Tri3Subdivision();
+              auto uelem = Elem::build(TRI3SUBDIVISION);
+              auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
+
               newelem->set_node(0) = elem->node_ptr(next[i]);
               newelem->set_node(1) = elem->node_ptr(i);
               newelem->set_node(2) = nb2->node_ptr(prev[j]);
@@ -464,7 +471,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               elem->set_neighbor(i, newelem);
               nb2->set_neighbor(prev[j], newelem);
 
-              missing_ghost_elems.push_back(newelem);
+              missing_ghost_elems.push_back(std::move(uelem));
               break;
             }
         } // end side loop
@@ -472,7 +479,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
 
   // add the missing ghost elements to the mesh
   for (auto & elem : missing_ghost_elems)
-    mesh.add_elem(elem);
+    mesh.add_elem(std::move(elem));
 }
 
 } // namespace libMesh
