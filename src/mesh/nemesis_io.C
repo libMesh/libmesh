@@ -1305,7 +1305,8 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
   // should not hurt to call this twice because the routine sets a
   // flag the first time it is called.
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+  std::vector<std::string> complex_names =
+    nemhelper->get_complex_names(names, /*_write_complex_abs=*/true);
   nemhelper->initialize_nodal_variables(complex_names);
 #else
   nemhelper->initialize_nodal_variables(names);
@@ -1514,7 +1515,8 @@ void Nemesis_IO::write_global_data (const std::vector<Number> & soln,
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
-  std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+  std::vector<std::string> complex_names =
+    nemhelper->get_complex_names(names, /*_write_complex_abs=*/true);
 
   nemhelper->initialize_global_variables(complex_names);
 
@@ -1524,24 +1526,28 @@ void Nemesis_IO::write_global_data (const std::vector<Number> & soln,
 
   // This will contain the real and imaginary parts and the magnitude
   // of the values in soln
-  std::vector<Real> complex_soln(3*num_values);
+  int nco = 3; // _write_complex_abs ? 3 : 2;
+  std::vector<Real> complex_soln(nco * num_values);
 
   for (unsigned i=0; i<num_vars; ++i)
     {
       for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + j] = value.real();
+          complex_soln[nco*i*num_elems + j] = value.real();
         }
       for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + num_elems +j] = value.imag();
+          complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
         }
-      for (unsigned int j=0; j<num_elems; ++j)
+      if (true/*_write_complex_abs*/)
         {
-          Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+          for (unsigned int j=0; j<num_elems; ++j)
+            {
+              Number value = soln[i*num_vars + j];
+              complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+            }
         }
     }
 
