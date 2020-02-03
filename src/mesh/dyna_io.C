@@ -718,7 +718,10 @@ void DynaIO::add_spline_constraints(DofMap & dof_map,
             spline_node.dof_number(sys_num, var_num, 0);
           dc_row[spline_dof_id] = pr.second;
         }
-      dof_map.add_constraint_row(constrained_id, dc_row);
+
+      // Don't forbid constraint overwrite, or we're likely to
+      // conflict with *any* other constraints.
+      dof_map.add_constraint_row(constrained_id, dc_row, false);
     }
 #else
   libmesh_ignore(dof_map, sys_num, var_num);
