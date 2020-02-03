@@ -56,7 +56,8 @@ void ElasticitySystem::init_data()
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
-  std::set<boundary_id_type> all_boundary_ids, dirichlet_boundary_ids;
+  std::set<boundary_id_type> all_boundary_ids, dirichlet_boundary_ids,
+    dirichlet_u_boundary_ids, dirichlet_v_boundary_ids;
   all_boundary_ids = this->get_mesh().get_boundary_info().get_boundary_ids();
   this->comm().set_union(all_boundary_ids);
 
@@ -66,8 +67,14 @@ void ElasticitySystem::init_data()
     dirichlet_boundary_ids.insert(node_boundary_id);
   if (all_boundary_ids.count(edge_boundary_id))
     dirichlet_boundary_ids.insert(edge_boundary_id);
+  if (all_boundary_ids.count(fixed_u_boundary_id))
+    dirichlet_u_boundary_ids.insert(fixed_u_boundary_id);
+  if (all_boundary_ids.count(fixed_v_boundary_id))
+    dirichlet_v_boundary_ids.insert(fixed_v_boundary_id);
 
-  std::vector<unsigned int> variables;
+  std::vector<unsigned int> variables, u_variable, v_variable;
+  u_variable.push_back(_u_var);
+  v_variable.push_back(_v_var);
   variables.push_back(_u_var);
   if (_dim > 1)
     variables.push_back(_v_var);
@@ -80,8 +87,23 @@ void ElasticitySystem::init_data()
   // indexed" functor
   DirichletBoundary dirichlet_bc(dirichlet_boundary_ids, variables,
                                  zf, LOCAL_VARIABLE_ORDER);
-
   this->get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+
+  if (!dirichlet_u_boundary_ids.empty())
+    {
+      DirichletBoundary dirichlet_u_bc(dirichlet_u_boundary_ids,
+                                       u_variable, zf,
+                                       LOCAL_VARIABLE_ORDER);
+      this->get_dof_map().add_dirichlet_boundary(dirichlet_u_bc);
+    }
+
+  if (!dirichlet_v_boundary_ids.empty())
+    {
+      DirichletBoundary dirichlet_v_bc(dirichlet_v_boundary_ids,
+                                       v_variable, zf,
+                                       LOCAL_VARIABLE_ORDER);
+      this->get_dof_map().add_dirichlet_boundary(dirichlet_v_bc);
+    }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
 
@@ -280,7 +302,7 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
 
       unsigned int n_qpoints = c.get_side_qrule().n_points();
 
-      Real pressure = 1;
+      Real pressure = 100;
       Gradient traction;
       traction(_dim-1) = -1;
 

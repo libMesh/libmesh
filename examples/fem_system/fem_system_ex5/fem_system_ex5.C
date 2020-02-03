@@ -200,6 +200,24 @@ int main (int argc, char ** argv)
           if (elem->is_edge_on_side(e, side_max_x) &&
               (dim == 2 || elem->is_edge_on_side(e, side_min_z)))
             mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
+
+      if (use_iga)
+        {
+          // The bottom side of our IGA mesh file should have v
+          // displacement fixed
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(0))
+            mesh.get_boundary_info().add_side(elem, 0, fixed_v_boundary_id);
+
+          // The left/top side of our IGA mesh file should have v
+          // displacement fixed
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(2))
+            mesh.get_boundary_info().add_side(elem, 1, fixed_u_boundary_id);
+
+          // The inside/left side of our IGA mesh file should have
+          // pressure applied
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(3))
+            mesh.get_boundary_info().add_side(elem, 3, pressure_boundary_id);
+        }
     }
 
   // Create an equation systems object.
