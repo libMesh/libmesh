@@ -110,37 +110,29 @@ protected:
     _mesh->add_point( Point(2.0,-1.0), 9 );
 
     {
-      Elem* elem_top_left = new Quad4;
+      Elem * elem_top_left = _mesh->add_elem(Elem::build_with_id(QUAD4, 0));
       elem_top_left->set_node(0) = _mesh->node_ptr(0);
       elem_top_left->set_node(1) = _mesh->node_ptr(1);
       elem_top_left->set_node(2) = _mesh->node_ptr(2);
       elem_top_left->set_node(3) = _mesh->node_ptr(3);
-      elem_top_left->set_id() = 0;
-      _mesh->add_elem(elem_top_left);
 
-      Elem* elem_bottom_left = new Quad4;
+      Elem * elem_bottom_left = _mesh->add_elem(Elem::build_with_id(QUAD4, 1));
       elem_bottom_left->set_node(0) = _mesh->node_ptr(4);
       elem_bottom_left->set_node(1) = _mesh->node_ptr(5);
       elem_bottom_left->set_node(2) = _mesh->node_ptr(6);
       elem_bottom_left->set_node(3) = _mesh->node_ptr(0);
-      elem_bottom_left->set_id() = 1;
-      _mesh->add_elem(elem_bottom_left);
 
-      Elem* elem_top_right = new Quad4;
+      Elem * elem_top_right = _mesh->add_elem(Elem::build_with_id(QUAD4, 2));
       elem_top_right->set_node(0) = _mesh->node_ptr(1);
       elem_top_right->set_node(1) = _mesh->node_ptr(7);
       elem_top_right->set_node(2) = _mesh->node_ptr(8);
       elem_top_right->set_node(3) = _mesh->node_ptr(2);
-      elem_top_right->set_id() = 2;
-      _mesh->add_elem(elem_top_right);
 
-      Elem* elem_bottom_right = new Quad4;
+      Elem * elem_bottom_right = _mesh->add_elem(Elem::build_with_id(QUAD4, 3));
       elem_bottom_right->set_node(0) = _mesh->node_ptr(5);
       elem_bottom_right->set_node(1) = _mesh->node_ptr(9);
       elem_bottom_right->set_node(2) = _mesh->node_ptr(7);
       elem_bottom_right->set_node(3) = _mesh->node_ptr(6);
-      elem_bottom_right->set_id() = 3;
-      _mesh->add_elem(elem_bottom_right);
     }
 
     // libMesh shouldn't renumber, or our based-on-initial-id

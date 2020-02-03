@@ -487,7 +487,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 #endif
 
       // Add the side
-      Elem * new_elem = boundary_mesh.add_elem(side.release());
+      Elem * new_elem = boundary_mesh.add_elem(std::move(side));
 
 #ifdef LIBMESH_ENABLE_AMR
       // Set parent links

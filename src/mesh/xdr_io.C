@@ -1596,7 +1596,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
           Elem * parent = (parent_id == DofObject::invalid_id) ?
             nullptr : mesh.elem_ptr(parent_id);
 
-          Elem * elem = Elem::build (elem_type, parent).release();
+          auto elem = Elem::build(elem_type, parent);
 
           elem->set_id() = e;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -1609,7 +1609,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
           if (parent)
             {
-              parent->add_child(elem);
+              parent->add_child(elem.get());
               parent->set_refinement_flag (Elem::INACTIVE);
               elem->set_refinement_flag   (Elem::JUST_REFINED);
             }
@@ -1626,7 +1626,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             }
 
           elems_of_dimension[elem->dim()] = true;
-          mesh.add_elem(elem);
+          mesh.add_elem(std::move(elem));
         }
     }
 

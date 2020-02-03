@@ -250,8 +250,7 @@ protected:
     _mesh->add_point( Point(0.0,1.0),3 );
 
     {
-      Elem* elem = _mesh->add_elem( new Quad4 );
-      elem->set_id(0);
+      Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 0));
       elem->subdomain_id() = 1;
 
       for (unsigned int n=0; n<4; n++)
@@ -262,8 +261,7 @@ protected:
     _mesh->add_point( Point(0.0,2.0),5 );
 
     {
-      Elem* elem = _mesh->add_elem( new Quad4 );
-      elem->set_id(1);
+      Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 1));
       elem->subdomain_id() = 1;
 
       elem->set_node(0) = _mesh->node_ptr(3);
@@ -278,8 +276,7 @@ protected:
     _mesh->add_point( Point(0.0,2.0),9 );
 
     {
-      Elem* elem = _mesh->add_elem( new Quad4 );
-      elem->set_id(2);
+      Elem* elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 2));
       elem->subdomain_id() = 2;
 
       elem->set_node(0) = _mesh->node_ptr(6);

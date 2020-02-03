@@ -838,27 +838,26 @@ void Nemesis_IO::read (const std::string & base_filename)
       // Loop over all the elements in this block
       for (unsigned int j=0; j<to_uint(nemhelper->num_elem_this_blk); j++)
         {
-          Elem * elem = Elem::build (conv.libmesh_elem_type()).release();
-          libmesh_assert (elem);
+          auto uelem = Elem::build (conv.libmesh_elem_type());
 
           // Assign subdomain and processor ID to the newly-created Elem.
           // Assigning the processor ID beforehand ensures that the Elem is
           // not added as an "unpartitioned" element.  Note that the element
           // numbering in Exodus is also 1-based.
-          elem->subdomain_id() = subdomain_id;
-          elem->processor_id() = this->processor_id();
-          elem->set_id()       = my_next_elem++;
+          uelem->subdomain_id() = subdomain_id;
+          uelem->processor_id() = this->processor_id();
+          uelem->set_id()       = my_next_elem++;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          elem->set_unique_id() = elem->id();
+          uelem->set_unique_id() = uelem->id();
 #endif
 
           // Mark that we have seen an element of the current element's
           // dimension.
-          elems_of_dimension[elem->dim()] = true;
+          elems_of_dimension[uelem->dim()] = true;
 
           // Add the created Elem to the Mesh, catch the Elem
           // pointer that the Mesh throws back.
-          elem = mesh.add_elem (elem);
+          Elem * elem = mesh.add_elem(std::move(uelem));
 
           // We are expecting the element "thrown back" by libmesh to have the ID we specified for it...
           // Check to see that really is the case.  Note that my_next_elem was post-incremented, so

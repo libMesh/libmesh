@@ -106,15 +106,15 @@ void OFFIO::read_stream(std::istream & in)
             }
         }
 
-      Elem * elem;
+      std::unique_ptr<Elem> elem;
       switch (nv)
         {
         case 2:
-          elem = new Edge2;
+          elem = Elem::build(EDGE2);
           break;
 
         case 3:
-          elem = new Tri3;
+          elem = Elem::build(TRI3);
           break;
 
         default:
@@ -122,13 +122,14 @@ void OFFIO::read_stream(std::istream & in)
         }
 
       elem->set_id(e);
-      the_mesh.add_elem (elem);
 
       for (unsigned int i=0; i<nv; i++)
         {
           in >> nid;
           elem->set_node(i) = the_mesh.node_ptr(nid);
         }
+
+      the_mesh.add_elem(std::move(elem));
     }
 }
 

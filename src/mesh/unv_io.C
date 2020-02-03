@@ -661,13 +661,13 @@ void UNVIO::elements_in (std::istream & in_file)
         in_file >> node_labels[j];
 
       // element pointer, to be allocated
-      Elem * elem = nullptr;
+      std::unique_ptr<Elem> elem;
 
       switch (fe_descriptor_id)
         {
         case 11: // Rod
           {
-            elem = new Edge2;
+            elem = Elem::build(EDGE2);
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=1;
@@ -677,7 +677,7 @@ void UNVIO::elements_in (std::istream & in_file)
         case 41: // Plane Stress Linear Triangle
         case 91: // Thin Shell   Linear Triangle
           {
-            elem = new Tri3;  // create new element
+            elem = Elem::build(TRI3);  // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=2;
@@ -688,7 +688,7 @@ void UNVIO::elements_in (std::istream & in_file)
         case 42: // Plane Stress Quadratic Triangle
         case 92: // Thin Shell   Quadratic Triangle
           {
-            elem = new Tri6;  // create new element
+            elem = Elem::build(TRI6);  // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=5;
@@ -705,7 +705,7 @@ void UNVIO::elements_in (std::istream & in_file)
         case 44: // Plane Stress Linear Quadrilateral
         case 94: // Thin Shell   Linear Quadrilateral
           {
-            elem = new Quad4; // create new element
+            elem = Elem::build(QUAD4); // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=3;
@@ -717,7 +717,7 @@ void UNVIO::elements_in (std::istream & in_file)
         case 45: // Plane Stress Quadratic Quadrilateral
         case 95: // Thin Shell   Quadratic Quadrilateral
           {
-            elem = new Quad8; // create new element
+            elem = Elem::build(QUAD8); // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=7;
@@ -732,7 +732,7 @@ void UNVIO::elements_in (std::istream & in_file)
 
         case 300: // Thin Shell   Quadratic Quadrilateral (nine nodes)
           {
-            elem = new Quad9; // create new element
+            elem = Elem::build(QUAD9); // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=7;
@@ -751,7 +751,7 @@ void UNVIO::elements_in (std::istream & in_file)
 
         case 111: // Solid Linear Tetrahedron
           {
-            elem = new Tet4;  // create new element
+            elem = Elem::build(TET4);  // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=1;
@@ -762,7 +762,7 @@ void UNVIO::elements_in (std::istream & in_file)
 
         case 112: // Solid Linear Prism
           {
-            elem = new Prism6;  // create new element
+            elem = Elem::build(PRISM6);  // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=1;
@@ -775,7 +775,7 @@ void UNVIO::elements_in (std::istream & in_file)
 
         case 115: // Solid Linear Brick
           {
-            elem = new Hex8;  // create new element
+            elem = Elem::build(HEX8);  // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=4;
@@ -790,7 +790,7 @@ void UNVIO::elements_in (std::istream & in_file)
 
         case 116: // Solid Quadratic Brick
           {
-            elem = new Hex20; // create new element
+            elem = Elem::build(HEX20); // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=12;
@@ -822,7 +822,7 @@ void UNVIO::elements_in (std::istream & in_file)
 
         case 118: // Solid Quadratic Tetrahedron
           {
-            elem = new Tet10; // create new element
+            elem = Elem::build(TET10); // create new element
 
             assign_elem_nodes[1]=0;
             assign_elem_nodes[2]=4;
@@ -861,7 +861,7 @@ void UNVIO::elements_in (std::istream & in_file)
       _unv_elem_id_to_libmesh_elem_id[element_label] = ctr;
 
       // Add the element to the Mesh
-      mesh.add_elem(elem);
+      mesh.add_elem(std::move(elem));
 
       // Increment the counter for the next iteration
       ctr++;

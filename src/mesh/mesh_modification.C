@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <limits>
 #include <map>
+#include <array>
 
 // Local includes
 #include "libmesh/boundary_info.h"
@@ -288,7 +289,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   // until they are ready to be added to the mesh.  This is because
   // adding new elements on the fly can cause reallocation and invalidation
   // of existing mesh element_iterators.
-  std::vector<Elem *> new_elements;
+  std::vector<std::unique_ptr<Elem>> new_elements;
 
   unsigned int max_subelems = 1;  // in 1D nothing needs to change
   if (mesh.mesh_dimension() == 2) // in 2D quads can split into 2 tris
@@ -339,17 +340,14 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
         // The new elements we will split the quad into.
         // In 3D we may need as many as 6 tets per hex
-        Elem * subelem[6];
-
-        for (unsigned int i = 0; i != max_subelems; ++i)
-          subelem[i] = nullptr;
+        std::array<std::unique_ptr<Elem>, 6> subelem {};
 
         switch (etype)
           {
           case QUAD4:
             {
-              subelem[0] = new Tri3;
-              subelem[1] = new Tri3;
+              subelem[0] = Elem::build(TRI3);
+              subelem[1] = Elem::build(TRI3);
 
               // Check for possible edge swap
               if ((elem->point(0) - elem->point(2)).norm() <
@@ -384,8 +382,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               if (elem->processor_id() != mesh.processor_id())
                 added_new_ghost_point = true;
 
-              subelem[0] = new Tri6;
-              subelem[1] = new Tri6;
+              subelem[0] = Elem::build(TRI6);
+              subelem[1] = Elem::build(TRI6);
 
               // Add a new node at the center (vertex average) of the element.
               Node * new_node = mesh.add_point((mesh.point(elem->node_id(0)) +
@@ -437,8 +435,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
           case QUAD9:
             {
-              subelem[0] = new Tri6;
-              subelem[1] = new Tri6;
+              subelem[0] = Elem::build(TRI6);
+              subelem[1] = Elem::build(TRI6);
 
               // Check for possible edge swap
               if ((elem->point(0) - elem->point(2)).norm() <
@@ -482,9 +480,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
           case PRISM6:
             {
               // Prisms all split into three tetrahedra
-              subelem[0] = new Tet4;
-              subelem[1] = new Tet4;
-              subelem[2] = new Tet4;
+              subelem[0] = Elem::build(TET4);
+              subelem[1] = Elem::build(TET4);
+              subelem[2] = Elem::build(TET4);
 
               // Triangular faces are not split.
 
@@ -642,9 +640,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
           case PRISM18:
             {
-              subelem[0] = new Tet10;
-              subelem[1] = new Tet10;
-              subelem[2] = new Tet10;
+              subelem[0] = Elem::build(TET10);
+              subelem[1] = Elem::build(TET10);
+              subelem[2] = Elem::build(TET10);
 
               // Split on 0-4 diagonal
               if (split_first_diagonal(elem, 0,4, 1,3))
@@ -1005,7 +1003,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                                   if (b_id != BoundaryInfo::invalid_id)
                                     {
                                       new_bndry_ids.push_back(b_id);
-                                      new_bndry_elements.push_back(subelem[i]);
+                                      new_bndry_elements.push_back(subelem[i].get());
                                       new_bndry_sides.push_back(subside);
                                     }
 
@@ -1042,7 +1040,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 #endif
 
               // Prepare to add the newly-created simplices
-              new_elements.push_back(subelem[i]);
+              new_elements.push_back(std::move(subelem[i]));
             }
 
         // Delete the original element
@@ -1054,7 +1052,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   // Now, iterate over the new elements vector, and add them each to
   // the Mesh.
   for (auto & elem : new_elements)
-    mesh.add_elem(elem);
+    mesh.add_elem(std::move(elem));
 
   if (mesh_has_boundary_data)
     {
@@ -1274,7 +1272,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
   // .) Add the level-0 copies back to the mesh
 
   // Temporary storage for new element pointers
-  std::vector<Elem *> new_elements;
+  std::vector<std::unique_ptr<Elem>> new_elements;
 
   // BoundaryInfo Storage for element ids, sides, and BC ids
   std::vector<Elem *>              saved_boundary_elements;
@@ -1293,7 +1291,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
   for (auto & elem : mesh.active_element_ptr_range())
     {
       // Make a new element of the same type
-      Elem * copy = Elem::build(elem->type()).release();
+      auto copy = Elem::build(elem->type());
 
       // Set node pointers (they still point to nodes in the original mesh)
       for (auto n : elem->node_index_range())
@@ -1322,7 +1320,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
           for (const auto & bc_id : bc_ids)
             if (bc_id != BoundaryInfo::invalid_id)
               {
-                saved_boundary_elements.push_back(copy);
+                saved_boundary_elements.push_back(copy.get());
                 saved_bc_ids.push_back(bc_id);
                 saved_bc_sides.push_back(s);
               }
@@ -1333,7 +1331,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
       mesh.delete_elem(elem);
 
       // But save the copy
-      new_elements.push_back(copy);
+      new_elements.push_back(std::move(copy));
     }
 
   // Make sure we saved the same number of boundary conditions
@@ -1352,7 +1350,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
       // change new_elem's id!
       dof_id_type orig_id = new_elem->id();
 
-      Elem * added_elem = mesh.add_elem(new_elem);
+      Elem * added_elem = mesh.add_elem(std::move(new_elem));
 
       // If the Elem, as it was re-added to the mesh, now has a
       // different ID (this is unlikely, so it's just an assert)

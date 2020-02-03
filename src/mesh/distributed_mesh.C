@@ -537,6 +537,16 @@ Elem * DistributedMesh::add_elem (Elem * e)
 
 
 
+Elem * DistributedMesh::add_elem (std::unique_ptr<Elem> e)
+{
+  // The mesh now takes ownership of the Elem. Eventually the guts of
+  // add_elem() will get moved to a private helper function, and
+  // calling add_elem() directly will be deprecated.
+  return add_elem(e.release());
+}
+
+
+
 Elem * DistributedMesh::insert_elem (Elem * e)
 {
   if (_elements[e->id()])

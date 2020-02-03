@@ -531,32 +531,32 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       // use braces to force scope.
       bool is_higher_order_elem = false;
 
-      Elem * el;
+      std::unique_ptr<Elem> el;
       switch(side->type())
         {
           // 3D infinite elements
           // TRIs
         case TRI3:
-          el=new InfPrism6;
+          el = Elem::build(INFPRISM6);
           break;
 
         case TRI6:
-          el=new InfPrism12;
+          el = Elem::build(INFPRISM12);
           is_higher_order_elem = true;
           break;
 
           // QUADs
         case QUAD4:
-          el=new InfHex8;
+          el = Elem::build(INFHEX8);
           break;
 
         case QUAD8:
-          el=new InfHex16;
+          el = Elem::build(INFHEX16);
           is_higher_order_elem = true;
           break;
 
         case QUAD9:
-          el=new InfHex18;
+          el = Elem::build(INFHEX18);
 
           // the method of assigning nodes (which follows below)
           // omits in the case of QUAD9 the bubble node; therefore
@@ -568,11 +568,11 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
           // 2D infinite elements
         case EDGE2:
-          el=new InfQuad4;
+          el = Elem::build(INFQUAD4);
           break;
 
         case EDGE3:
-          el=new InfQuad6;
+          el = Elem::build(INFQUAD6);
           el->set_node(4) = side->node_ptr(2);
           break;
 
@@ -662,7 +662,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
 
       // add infinite element to mesh
-      this->_mesh.add_elem(el);
+      this->_mesh.add_elem(std::move(el));
     } // for
 
 

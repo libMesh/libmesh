@@ -648,7 +648,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
       _in >> abaqus_elem_id >> c;
 
       // Add an element of the appropriate type to the Mesh.
-      Elem * elem = the_mesh.add_elem(Elem::build(elem_type).release());
+      Elem * elem = the_mesh.add_elem(Elem::build(elem_type));
 
       // Associate the ID returned from libmesh with the abaqus element ID
       //_libmesh_to_abaqus_elem_mapping[elem->id()] = abaqus_elem_id;

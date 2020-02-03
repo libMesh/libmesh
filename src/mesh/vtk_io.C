@@ -206,7 +206,7 @@ void VTKIO::read (const std::string & name)
 
       // Get the libMesh element type corresponding to this VTK element type.
       ElemType libmesh_elem_type = _element_maps.find(cell->GetCellType());
-      Elem * elem = Elem::build(libmesh_elem_type).release();
+      auto elem = Elem::build(libmesh_elem_type);
 
       // get the straightforward numbering from the VTK cells
       for (auto j : elem->node_index_range())
@@ -228,7 +228,7 @@ void VTKIO::read (const std::string & name)
 
       elems_of_dimension[elem->dim()] = true;
 
-      mesh.add_elem(elem);
+      mesh.add_elem(std::move(elem));
     } // end loop over VTK cells
 
   // Set the mesh dimension to the largest encountered for an element

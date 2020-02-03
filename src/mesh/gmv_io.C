@@ -2111,7 +2111,7 @@ void GMVIO::_read_one_cell()
       // libmesh element type needs to take that into account.
       ElemType type = this->gmv_elem_to_libmesh_elem(GMVLib::gmv_data.name1);
 
-      Elem * elem = Elem::build(type).release();
+      auto elem = Elem::build(type);
       elem->set_id(_next_elem_id++);
 
       // Get the ElementDefinition object for this element type
@@ -2132,7 +2132,7 @@ void GMVIO::_read_one_cell()
       elems_of_dimension[elem->dim()] = true;
 
       // Add the newly-created element to the mesh
-      mesh.add_elem(elem);
+      mesh.add_elem(std::move(elem));
     }
 
 

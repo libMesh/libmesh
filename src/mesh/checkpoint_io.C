@@ -1238,7 +1238,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
       else
         {
           // Create the element
-          Elem * elem = Elem::build(elem_type, parent).release();
+          auto elem = Elem::build(elem_type, parent);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           elem->set_unique_id() = unique_id;
@@ -1262,7 +1262,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
             {
               // We must specify a child_num, because we will have
               // skipped adding any preceding remote_elem children
-              parent->add_child(elem, child_num);
+              parent->add_child(elem.get(), child_num);
             }
 #else
           libmesh_ignore(child_num);
@@ -1277,13 +1277,13 @@ void CheckpointIO::read_connectivity (Xdr & io)
             elem->set_node(n) =
               mesh.node_ptr(cast_int<dof_id_type>(conn_data[n]));
 
-          mesh.add_elem(elem);
+          Elem * added_elem = mesh.add_elem(std::move(elem));
 
-          libmesh_assert_equal_to(n_extra_integers, elem->n_extra_integers());
+          libmesh_assert_equal_to(n_extra_integers, added_elem->n_extra_integers());
           for (unsigned int ei=0; ei != n_extra_integers; ++ei)
             {
               const dof_id_type extra_int = cast_int<dof_id_type>(elem_data[6+ei]);
-              elem->set_extra_integer(ei, extra_int);
+              added_elem->set_extra_integer(ei, extra_int);
             }
         }
     }

@@ -235,9 +235,8 @@ void ExodusII_IO::read (const std::string & fname)
       int jmax = nelem_last_block+exio_helper->num_elem_this_blk;
       for (int j=nelem_last_block; j<jmax; j++)
         {
-          Elem * elem = Elem::build (conv.libmesh_elem_type()).release();
-          libmesh_assert (elem);
-          elem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id) ;
+          auto uelem = Elem::build(conv.libmesh_elem_type());
+          uelem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id);
 
           // Use the elem_num_map to obtain the ID of this element in the Exodus file
           int exodus_id = exio_helper->elem_num_map[j];
@@ -247,13 +246,13 @@ void ExodusII_IO::read (const std::string & fname)
           // some day we could use 1-based numbering in libmesh and
           // thus match the Exodus numbering exactly, but at the
           // moment libmesh is zero-based.
-          elem->set_id(exodus_id-1);
+          uelem->set_id(exodus_id-1);
 
-          // Record that we have seen an element of dimension elem->dim()
-          elems_of_dimension[elem->dim()] = true;
+          // Record that we have seen an element of dimension uelem->dim()
+          elems_of_dimension[uelem->dim()] = true;
 
           // Catch the Elem pointer that the Mesh throws back
-          elem = mesh.add_elem (elem);
+          Elem * elem = mesh.add_elem(std::move(uelem));
 
           // If the Mesh assigned an ID different from what is in the
           // Exodus file, we should probably error.

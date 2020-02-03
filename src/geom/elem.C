@@ -335,6 +335,18 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
 
 
 
+std::unique_ptr<Elem> Elem::build_with_id (const ElemType type,
+                                           dof_id_type id)
+{
+  // Call the other build() method with nullptr parent, then set the
+  // required id.
+  auto temp = Elem::build(type, nullptr);
+  temp->set_id(id);
+  return temp;
+}
+
+
+
 const Elem * Elem::reference_elem () const
 {
   return &(ReferenceElem::get(this->type()));

@@ -205,7 +205,7 @@ void UCDIO::read_implementation (std::istream & in)
         ElemType et = libmesh_map_find(_reading_element_map, type);
 
         // Build the required type and release it into our custody.
-        Elem * elem = Elem::build(et).release();
+        auto elem = Elem::build(et);
 
         for (auto n : elem->node_index_range())
           {
@@ -227,7 +227,7 @@ void UCDIO::read_implementation (std::istream & in)
 
         // Add the element to the mesh
         elem->set_id(i);
-        mesh.add_elem (elem);
+        mesh.add_elem (std::move(elem));
       }
 
     // Set the mesh dimension to the largest encountered for an element

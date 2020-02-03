@@ -128,7 +128,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
         {
         case TRI3:
           {
-            Elem * elem = mesh_output.add_elem (new Tri3);
+            Elem * elem = mesh_output.add_elem(Elem::build(TRI3));
 
             for (unsigned int n=0; n<3; ++n)
               elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
@@ -143,7 +143,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
 
         case TRI6:
           {
-            Elem * elem = mesh_output.add_elem (new Tri6);
+            Elem * elem = mesh_output.add_elem(Elem::build(TRI6));
 
             // Triangle number TRI6 nodes in a different way to libMesh
             elem->set_node(0) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]);

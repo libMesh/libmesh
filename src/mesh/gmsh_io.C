@@ -525,9 +525,8 @@ void GmshIO::read_mesh(std::istream & in)
 
                   // Add the element to the mesh
                   {
-                    Elem * elem = Elem::build(eletype.type).release();
-                    elem->set_id(iel);
-                    elem = mesh.add_elem(elem);
+                    Elem * elem =
+                      mesh.add_elem(Elem::build_with_id(eletype.type, iel));
 
                     // Make sure that the libmesh element we added has nnodes nodes.
                     if (elem->n_nodes() != nnodes)
@@ -617,9 +616,8 @@ void GmshIO::read_mesh(std::istream & in)
                   // Loop over elements with dim > 0
                   for (std::size_t n = 0; n < num_elems_in_block; ++n)
                   {
-                    Elem * elem = Elem::build(eletype.type).release();
-                    elem->set_id(iel++);
-                    elem = mesh.add_elem(elem);
+                    Elem * elem =
+                      mesh.add_elem(Elem::build_with_id(eletype.type, iel++));
 
                     std::size_t gmsh_element_id;
                     in >> gmsh_element_id;

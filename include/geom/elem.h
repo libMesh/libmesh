@@ -1602,6 +1602,13 @@ public:
    */
   static std::unique_ptr<Elem> build (const ElemType type,
                                       Elem * p=nullptr);
+  /**
+   * Calls the build() method above with a nullptr parent, and
+   * additionally sets the newly-created Elem's id. This can be useful
+   * when adding pre-numbered Elems to a Mesh via add_elem() calls.
+   */
+  static std::unique_ptr<Elem> build_with_id (const ElemType type,
+                                              dof_id_type id);
 
 #ifdef LIBMESH_ENABLE_AMR
 

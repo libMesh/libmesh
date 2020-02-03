@@ -288,9 +288,8 @@ void DynaIO::read_mesh(std::istream & in)
               // freedom will be tied via constraint equations.
               Node *n = spline_node_ptrs[n_nodes_read] =
                 mesh.add_point(Point(xyzw[0], xyzw[1], xyzw[2]));
-              Elem * elem = Elem::build(NODEELEM).release();
+              Elem * elem = mesh.add_elem(Elem::build(NODEELEM));
               elem->set_node(0) = n;
-              mesh.add_elem(elem);
             }
             ++n_nodes_read;
 
@@ -560,7 +559,7 @@ void DynaIO::read_mesh(std::istream & in)
                " degree " << block_p[block_num] << " not found!");
 
           const ElementDefinition * elem_defn = &(eletypes_it->second);
-          Elem * elem = Elem::build(elem_defn->type).release();
+          auto elem = Elem::build(elem_defn->type);
           libmesh_assert_equal_to(elem->dim(), block_dim[block_num]);
 
           auto & my_constraint_rows = elem_constraint_rows[block_num][elem_num];
@@ -676,7 +675,7 @@ void DynaIO::read_mesh(std::istream & in)
                 }
             }
 
-          mesh.add_elem(elem);
+          mesh.add_elem(std::move(elem));
         }
     }
 }
