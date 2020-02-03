@@ -87,6 +87,13 @@ public:
   void verbose (bool set_verbosity);
 
   /**
+   * Set the flag indicating whether the complex modulus should be
+   * written when complex numbers are enabled. By default this flag
+   * is set to true.
+   */
+  void write_complex_magnitude (bool val);
+
+  /**
    * \returns An array containing the timesteps in the file.
    */
   const std::vector<Real> & get_time_steps();
@@ -418,12 +425,25 @@ private:
   std::vector<std::string> _output_variables;
 
   /**
-   * If true, _output_variables is allowed to remain empty.
-   * If false, if _output_variables is empty it will be populated with a complete list of all variables
-   * By default, calling set_output_variables() sets this flag to true, but it provides an override.
+   * Flag which controls the behavior of _output_variables:
+   * .) If true, _output_variables is allowed to remain empty.
+   * .) If false, if _output_variables is empty it will be populated
+   *    with a complete list of all variables.
+   * .) By default, calling set_output_variables() sets this flag to
+   *    true, but it provides an override.
    */
   bool _allow_empty_variables;
 
+  /**
+   * By default, when complex numbers are enabled, for each variable
+   * we write out three values: the real part, "r_u" the imaginary
+   * part, "i_u", and the complex modulus, a_u := sqrt(r_u*r_u +
+   * i_u*i_u), which is also the value returned by
+   * std::abs(std::complex).  Since the modulus is not an independent
+   * quantity, we can set this flag to false and save some file space
+   * by not writing out.
+   */
+  bool _write_complex_abs;
 };
 
 

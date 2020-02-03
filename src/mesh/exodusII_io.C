@@ -64,7 +64,8 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
   _verbose(false),
   _append(false),
 #endif
-  _allow_empty_variables(false)
+  _allow_empty_variables(false),
+  _write_complex_abs(true)
 {
 }
 
@@ -441,6 +442,13 @@ void ExodusII_IO::verbose (bool set_verbosity)
 
 
 
+void ExodusII_IO::write_complex_magnitude (bool val)
+{
+  _write_complex_abs = val;
+}
+
+
+
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 {
   exio_helper->use_mesh_dimension_instead_of_spatial_dimension(val);
@@ -717,10 +725,13 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
-  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+  std::vector<std::string> complex_names =
+    exio_helper->get_complex_names(names, _write_complex_abs);
 
-  std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains =
-    exio_helper->get_complex_vars_active_subdomains(vars_active_subdomains);
+  std::vector<std::set<subdomain_id_type>>
+    complex_vars_active_subdomains =
+    exio_helper->get_complex_vars_active_subdomains(vars_active_subdomains,
+                                                    _write_complex_abs);
   exio_helper->initialize_element_variables(complex_names, complex_vars_active_subdomains);
 
   unsigned int num_values = soln.size();
@@ -729,25 +740,28 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
   // This will contain the real and imaginary parts and the magnitude
   // of the values in soln
-  std::vector<Real> complex_soln(3*num_values);
+  int nco = _write_complex_abs ? 3 : 2;
+  std::vector<Real> complex_soln(nco * num_values);
 
   for (unsigned i=0; i<num_vars; ++i)
     {
-
       for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + j] = value.real();
+          complex_soln[nco*i*num_elems + j] = value.real();
         }
       for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + num_elems +j] = value.imag();
+          complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
         }
-      for (unsigned int j=0; j<num_elems; ++j)
+      if (_write_complex_abs)
         {
-          Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+          for (unsigned int j=0; j<num_elems; ++j)
+            {
+              Number value = soln[i*num_vars + j];
+              complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+            }
         }
     }
 
@@ -1077,21 +1091,28 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   // Build complex variable names "r_foo", "i_foo", "a_foo" and the lists of
   // subdomains on which they are active.
   auto complex_var_names =
-    exio_helper->get_complex_names(derived_var_names);
+    exio_helper->get_complex_names(derived_var_names,
+                                   _write_complex_abs);
   auto complex_vars_active_subdomains =
-    exio_helper->get_complex_vars_active_subdomains(derived_vars_active_subdomains);
+    exio_helper->get_complex_vars_active_subdomains(derived_vars_active_subdomains,
+                                                    _write_complex_abs);
   auto complex_subdomain_to_var_names =
-    exio_helper->get_complex_subdomain_to_var_names(subdomain_to_var_names);
+    exio_helper->get_complex_subdomain_to_var_names(subdomain_to_var_names,
+                                                    _write_complex_abs);
 
   // Make expanded version of vector "v" in which each entry in the
   // original expands to an ("r_", "i_", "a_") triple.
+  // "nco" is the number of complex outputs, which depends on whether
+  // or not we are writing out the complex magnitudes.
   std::vector<Real> complex_v;
-  complex_v.reserve(3 * v.size());
+  int nco = _write_complex_abs ? 3 : 2;
+  complex_v.reserve(nco * v.size());
   for (const auto & val : v)
     {
       complex_v.push_back(val.real());
       complex_v.push_back(val.imag());
-      complex_v.push_back(std::abs(val));
+      if (_write_complex_abs)
+        complex_v.push_back(std::abs(val));
     }
 
   // Finally, initialize storage for the variables and write them to file.
@@ -1142,7 +1163,8 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   std::vector<std::string> complex_names =
-    exio_helper->get_complex_names(output_names);
+    exio_helper->get_complex_names(output_names,
+                                   _write_complex_abs);
 
   // Call helper function for opening/initializing data, giving it the
   // complex variable names
@@ -1183,7 +1205,8 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
       std::vector<Real> magnitudes;
       real_parts.reserve(num_nodes);
       imag_parts.reserve(num_nodes);
-      magnitudes.reserve(num_nodes);
+      if (_write_complex_abs)
+        magnitudes.reserve(num_nodes);
 #endif
 
       // There could be gaps in "soln", but it will always be in the
@@ -1198,7 +1221,8 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
 #else
           real_parts.push_back(soln[idx].real());
           imag_parts.push_back(soln[idx].imag());
-          magnitudes.push_back(std::abs(soln[idx]));
+          if (_write_complex_abs)
+            magnitudes.push_back(std::abs(soln[idx]));
 #endif
         }
 
@@ -1206,9 +1230,11 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
 #ifdef LIBMESH_USE_REAL_NUMBERS
       exio_helper->write_nodal_values(variable_name_position+1, cur_soln, _timestep);
 #else
-      exio_helper->write_nodal_values(3*variable_name_position+1, real_parts, _timestep);
-      exio_helper->write_nodal_values(3*variable_name_position+2, imag_parts, _timestep);
-      exio_helper->write_nodal_values(3*variable_name_position+3, magnitudes, _timestep);
+      int nco = _write_complex_abs ? 3 : 2;
+      exio_helper->write_nodal_values(nco*variable_name_position+1, real_parts, _timestep);
+      exio_helper->write_nodal_values(nco*variable_name_position+2, imag_parts, _timestep);
+      if (_write_complex_abs)
+        exio_helper->write_nodal_values(3*variable_name_position+3, magnitudes, _timestep);
 #endif
 
     }
@@ -1241,7 +1267,9 @@ void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
-  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+  std::vector<std::string> complex_names =
+    exio_helper->get_complex_names(names,
+                                   _write_complex_abs);
 
   exio_helper->initialize_global_variables(complex_names);
 
@@ -1251,7 +1279,8 @@ void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
 
   // This will contain the real and imaginary parts and the magnitude
   // of the values in soln
-  std::vector<Real> complex_soln(3*num_values);
+  int nco = _write_complex_abs ? 3 : 2;
+  std::vector<Real> complex_soln(nco * num_values);
 
   for (unsigned i=0; i<num_vars; ++i)
     {
@@ -1259,17 +1288,20 @@ void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
       for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + j] = value.real();
+          complex_soln[nco*i*num_elems + j] = value.real();
         }
       for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + num_elems +j] = value.imag();
+          complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
         }
-      for (unsigned int j=0; j<num_elems; ++j)
+      if (_write_complex_abs)
         {
-          Number value = soln[i*num_vars + j];
-          complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+          for (unsigned int j=0; j<num_elems; ++j)
+            {
+              Number value = soln[i*num_vars + j];
+              complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+            }
         }
     }
 
@@ -1383,7 +1415,9 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
-  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+  std::vector<std::string> complex_names =
+    exio_helper->get_complex_names(names,
+                                   _write_complex_abs);
 
   // Call helper function for opening/initializing data, giving it the
   // complex variable names
@@ -1401,17 +1435,25 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
       std::vector<Real> real_parts(num_nodes);
       std::vector<Real> imag_parts(num_nodes);
-      std::vector<Real> magnitudes(num_nodes);
+      std::vector<Real> magnitudes;
+      if (_write_complex_abs)
+        magnitudes.resize(num_nodes);
+
+      // The number of complex outputs depends on whether or not we are
+      // writing out the absolute values.
+      int nco = _write_complex_abs ? 3 : 2;
 
       for (int i=0; i<num_nodes; ++i)
         {
           real_parts[i] = soln[i*num_vars + c].real();
           imag_parts[i] = soln[i*num_vars + c].imag();
-          magnitudes[i] = std::abs(soln[i*num_vars + c]);
+          if (_write_complex_abs)
+            magnitudes[i] = std::abs(soln[i*num_vars + c]);
         }
-      exio_helper->write_nodal_values(3*c+1,real_parts,_timestep);
-      exio_helper->write_nodal_values(3*c+2,imag_parts,_timestep);
-      exio_helper->write_nodal_values(3*c+3,magnitudes,_timestep);
+      exio_helper->write_nodal_values(nco*c+1, real_parts, _timestep);
+      exio_helper->write_nodal_values(nco*c+2, imag_parts, _timestep);
+      if (_write_complex_abs)
+        exio_helper->write_nodal_values(3*c+3, magnitudes, _timestep);
 #else
       // Copy out this variable's solution
       std::vector<Number> cur_soln(num_nodes);

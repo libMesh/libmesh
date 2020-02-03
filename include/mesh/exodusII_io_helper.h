@@ -439,16 +439,22 @@ public:
 
   /**
    * \returns A vector with three copies of each element in the provided name vector,
-   * starting with r_, i_ and a_ respectively.
+   * starting with r_, i_ and a_ respectively. If the "write_complex_abs" parameter
+   * is true (default), the complex modulus is written, otherwise only the real and
+   * imaginary parts are written.
    */
-  std::vector<std::string> get_complex_names(const std::vector<std::string> & names) const;
+  std::vector<std::string>
+  get_complex_names(const std::vector<std::string> & names,
+                    bool write_complex_abs) const;
 
   /**
    * returns a "tripled" copy of \p vars_active_subdomains, which is necessary in the
    * complex-valued case.
    */
-  std::vector<std::set<subdomain_id_type>> get_complex_vars_active_subdomains(
-    const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const;
+  std::vector<std::set<subdomain_id_type>>
+  get_complex_vars_active_subdomains
+  (const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains,
+   bool write_complex_abs) const;
 
   /**
    * Takes a map from subdomain id -> vector of active variable names
@@ -458,8 +464,9 @@ public:
    * function.
    */
   std::map<subdomain_id_type, std::vector<std::string>>
-  get_complex_subdomain_to_var_names(
-    const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names) const;
+  get_complex_subdomain_to_var_names
+  (const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names,
+   bool write_complex_abs) const;
 
   /**
    * This is the \p ExodusII_IO_Helper Conversion class.  It provides

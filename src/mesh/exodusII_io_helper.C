@@ -3185,17 +3185,19 @@ void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 
 
 std::vector<std::string>
-ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names) const
+ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names,
+                                      bool write_complex_abs) const
 {
   std::vector<std::string> complex_names;
 
   // This will loop over all names and create new "complex" names
-  // (i.e. names that start with r_, i_ or a_
+  // (i.e. names that start with r_, i_ or a_)
   for (const auto & name : names)
     {
       complex_names.push_back("r_" + name);
       complex_names.push_back("i_" + name);
-      complex_names.push_back("a_" + name);
+      if (write_complex_abs)
+        complex_names.push_back("a_" + name);
     }
 
   return complex_names;
@@ -3203,18 +3205,22 @@ ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names) co
 
 
 
-std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_active_subdomains(
-  const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const
+std::vector<std::set<subdomain_id_type>>
+ExodusII_IO_Helper::
+get_complex_vars_active_subdomains
+(const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains,
+ bool write_complex_abs) const
 {
   std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains;
 
   for (auto & s : vars_active_subdomains)
     {
-      // Push back the same data three times to match the tripling of the variables
-      // for the real, imag, and modulus for the complex-valued solution.
+      // Push back the same data enough times for the real, imag, (and
+      // possibly modulus) for the complex-valued solution.
       complex_vars_active_subdomains.push_back(s);
       complex_vars_active_subdomains.push_back(s);
-      complex_vars_active_subdomains.push_back(s);
+      if (write_complex_abs)
+        complex_vars_active_subdomains.push_back(s);
     }
 
   return complex_vars_active_subdomains;
@@ -3224,11 +3230,14 @@ std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_ac
 
 std::map<subdomain_id_type, std::vector<std::string>>
 ExodusII_IO_Helper::
-get_complex_subdomain_to_var_names(
-  const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names) const
+get_complex_subdomain_to_var_names
+(const std::map<subdomain_id_type, std::vector<std::string>> & subdomain_to_var_names,
+ bool write_complex_abs) const
 {
   // Eventual return value
   std::map<subdomain_id_type, std::vector<std::string>> ret;
+
+  unsigned int num_complex_outputs = write_complex_abs ? 3 : 2;
 
   for (const auto & pr : subdomain_to_var_names)
     {
@@ -3238,8 +3247,8 @@ get_complex_subdomain_to_var_names(
       // Get list of non-complex variable names active on this subdomain.
       const auto & varnames = pr.second;
 
-      // Allocate space for 3x the number of entries
-      vec.reserve(3 * varnames.size());
+      // Allocate space for the complex-valued entries
+      vec.reserve(num_complex_outputs * varnames.size());
 
       // For each varname in the input map, write three variable names
       // to the output formed by prepending "r_", "i_", and "a_",
@@ -3248,7 +3257,8 @@ get_complex_subdomain_to_var_names(
         {
           vec.push_back("r_" + varname);
           vec.push_back("i_" + varname);
-          vec.push_back("a_" + varname);
+          if (write_complex_abs)
+            vec.push_back("a_" + varname);
         }
     }
   return ret;
