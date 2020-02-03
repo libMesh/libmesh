@@ -207,6 +207,9 @@ public:
   { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phi; }
 
+  void request_phi() const override
+  { get_phi(); }
+
   /**
    * \returns The shape function derivatives at the quadrature
    * points.
@@ -214,6 +217,9 @@ public:
   const std::vector<std::vector<OutputGradient>> & get_dphi() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphi; }
+
+  void request_dphi() const override
+  { get_dphi(); }
 
   /**
    * \returns The curl of the shape function at the quadrature
@@ -432,13 +438,13 @@ public:
   /**
    * Prints the value of each shape function at each quadrature point.
    */
-  void print_phi(std::ostream & os) const;
+  void print_phi(std::ostream & os) const override;
 
   /**
    * Prints the value of each shape function's derivative
    * at each quadrature point.
    */
-  void print_dphi(std::ostream & os) const;
+  void print_dphi(std::ostream & os) const override;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -446,7 +452,7 @@ public:
    * Prints the value of each shape function's second derivatives
    * at each quadrature point.
    */
-  void print_d2phi(std::ostream & os) const;
+  void print_d2phi(std::ostream & os) const override;
 
 #endif
 
@@ -483,7 +489,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions(const Elem * elem, const std::vector<Point> & qp);
+  virtual void compute_shape_functions(const Elem * elem, const std::vector<Point> & qp) override;
 
   /**
    * Object that handles computing shape function values, gradients, etc

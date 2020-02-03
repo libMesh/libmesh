@@ -202,9 +202,10 @@ struct MakeNumber
 template <typename T>
 struct MakeNumber<std::complex<T>>
 {
-  // Compile-time error: we shouldn't need to make numbers out of
-  // numbers
-  //typedef std::complex<T> type;
+  // Should this be a compile-time error? we shouldn't need to make numbers out of
+  // numbers, but then again having the typedef below enables more generic
+  // programming
+  typedef std::complex<T> type;
 };
 
 
@@ -305,6 +306,60 @@ Number div_from_grad( const TensorValue<Number> & grad );
 /*! Place holder needed for ExactSolution to compile. Will compute the
   divergence of a tensor given the gradient of that tensor. */
 VectorValue<Number> div_from_grad( const TypeNTensor<3,Number> & grad );
+
+/**
+ * This helper structure is used to determine whether a template class is one of
+ * our mathematical structures, like TypeVector, TypeTensor and their descendents
+ */
+template <typename T>
+struct MathWrapperTraits
+{
+  static constexpr bool value = false;
+};
+
+template <typename T>
+struct MathWrapperTraits<TypeVector<T>>
+{
+  static constexpr bool value = true;
+};
+
+template <typename T>
+struct MathWrapperTraits<VectorValue<T>>
+{
+  static constexpr bool value = true;
+};
+
+template <typename T>
+struct MathWrapperTraits<TypeTensor<T>>
+{
+  static constexpr bool value = true;
+};
+
+template <typename T>
+struct MathWrapperTraits<TensorValue<T>>
+{
+  static constexpr bool value = true;
+};
+
+template <unsigned int N, typename T>
+struct MathWrapperTraits<TypeNTensor<N,T>>
+{
+  static constexpr bool value = true;
+};
+
+template <typename T, typename enable = void> struct MakeBaseNumber {};
+
+template <typename T>
+struct MakeBaseNumber<T, typename std::enable_if<ScalarTraits<T>::value>::type> {
+  typedef typename MakeNumber<T>::type type;
+};
+
+template <template <typename> class Wrapper, typename T>
+struct MakeBaseNumber<
+    Wrapper<T>,
+    typename std::enable_if<MathWrapperTraits<Wrapper<T>>::value>::type> {
+  typedef typename MakeBaseNumber<T>::type type;
+};
 
 }//namespace TensorTools
 
