@@ -154,6 +154,7 @@ public:
                             const dof_id_type id = DofObject::invalid_id,
                             const processor_id_type proc_id = DofObject::invalid_processor_id) override;
   virtual Node * add_node (Node * n) override;
+  virtual Node * add_node (std::unique_ptr<Node> n) override;
 
   /**
    * Insert \p Node \p n into the Mesh at a location consistent with
