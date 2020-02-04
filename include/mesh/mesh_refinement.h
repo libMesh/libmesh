@@ -321,6 +321,15 @@ public:
   Elem * add_elem (Elem * elem);
 
   /**
+   * Same as the function above, but makes it clear that the
+   * MeshRefinement object (actually, its Mesh) takes ownership of the
+   * Elem which is passed in, so the user is not responsible for
+   * deleting it. The version of add_elem() taking a dumb pointer will
+   * eventually be deprecated in favor of this version.
+   */
+  Elem * add_elem (std::unique_ptr<Elem> elem);
+
+  /**
    * \returns A constant reference to the \p MeshBase object associated
    * with this object.
    */
