@@ -106,7 +106,8 @@ unit_tests_sources = \
   systems/equation_systems_test.C \
   systems/systems_test.C \
   utils/point_locator_test.C \
-  utils/vectormap_test.C
+  utils/vectormap_test.C \
+  ad/geometric_ad_test.C
 
 #EXTRA_DIST = base/getpot_test_input.in
 

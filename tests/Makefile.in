@@ -233,7 +233,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	ad/geometric_ad_test.C fparser/autodiff.C
 am__dirstamp = $(am__leading_dot)dirstamp
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
@@ -316,7 +316,8 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	systems/unit_tests_dbg-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_dbg-systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-point_locator_test.$(OBJEXT) \
-	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1)
+	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) \
+	ad/unit_tests_dbg-geometric_ad_test.$(OBJEXT) $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
@@ -378,7 +379,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	ad/geometric_ad_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_3 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
 am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-dof_map_test.$(OBJEXT) \
@@ -461,6 +462,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	systems/unit_tests_devel-systems_test.$(OBJEXT) \
 	utils/unit_tests_devel-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT) \
+	ad/unit_tests_devel-geometric_ad_test.$(OBJEXT) \
 	$(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_devel_OBJECTS = $(am__objects_4)
 unit_tests_devel_OBJECTS = $(am_unit_tests_devel_OBJECTS)
@@ -519,7 +521,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	ad/geometric_ad_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_5 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
 am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-dof_map_test.$(OBJEXT) \
@@ -602,6 +604,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	systems/unit_tests_oprof-systems_test.$(OBJEXT) \
 	utils/unit_tests_oprof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT) \
+	ad/unit_tests_oprof-geometric_ad_test.$(OBJEXT) \
 	$(am__objects_5)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS = $(am__objects_6)
 unit_tests_oprof_OBJECTS = $(am_unit_tests_oprof_OBJECTS)
@@ -660,7 +663,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	ad/geometric_ad_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_7 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
 am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-dof_map_test.$(OBJEXT) \
@@ -742,7 +745,8 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	systems/unit_tests_opt-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_opt-systems_test.$(OBJEXT) \
 	utils/unit_tests_opt-point_locator_test.$(OBJEXT) \
-	utils/unit_tests_opt-vectormap_test.$(OBJEXT) $(am__objects_7)
+	utils/unit_tests_opt-vectormap_test.$(OBJEXT) \
+	ad/unit_tests_opt-geometric_ad_test.$(OBJEXT) $(am__objects_7)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_8)
 unit_tests_opt_OBJECTS = $(am_unit_tests_opt_OBJECTS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DEPENDENCIES = $(top_builddir)/libmesh_opt.la
@@ -800,7 +804,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	ad/geometric_ad_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_9 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
 am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-dof_map_test.$(OBJEXT) \
@@ -883,6 +887,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	systems/unit_tests_prof-systems_test.$(OBJEXT) \
 	utils/unit_tests_prof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT) \
+	ad/unit_tests_prof-geometric_ad_test.$(OBJEXT) \
 	$(am__objects_9)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_10)
 unit_tests_prof_OBJECTS = $(am_unit_tests_prof_OBJECTS)
@@ -911,6 +916,11 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	./$(DEPDIR)/unit_tests_oprof-driver.Po \
 	./$(DEPDIR)/unit_tests_opt-driver.Po \
 	./$(DEPDIR)/unit_tests_prof-driver.Po \
+	ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Po \
+	ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Po \
+	ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Po \
+	ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Po \
+	ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Po \
 	base/$(DEPDIR)/unit_tests_dbg-default_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po \
 	base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po \
@@ -1779,7 +1789,7 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	$(am__append_1)
+	ad/geometric_ad_test.C $(am__append_1)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -2095,6 +2105,14 @@ utils/unit_tests_dbg-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_dbg-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
+ad/$(am__dirstamp):
+	@$(MKDIR_P) ad
+	@: > ad/$(am__dirstamp)
+ad/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ad/$(DEPDIR)
+	@: > ad/$(DEPDIR)/$(am__dirstamp)
+ad/unit_tests_dbg-geometric_ad_test.$(OBJEXT): ad/$(am__dirstamp) \
+	ad/$(DEPDIR)/$(am__dirstamp)
 fparser/$(am__dirstamp):
 	@$(MKDIR_P) fparser
 	@: > fparser/$(am__dirstamp)
@@ -2275,6 +2293,8 @@ utils/unit_tests_devel-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_devel-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+ad/unit_tests_devel-geometric_ad_test.$(OBJEXT): ad/$(am__dirstamp) \
+	ad/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
@@ -2449,6 +2469,8 @@ utils/unit_tests_oprof-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_oprof-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+ad/unit_tests_oprof-geometric_ad_test.$(OBJEXT): ad/$(am__dirstamp) \
+	ad/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_oprof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
@@ -2623,6 +2645,8 @@ utils/unit_tests_opt-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_opt-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
+ad/unit_tests_opt-geometric_ad_test.$(OBJEXT): ad/$(am__dirstamp) \
+	ad/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_opt-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
@@ -2797,6 +2821,8 @@ utils/unit_tests_prof-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_prof-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
+ad/unit_tests_prof-geometric_ad_test.$(OBJEXT): ad/$(am__dirstamp) \
+	ad/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_prof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
@@ -2806,6 +2832,7 @@ unit_tests-prof$(EXEEXT): $(unit_tests_prof_OBJECTS) $(unit_tests_prof_DEPENDENC
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ad/*.$(OBJEXT)
 	-rm -f base/*.$(OBJEXT)
 	-rm -f fe/*.$(OBJEXT)
 	-rm -f fparser/*.$(OBJEXT)
@@ -2827,6 +2854,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_oprof-driver.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_opt-driver.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_prof-driver.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-default_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po@am__quote@ # am--include-marker
@@ -4397,6 +4429,20 @@ utils/unit_tests_dbg-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
 
+ad/unit_tests_dbg-geometric_ad_test.o: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_dbg-geometric_ad_test.o -MD -MP -MF ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Tpo -c -o ad/unit_tests_dbg-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_dbg-geometric_ad_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_dbg-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+
+ad/unit_tests_dbg-geometric_ad_test.obj: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_dbg-geometric_ad_test.obj -MD -MP -MF ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Tpo -c -o ad/unit_tests_dbg-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_dbg-geometric_ad_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_dbg-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+
 fparser/unit_tests_dbg-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_dbg-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_dbg-autodiff.Tpo -c -o fparser/unit_tests_dbg-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fparser/$(DEPDIR)/unit_tests_dbg-autodiff.Tpo fparser/$(DEPDIR)/unit_tests_dbg-autodiff.Po
@@ -5544,6 +5590,20 @@ utils/unit_tests_devel-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_devel-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
+ad/unit_tests_devel-geometric_ad_test.o: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_devel-geometric_ad_test.o -MD -MP -MF ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Tpo -c -o ad/unit_tests_devel-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_devel-geometric_ad_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_devel-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+
+ad/unit_tests_devel-geometric_ad_test.obj: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_devel-geometric_ad_test.obj -MD -MP -MF ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Tpo -c -o ad/unit_tests_devel-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_devel-geometric_ad_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_devel-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
 
 fparser/unit_tests_devel-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_devel-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_devel-autodiff.Tpo -c -o fparser/unit_tests_devel-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
@@ -6693,6 +6753,20 @@ utils/unit_tests_oprof-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
 
+ad/unit_tests_oprof-geometric_ad_test.o: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_oprof-geometric_ad_test.o -MD -MP -MF ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Tpo -c -o ad/unit_tests_oprof-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_oprof-geometric_ad_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_oprof-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+
+ad/unit_tests_oprof-geometric_ad_test.obj: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_oprof-geometric_ad_test.obj -MD -MP -MF ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Tpo -c -o ad/unit_tests_oprof-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_oprof-geometric_ad_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_oprof-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+
 fparser/unit_tests_oprof-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_oprof-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_oprof-autodiff.Tpo -c -o fparser/unit_tests_oprof-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fparser/$(DEPDIR)/unit_tests_oprof-autodiff.Tpo fparser/$(DEPDIR)/unit_tests_oprof-autodiff.Po
@@ -7840,6 +7914,20 @@ utils/unit_tests_opt-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_opt-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
+ad/unit_tests_opt-geometric_ad_test.o: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_opt-geometric_ad_test.o -MD -MP -MF ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Tpo -c -o ad/unit_tests_opt-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_opt-geometric_ad_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_opt-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+
+ad/unit_tests_opt-geometric_ad_test.obj: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_opt-geometric_ad_test.obj -MD -MP -MF ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Tpo -c -o ad/unit_tests_opt-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_opt-geometric_ad_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_opt-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
 
 fparser/unit_tests_opt-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_opt-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_opt-autodiff.Tpo -c -o fparser/unit_tests_opt-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
@@ -8989,6 +9077,20 @@ utils/unit_tests_prof-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
 
+ad/unit_tests_prof-geometric_ad_test.o: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_prof-geometric_ad_test.o -MD -MP -MF ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Tpo -c -o ad/unit_tests_prof-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_prof-geometric_ad_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_prof-geometric_ad_test.o `test -f 'ad/geometric_ad_test.C' || echo '$(srcdir)/'`ad/geometric_ad_test.C
+
+ad/unit_tests_prof-geometric_ad_test.obj: ad/geometric_ad_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT ad/unit_tests_prof-geometric_ad_test.obj -MD -MP -MF ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Tpo -c -o ad/unit_tests_prof-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Tpo ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ad/geometric_ad_test.C' object='ad/unit_tests_prof-geometric_ad_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o ad/unit_tests_prof-geometric_ad_test.obj `if test -f 'ad/geometric_ad_test.C'; then $(CYGPATH_W) 'ad/geometric_ad_test.C'; else $(CYGPATH_W) '$(srcdir)/ad/geometric_ad_test.C'; fi`
+
 fparser/unit_tests_prof-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_prof-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_prof-autodiff.Tpo -c -o fparser/unit_tests_prof-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fparser/$(DEPDIR)/unit_tests_prof-autodiff.Tpo fparser/$(DEPDIR)/unit_tests_prof-autodiff.Po
@@ -9222,6 +9324,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ad/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ad/$(am__dirstamp)
 	-rm -f base/$(DEPDIR)/$(am__dirstamp)
 	-rm -f base/$(am__dirstamp)
 	-rm -f fe/$(DEPDIR)/$(am__dirstamp)
@@ -9262,6 +9366,11 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/unit_tests_oprof-driver.Po
 	-rm -f ./$(DEPDIR)/unit_tests_opt-driver.Po
 	-rm -f ./$(DEPDIR)/unit_tests_prof-driver.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po
@@ -9717,6 +9826,11 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/unit_tests_oprof-driver.Po
 	-rm -f ./$(DEPDIR)/unit_tests_opt-driver.Po
 	-rm -f ./$(DEPDIR)/unit_tests_prof-driver.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_dbg-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_devel-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_oprof-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_opt-geometric_ad_test.Po
+	-rm -f ad/$(DEPDIR)/unit_tests_prof-geometric_ad_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po
