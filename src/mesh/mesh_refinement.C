@@ -211,10 +211,14 @@ Node * MeshRefinement::add_node(Elem & parent,
 Elem * MeshRefinement::add_elem (Elem * elem)
 {
   libmesh_assert(elem);
-  _mesh.add_elem (elem);
-  return elem;
+  return _mesh.add_elem (elem);
 }
 
+Elem * MeshRefinement::add_elem (std::unique_ptr<Elem> elem)
+{
+  libmesh_assert(elem);
+  return _mesh.add_elem(std::move(elem));
+}
 
 
 void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_cell,

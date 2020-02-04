@@ -100,8 +100,8 @@ void Elem::refine (MeshRefinement & mesh_refinement)
       const unsigned int nei = this->n_extra_integers();
       for (unsigned int c = 0; c != nc; c++)
         {
-          _children[c] = Elem::build(this->type(), this).release();
-          Elem * current_child = this->child_ptr(c);
+          auto current_child = Elem::build(this->type(), this);
+          _children[c] = current_child.get();
 
           current_child->set_refinement_flag(Elem::JUST_REFINED);
           current_child->set_p_level(parent_p_level);
@@ -116,12 +116,12 @@ void Elem::refine (MeshRefinement & mesh_refinement)
               current_child->set_node(cnode) = node;
             }
 
-          mesh_refinement.add_elem (current_child);
-          current_child->set_n_systems(this->n_systems());
-          libmesh_assert_equal_to (current_child->n_extra_integers(),
+          Elem * added_child = mesh_refinement.add_elem (std::move(current_child));
+          added_child->set_n_systems(this->n_systems());
+          libmesh_assert_equal_to (added_child->n_extra_integers(),
                                    this->n_extra_integers());
           for (unsigned int i=0; i != nei; ++i)
-            current_child->set_extra_integer(i, this->get_extra_integer(i));
+            added_child->set_extra_integer(i, this->get_extra_integer(i));
         }
     }
   else
