@@ -653,6 +653,16 @@ public:
   virtual Node * insert_node(Node * n) = 0;
 
   /**
+   * Version of insert_node() taking a std::unique_ptr by value. The version
+   * taking a dumb pointer will eventually be deprecated in favor of this
+   * version. This API is intended to indicate that ownership of the Node
+   * is transferred to the Mesh when this function is called, and it should
+   * play more nicely with the Node::build() API which has always returned
+   * a std::unique_ptr.
+   */
+  virtual Node * insert_node(std::unique_ptr<Node> n) = 0;
+
+  /**
    * Removes the Node n from the mesh.
    */
   virtual void delete_node (Node * n) = 0;

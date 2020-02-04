@@ -168,6 +168,7 @@ public:
    * storage.
    */
   virtual Node * insert_node(Node * n) override;
+  virtual Node * insert_node(std::unique_ptr<Node> n) override;
 
   virtual void delete_node (Node * n) override;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) override;

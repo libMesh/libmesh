@@ -274,6 +274,7 @@ public:
    * Calls add_node().
    */
   virtual Node * insert_node(Node * n) override;
+  virtual Node * insert_node(std::unique_ptr<Node> n) override;
 
   /**
    * Takes ownership of node \p n on this partition of a distributed
