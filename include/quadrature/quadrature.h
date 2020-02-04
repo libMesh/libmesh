@@ -46,7 +46,8 @@ namespace libMesh
 {
 
 // forward declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * The \p QBase class provides the basic functionality from which

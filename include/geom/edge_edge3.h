@@ -40,22 +40,29 @@ namespace libMesh
  * \date 2002
  * \brief A 1D geometric element with 3 nodes.
  */
-class Edge3 : public Edge
+template <typename RealType = Real>
+class Edge3Templ : public EdgeTempl<RealType>
 {
 public:
+  typedef Edge3Templ<RealType> Edge3;
+  using typename EdgeTempl<RealType>::Edge;
+  using typename EdgeTempl<RealType>::Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Edge3 (Elem * p=nullptr) :
+  Edge3Templ (Elem * p=nullptr) :
     Edge(Edge3::n_nodes(), p, _nodelinks_data) {}
 
-  Edge3 (Edge3 &&) = delete;
-  Edge3 (const Edge3 &) = delete;
+  Edge3Templ (Edge3 &&) = delete;
+  Edge3Templ (const Edge3 &) = delete;
   Edge3 & operator= (const Edge3 &) = delete;
   Edge3 & operator= (Edge3 &&) = delete;
-  virtual ~Edge3() = default;
+  virtual ~Edge3Templ() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -153,7 +160,7 @@ public:
   /**
    * An optimized method for computing the length of a 3-node edge.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)
@@ -219,6 +226,37 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
+
+template <typename RealType>
+const int Edge3Templ<RealType>::num_nodes;
+
+// Edge3 class static member initializations
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Edge3Templ<RealType>::_embedding_matrix[Edge3::num_children][Edge3::num_nodes][Edge3::num_nodes] =
+  {
+    // embedding matrix for child 0
+    {
+      // 0    1    2
+      {1.0, 0.0, 0.0}, // left
+      {0.0, 0.0, 1.0}, // right
+      {0.375,-0.125,0.75} // middle
+    },
+
+    // embedding matrix for child 1
+    {
+      // 0    1    2
+      {0.0, 0.0, 1.0}, // left
+      {0.0, 1.0, 0.0},  // right
+      {-0.125,0.375,0.75} // middle
+    }
+  };
+
+#endif
+
+typedef Edge3Templ<Real> Edge3;
 
 } // namespace libMesh
 

@@ -35,7 +35,8 @@ namespace libMesh
 {
 
 // forward declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 class FEComputeData;
 
 

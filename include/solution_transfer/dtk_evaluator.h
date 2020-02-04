@@ -45,7 +45,8 @@ namespace libMesh
 class EquationSystems;
 class System;
 class DofMap;
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 class FEType;
 
 template <typename T> class NumericVector;

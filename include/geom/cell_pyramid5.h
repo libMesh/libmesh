@@ -25,6 +25,9 @@
 
 namespace libMesh
 {
+template <typename> class Quad4Templ;
+template <typename> class Tri3Templ;
+template <typename> class Edge2Templ;
 
 /**
  * The \p Pyramid5 is an element in 3D composed of 5 nodes.
@@ -49,23 +52,33 @@ namespace libMesh
  * \date 2002
  * \brief A 3D pyramid element with 5 nodes.
  */
-class Pyramid5 final : public Pyramid
+template <typename RealType = Real>
+class Pyramid5Templ final : public PyramidTempl<RealType>
 {
 public:
+  typedef PyramidTempl<RealType> Pyramid;
+  typedef Pyramid5Templ<RealType> Pyramid5;
+  typedef Quad4Templ<RealType> Quad4;
+  typedef Tri3Templ<RealType> Tri3;
+  typedef Edge2Templ<RealType> Edge2;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid5 (Elem * p=nullptr) :
+  Pyramid5Templ (Elem * p=nullptr) :
     Pyramid(Pyramid5::n_nodes(), p, _nodelinks_data)
   {}
 
-  Pyramid5 (Pyramid5 &&) = delete;
-  Pyramid5 (const Pyramid5 &) = delete;
+  Pyramid5Templ (Pyramid5 &&) = delete;
+  Pyramid5Templ (const Pyramid5 &) = delete;
   Pyramid5 & operator= (const Pyramid5 &) = delete;
   Pyramid5 & operator= (Pyramid5 &&) = delete;
-  virtual ~Pyramid5() = default;
+  virtual ~Pyramid5Templ() = default;
 
   /**
    * \returns \p PRYAMID.
@@ -167,7 +180,7 @@ public:
   /**
    * Specialization for computing the volume of a pyramid.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * Builds a bounding box out of the nodal positions
@@ -198,6 +211,35 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
+
+// ------------------------------------------------------------
+// Pyramid5 class static member initializations
+
+template <typename RealType>
+const unsigned int Pyramid5Templ<RealType>::side_nodes_map[Pyramid5::num_sides][Pyramid5::nodes_per_side] =
+  {
+    {0, 1, 4, 99}, // Side 0
+    {1, 2, 4, 99}, // Side 1
+    {2, 3, 4, 99}, // Side 2
+    {3, 0, 4, 99}, // Side 3
+    {0, 3, 2,  1}  // Side 4
+  };
+
+template <typename RealType>
+const unsigned int Pyramid5Templ<RealType>::edge_nodes_map[Pyramid5::num_edges][Pyramid5::nodes_per_edge] =
+  {
+    {0, 1}, // Edge 0
+    {1, 2}, // Edge 1
+    {2, 3}, // Edge 2
+    {0, 3}, // Edge 3
+    {0, 4}, // Edge 4
+    {1, 4}, // Edge 5
+    {2, 4}, // Edge 6
+    {3, 4}  // Edge 7
+  };
+
+
+typedef Pyramid5Templ<Real> Pyramid5;
 
 } // namespace libMesh
 

@@ -33,9 +33,12 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
-class MeshBase;
-class Node;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
+template <typename> class NodeTempl;
+typedef NodeTempl<Real> Node;
 
 // Fix for STL laziness
 struct myhash {
@@ -71,7 +74,8 @@ class TopologyMap
   // We need to supply our own hash function.
   typedef std::unordered_map<std::pair<dof_id_type, dof_id_type>, dof_id_type, myhash> map_type;
 public:
-  void init(MeshBase &);
+  template <typename RealType>
+  void init(MeshBaseTempl<RealType> &);
 
   void clear() { _map.clear(); }
 
@@ -79,7 +83,8 @@ public:
    * Add a node to the map, between each pair of specified bracketing
    * nodes.
    */
-  void add_node(const Node & mid_node,
+  template <typename RealType>
+  void add_node(const NodeTempl<RealType> & mid_node,
                 const std::vector<
                 std::pair<dof_id_type, dof_id_type>> &
                 bracketing_nodes);
@@ -94,7 +99,8 @@ public:
                    bracketing_nodes) const;
 
 protected:
-  void fill(const MeshBase &);
+  template <typename RealType>
+  void fill(const MeshBaseTempl<RealType> &);
 
 private:
   map_type          _map;

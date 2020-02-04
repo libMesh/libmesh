@@ -33,7 +33,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 
 
 /**

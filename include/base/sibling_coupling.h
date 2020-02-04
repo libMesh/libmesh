@@ -36,14 +36,20 @@ namespace libMesh
  * \author Roy H. Stogner
  * \date 2016
  */
-class SiblingCoupling : public GhostingFunctor
+template <typename RealType = Real>
+class SiblingCouplingTempl : public GhostingFunctorTempl<RealType>
 {
 public:
+  typedef SiblingCouplingTempl<RealType> SiblingCoupling;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  using map_type = std::unordered_map<const ElemTempl<RealType> *, const CouplingMatrix*>;
 
   /**
    * Constructor.
    */
-  SiblingCoupling() :
+  SiblingCouplingTempl() :
     _dof_coupling(nullptr) {}
 
   // Change coupling matrix after construction
@@ -54,8 +60,8 @@ public:
    * For the specified range of active elements, find any sibling
    * elements which should be evaluable too.
    */
-  virtual void operator() (const MeshBase::const_element_iterator & range_begin,
-                           const MeshBase::const_element_iterator & range_end,
+  virtual void operator() (const typename MeshBaseTempl<RealType>::const_element_iterator & range_begin,
+                           const typename MeshBaseTempl<RealType>::const_element_iterator & range_end,
                            processor_id_type p,
                            map_type & coupled_elements);
 
@@ -63,6 +69,8 @@ private:
 
   const CouplingMatrix * _dof_coupling;
 };
+
+typedef SiblingCouplingTempl<Real> SiblingCoupling;
 
 } // namespace libMesh
 

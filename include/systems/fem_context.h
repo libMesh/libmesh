@@ -39,12 +39,13 @@ namespace libMesh
 {
 
 // Forward Declarations
-class BoundaryInfo;
-class Elem;
-template <typename T> class FEGenericBase;
-typedef FEGenericBase<Real> FEBase;
+template <typename> class BoundaryInfoTempl;
+typedef BoundaryInfoTempl<Real> BoundaryInfo;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 class QBase;
-class Point;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 template <typename T> class NumericVector;
 
 /**
@@ -1133,9 +1134,9 @@ protected:
    * We store FE objects for each element dimension present in the mesh,
    * except for edge_fe which only applies to 3D elements.
    */
-  std::vector<std::map<FEType, std::unique_ptr<FEAbstract>>> _element_fe;
-  std::vector<std::map<FEType, std::unique_ptr<FEAbstract>>> _side_fe;
-  std::map<FEType, std::unique_ptr<FEAbstract>> _edge_fe;
+  std::vector<std::map<FEType, std::unique_ptr<FEAbstract<>>>> _element_fe;
+  std::vector<std::map<FEType, std::unique_ptr<FEAbstract<>>>> _side_fe;
+  std::map<FEType, std::unique_ptr<FEAbstract<>>> _edge_fe;
 
 
   /**
@@ -1144,9 +1145,9 @@ protected:
    * present in the mesh, except for edge_fe_var which only applies
    * for 3D elements.
    */
-  std::vector<std::vector<FEAbstract *>> _element_fe_var;
-  std::vector<std::vector<FEAbstract *>> _side_fe_var;
-  std::vector<FEAbstract *> _edge_fe_var;
+  std::vector<std::vector<FEAbstract<> *>> _element_fe_var;
+  std::vector<std::vector<FEAbstract<> *>> _side_fe_var;
+  std::vector<FEAbstract<> *> _edge_fe_var;
 
   /**
    * Saved reference to BoundaryInfo on the mesh for this System.

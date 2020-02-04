@@ -36,8 +36,9 @@
 namespace libMesh
 {
 
-// Forward declarations
-class UnstructuredMesh;
+// forward declarations
+template <typename> class UnstructuredMeshTempl;
+typedef UnstructuredMeshTempl<Real> UnstructuredMesh;
 
 /**
  * This is an implementation of Larisa Branets' smoothing algorithms.

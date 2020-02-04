@@ -43,12 +43,13 @@ namespace libMesh
 {
 
 // Forward Declarations
-class PointLocatorBase;
-class MeshBase;
-class Point;
-class TreeBase;
-class Elem;
-class Node;
+template <typename> class PointLocatorBaseTempl;
+template <typename> class PointLocatorTreeTempl;
+template <typename> class MeshBaseTempl;
+template <typename> class PointTempl;
+template <typename> class TreeBaseTempl;
+template <typename> class ElemTempl;
+template <typename> class NodeTempl;
 
 
 /**
@@ -59,22 +60,31 @@ class Node;
  * \author Daniel Dreyer
  * \date 2003
  */
-class PointLocatorBase : public ReferenceCountedObject<PointLocatorBase>
+template <typename RealType = Real>
+class PointLocatorBaseTempl : public ReferenceCountedObject<PointLocatorBaseTempl<RealType>>
 {
+public:
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+  typedef PointLocatorTreeTempl<RealType> PointLocatorTree;
+
 protected:
   /**
    * Constructor.  Protected so that this base class
    * cannot be explicitly instantiated.  Takes a master
    * PointLocator that helps in saving memory.
    */
-  PointLocatorBase (const MeshBase & mesh,
-                    const PointLocatorBase * master);
+  PointLocatorBaseTempl (const MeshBase & mesh,
+                         const PointLocatorBase * master);
 
 public:
   /**
    * Destructor.
    */
-  virtual ~PointLocatorBase ();
+  virtual ~PointLocatorBaseTempl ();
 
   /**
    * Builds an PointLocator for the mesh \p mesh.
@@ -211,6 +221,8 @@ protected:
    */
   Real _close_to_point_tol;
 };
+
+typedef PointLocatorBaseTempl<Real> PointLocatorBase;
 
 } // namespace libMesh
 

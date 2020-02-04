@@ -49,6 +49,9 @@ template <typename Output=Number>
 class CompositeFunction : public FunctionBase<Output>
 {
 public:
+  typedef typename GetScalarType<Output>::type RealType;
+  typedef PointTempl<RealType> Point;
+
   explicit
   CompositeFunction () = default;
 

@@ -31,7 +31,8 @@ namespace libMesh
 {
 
 // forward declaration
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 
 /**
  * This class implements writing meshes using GNUplot, designed for

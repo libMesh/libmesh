@@ -56,16 +56,23 @@ namespace libMesh
 
 // Forward Declarations
 class CouplingMatrix;
-class DefaultCoupling;
+template <typename> class DefaultCouplingTempl;
+typedef DefaultCouplingTempl<Real> DefaultCoupling;
 class DirichletBoundary;
 class DirichletBoundaries;
 class DofMap;
 class DofObject;
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
+template <typename> class NodeTempl;
+typedef NodeTempl<Real> Node;
 class FEType;
-class MeshBase;
-class PeriodicBoundaryBase;
-class PeriodicBoundaries;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
+template <typename> class PeriodicBoundaryBaseTempl;
+typedef PeriodicBoundaryBaseTempl<Real> PeriodicBoundaryBase;
+template <typename> class PeriodicBoundariesTempl;
+typedef PeriodicBoundariesTempl<Real> PeriodicBoundaries;
 class System;
 class NonlinearImplicitSystem;
 template <typename T> class DenseVectorBase;

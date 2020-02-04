@@ -41,10 +41,15 @@ namespace libMesh
  * \date 2007
  * \brief Used by ParallelMesh to represent an Elem owned by another processor.
  */
-class RemoteElem : public Elem,
-                   public Singleton
+template <typename RealType = Real>
+class RemoteElemTempl : public ElemTempl<RealType>,
+                        public Singleton
 {
 public:
+  typedef RemoteElemTempl<RealType> RemoteElem;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * A unique \p id to distinguish remote element links
@@ -55,30 +60,44 @@ public:
    * Constructor. Private to force use of the \p create() member.
    */
 private:
-  RemoteElem () : Elem(0,
+  RemoteElemTempl () : Elem(0,
                        0,
                        nullptr,
                        _elemlinks_data,
                        nullptr)
   { this->set_id(remote_elem_id); }
 
+  static RemoteElem * remote_elem;
+
 public:
 
-  RemoteElem (RemoteElem &&) = delete;
-  RemoteElem (const RemoteElem &) = delete;
+  RemoteElemTempl (RemoteElem &&) = delete;
+  RemoteElemTempl (const RemoteElem &) = delete;
   RemoteElem & operator= (const RemoteElem &) = delete;
   RemoteElem & operator= (RemoteElem &&) = delete;
 
   /**
    * Sets remote_elem to nullptr.
    */
-  virtual ~RemoteElem();
+  virtual ~RemoteElemTempl();
 
   /**
    * Return a reference to the global \p RemoteElem
    * singleton object.
    */
   static const Elem & create ();
+
+  /**
+   * Return a reference to the global \p RemoteElem
+   * singleton object.
+   */
+  static const RemoteElem * get_instance ()
+    {
+      if (!remote_elem)
+        create();
+
+      return remote_elem;
+    }
 
   virtual Point master_point (const unsigned int /*i*/) const override
   { libmesh_not_implemented(); return Point(); }
@@ -216,8 +235,12 @@ protected:
   Elem * _elemlinks_data[1];
 };
 
-// Singleton RemoteElem
-extern const RemoteElem * remote_elem;
+template <typename RealType>
+RemoteElemTempl<RealType> *
+RemoteElemTempl<RealType>::remote_elem = nullptr;
+
+
+typedef RemoteElemTempl<Real> RemoteElem;
 
 } // namespace libMesh
 

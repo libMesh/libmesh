@@ -666,7 +666,7 @@ void CheckpointIO::write_remote_elem (Xdr & io,
       for (auto n : elem->side_index_range())
         {
           const Elem * neigh = elem->neighbor_ptr(n);
-          if (neigh == remote_elem ||
+          if (neigh == RemoteElem::get_instance() ||
               (neigh && !elements.count(neigh)))
             {
               elem_ids.push_back(elem->id());
@@ -682,7 +682,7 @@ void CheckpointIO::write_remote_elem (Xdr & io,
                c != nc; ++c)
             {
               const Elem * child = elem->child_ptr(c);
-              if (child == remote_elem ||
+              if (child == RemoteElem::get_instance() ||
                   (child && !elements.count(child)))
                 {
                   parent_ids.push_back(elem->id());
@@ -1312,7 +1312,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
       Elem & elem = mesh.elem_ref(cast_int<dof_id_type>(elem_ids[i]));
       if (!elem.neighbor_ptr(elem_sides[i]))
         elem.set_neighbor(elem_sides[i],
-                          const_cast<RemoteElem *>(remote_elem));
+                          const_cast<RemoteElem *>(RemoteElem::get_instance()));
       else
         libmesh_assert(!expect_all_remote);
     }
@@ -1336,7 +1336,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
       const Elem * child = elem.raw_child_ptr(child_numbers[i]);
 
       if (!child)
-        elem.add_child(const_cast<RemoteElem *>(remote_elem),
+        elem.add_child(const_cast<RemoteElem *>(RemoteElem::get_instance()),
                        child_numbers[i]);
       else
         libmesh_assert(!expect_all_remote);

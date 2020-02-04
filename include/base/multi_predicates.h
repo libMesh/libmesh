@@ -26,14 +26,16 @@
 #include <vector>
 
 namespace libMesh {
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 }
 
 namespace libMesh
 {
 
 // Forward declarations
-class BoundaryInfo;
+template <typename> class BoundaryInfoTempl;
+typedef BoundaryInfoTempl<Real> BoundaryInfo;
 
 /**
  * This namespace defines several multi_predicates which are used by

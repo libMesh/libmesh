@@ -34,7 +34,8 @@ namespace libMesh
 
 class RBParameters;
 class RBParametrizedFunction;
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 class RBTheta;
 
 /**

@@ -61,14 +61,36 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
-class MeshRefinement;
-class Elem;
+template <typename>
+class MeshBaseTempl;
+template <typename> class MeshRefinementTempl;
 #ifdef LIBMESH_ENABLE_PERIODIC
-class PeriodicBoundaries;
-class PointLocatorBase;
+template <typename> class PeriodicBoundariesTempl;
+template <typename> class PointLocatorBaseTempl;
 #endif
-
+template <typename,typename>
+class FEGenericBase;
+template <typename>
+class FEMapTempl;
+template <typename>
+class RemoteElemTempl;
+template <typename> class Edge2Templ;
+template <typename> class Edge3Templ;
+template <typename> class Edge4Templ;
+template <typename> class Tri3Templ;
+template <typename> class Tri6Templ;
+template <typename> class Quad4Templ;
+template <typename> class Quad8Templ;
+template <typename> class Quad9Templ;
+template <typename> class Hex8Templ;
+template <typename> class Hex20Templ;
+template <typename> class Hex27Templ;
+template <typename> class Tet4Templ;
+template <typename> class Tet10Templ;
+template <typename> class Pyramid5Templ;
+template <typename> class Prism6Templ;
+template <typename> class Prism15Templ;
+template <typename> class Prism18Templ;
 
 /**
  * This is the base class from which all geometric element types are
@@ -97,9 +119,42 @@ class PointLocatorBase;
  * \date 2002-2007
  * \brief The base class for all geometric element types.
  */
-class Elem : public ReferenceCountedObject<Elem>,
-             public DofObject
+template <typename RealType = Real>
+class ElemTempl : public ReferenceCountedObject<ElemTempl<RealType>>,
+                  public DofObject
 {
+public:
+  typedef ElemTempl<RealType> Elem;
+  typedef RemoteElemTempl<RealType> RemoteElem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef FEGenericBase<Real, RealType> FEBase;
+  typedef FEMapTempl<RealType> FEMap;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
+  typedef MeshRefinementTempl<RealType> MeshRefinement;
+#ifdef LIBMESH_ENABLE_PERIODIC
+  typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+  typedef PeriodicBoundariesTempl<RealType> PeriodicBoundaries;
+#endif
+  typedef Edge2Templ<RealType> Edge2;
+  typedef Edge3Templ<RealType> Edge3;
+  typedef Edge4Templ<RealType> Edge4;
+  typedef Tri3Templ<RealType> Tri3;
+  typedef Tri6Templ<RealType> Tri6;
+  typedef Quad4Templ<RealType> Quad4;
+  typedef Quad8Templ<RealType> Quad8;
+  typedef Quad9Templ<RealType> Quad9;
+  typedef Hex8Templ<RealType> Hex8;
+  typedef Hex20Templ<RealType> Hex20;
+  typedef Hex27Templ<RealType> Hex27;
+  typedef Tet4Templ<RealType> Tet4;
+  typedef Tet10Templ<RealType> Tet10;
+  typedef Pyramid5Templ<RealType> Pyramid5;
+  typedef Prism6Templ<RealType> Prism6;
+  typedef Prism15Templ<RealType> Prism15;
+  typedef Prism18Templ<RealType> Prism18;
+
 protected:
 
   /**
@@ -108,11 +163,11 @@ protected:
    * parent \p p.  The constructor allocates the memory necessary
    * to support this data.
    */
-  Elem (const unsigned int n_nodes,
-        const unsigned int n_sides,
-        Elem * parent,
-        Elem ** elemlinkdata,
-        Node ** nodelinkdata);
+  ElemTempl (const unsigned int n_nodes,
+             const unsigned int n_sides,
+             Elem * parent,
+             Elem ** elemlinkdata,
+             Node ** nodelinkdata);
 
 public:
 
@@ -125,15 +180,15 @@ public:
    * custom move constructor that explicitly sets _children to nullptr
    * to do this safely).
    */
-  Elem (Elem &&) = delete;
-  Elem (const Elem &) = delete;
+  ElemTempl (Elem &&) = delete;
+  ElemTempl (const Elem &) = delete;
   Elem & operator= (const Elem &) = delete;
   Elem & operator= (Elem &&) = delete;
 
   /**
    * Destructor.  Frees all the memory associated with the element.
    */
-  virtual ~Elem();
+  virtual ~ElemTempl();
 
   /**
    * \returns The \p Point associated with local \p Node \p i.
@@ -584,7 +639,7 @@ public:
    * The maximum number of nodes *any* element can contain.
    * This is useful for replacing heap vectors with stack arrays.
    */
-  static const unsigned int max_n_nodes = 27;
+  static const unsigned int max_n_nodes;
 
   /**
    * \returns An integer range from 0 up to (but not including)
@@ -867,7 +922,7 @@ public:
   /**
    * \returns The (length/area/volume) of the geometric element.
    */
-  virtual Real volume () const;
+  virtual RealType volume () const;
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)
@@ -1797,21 +1852,31 @@ protected:
   unsigned char _map_data;
 };
 
+template <typename RealType>
+const ElemTempl<RealType> * ElemTempl<RealType>::reference_elem () const
+{
+  libmesh_not_implemented();
+  return nullptr;
+}
 
+template <>
+const ElemTempl<Real> * ElemTempl<Real>::reference_elem () const;
 
 // ------------------------------------------------------------
 // Elem helper classes
 //
+template <typename RealType>
 class
-Elem::NodeRefIter : public PointerToPointerIter<Node>
+ElemTempl<RealType>::NodeRefIter : public PointerToPointerIter<NodeTempl<RealType>>
 {
 public:
   NodeRefIter (Node * const * nodepp) : PointerToPointerIter<Node>(nodepp) {}
 };
 
 
+template <typename RealType>
 class
-Elem::ConstNodeRefIter : public PointerToPointerIter<const Node>
+ElemTempl<RealType>::ConstNodeRefIter : public PointerToPointerIter<const NodeTempl<RealType>>
 {
 public:
   ConstNodeRefIter (const Node * const * nodepp) : PointerToPointerIter<const Node>(nodepp) {}
@@ -1819,32 +1884,36 @@ public:
 
 
 #ifdef LIBMESH_ENABLE_AMR
+template <typename RealType>
 class
-Elem::ChildRefIter : public PointerToPointerIter<Elem>
+ElemTempl<RealType>::ChildRefIter : public PointerToPointerIter<ElemTempl<RealType>>
 {
 public:
   ChildRefIter (Elem * const * childpp) : PointerToPointerIter<Elem>(childpp) {}
 };
 
 
+template <typename RealType>
 class
-Elem::ConstChildRefIter : public PointerToPointerIter<const Elem>
+ElemTempl<RealType>::ConstChildRefIter : public PointerToPointerIter<const ElemTempl<RealType>>
 {
 public:
   ConstChildRefIter (const Elem * const * childpp) : PointerToPointerIter<const Elem>(childpp) {}
 };
 
 
+template <typename RealType>
 inline
-SimpleRange<Elem::ChildRefIter> Elem::child_ref_range()
+SimpleRange<typename ElemTempl<RealType>::ChildRefIter> ElemTempl<RealType>::child_ref_range()
 {
   libmesh_assert(_children);
   return {_children, _children + this->n_children()};
 }
 
 
+template <typename RealType>
 inline
-SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
+SimpleRange<typename ElemTempl<RealType>::ConstChildRefIter> ElemTempl<RealType>::child_ref_range() const
 {
   libmesh_assert(_children);
   return {_children, _children + this->n_children()};
@@ -1857,8 +1926,9 @@ SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
 // ------------------------------------------------------------
 // global Elem functions
 
+template <typename RealType>
 inline
-std::ostream & operator << (std::ostream & os, const Elem & e)
+std::ostream & operator << (std::ostream & os, const ElemTempl<RealType> & e)
 {
   e.print_info(os);
   return os;
@@ -1867,12 +1937,13 @@ std::ostream & operator << (std::ostream & os, const Elem & e)
 
 // ------------------------------------------------------------
 // Elem class member functions
+template <typename RealType>
 inline
-Elem::Elem(const unsigned int nn,
-           const unsigned int ns,
-           Elem * p,
-           Elem ** elemlinkdata,
-           Node ** nodelinkdata) :
+ElemTempl<RealType>::ElemTempl(const unsigned int nn,
+                               const unsigned int ns,
+                               Elem * p,
+                               Elem ** elemlinkdata,
+                               Node ** nodelinkdata) :
   _nodes(nodelinkdata),
   _elemlinks(elemlinkdata),
 #ifdef LIBMESH_ENABLE_AMR
@@ -1880,8 +1951,8 @@ Elem::Elem(const unsigned int nn,
 #endif
   _sbd_id(0),
 #ifdef LIBMESH_ENABLE_AMR
-  _rflag(Elem::DO_NOTHING),
-  _pflag(Elem::DO_NOTHING),
+  _rflag(ElemTempl<RealType>::DO_NOTHING),
+  _pflag(ElemTempl<RealType>::DO_NOTHING),
   _p_level(0),
 #endif
   _map_type(p ? p->mapping_type() : 0),
@@ -1927,8 +1998,9 @@ Elem::Elem(const unsigned int nn,
 
 
 
+template <typename RealType>
 inline
-Elem::~Elem()
+ElemTempl<RealType>::~ElemTempl()
 {
   // Deleting my parent/neighbor/nodes storage isn't necessary since it's
   // handled by the subclass
@@ -1951,8 +2023,9 @@ Elem::~Elem()
 
 
 
+template <typename RealType>
 inline
-const Point & Elem::point (const unsigned int i) const
+const PointTempl<RealType> & ElemTempl<RealType>::point (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -1963,8 +2036,9 @@ const Point & Elem::point (const unsigned int i) const
 
 
 
+template <typename RealType>
 inline
-Point & Elem::point (const unsigned int i)
+PointTempl<RealType> & ElemTempl<RealType>::point (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_nodes());
 
@@ -1973,8 +2047,9 @@ Point & Elem::point (const unsigned int i)
 
 
 
+template <typename RealType>
 inline
-dof_id_type Elem::node_id (const unsigned int i) const
+dof_id_type ElemTempl<RealType>::node_id (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -1985,8 +2060,9 @@ dof_id_type Elem::node_id (const unsigned int i) const
 
 
 
+template <typename RealType>
 inline
-unsigned int Elem::local_node (const dof_id_type i) const
+unsigned int ElemTempl<RealType>::local_node (const dof_id_type i) const
 {
   for (auto n : IntRange<unsigned int>(0, this->n_nodes()))
     if (this->node_id(n) == i)
@@ -1997,16 +2073,18 @@ unsigned int Elem::local_node (const dof_id_type i) const
 
 
 
+template <typename RealType>
 inline
-const Node * const * Elem::get_nodes () const
+const NodeTempl<RealType> * const * ElemTempl<RealType>::get_nodes () const
 {
   return _nodes;
 }
 
 
 
+template <typename RealType>
 inline
-const Node * Elem::node_ptr (const unsigned int i) const
+const NodeTempl<RealType> * ElemTempl<RealType>::node_ptr (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -2016,8 +2094,9 @@ const Node * Elem::node_ptr (const unsigned int i) const
 
 
 
+template <typename RealType>
 inline
-Node * Elem::node_ptr (const unsigned int i)
+NodeTempl<RealType> * ElemTempl<RealType>::node_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -2027,24 +2106,27 @@ Node * Elem::node_ptr (const unsigned int i)
 
 
 
+template <typename RealType>
 inline
-const Node & Elem::node_ref (const unsigned int i) const
+const NodeTempl<RealType> & ElemTempl<RealType>::node_ref (const unsigned int i) const
 {
   return *this->node_ptr(i);
 }
 
 
 
+template <typename RealType>
 inline
-Node & Elem::node_ref (const unsigned int i)
+NodeTempl<RealType> & ElemTempl<RealType>::node_ref (const unsigned int i)
 {
   return *this->node_ptr(i);
 }
 
 
 
+template <typename RealType>
 inline
-unsigned int Elem::get_node_index (const Node * node_ptr) const
+unsigned int ElemTempl<RealType>::get_node_index (const Node * node_ptr) const
 {
   for (auto n : IntRange<unsigned int>(0, this->n_nodes()))
     if (this->_nodes[n] == node_ptr)
@@ -2055,8 +2137,9 @@ unsigned int Elem::get_node_index (const Node * node_ptr) const
 
 
 
+template <typename RealType>
 inline
-Node * & Elem::set_node (const unsigned int i)
+NodeTempl<RealType> * & ElemTempl<RealType>::set_node (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_nodes());
 
@@ -2065,24 +2148,27 @@ Node * & Elem::set_node (const unsigned int i)
 
 
 
+template <typename RealType>
 inline
-subdomain_id_type Elem::subdomain_id () const
+subdomain_id_type ElemTempl<RealType>::subdomain_id () const
 {
   return _sbd_id;
 }
 
 
 
+template <typename RealType>
 inline
-subdomain_id_type & Elem::subdomain_id ()
+subdomain_id_type & ElemTempl<RealType>::subdomain_id ()
 {
   return _sbd_id;
 }
 
 
 
+template <typename RealType>
 inline
-const Elem * Elem::neighbor_ptr (unsigned int i) const
+const ElemTempl<RealType> * ElemTempl<RealType>::neighbor_ptr (unsigned int i) const
 {
   libmesh_assert_less (i, this->n_neighbors());
 
@@ -2091,8 +2177,9 @@ const Elem * Elem::neighbor_ptr (unsigned int i) const
 
 
 
+template <typename RealType>
 inline
-Elem * Elem::neighbor_ptr (unsigned int i)
+ElemTempl<RealType> * ElemTempl<RealType>::neighbor_ptr (unsigned int i)
 {
   libmesh_assert_less (i, this->n_neighbors());
 
@@ -2101,8 +2188,9 @@ Elem * Elem::neighbor_ptr (unsigned int i)
 
 
 
+template <typename RealType>
 inline
-void Elem::set_neighbor (const unsigned int i, Elem * n)
+void ElemTempl<RealType>::set_neighbor (const unsigned int i, Elem * n)
 {
   libmesh_assert_less (i, this->n_neighbors());
 
@@ -2111,8 +2199,9 @@ void Elem::set_neighbor (const unsigned int i, Elem * n)
 
 
 
+template <typename RealType>
 inline
-bool Elem::has_neighbor (const Elem * elem) const
+bool ElemTempl<RealType>::has_neighbor (const Elem * elem) const
 {
   for (auto n : this->neighbor_ptr_range())
     if (n == elem)
@@ -2123,8 +2212,9 @@ bool Elem::has_neighbor (const Elem * elem) const
 
 
 
+template <typename RealType>
 inline
-Elem * Elem::child_neighbor (Elem * elem)
+ElemTempl<RealType> * ElemTempl<RealType>::child_neighbor (Elem * elem)
 {
   for (auto n : elem->neighbor_ptr_range())
     if (n && n->parent() == this)
@@ -2135,8 +2225,9 @@ Elem * Elem::child_neighbor (Elem * elem)
 
 
 
+template <typename RealType>
 inline
-const Elem * Elem::child_neighbor (const Elem * elem) const
+const ElemTempl<RealType> * ElemTempl<RealType>::child_neighbor (const Elem * elem) const
 {
   for (auto n : elem->neighbor_ptr_range())
     if (n && n->parent() == this)
@@ -2147,45 +2238,50 @@ const Elem * Elem::child_neighbor (const Elem * elem) const
 
 
 
+template <typename RealType>
 inline
-SimpleRange<Elem::NodeRefIter>
-Elem::node_ref_range()
+SimpleRange<typename ElemTempl<RealType>::NodeRefIter>
+ElemTempl<RealType>::node_ref_range()
 {
   return {_nodes, _nodes+this->n_nodes()};
 }
 
 
 
+template <typename RealType>
 inline
-SimpleRange<Elem::ConstNodeRefIter>
-Elem::node_ref_range() const
+SimpleRange<typename ElemTempl<RealType>::ConstNodeRefIter>
+ElemTempl<RealType>::node_ref_range() const
 {
   return {_nodes, _nodes+this->n_nodes()};
 }
 
 
 
+template <typename RealType>
 inline
 IntRange<unsigned short>
-Elem::node_index_range() const
+ElemTempl<RealType>::node_index_range() const
 {
   return {0, cast_int<unsigned short>(this->n_nodes())};
 }
 
 
 
+template <typename RealType>
 inline
 IntRange<unsigned short>
-Elem::edge_index_range() const
+ElemTempl<RealType>::edge_index_range() const
 {
   return {0, cast_int<unsigned short>(this->n_edges())};
 }
 
 
 
+template <typename RealType>
 inline
 IntRange<unsigned short>
-Elem::side_index_range() const
+ElemTempl<RealType>::side_index_range() const
 {
   return {0, cast_int<unsigned short>(this->n_sides())};
 }
@@ -2193,8 +2289,9 @@ Elem::side_index_range() const
 
 
 
+template <typename RealType>
 inline
-std::unique_ptr<const Elem> Elem::side_ptr (unsigned int i) const
+std::unique_ptr<const ElemTempl<RealType>> ElemTempl<RealType>::side_ptr (unsigned int i) const
 {
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
@@ -2205,9 +2302,10 @@ std::unique_ptr<const Elem> Elem::side_ptr (unsigned int i) const
 
 
 
+template <typename RealType>
 inline
 void
-Elem::side_ptr (std::unique_ptr<const Elem> & elem,
+ElemTempl<RealType>::side_ptr (std::unique_ptr<const Elem> & elem,
                 const unsigned int i) const
 {
   // Hand off to the non-const version of this function
@@ -2219,9 +2317,10 @@ Elem::side_ptr (std::unique_ptr<const Elem> & elem,
 
 
 
+template <typename RealType>
 inline
-std::unique_ptr<const Elem>
-Elem::build_side_ptr (const unsigned int i, bool proxy) const
+std::unique_ptr<const ElemTempl<RealType>>
+ElemTempl<RealType>::build_side_ptr (const unsigned int i, bool proxy) const
 {
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
@@ -2232,9 +2331,10 @@ Elem::build_side_ptr (const unsigned int i, bool proxy) const
 
 
 
+template <typename RealType>
 inline
 void
-Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
+ElemTempl<RealType>::build_side_ptr (std::unique_ptr<const Elem> & elem,
                       const unsigned int i) const
 {
   // Hand off to the non-const version of this function
@@ -2246,10 +2346,11 @@ Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
 
 
 
+template <typename RealType>
 template <typename Subclass>
 inline
 void
-Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
+ElemTempl<RealType>::simple_build_side_ptr (std::unique_ptr<Elem> & side,
                              const unsigned int i,
                              ElemType sidetype)
 {
@@ -2271,10 +2372,11 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
 
 
 
+template <typename RealType>
 template <typename Subclass, typename Mapclass>
 inline
 void
-Elem::simple_side_ptr (std::unique_ptr<Elem> & side,
+ElemTempl<RealType>::simple_side_ptr (std::unique_ptr<Elem> & side,
                        const unsigned int i,
                        ElemType sidetype)
 {
@@ -2296,9 +2398,10 @@ Elem::simple_side_ptr (std::unique_ptr<Elem> & side,
 
 
 
+template <typename RealType>
 inline
-std::unique_ptr<const Elem>
-Elem::build_edge_ptr (const unsigned int i) const
+std::unique_ptr<const ElemTempl<RealType>>
+ElemTempl<RealType>::build_edge_ptr (const unsigned int i) const
 {
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
@@ -2309,8 +2412,9 @@ Elem::build_edge_ptr (const unsigned int i) const
 
 
 
+template <typename RealType>
 inline
-bool Elem::on_boundary () const
+bool ElemTempl<RealType>::on_boundary () const
 {
   // By convention, the element is on the boundary
   // if it has a nullptr neighbor.
@@ -2319,8 +2423,9 @@ bool Elem::on_boundary () const
 
 
 
+template <typename RealType>
 inline
-unsigned int Elem::which_neighbor_am_i (const Elem * e) const
+unsigned int ElemTempl<RealType>::which_neighbor_am_i (const Elem * e) const
 {
   libmesh_assert(e);
 
@@ -2341,8 +2446,9 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
 
 
 
+template <typename RealType>
 inline
-bool Elem::active() const
+bool ElemTempl<RealType>::active() const
 {
 #ifdef LIBMESH_ENABLE_AMR
   if ((this->refinement_flag() == INACTIVE) ||
@@ -2359,8 +2465,9 @@ bool Elem::active() const
 
 
 
+template <typename RealType>
 inline
-bool Elem::subactive() const
+bool ElemTempl<RealType>::subactive() const
 {
 #ifdef LIBMESH_ENABLE_AMR
   if (this->active())
@@ -2379,8 +2486,9 @@ bool Elem::subactive() const
 
 
 
+template <typename RealType>
 inline
-bool Elem::has_children() const
+bool ElemTempl<RealType>::has_children() const
 {
 #ifdef LIBMESH_ENABLE_AMR
   if (_children == nullptr)
@@ -2393,8 +2501,9 @@ bool Elem::has_children() const
 }
 
 
+template <typename RealType>
 inline
-bool Elem::has_ancestor_children() const
+bool ElemTempl<RealType>::has_ancestor_children() const
 {
 #ifdef LIBMESH_ENABLE_AMR
   if (_children == nullptr)
@@ -2409,8 +2518,9 @@ bool Elem::has_ancestor_children() const
 
 
 
+template <typename RealType>
 inline
-bool Elem::is_ancestor_of(const Elem *
+bool ElemTempl<RealType>::is_ancestor_of(const Elem *
 #ifdef LIBMESH_ENABLE_AMR
                           descendant
 #endif
@@ -2430,24 +2540,27 @@ bool Elem::is_ancestor_of(const Elem *
 
 
 
+template <typename RealType>
 inline
-const Elem * Elem::parent () const
+const ElemTempl<RealType> * ElemTempl<RealType>::parent () const
 {
   return _elemlinks[0];
 }
 
 
 
+template <typename RealType>
 inline
-Elem * Elem::parent ()
+ElemTempl<RealType> * ElemTempl<RealType>::parent ()
 {
   return _elemlinks[0];
 }
 
 
 
+template <typename RealType>
 inline
-void Elem::set_parent (Elem * p)
+void ElemTempl<RealType>::set_parent (Elem * p)
 {
   // We no longer support using parent() as interior_parent()
   libmesh_assert_equal_to(this->dim(), p ? p->dim() : this->dim());
@@ -2456,8 +2569,9 @@ void Elem::set_parent (Elem * p)
 
 
 
+template <typename RealType>
 inline
-const Elem * Elem::top_parent () const
+const ElemTempl<RealType> * ElemTempl<RealType>::top_parent () const
 {
   const Elem * tp = this;
 
@@ -2474,8 +2588,9 @@ const Elem * Elem::top_parent () const
 
 
 
+template <typename RealType>
 inline
-unsigned int Elem::level() const
+unsigned int ElemTempl<RealType>::level() const
 {
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -2508,8 +2623,9 @@ unsigned int Elem::level() const
 
 
 
+template <typename RealType>
 inline
-unsigned int Elem::p_level() const
+unsigned int ElemTempl<RealType>::p_level() const
 {
 #ifdef LIBMESH_ENABLE_AMR
   return _p_level;
@@ -2520,32 +2636,36 @@ unsigned int Elem::p_level() const
 
 
 
+template <typename RealType>
 inline
-ElemMappingType Elem::mapping_type () const
+ElemMappingType ElemTempl<RealType>::mapping_type () const
 {
   return static_cast<ElemMappingType>(_map_type);
 }
 
 
 
+template <typename RealType>
 inline
-void Elem::set_mapping_type(const ElemMappingType type)
+void ElemTempl<RealType>::set_mapping_type(const ElemMappingType type)
 {
   _map_type = cast_int<unsigned char>(type);
 }
 
 
 
+template <typename RealType>
 inline
-unsigned char Elem::mapping_data () const
+unsigned char ElemTempl<RealType>::mapping_data () const
 {
   return _map_data;
 }
 
 
 
+template <typename RealType>
 inline
-void Elem::set_mapping_data(const unsigned char data)
+void ElemTempl<RealType>::set_mapping_data(const unsigned char data)
 {
   _map_data = data;
 }
@@ -2554,8 +2674,9 @@ void Elem::set_mapping_data(const unsigned char data)
 
 #ifdef LIBMESH_ENABLE_AMR
 
+template <typename RealType>
 inline
-const Elem * Elem::raw_child_ptr (unsigned int i) const
+const ElemTempl<RealType> * ElemTempl<RealType>::raw_child_ptr (unsigned int i) const
 {
   if (!_children)
     return nullptr;
@@ -2563,8 +2684,9 @@ const Elem * Elem::raw_child_ptr (unsigned int i) const
   return _children[i];
 }
 
+template <typename RealType>
 inline
-const Elem * Elem::child_ptr (unsigned int i) const
+const ElemTempl<RealType> * ElemTempl<RealType>::child_ptr (unsigned int i) const
 {
   libmesh_assert(_children);
   libmesh_assert(_children[i]);
@@ -2572,8 +2694,9 @@ const Elem * Elem::child_ptr (unsigned int i) const
   return _children[i];
 }
 
+template <typename RealType>
 inline
-Elem * Elem::child_ptr (unsigned int i)
+ElemTempl<RealType> * ElemTempl<RealType>::child_ptr (unsigned int i)
 {
   libmesh_assert(_children);
   libmesh_assert(_children[i]);
@@ -2582,8 +2705,9 @@ Elem * Elem::child_ptr (unsigned int i)
 }
 
 
+template <typename RealType>
 inline
-void Elem::set_child (unsigned int c, Elem * elem)
+void ElemTempl<RealType>::set_child (unsigned int c, Elem * elem)
 {
   libmesh_assert (this->has_children());
 
@@ -2592,8 +2716,9 @@ void Elem::set_child (unsigned int c, Elem * elem)
 
 
 
+template <typename RealType>
 inline
-unsigned int Elem::which_child_am_i (const Elem * e) const
+unsigned int ElemTempl<RealType>::which_child_am_i (const Elem * e) const
 {
   libmesh_assert(e);
   libmesh_assert (this->has_children());
@@ -2610,44 +2735,49 @@ unsigned int Elem::which_child_am_i (const Elem * e) const
 
 
 
+template <typename RealType>
 inline
-Elem::RefinementState Elem::refinement_flag () const
+typename ElemTempl<RealType>::RefinementState ElemTempl<RealType>::refinement_flag () const
 {
   return static_cast<RefinementState>(_rflag);
 }
 
 
 
+template <typename RealType>
 inline
-void Elem::set_refinement_flag(RefinementState rflag)
+void ElemTempl<RealType>::set_refinement_flag(RefinementState rflag)
 {
   _rflag = cast_int<unsigned char>(rflag);
 }
 
 
 
+template <typename RealType>
 inline
-Elem::RefinementState Elem::p_refinement_flag () const
+typename ElemTempl<RealType>::RefinementState ElemTempl<RealType>::p_refinement_flag () const
 {
   return static_cast<RefinementState>(_pflag);
 }
 
 
 
+template <typename RealType>
 inline
-void Elem::set_p_refinement_flag(RefinementState pflag)
+void ElemTempl<RealType>::set_p_refinement_flag(RefinementState pflag)
 {
   if (this->p_level() == 0)
     libmesh_assert_not_equal_to
-      (pflag, Elem::JUST_REFINED);
+      (pflag, ElemTempl<RealType>::JUST_REFINED);
 
   _pflag = cast_int<unsigned char>(pflag);
 }
 
 
 
+template <typename RealType>
 inline
-unsigned int Elem::max_descendant_p_level () const
+unsigned int ElemTempl<RealType>::max_descendant_p_level () const
 {
   // This is undefined for subactive elements,
   // which have no active descendants
@@ -2664,12 +2794,13 @@ unsigned int Elem::max_descendant_p_level () const
 
 
 
+template <typename RealType>
 inline
-void Elem::hack_p_level(unsigned int p)
+void ElemTempl<RealType>::hack_p_level(unsigned int p)
 {
   if (p == 0)
     libmesh_assert_not_equal_to
-      (this->p_refinement_flag(), Elem::JUST_REFINED);
+      (this->p_refinement_flag(), ElemTempl<RealType>::JUST_REFINED);
 
   _p_level = cast_int<unsigned char>(p);
 }
@@ -2679,16 +2810,18 @@ void Elem::hack_p_level(unsigned int p)
 #endif // ifdef LIBMESH_ENABLE_AMR
 
 
+template <typename RealType>
 inline
-dof_id_type Elem::compute_key (dof_id_type n0)
+dof_id_type ElemTempl<RealType>::compute_key (dof_id_type n0)
 {
   return n0;
 }
 
 
 
+template <typename RealType>
 inline
-dof_id_type Elem::compute_key (dof_id_type n0,
+dof_id_type ElemTempl<RealType>::compute_key (dof_id_type n0,
                                dof_id_type n1)
 {
   // Order the two so that n0 < n1
@@ -2699,8 +2832,9 @@ dof_id_type Elem::compute_key (dof_id_type n0,
 
 
 
+template <typename RealType>
 inline
-dof_id_type Elem::compute_key (dof_id_type n0,
+dof_id_type ElemTempl<RealType>::compute_key (dof_id_type n0,
                                dof_id_type n1,
                                dof_id_type n2)
 {
@@ -2733,8 +2867,9 @@ dof_id_type Elem::compute_key (dof_id_type n0,
 
 
 
+template <typename RealType>
 inline
-dof_id_type Elem::compute_key (dof_id_type n0,
+dof_id_type ElemTempl<RealType>::compute_key (dof_id_type n0,
                                dof_id_type n1,
                                dof_id_type n2,
                                dof_id_type n3)
@@ -2766,7 +2901,8 @@ dof_id_type Elem::compute_key (dof_id_type n0,
 /**
  * The definition of the protected nested SideIter class.
  */
-class Elem::SideIter
+template <typename RealType>
+class ElemTempl<RealType>::SideIter
 {
 public:
   // Constructor with arguments.
@@ -2880,16 +3016,18 @@ private:
 
 // Private implementation functions in the Elem class for the side iterators.
 // They have to come after the definition of the SideIter class.
+template <typename RealType>
 inline
-Elem::SideIter Elem::_first_side()
+typename ElemTempl<RealType>::SideIter ElemTempl<RealType>::_first_side()
 {
   return SideIter(0, this);
 }
 
 
 
+template <typename RealType>
 inline
-Elem::SideIter Elem::_last_side()
+typename ElemTempl<RealType>::SideIter ElemTempl<RealType>::_last_side()
 {
   return SideIter(this->n_neighbors(), this);
 }
@@ -2900,31 +3038,199 @@ Elem::SideIter Elem::_last_side()
 /**
  * The definition of the struct used for iterating over sides.
  */
+template <typename RealType>
 struct
-Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem *>
+ElemTempl<RealType>::side_iterator : variant_filter_iterator<ElemTempl<RealType>::Predicate, ElemTempl<RealType> *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   side_iterator (const IterType & d,
                  const IterType & e,
                  const PredType & p ) :
-    variant_filter_iterator<Elem::Predicate, Elem *>(d,e,p) {}
+    variant_filter_iterator<ElemTempl<RealType>::Predicate, ElemTempl<RealType> *>(d,e,p) {}
 };
 
 
 
+template <typename RealType>
 inline
-SimpleRange<Elem::NeighborPtrIter> Elem::neighbor_ptr_range()
+SimpleRange<typename ElemTempl<RealType>::NeighborPtrIter> ElemTempl<RealType>::neighbor_ptr_range()
 {
   return {_elemlinks+1, _elemlinks + 1 + this->n_neighbors()};
 }
 
 
+template <typename RealType>
 inline
-SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
+SimpleRange<typename ElemTempl<RealType>::ConstNeighborPtrIter> ElemTempl<RealType>::neighbor_ptr_range() const
 {
   return {_elemlinks+1, _elemlinks + 1 + this->n_neighbors()};
 }
+
+template <typename RealType>
+const unsigned int ElemTempl<RealType>::max_n_nodes = 27;
+
+template <typename RealType>
+const subdomain_id_type
+ElemTempl<RealType>::invalid_subdomain_id = std::numeric_limits<subdomain_id_type>::max();
+
+template <typename RealType>
+const unsigned int
+ElemTempl<RealType>::type_to_n_nodes_map [] =
+  {
+    2,  // EDGE2
+    3,  // EDGE3
+    4,  // EDGE4
+
+    3,  // TRI3
+    6,  // TRI6
+
+    4,  // QUAD4
+    8,  // QUAD8
+    9,  // QUAD9
+
+    4,  // TET4
+    10, // TET10
+
+    8,  // HEX8
+    20, // HEX20
+    27, // HEX27
+
+    6,  // PRISM6
+    15, // PRISM15
+    18, // PRISM18
+
+    5,  // PYRAMID5
+    13, // PYRAMID13
+    14, // PYRAMID14
+
+    2,  // INFEDGE2
+
+    4,  // INFQUAD4
+    6,  // INFQUAD6
+
+    8,  // INFHEX8
+    16, // INFHEX16
+    18, // INFHEX18
+
+    6,  // INFPRISM6
+    16, // INFPRISM12
+
+    1,  // NODEELEM
+
+    0,  // REMOTEELEM
+
+    3,  // TRI3SUBDIVISION
+    3,  // TRISHELL3
+    4,  // QUADSHELL4
+    8,  // QUADSHELL8
+  };
+
+template <typename RealType>
+const unsigned int
+ElemTempl<RealType>::type_to_n_sides_map [] =
+  {
+    2,  // EDGE2
+    2,  // EDGE3
+    2,  // EDGE4
+
+    3,  // TRI3
+    3,  // TRI6
+
+    4,  // QUAD4
+    4,  // QUAD8
+    4,  // QUAD9
+
+    4,  // TET4
+    4,  // TET10
+
+    6,  // HEX8
+    6,  // HEX20
+    6,  // HEX27
+
+    5,  // PRISM6
+    5,  // PRISM15
+    5,  // PRISM18
+
+    5,  // PYRAMID5
+    5,  // PYRAMID13
+    5,  // PYRAMID14
+
+    2,  // INFEDGE2
+
+    3,  // INFQUAD4
+    3,  // INFQUAD6
+
+    5,  // INFHEX8
+    5,  // INFHEX16
+    5,  // INFHEX18
+
+    4,  // INFPRISM6
+    4,  // INFPRISM12
+
+    0,  // NODEELEM
+
+    0,  // REMOTEELEM
+
+    3,  // TRI3SUBDIVISION
+    3,  // TRISHELL3
+    4,  // QUADSHELL4
+    4,  // QUADSHELL8
+  };
+
+template <typename RealType>
+const unsigned int
+ElemTempl<RealType>::type_to_n_edges_map [] =
+  {
+    0,  // EDGE2
+    0,  // EDGE3
+    0,  // EDGE4
+
+    3,  // TRI3
+    3,  // TRI6
+
+    4,  // QUAD4
+    4,  // QUAD8
+    4,  // QUAD9
+
+    6,  // TET4
+    6,  // TET10
+
+    12, // HEX8
+    12, // HEX20
+    12, // HEX27
+
+    9,  // PRISM6
+    9,  // PRISM15
+    9,  // PRISM18
+
+    8,  // PYRAMID5
+    8,  // PYRAMID13
+    8,  // PYRAMID14
+
+    0,  // INFEDGE2
+
+    4,  // INFQUAD4
+    4,  // INFQUAD6
+
+    8,  // INFHEX8
+    8,  // INFHEX16
+    8,  // INFHEX18
+
+    6,  // INFPRISM6
+    6,  // INFPRISM12
+
+    0,  // NODEELEM
+
+    0,  // REMOTEELEM
+
+    3,  // TRI3SUBDIVISION
+    3,  // TRISHELL3
+    4,  // QUADSHELL4
+    4,  // QUADSHELL8
+  };
+
+typedef ElemTempl<Real> Elem;
 
 } // namespace libMesh
 

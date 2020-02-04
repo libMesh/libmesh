@@ -27,7 +27,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class PeriodicBoundaries;
+template <typename> class PeriodicBoundariesTempl;
+template <typename> class PointLocatorBaseTempl;
 
 
 /**
@@ -38,33 +39,32 @@ class PeriodicBoundaries;
  * \author Roy H. Stogner
  * \date 2016
  */
-class PointNeighborCoupling : public GhostingFunctor
+template <typename RealType = Real>
+class PointNeighborCouplingTempl : public GhostingFunctorTempl<RealType>
 {
 public:
+  typedef PointNeighborCouplingTempl<RealType> PointNeighborCoupling;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+  typedef PeriodicBoundariesTempl<RealType> PeriodicBoundaries;
+  using map_type = std::unordered_map<const ElemTempl<RealType> *, const CouplingMatrix*>;
 
   /**
    * Constructor.
    */
-  PointNeighborCoupling() :
+  PointNeighborCouplingTempl() :
     _dof_coupling(nullptr),
 #ifdef LIBMESH_ENABLE_PERIODIC
     _periodic_bcs(nullptr),
 #endif
-    _mesh(nullptr),
-    _n_levels(0)
+    _mesh(nullptr)
   {}
 
   // Change coupling matrix after construction
-  void set_dof_coupling(const CouplingMatrix * dof_coupling)
+  void set_dof_coupling(const CouplingMatrix * dof_coupling) override
   { _dof_coupling = dof_coupling; }
-
-  // Return number of levels of point neighbors we will couple.
-  unsigned int n_levels()
-  { return _n_levels; }
-
-  // Change number of levels of point neighbors to couple.
-  void set_n_levels(unsigned int n_levels)
-  { _n_levels = n_levels; }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   // Set PeriodicBoundaries to couple.
@@ -97,8 +97,8 @@ public:
    * This will include the point neighbors, point neighbors of point
    * neighbors, etc, to n_levels depth.
    */
-  virtual void operator() (const MeshBase::const_element_iterator & range_begin,
-                           const MeshBase::const_element_iterator & range_end,
+  virtual void operator() (const typename MeshBaseTempl<RealType>::const_element_iterator & range_begin,
+                           const typename MeshBaseTempl<RealType>::const_element_iterator & range_end,
                            processor_id_type p,
                            map_type & coupled_elements) override;
 
@@ -109,8 +109,9 @@ private:
   const PeriodicBoundaries * _periodic_bcs;
 #endif
   const MeshBase * _mesh;
-  unsigned int _n_levels;
 };
+
+typedef PointNeighborCouplingTempl<Real> PointNeighborCoupling;
 
 } // namespace libMesh
 

@@ -26,6 +26,7 @@
 
 namespace libMesh
 {
+template <typename> class Edge3Templ;
 
 /**
  * The \p Tri6 is an element in 2D composed of 6 nodes.
@@ -53,22 +54,30 @@ namespace libMesh
  * \date 2002
  * \brief A 2D triangular element with 6 nodes.
  */
-class Tri6 : public Tri
+template <typename RealType = Real>
+class Tri6Templ : public TriTempl<RealType>
 {
 public:
+  typedef Tri6Templ<RealType> Tri6;
+  typedef TriTempl<RealType> Tri;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef Edge3Templ<RealType> Edge3;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tri6 (Elem * p=nullptr) :
+  Tri6Templ (Elem * p=nullptr) :
     Tri(Tri6::n_nodes(), p, _nodelinks_data) {}
 
-  Tri6 (Tri6 &&) = delete;
-  Tri6 (const Tri6 &) = delete;
+  Tri6Templ (Tri6 &&) = delete;
+  Tri6Templ (const Tri6 &) = delete;
   Tri6 & operator= (const Tri6 &) = delete;
   Tri6 & operator= (Tri6 &&) = delete;
-  virtual ~Tri6() = default;
+  virtual ~Tri6Templ() = default;
 
   /**
    * \returns \p TRI6.
@@ -204,7 +213,7 @@ public:
    * An optimized method for approximating the area of a
    * TRI6 using quadrature.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)
@@ -259,6 +268,97 @@ private:
    */
   static const unsigned short int _second_order_vertex_child_index[num_nodes];
 };
+
+template <typename RealType>
+const int Tri6Templ<RealType>::nodes_per_side;
+
+template <typename RealType>
+const unsigned int Tri6Templ<RealType>::side_nodes_map[Tri6::num_sides][Tri6::nodes_per_side] =
+  {
+    {0, 1, 3}, // Side 0
+    {1, 2, 4}, // Side 1
+    {2, 0, 5}  // Side 2
+  };
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Tri6Templ<RealType>::_embedding_matrix[Tri6::num_children][Tri6::num_nodes][Tri6::num_nodes] =
+  {
+    // embedding matrix for child 0
+    {
+      //  0      1      2    3    4    5
+      { 1.0,   0.0,   0.0, 0.0, 0.0, 0.0}, // 0
+      { 0.0,   0.0,   0.0, 1.0, 0.0, 0.0}, // 1
+      { 0.0,   0.0,   0.0, 0.0, 0.0, 1.0}, // 2
+      {.375, -.125,   0.0, .75, 0.0, 0.0}, // 3
+      { 0.0, -.125, -.125, 0.5, .25, 0.5}, // 4
+      {.375,   0.0, -.125, 0.0, 0.0, .75}  // 5
+    },
+
+    // embedding matrix for child 1
+    {
+      //  0      1      2    3    4    5
+      {  0.0,  0.0,   0.0, 1.0, 0.0, 0.0}, // 0
+      {  0.0,  1.0,   0.0, 0.0, 0.0, 0.0}, // 1
+      {  0.0,  0.0,   0.0, 0.0, 1.0, 0.0}, // 2
+      {-.125, .375,   0.0, .75, 0.0, 0.0}, // 3
+      {  0.0, .375, -.125, 0.0, .75, 0.0}, // 4
+      {-.125,  0.0, -.125, 0.5, 0.5, .25}  // 5
+    },
+
+    // embedding matrix for child 2
+    {
+      //  0       1     2    3    4    5
+      {  0.0,   0.0,  0.0, 0.0, 0.0, 1.0}, // 0
+      {  0.0,   0.0,  0.0, 0.0, 1.0, 0.0}, // 1
+      {  0.0,   0.0,  1.0, 0.0, 0.0, 0.0}, // 2
+      {-.125, -.125,  0.0, .25, 0.5, 0.5}, // 3
+      {  0.0, -.125, .375, 0.0, .75, 0.0}, // 4
+      {-.125,   0.0, .375, 0.0, 0.0, .75}  // 5
+    },
+
+    // embedding matrix for child 3
+    {
+      //  0       1      2    3    4    5
+      {  0.0,   0.0,   0.0, 1.0, 0.0, 0.0}, // 0
+      {  0.0,   0.0,   0.0, 0.0, 1.0, 0.0}, // 1
+      {  0.0,   0.0,   0.0, 0.0, 0.0, 1.0}, // 2
+      {-.125,   0.0, -.125, 0.5, 0.5, .25}, // 3
+      {-.125, -.125,   0.0, .25, 0.5, 0.5}, // 4
+      {  0.0, -.125, -.125, 0.5, .25, 0.5}  // 5
+    }
+  };
+
+#endif
+
+
+template <typename RealType>
+const unsigned short int Tri6Templ<RealType>::_second_order_vertex_child_number[Tri6::num_nodes] =
+  {
+    99,99,99, // Vertices
+    0,1,0     // Edges
+  };
+
+
+
+template <typename RealType>
+const unsigned short int Tri6Templ<RealType>::_second_order_vertex_child_index[Tri6::num_nodes] =
+  {
+    99,99,99, // Vertices
+    1,2,2     // Edges
+  };
+
+template <typename RealType>
+const unsigned short int Tri6Templ<RealType>::_second_order_adjacent_vertices[Tri6::num_sides][2] =
+  {
+    {0, 1}, // vertices adjacent to node 3
+    {1, 2}, // vertices adjacent to node 4
+    {0, 2}  // vertices adjacent to node 5
+  };
+
+typedef Tri6Templ<Real> Tri6;
 
 
 } // namespace libMesh

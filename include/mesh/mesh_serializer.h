@@ -20,14 +20,13 @@
 #define LIBMESH_MESH_SERIALIZER_H
 
 // Local includes
-
-// C++ includes
-
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel_only.h"
 
 namespace libMesh
 {
 // Forward declarations
-class MeshBase;
+template <typename> class MeshBaseTempl;
 
 /**
  * Temporarily serialize a DistributedMesh for output; a distributed
@@ -39,17 +38,49 @@ class MeshBase;
  * \date 2011
  * \brief Temporarily serializes a DistributedMesh for output.
  */
-class MeshSerializer
+template <typename RealType = Real>
+class MeshSerializerTempl
 {
-public:
-  MeshSerializer(MeshBase & mesh, bool need_serial = true, bool serial_only_needed_on_proc_0 = false);
+  typedef MeshBaseTempl<RealType> MeshBase;
 
-  ~MeshSerializer();
+public:
+  MeshSerializerTempl(MeshBase & mesh, bool need_serial = true, bool serial_only_needed_on_proc_0 = false);
+
+  ~MeshSerializerTempl();
 
 private:
   MeshBase & _mesh;
   bool reparallelize;
 };
+
+template <typename RealType>
+MeshSerializerTempl<RealType>::MeshSerializerTempl(
+  MeshBase & mesh, bool need_serial, bool serial_only_needed_on_proc_0) :
+    _mesh(mesh),
+    reparallelize(false)
+{
+  libmesh_parallel_only(mesh.comm());
+  if (need_serial && !_mesh.is_serial() && !serial_only_needed_on_proc_0) {
+    reparallelize = true;
+    _mesh.allgather();
+  }
+  else if (need_serial && !_mesh.is_serial() && serial_only_needed_on_proc_0) {
+    // Note: NOT reparallelizing on purpose.
+    // Just waste a bit of space on processor 0 to speed things up
+    _mesh.gather_to_zero();
+  }
+}
+
+
+
+template <typename RealType>
+MeshSerializerTempl<RealType>::~MeshSerializerTempl()
+{
+  if (reparallelize)
+    _mesh.delete_remote_elements();
+}
+
+typedef MeshSerializerTempl<Real> MeshSerializer;
 
 } // namespace libMesh
 

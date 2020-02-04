@@ -35,8 +35,10 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
-class Elem;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * This class implements writing 2D meshes in Postscript.  It borrows

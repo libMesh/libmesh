@@ -32,7 +32,8 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * This class implements useful utility functions for a patch of

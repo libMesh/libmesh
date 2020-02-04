@@ -32,7 +32,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * Partitions the Mesh based on the locations of element centroids.

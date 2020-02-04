@@ -18,40 +18,9 @@
 
 
 // Local Includes
-#include "libmesh/sibling_coupling.h"
-#include "libmesh/elem.h"
-#include "libmesh/remote_elem.h"
-#include "libmesh/libmesh_logging.h"
+#include "libmesh/sibling_coupling_impl.h"
 
 namespace libMesh
 {
-
-void SiblingCoupling::operator()
-  (const MeshBase::const_element_iterator & range_begin,
-   const MeshBase::const_element_iterator & range_end,
-   processor_id_type p,
-   map_type & coupled_elements)
-{
-  LOG_SCOPE("operator()", "SiblingCoupling");
-
-  for (const auto & elem : as_range(range_begin, range_end))
-    {
-      std::vector<const Elem *> active_siblings;
-
-      const Elem * parent = elem->parent();
-      if (!parent)
-        continue;
-
-#ifdef LIBMESH_ENABLE_AMR
-      parent->active_family_tree(active_siblings);
-#endif
-
-      for (const Elem * sibling : active_siblings)
-        if (sibling->processor_id() != p)
-          coupled_elements.insert
-            (std::make_pair(sibling, _dof_coupling));
-    }
+template class SiblingCouplingTempl<Real>;
 }
-
-
-} // namespace libMesh

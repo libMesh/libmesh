@@ -36,10 +36,9 @@ namespace libMesh
 {
 
 // forward declarations
-class MeshBase;
-class UnstructuredMesh;
-class Elem;
-
+template <typename> class MeshBaseTempl;
+template <typename> class UnstructuredMeshTempl;
+template <typename> class ElemTempl;
 
 // ------------------------------------------------------------
 // MeshTools::Generation namespace
@@ -55,7 +54,7 @@ namespace Generation
 {
 
 // forward declaration
-class QueryElemSubdomainIDBase;
+template <typename> class QueryElemSubdomainIDBaseTempl;
 
 /**
  * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
@@ -66,7 +65,8 @@ class QueryElemSubdomainIDBase;
  * Boundary ids are set to be equal to the side indexing on a
  * master hex
  */
-void build_cube (UnstructuredMesh & mesh,
+template <typename RealType>
+void build_cube (UnstructuredMeshTempl<RealType> & mesh,
                  const unsigned int nx=0,
                  const unsigned int ny=0,
                  const unsigned int nz=0,
@@ -80,7 +80,8 @@ void build_cube (UnstructuredMesh & mesh,
  * A specialized \p build_cube() for 0D meshes.  The resulting
  * mesh is a single NodeElem suitable for ODE tests
  */
-void build_point (UnstructuredMesh & mesh,
+template <typename RealType>
+void build_point (UnstructuredMeshTempl<RealType> & mesh,
                   const ElemType type=INVALID_ELEM,
                   const bool gauss_lobatto_grid=false);
 
@@ -90,7 +91,8 @@ void build_point (UnstructuredMesh & mesh,
  * Boundary ids are set to be equal to the side indexing on a
  * master edge
  */
-void build_line (UnstructuredMesh & mesh,
+template <typename RealType>
+void build_line (UnstructuredMeshTempl<RealType> & mesh,
                  const unsigned int nx,
                  const Real xmin=0., const Real xmax=1.,
                  const ElemType type=INVALID_ELEM,
@@ -102,7 +104,8 @@ void build_line (UnstructuredMesh & mesh,
  * Boundary ids are set to be equal to the side indexing on a
  * master quad
  */
-void build_square (UnstructuredMesh & mesh,
+template <typename RealType>
+void build_square (UnstructuredMeshTempl<RealType> & mesh,
                    const unsigned int nx,
                    const unsigned int ny,
                    const Real xmin=0., const Real xmax=1.,
@@ -113,7 +116,8 @@ void build_square (UnstructuredMesh & mesh,
 /**
  * Meshes a spherical or mapped-spherical domain.
  */
-void build_sphere (UnstructuredMesh & mesh,
+template <typename RealType>
+void build_sphere (UnstructuredMeshTempl<RealType> & mesh,
                    const Real rad=1,
                    const unsigned int nr=2,
                    const ElemType type=INVALID_ELEM,
@@ -123,11 +127,12 @@ void build_sphere (UnstructuredMesh & mesh,
 /**
  * Meshes the tensor product of a 1D and a 1D-or-2D domain.
  */
-void build_extrusion (UnstructuredMesh & mesh,
-                      const MeshBase & cross_section,
+template <typename RealType>
+void build_extrusion (UnstructuredMeshTempl<RealType> & mesh,
+                      const MeshBaseTempl<RealType> & cross_section,
                       const unsigned int nz,
                       RealVectorValue extrusion_vector,
-                      QueryElemSubdomainIDBase * elem_subdomain = nullptr);
+                      QueryElemSubdomainIDBaseTempl<RealType> * elem_subdomain = nullptr);
 
 #if defined(LIBMESH_HAVE_TRIANGLE) && LIBMESH_DIM > 1
 /**
@@ -135,7 +140,8 @@ void build_extrusion (UnstructuredMesh & mesh,
  * Delaunay triangulation.  This function internally calls the
  * triangle library written by J.R. Shewchuk.
  */
-void build_delaunay_square(UnstructuredMesh & mesh,
+template <typename RealType>
+void build_delaunay_square(UnstructuredMeshTempl<RealType> & mesh,
                            const unsigned int nx, // num. of elements in x-dir
                            const unsigned int ny, // num. of elements in y-dir
                            const Real xmin, const Real xmax,
@@ -148,13 +154,16 @@ void build_delaunay_square(UnstructuredMesh & mesh,
  * Class for receiving the callback during extrusion generation and providing user-defined
  * subdomains based on the old (existing) element id and the current layer.
  */
-class QueryElemSubdomainIDBase
+template <typename RealType>
+class QueryElemSubdomainIDBaseTempl
 {
 public:
-  virtual ~QueryElemSubdomainIDBase() {}
+  virtual ~QueryElemSubdomainIDBaseTempl() {}
 
-  virtual subdomain_id_type get_subdomain_for_layer(const Elem * old_elem, unsigned int layer) = 0;
+  virtual subdomain_id_type get_subdomain_for_layer(const ElemTempl<RealType> * old_elem, unsigned int layer) = 0;
 };
+
+typedef QueryElemSubdomainIDBaseTempl<Real> QueryElemSubdomainIDBase;
 
 } // end namespace Meshtools::Generation
 } // end namespace MeshTools

@@ -681,9 +681,9 @@ namespace libMesh {
 //
 // We put this at the end of libmesh_common.h so we can make use of
 // any exotic definitions of Real above.
-#ifdef LIBMESH_IS_COMPILING_ITSELF
+// #ifdef LIBMESH_IS_COMPILING_ITSELF
 #  include "libmesh/libmesh_augment_std_namespace.h"
-#endif
+//#endif
 
 
 #endif // LIBMESH_LIBMESH_COMMON_H

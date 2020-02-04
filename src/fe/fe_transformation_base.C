@@ -15,57 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh/fe_transformation_base.h"
-#include "libmesh/h1_fe_transformation.h"
-#include "libmesh/hcurl_fe_transformation.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/fe_transformation_base_impl.h"
 
 namespace libMesh
 {
 
-template<typename OutputShape>
-std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputShape>::build( const FEType & fe_type )
-{
-  switch (fe_type.family)
-    {
-      // H1 Conforming Elements
-    case LAGRANGE:
-    case HIERARCHIC:
-    case BERNSTEIN:
-    case SZABAB:
-    case CLOUGH: // PB: Really H2
-    case HERMITE: // PB: Really H2
-    case SUBDIVISION:
-    case LAGRANGE_VEC:
-    case MONOMIAL: // PB: Shouldn't this be L2 conforming?
-    case MONOMIAL_VEC: // PB: Shouldn't this be L2 conforming?
-    case XYZ: // PB: Shouldn't this be L2 conforming?
-    case RATIONAL_BERNSTEIN:
-    case L2_HIERARCHIC: // PB: Shouldn't this be L2 conforming?
-    case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
-    case JACOBI_20_00: // PB: For infinite elements...
-    case JACOBI_30_00: // PB: For infinite elements...
-      return libmesh_make_unique<H1FETransformation<OutputShape>>();
+template class FETransformationBase<Real,Real>;
+template class FETransformationBase<RealGradient,Real>;
 
-      // HCurl Conforming Elements
-    case NEDELEC_ONE:
-      return libmesh_make_unique<HCurlFETransformation<OutputShape>>();
-
-      // HDiv Conforming Elements
-      // L2 Conforming Elements
-
-      // Other...
-    case SCALAR:
-      // Should never need this for SCALARs
-      return libmesh_make_unique<H1FETransformation<OutputShape>>();
-
-    default:
-      libmesh_error_msg("Unknown family = " << fe_type.family);
-    }
 }
-
-template class FETransformationBase<Real>;
-template class FETransformationBase<RealGradient>;
-
-} // namespace libMesh

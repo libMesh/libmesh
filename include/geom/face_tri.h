@@ -26,6 +26,7 @@
 
 namespace libMesh
 {
+template <typename> class Edge2Templ;
 
 /**
  * The \p Tri is an element in 2D composed of 3 sides.
@@ -44,15 +45,22 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all triangular element types.
  */
-class Tri : public Face
+template <typename RealType = Real>
+class TriTempl : public FaceTempl<RealType>
 {
 public:
+  typedef TriTempl<RealType> Tri;
+  typedef FaceTempl<RealType> Face;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef Edge2Templ<RealType> Edge2;
 
   /**
    * Default triangular element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Tri (const unsigned int nn,
+  TriTempl (const unsigned int nn,
        Elem * p,
        Node ** nodelinkdata) :
     Face(nn, Tri::n_sides(), p, _elemlinks_data, nodelinkdata)
@@ -62,11 +70,11 @@ public:
       this->set_interior_parent(nullptr);
   }
 
-  Tri (Tri &&) = delete;
-  Tri (const Tri &) = delete;
+  TriTempl (Tri &&) = delete;
+  TriTempl (const Tri &) = delete;
   Tri & operator= (const Tri &) = delete;
   Tri & operator= (Tri &&) = delete;
-  virtual ~Tri() = default;
+  virtual ~TriTempl() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -175,6 +183,24 @@ protected:
    */
   static const Real _master_points[6][3];
 };
+
+// ------------------------------------------------------------
+// Tri class static member initializations
+
+
+// We need to require C++11...
+template <typename RealType>
+const Real TriTempl<RealType>::_master_points[6][3] =
+  {
+    {0, 0},
+    {1, 0},
+    {0, 1},
+    {0.5, 0},
+    {0.5, 0.5},
+    {0, 0.5}
+  };
+
+typedef TriTempl<Real> Tri;
 
 } // namespace libMesh
 

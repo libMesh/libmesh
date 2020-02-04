@@ -1,4 +1,3 @@
-// The libMesh Finite Element Library.
 // Copyright (C) 2002-2019 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
@@ -25,6 +24,8 @@
 
 namespace libMesh
 {
+template <typename> class Tri6Templ;
+template <typename> class Edge3Templ;
 
 /**
  * The \p Tet10 is an element in 3D composed of 10 nodes.
@@ -57,23 +58,33 @@ namespace libMesh
  * \date 2002
  * \brief A 3D tetrahedral element with 10 nodes.
  */
-class Tet10 final : public Tet
+template <typename RealType = Real>
+class Tet10Templ final : public TetTempl<RealType>
 {
 public:
+  typedef Tet10Templ<RealType> Tet10;
+  typedef TetTempl<RealType> Tet;
+  typedef CellTempl<RealType> Cell;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef Tri6Templ<RealType> Tri6;
+  typedef Edge3Templ<RealType> Edge3;
+  using typename Tet::Diagonal;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet10 (Elem * p=nullptr) :
+  Tet10Templ (Elem * p=nullptr) :
     Tet(Tet10::n_nodes(), p, _nodelinks_data)
   {}
 
-  Tet10 (Tet10 &&) = delete;
-  Tet10 (const Tet10 &) = delete;
+  Tet10Templ (Tet10 &&) = delete;
+  Tet10Templ (const Tet10 &) = delete;
   Tet10 & operator= (const Tet10 &) = delete;
   Tet10 & operator= (Tet10 &&) = delete;
-  virtual ~Tet10() = default;
+  virtual ~Tet10Templ() = default;
 
   /**
    * \returns \p TET10.
@@ -216,7 +227,7 @@ public:
   /**
    * A specialization for computing the volume of a Tet10.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
 protected:
 
@@ -264,6 +275,190 @@ private:
    */
   static const unsigned short int _second_order_vertex_child_index[10];
 };
+
+
+// ------------------------------------------------------------
+// Tet10 class static member initializations
+
+template <typename RealType>
+const int Tet10Templ<RealType>::nodes_per_side;
+
+template <typename RealType>
+const unsigned int Tet10Templ<RealType>::side_nodes_map[Tet10::num_sides][Tet10::nodes_per_side] =
+  {
+    {0, 2, 1, 6, 5, 4}, // Side 0
+    {0, 1, 3, 4, 8, 7}, // Side 1
+    {1, 2, 3, 5, 9, 8}, // Side 2
+    {2, 0, 3, 6, 7, 9}  // Side 3
+  };
+
+template <typename RealType>
+const unsigned int Tet10Templ<RealType>::edge_nodes_map[Tet10::num_edges][Tet10::nodes_per_edge] =
+  {
+    {0, 1, 4}, // Edge 0
+    {1, 2, 5}, // Edge 1
+    {0, 2, 6}, // Edge 2
+    {0, 3, 7}, // Edge 3
+    {1, 3, 8}, // Edge 4
+    {2, 3, 9}  // Edge 5
+  };
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Tet10Templ<RealType>::_embedding_matrix[Tet10::num_children][Tet10::num_nodes][Tet10::num_nodes] =
+  {
+    // embedding matrix for child 0
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 0
+      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 1
+      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
+      { 0.375,-0.125,    0.,    0.,  0.75,    0.,    0.,    0.,    0.,    0.}, // 4
+      {    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 5
+      { 0.375,    0.,-0.125,    0.,    0.,    0.,  0.75,    0.,    0.,    0.}, // 6
+      { 0.375,    0.,    0.,-0.125,    0.,    0.,    0.,  0.75,    0.,    0.}, // 7
+      {    0.,-0.125,    0.,-0.125,   0.5,    0.,    0.,   0.5,  0.25,    0.}, // 8
+      {    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}  // 9
+    },
+
+    // embedding matrix for child 1
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
+      {    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 1
+      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 2
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
+      {-0.125, 0.375,    0.,    0.,  0.75,    0.,    0.,    0.,    0.,    0.}, // 4
+      {    0., 0.375,-0.125,    0.,    0.,  0.75,    0.,    0.,    0.,    0.}, // 5
+      {-0.125,    0.,-0.125,    0.,   0.5,   0.5,  0.25,    0.,    0.,    0.}, // 6
+      {-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 7
+      {    0., 0.375,    0.,-0.125,    0.,    0.,    0.,    0.,  0.75,    0.}, // 8
+      {    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}  // 9
+    },
+
+    // embedding matrix for child 2
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
+      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
+      {    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 2
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 3
+      {-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 4
+      {    0.,-0.125, 0.375,    0.,    0.,  0.75,    0.,    0.,    0.,    0.}, // 5
+      {-0.125,    0., 0.375,    0.,    0.,    0.,  0.75,    0.,    0.,    0.}, // 6
+      {-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 7
+      {    0.,-0.125,    0.,-0.125,    0.,   0.5,    0.,    0.,  0.25,   0.5}, // 8
+      {    0.,    0., 0.375,-0.125,    0.,    0.,    0.,    0.,    0.,  0.75}  // 9
+    },
+
+    // embedding matrix for child 3
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 0
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
+      {    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.}, // 3
+      {-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 4
+      {    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}, // 5
+      {-0.125,    0.,-0.125,    0.,    0.,    0.,  0.25,   0.5,    0.,   0.5}, // 6
+      {-0.125,    0.,    0., 0.375,    0.,    0.,    0.,  0.75,    0.,    0.}, // 7
+      {    0.,-0.125,    0., 0.375,    0.,    0.,    0.,    0.,  0.75,    0.}, // 8
+      {    0.,    0.,-0.125, 0.375,    0.,    0.,    0.,    0.,    0.,  0.75}  // 9
+    },
+
+    // embedding matrix for child 4
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
+      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
+      {-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 4
+      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 5
+      {    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 6
+      {    0.,-0.125,    0.,-0.125,   0.5,    0.,    0.,   0.5,  0.25,    0.}, // 7
+      {-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 8
+      {    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}  // 9
+    },
+
+    // embedding matrix for child 5
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
+      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
+      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
+      {-0.125,    0.,-0.125,    0.,   0.5,   0.5,  0.25,    0.,    0.,    0.}, // 4
+      {-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 5
+      {    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 6
+      {-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 7
+      {    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}, // 8
+      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}  // 9
+    },
+
+    // embedding matrix for child 6
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
+      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
+      {-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 4
+      {    0.,-0.125,    0.,-0.125,    0.,   0.5,    0.,    0.,  0.25,   0.5}, // 5
+      {-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 6
+      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 7
+      {    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}, // 8
+      {    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}  // 9
+    },
+
+    // embedding matrix for child 7
+    {
+      //    0      1      2      3      4      5      6      7      8      9
+      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
+      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
+      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 4
+      {    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}, // 5
+      {-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 6
+      {    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}, // 7
+      {-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 8
+      {-0.125,    0.,-0.125,    0.,    0.,    0.,  0.25,   0.5,    0.,   0.5}  // 9
+    }
+  };
+
+#endif // LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const unsigned short int Tet10Templ<RealType>::_second_order_vertex_child_number[10] =
+  {
+    99,99,99,99, // Vertices
+    0,1,0,0,1,2  // Edges
+  };
+
+
+
+template <typename RealType>
+const unsigned short int Tet10Templ<RealType>::_second_order_vertex_child_index[10] =
+  {
+    99,99,99,99, // Vertices
+    1,2,2,3,3,3  // Edges
+  };
+
+template <typename RealType>
+const unsigned short int Tet10Templ<RealType>::_second_order_adjacent_vertices[6][2] =
+  {
+    {0, 1}, // vertices adjacent to node 4
+    {1, 2}, // vertices adjacent to node 5
+    {0, 2}, // vertices adjacent to node 6
+    {0, 3}, // vertices adjacent to node 7
+    {1, 3}, // vertices adjacent to node 8
+    {2, 3}  // vertices adjacent to node 9
+  };
+
+typedef Tet10Templ<Real> Tet10;
 
 } // namespace libMesh
 

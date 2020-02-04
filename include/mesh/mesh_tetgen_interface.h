@@ -38,7 +38,8 @@ namespace libMesh
 // Forward Declarations
 class UnstructuredMesh;
 class TetGenWrapper;
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * Class \p TetGenMeshInterface provides an interface for

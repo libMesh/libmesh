@@ -25,76 +25,76 @@
 // These macros help in instantiating specific versions
 // of the \p FE class.  Simply include this file, and
 // instantiate at the end for the desired dimension(s).
-#define INSTANTIATE_MAPS(_dim,_type)                                    \
-  template Point FE<_dim, _type>::map(const Elem *, const Point &);     \
-  template Point FE<_dim, _type>::map_xi(const Elem *, const Point &);  \
-  template Point FE<_dim, _type>::map_eta(const Elem *, const Point &); \
-  template Point FE<_dim, _type>::map_zeta(const Elem *, const Point &); \
-  template void  FE<_dim, _type>::inverse_map(const Elem *, const std::vector<Point> &, std::vector<Point> &, Real, bool); \
-  template Point FE<_dim, _type>::inverse_map(const Elem *, const Point &, Real, bool)
+#define INSTANTIATE_MAPS(_dim,_type,RealType)                                   \
+  template PointTempl<RealType> FE<_dim, _type, RealType>::map(const ElemTempl<RealType> *, const PointTempl<RealType> &);     \
+  template PointTempl<RealType> FE<_dim, _type, RealType>::map_xi(const ElemTempl<RealType> *, const PointTempl<RealType> &);  \
+  template PointTempl<RealType> FE<_dim, _type, RealType>::map_eta(const ElemTempl<RealType> *, const PointTempl<RealType> &); \
+  template PointTempl<RealType> FE<_dim, _type, RealType>::map_zeta(const ElemTempl<RealType> *, const PointTempl<RealType> &); \
+  template void Templ<RealType> FE<_dim, _type, RealType>::inverse_map(const ElemTempl<RealType> *, const std::vector<PointTempl<RealType>> &, std::vector<PointTempl<RealType>> &, Real, bool); \
+  template PointTempl<RealType> FE<_dim, _type, RealType>::inverse_map(const ElemTempl<RealType> *, const PointTempl<RealType> &, Real, bool)
 
-#define INSTANTIATE_SUBDIVISION_MAPS                                    \
-  template Point FE<2, SUBDIVISION>::map(const Elem *, const Point &);  \
-  template Point FE<2, SUBDIVISION>::map_xi(const Elem *, const Point &); \
-  template Point FE<2, SUBDIVISION>::map_eta(const Elem *, const Point &); \
-  template Point FE<2, SUBDIVISION>::map_zeta(const Elem *, const Point &)
+#define INSTANTIATE_SUBDIVISION_MAPS(RealType)                          \
+  template PointTempl<RealType> FE<2, SUBDIVISION, RealType>::map(const ElemTempl<RealType> *, const PointTempl<RealType> &);  \
+  template PointTempl<RealType> FE<2, SUBDIVISION, RealType>::map_xi(const ElemTempl<RealType> *, const PointTempl<RealType> &); \
+  template PointTempl<RealType> FE<2, SUBDIVISION, RealType>::map_eta(const ElemTempl<RealType> *, const PointTempl<RealType> &); \
+  template PointTempl<RealType> FE<2, SUBDIVISION, RealType>::map_zeta(const ElemTempl<RealType> *, const PointTempl<RealType> &)
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#define INSTANTIATE_SUBDIVISION_FE                                      \
-  template FE<2,SUBDIVISION>::FE(const FEType & fet); \
-  template unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
-  template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase *); \
-  template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
-  template void         FE<2,SUBDIVISION>::reinit(const Elem *,const std::vector<Point> * const,const std::vector<Real> * const); \
-  template void         FE<2,SUBDIVISION>::init_base_shape_functions(const std::vector<Point> &, const Elem *); \
-  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *)
+#define INSTANTIATE_SUBDIVISION_FE(RealType)                                      \
+  template FE<2,SUBDIVISION,RealType>::FE(const FEType & fet); \
+  template unsigned int FE<2,SUBDIVISION,RealType>::n_shape_functions () const;  \
+  template void         FE<2,SUBDIVISION,RealType>::attach_quadrature_rule (QBase *); \
+  template unsigned int FE<2,SUBDIVISION,RealType>::n_quadrature_points () const; \
+  template void         FE<2,SUBDIVISION,RealType>::reinit(const ElemTempl<RealType> *,const std::vector<PointTempl<RealType>> * const,const std::vector<Real> * const); \
+  template void         FE<2,SUBDIVISION,RealType>::init_base_shape_functions(const std::vector<PointTempl<RealType>> &, const ElemTempl<RealType> *); \
+  template void         FE<2,SUBDIVISION,RealType>::init_shape_functions(const std::vector<PointTempl<RealType>> &, const ElemTempl<RealType> *)
 
 #else // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#define INSTANTIATE_SUBDIVISION_FE                                      \
-  template FE<2,SUBDIVISION>::FE(const FEType & fet);                     \
-  template unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
-  template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase *); \
-  template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
-  template void         FE<2,SUBDIVISION>::reinit(const Elem *,const std::vector<Point> * const,const std::vector<Real> * const); \
-  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *)
+#define INSTANTIATE_SUBDIVISION_FE(RealType)                                      \
+  template FE<2,SUBDIVISION,RealType>::FE(const FEType & fet);                     \
+  template unsigned int FE<2,SUBDIVISION,RealType>::n_shape_functions () const;  \
+  template void         FE<2,SUBDIVISION,RealType>::attach_quadrature_rule (QBase *); \
+  template unsigned int FE<2,SUBDIVISION,RealType>::n_quadrature_points () const; \
+  template void         FE<2,SUBDIVISION,RealType>::reinit(const ElemTempl<RealType> *,const std::vector<PointTempl<RealType>> * const,const std::vector<Real> * const); \
+  template void         FE<2,SUBDIVISION,RealType>::init_shape_functions(const std::vector<PointTempl<RealType>> &, const ElemTempl<RealType> *)
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 #ifndef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
-#define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>;      \
-  template class FE< (_dim), HERMITE>;                                  \
-  template class FE< (_dim), HIERARCHIC>;                               \
-  template class FE< (_dim), L2_HIERARCHIC>;                            \
-  template class FE< (_dim), LAGRANGE>;                                 \
-  template class FE< (_dim), LAGRANGE_VEC>;                             \
-  template class FE< (_dim), L2_LAGRANGE>;                              \
-  template class FE< (_dim), MONOMIAL>;                                 \
-  template class FE< (_dim), SCALAR>;                                   \
-  template class FE< (_dim), XYZ>;                                      \
-  template class FE< (_dim), NEDELEC_ONE>;                              \
-  template class FE< (_dim), MONOMIAL_VEC>
+#define INSTANTIATE_FE(_dim, RealType)   template class FE< (_dim), CLOUGH, RealType>;      \
+  template class FE< (_dim), HERMITE, RealType>;                                  \
+  template class FE< (_dim), HIERARCHIC, RealType>;                               \
+  template class FE< (_dim), L2_HIERARCHIC, RealType>;                            \
+  template class FE< (_dim), LAGRANGE, RealType>;                                 \
+  template class FE< (_dim), LAGRANGE_VEC, RealType>;                             \
+  template class FE< (_dim), L2_LAGRANGE, RealType>;                              \
+  template class FE< (_dim), MONOMIAL, RealType>;                                 \
+  template class FE< (_dim), SCALAR, RealType>;                                   \
+  template class FE< (_dim), XYZ, RealType>;                                      \
+  template class FE< (_dim), NEDELEC_ONE, RealType>;                              \
+  template class FE< (_dim), MONOMIAL_VEC, RealType>
 
 #else //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
-#define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>;      \
-  template class FE< (_dim), HERMITE>;                                  \
-  template class FE< (_dim), HIERARCHIC>;                               \
-  template class FE< (_dim), L2_HIERARCHIC>;                            \
-  template class FE< (_dim), LAGRANGE>;                                 \
-  template class FE< (_dim), LAGRANGE_VEC>;                             \
-  template class FE< (_dim), L2_LAGRANGE>;                              \
-  template class FE< (_dim), MONOMIAL>;                                 \
-  template class FE< (_dim), SCALAR>;                                   \
-  template class FE< (_dim), BERNSTEIN>;                                \
-  template class FE< (_dim), SZABAB>;                                   \
-  template class FE< (_dim), XYZ>;                                      \
-  template class FE< (_dim), RATIONAL_BERNSTEIN>;                       \
-  template class FE< (_dim), NEDELEC_ONE>;                              \
-  template class FE< (_dim), MONOMIAL_VEC>
+#define INSTANTIATE_FE(_dim, RealType)   template class FE< (_dim), CLOUGH, RealType>;      \
+  template class FE< (_dim), HERMITE, RealType>;                                  \
+  template class FE< (_dim), HIERARCHIC, RealType>;                               \
+  template class FE< (_dim), L2_HIERARCHIC, RealType>;                            \
+  template class FE< (_dim), LAGRANGE, RealType>;                                 \
+  template class FE< (_dim), LAGRANGE_VEC, RealType>;                             \
+  template class FE< (_dim), L2_LAGRANGE, RealType>;                              \
+  template class FE< (_dim), MONOMIAL, RealType>;                                 \
+  template class FE< (_dim), SCALAR, RealType>;                                   \
+  template class FE< (_dim), BERNSTEIN, RealType>;                                \
+  template class FE< (_dim), SZABAB, RealType>;                                   \
+  template class FE< (_dim), XYZ, RealType>;                                      \
+  template class FE< (_dim), RATIONAL_BERNSTEIN, RealType>;                       \
+  template class FE< (_dim), NEDELEC_ONE, RealType>;                              \
+  template class FE< (_dim), MONOMIAL_VEC, RealType>
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 

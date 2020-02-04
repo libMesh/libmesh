@@ -26,6 +26,11 @@
 namespace libMesh
 {
 
+template <typename>
+class Quad4Templ;
+template <typename>
+class Edge2Templ;
+
 /**
  * The \p Hex8 is an element in 3D composed of 8 nodes.
  * It is numbered like this:
@@ -50,23 +55,30 @@ namespace libMesh
  * \date 2002
  * \brief A 3D hexahedral element with 8 nodes.
  */
-class Hex8 final : public Hex
+template <typename RealType = Real>
+class Hex8Templ final : public HexTempl<RealType>
 {
 public:
+  typedef Hex8Templ<RealType> Hex8;
+  typedef Quad4Templ<RealType> Quad4;
+  typedef Edge2Templ<RealType> Edge2;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Hex8 (Elem * p=nullptr) :
+  Hex8Templ (Elem * p=nullptr) :
     Hex(Hex8::n_nodes(), p, _nodelinks_data)
   {}
 
-  Hex8 (Hex8 &&) = delete;
-  Hex8 (const Hex8 &) = delete;
+  Hex8Templ (Hex8 &&) = delete;
+  Hex8Templ (const Hex8 &) = delete;
   Hex8 & operator= (const Hex8 &) = delete;
   Hex8 & operator= (Hex8 &&) = delete;
-  virtual ~Hex8() = default;
+  virtual ~Hex8Templ() = default;
 
   /**
    * \returns \p HEX8.
@@ -174,7 +186,7 @@ public:
    * A specialization for computing the area of a hexahedron
    * with flat sides.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * Builds a bounding box out of the nodal positions
@@ -210,6 +222,163 @@ protected:
 
 #endif // LIBMESH_ENABLE_AMR
 };
+
+// ------------------------------------------------------------
+// Hex8 class static member initializations
+
+template <typename RealType>
+const unsigned int Hex8Templ<RealType>::
+side_nodes_map[Hex8Templ<RealType>::num_sides][Hex8Templ<RealType>::nodes_per_side] =
+  {
+    {0, 3, 2, 1}, // Side 0
+    {0, 1, 5, 4}, // Side 1
+    {1, 2, 6, 5}, // Side 2
+    {2, 3, 7, 6}, // Side 3
+    {3, 0, 4, 7}, // Side 4
+    {4, 5, 6, 7}  // Side 5
+  };
+
+template <typename RealType>
+const unsigned int Hex8Templ<RealType>::
+edge_nodes_map[Hex8Templ<RealType>::num_edges][Hex8Templ<RealType>::nodes_per_edge] =
+  {
+    {0, 1}, // Edge 0
+    {1, 2}, // Edge 1
+    {2, 3}, // Edge 2
+    {0, 3}, // Edge 3
+    {0, 4}, // Edge 4
+    {1, 5}, // Edge 5
+    {2, 6}, // Edge 6
+    {3, 7}, // Edge 7
+    {4, 5}, // Edge 8
+    {5, 6}, // Edge 9
+    {6, 7}, // Edge 10
+    {4, 7}  // Edge 11
+  };
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Hex8Templ<RealType>::
+_embedding_matrix[Hex8Templ<RealType>::num_children]
+                 [Hex8Templ<RealType>::num_nodes]
+                 [Hex8Templ<RealType>::num_nodes] =
+  {
+    // The 8 children of the Hex-type elements can be thought of as being
+    // associated with the 8 vertices of the Hex.  Some of the children are
+    // numbered the same as their corresponding vertex, while some are
+    // not.  The children which are numbered differently have been marked
+    // with ** in the comments below.
+
+    // embedding matrix for child 0 (child 0 is associated with vertex 0)
+    {
+      //  0     1     2     3     4     5     6     7
+      { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
+      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
+      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 2
+      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
+      { 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 4
+      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 5
+      {.125, .125, .125, .125, .125, .125, .125, .125}, // 6
+      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}  // 7
+    },
+
+    // embedding matrix for child 1 (child 1 is associated with vertex 1)
+    {
+      //  0     1     2     3     4     5     6     7
+      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
+      { 0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
+      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
+      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 3
+      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 4
+      { 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 5
+      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 6
+      {.125, .125, .125, .125, .125, .125, .125, .125}  // 7
+    },
+
+    // embedding matrix for child 2 (child 2 is associated with vertex 3**)
+    {
+      //  0      1    2     3     4     5     6     7
+      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
+      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 1
+      { 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 2
+      { 0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0}, // 3
+      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 4
+      {.125, .125, .125, .125, .125, .125, .125, .125}, // 5
+      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 6
+      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}  // 7
+    },
+
+    // embedding matrix for child 3 (child 3 is associated with vertex 2**)
+    {
+      //  0      1    2     3     4     5     6     7
+      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 0
+      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
+      { 0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
+      { 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
+      {.125, .125, .125, .125, .125, .125, .125, .125}, // 4
+      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 5
+      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 6
+      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}  // 7
+    },
+
+    // embedding matrix for child 4 (child 4 is associated with vertex 4)
+    {
+      //  0      1    2     3     4     5     6     7
+      { 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 0
+      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 1
+      {.125, .125, .125, .125, .125, .125, .125, .125}, // 2
+      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 3
+      { 0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0}, // 4
+      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 5
+      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 6
+      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}  // 7
+    },
+
+    // embedding matrix for child 5 (child 5 is associated with vertex 5)
+    {
+      //  0      1    2     3     4     5     6     7
+      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 0
+      { 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 1
+      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 2
+      {.125, .125, .125, .125, .125, .125, .125, .125}, // 3
+      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 4
+      { 0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0}, // 5
+      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 6
+      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}  // 7
+    },
+
+    // embedding matrix for child 6 (child 6 is associated with vertex 7**)
+    {
+      //  0      1    2     3     4     5     6     7
+      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 0
+      {.125, .125, .125, .125, .125, .125, .125, .125}, // 1
+      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 2
+      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}, // 3
+      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}, // 4
+      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 5
+      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 6
+      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0}  // 7
+    },
+
+    // embedding matrix for child 7 (child 7 is associated with vertex 6**)
+    {
+      //  0      1    2     3     4     5     6     7
+      {.125, .125, .125, .125, .125, .125, .125, .125}, // 0
+      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 1
+      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 2
+      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 3
+      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 4
+      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 5
+      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0}, // 6
+      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}  // 7
+    }
+  };
+
+#endif
+
+
+typedef Hex8Templ<Real> Hex8;
 
 } // namespace libMesh
 

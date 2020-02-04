@@ -26,7 +26,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 
 /**
  * This class is responsible for reading an unstructured, triangulated

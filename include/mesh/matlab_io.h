@@ -29,7 +29,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 
 /**
  * This class implements reading meshes in the Matlab PDE toolkit

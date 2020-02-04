@@ -23,6 +23,10 @@
 // Local includes
 #include "libmesh/fe_base.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/fe_shim.h"
+#include "libmesh/fe_output_type.h"
+#include "libmesh/fe_forward.h"
+#include "libmesh/fe_map.h"
 
 // C++ includes
 #include <cstddef>
@@ -41,39 +45,6 @@ class InfFE;
 
 #endif
 
-
-/**
- * Most finite element types in libMesh are scalar-valued
- */
-template <FEFamily T>
-struct FEOutputType
-{
-  typedef Real type;
-};
-
-
-/**
- * Specialize for non-scalar-valued elements
- */
-template<>
-struct FEOutputType<LAGRANGE_VEC>
-{
-  typedef RealVectorValue type;
-};
-
-template<>
-struct FEOutputType<NEDELEC_ONE>
-{
-  typedef RealVectorValue type;
-};
-
-template<>
-struct FEOutputType<MONOMIAL_VEC>
-{
-  typedef RealVectorValue type;
-};
-
-
 /**
  * A specific instantiation of the \p FEBase class. This
  * class is templated, and specific template instantiations
@@ -91,10 +62,14 @@ struct FEOutputType<MONOMIAL_VEC>
  * \date 2002-2007
  * \brief Template class which generates the different FE families and orders.
  */
-template <unsigned int Dim, FEFamily T>
-class FE : public FEGenericBase<typename FEOutputType<T>::type>
+template <unsigned int Dim, FEFamily T, typename RealType>
+class FE : public FEGenericBase<typename FEOutputType<T>::type, RealType>
 {
 public:
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef FEMapTempl<RealType> FEMap;
 
   /**
    * Constructor.
@@ -103,7 +78,7 @@ public:
   FE(const FEType & fet);
 
   typedef typename
-  FEGenericBase<typename FEOutputType<T>::type>::OutputShape
+  FEGenericBase<typename FEOutputType<T>::type, RealType>::OutputShape
   OutputShape;
 
   /**
@@ -294,7 +269,11 @@ public:
   static void dofs_on_side(const Elem * const elem,
                            const Order o,
                            unsigned int s,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di)
+    {
+      FEDofsOnSideShim<Dim, T, RealType>::dofs_on_side(elem, o, s, di);
+    }
+
   /**
    * Fills the vector di with the local degree of freedom indices
    * associated with edge \p e of element \p elem
@@ -304,14 +283,17 @@ public:
   static void dofs_on_edge(const Elem * const elem,
                            const Order o,
                            unsigned int e,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di)
+    {
+      FEDofsOnSideShim<Dim, T, RealType>::dofs_on_edge(elem, o, e, di);
+    }
 
   static Point inverse_map (const Elem * elem,
                             const Point & p,
                             const Real tolerance = TOLERANCE,
                             const bool secure = true) {
     // libmesh_deprecated(); // soon
-    return FEMap::inverse_map(Dim, elem, p, tolerance, secure);
+    return FEInverseMapShim<Dim,T,RealType>::inverse_map(elem, p, tolerance, secure);
   }
 
   static void inverse_map (const Elem * elem,
@@ -320,8 +302,7 @@ public:
                            const Real tolerance = TOLERANCE,
                            const bool secure = true) {
     // libmesh_deprecated(); // soon
-    FEMap::inverse_map(Dim, elem, physical_points, reference_points,
-                       tolerance, secure);
+    FEInverseMapShim<Dim,T,RealType>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
   }
 
   /**
@@ -402,7 +383,7 @@ public:
   static void compute_constraints (DofConstraints & constraints,
                                    DofMap & dof_map,
                                    const unsigned int variable_number,
-                                   const Elem * elem);
+                                   const ElemTempl<Real> * elem);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -458,6 +439,13 @@ protected:
   virtual void init_shape_functions(const std::vector<Point> & qp,
                                     const Elem * e);
 
+
+  template <typename RealType2 = RealType,
+            typename std::enable_if<!std::is_same<RealType2,Real>::value,int>::type = 0>
+  void init_shape_functions(const std::vector<PointTempl<Real>> & qp,
+                            const Elem * e);
+
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
@@ -481,9 +469,173 @@ protected:
   ElemType last_side;
 
   unsigned int last_edge;
+
+  friend struct FEReinitShim<Dim, T, RealType>;
+  friend struct FEEdgeReinitShim<Dim, T, RealType>;
+  friend struct FESideMapShim<Dim, T, RealType>;
 };
 
+template <unsigned int Dim, FEFamily T, typename RealType>
+template <typename RealType2,
+          typename std::enable_if<!std::is_same<RealType2,Real>::value,int>::type>
+void
+FE<Dim, T, RealType>::init_shape_functions(const std::vector<PointTempl<Real>> & qp,
+                                           const Elem * e)
+{
+  std::vector<Point> my_qp(qp.size());
 
+  for (std::size_t point = 0; point < qp.size(); ++point)
+    my_qp[point] = qp[point];
+
+  this->init_shape_functions(my_qp, e);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+void
+FE<Dim, T, RealType>::nodal_soln(const Elem * elem,
+                                 const Order order,
+                                 const std::vector<Number> & elem_soln,
+                                 std::vector<Number> & nodal_soln)
+{
+  FEShim<Dim, T, RealType>::nodal_soln(elem, order, elem_soln, nodal_soln);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+unsigned int
+FE<Dim, T, RealType>::n_dofs(const ElemType t, const Order o)
+{
+  return FEShim<Dim, T, RealType>::n_dofs(t, o);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+unsigned int
+FE<Dim, T, RealType>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n)
+{
+  return FEShim<Dim, T, RealType>::n_dofs_at_node(t, o, n);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+unsigned int
+FE<Dim, T, RealType>::n_dofs_per_elem(const ElemType t, const Order o)
+{
+  return FEShim<Dim, T, RealType>::n_dofs_per_elem(t, o);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+FEContinuity
+FE<Dim, T, RealType>::get_continuity() const
+{
+  return FEShim<Dim, T, RealType>::get_continuity();
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+bool
+FE<Dim, T, RealType>::is_hierarchic() const
+{
+  return FEShim<Dim, T, RealType>::is_hierarchic();
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+bool
+FE<Dim, T, RealType>::shapes_need_reinit() const
+{
+  return FEShim<Dim, T, RealType>::shapes_need_reinit();
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+typename FE<Dim, T, RealType>::OutputShape
+FE<Dim, T, RealType>::shape(const ElemType t, const Order o, const unsigned int i, const Point & p)
+{
+  return FEShim<Dim, T, RealType>::shape(t, o, i, p);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+typename FE<Dim, T, RealType>::OutputShape
+FE<Dim, T, RealType>::shape(const Elem * elem,
+                            const Order o,
+                            const unsigned int i,
+                            const Point & p,
+                            const bool add_p_level)
+{
+  return FEShim<Dim, T, RealType>::shape(elem, o, i, p, add_p_level);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+typename FE<Dim, T, RealType>::OutputShape
+FE<Dim, T, RealType>::shape_deriv(
+    const ElemType t, const Order o, const unsigned int i, const unsigned int j, const Point & p)
+{
+  return FEShim<Dim, T, RealType>::shape_deriv(t, o, i, j, p);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+typename FE<Dim, T, RealType>::OutputShape
+FE<Dim, T, RealType>::shape_deriv(
+    const Elem * elem,
+    const Order o,
+    const unsigned int i,
+    const unsigned int j,
+    const Point & p,
+    const bool add_p_level)
+{
+  return FEShim<Dim, T, RealType>::shape_deriv(elem, o, i, j, p, add_p_level);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+typename FE<Dim, T, RealType>::OutputShape
+FE<Dim, T, RealType>::shape_second_deriv(
+    const ElemType t, const Order o, const unsigned int i, const unsigned int j, const Point & p)
+{
+  return FEShim<Dim, T, RealType>::shape_second_deriv(t, o, i, j, p);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+typename FE<Dim, T, RealType>::OutputShape
+FE<Dim, T, RealType>::shape_second_deriv(
+    const Elem * elem,
+    const Order o,
+    const unsigned int i,
+    const unsigned int j,
+    const Point & p,
+    const bool add_p_level)
+{
+  return FEShim<Dim, T, RealType>::shape_second_deriv(elem, o, i, j, p, add_p_level);
+}
+
+#endif
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+void
+FE<Dim, T, RealType>::reinit(const Elem * elem,
+                             const unsigned int s,
+                             const Real tolerance,
+                             const std::vector<Point> * const pts,
+                             const std::vector<Real> * const weights)
+{
+  FEReinitShim<Dim, T, RealType>::reinit(*this, elem, s, tolerance, pts, weights);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+void FE<Dim,T,RealType>::edge_reinit(const Elem * elem,
+                                     const unsigned int e,
+                                     const Real tolerance,
+                                     const std::vector<Point> * const pts,
+                                     const std::vector<Real> * const weights)
+{
+  FEEdgeReinitShim<Dim, T, RealType>::edge_reinit(*this, elem, e, tolerance, pts, weights);
+}
+
+template <unsigned int Dim, FEFamily T, typename RealType>
+void FE<Dim,T,RealType>::side_map (const Elem * elem,
+                                   const Elem * side,
+                                   const unsigned int s,
+                                   const std::vector<Point> & reference_side_points,
+                                   std::vector<Point> &       reference_points)
+{
+  FESideMapShim<Dim, T, RealType>::side_map(*this, elem, side, s, reference_side_points, reference_points);
+}
 
 /**
  * Clough-Tocher finite elements.  Still templated on the dimension,
@@ -492,8 +644,8 @@ protected:
  * \author Roy Stogner
  * \date 2004
  */
-template <unsigned int Dim>
-class FEClough : public FE<Dim,CLOUGH>
+template <unsigned int Dim, typename RealType = Real>
+class FEClough : public FE<Dim,CLOUGH,RealType>
 {
 public:
 
@@ -503,7 +655,7 @@ public:
    */
   explicit
   FEClough(const FEType & fet) :
-    FE<Dim,CLOUGH> (fet)
+      FE<Dim,CLOUGH,RealType> (fet)
   {}
 };
 
@@ -516,8 +668,8 @@ public:
  * \author Roy Stogner
  * \date 2005
  */
-template <unsigned int Dim>
-class FEHermite : public FE<Dim,HERMITE>
+template <unsigned int Dim, typename RealType = Real>
+class FEHermite : public FE<Dim,HERMITE,RealType>
 {
 public:
 
@@ -527,66 +679,64 @@ public:
    */
   explicit
   FEHermite(const FEType & fet) :
-    FE<Dim,HERMITE> (fet)
+    FE<Dim,HERMITE,RealType> (fet)
   {}
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * 1D hermite functions on unit interval
    */
-  static Real hermite_raw_shape_second_deriv(const unsigned int basis_num,
-                                             const Real xi);
+  static RealType hermite_raw_shape_second_deriv(const unsigned int basis_num,
+                                                 const RealType & xi);
 #endif
-  static Real hermite_raw_shape_deriv(const unsigned int basis_num,
-                                      const Real xi);
-  static Real hermite_raw_shape(const unsigned int basis_num,
-                                const Real xi);
+  static RealType hermite_raw_shape_deriv(const unsigned int basis_num,
+                                          const RealType & xi);
+  static RealType hermite_raw_shape(const unsigned int basis_num,
+                                    const RealType & xi);
 };
 
-
-
-/**
- * Subdivision finite elements.
- *
- * Template specialization prototypes are needed for calling from
- * inside FESubdivision::init_shape_functions
- */
-template <>
-Real FE<2,SUBDIVISION>::shape(const Elem * elem,
-                              const Order order,
-                              const unsigned int i,
-                              const Point & p,
-                              const bool add_p_level);
-
-template <>
-Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
-                                    const Order order,
-                                    const unsigned int i,
-                                    const unsigned int j,
-                                    const Point & p,
-                                    const bool add_p_level);
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template <>
-Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
-                                           const Order order,
-                                           const unsigned int i,
-                                           const unsigned int j,
-                                           const Point & p,
-                                           const bool add_p_level);
+
+template <unsigned int Dim, typename RealType>
+RealType
+FEHermite<Dim, RealType>::hermite_raw_shape_second_deriv(const unsigned int basis_num,
+                                                         const RealType & xi)
+{
+  return FEHermiteShim<Dim, RealType>::hermite_raw_shape_second_deriv(basis_num, xi);
+}
 
 #endif
 
-class FESubdivision : public FE<2,SUBDIVISION>
+template <unsigned int Dim, typename RealType>
+RealType
+FEHermite<Dim, RealType>::hermite_raw_shape_deriv(const unsigned int basis_num,
+                                                  const RealType & xi)
+{
+  return FEHermiteShim<Dim, RealType>::hermite_raw_shape_deriv(basis_num, xi);
+}
+
+template <unsigned int Dim, typename RealType>
+RealType
+FEHermite<Dim, RealType>::hermite_raw_shape(const unsigned int basis_num,
+                                            const RealType & xi)
+{
+  return FEHermiteShim<Dim, RealType>::hermite_raw_shape(basis_num, xi);
+}
+
+template <typename RealType = Real>
+class FESubdivisionTempl : public FE<2,SUBDIVISION,RealType>
 {
 public:
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef FESubdivisionTempl<RealType> FESubdivision;
 
   /**
    * Constructor. Creates a subdivision surface finite element.
    * Currently only supported for two-dimensional meshes in
    * three-dimensional space.
    */
-  FESubdivision(const FEType & fet);
+  FESubdivisionTempl(const FEType & fet);
 
   /**
    * This is at the core of this class. Use this for each new
@@ -636,9 +786,9 @@ public:
    * element, evaluated at the barycentric coordinates \p v,
    * \p w.
    */
-  static Real regular_shape(const unsigned int i,
-                            const Real v,
-                            const Real w);
+  static RealType regular_shape(const unsigned int i,
+                                const RealType & v,
+                                const RealType & w);
 
   /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th}
@@ -646,10 +796,10 @@ public:
    * Loop subdivision element, evaluated at the barycentric
    * coordinates \p v, \p w.
    */
-  static Real regular_shape_deriv(const unsigned int i,
-                                  const unsigned int j,
-                                  const Real v,
-                                  const Real w);
+  static RealType regular_shape_deriv(const unsigned int i,
+                                      const unsigned int j,
+                                      const RealType & v,
+                                      const RealType & w);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -658,10 +808,10 @@ public:
    * a regular Loop subdivision element, evaluated at the
    * barycentric coordinates \p v, \p w.
    */
-  static Real regular_shape_second_deriv(const unsigned int i,
-                                         const unsigned int j,
-                                         const Real v,
-                                         const Real w);
+  static RealType regular_shape_second_deriv(const unsigned int i,
+                                             const unsigned int j,
+                                             const RealType & v,
+                                             const RealType & w);
 
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVE
@@ -686,6 +836,7 @@ public:
                                       unsigned int valence);
 };
 
+typedef FESubdivisionTempl<Real> FESubdivision;
 
 
 /**
@@ -695,8 +846,8 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-template <unsigned int Dim>
-class FEHierarchic : public FE<Dim,HIERARCHIC>
+template <unsigned int Dim, typename RealType = Real>
+class FEHierarchic : public FE<Dim,HIERARCHIC,RealType>
 {
 public:
 
@@ -706,7 +857,7 @@ public:
    */
   explicit
   FEHierarchic(const FEType & fet) :
-    FE<Dim,HIERARCHIC> (fet)
+      FE<Dim,HIERARCHIC,RealType> (fet)
   {}
 };
 
@@ -719,8 +870,8 @@ public:
  * \author Truman E. Ellis
  * \date 2011
  */
-template <unsigned int Dim>
-class FEL2Hierarchic : public FE<Dim,L2_HIERARCHIC>
+template <unsigned int Dim, typename RealType = Real>
+class FEL2Hierarchic : public FE<Dim,L2_HIERARCHIC,RealType>
 {
 public:
 
@@ -730,7 +881,7 @@ public:
    */
   explicit
   FEL2Hierarchic(const FEType & fet) :
-    FE<Dim,L2_HIERARCHIC> (fet)
+      FE<Dim,L2_HIERARCHIC,RealType> (fet)
   {}
 };
 
@@ -743,8 +894,8 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-template <unsigned int Dim>
-class FELagrange : public FE<Dim,LAGRANGE>
+template <unsigned int Dim, typename RealType = Real>
+class FELagrange : public FE<Dim,LAGRANGE,RealType>
 {
 public:
 
@@ -754,7 +905,7 @@ public:
    */
   explicit
   FELagrange(const FEType & fet) :
-    FE<Dim,LAGRANGE> (fet)
+      FE<Dim,LAGRANGE,RealType> (fet)
   {}
 };
 
@@ -762,8 +913,8 @@ public:
 /**
  * Discontinuous Lagrange finite elements.
  */
-template <unsigned int Dim>
-class FEL2Lagrange : public FE<Dim,L2_LAGRANGE>
+template <unsigned int Dim, typename RealType = Real>
+class FEL2Lagrange : public FE<Dim,L2_LAGRANGE,RealType>
 {
 public:
 
@@ -773,7 +924,7 @@ public:
    */
   explicit
   FEL2Lagrange(const FEType & fet) :
-    FE<Dim,L2_LAGRANGE> (fet)
+      FE<Dim,L2_LAGRANGE,RealType> (fet)
   {}
 };
 
@@ -785,8 +936,8 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-template <unsigned int Dim>
-class FEMonomial : public FE<Dim,MONOMIAL>
+template <unsigned int Dim, typename RealType = Real>
+class FEMonomial : public FE<Dim,MONOMIAL,RealType>
 {
 public:
 
@@ -796,7 +947,7 @@ public:
    */
   explicit
   FEMonomial(const FEType & fet) :
-    FE<Dim,MONOMIAL> (fet)
+      FE<Dim,MONOMIAL,RealType> (fet)
   {}
 };
 
@@ -804,8 +955,8 @@ public:
 /**
  * The FEScalar class is used for working with SCALAR variables.
  */
-template <unsigned int Dim>
-class FEScalar : public FE<Dim,SCALAR>
+template <unsigned int Dim, typename RealType = Real>
+class FEScalar : public FE<Dim,SCALAR,RealType>
 {
 public:
 
@@ -817,7 +968,7 @@ public:
    */
   explicit
   FEScalar(const FEType & fet) :
-    FE<Dim,SCALAR> (fet)
+      FE<Dim,SCALAR,RealType> (fet)
   {}
 };
 
@@ -830,10 +981,12 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-template <unsigned int Dim>
-class FEXYZ : public FE<Dim,XYZ>
+template <unsigned int Dim, typename RealType = Real>
+class FEXYZ : public FE<Dim,XYZ,RealType>
 {
 public:
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
 
   /**
    * Constructor. Creates a monomial finite element
@@ -841,8 +994,10 @@ public:
    */
   explicit
   FEXYZ(const FEType & fet) :
-    FE<Dim,XYZ> (fet)
+      FE<Dim,XYZ,RealType> (fet)
   {}
+
+  using FE<Dim,XYZ,RealType>::reinit;
 
   /**
    * Explicitly call base class method.  This prevents some
@@ -853,17 +1008,6 @@ public:
                        const std::vector<Point> * const pts = nullptr,
                        const std::vector<Real> * const weights = nullptr) override
   { FE<Dim,XYZ>::reinit (elem, pts, weights); }
-
-  /**
-   * Reinitializes all the physical element-dependent data based on
-   * the \p side of \p face.
-   */
-  virtual void reinit (const Elem * elem,
-                       const unsigned int side,
-                       const Real tolerance = TOLERANCE,
-                       const std::vector<Point> * const pts = nullptr,
-                       const std::vector<Real> * const weights = nullptr) override;
-
 
 protected:
 
@@ -895,6 +1039,8 @@ protected:
   void compute_face_values (const Elem * elem,
                             const Elem * side,
                             const std::vector<Real> & weights);
+
+  friend struct FEReinitShim<Dim,XYZ,RealType>;
 };
 
 
@@ -906,8 +1052,8 @@ protected:
  * \author Paul T. Bauman
  * \date 2013
  */
-template <unsigned int Dim>
-class FELagrangeVec : public FE<Dim,LAGRANGE_VEC>
+template <unsigned int Dim, typename RealType = Real>
+class FELagrangeVec : public FE<Dim,LAGRANGE_VEC,RealType>
 {
 public:
 
@@ -930,8 +1076,8 @@ public:
  * \author Paul T. Bauman
  * \date 2013
  */
-template <unsigned int Dim>
-class FENedelecOne : public FE<Dim,NEDELEC_ONE>
+template <unsigned int Dim, typename RealType = Real>
+class FENedelecOne : public FE<Dim,NEDELEC_ONE,RealType>
 {
 public:
   /**
@@ -951,8 +1097,8 @@ public:
  * \author Alex D. Lindsay
  * \date 2019
  */
-template <unsigned int Dim>
-class FEMonomialVec : public FE<Dim,MONOMIAL_VEC>
+template <unsigned int Dim, typename RealType = Real>
+class FEMonomialVec : public FE<Dim,MONOMIAL_VEC,RealType>
 {
 public:
 

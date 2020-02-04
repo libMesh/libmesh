@@ -31,6 +31,8 @@
 namespace libMesh
 {
 
+template <typename> class Edge2Templ;
+
 /**
  * The \p Tri3 is an element in 2D composed of 3 nodes.
  * It is numbered like this:
@@ -53,22 +55,30 @@ namespace libMesh
  * \date 2002
  * \brief A 2D triangular element with 3 nodes.
  */
-class Tri3 : public Tri
+template <typename RealType = Real>
+class Tri3Templ : public TriTempl<RealType>
 {
 public:
+  typedef Tri3Templ<RealType> Tri3;
+  typedef TriTempl<RealType> Tri;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef Edge2Templ<RealType> Edge2;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tri3 (Elem * p=nullptr) :
+  Tri3Templ (Elem * p=nullptr) :
     Tri(Tri3::n_nodes(), p, _nodelinks_data) {}
 
-  Tri3 (Tri3 &&) = delete;
-  Tri3 (const Tri3 &) = delete;
+  Tri3Templ (Tri3 &&) = delete;
+  Tri3Templ (const Tri3 &) = delete;
   Tri3 & operator= (const Tri3 &) = delete;
   Tri3 & operator= (Tri3 &&) = delete;
-  virtual ~Tri3() = default;
+  virtual ~Tri3Templ() = default;
 
   /**
    * \returns \p TRI3.
@@ -159,7 +169,7 @@ public:
   /**
    * An optimized method for computing the area of a 3-node triangle.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * \returns The minimum and maximum angles for the triangle
@@ -209,6 +219,61 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
+
+// ------------------------------------------------------------
+// Tri3 class static member initializations
+
+template <typename RealType>
+const unsigned int Tri3Templ<RealType>::side_nodes_map[Tri3::num_sides][Tri3::nodes_per_side] =
+  {
+    {0, 1}, // Side 0
+    {1, 2}, // Side 1
+    {2, 0}  // Side 2
+  };
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Tri3Templ<RealType>::_embedding_matrix[Tri3::num_children][Tri3::num_nodes][Tri3::num_nodes] =
+  {
+    // embedding matrix for child 0
+    {
+      // 0    1    2
+      {1.0, 0.0, 0.0}, // 0
+      {0.5, 0.5, 0.0}, // 1
+      {0.5, 0.0, 0.5}  // 2
+    },
+
+    // embedding matrix for child 1
+    {
+      // 0    1    2
+      {0.5, 0.5, 0.0}, // 0
+      {0.0, 1.0, 0.0}, // 1
+      {0.0, 0.5, 0.5}  // 2
+    },
+
+    // embedding matrix for child 2
+    {
+      // 0    1    2
+      {0.5, 0.0, 0.5}, // 0
+      {0.0, 0.5, 0.5}, // 1
+      {0.0, 0.0, 1.0}  // 2
+    },
+
+    // embedding matrix for child 3
+    {
+      // 0    1    2
+      {0.5, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5}, // 1
+      {0.5, 0.0, 0.5}  // 2
+    }
+  };
+
+#endif
+
+
+typedef Tri3Templ<Real> Tri3;
 
 } // namespace libMesh
 

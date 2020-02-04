@@ -41,7 +41,10 @@ template <typename T> class DenseVector;
 class EquationSystems;
 template <typename T> class NumericVector;
 class DofMap;
-class PointLocatorBase;
+template <typename> class PointLocatorBaseTempl;
+typedef PointLocatorBaseTempl<Real> PointLocatorBase;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * This class provides function-like objects for data

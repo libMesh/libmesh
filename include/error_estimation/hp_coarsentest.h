@@ -39,8 +39,10 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
-class Point;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 class System;
 template <typename T> class TensorValue;
 template <typename T> class VectorValue;

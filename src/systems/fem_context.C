@@ -185,11 +185,11 @@ void FEMContext::init_internal_data(const System & sys)
 
   _element_fe.clear();
   for (int i=0; i<4; ++i)
-    _element_fe.push_back(std::map<FEType, std::unique_ptr<FEAbstract>>());
+    _element_fe.push_back(std::map<FEType, std::unique_ptr<FEAbstract<>>>());
 
   _side_fe.clear();
   for (int i=0; i<4; ++i)
-    _side_fe.push_back(std::map<FEType, std::unique_ptr<FEAbstract>>());
+    _side_fe.push_back(std::map<FEType, std::unique_ptr<FEAbstract<>>>());
 
   _element_fe_var.resize(4);
   _side_fe_var.resize(4);
@@ -228,11 +228,11 @@ void FEMContext::init_internal_data(const System & sys)
 
           if (_element_fe[dim][fe_type] == nullptr)
             {
-              _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
-              _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
+              _element_fe[dim][fe_type] = FEAbstract<>::build(dim, fe_type);
+              _side_fe[dim][fe_type] = FEAbstract<>::build(dim, fe_type);
 
               if (dim == 3)
-                _edge_fe[fe_type] = FEAbstract::build(dim, fe_type);
+                _edge_fe[fe_type] = FEAbstract<>::build(dim, fe_type);
             }
 
           _element_fe_var[dim][i] = _element_fe[dim][fe_type].get();

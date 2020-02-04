@@ -43,8 +43,10 @@ class RBEIMEvaluation;
 class RBSCMEvaluation;
 class RBParametrized;
 class ReplicatedMesh;
-class Elem;
-class Point;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 
 namespace RBDataDeserialization
 {

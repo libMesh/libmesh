@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/elem.h"
+#include "libmesh/node_elem.h"
 
 namespace libMesh
 {
@@ -34,17 +35,23 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all 1D geometric element types.
  */
-class Edge : public Elem
+template <typename RealType = Real>
+class EdgeTempl : public ElemTempl<RealType>
 {
 public:
+  typedef EdgeTempl<RealType> Edge;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef NodeElemTempl<RealType> NodeElem;
 
   /**
    * Default line element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Edge (const unsigned int nn,
-        Elem * p,
-        Node ** nodelinkdata) :
+  EdgeTempl (const unsigned int nn,
+             Elem * p,
+             Node ** nodelinkdata) :
     Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -52,11 +59,11 @@ public:
       this->set_interior_parent(nullptr);
   }
 
-  Edge (Edge &&) = delete;
-  Edge (const Edge &) = delete;
+  EdgeTempl (Edge &&) = delete;
+  EdgeTempl (const Edge &) = delete;
   Edge & operator= (const Edge &) = delete;
   Edge & operator= (Edge &&) = delete;
-  virtual ~Edge() = default;
+  virtual ~EdgeTempl() = default;
 
   /**
    * \returns 1, the dimensionality of the object.
@@ -188,6 +195,107 @@ protected:
 #endif
 
 };
+
+template <typename RealType>
+unsigned int EdgeTempl<RealType>::which_node_am_i(unsigned int side,
+                                   unsigned int /*side_node*/) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  return side;
+}
+
+
+
+template <typename RealType>
+std::unique_ptr<ElemTempl<RealType>> EdgeTempl<RealType>::side_ptr (const unsigned int i)
+{
+  libmesh_assert_less (i, 2);
+  std::unique_ptr<Elem> nodeelem = libmesh_make_unique<NodeElem>(this);
+  nodeelem->set_node(0) = this->node_ptr(i);
+  return nodeelem;
+}
+
+
+template <typename RealType>
+void EdgeTempl<RealType>::side_ptr (std::unique_ptr<Elem> & side,
+                           const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  if (!side.get() || side->type() != NODEELEM)
+    side = this->build_side_ptr(i, false);
+  else
+    {
+      side->subdomain_id() = this->subdomain_id();
+
+      side->set_node(0) = this->node_ptr(i);
+    }
+}
+
+
+
+
+template <typename RealType>
+std::unique_ptr<ElemTempl<RealType>> EdgeTempl<RealType>::build_side_ptr (const unsigned int i, bool)
+{
+  libmesh_assert_less (i, 2);
+  std::unique_ptr<Elem> nodeelem = libmesh_make_unique<NodeElem>(this);
+  nodeelem->set_node(0) = this->node_ptr(i);
+  return nodeelem;
+}
+
+
+template <typename RealType>
+void EdgeTempl<RealType>::build_side_ptr (std::unique_ptr<Elem> & side,
+                           const unsigned int i)
+{
+  this->side_ptr(side, i);
+}
+
+
+
+
+template <typename RealType>
+bool EdgeTempl<RealType>::is_child_on_side(const unsigned int c,
+                            const unsigned int s) const
+{
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
+
+  return (c == s);
+}
+
+
+
+template <typename RealType>
+unsigned int EdgeTempl<RealType>::opposite_side(const unsigned int side_in) const
+{
+  libmesh_assert_less (side_in, 2);
+  return 1 - side_in;
+}
+
+
+
+template <typename RealType>
+unsigned int EdgeTempl<RealType>::opposite_node(const unsigned int node_in,
+                                 const unsigned int libmesh_dbg_var(side_in)) const
+{
+  libmesh_assert_less (node_in, 2);
+  libmesh_assert_less (side_in, this->n_sides());
+  libmesh_assert(this->is_node_on_side(node_in, side_in));
+
+  return 1 - node_in;
+}
+
+template <typename RealType>
+std::vector<unsigned>
+EdgeTempl<RealType>::nodes_on_side(const unsigned int s) const
+{
+  libmesh_assert_less(s, 2);
+  return {s};
+}
+
+typedef EdgeTempl<Real> Edge;
 
 } // namespace libMesh
 

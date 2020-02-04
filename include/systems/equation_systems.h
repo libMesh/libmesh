@@ -54,8 +54,10 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
-class MeshBase;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 
 /**
  * This is the \p EquationSystems class.  It is in charge

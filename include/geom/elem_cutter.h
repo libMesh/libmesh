@@ -39,7 +39,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 class ReplicatedMesh;
 class TriangleInterface;
 class TetGenMeshInterface;

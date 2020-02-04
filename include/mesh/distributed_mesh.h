@@ -33,8 +33,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class Elem;
-class Node;
+template <typename> class ElemTempl;
+template <typename> class NodeTempl;
 
 
 /**
@@ -47,9 +47,21 @@ class Node;
  * \date 2007
  * \brief Mesh data structure which is distributed across all processors.
  */
-class DistributedMesh : public UnstructuredMesh
+template <typename RealType = Real>
+class DistributedMeshTempl : public UnstructuredMeshTempl<RealType>
 {
 public:
+  typedef DistributedMeshTempl<RealType> DistributedMesh;
+  typedef UnstructuredMeshTempl<RealType> UnstructuredMesh;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef NodeTempl<RealType> Node;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+
+  using typename MeshBase::element_iterator;
+  using typename MeshBase::const_element_iterator;
+  using typename MeshBase::node_iterator;
+  using typename MeshBase::const_node_iterator;
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
@@ -57,25 +69,25 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  DistributedMesh (const Parallel::Communicator & comm_in,
+  DistributedMeshTempl (const Parallel::Communicator & comm_in,
                    unsigned char dim=1);
 
   /**
    * Copy-constructor.  This should be able to take a
    * replicated or distributed mesh.
    */
-  DistributedMesh (const UnstructuredMesh & other_mesh);
+  DistributedMeshTempl (const UnstructuredMesh & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a
    * distributed mesh.
    */
-  DistributedMesh (const DistributedMesh & other_mesh);
+  DistributedMeshTempl (const DistributedMesh & other_mesh);
 
   /**
    * Move-constructor.
    */
-  DistributedMesh(DistributedMesh &&) = default;
+  DistributedMeshTempl(DistributedMesh &&) = default;
 
   /**
    * Copy and move assignment are not allowed.
@@ -92,7 +104,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~DistributedMesh();
+  virtual ~DistributedMeshTempl();
 
   /**
    * Clear all internal data.
@@ -597,17 +609,18 @@ private:
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Elem *>.
    */
-  typedef mapvector<Elem *, dof_id_type>::veclike_iterator             elem_iterator_imp;
-  typedef mapvector<Elem *, dof_id_type>::const_veclike_iterator const_elem_iterator_imp;
+  typedef typename mapvector<Elem *, dof_id_type>::veclike_iterator             elem_iterator_imp;
+  typedef typename mapvector<Elem *, dof_id_type>::const_veclike_iterator const_elem_iterator_imp;
 
   /**
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Node *>.
    */
-  typedef mapvector<Node *, dof_id_type>::veclike_iterator             node_iterator_imp;
-  typedef mapvector<Node *, dof_id_type>::const_veclike_iterator const_node_iterator_imp;
+  typedef typename mapvector<Node *, dof_id_type>::veclike_iterator             node_iterator_imp;
+  typedef typename mapvector<Node *, dof_id_type>::const_veclike_iterator const_node_iterator_imp;
 };
 
+typedef DistributedMeshTempl<Real> DistributedMesh;
 
 } // namespace libMesh
 

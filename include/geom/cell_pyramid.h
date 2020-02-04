@@ -26,8 +26,9 @@
 namespace libMesh
 {
 
-
-
+template <typename> class Pyramid5Templ;
+template <typename> class Quad4Templ;
+template <typename> class Tri3Templ;
 
 /**
  * The \p Pyramid is an element in 3D with 5 sides.
@@ -36,16 +37,25 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all pyramid element types.
  */
-class Pyramid : public Cell
+template <typename RealType = Real>
+class PyramidTempl : public CellTempl<RealType>
 {
 public:
+  typedef CellTempl<RealType> Cell;
+  typedef PyramidTempl<RealType> Pyramid;
+  typedef Pyramid5Templ<RealType> Pyramid5;
+  typedef Quad4Templ<RealType> Quad4;
+  typedef Tri3Templ<RealType> Tri3;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Default pyramid, one quad face, four triangular faces,
    * takes number of nodes and parent.
    * Derived classes implement 'true' elements.
    */
-  Pyramid(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
+  PyramidTempl(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Cell(nn, Pyramid::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -53,11 +63,11 @@ public:
       this->set_interior_parent(nullptr);
   }
 
-  Pyramid (Pyramid &&) = delete;
-  Pyramid (const Pyramid &) = delete;
+  PyramidTempl (Pyramid &&) = delete;
+  PyramidTempl (const Pyramid &) = delete;
   Pyramid & operator= (const Pyramid &) = delete;
   Pyramid & operator= (Pyramid &&) = delete;
-  virtual ~Pyramid() = default;
+  virtual ~PyramidTempl() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -167,6 +177,32 @@ protected:
 #endif
 
 };
+
+// ------------------------------------------------------------
+// Pyramid class static member initializations
+
+
+// We need to require C++11...
+template <typename RealType>
+const Real PyramidTempl<RealType>::_master_points[14][3] =
+  {
+    {-1, -1, 0},
+    {1, -1, 0},
+    {1, 1, 0},
+    {-1, 1, 0},
+    {0, 0, 1},
+    {0, -1, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {-1, 0, 0},
+    {0, -0.5, 0.5},
+    {0.5, 0, 0.5},
+    {0, 0.5, 0.5},
+    {-0.5, 0, 0.5}
+  };
+
+
+typedef PyramidTempl<Real> Pyramid;
 
 } // namespace libMesh
 

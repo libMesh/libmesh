@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/elem.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -34,15 +35,20 @@ namespace libMesh
  * \date 2006
  * \brief A zero-dimensional geometric entity implementing the Elem interface.
  */
-class NodeElem : public Elem
+template <typename RealType = Real>
+class NodeElemTempl : public ElemTempl<RealType>
 {
 public:
+  typedef NodeElemTempl<RealType> NodeElem;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  NodeElem (Elem * p=nullptr) :
+  NodeElemTempl (Elem * p=nullptr) :
     Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data,
          _nodelinks_data)
   {
@@ -51,11 +57,11 @@ public:
       this->set_interior_parent(nullptr);
   }
 
-  NodeElem (NodeElem &&) = delete;
-  NodeElem (const NodeElem &) = delete;
+  NodeElemTempl (NodeElem &&) = delete;
+  NodeElemTempl (const NodeElem &) = delete;
   NodeElem & operator= (const NodeElem &) = delete;
   NodeElem & operator= (NodeElem &&) = delete;
-  virtual ~NodeElem() = default;
+  virtual ~NodeElemTempl() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -261,6 +267,38 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
+
+template <typename RealType>
+Order NodeElemTempl<RealType>::default_order() const
+{
+  return FIRST;
+}
+
+
+
+template <typename RealType>
+void NodeElemTempl<RealType>::connectivity(const unsigned int,
+                            const IOPackage,
+                            std::vector<dof_id_type> &) const
+{
+  libmesh_not_implemented();
+}
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float NodeElemTempl<RealType>::_embedding_matrix[1][1][1] =
+  {
+    // embedding matrix for child 0
+    {
+      // 0
+      {1.0}, // 0
+    }
+  };
+
+#endif
+
+typedef NodeElemTempl<Real> NodeElem;
 
 } // namespace libMesh
 

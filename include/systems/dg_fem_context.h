@@ -281,13 +281,13 @@ private:
    * interior since we just need to handle DG interface
    * terms here.
    */
-  std::map<FEType, std::unique_ptr<FEAbstract>> _neighbor_side_fe;
+  std::map<FEType, std::unique_ptr<FEAbstract<>>> _neighbor_side_fe;
 
   /**
    * Pointers to the same finite element objects on the neighbor element,
    * but indexed by variable number
    */
-  std::vector<FEAbstract *> _neighbor_side_fe_var;
+  std::vector<FEAbstract<> *> _neighbor_side_fe_var;
 
   /**
    * Boolean flag to indicate whether or not the DG terms have been

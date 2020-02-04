@@ -21,10 +21,12 @@
 #define LIBMESH_POINT_H
 
 // Local includes
-#include "libmesh/type_vector.h"
+#include "libmesh/vector_value.h"
 
 namespace libMesh
 {
+
+template <typename> class NodeTempl;
 
 /**
  * A \p Point defines a location in LIBMESH_DIM dimensional Real space.  Points
@@ -35,7 +37,8 @@ namespace libMesh
  * \date 2003
  * \brief A geometric point in (x,y,z) space.
  */
-class Point : public TypeVector<Real>
+template <typename RealType>
+class PointTempl : public VectorValue<RealType>
 {
 public:
 
@@ -43,30 +46,46 @@ public:
    * Constructor.  By default sets all entries to 0.  Gives the point
    * 0 in \p LIBMESH_DIM dimensions.
    */
-  Point (const Real x=0.,
-         const Real y=0.,
-         const Real z=0.) :
-    TypeVector<Real> (x,y,z)
+  PointTempl (const RealType x=0.,
+         const RealType y=0.,
+         const RealType z=0.) :
+    VectorValue<RealType> (x,y,z)
   {}
 
   /**
    * Copy-constructor.
    */
-  Point (const Point & p) :
-    TypeVector<Real> (p)
+  PointTempl (const PointTempl & p) :
+    VectorValue<RealType> (p)
   {}
 
   /**
    * Copy-constructor.
    */
-  Point (const TypeVector<Real> & p) :
-    TypeVector<Real> (p)
+  PointTempl (const TypeVector<RealType> & p) :
+    VectorValue<RealType> (p)
   {}
+
+  /**
+   * Copy from other point type constructor
+   */
+  template <typename RealType2>
+  PointTempl (const PointTempl<RealType2> & p2) :
+      VectorValue<RealType>(p2) {}
 
   /**
    * Copy-assignment operator.
    */
-  Point& operator=(const Point & p) = default;
+  PointTempl& operator=(const PointTempl & p) = default;
+
+  /**
+   * Copy-assignment from other point type
+   */
+  template <typename RealType2>
+  PointTempl& operator=(const PointTempl<RealType2> & p2)
+    {
+      this->assign(p2);
+    }
 
   /**
    * Disambiguate constructing from non-Real scalars
@@ -74,22 +93,24 @@ public:
   template <typename T,
             typename = typename
               boostcopy::enable_if_c<ScalarTraits<T>::value,void>::type>
-  Point (const T x) :
-    TypeVector<Real> (x,0,0)
+  PointTempl (const T x) :
+    VectorValue<RealType> (x,0,0)
   {}
 
   /**
    * Empty.
    */
-  ~Point() {}
+  ~PointTempl() {}
 
 protected:
 
   /**
    * Make the derived class a friend.
    */
-  friend class Node;
+  friend class NodeTempl<RealType>;
 };
+
+typedef PointTempl<Real> Point;
 
 } // namespace libMesh
 

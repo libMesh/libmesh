@@ -41,8 +41,10 @@ class TransientRBEvaluation;
 class RBEIMEvaluation;
 class RBSCMEvaluation;
 class RBParametrized;
-class Point;
-class Elem;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 namespace RBDataSerialization
 {

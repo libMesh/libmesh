@@ -36,7 +36,8 @@ namespace libMesh
 
 // Forward declarations
 class Xdr;
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * MeshIO class used for writing XDR (eXternal Data Representation)

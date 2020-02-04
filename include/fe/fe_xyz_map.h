@@ -27,7 +27,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * An implementation of FEMap for "XYZ" elements.

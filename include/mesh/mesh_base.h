@@ -28,8 +28,8 @@
 #include "libmesh/multi_predicates.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
-#include "libmesh/parallel_object.h"
 #include "libmesh/simple_range.h"
+#include "libmesh/mesh_abstract.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -50,15 +50,121 @@ namespace libMesh
 {
 
 // forward declarations
-class Elem;
-class GhostingFunctor;
-class Node;
-class Point;
+template <typename>
+class ElemTempl;
+template <typename> class GhostingFunctorTempl;
+template <typename>
+class NodeTempl;
+template <typename>
+class PointTempl;
 class Partitioner;
 
 template <class MT>
 class MeshInput;
+template <typename>
+class MeshBaseTempl;
 
+template <typename RealType>
+std::ostream & operator << (std::ostream & os, const MeshBaseTempl<RealType> & m);
+
+/**
+ * The definition of the element_iterator struct.
+ */
+template <typename RealType>
+struct
+element_iterator_templ : variant_filter_iterator<typename Predicates::multi_predicate, ElemTempl<RealType> *>
+{
+  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  template <typename PredType, typename IterType>
+  element_iterator_templ (const IterType & d,
+                    const IterType & e,
+                    const PredType & p ) :
+    variant_filter_iterator<typename Predicates::multi_predicate, ElemTempl<RealType> *>(d,e,p) {}
+};
+
+
+
+
+/**
+ * The definition of the const_element_iterator struct.  It is similar to the regular
+ * iterator above, but also provides an additional conversion-to-const ctor.
+ */
+template <typename RealType>
+struct
+const_element_iterator_templ : variant_filter_iterator<typename Predicates::multi_predicate,
+                                                       ElemTempl<RealType> * const,
+                                                       ElemTempl<RealType> * const &,
+                                                       ElemTempl<RealType> * const *>
+{
+  /**
+   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
+   */
+  template <typename PredType, typename IterType>
+  const_element_iterator_templ (const IterType & d,
+                          const IterType & e,
+                          const PredType & p ) :
+      variant_filter_iterator<typename Predicates::multi_predicate, ElemTempl<RealType> * const, ElemTempl<RealType> * const &, ElemTempl<RealType> * const *>(d,e,p)  {}
+
+  /**
+   * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
+   * variant_filter_iterator copy constructor.
+   *
+   * \note This one is \e not templated!
+   */
+  const_element_iterator_templ (const element_iterator_templ<RealType> & rhs) :
+      variant_filter_iterator<typename Predicates::multi_predicate, ElemTempl<RealType> * const, ElemTempl<RealType> * const &, ElemTempl<RealType> * const *>(rhs) {}
+};
+
+
+/**
+ * The definition of the node_iterator struct.
+ */
+template <typename RealType>
+struct
+node_iterator_templ : variant_filter_iterator<typename Predicates::multi_predicate, NodeTempl<RealType> *>
+{
+  /**
+   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
+   */
+  template <typename PredType, typename IterType>
+  node_iterator_templ (const IterType & d,
+                       const IterType & e,
+                       const PredType & p ) :
+    variant_filter_iterator<typename Predicates::multi_predicate, NodeTempl<RealType> *>(d,e,p) {}
+};
+
+
+
+
+/**
+ * The definition of the const_node_iterator struct.  It is similar to the regular
+ * iterator above, but also provides an additional conversion-to-const ctor.
+ */
+template <typename RealType>
+struct
+const_node_iterator_templ : variant_filter_iterator<typename Predicates::multi_predicate,
+                                                        NodeTempl<RealType> * const,
+                                                        NodeTempl<RealType> * const &,
+                                                        NodeTempl<RealType> * const *>
+{
+  /**
+   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
+   */
+  template <typename PredType, typename IterType>
+  const_node_iterator_templ (const IterType & d,
+                             const IterType & e,
+                             const PredType & p ) :
+    variant_filter_iterator<typename Predicates::multi_predicate, NodeTempl<RealType> * const, NodeTempl<RealType> * const &, NodeTempl<RealType> * const *>(d,e,p)  {}
+
+  /**
+   * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
+   * variant_filter_iterator copy constructor.
+   *
+   * \note This one is *not* templated!
+   */
+  const_node_iterator_templ (const node_iterator_templ<RealType> & rhs) :
+    variant_filter_iterator<typename Predicates::multi_predicate, NodeTempl<RealType> * const, NodeTempl<RealType> * const &, NodeTempl<RealType> * const *>(rhs) {}
+};
 
 /**
  * This is the \p MeshBase class. This class provides all the data necessary
@@ -75,28 +181,36 @@ class MeshInput;
  * \date 2002
  * \brief Base class for Mesh.
  */
-class MeshBase : public ParallelObject
+template <typename RealType = Real>
+class MeshBaseTempl : public MeshAbstract
 {
 public:
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef ElemTempl<RealType> Elem;
+  typedef GhostingFunctorTempl<RealType> GhostingFunctor;
+  typedef BoundaryInfoTempl<RealType> BoundaryInfo;
+  typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
-  MeshBase (const Parallel::Communicator & comm_in,
-            unsigned char dim=1);
+  MeshBaseTempl (const Parallel::Communicator & comm_in,
+                 unsigned char dim=1);
 
   /**
    * Copy-constructor.
    */
-  MeshBase (const MeshBase & other_mesh);
+  MeshBaseTempl (const MeshBase & other_mesh);
 
   /**
    * Move-constructor - this function is defaulted out-of-line (in the
    * C file) to play nicely with our forward declarations.
    */
-  MeshBase(MeshBase &&);
+  MeshBaseTempl(MeshBase &&);
 
   /**
    * Copy and move assignment are not allowed because MeshBase
@@ -119,7 +233,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MeshBase ();
+  virtual ~MeshBaseTempl ();
 
   /**
    * A partitioner to use at each prepare_for_use()
@@ -199,14 +313,6 @@ public:
    * all nodes which are not part of a local or ghost element
    */
   virtual void delete_remote_elements () {}
-
-  /**
-   * \returns The logical dimension of the mesh; i.e. the manifold
-   * dimension of the elements in the mesh.  If we ever support
-   * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
-   * then this will return the largest such dimension.
-   */
-  unsigned int mesh_dimension () const;
 
   /**
    * Resets the logical dimension of the mesh. If the mesh has
@@ -987,7 +1093,7 @@ public:
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
-  virtual void partition (const unsigned int n_parts);
+  void partition (const unsigned int /*n_parts*/) {}
 
   void partition ()
   { this->partition(this->n_processors()); }
@@ -1078,48 +1184,6 @@ public:
   bool skip_partitioning() const { return _skip_all_partitioning; }
 
   /**
-   * Adds a functor which can specify ghosting requirements for use on
-   * distributed meshes.  Multiple ghosting functors can be added; any
-   * element which is required by any functor will be ghosted.
-   *
-   * GhostingFunctor memory must be managed by the code which calls
-   * this function; the GhostingFunctor lifetime is expected to extend
-   * until either the functor is removed or the Mesh is destructed.
-   */
-  void add_ghosting_functor(GhostingFunctor & ghosting_functor)
-  { _ghosting_functors.insert(&ghosting_functor); }
-
-  /**
-   * Adds a functor which can specify ghosting requirements for use on
-   * distributed meshes.  Multiple ghosting functors can be added; any
-   * element which is required by any functor will be ghosted.
-   *
-   * GhostingFunctor memory when using this method is managed by the
-   * shared_ptr mechanism.
-   */
-  void add_ghosting_functor(std::shared_ptr<GhostingFunctor> ghosting_functor)
-  { _shared_functors[ghosting_functor.get()] = ghosting_functor;
-    this->add_ghosting_functor(*ghosting_functor); }
-
-  /**
-   * Removes a functor which was previously added to the set of
-   * ghosting functors.
-   */
-  void remove_ghosting_functor(GhostingFunctor & ghosting_functor);
-
-  /**
-   * Beginning of range of ghosting functors
-   */
-  std::set<GhostingFunctor *>::const_iterator ghosting_functors_begin() const
-  { return _ghosting_functors.begin(); }
-
-  /**
-   * End of range of ghosting functors
-   */
-  std::set<GhostingFunctor *>::const_iterator ghosting_functors_end() const
-  { return _ghosting_functors.end(); }
-
-  /**
    * Default ghosting functor
    */
   GhostingFunctor & default_ghosting() { return *_default_ghosting; }
@@ -1169,7 +1233,7 @@ public:
    * Mesh mesh;
    * libMesh::out << mesh << std::endl;
    */
-  friend std::ostream & operator << (std::ostream & os, const MeshBase & m);
+  friend std::ostream & operator << <>(std::ostream & os, const MeshBaseTempl<RealType> & m);
 
   /**
    * Interfaces for reading/writing a mesh to/from a file.  Must be
@@ -1209,24 +1273,24 @@ public:
   typedef Predicates::multi_predicate Predicate;
 
   /**
-   * structs for the element_iterator's.
+   * the element_iterator's.
    *
    * \note These iterators were designed so that derived mesh classes
    * could use the _same_ base class iterators interchangeably.  Their
    * definition comes later in the header file.
    */
-  struct element_iterator;
-  struct const_element_iterator;
+  typedef element_iterator_templ<RealType> element_iterator;
+  typedef const_element_iterator_templ<RealType> const_element_iterator;
 
   /**
-   * structs for the node_iterator's.
+   * the node_iterator's.
    *
    * \note These iterators were designed so that derived mesh classes
    * could use the _same_ base class iterators interchangeably.  Their
    * definition comes later in the header file.
    */
-  struct node_iterator;
-  struct const_node_iterator;
+  typedef node_iterator_templ<RealType> node_iterator;
+  typedef const_node_iterator_templ<RealType> const_node_iterator;
 
   /**
    * In a few (very rare) cases, the user may have manually tagged the
@@ -1658,6 +1722,44 @@ public:
    */
   std::unique_ptr<BoundaryInfo> boundary_info;
 
+  /**
+   * Removes a functor which was previously added to the set of
+   * ghosting functors.
+   */
+  void remove_ghosting_functor(GhostingFunctorBase & ghosting_functor) override;
+
+  /**
+   * Adds a functor which can specify ghosting requirements for use on
+   * distributed meshes.  Multiple ghosting functors can be added; any
+   * element which is required by any functor will be ghosted.
+   *
+   * GhostingFunctor memory must be managed by the code which calls
+   * this function; the GhostingFunctor lifetime is expected to extend
+   * until either the functor is removed or the Mesh is destructed.
+   */
+  void add_ghosting_functor(GhostingFunctorBase & ghosting_functor) override;
+
+  /**
+   * Adds a functor which can specify ghosting requirements for use on
+   * distributed meshes.  Multiple ghosting functors can be added; any
+   * element which is required by any functor will be ghosted.
+   *
+   * GhostingFunctor memory when using this method is managed by the
+   * shared_ptr mechanism.
+   */
+  void add_ghosting_functor(std::shared_ptr<GhostingFunctorBase> ghosting_functor) override;
+
+  /**
+   * Beginning of range of ghosting functors
+   */
+  typename std::set<GhostingFunctor *>::const_iterator ghosting_functors_begin() const
+  { return _ghosting_functors.begin(); }
+
+  /**
+   * End of range of ghosting functors
+   */
+  typename std::set<GhostingFunctor *>::const_iterator ghosting_functors_end() const
+  { return _ghosting_functors.end(); }
 
 protected:
 
@@ -1761,13 +1863,6 @@ protected:
   std::map<subdomain_id_type, std::string> _block_id_to_name;
 
   /**
-   * We cache the dimension of the elements present in the mesh.
-   * So, if we have a mesh with 1D and 2D elements, this structure
-   * will contain 1 and 2.
-   */
-  std::set<unsigned char> _elem_dims;
-
-  /**
    * The "spatial dimension" of the Mesh.  See the documentation for
    * Mesh::spatial_dimension() for more information.
    */
@@ -1816,15 +1911,16 @@ protected:
    * distributing a DistributedMesh.
    *
    * Basically unused by ReplicatedMesh for now, but belongs to
-   * MeshBase because the cost is trivial.
+   * MeshAbstract because the cost is trivial.
    */
-  std::set<GhostingFunctor *> _ghosting_functors;
+  std::set<GhostingFunctorTempl<RealType> *> _ghosting_functors;
 
   /**
    * Hang on to references to any GhostingFunctor objects we were
    * passed in shared_ptr form
    */
-  std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor> > _shared_functors;
+  std::map<GhostingFunctorTempl<RealType> *,
+           std::shared_ptr<GhostingFunctorTempl<RealType>> > _shared_functors;
 
   /**
    * If nonzero, we will call PointLocatorBase::set_close_to_point_tol()
@@ -1848,7 +1944,7 @@ protected:
    * Make the \p BoundaryInfo class a friend so that
    * it can create and interact with \p BoundaryMesh.
    */
-  friend class BoundaryInfo;
+  friend class BoundaryInfoTempl<RealType>;
 
   /**
    * Make the \p MeshCommunication class a friend so that
@@ -1857,120 +1953,10 @@ protected:
   friend class MeshCommunication;
 };
 
-
-
-
-
-
-
-
-
-
-
-/**
- * The definition of the element_iterator struct.
- */
-struct
-MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem *>
-{
-  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
-  template <typename PredType, typename IterType>
-  element_iterator (const IterType & d,
-                    const IterType & e,
-                    const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Elem *>(d,e,p) {}
-};
-
-
-
-
-/**
- * The definition of the const_element_iterator struct.  It is similar to the regular
- * iterator above, but also provides an additional conversion-to-const ctor.
- */
-struct
-MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                           Elem * const,
-                                                           Elem * const &,
-                                                           Elem * const *>
-{
-  /**
-   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
-   */
-  template <typename PredType, typename IterType>
-  const_element_iterator (const IterType & d,
-                          const IterType & e,
-                          const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Elem * const, Elem * const &, Elem * const *>(d,e,p)  {}
-
-  /**
-   * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
-   * variant_filter_iterator copy constructor.
-   *
-   * \note This one is \e not templated!
-   */
-  const_element_iterator (const MeshBase::element_iterator & rhs) :
-    variant_filter_iterator<Predicate, Elem * const, Elem * const &, Elem * const *>(rhs) {}
-};
-
-
-
-
-
-
-
-/**
- * The definition of the node_iterator struct.
- */
-struct
-MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
-{
-  /**
-   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
-   */
-  template <typename PredType, typename IterType>
-  node_iterator (const IterType & d,
-                 const IterType & e,
-                 const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Node *>(d,e,p) {}
-};
-
-
-
-
-/**
- * The definition of the const_node_iterator struct.  It is similar to the regular
- * iterator above, but also provides an additional conversion-to-const ctor.
- */
-struct
-MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                        Node * const,
-                                                        Node * const &,
-                                                        Node * const *>
-{
-  /**
-   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
-   */
-  template <typename PredType, typename IterType>
-  const_node_iterator (const IterType & d,
-                       const IterType & e,
-                       const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Node * const, Node * const &, Node * const *>(d,e,p)  {}
-
-  /**
-   * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
-   * variant_filter_iterator copy constructor.
-   *
-   * \note This one is *not* templated!
-   */
-  const_node_iterator (const MeshBase::node_iterator & rhs) :
-    variant_filter_iterator<Predicate, Node * const, Node * const &, Node * const *>(rhs) {}
-};
-
-
+template <typename RealType>
 template <typename T>
 inline
-unsigned int MeshBase::add_elem_datum(const std::string & name,
+unsigned int MeshBaseTempl<RealType>::add_elem_datum(const std::string & name,
                                       bool allocate_data)
 {
   const std::size_t old_size = _elem_integer_names.size();
@@ -1987,9 +1973,10 @@ unsigned int MeshBase::add_elem_datum(const std::string & name,
 }
 
 
+template <typename RealType>
 template <typename T>
 inline
-std::vector<unsigned int> MeshBase::add_elem_data(const std::vector<std::string> & names,
+std::vector<unsigned int> MeshBaseTempl<RealType>::add_elem_data(const std::vector<std::string> & names,
                                                   bool allocate_data)
 {
   std::vector<unsigned int> returnval(names.size());
@@ -2006,9 +1993,10 @@ std::vector<unsigned int> MeshBase::add_elem_data(const std::vector<std::string>
 }
 
 
+template <typename RealType>
 template <typename T>
 inline
-unsigned int MeshBase::add_node_datum(const std::string & name,
+unsigned int MeshBaseTempl<RealType>::add_node_datum(const std::string & name,
                                       bool allocate_data)
 {
   const std::size_t old_size = _node_integer_names.size();
@@ -2025,9 +2013,10 @@ unsigned int MeshBase::add_node_datum(const std::string & name,
 }
 
 
+template <typename RealType>
 template <typename T>
 inline
-std::vector<unsigned int> MeshBase::add_node_data(const std::vector<std::string> & names,
+std::vector<unsigned int> MeshBaseTempl<RealType>::add_node_data(const std::vector<std::string> & names,
                                                   bool allocate_data)
 {
   std::vector<unsigned int> returnval(names.size());
@@ -2043,7 +2032,11 @@ std::vector<unsigned int> MeshBase::add_node_data(const std::vector<std::string>
   return returnval;
 }
 
+// Declare partitioning specialization for MeshBaseTempl<Real>
+template <>
+void MeshBaseTempl<Real>::partition (const unsigned int n_parts);
 
+typedef MeshBaseTempl<Real> MeshBase;
 
 } // namespace libMesh
 

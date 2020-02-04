@@ -42,7 +42,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class BoundaryInfo;
+template <typename> class BoundaryInfoTempl;
+typedef BoundaryInfoTempl<Real> BoundaryInfo;
 class DofMap;
 
 /**

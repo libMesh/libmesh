@@ -44,9 +44,22 @@ namespace libMesh
  * \date 2007
  * \brief Mesh data structure replicated on all processors.
  */
-class ReplicatedMesh : public UnstructuredMesh
+template <typename RealType = Real>
+class ReplicatedMeshTempl : public UnstructuredMeshTempl<RealType>
 {
 public:
+  typedef ReplicatedMeshTempl<RealType> ReplicatedMesh;
+  typedef UnstructuredMeshTempl<RealType> UnstructuredMesh;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef NodeTempl<RealType> Node;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef BoundaryInfoTempl<RealType> BoundaryInfo;
+
+  using typename MeshBase::element_iterator;
+  using typename MeshBase::const_element_iterator;
+  using typename MeshBase::node_iterator;
+  using typename MeshBase::const_node_iterator;
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
@@ -54,25 +67,25 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  ReplicatedMesh (const Parallel::Communicator & comm_in,
-                  unsigned char dim=1);
+  ReplicatedMeshTempl (const Parallel::Communicator & comm_in,
+                       unsigned char dim=1);
 
   /**
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.
    */
-  ReplicatedMesh (const UnstructuredMesh & other_mesh);
+  ReplicatedMeshTempl (const UnstructuredMesh & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a
    * serial mesh.
    */
-  ReplicatedMesh (const ReplicatedMesh & other_mesh);
+  ReplicatedMeshTempl (const ReplicatedMesh & other_mesh);
 
   /**
    * Move-constructor.
    */
-  ReplicatedMesh(ReplicatedMesh &&) = default;
+  ReplicatedMeshTempl(ReplicatedMesh &&) = default;
 
   /**
    * Copy and move assignment are not allowed.
@@ -89,7 +102,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ReplicatedMesh();
+  virtual ~ReplicatedMeshTempl();
 
   /**
    * Clear all internal data.
@@ -532,16 +545,43 @@ private:
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Elem *>.
    */
-  typedef std::vector<Elem *>::iterator             elem_iterator_imp;
-  typedef std::vector<Elem *>::const_iterator const_elem_iterator_imp;
+  typedef typename std::vector<Elem *>::iterator             elem_iterator_imp;
+  typedef typename std::vector<Elem *>::const_iterator const_elem_iterator_imp;
 
   /**
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Node *>.
    */
-  typedef std::vector<Node *>::iterator             node_iterator_imp;
-  typedef std::vector<Node *>::const_iterator const_node_iterator_imp;
+  typedef typename std::vector<Node *>::iterator             node_iterator_imp;
+  typedef typename std::vector<Node *>::const_iterator const_node_iterator_imp;
 };
+
+template <typename RealType>
+void ReplicatedMeshTempl<RealType>::stitching_helper (const ReplicatedMesh *,
+                                                      boundary_id_type,
+                                                      boundary_id_type,
+                                                      Real,
+                                                      bool,
+                                                      bool,
+                                                      bool,
+                                                      bool,
+                                                      bool)
+{
+  libmesh_not_implemented();
+}
+
+template <>
+void ReplicatedMeshTempl<Real>::stitching_helper (const ReplicatedMesh *,
+                                                  boundary_id_type,
+                                                  boundary_id_type,
+                                                  Real,
+                                                  bool,
+                                                  bool,
+                                                  bool,
+                                                  bool,
+                                                  bool);
+
+typedef ReplicatedMeshTempl<Real> ReplicatedMesh;
 
 } // namespace libMesh
 

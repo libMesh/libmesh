@@ -32,7 +32,8 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Point;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 
 /**
  * This class implements the Kelly error indicator

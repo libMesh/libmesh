@@ -28,10 +28,16 @@ namespace libMesh
 {
 
 // Forward declarations
-class Node;
+template <typename> class NodeTempl;
+typedef NodeTempl<Real> Node;
 
 typedef StoredRange<MeshBase::node_iterator,             Node *>      NodeRange;
 typedef StoredRange<MeshBase::const_node_iterator, const Node *> ConstNodeRange;
+
+template <typename RealType>
+using NodeRangeTempl = StoredRange<typename MeshBaseTempl<RealType>::node_iterator, NodeTempl<RealType> *>;
+template <typename RealType>
+using ConstNodeRangeTempl = StoredRange<typename MeshBaseTempl<RealType>::const_node_iterator, const NodeTempl<RealType> *>;
 
 } // namespace libMesh
 

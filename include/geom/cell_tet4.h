@@ -25,6 +25,8 @@
 
 namespace libMesh
 {
+template <typename> class Tri3Templ;
+template <typename> class Edge2Templ;
 
 /**
  * The \p Tet4 is an element in 3D composed of 4 nodes.
@@ -50,23 +52,32 @@ namespace libMesh
  * \date 2002
  * \brief A 3D tetrahedral element with 4 nodes.
  */
-class Tet4 final : public Tet
+template <typename RealType = Real>
+class Tet4Templ final : public TetTempl<RealType>
 {
 public:
+  typedef Tet4Templ<RealType> Tet4;
+  typedef TetTempl<RealType> Tet;
+  typedef CellTempl<RealType> Cell;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef Tri3Templ<RealType> Tri3;
+  typedef Edge2Templ<RealType> Edge2;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet4 (Elem * p=nullptr) :
+  Tet4Templ (Elem * p=nullptr) :
     Tet(Tet4::n_nodes(), p, _nodelinks_data)
   {}
 
-  Tet4 (Tet4 &&) = delete;
-  Tet4 (const Tet4 &) = delete;
+  Tet4Templ (Tet4 &&) = delete;
+  Tet4Templ (const Tet4 &) = delete;
   Tet4 & operator= (const Tet4 &) = delete;
   Tet4 & operator= (Tet4 &&) = delete;
-  virtual ~Tet4() = default;
+  virtual ~Tet4Templ() = default;
 
   /**
    * \returns \p TET4.
@@ -187,7 +198,7 @@ public:
    * An optimized method for computing the area of a
    * 4-node tetrahedron.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * \returns The min and max *dihedral* angles for the tetrahedron.
@@ -247,6 +258,111 @@ protected:
 #endif
 
 };
+
+// ------------------------------------------------------------
+// Tet4 class static member initializations
+
+template <typename RealType>
+const unsigned int Tet4Templ<RealType>::side_nodes_map[Tet4::num_sides][Tet4::nodes_per_side] =
+  {
+    {0, 2, 1}, // Side 0
+    {0, 1, 3}, // Side 1
+    {1, 2, 3}, // Side 2
+    {2, 0, 3}  // Side 3
+  };
+
+template <typename RealType>
+const unsigned int Tet4Templ<RealType>::edge_nodes_map[Tet4::num_edges][Tet4::nodes_per_edge] =
+  {
+    {0, 1}, // Edge 0
+    {1, 2}, // Edge 1
+    {0, 2}, // Edge 2
+    {0, 3}, // Edge 3
+    {1, 3}, // Edge 4
+    {2, 3}  // Edge 5
+  };
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Tet4Templ<RealType>::_embedding_matrix[Tet4::num_children][Tet4::num_nodes][Tet4::num_nodes] =
+  {
+    // embedding matrix for child 0
+    {
+      // 0    1    2    3
+      {1.0, 0.0, 0.0, 0.0}, // 0
+      {0.5, 0.5, 0.0, 0.0}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    },
+
+    // embedding matrix for child 1
+    {
+      // 0    1    2    3
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 1.0, 0.0, 0.0}, // 1
+      {0.0, 0.5, 0.5, 0.0}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
+
+    // embedding matrix for child 2
+    {
+      // 0    1    2    3
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.0, 0.0, 1.0, 0.0}, // 2
+      {0.0, 0.0, 0.5, 0.5}  // 3
+    },
+
+    // embedding matrix for child 3
+    {
+      // 0    1    2    3
+      {0.5, 0.0, 0.0, 0.5}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.0, 0.0, 1.0}  // 3
+    },
+
+    // embedding matrix for child 4
+    {
+      // 0    1    2    3
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    },
+
+    // embedding matrix for child 5
+    {
+      // 0    1    2    3
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
+
+    // embedding matrix for child 6
+    {
+      // 0    1    2    3
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
+
+    // embedding matrix for child 7
+    {
+      // 0    1    2    3
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    }
+  };
+
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
+typedef Tet4Templ<Real> Tet4;
 
 } // namespace libMesh
 

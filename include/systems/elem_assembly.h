@@ -26,7 +26,8 @@ namespace libMesh
 
 class FEMContext;
 class System;
-class Node;
+template <typename> class NodeTempl;
+typedef NodeTempl<Real> Node;
 
 /**
  * ElemAssembly provides a per-element (interior and boundary) assembly

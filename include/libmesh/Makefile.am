@@ -8,6 +8,7 @@ EXTRA_DIST = rebuild_makefile.sh
 BUILT_SOURCES = \
         auto_ptr.h \
         default_coupling.h \
+        default_coupling_impl.h \
         dirichlet_boundaries.h \
         dof_map.h \
         dof_object.h \
@@ -15,8 +16,10 @@ BUILT_SOURCES = \
         float128_shims.h \
         getpot.h \
         ghost_point_neighbors.h \
+        ghost_point_neighbors_impl.h \
         ghosting_functor.h \
         id_types.h \
+        instantiate_real_type.h \
         libmesh.h \
         libmesh_C_isnan.h \
         libmesh_augment_std_namespace.h \
@@ -29,13 +32,17 @@ BUILT_SOURCES = \
         libmesh_version.h \
         multi_predicates.h \
         periodic_boundaries.h \
+        periodic_boundaries_impl.h \
         periodic_boundary.h \
         periodic_boundary_base.h \
+        periodic_boundary_base_impl.h \
         point_neighbor_coupling.h \
+        point_neighbor_coupling_impl.h \
         print_trace.h \
         reference_counted_object.h \
         reference_counter.h \
         sibling_coupling.h \
+        sibling_coupling_impl.h \
         single_predicates.h \
         sparsity_pattern.h \
         variable.h \
@@ -75,17 +82,90 @@ BUILT_SOURCES = \
         weighted_patch_recovery_error_estimator.h \
         fe.h \
         fe_abstract.h \
+        fe_abstract_impl.h \
         fe_base.h \
+        fe_base_forward.h \
+        fe_base_impl.h \
+        fe_bernstein_impl.h \
+        fe_bernstein_shape_0D_impl.h \
+        fe_bernstein_shape_1D_impl.h \
+        fe_bernstein_shape_2D_impl.h \
+        fe_bernstein_shape_3D_impl.h \
+        fe_boundary_impl.h \
+        fe_clough_impl.h \
+        fe_clough_shape_0D_impl.h \
+        fe_clough_shape_1D_impl.h \
+        fe_clough_shape_2D_impl.h \
+        fe_clough_shape_3D_impl.h \
         fe_compute_data.h \
+        fe_constraints_impl.h \
+        fe_forward.h \
+        fe_hermite_impl.h \
+        fe_hermite_shape_0D_impl.h \
+        fe_hermite_shape_1D_impl.h \
+        fe_hermite_shape_2D_impl.h \
+        fe_hermite_shape_3D_impl.h \
+        fe_hierarchic_impl.h \
+        fe_hierarchic_shape_0D_impl.h \
+        fe_hierarchic_shape_1D_impl.h \
+        fe_hierarchic_shape_2D_impl.h \
+        fe_hierarchic_shape_3D_impl.h \
+        fe_impl.h \
         fe_interface.h \
+        fe_interface_impl.h \
+        fe_l2_hierarchic_impl.h \
+        fe_l2_lagrange_impl.h \
+        fe_lagrange_impl.h \
+        fe_lagrange_shape_0D_impl.h \
         fe_lagrange_shape_1D.h \
+        fe_lagrange_shape_1D_impl.h \
+        fe_lagrange_shape_2D_impl.h \
+        fe_lagrange_shape_3D_impl.h \
+        fe_lagrange_vec_impl.h \
         fe_macro.h \
         fe_map.h \
+        fe_map_impl.h \
+        fe_monomial_impl.h \
+        fe_monomial_shape_0D_impl.h \
+        fe_monomial_shape_1D_impl.h \
+        fe_monomial_shape_2D_impl.h \
+        fe_monomial_shape_3D_impl.h \
+        fe_monomial_vec_impl.h \
+        fe_nedelec_one_impl.h \
+        fe_nedelec_one_shape_2D_impl.h \
+        fe_nedelec_one_shape_3D_impl.h \
+        fe_output_type.h \
+        fe_rational_impl.h \
+        fe_rational_shape_0D_impl.h \
+        fe_rational_shape_1D_impl.h \
+        fe_rational_shape_2D_impl.h \
+        fe_rational_shape_3D_impl.h \
+        fe_scalar_impl.h \
+        fe_scalar_shape_0D_impl.h \
+        fe_scalar_shape_1D_impl.h \
+        fe_scalar_shape_2D_impl.h \
+        fe_scalar_shape_3D_impl.h \
+        fe_shim.h \
+        fe_subdivision_impl.h \
+        fe_szabab_impl.h \
+        fe_szabab_shape_0D_impl.h \
+        fe_szabab_shape_1D_impl.h \
+        fe_szabab_shape_2D_impl.h \
+        fe_szabab_shape_3D_impl.h \
         fe_transformation_base.h \
+        fe_transformation_base_impl.h \
         fe_type.h \
+        fe_xyz_boundary_impl.h \
+        fe_xyz_impl.h \
         fe_xyz_map.h \
+        fe_xyz_shape_0D_impl.h \
+        fe_xyz_shape_1D_impl.h \
+        fe_xyz_shape_2D_impl.h \
+        fe_xyz_shape_3D_impl.h \
         h1_fe_transformation.h \
+        h1_fe_transformation_impl.h \
         hcurl_fe_transformation.h \
+        hcurl_fe_transformation_impl.h \
         inf_fe.h \
         inf_fe_instantiate_1D.h \
         inf_fe_instantiate_2D.h \
@@ -96,8 +176,12 @@ BUILT_SOURCES = \
         cell.h \
         cell_hex.h \
         cell_hex20.h \
+        cell_hex20_impl.h \
         cell_hex27.h \
+        cell_hex27_impl.h \
         cell_hex8.h \
+        cell_hex8_impl.h \
+        cell_hex_impl.h \
         cell_inf.h \
         cell_inf_hex.h \
         cell_inf_hex16.h \
@@ -108,24 +192,36 @@ BUILT_SOURCES = \
         cell_inf_prism6.h \
         cell_prism.h \
         cell_prism15.h \
+        cell_prism15_impl.h \
         cell_prism18.h \
+        cell_prism18_impl.h \
         cell_prism6.h \
+        cell_prism6_impl.h \
+        cell_prism_impl.h \
         cell_pyramid.h \
         cell_pyramid13.h \
         cell_pyramid14.h \
         cell_pyramid5.h \
+        cell_pyramid5_impl.h \
+        cell_pyramid_impl.h \
         cell_tet.h \
         cell_tet10.h \
+        cell_tet10_impl.h \
         cell_tet4.h \
+        cell_tet4_impl.h \
+        cell_tet_impl.h \
         compare_elems_by_level.h \
         edge.h \
         edge_edge2.h \
         edge_edge3.h \
+        edge_edge3_impl.h \
         edge_edge4.h \
+        edge_edge4_impl.h \
         edge_inf_edge2.h \
         elem.h \
         elem_cutter.h \
         elem_hash.h \
+        elem_impl.h \
         elem_internal.h \
         elem_quality.h \
         elem_range.h \
@@ -135,15 +231,22 @@ BUILT_SOURCES = \
         face_inf_quad6.h \
         face_quad.h \
         face_quad4.h \
+        face_quad4_impl.h \
         face_quad4_shell.h \
         face_quad8.h \
+        face_quad8_impl.h \
         face_quad8_shell.h \
         face_quad9.h \
+        face_quad9_impl.h \
+        face_quad_impl.h \
         face_tri.h \
         face_tri3.h \
+        face_tri3_impl.h \
         face_tri3_shell.h \
         face_tri3_subdivision.h \
         face_tri6.h \
+        face_tri6_impl.h \
+        face_tri_impl.h \
         node.h \
         node_elem.h \
         node_range.h \
@@ -151,15 +254,18 @@ BUILT_SOURCES = \
         point.h \
         reference_elem.h \
         remote_elem.h \
+        remote_elem_impl.h \
         side.h \
         sphere.h \
         stored_range.h \
         surface.h \
         abaqus_io.h \
         boundary_info.h \
+        boundary_info_impl.h \
         boundary_mesh.h \
         checkpoint_io.h \
         distributed_mesh.h \
+        distributed_mesh_impl.h \
         dyna_io.h \
         ensight_io.h \
         exodusII_io.h \
@@ -172,15 +278,22 @@ BUILT_SOURCES = \
         matlab_io.h \
         medit_io.h \
         mesh.h \
+        mesh_abstract.h \
         mesh_base.h \
+        mesh_base_impl.h \
         mesh_communication.h \
+        mesh_communication_global_indices_impl.h \
+        mesh_communication_impl.h \
         mesh_function.h \
         mesh_generation.h \
+        mesh_generation_impl.h \
         mesh_input.h \
         mesh_inserter_iterator.h \
+        mesh_iterators_impl.h \
         mesh_modification.h \
         mesh_output.h \
         mesh_refinement.h \
+        mesh_refinement_impl.h \
         mesh_serializer.h \
         mesh_smoother.h \
         mesh_smoother_laplace.h \
@@ -189,6 +302,7 @@ BUILT_SOURCES = \
         mesh_tetgen_interface.h \
         mesh_tetgen_wrapper.h \
         mesh_tools.h \
+        mesh_tools_impl.h \
         mesh_triangle_holes.h \
         mesh_triangle_interface.h \
         mesh_triangle_wrapper.h \
@@ -200,12 +314,14 @@ BUILT_SOURCES = \
         patch.h \
         postscript_io.h \
         replicated_mesh.h \
+        replicated_mesh_impl.h \
         serial_mesh.h \
         sync_refinement_flags.h \
         tecplot_io.h \
         tetgen_io.h \
         ucd_io.h \
         unstructured_mesh.h \
+        unstructured_mesh_impl.h \
         unv_io.h \
         vtk_io.h \
         xdr_io.h \
@@ -271,6 +387,7 @@ BUILT_SOURCES = \
         parallel_bin_sorter.h \
         parallel_conversion_utils.h \
         parallel_elem.h \
+        parallel_elem_impl.h \
         parallel_ghost_sync.h \
         parallel_hilbert.h \
         parallel_histogram.h \
@@ -446,18 +563,24 @@ BUILT_SOURCES = \
         perfmon.h \
         plt_loader.h \
         point_locator_base.h \
+        point_locator_base_impl.h \
         point_locator_tree.h \
+        point_locator_tree_impl.h \
         pointer_to_pointer_iter.h \
         pool_allocator.h \
+        raw_value.h \
         restore_warnings.h \
         simple_range.h \
         statistics.h \
         string_to_enum.h \
         timestamp.h \
         topology_map.h \
+        topology_map_impl.h \
         tree.h \
         tree_base.h \
+        tree_impl.h \
         tree_node.h \
+        tree_node_impl.h \
         utility.h \
         vectormap.h \
         xdr_cxx.h \
@@ -553,6 +676,9 @@ auto_ptr.h: $(top_srcdir)/include/base/auto_ptr.h
 default_coupling.h: $(top_srcdir)/include/base/default_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+default_coupling_impl.h: $(top_srcdir)/include/base/default_coupling_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -574,10 +700,16 @@ getpot.h: $(top_srcdir)/include/base/getpot.h
 ghost_point_neighbors.h: $(top_srcdir)/include/base/ghost_point_neighbors.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+ghost_point_neighbors_impl.h: $(top_srcdir)/include/base/ghost_point_neighbors_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 ghosting_functor.h: $(top_srcdir)/include/base/ghosting_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 id_types.h: $(top_srcdir)/include/base/id_types.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+instantiate_real_type.h: $(top_srcdir)/include/base/instantiate_real_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh.h: $(top_srcdir)/include/base/libmesh.h
@@ -616,13 +748,22 @@ multi_predicates.h: $(top_srcdir)/include/base/multi_predicates.h
 periodic_boundaries.h: $(top_srcdir)/include/base/periodic_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+periodic_boundaries_impl.h: $(top_srcdir)/include/base/periodic_boundaries_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 periodic_boundary.h: $(top_srcdir)/include/base/periodic_boundary.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 periodic_boundary_base.h: $(top_srcdir)/include/base/periodic_boundary_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+periodic_boundary_base_impl.h: $(top_srcdir)/include/base/periodic_boundary_base_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 point_neighbor_coupling.h: $(top_srcdir)/include/base/point_neighbor_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+point_neighbor_coupling_impl.h: $(top_srcdir)/include/base/point_neighbor_coupling_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
@@ -635,6 +776,9 @@ reference_counter.h: $(top_srcdir)/include/base/reference_counter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sibling_coupling.h: $(top_srcdir)/include/base/sibling_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+sibling_coupling_impl.h: $(top_srcdir)/include/base/sibling_coupling_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 single_predicates.h: $(top_srcdir)/include/base/single_predicates.h
@@ -754,16 +898,124 @@ fe.h: $(top_srcdir)/include/fe/fe.h
 fe_abstract.h: $(top_srcdir)/include/fe/fe_abstract.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+fe_abstract_impl.h: $(top_srcdir)/include/fe/fe_abstract_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 fe_base.h: $(top_srcdir)/include/fe/fe_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_base_forward.h: $(top_srcdir)/include/fe/fe_base_forward.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_base_impl.h: $(top_srcdir)/include/fe/fe_base_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_bernstein_impl.h: $(top_srcdir)/include/fe/fe_bernstein_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_bernstein_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_bernstein_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_bernstein_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_bernstein_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_bernstein_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_bernstein_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_bernstein_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_bernstein_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_boundary_impl.h: $(top_srcdir)/include/fe/fe_boundary_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_clough_impl.h: $(top_srcdir)/include/fe/fe_clough_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_clough_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_clough_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_clough_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_clough_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_clough_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_clough_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_clough_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_clough_shape_3D_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_compute_data.h: $(top_srcdir)/include/fe/fe_compute_data.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+fe_constraints_impl.h: $(top_srcdir)/include/fe/fe_constraints_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_forward.h: $(top_srcdir)/include/fe/fe_forward.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hermite_impl.h: $(top_srcdir)/include/fe/fe_hermite_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hermite_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_hermite_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hermite_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_hermite_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hermite_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_hermite_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hermite_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_hermite_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hierarchic_impl.h: $(top_srcdir)/include/fe/fe_hierarchic_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hierarchic_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_hierarchic_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hierarchic_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_hierarchic_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hierarchic_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_hierarchic_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_hierarchic_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_hierarchic_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_impl.h: $(top_srcdir)/include/fe/fe_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 fe_interface.h: $(top_srcdir)/include/fe/fe_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+fe_interface_impl.h: $(top_srcdir)/include/fe/fe_interface_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_l2_hierarchic_impl.h: $(top_srcdir)/include/fe/fe_l2_hierarchic_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_l2_lagrange_impl.h: $(top_srcdir)/include/fe/fe_l2_lagrange_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_impl.h: $(top_srcdir)/include/fe/fe_lagrange_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_lagrange_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 fe_lagrange_shape_1D.h: $(top_srcdir)/include/fe/fe_lagrange_shape_1D.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_lagrange_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_lagrange_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_lagrange_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_vec_impl.h: $(top_srcdir)/include/fe/fe_lagrange_vec_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_macro.h: $(top_srcdir)/include/fe/fe_macro.h
@@ -772,19 +1024,130 @@ fe_macro.h: $(top_srcdir)/include/fe/fe_macro.h
 fe_map.h: $(top_srcdir)/include/fe/fe_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+fe_map_impl.h: $(top_srcdir)/include/fe/fe_map_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_monomial_impl.h: $(top_srcdir)/include/fe/fe_monomial_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_monomial_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_monomial_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_monomial_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_monomial_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_monomial_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_monomial_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_monomial_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_monomial_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_monomial_vec_impl.h: $(top_srcdir)/include/fe/fe_monomial_vec_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_nedelec_one_impl.h: $(top_srcdir)/include/fe/fe_nedelec_one_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_nedelec_one_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_nedelec_one_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_nedelec_one_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_nedelec_one_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_output_type.h: $(top_srcdir)/include/fe/fe_output_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_rational_impl.h: $(top_srcdir)/include/fe/fe_rational_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_rational_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_rational_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_rational_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_rational_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_rational_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_rational_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_rational_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_rational_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_scalar_impl.h: $(top_srcdir)/include/fe/fe_scalar_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_scalar_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_scalar_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_scalar_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_scalar_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_scalar_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_scalar_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_scalar_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_scalar_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_shim.h: $(top_srcdir)/include/fe/fe_shim.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_subdivision_impl.h: $(top_srcdir)/include/fe/fe_subdivision_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_szabab_impl.h: $(top_srcdir)/include/fe/fe_szabab_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_szabab_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_szabab_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_szabab_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_szabab_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_szabab_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_szabab_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_szabab_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_szabab_shape_3D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 fe_transformation_base.h: $(top_srcdir)/include/fe/fe_transformation_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_transformation_base_impl.h: $(top_srcdir)/include/fe/fe_transformation_base_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_type.h: $(top_srcdir)/include/fe/fe_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+fe_xyz_boundary_impl.h: $(top_srcdir)/include/fe/fe_xyz_boundary_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_xyz_impl.h: $(top_srcdir)/include/fe/fe_xyz_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 fe_xyz_map.h: $(top_srcdir)/include/fe/fe_xyz_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_xyz_shape_0D_impl.h: $(top_srcdir)/include/fe/fe_xyz_shape_0D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_xyz_shape_1D_impl.h: $(top_srcdir)/include/fe/fe_xyz_shape_1D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_xyz_shape_2D_impl.h: $(top_srcdir)/include/fe/fe_xyz_shape_2D_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_xyz_shape_3D_impl.h: $(top_srcdir)/include/fe/fe_xyz_shape_3D_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 h1_fe_transformation.h: $(top_srcdir)/include/fe/h1_fe_transformation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+h1_fe_transformation_impl.h: $(top_srcdir)/include/fe/h1_fe_transformation_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 hcurl_fe_transformation.h: $(top_srcdir)/include/fe/hcurl_fe_transformation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+hcurl_fe_transformation_impl.h: $(top_srcdir)/include/fe/hcurl_fe_transformation_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe.h: $(top_srcdir)/include/fe/inf_fe.h
@@ -817,10 +1180,22 @@ cell_hex.h: $(top_srcdir)/include/geom/cell_hex.h
 cell_hex20.h: $(top_srcdir)/include/geom/cell_hex20.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_hex20_impl.h: $(top_srcdir)/include/geom/cell_hex20_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_hex27.h: $(top_srcdir)/include/geom/cell_hex27.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_hex27_impl.h: $(top_srcdir)/include/geom/cell_hex27_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_hex8.h: $(top_srcdir)/include/geom/cell_hex8.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_hex8_impl.h: $(top_srcdir)/include/geom/cell_hex8_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_hex_impl.h: $(top_srcdir)/include/geom/cell_hex_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf.h: $(top_srcdir)/include/geom/cell_inf.h
@@ -853,10 +1228,22 @@ cell_prism.h: $(top_srcdir)/include/geom/cell_prism.h
 cell_prism15.h: $(top_srcdir)/include/geom/cell_prism15.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_prism15_impl.h: $(top_srcdir)/include/geom/cell_prism15_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_prism18.h: $(top_srcdir)/include/geom/cell_prism18.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_prism18_impl.h: $(top_srcdir)/include/geom/cell_prism18_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_prism6.h: $(top_srcdir)/include/geom/cell_prism6.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_prism6_impl.h: $(top_srcdir)/include/geom/cell_prism6_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_prism_impl.h: $(top_srcdir)/include/geom/cell_prism_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid.h: $(top_srcdir)/include/geom/cell_pyramid.h
@@ -871,13 +1258,28 @@ cell_pyramid14.h: $(top_srcdir)/include/geom/cell_pyramid14.h
 cell_pyramid5.h: $(top_srcdir)/include/geom/cell_pyramid5.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_pyramid5_impl.h: $(top_srcdir)/include/geom/cell_pyramid5_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_pyramid_impl.h: $(top_srcdir)/include/geom/cell_pyramid_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_tet.h: $(top_srcdir)/include/geom/cell_tet.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_tet10.h: $(top_srcdir)/include/geom/cell_tet10.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_tet10_impl.h: $(top_srcdir)/include/geom/cell_tet10_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_tet4.h: $(top_srcdir)/include/geom/cell_tet4.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_tet4_impl.h: $(top_srcdir)/include/geom/cell_tet4_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_tet_impl.h: $(top_srcdir)/include/geom/cell_tet_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 compare_elems_by_level.h: $(top_srcdir)/include/geom/compare_elems_by_level.h
@@ -892,7 +1294,13 @@ edge_edge2.h: $(top_srcdir)/include/geom/edge_edge2.h
 edge_edge3.h: $(top_srcdir)/include/geom/edge_edge3.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+edge_edge3_impl.h: $(top_srcdir)/include/geom/edge_edge3_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 edge_edge4.h: $(top_srcdir)/include/geom/edge_edge4.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+edge_edge4_impl.h: $(top_srcdir)/include/geom/edge_edge4_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 edge_inf_edge2.h: $(top_srcdir)/include/geom/edge_inf_edge2.h
@@ -905,6 +1313,9 @@ elem_cutter.h: $(top_srcdir)/include/geom/elem_cutter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_hash.h: $(top_srcdir)/include/geom/elem_hash.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+elem_impl.h: $(top_srcdir)/include/geom/elem_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_internal.h: $(top_srcdir)/include/geom/elem_internal.h
@@ -934,10 +1345,16 @@ face_quad.h: $(top_srcdir)/include/geom/face_quad.h
 face_quad4.h: $(top_srcdir)/include/geom/face_quad4.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+face_quad4_impl.h: $(top_srcdir)/include/geom/face_quad4_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 face_quad4_shell.h: $(top_srcdir)/include/geom/face_quad4_shell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad8.h: $(top_srcdir)/include/geom/face_quad8.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_quad8_impl.h: $(top_srcdir)/include/geom/face_quad8_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad8_shell.h: $(top_srcdir)/include/geom/face_quad8_shell.h
@@ -946,10 +1363,19 @@ face_quad8_shell.h: $(top_srcdir)/include/geom/face_quad8_shell.h
 face_quad9.h: $(top_srcdir)/include/geom/face_quad9.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+face_quad9_impl.h: $(top_srcdir)/include/geom/face_quad9_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_quad_impl.h: $(top_srcdir)/include/geom/face_quad_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 face_tri.h: $(top_srcdir)/include/geom/face_tri.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3.h: $(top_srcdir)/include/geom/face_tri3.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_tri3_impl.h: $(top_srcdir)/include/geom/face_tri3_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3_shell.h: $(top_srcdir)/include/geom/face_tri3_shell.h
@@ -959,6 +1385,12 @@ face_tri3_subdivision.h: $(top_srcdir)/include/geom/face_tri3_subdivision.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri6.h: $(top_srcdir)/include/geom/face_tri6.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_tri6_impl.h: $(top_srcdir)/include/geom/face_tri6_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_tri_impl.h: $(top_srcdir)/include/geom/face_tri_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 node.h: $(top_srcdir)/include/geom/node.h
@@ -982,6 +1414,9 @@ reference_elem.h: $(top_srcdir)/include/geom/reference_elem.h
 remote_elem.h: $(top_srcdir)/include/geom/remote_elem.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+remote_elem_impl.h: $(top_srcdir)/include/geom/remote_elem_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 side.h: $(top_srcdir)/include/geom/side.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1000,6 +1435,9 @@ abaqus_io.h: $(top_srcdir)/include/mesh/abaqus_io.h
 boundary_info.h: $(top_srcdir)/include/mesh/boundary_info.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+boundary_info_impl.h: $(top_srcdir)/include/mesh/boundary_info_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 boundary_mesh.h: $(top_srcdir)/include/mesh/boundary_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1007,6 +1445,9 @@ checkpoint_io.h: $(top_srcdir)/include/mesh/checkpoint_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 distributed_mesh.h: $(top_srcdir)/include/mesh/distributed_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+distributed_mesh_impl.h: $(top_srcdir)/include/mesh/distributed_mesh_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dyna_io.h: $(top_srcdir)/include/mesh/dyna_io.h
@@ -1045,10 +1486,22 @@ medit_io.h: $(top_srcdir)/include/mesh/medit_io.h
 mesh.h: $(top_srcdir)/include/mesh/mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+mesh_abstract.h: $(top_srcdir)/include/mesh/mesh_abstract.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 mesh_base.h: $(top_srcdir)/include/mesh/mesh_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+mesh_base_impl.h: $(top_srcdir)/include/mesh/mesh_base_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 mesh_communication.h: $(top_srcdir)/include/mesh/mesh_communication.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_communication_global_indices_impl.h: $(top_srcdir)/include/mesh/mesh_communication_global_indices_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_communication_impl.h: $(top_srcdir)/include/mesh/mesh_communication_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_function.h: $(top_srcdir)/include/mesh/mesh_function.h
@@ -1057,10 +1510,16 @@ mesh_function.h: $(top_srcdir)/include/mesh/mesh_function.h
 mesh_generation.h: $(top_srcdir)/include/mesh/mesh_generation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+mesh_generation_impl.h: $(top_srcdir)/include/mesh/mesh_generation_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 mesh_input.h: $(top_srcdir)/include/mesh/mesh_input.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_inserter_iterator.h: $(top_srcdir)/include/mesh/mesh_inserter_iterator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_iterators_impl.h: $(top_srcdir)/include/mesh/mesh_iterators_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_modification.h: $(top_srcdir)/include/mesh/mesh_modification.h
@@ -1070,6 +1529,9 @@ mesh_output.h: $(top_srcdir)/include/mesh/mesh_output.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_refinement.h: $(top_srcdir)/include/mesh/mesh_refinement.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_refinement_impl.h: $(top_srcdir)/include/mesh/mesh_refinement_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_serializer.h: $(top_srcdir)/include/mesh/mesh_serializer.h
@@ -1094,6 +1556,9 @@ mesh_tetgen_wrapper.h: $(top_srcdir)/include/mesh/mesh_tetgen_wrapper.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_tools.h: $(top_srcdir)/include/mesh/mesh_tools.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_tools_impl.h: $(top_srcdir)/include/mesh/mesh_tools_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_triangle_holes.h: $(top_srcdir)/include/mesh/mesh_triangle_holes.h
@@ -1129,6 +1594,9 @@ postscript_io.h: $(top_srcdir)/include/mesh/postscript_io.h
 replicated_mesh.h: $(top_srcdir)/include/mesh/replicated_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+replicated_mesh_impl.h: $(top_srcdir)/include/mesh/replicated_mesh_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1145,6 +1613,9 @@ ucd_io.h: $(top_srcdir)/include/mesh/ucd_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 unstructured_mesh.h: $(top_srcdir)/include/mesh/unstructured_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+unstructured_mesh_impl.h: $(top_srcdir)/include/mesh/unstructured_mesh_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 unv_io.h: $(top_srcdir)/include/mesh/unv_io.h
@@ -1340,6 +1811,9 @@ parallel_conversion_utils.h: $(top_srcdir)/include/parallel/parallel_conversion_
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_elem.h: $(top_srcdir)/include/parallel/parallel_elem.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_elem_impl.h: $(top_srcdir)/include/parallel/parallel_elem_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_ghost_sync.h: $(top_srcdir)/include/parallel/parallel_ghost_sync.h
@@ -1867,13 +2341,22 @@ plt_loader.h: $(top_srcdir)/include/utils/plt_loader.h
 point_locator_base.h: $(top_srcdir)/include/utils/point_locator_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+point_locator_base_impl.h: $(top_srcdir)/include/utils/point_locator_base_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 point_locator_tree.h: $(top_srcdir)/include/utils/point_locator_tree.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+point_locator_tree_impl.h: $(top_srcdir)/include/utils/point_locator_tree_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+raw_value.h: $(top_srcdir)/include/utils/raw_value.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
@@ -1894,13 +2377,22 @@ timestamp.h: $(top_srcdir)/include/utils/timestamp.h
 topology_map.h: $(top_srcdir)/include/utils/topology_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+topology_map_impl.h: $(top_srcdir)/include/utils/topology_map_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 tree.h: $(top_srcdir)/include/utils/tree.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tree_base.h: $(top_srcdir)/include/utils/tree_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+tree_impl.h: $(top_srcdir)/include/utils/tree_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 tree_node.h: $(top_srcdir)/include/utils/tree_node.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+tree_node_impl.h: $(top_srcdir)/include/utils/tree_node_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 utility.h: $(top_srcdir)/include/utils/utility.h

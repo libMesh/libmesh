@@ -25,8 +25,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class PointLocatorBase;
-class PeriodicBoundaries;
+template <typename> class PointLocatorBaseTempl;
+template <typename> class PeriodicBoundariesTempl;
 
 /**
  * The ElemInternal namespace holds helper functions that are used
@@ -351,14 +351,14 @@ active_family_tree_by_neighbor(T elem,
 
 
 
-template <class T>
+template <class T, typename RealType>
 void
 active_family_tree_by_topological_neighbor (T elem,
                                             std::vector<T> & family,
                                             T neighbor_in,
-                                            const MeshBase & mesh,
-                                            const PointLocatorBase & point_locator,
-                                            const PeriodicBoundaries * pb,
+                                            const MeshBaseTempl<RealType> & mesh,
+                                            const PointLocatorBaseTempl<RealType> & point_locator,
+                                            const PeriodicBoundariesTempl<RealType> * pb,
                                             bool reset = true)
 {
   // The "family tree" doesn't include subactive elements or

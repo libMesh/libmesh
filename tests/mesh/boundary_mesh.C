@@ -192,7 +192,7 @@ public:
 
         // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
-        if (pip == remote_elem)
+        if (pip == RemoteElem::get_instance())
           {
             CPPUNIT_ASSERT(elem->processor_id() != TestCommWorld->rank());
             continue;
@@ -224,7 +224,7 @@ public:
 
         // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
-        if (pip == remote_elem)
+        if (pip == RemoteElem::get_instance())
           {
             CPPUNIT_ASSERT(elem->processor_id() != TestCommWorld->rank());
             continue;
@@ -248,7 +248,7 @@ public:
 
         // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
-        if (pip == remote_elem)
+        if (pip == RemoteElem::get_instance())
           {
             CPPUNIT_ASSERT(elem->processor_id() != TestCommWorld->rank());
             continue;

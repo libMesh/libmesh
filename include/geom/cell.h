@@ -35,25 +35,29 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all 3D geometric element types.
  */
-class Cell : public Elem
+template <typename RealType = Real>
+class CellTempl : public ElemTempl<RealType>
 {
 public:
+  typedef CellTempl<RealType> Cell;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
+  typedef ElemTempl<RealType> Elem;
 
   /**
    * Constructor.
    */
-  Cell (const unsigned int nn,
-        const unsigned int ns,
-        Elem * p,
-        Elem ** elemlinkdata,
-        Node ** nodelinkdata) :
+  CellTempl (const unsigned int nn,
+             const unsigned int ns,
+             Elem * p,
+             Elem ** elemlinkdata,
+             Node ** nodelinkdata) :
     Elem (nn, ns, p, elemlinkdata, nodelinkdata) {}
 
-  Cell (Cell &&) = delete;
-  Cell (const Cell &) = delete;
+  CellTempl (Cell &&) = delete;
+  CellTempl (const Cell &) = delete;
   Cell & operator= (const Cell &) = delete;
   Cell & operator= (Cell &&) = delete;
-  virtual ~Cell() = default;
+  virtual ~CellTempl() = default;
 
   /**
    * \returns 3, the dimensionality of the object.
@@ -77,6 +81,26 @@ public:
 #endif
 };
 
+template <typename RealType>
+BoundingBoxTempl<RealType> CellTempl<RealType>::loose_bounding_box () const
+{
+  // This might have curved sides, but it's definitely *not* curving
+  // through 4-D space, so the full bounding box is just the merger of
+  // the sides' bounding boxes.
+
+  std::unique_ptr<const Elem> side_ptr { this->build_side_ptr(0, false) };
+  BoundingBox bbox = side_ptr->loose_bounding_box();
+  unsigned int my_n_sides = this->n_sides();
+  for (unsigned s=1; s < my_n_sides; ++s)
+    {
+      this->build_side_ptr(side_ptr, s);
+      bbox.union_with(side_ptr->loose_bounding_box());
+    }
+
+  return bbox;
+}
+
+typedef CellTempl<Real> Cell;
 
 } // namespace libMesh
 

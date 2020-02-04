@@ -36,7 +36,8 @@ namespace libMesh
 {
 
 // forward declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * This namespace implements singleton reference elements for each

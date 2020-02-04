@@ -32,12 +32,12 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
-class DistributedMesh;
+template <typename> class MeshBaseTempl;
+template <typename> class DistributedMeshTempl;
 
 // This is for backwards compatibility, but if your code relies on
 // forward declarations in our headers then fix it.
-class ParallelMesh;
+template <typename> class ParallelMeshTempl;
 
 /**
  * This is the \p MeshCommunication class.  It handles all the details
@@ -82,7 +82,8 @@ public:
    * It also broadcasts any boundary information the mesh has
    * associated with it.
    */
-  void broadcast (MeshBase &) const;
+  template <typename RealType>
+  void broadcast (MeshBaseTempl<RealType> &) const;
 
   /**
    * This method takes a parallel distributed mesh and redistributes
@@ -98,19 +99,22 @@ public:
    * Redistribution can also be done with newly coarsened elements'
    * neighbors only.
    */
-  void redistribute (DistributedMesh & mesh,
+  template <typename RealType>
+  void redistribute (DistributedMeshTempl<RealType> & mesh,
                      bool newly_coarsened_only = false) const;
 
   /**
    *
    */
-  void gather_neighboring_elements (DistributedMesh &) const;
+  template <typename RealType>
+  void gather_neighboring_elements (DistributedMeshTempl<RealType> &) const;
 
   /**
    * Examine a just-coarsened mesh, and for any newly-coarsened elements,
    * send the associated ghosted elements to the processor which needs them.
    */
-  void send_coarse_ghosts (MeshBase &) const;
+  template <typename RealType>
+  void send_coarse_ghosts (MeshBaseTempl<RealType> &) const;
 
   /**
    * This method takes an input \p DistributedMesh which may be
@@ -122,7 +126,8 @@ public:
    * case of \p root_id equal to \p DofObject::invalid_processor_id
    * this function performs an allgather.
    */
-  void gather (const processor_id_type root_id, DistributedMesh &) const;
+  template <typename RealType>
+  void gather (const processor_id_type root_id, DistributedMeshTempl<RealType> &) const;
 
   /**
    * This method takes an input \p DistributedMesh which may be
@@ -132,7 +137,8 @@ public:
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
-  void allgather (DistributedMesh & mesh) const
+  template <typename RealType>
+  void allgather (DistributedMeshTempl<RealType> & mesh) const
   { MeshCommunication::gather(DofObject::invalid_processor_id, mesh); }
 
   /**
@@ -149,7 +155,8 @@ public:
    * to delete.  These will be left on the current processor along with
    * local elements and ghosted neighbors.
    */
-  void delete_remote_elements (DistributedMesh &, const std::set<Elem *> &) const;
+  template <typename RealType>
+  void delete_remote_elements (DistributedMeshTempl<RealType> &, const std::set<ElemTempl<RealType> *> &) const;
 
   /**
    * This method assigns globally unique, partition-agnostic
@@ -161,20 +168,22 @@ public:
    * method can also be useful for identifying duplicate nodes
    * which may occur during parallel refinement.
    */
-  void assign_global_indices (MeshBase &) const;
+  template <typename RealType>
+  void assign_global_indices (MeshBaseTempl<RealType> &) const;
 
   /**
    * Throw an error if we have any index clashes in the numbering used by
    * assign_global_indices.
    */
-  void check_for_duplicate_global_indices (MeshBase & ) const;
+  template <typename RealType>
+  void check_for_duplicate_global_indices (MeshBaseTempl<RealType> & ) const;
 
   /**
    * This method determines a locally unique, contiguous
    * index for each object in the input range.
    */
-  template <typename ForwardIterator>
-  void find_local_indices (const libMesh::BoundingBox &,
+  template <typename RealType, typename ForwardIterator>
+  void find_local_indices (const libMesh::BoundingBoxTempl<RealType> &,
                            const ForwardIterator &,
                            const ForwardIterator &,
                            std::unordered_map<dof_id_type, dof_id_type> &) const;
@@ -183,9 +192,9 @@ public:
    * This method determines a globally unique, partition-agnostic
    * index for each object in the input range.
    */
-  template <typename ForwardIterator>
+  template <typename RealType, typename ForwardIterator>
   void find_global_indices (const Parallel::Communicator & communicator,
-                            const libMesh::BoundingBox &,
+                            const libMesh::BoundingBoxTempl<RealType> &,
                             const ForwardIterator &,
                             const ForwardIterator &,
                             std::vector<dof_id_type> &) const;
@@ -193,13 +202,15 @@ public:
   /**
    * Copy ids of ghost elements from their local processors.
    */
-  void make_elems_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_elems_parallel_consistent (MeshBaseTempl<RealType> &);
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Copy p levels of ghost elements from their local processors.
    */
-  void make_p_levels_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_p_levels_parallel_consistent (MeshBaseTempl<RealType> &);
 #endif // LIBMESH_ENABLE_AMR
 
   /**
@@ -207,41 +218,47 @@ public:
    * assuming all processor ids are parallel consistent, this function makes
    * all other ids parallel consistent.
    */
-  void make_node_ids_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_node_ids_parallel_consistent (MeshBaseTempl<RealType> &);
 
   /**
    * Assuming all unique_ids on local nodes are globally unique, and
    * assuming all processor ids are parallel consistent, this function makes
    * all ghost unique_ids parallel consistent.
    */
-  void make_node_unique_ids_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_node_unique_ids_parallel_consistent (MeshBaseTempl<RealType> &);
 
   /**
    * Assuming all processor ids on nodes touching local elements
    * are parallel consistent, this function makes all other processor ids
    * parallel consistent as well.
    */
-  void make_node_proc_ids_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_node_proc_ids_parallel_consistent (MeshBaseTempl<RealType> &);
 
   /**
    * Assuming all processor ids on nodes touching local elements
    * are parallel consistent, this function makes processor ids
    * on new nodes on other processors parallel consistent as well.
    */
-  void make_new_node_proc_ids_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_new_node_proc_ids_parallel_consistent (MeshBaseTempl<RealType> &);
 
   /**
    * Copy processor_ids and ids on ghost nodes from their
    * local processors.  This is useful for code which wants to add
    * nodes to a distributed mesh.
    */
-  void make_nodes_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_nodes_parallel_consistent (MeshBaseTempl<RealType> &);
 
   /**
    * Copy processor_ids and ids on new nodes from their local
    * processors.
    */
-  void make_new_nodes_parallel_consistent (MeshBase &);
+  template <typename RealType>
+  void make_new_nodes_parallel_consistent (MeshBaseTempl<RealType> &);
 };
 
 
@@ -251,26 +268,30 @@ public:
 // that are either on or connected to processor id \p pid.  Ask only
 // for elements in the range from \p elem_it before \p elem_end;
 // typically this may be mesh.active_pid_elements_*(pid)
-void query_ghosting_functors(const MeshBase & mesh,
+template <typename RealType>
+void query_ghosting_functors(const MeshBaseTempl<RealType> & mesh,
                              processor_id_type pid,
-                             MeshBase::const_element_iterator elem_it,
-                             MeshBase::const_element_iterator elem_end,
-                             std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+                             typename MeshBaseTempl<RealType>::const_element_iterator elem_it,
+                             typename MeshBaseTempl<RealType>::const_element_iterator elem_end,
+                             std::set<const ElemTempl<RealType> *, CompareElemIdsByLevel> & connected_elements);
 
 // Take a set of elements and insert all immediate
 // children of elements in the given range
-void connect_children(const MeshBase & mesh,
-                      MeshBase::const_element_iterator elem_it,
-                      MeshBase::const_element_iterator elem_end,
-                      std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+template <typename RealType>
+void connect_children(const MeshBaseTempl<RealType> & mesh,
+                      typename MeshBaseTempl<RealType>::const_element_iterator elem_it,
+                      typename MeshBaseTempl<RealType>::const_element_iterator elem_end,
+                      std::set<const ElemTempl<RealType> *, CompareElemIdsByLevel> & connected_elements);
 
 // Take a set of elements and insert all elements' ancestors and
 // subactive descendants as well.
-void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+template <typename RealType>
+void connect_families(std::set<const ElemTempl<RealType> *, CompareElemIdsByLevel> & connected_elements);
 
 // Take a set of elements and create a set of connected nodes.
-void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
-                      std::set<const Node *> & connected_nodes);
+template <typename RealType>
+void reconnect_nodes (const std::set<const ElemTempl<RealType> *, CompareElemIdsByLevel> & connected_elements,
+                      std::set<const NodeTempl<RealType> *> & connected_nodes);
 
 
 

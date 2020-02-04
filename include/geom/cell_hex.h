@@ -26,6 +26,9 @@
 namespace libMesh
 {
 
+template <typename>
+class Hex8Templ;
+
 /**
  * The \p Hex is an element in 3D with 6 sides.
  *
@@ -33,27 +36,33 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all hexahedral element types.
  */
-class Hex : public Cell
+template <typename RealType = Real>
+class HexTempl : public CellTempl<RealType>
 {
 public:
+  typedef HexTempl<RealType> Hex;
+  typedef Hex8Templ<RealType> Hex8;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Default brick element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Hex(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
-    Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata)
+  HexTempl(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
+      Cell(nn, HexTempl<RealType>::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 3)
       this->set_interior_parent(nullptr);
   }
 
-  Hex (Hex &&) = delete;
-  Hex (const Hex &) = delete;
+  HexTempl (Hex &&) = delete;
+  HexTempl (const Hex &) = delete;
   Hex & operator= (const Hex &) = delete;
   Hex & operator= (Hex &&) = delete;
-  virtual ~Hex() = default;
+  virtual ~HexTempl() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -121,7 +130,7 @@ public:
   /**
    * Don't hide Elem::key() defined in the base class.
    */
-  using Elem::key;
+  using ElemTempl<RealType>::key;
 
   /**
    * \returns An id associated with the \p s side of this element.
@@ -197,6 +206,125 @@ protected:
    */
   static const int _child_node_lookup[8][27];
 };
+
+// ------------------------------------------------------------
+// Hex class static member initializations
+
+template <typename RealType>
+const Real HexTempl<RealType>::_master_points[27][3] =
+  {
+    {-1, -1, -1},
+    {1, -1, -1},
+    {1, 1, -1},
+    {-1, 1, -1},
+    {-1, -1, 1},
+    {1, -1, 1},
+    {1, 1, 1},
+    {-1, 1, 1},
+    {0, -1, -1},
+    {1, 0, -1},
+    {0, 1, -1},
+    {-1, 0, -1},
+    {-1, -1, 0},
+    {1, -1, 0},
+    {1, 1, 0},
+    {-1, 1, 0},
+    {0, -1, 1},
+    {1, 0, 1},
+    {0, 1, 1},
+    {-1, 0, 1},
+    {0, 0, -1},
+    {0, -1, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {-1, 0, 0},
+    {0, 0, 1}
+  };
+
+template <typename RealType>
+const unsigned short int HexTempl<RealType>::_second_order_vertex_child_number[27] =
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    0,1,2,0,0,1,2,3,4,5,6,5, // Edges
+    0,0,1,2,0,4,             // Faces
+    0                        // Interior
+  };
+
+
+
+template <typename RealType>
+const unsigned short int HexTempl<RealType>::_second_order_vertex_child_index[27] =
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    1,2,3,3,4,5,6,7,5,6,7,7, // Edges
+    2,5,6,7,7,6,             // Faces
+    6                        // Interior
+  };
+
+
+template <typename RealType>
+const unsigned short int HexTempl<RealType>::_second_order_adjacent_vertices[12][2] =
+  {
+    { 0,  1}, // vertices adjacent to node 8
+    { 1,  2}, // vertices adjacent to node 9
+    { 2,  3}, // vertices adjacent to node 10
+    { 0,  3}, // vertices adjacent to node 11
+
+    { 0,  4}, // vertices adjacent to node 12
+    { 1,  5}, // vertices adjacent to node 13
+    { 2,  6}, // vertices adjacent to node 14
+    { 3,  7}, // vertices adjacent to node 15
+
+    { 4,  5}, // vertices adjacent to node 16
+    { 5,  6}, // vertices adjacent to node 17
+    { 6,  7}, // vertices adjacent to node 18
+    { 4,  7}  // vertices adjacent to node 19
+  };
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+// We number 125 "possible node locations" for a 2x2x2 refinement of
+// hexes with up to 3x3x3 nodes each
+template <typename RealType>
+const int HexTempl<RealType>::_child_node_lookup[8][27] =
+  {
+    // node lookup for child 0 (near node 0)
+    { 0, 2, 12, 10,  50, 52, 62, 60,  1, 7, 11, 5,  25, 27, 37, 35,
+      51, 57, 61, 55,  6,  26, 32, 36, 30,  56,  31},
+
+    // node lookup for child 1 (near node 1)
+    { 2, 4, 14, 12,  52, 54, 64, 62,  3, 9, 13, 7,  27, 29, 39, 37,
+      53, 59, 63, 57,  8,  28, 34, 38, 32,  58,  33},
+
+    // node lookup for child 2 (near node 3)
+    { 10, 12, 22, 20,  60, 62, 72, 70,  11, 17, 21, 15,  35, 37, 47, 45,
+      61, 67, 71, 65,  16,  36, 42, 46, 40,  66,  41},
+
+    // node lookup for child 3 (near node 2)
+    { 12, 14, 24, 22,  62, 64, 74, 72,  13, 19, 23, 17,  37, 39, 49, 47,
+      63, 69, 73, 67,  18,  38, 44, 48, 42,  68,  43},
+
+    // node lookup for child 4 (near node 4)
+    { 50, 52, 62, 60,  100, 102, 112, 110,  51, 57, 61, 55,  75, 77, 87, 85,
+      101, 107, 111, 105,  56,  76, 82, 86, 80,  106,  81},
+
+    // node lookup for child 5 (near node 5)
+    { 52, 54, 64, 62,  102, 104, 114, 112,  53, 59, 63, 57,  77, 79, 89, 87,
+      103, 109, 113, 107,  58,  78, 84, 88, 82,  108,  93},
+
+    // node lookup for child 6 (near node 7)
+    { 60, 62, 72, 70,  110, 112, 122, 120,  61, 67, 71, 65,  85, 87, 97, 95,
+      111, 117, 121, 115,  66,  86, 92, 96, 90,  116,  91},
+
+    // node lookup for child 7 (near node 6)
+    { 62, 64, 74, 72,  112, 114, 124, 122,  63, 69, 73, 67,  87, 89, 99, 97,
+      113, 119, 123, 117,  68,  88, 94, 98, 92,  118,  103}
+  };
+
+#endif // LIBMESH_ENABLE_AMR
+
+typedef HexTempl<Real> Hex;
 
 } // namespace libMesh
 

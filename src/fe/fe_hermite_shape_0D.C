@@ -15,98 +15,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-// C++ includes
-
 // Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+#include "libmesh/fe_hermite_shape_0D_impl.h"
 
 namespace libMesh
 {
 
-
-
-
-template <>
-Real FE<0,HERMITE>::shape(const ElemType,
-                          const Order,
-                          const unsigned int libmesh_dbg_var(i),
-                          const Point &)
-{
-  libmesh_assert_less (i, 1);
-  return 1.;
-}
-
-
-
-template <>
-Real FE<0,HERMITE>::shape(const Elem *,
-                          const Order,
-                          const unsigned int libmesh_dbg_var(i),
-                          const Point &,
-                          const bool)
-{
-  libmesh_assert_less (i, 1);
-  return 1.;
-}
-
-
-
-template <>
-Real FE<0,HERMITE>::shape_deriv(const ElemType,
-                                const Order,
-                                const unsigned int,
-                                const unsigned int,
-                                const Point &)
-{
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
-}
-
-
-
-template <>
-Real FE<0,HERMITE>::shape_deriv(const Elem *,
-                                const Order,
-                                const unsigned int,
-                                const unsigned int,
-                                const Point &,
-                                const bool)
-{
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
-}
-
-
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-template <>
-Real FE<0,HERMITE>::shape_second_deriv(const ElemType,
-                                       const Order,
-                                       const unsigned int,
-                                       const unsigned int,
-                                       const Point &)
-{
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
-}
-
-
-
-template <>
-Real FE<0,HERMITE>::shape_second_deriv(const Elem *,
-                                       const Order,
-                                       const unsigned int,
-                                       const unsigned int,
-                                       const Point &,
-                                       const bool)
-{
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
-}
-
-#endif
+// Explicit instantiation for Real
+template class FE<0,HERMITE,Real>;
 
 } // namespace libMesh

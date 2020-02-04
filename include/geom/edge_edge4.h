@@ -41,22 +41,29 @@ namespace libMesh
  * \date 2005
  * \brief A 1D geometric element with 4 nodes.
  */
-class Edge4 final : public Edge
+template <typename RealType = Real>
+class Edge4Templ final : public EdgeTempl<RealType>
 {
 public:
+  typedef Edge4Templ<RealType> Edge4;
+  using typename EdgeTempl<RealType>::Edge;
+  using typename EdgeTempl<RealType>::Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor. By default this element has no parent.
    */
   explicit
-  Edge4 (Elem * p=nullptr) :
+  Edge4Templ (Elem * p=nullptr) :
     Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
 
-  Edge4 (Edge4 &&) = delete;
-  Edge4 (const Edge4 &) = delete;
+  Edge4Templ (Edge4 &&) = delete;
+  Edge4Templ (const Edge4 &) = delete;
   Edge4 & operator= (const Edge4 &) = delete;
   Edge4 & operator= (Edge4 &&) = delete;
-  virtual ~Edge4() = default;
+  virtual ~Edge4Templ() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -173,7 +180,7 @@ public:
    * An optimized method for approximating the length of an
    * EDGE4 using quadrature.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * Geometric constants for Edge4.
@@ -211,6 +218,38 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
+
+template <typename RealType>
+const int Edge4Templ<RealType>::num_nodes;
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Edge4Templ<RealType>::_embedding_matrix[Edge4::num_children][Edge4::num_nodes][Edge4::num_nodes] =
+  {
+    // embedding matrix for child 0
+
+    {
+      // 0       1       2        3        // Shape function index
+      {1.0,      0.0,    0.0,     0.0},    // left,  xi = -1
+      {-0.0625, -0.0625, 0.5625,  0.5625}, // right, xi = 0
+      {0.3125,   0.0625, 0.9375, -0.3125}, // middle left,  xi = -2/3
+      {0.0,      0.0,    1.0,     0.0}     // middle right, xi = -1/3
+    },
+
+    // embedding matrix for child 1
+    {
+      // 0       1        2        3        // Shape function index
+      {-0.0625, -0.0625,  0.5625,  0.5625}, // left,  xi = 0
+      {0.0,      1.0,     0.0,     0.0},    // right, xi = 1
+      {0.0,      0.0,     0.0,     1.0},    // middle left,  xi = 1/3
+      {0.0625,   0.3125, -0.3125,  0.9375}  // middle right, xi = 2/3
+    }
+  };
+
+#endif
+
+typedef Edge4Templ<Real> Edge4;
 
 } // namespace libMesh
 

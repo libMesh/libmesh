@@ -67,7 +67,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 
 /**
  * This is the \p ExodusII_IO_Helper class.  This class hides the

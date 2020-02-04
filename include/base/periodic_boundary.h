@@ -26,13 +26,15 @@
 // Local Includes
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/vector_value.h" // RealVectorValue
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/libmesh.h" // libMesh::invalid_uinit
 
 namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
-class MeshBase;
+template <typename> class ElemTempl;
+template <typename> class MeshBaseTempl;
 
 /**
  * The definition of a periodic boundary.
@@ -41,28 +43,35 @@ class MeshBase;
  * \date 2010
  * \brief Used for implementing periodic BCs via constraints.
  */
-class PeriodicBoundary : public PeriodicBoundaryBase
+template <typename RealType = Real>
+class PeriodicBoundaryTempl : public PeriodicBoundaryBaseTempl<RealType>
 {
 public:
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PeriodicBoundaryTempl<RealType> PeriodicBoundary;
+  typedef PeriodicBoundaryBaseTempl<RealType> PeriodicBoundaryBase;
+
   /**
    * Constructor
    */
-  PeriodicBoundary();
+  PeriodicBoundaryTempl();
 
   /**
    * Destructor
    */
-  virtual ~PeriodicBoundary() {}
+  virtual ~PeriodicBoundaryTempl() {}
 
   /**
    * Copy constructor, with option for the copy to represent an inverse transformation.
    */
-  PeriodicBoundary(const PeriodicBoundary & o, TransformationType t = FORWARD);
+  PeriodicBoundaryTempl(const PeriodicBoundary & o, TransformationType t = FORWARD);
 
   /**
    * Constructor taking a reference to the translation vector.
    */
-  PeriodicBoundary(const RealVectorValue & vector);
+  PeriodicBoundaryTempl(const RealVectorValue & vector);
 
   /**
    * This function should be overridden by derived classes to
@@ -84,6 +93,54 @@ protected:
   // to produce corresponding points in pairedboundary
   RealVectorValue translation_vector;
 };
+
+template <typename RealType>
+PeriodicBoundaryTempl<RealType>::PeriodicBoundaryTempl() :
+  PeriodicBoundaryBase(),
+  translation_vector()
+{
+}
+
+
+
+template <typename RealType>
+PeriodicBoundaryTempl<RealType>::PeriodicBoundaryTempl(const PeriodicBoundary & o, TransformationType t) :
+  PeriodicBoundaryBase(o),
+  translation_vector(o.translation_vector)
+{
+  if (t == INVERSE)
+    {
+      std::swap(myboundary, pairedboundary);
+      translation_vector *= -1.0;
+    }
+}
+
+
+
+template <typename RealType>
+PeriodicBoundaryTempl<RealType>::PeriodicBoundaryTempl(const RealVectorValue & vector) :
+  PeriodicBoundaryBase(),
+  translation_vector(vector)
+{
+}
+
+
+
+template <typename RealType>
+PointTempl<RealType> PeriodicBoundaryTempl<RealType>::get_corresponding_pos(const Point & pt) const
+{
+  return pt + translation_vector;
+}
+
+
+
+template <typename RealType>
+std::unique_ptr<PeriodicBoundaryBaseTempl<RealType>> PeriodicBoundaryTempl<RealType>::clone(TransformationType t) const
+{
+  return libmesh_make_unique<PeriodicBoundary>(*this, t);
+}
+
+typedef PeriodicBoundaryTempl<Real> PeriodicBoundary;
 
 } // namespace libmesh
 

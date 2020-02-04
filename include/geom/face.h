@@ -34,26 +34,29 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all 2D geometric element types.
  */
-class Face : public Elem
+template <typename RealType>
+class FaceTempl : public ElemTempl<RealType>
 {
 public:
+  typedef FaceTempl<RealType> Face;
+  typedef ElemTempl<RealType> Elem;
 
   /**
    * Constructor.  Explicitly specifies the number of
    * nodes and neighbors for which storage will be allocated.
    */
-  Face (const unsigned int nn,
-        const unsigned int ns,
-        Elem * p,
-        Elem ** elemlinkdata,
-        Node ** nodelinkdata) :
+  FaceTempl (const unsigned int nn,
+             const unsigned int ns,
+             Elem * p,
+             Elem ** elemlinkdata,
+             Node ** nodelinkdata) :
     Elem(nn, ns, p, elemlinkdata, nodelinkdata) {}
 
-  Face (Face &&) = delete;
-  Face (const Face &) = delete;
+  FaceTempl (Face &&) = delete;
+  FaceTempl (const Face &) = delete;
   Face & operator= (const Face &) = delete;
   Face & operator= (Face &&) = delete;
-  virtual ~Face() = default;
+  virtual ~FaceTempl() = default;
 
   /**
    * \returns 2, the dimensionality of the object.
@@ -70,7 +73,7 @@ public:
    * build_side and build_edge are identical for faces.
    */
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override final
-  { return build_side_ptr(i); }
+  { return this->build_side_ptr(i); }
 
   /**
    * is_edge_on_side is trivial in 2D.
@@ -90,6 +93,8 @@ public:
 #endif
 
 };
+
+typedef FaceTempl<Real> Face;
 
 } // namespace libMesh
 

@@ -31,9 +31,11 @@ namespace libMesh
 {
 
 // Forward Declarations
-class MeshBase;
-class Point;
-class Elem;
+template <typename> class MeshBaseTempl;
+template <typename> class PointTempl;
+template <typename> class ElemTempl;
+template <typename> class NodeTempl;
+template <typename> class BoundingBoxTempl;
 
 /**
  * This is a point locator.  It locates points in space
@@ -45,9 +47,19 @@ class Elem;
  * \author Daniel Dreyer
  * \date 2003
  */
-class PointLocatorTree : public PointLocatorBase
+template <typename RealType = Real>
+class PointLocatorTreeTempl : public PointLocatorBaseTempl<RealType>
 {
 public:
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+  typedef PointLocatorTreeTempl<RealType> PointLocatorTree;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
+  typedef TreeBaseTempl<RealType> TreeBase;
+
   /**
    * Constructor.  Needs the \p mesh in which the points
    * should be located.  Optionally takes a master
@@ -56,8 +68,8 @@ public:
    * master locator holds a  tree, the others simply
    * use the master's tree.
    */
-  PointLocatorTree (const MeshBase & mesh,
-                    const PointLocatorBase * master = nullptr);
+  PointLocatorTreeTempl (const MeshBase & mesh,
+                         const PointLocatorBase * master = nullptr);
 
 
   /**
@@ -71,14 +83,14 @@ public:
    * use the master's tree. Allows the user to specify
    * the build type.
    */
-  PointLocatorTree (const MeshBase & mesh,
-                    const Trees::BuildType build_type,
-                    const PointLocatorBase * master = nullptr);
+  PointLocatorTreeTempl (const MeshBase & mesh,
+                         const Trees::BuildType build_type,
+                         const PointLocatorBase * master = nullptr);
 
   /**
    * Destructor.
    */
-  ~PointLocatorTree ();
+  ~PointLocatorTreeTempl ();
 
   /**
    * Clears the locator.  This function frees dynamic memory with "delete".
@@ -193,6 +205,8 @@ protected:
    */
   Trees::BuildType _build_type;
 };
+
+typedef PointLocatorTreeTempl<Real> PointLocatorTree;
 
 } // namespace libMesh
 

@@ -25,7 +25,9 @@
 
 namespace libMesh
 {
-
+template <typename> class Prism6Templ;
+template <typename> class Quad4Templ;
+template <typename> class Tri3Templ;
 /**
  * The \p Prism is an element in 3D with 5 sides.
  *
@@ -33,15 +35,24 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all prismatic element types.
  */
-class Prism : public Cell
+template <typename RealType = Real>
+class PrismTempl : public CellTempl<RealType>
 {
 public:
+  typedef CellTempl<RealType> Cell;
+  typedef PrismTempl<RealType> Prism;
+  typedef Prism6Templ<RealType> Prism6;
+  typedef Quad4Templ<RealType> Quad4;
+  typedef Tri3Templ<RealType> Tri3;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Default prismatic element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Prism(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
+  PrismTempl(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Cell(nn, Prism::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -49,11 +60,11 @@ public:
       this->set_interior_parent(nullptr);
   }
 
-  Prism (Prism &&) = delete;
-  Prism (const Prism &) = delete;
+  PrismTempl (Prism &&) = delete;
+  PrismTempl (const Prism &) = delete;
   Prism & operator= (const Prism &) = delete;
   Prism & operator= (Prism &&) = delete;
-  virtual ~Prism() = default;
+  virtual ~PrismTempl() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -168,6 +179,72 @@ protected:
    */
   static const Real _master_points[18][3];
 };
+
+// ------------------------------------------------------------
+// Prism class static member initializations
+
+
+// We need to require C++11...
+template <typename RealType>
+const Real PrismTempl<RealType>::_master_points[18][3] =
+  {
+    {0, 0, -1},
+    {1, 0, -1},
+    {0, 1, -1},
+    {0, 0, 1},
+    {1, 0, 1},
+    {0, 1, 1},
+    {0.5, 0, -1},
+    {0.5, 0.5, -1},
+    {0, 0.5, -1},
+    {0, 0, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {0.5, 0, 1},
+    {0.5, 0.5, 1},
+    {0, 0.5, 1},
+    {0.5, 0, 0},
+    {0.5, 0.5, 0},
+    {0, 0.5, 0}
+  };
+
+template <typename RealType>
+const unsigned short int PrismTempl<RealType>::_second_order_vertex_child_number[18] =
+  {
+    99,99,99,99,99,99, // Vertices
+    0,1,0,0,1,2,3,4,3, // Edges
+    0,1,0              // Faces
+  };
+
+
+
+template <typename RealType>
+const unsigned short int PrismTempl<RealType>::_second_order_vertex_child_index[18] =
+  {
+    99,99,99,99,99,99, // Vertices
+    1,2,2,3,4,5,4,5,5, // Edges
+    4,5,5              // Faces
+  };
+
+
+template <typename RealType>
+const unsigned short int PrismTempl<RealType>::_second_order_adjacent_vertices[9][2] =
+  {
+    { 0,  1}, // vertices adjacent to node 6
+    { 1,  2}, // vertices adjacent to node 7
+    { 0,  2}, // vertices adjacent to node 8
+
+    { 0,  3}, // vertices adjacent to node 9
+    { 1,  4}, // vertices adjacent to node 10
+    { 2,  5}, // vertices adjacent to node 11
+
+    { 3,  4}, // vertices adjacent to node 12
+    { 4,  5}, // vertices adjacent to node 13
+    { 3,  5}  // vertices adjacent to node 14
+  };
+
+
+typedef PrismTempl<Real> Prism;
 
 } // namespace libMesh
 

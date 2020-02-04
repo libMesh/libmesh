@@ -28,8 +28,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class Point;
-class Node;
+template <typename> class PointTempl;
+template <typename> class NodeTempl;
 
 /**
  * This defines the \p Side class.  A \p Side is basically a proxy

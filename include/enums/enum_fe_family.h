@@ -93,6 +93,14 @@ enum FEFieldType : int {
                   TYPE_SCALAR = 0,
                   TYPE_VECTOR};
 
+template <FEFamily> struct UnderlyingFEFamily;
+
+template <>
+struct UnderlyingFEFamily<RATIONAL_BERNSTEIN>
+{
+  static constexpr FEFamily value = BERNSTEIN;
+};
+
 }
 
 #endif

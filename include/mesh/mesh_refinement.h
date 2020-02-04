@@ -39,13 +39,14 @@ namespace libMesh
 {
 
 // Forward Declarations
-class MeshBase;
-class Point;
-class Node;
+template <typename> class MeshBaseTempl;
+template <typename> class PointTempl;
+template <typename> class NodeTempl;
 class ErrorVector;
-class PeriodicBoundaries;
-class Elem;
-class PointLocatorBase;
+template <typename> class PeriodicBoundariesTempl;
+template <typename> class ElemTempl;
+template <typename> class RemoteElemTempl;
+template <typename> class PointLocatorBaseTempl;
 
 /**
  * \brief Implements (adaptive) mesh refinement algorithms for a \p MeshBase.
@@ -58,21 +59,30 @@ class PointLocatorBase;
  * \date 2002-2007
  * \brief Responsible for mesh refinement algorithms and data.
  */
-class MeshRefinement : public ParallelObject
+template <typename RealType = Real>
+class MeshRefinementTempl : public ParallelObject
 {
 public:
+  typedef MeshRefinementTempl<RealType> MeshRefinement;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef ElemTempl<RealType> Elem;
+  typedef RemoteElemTempl<RealType> RemoteElem;
+  typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+  typedef PeriodicBoundariesTempl<RealType> PeriodicBoundaries;
 
   /**
    * Constructor.
    */
   explicit
-  MeshRefinement (MeshBase & mesh);
+  MeshRefinementTempl (MeshBase & mesh);
 
 private:
   // Both the copy ctor and the assignment operator are
   // declared private but not implemented.  This is the
   // standard practice to prevent them from being used.
-  MeshRefinement (const MeshRefinement &);
+  MeshRefinementTempl (const MeshRefinement &);
   MeshRefinement & operator=(const MeshRefinement &);
 
 public:
@@ -107,7 +117,7 @@ public:
   /**
    * Destructor. Deletes all the elements that are currently stored.
    */
-  ~MeshRefinement ();
+  ~MeshRefinementTempl ();
 
   /**
    * Deletes all the data that are currently stored.
@@ -865,93 +875,108 @@ private:
 #endif
 };
 
-
+typedef MeshRefinementTempl<Real> MeshRefinement;
 
 // ------------------------------------------------------------
 // MeshRefinement class inline members
 
-inline bool & MeshRefinement::coarsen_by_parents()
+template <typename RealType>
+inline bool & MeshRefinementTempl<RealType>::coarsen_by_parents()
 {
   _use_member_parameters = true;
   return _coarsen_by_parents;
 }
 
-inline Real & MeshRefinement::refine_fraction()
+template <typename RealType>
+inline Real & MeshRefinementTempl<RealType>::refine_fraction()
 {
   _use_member_parameters = true;
   return _refine_fraction;
 }
 
-inline Real & MeshRefinement::coarsen_fraction()
+template <typename RealType>
+inline Real & MeshRefinementTempl<RealType>::coarsen_fraction()
 {
   _use_member_parameters = true;
   return _coarsen_fraction;
 }
 
-inline unsigned int & MeshRefinement::max_h_level()
+template <typename RealType>
+inline unsigned int & MeshRefinementTempl<RealType>::max_h_level()
 {
   _use_member_parameters = true;
   return _max_h_level;
 }
 
-inline Real & MeshRefinement::coarsen_threshold()
+template <typename RealType>
+inline Real & MeshRefinementTempl<RealType>::coarsen_threshold()
 {
   _use_member_parameters = true;
   return _coarsen_threshold;
 }
 
-inline dof_id_type & MeshRefinement::nelem_target()
+template <typename RealType>
+inline dof_id_type & MeshRefinementTempl<RealType>::nelem_target()
 {
   _use_member_parameters = true;
   return _nelem_target;
 }
 
-inline Real & MeshRefinement::absolute_global_tolerance()
+template <typename RealType>
+inline Real & MeshRefinementTempl<RealType>::absolute_global_tolerance()
 {
   _use_member_parameters = true;
   return _absolute_global_tolerance;
 }
 
-inline unsigned char & MeshRefinement::face_level_mismatch_limit()
+template <typename RealType>
+inline unsigned char & MeshRefinementTempl<RealType>::face_level_mismatch_limit()
 {
   return _face_level_mismatch_limit;
 }
 
-inline unsigned char & MeshRefinement::edge_level_mismatch_limit()
+template <typename RealType>
+inline unsigned char & MeshRefinementTempl<RealType>::edge_level_mismatch_limit()
 {
   return _edge_level_mismatch_limit;
 }
 
-inline unsigned char & MeshRefinement::node_level_mismatch_limit()
+template <typename RealType>
+inline unsigned char & MeshRefinementTempl<RealType>::node_level_mismatch_limit()
 {
   return _node_level_mismatch_limit;
 }
 
-inline signed char & MeshRefinement::overrefined_boundary_limit()
+template <typename RealType>
+inline signed char & MeshRefinementTempl<RealType>::overrefined_boundary_limit()
 {
   return _overrefined_boundary_limit;
 }
 
-inline signed char & MeshRefinement::underrefined_boundary_limit()
+template <typename RealType>
+inline signed char & MeshRefinementTempl<RealType>::underrefined_boundary_limit()
 {
   return _underrefined_boundary_limit;
 }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
-inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()
+template <typename RealType>
+inline bool MeshRefinementTempl<RealType>::get_enforce_mismatch_limit_prior_to_refinement()
 {
   libmesh_deprecated();
   return enforce_mismatch_limit_prior_to_refinement();
 }
 
-inline void MeshRefinement::set_enforce_mismatch_limit_prior_to_refinement(bool enforce)
+template <typename RealType>
+inline void MeshRefinementTempl<RealType>::set_enforce_mismatch_limit_prior_to_refinement(bool enforce)
 {
   libmesh_deprecated();
   enforce_mismatch_limit_prior_to_refinement() = enforce;
 }
 #endif
 
-inline bool & MeshRefinement::enforce_mismatch_limit_prior_to_refinement()
+template <typename RealType>
+inline bool & MeshRefinementTempl<RealType>::enforce_mismatch_limit_prior_to_refinement()
 {
   return _enforce_mismatch_limit_prior_to_refinement;
 }

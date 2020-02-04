@@ -34,8 +34,11 @@ namespace libMesh
 // Forward declarations
 class EquationSystems;
 class ExodusII_IO_Helper;
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 class System;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 
 /**
  * The \p ExodusII_IO class implements reading meshes in the

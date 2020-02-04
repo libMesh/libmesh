@@ -31,16 +31,15 @@
 namespace libMesh
 {
 
-
 // forward declarations
-class BoundaryInfo;
+template <typename> class BoundaryInfoTempl;
 class DofConstraints;
 class DofMap;
-class Elem;
+template <typename> class ElemTempl;
 class FEType;
 class FEComputeData;
-class Point;
-class MeshBase;
+template <typename> class PointTempl;
+template <typename> class MeshBaseTempl;
 enum FEFamily : int;
 enum Order : int;
 enum FEFieldType : int;
@@ -48,9 +47,49 @@ enum ElemType : int;
 enum FEContinuity : int;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-class PeriodicBoundaries;
-class PointLocatorBase;
+template <typename> class PeriodicBoundariesTempl;
+typedef PeriodicBoundariesTempl<Real> PeriodicBoundaries;
+template <typename> class PointLocatorBaseTempl;
+typedef PointLocatorBaseTempl<Real> PointLocatorBase;
 #endif
+
+template <typename, typename> struct FEInterfaceShim;
+
+template <typename RealType>
+struct FEInterfaceShim<RealType, RealType>
+{
+  static void shape(const unsigned int dim,
+                    const FEType & fe_t,
+                    const ElemType t,
+                    const unsigned int i,
+                    const PointTempl<RealType> & p,
+                    RealType & phi);
+
+  static void shape(const unsigned int dim,
+                    const FEType & fe_t,
+                    const ElemTempl<RealType> * elem,
+                    const unsigned int i,
+                    const PointTempl<RealType> & p,
+                    RealType & phi);
+};
+
+template <typename RealType, template <typename> class Wrapper>
+struct FEInterfaceShim<RealType, Wrapper<RealType>>
+{
+  static void shape(const unsigned int dim,
+                    const FEType & fe_t,
+                    const ElemType t,
+                    const unsigned int i,
+                    const PointTempl<RealType> & p,
+                    Wrapper<RealType> & phi);
+
+  static void shape(const unsigned int dim,
+                    const FEType & fe_t,
+                    const ElemTempl<RealType> * elem,
+                    const unsigned int i,
+                    const PointTempl<RealType> & p,
+                    Wrapper<RealType> & phi);
+};
 
 /**
  * This class provides an encapsulated access to all static
@@ -107,9 +146,10 @@ public:
    * the right number of dofs when working with p-refined elements. See,
    * e.g. FEInterface::compute_data().
    */
+  template <typename RealType>
   static unsigned int n_dofs(const unsigned int dim,
                              const FEType & fe_t,
-                             const Elem * elem);
+                             const ElemTempl<RealType> * elem);
 
   /**
    * \returns The number of dofs at node n for a finite element
@@ -153,7 +193,8 @@ public:
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
-  static void dofs_on_side(const Elem * const elem,
+  template <typename RealType>
+  static void dofs_on_side(const ElemTempl<RealType> * const elem,
                            const unsigned int dim,
                            const FEType & fe_t,
                            unsigned int s,
@@ -166,7 +207,8 @@ public:
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
-  static void dofs_on_edge(const Elem * const elem,
+  template <typename RealType>
+  static void dofs_on_edge(const ElemTempl<RealType> * const elem,
                            const unsigned int dim,
                            const FEType & fe_t,
                            unsigned int e,
@@ -183,38 +225,42 @@ public:
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
+  template <typename RealType>
   static void nodal_soln(const unsigned int dim,
                          const FEType & fe_t,
-                         const Elem * elem,
+                         const ElemTempl<RealType> * elem,
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln);
 
   /**
    * This is now deprecated; use FEMap::map instead.
    */
-  static Point map(unsigned int dim,
+  template <typename RealType>
+  static PointTempl<RealType> map(unsigned int dim,
                    const FEType & fe_t,
-                   const Elem * elem,
-                   const Point & p);
+                   const ElemTempl<RealType> * elem,
+                   const PointTempl<RealType> & p);
 
   /**
    * This is now deprecated; use FEMap::inverse_map instead.
    */
-  static Point inverse_map (const unsigned int dim,
+  template <typename RealType>
+  static PointTempl<RealType> inverse_map (const unsigned int dim,
                             const FEType & fe_t,
-                            const Elem * elem,
-                            const Point & p,
+                            const ElemTempl<RealType> * elem,
+                            const PointTempl<RealType> & p,
                             const Real tolerance = TOLERANCE,
                             const bool secure = true);
 
   /**
    * This is now deprecated; use FEMap::inverse_map instead.
    */
+  template <typename RealType>
   static void  inverse_map (const unsigned int dim,
                             const FEType & fe_t,
-                            const Elem * elem,
-                            const std::vector<Point> & physical_points,
-                            std::vector<Point> &       reference_points,
+                            const ElemTempl<RealType> * elem,
+                            const std::vector<PointTempl<RealType>> & physical_points,
+                            std::vector<PointTempl<RealType>> &       reference_points,
                             const Real tolerance = TOLERANCE,
                             const bool secure = true);
 
@@ -226,7 +272,8 @@ public:
    * \p eps can be specified to indicate a tolerance.  For example,
    * \f$ \xi \le 1 \f$ becomes \f$ \xi \le 1 + \epsilon \f$.
    */
-  static bool on_reference_element(const Point & p,
+  template <typename RealType>
+  static bool on_reference_element(const PointTempl<RealType> & p,
                                    const ElemType t,
                                    const Real eps=TOLERANCE);
   /**
@@ -238,11 +285,12 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  static Real shape(const unsigned int dim,
+  template <typename RealType>
+  static RealType shape(const unsigned int dim,
                     const FEType & fe_t,
                     const ElemType t,
                     const unsigned int i,
-                    const Point & p);
+                    const PointTempl<RealType> & p);
 
   /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
@@ -253,11 +301,12 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the base
    * order of the element.
    */
-  static Real shape(const unsigned int dim,
+  template <typename RealType>
+  static RealType shape(const unsigned int dim,
                     const FEType & fe_t,
-                    const Elem * elem,
+                    const ElemTempl<RealType> * elem,
                     const unsigned int i,
-                    const Point & p);
+                    const PointTempl<RealType> & p);
 
   /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
@@ -268,12 +317,12 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  template<typename OutputType>
+  template <typename RealType, typename OutputType>
   static void shape(const unsigned int dim,
                     const FEType & fe_t,
                     const ElemType t,
                     const unsigned int i,
-                    const Point & p,
+                    const PointTempl<RealType> & p,
                     OutputType & phi);
 
   /**
@@ -285,25 +334,27 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  template<typename OutputType>
+  template <typename RealType, typename OutputType>
   static void shape(const unsigned int dim,
                     const FEType & fe_t,
-                    const Elem * elem,
+                    const ElemTempl<RealType> * elem,
                     const unsigned int i,
-                    const Point & p,
+                    const PointTempl<RealType> & p,
                     OutputType & phi);
 
-  typedef Real (*shape_ptr) (const Elem * elem,
+  template <typename RealType>
+  using shape_ptr = RealType (*) (const ElemTempl<RealType> * elem,
                              const Order o,
                              const unsigned int i,
-                             const Point & p,
+                             const PointTempl<RealType> & p,
                              const bool add_p_level);
 
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
    */
-  static shape_ptr
+  template <typename RealType>
+  static shape_ptr<RealType>
   shape_function(const unsigned int dim,
                  const FEType & fe_t);
 
@@ -318,12 +369,13 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  static Real shape_deriv(const unsigned int dim,
+  template <typename RealType>
+  static RealType shape_deriv(const unsigned int dim,
                           const FEType & fe_t,
                           const ElemType t,
                           const unsigned int i,
                           const unsigned int j,
-                          const Point & p);
+                          const PointTempl<RealType> & p);
 
   /**
    * \returns The \f$ j^{th} \f$ coordinate of the gradient of
@@ -335,25 +387,28 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  static Real shape_deriv (const unsigned int dim,
+  template <typename RealType>
+  static RealType shape_deriv (const unsigned int dim,
                            const FEType & fe_t,
-                           const Elem *elem,
+                           const ElemTempl<RealType> *elem,
                            const unsigned int i,
                            const unsigned int j,
-                           const Point & p);
+                           const PointTempl<RealType> & p);
 
-  typedef Real (*shape_deriv_ptr) (const Elem * elem,
+  template <typename RealType>
+  using shape_deriv_ptr = RealType (*) (const ElemTempl<RealType> * elem,
                                    const Order o,
                                    const unsigned int i,
                                    const unsigned int j,
-                                   const Point & p,
+                                   const PointTempl<RealType> & p,
                                    const bool add_p_level);
 
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
    */
-  static shape_deriv_ptr
+  template <typename RealType>
+  static shape_deriv_ptr<RealType>
   shape_deriv_function(const unsigned int dim,
                        const FEType & fe_t);
 
@@ -377,12 +432,13 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  static Real shape_second_deriv(const unsigned int dim,
+  template <typename RealType>
+  static RealType shape_second_deriv(const unsigned int dim,
                                  const FEType & fe_t,
                                  const ElemType t,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point & p);
+                                 const PointTempl<RealType> & p);
 
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -399,25 +455,28 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  static Real shape_second_deriv (const unsigned int dim,
+  template <typename RealType>
+  static RealType shape_second_deriv (const unsigned int dim,
                                   const FEType & fe_t,
-                                  const Elem *elem,
+                                  const ElemTempl<RealType> *elem,
                                   const unsigned int i,
                                   const unsigned int j,
-                                  const Point & p);
+                                  const PointTempl<RealType> & p);
 
-  typedef Real (*shape_second_deriv_ptr) (const Elem * elem,
+  template <typename RealType>
+  using shape_second_deriv_ptr = RealType (*) (const ElemTempl<RealType> * elem,
                                           const Order o,
                                           const unsigned int i,
                                           const unsigned int j,
-                                          const Point & p,
+                                          const PointTempl<RealType> & p,
                                           const bool add_p_level);
 
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
    */
-  static shape_second_deriv_ptr
+  template <typename RealType>
+  static shape_second_deriv_ptr<RealType>
   shape_second_deriv_function(const unsigned int dim,
                               const FEType & fe_t);
 #endif
@@ -434,7 +493,7 @@ public:
    */
   static void compute_data(const unsigned int dim,
                            const FEType & fe_t,
-                           const Elem * elem,
+                           const ElemTempl<Real> * elem,
                            FEComputeData & data);
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -446,7 +505,7 @@ public:
   static void compute_constraints (DofConstraints & constraints,
                                    DofMap & dof_map,
                                    const unsigned int variable_number,
-                                   const Elem * elem);
+                                   const ElemTempl<Real> * elem);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -458,10 +517,10 @@ public:
   static void compute_periodic_constraints (DofConstraints & constraints,
                                             DofMap & dof_map,
                                             const PeriodicBoundaries & boundaries,
-                                            const MeshBase & mesh,
+                                            const MeshBaseTempl<Real> & mesh,
                                             const PointLocatorBase * point_locator,
                                             const unsigned int variable_number,
-                                            const Elem * elem);
+                                            const ElemTempl<Real> * elem);
 #endif // #ifdef LIBMESH_ENABLE_PERIODIC
 
   /**
@@ -493,7 +552,8 @@ public:
    * \returns The number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
-  static unsigned int n_vec_dim (const MeshBase & mesh,
+  template <typename RealType>
+  static unsigned int n_vec_dim (const MeshBaseTempl<RealType> & mesh,
                                  const FEType & fe_type);
   /**
    * Returns the input FEType's FEContinuity based on the underlying
@@ -539,67 +599,77 @@ private:
                                            const FEType & fe_t,
                                            const ElemType t);
 
+  template <typename RealType>
   static void ifem_nodal_soln(const unsigned int dim,
                               const FEType & fe_t,
-                              const Elem * elem,
+                              const ElemTempl<RealType> * elem,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln);
 
-  static Point ifem_map (const unsigned int dim,
+  template <typename RealType>
+  static PointTempl<RealType> ifem_map (const unsigned int dim,
                          const FEType & fe_t,
-                         const Elem * elem,
-                         const Point & p);
+                         const ElemTempl<RealType> * elem,
+                         const PointTempl<RealType> & p);
 
-  static Point ifem_inverse_map (const unsigned int dim,
+  template <typename RealType>
+  static PointTempl<RealType> ifem_inverse_map (const unsigned int dim,
                                  const FEType & fe_t,
-                                 const Elem * elem,
-                                 const Point & p,
+                                 const ElemTempl<RealType> * elem,
+                                 const PointTempl<RealType> & p,
                                  const Real tolerance = TOLERANCE,
                                  const bool secure = true);
 
+  template <typename RealType>
   static void ifem_inverse_map (const unsigned int dim,
                                 const FEType & fe_t,
-                                const Elem * elem,
-                                const std::vector<Point> & physical_points,
-                                std::vector<Point> &       reference_points,
+                                const ElemTempl<RealType> * elem,
+                                const std::vector<PointTempl<RealType>> & physical_points,
+                                std::vector<PointTempl<RealType>> &       reference_points,
                                 const Real tolerance = TOLERANCE,
                                 const bool secure = true);
 
 
-  static bool ifem_on_reference_element(const Point & p,
+  template <typename RealType>
+  static bool ifem_on_reference_element(const PointTempl<RealType> & p,
                                         const ElemType t,
                                         const Real eps);
 
-  static Real ifem_shape(const unsigned int dim,
+  template <typename RealType>
+  static RealType ifem_shape(const unsigned int dim,
                          const FEType & fe_t,
                          const ElemType t,
                          const unsigned int i,
-                         const Point & p);
+                         const PointTempl<RealType> & p);
 
-  static Real ifem_shape(const unsigned int dim,
+  template <typename RealType>
+  static RealType ifem_shape(const unsigned int dim,
                          const FEType & fe_t,
-                         const Elem * elem,
+                         const ElemTempl<RealType> * elem,
                          const unsigned int i,
-                         const Point & p);
+                         const PointTempl<RealType> & p);
 
 
-  static Real ifem_shape_deriv(const unsigned int dim,
+  template <typename RealType>
+  static RealType ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
                                const ElemType t,
                                const unsigned int i,
                                const unsigned int j,
-                               const Point & p);
+                               const PointTempl<RealType> & p);
 
-  static Real ifem_shape_deriv(const unsigned int dim,
+  template <typename RealType>
+  static RealType ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
-                               const Elem * elem,
+                               const ElemTempl<RealType> * elem,
                                const unsigned int i,
                                const unsigned int j,
-                               const Point & p);
+                               const PointTempl<RealType> & p);
 
+  template <typename RealType>
   static void ifem_compute_data(const unsigned int dim,
                                 const FEType & fe_t,
-                                const Elem * elem,
+                                const ElemTempl<RealType> * elem,
                                 FEComputeData & data);
 
 #endif

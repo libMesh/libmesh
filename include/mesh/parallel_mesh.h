@@ -31,21 +31,37 @@ namespace libMesh
 //
 // This has to be a shim class rather than a typedef so that forward
 // declarations still work.
-class ParallelMesh : public DistributedMesh
+template <typename RealType = Real>
+class ParallelMeshTempl : public DistributedMeshTempl<RealType>
 {
 public:
+  typedef ParallelMeshTempl<RealType> ParallelMesh;
+  typedef DistributedMeshTempl<RealType> DistributedMesh;
+  typedef UnstructuredMeshTempl<RealType> UnstructuredMesh;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef NodeTempl<RealType> Node;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+
+  using typename MeshBase::element_iterator;
+  using typename MeshBase::const_element_iterator;
+  using typename MeshBase::node_iterator;
+  using typename MeshBase::const_node_iterator;
+
   explicit
-  ParallelMesh (const Parallel::Communicator & comm_in,
-                unsigned char dim=1)
+  ParallelMeshTempl (const Parallel::Communicator & comm_in,
+                     unsigned char dim=1)
     : DistributedMesh(comm_in,dim) {}
 
-  ParallelMesh (const UnstructuredMesh & other_mesh) : DistributedMesh(other_mesh) {}
+  ParallelMeshTempl (const UnstructuredMesh & other_mesh) : DistributedMesh(other_mesh) {}
 
   virtual std::unique_ptr<MeshBase> clone () const override
   { return libmesh_make_unique<ParallelMesh>(*this); }
 
-  ~ParallelMesh() {}
+  ~ParallelMeshTempl() {}
 };
+
+typedef ParallelMeshTempl<Real> ParallelMesh;
 
 } // namespace libMesh
 

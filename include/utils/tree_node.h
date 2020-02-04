@@ -35,9 +35,9 @@ namespace libMesh
 {
 
 // Forward Declarations
-class MeshBase;
-class Node;
-class Elem;
+template <typename> class MeshBaseTempl;
+template <typename> class NodeTempl;
+template <typename> class ElemTempl;
 
 /**
  * This class defines a node on a tree.  A tree node
@@ -49,10 +49,16 @@ class Elem;
  * \date 2003
  * \brief Base class for different Tree types.
  */
-template <unsigned int N>
+template <unsigned int N, typename RealType = Real>
 class TreeNode
 {
 public:
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef NodeTempl<RealType> Node;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
+
   /**
    * Constructor.  Takes a pointer to this node's
    * parent.  The pointer should only be nullptr
@@ -248,14 +254,11 @@ private:
 };
 
 
-
-
-
 // ------------------------------------------------------------
 // TreeNode class inline methods
-template <unsigned int N>
+template <unsigned int N, typename RealType>
 inline
-TreeNode<N>::TreeNode (const MeshBase & m,
+TreeNode<N,RealType>::TreeNode (const MeshBase & m,
                        unsigned int tbs,
                        const TreeNode<N> * p) :
   mesh           (m),
@@ -275,9 +278,9 @@ TreeNode<N>::TreeNode (const MeshBase & m,
 
 
 
-template <unsigned int N>
+template <unsigned int N, typename RealType>
 inline
-TreeNode<N>::~TreeNode ()
+TreeNode<N,RealType>::~TreeNode ()
 {
   // When we are destructed we must delete all of our
   // children.  They will thus delete their children,
@@ -288,9 +291,9 @@ TreeNode<N>::~TreeNode ()
 
 
 
-template <unsigned int N>
+template <unsigned int N, typename RealType>
 inline
-unsigned int TreeNode<N>::level () const
+unsigned int TreeNode<N,RealType>::level () const
 {
   if (parent != nullptr)
     return parent->level()+1;

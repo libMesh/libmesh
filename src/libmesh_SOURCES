@@ -12,7 +12,6 @@ libmesh_SOURCES =  \
         src/base/libmesh_singleton.C \
         src/base/libmesh_version.C \
         src/base/periodic_boundaries.C \
-        src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
         src/base/point_neighbor_coupling.C \
         src/base/print_trace.C \
@@ -40,72 +39,39 @@ libmesh_SOURCES =  \
         src/fe/fe_abstract.C \
         src/fe/fe_base.C \
         src/fe/fe_bernstein.C \
-        src/fe/fe_bernstein_shape_0D.C \
-        src/fe/fe_bernstein_shape_1D.C \
-        src/fe/fe_bernstein_shape_2D.C \
-        src/fe/fe_bernstein_shape_3D.C \
         src/fe/fe_boundary.C \
         src/fe/fe_clough.C \
-        src/fe/fe_clough_shape_0D.C \
         src/fe/fe_clough_shape_1D.C \
         src/fe/fe_clough_shape_2D.C \
-        src/fe/fe_clough_shape_3D.C \
         src/fe/fe_compute_data.C \
+        src/fe/fe_constraints.C \
         src/fe/fe_hermite.C \
         src/fe/fe_hermite_shape_0D.C \
         src/fe/fe_hermite_shape_1D.C \
         src/fe/fe_hermite_shape_2D.C \
         src/fe/fe_hermite_shape_3D.C \
         src/fe/fe_hierarchic.C \
-        src/fe/fe_hierarchic_shape_0D.C \
-        src/fe/fe_hierarchic_shape_1D.C \
         src/fe/fe_hierarchic_shape_2D.C \
-        src/fe/fe_hierarchic_shape_3D.C \
         src/fe/fe_interface.C \
         src/fe/fe_interface_inf_fe.C \
         src/fe/fe_l2_hierarchic.C \
         src/fe/fe_l2_lagrange.C \
         src/fe/fe_lagrange.C \
-        src/fe/fe_lagrange_shape_0D.C \
-        src/fe/fe_lagrange_shape_1D.C \
-        src/fe/fe_lagrange_shape_2D.C \
-        src/fe/fe_lagrange_shape_3D.C \
         src/fe/fe_lagrange_vec.C \
         src/fe/fe_map.C \
         src/fe/fe_monomial.C \
-        src/fe/fe_monomial_shape_0D.C \
-        src/fe/fe_monomial_shape_1D.C \
-        src/fe/fe_monomial_shape_2D.C \
-        src/fe/fe_monomial_shape_3D.C \
         src/fe/fe_monomial_vec.C \
         src/fe/fe_nedelec_one.C \
-        src/fe/fe_nedelec_one_shape_2D.C \
-        src/fe/fe_nedelec_one_shape_3D.C \
         src/fe/fe_rational.C \
-        src/fe/fe_rational_shape_0D.C \
-        src/fe/fe_rational_shape_1D.C \
         src/fe/fe_rational_shape_2D.C \
-        src/fe/fe_rational_shape_3D.C \
         src/fe/fe_scalar.C \
-        src/fe/fe_scalar_shape_0D.C \
-        src/fe/fe_scalar_shape_1D.C \
-        src/fe/fe_scalar_shape_2D.C \
-        src/fe/fe_scalar_shape_3D.C \
         src/fe/fe_subdivision_2D.C \
         src/fe/fe_szabab.C \
-        src/fe/fe_szabab_shape_0D.C \
-        src/fe/fe_szabab_shape_1D.C \
-        src/fe/fe_szabab_shape_2D.C \
-        src/fe/fe_szabab_shape_3D.C \
         src/fe/fe_transformation_base.C \
         src/fe/fe_type.C \
         src/fe/fe_xyz.C \
         src/fe/fe_xyz_boundary.C \
         src/fe/fe_xyz_map.C \
-        src/fe/fe_xyz_shape_0D.C \
-        src/fe/fe_xyz_shape_1D.C \
-        src/fe/fe_xyz_shape_2D.C \
-        src/fe/fe_xyz_shape_3D.C \
         src/fe/h1_fe_transformation.C \
         src/fe/hcurl_fe_transformation.C \
         src/fe/inf_fe.C \
@@ -118,13 +84,10 @@ libmesh_SOURCES =  \
         src/fe/inf_fe_map.C \
         src/fe/inf_fe_map_eval.C \
         src/fe/inf_fe_static.C \
-        src/geom/bounding_box.C \
-        src/geom/cell.C \
         src/geom/cell_hex.C \
         src/geom/cell_hex20.C \
         src/geom/cell_hex27.C \
         src/geom/cell_hex8.C \
-        src/geom/cell_inf.C \
         src/geom/cell_inf_hex.C \
         src/geom/cell_inf_hex16.C \
         src/geom/cell_inf_hex18.C \
@@ -143,16 +106,12 @@ libmesh_SOURCES =  \
         src/geom/cell_tet.C \
         src/geom/cell_tet10.C \
         src/geom/cell_tet4.C \
-        src/geom/edge.C \
-        src/geom/edge_edge2.C \
         src/geom/edge_edge3.C \
         src/geom/edge_edge4.C \
         src/geom/edge_inf_edge2.C \
         src/geom/elem.C \
         src/geom/elem_cutter.C \
         src/geom/elem_quality.C \
-        src/geom/elem_refinement.C \
-        src/geom/face.C \
         src/geom/face_inf_quad.C \
         src/geom/face_inf_quad4.C \
         src/geom/face_inf_quad6.C \
@@ -167,10 +126,7 @@ libmesh_SOURCES =  \
         src/geom/face_tri3_shell.C \
         src/geom/face_tri3_subdivision.C \
         src/geom/face_tri6.C \
-        src/geom/node.C \
-        src/geom/node_elem.C \
         src/geom/plane.C \
-        src/geom/point.C \
         src/geom/reference_elem.C \
         src/geom/reference_elem.data \
         src/geom/remote_elem.C \
@@ -192,6 +148,7 @@ libmesh_SOURCES =  \
         src/mesh/inf_elem_builder.C \
         src/mesh/matlab_io.C \
         src/mesh/medit_io.C \
+        src/mesh/mesh_abstract.C \
         src/mesh/mesh_base.C \
         src/mesh/mesh_communication.C \
         src/mesh/mesh_communication_global_indices.C \
@@ -201,9 +158,6 @@ libmesh_SOURCES =  \
         src/mesh/mesh_modification.C \
         src/mesh/mesh_output.C \
         src/mesh/mesh_refinement.C \
-        src/mesh/mesh_refinement_flagging.C \
-        src/mesh/mesh_refinement_smoothing.C \
-        src/mesh/mesh_serializer.C \
         src/mesh/mesh_smoother.C \
         src/mesh/mesh_smoother_laplace.C \
         src/mesh/mesh_smoother_vsmoother.C \

@@ -30,7 +30,7 @@ namespace libMesh
 {
 
 // Forward Declarations
-class MeshBase;
+template <typename> class MeshBaseTempl;
 
 /**
  * This class defines a tree that may be used for fast point
@@ -40,10 +40,15 @@ class MeshBase;
  * \date 2002
  * \brief Tree class templated on the number of leaves on each node.
  */
-template <unsigned int N>
-class Tree : public TreeBase
+template <unsigned int N, typename RealType = Real>
+class Tree : public TreeBaseTempl<RealType>
 {
 public:
+  typedef ElemTempl<RealType> Elem;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+
+
   /**
    * Constructor. Requires a mesh and the target bin size. Optionally takes the build method.
    */
@@ -132,17 +137,26 @@ namespace Trees
  */
 typedef Tree<2> BinaryTree;
 
+template <typename RealType>
+using BinaryTreeTempl = Tree<2,RealType>;
+
 /**
  * A QuadTree is a tree appropriate
  * for 2D meshes.
  */
 typedef Tree<4> QuadTree;
 
+template <typename RealType>
+using QuadTreeTempl = Tree<4,RealType>;
+
 /**
  * An OctTree is a tree appropriate
  * for 3D meshes.
  */
 typedef Tree<8> OctTree;
+
+template <typename RealType>
+using OctTreeTempl = Tree<8,RealType>;
 }
 
 } // namespace libMesh

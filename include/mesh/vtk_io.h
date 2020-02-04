@@ -43,7 +43,8 @@ class vtkUnstructuredGrid;
 namespace libMesh
 {
 
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 
 /**
  * This class implements reading and writing meshes in the VTK format.

@@ -31,16 +31,21 @@ namespace libMesh
 {
 
 // Forward declarations
-class Elem;
+template <typename> class ElemTempl;
+template <typename> class MeshBaseTempl;
+template <typename> class RemoteElemTempl;
 
 namespace Parallel
 {
 
-template <>
-class Packing<const Elem *>
+template <typename RealType>
+class Packing<const ElemTempl<RealType> *>
 {
 public:
   typedef largest_id_type buffer_type;
+  typedef ElemTempl<RealType> Elem;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef RemoteElemTempl<RealType> RemoteElem;
 
   template <typename OutputIter, typename Context>
   static void pack(const Elem * const & object,
@@ -59,11 +64,14 @@ public:
 };
 
 
-template <>
-class Packing<Elem *>
+template <typename RealType>
+class Packing<ElemTempl<RealType> *>
 {
 public:
   typedef largest_id_type buffer_type;
+  typedef ElemTempl<RealType> Elem;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef RemoteElemTempl<RealType> RemoteElem;
 
   template <typename OutputIter, typename Context>
   static void pack(Elem * const & object,
@@ -85,10 +93,11 @@ public:
 };
 
 
+template <typename RealType>
 template <typename BufferIter, typename Context>
-inline const Elem*
-Packing<const Elem*>::unpack(BufferIter in, Context * ctx)
-{ return Packing<Elem*>::unpack(in, ctx); }
+inline const ElemTempl<RealType>*
+Packing<const ElemTempl<RealType>*>::unpack(BufferIter in, Context * ctx)
+{ return Packing<ElemTempl<RealType>*>::unpack(in, ctx); }
 
 } // namespace Parallel
 } // namespace libMesh

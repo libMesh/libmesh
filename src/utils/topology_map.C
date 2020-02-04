@@ -18,66 +18,10 @@
 
 
 // Local Includes
-#include "libmesh/elem.h"
-#include "libmesh/topology_map.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/node.h"
-#include "libmesh/parallel_only.h"
-#include "libmesh/remote_elem.h"
-#include "libmesh/libmesh_logging.h"
-
-// C++ Includes
-#include <limits>
-#include <utility>
+#include "libmesh/topology_map_impl.h"
 
 namespace libMesh
 {
-
-void TopologyMap::init(MeshBase & mesh)
-{
-  // This function must be run on all processors at once
-  // for non-serial meshes
-  if (!mesh.is_serial())
-    libmesh_parallel_only(mesh.comm());
-
-  LOG_SCOPE("init()", "TopologyMap");
-
-  // Clear the old map
-  _map.clear();
-
-  this->fill(mesh);
-}
-
-
-
-void TopologyMap::add_node(const Node & mid_node,
-                           const std::vector<std::pair<dof_id_type, dof_id_type>> & bracketing_nodes)
-{
-  const dof_id_type mid_node_id = mid_node.id();
-
-  libmesh_assert_not_equal_to(mid_node_id, DofObject::invalid_id);
-
-  for (auto pair : bracketing_nodes)
-    {
-      const dof_id_type id1 = pair.first;
-      const dof_id_type id2 = pair.second;
-      const dof_id_type lower_id = std::min(id1, id2);
-      const dof_id_type upper_id = std::max(id1, id2);
-
-      // We should never be inserting inconsistent data
-#ifndef NDEBUG
-      map_type::iterator it =
-        _map.find(std::make_pair(lower_id, upper_id));
-
-      if (it != _map.end())
-        libmesh_assert_equal_to (it->second, mid_node_id);
-#endif
-
-      this->_map.insert(std::make_pair(std::make_pair(lower_id, upper_id),
-                                       mid_node_id));
-
-    }
-}
 
 
 dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_type>> & bracketing_nodes) const
@@ -131,44 +75,6 @@ dof_id_type TopologyMap::find(dof_id_type bracket_node1,
   return it->second;
 }
 
-
-
-#ifdef LIBMESH_ENABLE_AMR
-
-void TopologyMap::fill(const MeshBase & mesh)
-{
-  // Populate the nodes map
-  for (const auto & elem : mesh.element_ptr_range())
-    {
-      // We only need to add nodes which might be added during mesh
-      // refinement; this means they need to be child nodes.
-      if (!elem->has_children())
-        continue;
-
-      for (unsigned int c = 0, nc = elem->n_children(); c != nc; ++c)
-        {
-          const Elem * child = elem->child_ptr(c);
-          if (child == remote_elem)
-            continue;
-
-          for (unsigned int n = 0, nnic = elem->n_nodes_in_child(c); n != nnic; ++n)
-            {
-              const std::vector<std::pair<dof_id_type, dof_id_type>>
-                bracketing_nodes = elem->bracketing_nodes(c,n);
-
-              this->add_node(child->node_ref(n), bracketing_nodes);
-            }
-        }
-    }
-}
-
-#else
-
-// no-op without AMR
-void TopologyMap::fill(const MeshBase &) {}
-
-#endif
-
-
+TOPO_MAP_INSTANTIATE(Real);
 
 } // namespace libMesh

@@ -28,6 +28,11 @@
 namespace libMesh
 {
 
+template <typename>
+class Quad4Templ;
+template <typename>
+class Edge2Templ;
+
 /**
  * The \p QUAD is an element in 2D composed of 4 sides.
  * It looks like this:
@@ -45,15 +50,22 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all quadrilateral element types.
  */
-class Quad : public Face
+template <typename RealType>
+class QuadTempl : public FaceTempl<RealType>
 {
 public:
+  typedef QuadTempl<RealType> Quad;
+  typedef Quad4Templ<RealType> Quad4;
+  typedef Edge2Templ<RealType> Edge2;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
 
   /**
    * Default quadrilateral element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Quad (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
+  QuadTempl (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Face(nn, Quad::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -61,11 +73,11 @@ public:
       this->set_interior_parent(nullptr);
   }
 
-  Quad (Quad &&) = delete;
-  Quad (const Quad &) = delete;
+  QuadTempl (Quad &&) = delete;
+  QuadTempl (const Quad &) = delete;
   Quad & operator= (const Quad &) = delete;
   Quad & operator= (Quad &&) = delete;
-  virtual ~Quad() = default;
+  virtual ~QuadTempl() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -212,6 +224,79 @@ protected:
    */
   static const int _child_node_lookup[4][9];
 };
+
+// ------------------------------------------------------------
+// Quad class static member initializations
+
+template <typename RealType>
+const Real QuadTempl<RealType>::_master_points[9][3] =
+  {
+    {-1, -1},
+    {1, -1},
+    {1, 1},
+    {-1, 1},
+    {0, -1},
+    {1, 0},
+    {0, 1},
+    {-1, 0},
+    {0, 0}
+  };
+
+template <typename RealType>
+const unsigned short int QuadTempl<RealType>::_second_order_adjacent_vertices[4][2] =
+  {
+    {0, 1}, // vertices adjacent to node 4
+    {1, 2}, // vertices adjacent to node 5
+    {2, 3}, // vertices adjacent to node 6
+    {0, 3}  // vertices adjacent to node 7
+  };
+
+
+
+template <typename RealType>
+const unsigned short int QuadTempl<RealType>::_second_order_vertex_child_number[9] =
+  {
+    99,99,99,99, // Vertices
+    0,1,2,0,     // Edges
+    0            // Interior
+  };
+
+
+
+template <typename RealType>
+const unsigned short int QuadTempl<RealType>::_second_order_vertex_child_index[9] =
+  {
+    99,99,99,99, // Vertices
+    1,2,3,3,     // Edges
+    2            // Interior
+  };
+
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+// We number 25 "possible node locations" for a 2x2 refinement of
+// quads with up to 3x3 nodes each
+template <typename RealType>
+const int QuadTempl<RealType>::_child_node_lookup[4][9] =
+  {
+    // node lookup for child 0 (near node 0)
+    { 0, 2, 12, 10,  1, 7, 11, 5,  6},
+
+    // node lookup for child 1 (near node 1)
+    { 2, 4, 14, 12,  3, 9, 13, 7,  8},
+
+    // node lookup for child 2 (near node 3)
+    { 10, 12, 22, 20,  11, 17, 21, 15,  16},
+
+    // node lookup for child 3 (near node 2)
+    { 12, 14, 24, 22,  13, 19, 23, 17,  18}
+  };
+
+
+#endif
+
+typedef QuadTempl<Real> Quad;
 
 } // namespace libMesh
 

@@ -31,7 +31,8 @@ namespace libMesh
 
 // Forward declarations
 class EquationSystems;
-class Point;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 
 /**
  * class \p FEComputeData hides arbitrary data to be passed to and from

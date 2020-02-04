@@ -25,16 +25,20 @@
 #include "libmesh/point.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/fe_shim.h"
 
 // C++ includes
 #include <memory>
+#include <type_traits>
 
 namespace libMesh
 {
 
 // forward declarations
-class Elem;
-class Node;
+template <typename>
+class ElemTempl;
+template <typename>
+class NodeTempl;
 
 /**
  * Class contained in FE that encapsulates mapping (i.e. from physical
@@ -44,12 +48,20 @@ class Node;
  * \date 2012
  * \brief Computes finite element mapping function values, gradients, etc.
  */
-class FEMap
+template <typename RealType = Real>
+class FEMapTempl
 {
 public:
+  typedef FEMapTempl<RealType> FEMap;
+  typedef NodeTempl<RealType> Node;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef VectorValue<RealType> RealVectorValue;
+  typedef TensorValue<RealType> RealTensor;
+  typedef TensorValue<RealType> RealTensorValue;
 
-  FEMap(Real jtol = 0);
-  virtual ~FEMap(){}
+  FEMapTempl(Real jtol = 0);
+  virtual ~FEMapTempl(){}
 
   static std::unique_ptr<FEMap> build(FEType fe_type);
 
@@ -57,6 +69,16 @@ public:
 
   template<unsigned int Dim>
   void init_reference_to_physical_map(const std::vector<Point> & qp,
+                                      const Elem * elem);
+
+  /**
+   * Method for casting real points into AD type points for use when initializing
+   * shape functions based on a quadrature rule, which is always going to supply the same
+   * reference points regardless of mesh dislacements
+   */
+  template<unsigned int Dim, typename T = RealType,
+           typename std::enable_if<!std::is_same<T,Real>::value,int>::type = 0>
+  void init_reference_to_physical_map(const std::vector<PointTempl<Real>> & qp,
                                       const Elem * elem);
 
   /**
@@ -128,11 +150,31 @@ public:
                                  const Elem * side);
 
   /**
+   * Method for casting real points into AD type points for use when initializing
+   * shape functions based on a quadrature rule, which is always going to supply the same
+   * reference points regardless of mesh dislacements
+   */
+  template<unsigned int Dim, typename T = RealType,
+           typename std::enable_if<!std::is_same<T,Real>::value,int>::type = 0>
+  void init_face_shape_functions(const std::vector<PointTempl<Real>> & qp,
+                                 const Elem * side);
+
+  /**
    * Same as before, but for an edge. This is used for some projection
    * operators.
    */
   template<unsigned int Dim>
   void init_edge_shape_functions(const std::vector<Point> & qp,
+                                 const Elem * edge);
+
+ /**
+   * Method for casting real points into AD type points for use when initializing
+   * shape functions based on a quadrature rule, which is always going to supply the same
+   * reference points regardless of mesh dislacements
+   */
+  template<unsigned int Dim, typename T = RealType,
+           typename std::enable_if<!std::is_same<T,Real>::value,int>::type = 0>
+  void init_edge_shape_functions(const std::vector<PointTempl<Real>> & qp,
                                  const Elem * edge);
 
   /**
@@ -199,7 +241,7 @@ public:
   /**
    * \returns The element Jacobian for each quadrature point.
    */
-  const std::vector<Real> & get_jacobian() const
+  const std::vector<RealType> & get_jacobian() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return jac; }
 
@@ -207,7 +249,7 @@ public:
    * \returns The element Jacobian times the quadrature weight for
    * each quadrature point.
    */
-  const std::vector<Real> & get_JxW() const
+  const std::vector<RealType> & get_JxW() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return JxW; }
 
@@ -215,7 +257,7 @@ public:
    * \returns The element tangents in xi-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdxi() const
+  const std::vector<RealVectorValue> & get_dxyzdxi() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dxyzdxi_map; }
 
@@ -223,7 +265,7 @@ public:
    * \returns The element tangents in eta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdeta() const
+  const std::vector<RealVectorValue> & get_dxyzdeta() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dxyzdeta_map; }
 
@@ -231,7 +273,7 @@ public:
    * \returns The element tangents in zeta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdzeta() const
+  const std::vector<RealVectorValue> & get_dxyzdzeta() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dxyzdzeta_map; }
 
@@ -240,42 +282,42 @@ public:
   /**
    * \returns The second partial derivatives in xi.
    */
-  const std::vector<RealGradient> & get_d2xyzdxi2() const
+  const std::vector<RealVectorValue> & get_d2xyzdxi2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2xyzdxi2_map; }
 
   /**
    * \returns The second partial derivatives in eta.
    */
-  const std::vector<RealGradient> & get_d2xyzdeta2() const
+  const std::vector<RealVectorValue> & get_d2xyzdeta2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2xyzdeta2_map; }
 
   /**
    * \returns The second partial derivatives in zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdzeta2() const
+  const std::vector<RealVectorValue> & get_d2xyzdzeta2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2xyzdzeta2_map; }
 
   /**
    * \returns The second partial derivatives in xi-eta.
    */
-  const std::vector<RealGradient> & get_d2xyzdxideta() const
+  const std::vector<RealVectorValue> & get_d2xyzdxideta() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2xyzdxideta_map; }
 
   /**
    * \returns The second partial derivatives in xi-zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdxidzeta() const
+  const std::vector<RealVectorValue> & get_d2xyzdxidzeta() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2xyzdxidzeta_map; }
 
   /**
    * \returns The second partial derivatives in eta-zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdetadzeta() const
+  const std::vector<RealVectorValue> & get_d2xyzdetadzeta() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2xyzdetadzeta_map; }
 
@@ -285,7 +327,7 @@ public:
    * \returns The dxi/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidx() const
+  const std::vector<RealType> & get_dxidx() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dxidx_map; }
 
@@ -293,7 +335,7 @@ public:
    * \returns The dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidy() const
+  const std::vector<RealType> & get_dxidy() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dxidy_map; }
 
@@ -301,7 +343,7 @@ public:
    * \returns The dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidz() const
+  const std::vector<RealType> & get_dxidz() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dxidz_map; }
 
@@ -309,7 +351,7 @@ public:
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detadx() const
+  const std::vector<RealType> & get_detadx() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return detadx_map; }
 
@@ -317,7 +359,7 @@ public:
    * \returns The deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detady() const
+  const std::vector<RealType> & get_detady() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return detady_map; }
 
@@ -325,7 +367,7 @@ public:
    * \returns The deta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detadz() const
+  const std::vector<RealType> & get_detadz() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return detadz_map; }
 
@@ -333,7 +375,7 @@ public:
    * \returns The dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetadx() const
+  const std::vector<RealType> & get_dzetadx() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dzetadx_map; }
 
@@ -341,7 +383,7 @@ public:
    * \returns The dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetady() const
+  const std::vector<RealType> & get_dzetady() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dzetady_map; }
 
@@ -349,7 +391,7 @@ public:
    * \returns The dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetadz() const
+  const std::vector<RealType> & get_dzetadz() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dzetadz_map; }
 
@@ -357,21 +399,21 @@ public:
   /**
    * Second derivatives of "xi" reference coordinate wrt physical coordinates.
    */
-  const std::vector<std::vector<Real>> & get_d2xidxyz2() const
+  const std::vector<std::vector<RealType>> & get_d2xidxyz2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2xidxyz2_map; }
 
   /**
    * Second derivatives of "eta" reference coordinate wrt physical coordinates.
    */
-  const std::vector<std::vector<Real>> & get_d2etadxyz2() const
+  const std::vector<std::vector<RealType>> & get_d2etadxyz2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2etadxyz2_map; }
 
   /**
    * Second derivatives of "zeta" reference coordinate wrt physical coordinates.
    */
-  const std::vector<std::vector<Real>> & get_d2zetadxyz2() const
+  const std::vector<std::vector<RealType>> & get_d2zetadxyz2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2zetadxyz2_map; }
 #endif
@@ -379,34 +421,34 @@ public:
   /**
    * \returns The reference to physical map for the side/edge
    */
-  const std::vector<std::vector<Real>> & get_psi() const
+  const std::vector<std::vector<RealType>> & get_psi() const
   { return psi_map; }
 
   /**
    * \returns The reference to physical map for the element
    */
-  const std::vector<std::vector<Real>> & get_phi_map() const
+  const std::vector<std::vector<RealType>> & get_phi_map() const
   { libmesh_assert(!calculations_started || calculate_xyz);
     calculate_xyz = true; return phi_map; }
 
   /**
    * \returns The reference to physical map derivative
    */
-  const std::vector<std::vector<Real>> & get_dphidxi_map() const
+  const std::vector<std::vector<RealType>> & get_dphidxi_map() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dphidxi_map; }
 
   /**
    * \returns The reference to physical map derivative
    */
-  const std::vector<std::vector<Real>> & get_dphideta_map() const
+  const std::vector<std::vector<RealType>> & get_dphideta_map() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dphideta_map; }
 
   /**
    * \returns The reference to physical map derivative
    */
-  const std::vector<std::vector<Real>> & get_dphidzeta_map() const
+  const std::vector<std::vector<RealType>> & get_dphidzeta_map() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dphidzeta_map; }
 
@@ -429,7 +471,7 @@ public:
   /**
    * \returns The curvatures for use in face integration.
    */
-  const std::vector<Real> & get_curvatures() const
+  const std::vector<RealType> & get_curvatures() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return curvatures;}
 
@@ -453,28 +495,28 @@ public:
   /**
    * \returns The reference to physical map for the side/edge
    */
-  std::vector<std::vector<Real>> & get_psi()
+  std::vector<std::vector<RealType>> & get_psi()
   { return psi_map; }
 
   /**
    * \returns The reference to physical map derivative for the side/edge
    */
-  std::vector<std::vector<Real>> & get_dpsidxi()
+  std::vector<std::vector<RealType>> & get_dpsidxi()
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dpsidxi_map; }
 
-  const std::vector<std::vector<Real>> & get_dpsidxi() const
+  const std::vector<std::vector<RealType>> & get_dpsidxi() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dpsidxi_map; }
 
   /**
    * \returns The reference to physical map derivative for the side/edge
    */
-  std::vector<std::vector<Real>> & get_dpsideta()
+  std::vector<std::vector<RealType>> & get_dpsideta()
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dpsideta_map; }
 
-  const std::vector<std::vector<Real>> & get_dpsideta() const
+  const std::vector<std::vector<RealType>> & get_dpsideta() const
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dpsideta_map; }
 
@@ -483,35 +525,35 @@ public:
   /**
    * \returns The reference to physical map 2nd derivative for the side/edge
    */
-  std::vector<std::vector<Real>> & get_d2psidxi2()
+  std::vector<std::vector<RealType>> & get_d2psidxi2()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2psidxi2_map; }
 
   /**
    * \returns const reference to physical map 2nd derivative for the side/edge
    */
-  const std::vector<std::vector<Real>> & get_d2psidxi2() const
+  const std::vector<std::vector<RealType>> & get_d2psidxi2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2psidxi2_map; }
 
   /**
    * \returns The reference to physical map 2nd derivative for the side/edge
    */
-  std::vector<std::vector<Real>> & get_d2psidxideta()
+  std::vector<std::vector<RealType>> & get_d2psidxideta()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2psidxideta_map; }
 
   /**
    * \returns const reference to physical map 2nd derivative for the side/edge
    */
-  const std::vector<std::vector<Real>> & get_d2psidxideta() const
+  const std::vector<std::vector<RealType>> & get_d2psidxideta() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2psidxideta_map; }
 
   /**
    * \returns The reference to physical map 2nd derivative for the side/edge
    */
-  std::vector<std::vector<Real>> & get_d2psideta2()
+  std::vector<std::vector<RealType>> & get_d2psideta2()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2psideta2_map; }
 
@@ -519,7 +561,7 @@ public:
   /**
    * \returns const reference to physical map 2nd derivative for the side/edge
    */
-  const std::vector<std::vector<Real>> & get_d2psideta2() const
+  const std::vector<std::vector<RealType>> & get_d2psideta2() const
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2psideta2_map; }
 
@@ -528,28 +570,28 @@ public:
   /**
    * \returns The reference to physical map for the element
    */
-  std::vector<std::vector<Real>> & get_phi_map()
+  std::vector<std::vector<RealType>> & get_phi_map()
   { libmesh_assert(!calculations_started || calculate_xyz);
     calculate_xyz = true; return phi_map; }
 
   /**
    * \returns The reference to physical map derivative
    */
-  std::vector<std::vector<Real>> & get_dphidxi_map()
+  std::vector<std::vector<RealType>> & get_dphidxi_map()
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dphidxi_map; }
 
   /**
    * \returns The reference to physical map derivative
    */
-  std::vector<std::vector<Real>> & get_dphideta_map()
+  std::vector<std::vector<RealType>> & get_dphideta_map()
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dphideta_map; }
 
   /**
    * \returns The reference to physical map derivative
    */
-  std::vector<std::vector<Real>> & get_dphidzeta_map()
+  std::vector<std::vector<RealType>> & get_dphidzeta_map()
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return dphidzeta_map; }
 
@@ -557,42 +599,42 @@ public:
   /**
    * \returns The reference to physical map 2nd derivative
    */
-  std::vector<std::vector<Real>> & get_d2phidxi2_map()
+  std::vector<std::vector<RealType>> & get_d2phidxi2_map()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2phidxi2_map; }
 
   /**
    * \returns The reference to physical map 2nd derivative
    */
-  std::vector<std::vector<Real>> & get_d2phidxideta_map()
+  std::vector<std::vector<RealType>> & get_d2phidxideta_map()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2phidxideta_map; }
 
   /**
    * \returns The reference to physical map 2nd derivative
    */
-  std::vector<std::vector<Real>> & get_d2phidxidzeta_map()
+  std::vector<std::vector<RealType>> & get_d2phidxidzeta_map()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2phidxidzeta_map; }
 
   /**
    * \returns The reference to physical map 2nd derivative
    */
-  std::vector<std::vector<Real>> & get_d2phideta2_map()
+  std::vector<std::vector<RealType>> & get_d2phideta2_map()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2phideta2_map; }
 
   /**
    * \returns The reference to physical map 2nd derivative
    */
-  std::vector<std::vector<Real>> & get_d2phidetadzeta_map()
+  std::vector<std::vector<RealType>> & get_d2phidetadzeta_map()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2phidetadzeta_map; }
 
   /**
    * \returns The reference to physical map 2nd derivative
    */
-  std::vector<std::vector<Real>> & get_d2phidzeta2_map()
+  std::vector<std::vector<RealType>> & get_d2phidzeta2_map()
   { libmesh_assert(!calculations_started || calculate_d2xyz);
     calculate_d2xyz = true; return d2phidzeta2_map; }
 #endif
@@ -603,7 +645,7 @@ public:
    * \returns Writable reference to the element Jacobian times
    * the quadrature weight for each quadrature point.
    */
-  std::vector<Real> & get_JxW()
+  std::vector<RealType> & get_JxW()
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return JxW; }
 
@@ -640,7 +682,7 @@ protected:
    *
    * \returns The x value of the pth entry of the dxzydxi_map.
    */
-  Real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); }
+  RealType dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -648,7 +690,7 @@ protected:
    *
    * \returns The y value of the pth entry of the dxzydxi_map.
    */
-  Real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); }
+  RealType dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -656,7 +698,7 @@ protected:
    *
    * \returns The z value of the pth entry of the dxzydxi_map.
    */
-  Real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); }
+  RealType dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -664,7 +706,7 @@ protected:
    *
    * \returns The x value of the pth entry of the dxzydeta_map.
    */
-  Real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); }
+  RealType dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -672,7 +714,7 @@ protected:
    *
    * \returns The y value of the pth entry of the dxzydeta_map.
    */
-  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }
+  RealType dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -680,7 +722,7 @@ protected:
    *
    * \returns The z value of the pth entry of the dxzydeta_map.
    */
-  Real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); }
+  RealType dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -688,7 +730,7 @@ protected:
    *
    * \returns The x value of the pth entry of the dxzydzeta_map.
    */
-  Real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); }
+  RealType dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -696,7 +738,7 @@ protected:
    *
    * \returns The y value of the pth entry of the dxzydzeta_map.
    */
-  Real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); }
+  RealType dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
@@ -704,7 +746,7 @@ protected:
    *
    * \returns The z value of the pth entry of the dxzydzeta_map.
    */
-  Real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); }
+  RealType dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); }
 
   /**
    * The spatial locations of the quadrature points
@@ -715,19 +757,19 @@ protected:
    * Vector of partial derivatives:
    * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi)
    */
-  std::vector<RealGradient> dxyzdxi_map;
+  std::vector<RealVectorValue> dxyzdxi_map;
 
   /**
    * Vector of partial derivatives:
    * d(x)/d(eta), d(y)/d(eta), d(z)/d(eta)
    */
-  std::vector<RealGradient> dxyzdeta_map;
+  std::vector<RealVectorValue> dxyzdeta_map;
 
   /**
    * Vector of partial derivatives:
    * d(x)/d(zeta), d(y)/d(zeta), d(z)/d(zeta)
    */
-  std::vector<RealGradient> dxyzdzeta_map;
+  std::vector<RealVectorValue> dxyzdzeta_map;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -735,37 +777,37 @@ protected:
    * Vector of second partial derivatives in xi:
    * d^2(x)/d(xi)^2, d^2(y)/d(xi)^2, d^2(z)/d(xi)^2
    */
-  std::vector<RealGradient> d2xyzdxi2_map;
+  std::vector<RealVectorValue> d2xyzdxi2_map;
 
   /**
    * Vector of mixed second partial derivatives in xi-eta:
    * d^2(x)/d(xi)d(eta) d^2(y)/d(xi)d(eta) d^2(z)/d(xi)d(eta)
    */
-  std::vector<RealGradient> d2xyzdxideta_map;
+  std::vector<RealVectorValue> d2xyzdxideta_map;
 
   /**
    * Vector of second partial derivatives in eta:
    * d^2(x)/d(eta)^2
    */
-  std::vector<RealGradient> d2xyzdeta2_map;
+  std::vector<RealVectorValue> d2xyzdeta2_map;
 
   /**
    * Vector of second partial derivatives in xi-zeta:
    * d^2(x)/d(xi)d(zeta), d^2(y)/d(xi)d(zeta), d^2(z)/d(xi)d(zeta)
    */
-  std::vector<RealGradient> d2xyzdxidzeta_map;
+  std::vector<RealVectorValue> d2xyzdxidzeta_map;
 
   /**
    * Vector of mixed second partial derivatives in eta-zeta:
    * d^2(x)/d(eta)d(zeta) d^2(y)/d(eta)d(zeta) d^2(z)/d(eta)d(zeta)
    */
-  std::vector<RealGradient> d2xyzdetadzeta_map;
+  std::vector<RealVectorValue> d2xyzdetadzeta_map;
 
   /**
    * Vector of second partial derivatives in zeta:
    * d^2(x)/d(zeta)^2
    */
-  std::vector<RealGradient> d2xyzdzeta2_map;
+  std::vector<RealVectorValue> d2xyzdzeta2_map;
 
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -773,148 +815,148 @@ protected:
    * Map for partial derivatives:
    * d(xi)/d(x). Needed for the Jacobian.
    */
-  std::vector<Real> dxidx_map;
+  std::vector<RealType> dxidx_map;
 
   /**
    * Map for partial derivatives:
    * d(xi)/d(y). Needed for the Jacobian.
    */
-  std::vector<Real> dxidy_map;
+  std::vector<RealType> dxidy_map;
 
   /**
    * Map for partial derivatives:
    * d(xi)/d(z). Needed for the Jacobian.
    */
-  std::vector<Real> dxidz_map;
+  std::vector<RealType> dxidz_map;
 
 
   /**
    * Map for partial derivatives:
    * d(eta)/d(x). Needed for the Jacobian.
    */
-  std::vector<Real> detadx_map;
+  std::vector<RealType> detadx_map;
 
   /**
    * Map for partial derivatives:
    * d(eta)/d(y). Needed for the Jacobian.
    */
-  std::vector<Real> detady_map;
+  std::vector<RealType> detady_map;
 
   /**
    * Map for partial derivatives:
    * d(eta)/d(z). Needed for the Jacobian.
    */
-  std::vector<Real> detadz_map;
+  std::vector<RealType> detadz_map;
 
 
   /**
    * Map for partial derivatives:
    * d(zeta)/d(x). Needed for the Jacobian.
    */
-  std::vector<Real> dzetadx_map;
+  std::vector<RealType> dzetadx_map;
 
   /**
    * Map for partial derivatives:
    * d(zeta)/d(y). Needed for the Jacobian.
    */
-  std::vector<Real> dzetady_map;
+  std::vector<RealType> dzetady_map;
 
   /**
    * Map for partial derivatives:
    * d(zeta)/d(z). Needed for the Jacobian.
    */
-  std::vector<Real> dzetadz_map;
+  std::vector<RealType> dzetadz_map;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Second derivatives of "xi" reference coordinate wrt physical coordinates.
    * At each qp: (xi_{xx}, xi_{xy}, xi_{xz}, xi_{yy}, xi_{yz}, xi_{zz})
    */
-  std::vector<std::vector<Real>> d2xidxyz2_map;
+  std::vector<std::vector<RealType>> d2xidxyz2_map;
 
   /**
    * Second derivatives of "eta" reference coordinate wrt physical coordinates.
    * At each qp: (eta_{xx}, eta_{xy}, eta_{xz}, eta_{yy}, eta_{yz}, eta_{zz})
    */
-  std::vector<std::vector<Real>> d2etadxyz2_map;
+  std::vector<std::vector<RealType>> d2etadxyz2_map;
 
   /**
    * Second derivatives of "zeta" reference coordinate wrt physical coordinates.
    * At each qp: (zeta_{xx}, zeta_{xy}, zeta_{xz}, zeta_{yy}, zeta_{yz}, zeta_{zz})
    */
-  std::vector<std::vector<Real>> d2zetadxyz2_map;
+  std::vector<std::vector<RealType>> d2zetadxyz2_map;
 #endif
 
   /**
    * Map for the shape function phi.
    */
-  std::vector<std::vector<Real>> phi_map;
+  std::vector<std::vector<RealType>> phi_map;
 
   /**
    * Map for the derivative, d(phi)/d(xi).
    */
-  std::vector<std::vector<Real>> dphidxi_map;
+  std::vector<std::vector<RealType>> dphidxi_map;
 
   /**
    * Map for the derivative, d(phi)/d(eta).
    */
-  std::vector<std::vector<Real>> dphideta_map;
+  std::vector<std::vector<RealType>> dphideta_map;
 
   /**
    * Map for the derivative, d(phi)/d(zeta).
    */
-  std::vector<std::vector<Real>> dphidzeta_map;
+  std::vector<std::vector<RealType>> dphidzeta_map;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * Map for the second derivative, d^2(phi)/d(xi)^2.
    */
-  std::vector<std::vector<Real>> d2phidxi2_map;
+  std::vector<std::vector<RealType>> d2phidxi2_map;
 
   /**
    * Map for the second derivative, d^2(phi)/d(xi)d(eta).
    */
-  std::vector<std::vector<Real>> d2phidxideta_map;
+  std::vector<std::vector<RealType>> d2phidxideta_map;
 
   /**
    * Map for the second derivative, d^2(phi)/d(xi)d(zeta).
    */
-  std::vector<std::vector<Real>> d2phidxidzeta_map;
+  std::vector<std::vector<RealType>> d2phidxidzeta_map;
 
   /**
    * Map for the second derivative, d^2(phi)/d(eta)^2.
    */
-  std::vector<std::vector<Real>> d2phideta2_map;
+  std::vector<std::vector<RealType>> d2phideta2_map;
 
   /**
    * Map for the second derivative, d^2(phi)/d(eta)d(zeta).
    */
-  std::vector<std::vector<Real>> d2phidetadzeta_map;
+  std::vector<std::vector<RealType>> d2phidetadzeta_map;
 
   /**
    * Map for the second derivative, d^2(phi)/d(zeta)^2.
    */
-  std::vector<std::vector<Real>> d2phidzeta2_map;
+  std::vector<std::vector<RealType>> d2phidzeta2_map;
 
 #endif
 
   /**
    * Map for the side shape functions, psi.
    */
-  std::vector<std::vector<Real>> psi_map;
+  std::vector<std::vector<RealType>> psi_map;
 
   /**
    * Map for the derivative of the side functions,
    * d(psi)/d(xi).
    */
-  std::vector<std::vector<Real>> dpsidxi_map;
+  std::vector<std::vector<RealType>> dpsidxi_map;
 
   /**
    * Map for the derivative of the side function,
    * d(psi)/d(eta).
    */
-  std::vector<std::vector<Real>> dpsideta_map;
+  std::vector<std::vector<RealType>> dpsideta_map;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -923,21 +965,21 @@ protected:
    * side shape functions.  Useful for computing
    * the curvature at the quadrature points.
    */
-  std::vector<std::vector<Real>> d2psidxi2_map;
+  std::vector<std::vector<RealType>> d2psidxi2_map;
 
   /**
    * Map for the second (cross) derivatives in xi, eta
    * of the side shape functions.  Useful for
    * computing the curvature at the quadrature points.
    */
-  std::vector<std::vector<Real>> d2psidxideta_map;
+  std::vector<std::vector<RealType>> d2psidxideta_map;
 
   /**
    * Map for the second derivatives (in eta) of the
    * side shape functions.  Useful for computing the
    * curvature at the quadrature points.
    */
-  std::vector<std::vector<Real>> d2psideta2_map;
+  std::vector<std::vector<RealType>> d2psideta2_map;
 
 #endif
 
@@ -957,19 +999,19 @@ protected:
    * curvatures) on the boundary at the quadrature points.
    * The mean curvature is a scalar value.
    */
-  std::vector<Real> curvatures;
+  std::vector<RealType> curvatures;
 
 #endif
 
   /**
    * Jacobian values at quadrature points
    */
-  std::vector<Real> jac;
+  std::vector<RealType> jac;
 
   /**
    * Jacobian*Weight values at quadrature points
    */
-  std::vector<Real> JxW;
+  std::vector<RealType> JxW;
 
   /**
    * Have calculations with this object already been started?
@@ -1000,8 +1042,16 @@ protected:
    * FE classes should be able to reset calculations_started in a few
    * special cases.
    */
-  template <unsigned int Dim, FEFamily T>
+  template <unsigned int, FEFamily, typename>
   friend class FE;
+  template <unsigned int, typename>
+  friend struct FEMapShapeFuncShim;
+  template <unsigned int, FEFamily, typename>
+  friend struct FEReinitShim;
+  template <unsigned int, FEFamily, typename>
+  friend struct FEEdgeReinitShim;
+  template <unsigned int, FEFamily, typename>
+  friend struct FESideMapShim;
 
   /**
    * The Jacobian tolerance used for determining when the mapping fails. The mapping is
@@ -1023,6 +1073,63 @@ private:
   std::vector<const Node *> _elem_nodes;
 };
 
+template <typename RealType>
+template <unsigned int Dim>
+void FEMapTempl<RealType>::init_face_shape_functions(const std::vector<Point> & point, const Elem * elem)
+{
+  FEMapShapeFuncShim<Dim, RealType>::init_face_shape_functions(*this, point, elem);
+}
+
+template <typename RealType>
+template <unsigned int Dim>
+void FEMapTempl<RealType>::init_edge_shape_functions(const std::vector<Point> & point, const Elem * elem)
+{
+  FEMapShapeFuncShim<Dim, RealType>::init_edge_shape_functions(*this, point, elem);
+}
+
+template <typename RealType>
+template <unsigned int Dim, typename T,
+          typename std::enable_if<!std::is_same<T,Real>::value,int>::type>
+void FEMapTempl<RealType>::init_face_shape_functions(const std::vector<PointTempl<Real>> & qp,
+                                                     const Elem * side)
+{
+  std::vector<Point> my_qp(qp.size());
+
+  for (std::size_t point = 0; point < qp.size(); ++point)
+    my_qp[point] = qp[point];
+
+  this->init_face_shape_functions(my_qp, side);
+}
+
+template <typename RealType>
+template <unsigned int Dim, typename T,
+          typename std::enable_if<!std::is_same<T,Real>::value,int>::type>
+void FEMapTempl<RealType>::init_edge_shape_functions(const std::vector<PointTempl<Real>> & qp,
+                                                     const Elem * edge)
+{
+  std::vector<Point> my_qp(qp.size());
+
+  for (std::size_t point = 0; point < qp.size(); ++point)
+    my_qp[point] = qp[point];
+
+  this->init_edge_shape_functions(my_qp, edge);
+}
+
+template <typename RealType>
+template <unsigned int Dim, typename T,
+          typename std::enable_if<!std::is_same<T,Real>::value,int>::type>
+void FEMapTempl<RealType>::init_reference_to_physical_map(const std::vector<PointTempl<Real>> & qp,
+                                                          const Elem * elem)
+{
+  std::vector<Point> my_qp(qp.size());
+
+  for (std::size_t point = 0; point < qp.size(); ++point)
+    my_qp[point] = qp[point];
+
+  this->init_reference_to_physical_map(my_qp, elem);
+}
+
+typedef FEMapTempl<Real> FEMap;
 }
 
 #endif // LIBMESH_FE_MAP_H

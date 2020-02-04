@@ -176,7 +176,7 @@ public:
         CPPUNIT_ASSERT_EQUAL( Elem::INACTIVE,elem->refinement_flag() );
 
         for (unsigned int c=0; c<elem->n_children(); c++)
-          if (elem->child_ptr(c) != remote_elem)
+          if (elem->child_ptr(c) != RemoteElem::get_instance())
             CPPUNIT_ASSERT_EQUAL(Elem::JUST_REFINED,
                                  elem->child_ptr(c)->refinement_flag());
       }

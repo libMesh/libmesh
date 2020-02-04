@@ -43,7 +43,8 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * This class implements the Patch Recovery error indicator.

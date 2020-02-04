@@ -35,8 +35,9 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
-class MeshBase;
+template <typename> class ElemTempl;
+template <typename> class MeshBaseTempl;
+template <typename> class PointTempl;
 
 /**
  * The base class for defining periodic boundaries.
@@ -45,9 +46,16 @@ class MeshBase;
  * \date 2010
  * \brief Base class for all PeriodicBoundary implementations.
  */
-class PeriodicBoundaryBase
+template <typename RealType = Real>
+class PeriodicBoundaryBaseTempl
 {
 public:
+  typedef PointTempl<RealType> Point;
+  typedef ElemTempl<RealType> Elem;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PeriodicBoundaryBaseTempl<RealType> PeriodicBoundaryBase;
+
+
   enum TransformationType
     { FORWARD=0,
       INVERSE=1 };
@@ -60,17 +68,17 @@ public:
   /**
    * Constructor
    */
-  PeriodicBoundaryBase();
+  PeriodicBoundaryBaseTempl();
 
   /**
    * Copy constructor
    */
-  PeriodicBoundaryBase(const PeriodicBoundaryBase & other);
+  PeriodicBoundaryBaseTempl(const PeriodicBoundaryBase & other);
 
   /**
    * Destructor
    */
-  virtual ~PeriodicBoundaryBase() {}
+  virtual ~PeriodicBoundaryBaseTempl() {}
 
   /**
    * This function should be overridden by derived classes to
@@ -146,6 +154,8 @@ protected:
   std::unique_ptr<DenseMatrix<Real>> _transformation_matrix;
 
 };
+
+typedef PeriodicBoundaryBaseTempl<Real> PeriodicBoundaryBase;
 
 } // namespace libmesh
 

@@ -62,13 +62,15 @@ namespace libMesh
 // Forward Declarations
 class System;
 class EquationSystems;
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 class Xdr;
 class DofMap;
 template <typename Output> class FunctionBase;
 class Parameters;
 class ParameterVector;
-class Point;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 class SensitivityData;
 template <typename T> class NumericVector;
 template <typename T> class SparseMatrix;

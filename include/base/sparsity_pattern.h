@@ -32,9 +32,12 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
+template <typename> class MeshBaseTempl;
+typedef MeshBaseTempl<Real> MeshBase;
 class DofMap;
 class CouplingMatrix;
+template <typename> class GhostingFunctorTempl;
+typedef GhostingFunctorTempl<Real> GhostingFunctor;
 
 /**
  * This defines the sparsity pattern, or graph, of a sparse matrix.

@@ -33,9 +33,9 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
-class PeriodicBoundaryBase;
-class PointLocatorBase;
+template <typename> class ElemTempl;
+template <typename> class PeriodicBoundaryBaseTempl;
+template <typename> class PointLocatorBaseTempl;
 
 /**
  * We're using a class instead of a typedef to allow forward
@@ -48,16 +48,22 @@ class PointLocatorBase;
  * \date 2010
  * \brief Maps between boundary ids and PeriodicBoundaryBase objects.
  */
-class PeriodicBoundaries : public std::map<boundary_id_type, PeriodicBoundaryBase *>
+template <typename RealType = Real>
+class PeriodicBoundariesTempl : public std::map<boundary_id_type, PeriodicBoundaryBaseTempl<RealType> *>
 {
 public:
+  typedef PeriodicBoundariesTempl<RealType> PeriodicBoundaries;
+  typedef PeriodicBoundaryBaseTempl<RealType> PeriodicBoundaryBase;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+
   PeriodicBoundaryBase * boundary(boundary_id_type id);
 
   const PeriodicBoundaryBase * boundary(boundary_id_type id) const;
 
-  PeriodicBoundaries() {}
+  PeriodicBoundariesTempl() {}
 
-  ~PeriodicBoundaries();
+  ~PeriodicBoundariesTempl();
 
   // The periodic neighbor of \p e in direction \p side, if it
   // exists, nullptr otherwise.
@@ -66,6 +72,8 @@ public:
                         const Elem * e,
                         unsigned int side) const;
 };
+
+typedef PeriodicBoundariesTempl<Real> PeriodicBoundaries;
 
 } // namespace libMesh
 

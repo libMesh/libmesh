@@ -26,6 +26,7 @@
 
 namespace libMesh
 {
+template <typename> class Edge3Templ;
 
 /**
  * The \p QUAD8 is an element in 2D composed of 8 nodes.
@@ -48,22 +49,30 @@ namespace libMesh
  * \date 2002
  * \brief A 2D quadrilateral element with 8 nodes.
  */
-class Quad8 : public Quad
+template <typename RealType = Real>
+class Quad8Templ : public QuadTempl<RealType>
 {
 public:
+  typedef QuadTempl<RealType> Quad;
+  typedef Quad8Templ<RealType> Quad8;
+  typedef Edge3Templ<RealType> Edge3;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor. By default this element has no parent.
    */
   explicit
-  Quad8 (Elem * p=nullptr) :
+  Quad8Templ (Elem * p=nullptr) :
     Quad(Quad8::n_nodes(), p, _nodelinks_data) {}
 
-  Quad8 (Quad8 &&) = delete;
-  Quad8 (const Quad8 &) = delete;
+  Quad8Templ (Quad8 &&) = delete;
+  Quad8Templ (const Quad8 &) = delete;
   Quad8 & operator= (const Quad8 &) = delete;
   Quad8 & operator= (Quad8 &&) = delete;
-  virtual ~Quad8() = default;
+  virtual ~Quad8Templ() = default;
 
   /**
    * \returns \p QUAD8.
@@ -199,7 +208,7 @@ public:
    * An optimized method for approximating the area of a
    * QUAD8 using quadrature.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)
@@ -238,6 +247,81 @@ protected:
 
 };
 
+template <typename RealType>
+const int Quad8Templ<RealType>::nodes_per_side;
+
+template <typename RealType>
+const unsigned int Quad8Templ<RealType>::side_nodes_map[Quad8::num_sides][Quad8::nodes_per_side] =
+  {
+    {0, 1, 4}, // Side 0
+    {1, 2, 5}, // Side 1
+    {2, 3, 6}, // Side 2
+    {3, 0, 7}  // Side 3
+  };
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Quad8Templ<RealType>::_embedding_matrix[Quad8::num_children][Quad8::num_nodes][Quad8::num_nodes] =
+  {
+    // embedding matrix for child 0
+    {
+      //         0           1           2           3           4           5           6           7
+      {    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
+      {    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000 }, // 1
+      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 2
+      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000 }, // 3
+      {   0.375000,  -0.125000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 4
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.750000,   0.375000,   0.250000,   0.375000 }, // 5
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.375000,   0.250000,   0.375000,   0.750000 }, // 6
+      {   0.375000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,   0.750000 }  // 7
+    },
+
+    // embedding matrix for child 1
+    {
+      //         0           1           2           3           4           5           6           7
+      {    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000 }, // 0
+      {    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
+      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000 }, // 2
+      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 3
+      {  -0.125000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 4
+      {    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 5
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.375000,   0.750000,   0.375000,   0.250000 }, // 6
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.750000,   0.375000,   0.250000,   0.375000 }  // 7
+    },
+
+    // embedding matrix for child 2
+    {
+      //         0           1           2           3           4           5           6           7
+      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000 }, // 0
+      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 1
+      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000 }, // 2
+      {    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.375000,   0.250000,   0.375000,   0.750000 }, // 4
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.250000,   0.375000,   0.750000,   0.375000 }, // 5
+      {    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 6
+      {  -0.125000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000 }  // 7
+    },
+
+    // embedding matrix for child 3
+    {
+      //         0           1           2           3           4           5           6           7
+      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 0
+      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000 }, // 1
+      {    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
+      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000 }, // 3
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.375000,   0.750000,   0.375000,   0.250000 }, // 4
+      {    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 5
+      {    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 6
+      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,   0.250000,   0.375000,   0.750000,   0.375000 }  // 7
+    }
+  };
+
+
+#endif
+
+typedef Quad8Templ<Real> Quad8;
 
 } // namespace libMesh
 

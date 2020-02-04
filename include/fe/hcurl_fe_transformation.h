@@ -32,30 +32,33 @@ namespace libMesh
  * \author Paul T. Bauman
  * \date 2012
  */
-template<typename OutputShape>
-class HCurlFETransformation : public FETransformationBase<OutputShape>
+template<typename MathType, typename RealType = Real>
+class HCurlFETransformation : public FETransformationBase<MathType,RealType>
 {
 public:
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef typename FEOutputTwoType<MathType,RealType>::OutputShape OutputShape;
 
   HCurlFETransformation()
-    : FETransformationBase<OutputShape>(){}
+      : FETransformationBase<MathType,RealType>(){}
 
   virtual ~HCurlFETransformation(){}
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const override;
+  virtual void init_map_phi(const FEGenericBase<MathType,RealType> & fe) const override;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const override;
+  virtual void init_map_dphi(const FEGenericBase<MathType,RealType> & fe) const override;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const override;
+  virtual void init_map_d2phi(const FEGenericBase<MathType,RealType> & fe) const override;
 
   /**
    * Evaluates shape functions in physical coordinates for \f$ H(curl)
@@ -68,7 +71,7 @@ public:
   virtual void map_phi(const unsigned int dim,
                        const Elem * const elem,
                        const std::vector<Point> & qp,
-                       const FEGenericBase<OutputShape> & fe,
+                       const FEGenericBase<MathType,RealType> & fe,
                        std::vector<std::vector<OutputShape>> & phi) const override;
 
   /**
@@ -78,8 +81,8 @@ public:
   virtual void map_dphi(const unsigned int /*dim*/,
                         const Elem * const /*elem*/,
                         const std::vector<Point> & /*qp*/,
-                        const FEGenericBase<OutputShape> & /*fe*/,
-                        std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & /*dphi*/,
+                        const FEGenericBase<MathType,RealType> & /*fe*/,
+                        std::vector<std::vector<typename FEOutputTwoType<MathType,RealType>::OutputGradient>> & /*dphi*/,
                         std::vector<std::vector<OutputShape>> & /*dphidx*/,
                         std::vector<std::vector<OutputShape>> & /*dphidy*/,
                         std::vector<std::vector<OutputShape>> & /*dphidz*/) const override
@@ -94,8 +97,8 @@ public:
    */
   virtual void map_d2phi(const unsigned int /*dim*/,
                          const std::vector<Point> & /*qp*/,
-                         const FEGenericBase<OutputShape> & /*fe*/,
-                         std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> & /*d2phi*/,
+                         const FEGenericBase<MathType,RealType> & /*fe*/,
+                         std::vector<std::vector<typename FEOutputTwoType<MathType,RealType>::OutputTensor>> & /*d2phi*/,
                          std::vector<std::vector<OutputShape>> & /*d2phidx2*/,
                          std::vector<std::vector<OutputShape>> & /*d2phidxdy*/,
                          std::vector<std::vector<OutputShape>> & /*d2phidxdz*/,
@@ -117,7 +120,7 @@ public:
   virtual void map_curl(const unsigned int dim,
                         const Elem * const elem,
                         const std::vector<Point> & qp,
-                        const FEGenericBase<OutputShape> & fe,
+                        const FEGenericBase<MathType,RealType> & fe,
                         std::vector<std::vector<OutputShape>> & curl_phi) const override;
 
   /**
@@ -127,8 +130,8 @@ public:
   virtual void map_div(const unsigned int /*dim*/,
                        const Elem * const /*elem*/,
                        const std::vector<Point> & /*qp*/,
-                       const FEGenericBase<OutputShape> & /*fe*/,
-                       std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> & /*div_phi*/) const override
+                       const FEGenericBase<MathType,RealType> & /*fe*/,
+                       std::vector<std::vector<typename FEOutputTwoType<MathType,RealType>::OutputDivergence>> & /*div_phi*/) const override
   {
     libmesh_warning("WARNING: Shape function divergences for HCurl elements are not currently being computed!");
   }

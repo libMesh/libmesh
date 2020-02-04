@@ -25,6 +25,10 @@
 
 namespace libMesh
 {
+template <typename> class ElemTempl;
+template <typename> class RemoteElemTempl;
+template <typename> class MeshBaseTempl;
+template <typename> class NodeTempl;
 
 /**
  * This class implements the default geometry ghosting in libMesh:
@@ -33,22 +37,29 @@ namespace libMesh
  * \author Roy H. Stogner
  * \date 2016
  */
-class GhostPointNeighbors : public GhostingFunctor
+template <typename RealType = Real>
+class GhostPointNeighborsTempl : public GhostingFunctorTempl<RealType>
 {
 public:
+  typedef GhostPointNeighborsTempl<RealType> GhostPointNeighbors;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef ElemTempl<RealType> Elem;
+  typedef RemoteElemTempl<RealType> RemoteElem;
+  typedef NodeTempl<RealType> Node;
+  using map_type = std::unordered_map<const ElemTempl<RealType> *, const CouplingMatrix*>;
 
   /**
    * Constructor.
    */
-  GhostPointNeighbors(const MeshBase & mesh) : _mesh(mesh) {}
+  GhostPointNeighborsTempl(const MeshBase & mesh) : _mesh(mesh) {}
 
   /**
    * For the specified range of active elements, find their point
    * neighbors and interior_parent elements, ignoring those on
    * processor p.
    */
-  virtual void operator() (const MeshBase::const_element_iterator & range_begin,
-                           const MeshBase::const_element_iterator & range_end,
+  virtual void operator() (const typename MeshBase::const_element_iterator & range_begin,
+                           const typename MeshBase::const_element_iterator & range_end,
                            processor_id_type p,
                            map_type & coupled_elements);
 
@@ -56,6 +67,8 @@ private:
 
   const MeshBase & _mesh;
 };
+
+typedef GhostPointNeighborsTempl<Real> GhostPointNeighbors;
 
 } // namespace libMesh
 

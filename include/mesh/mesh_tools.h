@@ -47,7 +47,10 @@ namespace libMesh
 
 // forward declarations
 class Sphere;
-class Elem;
+template <typename> class ElemTempl;
+template <typename> class NodeTempl;
+template <typename> class NodeTempl;
+template <typename> class PointTempl;
 
 /**
  * Utility functions for operations on a \p Mesh object.  Here is where
@@ -67,17 +70,17 @@ namespace MeshTools
  * \deprecated Use libMesh::BoundingBox instead.
  */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-class BoundingBox : public libMesh::BoundingBox
+class BoundingBox : public libMesh::BoundingBoxTempl<Real>
 {
 public:
-  BoundingBox (const Point & new_min,
-               const Point & new_max) :
-    libMesh::BoundingBox(new_min, new_max) {
+  BoundingBox (const PointTempl<Real> & new_min,
+               const PointTempl<Real> & new_max) :
+    libMesh::BoundingBoxTempl<Real>(new_min, new_max) {
     libmesh_deprecated(); // Switch to libMesh::BoundingBox
   }
 
-  BoundingBox (const std::pair<Point, Point> & bbox) :
-    libMesh::BoundingBox(bbox) {
+  BoundingBox (const std::pair<PointTempl<Real>, PointTempl<Real>> & bbox) :
+    libMesh::BoundingBoxTempl<Real>(bbox) {
     libmesh_deprecated(); // Switch to libMesh::BoundingBox
   }
 
@@ -96,7 +99,8 @@ public:
  * balancing scheme is to keep the weight per processor as uniform as
  * possible.
  */
-dof_id_type total_weight (const MeshBase & mesh);
+template <typename RealType>
+dof_id_type total_weight (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns The sum over all the elements on processor \p pid
@@ -106,11 +110,13 @@ dof_id_type total_weight (const MeshBase & mesh);
  * balancing scheme is to keep the weight per processor as uniform as
  * possible.
  */
-dof_id_type weight (const MeshBase & mesh,
+template <typename RealType>
+dof_id_type weight (const MeshBaseTempl<RealType> & mesh,
                     const processor_id_type pid);
 
+template <typename RealType>
 inline
-dof_id_type weight (const MeshBase & mesh)
+dof_id_type weight (const MeshBaseTempl<RealType> & mesh)
 { return MeshTools::weight (mesh, mesh.processor_id()); }
 
 /**
@@ -119,14 +125,16 @@ dof_id_type weight (const MeshBase & mesh)
  * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
  * element connected to node \p i.
  */
-void build_nodes_to_elem_map (const MeshBase & mesh,
+template <typename RealType>
+void build_nodes_to_elem_map (const MeshBaseTempl<RealType> & mesh,
                               std::vector<std::vector<dof_id_type>> & nodes_to_elem_map);
 
 /**
  * The same, except element pointers are returned instead of indices.
  */
-void build_nodes_to_elem_map (const MeshBase & mesh,
-                              std::vector<std::vector<const Elem *>> & nodes_to_elem_map);
+template <typename RealType>
+void build_nodes_to_elem_map (const MeshBaseTempl<RealType> & mesh,
+                              std::vector<std::vector<const ElemTempl<RealType> *>> & nodes_to_elem_map);
 
 /**
  * After calling this function the input map \p nodes_to_elem_map
@@ -134,14 +142,16 @@ void build_nodes_to_elem_map (const MeshBase & mesh,
  * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
  * element connected to node \p i.
  */
-void build_nodes_to_elem_map (const MeshBase & mesh,
+template <typename RealType>
+void build_nodes_to_elem_map (const MeshBaseTempl<RealType> & mesh,
                               std::unordered_map<dof_id_type, std::vector<dof_id_type>> & nodes_to_elem_map);
 
 /**
  * The same, except element pointers are returned instead of indices.
  */
-void build_nodes_to_elem_map (const MeshBase & mesh,
-                              std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map);
+template <typename RealType>
+void build_nodes_to_elem_map (const MeshBaseTempl<RealType> & mesh,
+                              std::unordered_map<dof_id_type, std::vector<const ElemTempl<RealType> *>> & nodes_to_elem_map);
 
 
 //   /**
@@ -149,21 +159,23 @@ void build_nodes_to_elem_map (const MeshBase & mesh,
 //    * to triangles.  \p QUAD4s will be converted to \p TRI3s, \p QUAD8s
 //    * and \p QUAD9s will be converted to \p TRI6s.
 //    */
-//   void all_tri (MeshBase & mesh);
+//   void all_tri (MeshBaseTempl<RealType> & mesh);
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
 /**
  * Fills the vector "on_boundary" with flags that tell whether each node
  * is on the domain boundary (true)) or not (false).
  */
-void find_boundary_nodes (const MeshBase & mesh,
+template <typename RealType>
+void find_boundary_nodes (const MeshBaseTempl<RealType> & mesh,
                           std::vector<bool> & on_boundary);
 #endif
 
 /**
  * Returns a std::set containing Node IDs for all of the boundary nodes
  */
-std::unordered_set<dof_id_type> find_boundary_nodes(const MeshBase & mesh);
+template <typename RealType>
+std::unordered_set<dof_id_type> find_boundary_nodes(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * Returns a std::set containing Node IDs for all of the block boundary nodes
@@ -171,7 +183,8 @@ std::unordered_set<dof_id_type> find_boundary_nodes(const MeshBase & mesh);
  * A "block boundary node" is a node that is connected to elemenents from 2
  * or more blockse
  */
-std::unordered_set<dof_id_type> find_block_boundary_nodes(const MeshBase & mesh);
+template <typename RealType>
+std::unordered_set<dof_id_type> find_block_boundary_nodes(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns Two points defining a cartesian box that bounds the
@@ -182,7 +195,7 @@ std::unordered_set<dof_id_type> find_block_boundary_nodes(const MeshBase & mesh)
  */
 #ifdef LIBMESH_ENABLE_DEPRECATED
 BoundingBox
-bounding_box (const MeshBase & mesh);
+bounding_box (const MeshBaseTempl<Real> & mesh);
 #endif
 
 /**
@@ -190,14 +203,16 @@ bounding_box (const MeshBase & mesh);
  *
  * \returns The non-deprecated libMesh::BoundingBox type.
  */
-libMesh::BoundingBox
-create_bounding_box (const MeshBase & mesh);
+template <typename RealType>
+libMesh::BoundingBoxTempl<RealType>
+create_bounding_box (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns A bounding sphere for \p mesh instead of a bounding box.
  */
+template <typename RealType>
 Sphere
-bounding_sphere (const MeshBase & mesh);
+bounding_sphere (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns Two points defining a cartesian box that bounds the
@@ -206,8 +221,9 @@ bounding_sphere (const MeshBase & mesh);
  * In the case of curved elements, this box might *not* bound the
  * elements of the mesh.
  */
-libMesh::BoundingBox
-create_nodal_bounding_box (const MeshBase & mesh);
+template <typename RealType>
+libMesh::BoundingBoxTempl<RealType>
+create_nodal_bounding_box (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns Two points defining a cartesian box that bounds the
@@ -217,8 +233,9 @@ create_nodal_bounding_box (const MeshBase & mesh);
  * need to be run in parallel, because this is the only function we
  * can guarantee can be resolved with only local information.
  */
-libMesh::BoundingBox
-create_local_bounding_box (const MeshBase & mesh);
+template <typename RealType>
+libMesh::BoundingBoxTempl<RealType>
+create_local_bounding_box (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns Two points defining a cartesian box that bounds the
@@ -228,7 +245,7 @@ create_local_bounding_box (const MeshBase & mesh);
  */
 #ifdef LIBMESH_ENABLE_DEPRECATED
 BoundingBox
-processor_bounding_box (const MeshBase & mesh,
+processor_bounding_box (const MeshBaseTempl<Real> & mesh,
                         const processor_id_type pid);
 #endif
 
@@ -237,15 +254,17 @@ processor_bounding_box (const MeshBase & mesh,
  *
  * \returns The non-deprecated libMesh::BoundingBox type.
  */
-libMesh::BoundingBox
-create_processor_bounding_box (const MeshBase & mesh,
+template <typename RealType>
+libMesh::BoundingBoxTempl<RealType>
+create_processor_bounding_box (const MeshBaseTempl<RealType> & mesh,
                                const processor_id_type pid);
 
 /**
  * \returns A processor bounding sphere instead of a processor bounding box.
  */
+template <typename RealType>
 Sphere
-processor_bounding_sphere (const MeshBase & mesh,
+processor_bounding_sphere (const MeshBaseTempl<RealType> & mesh,
                            const processor_id_type pid);
 
 /**
@@ -256,7 +275,7 @@ processor_bounding_sphere (const MeshBase & mesh,
  */
 #ifdef LIBMESH_ENABLE_DEPRECATED
 BoundingBox
-subdomain_bounding_box (const MeshBase & mesh,
+subdomain_bounding_box (const MeshBaseTempl<Real> & mesh,
                         const subdomain_id_type sid);
 #endif
 
@@ -266,15 +285,17 @@ subdomain_bounding_box (const MeshBase & mesh,
  *
  * \returns The non-deprecated libMesh::BoundingBox type.
  */
-libMesh::BoundingBox
-create_subdomain_bounding_box (const MeshBase & mesh,
+template <typename RealType>
+libMesh::BoundingBoxTempl<RealType>
+create_subdomain_bounding_box (const MeshBaseTempl<RealType> & mesh,
                                const subdomain_id_type sid);
 
 /**
  * \returns A subdomain bounding sphere instead of a subdomain bounding box.
  */
+template <typename RealType>
 Sphere
-subdomain_bounding_sphere (const MeshBase & mesh,
+subdomain_bounding_sphere (const MeshBaseTempl<RealType> & mesh,
                            const subdomain_id_type sid);
 
 
@@ -282,7 +303,8 @@ subdomain_bounding_sphere (const MeshBase & mesh,
  * Fills in a vector of all element types in the mesh.  Implemented
  * in terms of element_iterators.
  */
-void elem_types (const MeshBase & mesh,
+template <typename RealType>
+void elem_types (const MeshBaseTempl<RealType> & mesh,
                  std::vector<ElemType> & et);
 
 /**
@@ -290,7 +312,8 @@ void elem_types (const MeshBase & mesh,
  *
  * Implemented in terms of type_element_iterators.
  */
-dof_id_type n_elem_of_type (const MeshBase & mesh,
+template <typename RealType>
+dof_id_type n_elem_of_type (const MeshBaseTempl<RealType> & mesh,
                             const ElemType type);
 
 /**
@@ -298,7 +321,8 @@ dof_id_type n_elem_of_type (const MeshBase & mesh,
  *
  * Implemented in terms of active_type_element_iterators.
  */
-dof_id_type n_active_elem_of_type (const MeshBase & mesh,
+template <typename RealType>
+dof_id_type n_active_elem_of_type (const MeshBaseTempl<RealType> & mesh,
                                    const ElemType type);
 
 /**
@@ -309,7 +333,8 @@ dof_id_type n_active_elem_of_type (const MeshBase & mesh,
  * a single function which takes a range of iterators and computes the
  * std::distance between them.
  */
-dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
+template <typename RealType>
+dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBaseTempl<RealType> & mesh,
                                                   const ElemType type,
                                                   const unsigned int level);
 
@@ -320,7 +345,8 @@ dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
  * unpartitioned elements and finding the maximum level, then summing
  * in parallel.
  */
-unsigned int n_levels(const MeshBase & mesh);
+template <typename RealType>
+unsigned int n_levels(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns The number of levels of refinement in the local mesh.
@@ -328,7 +354,8 @@ unsigned int n_levels(const MeshBase & mesh);
  * Implemented by looping over all the local elements and finding the
  * maximum level.
  */
-unsigned int n_local_levels(const MeshBase & mesh);
+template <typename RealType>
+unsigned int n_local_levels(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns The number of levels of refinement in the active mesh.
@@ -336,7 +363,8 @@ unsigned int n_local_levels(const MeshBase & mesh);
  * Implemented by looping over all the active local elements and finding
  * the maximum level, then taking the max in parallel.
  */
-unsigned int n_active_levels(const MeshBase & mesh);
+template <typename RealType>
+unsigned int n_active_levels(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns The number of levels of refinement in the active local mesh.
@@ -344,7 +372,8 @@ unsigned int n_active_levels(const MeshBase & mesh);
  * Implemented by looping over all the active local elements and finding
  * the maximum level.
  */
-unsigned int n_active_local_levels(const MeshBase & mesh);
+template <typename RealType>
+unsigned int n_active_local_levels(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns The number of p-levels of refinement in the mesh.
@@ -352,7 +381,8 @@ unsigned int n_active_local_levels(const MeshBase & mesh);
  * Implemented by looping over all the local elements and finding the
  * maximum p-level, then summing in parallel.
  */
-unsigned int n_p_levels (const MeshBase & mesh);
+template <typename RealType>
+unsigned int n_p_levels (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * \returns The number of levels of refinement in the mesh, even if that
@@ -363,7 +393,8 @@ unsigned int n_p_levels (const MeshBase & mesh);
  * n_levels() but will return correct values even when the mesh is in
  * an inconsistent parallel state.
  */
-unsigned int paranoid_n_levels(const MeshBase & mesh);
+template <typename RealType>
+unsigned int paranoid_n_levels(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * Builds a set of node IDs for nodes which belong to non-subactive
@@ -371,47 +402,53 @@ unsigned int paranoid_n_levels(const MeshBase & mesh);
  * or inactive.  This is useful for determining which nodes should be
  * written to a data file, and is used by the XDA mesh writing methods.
  */
-void get_not_subactive_node_ids(const MeshBase & mesh,
+template <typename RealType>
+void get_not_subactive_node_ids(const MeshBaseTempl<RealType> & mesh,
                                 std::set<dof_id_type> & not_subactive_node_ids);
 
 /**
  * Count up the number of elements of a specific type
  * (as defined by an iterator range).
  */
-dof_id_type n_elem (const MeshBase::const_element_iterator & begin,
-                    const MeshBase::const_element_iterator & end);
+template <typename IteratorType>
+dof_id_type n_elem (const IteratorType & begin,
+                    const IteratorType & end);
 
 
 /**
  * Count up the number of nodes of a specific type
  * (as defined by an iterator range).
  */
-dof_id_type n_nodes (const MeshBase::const_node_iterator & begin,
-                     const MeshBase::const_node_iterator & end);
+template <typename IteratorType>
+dof_id_type n_nodes (const IteratorType & begin,
+                     const IteratorType & end);
 
 
 /**
  * Find the maximum h-refinement level in a mesh.
  */
-unsigned int max_level (const MeshBase & mesh);
+template <typename RealType>
+unsigned int max_level (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * Given a mesh and a node in the mesh, the vector will be filled with
  * every node directly attached to the given one.
  */
-void find_nodal_neighbors(const MeshBase & mesh,
-                          const Node & n,
-                          const std::vector<std::vector<const Elem *>> & nodes_to_elem_map,
-                          std::vector<const Node *> & neighbors);
+template <typename RealType>
+void find_nodal_neighbors(const MeshBaseTempl<RealType> & mesh,
+                          const NodeTempl<RealType> & n,
+                          const std::vector<std::vector<const ElemTempl<RealType> *>> & nodes_to_elem_map,
+                          std::vector<const NodeTempl<RealType> *> & neighbors);
 
 /**
  * Given a mesh and a node in the mesh, the vector will be filled with
  * every node directly attached to the given one.
  */
-void find_nodal_neighbors(const MeshBase & mesh,
-                          const Node & n,
-                          const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
-                          std::vector<const Node *> & neighbors);
+template <typename RealType>
+void find_nodal_neighbors(const MeshBaseTempl<RealType> & mesh,
+                          const NodeTempl<RealType> & n,
+                          const std::unordered_map<dof_id_type, std::vector<const ElemTempl<RealType> *>> & nodes_to_elem_map,
+                          std::vector<const NodeTempl<RealType> *> & neighbors);
 
 /**
  * Given a mesh hanging_nodes will be filled with an associative array keyed off the
@@ -419,7 +456,8 @@ void find_nodal_neighbors(const MeshBase & mesh,
  * parents of the node (meaning the two nodes to either side of it that make up
  * the side the hanging node is on.
  */
-void find_hanging_nodes_and_parents(const MeshBase & mesh,
+template <typename RealType>
+void find_hanging_nodes_and_parents(const MeshBaseTempl<RealType> & mesh,
                                     std::map<dof_id_type, std::vector<dof_id_type>> & hanging_nodes);
 
 /**
@@ -432,7 +470,8 @@ void find_hanging_nodes_and_parents(const MeshBase & mesh,
  * On a distributed mesh, this function must be called in parallel
  * to sync everyone's corrected processor ids on ghost nodes.
  */
-void correct_node_proc_ids(MeshBase &);
+template <typename RealType>
+void correct_node_proc_ids(MeshBaseTempl<RealType> &);
 
 
 #ifdef DEBUG
@@ -440,52 +479,60 @@ void correct_node_proc_ids(MeshBase &);
  * A function for verifying that an element has been cut off
  * from the rest of the mesh
  */
-void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
-                                     const Elem * bad_elem);
+template <typename RealType>
+void libmesh_assert_no_links_to_elem(const MeshBaseTempl<RealType> & mesh,
+                                     const ElemTempl<RealType> * bad_elem);
 
 /**
  * A function for testing that all DofObjects within a mesh
  * have the same n_systems count
  */
-void libmesh_assert_equal_n_systems (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_equal_n_systems (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for testing that all non-recently-created DofObjects
  * within a mesh have old_dof_object data.  This is not expected to
  * be true at all points within a simulation code.
  */
-void libmesh_assert_old_dof_objects (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_old_dof_objects (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for walking across the mesh to try and ferret out
  * invalidated or misassigned pointers
  */
-void libmesh_assert_valid_node_pointers (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_node_pointers (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that active local elements' neighbors
  * are never remote elements
  */
-void libmesh_assert_valid_remote_elems (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_remote_elems (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that ids and processor assignment of elements
  * are correctly sorted (monotone increasing)
  */
-void libmesh_assert_valid_elem_ids (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_elem_ids (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that ids of elements are correctly
  * sorted for AMR (parents have lower ids than children)
  */
-void libmesh_assert_valid_amr_elem_ids (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_amr_elem_ids (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that any interior_parent pointers on
  * elements are consistent with AMR (parents' interior_parents are
  * interior_parents' parents)
  */
-void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_amr_interior_parents (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that all nodes are connected to at least
@@ -497,13 +544,15 @@ void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
  * without also being given the remote elements connected to those
  * nodes.
  */
-void libmesh_assert_connected_nodes (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_connected_nodes (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that boundary condition ids match
  * across processors.
  */
-void libmesh_assert_valid_boundary_ids (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_boundary_ids (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that degree of freedom indexing matches
@@ -512,7 +561,8 @@ void libmesh_assert_valid_boundary_ids (const MeshBase & mesh);
  * Verify a particular system by specifying that system's number, or
  * verify all systems at once by leaving \p sysnum unspecified.
  */
-void libmesh_assert_valid_dof_ids (const MeshBase & mesh,
+template <typename RealType>
+void libmesh_assert_valid_dof_ids (const MeshBaseTempl<RealType> & mesh,
                                    unsigned int sysnum = libMesh::invalid_uint);
 
 /**
@@ -522,7 +572,8 @@ void libmesh_assert_valid_dof_ids (const MeshBase & mesh,
  *
  * Verify a particular system by specifying that system's number.
  */
-void libmesh_assert_contiguous_dof_ids (const MeshBase & mesh,
+template <typename RealType>
+void libmesh_assert_contiguous_dof_ids (const MeshBaseTempl<RealType> & mesh,
                                         unsigned int sysnum);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -531,7 +582,8 @@ void libmesh_assert_contiguous_dof_ids (const MeshBase & mesh,
  *
  * FIXME: we ought to check for uniqueness too.
  */
-void libmesh_assert_valid_unique_ids (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_unique_ids (const MeshBaseTempl<RealType> & mesh);
 #endif
 
 /**
@@ -539,14 +591,16 @@ void libmesh_assert_valid_unique_ids (const MeshBase & mesh);
  * parallel consistent (every processor can see every node or element
  * it owns)
  */
-void libmesh_assert_consistent_distributed(const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_consistent_distributed(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that distribution of nodes is parallel
  * consistent (every processor can see every node it owns) even before
  * node ids have been made consistent
  */
-void libmesh_assert_consistent_distributed_nodes(const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_consistent_distributed_nodes(const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that processor assignment is parallel
@@ -554,15 +608,16 @@ void libmesh_assert_consistent_distributed_nodes(const MeshBase & mesh);
  * it can see) even on nodes which have not yet recieved consistent
  * DofObject::id(), using element topology to identify matching nodes.
  */
-void libmesh_assert_parallel_consistent_new_node_procids (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_parallel_consistent_new_node_procids (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that processor assignment is parallel
  * consistent (every processor agrees on the processor id of each dof
  * object it can see)
  */
-template <typename DofObjectSubclass>
-void libmesh_assert_parallel_consistent_procids (const MeshBase & mesh);
+template <typename DofObjectSubclass, typename RealType>
+void libmesh_assert_parallel_consistent_procids (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that processor assignment is
@@ -570,15 +625,15 @@ void libmesh_assert_parallel_consistent_procids (const MeshBase & mesh);
  * element on its processor) or elements (each parent has the
  * processor id of one of its children).
  */
-template <typename DofObjectSubclass>
-void libmesh_assert_topology_consistent_procids (const MeshBase & mesh);
+template <typename DofObjectSubclass, typename RealType>
+void libmesh_assert_topology_consistent_procids (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that processor assignment is
  * both parallel and topologically consistent.
  */
-template <typename DofObjectSubclass>
-void libmesh_assert_valid_procids (const MeshBase & mesh) {
+template <typename DofObjectSubclass, typename RealType>
+void libmesh_assert_valid_procids (const MeshBaseTempl<RealType> & mesh) {
   libmesh_assert_parallel_consistent_procids<DofObjectSubclass>(mesh);
   libmesh_assert_topology_consistent_procids<DofObjectSubclass>(mesh);
 }
@@ -587,19 +642,22 @@ void libmesh_assert_valid_procids (const MeshBase & mesh) {
  * A function for verifying that processor assignment of nodes matches
  * the heuristic specified in Node::choose_processor_id()
  */
-void libmesh_assert_canonical_node_procids (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_canonical_node_procids (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that refinement flags on elements
  * are consistent between processors
  */
-void libmesh_assert_valid_refinement_flags (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_refinement_flags (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that elements on this processor have
  * valid descendants and consistent active flags.
  */
-void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
+template <typename RealType>
+void libmesh_assert_valid_refinement_tree (const MeshBaseTempl<RealType> & mesh);
 
 /**
  * A function for verifying that neighbor connectivity is correct (each
@@ -611,7 +669,8 @@ void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
  * thrown for neighbor links where a remote_elem should exist but a nullptr
  * exists instead.
  */
-void libmesh_assert_valid_neighbors (const MeshBase & mesh,
+template <typename RealType>
+void libmesh_assert_valid_neighbors (const MeshBaseTempl<RealType> & mesh,
                                      bool assert_valid_remote_elems=true);
 #endif
 
@@ -631,7 +690,8 @@ namespace Private {
  * fix_node_and_element_numbering().
  *
  */
-void globally_renumber_nodes_and_elements (MeshBase &);
+template <typename RealType>
+void globally_renumber_nodes_and_elements (MeshBaseTempl<RealType> &);
 } // end namespace Private
 
 } // end namespace MeshTools

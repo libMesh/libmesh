@@ -25,6 +25,7 @@
 #include "libmesh/function_base.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/fe_base_forward.h"
 
 // C++ includes
 #include <cstddef>
@@ -35,11 +36,12 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Elem;
-template <typename T> class FEGenericBase;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 typedef FEGenericBase<Real> FEBase;
 class MeshFunction;
-class Point;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 class Parameters;
 template <typename T> class DenseVector;
 

@@ -34,8 +34,68 @@ namespace libMesh
 
 // Forward Declarations
 class CouplingMatrix;
-class Elem;
+template <typename> class ElemTempl;
 
+template <typename RealType>
+using gf_map_type = std::unordered_map<const ElemTempl<RealType> *, const CouplingMatrix*>;
+
+class GhostingFunctorBase : public ReferenceCountedObject<GhostingFunctorBase>
+{
+public:
+  GhostingFunctorBase (unsigned int n_levels = 0) : _n_levels(n_levels) {}
+
+  /**
+   * Virtual destructor; this is an abstract base class.
+   */
+  virtual ~GhostingFunctorBase() {}
+
+  /**
+   * GhostingFunctor subclasses which cache data will need to
+   * initialize that cache.  We call mesh_reinit() whenever the
+   * relevant Mesh has changed, but before remote elements on a
+   * distributed mesh are deleted.
+   */
+  virtual void mesh_reinit () {};
+
+  /**
+   * For algebraic ghosting or coupling functors we also call
+   * dofmap_reinit() later, after dofs have been distributed on the
+   * new mesh but before the functors have been queried for send_list
+   * or sparsity pattern calculations.
+   */
+  virtual void dofmap_reinit () {};
+
+  /**
+   * GhostingFunctor subclasses with relatively long-lasting caches
+   * may want to redistribute those caches whenever the relevant Mesh
+   * is redistributed; we will give them an opportunity when that
+   * happens.  At the point in the code where this is called, element
+   * processor ids have been set to their new destinations, and those
+   * elements have been copied to their new destinations, but the
+   * elements have not yet been deleted by the processors which
+   * previously held them..
+   */
+  virtual void redistribute () {};
+
+  /**
+   * GhostingFunctor subclasses with relatively long-lasting caches
+   * may want to delete the no-longer-relevant parts of those caches
+   * after a redistribution is complete.
+   */
+  virtual void delete_remote_elements () {};
+
+  // Change coupling matrix after construction
+  virtual void set_dof_coupling(const CouplingMatrix * /*dof_coupling*/) {}
+
+  // Change number of levels of neighbors to couple.
+  void set_n_levels(unsigned int n_levels) { _n_levels = n_levels; }
+
+  // Return number of levels of neighbors we will couple.
+  unsigned int n_levels() { return _n_levels; }
+
+protected:
+  unsigned int _n_levels;
+};
 
 /**
  * This abstract base class defines the interface by which library
@@ -150,25 +210,26 @@ class Elem;
  * \author Roy H. Stogner
  * \date 2016
  */
-class GhostingFunctor : public ReferenceCountedObject<GhostingFunctor>
+template <typename RealType = Real>
+class GhostingFunctorTempl : public GhostingFunctorBase
 {
 public:
 
   /**
    * Constructor.  Empty in the base class.
    */
-  GhostingFunctor() {}
+  GhostingFunctorTempl() : GhostingFunctorBase() {}
 
   /**
    * Virtual destructor; this is an abstract base class.
    */
-  virtual ~GhostingFunctor() {}
+  virtual ~GhostingFunctorTempl() {}
 
   /**
    * What elements do we care about and what variables do we care
    * about on each element?
    */
-  typedef std::unordered_map<const Elem*, const CouplingMatrix*> map_type;
+  using map_type = gf_map_type<RealType>;
 
   /**
    * For the specified range of active elements, what other elements
@@ -180,46 +241,14 @@ public:
    * processor p" with "ignoring those which match a predicate
    * functor" eventually.
    */
-  virtual void operator() (const MeshBase::const_element_iterator & range_begin,
-                           const MeshBase::const_element_iterator & range_end,
+  virtual void operator() (const typename MeshBaseTempl<RealType>::const_element_iterator & range_begin,
+                           const typename MeshBaseTempl<RealType>::const_element_iterator & range_end,
                            processor_id_type p,
                            map_type & coupled_elements) = 0;
 
-  /**
-   * GhostingFunctor subclasses which cache data will need to
-   * initialize that cache.  We call mesh_reinit() whenever the
-   * relevant Mesh has changed, but before remote elements on a
-   * distributed mesh are deleted.
-   */
-  virtual void mesh_reinit () {};
-
-  /**
-   * For algebraic ghosting or coupling functors we also call
-   * dofmap_reinit() later, after dofs have been distributed on the
-   * new mesh but before the functors have been queried for send_list
-   * or sparsity pattern calculations.
-   */
-  virtual void dofmap_reinit () {};
-
-  /**
-   * GhostingFunctor subclasses with relatively long-lasting caches
-   * may want to redistribute those caches whenever the relevant Mesh
-   * is redistributed; we will give them an opportunity when that
-   * happens.  At the point in the code where this is called, element
-   * processor ids have been set to their new destinations, and those
-   * elements have been copied to their new destinations, but the
-   * elements have not yet been deleted by the processors which
-   * previously held them..
-   */
-  virtual void redistribute () {};
-
-  /**
-   * GhostingFunctor subclasses with relatively long-lasting caches
-   * may want to delete the no-longer-relevant parts of those caches
-   * after a redistribution is complete.
-   */
-  virtual void delete_remote_elements () {};
 };
+
+typedef GhostingFunctorTempl<Real> GhostingFunctor;
 
 } // namespace libMesh
 

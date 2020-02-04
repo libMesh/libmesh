@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_vector.h" // required to instantiate a DenseVector<> below
+#include "libmesh/compare_types.h"
 
 // C++ includes
 #include <cstddef>
@@ -32,7 +33,7 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Point;
+template <typename> class PointTempl;
 
 /**
  * \brief Base class for functors that can be evaluated at a point and
@@ -70,6 +71,8 @@ protected:
   FunctionBase (const FunctionBase * master = nullptr);
 
 public:
+  typedef typename GetScalarType<Output>::type RealType;
+  typedef PointTempl<RealType> Point;
 
   /**
    * The 5 special functions can be defaulted for this class.

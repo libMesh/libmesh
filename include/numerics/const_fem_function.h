@@ -31,7 +31,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class Point;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 
 /**
  * FEMFunction that returns a single value, regardless of the time and

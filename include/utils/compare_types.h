@@ -178,6 +178,18 @@ SUPERTYPE(long double, Real);
 #undef CompareTypes_super
 #undef SUPERTYPE
 
+template <typename T>
+struct GetScalarType
+{
+  typedef typename std::enable_if<ScalarTraits<T>::value, T>::type type;
+};
+
+template <template <typename> class Wrapper, typename T>
+struct GetScalarType<Wrapper<T>>
+{
+  typedef typename std::enable_if<ScalarTraits<T>::value, T>::type type;
+};
+
 // gcc can't tell which of the following is the most specialized?  Weak.
 /*
   template<typename S, typename T>

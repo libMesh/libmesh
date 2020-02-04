@@ -3,7 +3,6 @@
 # not be installed.  These header files may have implementation
 # details which are not required for the public interface
 noinst_HEADERS =  \
-        base/libmesh_augment_std_namespace.h \
         mesh/nemesis_io_helper.h \
         numerics/laspack_matrix.h \
         numerics/laspack_vector.h \
@@ -19,6 +18,7 @@ include_HEADERS =  \
         libmesh_config.h \
         base/auto_ptr.h \
         base/default_coupling.h \
+        base/default_coupling_impl.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
         base/dof_object.h \
@@ -26,10 +26,13 @@ include_HEADERS =  \
         base/float128_shims.h \
         base/getpot.h \
         base/ghost_point_neighbors.h \
+        base/ghost_point_neighbors_impl.h \
         base/ghosting_functor.h \
         base/id_types.h \
+        base/instantiate_real_type.h \
         base/libmesh.h \
         base/libmesh_C_isnan.h \
+        base/libmesh_augment_std_namespace.h \
         base/libmesh_base.h \
         base/libmesh_common.h \
         base/libmesh_documentation.h \
@@ -39,13 +42,17 @@ include_HEADERS =  \
         base/libmesh_version.h \
         base/multi_predicates.h \
         base/periodic_boundaries.h \
+        base/periodic_boundaries_impl.h \
         base/periodic_boundary.h \
         base/periodic_boundary_base.h \
+        base/periodic_boundary_base_impl.h \
         base/point_neighbor_coupling.h \
+        base/point_neighbor_coupling_impl.h \
         base/print_trace.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
         base/sibling_coupling.h \
+        base/sibling_coupling_impl.h \
         base/single_predicates.h \
         base/sparsity_pattern.h \
         base/variable.h \
@@ -85,17 +92,90 @@ include_HEADERS =  \
         error_estimation/weighted_patch_recovery_error_estimator.h \
         fe/fe.h \
         fe/fe_abstract.h \
+        fe/fe_abstract_impl.h \
         fe/fe_base.h \
+        fe/fe_base_forward.h \
+        fe/fe_base_impl.h \
+        fe/fe_bernstein_impl.h \
+        fe/fe_bernstein_shape_0D_impl.h \
+        fe/fe_bernstein_shape_1D_impl.h \
+        fe/fe_bernstein_shape_2D_impl.h \
+        fe/fe_bernstein_shape_3D_impl.h \
+        fe/fe_boundary_impl.h \
+        fe/fe_clough_impl.h \
+        fe/fe_clough_shape_0D_impl.h \
+        fe/fe_clough_shape_1D_impl.h \
+        fe/fe_clough_shape_2D_impl.h \
+        fe/fe_clough_shape_3D_impl.h \
         fe/fe_compute_data.h \
+        fe/fe_constraints_impl.h \
+        fe/fe_forward.h \
+        fe/fe_hermite_impl.h \
+        fe/fe_hermite_shape_0D_impl.h \
+        fe/fe_hermite_shape_1D_impl.h \
+        fe/fe_hermite_shape_2D_impl.h \
+        fe/fe_hermite_shape_3D_impl.h \
+        fe/fe_hierarchic_impl.h \
+        fe/fe_hierarchic_shape_0D_impl.h \
+        fe/fe_hierarchic_shape_1D_impl.h \
+        fe/fe_hierarchic_shape_2D_impl.h \
+        fe/fe_hierarchic_shape_3D_impl.h \
+        fe/fe_impl.h \
         fe/fe_interface.h \
+        fe/fe_interface_impl.h \
+        fe/fe_l2_hierarchic_impl.h \
+        fe/fe_l2_lagrange_impl.h \
+        fe/fe_lagrange_impl.h \
+        fe/fe_lagrange_shape_0D_impl.h \
         fe/fe_lagrange_shape_1D.h \
+        fe/fe_lagrange_shape_1D_impl.h \
+        fe/fe_lagrange_shape_2D_impl.h \
+        fe/fe_lagrange_shape_3D_impl.h \
+        fe/fe_lagrange_vec_impl.h \
         fe/fe_macro.h \
         fe/fe_map.h \
+        fe/fe_map_impl.h \
+        fe/fe_monomial_impl.h \
+        fe/fe_monomial_shape_0D_impl.h \
+        fe/fe_monomial_shape_1D_impl.h \
+        fe/fe_monomial_shape_2D_impl.h \
+        fe/fe_monomial_shape_3D_impl.h \
+        fe/fe_monomial_vec_impl.h \
+        fe/fe_nedelec_one_impl.h \
+        fe/fe_nedelec_one_shape_2D_impl.h \
+        fe/fe_nedelec_one_shape_3D_impl.h \
+        fe/fe_output_type.h \
+        fe/fe_rational_impl.h \
+        fe/fe_rational_shape_0D_impl.h \
+        fe/fe_rational_shape_1D_impl.h \
+        fe/fe_rational_shape_2D_impl.h \
+        fe/fe_rational_shape_3D_impl.h \
+        fe/fe_scalar_impl.h \
+        fe/fe_scalar_shape_0D_impl.h \
+        fe/fe_scalar_shape_1D_impl.h \
+        fe/fe_scalar_shape_2D_impl.h \
+        fe/fe_scalar_shape_3D_impl.h \
+        fe/fe_shim.h \
+        fe/fe_subdivision_impl.h \
+        fe/fe_szabab_impl.h \
+        fe/fe_szabab_shape_0D_impl.h \
+        fe/fe_szabab_shape_1D_impl.h \
+        fe/fe_szabab_shape_2D_impl.h \
+        fe/fe_szabab_shape_3D_impl.h \
         fe/fe_transformation_base.h \
+        fe/fe_transformation_base_impl.h \
         fe/fe_type.h \
+        fe/fe_xyz_boundary_impl.h \
+        fe/fe_xyz_impl.h \
         fe/fe_xyz_map.h \
+        fe/fe_xyz_shape_0D_impl.h \
+        fe/fe_xyz_shape_1D_impl.h \
+        fe/fe_xyz_shape_2D_impl.h \
+        fe/fe_xyz_shape_3D_impl.h \
         fe/h1_fe_transformation.h \
+        fe/h1_fe_transformation_impl.h \
         fe/hcurl_fe_transformation.h \
+        fe/hcurl_fe_transformation_impl.h \
         fe/inf_fe.h \
         fe/inf_fe_instantiate_1D.h \
         fe/inf_fe_instantiate_2D.h \
@@ -106,8 +186,12 @@ include_HEADERS =  \
         geom/cell.h \
         geom/cell_hex.h \
         geom/cell_hex20.h \
+        geom/cell_hex20_impl.h \
         geom/cell_hex27.h \
+        geom/cell_hex27_impl.h \
         geom/cell_hex8.h \
+        geom/cell_hex8_impl.h \
+        geom/cell_hex_impl.h \
         geom/cell_inf.h \
         geom/cell_inf_hex.h \
         geom/cell_inf_hex16.h \
@@ -118,24 +202,36 @@ include_HEADERS =  \
         geom/cell_inf_prism6.h \
         geom/cell_prism.h \
         geom/cell_prism15.h \
+        geom/cell_prism15_impl.h \
         geom/cell_prism18.h \
+        geom/cell_prism18_impl.h \
         geom/cell_prism6.h \
+        geom/cell_prism6_impl.h \
+        geom/cell_prism_impl.h \
         geom/cell_pyramid.h \
         geom/cell_pyramid13.h \
         geom/cell_pyramid14.h \
         geom/cell_pyramid5.h \
+        geom/cell_pyramid5_impl.h \
+        geom/cell_pyramid_impl.h \
         geom/cell_tet.h \
         geom/cell_tet10.h \
+        geom/cell_tet10_impl.h \
         geom/cell_tet4.h \
+        geom/cell_tet4_impl.h \
+        geom/cell_tet_impl.h \
         geom/compare_elems_by_level.h \
         geom/edge.h \
         geom/edge_edge2.h \
         geom/edge_edge3.h \
+        geom/edge_edge3_impl.h \
         geom/edge_edge4.h \
+        geom/edge_edge4_impl.h \
         geom/edge_inf_edge2.h \
         geom/elem.h \
         geom/elem_cutter.h \
         geom/elem_hash.h \
+        geom/elem_impl.h \
         geom/elem_internal.h \
         geom/elem_quality.h \
         geom/elem_range.h \
@@ -145,15 +241,22 @@ include_HEADERS =  \
         geom/face_inf_quad6.h \
         geom/face_quad.h \
         geom/face_quad4.h \
+        geom/face_quad4_impl.h \
         geom/face_quad4_shell.h \
         geom/face_quad8.h \
+        geom/face_quad8_impl.h \
         geom/face_quad8_shell.h \
         geom/face_quad9.h \
+        geom/face_quad9_impl.h \
+        geom/face_quad_impl.h \
         geom/face_tri.h \
         geom/face_tri3.h \
+        geom/face_tri3_impl.h \
         geom/face_tri3_shell.h \
         geom/face_tri3_subdivision.h \
         geom/face_tri6.h \
+        geom/face_tri6_impl.h \
+        geom/face_tri_impl.h \
         geom/node.h \
         geom/node_elem.h \
         geom/node_range.h \
@@ -161,15 +264,18 @@ include_HEADERS =  \
         geom/point.h \
         geom/reference_elem.h \
         geom/remote_elem.h \
+        geom/remote_elem_impl.h \
         geom/side.h \
         geom/sphere.h \
         geom/stored_range.h \
         geom/surface.h \
         mesh/abaqus_io.h \
         mesh/boundary_info.h \
+        mesh/boundary_info_impl.h \
         mesh/boundary_mesh.h \
         mesh/checkpoint_io.h \
         mesh/distributed_mesh.h \
+        mesh/distributed_mesh_impl.h \
         mesh/dyna_io.h \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \
@@ -182,15 +288,22 @@ include_HEADERS =  \
         mesh/matlab_io.h \
         mesh/medit_io.h \
         mesh/mesh.h \
+        mesh/mesh_abstract.h \
         mesh/mesh_base.h \
+        mesh/mesh_base_impl.h \
         mesh/mesh_communication.h \
+        mesh/mesh_communication_global_indices_impl.h \
+        mesh/mesh_communication_impl.h \
         mesh/mesh_function.h \
         mesh/mesh_generation.h \
+        mesh/mesh_generation_impl.h \
         mesh/mesh_input.h \
         mesh/mesh_inserter_iterator.h \
+        mesh/mesh_iterators_impl.h \
         mesh/mesh_modification.h \
         mesh/mesh_output.h \
         mesh/mesh_refinement.h \
+        mesh/mesh_refinement_impl.h \
         mesh/mesh_serializer.h \
         mesh/mesh_smoother.h \
         mesh/mesh_smoother_laplace.h \
@@ -199,6 +312,7 @@ include_HEADERS =  \
         mesh/mesh_tetgen_interface.h \
         mesh/mesh_tetgen_wrapper.h \
         mesh/mesh_tools.h \
+        mesh/mesh_tools_impl.h \
         mesh/mesh_triangle_holes.h \
         mesh/mesh_triangle_interface.h \
         mesh/mesh_triangle_wrapper.h \
@@ -209,12 +323,14 @@ include_HEADERS =  \
         mesh/patch.h \
         mesh/postscript_io.h \
         mesh/replicated_mesh.h \
+        mesh/replicated_mesh_impl.h \
         mesh/serial_mesh.h \
         mesh/sync_refinement_flags.h \
         mesh/tecplot_io.h \
         mesh/tetgen_io.h \
         mesh/ucd_io.h \
         mesh/unstructured_mesh.h \
+        mesh/unstructured_mesh_impl.h \
         mesh/unv_io.h \
         mesh/vtk_io.h \
         mesh/xdr_io.h \
@@ -277,6 +393,7 @@ include_HEADERS =  \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
         parallel/parallel_elem.h \
+        parallel/parallel_elem_impl.h \
         parallel/parallel_ghost_sync.h \
         parallel/parallel_histogram.h \
         parallel/parallel_node.h \
@@ -440,28 +557,4 @@ include_HEADERS =  \
         utils/int_range.h \
         utils/jacobi_polynomials.h \
         utils/libmesh_nullptr.h \
-        utils/location_maps.h \
-        utils/mapvector.h \
-        utils/null_output_iterator.h \
-        utils/number_lookups.h \
-        utils/ostream_proxy.h \
-        utils/parameters.h \
-        utils/perf_log.h \
-        utils/perfmon.h \
-        utils/plt_loader.h \
-        utils/point_locator_base.h \
-        utils/point_locator_tree.h \
-        utils/pointer_to_pointer_iter.h \
-        utils/pool_allocator.h \
-        utils/restore_warnings.h \
-        utils/simple_range.h \
-        utils/statistics.h \
-        utils/string_to_enum.h \
-        utils/timestamp.h \
-        utils/topology_map.h \
-        utils/tree.h \
-        utils/tree_base.h \
-        utils/tree_node.h \
-        utils/utility.h \
-        utils/vectormap.h \
-        utils/xdr_cxx.h 
+        utils/location_maps.h

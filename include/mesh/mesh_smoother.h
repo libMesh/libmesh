@@ -20,11 +20,14 @@
 #ifndef LIBMESH_MESH_SMOOTHER_H
 #define LIBMESH_MESH_SMOOTHER_H
 
+#include "libmesh/libmesh_common.h"
+
 namespace libMesh
 {
 
 // forward declarations
-class UnstructuredMesh;
+template <typename> class UnstructuredMeshTempl;
+typedef UnstructuredMeshTempl<Real> UnstructuredMesh;
 
 
 /**

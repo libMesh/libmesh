@@ -189,10 +189,10 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
         case 1:
         case 2:
         case 3:
-          return libmesh_make_unique<Side<Tri6,Pyramid14>>(this,i);
+          return libmesh_make_unique<Side<Tri6Templ<Real>,Pyramid14>>(this,i);
 
         case 4:
-          return libmesh_make_unique<Side<Quad9,Pyramid14>>(this,i);
+          return libmesh_make_unique<Side<Quad9Templ<Real>,Pyramid14>>(this,i);
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -211,12 +211,12 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
         case 2: // triangular face 3
         case 3: // triangular face 4
           {
-            face = libmesh_make_unique<Tri6>();
+            face = libmesh_make_unique<Tri6Templ<Real>>();
             break;
           }
         case 4: // the quad face at z=0
           {
-            face = libmesh_make_unique<Quad9>();
+            face = libmesh_make_unique<Quad9Templ<Real>>();
             break;
           }
         default:
@@ -280,7 +280,7 @@ std::unique_ptr<Elem> Pyramid14::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return libmesh_make_unique<SideEdge<Edge3,Pyramid14>>(this,i);
+  return libmesh_make_unique<SideEdge<Edge3Templ<Real>,Pyramid14>>(this,i);
 }
 
 

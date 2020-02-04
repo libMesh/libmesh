@@ -27,6 +27,11 @@
 namespace libMesh
 {
 
+template <typename>
+class Edge2Templ;
+template <typename>
+class BoundingBoxTempl;
+
 /**
  * The \p QUAD4 is an element in 2D composed of 4 nodes.
  * It is numbered like this:
@@ -48,22 +53,29 @@ namespace libMesh
  * \date 2002
  * \brief A 2D quadrilateral element with 4 nodes.
  */
-class Quad4 : public Quad
+template <typename RealType>
+class Quad4Templ : public QuadTempl<RealType>
 {
 public:
+  typedef Quad4Templ<RealType> Quad4;
+  typedef Edge2Templ<RealType> Edge2;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Quad4 (Elem * p=nullptr) :
+  Quad4Templ (Elem * p=nullptr) :
     Quad(Quad4::n_nodes(), p, _nodelinks_data) {}
 
-  Quad4 (Quad4 &&) = delete;
-  Quad4 (const Quad4 &) = delete;
+  Quad4Templ (Quad4 &&) = delete;
+  Quad4Templ (const Quad4 &) = delete;
   Quad4 & operator= (const Quad4 &) = delete;
   Quad4 & operator= (Quad4 &&) = delete;
-  virtual ~Quad4() = default;
+  virtual ~Quad4Templ() = default;
 
   /**
    * \returns \p QUAD4.
@@ -150,7 +162,7 @@ public:
    * 4-node quad with straight sides, but not necessarily a
    * parallelogram.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
   /**
    * Builds a bounding box out of the nodal positions
@@ -188,6 +200,68 @@ protected:
 
 };
 
+// ------------------------------------------------------------
+// Quad4 class static member initialization
+
+template <typename RealType>
+const unsigned int Quad4Templ<RealType>::
+side_nodes_map[Quad4Templ<RealType>::num_sides][Quad4Templ<RealType>::nodes_per_side] =
+  {
+    {0, 1}, // Side 0
+    {1, 2}, // Side 1
+    {2, 3}, // Side 2
+    {3, 0}  // Side 3
+  };
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+template <typename RealType>
+const float Quad4Templ<RealType>::
+_embedding_matrix[Quad4Templ<RealType>::num_children]
+                 [Quad4Templ<RealType>::num_nodes]
+                 [Quad4Templ<RealType>::num_nodes] =
+  {
+    // embedding matrix for child 0
+    {
+      // 0    1    2    3
+      {1.0, 0.0, 0.0, 0.0}, // 0
+      {0.5, 0.5, 0.0, 0.0}, // 1
+      {.25, .25, .25, .25}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    },
+
+    // embedding matrix for child 1
+    {
+      // 0    1    2    3
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 1.0, 0.0, 0.0}, // 1
+      {0.0, 0.5, 0.5, 0.0}, // 2
+      {.25, .25, .25, .25}  // 3
+    },
+
+    // embedding matrix for child 2
+    {
+      // 0    1    2    3
+      {0.5, 0.0, 0.0, 0.5}, // 0
+      {.25, .25, .25, .25}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.0, 0.0, 1.0}  // 3
+    },
+
+    // embedding matrix for child 3
+    {
+      // 0    1    2    3
+      {.25, .25, .25, .25}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.0, 0.0, 1.0, 0.0}, // 2
+      {0.0, 0.0, 0.5, 0.5}  // 3
+    }
+  };
+
+#endif
+
+typedef Quad4Templ<Real> Quad4;
 
 } // namespace libMesh
 

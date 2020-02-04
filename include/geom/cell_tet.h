@@ -33,15 +33,21 @@ namespace libMesh
  * \date 2002
  * \brief The base class for all tetrahedral element types.
  */
-class Tet : public Cell
+template <typename RealType = Real>
+class TetTempl : public CellTempl<RealType>
 {
 public:
+  typedef TetTempl<RealType> Tet;
+  typedef CellTempl<RealType> Cell;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Default tetrahedral element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Tet (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
+  TetTempl (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata),
     _diagonal_selection(INVALID_DIAG)
   {
@@ -50,11 +56,11 @@ public:
       this->set_interior_parent(nullptr);
   }
 
-  Tet (Tet &&) = delete;
-  Tet (const Tet &) = delete;
+  TetTempl (Tet &&) = delete;
+  TetTempl (const Tet &) = delete;
   Tet & operator= (const Tet &) = delete;
   Tet & operator= (Tet &&) = delete;
-  virtual ~Tet() = default;
+  virtual ~TetTempl() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
@@ -219,6 +225,28 @@ protected:
    */
   void choose_diagonal() const;
 };
+
+// ------------------------------------------------------------
+// Tet class static member initializations
+
+
+// We need to require C++11...
+template <typename RealType>
+const Real TetTempl<RealType>::_master_points[10][3] =
+  {
+    {0, 0, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {0, 0, 1},
+    {0.5, 0, 0},
+    {0.5, 0.5, 0},
+    {0, 0.5, 0},
+    {0, 0, 0.5},
+    {0.5, 0, 0.5},
+    {0, 0.5, 0.5}
+  };
+
+typedef TetTempl<Real> Tet;
 
 } // namespace libMesh
 

@@ -35,8 +35,10 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Point;
-class Elem;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * This abstract base class implements utility functions for error estimators

@@ -51,11 +51,11 @@ namespace libMesh
 // forward declarations
 template <typename T> class DenseMatrix;
 template <typename T> class DenseVector;
-class BoundaryInfo;
+template <typename> class BoundaryInfoTempl;
 class DofConstraints;
 class DofMap;
-class Elem;
-class MeshBase;
+template <typename> class ElemTempl;
+template <typename> class MeshBaseTempl;
 template <typename T> class NumericVector;
 class QBase;
 
@@ -64,8 +64,10 @@ class NodeConstraints;
 #endif
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-class PeriodicBoundaries;
-class PointLocatorBase;
+template <typename> class PeriodicBoundariesTempl;
+typedef PeriodicBoundariesTempl<Real> PeriodicBoundaries;
+template <typename> class PointLocatorBaseTempl;
+typedef PointLocatorBaseTempl<Real> PointLocatorBase;
 #endif
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -73,6 +75,11 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE;
 #endif
 
+template <typename RealType = Real>
+class FEAbstract;
+
+template <typename RealType>
+std::ostream & operator << (std::ostream & os, const FEAbstract<RealType> & fe);
 
 
 /**
@@ -97,9 +104,13 @@ class InfFE;
  * \author Benjamin S. Kirk
  * \date 2002
  */
-class FEAbstract : public ReferenceCountedObject<FEAbstract>
+template <typename RealType>
+class FEAbstract : public ReferenceCountedObject<FEAbstract<RealType>>
 {
 protected:
+  typedef FEMapTempl<RealType> FEMap;
+  typedef PointTempl<RealType> Point;
+  typedef ElemTempl<RealType> Elem;
 
   /**
    * Constructor.  Optionally initializes required data
@@ -241,28 +252,28 @@ public:
    * \returns The element Jacobian times the quadrature weight for
    * each quadrature point.
    */
-  const std::vector<Real> & get_JxW() const
+  const std::vector<RealType> & get_JxW() const
   { calculate_map = true; return this->_fe_map->get_JxW(); }
 
   /**
    * \returns The element tangents in xi-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdxi() const
+  const std::vector<VectorValue<RealType>> & get_dxyzdxi() const
   { calculate_map = true; return this->_fe_map->get_dxyzdxi(); }
 
   /**
    * \returns The element tangents in eta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdeta() const
+  const std::vector<VectorValue<RealType>> & get_dxyzdeta() const
   { calculate_map = true; return this->_fe_map->get_dxyzdeta(); }
 
   /**
    * \returns The element tangents in zeta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdzeta() const
+  const std::vector<VectorValue<RealType>> & get_dxyzdzeta() const
   { return _fe_map->get_dxyzdzeta(); }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -270,37 +281,37 @@ public:
   /**
    * \returns The second partial derivatives in xi.
    */
-  const std::vector<RealGradient> & get_d2xyzdxi2() const
+  const std::vector<VectorValue<RealType>> & get_d2xyzdxi2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxi2(); }
 
   /**
    * \returns The second partial derivatives in eta.
    */
-  const std::vector<RealGradient> & get_d2xyzdeta2() const
+  const std::vector<VectorValue<RealType>> & get_d2xyzdeta2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdeta2(); }
 
   /**
    * \returns The second partial derivatives in zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdzeta2() const
+  const std::vector<VectorValue<RealType>> & get_d2xyzdzeta2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdzeta2(); }
 
   /**
    * \returns The second partial derivatives in xi-eta.
    */
-  const std::vector<RealGradient> & get_d2xyzdxideta() const
+  const std::vector<VectorValue<RealType>> & get_d2xyzdxideta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxideta(); }
 
   /**
    * \returns The second partial derivatives in xi-zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdxidzeta() const
+  const std::vector<VectorValue<RealType>> & get_d2xyzdxidzeta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxidzeta(); }
 
   /**
    * \returns The second partial derivatives in eta-zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdetadzeta() const
+  const std::vector<VectorValue<RealType>> & get_d2xyzdetadzeta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdetadzeta(); }
 
 #endif
@@ -309,63 +320,63 @@ public:
    * \returns The dxi/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidx() const
+  const std::vector<RealType> & get_dxidx() const
   { calculate_map = true; return this->_fe_map->get_dxidx(); }
 
   /**
    * \returns The dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidy() const
+  const std::vector<RealType> & get_dxidy() const
   { calculate_map = true; return this->_fe_map->get_dxidy(); }
 
   /**
    * \returns The dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidz() const
+  const std::vector<RealType> & get_dxidz() const
   { calculate_map = true; return this->_fe_map->get_dxidz(); }
 
   /**
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detadx() const
+  const std::vector<RealType> & get_detadx() const
   { calculate_map = true; return this->_fe_map->get_detadx(); }
 
   /**
    * \returns The deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detady() const
+  const std::vector<RealType> & get_detady() const
   { calculate_map = true; return this->_fe_map->get_detady(); }
 
   /**
    * \returns The deta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detadz() const
+  const std::vector<RealType> & get_detadz() const
   { calculate_map = true; return this->_fe_map->get_detadz(); }
 
   /**
    * \returns The dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetadx() const
+  const std::vector<RealType> & get_dzetadx() const
   { calculate_map = true; return this->_fe_map->get_dzetadx(); }
 
   /**
    * \returns The dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetady() const
+  const std::vector<RealType> & get_dzetady() const
   { calculate_map = true; return this->_fe_map->get_dzetady(); }
 
   /**
    * \returns The dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetadz() const
+  const std::vector<RealType> & get_dzetadz() const
   { calculate_map = true; return this->_fe_map->get_dzetadz(); }
 
   /**
@@ -384,7 +395,7 @@ public:
   /**
    * \returns The curvatures for use in face integration.
    */
-  const std::vector<Real> & get_curvatures() const
+  const std::vector<RealType> & get_curvatures() const
   { calculate_map = true; return this->_fe_map->get_curvatures();}
 
 #endif
@@ -502,7 +513,7 @@ public:
   /**
    * Same as above, but allows you to print to a stream.
    */
-  friend std::ostream & operator << (std::ostream & os, const FEAbstract & fe);
+  friend std::ostream & operator << <> (std::ostream & os, const FEAbstract & fe);
 
 
 protected:

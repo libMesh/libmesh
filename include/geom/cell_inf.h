@@ -39,7 +39,7 @@ namespace libMesh
  * \date 2003
  * \brief The base class for all 3D infinite geometric element types.
  */
-class InfCell : public Elem
+class InfCell : public ElemTempl<Real>
 {
 public:
 

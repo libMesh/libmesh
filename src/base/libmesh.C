@@ -396,7 +396,8 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   Singleton::setup();
 
   // Make sure the construction worked
-  libmesh_assert(remote_elem);
+  // libmesh_assert(remote_elem);
+  // We don't know what our RealType is here, so can't assert on a particular type of remote element
 
 #if defined(LIBMESH_HAVE_MPI)
 

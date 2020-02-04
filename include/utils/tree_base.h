@@ -31,10 +31,10 @@ namespace libMesh
 
 
 // Forward Declarations
-class TreeBase;
-class MeshBase;
-class Point;
-class Elem;
+template <typename> class TreeBaseTempl;
+template <typename> class MeshBaseTempl;
+template <typename> class PointTempl;
+template <typename> class ElemTempl;
 
 
 namespace Trees
@@ -62,20 +62,27 @@ enum BuildType {NODES=0,
  * This is the base class for trees, it allows pointer
  * usage of trees.
  */
-class TreeBase : public ReferenceCountedObject<TreeBase>
+template <typename RealType = Real>
+class TreeBaseTempl : public ReferenceCountedObject<TreeBaseTempl<RealType>>
 {
+public:
+  typedef TreeBaseTempl<RealType> TreeBase;
+  typedef ElemTempl<RealType> Elem;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+
 protected:
   /**
    * Constructor.  Protected.
    */
   explicit
-  TreeBase (const MeshBase & m);
+  TreeBaseTempl (const MeshBase & m);
 
 public:
   /**
    * Destructor.
    */
-  virtual ~TreeBase() {}
+  virtual ~TreeBaseTempl() {}
 
   /**
    * Prints the nodes.
@@ -126,11 +133,14 @@ protected:
 // TreeBase class inline methods
 
 // constructor
+template <typename RealType>
 inline
-TreeBase::TreeBase (const MeshBase & m) :
+TreeBaseTempl<RealType>::TreeBaseTempl (const MeshBase & m) :
   mesh(m)
 {
 }
+
+typedef TreeBaseTempl<Real> TreeBase;
 
 } // namespace libMesh
 

@@ -31,7 +31,8 @@ namespace libMesh
 {
 
 // Forward declarations
-class Node;
+template <typename> class NodeTempl;
+typedef NodeTempl<Real> Node;
 
 namespace Parallel
 {

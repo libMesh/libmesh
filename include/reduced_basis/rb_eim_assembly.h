@@ -34,7 +34,8 @@
 namespace libMesh
 {
 
-class Elem;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 class RBParameters;
 class RBEIMConstruction;
 

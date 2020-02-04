@@ -64,7 +64,7 @@ DGFEMContext::DGFEMContext (const System & sys)
       FEType fe_type = sys.variable_type(i);
 
       if (_neighbor_side_fe[fe_type] == nullptr)
-        _neighbor_side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type);
+        _neighbor_side_fe[fe_type] = FEAbstract<>::build(this->_dim, fe_type);
 
       _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type].get();
     }
@@ -94,7 +94,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   for (auto & pr : _neighbor_side_fe)
     {
       FEType neighbor_side_fe_type = pr.first;
-      FEAbstract * side_fe = _side_fe[this->get_dim()][neighbor_side_fe_type].get();
+      FEAbstract<> * side_fe = _side_fe[this->get_dim()][neighbor_side_fe_type].get();
       qface_side_points = side_fe->get_xyz();
 
       FEMap::inverse_map (this->get_dim(), &get_neighbor(),

@@ -37,10 +37,10 @@ namespace libMesh
 
 
 // Forward declarations
-class Elem;
-class Node;
-class MeshBase;
-class UnstructuredMesh;
+template <typename> class ElemTempl;
+template <typename> class NodeTempl;
+template <typename> class MeshBaseTempl;
+template <typename> class UnstructuredMeshTempl;
 
 
 /**
@@ -54,10 +54,18 @@ class UnstructuredMesh;
  * \date 2002
  * \brief Used by the Mesh to keep track of boundary nodes and elements.
  */
-class BoundaryInfo : public ParallelObject
+template <typename RealType = Real>
+class BoundaryInfoTempl : public ParallelObject
 {
+public:
+  typedef BoundaryInfoTempl<RealType> BoundaryInfo;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef UnstructuredMeshTempl<RealType> UnstructuredMesh;
+
 protected:
-  friend class MeshBase;
+  friend class MeshBaseTempl<RealType>;
 
   /**
    * Constructor.  Takes a reference to the mesh.
@@ -65,7 +73,7 @@ protected:
    * by the Mesh class.  A user should never instantiate
    * this class.  Therefore the constructor is protected.
    */
-  BoundaryInfo (MeshBase & m);
+  BoundaryInfoTempl (MeshBase & m);
 
 public:
   /**
@@ -79,7 +87,7 @@ public:
   /**
    * Destructor.  Not much to do.
    */
-  ~BoundaryInfo ();
+  ~BoundaryInfoTempl ();
 
   /**
    * Clears the underlying data structures and restores the object to
@@ -1016,6 +1024,13 @@ private:
    */
   std::map<boundary_id_type, std::string> _es_id_to_name;
 };
+
+//------------------------------------------------------
+// BoundaryInfo static member initializations
+template <typename RealType>
+const boundary_id_type BoundaryInfoTempl<RealType>::invalid_id = -123;
+
+typedef BoundaryInfoTempl<Real> BoundaryInfo;
 
 } // namespace libMesh
 

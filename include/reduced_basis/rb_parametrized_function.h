@@ -29,8 +29,10 @@ namespace libMesh
 {
 
 class RBParameters;
-class Point;
-class Elem;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
 
 /**
  * A simple functor class that provides a RBParameter-dependent function.

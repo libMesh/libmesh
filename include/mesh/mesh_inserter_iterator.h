@@ -30,9 +30,12 @@ namespace libMesh
 {
 
 // Forward declarations
-class Elem;
-class Node;
-class Point;
+template <typename> class ElemTempl;
+typedef ElemTempl<Real> Elem;
+template <typename> class NodeTempl;
+typedef NodeTempl<Real> Node;
+template <typename> class PointTempl;
+typedef PointTempl<Real> Point;
 
 /**
  * A class for templated methods that expect output iterator
