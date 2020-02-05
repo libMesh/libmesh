@@ -526,7 +526,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
                   + (45./16.)*pow<2>(1.-xi)*pow<2>(1.+xi);
         case 6:
           return -(15./16.)*pow<4>(1.+xi)
-                  + (15./8.)*pow<3>(1.+xi)*(1.-xi);
+                 + (15./8.)*pow<3>(1.+xi)*(1.-xi);
         default:
           libmesh_error_msg("Invalid shape function index i = " << i);
         }
