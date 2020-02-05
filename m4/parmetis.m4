@@ -22,20 +22,22 @@ AC_DEFUN([CONFIGURE_PARMETIS],
           dnl We consider 4 different combinations of METIS/ParMETIS support in PETSc.
 
           dnl Case A: PETSc is built with both METIS and ParMETIS support. In this case we use both.
-          AS_IF([test "x$build_metis" = "xno" && test $petsc_have_parmetis -gt 0],
+          AS_IF([test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -gt 0],
                 [
                   AC_DEFINE(HAVE_PARMETIS, 1,
                             [Flag indicating whether the library will be compiled with Parmetis support])
+                  build_parmetis=no
                   AC_MSG_RESULT([<<< Configuring library with PETSc Parmetis support >>>])
                 ])
 
           dnl Case B: PETSc is built with Metis support but no
           dnl ParMETIS. We use their METIS and disable ParMETIS support to
           dnl avoid mixing.
-          AS_IF([test "x$build_metis" = "xno" && test $petsc_have_parmetis -eq 0],
+          AS_IF([test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -eq 0],
                 [
                   PARMETIS_INCLUDE=""
                   PARMETIS_LIB=""
+                  build_parmetis=no
                   enableparmetis=no
                   AC_MSG_RESULT([<<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>])
                 ])
@@ -48,15 +50,18 @@ AC_DEFUN([CONFIGURE_PARMETIS],
                 [
                   PARMETIS_INCLUDE=""
                   PARMETIS_LIB=""
+                  build_parmetis=no
                   enableparmetis=no
                   AC_MSG_RESULT([<<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>])
                 ])
 
-          dnl Case D: PETSc was not built with METIS or ParMETIS support. We build both on our own.
-          AS_IF([test "x$build_metis" = "xyes" && test $petsc_have_parmetis -eq 0],
+          dnl Case D: We're using internal or non-PETSc external
+          dnl METIS. We build ParMETIS on our own.
+          AS_IF([test "x$build_metis" != "xpetsc" && test $petsc_have_parmetis -eq 0],
                 [
                   PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
                   PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
+                  build_parmetis=yes
                   AC_DEFINE(HAVE_PARMETIS, 1,
                             [Flag indicating whether the library will be compiled with Parmetis support])
                   AC_MSG_RESULT([<<< Configuring library with internal Parmetis support >>>])
@@ -66,7 +71,9 @@ AC_DEFUN([CONFIGURE_PARMETIS],
           PARMETIS_INCLUDE=""
           PARMETIS_LIB=""
           enableparmetis=no
+          build_parmetis=no
         ])
+  AM_CONDITIONAL(BUILD_PARMETIS, test x$build_parmetis = xyes)
 
   AC_SUBST(PARMETIS_INCLUDE)
   AC_SUBST(PARMETIS_LIB)

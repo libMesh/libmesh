@@ -180,7 +180,7 @@ endif
 endif
 
 if LIBMESH_ENABLE_PARMETIS
-if BUILD_METIS
+if BUILD_PARMETIS
   SUBDIRS    += parmetis
   opt_libs   += parmetis/libopt.la
   dbg_libs   += parmetis/libdbg.la
