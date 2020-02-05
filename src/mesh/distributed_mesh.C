@@ -773,11 +773,23 @@ Node * DistributedMesh::add_node (Node * n)
   return n;
 }
 
+Node * DistributedMesh::add_node (std::unique_ptr<Node> n)
+{
+  // The mesh now takes ownership of the Node. Eventually the guts of
+  // add_node() will get moved to a private helper function, and
+  // calling add_node() directly will be deprecated.
+  return add_node(n.release());
+}
 
 
 Node * DistributedMesh::insert_node(Node * n)
 {
   return DistributedMesh::add_node(n);
+}
+
+Node * DistributedMesh::insert_node(std::unique_ptr<Node> n)
+{
+  return DistributedMesh::insert_node(std::move(n));
 }
 
 

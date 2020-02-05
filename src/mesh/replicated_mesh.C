@@ -505,6 +505,14 @@ Node * ReplicatedMesh::add_node (Node * n)
   return n;
 }
 
+Node * ReplicatedMesh::add_node (std::unique_ptr<Node> n)
+{
+  // The mesh now takes ownership of the Node. Eventually the guts of
+  // add_node() will get moved to a private helper function, and
+  // calling add_node() directly will be deprecated.
+  return add_node(n.release());
+}
+
 
 
 Node * ReplicatedMesh::insert_node(Node * n)
@@ -550,6 +558,13 @@ Node * ReplicatedMesh::insert_node(Node * n)
   return n;
 }
 
+Node * ReplicatedMesh::insert_node(std::unique_ptr<Node> n)
+{
+  // The mesh now takes ownership of the Node. Eventually the guts of
+  // insert_node(Node*) will get moved to a private helper function, and
+  // calling insert_node(Node*) directly will be deprecated.
+  return insert_node(n.release());
+}
 
 
 void ReplicatedMesh::delete_node(Node * n)

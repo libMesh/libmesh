@@ -268,11 +268,13 @@ public:
                             const dof_id_type id = DofObject::invalid_id,
                             const processor_id_type proc_id = DofObject::invalid_processor_id) override;
   virtual Node * add_node (Node * n) override;
+  virtual Node * add_node (std::unique_ptr<Node> n) override;
 
   /**
    * Calls add_node().
    */
   virtual Node * insert_node(Node * n) override;
+  virtual Node * insert_node(std::unique_ptr<Node> n) override;
 
   /**
    * Takes ownership of node \p n on this partition of a distributed
