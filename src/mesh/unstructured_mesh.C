@@ -888,9 +888,9 @@ void UnstructuredMesh::all_first_order ()
        * build the first-order equivalent, add to
        * the new_elements list.
        */
-      Elem * lo_elem = Elem::build
+      auto lo_elem = Elem::build
         (Elem::first_order_equivalent_type
-         (so_elem->type()), so_elem->parent()).release();
+         (so_elem->type()), so_elem->parent());
 
       const unsigned short n_sides = so_elem->n_sides();
 
@@ -907,7 +907,7 @@ void UnstructuredMesh::all_first_order ()
           {
             Elem * child = so_elem->child_ptr(c);
             if (child != remote_elem)
-              child->set_parent(lo_elem);
+              child->set_parent(lo_elem.get());
             lo_elem->add_child(child, c);
           }
 
@@ -918,7 +918,7 @@ void UnstructuredMesh::all_first_order ()
         {
           unsigned int c =
             so_elem->parent()->which_child_am_i(so_elem);
-          lo_elem->parent()->replace_child(lo_elem, c);
+          lo_elem->parent()->replace_child(lo_elem.get(), c);
         }
 
       /*
@@ -959,7 +959,7 @@ void UnstructuredMesh::all_first_order ()
        * data structure by insert_elem.
        */
       this->get_boundary_info().copy_boundary_ids
-        (this->get_boundary_info(), so_elem, lo_elem);
+        (this->get_boundary_info(), so_elem, lo_elem.get());
 
       /*
        * The new first-order element is ready.
@@ -972,7 +972,7 @@ void UnstructuredMesh::all_first_order ()
 #endif
       lo_elem->processor_id() = so_elem->processor_id();
       lo_elem->subdomain_id() = so_elem->subdomain_id();
-      this->insert_elem(lo_elem);
+      this->insert_elem(std::move(lo_elem));
     }
 
   // Deleting nodes does not invalidate iterators, so this is safe.
@@ -1119,17 +1119,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * them with an equivalent second-order element.  Don't
    * forget to delete the low-order element, or else it will leak!
    */
-  element_iterator
-    it = elements_begin(),
-    endit = elements_end();
-
-  for (; it != endit; ++it)
+  for (auto & lo_elem : element_ptr_range())
     {
-      // the linear-order element
-      Elem * lo_elem = *it;
-
-      libmesh_assert(lo_elem);
-
       // make sure it is linear order
       if (lo_elem->default_order() != FIRST)
         libmesh_error_msg("ERROR: This is not a linear element: type=" << lo_elem->type());
@@ -1152,9 +1143,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * for either type of second-order equivalent, e.g.
        * Hex20 or Hex27, as equivalents for Hex8
        */
-      Elem * so_elem =
+      auto so_elem =
         Elem::build (Elem::second_order_equivalent_type(lo_elem->type(),
-                                                        full_ordered) ).release();
+                                                        full_ordered));
 
       libmesh_assert_equal_to (lo_elem->n_vertices(), so_elem->n_vertices());
 
@@ -1177,7 +1168,6 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        */
       const unsigned int son_begin = so_elem->n_vertices();
       const unsigned int son_end   = so_elem->n_nodes();
-
 
       for (unsigned int son=son_begin; son<son_end; son++)
         {
@@ -1294,7 +1284,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * here.
        */
       this->get_boundary_info().copy_boundary_ids
-        (this->get_boundary_info(), lo_elem, so_elem);
+        (this->get_boundary_info(), lo_elem, so_elem.get());
 
       /*
        * The new second-order element is ready.
@@ -1307,7 +1297,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 #endif
       so_elem->processor_id() = lo_pid;
       so_elem->subdomain_id() = lo_elem->subdomain_id();
-      this->insert_elem(so_elem);
+      this->insert_elem(std::move(so_elem));
     }
 
   // we can clear the map
