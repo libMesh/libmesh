@@ -104,6 +104,17 @@ Real FE<2,HIERARCHIC>::shape(const Elem * elem,
 
 
 template <>
+Real FE<2,HIERARCHIC>::shape(const FEType fet,
+                             const Elem * elem,
+                             const unsigned int i,
+                             const Point & p,
+                             const bool add_p_level)
+{
+  return fe_hierarchic_2D_shape(elem, fet.order, i, p, add_p_level);
+}
+
+
+template <>
 Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
                                 const Order order,
                                 const unsigned int i,
@@ -113,6 +124,16 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
   return fe_hierarchic_2D_shape(elem, order, i, p, add_p_level);
 }
 
+
+template <>
+Real FE<2,L2_HIERARCHIC>::shape(const FEType fet,
+                                const Elem * elem,
+                                const unsigned int i,
+                                const Point & p,
+                                const bool add_p_level)
+{
+  return fe_hierarchic_2D_shape(elem, fet.order, i, p, add_p_level);
+}
 
 
 template <>
@@ -153,6 +174,19 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem * elem,
 }
 
 
+template <>
+Real FE<2,HIERARCHIC>::shape_deriv(const FEType fet,
+                                   const Elem * elem,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point & p,
+                                   const bool add_p_level)
+{
+  return fe_hierarchic_2D_shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
+
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
@@ -165,6 +199,17 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
   return fe_hierarchic_2D_shape_deriv(elem, order, i, j, p, add_p_level);
 }
 
+
+template <>
+Real FE<2,L2_HIERARCHIC>::shape_deriv(const FEType fet,
+                                      const Elem * elem,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p,
+                                      const bool add_p_level)
+{
+  return fe_hierarchic_2D_shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -207,6 +252,17 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem * elem,
 }
 
 
+template <>
+Real FE<2,HIERARCHIC>::shape_second_deriv(const FEType fet,
+                                          const Elem * elem,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point & p,
+                                          const bool add_p_level)
+{
+  return fe_hierarchic_2D_shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
@@ -217,6 +273,18 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                                              const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_second_deriv(elem, order, i, j, p, add_p_level);
+}
+
+
+template <>
+Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const FEType fet,
+                                             const Elem * elem,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p,
+                                             const bool add_p_level)
+{
+  return fe_hierarchic_2D_shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
 }
 
 #endif //  LIBMESH_ENABLE_SECOND_DERIVATIVES

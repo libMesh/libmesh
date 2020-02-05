@@ -236,6 +236,24 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
 }
 
 
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+Real InfFE<Dim,T_radial,T_map>::shape(const FEType fet,
+                                      const Elem * inf_elem,
+                                      const unsigned int i,
+                                      const Point & p,
+                                      const bool add_p_level)
+{
+  if (add_p_level)
+    {
+      FEType tmp_fet=fet;
+      tmp_fet = static_cast<Order>(fet.order + add_p_level * inf_elem->p_level());
+      return InfFE<Dim,T_radial,T_map>::shape(tmp_fet, inf_elem, i, p);
+    }
+  return InfFE<Dim,T_radial,T_map>::shape(fet, inf_elem, i, p);
+}
+
+
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
                                              const ElemType inf_elem_type,
@@ -512,6 +530,24 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
 
   else
     libmesh_error_msg("compute_data() for 1-dimensional InfFE not implemented.");
+}
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+Real InfFE<Dim,T_radial,T_map>::shape_deriv(const FEType fet,
+                                            const Elem * inf_elem,
+                                            const unsigned int i,
+                                            const unsigned int j,
+                                            const Point & p,
+                                            const bool add_p_level)
+{
+  if (add_p_level)
+    {
+      FEType tmp_fet=fet;
+      tmp_fet = static_cast<Order>(fet.order + add_p_level * inf_elem->p_level());
+      return InfFE<Dim,T_radial,T_map>::shape_deriv(tmp_fet, inf_elem, i, j, p);
+    }
+  return InfFE<Dim,T_radial,T_map>::shape_deriv(fet, inf_elem, i, j, p);
 }
 
 
@@ -1093,6 +1129,9 @@ INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_node_indices(const ElemType,
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
@@ -1102,6 +1141,9 @@ INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const El
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));

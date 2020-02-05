@@ -88,6 +88,19 @@ Real FE<1,SZABAB>::shape(const Elem * elem,
 }
 
 
+template <>
+Real FE<1,SZABAB>::shape(const FEType fet,
+                         const Elem * elem,
+                         const unsigned int i,
+                         const Point & p,
+                         const bool add_p_level)
+{
+  libmesh_assert(elem);
+
+  return FE<1,SZABAB>::shape(elem->type(), static_cast<Order>(fet.order + add_p_level * add_p_level * elem->p_level()), i, p);
+}
+
+
 
 template <>
 Real FE<1,SZABAB>::shape_deriv(const ElemType,
@@ -150,6 +163,24 @@ Real FE<1,SZABAB>::shape_deriv(const Elem * elem,
 }
 
 
+
+template <>
+Real FE<1,SZABAB>::shape_deriv(const FEType fet,
+                               const Elem * elem,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point & p,
+                               const bool add_p_level)
+{
+  libmesh_assert(elem);
+
+  return FE<1,SZABAB>::shape_deriv(elem->type(),
+                                   static_cast<Order>(fet.order + add_p_level * add_p_level * elem->p_level()),
+                                   i,
+                                   j,
+                                   p);
+}
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
@@ -190,6 +221,26 @@ Real FE<1,SZABAB>::shape_second_deriv(const Elem *,
   warning_given = true;
   return 0.;
 }
+
+
+template <>
+Real FE<1,SZABAB>::shape_second_deriv(const FEType fet,
+                                      const Elem * elem,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p,
+                                      const bool add_p_level)
+{
+  libmesh_assert(elem);
+
+  return FE<1,SZABAB>::shape_second_deriv(elem->type(),
+                                          static_cast<Order>(fet.order + add_p_level * add_p_level * elem->p_level()),
+                                          i,
+                                          j,
+                                          p);
+}
+
+
 #endif
 
 } // namespace libMesh

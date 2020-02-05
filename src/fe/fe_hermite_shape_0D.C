@@ -51,6 +51,18 @@ Real FE<0,HERMITE>::shape(const Elem *,
   return 1.;
 }
 
+template <>
+Real FE<0,HERMITE>::shape(const FEType,
+                          const Elem *,
+                          const unsigned int libmesh_dbg_var(i),
+                          const Point &,
+                          const bool)
+{
+  libmesh_assert_less (i, 1);
+  return 1.;
+}
+
+
 
 
 template <>
@@ -79,6 +91,20 @@ Real FE<0,HERMITE>::shape_deriv(const Elem *,
 }
 
 
+template <>
+Real FE<0,HERMITE>::shape_deriv(const FEType,
+                                const Elem *,
+                                const unsigned int,
+                                const unsigned int,
+                                const Point &,
+                                const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -98,6 +124,19 @@ Real FE<0,HERMITE>::shape_second_deriv(const ElemType,
 template <>
 Real FE<0,HERMITE>::shape_second_deriv(const Elem *,
                                        const Order,
+                                       const unsigned int,
+                                       const unsigned int,
+                                       const Point &,
+                                       const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+template <>
+Real FE<0,HERMITE>::shape_second_deriv(const FEType,
+                                       const Elem *,
                                        const unsigned int,
                                        const unsigned int,
                                        const Point &,

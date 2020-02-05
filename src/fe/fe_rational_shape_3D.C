@@ -33,17 +33,6 @@ static const libMesh::FEFamily _underlying_fe_family = libMesh::BERNSTEIN;
 namespace libMesh
 {
 
-template <>
-Real FE<3,RATIONAL_BERNSTEIN>::shape(const ElemType,
-                                     const Order,
-                                     const unsigned int,
-                                     const Point &)
-{
-  libmesh_error_msg("Rational bases require the real element \nto query nodal weighting.");
-  return 0.;
-}
-
-
 
 template <>
 Real FE<3,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
@@ -91,16 +80,25 @@ Real FE<3,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
 
 
 template <>
-Real FE<3,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
-                                           const Order,
-                                           const unsigned int,
-                                           const unsigned int,
-                                           const Point &)
+Real FE<3,RATIONAL_BERNSTEIN>::shape(const ElemType,
+                                     const Order,
+                                     const unsigned int,
+                                     const Point &)
 {
   libmesh_error_msg("Rational bases require the real element \nto query nodal weighting.");
   return 0.;
 }
 
+template <>
+Real FE<3,RATIONAL_BERNSTEIN>::shape(const FEType fet,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const Point & p,
+                                     const bool add_p_level)
+{
+  return FE<3,RATIONAL_BERNSTEIN>::shape
+    (elem, fet.order, i, p, add_p_level);
+}
 
 
 template <>
@@ -156,20 +154,33 @@ Real FE<3,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
 }
 
 
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
-Real FE<3,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
-                                                  const Order,
-                                                  const unsigned int,
-                                                  const unsigned int,
-                                                  const Point &)
+Real FE<3,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
+                                           const Order,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const Point &)
 {
   libmesh_error_msg("Rational bases require the real element \nto query nodal weighting.");
   return 0.;
 }
 
 
+template <>
+Real FE<3,RATIONAL_BERNSTEIN>::shape_deriv(const FEType fet,
+                                           const Elem * elem,
+                                           const unsigned int i,
+                                           const unsigned int j,
+                                           const Point & p,
+                                           const bool add_p_level)
+{
+  return FE<3,RATIONAL_BERNSTEIN>::shape_deriv
+    (elem, fet.order, i, j, p, add_p_level);
+}
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<3,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
@@ -276,6 +287,34 @@ Real FE<3,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
           2 * weighted_grada_sum * weighted_shape_i * weighted_gradb_sum / weighted_sum) /
          weighted_sum / weighted_sum;
 }
+
+
+
+template <>
+Real FE<3,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
+                                                  const Order,
+                                                  const unsigned int,
+                                                  const unsigned int,
+                                                  const Point &)
+{
+  libmesh_error_msg("Rational bases require the real element \nto query nodal weighting.");
+  return 0.;
+}
+
+
+template <>
+Real FE<3,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType fet,
+                                                  const Elem * elem,
+                                                  const unsigned int i,
+                                                  const unsigned int j,
+                                                  const Point & p,
+                                                  const bool add_p_level)
+{
+  return FE<3,RATIONAL_BERNSTEIN>::shape_second_deriv
+    (elem, fet.order, i, j, p, add_p_level);
+}
+
+
 
 #endif
 

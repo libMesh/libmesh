@@ -51,6 +51,16 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape(const Elem *,
   return 1.;
 }
 
+template <>
+Real FE<0,RATIONAL_BERNSTEIN>::shape(const FEType,
+                                     const Elem *,
+                                     const unsigned int libmesh_dbg_var(i),
+                                     const Point &,
+                                     const bool)
+{
+  libmesh_assert_less (i, 1);
+  return 1.;
+}
 
 
 template <>
@@ -80,6 +90,19 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const Elem *,
 
 
 
+template <>
+Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const FEType,
+                                           const Elem *,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const Point &,
+                                           const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
@@ -106,6 +129,21 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem *,
   libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;
 }
+
+
+
+template <>
+Real FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType,
+                                                  const Elem *,
+                                                  const unsigned int,
+                                                  const unsigned int,
+                                                  const Point &,
+                                                  const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
 
 #endif
 

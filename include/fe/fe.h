@@ -136,6 +136,21 @@ public:
                            const bool add_p_level = true);
 
   /**
+   * \returns The value of the \f$ i^{th} \f$ shape function at
+   * point \p p.  This method allows you to specify the dimension and
+   * element type directly. The order is given by the FEType.
+   * This allows the method to be static.
+   *
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
+   */
+   static OutputShape shape(const FEType fet,
+                            const Elem * elem,
+                            const unsigned int i,
+                            const Point & p,
+                            const bool add_p_level = true);
+  /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at point \p p.  This method allows you to
    * specify the dimension, element type, and order directly.
@@ -158,6 +173,23 @@ public:
    */
   static OutputShape shape_deriv(const Elem * elem,
                                  const Order o,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p,
+                                 const bool add_p_level = true);
+
+
+  /**
+   * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function.  You must specify element type, and order (via
+   * FEType) directly.
+   *
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
+   */
+  static OutputShape shape_deriv(const FEType fet,
+                                 const Elem * elem,
                                  const unsigned int i,
                                  const unsigned int j,
                                  const Point & p,
@@ -214,6 +246,33 @@ public:
    */
   static OutputShape shape_second_deriv(const Elem * elem,
                                         const Order o,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p,
+                                        const bool add_p_level = true);
+
+  /**
+   * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at the point \p p.
+   *
+   * \note Cross-derivatives are indexed according to:
+   * j = 0 ==> d^2 phi / dxi^2
+   * j = 1 ==> d^2 phi / dxi deta
+   * j = 2 ==> d^2 phi / deta^2
+   * j = 3 ==> d^2 phi / dxi dzeta
+   * j = 4 ==> d^2 phi / deta dzeta
+   * j = 5 ==> d^2 phi / dzeta^2
+   *
+   * \note Computing second derivatives is not currently supported for
+   * all element types: \f$ C^1 \f$ (Clough, Hermite and Subdivision),
+   * Lagrange, Hierarchic, L2_Hierarchic, and Monomial are supported.
+   * All other element types return an error when asked for second
+   * derivatives.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
+   */
+  static OutputShape shape_second_deriv(const FEType fet,
+                                        const Elem * elem,
                                         const unsigned int i,
                                         const unsigned int j,
                                         const Point & p,

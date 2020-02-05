@@ -293,8 +293,8 @@ public:
                     const Point & p,
                     OutputType & phi);
 
-  typedef Real (*shape_ptr) (const Elem * elem,
-                             const Order o,
+  typedef Real (*shape_ptr) (const FEType fe_t,
+                             const Elem * elem,
                              const unsigned int i,
                              const Point & p,
                              const bool add_p_level);
@@ -305,7 +305,8 @@ public:
    */
   static shape_ptr
   shape_function(const unsigned int dim,
-                 const FEType & fe_t);
+                 const FEType & fe_t,
+                 const ElemType t);
 
 
   /**
@@ -342,8 +343,8 @@ public:
                            const unsigned int j,
                            const Point & p);
 
-  typedef Real (*shape_deriv_ptr) (const Elem * elem,
-                                   const Order o,
+  typedef Real (*shape_deriv_ptr) (const FEType fet,
+                                   const Elem * elem,
                                    const unsigned int i,
                                    const unsigned int j,
                                    const Point & p,
@@ -355,7 +356,8 @@ public:
    */
   static shape_deriv_ptr
   shape_deriv_function(const unsigned int dim,
-                       const FEType & fe_t);
+                       const FEType & fe_t,
+                       const ElemType t);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -406,8 +408,8 @@ public:
                                   const unsigned int j,
                                   const Point & p);
 
-  typedef Real (*shape_second_deriv_ptr) (const Elem * elem,
-                                          const Order o,
+  typedef Real (*shape_second_deriv_ptr) (const FEType fet,
+                                          const Elem * elem,
                                           const unsigned int i,
                                           const unsigned int j,
                                           const Point & p,
@@ -419,7 +421,8 @@ public:
    */
   static shape_second_deriv_ptr
   shape_second_deriv_function(const unsigned int dim,
-                              const FEType & fe_t);
+                              const FEType & fe_t,
+                              const ElemType t);
 #endif
 
   /**

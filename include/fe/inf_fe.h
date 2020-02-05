@@ -280,6 +280,24 @@ public:
                     const Point & p);
 
   /**
+   * \returns The value of the \f$ i^{th} \f$ shape function at
+   * point \p p.  This method lets you specify the relevant
+   * data directly, and is therefore allowed to be static.
+   *
+   * \note This class member is not as efficient as its counterpart in
+   * \p FE<Dim,T>, and is not employed in the \p reinit() cycle.
+   *
+   * \note This method does not return physically correct shapes,
+   * instead use \p compute_data().  The \p shape() methods should
+   * only be used for mapping.
+   */
+  static Real shape(const FEType fet,
+                    const Elem * elem,
+                    const unsigned int i,
+                    const Point & p,
+                    const bool add_p_level);
+
+  /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at point \p p. This method lets you specify the relevant
    * data directly, and is therefore allowed to be static.
@@ -296,6 +314,25 @@ public:
                            const unsigned int i,
                            const unsigned int j,
                            const Point & p);
+
+  /**
+   * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at point \p p. This method lets you specify the relevant
+   * data directly, and is therefore allowed to be static.
+   *
+   * \note This class member is not as efficient as its counterpart in
+   * \p FE<Dim,T>, and is not employed in the \p reinit() cycle.
+   *
+   * \note This method does not return physically correct shape gradients,
+   * instead use \p compute_data().  The \p shape_deriv() methods should
+   * only be used for mapping.
+   */
+  static Real shape_deriv (const FEType fet,
+                           const Elem * inf_elem,
+                           const unsigned int i,
+                           const unsigned int j,
+                           const Point & p,
+                           const bool add_p_level);
 
   /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$

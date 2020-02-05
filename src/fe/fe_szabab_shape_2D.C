@@ -49,17 +49,6 @@ static const Real sqrt26 = std::sqrt(26.);
 namespace libMesh
 {
 
-template <>
-Real FE<2,SZABAB>::shape(const ElemType,
-                         const Order,
-                         const unsigned int,
-                         const Point &)
-{
-  libmesh_error_msg("Szabo-Babuska polynomials require the element type \nbecause edge orientation is needed.");
-  return 0.;
-}
-
-
 
 template <>
 Real FE<2,SZABAB>::shape(const Elem * elem,
@@ -735,15 +724,28 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,SZABAB>::shape_deriv(const ElemType,
-                               const Order,
-                               const unsigned int,
-                               const unsigned int,
-                               const Point &)
+Real FE<2,SZABAB>::shape(const ElemType,
+                         const Order,
+                         const unsigned int,
+                         const Point &)
 {
   libmesh_error_msg("Szabo-Babuska polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
 }
+
+
+
+template <>
+Real FE<2,SZABAB>::shape(const FEType fet,
+                         const Elem * elem,
+                         const unsigned int i,
+                         const Point & p,
+                         const bool add_p_level)
+{
+  return FE<2,SZABAB>::shape(elem, fet.order, i, p, add_p_level);
+}
+
+
 
 
 
@@ -1397,6 +1399,35 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 }
 
 
+
+
+
+template <>
+Real FE<2,SZABAB>::shape_deriv(const ElemType,
+                               const Order,
+                               const unsigned int,
+                               const unsigned int,
+                               const Point &)
+{
+  libmesh_error_msg("Szabo-Babuska polynomials require the element type \nbecause edge orientation is needed.");
+  return 0.;
+}
+
+
+template <>
+Real FE<2,SZABAB>::shape_deriv(const FEType fet,
+                               const Elem * elem,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point & p,
+                               const bool add_p_level)
+{
+  return FE<2,SZABAB>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
+
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
@@ -1422,6 +1453,26 @@ Real FE<2,SZABAB>::shape_second_deriv(const ElemType,
 template <>
 Real FE<2,SZABAB>::shape_second_deriv(const Elem *,
                                       const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point &,
+                                      const bool)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+    libMesh::err << "Second derivatives for Szabab elements "
+                 << " are not yet implemented!"
+                 << std::endl;
+
+  warning_given = true;
+  return 0.;
+}
+
+
+template <>
+Real FE<2,SZABAB>::shape_second_deriv(const FEType,
+                                      const Elem *,
                                       const unsigned int,
                                       const unsigned int,
                                       const Point &,

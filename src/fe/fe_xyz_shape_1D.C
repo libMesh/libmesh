@@ -27,19 +27,6 @@
 namespace libMesh
 {
 
-
-template <>
-Real FE<1,XYZ>::shape(const ElemType,
-                      const Order,
-                      const unsigned int,
-                      const Point &)
-{
-  libmesh_error_msg("XYZ polynomials require the element \n because the centroid is needed.");
-  return 0.;
-}
-
-
-
 template <>
 Real FE<1,XYZ>::shape(const Elem * elem,
                       const Order libmesh_dbg_var(order),
@@ -91,16 +78,27 @@ Real FE<1,XYZ>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,XYZ>::shape_deriv(const ElemType,
-                            const Order,
-                            const unsigned int,
-                            const unsigned int,
-                            const Point &)
+Real FE<1,XYZ>::shape(const ElemType,
+                      const Order,
+                      const unsigned int,
+                      const Point &)
 {
   libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
   return 0.;
 }
 
+
+
+
+template <>
+Real FE<1,XYZ>::shape(const FEType fet,
+                      const Elem * elem,
+                      const unsigned int i,
+                      const Point & p,
+                      const bool add_p_level)
+{
+  return FE<1,XYZ>::shape(elem, fet.order, i, p, add_p_level);
+}
 
 
 template <>
@@ -157,18 +155,35 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
 }
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<1,XYZ>::shape_second_deriv(const ElemType,
-                                   const Order,
-                                   const unsigned int,
-                                   const unsigned int,
-                                   const Point &)
+Real FE<1,XYZ>::shape_deriv(const ElemType,
+                            const Order,
+                            const unsigned int,
+                            const unsigned int,
+                            const Point &)
 {
   libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
   return 0.;
 }
+
+
+template <>
+Real FE<1,XYZ>::shape_deriv(const FEType fet,
+                            const Elem * elem,
+                            const unsigned int i,
+                            const unsigned int j,
+                            const Point & p,
+                            const bool add_p_level)
+{
+  return FE<1,XYZ>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 
@@ -223,6 +238,32 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
       return val/dist2;
     }
 }
+
+
+template <>
+Real FE<1,XYZ>::shape_second_deriv(const ElemType,
+                                   const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point &)
+{
+  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,XYZ>::shape_second_deriv(const FEType fet,
+                                   const Elem * elem,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point & p,
+                                   const bool add_p_level)
+{
+  return FE<1,XYZ>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
 #endif
 
 } // namespace libMesh
