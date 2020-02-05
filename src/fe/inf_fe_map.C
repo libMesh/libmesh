@@ -203,6 +203,12 @@ Point InfFEMap::inverse_map (const unsigned int dim,
       libmesh_error_msg("Invalid dim = " << dim);
     }
 
+#ifndef NDEBUG
+  // In debug mode, the validity of base_elems id is checked.
+  // Thus, we should set it to a valid  one:
+  base_elem->set_id(inf_elem->id());
+#endif
+
   // 3.)
   // Now we have the intersection-point (projection of physical point onto base-element).
   // Lets compute its internal coordinates (being p(0) and p(1)):
