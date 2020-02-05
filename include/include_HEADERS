@@ -88,6 +88,7 @@ include_HEADERS =  \
         fe/fe_base.h \
         fe/fe_compute_data.h \
         fe/fe_interface.h \
+        fe/fe_interface_macros.h \
         fe/fe_lagrange_shape_1D.h \
         fe/fe_macro.h \
         fe/fe_map.h \

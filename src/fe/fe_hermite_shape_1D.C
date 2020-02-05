@@ -32,10 +32,8 @@ using namespace libMesh;
 void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
 {
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
-
-  const FEType map_fe_type(mapping_order, mapping_family);
+  const FEType map_fe_type(elem->default_order(), mapping_family);
 
   const int n_mapping_shape_functions =
     FEInterface::n_shape_functions (1, map_fe_type,
@@ -51,7 +49,7 @@ void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
   std::vector<Real> dxidx(2);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(1, map_fe_type);
+    FEInterface::shape_deriv_function(1, map_fe_type, mapping_elem_type);
 
   for (int p = 0; p != 2; ++p)
     {
@@ -59,7 +57,7 @@ void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = shape_deriv_ptr
-            (elem, mapping_order, i, 0, dofpt[p], false);
+            (map_fe_type, elem, i, 0, dofpt[p], false);
           dxdxi[p] += elem->point(i)(0) * ddxi;
         }
     }
@@ -182,18 +180,6 @@ Real FEHermite<1>::hermite_raw_shape(const unsigned int i, const Real xi)
 
 
 template <>
-Real FE<1,HERMITE>::shape(const ElemType,
-                          const Order,
-                          const unsigned int,
-                          const Point &)
-{
-  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
-}
-
-
-
-template <>
 Real FE<1,HERMITE>::shape(const Elem * elem,
                           const Order libmesh_dbg_var(order),
                           const unsigned int i,
@@ -246,16 +232,25 @@ Real FE<1,HERMITE>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,HERMITE>::shape_deriv(const ElemType,
-                                const Order,
-                                const unsigned int,
-                                const unsigned int,
-                                const Point &)
+Real FE<1,HERMITE>::shape(const ElemType,
+                          const Order,
+                          const unsigned int,
+                          const Point &)
 {
   libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
+
+template <>
+Real FE<1,HERMITE>::shape(const FEType fet,
+                          const Elem * elem,
+                          const unsigned int i,
+                          const Point & p,
+                          const bool add_p_level)
+{
+  return FE<1,HERMITE>::shape(elem, fet.order, i, p, add_p_level);
+}
 
 
 template <>
@@ -310,18 +305,29 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
 }
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
 template <>
-Real FE<1,HERMITE>::shape_second_deriv(const ElemType,
-                                       const Order,
-                                       const unsigned int,
-                                       const unsigned int,
-                                       const Point &)
+Real FE<1,HERMITE>::shape_deriv(const ElemType,
+                                const Order,
+                                const unsigned int,
+                                const unsigned int,
+                                const Point &)
 {
   libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
+
+template <>
+Real FE<1,HERMITE>::shape_deriv(const FEType fet,
+                                const Elem * elem,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Point & p,
+                                const bool add_p_level)
+{
+  return FE<1,HERMITE>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 template <>
@@ -374,6 +380,30 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 }
+
+
+template <>
+Real FE<1,HERMITE>::shape_second_deriv(const ElemType,
+                                       const Order,
+                                       const unsigned int,
+                                       const unsigned int,
+                                       const Point &)
+{
+  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
+  return 0.;
+}
+
+template <>
+Real FE<1,HERMITE>::shape_second_deriv(const FEType fet,
+                                       const Elem * elem,
+                                       const unsigned int i,
+                                       const unsigned int j,
+                                       const Point & p,
+                                       const bool add_p_level)
+{
+  return FE<1,HERMITE>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
 
 #endif
 

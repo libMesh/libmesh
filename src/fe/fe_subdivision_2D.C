@@ -738,6 +738,20 @@ Real FE<2,SUBDIVISION>::shape(const Elem * elem,
 }
 
 
+template <>
+Real FE<2,SUBDIVISION>::shape(const FEType fet,
+                              const Elem * elem,
+                              const unsigned int i,
+                              const Point & p,
+                              const bool add_p_level)
+{
+  libmesh_assert(elem);
+  const Order totalorder =
+    static_cast<Order>(fet.order+add_p_level*elem->p_level());
+  return FE<2,SUBDIVISION>::shape(elem->type(), totalorder, i, p);
+}
+
+
 
 template <>
 Real FE<2,SUBDIVISION>::shape_deriv(const ElemType type,
@@ -777,6 +791,21 @@ Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
   const Order totalorder =
     static_cast<Order>(order+add_p_level*elem->p_level());
+  return FE<2,SUBDIVISION>::shape_deriv(elem->type(), totalorder, i, j, p);
+}
+
+
+template <>
+Real FE<2,SUBDIVISION>::shape_deriv(const FEType fet,
+                                    const Elem * elem,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p,
+                                    const bool add_p_level)
+{
+  libmesh_assert(elem);
+  const Order totalorder =
+    static_cast<Order>(fet.order+add_p_level*elem->p_level());
   return FE<2,SUBDIVISION>::shape_deriv(elem->type(), totalorder, i, j, p);
 }
 
@@ -823,6 +852,23 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
     static_cast<Order>(order+add_p_level*elem->p_level());
   return FE<2,SUBDIVISION>::shape_second_deriv(elem->type(), totalorder, i, j, p);
 }
+
+
+
+template <>
+Real FE<2,SUBDIVISION>::shape_second_deriv(const FEType fet,
+                                           const Elem * elem,
+                                           const unsigned int i,
+                                           const unsigned int j,
+                                           const Point & p,
+                                           const bool add_p_level)
+{
+  libmesh_assert(elem);
+  const Order totalorder =
+    static_cast<Order>(fet.order+add_p_level*elem->p_level());
+  return FE<2,SUBDIVISION>::shape_second_deriv(elem->type(), totalorder, i, j, p);
+}
+
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 

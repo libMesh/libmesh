@@ -25,17 +25,6 @@
 namespace libMesh
 {
 
-template <>
-RealGradient FE<2,NEDELEC_ONE>::shape(const ElemType,
-                                      const Order,
-                                      const unsigned int,
-                                      const Point &)
-{
-  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
-  return RealGradient();
-}
-
-
 // An excellent discussion of Nedelec shape functions is given in
 // http://www.dealii.org/developer/reports/nedelec/nedelec.pdf
 template <>
@@ -163,18 +152,27 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
 
 
 
+
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const ElemType,
-                                            const Order,
-                                            const unsigned int,
-                                            const unsigned int,
-                                            const Point &)
+RealGradient FE<2,NEDELEC_ONE>::shape(const ElemType,
+                                      const Order,
+                                      const unsigned int,
+                                      const Point &)
 {
   libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
 
+template <>
+RealGradient FE<2,NEDELEC_ONE>::shape(const FEType fet,
+                                      const Elem * elem,
+                                      const unsigned int i,
+                                      const Point & p,
+                                      const bool add_p_level)
+{
+  return FE<2,NEDELEC_ONE>::shape(elem, fet.order, i, p, add_p_level);
+}
 
 template <>
 RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
@@ -329,20 +327,33 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
 
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
-                                                   const Order,
-                                                   const unsigned int,
-                                                   const unsigned int,
-                                                   const Point &)
+RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const ElemType,
+                                            const Order,
+                                            const unsigned int,
+                                            const unsigned int,
+                                            const Point &)
 {
   libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
+template <>
+RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const FEType fet,
+                                            const Elem * elem,
+                                            const unsigned int i,
+                                            const unsigned int j,
+                                            const Point & p,
+                                            const bool add_p_level)
+{
+  return FE<2,NEDELEC_ONE>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
 
+
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
@@ -402,6 +413,33 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   libmesh_not_implemented();
 #endif
 }
+
+
+
+template <>
+RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
+                                                   const Order,
+                                                   const unsigned int,
+                                                   const unsigned int,
+                                                   const Point &)
+{
+  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
+  return RealGradient();
+}
+
+
+template <>
+RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const FEType fet,
+                                                   const Elem * elem,
+                                                   const unsigned int i,
+                                                   const unsigned int j,
+                                                   const Point & p,
+                                                   const bool add_p_level)
+{
+  return FE<2,NEDELEC_ONE>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
 
 #endif
 

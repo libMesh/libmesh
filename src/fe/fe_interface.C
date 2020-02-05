@@ -19,6 +19,12 @@
 
 // Local includes
 #include "libmesh/fe_interface.h"
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#include "libmesh/fe_interface_macros.h"
+#include "libmesh/inf_fe.h"
+#endif
+
 #include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_compute_data.h"
@@ -810,6 +816,12 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       RealGradient & phi)
 {
   // This even does not handle infinite elements at all!?
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(t))
+  {
+     libmesh_not_implemented();
+  }
+#endif
   const Order o = fe_t.order;
 
   switch(dim)
@@ -833,11 +845,17 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
   return;
 }
 
-
 FEInterface::shape_ptr
 FEInterface::shape_function(const unsigned int dim,
-                            const FEType & fe_t)
+                            const FEType & fe_t,
+                            const ElemType libmesh_inf_var(t))
 {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(t))
+   {
+    inf_fe_switch(shape);
+   }
+#endif
   fe_switch(shape);
 }
 
@@ -859,20 +877,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 #endif
 
   const Order o = fe_t.order;
-
-  switch(dim)
-    {
-    case 0:
-      fe_family_switch (0, shape_deriv(t, o, i, j, p), return , ;);
-    case 1:
-      fe_family_switch (1, shape_deriv(t, o, i, j, p), return , ;);
-    case 2:
-      fe_family_switch (2, shape_deriv(t, o, i, j, p), return  , ;);
-    case 3:
-      fe_family_switch (3, shape_deriv(t, o, i, j, p), return , ;);
-    default:
-      libmesh_error_msg("Invalid dimension = " << dim);
-    }
+  fe_switch(shape_deriv(t,o,i,j,p));
   return 0;
 }
 
@@ -914,8 +919,15 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 
 FEInterface::shape_deriv_ptr
 FEInterface::shape_deriv_function(const unsigned int dim,
-                                  const FEType & fe_t)
+                                  const FEType & fe_t,
+                                  const ElemType libmesh_inf_var(t))
 {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(t))
+  {
+    inf_fe_switch(shape_deriv);
+  }
+#endif
   fe_switch(shape_deriv);
 }
 
@@ -987,8 +999,13 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
 
 FEInterface::shape_second_deriv_ptr
 FEInterface::shape_second_deriv_function(const unsigned int dim,
-                                         const FEType & fe_t)
+                                         const FEType & fe_t,
+                                         const ElemType libmesh_inf_var(t))
 {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(t))
+    libmesh_not_implemented();
+#endif
   fe_switch(shape_second_deriv);
 }
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -1002,6 +1019,13 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    libmesh_not_implemented();
+  // This is actually an issue for infinite elements: They require type 'Gradient'!
+#endif
+
   const Order o = fe_t.order;
 
   switch(dim)

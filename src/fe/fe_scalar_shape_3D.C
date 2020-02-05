@@ -44,6 +44,17 @@ Real FE<3,SCALAR>::shape(const Elem *,
   return 1.;
 }
 
+
+template <>
+Real FE<3,SCALAR>::shape(const FEType,
+                         const Elem *,
+                         const unsigned int,
+                         const Point &,
+                         const bool)
+{
+  return 1.;
+}
+
 template <>
 Real FE<3,SCALAR>::shape_deriv(const ElemType,
                                const Order,
@@ -64,6 +75,19 @@ Real FE<3,SCALAR>::shape_deriv(const Elem *,
 {
   return 0.;
 }
+
+
+template <>
+Real FE<3,SCALAR>::shape_deriv(const FEType,
+                               const Elem *,
+                               const unsigned int,
+                               const unsigned int,
+                               const Point &,
+                               const bool)
+{
+  return 0.;
+}
+
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -87,6 +111,19 @@ Real FE<3,SCALAR>::shape_second_deriv(const Elem *,
 {
   return 0.;
 }
+
+
+template <>
+Real FE<3,SCALAR>::shape_second_deriv(const FEType,
+                                      const Elem *,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point &,
+                                      const bool)
+{
+  return 0.;
+}
+
 
 #endif
 

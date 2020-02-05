@@ -91,14 +91,14 @@ void clough_compute_coefs(const Elem * elem)
   std::vector<Real> dxidx(2);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(2, map_fe_type);
+    FEInterface::shape_deriv_function(2, map_fe_type, mapping_elem_type);
 
   for (int p = 0; p != 2; ++p)
     {
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = shape_deriv_ptr
-            (elem, mapping_order, i, 0, dofpt[p], false);
+            (map_fe_type, elem, i, 0, dofpt[p], false);
           dxdxi[p] += dofpt[p](0) * ddxi;
         }
     }
@@ -224,18 +224,6 @@ namespace libMesh
 
 
 template <>
-Real FE<1,CLOUGH>::shape(const ElemType,
-                         const Order,
-                         const unsigned int,
-                         const Point &)
-{
-  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
-}
-
-
-
-template <>
 Real FE<1,CLOUGH>::shape(const Elem * elem,
                          const Order order,
                          const unsigned int i,
@@ -287,6 +275,29 @@ Real FE<1,CLOUGH>::shape(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 }
+
+
+
+template <>
+Real FE<1,CLOUGH>::shape(const ElemType,
+                         const Order,
+                         const unsigned int,
+                         const Point &)
+{
+  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
+  return 0.;
+}
+
+template <>
+Real FE<1,CLOUGH>::shape(const FEType fet,
+                         const Elem * elem,
+                         const unsigned int i,
+                         const Point & p,
+                         const bool add_p_level)
+{
+  return FE<1,CLOUGH>::shape(elem, fet.order, i, p, add_p_level);
+}
+
 
 
 
@@ -356,20 +367,20 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
 }
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
 template <>
-Real FE<1,CLOUGH>::shape_second_deriv(const ElemType,
-                                      const Order,
-                                      const unsigned int,
-                                      const unsigned int,
-                                      const Point &)
+Real FE<1,CLOUGH>::shape_deriv(const FEType fet,
+                               const Elem * elem,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point & p,
+                               const bool add_p_level)
 {
-  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
+  return FE<1,CLOUGH>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
 }
 
 
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
 Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
@@ -422,6 +433,31 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 }
+
+
+template <>
+Real FE<1,CLOUGH>::shape_second_deriv(const ElemType,
+                                      const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point &)
+{
+  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
+  return 0.;
+}
+
+template <>
+Real FE<1,CLOUGH>::shape_second_deriv(const FEType fet,
+                                      const Elem * elem,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p,
+                                      const bool add_p_level)
+{
+  return FE<1,CLOUGH>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
 
 #endif
 

@@ -55,6 +55,20 @@ Real FE<3,CLOUGH>::shape(const Elem * libmesh_dbg_var(elem),
 }
 
 
+template <>
+Real FE<3,CLOUGH>::shape(const FEType,
+                         const Elem * libmesh_dbg_var(elem),
+                         const unsigned int,
+                         const Point &,
+                         const bool)
+{
+  libmesh_assert(elem);
+
+  libmesh_not_implemented();
+  return 0.;
+}
+
+
 
 template <>
 Real FE<3,CLOUGH>::shape_deriv(const ElemType,
@@ -83,6 +97,19 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem * libmesh_dbg_var(elem),
 }
 
 
+template <>
+Real FE<3,CLOUGH>::shape_deriv(const FEType,
+                               const Elem * libmesh_dbg_var(elem),
+                               const unsigned int,
+                               const unsigned int,
+                               const Point &,
+                               const bool)
+{
+  libmesh_assert(elem);
+  libmesh_not_implemented();
+  return 0.;
+}
+
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -101,6 +128,19 @@ Real FE<3,CLOUGH>::shape_second_deriv(const ElemType,
 template <>
 Real FE<3,CLOUGH>::shape_second_deriv(const Elem * libmesh_dbg_var(elem),
                                       const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point &,
+                                      const bool)
+{
+  libmesh_assert(elem);
+  libmesh_not_implemented();
+  return 0.;
+}
+
+template <>
+Real FE<3,CLOUGH>::shape_second_deriv(const FEType,
+                                      const Elem * libmesh_dbg_var(elem),
                                       const unsigned int,
                                       const unsigned int,
                                       const Point &,

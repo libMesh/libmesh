@@ -54,6 +54,19 @@ Real FE<0,XYZ>::shape(const Elem *,
 
 
 template <>
+Real FE<0,XYZ>::shape(const FEType,
+                      const Elem *,
+                      const unsigned int libmesh_dbg_var(i),
+                      const Point &,
+                      const bool)
+{
+  libmesh_assert_less (i, 1);
+  return 1.;
+}
+
+
+
+template <>
 Real FE<0,XYZ>::shape_deriv(const ElemType,
                             const Order,
                             const unsigned int,
@@ -69,6 +82,20 @@ Real FE<0,XYZ>::shape_deriv(const ElemType,
 template <>
 Real FE<0,XYZ>::shape_deriv(const Elem *,
                             const Order,
+                            const unsigned int,
+                            const unsigned int,
+                            const Point &,
+                            const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<0,XYZ>::shape_deriv(const FEType,
+                            const Elem *,
                             const unsigned int,
                             const unsigned int,
                             const Point &,
@@ -98,6 +125,20 @@ Real FE<0,XYZ>::shape_second_deriv(const ElemType,
 template <>
 Real FE<0,XYZ>::shape_second_deriv(const Elem *,
                                    const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point &,
+                                   const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<0,XYZ>::shape_second_deriv(const FEType,
+                                   const Elem *,
                                    const unsigned int,
                                    const unsigned int,
                                    const Point &,

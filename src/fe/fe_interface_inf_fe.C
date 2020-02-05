@@ -23,76 +23,11 @@
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #include "libmesh/fe_interface.h"
+#include "libmesh/fe_interface_macros.h"
 #include "libmesh/inf_fe.h"
 
 namespace libMesh
 {
-
-
-#define inf_fe_family_mapping_switch(dim, func_and_args, prefix, suffix) \
-  do {                                                                  \
-    switch (fe_t.radial_family)                                         \
-      {                                                                 \
-      case INFINITE_MAP:                                                \
-        switch(fe_t.inf_map)                                            \
-          {                                                             \
-          case CARTESIAN:                                               \
-            prefix InfFE<dim,INFINITE_MAP,CARTESIAN>::func_and_args suffix \
-          case SPHERICAL:                                               \
-          case ELLIPSOIDAL:                                             \
-            libmesh_not_implemented();                                  \
-          default:                                                      \
-            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
-          }                                                             \
-      case JACOBI_20_00:                                                \
-        switch(fe_t.inf_map)                                            \
-          {                                                             \
-          case CARTESIAN:                                               \
-            prefix InfFE<dim,JACOBI_20_00,CARTESIAN>::func_and_args suffix \
-          case SPHERICAL:                                               \
-          case ELLIPSOIDAL:                                             \
-            libmesh_not_implemented();                                  \
-          default:                                                      \
-            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
-          }                                                             \
-      case JACOBI_30_00:                                                \
-        switch(fe_t.inf_map)                                            \
-          {                                                             \
-          case CARTESIAN:                                               \
-            prefix InfFE<dim,JACOBI_30_00,CARTESIAN>::func_and_args suffix \
-          case SPHERICAL:                                               \
-          case ELLIPSOIDAL:                                             \
-            libmesh_not_implemented();                                  \
-          default:                                                      \
-            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
-          }                                                             \
-      case LEGENDRE:                                                    \
-        switch(fe_t.inf_map)                                            \
-          {                                                             \
-          case CARTESIAN:                                               \
-            prefix InfFE<dim,LEGENDRE,CARTESIAN>::func_and_args suffix \
-          case SPHERICAL:                                               \
-          case ELLIPSOIDAL:                                             \
-            libmesh_not_implemented();                                  \
-          default:                                                      \
-            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
-          }                                                             \
-      case LAGRANGE:                                                    \
-        switch(fe_t.inf_map)                                            \
-          {                                                             \
-          case CARTESIAN:                                               \
-            prefix InfFE<dim,LAGRANGE,CARTESIAN>::func_and_args suffix \
-          case SPHERICAL:                                               \
-          case ELLIPSOIDAL:                                             \
-            libmesh_not_implemented();                                  \
-          default:                                                      \
-            libmesh_error_msg("Invalid radial mapping " << fe_t.inf_map); \
-          }                                                             \
-      default:                                                          \
-        libmesh_error_msg("Invalid radial family = " << fe_t.radial_family); \
-      }                                                                 \
-  } while (0)
-
 
 //------------------------------------------------------------
 //FEInterface class members handling calls to InfFE
@@ -671,100 +606,13 @@ bool FEInterface::ifem_on_reference_element(const Point & p,
 
 
 
-
 Real FEInterface::ifem_shape(const unsigned int dim,
                              const FEType & fe_t,
                              const ElemType t,
                              const unsigned int i,
                              const Point & p)
 {
-  switch (dim)
-    {
-      // 1D
-    case 1:
-      {
-        switch (fe_t.radial_family)
-          {
-            /*
-             * For no derivatives (and local coordinates, as
-             * given in \p p) the infinite element shapes
-             * are independent of mapping type
-             */
-          case INFINITE_MAP:
-            return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case JACOBI_20_00:
-            return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case JACOBI_30_00:
-            return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case LEGENDRE:
-            return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case LAGRANGE:
-            return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-      }
-
-
-      // 2D
-    case 2:
-      {
-        switch (fe_t.radial_family)
-          {
-          case INFINITE_MAP:
-            return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case JACOBI_20_00:
-            return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case JACOBI_30_00:
-            return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case LEGENDRE:
-            return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case LAGRANGE:
-            return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-      }
-
-
-      // 3D
-    case 3:
-      {
-        switch (fe_t.radial_family)
-          {
-          case INFINITE_MAP:
-            return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case JACOBI_20_00:
-            return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case JACOBI_30_00:
-            return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case LEGENDRE:
-            return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
-
-          case LAGRANGE:
-            return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-      }
-
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
-    }
+   inf_fe_switch(shape(fe_t, t, i, p));
 }
 
 
@@ -776,93 +624,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
                              const unsigned int i,
                              const Point & p)
 {
-  switch (dim)
-    {
-      // 1D
-    case 1:
-      {
-        switch (fe_t.radial_family)
-          {
-            /*
-             * For no derivatives (and local coordinates, as
-             * given in \p p) the infinite element shapes
-             * are independent of mapping type
-             */
-          case INFINITE_MAP:
-            return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case JACOBI_20_00:
-            return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case JACOBI_30_00:
-            return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case LEGENDRE:
-            return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case LAGRANGE:
-            return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-      }
-
-
-      // 2D
-    case 2:
-      {
-        switch (fe_t.radial_family)
-          {
-          case INFINITE_MAP:
-            return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case JACOBI_20_00:
-            return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case JACOBI_30_00:
-            return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case LEGENDRE:
-            return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case LAGRANGE:
-            return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-      }
-
-
-      // 3D
-    case 3:
-      {
-        switch (fe_t.radial_family)
-          {
-          case INFINITE_MAP:
-            return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case JACOBI_20_00:
-            return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case JACOBI_30_00:
-            return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case LEGENDRE:
-            return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          case LAGRANGE:
-            return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-      }
-
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
-    }
+   inf_fe_switch( shape(fe_t, elem, i, p));
 }
 
 Real FEInterface::ifem_shape_deriv (const unsigned int dim,
@@ -872,21 +634,7 @@ Real FEInterface::ifem_shape_deriv (const unsigned int dim,
                                     const unsigned int j,
                                     const Point & p)
 {
-  switch (dim)
-    {
-      // 1D
-    case 1:
-      inf_fe_family_mapping_switch(1, shape_deriv(fe_t, elem, i, j, p), return, ;);
-      // 2D
-    case 2:
-      inf_fe_family_mapping_switch(2, shape_deriv(fe_t, elem, i, j, p), return, ;);
-      // 3D
-    case 3:
-      inf_fe_family_mapping_switch(3, shape_deriv(fe_t, elem, i, j, p), return, ;);
-
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
-    }
+   inf_fe_switch(shape_deriv(fe_t, elem, i, j, p));
 }
 
 
@@ -897,21 +645,7 @@ Real FEInterface::ifem_shape_deriv(const unsigned int dim,
                                    const unsigned int j,
                                    const Point & p)
 {
-  switch (dim)
-    {
-      // 1D
-    case 1:
-      inf_fe_family_mapping_switch(1, shape_deriv(fe_t, t, i, j, p), return, ;);
-      // 2D
-    case 2:
-      inf_fe_family_mapping_switch(2, shape_deriv(fe_t, t, i, j, p), return, ;);
-      // 3D
-    case 3:
-      inf_fe_family_mapping_switch(3, shape_deriv(fe_t, t, i, j, p), return, ;);
-
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
-    }
+   inf_fe_switch(shape_deriv(fe_t, t, i, j, p));
 }
 
 
@@ -922,106 +656,19 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 {
   switch (dim)
     {
-      // 1D
     case 1:
       {
-        switch (fe_t.radial_family)
-          {
-            /*
-             * For no derivatives (and local coordinates, as
-             * given in \p p) the infinite element shapes
-             * are independent of mapping type
-             */
-          case INFINITE_MAP:
-            InfFE<1,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case JACOBI_20_00:
-            InfFE<1,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case JACOBI_30_00:
-            InfFE<1,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case LEGENDRE:
-            InfFE<1,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case LAGRANGE:
-            InfFE<1,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-
+        inf_fe_family_mapping_switch(1, compute_data(fe_t, elem,data), , ;break;);
         break;
       }
-
-
-      // 2D
     case 2:
       {
-        switch (fe_t.radial_family)
-          {
-          case INFINITE_MAP:
-            InfFE<2,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case JACOBI_20_00:
-            InfFE<2,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case JACOBI_30_00:
-            InfFE<2,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case LEGENDRE:
-            InfFE<2,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case LAGRANGE:
-            InfFE<2,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-
+        inf_fe_family_mapping_switch(2, compute_data(fe_t, elem,data), , ;break;);
         break;
       }
-
-
-      // 3D
     case 3:
       {
-        switch (fe_t.radial_family)
-          {
-          case INFINITE_MAP:
-            InfFE<3,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case JACOBI_20_00:
-            InfFE<3,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case JACOBI_30_00:
-            InfFE<3,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case LEGENDRE:
-            InfFE<3,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          case LAGRANGE:
-            InfFE<3,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
-
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
-          }
-
+        inf_fe_family_mapping_switch(3, compute_data(fe_t, elem,data), , ;break;);
         break;
       }
 

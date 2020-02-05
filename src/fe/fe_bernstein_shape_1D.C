@@ -201,6 +201,19 @@ Real FE<1,BERNSTEIN>::shape(const Elem * elem,
 }
 
 
+template <>
+Real FE<1,BERNSTEIN>::shape(const FEType fet,
+                            const Elem * elem,
+                            const unsigned int i,
+                            const Point & p,
+                            const bool add_p_level)
+{
+  libmesh_assert(elem);
+  return FE<1,BERNSTEIN>::shape
+    (elem->type(),
+     static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
+}
+
 
 template <>
 Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
@@ -373,6 +386,20 @@ Real FE<1,BERNSTEIN>::shape_deriv(const Elem * elem,
   return FE<1,BERNSTEIN>::shape_deriv
     (elem->type(),
      static_cast<Order>(order + add_p_level*elem->p_level()), i, j, p);
+}
+
+template <>
+Real FE<1,BERNSTEIN>::shape_deriv(const FEType fet,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p,
+                                  const bool add_p_level)
+{
+  libmesh_assert(elem);
+  return FE<1,BERNSTEIN>::shape_deriv
+    (elem->type(),
+     static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -572,6 +599,20 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem * elem,
   return FE<1,BERNSTEIN>::shape_second_deriv
     (elem->type(),
      static_cast<Order>(order + add_p_level*elem->p_level()), i, j, p);
+}
+
+template <>
+Real FE<1,BERNSTEIN>::shape_second_deriv(const FEType fet,
+                                         const Elem * elem,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const Point & p,
+                                         const bool add_p_level)
+{
+  libmesh_assert(elem);
+  return FE<1,BERNSTEIN>::shape_second_deriv
+    (elem->type(),
+     static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
 }
 
 #endif

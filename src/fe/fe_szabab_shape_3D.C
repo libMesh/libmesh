@@ -53,6 +53,18 @@ Real FE<3,SZABAB>::shape(const Elem *,
 
 
 template <>
+Real FE<3,SZABAB>::shape(const FEType,
+                         const Elem *,
+                         const unsigned int,
+                         const Point &,
+                         const bool)
+{
+  libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
+  return 0;
+}
+
+
+template <>
 Real FE<3,SZABAB>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
@@ -75,6 +87,19 @@ Real FE<3,SZABAB>::shape_deriv(const Elem *,
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;
+}
+
+
+template <>
+Real FE<3,SZABAB>::shape_deriv(const FEType,
+                               const Elem *,
+                               const unsigned int,
+                               const unsigned int,
+                               const Point &,
+                               const bool)
+{
+  libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
+  return 0;
 }
 
 
@@ -102,6 +127,26 @@ Real FE<3,SZABAB>::shape_second_deriv(const Elem *,
                                       const bool)
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
+  return 0.;
+}
+
+
+template <>
+Real FE<3,SZABAB>::shape_second_deriv(const FEType,
+                                      const Elem *,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point &,
+                                      const bool)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+    libMesh::err << "Second derivatives for Szabab elements "
+                 << " are not yet implemented!"
+                 << std::endl;
+
+  warning_given = true;
   return 0.;
 }
 

@@ -29,19 +29,6 @@
 namespace libMesh
 {
 
-
-template <>
-Real FE<2,BERNSTEIN>::shape(const ElemType,
-                            const Order,
-                            const unsigned int,
-                            const Point &)
-{
-  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge orientation is needed.");
-  return 0.;
-}
-
-
-
 template <>
 Real FE<2,BERNSTEIN>::shape(const Elem * elem,
                             const Order order,
@@ -383,16 +370,25 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
 }
 
 
-
 template <>
-Real FE<2,BERNSTEIN>::shape_deriv(const ElemType,
-                                  const Order,
-                                  const unsigned int,
-                                  const unsigned int,
-                                  const Point &)
+Real FE<2,BERNSTEIN>::shape(const ElemType,
+                            const Order,
+                            const unsigned int,
+                            const Point &)
 {
   libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
+}
+
+
+template <>
+Real FE<2,BERNSTEIN>::shape(const FEType fet,
+                            const Elem * elem,
+                            const unsigned int i,
+                            const Point & p,
+                            const bool add_p_level)
+{
+  return FE<2,BERNSTEIN>::shape(elem, fet.order, i, p, add_p_level);
 }
 
 
@@ -563,17 +559,33 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
 
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 template <>
-Real FE<2,BERNSTEIN>::shape_second_deriv(const ElemType,
-                                         const Order,
-                                         const unsigned int,
-                                         const unsigned int,
-                                         const Point &)
+Real FE<2,BERNSTEIN>::shape_deriv(const ElemType,
+                                  const Order,
+                                  const unsigned int,
+                                  const unsigned int,
+                                  const Point &)
 {
   libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
 }
+
+template <>
+Real FE<2,BERNSTEIN>::shape_deriv(const FEType fet,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p,
+                                  const bool add_p_level)
+{
+  return FE<2,BERNSTEIN>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 
@@ -718,6 +730,33 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 }
+
+
+template <>
+Real FE<2,BERNSTEIN>::shape_second_deriv(const ElemType,
+                                         const Order,
+                                         const unsigned int,
+                                         const unsigned int,
+                                         const Point &)
+{
+  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge orientation is needed.");
+  return 0.;
+}
+
+
+template <>
+Real FE<2,BERNSTEIN>::shape_second_deriv(const FEType fet,
+                                         const Elem * elem,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const Point & p,
+                                         const bool add_p_level)
+{
+  libmesh_assert(elem);
+  return FE<2,BERNSTEIN>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
 
 #endif
 

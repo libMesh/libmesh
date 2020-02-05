@@ -264,6 +264,14 @@ extern bool warned_about_auto_ptr;
 #define libmesh_dbg_var(var)
 #endif
 
+// The libmesh_inf_var() macro indicates that an argument to a function
+// is used only when infinite elements are enabled
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#define libmesh_inf_var(var) var
+#else
+#define libmesh_inf_var(var)
+#endif
+
 // The libmesh_assert() macro acts like C's assert(), but throws a
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
