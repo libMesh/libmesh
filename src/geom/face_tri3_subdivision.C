@@ -28,7 +28,10 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tri3 subdivision class member functions
 
-Tri3Subdivision::Tri3Subdivision(Elem * p) : Tri3(p), _subdivision_updated(true)
+Tri3Subdivision::Tri3Subdivision(Elem * p) :
+  Tri3(p),
+  _subdivision_updated(p ? true : false),
+  _is_ghost(p ? true : false)
 {
   if (p)
     {
