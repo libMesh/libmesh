@@ -105,8 +105,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
     {
       libmesh_assert_equal_to(elem->type(), TRI3);
 
-      Elem * tri = new Tri3Subdivision;
-      tri->set_id(elem->id());
+      auto tri = Elem::build_with_id(TRI3SUBDIVISION, elem->id());
       tri->subdomain_id() = elem->subdomain_id();
       tri->set_node(0) = elem->node_ptr(0);
       tri->set_node(1) = elem->node_ptr(1);
@@ -122,7 +121,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
                 {
                   // add the boundary id to the list of new boundary ids
                   new_boundary_ids.push_back(id);
-                  new_boundary_elements.push_back(tri);
+                  new_boundary_elements.push_back(tri.get());
                   new_boundary_sides.push_back(side);
                 }
             }
@@ -131,8 +130,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
           mesh.get_boundary_info().remove(elem);
         }
 
-      new_elements.push_back(tri);
-      mesh.insert_elem(tri);
+      new_elements.push_back(mesh.insert_elem(std::move(tri)));
     }
   mesh.prepare_for_use();
 
