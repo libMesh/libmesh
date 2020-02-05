@@ -89,8 +89,6 @@ void MeshTools::Subdivision::find_one_ring(const Tri3Subdivision * elem,
 
 void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
 {
-  std::vector<Elem *> new_elements;
-  new_elements.reserve(mesh.n_elem());
   const bool mesh_has_boundary_data =
     (mesh.get_boundary_info().n_boundary_ids() > 0);
 
@@ -130,7 +128,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
           mesh.get_boundary_info().remove(elem);
         }
 
-      new_elements.push_back(mesh.insert_elem(std::move(tri)));
+      mesh.insert_elem(std::move(tri));
     }
   mesh.prepare_for_use();
 
