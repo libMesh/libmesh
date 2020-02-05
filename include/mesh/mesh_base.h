@@ -693,6 +693,16 @@ public:
   virtual Elem * insert_elem (Elem * e) = 0;
 
   /**
+   * Version of insert_elem() taking a std::unique_ptr by value. The version
+   * taking a dumb pointer will eventually be deprecated in favor of this
+   * version. This API is intended to indicate that ownership of the Elem
+   * is transferred to the Mesh when this function is called, and it should
+   * play more nicely with the Elem::build() API which has always returned
+   * a std::unique_ptr.
+   */
+  virtual Elem * insert_elem (std::unique_ptr<Elem> e) = 0;
+
+  /**
    * Removes element \p e from the mesh. This method must be
    * implemented in derived classes in such a way that it does not
    * invalidate element iterators.  Users should call

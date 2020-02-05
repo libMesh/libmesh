@@ -287,6 +287,7 @@ public:
   virtual Elem * add_elem (Elem * e) override;
   virtual Elem * add_elem (std::unique_ptr<Elem> e) override;
   virtual Elem * insert_elem (Elem * e) override;
+  virtual Elem * insert_elem (std::unique_ptr<Elem> e) override;
   virtual void delete_elem (Elem * e) override;
   virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id) override;
 
