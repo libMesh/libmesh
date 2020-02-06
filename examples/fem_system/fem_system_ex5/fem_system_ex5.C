@@ -33,9 +33,11 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/getpot.h"
+#include "libmesh/dyna_io.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/mesh.h"
+#include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
@@ -76,7 +78,7 @@ int main (int argc, char ** argv)
 #endif
 
   // Parse the input file
-  GetPot infile("fem_system_ex3.in");
+  GetPot infile("fem_system_ex5.in");
 
   // Override input file arguments from the command line
   infile.parse_command_line(argc, argv);
@@ -89,91 +91,152 @@ int main (int argc, char ** argv)
   const unsigned int write_interval    = infile("write_interval", 1);
 #endif
 
-  // Initialize the cantilever mesh
-  const unsigned int dim = 3;
+  // Initialize the mesh
+  const unsigned int dim = infile("dim", 2);
+  libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
-  // Make sure libMesh was compiled for 3D
-  libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
-
-  // Create a 3D mesh distributed across the default MPI communicator.
+  // Create a mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
-  MeshTools::Generation::build_cube (mesh,
-                                     32,
-                                     8,
-                                     4,
-                                     0., 1.*x_scaling,
-                                     0., 0.3,
-                                     0., 0.1,
-                                     HEX8);
 
+  // Use an IsoGeometricAnalysis mesh?
+  const bool use_iga = infile("use_iga", true);
+
+  // Make DynaIO::add_spline_constraints work on DistributedMesh
+  if (use_iga)
+    {
+      mesh.allow_renumbering(false);
+      mesh.allow_remote_element_removal(false);
+    }
+
+  // Declare DynaIO here so we can use its constraint equations later
+  DynaIO dyna_io(mesh);
+
+  // Declare a default FEType here to override if needed for IGA later
+  FEType fe_type;
+
+  // Load an IGA pressurized cylinder mesh or build a cantilever mesh
+  if (use_iga)
+    {
+      if (mesh.processor_id() == 0)
+        dyna_io.read("PressurizedCyl_Patch6_256Elem.bxt");
+      MeshCommunication().broadcast (mesh);
+      mesh.prepare_for_use();
+
+      fe_type.order = 2;
+      fe_type.family = RATIONAL_BERNSTEIN;
+    }
+  else
+    {
+      if (dim == 3)
+        MeshTools::Generation::build_cube
+          (mesh, 32, 8, 4, 0., 1.*x_scaling, 0., 0.3, 0., 0.1, HEX8);
+      else if (dim == 2)
+        MeshTools::Generation::build_square
+          (mesh, 8, 4, 0., 1.*x_scaling, 0., 0.3, QUAD4);
+      else
+        libmesh_error_msg("Unsupported dim = " << dim);
+    }
 
   // Print information about the mesh to the screen.
   mesh.print_info();
+
+  // Change our boundary id definitions to match the problem mesh
+  if (dim == 2)
+    {
+      boundary_id_min_z = 99;
+      boundary_id_min_y = 0;
+      boundary_id_max_x = 1;
+      boundary_id_max_y = 2;
+      boundary_id_min_x = 3;
+      boundary_id_max_z = 99;
+    }
 
   // Let's add some node and edge boundary conditions.
   // Each processor should know about each boundary condition it can
   // see, so we loop over all elements, not just local elements.
   for (const auto & elem : mesh.element_ptr_range())
     {
-      unsigned int
-        side_max_x = 0, side_min_y = 0,
-        side_max_y = 0, side_max_z = 0;
-      bool
-        found_side_max_x = false, found_side_max_y = false,
-        found_side_min_y = false, found_side_max_z = false;
-      for (auto side : elem->side_index_range())
+      if (!use_iga)
         {
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_x))
+          unsigned int side_max_x = 0, side_max_y = 0, side_min_z = 0;
+          bool
+            found_side_max_x = false, found_side_max_y = false,
+            found_side_min_z = false;
+          for (auto side : elem->side_index_range())
             {
-              side_max_x = side;
-              found_side_max_x = true;
+              if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_x))
+                {
+                  side_max_x = side;
+                  found_side_max_x = true;
+                }
+
+              if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_y))
+                {
+                  side_max_y = side;
+                  found_side_max_y = true;
+                }
+
+              if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_min_z)
+                  || dim == 2)
+                {
+                  side_min_z = side;
+                  found_side_min_z = true;
+                }
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_min_y))
-            {
-              side_min_y = side;
-              found_side_min_y = true;
-            }
+          // If elem has sides on boundaries
+          // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MIN_Z
+          // then let's set a node boundary condition
+          if (found_side_max_x && found_side_max_y && found_side_min_z)
+            for (auto n : elem->node_index_range())
+              if (elem->is_node_on_side(n, side_max_x) &&
+                  elem->is_node_on_side(n, side_max_y) &&
+                  (dim == 2 || elem->is_node_on_side(n, side_min_z)))
+                mesh.get_boundary_info().add_node(elem->node_ptr(n), node_boundary_id);
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_y))
-            {
-              side_max_y = side;
-              found_side_max_y = true;
-            }
-
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_z))
-            {
-              side_max_z = side;
-              found_side_max_z = true;
-            }
+          // If elem has sides on boundaries
+          // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Z
+          // then let's set an edge boundary condition
+          if (found_side_max_x && found_side_min_z)
+            for (auto e : elem->edge_index_range())
+              if (elem->is_edge_on_side(e, side_max_x) &&
+                  (dim == 2 || elem->is_edge_on_side(e, side_min_z)))
+                mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
         }
+      else // if (use_iga)
+        {
+          // On our IGA mesh, we don't have BCs set yet, but:
+          // Side 0 is the r=1 outer quarter circle
+          // Side 1 is the x=0 symmetry boundary
+          // Side 2 is the r=0.5 inner quarter circle
+          // Side 3 is the y=0 symmetry boundary
 
-      // If elem has sides on boundaries
-      // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
-      // then let's set a node boundary condition
-      if (found_side_max_x && found_side_max_y && found_side_max_z)
-        for (auto n : elem->node_index_range())
-          if (elem->is_node_on_side(n, side_max_x) &&
-              elem->is_node_on_side(n, side_max_y) &&
-              elem->is_node_on_side(n, side_max_z))
-            mesh.get_boundary_info().add_node(elem->node_ptr(n), node_boundary_id);
+          // The bottom side of our IGA mesh file should have v
+          // displacement fixed
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(3))
+            mesh.get_boundary_info().add_side(elem, 3, fixed_v_boundary_id);
 
-      // If elem has sides on boundaries
-      // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
-      // then let's set an edge boundary condition
-      if (found_side_max_x && found_side_min_y)
-        for (auto e : elem->edge_index_range())
-          if (elem->is_edge_on_side(e, side_max_x) &&
-              elem->is_edge_on_side(e, side_min_y))
-            mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
+          // The left/top side of our IGA mesh file should have u
+          // displacement fixed
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(1))
+            mesh.get_boundary_info().add_side(elem, 1, fixed_u_boundary_id);
+
+          // The inside of our cylinder should have pressure applied
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(2))
+            mesh.get_boundary_info().add_side(elem, 2, pressure_boundary_id);
+        }
     }
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // Declare the system "Navier-Stokes" and its variables.
+  // Declare the system "Linear Elasticity" and its variables.
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
+
+  system.set_dim(dim);
+
+  system.set_fe_type(fe_type);
 
   // Solve this as a time-dependent or steady system
   std::string time_solver = infile("time_solver","DIE!");
@@ -185,15 +248,17 @@ int main (int argc, char ** argv)
     {
       // Create ExplicitSystem to help output velocity
       v_system = &equation_systems.add_system<ExplicitSystem> ("Velocity");
-      v_system->add_variable("u_vel", FIRST, LAGRANGE);
-      v_system->add_variable("v_vel", FIRST, LAGRANGE);
-      v_system->add_variable("w_vel", FIRST, LAGRANGE);
+      v_system->add_variable("u_vel", fe_type);
+      v_system->add_variable("v_vel", fe_type);
+      if (dim == 3)
+        v_system->add_variable("w_vel", fe_type);
 
       // Create ExplicitSystem to help output acceleration
       a_system = &equation_systems.add_system<ExplicitSystem> ("Acceleration");
-      a_system->add_variable("u_accel", FIRST, LAGRANGE);
-      a_system->add_variable("v_accel", FIRST, LAGRANGE);
-      a_system->add_variable("w_accel", FIRST, LAGRANGE);
+      a_system->add_variable("u_accel", fe_type);
+      a_system->add_variable("v_accel", fe_type);
+      if (dim == 3)
+        a_system->add_variable("w_accel", fe_type);
     }
 
   if (time_solver == std::string("newmark"))
@@ -223,6 +288,15 @@ int main (int argc, char ** argv)
 
   // Initialize the system
   equation_systems.init ();
+
+  // Add any spline constraints for IGA problems
+  if (use_iga)
+    {
+      for (unsigned int n = 0; n != system.n_vars(); ++n)
+        dyna_io.add_spline_constraints(system.get_dof_map(),
+                                       system.number(), n);
+      system.reinit_constraints();
+    }
 
   // Set the time stepping options
   system.deltat = deltat;

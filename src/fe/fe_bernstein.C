@@ -240,9 +240,8 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
           case 7:
             return (o-1);
 
-            // Internal DoFs are associated with the elem, not its nodes
           case 8:
-            return 0;
+            return ((o-1)*(o-1));
 
           default:
             libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD9!");
@@ -355,7 +354,7 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
         return 0;
       libmesh_fallthrough();
     case QUAD9:
-      return ((o-1)*(o-1));
+      return 0;
     case HEX8:
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();

@@ -309,6 +309,12 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
 {
   switch(itemType)
     {
+    case NODEELEM:
+      {
+        nodes.resize(1);
+        nodes[0] = Point (0.,0.,0.);
+        return;
+      }
     case EDGE2:
       {
         nodes.resize(2);

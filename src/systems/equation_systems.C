@@ -749,7 +749,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                   for (auto i : index_range(dof_indices))
                     elem_soln[i] = sys_soln(dof_indices[i]);
 
-                  FEInterface::nodal_soln (dim,
+                  FEInterface::nodal_soln (elem->dim(),
                                            fe_type,
                                            elem,
                                            elem_soln,
@@ -1054,8 +1054,6 @@ EquationSystems::build_discontinuous_solution_vector
 
   libmesh_assert (this->n_systems());
 
-  const unsigned int dim = _mesh.mesh_dimension();
-
   // Get the number of variables (nv) by counting the number of variables
   // in each system listed in system_names
   unsigned int nv = 0;
@@ -1169,7 +1167,7 @@ EquationSystems::build_discontinuous_solution_vector
                       // Compute the FE solution at all the nodes, but
                       // only use the first n_vertices() entries if
                       // vertices_only == true.
-                      FEInterface::nodal_soln (dim,
+                      FEInterface::nodal_soln (elem->dim(),
                                                fe_type,
                                                elem,
                                                soln_coeffs,
