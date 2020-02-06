@@ -554,6 +554,14 @@ public:
    */
   bool use_blas_lapack;
 
+  /**
+   * Helper structure for determining whether to use blas_lapack
+   */
+  struct UseBlasLapack
+  {
+    static const bool value = false;
+  };
+
 private:
 
   /**
@@ -763,9 +771,13 @@ typedef DenseMatrix<Complex> ComplexDenseMatrix;
 
 using namespace DenseMatrices;
 
-
-
-
+#ifdef LIBMESH_HAVE_PETSC
+template <>
+struct DenseMatrix<double>::UseBlasLapack
+{
+  static const bool value = true;
+};
+#endif
 
 // ------------------------------------------------------------
 // Dense Matrix member functions
@@ -774,11 +786,7 @@ inline
 DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
                             const unsigned int new_n) :
   DenseMatrixBase<T>(new_m,new_n),
-#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
-  use_blas_lapack(true),
-#else
-  use_blas_lapack(false),
-#endif
+  use_blas_lapack(DenseMatrix<T>::UseBlasLapack::value),
   _val(),
   _decomposition_type(NONE)
 {
