@@ -156,67 +156,74 @@ int main (int argc, char ** argv)
   // see, so we loop over all elements, not just local elements.
   for (const auto & elem : mesh.element_ptr_range())
     {
-      unsigned int side_max_x = 0, side_max_y = 0, side_min_z = 0;
-      bool
-        found_side_max_x = false, found_side_max_y = false,
-        found_side_min_z = false;
-      for (auto side : elem->side_index_range())
+      if (!use_iga)
         {
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_x))
+          unsigned int side_max_x = 0, side_max_y = 0, side_min_z = 0;
+          bool
+            found_side_max_x = false, found_side_max_y = false,
+            found_side_min_z = false;
+          for (auto side : elem->side_index_range())
             {
-              side_max_x = side;
-              found_side_max_x = true;
+              if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_x))
+                {
+                  side_max_x = side;
+                  found_side_max_x = true;
+                }
+
+              if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_y))
+                {
+                  side_max_y = side;
+                  found_side_max_y = true;
+                }
+
+              if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_min_z)
+                  || dim == 2)
+                {
+                  side_min_z = side;
+                  found_side_min_z = true;
+                }
             }
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_max_y))
-            {
-              side_max_y = side;
-              found_side_max_y = true;
-            }
+          // If elem has sides on boundaries
+          // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MIN_Z
+          // then let's set a node boundary condition
+          if (found_side_max_x && found_side_max_y && found_side_min_z)
+            for (auto n : elem->node_index_range())
+              if (elem->is_node_on_side(n, side_max_x) &&
+                  elem->is_node_on_side(n, side_max_y) &&
+                  (dim == 2 || elem->is_node_on_side(n, side_min_z)))
+                mesh.get_boundary_info().add_node(elem->node_ptr(n), node_boundary_id);
 
-          if (mesh.get_boundary_info().has_boundary_id(elem, side, boundary_id_min_z)
-              || dim == 2)
-            {
-              side_min_z = side;
-              found_side_min_z = true;
-            }
+          // If elem has sides on boundaries
+          // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Z
+          // then let's set an edge boundary condition
+          if (found_side_max_x && found_side_min_z)
+            for (auto e : elem->edge_index_range())
+              if (elem->is_edge_on_side(e, side_max_x) &&
+                  (dim == 2 || elem->is_edge_on_side(e, side_min_z)))
+                mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
         }
-
-      // If elem has sides on boundaries
-      // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MIN_Z
-      // then let's set a node boundary condition
-      if (found_side_max_x && found_side_max_y && found_side_min_z)
-        for (auto n : elem->node_index_range())
-          if (elem->is_node_on_side(n, side_max_x) &&
-              elem->is_node_on_side(n, side_max_y) &&
-              (dim == 2 || elem->is_node_on_side(n, side_min_z)))
-            mesh.get_boundary_info().add_node(elem->node_ptr(n), node_boundary_id);
-
-      // If elem has sides on boundaries
-      // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Z
-      // then let's set an edge boundary condition
-      if (found_side_max_x && found_side_min_z)
-        for (auto e : elem->edge_index_range())
-          if (elem->is_edge_on_side(e, side_max_x) &&
-              (dim == 2 || elem->is_edge_on_side(e, side_min_z)))
-            mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
-
-      if (use_iga)
+      else // if (use_iga)
         {
+          // On our IGA mesh, we don't have BCs set yet, but:
+          // Side 0 is the r=1 outer quarter circle
+          // Side 1 is the x=0 symmetry boundary
+          // Side 2 is the r=0.5 inner quarter circle
+          // Side 3 is the y=0 symmetry boundary
+
           // The bottom side of our IGA mesh file should have v
           // displacement fixed
-          if (elem->type() == QUAD9 && !elem->neighbor_ptr(0))
-            mesh.get_boundary_info().add_side(elem, 0, fixed_v_boundary_id);
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(3))
+            mesh.get_boundary_info().add_side(elem, 3, fixed_v_boundary_id);
 
-          // The left/top side of our IGA mesh file should have v
+          // The left/top side of our IGA mesh file should have u
           // displacement fixed
-          if (elem->type() == QUAD9 && !elem->neighbor_ptr(2))
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(1))
             mesh.get_boundary_info().add_side(elem, 1, fixed_u_boundary_id);
 
-          // The inside/left side of our IGA mesh file should have
-          // pressure applied
-          if (elem->type() == QUAD9 && !elem->neighbor_ptr(3))
-            mesh.get_boundary_info().add_side(elem, 3, pressure_boundary_id);
+          // The inside of our cylinder should have pressure applied
+          if (elem->type() == QUAD9 && !elem->neighbor_ptr(2))
+            mesh.get_boundary_info().add_side(elem, 2, pressure_boundary_id);
         }
     }
 
