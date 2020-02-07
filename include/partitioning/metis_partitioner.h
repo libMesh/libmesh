@@ -35,20 +35,26 @@ namespace libMesh
  * \date 2003
  * \brief Partitioner which interfaces with the METIS library.
  */
-class MetisPartitioner : public Partitioner
+template <typename RealType = Real>
+class MetisPartitionerTempl : public PartitionerTempl<RealType>
 {
 public:
+  typedef MetisPartitionerTempl<RealType> MetisPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Ctors, assignment operators, and destructor are all explicitly
    * defaulted for this class.
    */
-  MetisPartitioner () = default;
-  MetisPartitioner (const MetisPartitioner &) = default;
-  MetisPartitioner (MetisPartitioner &&) = default;
+  MetisPartitionerTempl () = default;
+  MetisPartitionerTempl (const MetisPartitioner &) = default;
+  MetisPartitionerTempl (MetisPartitioner &&) = default;
   MetisPartitioner & operator= (const MetisPartitioner &) = default;
   MetisPartitioner & operator= (MetisPartitioner &&) = default;
-  virtual ~MetisPartitioner() = default;
+  virtual ~MetisPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -58,14 +64,14 @@ public:
     return libmesh_make_unique<MetisPartitioner>(*this);
   }
 
-  virtual void attach_weights(ErrorVector * weights) override { _weights = weights; }
+  virtual void attach_weights(ErrorVector * weights) override { this->_weights = weights; }
 
   /**
    * Called by the SubdomainPartitioner to partition elements in the range (it, end).
    */
   virtual void partition_range(MeshBase & mesh,
-                               MeshBase::element_iterator it,
-                               MeshBase::element_iterator end,
+                               typename MeshBase::element_iterator it,
+                               typename MeshBase::element_iterator end,
                                const unsigned int n) override;
 
 protected:
@@ -76,6 +82,8 @@ protected:
   virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) override;
 };
+
+typedef MetisPartitionerTempl<Real> MetisPartitioner;
 
 } // namespace libMesh
 

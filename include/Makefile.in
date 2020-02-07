@@ -789,7 +789,9 @@ include_HEADERS = \
         geom/cell_prism_impl.h \
         geom/cell_pyramid.h \
         geom/cell_pyramid13.h \
+        geom/cell_pyramid13_impl.h \
         geom/cell_pyramid14.h \
+        geom/cell_pyramid14_impl.h \
         geom/cell_pyramid5.h \
         geom/cell_pyramid5_impl.h \
         geom/cell_pyramid_impl.h \
@@ -833,6 +835,7 @@ include_HEADERS = \
         geom/face_tri3_impl.h \
         geom/face_tri3_shell.h \
         geom/face_tri3_subdivision.h \
+        geom/face_tri3_subdivision_impl.h \
         geom/face_tri6.h \
         geom/face_tri6_impl.h \
         geom/face_tri_impl.h \
@@ -985,16 +988,24 @@ include_HEADERS = \
         parallel/threads_pthread.h \
         parallel/threads_tbb.h \
         partitioning/centroid_partitioner.h \
+        partitioning/centroid_partitioner_impl.h \
         partitioning/hilbert_sfc_partitioner.h \
         partitioning/linear_partitioner.h \
+        partitioning/linear_partitioner_impl.h \
         partitioning/mapped_subdomain_partitioner.h \
+        partitioning/mapped_subdomain_partitioner_impl.h \
         partitioning/metis_csr_graph.h \
         partitioning/metis_partitioner.h \
+        partitioning/metis_partitioner_impl.h \
         partitioning/morton_sfc_partitioner.h \
         partitioning/parmetis_partitioner.h \
+        partitioning/parmetis_partitioner_impl.h \
         partitioning/partitioner.h \
+        partitioning/partitioner_impl.h \
         partitioning/sfc_partitioner.h \
+        partitioning/sfc_partitioner_impl.h \
         partitioning/subdomain_partitioner.h \
+        partitioning/subdomain_partitioner_impl.h \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \

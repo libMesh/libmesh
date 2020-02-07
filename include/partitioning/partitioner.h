@@ -47,24 +47,29 @@ class ErrorVector;
  * \date 2003
  * \brief Base class for all concrete Partitioner instantiations.
  */
-class Partitioner
+template <typename RealType = Real>
+class PartitionerTempl
 {
 public:
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Constructor.
    */
-  Partitioner () : _weights(nullptr) {}
+  PartitionerTempl () : _weights(nullptr) {}
 
   /**
    * Copy/move ctor, copy/move assignment operator, and destructor are
    * all explicitly defaulted for this class.
    */
-  Partitioner (const Partitioner &) = default;
-  Partitioner (Partitioner &&) = default;
+  PartitionerTempl (const Partitioner &) = default;
+  PartitionerTempl (Partitioner &&) = default;
   Partitioner & operator= (const Partitioner &) = default;
   Partitioner & operator= (Partitioner &&) = default;
-  virtual ~Partitioner() = default;
+  virtual ~PartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -125,8 +130,8 @@ public:
    * the elements of the Mesh.
    */
   virtual void partition_range (MeshBase & /*mesh*/,
-                                MeshBase::element_iterator /*beg*/,
-                                MeshBase::element_iterator /*end*/,
+                                typename MeshBase::element_iterator /*beg*/,
+                                typename MeshBase::element_iterator /*end*/,
                                 const unsigned int /*n_parts*/)
   { libmesh_not_implemented(); }
 
@@ -216,8 +221,8 @@ protected:
    * Slightly generalized version of single_partition which acts on a
    * range of elements defined by the pair of iterators (it, end).
    */
-  void single_partition_range(MeshBase::element_iterator it,
-                              MeshBase::element_iterator end);
+  void single_partition_range(typename MeshBase::element_iterator it,
+                              typename MeshBase::element_iterator end);
 
   /**
    * This is the actual partitioning method which must be overridden
@@ -290,6 +295,14 @@ protected:
 
   std::vector<Elem *> _local_id_to_elem;
 };
+
+// ------------------------------------------------------------
+// Partitioner static data
+template <typename RealType>
+const dof_id_type PartitionerTempl<RealType>::communication_blocksize =
+  dof_id_type(1000000);
+
+typedef PartitionerTempl<Real> Partitioner;
 
 } // namespace libMesh
 

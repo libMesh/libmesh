@@ -36,6 +36,7 @@ namespace libMesh
 template <typename> class ElemTempl;
 template <typename> class PeriodicBoundaryBaseTempl;
 template <typename> class PointLocatorBaseTempl;
+template <typename> class MeshBaseTempl;
 
 /**
  * We're using a class instead of a typedef to allow forward
@@ -56,6 +57,10 @@ public:
   typedef PeriodicBoundaryBaseTempl<RealType> PeriodicBoundaryBase;
   typedef ElemTempl<RealType> Elem;
   typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+  typedef MeshBaseTempl<RealType> MeshBase;
+
+  using typename std::map<boundary_id_type, PeriodicBoundaryBaseTempl<RealType> *>::iterator;
+  using typename std::map<boundary_id_type, PeriodicBoundaryBaseTempl<RealType> *>::const_iterator;
 
   PeriodicBoundaryBase * boundary(boundary_id_type id);
 

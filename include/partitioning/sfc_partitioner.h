@@ -38,15 +38,21 @@ namespace libMesh
  * \date 2003
  * \brief Partitioner based on different types of space filling curves.
  */
-class SFCPartitioner : public Partitioner
+template <typename RealType = Real>
+class SFCPartitionerTempl : public PartitionerTempl<RealType>
 {
 public:
+  typedef SFCPartitionerTempl<RealType> SFCPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Constructor.  Sets the default space filling
    * curve type to "Hilbert".
    */
-  SFCPartitioner () :
+  SFCPartitionerTempl () :
     _sfc_type ("Hilbert")
   {}
 
@@ -54,11 +60,11 @@ public:
    * Copy/move ctor, copy/move assignment operator, and destructor are
    * all explicitly defaulted for this class.
    */
-  SFCPartitioner (const SFCPartitioner &) = default;
-  SFCPartitioner (SFCPartitioner &&) = default;
+  SFCPartitionerTempl (const SFCPartitioner &) = default;
+  SFCPartitionerTempl (SFCPartitioner &&) = default;
   SFCPartitioner & operator= (const SFCPartitioner &) = default;
   SFCPartitioner & operator= (SFCPartitioner &&) = default;
-  virtual ~SFCPartitioner() = default;
+  virtual ~SFCPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -84,8 +90,8 @@ public:
    * Called by the SubdomainPartitioner to partition elements in the range (it, end).
    */
   virtual void partition_range(MeshBase & mesh,
-                               MeshBase::element_iterator it,
-                               MeshBase::element_iterator end,
+                               typename MeshBase::element_iterator it,
+                               typename MeshBase::element_iterator end,
                                const unsigned int n) override;
 
 protected:
@@ -104,6 +110,8 @@ private:
    */
   std::string _sfc_type;
 };
+
+typedef SFCPartitionerTempl<Real> SFCPartitioner;
 
 } // namespace libMesh
 

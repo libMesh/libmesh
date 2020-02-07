@@ -18,52 +18,9 @@
 
 
 // Local Includes
-#include "libmesh/mesh_base.h"
-#include "libmesh/mapped_subdomain_partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
-#include "libmesh/utility.h"
+#include "libmesh/mapped_subdomain_partitioner_impl.h"
 
 namespace libMesh
 {
-
-
-void MappedSubdomainPartitioner::partition_range(MeshBase & /*mesh*/,
-                                                 MeshBase::element_iterator it,
-                                                 MeshBase::element_iterator end,
-                                                 const unsigned int n)
-{
-  libmesh_assert_greater (n, 0);
-
-  // Check for an easy return.  If the user has not specified any
-  // entries in subdomain_to_proc, we just do a single partitioning.
-  if ((n == 1) || subdomain_to_proc.empty())
-    {
-      this->single_partition_range (it, end);
-      return;
-    }
-
-  // Now actually do the partitioning.
-  LOG_SCOPE ("partition_range()", "MappedSubdomainPartitioner");
-
-  for (auto & elem : as_range(it, end))
-    {
-      subdomain_id_type sbd_id = elem->subdomain_id();
-
-      // Find which processor id corresponds to this element's subdomain id.
-      elem->processor_id() = libmesh_map_find(subdomain_to_proc, sbd_id);
-    }
+template class MappedSubdomainPartitionerTempl<Real>;
 }
-
-
-
-void MappedSubdomainPartitioner::_do_partition (MeshBase & mesh,
-                                                const unsigned int n)
-{
-  this->partition_range(mesh,
-                        mesh.active_elements_begin(),
-                        mesh.active_elements_end(),
-                        n);
-}
-
-} // namespace libMesh

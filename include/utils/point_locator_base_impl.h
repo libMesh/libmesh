@@ -131,8 +131,8 @@ locate_node(const Point & p,
   for (const auto & elem : candidate_elements)
     {
       const int elem_n_nodes = elem->n_nodes();
-      const Real hmax = elem->hmax();
-      const Real dist_tol_sq = (tol * hmax) * (tol * hmax);
+      const RealType hmax = elem->hmax();
+      const RealType dist_tol_sq = (tol * hmax) * (tol * hmax);
 
       for (int n=0; n != elem_n_nodes; ++n)
         if ((elem->point(n) - p).norm_sq() < dist_tol_sq)

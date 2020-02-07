@@ -32,27 +32,34 @@ namespace libMesh
  * \author David Knezevic
  * \date 2016
  */
-class TriShell3 : public Tri3
+template <typename RealType = Real>
+class TriShell3Templ : public Tri3Templ<RealType>
 {
 public:
+  typedef TriShell3Templ<RealType> TriShell3;
+  typedef Tri3Templ<RealType> Tri3;
+  typedef ElemTempl<RealType> Elem;
+
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  TriShell3 (Elem * p=nullptr) :
+  TriShell3Templ (Elem * p=nullptr) :
     Tri3(p) {}
 
-  TriShell3 (TriShell3 &&) = delete;
-  TriShell3 (const TriShell3 &) = delete;
+  TriShell3Templ (TriShell3 &&) = delete;
+  TriShell3Templ (const TriShell3 &) = delete;
   TriShell3 & operator= (const TriShell3 &) = delete;
   TriShell3 & operator= (TriShell3 &&) = delete;
-  virtual ~TriShell3() = default;
+  virtual ~TriShell3Templ() = default;
 
   /**
    * \returns \p TRISHELL3.
    */
   virtual ElemType type () const override { return TRISHELL3; }
 };
+
+typedef TriShell3Templ<Real> TriShell3;
 
 } // namespace libMesh
 

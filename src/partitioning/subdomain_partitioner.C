@@ -18,51 +18,9 @@
 
 
 // Local Includes
-#include "libmesh/subdomain_partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
-#include "libmesh/metis_partitioner.h"
-#include "libmesh/int_range.h"
+#include "libmesh/subdomain_partitioner_impl.h"
 
 namespace libMesh
 {
-
-SubdomainPartitioner::SubdomainPartitioner () :
-  _internal_partitioner(libmesh_make_unique<MetisPartitioner>())
-{}
-
-
-SubdomainPartitioner::SubdomainPartitioner (const SubdomainPartitioner & other)
-  : Partitioner(other),
-    chunks(other.chunks),
-    _internal_partitioner(other._internal_partitioner->clone())
-{}
-
-
-void SubdomainPartitioner::_do_partition (MeshBase & mesh,
-                                          const unsigned int n)
-{
-  libmesh_assert_greater (n, 0);
-
-  // Check for an easy return.  If the user has not specified any
-  // entries in the chunks vector, we just do a single partitioning.
-  if ((n == 1) || chunks.empty())
-    {
-      this->single_partition (mesh);
-      return;
-    }
-
-  // Now actually do the partitioning.
-  LOG_SCOPE ("_do_partition()", "SubdomainPartitioner");
-
-  // For each chunk, construct an iterator range for the set of
-  // subdomains in question, and pass it to the internal Partitioner.
-  for (const auto & id_set : chunks)
-    _internal_partitioner->
-      partition_range(mesh,
-                      mesh.active_subdomain_set_elements_begin(id_set),
-                      mesh.active_subdomain_set_elements_end(id_set),
-                      n);
+template class SubdomainPartitionerTempl<Real>;
 }
-
-} // namespace libMesh

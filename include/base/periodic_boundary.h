@@ -53,6 +53,10 @@ public:
   typedef PeriodicBoundaryTempl<RealType> PeriodicBoundary;
   typedef PeriodicBoundaryBaseTempl<RealType> PeriodicBoundaryBase;
 
+  using typename PeriodicBoundaryBase::TransformationType;
+  using PeriodicBoundaryBase::FORWARD;
+  using PeriodicBoundaryBase::INVERSE;
+
   /**
    * Constructor
    */
@@ -110,7 +114,7 @@ PeriodicBoundaryTempl<RealType>::PeriodicBoundaryTempl(const PeriodicBoundary & 
 {
   if (t == INVERSE)
     {
-      std::swap(myboundary, pairedboundary);
+      std::swap(this->myboundary, this->pairedboundary);
       translation_vector *= -1.0;
     }
 }

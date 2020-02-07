@@ -210,7 +210,9 @@ include_HEADERS =  \
         geom/cell_prism_impl.h \
         geom/cell_pyramid.h \
         geom/cell_pyramid13.h \
+        geom/cell_pyramid13_impl.h \
         geom/cell_pyramid14.h \
+        geom/cell_pyramid14_impl.h \
         geom/cell_pyramid5.h \
         geom/cell_pyramid5_impl.h \
         geom/cell_pyramid_impl.h \
@@ -254,6 +256,7 @@ include_HEADERS =  \
         geom/face_tri3_impl.h \
         geom/face_tri3_shell.h \
         geom/face_tri3_subdivision.h \
+        geom/face_tri3_subdivision_impl.h \
         geom/face_tri6.h \
         geom/face_tri6_impl.h \
         geom/face_tri_impl.h \
@@ -406,16 +409,24 @@ include_HEADERS =  \
         parallel/threads_pthread.h \
         parallel/threads_tbb.h \
         partitioning/centroid_partitioner.h \
+        partitioning/centroid_partitioner_impl.h \
         partitioning/hilbert_sfc_partitioner.h \
         partitioning/linear_partitioner.h \
+        partitioning/linear_partitioner_impl.h \
         partitioning/mapped_subdomain_partitioner.h \
+        partitioning/mapped_subdomain_partitioner_impl.h \
         partitioning/metis_csr_graph.h \
         partitioning/metis_partitioner.h \
+        partitioning/metis_partitioner_impl.h \
         partitioning/morton_sfc_partitioner.h \
         partitioning/parmetis_partitioner.h \
+        partitioning/parmetis_partitioner_impl.h \
         partitioning/partitioner.h \
+        partitioning/partitioner_impl.h \
         partitioning/sfc_partitioner.h \
+        partitioning/sfc_partitioner_impl.h \
         partitioning/subdomain_partitioner.h \
+        partitioning/subdomain_partitioner_impl.h \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \
@@ -557,4 +568,34 @@ include_HEADERS =  \
         utils/int_range.h \
         utils/jacobi_polynomials.h \
         utils/libmesh_nullptr.h \
-        utils/location_maps.h
+        utils/location_maps.h \
+        utils/mapvector.h \
+        utils/null_output_iterator.h \
+        utils/number_lookups.h \
+        utils/ostream_proxy.h \
+        utils/parameters.h \
+        utils/perf_log.h \
+        utils/perfmon.h \
+        utils/plt_loader.h \
+        utils/point_locator_base.h \
+        utils/point_locator_base_impl.h \
+        utils/point_locator_tree.h \
+        utils/point_locator_tree_impl.h \
+        utils/pointer_to_pointer_iter.h \
+        utils/pool_allocator.h \
+        utils/raw_value.h \
+        utils/restore_warnings.h \
+        utils/simple_range.h \
+        utils/statistics.h \
+        utils/string_to_enum.h \
+        utils/timestamp.h \
+        utils/topology_map.h \
+        utils/topology_map_impl.h \
+        utils/tree.h \
+        utils/tree_base.h \
+        utils/tree_impl.h \
+        utils/tree_node.h \
+        utils/tree_node_impl.h \
+        utils/utility.h \
+        utils/vectormap.h \
+        utils/xdr_cxx.h 

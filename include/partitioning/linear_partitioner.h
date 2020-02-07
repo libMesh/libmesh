@@ -37,20 +37,26 @@ namespace libMesh
  * \date 2003
  * \brief Partitions the elements based solely on their ids.
  */
-class LinearPartitioner : public Partitioner
+template <typename RealType = Real>
+class LinearPartitionerTempl : public PartitionerTempl<RealType>
 {
 public:
+  typedef LinearPartitionerTempl<RealType> LinearPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Ctors, assignment operators, and destructor are
    * all explicitly defaulted for this class.
    */
-  LinearPartitioner () = default;
-  LinearPartitioner (const LinearPartitioner &) = default;
-  LinearPartitioner (LinearPartitioner &&) = default;
+  LinearPartitionerTempl () = default;
+  LinearPartitionerTempl (const LinearPartitioner &) = default;
+  LinearPartitionerTempl (LinearPartitioner &&) = default;
   LinearPartitioner & operator= (const LinearPartitioner &) = default;
   LinearPartitioner & operator= (LinearPartitioner &&) = default;
-  virtual ~LinearPartitioner() = default;
+  virtual ~LinearPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -64,8 +70,8 @@ public:
    * Called by the SubdomainPartitioner to partition elements in the range (it, end).
    */
   virtual void partition_range(MeshBase & mesh,
-                               MeshBase::element_iterator it,
-                               MeshBase::element_iterator end,
+                               typename MeshBase::element_iterator it,
+                               typename MeshBase::element_iterator end,
                                const unsigned int n) override;
 protected:
 
@@ -75,6 +81,8 @@ protected:
   virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) override;
 };
+
+typedef LinearPartitionerTempl<Real> LinearPartitioner;
 
 } // namespace libMesh
 

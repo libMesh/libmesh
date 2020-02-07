@@ -88,9 +88,16 @@ template <typename> class Hex27Templ;
 template <typename> class Tet4Templ;
 template <typename> class Tet10Templ;
 template <typename> class Pyramid5Templ;
+template <typename> class Pyramid13Templ;
+template <typename> class Pyramid14Templ;
 template <typename> class Prism6Templ;
 template <typename> class Prism15Templ;
 template <typename> class Prism18Templ;
+template <typename> class NodeElemTempl;
+template <typename> class TriShell3Templ;
+template <typename> class Tri3SubdivisionTempl;
+template <typename> class QuadShell4Templ;
+template <typename> class QuadShell8Templ;
 
 /**
  * This is the base class from which all geometric element types are
@@ -151,9 +158,16 @@ public:
   typedef Tet4Templ<RealType> Tet4;
   typedef Tet10Templ<RealType> Tet10;
   typedef Pyramid5Templ<RealType> Pyramid5;
+  typedef Pyramid13Templ<RealType> Pyramid13;
+  typedef Pyramid14Templ<RealType> Pyramid14;
   typedef Prism6Templ<RealType> Prism6;
   typedef Prism15Templ<RealType> Prism15;
   typedef Prism18Templ<RealType> Prism18;
+  typedef NodeElemTempl<RealType> NodeElem;
+  typedef TriShell3Templ<RealType> TriShell3;
+  typedef Tri3SubdivisionTempl<RealType> Tri3Subdivision;
+  typedef QuadShell4Templ<RealType> QuadShell4;
+  typedef QuadShell8Templ<RealType> QuadShell8;
 
 protected:
 
@@ -912,12 +926,12 @@ public:
   /**
    * \returns The minimum vertex separation for the element.
    */
-  virtual Real hmin () const;
+  virtual RealType hmin () const;
 
   /**
    * \returns The maximum vertex separation for the element.
    */
-  virtual Real hmax () const;
+  virtual RealType hmax () const;
 
   /**
    * \returns The (length/area/volume) of the geometric element.
@@ -1104,8 +1118,8 @@ public:
    *
    * Useful for computing the lengths of the sides of elements.
    */
-  Real length (const unsigned int n1,
-               const unsigned int n2) const;
+  RealType length (const unsigned int n1,
+                   const unsigned int n2) const;
 
   /**
    * \returns The number of adjacent vertices that uniquely define the

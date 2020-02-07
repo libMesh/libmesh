@@ -200,7 +200,9 @@ BUILT_SOURCES = \
         cell_prism_impl.h \
         cell_pyramid.h \
         cell_pyramid13.h \
+        cell_pyramid13_impl.h \
         cell_pyramid14.h \
+        cell_pyramid14_impl.h \
         cell_pyramid5.h \
         cell_pyramid5_impl.h \
         cell_pyramid_impl.h \
@@ -244,6 +246,7 @@ BUILT_SOURCES = \
         face_tri3_impl.h \
         face_tri3_shell.h \
         face_tri3_subdivision.h \
+        face_tri3_subdivision_impl.h \
         face_tri6.h \
         face_tri6_impl.h \
         face_tri_impl.h \
@@ -401,17 +404,25 @@ BUILT_SOURCES = \
         threads_pthread.h \
         threads_tbb.h \
         centroid_partitioner.h \
+        centroid_partitioner_impl.h \
         hilbert_sfc_partitioner.h \
         linear_partitioner.h \
+        linear_partitioner_impl.h \
         mapped_subdomain_partitioner.h \
+        mapped_subdomain_partitioner_impl.h \
         metis_csr_graph.h \
         metis_partitioner.h \
+        metis_partitioner_impl.h \
         morton_sfc_partitioner.h \
         parmetis_helper.h \
         parmetis_partitioner.h \
+        parmetis_partitioner_impl.h \
         partitioner.h \
+        partitioner_impl.h \
         sfc_partitioner.h \
+        sfc_partitioner_impl.h \
         subdomain_partitioner.h \
+        subdomain_partitioner_impl.h \
         diff_physics.h \
         diff_qoi.h \
         fem_physics.h \
@@ -1252,7 +1263,13 @@ cell_pyramid.h: $(top_srcdir)/include/geom/cell_pyramid.h
 cell_pyramid13.h: $(top_srcdir)/include/geom/cell_pyramid13.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_pyramid13_impl.h: $(top_srcdir)/include/geom/cell_pyramid13_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_pyramid14.h: $(top_srcdir)/include/geom/cell_pyramid14.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_pyramid14_impl.h: $(top_srcdir)/include/geom/cell_pyramid14_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid5.h: $(top_srcdir)/include/geom/cell_pyramid5.h
@@ -1382,6 +1399,9 @@ face_tri3_shell.h: $(top_srcdir)/include/geom/face_tri3_shell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3_subdivision.h: $(top_srcdir)/include/geom/face_tri3_subdivision.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_tri3_subdivision_impl.h: $(top_srcdir)/include/geom/face_tri3_subdivision_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri6.h: $(top_srcdir)/include/geom/face_tri6.h
@@ -1855,19 +1875,31 @@ threads_tbb.h: $(top_srcdir)/include/parallel/threads_tbb.h
 centroid_partitioner.h: $(top_srcdir)/include/partitioning/centroid_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+centroid_partitioner_impl.h: $(top_srcdir)/include/partitioning/centroid_partitioner_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 hilbert_sfc_partitioner.h: $(top_srcdir)/include/partitioning/hilbert_sfc_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 linear_partitioner.h: $(top_srcdir)/include/partitioning/linear_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+linear_partitioner_impl.h: $(top_srcdir)/include/partitioning/linear_partitioner_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 mapped_subdomain_partitioner.h: $(top_srcdir)/include/partitioning/mapped_subdomain_partitioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mapped_subdomain_partitioner_impl.h: $(top_srcdir)/include/partitioning/mapped_subdomain_partitioner_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 metis_csr_graph.h: $(top_srcdir)/include/partitioning/metis_csr_graph.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 metis_partitioner.h: $(top_srcdir)/include/partitioning/metis_partitioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+metis_partitioner_impl.h: $(top_srcdir)/include/partitioning/metis_partitioner_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 morton_sfc_partitioner.h: $(top_srcdir)/include/partitioning/morton_sfc_partitioner.h
@@ -1879,13 +1911,25 @@ parmetis_helper.h: $(top_srcdir)/include/partitioning/parmetis_helper.h
 parmetis_partitioner.h: $(top_srcdir)/include/partitioning/parmetis_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+parmetis_partitioner_impl.h: $(top_srcdir)/include/partitioning/parmetis_partitioner_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 partitioner.h: $(top_srcdir)/include/partitioning/partitioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+partitioner_impl.h: $(top_srcdir)/include/partitioning/partitioner_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sfc_partitioner.h: $(top_srcdir)/include/partitioning/sfc_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+sfc_partitioner_impl.h: $(top_srcdir)/include/partitioning/sfc_partitioner_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 subdomain_partitioner.h: $(top_srcdir)/include/partitioning/subdomain_partitioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+subdomain_partitioner_impl.h: $(top_srcdir)/include/partitioning/subdomain_partitioner_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_physics.h: $(top_srcdir)/include/physics/diff_physics.h

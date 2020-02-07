@@ -41,7 +41,7 @@ template <typename> class ElemTempl;
 template <typename> class NodeTempl;
 template <typename> class MeshBaseTempl;
 template <typename> class UnstructuredMeshTempl;
-
+template <typename> class MeshSerializerTempl;
 
 /**
  * The \p BoundaryInfo class contains information relevant to boundary
@@ -63,7 +63,7 @@ public:
   typedef NodeTempl<RealType> Node;
   typedef MeshBaseTempl<RealType> MeshBase;
   typedef UnstructuredMeshTempl<RealType> UnstructuredMesh;
-
+  typedef MeshSerializerTempl<RealType> MeshSerializer;
 protected:
   friend class MeshBaseTempl<RealType>;
 

@@ -34,14 +34,21 @@ namespace libMesh
  * \date 2003
  * \brief Partitioner based on Hilbert's space filling curve algorithm.
  */
-class HilbertSFCPartitioner : public SFCPartitioner
+template <typename RealType = Real>
+class HilbertSFCPartitionerTempl : public SFCPartitionerTempl<RealType>
 {
 public:
+  typedef HilbertSFCPartitionerTempl<RealType> HilbertSFCPartitioner;
+  typedef SFCPartitionerTempl<RealType> SFCPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Constructor. Sets the underlying space filling curve type.
    */
-  HilbertSFCPartitioner ()
+  HilbertSFCPartitionerTempl ()
   {
     this->set_sfc_type ("Hilbert");
   }
@@ -50,11 +57,11 @@ public:
    * Copy/move ctor, copy/move assignment operator, and destructor are
    * all explicitly defaulted for this class.
    */
-  HilbertSFCPartitioner (const HilbertSFCPartitioner &) = default;
-  HilbertSFCPartitioner (HilbertSFCPartitioner &&) = default;
+  HilbertSFCPartitionerTempl (const HilbertSFCPartitioner &) = default;
+  HilbertSFCPartitionerTempl (HilbertSFCPartitioner &&) = default;
   HilbertSFCPartitioner & operator= (const HilbertSFCPartitioner &) = default;
   HilbertSFCPartitioner & operator= (HilbertSFCPartitioner &&) = default;
-  virtual ~HilbertSFCPartitioner() = default;
+  virtual ~HilbertSFCPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -75,6 +82,8 @@ protected:
     SFCPartitioner::_do_partition (mesh, n);
   }
 };
+
+typedef HilbertSFCPartitionerTempl<Real> HilbertSFCPartitioner;
 
 } // namespace libMesh
 

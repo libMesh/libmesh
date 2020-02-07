@@ -44,15 +44,21 @@ class ParmetisHelper;
  * \date 2003
  * \brief Partitioner which provides an interface to ParMETIS.
  */
-class ParmetisPartitioner : public Partitioner
+template <typename RealType = Real>
+class ParmetisPartitionerTempl : public PartitionerTempl<RealType>
 {
 public:
+  typedef ParmetisPartitionerTempl<RealType> ParmetisPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Default and copy ctors.
    */
-  ParmetisPartitioner ();
-  ParmetisPartitioner (const ParmetisPartitioner & other);
+  ParmetisPartitionerTempl ();
+  ParmetisPartitionerTempl (const ParmetisPartitioner & other);
 
   /**
    * This class contains a unique_ptr member, so it can't be default
@@ -64,14 +70,14 @@ public:
    * Move ctor, move assignment operator, and destructor are
    * all explicitly inline-defaulted for this class.
    */
-  ParmetisPartitioner (ParmetisPartitioner &&) = default;
+  ParmetisPartitionerTempl (ParmetisPartitioner &&) = default;
   ParmetisPartitioner & operator= (ParmetisPartitioner &&) = default;
 
   /**
    * The destructor is out-of-line-defaulted to play nice with forward
    * declarations.
    */
-  virtual ~ParmetisPartitioner();
+  virtual ~ParmetisPartitionerTempl();
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -123,6 +129,8 @@ private:
 
 #endif
 };
+
+typedef ParmetisPartitionerTempl<Real> ParmetisPartitioner;
 
 } // namespace libMesh
 

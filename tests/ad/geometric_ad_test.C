@@ -1,23 +1,24 @@
+#include <libmesh/libmesh_common.h>
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+
+// Needed first for instantiations of anything DualNumber related.
+// DualNumber will always be a template argument to libMesh templates
+// and never visa versa
+#include "metaphysicl/dualdynamicsparsenumberarray.h"
+
 #include <libmesh/distributed_mesh.h>
 #include <libmesh/instantiate_real_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
-#ifdef LIBMESH_HAVE_METAPHYSICL
-
-#include "metaphysicl/dualdynamicsparsenumberarray.h"
+using namespace libMesh;
 
 typedef MetaPhysicL::DualNumber<Real, MetaPhysicL::DynamicSparseNumberArray<Real, unsigned int>>
 DualReal;
 
-namespace libMesh
-{
 INSTANTIATE_ALL_REAL_TYPE(DualReal);
-}
-
-using namespace libMesh;
-
 
 class GeometricADTest : public CppUnit::TestCase
 {

@@ -52,17 +52,23 @@ namespace libMesh
  * \date 2017
  * \brief Independently partitions chunks of subdomains and combines the results.
  */
-class SubdomainPartitioner : public Partitioner
+template <typename RealType = Real>
+class SubdomainPartitionerTempl : public PartitionerTempl<RealType>
 {
 public:
+  typedef SubdomainPartitionerTempl<RealType> SubdomainPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Constructors. The default ctor initializes the internal
    * Partitioner object to a MetisPartitioner so the class is usable,
    * although this type can be customized later.
    */
-  SubdomainPartitioner ();
-  SubdomainPartitioner (const SubdomainPartitioner & other);
+  SubdomainPartitionerTempl ();
+  SubdomainPartitionerTempl (const SubdomainPartitioner & other);
 
   /**
    * This class contains a unique_ptr member, so it can't be default
@@ -74,9 +80,9 @@ public:
    * Move ctor, move assignment operator, and destructor are
    * all explicitly defaulted for this class.
    */
-  SubdomainPartitioner (SubdomainPartitioner &&) = default;
+  SubdomainPartitionerTempl (SubdomainPartitioner &&) = default;
   SubdomainPartitioner & operator= (SubdomainPartitioner &&) = default;
-  virtual ~SubdomainPartitioner() = default;
+  virtual ~SubdomainPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -123,6 +129,8 @@ protected:
   virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) override;
 };
+
+typedef SubdomainPartitionerTempl<Real> SubdomainPartitioner;
 
 } // namespace libMesh
 

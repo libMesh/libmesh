@@ -57,6 +57,8 @@
 #include "libmesh/cell_prism6_impl.h"
 #include "libmesh/cell_prism_impl.h"
 #include "libmesh/cell_pyramid5_impl.h"
+#include "libmesh/cell_pyramid13_impl.h"
+#include "libmesh/cell_pyramid14_impl.h"
 #include "libmesh/cell_pyramid_impl.h"
 #include "libmesh/cell_tet10_impl.h"
 #include "libmesh/cell_tet4_impl.h"
@@ -71,6 +73,7 @@
 #include "libmesh/face_tri3_impl.h"
 #include "libmesh/face_tri6_impl.h"
 #include "libmesh/face_tri_impl.h"
+#include "libmesh/face_tri3_subdivision_impl.h"
 #include "libmesh/remote_elem_impl.h"
 #include "libmesh/boundary_info_impl.h"
 #include "libmesh/distributed_mesh_impl.h"
@@ -93,6 +96,14 @@
 #include "libmesh/tree_impl.h"
 #include "libmesh/periodic_boundaries_impl.h"
 #include "libmesh/periodic_boundary_base_impl.h"
+#include "libmesh/partitioner_impl.h"
+#include "libmesh/centroid_partitioner_impl.h"
+#include "libmesh/linear_partitioner_impl.h"
+#include "libmesh/mapped_subdomain_partitioner_impl.h"
+#include "libmesh/metis_partitioner_impl.h"
+#include "libmesh/parmetis_partitioner_impl.h"
+#include "libmesh/sfc_partitioner_impl.h"
+#include "libmesh/subdomain_partitioner_impl.h"
 
 #define INSTANTIATE_ALL_REAL_TYPE0(RealType)                                                       \
   template class DefaultCouplingTempl<RealType>;                                                   \
@@ -209,12 +220,23 @@
   template class PyramidTempl<RealType>;                                                           \
   template class RemoteElemTempl<RealType>;                                                        \
   template class TriTempl<RealType>; \
+  template class Tri3SubdivisionTempl<RealType>; \
+  template class Pyramid13Templ<RealType>; \
+  template class Pyramid14Templ<RealType>; \
   template class TreeNode<2,RealType>; \
   template class TreeNode<4,RealType>; \
   template class TreeNode<8,RealType>; \
   template class Tree<2,RealType>; \
   template class Tree<4,RealType>; \
-  template class Tree<8,RealType>
+  template class Tree<8,RealType>; \
+  template class PartitionerTempl<RealType>; \
+  template class CentroidPartitionerTempl<RealType>; \
+  template class LinearPartitionerTempl<RealType>; \
+  template class MappedSubdomainPartitionerTempl<RealType>; \
+  template class MetisPartitionerTempl<RealType>; \
+  template class ParmetisPartitionerTempl<RealType>; \
+  template class SFCPartitionerTempl<RealType>; \
+  template class SubdomainPartitionerTempl<RealType>
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 #define INSTANTIATE_ALL_REAL_TYPE(RealType)                                                        \

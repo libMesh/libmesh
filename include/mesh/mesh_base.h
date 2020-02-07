@@ -50,14 +50,11 @@ namespace libMesh
 {
 
 // forward declarations
-template <typename>
-class ElemTempl;
+template <typename> class ElemTempl;
 template <typename> class GhostingFunctorTempl;
-template <typename>
-class NodeTempl;
-template <typename>
-class PointTempl;
-class Partitioner;
+template <typename> class NodeTempl;
+template <typename> class PointTempl;
+template <typename> class PartitionerTempl;
 
 template <class MT>
 class MeshInput;
@@ -192,6 +189,7 @@ public:
   typedef GhostingFunctorTempl<RealType> GhostingFunctor;
   typedef BoundaryInfoTempl<RealType> BoundaryInfo;
   typedef PointLocatorBaseTempl<RealType> PointLocatorBase;
+  typedef PartitionerTempl<RealType> Partitioner;
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
@@ -1932,7 +1930,7 @@ protected:
    * The partitioner class is a friend so that it can set
    * the number of partitions.
    */
-  friend class Partitioner;
+  friend class PartitionerTempl<RealType>;
 
   /**
    * The MeshInput classes are friends so that they can set the number

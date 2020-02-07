@@ -198,9 +198,9 @@ PointTempl<RealType> ElemTempl<RealType>::centroid() const
 
 
 template <typename RealType>
-Real ElemTempl<RealType>::hmin() const
+RealType ElemTempl<RealType>::hmin() const
 {
-  Real h_min=std::numeric_limits<Real>::max();
+  RealType h_min=std::numeric_limits<Real>::max();
 
   // Avoid calling a virtual a lot of times
   const auto n_vertices = this->n_vertices();
@@ -219,9 +219,9 @@ Real ElemTempl<RealType>::hmin() const
 
 
 template <typename RealType>
-Real ElemTempl<RealType>::hmax() const
+RealType ElemTempl<RealType>::hmax() const
 {
-  Real h_max=0;
+  RealType h_max=0;
 
   // Avoid calling a virtual a lot of times
   const auto n_vertices = this->n_vertices();
@@ -240,8 +240,8 @@ Real ElemTempl<RealType>::hmax() const
 
 
 template <typename RealType>
-Real ElemTempl<RealType>::length(const unsigned int n1,
-                  const unsigned int n2) const
+RealType ElemTempl<RealType>::length(const unsigned int n1,
+                                     const unsigned int n2) const
 {
   libmesh_assert_less ( n1, this->n_vertices() );
   libmesh_assert_less ( n2, this->n_vertices() );
@@ -2058,7 +2058,7 @@ bool ElemTempl<RealType>::point_test(const PointTempl<RealType> & p, Real box_to
         point_below_max_x = false;
 
       // For relative bounding box checks in physical space
-      const Real my_hmax = this->hmax();
+      const RealType my_hmax = this->hmax();
 
       for (auto & n : this->node_ref_range())
         {
@@ -2109,7 +2109,7 @@ bool ElemTempl<RealType>::point_test(const PointTempl<RealType> & p, Real box_to
 
       // Compute the distance between the original point and the re-mapped point.
       // They should be in the same place.
-      Real dist = (xyz - p).norm();
+      RealType dist = (xyz - p).norm();
 
 
       // If dist is larger than some fraction of the tolerance, then return false.

@@ -39,20 +39,26 @@ namespace libMesh
  * \date 2017
  * \brief Partitions elements based on user-defined mapping from subdomain ids -> processor ids.
  */
-class MappedSubdomainPartitioner : public Partitioner
+template <typename RealType = Real>
+class MappedSubdomainPartitionerTempl : public PartitionerTempl<RealType>
 {
 public:
+  typedef MappedSubdomainPartitionerTempl<RealType> MappedSubdomainPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Ctors, assignment operators, and destructor are all explicitly
    * defaulted for this class.
    */
-  MappedSubdomainPartitioner () = default;
-  MappedSubdomainPartitioner (const MappedSubdomainPartitioner &) = default;
-  MappedSubdomainPartitioner (MappedSubdomainPartitioner &&) = default;
+  MappedSubdomainPartitionerTempl () = default;
+  MappedSubdomainPartitionerTempl (const MappedSubdomainPartitioner &) = default;
+  MappedSubdomainPartitionerTempl (MappedSubdomainPartitioner &&) = default;
   MappedSubdomainPartitioner & operator= (const MappedSubdomainPartitioner &) = default;
   MappedSubdomainPartitioner & operator= (MappedSubdomainPartitioner &&) = default;
-  virtual ~MappedSubdomainPartitioner() = default;
+  virtual ~MappedSubdomainPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -82,8 +88,8 @@ public:
    * Called by the SubdomainPartitioner to partition elements in the range (it, end).
    */
   virtual void partition_range(MeshBase & mesh,
-                               MeshBase::element_iterator it,
-                               MeshBase::element_iterator end,
+                               typename MeshBase::element_iterator it,
+                               typename MeshBase::element_iterator end,
                                const unsigned int n) override;
 
 protected:
@@ -94,6 +100,8 @@ protected:
   virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) override;
 };
+
+typedef MappedSubdomainPartitionerTempl<Real> MappedSubdomainPartitioner;
 
 } // namespace libMesh
 

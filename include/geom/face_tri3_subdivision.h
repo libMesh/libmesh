@@ -37,26 +37,32 @@ namespace libMesh
  * \date 2014
  * \brief A surface shell element used in mechanics calculations.
  */
-class Tri3Subdivision final : public Tri3
+template <typename RealType = Real>
+class Tri3SubdivisionTempl final : public Tri3Templ<RealType>
 {
 public:
+  typedef Tri3SubdivisionTempl<RealType> Tri3Subdivision;
+  typedef Tri3Templ<RealType> Tri3;
+  typedef ElemTempl<RealType> Elem;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
 
   /**
    * Constructor without parent specification.
    */
-  Tri3Subdivision() :
+  Tri3SubdivisionTempl() :
     Tri3(), _subdivision_updated(false), _is_ghost(false) {}
 
   /**
    * Constructor with parent specification.
    */
-  Tri3Subdivision(Elem * p);
+  Tri3SubdivisionTempl(Elem * p);
 
-  Tri3Subdivision (Tri3Subdivision &&) = delete;
-  Tri3Subdivision (const Tri3Subdivision &) = delete;
+  Tri3SubdivisionTempl (Tri3Subdivision &&) = delete;
+  Tri3SubdivisionTempl (const Tri3Subdivision &) = delete;
   Tri3Subdivision & operator= (const Tri3Subdivision &) = delete;
   Tri3Subdivision & operator= (Tri3Subdivision &&) = delete;
-  virtual ~Tri3Subdivision() = default;
+  virtual ~Tri3SubdivisionTempl() = default;
 
   /**
    * \returns \p TRI3SUBDIVISION.
@@ -140,6 +146,8 @@ private:
    */
   bool _is_ghost;
 };
+
+typedef Tri3SubdivisionTempl<Real> Tri3Subdivision;
 
 
 } // namespace libMesh

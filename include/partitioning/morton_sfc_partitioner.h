@@ -34,14 +34,21 @@ namespace libMesh
  * \date 2003
  * \brief Partitioner based on Morton's space filling curve algorithm.
  */
-class MortonSFCPartitioner : public SFCPartitioner
+template <typename RealType = Real>
+class MortonSFCPartitionerTempl : public SFCPartitionerTempl<RealType>
 {
 public:
+  typedef MortonSFCPartitionerTempl<RealType> MortonSFCPartitioner;
+  typedef SFCPartitionerTempl<RealType> SFCPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * Constructor. Sets the underlying space filling curve type.
    */
-  MortonSFCPartitioner ()
+  MortonSFCPartitionerTempl ()
   {
     this->set_sfc_type ("Morton");
   }
@@ -50,11 +57,11 @@ public:
    * Copy/move ctor, copy/move assignment operator, and destructor are
    * all explicitly defaulted for this class.
    */
-  MortonSFCPartitioner (const MortonSFCPartitioner &) = default;
-  MortonSFCPartitioner (MortonSFCPartitioner &&) = default;
+  MortonSFCPartitionerTempl (const MortonSFCPartitioner &) = default;
+  MortonSFCPartitionerTempl (MortonSFCPartitioner &&) = default;
   MortonSFCPartitioner & operator= (const MortonSFCPartitioner &) = default;
   MortonSFCPartitioner & operator= (MortonSFCPartitioner &&) = default;
-  virtual ~MortonSFCPartitioner() = default;
+  virtual ~MortonSFCPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -75,6 +82,8 @@ protected:
     SFCPartitioner::_do_partition (mesh, n);
   }
 };
+
+typedef MortonSFCPartitionerTempl<Real> MortonSFCPartitioner;
 
 } // namespace libMesh
 

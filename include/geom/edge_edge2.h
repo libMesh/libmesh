@@ -48,7 +48,9 @@ class Edge2Templ : public EdgeTempl<RealType>
 public:
   typedef Edge2Templ<RealType> Edge2;
   using typename EdgeTempl<RealType>::Edge;
-  using typename EdgeTempl<RealType>::Elem;
+  using typename Edge::Elem;
+  using typename Edge::Point;
+  using typename Edge::Node;
 
   /**
    * Constructor.  By default this element has no parent.

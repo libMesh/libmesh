@@ -33,27 +33,34 @@ namespace libMesh
  * \date 2016
  * \brief A 2D quadrilateral shell element with 4 nodes.
  */
-class QuadShell4 : public Quad4
+template <typename RealType = Real>
+class QuadShell4Templ : public Quad4Templ<RealType>
 {
 public:
+  typedef QuadShell4Templ<RealType> QuadShell4;
+  typedef Quad4Templ<RealType> Quad4;
+  typedef ElemTempl<RealType> Elem;
+
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  QuadShell4 (Elem * p=nullptr) :
+  QuadShell4Templ (Elem * p=nullptr) :
     Quad4(p) {}
 
-  QuadShell4 (QuadShell4 &&) = delete;
-  QuadShell4 (const QuadShell4 &) = delete;
+  QuadShell4Templ (QuadShell4 &&) = delete;
+  QuadShell4Templ (const QuadShell4 &) = delete;
   QuadShell4 & operator= (const QuadShell4 &) = delete;
   QuadShell4 & operator= (QuadShell4 &&) = delete;
-  virtual ~QuadShell4() = default;
+  virtual ~QuadShell4Templ() = default;
 
   /**
    * \returns \p QUADSHELL4.
    */
   virtual ElemType type () const override { return QUADSHELL4; }
 };
+
+typedef QuadShell4Templ<Real> QuadShell4;
 
 } // namespace libMesh
 

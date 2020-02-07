@@ -46,9 +46,15 @@ typedef ElemTempl<Real> Elem;
  * \author Benjamin S. Kirk
  * \date 2003
  */
-class CentroidPartitioner : public Partitioner
+template <typename RealType = Real>
+class CentroidPartitionerTempl : public PartitionerTempl<RealType>
 {
 public:
+  typedef CentroidPartitionerTempl<RealType> CentroidPartitioner;
+  typedef PartitionerTempl<RealType> Partitioner;
+  typedef MeshBaseTempl<RealType> MeshBase;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
 
   /**
    * A typedef which controls the sorting method used for ordering the
@@ -66,17 +72,17 @@ public:
    * defaults to \p X ordering.
    */
   explicit
-  CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
+  CentroidPartitionerTempl (const CentroidSortMethod sm=X) : _sort_method(sm) {}
 
   /**
    * Copy/move ctor, copy/move assignment operator, and destructor are
    * all explicitly defaulted for this class.
    */
-  CentroidPartitioner (const CentroidPartitioner &) = default;
-  CentroidPartitioner (CentroidPartitioner &&) = default;
+  CentroidPartitionerTempl (const CentroidPartitioner &) = default;
+  CentroidPartitionerTempl (CentroidPartitioner &&) = default;
   CentroidPartitioner & operator= (const CentroidPartitioner &) = default;
   CentroidPartitioner & operator= (CentroidPartitioner &&) = default;
-  virtual ~CentroidPartitioner() = default;
+  virtual ~CentroidPartitionerTempl() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
@@ -100,8 +106,8 @@ public:
    * Called by the SubdomainPartitioner to partition elements in the range (it, end).
    */
   virtual void partition_range(MeshBase & mesh,
-                               MeshBase::element_iterator it,
-                               MeshBase::element_iterator end,
+                               typename MeshBase::element_iterator it,
+                               typename MeshBase::element_iterator end,
                                const unsigned int n) override;
 
 protected:
@@ -117,8 +123,8 @@ private:
   /**
    * Computes a list of element centroids for the mesh.
    */
-  void compute_centroids (MeshBase::element_iterator it,
-                          MeshBase::element_iterator end);
+  void compute_centroids (typename MeshBase::element_iterator it,
+                          typename MeshBase::element_iterator end);
 
   /**
    * Helper function which sorts by the centroid's x-coordinate in the
@@ -159,6 +165,8 @@ private:
    */
   std::vector<std::pair<Point, Elem *>> _elem_centroids;
 };
+
+typedef CentroidPartitionerTempl<Real> CentroidPartitioner;
 
 } // namespace libMesh
 

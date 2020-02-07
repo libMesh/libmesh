@@ -65,23 +65,33 @@ namespace libMesh
  * \date 2014
  * \brief A 3D pyramid element with 13 nodes.
  */
-class Pyramid13 final : public Pyramid
+template <typename RealType = Real>
+class Pyramid13Templ final : public PyramidTempl<RealType>
 {
 public:
+  typedef PyramidTempl<RealType> Pyramid;
+  typedef Pyramid13Templ<RealType> Pyramid13;
+  typedef Quad8Templ<RealType> Quad8;
+  typedef Tri6Templ<RealType> Tri6;
+  typedef Edge3Templ<RealType> Edge3;
+  typedef ElemTempl<RealType> Elem;
+  typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
+  typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid13 (Elem * p=nullptr) :
+  Pyramid13Templ (Elem * p=nullptr) :
     Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
   {}
 
-  Pyramid13 (Pyramid13 &&) = delete;
-  Pyramid13 (const Pyramid13 &) = delete;
+  Pyramid13Templ (Pyramid13 &&) = delete;
+  Pyramid13Templ (const Pyramid13 &) = delete;
   Pyramid13 & operator= (const Pyramid13 &) = delete;
   Pyramid13 & operator= (Pyramid13 &&) = delete;
-  virtual ~Pyramid13() = default;
+  virtual ~Pyramid13Templ() = default;
 
   /**
    * \returns 13.
@@ -207,7 +217,7 @@ public:
   /**
    * Specialization for computing the volume of a Pyramid13.
    */
-  virtual Real volume () const override;
+  virtual RealType volume () const override;
 
 protected:
 
@@ -233,6 +243,40 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
+
+// ------------------------------------------------------------
+// Pyramid13 class static member initializations
+template <typename RealType> const int Pyramid13Templ<RealType>::num_nodes;
+template <typename RealType> const int Pyramid13Templ<RealType>::num_sides;
+template <typename RealType> const int Pyramid13Templ<RealType>::num_edges;
+template <typename RealType> const int Pyramid13Templ<RealType>::num_children;
+template <typename RealType> const int Pyramid13Templ<RealType>::nodes_per_side;
+template <typename RealType> const int Pyramid13Templ<RealType>::nodes_per_edge;
+
+template <typename RealType>
+const unsigned int Pyramid13Templ<RealType>::side_nodes_map[Pyramid13::num_sides][Pyramid13::nodes_per_side] =
+  {
+    {0, 1, 4, 5, 10,  9, 99, 99}, // Side 0 (front)
+    {1, 2, 4, 6, 11, 10, 99, 99}, // Side 1 (right)
+    {2, 3, 4, 7, 12, 11, 99, 99}, // Side 2 (back)
+    {3, 0, 4, 8,  9, 12, 99, 99}, // Side 3 (left)
+    {0, 3, 2, 1,  8,  7,  6,  5}  // Side 4 (base)
+  };
+
+template <typename RealType>
+const unsigned int Pyramid13Templ<RealType>::edge_nodes_map[Pyramid13::num_edges][Pyramid13::nodes_per_edge] =
+  {
+    {0, 1,  5}, // Edge 0
+    {1, 2,  6}, // Edge 1
+    {2, 3,  7}, // Edge 2
+    {0, 3,  8}, // Edge 3
+    {0, 4,  9}, // Edge 4
+    {1, 4, 10}, // Edge 5
+    {2, 4, 11}, // Edge 6
+    {3, 4, 12}  // Edge 7
+  };
+
+typedef Pyramid13Templ<Real> Pyramid13;
 
 } // namespace libMesh
 
