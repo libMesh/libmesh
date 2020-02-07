@@ -764,6 +764,8 @@ LIBMESH_ENABLE_PARMETIS_FALSE
 LIBMESH_ENABLE_PARMETIS_TRUE
 PARMETIS_LIB
 PARMETIS_INCLUDE
+BUILD_PARMETIS_FALSE
+BUILD_PARMETIS_TRUE
 LIBMESH_ENABLE_METIS_FALSE
 LIBMESH_ENABLE_METIS_TRUE
 METIS_LIB
@@ -1231,6 +1233,7 @@ with_tecio_x11_include
 enable_tecplot
 enable_metis
 with_metis
+with_metis_include
 enable_parmetis
 enable_tetgen
 enable_triangle
@@ -2123,9 +2126,10 @@ Optional Packages:
   --with-tecio-x11-include=PATH
                           Path to X11 header files. E.g. /usr/include but
                           _not_ /usr/include/X11
-  --with-metis=<internal,PETSc>
-                          metis to use. internal: build from contrib, PETSc:
-                          rely on PETSc
+  --with-metis=<internal,PETSc,/some/libdir>
+                          internal: build from contrib, PETSc: rely on PETSc
+  --with-metis-include=</some/includedir>
+
   --with-vtk-include=PATH Specify the path for VTK header files
   --with-vtk-lib=PATH     Specify the path for VTK libs
   --with-eigen-include=PATH
@@ -33439,7 +33443,7 @@ fi
 
     # If the user doesn't have any PETSC directory specified, let's check to
     # see if it's installed via Ubuntu module
-    if test "x$PETSC_DIR" = x; then :
+    if test "x${PETSC_DIR}" = x; then :
 
             # Extract the first word of "petscarch", so it can be a program name with args.
 set dummy petscarch; ac_word=$2
@@ -33485,12 +33489,12 @@ fi
 
                     export PETSC_DIR=/usr/lib/petsc
                     export PETSC_ARCH=`$PETSCARCH`
-                    if test -d $PETSC_DIR; then :
+                    if test -d ${PETSC_DIR}; then :
 
-                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_DIR $PETSC_DIR" >&5
-$as_echo "using system-provided PETSC_DIR $PETSC_DIR" >&6; }
-                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_ARCH $PETSC_ARCH" >&5
-$as_echo "using system-provided PETSC_ARCH $PETSC_ARCH" >&6; }
+                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_DIR ${PETSC_DIR}" >&5
+$as_echo "using system-provided PETSC_DIR ${PETSC_DIR}" >&6; }
+                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_ARCH ${PETSC_ARCH}" >&5
+$as_echo "using system-provided PETSC_ARCH ${PETSC_ARCH}" >&6; }
 
 fi
 
@@ -33506,12 +33510,24 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-    as_ac_Header=`$as_echo "ac_cv_header_$PETSC_DIR/include/petscversion.h" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "$PETSC_DIR/include/petscversion.h" "$as_ac_Header" "$ac_includes_default"
+    as_ac_Header=`$as_echo "ac_cv_header_${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enablepetsc=yes
+                     petsc_version_h_file=${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h
+else
+
+      as_ac_Header=`$as_echo "ac_cv_header_${PETSC_DIR}/include/petscversion.h" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "${PETSC_DIR}/include/petscversion.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enablepetsc=yes,
+                       petsc_version_h_file=${PETSC_DIR}/include/petscversion.h
 else
   enablepetsc=no
+fi
+
+
+
 fi
 
 
@@ -33528,14 +33544,14 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     # If version 2.x, also check that PETSC_ARCH is set
     if test "$enablepetsc" !=  no; then :
 
-                                    petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
-            petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
-            petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
-            petscrelease=`grep "define PETSC_VERSION_RELEASE" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_RELEASE[ ]*//g"`
+                                    petscmajor=`grep "define PETSC_VERSION_MAJOR" $petsc_version_h_file | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
+            petscminor=`grep "define PETSC_VERSION_MINOR" $petsc_version_h_file | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
+            petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $petsc_version_h_file | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
+            petscrelease=`grep "define PETSC_VERSION_RELEASE" $petsc_version_h_file | sed -e "s/#define PETSC_VERSION_RELEASE[ ]*//g"`
             petscversion=$petscmajor.$petscminor.$petscsubminor
             petscmajorminor=$petscmajor.$petscminor.x
 
-            if test "$petscmajor" = "2" && test "x$PETSC_ARCH" = "x"; then :
+            if test "$petscmajor" = "2" && test "x${PETSC_ARCH}" = "x"; then :
 
                                         enablepetsc=no
                     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc 2.x detected and \"\$PETSC_ARCH\" not set.  PETSc disabled. >>>" >&5
@@ -33560,16 +33576,16 @@ fi
     # If we haven't been disabled yet, carry on!
     if test $enablepetsc != no; then :
 
-                if test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf; then :
-                PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni`
-elif test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables; then :
-                PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
-elif test -r $PETSC_DIR/conf/petscvariables; then :
-                PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
-elif test -r $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables; then :
-                PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
-elif test -r $PETSC_DIR/lib/petsc/conf/petscvariables; then :
-                PETSC_MPI=`grep MPIEXEC $PETSC_DIR/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
+                if test -r ${PETSC_DIR}/bmake/${PETSC_ARCH}/petscconf; then :
+                PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/bmake/${PETSC_ARCH}/petscconf | grep -v mpiexec.uni`
+elif test -r ${PETSC_DIR}/${PETSC_ARCH}/conf/petscvariables; then :
+                PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/${PETSC_ARCH}/conf/petscvariables | grep -v mpiexec.uni`
+elif test -r ${PETSC_DIR}/conf/petscvariables; then :
+                PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/conf/petscvariables | grep -v mpiexec.uni`
+elif test -r ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables; then :
+                PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
+elif test -r ${PETSC_DIR}/lib/petsc/conf/petscvariables; then :
+                PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
 fi
 
                 if test "x$PETSC_MPI" != x; then :
@@ -34093,8 +34109,8 @@ fi
 fi
 
         # Print informative message about the version of PETSc we detected
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Found PETSc $petscversion installation in $PETSC_DIR ... >>>" >&5
-$as_echo "<<< Found PETSc $petscversion installation in $PETSC_DIR ... >>>" >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Found PETSc $petscversion installation in ${PETSC_DIR} ... >>>" >&5
+$as_echo "<<< Found PETSc $petscversion installation in ${PETSC_DIR} ... >>>" >&6; }
 
         # Figure out whether this PETSC_DIR is a PETSc source tree or an installed PETSc.
         if               test -r ${PETSC_DIR}/makefile && test -r ${PETSC_DIR}/${PETSC_ARCH}/conf/variables; then :
@@ -34109,6 +34125,9 @@ elif               test -r ${PETSC_DIR}/conf/variables; then :
 elif               test -r ${PETSC_DIR}/lib/petsc/conf/variables; then :
   PREFIX_INSTALLED_PETSC=yes
                PETSC_VARS_FILE=${PETSC_DIR}/lib/petsc/conf/variables
+elif               test -r ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables; then :
+  PREFIX_INSTALLED_PETSC=yes
+               PETSC_VARS_FILE=${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables
 elif
                             test -r ${PETSC_DIR}/makefile && test -r ${PETSC_DIR}/conf/variables; then :
   PREFIX_INSTALLED_PETSC=no
@@ -34124,8 +34143,8 @@ fi
 
                 if test "$enablepetsc" != "no" && test "$PREFIX_INSTALLED_PETSC" = "no"; then :
 
-                PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
-                PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
+                PETSCLINKLIBS=`make -s -C ${PETSC_DIR} getlinklibs`
+                PETSCINCLUDEDIRS=`make -s -C ${PETSC_DIR} getincludedirs`
                 printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
                 printf '%s\n' "getPETSC_CC_INCLUDES:" >> Makefile_config_petsc
                 printf '\t%s\n' "echo \$(PETSC_CC_INCLUDES)" >> Makefile_config_petsc
@@ -34139,7 +34158,14 @@ else
 
                 printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
                 printf '%s\n' "getincludedirs:" >> Makefile_config_petsc
-                printf '\t%s\n' "echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)" >> Makefile_config_petsc
+                printf '\t%s' "echo " >> Makefile_config_petsc
+                if test -d ${PETSC_DIR}/include; then :
+  printf '%s ' "-I\$(PETSC_DIR)/include" >> Makefile_config_petsc
+fi
+                if test -d ${PETSC_DIR}/${PETSC_ARCH}/include; then :
+  printf '%s ' "-I\$(PETSC_DIR)/\$(PETSC_ARCH)/include" >> Makefile_config_petsc
+fi
+                printf '%s\n' "\$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)" >> Makefile_config_petsc
                 printf '%s\n'  "getPETSC_CC_INCLUDES:" >> Makefile_config_petsc
                 printf '\t%s\n' "echo \$(PETSC_CC_INCLUDES)" >> Makefile_config_petsc
                 printf '%s\n' "getPETSC_FC_INCLUDES:" >> Makefile_config_petsc
@@ -38684,20 +38710,34 @@ if test "${with_metis+set}" = set; then :
   internal) :
     build_metis=yes ;; #(
   PETSc) :
-    build_metis=no ;; #(
+    build_metis=petsc ;; #(
   *) :
-    as_fn_error $? "bad value ${withval} for --with-metis" "$LINENO" 5 ;;
+    METIS_LIB="-L${withval} -lmetis"
+                       build_metis=no ;;
 esac
+              enablemetis=yes
 else
   build_metis=yes
 fi
 
 
-      if test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0; then :
-  build_metis=no
+
+
+# Check whether --with-metis-include was given.
+if test "${with_metis_include+set}" = set; then :
+  withval=$with_metis_include; METIS_INCLUDE="-I${withval}"
+              enablemetis=yes
+              build_metis=no
 fi
 
-            if test "$enablemetis" = "yes" && test "$build_metis" = "no"; then :
+
+      if test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling internal Metis support to avoid PETSc conflict>>>" >&5
+$as_echo "<<< Disabling internal Metis support to avoid PETSc conflict>>>" >&6; }
+         build_metis=petsc
+fi
+
+            if test "$enablemetis" = "yes" && test "$build_metis" = "petsc"; then :
 
           if test "x$petsc_have_metis" = "x0" || test "$enablepetsc" = "no"; then :
   build_metis=yes
@@ -38710,7 +38750,7 @@ fi
                     if test "$build_metis" = "yes"; then :
 
                   METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/include"
-                  METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
+                  METIS_LIB="" # contrib Metis gets lumped into libcontrib
 
 fi
 
@@ -38792,6 +38832,7 @@ fi
 
 if test $enablemetis = yes; then :
   libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_optional_LIBS="$METIS_LIB $libmesh_optional_LIBS"
 fi
  if test x$enablemetis = xyes; then
   LIBMESH_ENABLE_METIS_TRUE=
@@ -38834,20 +38875,22 @@ fi
       if test "x$enableparmetis" = "xyes"; then :
 
 
-                    if test "x$build_metis" = "xno" && test $petsc_have_parmetis -gt 0; then :
+                    if test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -gt 0; then :
 
 
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
 
+                  build_parmetis=no
                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with PETSc Parmetis support >>>" >&5
 $as_echo "<<< Configuring library with PETSc Parmetis support >>>" >&6; }
 
 fi
 
-                                        if test "x$build_metis" = "xno" && test $petsc_have_parmetis -eq 0; then :
+                                        if test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -eq 0; then :
 
                   PARMETIS_INCLUDE=""
                   PARMETIS_LIB=""
+                  build_parmetis=no
                   enableparmetis=no
                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&5
 $as_echo "<<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&6; }
@@ -38858,16 +38901,18 @@ fi
 
                   PARMETIS_INCLUDE=""
                   PARMETIS_LIB=""
+                  build_parmetis=no
                   enableparmetis=no
                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&5
 $as_echo "<<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&6; }
 
 fi
 
-                    if test "x$build_metis" = "xyes" && test $petsc_have_parmetis -eq 0; then :
+                              if test "x$build_metis" != "xpetsc" && test $petsc_have_parmetis -eq 0; then :
 
                   PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
                   PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
+                  build_parmetis=yes
 
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
 
@@ -38881,8 +38926,17 @@ else
           PARMETIS_INCLUDE=""
           PARMETIS_LIB=""
           enableparmetis=no
+          build_parmetis=no
 
 fi
+   if test x$build_parmetis = xyes; then
+  BUILD_PARMETIS_TRUE=
+  BUILD_PARMETIS_FALSE='#'
+else
+  BUILD_PARMETIS_TRUE='#'
+  BUILD_PARMETIS_FALSE=
+fi
+
 
 
 
@@ -43010,6 +43064,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_METIS_TRUE}" && test -z "${LIBMESH_ENABLE_METIS_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_METIS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_PARMETIS_TRUE}" && test -z "${BUILD_PARMETIS_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_PARMETIS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_PARMETIS_TRUE}" && test -z "${LIBMESH_ENABLE_PARMETIS_FALSE}"; then
