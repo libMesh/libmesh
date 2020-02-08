@@ -21,8 +21,6 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-// C++ includes
-
 // Local Includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/nonlinear_implicit_system.h"
@@ -33,16 +31,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/solver_configuration.h"
-
-/* DMlibMesh include. */
 #include "libmesh/petscdmlibmesh.h"
-
-// Pick the right version of the petsc line search getter function name
-#if PETSC_VERSION_LESS_THAN(3,4,0)
-#  define SNESGETLINESEARCH SNESGetSNESLineSearch
-#else
-#  define SNESGETLINESEARCH SNESGetLineSearch
-#endif
 
 namespace libMesh
 {
@@ -298,13 +287,7 @@ extern "C"
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
   PetscErrorCode
-  libmesh_petsc_snes_jacobian(
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-                              SNES snes, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx
-#else
-                              SNES snes, Vec x, Mat jac, Mat pc, void * ctx
-#endif
-                              )
+  libmesh_petsc_snes_jacobian(SNES snes, Vec x, Mat jac, Mat pc, void * ctx)
   {
     LOG_SCOPE("jacobian()", "PetscNonlinearSolver");
 
@@ -327,13 +310,8 @@ extern "C"
     }
 
     NonlinearImplicitSystem & sys = solver->system();
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-    PetscMatrix<Number> PC(*pc, sys.comm());
-    PetscMatrix<Number> Jac(*jac, sys.comm());
-#else
     PetscMatrix<Number> PC(pc, sys.comm());
     PetscMatrix<Number> Jac(jac, sys.comm());
-#endif
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
 
@@ -384,9 +362,6 @@ extern "C"
 
     PC.close();
     Jac.close();
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-    *msflag = SAME_NONZERO_PATTERN;
-#endif
 
     return ierr;
   }
@@ -409,22 +384,10 @@ extern "C"
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode
-  __libmesh_petsc_snes_jacobian(
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                SNES snes, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx
-#else
-                                SNES snes, Vec x, Mat jac, Mat pc, void * ctx
-#endif
-                                )
+  __libmesh_petsc_snes_jacobian(SNES snes, Vec x, Mat jac, Mat pc, void * ctx)
   {
     libmesh_deprecated();
-    return libmesh_petsc_snes_jacobian(
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                       snes, x, jac, pc, msflag, ctx
-#else
-                                       snes, x, jac, pc, ctx
-#endif
-                                       );
+    return libmesh_petsc_snes_jacobian(snes, x, jac, pc, ctx);
   }
 #endif
 
@@ -438,13 +401,7 @@ extern "C"
   // the user is responsible for setting changed_y and changed_w
   // appropriately, depending on whether or not the search
   // direction or solution vector was changed, respectively.
-  PetscErrorCode libmesh_petsc_snes_postcheck(
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-                                              SNES, Vec x, Vec y, Vec w, void * context, PetscBool * changed_y, PetscBool * changed_w
-#else
-                                              SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context
-#endif
-                                              )
+  PetscErrorCode libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context)
   {
     LOG_SCOPE("postcheck()", "PetscNonlinearSolver");
 
@@ -515,22 +472,10 @@ extern "C"
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode __libmesh_petsc_snes_postcheck(
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-                                                SNES, Vec x, Vec y, Vec w, void * context, PetscBool * changed_y, PetscBool * changed_w
-#else
-                                                SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context
-#endif
-                                                )
+  PetscErrorCode __libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context)
   {
     libmesh_deprecated();
-    return libmesh_petsc_snes_postcheck(
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-                                        nullptr, x, y, w, context, changed_y, changed_w
-#else
-                                        nullptr, x, y, w, changed_y, changed_w, context
-#endif
-                                        );
+    return libmesh_petsc_snes_postcheck(nullptr, x, y, w, changed_y, changed_w, context);
   }
 #endif
 } // end extern "C"
@@ -603,7 +548,6 @@ void PetscNonlinearSolver<T>::init (const char * name)
           LIBMESH_CHKERR(ierr);
         }
 
-#if !PETSC_RELEASE_LESS_THAN(3,3,0)
       // Attaching a DM to SNES.
       DM dm;
       ierr = DMCreate(this->comm().get(), &dm);LIBMESH_CHKERR(ierr);
@@ -619,8 +563,6 @@ void PetscNonlinearSolver<T>::init (const char * name)
       // SNES now owns the reference to dm.
       ierr = DMDestroy(&dm);                     LIBMESH_CHKERR(ierr);
 
-#endif
-
       if (_default_monitor)
         {
           ierr = SNESMonitorSet (_snes, libmesh_petsc_snes_monitor,
@@ -634,13 +576,6 @@ void PetscNonlinearSolver<T>::init (const char * name)
         {
           this->_solver_configuration->set_options_during_init();
         }
-
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-      // Cannot call SNESSetOptions before SNESSetFunction when using
-      // any matrix free options with PETSc 3.1.0+
-      ierr = SNESSetFromOptions(_snes);
-      LIBMESH_CHKERR(ierr);
-#endif
 
       if (this->_preconditioner)
         {
@@ -669,22 +604,15 @@ void PetscNonlinearSolver<T>::init (const char * name)
   // attached for no reason.
   if (this->postcheck || this->postcheck_object)
     {
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-      PetscErrorCode ierr = SNESLineSearchSetPostCheck(_snes, libmesh_petsc_snes_postcheck, this);
-      LIBMESH_CHKERR(ierr);
-
-#else
       SNESLineSearch linesearch;
-      PetscErrorCode ierr = SNESGETLINESEARCH(_snes, &linesearch);
+      PetscErrorCode ierr = SNESGetLineSearch(_snes, &linesearch);
       LIBMESH_CHKERR(ierr);
 
       ierr = SNESLineSearchSetPostCheck(linesearch, libmesh_petsc_snes_postcheck, this);
       LIBMESH_CHKERR(ierr);
-#endif
     }
 }
 
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
 template <typename T>
 void
 PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
@@ -705,11 +633,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
       PetscScalar * dots;
       PetscInt nmodes = cast_int<PetscInt>(sp.size());
 
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = PetscMalloc2(nmodes,Vec,&modes,nmodes,PetscScalar,&dots);
-#else
       ierr = PetscMalloc2(nmodes,&modes,nmodes,&dots);
-#endif
       LIBMESH_CHKERR(ierr);
 
       for (PetscInt i=0; i<nmodes; ++i)
@@ -757,7 +681,6 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
       LIBMESH_CHKERR(ierr);
     }
 }
-#endif
 
 template <typename T>
 std::pair<unsigned int, Real>
@@ -792,7 +715,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
     }
 
 
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
   // Only set the nullspace if we have a way of computing it and the result is non-empty.
   if (this->nullspace || this->nullspace_object)
     {
@@ -839,7 +761,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
           LIBMESH_CHKERR(ierr);
         }
     }
-#endif
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
@@ -898,7 +819,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // overzealous check was moved out of SNESSetUp in PETSc 3.5.0
   // (petsc/petsc@154060b), so this code block should be safe to use
   // in 3.5.0 and later.
-#if !PETSC_VERSION_LESS_THAN(3,5,0)
 #if !PETSC_VERSION_LESS_THAN(3,6,0)
   ierr = SNESSetSolution(_snes, x->vec());
   LIBMESH_CHKERR(ierr);
@@ -911,28 +831,22 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LIBMESH_CHKERR(ierr);
   ierr = MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this);
   LIBMESH_CHKERR(ierr);
-#if !PETSC_VERSION_LESS_THAN(3, 8, 4)
+#if !PETSC_VERSION_LESS_THAN(3,8,4)
   // Resue the residual vector from SNES
   ierr = MatSNESMFSetReuseBase(J, static_cast<PetscBool>(_snesmf_reuse_base));
   LIBMESH_CHKERR(ierr);
 #endif
-#endif
 
-#if PETSC_VERSION_LESS_THAN(3, 3, 0)
-  if (linesearch_object)
-    libmesh_error_msg("Line search setter interface introduced in petsc version 3.3!");
-#else
   SNESLineSearch linesearch;
   if (linesearch_object)
   {
-    ierr = SNESGETLINESEARCH(_snes, &linesearch);
+    ierr = SNESGetLineSearch(_snes, &linesearch);
     LIBMESH_CHKERR(ierr);
     ierr = SNESLineSearchSetType(linesearch, SNESLINESEARCHSHELL);
     LIBMESH_CHKERR(ierr);
     ierr = SNESLineSearchShellSetUserFunc(linesearch, libmesh_petsc_linesearch_shellfunc, this);
     LIBMESH_CHKERR(ierr);
   }
-#endif
 
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
   LIBMESH_CHKERR(ierr);

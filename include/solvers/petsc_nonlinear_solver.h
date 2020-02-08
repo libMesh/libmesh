@@ -51,19 +51,8 @@ extern "C"
   PetscErrorCode libmesh_petsc_snes_fd_residual (SNES, Vec x, Vec r, void * ctx);
   PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
   PetscErrorCode libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  PetscErrorCode libmesh_petsc_snes_jacobian (SNES, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx);
-#else
   PetscErrorCode libmesh_petsc_snes_jacobian (SNES, Vec x, Mat jac, Mat pc, void * ctx);
-#endif
-
-  PetscErrorCode libmesh_petsc_snes_postcheck(
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-                                                SNES, Vec x, Vec y, Vec w, void * context, PetscBool * changed_y, PetscBool * changed_w
-#else
-                                                SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context
-#endif
-                                                );
+  PetscErrorCode libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context);
   PetscErrorCode libmesh_petsc_linesearch_shellfunc(SNESLineSearch linesearch, void * ctx);
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -71,19 +60,8 @@ extern "C"
   PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void * ctx);
   PetscErrorCode __libmesh_petsc_snes_fd_residual (SNES, Vec x, Vec r, void * ctx);
   PetscErrorCode __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx);
-#else
   PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat jac, Mat pc, void * ctx);
-#endif
-
-  PetscErrorCode __libmesh_petsc_snes_postcheck(
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-                                                SNES, Vec x, Vec y, Vec w, void * context, PetscBool * changed_y, PetscBool * changed_w
-#else
-                                                SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context
-#endif
-                                                );
+  PetscErrorCode __libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context);
 #endif
 }
 
@@ -257,21 +235,15 @@ protected:
    */
   bool _snesmf_reuse_base;
 
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number> *> &, sys_type &),
                             MatNullSpace *);
-#endif
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  friend PetscErrorCode libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx);
-#else
   friend PetscErrorCode libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void * ctx);
-#endif
 };
 
 
