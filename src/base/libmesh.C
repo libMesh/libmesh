@@ -68,9 +68,7 @@
 # include "libmesh/petsc_macro.h"
 # include <petsc.h>
 # include <petscerror.h>
-#if !PETSC_RELEASE_LESS_THAN(3,3,0)
-#include "libmesh/petscdmlibmesh.h"
-#endif
+# include "libmesh/petscdmlibmesh.h"
 # if defined(LIBMESH_HAVE_SLEPC)
 // Ignore unused variable warnings from SLEPc
 #  include "libmesh/ignore_warnings.h"
@@ -533,15 +531,8 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
         }
 # endif
-#if !PETSC_RELEASE_LESS_THAN(3,3,0)
       // Register the reference implementation of DMlibMesh
-#if PETSC_RELEASE_LESS_THAN(3,4,0)
-      ierr = DMRegister(DMLIBMESH, PETSC_NULL, "DMCreate_libMesh", DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
-#else
       ierr = DMRegister(DMLIBMESH, DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
-#endif
-
-#endif
     }
 #endif
 

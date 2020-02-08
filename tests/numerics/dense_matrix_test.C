@@ -380,9 +380,7 @@ private:
   }
 };
 
-// Only run the test if we expect it can actually work!
+// These tests require PETSc
 #ifdef LIBMESH_HAVE_PETSC
-#if !PETSC_VERSION_LESS_THAN(3,1,0)
 CPPUNIT_TEST_SUITE_REGISTRATION(DenseMatrixTest);
-#endif
 #endif
