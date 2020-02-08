@@ -18,9 +18,8 @@
 
 
 #include "libmesh/petsc_macro.h"
-// This only works with petsc-3.3 and above.
 
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
+#ifdef LIBMESH_HAVE_PETSC
 
 // PETSc includes
 #if !PETSC_RELEASE_LESS_THAN(3,6,0)
@@ -332,11 +331,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len,
       CHKERRQ(ierr);
       if (dlm->embedding) {
         /* Create a relative embedding into the parent's index space. */
-#if PETSC_RELEASE_LESS_THAN(3,3,1)
-        ierr = ISMapFactorRight(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
-#else
         ierr = ISEmbed(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
-#endif
         PetscInt elen, dlen;
         ierr = ISGetLocalSize(emb, &elen); CHKERRQ(ierr);
         ierr = ISGetLocalSize(dis, &dlen); CHKERRQ(ierr);
@@ -437,11 +432,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt * len
       CHKERRQ(ierr);
       if (dlm->embedding) {
         /* Create a relative embedding into the parent's index space. */
-#if PETSC_RELEASE_LESS_THAN(3,3,1)
-        ierr = ISMapFactorRight(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
-#else
         ierr = ISEmbed(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
-#endif
         PetscInt elen, dlen;
         ierr = ISGetLocalSize(emb, &elen); CHKERRQ(ierr);
         ierr = ISGetLocalSize(dis, &dlen);  CHKERRQ(ierr);
@@ -593,193 +584,6 @@ struct token {
 };
 
 
-// The following functions are only needed for older PETScs.
-#if PETSC_RELEASE_LESS_THAN(3,3,1)
-
-#undef __FUNCT__
-#define __FUNCT__ "DMlibMeshParseDecompositionDescriptor_Private"
-static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, const char * ddesc, PetscInt * dtype, PetscInt * dcount, PetscInt ** dsizes, char **** dlists)
-{
-  PetscFunctionBegin;
-  PetscErrorCode ierr;
-  PetscBool eq;
-  char * s0;
-  char * s;
-  char * ss;
-  struct token * llfirst = PETSC_NULL;
-  struct token * lllast = PETSC_NULL;
-  struct token * tok;
-  PetscInt stcount = 0, brcount = 0, d, i;
-  size_t len0, count;
-
-  /*
-    Parse the decomposition descriptor.
-    Decomposition names could be of one of two forms:
-    var:v1,v2;v3,v4;v4,v5;
-    block:b1,b2;b3,b4;b4,b5;
-    resulting in an overlapping decomposition that groups
-    variables (v1,v2), (v3,v4), (v4,v5) or
-    blocks    (b1,b2), (b3,b4), (b4,b5).
-  */
-  /* Copy the descriptor so that we can manipulate it in place. */
-  ierr = PetscStrallocpy(ddesc,&s0);   CHKERRQ(ierr);
-  ierr = PetscStrlen(s0, &len0)  ;     CHKERRQ(ierr);
-  ierr = PetscStrstr(s0,":",&ss);      CHKERRQ(ierr);
-  if (!ss) {
-    ss = s0+len0;
-  }
-  else {
-    *ss = 0;
-  }
-  ierr = PetscStrcmp(s0,"var",&eq);    CHKERRQ(ierr);
-  if (eq) {
-    *dtype=DMLIBMESH_FIELD_DECOMPOSITION;
-  }
-  else {
-    ierr = PetscStrcmp(s0,"block",&eq);CHKERRQ(ierr);
-    if (!eq)
-      SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Could not determine decomposition type from descriptor: %s\n", ddesc); CHKERRQ(ierr);
-    *dtype=DMLIBMESH_DOMAIN_DECOMPOSITION;
-  }
-  ierr = PetscStrlen(s0,&count);       CHKERRQ(ierr);
-  while (count < len0) {
-    struct token * st;
-    struct token * br;
-    ++ss; ++count;
-    s=ss;
-    while (*ss && *ss != ',' && *ss != ';') {
-      ++ss; ++count;
-    }
-    st = PETSC_NULL; br = PETSC_NULL;
-    if (*ss) {
-      /*
-        Found a separator, or a break.
-        Add an appropriate token to the list.
-        A token separator ',' produces no token.
-      */
-      if (*ss == ';') {
-        /* Create a break token: a token with a null string. */
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-        ierr = PetscNew(struct token,&br);CHKERRQ(ierr);
-#else
-        ierr = PetscNew(&br);CHKERRQ(ierr);
-#endif
-      }
-      *ss = 0;
-      if (s != ss) {
-        /* A nonempty string. */
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-        ierr = PetscNew(struct token, &st);CHKERRQ(ierr);
-#else
-        ierr = PetscNew(&st);CHKERRQ(ierr);
-#endif
-        st->s = s; /* The string will be properly copied below. */
-      }
-      /* Add the new tokens to the list. */
-      if (st) {
-        if (!lllast) {
-          llfirst = lllast = st;
-        }
-        else {
-          lllast->next = st; lllast = st;
-        }
-      }
-      if (br) {
-        if (!lllast) {
-          llfirst = lllast = br;
-        }
-        else {
-          lllast->next = br; lllast = br;
-        }
-      }
-    }
-  }
-  /* The result of parsing is in the linked list ll. */
-  /* Count up the strings and the breaks. */
-  tok = llfirst;
-  while (tok) {
-    if (tok->s)
-      ++stcount;
-    else
-      ++brcount;
-    tok = tok->next;
-  }
-  /* Allocate the space for the output. */
-  *dcount = brcount;
-  ierr = PetscMalloc(*dcount*sizeof(PetscInt), dsizes); CHKERRQ(ierr);
-  ierr = PetscMalloc(*dcount*sizeof(char **),   dlists); CHKERRQ(ierr);
-  for (d = 0; d < *dcount; ++d) (*dsizes)[d] = 0;
-  tok = llfirst; d = 0;
-  while (tok) {
-    if (tok->s)
-      ++(*dsizes)[d];
-    else
-      ++d;
-    tok = tok->next;
-  }
-  for (d = 0; d < *dcount; ++d) {
-    ierr = PetscMalloc(sizeof(char **)*(*dsizes)[d], (* dlists)+d); CHKERRQ(ierr);
-  }
-  /* Now copy strings and destroy tokens. */
-  tok = llfirst; d = 0; i = 0;
-  while (tok) {
-    if (tok->s) {
-      ierr = PetscStrallocpy(tok->s, (*dlists)[d]+i); CHKERRQ(ierr);
-      ++i;
-    }
-    else {
-      ++d;
-      i = 0;
-    }
-    llfirst = tok;
-    tok = tok->next;
-    ierr = PetscFree(llfirst); CHKERRQ(ierr);
-  }
-  /* Deallocate workspace. */
-  ierr = PetscFree(s0); CHKERRQ(ierr);
-  PetscFunctionReturn(0);
-}
-
-#undef __FUNCT__
-#define __FUNCT__ "DMCreateFieldDecompositionDM_libMesh"
-static PetscErrorCode  DMCreateFieldDecompositionDM_libMesh(DM dm, const char * ddesc, DM * ddm)
-{
-  PetscFunctionBegin;
-  PetscErrorCode ierr;
-  PetscInt dtype, dcount;
-  PetscInt * dsizes;
-  char *** dlists;
-  PetscFunctionBegin;
-  *ddm = PETSC_NULL;
-  ierr = DMlibMeshParseDecompositionDescriptor_Private(dm,ddesc,&dtype,&dcount,&dsizes,&dlists); CHKERRQ(ierr);
-  if (dtype == DMLIBMESH_FIELD_DECOMPOSITION){
-    ierr = DMlibMeshCreateFieldDecompositionDM(dm,dcount,dsizes,dlists,ddm); CHKERRQ(ierr);
-  }
-  else SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Unexpected unknown decomposition type for field decomposition descriptor %s", ddesc);
-  PetscFunctionReturn(0);
-}
-
-#undef __FUNCT__
-#define __FUNCT__ "DMCreateDomainDecompositionDM_libMesh"
-static PetscErrorCode  DMCreateDomainDecompositionDM_libMesh(DM dm, const char * ddesc, DM * ddm)
-{
-  PetscFunctionBegin;
-  PetscErrorCode ierr;
-  PetscInt dtype, dcount;
-  PetscInt * dsizes;
-  char *** dlists;
-  PetscFunctionBegin;
-  *ddm = PETSC_NULL;
-  ierr = DMlibMeshParseDecompositionDescriptor_Private(dm,ddesc,&dtype,&dcount,&dsizes,&dlists); CHKERRQ(ierr);
-  if (dtype == DMLIBMESH_DOMAIN_DECOMPOSITION) {
-    ierr = DMlibMeshCreateDomainDecompositionDM(dm,dcount,dsizes,dlists,ddm); CHKERRQ(ierr);
-  }
-  else SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Unexpected unknown decomposition type for domain decomposition descriptor %s", ddesc);
-  PetscFunctionReturn(0);
-}
-
-#endif
-
 
 #undef __FUNCT__
 #define __FUNCT__ "DMlibMeshFunction"
@@ -837,7 +641,6 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   PetscFunctionReturn(0);
 }
 
-#if !PETSC_RELEASE_LESS_THAN(3,3,1)
 #undef __FUNCT__
 #define __FUNCT__ "SNESFunction_DMlibMesh"
 static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void * ctx)
@@ -848,18 +651,11 @@ static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void * ctx)
   ierr = DMlibMeshFunction(dm,x,r);CHKERRQ(ierr);
   PetscFunctionReturn(0);
 }
-#endif
 
 
 #undef __FUNCT__
 #define __FUNCT__ "DMlibMeshJacobian"
-static PetscErrorCode DMlibMeshJacobian(
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                        DM dm, Vec x, Mat jac, Mat pc, MatStructure * msflag
-#else
-                                        DM dm, Vec x, Mat jac, Mat pc
-#endif
-                                        )
+static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
@@ -915,34 +711,19 @@ static PetscErrorCode DMlibMeshJacobian(
   the_pc.close();
   Jac.close();
   X_global.close();
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  *msflag = SAME_NONZERO_PATTERN;
-#endif
   PetscFunctionReturn(0);
 }
 
-#if !PETSC_RELEASE_LESS_THAN(3,3,1)
 #undef  __FUNCT__
 #define __FUNCT__ "SNESJacobian_DMlibMesh"
-static PetscErrorCode SNESJacobian_DMlibMesh(
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                             SNES, Vec x, Mat * jac, Mat * pc, MatStructure * flag, void * ctx
-#else
-                                             SNES, Vec x, Mat jac, Mat pc, void * ctx
-#endif
-                                             )
+static PetscErrorCode SNESJacobian_DMlibMesh(SNES, Vec x, Mat jac, Mat pc, void * ctx)
 {
   DM dm = (DM)ctx;
   PetscErrorCode ierr;
   PetscFunctionBegin;
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  ierr = DMlibMeshJacobian(dm,x,*jac,*pc,flag); CHKERRQ(ierr);
-#else
   ierr = DMlibMeshJacobian(dm,x,jac,pc); CHKERRQ(ierr);
-#endif
   PetscFunctionReturn(0);
 }
-#endif
 
 #undef __FUNCT__
 #define __FUNCT__ "DMVariableBounds_libMesh"
@@ -955,15 +736,10 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
   PetscVector<Number> XL(xl, sys.comm());
   PetscVector<Number> XU(xu, sys.comm());
   PetscFunctionBegin;
-#if PETSC_VERSION_LESS_THAN(3,5,0) && PETSC_VERSION_RELEASE
-  ierr = VecSet(xl, SNES_VI_NINF);CHKERRQ(ierr);
-  ierr = VecSet(xu, SNES_VI_INF);CHKERRQ(ierr);
-#else
   // Workaround for nonstandard Q suffix warning with quad precision
   const PetscReal petsc_inf = std::numeric_limits<PetscReal>::max() / 4;
   ierr = VecSet(xl, -petsc_inf);CHKERRQ(ierr);
   ierr = VecSet(xu, petsc_inf);CHKERRQ(ierr);
-#endif
   if (sys.nonlinear_solver->bounds != nullptr)
     sys.nonlinear_solver->bounds(XL,XU,sys);
   else if (sys.nonlinear_solver->bounds_object != nullptr)
@@ -1018,11 +794,7 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
 
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateMatrix_libMesh"
-#if PETSC_VERSION_LT(3,5,0)
-static PetscErrorCode DMCreateMatrix_libMesh(DM dm, const MatType, Mat * A)
-#else
-  static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat * A)
-#endif
+static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat * A)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
@@ -1122,13 +894,8 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
     Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that.
   */
   if (!dlm->embedding) {
-#if PETSC_RELEASE_LESS_THAN(3,3,1)
-    ierr = DMSetFunction(dm, DMlibMeshFunction); CHKERRQ(ierr);
-    ierr = DMSetJacobian(dm, DMlibMeshJacobian); CHKERRQ(ierr);
-#else
     ierr = DMSNESSetFunction(dm, SNESFunction_DMlibMesh, (void *)dm); CHKERRQ(ierr);
     ierr = DMSNESSetJacobian(dm, SNESJacobian_DMlibMesh, (void *)dm); CHKERRQ(ierr);
-#endif
     if (dlm->sys->nonlinear_solver->bounds || dlm->sys->nonlinear_solver->bounds_object)
       ierr = DMSetVariableBounds(dm, DMVariableBounds_libMesh); CHKERRQ(ierr);
   }
@@ -1174,11 +941,7 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
 
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  ierr = PetscNewLog(dm,DM_libMesh,&dlm);CHKERRQ(ierr);
-#else
   ierr = PetscNewLog(dm,&dlm);CHKERRQ(ierr);
-#endif
   dm->data = dlm;
 
   /* DMlibMesh impl */
@@ -1210,10 +973,6 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
 #endif
 
 
-#if PETSC_RELEASE_LESS_THAN(3,3,1)
-  dm->ops->createfielddecompositiondm  = DMCreateFieldDecompositionDM_libMesh;
-  dm->ops->createdomaindecompositiondm = DMCreateDomainDecompositionDM_libMesh;
-#endif
   dm->ops->createfielddecomposition    = DMCreateFieldDecomposition_libMesh;
   dm->ops->createdomaindecomposition   = DMCreateDomainDecomposition_libMesh;
 
@@ -1223,17 +982,11 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
   dm->ops->setup              = DMSetUp_libMesh;
 
   /* DMlibMesh API */
-#if PETSC_RELEASE_LESS_THAN(3,4,0)
-  ierr = PetscObjectComposeFunction((PetscObject)dm,"DMlibMeshSetSystem_C",PETSC_NULL,(PetscVoidFunction)DMlibMeshSetSystem_libMesh);CHKERRQ(ierr);
-  ierr = PetscObjectComposeFunction((PetscObject)dm,"DMlibMeshGetSystem_C",PETSC_NULL,(PetscVoidFunction)DMlibMeshGetSystem_libMesh);CHKERRQ(ierr);
-#else
   ierr = PetscObjectComposeFunction((PetscObject)dm,"DMlibMeshSetSystem_C",DMlibMeshSetSystem_libMesh);CHKERRQ(ierr);
   ierr = PetscObjectComposeFunction((PetscObject)dm,"DMlibMeshGetSystem_C",DMlibMeshGetSystem_libMesh);CHKERRQ(ierr);
-#endif
 
   PetscFunctionReturn(0);
 }
 EXTERN_C_END
 
-
-#endif // #if !PETSC_VERSION_LESS_THAN(3,3,0)
+#endif // LIBMESH_HAVE_PETSC
