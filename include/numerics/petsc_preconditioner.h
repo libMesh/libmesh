@@ -111,13 +111,7 @@ private:
    * so that it can be called from set_petsc_preconditioner_type().  Not sure
    * why set_petsc_preconditioner_type() needs to be static though...
    */
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-  // In Petsc 2.3.3, PCType was #define'd as const char *
-  static void set_petsc_subpreconditioner_type(PCType type, PC & pc);
-#else
-  // In later versions, PCType is #define'd as char *, so we need the const
   static void set_petsc_subpreconditioner_type(const PCType type, PC & pc);
-#endif
 };
 
 
