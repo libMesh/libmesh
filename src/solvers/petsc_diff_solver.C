@@ -131,14 +131,8 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_diff_solver_jacobian (SNES,
                                         Vec x,
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                        Mat * libmesh_dbg_var(j),
-                                        Mat * pc,
-                                        MatStructure * msflag,
-#else
                                         Mat libmesh_dbg_var(j),
                                         Mat pc,
-#endif
                                         void * ctx)
   {
     libmesh_assert(x);
@@ -157,11 +151,7 @@ extern "C"
       *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_input(x, sys.comm());
 
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-    PetscMatrix<Number> J_input(*pc, sys.comm());
-#else
     PetscMatrix<Number> J_input(pc, sys.comm());
-#endif
     PetscMatrix<Number> & J_system =
       *cast_ptr<PetscMatrix<Number> *>(sys.matrix);
 
@@ -186,9 +176,6 @@ extern "C"
     X_input.swap(X_system);
     J_input.swap(J_system);
 
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-    *msflag = SAME_NONZERO_PATTERN;
-#endif
     // No errors, we hope
     return 0;
   }
@@ -260,11 +247,7 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
       return DiffSolver::CONVERGED_ABSOLUTE_RESIDUAL;
     case SNES_CONVERGED_FNORM_RELATIVE:
       return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
-#if PETSC_VERSION_LESS_THAN(3,2,1)
-    case SNES_CONVERGED_PNORM_RELATIVE:
-#else
     case SNES_CONVERGED_SNORM_RELATIVE:
-#endif
       return DiffSolver::CONVERGED_RELATIVE_STEP;
     case SNES_CONVERGED_ITS:
       // SNES_CONVERGED_TR_DELTA was changed to a diverged condition,
@@ -277,19 +260,13 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
     case SNES_DIVERGED_FUNCTION_DOMAIN:
     case SNES_DIVERGED_FUNCTION_COUNT:
     case SNES_DIVERGED_FNORM_NAN:
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
     case SNES_DIVERGED_INNER:
-#endif
     case SNES_DIVERGED_LINEAR_SOLVE:
     case SNES_DIVERGED_LOCAL_MIN:
       return DiffSolver::DIVERGED_NO_REASON;
     case SNES_DIVERGED_MAX_IT:
       return DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
-#if PETSC_VERSION_LESS_THAN(3,2,0)
-    case SNES_DIVERGED_LS_FAILURE:
-#else
     case SNES_DIVERGED_LINE_SEARCH:
-#endif
       return DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
       // In PETSc, SNES_CONVERGED_ITERATING means
       // the solve is still iterating, but by the
