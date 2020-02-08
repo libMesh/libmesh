@@ -51,40 +51,30 @@
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
-#if PETSC_RELEASE_LESS_THAN(3,0,1)
   /**
    * This function is called by PETSc to initialize the preconditioner.
    * ctx will hold the Preconditioner.
    */
-  PetscErrorCode libmesh_petsc_preconditioner_setup (void * ctx);
+  PetscErrorCode libmesh_petsc_preconditioner_setup (PC);
 
   /**
    * This function is called by PETSc to actually apply the preconditioner.
    * ctx will hold the Preconditioner.
    */
-  PetscErrorCode libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y);
-#else
-  PetscErrorCode libmesh_petsc_preconditioner_setup (PC);
   PetscErrorCode libmesh_petsc_preconditioner_apply(PC, Vec x, Vec y);
-#endif
 
 #if LIBMESH_ENABLE_DEPRECATED
-#if PETSC_RELEASE_LESS_THAN(3,0,1)
   /**
    * This function is called by PETSc to initialize the preconditioner.
    * ctx will hold the Preconditioner.
    */
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx);
+  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC);
 
   /**
    * This function is called by PETSc to actually apply the preconditioner.
    * ctx will hold the Preconditioner.
    */
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y);
-#else
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC);
   PetscErrorCode __libmesh_petsc_preconditioner_apply(PC, Vec x, Vec y);
-#endif
 #endif
 } // end extern "C"
 
@@ -358,19 +348,9 @@ PetscLinearSolver<T>::_restrict_solve_to_is_local_size() const
 
 template <typename T>
 void
-PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-                                             // unnamed to avoid compiler "unused parameter" warning
-#else
-                                             vec_in
-#endif
-                                             )
+PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> & vec_in)
 {
   libmesh_assert(_restrict_solve_to_is);
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-  // No ISComplement in PETSc 2.3.3
-  libmesh_not_implemented();
-#else
   if (_restrict_solve_to_is_complement==nullptr)
     {
       int ierr = ISComplement(_restrict_solve_to_is,
@@ -379,7 +359,6 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
                               &_restrict_solve_to_is_complement);
       LIBMESH_CHKERR(ierr);
     }
-#endif
 }
 
 

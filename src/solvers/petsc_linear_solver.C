@@ -45,32 +45,6 @@ namespace libMesh
 
 extern "C"
 {
-#if PETSC_RELEASE_LESS_THAN(3,0,1)
-  PetscErrorCode libmesh_petsc_preconditioner_setup (void * ctx)
-  {
-    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
-
-    if (!preconditioner->initialized())
-      libmesh_error_msg("Preconditioner not initialized!  Make sure you call init() before solve!");
-
-    preconditioner->setup();
-
-    return 0;
-  }
-
-
-  PetscErrorCode libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y)
-  {
-    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
-
-    PetscVector<Number> x_vec(x, preconditioner->comm());
-    PetscVector<Number> y_vec(y, preconditioner->comm());
-
-    preconditioner->apply(x_vec,y_vec);
-
-    return 0;
-  }
-#else
   PetscErrorCode libmesh_petsc_preconditioner_setup (PC pc)
   {
     void * ctx;
@@ -98,23 +72,8 @@ extern "C"
 
     return 0;
   }
-#endif
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
-#if PETSC_RELEASE_LESS_THAN(3,0,1)
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
-  {
-    libmesh_deprecated();
-    return libmesh_petsc_preconditioner_setup(ctx);
-  }
-
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y)
-  {
-    libmesh_deprecated();
-    return libmesh_petsc_preconditioner_apply(ctx, x, y);
-  }
-
-#else
   PetscErrorCode __libmesh_petsc_preconditioner_setup (PC pc)
   {
     libmesh_deprecated();
@@ -126,7 +85,6 @@ extern "C"
     libmesh_deprecated();
     return libmesh_petsc_preconditioner_apply(pc, x, y);
   }
-#endif
 #endif
 } // end extern "C"
 
@@ -241,12 +199,7 @@ void PetscLinearSolver<T>::init (const char * name)
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
       // preonly, which complains if asked to use initial guesses.
-#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_RELEASE_LESS_THAN(3,4,0)
-      // Pre-3.0 and petsc-dev (as of October 2012) use non-const versions
       KSPType ksp_type;
-#else
-      const KSPType ksp_type;
-#endif
 
       ierr = KSPGetType (_ksp, &ksp_type);
       LIBMESH_CHKERR(ierr);
@@ -311,11 +264,7 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
       LIBMESH_CHKERR(ierr);
 
       // Set operators. The input matrix works as the preconditioning matrix
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat(),DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat());
-#endif
       LIBMESH_CHKERR(ierr);
 
       // Set user-specified  solver and preconditioner types
@@ -346,11 +295,7 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
       // preonly, which complains if asked to use initial guesses.
-#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_RELEASE_LESS_THAN(3,4,0)
       KSPType ksp_type;
-#else
-      const KSPType ksp_type;
-#endif
 
       ierr = KSPGetType (_ksp, &ksp_type);
       LIBMESH_CHKERR(ierr);
@@ -509,9 +454,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
                                     _restrict_solve_to_is,
                                     _restrict_solve_to_is,
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-                                    PETSC_DECIDE,
-#endif
                                     MAT_INITIAL_MATRIX,
                                     &submat);
       LIBMESH_CHKERR(ierr);
@@ -519,9 +461,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       ierr = LibMeshCreateSubMatrix(precond->mat(),
                                     _restrict_solve_to_is,
                                     _restrict_solve_to_is,
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-                                    PETSC_DECIDE,
-#endif
                                     MAT_INITIAL_MATRIX,
                                     &subprecond);
       LIBMESH_CHKERR(ierr);
@@ -561,9 +500,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           ierr = LibMeshCreateSubMatrix(matrix->mat(),
                                         _restrict_solve_to_is,
                                         _restrict_solve_to_is_complement,
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-                                        PETSC_DECIDE,
-#endif
                                         MAT_INITIAL_MATRIX,
                                         &submat1);
           LIBMESH_CHKERR(ierr);
@@ -578,15 +514,10 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           ierr = MatDestroy(&submat1);
           LIBMESH_CHKERR(ierr);
         }
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, submat, subprecond,
-                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, submat, subprecond);
 
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
       ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-#endif
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -598,15 +529,10 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
     }
   else
     {
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat());
 
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
       ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-#endif
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -776,9 +702,6 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
                                     _restrict_solve_to_is,
                                     _restrict_solve_to_is,
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-                                    PETSC_DECIDE,
-#endif
                                     MAT_INITIAL_MATRIX,
                                     &submat);
       LIBMESH_CHKERR(ierr);
@@ -786,9 +709,6 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       ierr = LibMeshCreateSubMatrix(precond->mat(),
                                     _restrict_solve_to_is,
                                     _restrict_solve_to_is,
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-                                    PETSC_DECIDE,
-#endif
                                     MAT_INITIAL_MATRIX,
                                     &subprecond);
       LIBMESH_CHKERR(ierr);
@@ -828,9 +748,6 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
           ierr = LibMeshCreateSubMatrix(matrix->mat(),
                                         _restrict_solve_to_is,
                                         _restrict_solve_to_is_complement,
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-                                        PETSC_DECIDE,
-#endif
                                         MAT_INITIAL_MATRIX,
                                         &submat1);
           LIBMESH_CHKERR(ierr);
@@ -845,15 +762,10 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
           ierr = MatDestroy(&submat1);
           LIBMESH_CHKERR(ierr);
         }
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, submat, subprecond,
-                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, submat, subprecond);
 
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
       ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-#endif
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -865,15 +777,10 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
     }
   else
     {
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat());
 
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
       ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-#endif
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -973,15 +880,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                              const double tol,
                              const unsigned int m_its)
 {
-
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-  if (_restrict_solve_to_is != nullptr)
-    libmesh_error_msg("The current implementation of subset solves with " \
-                      << "shell matrices requires PETSc version 3.1 or above.  " \
-                      << "Older PETSc version do not support automatic " \
-                      << "submatrix generation of shell matrices.");
-#endif
-
   LOG_SCOPE("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
@@ -1058,14 +956,12 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecScatterEnd(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
       LIBMESH_CHKERR(ierr);
 
-#if !PETSC_VERSION_LESS_THAN(3,1,0)
       ierr = LibMeshCreateSubMatrix(mat,
                                     _restrict_solve_to_is,
                                     _restrict_solve_to_is,
                                     MAT_INITIAL_MATRIX,
                                     &submat);
       LIBMESH_CHKERR(ierr);
-#endif
 
       /* Since removing columns of the matrix changes the equation
          system, we will now change the right hand side to compensate
@@ -1099,14 +995,12 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecScale(subvec1,-1.0);
           LIBMESH_CHKERR(ierr);
 
-#if !PETSC_VERSION_LESS_THAN(3,1,0)
           ierr = LibMeshCreateSubMatrix(mat,
                                         _restrict_solve_to_is,
                                         _restrict_solve_to_is_complement,
                                         MAT_INITIAL_MATRIX,
                                         &submat1);
           LIBMESH_CHKERR(ierr);
-#endif
 
           // The following lines would be correct, but don't work
           // correctly in PETSc up to 3.1.0-p5.  See discussion in
@@ -1136,22 +1030,12 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = MatDestroy(&submat1);
           LIBMESH_CHKERR(ierr);
         }
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, submat, submat,
-                             DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, submat, submat);
-#endif
       LIBMESH_CHKERR(ierr);
     }
   else
     {
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, mat, mat,
-                             DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, mat, mat);
-#endif
       LIBMESH_CHKERR(ierr);
     }
 
@@ -1241,15 +1125,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                              const double tol,
                              const unsigned int m_its)
 {
-
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-  if (_restrict_solve_to_is != nullptr)
-    libmesh_error_msg("The current implementation of subset solves with " \
-                      << "shell matrices requires PETSc version 3.1 or above.  " \
-                      << "Older PETSc version do not support automatic " \
-                      << "submatrix generation of shell matrices.");
-#endif
-
   LOG_SCOPE("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
@@ -1329,7 +1204,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecScatterEnd(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
       LIBMESH_CHKERR(ierr);
 
-#if !PETSC_VERSION_LESS_THAN(3,1,0)
       ierr = LibMeshCreateSubMatrix(mat,
                                     _restrict_solve_to_is,
                                     _restrict_solve_to_is,
@@ -1343,7 +1217,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                                     MAT_INITIAL_MATRIX,
                                     &subprecond);
       LIBMESH_CHKERR(ierr);
-#endif
 
       /* Since removing columns of the matrix changes the equation
          system, we will now change the right hand side to compensate
@@ -1376,14 +1249,12 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecScale(subvec1,-1.0);
           LIBMESH_CHKERR(ierr);
 
-#if !PETSC_VERSION_LESS_THAN(3,1,0)
           ierr = LibMeshCreateSubMatrix(mat,
                                         _restrict_solve_to_is,
                                         _restrict_solve_to_is_complement,
                                         MAT_INITIAL_MATRIX,
                                         &submat1);
           LIBMESH_CHKERR(ierr);
-#endif
 
           // The following lines would be correct, but don't work
           // correctly in PETSc up to 3.1.0-p5.  See discussion in
@@ -1415,12 +1286,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           LIBMESH_CHKERR(ierr);
         }
 
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, submat, subprecond,
-                             DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, submat, subprecond);
-#endif
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -1432,12 +1298,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
     }
   else
     {
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat(),
-                             DIFFERENT_NONZERO_PATTERN);
-#else
       ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
-#endif
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -1661,16 +1522,9 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
       return;
 
     case CHEBYSHEV:
-#if defined(LIBMESH_HAVE_PETSC) && PETSC_VERSION_LESS_THAN(3,3,0)
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCHEBYCHEV));
-      LIBMESH_CHKERR(ierr);
-      return;
-#else
       ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCHEBYSHEV));
       LIBMESH_CHKERR(ierr);
       return;
-#endif
-
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Solver: "
@@ -1689,10 +1543,8 @@ LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason() const
 
   switch(reason)
     {
-#if !PETSC_VERSION_LESS_THAN(3,2,0)
     case KSP_CONVERGED_RTOL_NORMAL     : return CONVERGED_RTOL_NORMAL;
     case KSP_CONVERGED_ATOL_NORMAL     : return CONVERGED_ATOL_NORMAL;
-#endif
     case KSP_CONVERGED_RTOL            : return CONVERGED_RTOL;
     case KSP_CONVERGED_ATOL            : return CONVERGED_ATOL;
     case KSP_CONVERGED_ITS             : return CONVERGED_ITS;
@@ -1707,11 +1559,7 @@ LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason() const
     case KSP_DIVERGED_BREAKDOWN_BICG   : return DIVERGED_BREAKDOWN_BICG;
     case KSP_DIVERGED_NONSYMMETRIC     : return DIVERGED_NONSYMMETRIC;
     case KSP_DIVERGED_INDEFINITE_PC    : return DIVERGED_INDEFINITE_PC;
-#if PETSC_VERSION_LESS_THAN(3,4,0)
-    case KSP_DIVERGED_NAN              : return DIVERGED_NAN;
-#else
     case KSP_DIVERGED_NANORINF         : return DIVERGED_NAN;
-#endif
     case KSP_DIVERGED_INDEFINITE_MAT   : return DIVERGED_INDEFINITE_MAT;
     case KSP_CONVERGED_ITERATING       : return CONVERGED_ITERATING;
 #if !PETSC_VERSION_LESS_THAN(3,7,0)
