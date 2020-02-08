@@ -279,17 +279,6 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & v_in,
 }
 
 
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-template <typename T>
-void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> &,
-                                                     const SparseMatrix<T> &)
-{
-  libmesh_error_msg("MatMultHermitianTranspose was introduced in PETSc 3.1.0," \
-                    << "No one has made it backwards compatible with older " \
-                    << "versions of PETSc so far.");
-}
-
-#else
 
 template <typename T>
 void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_in,
@@ -321,7 +310,7 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_
   // Add the temporary copy to the matvec result
   this->add(1., *this_clone);
 }
-#endif
+
 
 
 template <typename T>
@@ -1403,13 +1392,6 @@ void PetscVector<T>::_get_array(bool read_only) const
           PetscErrorCode ierr=0;
           if (this->type() != GHOSTED)
             {
-#if PETSC_VERSION_LESS_THAN(3,2,0)
-              // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
-              // have an older PETSc than that, we'll do an ugly
-              // const_cast and call VecGetArray() instead.
-              ierr = VecGetArray(_vec, const_cast<PetscScalar **>(&_values));
-              _values_read_only = false;
-#else
               if (read_only)
                 {
                   ierr = VecGetArrayRead(_vec, &_read_only_values);
@@ -1420,7 +1402,6 @@ void PetscVector<T>::_get_array(bool read_only) const
                   ierr = VecGetArray(_vec, &_values);
                   _values_read_only = false;
                 }
-#endif
               LIBMESH_CHKERR(ierr);
               _local_size = this->local_size();
             }
@@ -1429,13 +1410,6 @@ void PetscVector<T>::_get_array(bool read_only) const
               ierr = VecGhostGetLocalForm (_vec,&_local_form);
               LIBMESH_CHKERR(ierr);
 
-#if PETSC_VERSION_LESS_THAN(3,2,0)
-              // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
-              // have an older PETSc than that, we'll do an ugly
-              // const_cast and call VecGetArray() instead.
-              ierr = VecGetArray(_local_form, const_cast<PetscScalar **>(&_values));
-              _values_read_only = false;
-#else
               if (read_only)
                 {
                   ierr = VecGetArrayRead(_local_form, &_read_only_values);
@@ -1446,7 +1420,6 @@ void PetscVector<T>::_get_array(bool read_only) const
                   ierr = VecGetArray(_local_form, &_values);
                   _values_read_only = false;
                 }
-#endif
               LIBMESH_CHKERR(ierr);
 
               PetscInt my_local_size = 0;
@@ -1498,34 +1471,21 @@ void PetscVector<T>::_restore_array() const
           PetscErrorCode ierr=0;
           if (this->type() != GHOSTED)
             {
-#if PETSC_VERSION_LESS_THAN(3,2,0)
-              // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
-              // have an older PETSc than that, we'll do an ugly
-              // const_cast and call VecRestoreArray() instead.
-              ierr = VecRestoreArray (_vec, const_cast<PetscScalar **>(&_values));
-#else
               if (_values_read_only)
                 ierr = VecRestoreArrayRead (_vec, &_read_only_values);
               else
                 ierr = VecRestoreArray (_vec, &_values);
-#endif
 
               LIBMESH_CHKERR(ierr);
               _values = nullptr;
             }
           else
             {
-#if PETSC_VERSION_LESS_THAN(3,2,0)
-              // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
-              // have an older PETSc than that, we'll do an ugly
-              // const_cast and call VecRestoreArray() instead.
-              ierr = VecRestoreArray (_local_form, const_cast<PetscScalar **>(&_values));
-#else
               if (_values_read_only)
                 ierr = VecRestoreArrayRead (_local_form, &_read_only_values);
               else
                 ierr = VecRestoreArray (_local_form, &_values);
-#endif
+
               LIBMESH_CHKERR(ierr);
               _values = nullptr;
               ierr = VecGhostRestoreLocalForm (_vec,&_local_form);
