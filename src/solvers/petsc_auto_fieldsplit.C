@@ -25,10 +25,6 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/system.h"
 
-#if !PETSC_VERSION_LESS_THAN(3,2,0)
-
-// C++ includes
-
 namespace {
 using namespace libMesh;
 
@@ -108,24 +104,4 @@ void petsc_auto_fieldsplit (PC my_pc,
 } // namespace libMesh
 
 
-#else  // #PETSC_VERSION < 3.2.0
-
-namespace libMesh
-{
-void petsc_auto_fieldsplit (PC /* my_pc */,
-                            const System & /* sys */)
-{
-  if (libMesh::on_command_line("--solver-variable-names"))
-    {
-      libmesh_do_once(
-                      libMesh::out << "WARNING: libMesh does not support setting field splits" <<
-                      std::endl << "with PETSc "
-                      << LIBMESH_DETECTED_PETSC_VERSION_MAJOR << '.'
-                      << LIBMESH_DETECTED_PETSC_VERSION_MINOR << '.'
-                      << LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR << std::endl;);
-    }
-}
-}
-
-#endif // #PETSC_VERSION > 3.2.0
 #endif // #ifdef LIBMESH_HAVE_PETSC
