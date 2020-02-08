@@ -329,7 +329,7 @@ public:
    *
    * \note This is generally not required in user-level code.
    *
-   * \note Don't do anything crazy like calling LibMeshVecDestroy() on
+   * \note Don't do anything crazy like calling VecDestroy() on
    * it, or very bad things will likely happen!
    */
   Vec vec () { libmesh_assert (_vec); return _vec; }
@@ -838,7 +838,7 @@ void PetscVector<T>::clear ()
     {
       PetscErrorCode ierr=0;
 
-      ierr = LibMeshVecDestroy(&_vec);
+      ierr = VecDestroy(&_vec);
       LIBMESH_CHKERR(ierr);
     }
 

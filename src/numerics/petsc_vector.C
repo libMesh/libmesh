@@ -687,10 +687,10 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   std::iota (idx.begin(), idx.end(), 0);
 
   // Create the index set & scatter object
-  ierr = ISCreateLibMesh(this->comm().get(), n, idx.data(), PETSC_USE_POINTER, &is);
+  ierr = ISCreateGeneral(this->comm().get(), n, idx.data(), PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = LibMeshVecScatterCreate(_vec,          is,
+  ierr = VecScatterCreate(_vec,          is,
                           v_local->_vec, is,
                           &scatter);
   LIBMESH_CHKERR(ierr);
@@ -705,10 +705,10 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   LIBMESH_CHKERR(ierr);
 
   // Clean up
-  ierr = LibMeshISDestroy (&is);
+  ierr = ISDestroy (&is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = LibMeshVecScatterDestroy(&scatter);
+  ierr = VecScatterDestroy(&scatter);
   LIBMESH_CHKERR(ierr);
 
   // Make sure ghost dofs are up to date
@@ -759,11 +759,11 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
 
   // Create the index set & scatter object
   PetscInt * idxptr = idx.empty() ? nullptr : idx.data();
-  ierr = ISCreateLibMesh(this->comm().get(), n_sl+this->local_size(),
+  ierr = ISCreateGeneral(this->comm().get(), n_sl+this->local_size(),
                          idxptr, PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = LibMeshVecScatterCreate(_vec,          is,
+  ierr = VecScatterCreate(_vec,          is,
                           v_local->_vec, is,
                           &scatter);
   LIBMESH_CHKERR(ierr);
@@ -779,10 +779,10 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
   LIBMESH_CHKERR(ierr);
 
   // Clean up
-  ierr = LibMeshISDestroy (&is);
+  ierr = ISDestroy (&is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = LibMeshVecScatterDestroy(&scatter);
+  ierr = VecScatterDestroy(&scatter);
   LIBMESH_CHKERR(ierr);
 
   // Make sure ghost dofs are up to date
@@ -810,13 +810,13 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   PetscInt * idxptr =
     indices.empty() ? nullptr : numeric_petsc_cast(indices.data());
   IS is;
-  ierr = ISCreateLibMesh(this->comm().get(), cast_int<PetscInt>(indices.size()), idxptr,
+  ierr = ISCreateGeneral(this->comm().get(), cast_int<PetscInt>(indices.size()), idxptr,
                          PETSC_USE_POINTER, &is);
   LIBMESH_CHKERR(ierr);
 
   // Create the VecScatter object. "PETSC_NULL" means "use the identity IS".
   VecScatter scatter;
-  ierr = LibMeshVecScatterCreate(_vec,
+  ierr = VecScatterCreate(_vec,
                           /*src is=*/is,
                           /*dest vec=*/dest,
                           /*dest is=*/PETSC_NULL,
@@ -847,13 +847,13 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   LIBMESH_CHKERR(ierr);
 
   // Clean up PETSc data structures.
-  ierr = LibMeshVecScatterDestroy(&scatter);
+  ierr = VecScatterDestroy(&scatter);
   LIBMESH_CHKERR(ierr);
 
-  ierr = LibMeshISDestroy (&is);
+  ierr = ISDestroy (&is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = LibMeshVecDestroy(&dest);
+  ierr = VecDestroy(&dest);
   LIBMESH_CHKERR(ierr);
 }
 
@@ -898,11 +898,11 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
     std::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
-    ierr = ISCreateLibMesh(this->comm().get(), my_local_size,
+    ierr = ISCreateGeneral(this->comm().get(), my_local_size,
                            my_local_size ? idx.data() : nullptr, PETSC_USE_POINTER, &is);
     LIBMESH_CHKERR(ierr);
 
-    ierr = LibMeshVecScatterCreate(_vec,              is,
+    ierr = VecScatterCreate(_vec,              is,
                             parallel_vec._vec, is,
                             &scatter);
     LIBMESH_CHKERR(ierr);
@@ -916,10 +916,10 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
     LIBMESH_CHKERR(ierr);
 
     // Clean up
-    ierr = LibMeshISDestroy (&is);
+    ierr = ISDestroy (&is);
     LIBMESH_CHKERR(ierr);
 
-    ierr = LibMeshVecScatterDestroy(&scatter);
+    ierr = VecScatterDestroy(&scatter);
     LIBMESH_CHKERR(ierr);
   }
 
@@ -1023,9 +1023,9 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
               LIBMESH_CHKERR(ierr);
             }
 
-          ierr = LibMeshVecScatterDestroy(&ctx);
+          ierr = VecScatterDestroy(&ctx);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshVecDestroy(&vout);
+          ierr = VecDestroy(&vout);
           LIBMESH_CHKERR(ierr);
 
         }
@@ -1262,7 +1262,7 @@ void PetscVector<T>::print_matlab (const std::string & name) const
   /**
    * Destroy the viewer.
    */
-  ierr = LibMeshPetscViewerDestroy (&petsc_viewer);
+  ierr = PetscViewerDestroy (&petsc_viewer);
   LIBMESH_CHKERR(ierr);
 }
 
@@ -1317,14 +1317,14 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
   std::iota (idx.begin(), idx.end(), 0);
 
   // Construct index sets
-  ierr = ISCreateLibMesh(this->comm().get(),
+  ierr = ISCreateGeneral(this->comm().get(),
                          cast_int<PetscInt>(rows.size()),
                          numeric_petsc_cast(rows.data()),
                          PETSC_USE_POINTER,
                          &parent_is);
   LIBMESH_CHKERR(ierr);
 
-  ierr = ISCreateLibMesh(this->comm().get(),
+  ierr = ISCreateGeneral(this->comm().get(),
                          cast_int<PetscInt>(rows.size()),
                          idx.data(),
                          PETSC_USE_POINTER,
@@ -1332,7 +1332,7 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
   LIBMESH_CHKERR(ierr);
 
   // Construct the scatter object
-  ierr = LibMeshVecScatterCreate(this->_vec,
+  ierr = VecScatterCreate(this->_vec,
                           parent_is,
                           petsc_subvector->_vec,
                           subvector_is,
@@ -1352,9 +1352,9 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
                        SCATTER_FORWARD); LIBMESH_CHKERR(ierr);
 
   // Clean up
-  ierr = LibMeshISDestroy(&parent_is);       LIBMESH_CHKERR(ierr);
-  ierr = LibMeshISDestroy(&subvector_is);    LIBMESH_CHKERR(ierr);
-  ierr = LibMeshVecScatterDestroy(&scatter); LIBMESH_CHKERR(ierr);
+  ierr = ISDestroy(&parent_is);       LIBMESH_CHKERR(ierr);
+  ierr = ISDestroy(&subvector_is);    LIBMESH_CHKERR(ierr);
+  ierr = VecScatterDestroy(&scatter); LIBMESH_CHKERR(ierr);
 }
 
 

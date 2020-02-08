@@ -155,14 +155,14 @@ void PetscLinearSolver<T>::clear ()
          be removed and the subset index set destroyed.  */
       if (_restrict_solve_to_is != nullptr)
         {
-          PetscErrorCode ierr = LibMeshISDestroy(&_restrict_solve_to_is);
+          PetscErrorCode ierr = ISDestroy(&_restrict_solve_to_is);
           LIBMESH_CHKERR(ierr);
           _restrict_solve_to_is = nullptr;
         }
 
       if (_restrict_solve_to_is_complement != nullptr)
         {
-          PetscErrorCode ierr = LibMeshISDestroy(&_restrict_solve_to_is_complement);
+          PetscErrorCode ierr = ISDestroy(&_restrict_solve_to_is_complement);
           LIBMESH_CHKERR(ierr);
           _restrict_solve_to_is_complement = nullptr;
         }
@@ -171,7 +171,7 @@ void PetscLinearSolver<T>::clear ()
 
       PetscErrorCode ierr=0;
 
-      ierr = LibMeshKSPDestroy(&_ksp);
+      ierr = KSPDestroy(&_ksp);
       LIBMESH_CHKERR(ierr);
 
       // Mimic PETSc default solver and preconditioner
@@ -419,7 +419,7 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const
       for (auto i : index_range(*dofs))
         petsc_dofs[i] = (*dofs)[i];
 
-      ierr = ISCreateLibMesh(this->comm().get(),
+      ierr = ISCreateGeneral(this->comm().get(),
                              cast_int<PetscInt>(dofs->size()),
                              petsc_dofs, PETSC_OWN_POINTER,
                              &_restrict_solve_to_is);
@@ -493,7 +493,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -547,7 +547,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
@@ -571,11 +571,11 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
           LIBMESH_CHKERR(ierr);
 
-          ierr = LibMeshVecScatterDestroy(&scatter1);
+          ierr = VecScatterDestroy(&scatter1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshVecDestroy(&subvec1);
+          ierr = VecDestroy(&subvec1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshMatDestroy(&submat1);
+          ierr = MatDestroy(&submat1);
           LIBMESH_CHKERR(ierr);
         }
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
@@ -679,7 +679,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterDestroy(&scatter);
+      ierr = VecScatterDestroy(&scatter);
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -690,13 +690,13 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           this->_preconditioner->init();
         }
 
-      ierr = LibMeshVecDestroy(&subsolution);
+      ierr = VecDestroy(&subsolution);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshVecDestroy(&subrhs);
+      ierr = VecDestroy(&subrhs);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshMatDestroy(&submat);
+      ierr = MatDestroy(&submat);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshMatDestroy(&subprecond);
+      ierr = MatDestroy(&subprecond);
       LIBMESH_CHKERR(ierr);
     }
 
@@ -760,7 +760,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -814,7 +814,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
@@ -838,11 +838,11 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
           ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
           LIBMESH_CHKERR(ierr);
 
-          ierr = LibMeshVecScatterDestroy(&scatter1);
+          ierr = VecScatterDestroy(&scatter1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshVecDestroy(&subvec1);
+          ierr = VecDestroy(&subvec1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshMatDestroy(&submat1);
+          ierr = MatDestroy(&submat1);
           LIBMESH_CHKERR(ierr);
         }
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
@@ -939,7 +939,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterDestroy(&scatter);
+      ierr = VecScatterDestroy(&scatter);
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -950,13 +950,13 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
           this->_preconditioner->init();
         }
 
-      ierr = LibMeshVecDestroy(&subsolution);
+      ierr = VecDestroy(&subsolution);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshVecDestroy(&subrhs);
+      ierr = VecDestroy(&subrhs);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshMatDestroy(&submat);
+      ierr = MatDestroy(&submat);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshMatDestroy(&subprecond);
+      ierr = MatDestroy(&subprecond);
       LIBMESH_CHKERR(ierr);
     }
 
@@ -1045,7 +1045,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -1088,7 +1088,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
@@ -1129,11 +1129,11 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           LIBMESH_CHKERR(ierr);
           ierr = VecAXPY(subrhs,1.0,subvec2);
 
-          ierr = LibMeshVecScatterDestroy(&scatter1);
+          ierr = VecScatterDestroy(&scatter1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshVecDestroy(&subvec1);
+          ierr = VecDestroy(&subvec1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshMatDestroy(&submat1);
+          ierr = MatDestroy(&submat1);
           LIBMESH_CHKERR(ierr);
         }
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
@@ -1211,19 +1211,19 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterDestroy(&scatter);
+      ierr = VecScatterDestroy(&scatter);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecDestroy(&subsolution);
+      ierr = VecDestroy(&subsolution);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshVecDestroy(&subrhs);
+      ierr = VecDestroy(&subrhs);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshMatDestroy(&submat);
+      ierr = MatDestroy(&submat);
       LIBMESH_CHKERR(ierr);
     }
 
   // Destroy the matrix.
-  ierr = LibMeshMatDestroy(&mat);
+  ierr = MatDestroy(&mat);
   LIBMESH_CHKERR(ierr);
 
   // return the # of its. and the final residual norm.
@@ -1316,7 +1316,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
+      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs, nullptr, &scatter);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
@@ -1365,7 +1365,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecSetFromOptions(subvec1);
           LIBMESH_CHKERR(ierr);
 
-          ierr = LibMeshVecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
+          ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
           LIBMESH_CHKERR(ierr);
 
           ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
@@ -1407,11 +1407,11 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecAXPY(subrhs,1.0,subvec2);
           LIBMESH_CHKERR(ierr);
 
-          ierr = LibMeshVecScatterDestroy(&scatter1);
+          ierr = VecScatterDestroy(&scatter1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshVecDestroy(&subvec1);
+          ierr = VecDestroy(&subvec1);
           LIBMESH_CHKERR(ierr);
-          ierr = LibMeshMatDestroy(&submat1);
+          ierr = MatDestroy(&submat1);
           LIBMESH_CHKERR(ierr);
         }
 
@@ -1503,7 +1503,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshVecScatterDestroy(&scatter);
+      ierr = VecScatterDestroy(&scatter);
       LIBMESH_CHKERR(ierr);
 
       if (this->_preconditioner)
@@ -1514,18 +1514,18 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           this->_preconditioner->init();
         }
 
-      ierr = LibMeshVecDestroy(&subsolution);
+      ierr = VecDestroy(&subsolution);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshVecDestroy(&subrhs);
+      ierr = VecDestroy(&subrhs);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshMatDestroy(&submat);
+      ierr = MatDestroy(&submat);
       LIBMESH_CHKERR(ierr);
-      ierr = LibMeshMatDestroy(&subprecond);
+      ierr = MatDestroy(&subprecond);
       LIBMESH_CHKERR(ierr);
     }
 
   // Destroy the matrix.
-  ierr = LibMeshMatDestroy(&mat);
+  ierr = MatDestroy(&mat);
   LIBMESH_CHKERR(ierr);
 
   // return the # of its. and the final residual norm.

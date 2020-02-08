@@ -224,7 +224,7 @@ void PetscDiffSolver::clear()
 {
   LOG_SCOPE("clear()", "PetscDiffSolver");
 
-  int ierr = LibMeshSNESDestroy(&_snes);
+  int ierr = SNESDestroy(&_snes);
   LIBMESH_CHKERR(ierr);
 
 #if !PETSC_VERSION_LESS_THAN(3,7,3)

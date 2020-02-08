@@ -572,7 +572,7 @@ void PetscNonlinearSolver<T>::clear ()
 
       PetscErrorCode ierr=0;
 
-      ierr = LibMeshSNESDestroy(&_snes);
+      ierr = SNESDestroy(&_snes);
       LIBMESH_CHKERR(ierr);
 
       // Reset the nonlinear iteration counter.  This information is only relevant

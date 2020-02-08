@@ -65,7 +65,7 @@ void PetscPreconditioner<T>::init ()
       // Should probably use PCReset(), but it's not working at the moment so we'll destroy instead
       if (_pc)
         {
-          int ierr = LibMeshPCDestroy(&_pc);
+          int ierr = PCDestroy(&_pc);
           LIBMESH_CHKERR(ierr);
         }
 
@@ -103,7 +103,7 @@ void PetscPreconditioner<T>::clear()
 {
   if (_pc)
     {
-      int ierr = LibMeshPCDestroy(&_pc);
+      int ierr = PCDestroy(&_pc);
       LIBMESH_CHKERR(ierr);
     }
 }

@@ -69,47 +69,23 @@
 #endif
 #include <libmesh/restore_warnings.h>
 
-#if PETSC_RELEASE_LESS_THAN(3,1,1)
-typedef PetscTruth PetscBool;
-#endif
-
-#if PETSC_RELEASE_LESS_THAN(3,1,1)
-#  define LibMeshVecDestroy(x)         VecDestroy(*(x))
-#  define LibMeshVecScatterDestroy(x)  VecScatterDestroy(*(x))
-#  define LibMeshMatDestroy(x)         MatDestroy(*(x))
-#  define LibMeshISDestroy(x)          ISDestroy(*(x))
-#  define LibMeshKSPDestroy(x)         KSPDestroy(*(x))
-#  define LibMeshSNESDestroy(x)        SNESDestroy(*(x))
-#  define LibMeshPetscViewerDestroy(x) PetscViewerDestroy(*(x))
-#  define LibMeshPCDestroy(x)          PCDestroy(*(x))
-#else
-#  define LibMeshVecDestroy(x)         VecDestroy(x)
-#  define LibMeshVecScatterDestroy(x)  VecScatterDestroy(x)
-#  define LibMeshMatDestroy(x)         MatDestroy(x)
-#  define LibMeshISDestroy(x)          ISDestroy(x)
-#  define LibMeshKSPDestroy(x)         KSPDestroy(x)
-#  define LibMeshSNESDestroy(x)        SNESDestroy(x)
-#  define LibMeshPetscViewerDestroy(x) PetscViewerDestroy(x)
-#  define LibMeshPCDestroy(x)          PCDestroy(x)
-#endif
+// These macros are still around for backwards compatibility, but we
+// no longer use them within the library.
+#define LibMeshVecDestroy(x)         VecDestroy(x)
+#define LibMeshVecScatterDestroy(x)  VecScatterDestroy(x)
+#define LibMeshMatDestroy(x)         MatDestroy(x)
+#define LibMeshISDestroy(x)          ISDestroy(x)
+#define LibMeshKSPDestroy(x)         KSPDestroy(x)
+#define LibMeshSNESDestroy(x)        SNESDestroy(x)
+#define LibMeshPetscViewerDestroy(x) PetscViewerDestroy(x)
+#define LibMeshPCDestroy(x)          PCDestroy(x)
 
 // PETSc devs temporarily considered adding VecScatterCreateWithData, but
 // it was dropped in PETSc-130e142e39 and never made it into any release.
 // We will keep the ifdef for backwards compatibility in case anyone wrote
 // code directly using it, but that should be pretty unlikely.
 #define LibMeshVecScatterCreate(xin,ix,yin,iy,newctx)  VecScatterCreate(xin,ix,yin,iy,newctx)
-
-#if PETSC_RELEASE_LESS_THAN(3,1,1)
-typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;
-#  define ISCreateLibMesh(comm,n,idx,mode,is)           \
-  ((mode) == PETSC_USE_POINTER                          \
-   ? ISCreateGeneralWithArray((comm),(n),(idx),(is))    \
-   : ((mode) == PETSC_OWN_POINTER                       \
-      ? ISCreateGeneralNC((comm),(n),(idx),(is))        \
-      : ISCreateGeneral((comm),(n),(idx),(is))))
-#else
-#  define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
-#endif
+#define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 
 // As of release 3.8.0, MatGetSubMatrix was renamed to MatCreateSubMatrix.
 #if PETSC_RELEASE_LESS_THAN(3,8,0)
