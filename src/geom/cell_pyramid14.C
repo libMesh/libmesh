@@ -161,7 +161,7 @@ dof_id_type Pyramid14::key (const unsigned int s) const
 
 
 
-unsigned int Pyramid14::which_node_am_i(unsigned int side,
+unsigned int Pyramid14::local_side_node(unsigned int side,
                                         unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

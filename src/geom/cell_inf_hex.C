@@ -87,7 +87,7 @@ dof_id_type InfHex::key (const unsigned int s) const
 
 
 
-unsigned int InfHex::which_node_am_i(unsigned int side,
+unsigned int InfHex::local_side_node(unsigned int side,
                                      unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

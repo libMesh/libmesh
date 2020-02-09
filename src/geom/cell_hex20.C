@@ -190,7 +190,7 @@ void Hex20::build_side_ptr (std::unique_ptr<Elem> & side,
 
 
 
-unsigned int Hex20::which_node_am_i(unsigned int side,
+unsigned int Hex20::local_side_node(unsigned int side,
                                     unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

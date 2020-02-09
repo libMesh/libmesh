@@ -141,7 +141,7 @@ public:
   /**
    * \returns \p InfHex8::side_nodes_map[side][side_node] after doing some range checking.
    */
-  virtual unsigned int which_node_am_i(unsigned int side,
+  virtual unsigned int local_side_node(unsigned int side,
                                        unsigned int side_node) const override;
 
   /**

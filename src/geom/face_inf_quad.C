@@ -61,7 +61,7 @@ dof_id_type InfQuad::key (const unsigned int s) const
 
 
 
-unsigned int InfQuad::which_node_am_i(unsigned int side,
+unsigned int InfQuad::local_side_node(unsigned int side,
                                       unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

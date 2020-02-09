@@ -188,7 +188,7 @@ dof_id_type Prism18::key (const unsigned int s) const
 
 
 
-unsigned int Prism18::which_node_am_i(unsigned int side,
+unsigned int Prism18::local_side_node(unsigned int side,
                                       unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

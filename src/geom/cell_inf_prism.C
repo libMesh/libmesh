@@ -84,7 +84,7 @@ dof_id_type InfPrism::key (const unsigned int s) const
 
 
 
-unsigned int InfPrism::which_node_am_i(unsigned int side,
+unsigned int InfPrism::local_side_node(unsigned int side,
                                        unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

@@ -1986,7 +1986,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
               //
               // TODO: This should also be given by e.g.:
               // Hex8::edge_nodes_map[edge_id][n]. Note: we have something
-              // like this for sides, Elem::which_node_am_i(), but nothing
+              // like this for sides, Elem::local_side_node(), but nothing
               // equivalent for edges.
               const Elem * parent = mesh.elem_ptr(elem_id);
               for (auto pn : parent->node_index_range())

@@ -408,14 +408,20 @@ public:
    * \returns The local node id for node \p side_node on side \p side of
    * this Elem. Simply relies on the \p side_nodes_map for each of the
    * derived types. For example,
-   * Tri3::which_node_am_i(0, 0) -> 0
-   * Tri3::which_node_am_i(0, 1) -> 1
-   * Tri3::which_node_am_i(1, 0) -> 1
-   * Tri3::which_node_am_i(1, 1) -> 2
+   * Tri3::local_side_node(0, 0) -> 0
+   * Tri3::local_side_node(0, 1) -> 1
+   * Tri3::local_side_node(1, 0) -> 1
+   * Tri3::local_side_node(1, 1) -> 2
    * etc...
    */
-  virtual unsigned int which_node_am_i(unsigned int side,
+  virtual unsigned int local_side_node(unsigned int side,
                                        unsigned int side_node) const = 0;
+
+  /**
+   * This function is deprecated, call local_side_node(side, side_node) instead.
+   */
+  unsigned int which_node_am_i(unsigned int side,
+                               unsigned int side_node) const;
 
   /**
    * \returns \p true if a vertex of \p e is contained

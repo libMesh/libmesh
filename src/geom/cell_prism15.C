@@ -149,7 +149,7 @@ Order Prism15::default_order() const
 
 
 
-unsigned int Prism15::which_node_am_i(unsigned int side,
+unsigned int Prism15::local_side_node(unsigned int side,
                                       unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

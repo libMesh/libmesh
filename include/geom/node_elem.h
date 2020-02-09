@@ -117,9 +117,9 @@ public:
   /**
    * NodeElems don't have sides, so they can't have nodes on sides.
    */
-  virtual unsigned int which_node_am_i(unsigned int /*side*/,
+  virtual unsigned int local_side_node(unsigned int /*side*/,
                                        unsigned int /*side_node*/) const override
-  { libmesh_error_msg("Calling NodeElem::which_node_am_i() does not make sense."); return 0; }
+  { libmesh_error_msg("Calling NodeElem::local_side_node() does not make sense."); return 0; }
 
   /**
    * The \p Elem::side_ptr() member makes no sense for nodes.

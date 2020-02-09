@@ -136,7 +136,7 @@ public:
   /**
    * \returns \p side after doing some range checking. \p side_node is ignored.
    */
-  virtual unsigned int which_node_am_i(unsigned int side,
+  virtual unsigned int local_side_node(unsigned int side,
                                        unsigned int /*side_node*/) const override final;
 
   /**

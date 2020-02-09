@@ -117,7 +117,7 @@ Order InfPrism12::default_order() const
   return SECOND;
 }
 
-unsigned int InfPrism12::which_node_am_i(unsigned int side,
+unsigned int InfPrism12::local_side_node(unsigned int side,
                                          unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

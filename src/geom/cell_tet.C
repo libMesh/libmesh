@@ -62,7 +62,7 @@ dof_id_type Tet::key (const unsigned int s) const
 
 
 
-unsigned int Tet::which_node_am_i(unsigned int side,
+unsigned int Tet::local_side_node(unsigned int side,
                                   unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
