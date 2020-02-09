@@ -140,6 +140,12 @@ public:
                                        unsigned int side_node) const override;
 
   /**
+   * \returns InfPrism6::edge_nodes_map[edge][edge_node] after doing some range checking.
+   */
+  virtual unsigned int local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const override;
+
+  /**
    * \returns A primitive (3-noded) tri or (4-noded) infquad for
    * face i.
    */

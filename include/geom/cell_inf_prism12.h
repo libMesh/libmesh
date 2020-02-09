@@ -134,6 +134,12 @@ public:
                                        unsigned int side_node) const override;
 
   /**
+   * \returns \p InfPrism12::edge_nodes_map[edge][edge_node] after doing some range checking.
+   */
+  virtual unsigned int local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const override;
+
+  /**
    * \returns A \p TRI6 built coincident with face 0, or an \p
    * INFQUAD6 built coincident with faces 1 to 3.
    *

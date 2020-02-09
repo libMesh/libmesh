@@ -418,6 +418,16 @@ public:
                                        unsigned int side_node) const = 0;
 
   /**
+   * Similar to Elem::local_side_node(), but instead of a side id, takes
+   * an edge id and a node id on that edge and returns a local node number
+   * for the Elem. The implementation relies on the "edge_nodes_map" tables
+   * for 3D elements. For 2D elements, calls local_side_node(). Throws an
+   * error if called on 1D elements.
+   */
+  virtual unsigned int local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const = 0;
+
+  /**
    * This function is deprecated, call local_side_node(side, side_node) instead.
    */
   unsigned int which_node_am_i(unsigned int side,

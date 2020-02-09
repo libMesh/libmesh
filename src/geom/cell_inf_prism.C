@@ -90,12 +90,23 @@ unsigned int InfPrism::local_side_node(unsigned int side,
   libmesh_assert_less (side, this->n_sides());
 
   // Never more than 4 nodes per side.
-  libmesh_assert_less(side_node, 4);
+  libmesh_assert_less(side_node, InfPrism6::nodes_per_side);
 
   // Some sides have 3 nodes.
   libmesh_assert(side != 0 || side_node < 3);
 
   return InfPrism6::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int InfPrism::local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const
+{
+  libmesh_assert_less(edge, this->n_edges());
+  libmesh_assert_less(edge_node, InfPrism6::nodes_per_edge);
+
+  return InfPrism6::edge_nodes_map[edge][edge_node];
 }
 
 

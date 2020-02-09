@@ -137,6 +137,12 @@ public:
                                        unsigned int side_node) const override;
 
   /**
+   * \returns \p Hex8::edge_nodes_map[edge][edge_node] after doing some range checking.
+   */
+  virtual unsigned int local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const override;
+
+  /**
    * \returns A primitive (4-noded) quad for face i.
    */
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;

@@ -229,6 +229,17 @@ unsigned int Hex27::local_side_node(unsigned int side,
 
 
 
+unsigned int Hex27::local_edge_node(unsigned int edge,
+                                    unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+  libmesh_assert_less (edge_node, Hex27::nodes_per_edge);
+
+  return Hex27::edge_nodes_map[edge][edge_node];
+}
+
+
+
 std::unique_ptr<Elem> Hex27::build_side_ptr (const unsigned int i,
                                              bool proxy)
 {

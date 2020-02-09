@@ -152,12 +152,28 @@ unsigned int InfHex18::local_side_node(unsigned int side,
   libmesh_assert_less (side, this->n_sides());
 
   // Never more than 9 nodes per side.
-  libmesh_assert_less (side_node, 9);
+  libmesh_assert_less (side_node, InfHex18::nodes_per_side);
 
   // Some sides have 6 nodes.
   libmesh_assert(side == 0 || side_node < 6);
 
   return InfHex18::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int InfHex18::local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+
+  // Never more than 3 nodes per edge.
+  libmesh_assert_less (edge_node, InfHex18::nodes_per_edge);
+
+  // Some edges only have 2 nodes.
+  libmesh_assert(edge < 4 || edge_node < 2);
+
+  return InfHex18::edge_nodes_map[edge][edge_node];
 }
 
 

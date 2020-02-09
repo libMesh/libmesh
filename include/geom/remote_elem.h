@@ -98,6 +98,10 @@ public:
                                        unsigned int /*side_node*/) const override
   { libmesh_not_implemented(); return 0; }
 
+  virtual unsigned int local_edge_node(unsigned int /*side*/,
+                                       unsigned int /*side_node*/) const override
+  { libmesh_not_implemented(); return 0; }
+
   virtual bool is_remote () const override
   { return true; }
 

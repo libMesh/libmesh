@@ -148,6 +148,12 @@ public:
                                        unsigned int side_node) const override;
 
   /**
+   * \returns \p Pyramid13::edge_nodes_map[edge][edge_node] after doing some range checking.
+   */
+  virtual unsigned int local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const override;
+
+  /**
    * Builds a \p QUAD8 or \p TRI6 coincident with face i.
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */

@@ -33,6 +33,15 @@ unsigned int Edge::local_side_node(unsigned int side,
 
 
 
+unsigned int Edge::local_edge_node(unsigned int /*edge*/,
+                                   unsigned int /*edge_node*/) const
+{
+  libmesh_error_msg("Calling Edge::local_edge_node() does not make sense.");
+  return 0;
+}
+
+
+
 std::unique_ptr<Elem> Edge::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, 2);

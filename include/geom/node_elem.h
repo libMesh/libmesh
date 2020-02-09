@@ -122,6 +122,13 @@ public:
   { libmesh_error_msg("Calling NodeElem::local_side_node() does not make sense."); return 0; }
 
   /**
+   * NodeElems don't have edges, so they can't have nodes on edges.
+   */
+  virtual unsigned int local_edge_node(unsigned int /*edge*/,
+                                       unsigned int /*edge_node*/) const override
+  { libmesh_error_msg("Calling NodeElem::local_edge_node() does not make sense."); return 0; }
+
+  /**
    * The \p Elem::side_ptr() member makes no sense for nodes.
    */
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int) override

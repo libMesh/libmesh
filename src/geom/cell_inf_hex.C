@@ -91,9 +91,20 @@ unsigned int InfHex::local_side_node(unsigned int side,
                                      unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 4);
+  libmesh_assert_less (side_node, InfHex8::nodes_per_side);
 
   return InfHex8::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int InfHex::local_edge_node(unsigned int edge,
+                                     unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+  libmesh_assert_less (edge_node, InfHex8::nodes_per_edge);
+
+  return InfHex8::edge_nodes_map[edge][edge_node];
 }
 
 

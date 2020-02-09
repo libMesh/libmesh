@@ -72,6 +72,14 @@ unsigned int InfQuad::local_side_node(unsigned int side,
 
 
 
+unsigned int InfQuad::local_edge_node(unsigned int edge,
+                                      unsigned int edge_node) const
+{
+  return local_side_node(edge, edge_node);
+}
+
+
+
 std::unique_ptr<Elem> InfQuad::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());

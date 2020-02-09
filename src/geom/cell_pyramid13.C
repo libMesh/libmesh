@@ -151,6 +151,17 @@ unsigned int Pyramid13::local_side_node(unsigned int side,
 
 
 
+unsigned int Pyramid13::local_edge_node(unsigned int edge,
+                                        unsigned int edge_node) const
+{
+  libmesh_assert_less(edge, this->n_edges());
+  libmesh_assert_less(edge_node, Pyramid13::nodes_per_edge);
+
+  return Pyramid13::edge_nodes_map[edge][edge_node];
+}
+
+
+
 std::unique_ptr<Elem> Pyramid13::build_side_ptr (const unsigned int i, bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());

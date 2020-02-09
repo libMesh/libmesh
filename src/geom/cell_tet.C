@@ -66,11 +66,21 @@ unsigned int Tet::local_side_node(unsigned int side,
                                   unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 3);
+  libmesh_assert_less (side_node, Tet4::nodes_per_side);
 
   return Tet4::side_nodes_map[side][side_node];
 }
 
+
+
+unsigned int Tet::local_edge_node(unsigned int edge,
+                                  unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+  libmesh_assert_less (edge_node, Tet4::nodes_per_edge);
+
+  return Tet4::edge_nodes_map[edge][edge_node];
+}
 
 
 std::unique_ptr<Elem> Tet::side_ptr (const unsigned int i)

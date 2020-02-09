@@ -165,6 +165,17 @@ unsigned int Prism15::local_side_node(unsigned int side,
 
 
 
+unsigned int Prism15::local_edge_node(unsigned int edge,
+                                      unsigned int edge_node) const
+{
+  libmesh_assert_less(edge, this->n_edges());
+  libmesh_assert_less(edge_node, Prism15::nodes_per_edge);
+
+  return Prism15::edge_nodes_map[edge][edge_node];
+}
+
+
+
 std::unique_ptr<Elem> Prism15::build_side_ptr (const unsigned int i,
                                                bool proxy)
 {

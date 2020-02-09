@@ -201,6 +201,17 @@ unsigned int Hex20::local_side_node(unsigned int side,
 
 
 
+unsigned int Hex20::local_edge_node(unsigned int edge,
+                                    unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+  libmesh_assert_less (edge_node, Hex20::nodes_per_edge);
+
+  return Hex20::edge_nodes_map[edge][edge_node];
+}
+
+
+
 std::unique_ptr<Elem> Hex20::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());

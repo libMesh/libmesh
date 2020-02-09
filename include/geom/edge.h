@@ -140,6 +140,13 @@ public:
                                        unsigned int /*side_node*/) const override final;
 
   /**
+   * Throws an error. Edge elems have n_edges() == 0, so it does not
+   * make sense to call local_edge_node().
+   */
+  virtual unsigned int local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const override final;
+
+  /**
    * \returns A pointer to a NodeElem for the specified node.
    */
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
