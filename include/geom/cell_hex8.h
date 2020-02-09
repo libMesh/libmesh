@@ -59,11 +59,14 @@ template <typename RealType = Real>
 class Hex8Templ final : public HexTempl<RealType>
 {
 public:
+  typedef RealType real_type;
+  typedef HexTempl<RealType> Hex;
   typedef Hex8Templ<RealType> Hex8;
   typedef Quad4Templ<RealType> Quad4;
   typedef Edge2Templ<RealType> Edge2;
   typedef ElemTempl<RealType> Elem;
   typedef PointTempl<RealType> Point;
+  typedef NodeTempl<RealType> Node;
   typedef BoundingBoxTempl<RealType> BoundingBox;
 
   /**

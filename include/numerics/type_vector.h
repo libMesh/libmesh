@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/raw_value.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -444,9 +445,6 @@ protected:
    */
   T _coords[LIBMESH_DIM];
 };
-
-
-
 
 
 //------------------------------------------------------

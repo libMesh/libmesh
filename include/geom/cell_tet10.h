@@ -62,6 +62,7 @@ template <typename RealType = Real>
 class Tet10Templ final : public TetTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef Tet10Templ<RealType> Tet10;
   typedef TetTempl<RealType> Tet;
   typedef CellTempl<RealType> Cell;

@@ -56,6 +56,7 @@ template <typename RealType = Real>
 class Tet4Templ final : public TetTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef Tet4Templ<RealType> Tet4;
   typedef TetTempl<RealType> Tet;
   typedef CellTempl<RealType> Cell;
@@ -209,7 +210,7 @@ public:
    * bad for interpolation, but they can affect the stiffness matrix
    * condition number.
    */
-  std::pair<Real, Real> min_and_max_angle() const;
+  std::pair<RealType, RealType> min_and_max_angle() const;
 
   /**
    * Don't hide Tet::key(side) defined in the base class.

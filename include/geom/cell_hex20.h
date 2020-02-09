@@ -71,6 +71,7 @@ template <typename RealType = Real>
 class Hex20Templ final : public HexTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef Hex20Templ<RealType> Hex20;
   typedef Quad8Templ<RealType> Quad8;
   typedef Edge3Templ<RealType> Edge3;

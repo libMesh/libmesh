@@ -152,12 +152,12 @@ std::unique_ptr<ElemTempl<RealType>> Prism15Templ<RealType>::build_side_ptr (con
         {
         case 0:  // the triangular face at z=-1
         case 4:
-          return libmesh_make_unique<Side<Tri6Templ<Real>,Prism15>>(this,i);
+          return libmesh_make_unique<Side<Tri6Templ<RealType>,Prism15>>(this,i);
 
         case 1:
         case 2:
         case 3:
-          return libmesh_make_unique<Side<Quad8Templ<Real>,Prism15>>(this,i);
+          return libmesh_make_unique<Side<Quad8Templ<RealType>,Prism15>>(this,i);
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -248,7 +248,7 @@ std::unique_ptr<ElemTempl<RealType>> Prism15Templ<RealType>::build_edge_ptr (con
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return libmesh_make_unique<SideEdge<Edge3Templ<Real>,Prism15>>(this,i);
+  return libmesh_make_unique<SideEdge<Edge3Templ<RealType>,Prism15>>(this,i);
 }
 
 

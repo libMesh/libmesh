@@ -86,6 +86,20 @@ ScalarTraits_true(Real);
 template<typename T>
 struct ScalarTraits<std::complex<T>> { static const bool value = ScalarTraits<T>::value; };
 
+// List of classes for which instantiations of std::complex are defined, e.g. where
+// TensorTools::MakeNumber will always make sense
+template <typename T>
+struct RealTraits {
+  static const bool value = false;
+};
+
+#define RealTraits_true(type)                                   \
+  template<>                                                    \
+  struct RealTraits<type> { static const bool value = true; }
+
+RealTraits_true(float);
+RealTraits_true(double);
+RealTraits_true(long double);
 
 
 // Operators using different but compatible types need a return value

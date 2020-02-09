@@ -57,6 +57,7 @@ template <typename RealType>
 class Quad4Templ : public QuadTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef Quad4Templ<RealType> Quad4;
   typedef Edge2Templ<RealType> Edge2;
   typedef ElemTempl<RealType> Elem;

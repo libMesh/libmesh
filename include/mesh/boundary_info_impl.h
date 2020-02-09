@@ -313,7 +313,7 @@ void BoundaryInfoTempl<RealType>::sync (const std::set<boundary_id_type> & reque
   boundary_mesh.prepare_for_use(/*skip_renumber =*/ false);
 
   // and finally distribute element partitioning to the nodes
-  Partitioner::set_node_processor_ids(boundary_mesh);
+  PartitionerTempl<RealType>::set_node_processor_ids(boundary_mesh);
 }
 
 
@@ -342,7 +342,7 @@ void BoundaryInfoTempl<RealType>::get_side_and_node_maps (UnstructuredMesh & bou
       for (auto side : interior_parent->side_index_range())
         {
           interior_parent->build_side_ptr(interior_parent_side, side);
-          Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
+          RealType centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
 
           if (centroid_distance < (tolerance * boundary_elem->hmin()))
             {
@@ -554,7 +554,7 @@ void BoundaryInfoTempl<RealType>::add_elements(const std::set<boundary_id_type> 
             {
               // Might this interior side have a RemoteElem that
               // needs a corresponding Remote on a boundary side?
-              if (elem->neighbor_ptr(interior_side) != RemoteElem::get_instance())
+              if (elem->neighbor_ptr(interior_side) != RemoteElemTempl<RealType>::get_instance())
                 continue;
 
               // Which boundary side?
@@ -597,7 +597,7 @@ void BoundaryInfoTempl<RealType>::add_elements(const std::set<boundary_id_type> 
                     {
                       new_elem->set_neighbor
                         (boundary_side,
-                         const_cast<RemoteElem *>(RemoteElem::get_instance()));
+                         const_cast<RemoteElemTempl<RealType> *>(RemoteElemTempl<RealType>::get_instance()));
                       break;
                     }
                 }

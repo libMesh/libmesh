@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/type_vector.h"
+#include "libmesh/raw_value.h"
 
 // C++ includes
 
@@ -118,6 +119,36 @@ public:
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 };
 
+/**
+ * We don't have an Enable = void default template parameter to
+ * play around with for RawType, so we just gotta do distinct
+ * partial specializations
+ */
+template <>
+struct RawType<VectorValue<Real>>
+{
+  typedef const VectorValue<Real> & value_type;
+
+  static value_type value(const VectorValue<Real> & a) { return a; }
+};
+
+template <typename T>
+struct RawType<VectorValue<T>>
+{
+  typedef VectorValue<typename RawType<T>::value_type> value_type;
+
+  static value_type value(const VectorValue<T> & a)
+    {
+      return value_type(raw_value(a(0))
+#if LIBMESH_DIM > 1
+                        , raw_value(a(1))
+#endif
+#if LIBMESH_DIM > 2
+                        , raw_value(a(2))
+#endif
+        );
+    }
+};
 
 
 /**

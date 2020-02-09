@@ -30,9 +30,17 @@
 // sure none of its dependencies end up in that namespace
 #include <mpi.h>
 
+// Dummy namespace declaration
+namespace Metis
+{
+}
+
 // Include the ParMETIS header files.  We need this so we can use
 // ParMetis' idx_t and real_t types directly.
 namespace Parmetis {
+// Generally speaking we wrap metis in a namespace
+using namespace Metis;
+
 extern "C" {
 #     include "libmesh/ignore_warnings.h"
 #     include "parmetis.h"

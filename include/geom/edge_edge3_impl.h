@@ -171,23 +171,23 @@ RealType Edge3Templ<RealType>::volume () const
   Point A = this->point(0) + this->point(1) - 2*this->point(2);
   Point B = (this->point(1) - this->point(0))/2;
 
-  const Real a = A.norm_sq();
-  const Real c = B.norm_sq();
+  const RealType a = A.norm_sq();
+  const RealType c = B.norm_sq();
 
   // Degenerate straight line case
   if (a < TOLERANCE*TOLERANCE)
     return 2. * std::sqrt(c);
 
-  const Real b = 2.*(A*B);
-  const Real ba=b/a;
-  const Real ca=c/a;
+  const RealType b = 2.*(A*B);
+  const RealType ba=b/a;
+  const RealType ca=c/a;
 
   libmesh_assert (1.-ba+ca>0.);
 
-  const Real s1 = std::sqrt(1. - ba + ca);
-  const Real s2 = std::sqrt(1. + ba + ca);
+  const RealType s1 = std::sqrt(1. - ba + ca);
+  const RealType s2 = std::sqrt(1. + ba + ca);
 
-  Real log_term = (1. - 0.5*ba + s1) / (-1. - 0.5*ba + s2);
+  RealType log_term = (1. - 0.5*ba + s1) / (-1. - 0.5*ba + s2);
   libmesh_assert(!libmesh_isnan(log_term) && log_term > 0.);
 
   return 0.5*std::sqrt(a)*((1.-0.5*ba)*s1 +
@@ -208,8 +208,8 @@ BoundingBoxTempl<RealType> Edge3Templ<RealType>::loose_bounding_box () const
 
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
-      Real center = this->point(2)(d);
-      Real hd = std::max(std::abs(center - this->point(0)(d)),
+      RealType center = this->point(2)(d);
+      RealType hd = std::max(std::abs(center - this->point(0)(d)),
                          std::abs(center - this->point(1)(d)));
 
       pmin(d) = center - hd;

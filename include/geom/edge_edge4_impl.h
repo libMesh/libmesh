@@ -169,8 +169,8 @@ BoundingBoxTempl<RealType> Edge4Templ<RealType>::loose_bounding_box () const
 
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
-      Real center = (this->point(2)(d) + this->point(3)(d))/2;
-      Real hd = std::max(std::abs(center - this->point(0)(d)),
+      RealType center = (this->point(2)(d) + this->point(3)(d))/2;
+      RealType hd = std::max(std::abs(center - this->point(0)(d)),
                          std::abs(center - this->point(1)(d)));
 
       pmin(d) = center - hd;
@@ -223,7 +223,7 @@ RealType Edge4Templ<RealType>::volume () const
                      (18 + std::sqrt(30.)) / 36,
                      (18 - std::sqrt(30.)) / 36};
 
-  Real vol=0.;
+  RealType vol=0.;
   for (unsigned int i=0; i<N; ++i)
     vol += w[i] * (q[i]*q[i]*a1 + q[i]*b1 + c1).norm();
 

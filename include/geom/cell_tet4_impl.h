@@ -227,7 +227,7 @@ RealType Tet4Templ<RealType>::volume () const
 
 
 template <typename RealType>
-std::pair<Real, Real> Tet4Templ<RealType>::min_and_max_angle() const
+std::pair<RealType, RealType> Tet4Templ<RealType>::min_and_max_angle() const
 {
   Point n[4];
 
@@ -237,7 +237,7 @@ std::pair<Real, Real> Tet4Templ<RealType>::min_and_max_angle() const
   n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
   n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
 
-  Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
+  RealType dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
 
   // Compute dihedral angles
   for (unsigned int k=0,i=0; i<4; ++i)
@@ -268,18 +268,18 @@ bool Tet4Templ<RealType>::contains_point (const Point & p, Real tol) const
 {
   // See the response by Tony Noe on this thread.
   // http://bbs.dartmouth.edu/~fangq/MATH/download/source/Point_in_Tetrahedron.htm
-  Point
-    col1 = this->point(1) - this->point(0),
-    col2 = this->point(2) - this->point(0),
-    col3 = this->point(3) - this->point(0);
+  PointTempl<Real>
+    col1 = raw_value(this->point(1)) - raw_value(this->point(0)),
+    col2 = raw_value(this->point(2)) - raw_value(this->point(0)),
+    col3 = raw_value(this->point(3)) - raw_value(this->point(0));
 
-  Point r;
+  PointTempl<Real> r;
 
   libmesh_try
     {
       RealTensorValue(col1(0), col2(0), col3(0),
                       col1(1), col2(1), col3(1),
-                      col1(2), col2(2), col3(2)).solve(p - this->point(0), r);
+                      col1(2), col2(2), col3(2)).solve(raw_value(p) - raw_value(this->point(0)), r);
     }
   libmesh_catch (ConvergenceFailure &)
     {

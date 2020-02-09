@@ -41,6 +41,7 @@ template <typename RealType = Real>
 class Tri3SubdivisionTempl final : public Tri3Templ<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef Tri3SubdivisionTempl<RealType> Tri3Subdivision;
   typedef Tri3Templ<RealType> Tri3;
   typedef ElemTempl<RealType> Elem;

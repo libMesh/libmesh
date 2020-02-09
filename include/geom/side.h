@@ -30,6 +30,7 @@ namespace libMesh
 // Forward declarations
 template <typename> class PointTempl;
 template <typename> class NodeTempl;
+template <typename> class ElemTempl;
 
 /**
  * This defines the \p Side class.  A \p Side is basically a proxy
@@ -48,6 +49,11 @@ template <class SideType, class ParentType>
 class Side : public SideType
 {
 public:
+  typedef typename SideType::real_type RealType;
+  typedef RealType real_type;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef ElemTempl<RealType> Elem;
 
   /**
    * Constructor.  Creates a side from an element.
@@ -106,6 +112,11 @@ template <class EdgeType, class ParentType>
 class SideEdge : public EdgeType
 {
 public:
+  typedef typename EdgeType::real_type RealType;
+  typedef RealType real_type;
+  typedef NodeTempl<RealType> Node;
+  typedef PointTempl<RealType> Point;
+  typedef ElemTempl<RealType> Elem;
 
   /**
    * Constructor.  Creates a side from an element.

@@ -96,7 +96,7 @@ ReplicatedMeshTempl<RealType>::ReplicatedMeshTempl (const Parallel::Communicator
   // here in the constructor.
   this->_next_unique_id = 0;
 #endif
-  this->_partitioner = libmesh_make_unique<MetisPartitioner>();
+  this->_partitioner = libmesh_make_unique<MetisPartitionerTempl<RealType>>();
 }
 
 

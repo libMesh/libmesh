@@ -45,6 +45,7 @@ template <typename RealType = Real>
 class Edge4Templ final : public EdgeTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef Edge4Templ<RealType> Edge4;
   using typename EdgeTempl<RealType>::Edge;
   using typename EdgeTempl<RealType>::Elem;

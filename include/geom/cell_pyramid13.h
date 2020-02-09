@@ -69,6 +69,7 @@ template <typename RealType = Real>
 class Pyramid13Templ final : public PyramidTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef PyramidTempl<RealType> Pyramid;
   typedef Pyramid13Templ<RealType> Pyramid13;
   typedef Quad8Templ<RealType> Quad8;

@@ -20,18 +20,13 @@
 
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_HAVE_METAPHYSICL
-#include "metaphysicl/raw_type.h"
-#endif
-
 namespace libMesh
 {
 #ifdef LIBMESH_HAVE_METAPHYSICL
+#include "metaphysicl/raw_type.h"
 
-template <typename T>
-inline
-typename MetaPhysicL::RawType<T>::value_type
-raw_value(const T& a) { return MetaPhysicL::RawType<T>::value(a); }
+using MetaPhysicL::raw_value;
+using typename MetaPhysicL::RawType;
 
 #else
 

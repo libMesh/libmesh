@@ -77,6 +77,7 @@ template <typename RealType = Real>
 class Prism15Templ final : public PrismTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef PrismTempl<RealType> Prism;
   typedef Prism15Templ<RealType> Prism15;
   typedef Quad8Templ<RealType> Quad8;

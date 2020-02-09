@@ -56,7 +56,7 @@ DistributedMeshTempl<RealType>::DistributedMeshTempl (const Parallel::Communicat
 #endif
 
   // FIXME: give parmetis the communicator!
-  this->_partitioner = libmesh_make_unique<ParmetisPartitioner>();
+  this->_partitioner = libmesh_make_unique<ParmetisPartitionerTempl<RealType>>();
 }
 
 

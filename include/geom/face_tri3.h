@@ -59,6 +59,7 @@ template <typename RealType = Real>
 class Tri3Templ : public TriTempl<RealType>
 {
 public:
+  typedef RealType real_type;
   typedef Tri3Templ<RealType> Tri3;
   typedef TriTempl<RealType> Tri;
   typedef ElemTempl<RealType> Elem;
