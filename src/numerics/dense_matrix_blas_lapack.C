@@ -526,7 +526,6 @@ void DenseMatrix<T>::_svd_helper (char,
 
 
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
-#if !PETSC_VERSION_LESS_THAN(3,1,0)
 
 template<typename T>
 void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
@@ -683,17 +682,6 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
 
 #else
 
-template<typename T>
-void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & /*rhs*/,
-                                       DenseVector<T> & /*x*/,
-                                       Real /*rcond*/) const
-{
-  libmesh_error_msg("svd_solve() requires PETSc >= 3.1!");
-}
-
-#endif // !PETSC_VERSION_LESS_THAN(3,1,0)
-
-#else
 template<typename T>
 void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& /*rhs*/,
                                        DenseVector<T> & /*x*/,

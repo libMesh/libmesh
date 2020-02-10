@@ -329,7 +329,7 @@ public:
    *
    * \note This is generally not required in user-level code.
    *
-   * \note Don't do anything crazy like calling LibMeshVecDestroy() on
+   * \note Don't do anything crazy like calling VecDestroy() on
    * it, or very bad things will likely happen!
    */
   Vec vec () { libmesh_assert (_vec); return _vec; }
@@ -567,54 +567,35 @@ PetscVector<T>::PetscVector (Vec v,
   LIBMESH_CHKERR(ierr);
 
   // Get the vector type from PETSc.
-  // As of PETSc 3.0.0, the VecType #define lost its const-ness, so we
-  // need to have it in the code
-#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_VERSION_LESS_THAN(3,4,0)
-  // Pre-3.0 and petsc-dev (as of October 2012) use non-const versions
   VecType ptype;
-#else
-  const VecType ptype;
-#endif
   ierr = VecGetType(_vec, &ptype);
   LIBMESH_CHKERR(ierr);
 
   if ((std::strcmp(ptype,VECSHARED) == 0) || (std::strcmp(ptype,VECMPI) == 0))
     {
-#if PETSC_RELEASE_LESS_THAN(3,1,1)
-      ISLocalToGlobalMapping mapping = _vec->mapping;
-#else
       ISLocalToGlobalMapping mapping;
       ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
       LIBMESH_CHKERR(ierr);
-#endif
 
       // If is a sparsely stored vector, set up our new mapping
       if (mapping)
         {
           const numeric_index_type my_local_size = static_cast<numeric_index_type>(petsc_local_size);
           const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
-#if PETSC_RELEASE_LESS_THAN(3,4,0)
-          const numeric_index_type ghost_end = static_cast<numeric_index_type>(mapping->n);
-#else
           PetscInt n;
           ierr = ISLocalToGlobalMappingGetSize(mapping, &n);
           LIBMESH_CHKERR(ierr);
+
           const numeric_index_type ghost_end = static_cast<numeric_index_type>(n);
-#endif
-#if PETSC_RELEASE_LESS_THAN(3,1,1)
-          const PetscInt * indices = mapping->indices;
-#else
           const PetscInt * indices;
           ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
           LIBMESH_CHKERR(ierr);
-#endif
+
           for (numeric_index_type i=ghost_begin; i<ghost_end; i++)
             _global_to_local_map[indices[i]] = i-my_local_size;
           this->_type = GHOSTED;
-#if !PETSC_RELEASE_LESS_THAN(3,1,1)
           ierr = ISLocalToGlobalMappingRestoreIndices(mapping, &indices);
           LIBMESH_CHKERR(ierr);
-#endif
         }
       else
         this->_type = PARALLEL;
@@ -857,7 +838,7 @@ void PetscVector<T>::clear ()
     {
       PetscErrorCode ierr=0;
 
-      ierr = LibMeshVecDestroy(&_vec);
+      ierr = VecDestroy(&_vec);
       LIBMESH_CHKERR(ierr);
     }
 

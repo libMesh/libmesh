@@ -275,7 +275,7 @@ public:
    *
    * \note This is generally not required in user-level code.
    *
-   * \note Don't do anything crazy like calling LibMeshMatDestroy() on
+   * \note Don't do anything crazy like calling MatDestroy() on
    * it, or very bad things will likely happen!
    */
   Mat mat () { libmesh_assert (_mat); return _mat; }

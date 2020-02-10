@@ -22,8 +22,6 @@
 // developer-facing only?)
 
 #include "libmesh/petsc_macro.h"
-// This only works with petsc-3.3 and above.
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
 
 #ifdef I
 # define LIBMESH_SAW_I
@@ -51,5 +49,4 @@ EXTERN_C_BEGIN
 PETSC_EXTERN PetscErrorCode DMCreate_libMesh(DM);
 EXTERN_C_END
 
-#endif // #if !PETSC_VERSION_LESS_THAN(3,3,0)
 #endif // #ifdef PETSCDMLIBEMSH_H

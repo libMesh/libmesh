@@ -32,19 +32,6 @@
 #include "libmesh/parallel.h"
 
 
-// For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earlier.
-// For example:
-// [0]PETSC ERROR: --------------------- Error Message ------------------------------------
-// [0]PETSC ERROR: Nonconforming object sizes!
-// [0]PETSC ERROR: Attempt to set block size 3 with BAIJ 1!
-// [0]PETSC ERROR: ------------------------------------------------------------------------
-// so as a cowardly workaround disable the functionality in this translation unit for older PETSc's
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-#  undef LIBMESH_ENABLE_BLOCKED_STORAGE
-#endif
-
-
-
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
 
 namespace
@@ -210,11 +197,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
     }
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR);
-#else
   ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-#endif
   LIBMESH_CHKERR(ierr);
 
   // Is prefix information available somewhere? Perhaps pass in the system name?
@@ -336,11 +319,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
     }
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR);
-#else
   ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-#endif
   LIBMESH_CHKERR(ierr);
 
   // Is prefix information available somewhere? Perhaps pass in the system name?
@@ -465,11 +444,7 @@ void PetscMatrix<T>::init (const ParallelType)
     }
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR);
-#else
   ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-#endif
   LIBMESH_CHKERR(ierr);
 
   // Is prefix information available somewhere? Perhaps pass in the system name?
@@ -533,13 +508,6 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 
   PetscErrorCode ierr=0;
 
-#if PETSC_RELEASE_LESS_THAN(3,1,1)
-  if (!rows.empty())
-    ierr = MatZeroRows(_mat, rows.size(),
-                       numeric_petsc_cast(rows.data()), diag_value);
-  else
-    ierr = MatZeroRows(_mat, 0, NULL, diag_value);
-#else
   // As of petsc-dev at the time of 3.1.0, MatZeroRows now takes two additional
   // optional arguments.  The optional arguments (x,b) can be used to specify the
   // solutions for the zeroed rows (x) and right hand side (b) to update.
@@ -549,9 +517,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
                        numeric_petsc_cast(rows.data()), PS(diag_value),
                        NULL, NULL);
   else
-    ierr = MatZeroRows(_mat, 0, NULL, PS(diag_value), NULL,
-                       NULL);
-#endif
+    ierr = MatZeroRows(_mat, 0, NULL, PS(diag_value), NULL, NULL);
 
   LIBMESH_CHKERR(ierr);
 }
@@ -565,7 +531,7 @@ void PetscMatrix<T>::clear ()
     {
       semiparallel_only();
 
-      ierr = LibMeshMatDestroy (&_mat);
+      ierr = MatDestroy (&_mat);
       LIBMESH_CHKERR(ierr);
 
       this->_is_initialized = false;
@@ -691,7 +657,7 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
   /**
    * Destroy the viewer.
    */
-  ierr = LibMeshPetscViewerDestroy (&petsc_viewer);
+  ierr = PetscViewerDestroy (&petsc_viewer);
   LIBMESH_CHKERR(ierr);
 }
 
@@ -903,13 +869,13 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
   PetscErrorCode ierr=0;
   IS isrow, iscol;
 
-  ierr = ISCreateLibMesh(this->comm().get(),
+  ierr = ISCreateGeneral(this->comm().get(),
                          cast_int<PetscInt>(rows.size()),
                          numeric_petsc_cast(rows.data()),
                          PETSC_USE_POINTER,
                          &isrow); LIBMESH_CHKERR(ierr);
 
-  ierr = ISCreateLibMesh(this->comm().get(),
+  ierr = ISCreateGeneral(this->comm().get(),
                          cast_int<PetscInt>(cols.size()),
                          numeric_petsc_cast(cols.data()),
                          PETSC_USE_POINTER,
@@ -919,9 +885,6 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
   ierr = LibMeshCreateSubMatrix(_mat,
                                 isrow,
                                 iscol,
-#if PETSC_RELEASE_LESS_THAN(3,0,1)
-                                PETSC_DECIDE,
-#endif
                                 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
                                 &(petsc_submatrix->_mat));  LIBMESH_CHKERR(ierr);
 
@@ -930,8 +893,8 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
   petsc_submatrix->close();
 
   // Clean up PETSc data structures
-  ierr = LibMeshISDestroy(&isrow); LIBMESH_CHKERR(ierr);
-  ierr = LibMeshISDestroy(&iscol); LIBMESH_CHKERR(ierr);
+  ierr = ISDestroy(&isrow); LIBMESH_CHKERR(ierr);
+  ierr = ISDestroy(&iscol); LIBMESH_CHKERR(ierr);
 }
 
 
@@ -961,13 +924,6 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
     dest.clear();
 
   PetscErrorCode ierr;
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-  if (&petsc_dest == this)
-    ierr = MatTranspose(_mat,NULL);
-  else
-    ierr = MatTranspose(_mat,&petsc_dest._mat);
-  LIBMESH_CHKERR(ierr);
-#else
   if (&petsc_dest == this)
     // The MAT_REUSE_MATRIX flag was replaced by MAT_INPLACE_MATRIX
     // in PETSc 3.7.0
@@ -979,7 +935,6 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
   else
     ierr = MatTranspose(_mat,MAT_INITIAL_MATRIX,&petsc_dest._mat);
   LIBMESH_CHKERR(ierr);
-#endif
 
   // Specify that the transposed matrix is initialized and close it.
   petsc_dest._is_initialized = true;

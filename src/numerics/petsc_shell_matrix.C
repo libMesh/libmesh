@@ -62,7 +62,7 @@ void PetscShellMatrix<T>::clear ()
 
   if ((this->initialized()))
     {
-      ierr = LibMeshMatDestroy (&_mat);
+      ierr = MatDestroy (&_mat);
       LIBMESH_CHKERR(ierr);
 
       this->_is_initialized = false;
