@@ -1969,38 +1969,25 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // objects here.
       for (auto n : edge->node_index_range())
         {
-          dof_id_type libmesh_node_id = edge->node_ptr(n)->id();
-
           // We look up Exodus node numbers differently if we are
           // writing a discontinuous Exodus file.
           int exodus_node_id = -1;
 
           if (!use_discontinuous)
-            exodus_node_id = libmesh_map_find
-              (libmesh_node_num_to_exodus, cast_int<int>(libmesh_node_id));
+            {
+              dof_id_type libmesh_node_id = edge->node_ptr(n)->id();
+              exodus_node_id = libmesh_map_find
+                (libmesh_node_num_to_exodus, cast_int<int>(libmesh_node_id));
+            }
           else
             {
-              // Find the node on the "parent" element containing this edge
-              // which matches libmesh_node_id. Then use that id to look up
+              // Get the node on the element containing this edge
+              // which corresponds to edge node n. Then use that id to look up
               // the exodus_node_id in the discontinuous_node_indices map.
-              //
-              // TODO: This should also be given by e.g.:
-              // Hex8::edge_nodes_map[edge_id][n]. Note: we have something
-              // like this for sides, Elem::which_node_am_i(), but nothing
-              // equivalent for edges.
-              const Elem * parent = mesh.elem_ptr(elem_id);
-              for (auto pn : parent->node_index_range())
-                if (parent->node_ptr(pn)->id() == libmesh_node_id)
-                  {
-                    exodus_node_id = libmesh_map_find
-                      (discontinuous_node_indices,
-                       std::make_pair(elem_id, pn));
-                    break;
-                  }
+              unsigned int pn = mesh.elem_ptr(elem_id)->local_edge_node(edge_id, n);
+              exodus_node_id = libmesh_map_find
+                (discontinuous_node_indices, std::make_pair(elem_id, pn));
             }
-
-          if (exodus_node_id == -1)
-            libmesh_error_msg("Unable to map edge's libMesh node id to its Exodus node id.");
 
           conn.push_back(exodus_node_id);
         }

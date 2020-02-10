@@ -135,7 +135,7 @@ Order Pyramid13::default_order() const
 
 
 
-unsigned int Pyramid13::which_node_am_i(unsigned int side,
+unsigned int Pyramid13::local_side_node(unsigned int side,
                                         unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
@@ -147,6 +147,17 @@ unsigned int Pyramid13::which_node_am_i(unsigned int side,
   libmesh_assert(side == 4 || side_node < 6);
 
   return Pyramid13::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Pyramid13::local_edge_node(unsigned int edge,
+                                        unsigned int edge_node) const
+{
+  libmesh_assert_less(edge, this->n_edges());
+  libmesh_assert_less(edge_node, Pyramid13::nodes_per_edge);
+
+  return Pyramid13::edge_nodes_map[edge][edge_node];
 }
 
 

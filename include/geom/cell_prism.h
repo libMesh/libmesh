@@ -125,8 +125,14 @@ public:
   /**
    * \returns \p Prism6::side_nodes_map[side][side_node] after doing some range checking.
    */
-  virtual unsigned int which_node_am_i(unsigned int side,
+  virtual unsigned int local_side_node(unsigned int side,
                                        unsigned int side_node) const override;
+
+  /**
+   * \returns \p Prism6::edge_nodes_map[edge][edge_node] after doing some range checking.
+   */
+  virtual unsigned int local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const override;
 
   /**
    * \returns A primitive triangle or quad for face i.

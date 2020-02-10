@@ -203,7 +203,7 @@ dof_id_type Quad8::key (const unsigned int s) const
 
 
 
-unsigned int Quad8::which_node_am_i(unsigned int side,
+unsigned int Quad8::local_side_node(unsigned int side,
                                     unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

@@ -58,13 +58,21 @@ dof_id_type Tri::key (const unsigned int s) const
 
 
 
-unsigned int Tri::which_node_am_i(unsigned int side,
+unsigned int Tri::local_side_node(unsigned int side,
                                   unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 2);
+  libmesh_assert_less (side_node, Tri3::nodes_per_side);
 
   return Tri3::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Tri::local_edge_node(unsigned int edge,
+                                  unsigned int edge_node) const
+{
+  return local_side_node(edge, edge_node);
 }
 
 

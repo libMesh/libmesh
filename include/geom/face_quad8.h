@@ -142,7 +142,7 @@ public:
   /**
    * \returns \p Quad8::side_nodes_map[side][side_node] after doing some range checking.
    */
-  virtual unsigned int which_node_am_i(unsigned int side,
+  virtual unsigned int local_side_node(unsigned int side,
                                        unsigned int side_node) const override;
 
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,

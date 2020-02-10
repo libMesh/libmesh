@@ -85,13 +85,24 @@ dof_id_type Hex::key (const unsigned int s) const
 
 
 
-unsigned int Hex::which_node_am_i(unsigned int side,
+unsigned int Hex::local_side_node(unsigned int side,
                                   unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 4);
+  libmesh_assert_less (side_node, Hex8::nodes_per_side);
 
   return Hex8::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Hex::local_edge_node(unsigned int edge,
+                                  unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+  libmesh_assert_less (edge_node, Hex8::nodes_per_edge);
+
+  return Hex8::edge_nodes_map[edge][edge_node];
 }
 
 

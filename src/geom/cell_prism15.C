@@ -149,7 +149,7 @@ Order Prism15::default_order() const
 
 
 
-unsigned int Prism15::which_node_am_i(unsigned int side,
+unsigned int Prism15::local_side_node(unsigned int side,
                                       unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
@@ -161,6 +161,17 @@ unsigned int Prism15::which_node_am_i(unsigned int side,
   libmesh_assert(!(side==0 || side==4) || side_node < 6);
 
   return Prism15::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Prism15::local_edge_node(unsigned int edge,
+                                      unsigned int edge_node) const
+{
+  libmesh_assert_less(edge, this->n_edges());
+  libmesh_assert_less(edge_node, Prism15::nodes_per_edge);
+
+  return Prism15::edge_nodes_map[edge][edge_node];
 }
 
 

@@ -24,11 +24,20 @@
 namespace libMesh
 {
 
-unsigned int Edge::which_node_am_i(unsigned int side,
+unsigned int Edge::local_side_node(unsigned int side,
                                    unsigned int /*side_node*/) const
 {
   libmesh_assert_less (side, this->n_sides());
   return side;
+}
+
+
+
+unsigned int Edge::local_edge_node(unsigned int /*edge*/,
+                                   unsigned int /*edge_node*/) const
+{
+  libmesh_error_msg("Calling Edge::local_edge_node() does not make sense.");
+  return 0;
 }
 
 

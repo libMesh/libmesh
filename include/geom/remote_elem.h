@@ -94,7 +94,11 @@ public:
   virtual dof_id_type key (const unsigned int) const override
   { libmesh_not_implemented(); return 0; }
 
-  virtual unsigned int which_node_am_i(unsigned int /*side*/,
+  virtual unsigned int local_side_node(unsigned int /*side*/,
+                                       unsigned int /*side_node*/) const override
+  { libmesh_not_implemented(); return 0; }
+
+  virtual unsigned int local_edge_node(unsigned int /*side*/,
                                        unsigned int /*side_node*/) const override
   { libmesh_not_implemented(); return 0; }
 

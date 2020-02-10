@@ -126,7 +126,7 @@ Order InfHex16::default_order() const
 
 
 
-unsigned int InfHex16::which_node_am_i(unsigned int side,
+unsigned int InfHex16::local_side_node(unsigned int side,
                                        unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
@@ -138,6 +138,22 @@ unsigned int InfHex16::which_node_am_i(unsigned int side,
   libmesh_assert(side == 0 || side_node < 6);
 
   return InfHex16::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int InfHex16::local_edge_node(unsigned int edge,
+                                       unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+
+  // Never more than 3 nodes per edge.
+  libmesh_assert_less (edge_node, InfHex16::nodes_per_edge);
+
+  // Some edges only have 2 nodes.
+  libmesh_assert(edge < 4 || edge_node < 2);
+
+  return InfHex16::edge_nodes_map[edge][edge_node];
 }
 
 

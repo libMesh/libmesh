@@ -537,6 +537,15 @@ unsigned int Elem::which_side_am_i (const Elem * e) const
 
 
 
+unsigned int Elem::which_node_am_i(unsigned int side,
+                                   unsigned int side_node) const
+{
+  libmesh_deprecated();
+  return local_side_node(side, side_node);
+}
+
+
+
 bool Elem::contains_vertex_of(const Elem * e) const
 {
   // Our vertices are the first numbered nodes

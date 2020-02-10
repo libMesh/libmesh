@@ -62,13 +62,21 @@ dof_id_type Quad::key (const unsigned int s) const
 
 
 
-unsigned int Quad::which_node_am_i(unsigned int side,
+unsigned int Quad::local_side_node(unsigned int side,
                                    unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 2);
+  libmesh_assert_less (side_node, Quad4::nodes_per_side);
 
   return Quad4::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Quad::local_edge_node(unsigned int edge,
+                                   unsigned int edge_node) const
+{
+  return local_side_node(edge, edge_node);
 }
 
 

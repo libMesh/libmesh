@@ -87,18 +87,29 @@ dof_id_type Prism::key (const unsigned int s) const
 
 
 
-unsigned int Prism::which_node_am_i(unsigned int side,
+unsigned int Prism::local_side_node(unsigned int side,
                                     unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
 
   // Never more than 4 nodes per side.
-  libmesh_assert_less(side_node, 4);
+  libmesh_assert_less(side_node, Prism6::nodes_per_side);
 
   // Some sides have 3 nodes.
   libmesh_assert(!(side==0 || side==4) || side_node < 3);
 
   return Prism6::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Prism::local_edge_node(unsigned int edge,
+                                    unsigned int edge_node) const
+{
+  libmesh_assert_less(edge, this->n_edges());
+  libmesh_assert_less(edge_node, Prism6::nodes_per_edge);
+
+  return Prism6::edge_nodes_map[edge][edge_node];
 }
 
 

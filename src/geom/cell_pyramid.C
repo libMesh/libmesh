@@ -81,18 +81,29 @@ dof_id_type Pyramid::key (const unsigned int s) const
 
 
 
-unsigned int Pyramid::which_node_am_i(unsigned int side,
+unsigned int Pyramid::local_side_node(unsigned int side,
                                       unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
 
   // Never more than 4 nodes per side.
-  libmesh_assert_less(side_node, 4);
+  libmesh_assert_less(side_node, Pyramid5::nodes_per_side);
 
   // Some sides have 3 nodes.
   libmesh_assert(side == 4 || side_node < 3);
 
   return Pyramid5::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Pyramid::local_edge_node(unsigned int edge,
+                                      unsigned int edge_node) const
+{
+  libmesh_assert_less(edge, this->n_edges());
+  libmesh_assert_less(edge_node, Pyramid5::nodes_per_edge);
+
+  return Pyramid5::edge_nodes_map[edge][edge_node];
 }
 
 

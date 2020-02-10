@@ -187,7 +187,7 @@ dof_id_type Tri6::key (const unsigned int s) const
 
 
 
-unsigned int Tri6::which_node_am_i(unsigned int side,
+unsigned int Tri6::local_side_node(unsigned int side,
                                    unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());

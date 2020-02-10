@@ -190,13 +190,24 @@ void Hex20::build_side_ptr (std::unique_ptr<Elem> & side,
 
 
 
-unsigned int Hex20::which_node_am_i(unsigned int side,
+unsigned int Hex20::local_side_node(unsigned int side,
                                     unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
   libmesh_assert_less (side_node, Hex20::nodes_per_side);
 
   return Hex20::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Hex20::local_edge_node(unsigned int edge,
+                                    unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+  libmesh_assert_less (edge_node, Hex20::nodes_per_edge);
+
+  return Hex20::edge_nodes_map[edge][edge_node];
 }
 
 

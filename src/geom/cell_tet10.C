@@ -172,13 +172,24 @@ Order Tet10::default_order() const
 
 
 
-unsigned int Tet10::which_node_am_i(unsigned int side,
+unsigned int Tet10::local_side_node(unsigned int side,
                                     unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
   libmesh_assert_less (side_node, Tet10::nodes_per_side);
 
   return Tet10::side_nodes_map[side][side_node];
+}
+
+
+
+unsigned int Tet10::local_edge_node(unsigned int edge,
+                                    unsigned int edge_node) const
+{
+  libmesh_assert_less (edge, this->n_edges());
+  libmesh_assert_less (edge_node, Tet10::nodes_per_edge);
+
+  return Tet10::edge_nodes_map[edge][edge_node];
 }
 
 
