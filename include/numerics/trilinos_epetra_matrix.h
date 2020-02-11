@@ -124,6 +124,10 @@ public:
 
   virtual void zero () override;
 
+  virtual std::unique_ptr<SparseMatrix<T>> zero_clone () const override;
+
+  virtual std::unique_ptr<SparseMatrix<T>> clone () const override;
+
   virtual void close () override;
 
   virtual numeric_index_type m () const override;

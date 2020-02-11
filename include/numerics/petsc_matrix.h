@@ -169,6 +169,10 @@ public:
 
   virtual void zero () override;
 
+  virtual std::unique_ptr<SparseMatrix<T>> zero_clone () const override;
+
+  virtual std::unique_ptr<SparseMatrix<T>> clone () const override;
+
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0) override;
 
   virtual void close () override;

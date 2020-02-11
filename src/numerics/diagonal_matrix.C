@@ -20,9 +20,11 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
+
 template <typename T>
 DiagonalMatrix<T>::DiagonalMatrix(const Parallel::Communicator & comm_in) : SparseMatrix<T>(comm_in)
 {
@@ -100,6 +102,42 @@ void
 DiagonalMatrix<T>::zero()
 {
   _diagonal->zero();
+}
+
+template <typename T>
+std::unique_ptr<SparseMatrix<T>> DiagonalMatrix<T>::zero_clone () const
+{
+  // Make empty copy with matching comm
+  auto mat_copy = libmesh_make_unique<DiagonalMatrix<T>>(this->comm());
+
+  // Make zero copy of our diagonal
+  auto diag_copy = _diagonal->zero_clone();
+
+  // Swap diag_copy with diagonal in mat_copy
+  *mat_copy = std::move(*diag_copy);
+
+  // Work around an issue on older compilers.  We are able to simply
+  // "return mat_copy;" on newer compilers
+  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
+}
+
+
+
+template <typename T>
+std::unique_ptr<SparseMatrix<T>> DiagonalMatrix<T>::clone () const
+{
+  // Make empty copy with matching comm
+  auto mat_copy = libmesh_make_unique<DiagonalMatrix<T>>(this->comm());
+
+  // Make copy of our diagonal
+  auto diag_copy = _diagonal->clone();
+
+  // Swap diag_copy with diagonal in mat_copy
+  *mat_copy = std::move(*diag_copy);
+
+  // Work around an issue on older compilers.  We are able to simply
+  // "return mat_copy;" on newer compilers
+  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
 }
 
 template <typename T>

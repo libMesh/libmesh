@@ -523,6 +523,42 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 }
 
 template <typename T>
+std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
+{
+  // Copy the nonzero pattern only
+  Mat copy;
+  PetscErrorCode ierr = MatDuplicate(_mat, MAT_DO_NOT_COPY_VALUES, &copy);
+  LIBMESH_CHKERR(ierr);
+
+  // Call wrapping PetscMatrix constructor, have it take over
+  // ownership.
+  auto ret = libmesh_make_unique<PetscMatrix<T>>(copy, this->comm());
+  ret->set_destroy_mat_on_exit(true);
+
+  // Work around an issue on older compilers.  We are able to simply
+  // "return ret;" on newer compilers
+  return std::unique_ptr<SparseMatrix<T>>(ret.release());
+}
+
+template <typename T>
+std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
+{
+  // Copy the nonzero pattern and numerical values
+  Mat copy;
+  PetscErrorCode ierr = MatDuplicate(_mat, MAT_COPY_VALUES, &copy);
+  LIBMESH_CHKERR(ierr);
+
+  // Call wrapping PetscMatrix constructor, have it take over
+  // ownership.
+  auto ret = libmesh_make_unique<PetscMatrix<T>>(copy, this->comm());
+  ret->set_destroy_mat_on_exit(true);
+
+  // Work around an issue on older compilers.  We are able to simply
+  // "return ret;" on newer compilers
+  return std::unique_ptr<SparseMatrix<T>>(ret.release());
+}
+
+template <typename T>
 void PetscMatrix<T>::clear ()
 {
   PetscErrorCode ierr=0;
