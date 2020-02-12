@@ -354,6 +354,7 @@ void VTKIO::write_nodal_data (const std::string & fname,
     {
 #if !VTK_VERSION_LESS_THAN(5,6,0)
       writer->SetCompressorTypeToZLib();
+      writer->SetDataModeToBinary();
 #else
       libmesh_do_once(libMesh::err << "Compression not implemented with old VTK libs!" << std::endl;);
 #endif
