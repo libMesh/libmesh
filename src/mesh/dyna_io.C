@@ -23,6 +23,7 @@
 #include "libmesh/dyna_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -630,7 +631,8 @@ void DynaIO::read_mesh(std::istream & in)
                     my_constraint_rows[spline_node_index];
 
                   const Real coef =
-                    dense_constraint_vecs[0].at(elem_coef_vec_index)[elem_node_index];
+                    libmesh_vector_at(dense_constraint_vecs[0],
+                                      elem_coef_vec_index)[elem_node_index];
 
                   // Global nodes are supposed to be in sorted order
                   if (global_node_idx != DofObject::invalid_id)
@@ -663,12 +665,16 @@ void DynaIO::read_mesh(std::istream & in)
                       const dyna_int_type elem_coef_vec_index =
                         my_constraint_rows[spline_node_index];
 
-                      const Node * spline_node = spline_node_ptrs.at(my_node_idx);
+                      const Node * spline_node =
+                          libmesh_vector_at(spline_node_ptrs,
+                                            my_node_idx);
 
                       const Real coef =
-                        dense_constraint_vecs[0].at(elem_coef_vec_index)[elem_node_index];
+                        libmesh_vector_at(dense_constraint_vecs[0],
+                                          elem_coef_vec_index)[elem_node_index];
                       p.add_scaled(*spline_node, coef);
-                      w += coef * spline_weights.at(my_node_idx);
+                      w += coef * libmesh_vector_at(spline_weights,
+                                                    my_node_idx);
 
                       constraint_row.emplace_back(spline_node->id(), coef);
                     }
