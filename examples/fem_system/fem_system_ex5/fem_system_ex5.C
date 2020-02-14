@@ -117,6 +117,7 @@ int main (int argc, char ** argv)
   // Load an IGA pressurized cylinder mesh or build a cantilever mesh
   if (use_iga)
     {
+      libMesh::out << "\nReading IGA mesh.\n" << std::endl;
       if (mesh.processor_id() == 0)
         dyna_io.read("PressurizedCyl_Patch6_256Elem.bxt");
       MeshCommunication().broadcast (mesh);

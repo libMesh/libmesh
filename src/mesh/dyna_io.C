@@ -141,7 +141,8 @@ void DynaIO::read_mesh(std::istream & in)
   // broadcast later
   libmesh_assert_equal_to (MeshInput<MeshBase>::mesh().processor_id(), 0);
 
-  libmesh_assert(in.good());
+  if (!in.good())
+    libmesh_error_msg("Can't read input stream");
 
   // clear any data in the mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -234,7 +235,9 @@ void DynaIO::read_mesh(std::istream & in)
 
           if (s.find("B E X T 2.0") == static_cast<std::string::size_type>(0))
           {
-            libmesh_assert_equal_to(section, FILE_HEADER);
+            if (section != FILE_HEADER)
+              libmesh_error_msg("Found 'B E X T 2.0' outside file header?");
+
             section = PATCH_HEADER;
             continue;
           }
@@ -518,15 +521,16 @@ void DynaIO::read_mesh(std::istream & in)
     }
 
   // Merge dense_constraint_vecs blocks
-  for (auto coef_vec_block :
-       IntRange<dyna_int_type>(0, n_dense_coef_vec_blocks))
-    {
-      auto & dcv0 = dense_constraint_vecs[0];
-      auto & dcvi = dense_constraint_vecs[coef_vec_block];
-      dcv0.insert(dcv0.end(),
-                  std::make_move_iterator(dcvi.begin()),
-                  std::make_move_iterator(dcvi.end()));
-    }
+  if (n_dense_coef_vec_blocks)
+    for (auto coef_vec_block :
+         IntRange<dyna_int_type>(1, n_dense_coef_vec_blocks))
+      {
+        auto & dcv0 = dense_constraint_vecs[0];
+        auto & dcvi = dense_constraint_vecs[coef_vec_block];
+        dcv0.insert(dcv0.end(),
+                    std::make_move_iterator(dcvi.begin()),
+                    std::make_move_iterator(dcvi.end()));
+      }
   dense_constraint_vecs.resize(1);
 
   // Constraint matrices:
@@ -561,7 +565,9 @@ void DynaIO::read_mesh(std::istream & in)
 
           const ElementDefinition * elem_defn = &(eletypes_it->second);
           auto elem = Elem::build(elem_defn->type);
-          libmesh_assert_equal_to(elem->dim(), block_dim[block_num]);
+          if (elem->dim() != block_dim[block_num])
+            libmesh_error_msg("Elem dim " << elem->dim() <<
+                              " != block_dim " << block_dim[block_num]);
 
           auto & my_constraint_rows = elem_constraint_rows[block_num][elem_num];
           auto & my_global_nodes    = elem_global_nodes[block_num][elem_num];
@@ -624,12 +630,13 @@ void DynaIO::read_mesh(std::istream & in)
                     my_constraint_rows[spline_node_index];
 
                   const Real coef =
-                    dense_constraint_vecs[0][elem_coef_vec_index][elem_node_index];
+                    dense_constraint_vecs[0].at(elem_coef_vec_index)[elem_node_index];
 
                   // Global nodes are supposed to be in sorted order
                   if (global_node_idx != DofObject::invalid_id)
-                  libmesh_assert_greater(my_global_nodes[spline_node_index],
-                                         global_node_idx);
+                    if (my_global_nodes[spline_node_index] <= global_node_idx)
+                      libmesh_error_msg("Found unsorted global node");
+
                   global_node_idx = my_global_nodes[spline_node_index];
 
                   if (coef != 0) // Ignore irrelevant spline nodes
@@ -656,12 +663,12 @@ void DynaIO::read_mesh(std::istream & in)
                       const dyna_int_type elem_coef_vec_index =
                         my_constraint_rows[spline_node_index];
 
-                      const Node * spline_node = spline_node_ptrs[my_node_idx];
+                      const Node * spline_node = spline_node_ptrs.at(my_node_idx);
 
                       const Real coef =
-                        dense_constraint_vecs[0][elem_coef_vec_index][elem_node_index];
+                        dense_constraint_vecs[0].at(elem_coef_vec_index)[elem_node_index];
                       p.add_scaled(*spline_node, coef);
-                      w += coef * spline_weights[my_node_idx];
+                      w += coef * spline_weights.at(my_node_idx);
 
                       constraint_row.emplace_back(spline_node->id(), coef);
                     }
