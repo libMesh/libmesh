@@ -521,15 +521,16 @@ void DynaIO::read_mesh(std::istream & in)
     }
 
   // Merge dense_constraint_vecs blocks
-  for (auto coef_vec_block :
-       IntRange<dyna_int_type>(0, n_dense_coef_vec_blocks))
-    {
-      auto & dcv0 = dense_constraint_vecs[0];
-      auto & dcvi = dense_constraint_vecs[coef_vec_block];
-      dcv0.insert(dcv0.end(),
-                  std::make_move_iterator(dcvi.begin()),
-                  std::make_move_iterator(dcvi.end()));
-    }
+  if (n_dense_coef_vec_blocks)
+    for (auto coef_vec_block :
+         IntRange<dyna_int_type>(1, n_dense_coef_vec_blocks))
+      {
+        auto & dcv0 = dense_constraint_vecs[0];
+        auto & dcvi = dense_constraint_vecs[coef_vec_block];
+        dcv0.insert(dcv0.end(),
+                    std::make_move_iterator(dcvi.begin()),
+                    std::make_move_iterator(dcvi.end()));
+      }
   dense_constraint_vecs.resize(1);
 
   // Constraint matrices:
