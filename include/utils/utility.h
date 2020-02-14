@@ -35,14 +35,14 @@ namespace libMesh
  * idiom, which is similar to calling map.at(), but gives a more
  * useful error message with a line number.
  */
-#define libmesh_map_find(map, key) Utility::map_find((map), (key), __FILE__, __LINE__)
+#define libmesh_map_find(map, key) libMesh::Utility::map_find((map), (key), __FILE__, __LINE__)
 
 /**
  * Encapsulates the common "get value from vector, otherwise error"
  * idiom, which is similar to calling vec.at(), but gives a more
  * useful error message with a line number.
  */
-#define libmesh_vector_at(vec, idx) Utility::vector_at((vec), (idx), __FILE__, __LINE__)
+#define libmesh_vector_at(vec, idx) libMesh::Utility::vector_at((vec), (idx), __FILE__, __LINE__)
 
 // ------------------------------------------------------------
 // The Utility namespace is for functions
