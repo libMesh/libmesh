@@ -35,7 +35,14 @@ namespace libMesh
  * idiom, which is similar to calling map.at(), but gives a more
  * useful error message with a line number.
  */
-#define libmesh_map_find(map, key) Utility::map_find((map), (key), __FILE__, __LINE__)
+#define libmesh_map_find(map, key) libMesh::Utility::map_find((map), (key), __FILE__, __LINE__)
+
+/**
+ * Encapsulates the common "get value from vector, otherwise error"
+ * idiom, which is similar to calling vec.at(), but gives a more
+ * useful error message with a line number.
+ */
+#define libmesh_vector_at(vec, idx) libMesh::Utility::vector_at((vec), (idx), __FILE__, __LINE__)
 
 // ------------------------------------------------------------
 // The Utility namespace is for functions
@@ -146,6 +153,45 @@ map_find(const Map & map,
     libmesh_error_msg("map_find() error: key \"" << key << "\" not found in file " \
                       << filename << " on line " << line_number);
   return it->second;
+}
+
+
+/**
+ * A replacement for std::vector::at(i) which is meant to be used with
+ * a macro, and, unlike at(), gives a proper line number and useful
+ * error message when the index is past the end.
+ */
+template<typename Vector>
+inline
+typename Vector::reference &
+vector_at(Vector & vec,
+          typename Vector::size_type i,
+          const char * filename,
+          int line_number)
+{
+  if (i >= vec.size())
+    libmesh_error_msg("vec_at() error: Index " << i <<
+                      " past end of vector in file " << filename <<
+                      " on line " << line_number);
+  return vec[i];
+}
+
+/**
+ * Same as above, but for const inputs.
+ */
+template<typename Vector>
+inline
+typename Vector::const_reference &
+vector_at(const Vector & vec,
+          typename Vector::size_type i,
+          const char * filename,
+          int line_number)
+{
+  if (i >= vec.size())
+    libmesh_error_msg("vec_at() error: Index " << i <<
+                      " past end of vector in file " << filename <<
+                      " on line " << line_number);
+  return vec[i];
 }
 
 /**
