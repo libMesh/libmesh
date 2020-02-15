@@ -170,9 +170,9 @@ vector_at(Vector & vec,
           int line_number)
 {
   if (i >= vec.size())
-    libmesh_error_msg("vec_at() error: Index " + std::to_string(i) +
-                      " past end of vector in file " + std::string(filename) +
-                      " on line " + std::to_string(line_number));
+    libmesh_error_msg("vec_at() error: Index " << i <<
+                      " past end of vector in file " << filename <<
+                      " on line " << line_number);
   return vec[i];
 }
 
@@ -188,9 +188,9 @@ vector_at(const Vector & vec,
           int line_number)
 {
   if (i >= vec.size())
-    libmesh_error_msg("vec_at() error: Index " + std::to_string(i) +
-                      " past end of vector in file " + std::string(filename) +
-                      " on line " + std::to_string(line_number));
+    libmesh_error_msg("vec_at() error: Index " << i <<
+                      " past end of vector in file " << filename <<
+                      " on line " << line_number);
   return vec[i];
 }
 
