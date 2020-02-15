@@ -397,7 +397,8 @@ AC_CONFIG_FILES([contrib/tecplot/binary/Makefile])
 # -------------------------------------------------------------
 CONFIGURE_METIS
 AS_IF([test $enablemetis = yes],
-      [libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"])
+      [libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_optional_LIBS="$METIS_LIB $libmesh_optional_LIBS"])
 AM_CONDITIONAL(LIBMESH_ENABLE_METIS, test x$enablemetis = xyes)
 AC_CONFIG_FILES([contrib/metis/Makefile])
 # -------------------------------------------------------------

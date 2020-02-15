@@ -13,25 +13,36 @@ AC_DEFUN([CONFIGURE_METIS],
                 [enablemetis=$enableoptional])
 
   AC_ARG_WITH(metis,
-             AS_HELP_STRING([--with-metis=<internal,PETSc>],
-                            [metis to use. internal: build from contrib, PETSc: rely on PETSc]),
+             AS_HELP_STRING([--with-metis=<internal,PETSc,/some/libdir>],
+                            [internal: build from contrib, PETSc: rely on PETSc]),
              [AS_CASE("${withval}",
                       [internal], [build_metis=yes],
-                      [PETSc],    [build_metis=no],
-                      [AC_MSG_ERROR(bad value ${withval} for --with-metis)])],
+                      [PETSc],    [build_metis=petsc],
+                      [METIS_LIB="-L${withval} -lmetis"
+                       build_metis=no])
+              enablemetis=yes],
              [build_metis=yes])
+
+
+  AC_ARG_WITH(metis-include,
+             AS_HELP_STRING([--with-metis-include=</some/includedir>]),
+             [METIS_INCLUDE="-I${withval}"
+              enablemetis=yes
+              build_metis=no],
+             [])
 
   dnl If PETSc has its own METIS, default to using that one regardless
   dnl of what the user specified (if anything) in --with-metis.
   AS_IF([test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0],
-        [build_metis=no])
+        [AC_MSG_RESULT(<<< Disabling internal Metis support to avoid PETSc conflict>>>)
+         build_metis=petsc])
 
   dnl Conversely, if:
   dnl .) METIS is enabled in libmesh,
   dnl .) PETSc does not have a METIS or we aren't using PETSc, and
-  dnl .) build_metis=no because user said --with-metis=PETSc,
+  dnl .) build_metis=petsc because user said --with-metis=PETSc,
   dnl then we need to make sure that libmesh builds its own METIS!
-  AS_IF([test "$enablemetis" = "yes" && test "$build_metis" = "no"],
+  AS_IF([test "$enablemetis" = "yes" && test "$build_metis" = "petsc"],
         [
           AS_IF([test "x$petsc_have_metis" = "x0" || test "$enablepetsc" = "no"],
                 [build_metis=yes])
@@ -45,7 +56,7 @@ AC_DEFUN([CONFIGURE_METIS],
           AS_IF([test "$build_metis" = "yes"],
                 [
                   METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/include"
-                  METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
+                  METIS_LIB="" # contrib Metis gets lumped into libcontrib
                 ])
           AC_DEFINE(HAVE_METIS, 1, [Flag indicating whether the library will be compiled with Metis support])
           AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
