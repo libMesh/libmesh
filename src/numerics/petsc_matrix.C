@@ -525,6 +525,9 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
 {
+  if (!this->closed())
+    libmesh_error_msg("Matrix must be closed before it can be cloned!");
+
   // Copy the nonzero pattern only
   Mat copy;
   PetscErrorCode ierr = MatDuplicate(_mat, MAT_DO_NOT_COPY_VALUES, &copy);
@@ -540,9 +543,14 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
   return std::unique_ptr<SparseMatrix<T>>(ret.release());
 }
 
+
+
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
 {
+  if (!this->closed())
+    libmesh_error_msg("Matrix must be closed before it can be cloned!");
+
   // Copy the nonzero pattern and numerical values
   Mat copy;
   PetscErrorCode ierr = MatDuplicate(_mat, MAT_COPY_VALUES, &copy);
