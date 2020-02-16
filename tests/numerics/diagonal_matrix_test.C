@@ -33,6 +33,7 @@ public:
 
   CPPUNIT_TEST(testSizes);
   CPPUNIT_TEST(testNumerics);
+  CPPUNIT_TEST(testClone);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -204,6 +205,39 @@ public:
           else
             LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real((*_matrix)(i, j)), _tolerance);
         }
+    }
+  }
+
+  void testClone()
+  {
+    {
+      // Create copy, test that it can go out of scope
+      auto copy = _matrix->clone();
+
+      // Check that matrices have the same local/global sizes
+      CPPUNIT_ASSERT_EQUAL(copy->m(), _matrix->m());
+      CPPUNIT_ASSERT_EQUAL(copy->n(), _matrix->n());
+      CPPUNIT_ASSERT_EQUAL(copy->local_m(), _matrix->local_m());
+      CPPUNIT_ASSERT_EQUAL(copy->row_start(), _matrix->row_start());
+      CPPUNIT_ASSERT_EQUAL(copy->row_stop(), _matrix->row_stop());
+
+      // Check that copy has same values as original
+      LIBMESH_ASSERT_FP_EQUAL(copy->l1_norm(), _matrix->l1_norm(), _tolerance);
+    }
+
+    {
+      // Create zero copy
+      auto zero_copy = _matrix->zero_clone();
+
+      // Check that matrices have the same local/global sizes
+      CPPUNIT_ASSERT_EQUAL(zero_copy->m(), _matrix->m());
+      CPPUNIT_ASSERT_EQUAL(zero_copy->n(), _matrix->n());
+      CPPUNIT_ASSERT_EQUAL(zero_copy->local_m(), _matrix->local_m());
+      CPPUNIT_ASSERT_EQUAL(zero_copy->row_start(), _matrix->row_start());
+      CPPUNIT_ASSERT_EQUAL(zero_copy->row_stop(), _matrix->row_stop());
+
+      // Check that zero_copy has same values as original
+      LIBMESH_ASSERT_FP_EQUAL(0.0, zero_copy->l1_norm(), _tolerance);
     }
   }
 
