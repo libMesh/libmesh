@@ -165,6 +165,21 @@ public:
   virtual void zero () = 0;
 
   /**
+   * \returns A smart pointer to a copy of this matrix with the same
+   * type, size, and partitioning, but with all zero entries.
+   *
+   * \note This must be overridden in the derived classes.
+   */
+  virtual std::unique_ptr<SparseMatrix<T>> zero_clone () const = 0;
+
+  /**
+   * \returns A smart pointer to a copy of this matrix.
+   *
+   * \note This must be overridden in the derived classes.
+   */
+  virtual std::unique_ptr<SparseMatrix<T>> clone () const = 0;
+
+  /**
    * Sets all row entries to 0 then puts \p diag_value in the diagonal entry.
    */
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0);

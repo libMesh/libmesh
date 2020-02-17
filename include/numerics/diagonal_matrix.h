@@ -99,6 +99,10 @@ public:
 
   void zero() override;
 
+  virtual std::unique_ptr<SparseMatrix<T>> zero_clone () const override;
+
+  virtual std::unique_ptr<SparseMatrix<T>> clone () const override;
+
   void close() override;
 
   numeric_index_type m() const override;
