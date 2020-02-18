@@ -20,16 +20,11 @@
 
 #include "libmesh/libmesh_common.h"
 
-namespace libMesh
-{
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/raw_type.h"
-
-using MetaPhysicL::raw_value;
-using typename MetaPhysicL::RawType;
-
 #else
-
+namespace MetaPhysicL
+{
 // RawType strips the derivatives, shadow magic, etc. off of
 // types.  Vector types remain vector types.
 template <typename T>
@@ -54,8 +49,12 @@ template <typename T>
 inline
 typename RawType<T>::value_type
 raw_value(const T& a) { return RawType<T>::value(a); }
-
+}
 #endif
+
+namespace libMesh
+{
+using MetaPhysicL::raw_value;
 }
 
 #endif // LIBMESH_RAW_VALUE_H
