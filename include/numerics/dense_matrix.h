@@ -771,7 +771,12 @@ typedef DenseMatrix<Complex> ComplexDenseMatrix;
 
 using namespace DenseMatrices;
 
-#ifdef LIBMESH_HAVE_PETSC
+// The PETSc Lapack wrappers are only for PetscScalar, therefore we
+// can't e.g. get a Lapack version of DenseMatrix<Real>::lu_solve()
+// when libmesh/PETSc are compiled with complex numbers.
+#if defined(LIBMESH_HAVE_PETSC) && \
+  defined(LIBMESH_USE_REAL_NUMBERS) && \
+  defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
 template <>
 struct DenseMatrix<double>::UseBlasLapack
 {
