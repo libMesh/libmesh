@@ -182,10 +182,19 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
-    PetscVector<Number> X(x, rc.sys.comm());
+
+    // Synchronize PETSc x to local solution since the local solution may be changed due to the constraints
+    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(rc.sys.solution.get());
+    PetscVector<Number> X_global(x, rc.sys.comm());
+
+    X_global.swap(X_sys);
+    rc.sys.update();
+    X_global.swap(X_sys);
 
     R.close();
-    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, &X);
+
+    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
+
     R.close();
 
     return rc.ierr;
@@ -222,9 +231,17 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
 
+    // Synchronize PETSc x to local solution since the local solution may be changed due to the constraints
+    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(rc.sys.solution.get());
+    PetscVector<Number> X_global(x, rc.sys.comm());
+
+    X_global.swap(X_sys);
+    rc.sys.update();
+    X_global.swap(X_sys);
+
     R.close();
-    PetscVector<Number> X(x, rc.sys.comm());
-    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, &X);
+
+    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
 
     R.close();
 
@@ -264,9 +281,17 @@ extern "C"
       libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
                         "Jacobian-vector products!");
 
+    // Synchronize PETSc x to local solution since the local solution may be changed due to the constraints
+    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(rc.sys.solution.get());
+    PetscVector<Number> X_global(x, rc.sys.comm());
+
+    X_global.swap(X_sys);
+    rc.sys.update();
+    X_global.swap(X_sys);
+
     R.close();
-    PetscVector<Number> X(x, rc.sys.comm());
-    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, &X);
+
+    rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
 
     R.close();
 
