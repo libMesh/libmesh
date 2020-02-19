@@ -665,8 +665,8 @@ public:
    * this, but for consistency with the other build_XYZ_list
    * functions, we're using tuples.
    */
-  std::vector<std::tuple<dof_id_type, boundary_id_type>>
-  build_node_list() const;
+  typedef std::tuple<dof_id_type, boundary_id_type> NodeBCTuple;
+  std::vector<NodeBCTuple> build_node_list() const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary

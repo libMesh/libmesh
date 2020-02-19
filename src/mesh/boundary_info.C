@@ -1723,10 +1723,10 @@ void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
 #endif
 
 
-std::vector<std::tuple<dof_id_type, boundary_id_type>>
+std::vector<BoundaryInfo::NodeBCTuple>
 BoundaryInfo::build_node_list() const
 {
-  std::vector<std::tuple<dof_id_type, boundary_id_type>> bc_tuples;
+  std::vector<NodeBCTuple> bc_tuples;
   bc_tuples.reserve(_boundary_node_id.size());
 
   for (const auto & pr : _boundary_node_id)
