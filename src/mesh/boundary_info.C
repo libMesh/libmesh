@@ -1723,18 +1723,23 @@ void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
 #endif
 
 
-std::vector<std::tuple<dof_id_type, boundary_id_type>>
-BoundaryInfo::build_node_list() const
+std::vector<BoundaryInfo::NodeBCTuple>
+BoundaryInfo::build_node_list(NodeBCTupleSortBy sort_by) const
 {
-  std::vector<std::tuple<dof_id_type, boundary_id_type>> bc_tuples;
+  std::vector<NodeBCTuple> bc_tuples;
   bc_tuples.reserve(_boundary_node_id.size());
 
   for (const auto & pr : _boundary_node_id)
     bc_tuples.emplace_back(pr.first->id(), pr.second);
 
   // This list is currently in memory address (arbitrary) order, so
-  // sort to make it consistent on all procs.
-  std::sort(bc_tuples.begin(), bc_tuples.end());
+  // sort, using the specified ordering, to make it consistent on all procs.
+  if (sort_by == NODE_ID)
+    std::sort(bc_tuples.begin(), bc_tuples.end());
+  else if (sort_by == BOUNDARY_ID)
+    std::sort(bc_tuples.begin(), bc_tuples.end(),
+              [](const NodeBCTuple & left, const NodeBCTuple & right)
+              {return std::get<1>(left) < std::get<1>(right);});
 
   return bc_tuples;
 }
@@ -1998,10 +2003,10 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
 #endif
 
 
-std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+std::vector<BoundaryInfo::BCTuple>
 BoundaryInfo::build_side_list() const
 {
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> bc_triples;
+  std::vector<BCTuple> bc_triples;
   bc_triples.reserve(_boundary_side_id.size());
 
   for (const auto & pr : _boundary_side_id)
@@ -2049,10 +2054,10 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
 #endif
 
 
-std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+std::vector<BoundaryInfo::BCTuple>
 BoundaryInfo::build_active_side_list () const
 {
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> bc_triples;
+  std::vector<BCTuple> bc_triples;
   bc_triples.reserve(_boundary_side_id.size());
 
   for (const auto & pr : _boundary_side_id)
@@ -2113,10 +2118,10 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type> & el,
 #endif
 
 
-std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+std::vector<BoundaryInfo::BCTuple>
 BoundaryInfo::build_edge_list() const
 {
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> bc_triples;
+  std::vector<BCTuple> bc_triples;
   bc_triples.reserve(_boundary_edge_id.size());
 
   for (const auto & pr : _boundary_edge_id)
@@ -2161,10 +2166,10 @@ void BoundaryInfo::build_shellface_list (std::vector<dof_id_type> & el,
 #endif
 
 
-std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+std::vector<BoundaryInfo::BCTuple>
 BoundaryInfo::build_shellface_list() const
 {
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> bc_triples;
+  std::vector<BCTuple> bc_triples;
   bc_triples.reserve(_boundary_shellface_id.size());
 
   for (const auto & pr : _boundary_shellface_id)

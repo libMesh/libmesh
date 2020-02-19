@@ -664,9 +664,15 @@ public:
    * advantage of guaranteed RVO. Note: we could use std::pairs for
    * this, but for consistency with the other build_XYZ_list
    * functions, we're using tuples.
+   *
+   * The "sort_by" parameter controls how the resulting list of tuples
+   * is sorted.  It is possible (but not recommended) to choose
+   * UNSORTED, since in that case the resulting vectors will
+   * potentially be in different ordres on different procs.
    */
-  std::vector<std::tuple<dof_id_type, boundary_id_type>>
-  build_node_list() const;
+  typedef std::tuple<dof_id_type, boundary_id_type> NodeBCTuple;
+  enum NodeBCTupleSortBy : int {NODE_ID, BOUNDARY_ID, UNSORTED};
+  std::vector<NodeBCTuple> build_node_list(NodeBCTupleSortBy sort_by = NODE_ID) const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
