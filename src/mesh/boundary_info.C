@@ -1724,7 +1724,7 @@ void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
 
 
 std::vector<BoundaryInfo::NodeBCTuple>
-BoundaryInfo::build_node_list() const
+BoundaryInfo::build_node_list(NodeBCTupleSortBy sort_by) const
 {
   std::vector<NodeBCTuple> bc_tuples;
   bc_tuples.reserve(_boundary_node_id.size());
@@ -1733,8 +1733,13 @@ BoundaryInfo::build_node_list() const
     bc_tuples.emplace_back(pr.first->id(), pr.second);
 
   // This list is currently in memory address (arbitrary) order, so
-  // sort to make it consistent on all procs.
-  std::sort(bc_tuples.begin(), bc_tuples.end());
+  // sort, using the specified ordering, to make it consistent on all procs.
+  if (sort_by == NODE_ID)
+    std::sort(bc_tuples.begin(), bc_tuples.end());
+  else if (sort_by == BOUNDARY_ID)
+    std::sort(bc_tuples.begin(), bc_tuples.end(),
+              [](const NodeBCTuple & left, const NodeBCTuple & right)
+              {return std::get<1>(left) < std::get<1>(right);});
 
   return bc_tuples;
 }
