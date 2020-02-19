@@ -606,7 +606,17 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
       std::unique_ptr<DGFEMContext> c = libmesh_make_unique<DGFEMContext>(*this);
       DGFEMContext & context = cast_ref<DGFEMContext &>(*c);
+
+      // Pre-request required data
       init_context_with_sys(context, *this);
+
+      // Get local references to context data (will be updated each
+      // time elem_fe_reinit() is called).
+      FEBase * elem_fe = nullptr;
+      context.get_element_fe( 0, elem_fe );
+      const std::vector<Real> & JxW = elem_fe->get_JxW();
+      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const std::vector<Point> & xyz = elem_fe->get_xyz();
 
       // First cache all the element data
       std::vector<std::vector<std::vector<Number>>> parametrized_fn_vals(mesh.n_elem());
@@ -617,18 +627,13 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
         {
           dof_id_type elem_id = elem->id();
 
+          // Recompute values for current Elem
           context.pre_fe_reinit(*this, elem);
           context.elem_fe_reinit();
 
-          FEBase * elem_fe = nullptr;
-          context.get_element_fe( 0, elem_fe );
-          unsigned int n_qpoints = context.get_element_qrule().n_points();
-          const std::vector<Real> & JxW = elem_fe->get_JxW();
-          const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
-          const std::vector<Point> & xyz = elem_fe->get_xyz();
-
           // Loop over qp before var because parametrized functions often use
           // some caching based on qp.
+          unsigned int n_qpoints = context.get_element_qrule().n_points();
           parametrized_fn_vals[elem_id].resize(n_qpoints);
           JxW_values[elem_id].resize(n_qpoints);
           phi_values[elem_id].resize(n_qpoints);
