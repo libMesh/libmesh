@@ -360,7 +360,18 @@ void RBEIMConstruction::enrich_RB_space()
 
   std::unique_ptr<DGFEMContext> explicit_c = libmesh_make_unique<DGFEMContext>(get_explicit_system());
   DGFEMContext & explicit_context = cast_ref<DGFEMContext &>(*explicit_c);
+
+  // Pre-request required data
   init_context_with_sys(explicit_context, get_explicit_system());
+
+  // Get local reference to xyz data for variable 0. This is needed in
+  // the loop below, but we cannot call elem_fe->get_xyz() once
+  // calculations have already started. Note: We don't need a separate
+  // "xyz" for each var, since all vars should be using the same
+  // quadrature rule.
+  FEBase * elem_fe = nullptr;
+  explicit_context.get_element_fe( 0, elem_fe );
+  const std::vector<Point> & xyz = elem_fe->get_xyz();
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
@@ -382,12 +393,8 @@ void RBEIMConstruction::enrich_RB_space()
                   largest_abs_value = abs_value;
                   optimal_var = var;
                   optimal_elem_id = elem->id();
-
-                  FEBase * elem_fe = nullptr;
-                  explicit_context.get_element_fe( var, elem_fe );
-                  optimal_point = elem_fe->get_xyz()[qp];
+                  optimal_point = xyz[qp];
                 }
-
             }
         }
     }
