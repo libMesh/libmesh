@@ -304,122 +304,155 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
     this->n_shape_functions(this->get_type(),
                             this->get_order());
 
-  // resize the vectors to hold current data
-  // Phi are the shape functions used for the FE approximation
-  // Phi_map are the shape functions used for the FE mapping
-  if (this->calculate_phi)
-    this->phi.resize     (n_approx_shape_functions);
-
-  if (this->calculate_dphi)
+  // Maybe we already have correctly-sized data?  Check data sizes,
+  // and get ready to break out of a "loop" if all these resize()
+  // calls are redundant.
+  unsigned int old_n_qp = 0;
+  do
     {
-      this->dphi.resize    (n_approx_shape_functions);
-      this->dphidx.resize  (n_approx_shape_functions);
-      this->dphidy.resize  (n_approx_shape_functions);
-      this->dphidz.resize  (n_approx_shape_functions);
-    }
-
-  if (this->calculate_dphiref)
-    {
-      if (Dim > 0)
-        this->dphidxi.resize (n_approx_shape_functions);
-
-      if (Dim > 1)
-        this->dphideta.resize      (n_approx_shape_functions);
-
-      if (Dim > 2)
-        this->dphidzeta.resize     (n_approx_shape_functions);
-    }
-
-  if (this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
-    this->curl_phi.resize(n_approx_shape_functions);
-
-  if (this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
-    this->div_phi.resize(n_approx_shape_functions);
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (this->calculate_d2phi)
-    {
-      this->d2phi.resize     (n_approx_shape_functions);
-      this->d2phidx2.resize  (n_approx_shape_functions);
-      this->d2phidxdy.resize (n_approx_shape_functions);
-      this->d2phidxdz.resize (n_approx_shape_functions);
-      this->d2phidy2.resize  (n_approx_shape_functions);
-      this->d2phidydz.resize (n_approx_shape_functions);
-      this->d2phidz2.resize  (n_approx_shape_functions);
-
-      if (Dim > 0)
-        this->d2phidxi2.resize (n_approx_shape_functions);
-
-      if (Dim > 1)
-        {
-          this->d2phidxideta.resize (n_approx_shape_functions);
-          this->d2phideta2.resize   (n_approx_shape_functions);
-        }
-      if (Dim > 2)
-        {
-          this->d2phidxidzeta.resize  (n_approx_shape_functions);
-          this->d2phidetadzeta.resize (n_approx_shape_functions);
-          this->d2phidzeta2.resize    (n_approx_shape_functions);
-        }
-    }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-    {
+      // resize the vectors to hold current data
+      // Phi are the shape functions used for the FE approximation
+      // Phi_map are the shape functions used for the FE mapping
       if (this->calculate_phi)
-        this->phi[i].resize         (n_qp);
+        {
+          if (this->phi.size() == n_approx_shape_functions)
+            {
+              old_n_qp = n_approx_shape_functions ? this->phi[0].size() : 0;
+              break;
+            }
+          this->phi.resize     (n_approx_shape_functions);
+        }
+
       if (this->calculate_dphi)
         {
-          this->dphi[i].resize        (n_qp);
-          this->dphidx[i].resize      (n_qp);
-          this->dphidy[i].resize      (n_qp);
-          this->dphidz[i].resize      (n_qp);
+          if (this->dphi.size() == n_approx_shape_functions)
+            {
+              old_n_qp = n_approx_shape_functions ? this->dphi[0].size() : 0;
+              break;
+            }
+          this->dphi.resize    (n_approx_shape_functions);
+          this->dphidx.resize  (n_approx_shape_functions);
+          this->dphidy.resize  (n_approx_shape_functions);
+          this->dphidz.resize  (n_approx_shape_functions);
         }
 
       if (this->calculate_dphiref)
         {
           if (Dim > 0)
-            this->dphidxi[i].resize(n_qp);
+            {
+              if (this->dphidxi.size() == n_approx_shape_functions)
+                {
+                  old_n_qp = n_approx_shape_functions ? this->dphidxi[0].size() : 0;
+                  break;
+                }
+              this->dphidxi.resize (n_approx_shape_functions);
+            }
 
           if (Dim > 1)
-            this->dphideta[i].resize(n_qp);
+            this->dphideta.resize      (n_approx_shape_functions);
 
           if (Dim > 2)
-            this->dphidzeta[i].resize(n_qp);
+            this->dphidzeta.resize     (n_approx_shape_functions);
         }
 
       if (this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
-        this->curl_phi[i].resize(n_qp);
+        this->curl_phi.resize(n_approx_shape_functions);
 
       if (this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
-        this->div_phi[i].resize(n_qp);
+        this->div_phi.resize(n_approx_shape_functions);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (this->calculate_d2phi)
         {
-          this->d2phi[i].resize     (n_qp);
-          this->d2phidx2[i].resize  (n_qp);
-          this->d2phidxdy[i].resize (n_qp);
-          this->d2phidxdz[i].resize (n_qp);
-          this->d2phidy2[i].resize  (n_qp);
-          this->d2phidydz[i].resize (n_qp);
-          this->d2phidz2[i].resize  (n_qp);
+          if (this->d2phi.size() == n_approx_shape_functions)
+            {
+              old_n_qp = n_approx_shape_functions ? this->d2phi[0].size() : 0;
+              break;
+            }
+          this->d2phi.resize     (n_approx_shape_functions);
+          this->d2phidx2.resize  (n_approx_shape_functions);
+          this->d2phidxdy.resize (n_approx_shape_functions);
+          this->d2phidxdz.resize (n_approx_shape_functions);
+          this->d2phidy2.resize  (n_approx_shape_functions);
+          this->d2phidydz.resize (n_approx_shape_functions);
+          this->d2phidz2.resize  (n_approx_shape_functions);
+
           if (Dim > 0)
-            this->d2phidxi2[i].resize (n_qp);
+            this->d2phidxi2.resize (n_approx_shape_functions);
+
           if (Dim > 1)
             {
-              this->d2phidxideta[i].resize (n_qp);
-              this->d2phideta2[i].resize   (n_qp);
+              this->d2phidxideta.resize (n_approx_shape_functions);
+              this->d2phideta2.resize   (n_approx_shape_functions);
             }
           if (Dim > 2)
             {
-              this->d2phidxidzeta[i].resize  (n_qp);
-              this->d2phidetadzeta[i].resize (n_qp);
-              this->d2phidzeta2[i].resize    (n_qp);
+              this->d2phidxidzeta.resize  (n_approx_shape_functions);
+              this->d2phidetadzeta.resize (n_approx_shape_functions);
+              this->d2phidzeta2.resize    (n_approx_shape_functions);
             }
         }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     }
+  while (false);
+
+  if (old_n_qp != n_qp)
+    for (unsigned int i=0; i<n_approx_shape_functions; i++)
+      {
+        if (this->calculate_phi)
+          this->phi[i].resize         (n_qp);
+        if (this->calculate_dphi)
+          {
+            this->dphi[i].resize        (n_qp);
+            this->dphidx[i].resize      (n_qp);
+            this->dphidy[i].resize      (n_qp);
+            this->dphidz[i].resize      (n_qp);
+          }
+
+        if (this->calculate_dphiref)
+          {
+            if (Dim > 0)
+              this->dphidxi[i].resize(n_qp);
+
+            if (Dim > 1)
+              this->dphideta[i].resize(n_qp);
+
+            if (Dim > 2)
+              this->dphidzeta[i].resize(n_qp);
+          }
+
+        if (this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
+          this->curl_phi[i].resize(n_qp);
+
+        if (this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
+          this->div_phi[i].resize(n_qp);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        if (this->calculate_d2phi)
+          {
+            this->d2phi[i].resize     (n_qp);
+            this->d2phidx2[i].resize  (n_qp);
+            this->d2phidxdy[i].resize (n_qp);
+            this->d2phidxdz[i].resize (n_qp);
+            this->d2phidy2[i].resize  (n_qp);
+            this->d2phidydz[i].resize (n_qp);
+            this->d2phidz2[i].resize  (n_qp);
+            if (Dim > 0)
+              this->d2phidxi2[i].resize (n_qp);
+            if (Dim > 1)
+              {
+                this->d2phidxideta[i].resize (n_qp);
+                this->d2phideta2[i].resize   (n_qp);
+              }
+            if (Dim > 2)
+              {
+                this->d2phidxidzeta[i].resize  (n_qp);
+                this->d2phidetadzeta[i].resize (n_qp);
+                this->d2phidzeta2[i].resize    (n_qp);
+              }
+          }
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      }
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
