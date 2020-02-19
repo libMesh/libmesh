@@ -16,6 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#ifndef LIBMESH_FE_LAGRANGE_SHAPE_1D_H
+#define LIBMESH_FE_LAGRANGE_SHAPE_1D_H
+
 // Local includes
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_order.h"
@@ -316,3 +319,5 @@ Real fe_lagrange_1D_shape_second_deriv(const Order order,
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 }
+
+#endif // LIBMESH_FE_LAGRANGE_SHAPE_1D_H
