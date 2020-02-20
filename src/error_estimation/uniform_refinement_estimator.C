@@ -306,7 +306,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       // Copy the projected coarse grid solutions, which will be
       // overwritten by solve()
       projected_solutions[i] = NumericVector<Number>::build(system.comm());
-      projected_solutions[i]->init(system.solution->size(), true, SERIAL);
+      projected_solutions[i]->init(system.solution->size(),
+                                   system.solution->local_size(),
+                                   system.get_dof_map().get_send_list(),
+                                   true, GHOSTED);
       system.solution->localize(*projected_solutions[i],
                                 system.get_dof_map().get_send_list());
     }
