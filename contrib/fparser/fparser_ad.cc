@@ -17,6 +17,7 @@ using namespace FPoptimizer_CodeTree;
 #include <unistd.h>
 
 #if LIBMESH_HAVE_FPARSER_JIT
+#  define FPARSER_CACHING
 #  include <dlfcn.h>
 #endif
 
@@ -477,6 +478,7 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
     int result = ad->AutoDiff(var_number, this->mData, autoOptimize);
 
     // save the derivative if cacheing is enabled and derivative was successfully taken
+#ifdef FPARSER_CACHING
     if (cached && result == -1)
     {
       // create cache directory
@@ -510,6 +512,7 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
         }
       }
     }
+#endif // FPARSER_CACHING
 
     return result;
   }
