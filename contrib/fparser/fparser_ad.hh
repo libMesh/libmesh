@@ -135,6 +135,8 @@ public:
   void RegisterDerivative(const std::string & a, const std::string & b, const std::string & c);
 
 protected:
+
+#if LIBMESH_HAVE_FPARSER_JIT
   /// return a SHA1 hash for the current bytecode and value type name
   std::string JITCodeHash(const std::string & value_type_name);
 
@@ -143,6 +145,7 @@ protected:
 
   /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
   bool JITCompileHelper(const std::string &);
+#endif // LIBMESH_HAVE_FPARSER_JIT
 
   /// JIT function pointer
   Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
@@ -185,6 +188,8 @@ protected:
     virtual const char* what() const throw() { return "Unknown serialization file version"; }
   } UnknownSerializationVersionException;
 };
+
+#ifdef LIBMESH_HAVE_FPARSER_JIT
 
 /// Forward declare SHA1 hash object
 class SHA1;
@@ -245,6 +250,8 @@ protected:
   const bool _use_cache;
 };
 } // namespace FParserJIT
+
+#endif // LIBMESH_HAVE_FPARSER_JIT
 
 class FunctionParserAD: public FunctionParserADBase<double> {};
 class FunctionParserAD_f: public FunctionParserADBase<float> {};

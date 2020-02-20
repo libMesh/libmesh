@@ -608,13 +608,6 @@ bool FunctionParserADBase<Value_t>::JITCompile()
 }
 
 #if LIBMESH_HAVE_FPARSER_JIT
-// JIT compile for supported types
-template<>
-bool FunctionParserADBase<double>::JITCompile() { return JITCompileHelper("double"); }
-template<>
-bool FunctionParserADBase<float>::JITCompile() { return JITCompileHelper("float"); }
-template<>
-bool FunctionParserADBase<long double>::JITCompile() { return JITCompileHelper("long double"); }
 
 template<typename Value_t>
 Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
@@ -624,7 +617,14 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
   else
     return (*compiledFunction)(Vars, pImmed, Epsilon<Value_t>::value);
 }
-#endif // LIBMESH_HAVE_FPARSER_JIT
+
+// JIT compile for supported types
+template<>
+bool FunctionParserADBase<double>::JITCompile() { return JITCompileHelper("double"); }
+template<>
+bool FunctionParserADBase<float>::JITCompile() { return JITCompileHelper("float"); }
+template<>
+bool FunctionParserADBase<long double>::JITCompile() { return JITCompileHelper("long double"); }
 
 template<typename Value_t>
 std::string FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
@@ -1173,6 +1173,8 @@ void * Compiler::getFunction(const std::string & fname)
   throw std::runtime_error(error);
 }
 }
+
+#endif // LIBMESH_HAVE_FPARSER_JIT
 
 template<typename Value_t>
 void FunctionParserADBase<Value_t>::Serialize(std::ostream & ostr)
