@@ -1422,7 +1422,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 
   // Localize the potentially parallel vector
   std::unique_ptr<NumericVector<Number>> local_v = NumericVector<Number>::build(this->comm());
-  local_v->init(v.size(), true, SERIAL);
+  local_v->init(v.size(), v.local_size(), _dof_map->get_send_list(),
+                true, GHOSTED);
   v.localize (*local_v, _dof_map->get_send_list());
 
   // I'm not sure how best to mix Hilbert norms on some variables (for

@@ -2128,7 +2128,9 @@ void DofMap::enforce_constraints_exactly (const System & system,
   else if (v->type() == PARALLEL)
     {
       v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v->size(), v->size(), true, SERIAL);
+      v_built->init (v->size(), v->local_size(),
+                     this->get_send_list(), true,
+                     GHOSTED);
       v->localize(*v_built);
       v_built->close();
       v_local = v_built.get();
@@ -2206,7 +2208,8 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
   else if (solution->type() == PARALLEL)
     {
       solution_built = NumericVector<Number>::build(this->comm());
-      solution_built->init (solution->size(), solution->size(), true, SERIAL);
+      solution_built->init (solution->size(), solution->local_size(),
+                            this->get_send_list(), true, GHOSTED);
       solution->localize(*solution_built);
       solution_built->close();
       solution_local = solution_built.get();
@@ -2302,7 +2305,8 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
   else if (v.type() == PARALLEL)
     {
       v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v.size(), v.size(), true, SERIAL);
+      v_built->init (v.size(), v.local_size(),
+                     this->get_send_list(), true, GHOSTED);
       v.localize(*v_built);
       v_built->close();
       v_local = v_built.get();
