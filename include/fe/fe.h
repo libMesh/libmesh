@@ -151,6 +151,24 @@ public:
                             const unsigned int i,
                             const Point & p,
                             const bool add_p_level = true);
+
+  /**
+   * Fills \p v with the values of the \f$ i^{th} \f$
+   * shape function, evaluated at all points p.  You must specify
+   * element order directly.  \p v should already be the appropriate
+   * size.
+   *
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
+   */
+  static void shapes(const Elem * elem,
+                     const Order o,
+                     const unsigned int i,
+                     const std::vector<Point> & p,
+                     std::vector<OutputShape> & v,
+                     const bool add_p_level = true);
+
   /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at point \p p.  This method allows you to
@@ -546,6 +564,21 @@ protected:
                                          const Elem * e) override;
 
 #endif
+
+  /**
+   * A default implementation for shapes
+   */
+  static void default_shapes (const Elem * elem,
+                              const Order o,
+                              const unsigned int i,
+                              const std::vector<Point> & p,
+                              std::vector<OutputShape> & v,
+                              const bool add_p_level = true)
+    {
+      libmesh_assert_equal_to(p.size(), v.size());
+      for (auto vi : index_range(v))
+        v[vi] = FE<Dim,T>::shape (elem, o, i, p[vi], add_p_level);
+    }
 
   /**
    * A default implementation for shape_derivs
@@ -1173,6 +1206,19 @@ typedef FE<3,MONOMIAL> FEMonomial3D;
 
 #define LIBMESH_DEFAULT_VECTORIZED_FE(MyDim, MyType) \
 template<>                                           \
+void FE<MyDim,MyType>::shapes                        \
+  (const Elem * elem,                                \
+   const Order o,                                    \
+   const unsigned int i,                             \
+   const std::vector<Point> & p,                     \
+   std::vector<OutputShape> & v,                     \
+   const bool add_p_level)                           \
+{                                                    \
+  FE<MyDim,MyType>::default_shapes                   \
+    (elem,o,i,p,v,add_p_level);                      \
+}                                                    \
+                                                     \
+template<>                                           \
 void FE<MyDim,MyType>::shape_derivs                  \
   (const Elem * elem,                                \
    const Order o,                                    \
@@ -1182,7 +1228,8 @@ void FE<MyDim,MyType>::shape_derivs                  \
    std::vector<OutputShape> & v,                     \
    const bool add_p_level)                           \
 {                                                    \
-  FE<MyDim,MyType>::default_shape_derivs(elem,o,i,j,p,v,add_p_level);  \
+  FE<MyDim,MyType>::default_shape_derivs             \
+    (elem,o,i,j,p,v,add_p_level);                    \
 }
 
 
