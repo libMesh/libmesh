@@ -35,6 +35,10 @@ static const libMesh::FEFamily _underlying_fe_family = libMesh::BERNSTEIN;
 namespace libMesh
 {
 
+
+LIBMESH_DEFAULT_VECTORIZED_FE(1,RATIONAL_BERNSTEIN)
+
+
 template <>
 Real FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
                                      const Order order,

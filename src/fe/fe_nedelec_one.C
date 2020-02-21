@@ -25,8 +25,16 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/enum_to_string.h"
 
+
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(0,NEDELEC_ONE)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,NEDELEC_ONE)
+LIBMESH_DEFAULT_VECTORIZED_FE(2,NEDELEC_ONE)
+LIBMESH_DEFAULT_VECTORIZED_FE(3,NEDELEC_ONE)
+
 
 // Anonymous namespace for local helper functions
 namespace {

@@ -20,8 +20,14 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 
+
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(0,LAGRANGE)
+LIBMESH_DEFAULT_VECTORIZED_FE(0,L2_LAGRANGE)
+
 
 template <>
 Real FE<0,L2_LAGRANGE>::shape(const ElemType,

@@ -29,6 +29,9 @@ namespace libMesh
 {
 
 
+LIBMESH_DEFAULT_VECTORIZED_FE(3,CLOUGH)
+
+
 template <>
 Real FE<3,CLOUGH>::shape(const ElemType,
                          const Order,

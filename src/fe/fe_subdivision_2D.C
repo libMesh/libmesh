@@ -30,6 +30,10 @@
 namespace libMesh
 {
 
+
+LIBMESH_DEFAULT_VECTORIZED_FE(2,SUBDIVISION)
+
+
 FESubdivision::FESubdivision(const FEType & fet) :
   FE<2,SUBDIVISION>(fet)
 {

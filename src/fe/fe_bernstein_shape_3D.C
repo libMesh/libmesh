@@ -31,6 +31,8 @@ namespace libMesh
 {
 
 
+LIBMESH_DEFAULT_VECTORIZED_FE(3,BERNSTEIN)
+
 
 template <>
 Real FE<3,BERNSTEIN>::shape(const Elem * elem,

@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/utility.h"
 
+
 // Anonymous namespace for functions shared by HIERARCHIC and
 // L2_HIERARCHIC implementations. Implementations appear at the bottom
 // of this file.
@@ -55,6 +56,11 @@ Real fe_hierarchic_1D_shape_second_deriv(const ElemType,
 
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(1,HIERARCHIC)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,L2_HIERARCHIC)
+
 
 template <>
 Real FE<1,HIERARCHIC>::shape(const ElemType elem_type,

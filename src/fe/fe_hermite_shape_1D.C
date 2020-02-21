@@ -24,6 +24,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/utility.h"
 
+
 namespace
 {
 using namespace libMesh;
@@ -74,6 +75,10 @@ void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
 
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(1,HERMITE)
+
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 

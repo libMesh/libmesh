@@ -24,6 +24,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/number_lookups.h"
 
+
 namespace
 {
 using namespace libMesh;
@@ -375,6 +376,9 @@ Real hermite_bases_3D (std::vector<unsigned int> & bases1D,
 
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(3,HERMITE)
 
 
 template <>

@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/number_lookups.h"
 
+
 // Anonymous namespace for functions shared by HIERARCHIC and
 // L2_HIERARCHIC implementations. Implementations appear at the bottom
 // of this file.
@@ -667,6 +668,11 @@ void cube_indices(const Elem * elem,
 
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(3,HIERARCHIC)
+LIBMESH_DEFAULT_VECTORIZED_FE(3,L2_HIERARCHIC)
+
 
 template <>
 Real FE<3,HIERARCHIC>::shape(const ElemType,

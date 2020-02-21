@@ -23,9 +23,12 @@
 #include "libmesh/elem.h"
 
 
-
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(1,XYZ)
+
 
 template <>
 Real FE<1,XYZ>::shape(const Elem * elem,

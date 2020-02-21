@@ -23,9 +23,11 @@
 #include "libmesh/elem.h"
 
 
-
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(0,BERNSTEIN)
 
 
 template <>
@@ -100,7 +102,6 @@ Real FE<0,BERNSTEIN>::shape_deriv(const FEType,
   libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;
 }
-
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
