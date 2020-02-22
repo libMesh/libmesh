@@ -321,8 +321,11 @@ void System::project_vector (const NumericVector<Number> & old_v,
       local_old_vector_built = NumericVector<Number>::build(this->comm());
       new_vector_ptr = new_vector_built.get();
       local_old_vector = local_old_vector_built.get();
-      new_vector_ptr->init(this->n_dofs(), false, SERIAL);
-      local_old_vector->init(old_v.size(), false, SERIAL);
+      new_vector_ptr->init(this->n_dofs(), this->n_local_dofs(),
+                           this->get_dof_map().get_send_list(), false,
+                           GHOSTED);
+      local_old_vector->init(old_v.size(), old_v.local_size(),
+                             projection_list.send_list, false, GHOSTED);
       old_v.localize(*local_old_vector, projection_list.send_list);
       local_old_vector->close();
       old_vector_ptr = local_old_vector;
@@ -447,10 +450,8 @@ void System::project_vector (const NumericVector<Number> & old_v,
     {
       // We may have to set dof values that this processor doesn't
       // own in certain special cases, like LAGRANGE FIRST or
-      // HERMITE THIRD elements on second-order meshes
-      for (auto i : IntRange<dof_id_type>(0, new_v.size()))
-        if (new_vector(i) != 0.0)
-          new_v.set(i, new_vector(i));
+      // HERMITE THIRD elements on second-order meshes?
+      new_v = new_vector;
       new_v.close();
     }
 
