@@ -55,51 +55,10 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
                                                const FEGenericBase<OutputShape> & fe,
                                                std::vector<std::vector<OutputShape>> & phi ) const
 {
-  switch(dim)
+  for (auto i : index_range(phi))
     {
-    case 0:
-      {
-        for (auto i : index_range(phi))
-          {
-            libmesh_assert_equal_to ( qp.size(), phi[i].size() );
-            for (auto p : index_range(phi[i]))
-              FEInterface::shape<OutputShape>(0, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
-          }
-        break;
-      }
-    case 1:
-      {
-        for (auto i : index_range(phi))
-          {
-            libmesh_assert_equal_to ( qp.size(), phi[i].size() );
-            for (auto p : index_range(phi[i]))
-              FEInterface::shape<OutputShape>(1, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
-          }
-        break;
-      }
-    case 2:
-      {
-        for (auto i : index_range(phi))
-          {
-            libmesh_assert_equal_to ( qp.size(), phi[i].size() );
-            for (auto p : index_range(phi[i]))
-              FEInterface::shape<OutputShape>(2, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
-          }
-        break;
-      }
-    case 3:
-      {
-        for (auto i : index_range(phi))
-          {
-            libmesh_assert_equal_to ( qp.size(), phi[i].size() );
-            for (auto p : index_range(phi[i]))
-              FEInterface::shape<OutputShape>(3, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
-          }
-        break;
-      }
-
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
+      libmesh_assert_equal_to ( qp.size(), phi[i].size() );
+      FEInterface::shapes<OutputShape>(dim, fe.get_fe_type(), elem, i, qp, phi[i]);
     }
 }
 

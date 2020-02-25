@@ -34,6 +34,9 @@ namespace libMesh
 {
 
 
+LIBMESH_DEFAULT_VECTORIZED_FE(3,RATIONAL_BERNSTEIN)
+
+
 template <>
 Real FE<3,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
                                      const Order order,

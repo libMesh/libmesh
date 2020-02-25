@@ -23,9 +23,11 @@
 #include "libmesh/elem.h"
 
 
-
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(0,RATIONAL_BERNSTEIN)
 
 
 template <>

@@ -24,8 +24,12 @@
 
 #include "libmesh/fe.h"
 
+
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(3,SZABAB)
 
 
 template <>

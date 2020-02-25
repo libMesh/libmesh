@@ -24,6 +24,11 @@
 namespace libMesh
 {
 
+
+LIBMESH_DEFAULT_VECTORIZED_FE(0,HIERARCHIC)
+LIBMESH_DEFAULT_VECTORIZED_FE(0,L2_HIERARCHIC)
+
+
 template <>
 Real FE<0,L2_HIERARCHIC>::shape(const ElemType,
                                 const Order,

@@ -24,8 +24,16 @@
 #include "libmesh/elem.h"
 #include "libmesh/tensor_value.h"
 
+
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(0,LAGRANGE_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,LAGRANGE_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(2,LAGRANGE_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(3,LAGRANGE_VEC)
+
 
 // ------------------------------------------------------------
 // Lagrange-specific implementations

@@ -22,8 +22,13 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 
+
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(3,SCALAR)
+
 
 template <>
 Real FE<3,SCALAR>::shape(const ElemType,

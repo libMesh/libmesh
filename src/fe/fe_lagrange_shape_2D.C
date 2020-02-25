@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
 
+
 // Anonymous namespace for functions shared by LAGRANGE and
 // L2_LAGRANGE implementations. Implementations appear at the bottom
 // of this file.
@@ -55,6 +56,11 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
 
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(2,LAGRANGE)
+LIBMESH_DEFAULT_VECTORIZED_FE(2,L2_LAGRANGE)
+
 
 template <>
 Real FE<2,LAGRANGE>::shape(const ElemType type,

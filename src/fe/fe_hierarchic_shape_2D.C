@@ -67,6 +67,11 @@ Real fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
 namespace libMesh
 {
 
+
+LIBMESH_DEFAULT_VECTORIZED_FE(2,HIERARCHIC)
+LIBMESH_DEFAULT_VECTORIZED_FE(2,L2_HIERARCHIC)
+
+
 template <>
 Real FE<2,HIERARCHIC>::shape(const ElemType,
                              const Order,

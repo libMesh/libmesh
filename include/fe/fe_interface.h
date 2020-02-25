@@ -293,6 +293,22 @@ public:
                     const Point & p,
                     OutputType & phi);
 
+  /**
+   * Fills \p phi with the values of the \f$ i^{th} \f$ shape function
+   * at point \p p. This method allows you to specify the dimension,
+   * element type, and order directly.
+   *
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
+   */
+  template<typename OutputType>
+  static void shapes(const unsigned int dim,
+                     const FEType & fe_t,
+                     const Elem * elem,
+                     const unsigned int i,
+                     const std::vector<Point> & p,
+                     std::vector<OutputType> & phi);
+
   typedef Real (*shape_ptr) (const FEType fe_t,
                              const Elem * elem,
                              const unsigned int i,

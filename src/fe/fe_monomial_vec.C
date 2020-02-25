@@ -22,8 +22,16 @@
 #include "libmesh/elem.h"
 #include "libmesh/tensor_value.h"
 
+
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(0,MONOMIAL_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,MONOMIAL_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(2,MONOMIAL_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(3,MONOMIAL_VEC)
+
 
 // ------------------------------------------------------------
 // Vector monomial specific implementations

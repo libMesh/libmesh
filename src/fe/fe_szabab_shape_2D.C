@@ -50,6 +50,9 @@ namespace libMesh
 {
 
 
+LIBMESH_DEFAULT_VECTORIZED_FE(2,SZABAB)
+
+
 template <>
 Real FE<2,SZABAB>::shape(const Elem * elem,
                          const Order order,

@@ -21,8 +21,14 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
 
+
 namespace libMesh
 {
+
+
+LIBMESH_DEFAULT_VECTORIZED_FE(1,LAGRANGE)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,L2_LAGRANGE)
+
 
 template <>
 Real FE<1,LAGRANGE>::shape(const ElemType,

@@ -29,6 +29,10 @@
 namespace libMesh
 {
 
+
+LIBMESH_DEFAULT_VECTORIZED_FE(2,BERNSTEIN)
+
+
 template <>
 Real FE<2,BERNSTEIN>::shape(const Elem * elem,
                             const Order order,
