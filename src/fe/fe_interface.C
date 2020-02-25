@@ -851,6 +851,50 @@ void FEInterface::shapes<Real>(const unsigned int dim,
 
 
 template<>
+void FEInterface::all_shapes<Real>(const unsigned int dim,
+                                   const FEType & fe_t,
+                                   const Elem * elem,
+                                   const std::vector<Point> & p,
+                                   std::vector<std::vector<Real>> & phi)
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (elem && is_InfFE_elem(elem->type()))
+    {
+      for (auto i : index_range(phi))
+        FEInterface::shapes<Real>(dim, fe_t, elem, i, p, phi[i]);
+      return;
+    }
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_scalar_vec_error_switch(0, all_shapes(elem,o,p,phi), , ; return;);
+      break;
+    case 1:
+      fe_scalar_vec_error_switch(1, all_shapes(elem,o,p,phi), , ; return;);
+      break;
+    case 2:
+      fe_scalar_vec_error_switch(2, all_shapes(elem,o,p,phi), , ; return;);
+      break;
+    case 3:
+      fe_scalar_vec_error_switch(3, all_shapes(elem,o,p,phi), , ; return;);
+      break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+
+  return;
+}
+
+
+
+
+
+template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const FEType & fe_t,
                                       const ElemType t,
@@ -919,6 +963,45 @@ void FEInterface::shapes<RealGradient>(const unsigned int dim,
       break;
     case 3:
       fe_vector_scalar_error_switch(3, shapes(elem,o,i,p,phi), , ; return;);
+      break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+
+  return;
+}
+
+
+
+template<>
+void FEInterface::all_shapes<RealGradient>(const unsigned int dim,
+                                           const FEType & fe_t,
+                                           const Elem * elem,
+                                           const std::vector<Point> & p,
+                                           std::vector<std::vector<RealGradient>> & phi)
+{
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    libmesh_not_implemented();
+  // This is actually an issue for infinite elements: They require type 'Gradient'!
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_vector_scalar_error_switch(0, all_shapes(elem,o,p,phi), , ; return;);
+      break;
+    case 1:
+      fe_vector_scalar_error_switch(1, all_shapes(elem,o,p,phi), , ; return;);
+      break;
+    case 2:
+      fe_vector_scalar_error_switch(2, all_shapes(elem,o,p,phi), , ; return;);
+      break;
+    case 3:
+      fe_vector_scalar_error_switch(3, all_shapes(elem,o,p,phi), , ; return;);
       break;
     default:
       libmesh_error_msg("Invalid dimension = " << dim);

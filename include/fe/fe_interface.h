@@ -309,6 +309,13 @@ public:
                      const std::vector<Point> & p,
                      std::vector<OutputType> & phi);
 
+  template<typename OutputType>
+  static void all_shapes(const unsigned int dim,
+                         const FEType & fe_t,
+                         const Elem * elem,
+                         const std::vector<Point> & p,
+                         std::vector<std::vector<OutputType>> & phi);
+
   typedef Real (*shape_ptr) (const FEType fe_t,
                              const Elem * elem,
                              const unsigned int i,
