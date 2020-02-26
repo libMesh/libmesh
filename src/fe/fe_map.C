@@ -442,33 +442,33 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
               }
           }
         else
-          for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-            {
-              if (calculate_xyz)
-                for (std::size_t p=0; p<n_qp; p++)
-                  this->phi_map[i][p] =
-                    shape_ptr(map_fe_type, elem, i, qp[p], false);
+          {
+            if (calculate_xyz)
+              FEInterface::all_shapes(3, map_fe_type, elem, qp, this->phi_map, false);
 
-              if (calculate_dxyz)
-                for (std::size_t p=0; p<n_qp; p++)
-                  {
-                    this->dphidxi_map[i][p]   = shape_deriv_ptr (map_fe_type, elem, i, 0, qp[p], false);
-                    this->dphideta_map[i][p]  = shape_deriv_ptr (map_fe_type, elem, i, 1, qp[p], false);
-                    this->dphidzeta_map[i][p] = shape_deriv_ptr (map_fe_type, elem, i, 2, qp[p], false);
-                  }
+            for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+              {
+                if (calculate_dxyz)
+                  for (std::size_t p=0; p<n_qp; p++)
+                    {
+                      this->dphidxi_map[i][p]   = shape_deriv_ptr (map_fe_type, elem, i, 0, qp[p], false);
+                      this->dphideta_map[i][p]  = shape_deriv_ptr (map_fe_type, elem, i, 1, qp[p], false);
+                      this->dphidzeta_map[i][p] = shape_deriv_ptr (map_fe_type, elem, i, 2, qp[p], false);
+                    }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              if (calculate_d2xyz)
-                for (std::size_t p=0; p<n_qp; p++)
-                  {
-                    this->d2phidxi2_map[i][p]      = shape_second_deriv_ptr (map_fe_type, elem, i, 0, qp[p], false);
-                    this->d2phidxideta_map[i][p]   = shape_second_deriv_ptr (map_fe_type, elem, i, 1, qp[p], false);
-                    this->d2phideta2_map[i][p]     = shape_second_deriv_ptr (map_fe_type, elem, i, 2, qp[p], false);
-                    this->d2phidxidzeta_map[i][p]  = shape_second_deriv_ptr (map_fe_type, elem, i, 3, qp[p], false);
-                    this->d2phidetadzeta_map[i][p] = shape_second_deriv_ptr (map_fe_type, elem, i, 4, qp[p], false);
-                    this->d2phidzeta2_map[i][p]    = shape_second_deriv_ptr (map_fe_type, elem, i, 5, qp[p], false);
-                  }
+                if (calculate_d2xyz)
+                  for (std::size_t p=0; p<n_qp; p++)
+                    {
+                      this->d2phidxi2_map[i][p]      = shape_second_deriv_ptr (map_fe_type, elem, i, 0, qp[p], false);
+                      this->d2phidxideta_map[i][p]   = shape_second_deriv_ptr (map_fe_type, elem, i, 1, qp[p], false);
+                      this->d2phideta2_map[i][p]     = shape_second_deriv_ptr (map_fe_type, elem, i, 2, qp[p], false);
+                      this->d2phidxidzeta_map[i][p]  = shape_second_deriv_ptr (map_fe_type, elem, i, 3, qp[p], false);
+                      this->d2phidetadzeta_map[i][p] = shape_second_deriv_ptr (map_fe_type, elem, i, 4, qp[p], false);
+                      this->d2phidzeta2_map[i][p]    = shape_second_deriv_ptr (map_fe_type, elem, i, 5, qp[p], false);
+                    }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-            }
+              }
+          }
 
         break;
       }
