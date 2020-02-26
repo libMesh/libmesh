@@ -131,79 +131,105 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
     FEInterface::n_shape_functions (Dim, map_fe_type,
                                     mapping_elem_type);
 
-  if (calculate_xyz)
-    this->phi_map.resize         (n_mapping_shape_functions);
-  if (Dim > 0)
-    {
-      if (calculate_dxyz)
-        this->dphidxi_map.resize     (n_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      if (calculate_d2xyz)
-        this->d2phidxi2_map.resize   (n_mapping_shape_functions);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    }
+  // Maybe we already have correctly-sized data?  Check data sizes,
+  // and get ready to break out of a "loop" if all these resize()
+  // calls are redundant.
+  unsigned int old_n_qp = 0;
 
-  if (Dim > 1)
-    {
-      if (calculate_dxyz)
-        this->dphideta_map.resize  (n_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      if (calculate_d2xyz)
-        {
-          this->d2phidxideta_map.resize   (n_mapping_shape_functions);
-          this->d2phideta2_map.resize     (n_mapping_shape_functions);
-        }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    }
-
-  if (Dim > 2)
-    {
-      if (calculate_dxyz)
-        this->dphidzeta_map.resize (n_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      if (calculate_d2xyz)
-        {
-          this->d2phidxidzeta_map.resize  (n_mapping_shape_functions);
-          this->d2phidetadzeta_map.resize (n_mapping_shape_functions);
-          this->d2phidzeta2_map.resize    (n_mapping_shape_functions);
-        }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    }
-
-
-  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+  do
     {
       if (calculate_xyz)
-        this->phi_map[i].resize         (n_qp);
+        {
+          if (this->phi_map.size() == n_mapping_shape_functions)
+            {
+              old_n_qp = n_mapping_shape_functions ? this->phi_map[0].size() : 0;
+              break;
+            }
+          this->phi_map.resize         (n_mapping_shape_functions);
+        }
       if (Dim > 0)
         {
           if (calculate_dxyz)
-            this->dphidxi_map[i].resize     (n_qp);
+            {
+              if (this->dphidxi_map.size() == n_mapping_shape_functions)
+                {
+                  old_n_qp = n_mapping_shape_functions ? this->dphidxi_map[0].size() : 0;
+                  break;
+                }
+              this->dphidxi_map.resize     (n_mapping_shape_functions);
+            }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+          // Don't waste time considering early break here; if we
+          // asked for d2xyz then we surely asked for dxyz too and
+          // considered early break above.
+          if (calculate_d2xyz)
+            this->d2phidxi2_map.resize   (n_mapping_shape_functions);
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        }
+
+      if (Dim > 1)
+        {
+          if (calculate_dxyz)
+            this->dphideta_map.resize  (n_mapping_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           if (calculate_d2xyz)
             {
-              this->d2phidxi2_map[i].resize     (n_qp);
-              if (Dim > 1)
-                {
-                  this->d2phidxideta_map[i].resize (n_qp);
-                  this->d2phideta2_map[i].resize (n_qp);
-                }
-              if (Dim > 2)
-                {
-                  this->d2phidxidzeta_map[i].resize  (n_qp);
-                  this->d2phidetadzeta_map[i].resize (n_qp);
-                  this->d2phidzeta2_map[i].resize    (n_qp);
-                }
+              this->d2phidxideta_map.resize   (n_mapping_shape_functions);
+              this->d2phideta2_map.resize     (n_mapping_shape_functions);
             }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        }
 
-          if (Dim > 1 && calculate_dxyz)
-            this->dphideta_map[i].resize  (n_qp);
-
-          if (Dim > 2 && calculate_dxyz)
-            this->dphidzeta_map[i].resize (n_qp);
+      if (Dim > 2)
+        {
+          if (calculate_dxyz)
+            this->dphidzeta_map.resize (n_mapping_shape_functions);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+          if (calculate_d2xyz)
+            {
+              this->d2phidxidzeta_map.resize  (n_mapping_shape_functions);
+              this->d2phidetadzeta_map.resize (n_mapping_shape_functions);
+              this->d2phidzeta2_map.resize    (n_mapping_shape_functions);
+            }
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         }
     }
+  while (false);
+
+  if (old_n_qp != n_qp)
+    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+      {
+        if (calculate_xyz)
+          this->phi_map[i].resize         (n_qp);
+        if (Dim > 0)
+          {
+            if (calculate_dxyz)
+              this->dphidxi_map[i].resize     (n_qp);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+            if (calculate_d2xyz)
+              {
+                this->d2phidxi2_map[i].resize     (n_qp);
+                if (Dim > 1)
+                  {
+                    this->d2phidxideta_map[i].resize (n_qp);
+                    this->d2phideta2_map[i].resize (n_qp);
+                  }
+                if (Dim > 2)
+                  {
+                    this->d2phidxidzeta_map[i].resize  (n_qp);
+                    this->d2phidetadzeta_map[i].resize (n_qp);
+                    this->d2phidzeta2_map[i].resize    (n_qp);
+                  }
+              }
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+            if (Dim > 1 && calculate_dxyz)
+              this->dphideta_map[i].resize  (n_qp);
+
+            if (Dim > 2 && calculate_dxyz)
+                this->dphidzeta_map[i].resize (n_qp);
+          }
+      }
 
   // Optimize for the *linear* geometric elements case:
   bool is_linear = elem->is_linear();
