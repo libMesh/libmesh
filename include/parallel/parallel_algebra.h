@@ -38,6 +38,7 @@
 // C++ includes
 #include <cstddef>
 #include <memory>
+#include <type_traits>
 
 namespace TIMPI {
 
@@ -54,7 +55,8 @@ using libMesh::Point;
 // have vptrs, and I'd rather not have the datatype break in those
 // cases.
 template <typename T>
-class StandardType<TypeVector<T>> : public DataType
+class StandardType<TypeVector<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+  : public DataType
 {
 public:
   explicit
@@ -113,11 +115,14 @@ public:
   }
 
   ~StandardType() { this->free(); }
+
+  static const bool is_fixed_type = true;
 };
 
 
 template <typename T>
-class StandardType<VectorValue<T>> : public DataType
+class StandardType<VectorValue<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+  : public DataType
 {
 public:
   explicit
@@ -178,8 +183,9 @@ public:
   }
 
   ~StandardType() { this->free(); }
-};
 
+  static const bool is_fixed_type = true;
+};
 
 template <>
 class StandardType<Point> : public DataType
@@ -246,8 +252,9 @@ public:
   }
 
   ~StandardType() { this->free(); }
-};
 
+  static const bool is_fixed_type = true;
+};
 
 // OpFunction<> specializations to return an MPI_Op version of the
 // reduction operations on LIBMESH_DIM-vectors.
@@ -361,7 +368,8 @@ class OpFunction<Point> : public TypeVectorOpFunction<Point> {};
 //
 // We assume contiguous storage here
 template <typename T>
-class StandardType<TypeTensor<T>> : public DataType
+class StandardType<TypeTensor<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+  : public DataType
 {
 public:
   explicit
@@ -369,10 +377,13 @@ public:
     DataType(StandardType<T>(example ?  &((*example)(0,0)) : nullptr), LIBMESH_DIM*LIBMESH_DIM) {}
 
   inline ~StandardType() { this->free(); }
+
+  static const bool is_fixed_type = true;
 };
 
 template <typename T>
-class StandardType<TensorValue<T>> : public DataType
+class StandardType<TensorValue<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+  : public DataType
 {
 public:
   explicit
@@ -380,6 +391,8 @@ public:
     DataType(StandardType<T>(example ?  &((*example)(0,0)) : nullptr), LIBMESH_DIM*LIBMESH_DIM) {}
 
   inline ~StandardType() { this->free(); }
+
+  static const bool is_fixed_type = true;
 };
 } // namespace TIMPI
 

@@ -62,6 +62,8 @@ public:
   }
 
   ~StandardType() { this->free(); }
+
+  static const bool is_fixed_type = true;
 };
 
 #endif // LIBMESH_HAVE_MPI
