@@ -789,7 +789,7 @@ Node * DistributedMesh::insert_node(Node * n)
 
 Node * DistributedMesh::insert_node(std::unique_ptr<Node> n)
 {
-  return DistributedMesh::insert_node(std::move(n));
+  return insert_node(n.release());
 }
 
 
