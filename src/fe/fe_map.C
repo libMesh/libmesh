@@ -87,6 +87,25 @@ std::unique_ptr<FEMap> FEMap::build( FEType fe_type )
 
 
 
+void FEMap::add_calculations()
+{
+  this->calculations_started = false;
+  this->phi_map.clear();
+  this->dphidxi_map.clear();
+  this->dphideta_map.clear();
+  this->dphidzeta_map.clear();
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  this->d2phidxi2_map.clear();
+  this->d2phidxideta_map.clear();
+  this->d2phideta2_map.clear();
+  this->d2phidxidzeta_map.clear();
+  this->d2phidetadzeta_map.clear();
+  this->d2phidzeta2_map.clear();
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+}
+
+
+
 template<unsigned int Dim>
 void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
                                            const Elem * elem)
