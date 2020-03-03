@@ -169,6 +169,23 @@ public:
                      std::vector<OutputShape> & v,
                      const bool add_p_level = true);
 
+
+  /**
+   * Fills \p v[i][qp] with the values of the \f$ i^{th} \f$
+   * shape functions, evaluated at points qp in p.  You must specify
+   * element order directly.  \p v should already be the appropriate
+   * size.
+   *
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
+   */
+  static void all_shapes(const Elem * elem,
+                         const Order o,
+                         const std::vector<Point> & p,
+                         std::vector<std::vector<OutputShape> > & v,
+                         const bool add_p_level = true);
+
   /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at point \p p.  This method allows you to
@@ -578,6 +595,22 @@ protected:
       libmesh_assert_equal_to(p.size(), v.size());
       for (auto vi : index_range(v))
         v[vi] = FE<Dim,T>::shape (elem, o, i, p[vi], add_p_level);
+    }
+
+  /**
+   * A default implementation for all_shapes
+   */
+  static void default_all_shapes (const Elem * elem,
+                                  const Order o,
+                                  const std::vector<Point> & p,
+                                  std::vector<std::vector<OutputShape>> & v,
+                                  const bool add_p_level = true)
+    {
+      for (auto i : index_range(v))
+        {
+          libmesh_assert_equal_to ( p.size(), v[i].size() );
+          FE<Dim,T>::shapes (elem, o, i, p, v[i], add_p_level);
+        }
     }
 
   /**
@@ -1205,6 +1238,18 @@ typedef FE<3,MONOMIAL> FEMonomial3D;
 } // namespace libMesh
 
 #define LIBMESH_DEFAULT_VECTORIZED_FE(MyDim, MyType) \
+template<>                                           \
+void FE<MyDim,MyType>::all_shapes                    \
+  (const Elem * elem,                                \
+   const Order o,                                    \
+   const std::vector<Point> & p,                     \
+   std::vector<std::vector<OutputShape>> & v,        \
+   const bool add_p_level)                           \
+{                                                    \
+  FE<MyDim,MyType>::default_all_shapes               \
+    (elem,o,p,v,add_p_level);                        \
+}                                                    \
+                                                     \
 template<>                                           \
 void FE<MyDim,MyType>::shapes                        \
   (const Elem * elem,                                \

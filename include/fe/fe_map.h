@@ -608,6 +608,12 @@ public:
     calculate_dxyz = true; return JxW; }
 
   /**
+   * Allows the user to prerequest additional calculations in between
+   * two calls to reinit();
+   */
+  void add_calculations();
+
+  /**
    * Set the Jacobian tolerance used for determining when the mapping fails. The mapping is
    * determined to fail if jac <= jacobian_tolerance.
    */
@@ -995,13 +1001,6 @@ protected:
   mutable bool calculate_d2xyz;
 
 #endif
-
-  /**
-   * FE classes should be able to reset calculations_started in a few
-   * special cases.
-   */
-  template <unsigned int Dim, FEFamily T>
-  friend class FE;
 
   /**
    * The Jacobian tolerance used for determining when the mapping fails. The mapping is

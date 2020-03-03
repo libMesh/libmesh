@@ -307,7 +307,16 @@ public:
                      const Elem * elem,
                      const unsigned int i,
                      const std::vector<Point> & p,
-                     std::vector<OutputType> & phi);
+                     std::vector<OutputType> & phi,
+                     const bool add_p_level = true);
+
+  template<typename OutputType>
+  static void all_shapes(const unsigned int dim,
+                         const FEType & fe_t,
+                         const Elem * elem,
+                         const std::vector<Point> & p,
+                         std::vector<std::vector<OutputType>> & phi,
+                         const bool add_p_level = true);
 
   typedef Real (*shape_ptr) (const FEType fe_t,
                              const Elem * elem,

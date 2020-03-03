@@ -125,7 +125,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
   // We're (possibly re-) calculating now!  FIXME - we currently
   // expect to be able to use side_map and JxW later, but we could
   // optimize further here.
-  this->_fe_map->calculations_started = false;
+  this->_fe_map->add_calculations();
   this->_fe_map->get_JxW();
   this->_fe_map->get_xyz();
   this->determine_calculations();
@@ -243,7 +243,7 @@ void FE<Dim,T>::edge_reinit(const Elem * elem,
   // We're (possibly re-) calculating now!  Time to determine what.
   // FIXME - we currently just assume that we're using JxW and calling
   // edge_map later.
-  this->_fe_map->calculations_started = false;
+  this->_fe_map->add_calculations();
   this->_fe_map->get_JxW();
   this->_fe_map->get_xyz();
   this->determine_calculations();
