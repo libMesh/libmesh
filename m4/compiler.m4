@@ -6,32 +6,63 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   # look for a decent C++ compiler or honor --with-cxx=...
   CXX_TRY_LIST="g++ icpc icc pgCC c++"
 
-     # -------------------------------------------------------------------
-     # MPI -- enabled by default.  Check for it now so we can be somewhat
-     #                             smart about which compilers to look for
-     # -------------------------------------------------------------------
-     AC_ARG_ENABLE(mpi,
-                   AS_HELP_STRING([--disable-mpi],
-                                  [build without MPI message passing support]),
-                   [AS_CASE("${enableval}",
-                            [yes], [enablempi=yes],
-                            [no],  [enablempi=no],
-                            [AC_MSG_ERROR(bad value ${enableval} for --enable-mpi)])],
-                   [enablempi=yes])
-
-  AS_IF([test "$enablempi" != no],
-        [CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"],
-        AC_MSG_RESULT([>>> Disabling MPI per user request <<<]))
-
   AC_ARG_WITH([cxx],
               AS_HELP_STRING([--with-cxx=CXX], [C++ compiler to use]),
               [CXX="$withval"],
               [])
 
+  AS_IF([test "$enablempi" != no],
+        [
+          dnl Ok we want to enable mpi. Let's think about what compilers
+          dnl we want to try.
+          AS_IF([test x"$MPI" != x],
+                [
+                  dnl only try to set CXX if the user hasn't specified one already
+                  AS_IF([test -z "$CXX"],
+                        [
+                          dnl If the user specified an MPI directory either
+                          dnl through --with-mpi= or through MPIHOME/MPI_HOME, then we will try
+                          dnl to use MPI compiler wrappers $MPI/bin
+                          AS_IF([test -d "$MPI/bin"],
+                                [
+                                  AC_CHECK_PROGS(LOCAL_CXX, [mpicxx mpiCC mpicc], [], ["$MPI/bin"])
+                                  AS_IF([test -z "$LOCAL_CXX"],
+                                        [AS_ECHO(["None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi compiler wrappers"])],
+                                        [MPI_USING_WRAPPERS=1;CXX="$MPI/bin/$LOCAL_CXX"])
+                                ],
+                                [AS_ECHO(["An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi compiler wrappers"])])
+                        ]) dnl AS_IF([test -z "$CXX"])
+                ],
+                [
+                  dnl No MPI directory specified. If we have PETSc, let's try to snoop some
+                  dnl information from there. We'll use this information further below and in
+                  dnl mpi.m4
+                  CONFIGURE_PETSC
+                  AS_IF([test x"$PETSC_HAVE_MPI" = x1 && test x"$PETSC_CXX" != x],
+                        [],
+                        dnl PETSc doesn't define a CXX so we'll just try to pull one from the environment
+                        [CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"])
+                ]) dnl AS_IF([test x"$MPI" != x])
+        ],
+        AC_MSG_RESULT([>>> Disabling MPI per user request <<<])) dnl AS_IF([test "$enablempi" != no])
+
   # --------------------------------------------------------------
   # Determines a C++ compiler to use.  First checks if the variable CXX is
-  # already set.  If not, then searches under g++, c++, and other names.
+  # already set.
   # --------------------------------------------------------------
+  AS_IF([test -z "$CXX"],
+        [
+          dnl See whether we are using PETSC_CXX. Unfortunately PETSC_CXX may
+          dnl be prefixed with a PATH, and its not straightforward to strip it off.
+          dnl If CXX is not set AC_PROG_CXX will call AC_CHECK_TOOLS which will prefix
+          dnl every argument in CXX_TRY_LIST with values in $PATH, so we will
+          dnl not find something like PATH/PETSC_PREFIX/mpicxx. The solution
+          dnl then is just to set CXX to PETSC_CXX so that AC_CHECK_TOOLS
+          dnl never gets called
+          AS_IF([test x"$PETSC_HAVE_MPI" = x1 && test x"$PETSC_CXX" != x],
+                [CXX="$PETSC_CXX"])
+        ])
+
   AC_PROG_CXX([$CXX_TRY_LIST])
   # --------------------------------------------------------------
 

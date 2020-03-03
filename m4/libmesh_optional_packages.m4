@@ -153,17 +153,26 @@ LIBMESH_TEST_BOOST_MOVELIB_UNIQUE_PTR
 AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # --------------------------------------------------------------
 
+# -------------------------------------------------------------
+# MPI -- enabled by default
+# -------------------------------------------------------------
+
+AS_IF([test "x$enablempi" = xyes],
+      [
+        ACX_MPI
+        AS_IF([test "x$enablempi" = xyes],
+              [
+                AS_IF([test x"$MPI_INCLUDES" = x],,[libmesh_optional_INCLUDES="$MPI_INCLUDES $libmesh_optional_INCLUDES"])
+                AS_IF([test x"$MPI_LIBS" != x], [libmesh_optional_LIBS="$MPI_LIBS $libmesh_optional_LIBS"])
+                AS_IF([test x"$MPI_LDFLAGS" != x], [libmesh_optional_LIBS="$MPI_LDFLAGS $libmesh_optional_LIBS"])
+              ])
+      ])
+
 
 # -------------------------------------------------------------
 # Petsc -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_PETSC
-AS_IF([test $enablempi != no],
-      [
-        libmesh_optional_INCLUDES="$MPI_INCLUDES_PATHS $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$MPI_LIBS_PATHS $MPI_LIBS $libmesh_optional_LIBS"
-      ])
-
 AS_IF([test $enablepetsc != no],
       [
         libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
