@@ -122,50 +122,10 @@ AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 
 dnl--------------------------------------------------------------------
-dnl MPI configure arguments
-dnl Put this here because we'll use the values in both
-dnl LIBMESH_SET_COMPILERS and in ACX_MPI. MPI support is enabled by
-dnl default. We check for it now so we can be somewhat smart about
-dnl which compilers to look for
+dnl Check for whether to enable MPI and PETSc which will influence our
+dnl choice of compiler
 dnl--------------------------------------------------------------------
-
-AC_ARG_ENABLE(mpi,
-              AS_HELP_STRING([--disable-mpi],
-                             [build without MPI message passing support]),
-              [AS_CASE("${enableval}",
-                       [yes], [enablempi=yes],
-                       [no],  [enablempi=no],
-                       [AC_MSG_ERROR(bad value ${enableval} for --enable-mpi)])],
-              [enablempi=yes])
-
-AC_ARG_WITH([mpi],
-            AS_HELP_STRING([--with-mpi@<:@=DIR@:>@],
-                           [Prefix where MPI is installed (default is MPIHOME and then MPI_HOME)]),
-            [
-              dnl We have no way of knowing whether the user explicitly enabled mpi
-              dnl with --enable-mpi or whether it was set by default, so if the user
-              dnl specified --with-mpi=no or --without-mpi we're just going to tell them they've given
-              dnl competing options
-              AS_IF([test "$enablempi" = yes && test "$withval" = no],
-                    [AC_MSG_ERROR([Did you mean to disable MPI? If you really mean it, use the --disable-mpi option instead])]
-                    )
-              MPI="$withval"
-            ],
-            [
-              AS_ECHO(["note: MPI library path not given..."])
-              AS_IF([test x"$MPIHOME" != x],
-                    [
-                      AS_ECHO(["trying prefix=$MPIHOME"])
-                      MPI=$MPIHOME
-                    ],
-                    [
-                      AS_IF([test x"$MPI_HOME" != x],
-                            [
-                              AS_ECHO(["trying prefix=$MPI_HOME"])
-                              MPI=$MPI_HOME
-                            ])
-                    ])
-            ])
+LIBMESH_COMPILER_CONTROL_ARGS
 
 # --------------------------------------------------------------
 # Set our preferred compilers

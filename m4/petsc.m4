@@ -3,14 +3,10 @@
 # -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_PETSC],
 [
-  AC_ARG_ENABLE(petsc,
-                AS_HELP_STRING([--disable-petsc],
-                               [build without PETSc iterative solver support]),
-                [AS_CASE("${enableval}",
-                         [yes], [enablepetsc=yes;enablepetsc_mpi=yes],
-                         [no],  [enablepetsc=no;enablepetsc_mpi=no],
-                         [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc)])],
-                [enablepetsc=$enableoptional;enablepetsc_mpi=yes])
+  dnl We need to verify that we've done AC_ARG_ENABLE(petsc)
+  dnl which occurs in LIBMESH_COMPILER_CONTROL_ARGS
+  AS_IF([test x"CALLED_COMPILER_CONTROL_ARGS" != x1],
+        [AC_MSG_ERROR([the compiler control args macros must be called before querying petsc configure])])
 
   # Setting --enable-petsc-required causes an error to be emitted
   # during configure if PETSc is not detected successfully during

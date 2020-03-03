@@ -2,6 +2,11 @@ dnl ---------------------------------------------------------------------------
 dnl check for the required MPI library
 dnl ---------------------------------------------------------------------------
 AC_DEFUN([ACX_MPI], [
+dnl We need to verify that we've done AC_ARG_ENABLE(mpi) and AC_ARG_WITH(mpi)
+dnl which occur in LIBMESH_COMPILER_CONTROL_ARGS
+AS_IF([test x"CALLED_COMPILER_CONTROL_ARGS" != x1],
+      [AC_MSG_ERROR([the compiler control args macro must be called before the mpi macro])])
+
 
 AS_IF(
   [test x"$MPI_USING_WRAPPERS" = x1],
