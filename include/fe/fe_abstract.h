@@ -231,6 +231,17 @@ public:
   { return dim; }
 
   /**
+   * \returns nothing, but lets the FE know you're explicitly
+   * prerequesting calculations.  This is useful when you only want
+   * the FE for n_quadrature_points, n_dofs_on_side, or other methods
+   * that don't require shape function calculations, but you don't
+   * want libMesh "backwards compatibility" mode to assume you've made
+   * no prerequests and need to calculate everything.
+   */
+  void get_nothing() const
+  { calculate_nothing = true; }
+
+  /**
    * \returns The \p xyz spatial locations of the quadrature
    * points on the element.
    */
@@ -543,6 +554,11 @@ protected:
    * Then all get_* functions should already have been called.
    */
   mutable bool calculations_started;
+
+  /**
+   * Are we potentially deliberately calculating nothing?
+   */
+  mutable bool calculate_nothing;
 
   /**
    * Are we calculating mapping functions?

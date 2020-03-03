@@ -757,13 +757,18 @@ void FEGenericBase<OutputType>::determine_calculations()
 {
   this->calculations_started = true;
 
-  // If the user forgot to request anything, we'll be safe and
-  // calculate everything:
+  // If the user forgot to request anything, but we're enabling
+  // deprecated backwards compatibility, then we'll be safe and
+  // calculate everything.  If we haven't enable deprecated backwards
+  // compatibility then we'll scream and die.
+#ifdef LIBMESH_ENABLE_DEPRECATED
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi &&
+  if (!this->calculate_nothing &&
+      !this->calculate_phi && !this->calculate_dphi &&
       !this->calculate_d2phi && !this->calculate_curl_phi &&
       !this->calculate_div_phi && !this->calculate_map)
     {
+      libmesh_deprecated();
       this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
       if (FEInterface::field_type(fe_type.family) == TYPE_VECTOR)
         {
@@ -772,10 +777,12 @@ void FEGenericBase<OutputType>::determine_calculations()
         }
     }
 #else
-  if (!this->calculate_phi && !this->calculate_dphi &&
+  if (!this->calculate_nothing &&
+      !this->calculate_phi && !this->calculate_dphi &&
       !this->calculate_curl_phi && !this->calculate_div_phi &&
       !this->calculate_map)
     {
+      libmesh_deprecated();
       this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
       if (FEInterface::field_type(fe_type.family) == TYPE_VECTOR)
         {
@@ -784,6 +791,20 @@ void FEGenericBase<OutputType>::determine_calculations()
         }
     }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#else
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  libmesh_assert (this->calculate_nothing ||
+      this->calculate_phi || this->calculate_dphi ||
+      this->calculate_d2phi ||
+      this->calculate_curl_phi || this->calculate_div_phi ||
+      this->calculate_map)
+#else
+  libmesh_assert (this->calculate_nothing ||
+      this->calculate_phi || this->calculate_dphi ||
+      this->calculate_curl_phi || this->calculate_div_phi ||
+      this->calculate_map)
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   // Request whichever terms are necessary from the FEMap
   if (this->calculate_phi)
