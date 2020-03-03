@@ -797,12 +797,12 @@ void FEGenericBase<OutputType>::determine_calculations()
       this->calculate_phi || this->calculate_dphi ||
       this->calculate_d2phi ||
       this->calculate_curl_phi || this->calculate_div_phi ||
-      this->calculate_map)
+      this->calculate_map);
 #else
   libmesh_assert (this->calculate_nothing ||
       this->calculate_phi || this->calculate_dphi ||
       this->calculate_curl_phi || this->calculate_div_phi ||
-      this->calculate_map)
+      this->calculate_map);
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 #endif // LIBMESH_ENABLE_DEPRECATED
 
