@@ -2,15 +2,13 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 [
-dnl We need to verify that we've done AC_ARG_ENABLE(optional), AC_ARG_ENABLE(mpi), AC_ARG_WITH(mpi),
+dnl We need to make sure that we've done AC_ARG_ENABLE(optional), AC_ARG_ENABLE(mpi), AC_ARG_WITH(mpi),
 dnl and AC_ARG_ENABLE(petsc) which all occur in LIBMESH_COMPILER_CONTROL_ARGS
-AS_IF([test x"CALLED_COMPILER_CONTROL_ARGS" != x1],
-      [AC_MSG_ERROR([the compiler control args macro must be called before configuring optional packages])])
+AC_REQUIRE([LIBMESH_COMPILER_CONTROL_ARGS])
 
 dnl We also need to ensure that we've set our compilers, which is where query for a valid
 dnl PETSc configuration
-AS_IF([test x"LIBMESH_SET_COMPILERS" != x1],
-      [AC_MSG_ERROR([compilers must be set before configuring optional packages])])
+AC_REQUIRE([LIBMESH_SET_COMPILERS])
 
 # initialize these empty - append below
 # note that
@@ -170,6 +168,7 @@ AS_IF([test "x$enablempi" = xyes],
 # -------------------------------------------------------------------
 AS_IF([test $enablepetsc != no],
       [
+        CONFIGURE_PETSC
         libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
         libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
       ])

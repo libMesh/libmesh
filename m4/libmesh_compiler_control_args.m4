@@ -66,6 +66,4 @@ AC_ARG_ENABLE(petsc,
                        [no],  [enablepetsc=no;enablepetsc_mpi=no],
                        [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc)])],
               [enablepetsc=$enableoptional;enablepetsc_mpi=$enableoptional])
-
-CALLED_COMPILER_CONTROL_ARGS=1
 ])
