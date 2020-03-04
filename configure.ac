@@ -125,7 +125,7 @@ AC_SUBST(PERL)
 # Check for whether to enable MPI and PETSc which will influence our
 # choice of compiler
 #--------------------------------------------------------------------
-LIBMESH_COMPILER_CONTROL_ARGS
+COMPILER_CONTROL_ARGS
 
 #-----------------------------------------------------------------------
 # Scrape PETSc configure information for their CXX, MPI_INCLUDE, MPI_LIB,

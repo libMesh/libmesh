@@ -3,8 +3,8 @@
 AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 [
 dnl We need to make sure that we've done AC_ARG_ENABLE(optional), AC_ARG_ENABLE(mpi), AC_ARG_WITH(mpi),
-dnl and AC_ARG_ENABLE(petsc) which all occur in LIBMESH_COMPILER_CONTROL_ARGS
-AC_REQUIRE([LIBMESH_COMPILER_CONTROL_ARGS])
+dnl and AC_ARG_ENABLE(petsc) which all occur in COMPILER_CONTROL_ARGS
+AC_REQUIRE([COMPILER_CONTROL_ARGS])
 
 dnl We also need to ensure that we've set our compilers, which is where query for a valid
 dnl PETSc configuration

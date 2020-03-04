@@ -2,7 +2,7 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_SET_COMPILERS],
 [
-  AC_REQUIRE([LIBMESH_COMPILER_CONTROL_ARGS])
+  AC_REQUIRE([COMPILER_CONTROL_ARGS])
   AC_REQUIRE([SCRAPE_PETSC_CONFIGURE])
 
   # --------------------------------------------------------------
