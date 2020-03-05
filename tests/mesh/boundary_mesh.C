@@ -83,6 +83,22 @@ protected:
     // Get the border of the square
     _mesh->get_boundary_info().sync(*_all_boundary_mesh);
 
+    // Check that the interior_parent side indices that we set on the
+    // BoundaryMesh as extra integers agree with the side returned
+    // by which_side_am_i().
+    unsigned int parent_side_index_tag =
+      _all_boundary_mesh->get_elem_integer_index("parent_side_index");
+
+    for (const auto & belem : _all_boundary_mesh->element_ptr_range())
+      {
+        dof_id_type parent_side_index =
+          belem->get_extra_integer(parent_side_index_tag);
+
+        CPPUNIT_ASSERT_EQUAL
+          (static_cast<dof_id_type>(belem->interior_parent()->which_side_am_i(belem)),
+           parent_side_index);
+      }
+
     std::set<boundary_id_type> left_id, right_id;
     left_id.insert(3);
     right_id.insert(1);
