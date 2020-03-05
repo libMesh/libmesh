@@ -5031,7 +5031,7 @@ fi
 
 
 fi
-  if test "$enablepetsc" = no && "$enablepetsc_mpi" != no; then :
+  if test "$enablepetsc" = no && test "$enablepetsc_mpi" != no; then :
 
           as_fn_error $? "petsc was disabled but petscs mpi was not disabled" "$LINENO" 5
           as_fn_error $? "something wrong must have happened during the configure process" "$LINENO" 5
