@@ -461,6 +461,12 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   unique_id_type old_max_unique_id = boundary_mesh.parallel_max_unique_id();
 #endif
 
+  // Add an "extra" integer for storing the side index of the parent
+  // Elem which each boundary Elem corresponds to. We do this once
+  // before any Elems have been added.
+  unsigned int parent_side_index_tag =
+    boundary_mesh.add_elem_integer("parent_side_index");
+
   for (const auto & pr : sides_to_add)
     {
       const dof_id_type elem_id = pr.first;
@@ -488,6 +494,10 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
       // Add the side
       Elem * new_elem = boundary_mesh.add_elem(std::move(side));
+
+      // new_elem gets an "extra" integer equal to the side id "s"
+      // of the interior_parent it corresponds to.
+      new_elem->set_extra_integer(parent_side_index_tag, s);
 
 #ifdef LIBMESH_ENABLE_AMR
       // Set parent links
