@@ -2,7 +2,13 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 [
+dnl We need to make sure that we've done AC_ARG_ENABLE(optional), AC_ARG_ENABLE(mpi), AC_ARG_WITH(mpi),
+dnl and AC_ARG_ENABLE(petsc) which all occur in COMPILER_CONTROL_ARGS
+AC_REQUIRE([COMPILER_CONTROL_ARGS])
 
+dnl We also need to ensure that we've set our compilers, which is where query for a valid
+dnl PETSc configuration
+AC_REQUIRE([LIBMESH_SET_COMPILERS])
 
 # initialize these empty - append below
 # note that
@@ -46,17 +52,6 @@ AS_IF([test -r $top_srcdir/contrib/timpi/README],
   AC_MSG_ERROR([You must run "git submodule update --init contrib/timpi" before configuring libmesh])
 ])
 
-# --------------------------------------------------------------
-# Allow for disable-optional
-# --------------------------------------------------------------
-AC_ARG_ENABLE(optional,
-              AS_HELP_STRING([--disable-optional],
-                             [build without most optional external libraries]),
-              [AS_CASE("${enableval}",
-                       [yes], [enableoptional=yes],
-                       [no],  [enableoptional=no],
-                       [AC_MSG_ERROR(bad value ${enableval} for --enable-optional)])],
-              [enableoptional=yes])
 
 # Note that even when optional packages are disabled we need to
 # run their m4 macros to get proper AM_CONDITIONALs.  Just be
@@ -153,19 +148,27 @@ LIBMESH_TEST_BOOST_MOVELIB_UNIQUE_PTR
 AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # --------------------------------------------------------------
 
-
 # -------------------------------------------------------------
-# Petsc -- enabled by default
+# MPI -- enabled by default
 # -------------------------------------------------------------
-CONFIGURE_PETSC
-AS_IF([test $enablempi != no],
+AS_IF([test "x$enablempi" = xyes],
       [
-        libmesh_optional_INCLUDES="$MPI_INCLUDES_PATHS $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$MPI_LIBS_PATHS $MPI_LIBS $libmesh_optional_LIBS"
+        ACX_MPI
+        AS_IF([test "x$enablempi" = xyes],
+              [
+                AS_IF([test x"$MPI_INCLUDES" = x],,[libmesh_optional_INCLUDES="$MPI_INCLUDES $libmesh_optional_INCLUDES"])
+                AS_IF([test x"$MPI_LIBS" != x], [libmesh_optional_LIBS="$MPI_LIBS $libmesh_optional_LIBS"])
+                AS_IF([test x"$MPI_LDFLAGS" != x], [libmesh_optional_LIBS="$MPI_LDFLAGS $libmesh_optional_LIBS"])
+              ])
       ])
 
+
+# -------------------------------------------------------------------
+# Petsc -- We arelady called CONFIGURE_PETSC in LIBMESH_SET_COMPILERS
+# -------------------------------------------------------------------
 AS_IF([test $enablepetsc != no],
       [
+        CONFIGURE_PETSC
         libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
         libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
       ])

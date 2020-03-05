@@ -121,6 +121,18 @@ AC_LANG([C++])
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 
+#--------------------------------------------------------------------
+# Check for whether to enable MPI and PETSc which will influence our
+# choice of compiler
+#--------------------------------------------------------------------
+COMPILER_CONTROL_ARGS
+
+#-----------------------------------------------------------------------
+# Scrape PETSc configure information for their CXX, MPI_INCLUDE, MPI_LIB,
+# PETSCLINKLIBS, PETSCINCLUDEDIRS, and other variables
+#-----------------------------------------------------------------------
+SCRAPE_PETSC_CONFIGURE
+
 # --------------------------------------------------------------
 # Set our preferred compilers
 # --------------------------------------------------------------
