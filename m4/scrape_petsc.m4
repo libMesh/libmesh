@@ -171,7 +171,7 @@ AC_DEFUN([SCRAPE_PETSC_CONFIGURE],
 
     ]) dnl AS_IF(enable_petsc)
 
-  AS_IF([test "$enablepetsc" = no && "$enablepetsc_mpi" != no],
+  AS_IF([test "$enablepetsc" = no && test "$enablepetsc_mpi" != no],
         [
           AC_MSG_ERROR([petsc was disabled but petscs mpi was not disabled])
           AC_MSG_ERROR([something wrong must have happened during the configure process])
