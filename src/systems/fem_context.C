@@ -861,7 +861,7 @@ void FEMContext::point_value(unsigned int var,
 
   // Build a FE for calculating u(p)
   FEGenericBase<OutputShape> * fe_new =
-    this->build_new_fe( fe, p, tolerance );
+    this->build_new_fe( fe, p, tolerance, 0 );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<OutputShape>> &  phi = fe_new->get_phi();
@@ -911,7 +911,7 @@ void FEMContext::point_gradient(unsigned int var,
 
   // Build a FE for calculating u(p)
   FEGenericBase<OutputShape> * fe_new =
-    this->build_new_fe( fe, p, tolerance );
+    this->build_new_fe( fe, p, tolerance, 1 );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> &  dphi = fe_new->get_dphi();
@@ -962,7 +962,7 @@ void FEMContext::point_hessian(unsigned int var,
 
   // Build a FE for calculating u(p)
   FEGenericBase<OutputShape> * fe_new =
-    this->build_new_fe( fe, p, tolerance );
+    this->build_new_fe( fe, p, tolerance, 2 );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> &  d2phi = fe_new->get_d2phi();
@@ -1000,7 +1000,7 @@ void FEMContext::point_curl(unsigned int var,
 
   // Build a FE for calculating u(p)
   FEGenericBase<OutputShape> * fe_new =
-    this->build_new_fe( fe, p, tolerance );
+    this->build_new_fe( fe, p, tolerance, 3 );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> &  curl_phi = fe_new->get_curl_phi();
@@ -1196,7 +1196,7 @@ void FEMContext::fixed_point_value(unsigned int var,
 
   // Build a FE for calculating u(p)
   FEGenericBase<OutputShape> * fe_new =
-    this->build_new_fe( fe, p, tolerance );
+    this->build_new_fe( fe, p, tolerance, 0 );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<OutputShape>> &  phi = fe_new->get_phi();
@@ -1246,7 +1246,7 @@ void FEMContext::fixed_point_gradient(unsigned int var,
 
   // Build a FE for calculating u(p)
   FEGenericBase<OutputShape> * fe_new =
-    this->build_new_fe( fe, p, tolerance );
+    this->build_new_fe( fe, p, tolerance, 1 );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> &  dphi = fe_new->get_dphi();
@@ -1297,7 +1297,7 @@ void FEMContext::fixed_point_hessian(unsigned int var,
 
   // Build a FE for calculating u(p)
   FEGenericBase<OutputShape> * fe_new =
-    this->build_new_fe( fe, p, tolerance );
+    this->build_new_fe( fe, p, tolerance, 2 );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> &  d2phi = fe_new->get_d2phi();
@@ -1877,7 +1877,8 @@ void FEMContext::_update_time_from_system(Real theta)
 template<>
 FEGenericBase<Real> *
 FEMContext::cached_fe( const unsigned int elem_dim,
-                       const FEType fe_type ) const
+                       const FEType fe_type,
+                       const int get_derivative_level ) const
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   const bool fe_needs_inf =
@@ -1886,13 +1887,18 @@ FEMContext::cached_fe( const unsigned int elem_dim,
 
   if (!_real_fe ||
       elem_dim != _real_fe->get_dim() ||
-      fe_type != _real_fe->get_fe_type())
-    _real_fe =
+      fe_type != _real_fe->get_fe_type() ||
+      get_derivative_level != _real_fe_derivative_level)
+    {
+      _real_fe_derivative_level = get_derivative_level;
+
+      _real_fe =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      fe_needs_inf ?
-      FEGenericBase<Real>::build_InfFE(elem_dim, fe_type) :
+        fe_needs_inf ?
+        FEGenericBase<Real>::build_InfFE(elem_dim, fe_type) :
 #endif
-      FEGenericBase<Real>::build(elem_dim, fe_type);
+        FEGenericBase<Real>::build(elem_dim, fe_type);
+    }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   else if (fe_needs_inf && !_real_fe_is_inf)
@@ -1913,7 +1919,8 @@ FEMContext::cached_fe( const unsigned int elem_dim,
 template<>
 FEGenericBase<RealGradient> *
 FEMContext::cached_fe( const unsigned int elem_dim,
-                       const FEType fe_type ) const
+                       const FEType fe_type,
+                       const int get_derivative_level ) const
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   const bool fe_needs_inf =
@@ -1922,13 +1929,18 @@ FEMContext::cached_fe( const unsigned int elem_dim,
 
   if (!_real_grad_fe ||
       elem_dim != _real_grad_fe->get_dim() ||
-      fe_type != _real_grad_fe->get_fe_type())
-    _real_grad_fe =
+      fe_type != _real_grad_fe->get_fe_type() ||
+      get_derivative_level != _real_grad_fe_derivative_level)
+    {
+      _real_grad_fe_derivative_level = get_derivative_level;
+
+      _real_grad_fe =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      fe_needs_inf ?
-      FEGenericBase<RealGradient>::build_InfFE(elem_dim, fe_type) :
+        fe_needs_inf ?
+        FEGenericBase<RealGradient>::build_InfFE(elem_dim, fe_type) :
 #endif
-      FEGenericBase<RealGradient>::build(elem_dim, fe_type);
+        FEGenericBase<RealGradient>::build(elem_dim, fe_type);
+    }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   else if (fe_needs_inf && !_real_grad_fe_is_inf)
@@ -1951,7 +1963,8 @@ template<typename OutputShape>
 FEGenericBase<OutputShape> *
 FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
                           const Point & p,
-                          const Real tolerance) const
+                          const Real tolerance,
+                          const int get_derivative_level) const
 {
   FEType fe_type = fe->get_fe_type();
 
@@ -1973,7 +1986,8 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
 
   const unsigned int elem_dim = this->has_elem() ? this->get_elem().dim() : 0;
 
-  FEGenericBase<OutputShape>* fe_new = cached_fe<OutputShape>(elem_dim, fe_type);
+  FEGenericBase<OutputShape>* fe_new =
+    cached_fe<OutputShape>(elem_dim, fe_type, get_derivative_level);
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
@@ -1982,6 +1996,30 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
     Point(0);
 
   std::vector<Point> coor(1, master_point);
+
+  switch (get_derivative_level)
+    {
+    case -1:
+      fe_new->get_phi();
+      fe_new->get_dphi();
+      fe_new->get_d2phi();
+      fe_new->get_curl_phi();
+      break;
+    case 0:
+      fe_new->get_phi();
+      break;
+    case 1:
+      fe_new->get_dphi();
+      break;
+    case 2:
+      fe_new->get_d2phi();
+      break;
+    case 3:
+      fe_new->get_curl_phi();
+      break;
+    default:
+      libmesh_error();
+    }
 
   // Reinitialize the element and compute the shape function values at coor
   if (this->has_elem())
@@ -2120,11 +2158,13 @@ template void FEMContext::side_accel<Gradient>(unsigned int, unsigned int, Gradi
 template FEGenericBase<Real> *
 FEMContext::build_new_fe(const FEGenericBase<Real>*,
                          const Point &,
-                         const Real) const;
+                         const Real,
+                         const int) const;
 
 template FEGenericBase<RealGradient> *
 FEMContext::build_new_fe(const FEGenericBase<RealGradient>*,
                          const Point &,
-                         const Real) const;
+                         const Real,
+                         const int) const;
 
 } // namespace libMesh
