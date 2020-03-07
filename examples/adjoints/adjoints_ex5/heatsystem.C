@@ -88,6 +88,11 @@ void HeatSystem::init_context(DiffContext & context)
   elem_fe->get_JxW();
   elem_fe->get_dphi();
 
+  // Don't waste time on side computations for T
+  FEBase * side_fe = nullptr;
+  c.get_side_fe(0, side_fe);
+  side_fe->get_nothing();
+
   // We'll have a more automatic solution to preparing adjoint
   // solutions for time integration, eventually...
   if (c.is_adjoint())
