@@ -219,6 +219,10 @@ void assembly_with_dg_fem_context(EquationSystems& es,
     context.get_side_fe( 0, side_fe );
     side_fe->get_JxW();
     side_fe->get_phi();
+
+    FEBase* neighbor_side_fe = NULL;
+    context.get_neighbor_side_fe(0, neighbor_side_fe);
+    neighbor_side_fe->get_phi();
   }
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
