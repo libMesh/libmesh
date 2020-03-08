@@ -202,6 +202,11 @@ void NavierSystem::init_context(DiffContext & context)
   u_side_fe->get_JxW();
   u_side_fe->get_phi();
   u_side_fe->get_xyz();
+
+  // And tell the context what data we *don't* need
+  FEBase * p_side_fe;
+  c.get_side_fe(p_var, p_side_fe);
+  p_side_fe->get_nothing();
 }
 
 
