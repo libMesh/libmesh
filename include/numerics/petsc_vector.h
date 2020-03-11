@@ -577,8 +577,13 @@ PetscVector<T>::PetscVector (Vec v,
       ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
       LIBMESH_CHKERR(ierr);
 
+      Vec localrep;
+      ierr = VecGhostGetLocalForm(_vec,&localrep);
+      LIBMESH_CHKERR(ierr);
       // If is a sparsely stored vector, set up our new mapping
-      if (mapping)
+      // Only checking mapping is not enough to determine if a vec is ghosted
+      // We need to check if vec has a local representation
+      if (mapping && localrep)
         {
           const numeric_index_type my_local_size = static_cast<numeric_index_type>(petsc_local_size);
           const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
@@ -599,6 +604,9 @@ PetscVector<T>::PetscVector (Vec v,
         }
       else
         this->_type = PARALLEL;
+
+      ierr = VecGhostRestoreLocalForm(_vec,&localrep);
+      LIBMESH_CHKERR(ierr);
     }
   else
     this->_type = SERIAL;
