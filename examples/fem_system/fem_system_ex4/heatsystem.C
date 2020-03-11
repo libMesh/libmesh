@@ -66,6 +66,10 @@ void HeatSystem::init_context(DiffContext & context)
       fe->get_dphi(); // For bilinear form
       fe->get_xyz();  // For forcing
       fe->get_phi();  // For forcing
+
+      FEBase * side_fe = nullptr;
+      c.get_side_fe(T_var, side_fe, dim);
+      side_fe->get_nothing();
     }
 
   FEMSystem::init_context(context);
