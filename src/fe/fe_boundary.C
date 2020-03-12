@@ -122,6 +122,12 @@ void FE<Dim,T>::reinit(const Elem * elem,
   // We now do this for 1D elements!
   // libmesh_assert_not_equal_to (Dim, 1);
 
+  // If we called this function redundantly (e.g. in an FEMContext
+  // that isn't asked to do any side calculations) then let's skip the
+  // whole inverse_map process that calculates side points
+  if (this->calculating_nothing())
+    return;
+
   // We're (possibly re-) calculating now!  FIXME - we currently
   // expect to be able to use side_map and JxW later, but we could
   // optimize further here.
