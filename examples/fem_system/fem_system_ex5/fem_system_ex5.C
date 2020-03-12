@@ -315,6 +315,15 @@ int main (int argc, char ** argv)
   solver.max_linear_iterations = infile("max_linear_iterations", 50000);
   solver.initial_linear_tolerance = infile("initial_linear_tolerance", 1.e-3);
 
+  // And the system
+  system.print_element_jacobians = infile("print_element_jacobians", false);
+  system.print_element_solutions = infile("print_element_solutions", false);
+  system.print_element_residuals = infile("print_element_residuals", false);
+  system.print_residuals = infile("print_residuals", false);
+  system.print_jacobians = infile("print_residuals", false);
+  system.print_residual_norms = infile("print_residual_norms", false);
+  system.print_jacobian_norms = infile("print_residuals", false);
+
   // Print information about the system to the screen.
   equation_systems.print_info();
 
