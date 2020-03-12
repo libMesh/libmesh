@@ -132,6 +132,20 @@ void ElasticitySystem::init_context(DiffContext & context)
 
   // We might want to apply traction perpendicular to some boundaries.
   u_side_fe->get_normals();
+
+  // If this is an IGA mesh then we have spline control NodeElem
+  // points
+  if (c.elem_dimensions().count(0))
+    {
+      FEBase * null_fe;
+      c.get_element_fe(_u_var, null_fe, 0);
+      null_fe->get_JxW();
+      null_fe->get_phi();
+      null_fe->get_dphi();
+
+      c.get_side_fe(_u_var, null_fe, 0);
+      null_fe->get_nothing();
+    }
 }
 
 bool ElasticitySystem::element_time_derivative(bool request_jacobian,
