@@ -104,8 +104,11 @@ protected:
     right_id.insert(1);
 
     // Add the right side of the square to the square; this should
-    // make it a mixed dimension mesh
-    _mesh->get_boundary_info().add_elements(right_id, *_mesh);
+    // make it a mixed dimension mesh. We skip storing the parent
+    // side ids (which is the default) since they are not needed
+    // in this particular test.
+    _mesh->get_boundary_info().add_elements
+      (right_id, *_mesh, /*store_parent_side_ids=*/false);
     _mesh->prepare_for_use();
 
     // Add the left side of the square to its own boundary mesh.
