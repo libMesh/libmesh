@@ -665,6 +665,13 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
+      if(elem->type() == NODEELEM)
+        {
+          // We skip NODEELEMs here since we assume that we
+          // do not perform any assembly directly on NODEELEMs
+          continue;
+        }
+
       // Subdivision elements need special care:
       // - skip ghost elements
       // - init special quadrature rule
