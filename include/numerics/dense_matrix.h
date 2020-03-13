@@ -42,19 +42,16 @@
 #include <algorithm>
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
-namespace MetaPhysicL
-{
-template <typename, typename>
-class DualNumber;
-}
+#include "metaphysicl/dualnumber_forward.h"
+
 namespace std
 {
 // These declarations must be visible to the DenseMatrix method declarations that use
 // a std::abs trailing return type in order to instantiate a DenseMatrix<DualNumber>
-template <typename T, typename D>
-MetaPhysicL::DualNumber<T, D> abs(const MetaPhysicL::DualNumber<T, D> & in);
-template <typename T, typename D>
-MetaPhysicL::DualNumber<T, D> abs(MetaPhysicL::DualNumber<T, D> && in);
+template <typename T, typename D, bool asd>
+MetaPhysicL::DualNumber<T, D, asd> abs(const MetaPhysicL::DualNumber<T, D, asd> & in);
+template <typename T, typename D, bool asd>
+MetaPhysicL::DualNumber<T, D, asd> abs(MetaPhysicL::DualNumber<T, D, asd> && in);
 }
 #endif
 
