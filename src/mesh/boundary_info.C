@@ -272,8 +272,13 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
         }
     }
 
-  // Let's add the elements
-  this->add_elements (requested_boundary_ids, boundary_mesh, subdomains_relative_to);
+  // Add the elements. When syncing a boundary mesh, we also store the
+  // parent side ids in addition to the interior_parent pointers,
+  // since this information is frequently needed on boundary meshes.
+  this->add_elements(requested_boundary_ids,
+                     boundary_mesh,
+                     subdomains_relative_to,
+                     /*store_parent_side_ids=*/true);
 
   // The new elements are currently using the interior mesh's nodes;
   // we want them to use the boundary mesh's nodes instead.
@@ -364,7 +369,8 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 
 
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
-                                UnstructuredMesh & boundary_mesh)
+                                UnstructuredMesh & boundary_mesh,
+                                bool store_parent_side_ids)
 {
   // Call the 3 argument version of this function with a dummy value for the third arg.
   std::set<subdomain_id_type> subdomains_relative_to;
@@ -372,14 +378,16 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
   this->add_elements(requested_boundary_ids,
                      boundary_mesh,
-                     subdomains_relative_to);
+                     subdomains_relative_to,
+                     store_parent_side_ids);
 }
 
 
 
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
                                 UnstructuredMesh & boundary_mesh,
-                                const std::set<subdomain_id_type> & subdomains_relative_to)
+                                const std::set<subdomain_id_type> & subdomains_relative_to,
+                                bool store_parent_side_ids)
 {
   LOG_SCOPE("add_elements()", "BoundaryInfo");
 
@@ -461,6 +469,12 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   unique_id_type old_max_unique_id = boundary_mesh.parallel_max_unique_id();
 #endif
 
+  // Add an "extra" integer for storing the side index of the parent
+  // Elem which each boundary Elem corresponds to. We do this once
+  // before any Elems have been added.
+  unsigned int parent_side_index_tag = store_parent_side_ids ?
+    boundary_mesh.add_elem_integer("parent_side_index") : libMesh::invalid_uint;
+
   for (const auto & pr : sides_to_add)
     {
       const dof_id_type elem_id = pr.first;
@@ -488,6 +502,11 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
       // Add the side
       Elem * new_elem = boundary_mesh.add_elem(std::move(side));
+
+      // If requested, new_elem gets an "extra" integer equal to the
+      // side id "s" of the interior_parent it corresponds to.
+      if (store_parent_side_ids)
+        new_elem->set_extra_integer(parent_side_index_tag, s);
 
 #ifdef LIBMESH_ENABLE_AMR
       // Set parent links

@@ -161,7 +161,8 @@ public:
    * Only boundary elements with the specified ids are created.
    */
   void add_elements (const std::set<boundary_id_type> & requested_boundary_ids,
-                     UnstructuredMesh & boundary_mesh);
+                     UnstructuredMesh & boundary_mesh,
+                     bool store_parent_side_ids = false);
 
   /**
    * Same as the add_elements() function above, but takes a set of
@@ -171,7 +172,8 @@ public:
    */
   void add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
                     UnstructuredMesh & boundary_mesh,
-                    const std::set<subdomain_id_type> & subdomains_relative_to);
+                    const std::set<subdomain_id_type> & subdomains_relative_to,
+                    bool store_parent_side_ids = false);
 
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
