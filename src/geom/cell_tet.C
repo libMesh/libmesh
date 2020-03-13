@@ -200,8 +200,15 @@ bool Tet::is_edge_on_side(const unsigned int e,
   libmesh_assert_less (e, this->n_edges());
   libmesh_assert_less (s, this->n_sides());
 
-  return (is_node_on_side(Tet4::edge_nodes_map[e][0],s) &&
-          is_node_on_side(Tet4::edge_nodes_map[e][1],s));
+  return (Tet4::edge_sides_map[e][0] == s ||
+          Tet4::edge_sides_map[e][1] == s);
+}
+
+
+
+std::vector<unsigned int> Tet::sides_on_edge(const unsigned int e) const
+{
+  return {Tet4::edge_sides_map[e][0], Tet4::edge_sides_map[e][1]};
 }
 
 

@@ -123,4 +123,10 @@ Edge::nodes_on_side(const unsigned int s) const
   return {s};
 }
 
+std::vector<unsigned>
+Edge::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
+}
+
 } // namespace libMesh

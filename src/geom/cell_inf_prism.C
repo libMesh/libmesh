@@ -208,8 +208,8 @@ bool InfPrism::is_edge_on_side (const unsigned int e,
   libmesh_assert_less (e, this->n_edges());
   libmesh_assert_less (s, this->n_sides());
 
-  return (is_node_on_side(InfPrism6::edge_nodes_map[e][0],s) &&
-          is_node_on_side(InfPrism6::edge_nodes_map[e][1],s));
+  return (InfPrism6::edge_sides_map[e][0] == s ||
+          InfPrism6::edge_sides_map[e][1] == s);
 }
 
 bool InfPrism::contains_point (const Point & p, Real tol) const

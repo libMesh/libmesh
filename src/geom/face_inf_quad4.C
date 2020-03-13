@@ -117,6 +117,12 @@ InfQuad4::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+InfQuad4::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
+}
+
 bool InfQuad4::contains_point (const Point & p, Real tol) const
 {
   /*

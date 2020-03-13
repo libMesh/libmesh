@@ -134,6 +134,12 @@ Tri6::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+Tri6::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
+}
+
 bool Tri6::has_affine_map() const
 {
   // Make sure edges are straight

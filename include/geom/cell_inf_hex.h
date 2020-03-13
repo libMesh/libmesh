@@ -126,6 +126,8 @@ public:
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const override final;
 
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
+
   /**
    * Don't hide Elem::key() defined in the base class.
    */

@@ -79,6 +79,12 @@ public:
                                const unsigned int s) const override final
   { return (e == s); }
 
+  /**
+   * sides_on_edge is trivial in 2D.
+   */
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final
+  { return {e}; }
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**

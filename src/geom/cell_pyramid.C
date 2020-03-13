@@ -207,8 +207,15 @@ bool Pyramid::is_edge_on_side(const unsigned int e,
   libmesh_assert_less (e, this->n_edges());
   libmesh_assert_less (s, this->n_sides());
 
-  return (is_node_on_side(Pyramid5::edge_nodes_map[e][0],s) &&
-          is_node_on_side(Pyramid5::edge_nodes_map[e][1],s));
+  return (Pyramid5::edge_sides_map[e][0] == s ||
+          Pyramid5::edge_sides_map[e][1] == s);
+}
+
+
+
+std::vector<unsigned int> Pyramid::sides_on_edge(const unsigned int e) const
+{
+  return {Pyramid5::edge_sides_map[e][0], Pyramid5::edge_sides_map[e][1]};
 }
 
 

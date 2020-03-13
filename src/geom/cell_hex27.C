@@ -124,6 +124,13 @@ Hex27::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+Hex27::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+}
+
 bool Hex27::is_node_on_edge(const unsigned int n,
                             const unsigned int e) const
 {
