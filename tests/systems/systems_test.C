@@ -30,6 +30,7 @@
 #include <libmesh/cell_hex20.h>
 #include <libmesh/cell_hex27.h>
 #include <libmesh/cell_tet10.h>
+#include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"

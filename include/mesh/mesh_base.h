@@ -21,7 +21,6 @@
 #define LIBMESH_MESH_BASE_H
 
 // Local Includes
-#include "libmesh/boundary_info.h"
 #include "libmesh/dof_object.h" // for invalid_processor_id
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_common.h"
@@ -55,6 +54,7 @@ class GhostingFunctor;
 class Node;
 class Point;
 class Partitioner;
+class BoundaryInfo;
 
 template <class MT>
 class MeshInput;

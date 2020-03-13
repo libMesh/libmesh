@@ -3,6 +3,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
+#include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"

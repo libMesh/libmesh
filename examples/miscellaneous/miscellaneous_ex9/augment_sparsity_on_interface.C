@@ -3,6 +3,7 @@
 
 // libMesh includes
 #include "libmesh/elem.h"
+#include "libmesh/boundary_info.h"
 
 using namespace libMesh;
 

@@ -22,7 +22,6 @@
 
 // Local Includes
 #include "libmesh/unstructured_mesh.h"
-#include "libmesh/boundary_info.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes

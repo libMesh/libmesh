@@ -23,6 +23,7 @@
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/edge_edge2.h"
+#include "libmesh/boundary_info.h"
 
 // The nonlinear solver and system we will be using
 #include "libmesh/nonlinear_solver.h"

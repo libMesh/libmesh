@@ -33,6 +33,7 @@
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
 #include "libmesh/utility.h"
+#include "libmesh/boundary_info.h"
 
 // C++ includes
 #include <array>

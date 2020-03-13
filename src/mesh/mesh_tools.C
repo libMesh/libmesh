@@ -34,6 +34,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"
+#include "libmesh/boundary_info.h"
 
 #ifdef DEBUG
 #  include "libmesh/remote_elem.h"

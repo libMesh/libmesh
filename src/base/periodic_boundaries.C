@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/periodic_boundary.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/boundary_info.h"
 
 namespace libMesh
 {
