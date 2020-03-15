@@ -4,6 +4,7 @@
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/auto_ptr.h> // libmesh_make_unique
+#include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"

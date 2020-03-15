@@ -26,6 +26,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/unsteady_solver.h"
 #include "libmesh/parallel_implementation.h" // set_union
+#include "libmesh/boundary_info.h"
 
 using namespace libMesh;
 

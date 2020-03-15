@@ -130,10 +130,7 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
 }
 
 
-BoundaryInfo::~BoundaryInfo()
-{
-  this->clear();
-}
+BoundaryInfo::~BoundaryInfo() = default;
 
 
 
