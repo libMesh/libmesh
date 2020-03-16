@@ -480,6 +480,21 @@ protected:
   void determine_calculations();
 
   /**
+   * \returns true iff no calculations have been requested of this
+   * FE object or of its associated FEMap
+   */
+  bool calculating_nothing() const
+  {
+    return calculate_nothing &&
+      !this->calculate_phi && !this->calculate_dphi &&
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      !this->calculate_d2phi &&
+#endif
+      !this->calculate_curl_phi && !this->calculate_div_phi &&
+      !this->calculate_map;
+  }
+
+  /**
    * After having updated the jacobian and the transformation
    * from local to global coordinates in \p FEAbstract::compute_map(),
    * the first derivatives of the shape functions are

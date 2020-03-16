@@ -733,6 +733,10 @@ void RBEIMConstruction::init_context_with_sys(FEMContext & c, System & sys)
       elem_fe->get_JxW();
       elem_fe->get_phi();
       elem_fe->get_xyz();
+
+      FEBase * side_fe = nullptr;
+      c.get_side_fe( var, side_fe );
+      side_fe->get_nothing();
     }
 }
 

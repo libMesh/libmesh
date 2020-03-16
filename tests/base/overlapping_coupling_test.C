@@ -585,6 +585,7 @@ private:
         // A little extra unit testing on the range iterator
         CPPUNIT_ASSERT_EQUAL(2, (int)elem->subdomain_id());
 
+        subdomain_one_context.get_element_fe(u_var)->get_nothing(); // for this unit test
         const std::vector<libMesh::Point> & qpoints = subdomain_two_context.get_element_fe(u_var)->get_xyz();
 
         // Setup the context for the current element
@@ -701,7 +702,12 @@ private:
     DenseMatrix<Number> K12, K21;
 
     FEMContext subdomain_one_context(system);
+    subdomain_one_context.get_element_fe(u_var)->get_nothing();
+    subdomain_one_context.get_element_fe(v_var)->get_nothing();
+
     FEMContext subdomain_two_context(system);
+    subdomain_two_context.get_element_fe(u_var)->get_xyz();
+    subdomain_two_context.get_element_fe(v_var)->get_nothing();
 
     // Add normally coupled parts of the matrix
     for (const auto & elem : _mesh->active_local_subdomain_elements_ptr_range(1))

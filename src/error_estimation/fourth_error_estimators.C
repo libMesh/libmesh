@@ -76,7 +76,7 @@ LaplacianErrorEstimator::init_context(FEMContext & c)
 
       for (const auto & dim : elem_dims)
         {
-          fine_context->get_side_fe( v, side_fe, dim );
+          c.get_side_fe( v, side_fe, dim );
 
           // We'll need hessians on both sides for flux jump computation
           side_fe->get_d2phi();

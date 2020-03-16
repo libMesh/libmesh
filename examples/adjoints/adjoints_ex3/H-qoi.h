@@ -15,10 +15,12 @@ using namespace libMesh;
 class CoupledSystemQoI : public DifferentiableQoI
 {
 public:
-  CoupledSystemQoI(){}
+  CoupledSystemQoI() {}
   virtual ~CoupledSystemQoI(){}
 
   virtual void init_qoi(std::vector<Number> & sys_qoi);
+  virtual void init_context(DiffContext &);
+
   virtual void postprocess(){}
 
   virtual void side_qoi_derivative(DiffContext & context,
@@ -33,6 +35,9 @@ public:
     *my_clone = *this;
     return std::unique_ptr<DifferentiableQoI>(my_clone);
   }
+
+protected:
+  unsigned int u_var, p_var;
 };
 
 #endif // H_QOI_H

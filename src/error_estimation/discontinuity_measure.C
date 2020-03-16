@@ -72,7 +72,7 @@ DiscontinuityMeasure::init_context(FEMContext & c)
 
       for (const auto & dim : elem_dims)
         {
-          fine_context->get_side_fe( v, side_fe, dim );
+          c.get_side_fe( v, side_fe, dim );
 
           // We'll need values on both sides for discontinuity computation
           side_fe->get_phi();

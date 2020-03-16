@@ -1361,17 +1361,23 @@ void FEMSystem::init_context(DiffContext & c)
           case( TYPE_SCALAR ):
             {
               FEBase * elem_fe = nullptr;
-              context.get_element_fe(var, elem_fe);
-              elem_fe->get_JxW();
-              elem_fe->get_phi();
+              for (auto dim : context.elem_dimensions())
+                {
+                  context.get_element_fe(var, elem_fe, dim);
+                  elem_fe->get_JxW();
+                  elem_fe->get_phi();
+                }
             }
             break;
           case( TYPE_VECTOR ):
             {
               FEGenericBase<RealGradient> * elem_fe = nullptr;
-              context.get_element_fe(var, elem_fe);
-              elem_fe->get_JxW();
-              elem_fe->get_phi();
+              for (auto dim : context.elem_dimensions())
+                {
+                  context.get_element_fe(var, elem_fe, dim);
+                  elem_fe->get_JxW();
+                  elem_fe->get_phi();
+                }
             }
             break;
           default:

@@ -101,6 +101,30 @@ public:
   }
 
   /**
+   * Pre-request all relevant element data.
+   */
+  virtual void init_context(FEMContext & c)
+  {
+    // For efficiency, we should prerequest all
+    // the data we will need to build the
+    // linear system before doing an element loop.
+    //
+    // With equal variable types in x/y/z we only have the one elem_fe
+    // to prerequest from.
+    FEBase * elem_fe = nullptr;
+    c.get_element_fe(Gx_var, elem_fe);
+
+    elem_fe->get_JxW();
+    elem_fe->get_phi();
+    elem_fe->get_dphi();
+
+    FEBase * side_fe = nullptr;
+    c.get_side_fe(Gx_var, side_fe);
+    side_fe->get_nothing();
+  }
+
+
+  /**
    * Variable numbers.
    */
   unsigned int Gx_var;

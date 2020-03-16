@@ -91,8 +91,13 @@ public:
     s = libmesh_make_unique<FEMContext>(*sys);
     if (elem && elem->processor_id() == TestCommWorld->rank())
       {
+        c->get_element_fe(0)->get_phi();
+        c->get_element_fe(0)->get_dphi();
+        c->get_element_fe(0)->get_d2phi();
         c->pre_fe_reinit(*sys, elem);
         c->elem_fe_reinit();
+
+        s->get_side_fe(0)->get_normals(); // Prerequest
         s->pre_fe_reinit(*sys, elem);
         s->side = 3;
         s->side_fe_reinit();

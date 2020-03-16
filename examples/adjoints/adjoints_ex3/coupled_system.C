@@ -201,6 +201,11 @@ void CoupledSystem::init_context(DiffContext & context)
   side_fe->get_JxW();
   side_fe->get_phi();
   side_fe->get_xyz();
+
+  // Don't waste time on side computations for p
+  FEBase * p_side_fe = nullptr;
+  c.get_side_fe(p_var, p_side_fe);
+  p_side_fe->get_nothing();
 }
 
 

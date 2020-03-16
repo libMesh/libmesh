@@ -46,6 +46,8 @@ namespace libMesh
 // JumpErrorEstimator implementations
 void JumpErrorEstimator::init_context (FEMContext &)
 {
+  // Derived classes are *supposed* to rederive this
+  libmesh_deprecated();
 }
 
 

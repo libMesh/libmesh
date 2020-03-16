@@ -114,6 +114,11 @@ public:
     elem_fe->get_JxW();
     elem_fe->get_phi();
     elem_fe->get_dphi();
+
+    FEBase * side_fe = nullptr;
+    c.get_side_fe(u_var, side_fe);
+    side_fe->get_JxW();
+    side_fe->get_phi();
   }
 
   /**
