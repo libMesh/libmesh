@@ -22,11 +22,13 @@
 
 // Local includes
 #include "libmesh/mesh_triangle_wrapper.h"
-#include "libmesh/unstructured_mesh.h"
-#include "libmesh/point.h"
+
+#include "libmesh/boundary_info.h"
+#include "libmesh/enum_elem_type.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
-#include "libmesh/enum_elem_type.h"
+#include "libmesh/point.h"
+#include "libmesh/unstructured_mesh.h"
 
 namespace libMesh
 {

@@ -23,10 +23,12 @@
 #include <sstream>
 
 // Local includes
+#include "libmesh/mesh_tetgen_interface.h"
+
+#include "libmesh/boundary_info.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/unstructured_mesh.h"
-#include "libmesh/mesh_tetgen_interface.h"
 #include "libmesh/utility.h" // binary_find
 #include "libmesh/mesh_tetgen_wrapper.h"
 
