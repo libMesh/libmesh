@@ -141,8 +141,11 @@ DofObject & DofObject::operator= (const DofObject & dof_obj)
 
 void  DofObject::clear_old_dof_object ()
 {
-  delete this->old_dof_object;
-  this->old_dof_object = nullptr;
+  if (this->old_dof_object)
+  {
+    delete this->old_dof_object;
+    this->old_dof_object = nullptr;
+  }
 }
 
 
