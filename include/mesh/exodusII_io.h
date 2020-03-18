@@ -304,6 +304,13 @@ public:
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
+   * Set the elemental variables in the Exodus file that to be read into extra
+   * element integers. The names of these elemental variables will be used to
+   * name the extra element integers.
+   */
+  void set_reading_extra_integer_vars(const std::vector<std::string> & extra_integer_vars);
+
+  /**
    * Sets the list of variable names to be included in the output.
    * This is _optional_.  If this is never called then all variables
    * will be present. If this is called and an empty vector is supplied
@@ -417,6 +424,13 @@ private:
    */
   bool _append;
 #endif
+
+  /**
+   * An optional list of variables in the EXODUS file that are
+   * to be used to set extra integers when loading the file into a mesh.
+   * The variable names will be used to name the extra integers.
+   */
+  std::vector<std::string> _extra_integer_vars;
 
   /**
    * The names of the variables to be output.
