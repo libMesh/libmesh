@@ -66,6 +66,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_noncritical_partitioning(false),
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
+  _skip_find_neighbors(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
   _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
@@ -95,7 +96,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #endif
   _skip_noncritical_partitioning(false),
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false),
+  _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
+  _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(true),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
@@ -350,6 +352,12 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
       this->allow_renumbering(false);
     }
 
+  if (skip_find_neighbors)
+  {
+    libmesh_deprecated();
+    this->allow_find_neighbors(false);
+  }
+
   // Mesh modification operations might not leave us with consistent
   // id counts, but our partitioner might need that consistency.
   if (!_skip_renumber_nodes_and_elements)
@@ -358,7 +366,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
     this->update_parallel_id_counts();
 
   // Let all the elements find their neighbors
-  if (!skip_find_neighbors)
+  if (!_skip_find_neighbors)
     this->find_neighbors();
 
   // The user may have set boundary conditions.  We require that the

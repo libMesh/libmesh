@@ -1066,6 +1066,13 @@ public:
   bool allow_renumbering() const { return !_skip_renumber_nodes_and_elements; }
 
   /**
+   * If \p false is passed then this mesh will no longer work to find element
+   * neighbors when being prepared for use
+   */
+  void allow_find_neighbors(bool allow) { _skip_find_neighbors = !allow; }
+  bool allow_find_neighbors() const { return !_skip_find_neighbors; }
+
+  /**
    * If false is passed in then this mesh will no longer have remote
    * elements deleted when being prepared for use; i.e. even a
    * DistributedMesh will remain (if it is already) serialized.
@@ -1784,6 +1791,11 @@ protected:
    * This is set when prepare_for_use() is called.
    */
   bool _skip_renumber_nodes_and_elements;
+
+  /**
+   * If this is \p true then we will skip \p find_neighbors in \p prepare_for_use
+   */
+  bool _skip_find_neighbors;
 
   /**
    * If this is false then even on DistributedMesh remote elements
