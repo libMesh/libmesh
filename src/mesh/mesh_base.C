@@ -321,7 +321,13 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 {
   libmesh_deprecated();
 
-  this->allow_renumbering(!skip_renumber_nodes_and_elements);
+  // We only respect the users wish if they tell us to skip renumbering. If they tell us not to
+  // skip renumbering but someone previously called allow_renumbering(false), then the latter takes
+  // precedence
+  if (skip_renumber_nodes_and_elements)
+    this->allow_renumbering(false);
+
+  // We always accept the user's value for skip_find_neighbors, in contrast to skip_renumber
   this->allow_find_neighbors(!skip_find_neighbors);
 
   this->prepare_for_use();
@@ -331,7 +337,11 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 {
   libmesh_deprecated();
 
-  this->allow_renumbering(!skip_renumber_nodes_and_elements);
+  // We only respect the users wish if they tell us to skip renumbering. If they tell us not to
+  // skip renumbering but someone previously called allow_renumbering(false), then the latter takes
+  // precedence
+  if (skip_renumber_nodes_and_elements)
+    this->allow_renumbering(false);
 
   this->prepare_for_use();
 }
