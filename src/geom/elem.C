@@ -443,28 +443,14 @@ bool Elem::operator == (const Elem & rhs) const
   if (this->type() != rhs.type())
     return false;
 
-  const unsigned short n_n = this->n_nodes();
-  libmesh_assert_equal_to(n_n, rhs.n_nodes());
+  const Real tolerance = TOLERANCE * this->hmin();
 
-  // Make two sorted arrays of global node ids and compare them for
-  // equality.
-  std::array<dof_id_type, Elem::max_n_nodes> this_ids, rhs_ids;
+  const Real centroid_distance = (rhs.centroid() - this->centroid()).norm();
 
-  for (unsigned short n = 0; n != n_n; n++)
-    {
-      this_ids[n] = this->node_id(n);
-      rhs_ids[n] = rhs.node_id(n);
-    }
-
-  // Sort the vectors to rule out different local node numberings.
-  std::sort(this_ids.begin(), this_ids.begin()+n_n);
-  std::sort(rhs_ids.begin(), rhs_ids.begin()+n_n);
-
-  // If the node ids match, the elements are equal!
-  for (unsigned short n = 0; n != n_n; ++n)
-    if (this_ids[n] != rhs_ids[n])
-      return false;
-  return true;
+  if (centroid_distance < tolerance)
+    return true;
+  else
+    return false;
 }
 
 
