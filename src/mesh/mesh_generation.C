@@ -1406,7 +1406,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use (/*skip_renumber =*/ false);
+  mesh.allow_find_neighbors(true);
+  mesh.prepare_for_use ();
 }
 
 
@@ -1936,7 +1937,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use(/*skip_renumber =*/ false);
+  mesh.allow_find_neighbors(true);
+  mesh.prepare_for_use();
 }
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
@@ -2261,7 +2263,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   STOP_LOG("build_extrusion()", "MeshTools::Generation");
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use(/*skip_renumber =*/ false);
+  mesh.allow_find_neighbors(true);
+  mesh.prepare_for_use();
 }
 
 

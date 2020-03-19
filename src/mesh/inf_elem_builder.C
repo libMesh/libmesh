@@ -63,7 +63,8 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
   // when finished with building the Ifems,
   // it remains to prepare the mesh for use:
   // find neighbors (again), partition (if needed)...
-  this->_mesh.prepare_for_use (/*skip_renumber =*/ false);
+  this->_mesh.allow_find_neighbors(true);
+  this->_mesh.prepare_for_use ();
 
   return origin;
 }
@@ -259,7 +260,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
   // when finished with building the Ifems,
   // it remains to prepare the mesh for use:
   // find neighbors again, partition (if needed)...
-  this->_mesh.prepare_for_use (/*skip_renumber =*/ false);
+  this->_mesh.allow_find_neighbors(true);
+  this->_mesh.prepare_for_use ();
 
   return origin;
 }
