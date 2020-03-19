@@ -319,6 +319,25 @@ bool MeshBase::has_node_integer(const std::string & name) const
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
+  libmesh_deprecated();
+
+  this->allow_renumbering(!skip_renumber_nodes_and_elements);
+  this->allow_find_neighbors(!skip_find_neighbors);
+
+  this->prepare_for_use();
+}
+
+void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
+{
+  libmesh_deprecated();
+
+  this->allow_renumbering(!skip_renumber_nodes_and_elements);
+
+  this->prepare_for_use();
+}
+
+void MeshBase::prepare_for_use ()
+{
   LOG_SCOPE("prepare_for_use()", "MeshBase");
 
   parallel_object_only();
@@ -337,26 +356,11 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, _skip_renumber_nodes_and_elements is false.
   //
-  // We may currently change that by passing
-  // skip_renumber_nodes_and_elements==true to this function, but we
-  // should use the allow_renumbering() accessor instead.
-  //
   // Instances where you if prepare_for_use() should not renumber the nodes
   // and elements include reading in e.g. an xda/r or gmv file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
 
-  if (skip_renumber_nodes_and_elements)
-    {
-      libmesh_deprecated();
-      this->allow_renumbering(false);
-    }
-
-  if (skip_find_neighbors)
-  {
-    libmesh_deprecated();
-    this->allow_find_neighbors(false);
-  }
 
   // Mesh modification operations might not leave us with consistent
   // id counts, but our partitioner might need that consistency.

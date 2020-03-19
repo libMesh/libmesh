@@ -1016,13 +1016,17 @@ public:
    *  4.) call \p cache_elem_dims()
    *
    * The argument to skip renumbering is now deprecated - to prevent a
-   * mesh from being renumbered, set allow_renumbering(false).
+   * mesh from being renumbered, set allow_renumbering(false). The argument to skip
+   * finding neighbors is also deprecated. To prevent find_neighbors, set
+   * allow_find_neighbors(false)
    *
    * If this is a distributed mesh, local copies of remote elements
    * will be deleted here - to keep those elements replicated during
    * preparation, set allow_remote_element_removal(false).
    */
-  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false, const bool skip_find_neighbors=false);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements);
+  void prepare_for_use ();
 
   /**
    * Call the default partitioner (currently \p metis_partition()).
