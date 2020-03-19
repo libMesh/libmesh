@@ -234,12 +234,13 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
   //partitioning for now.
   this->allow_renumbering(false);
   this->allow_remote_element_removal(false);
+  this->allow_find_neighbors(!skip_find_neighbors);
 
   // We should generally be able to skip *all* partitioning here
   // because we're only adding one already-consistent mesh to another.
   this->skip_partitioning(true);
 
-  this->prepare_for_use(false, skip_find_neighbors);
+  this->prepare_for_use();
 
   //But in the long term, use the same renumbering and partitioning
   //policies as our source mesh.
