@@ -809,6 +809,31 @@ Real RBEIMConstruction::get_RB_error_bound()
   return best_fit_error;
 }
 
+void RBEIMConstruction::init_context(FEMContext & c)
+{
+  // Pre-request FE data for all element dimensions present in the
+  // mesh.  Note: we currently pre-request FE data for all variables
+  // in the current system but in some cases that may be overkill, for
+  // example if only variable 0 is used.
+  const System & sys = c.get_system();
+  const MeshBase & mesh = sys.get_mesh();
+
+  for (unsigned int dim=1; dim<=3; ++dim)
+    if (mesh.elem_dimensions().count(dim))
+      for (unsigned int var=0; var<sys.n_vars(); ++var)
+      {
+        auto fe = c.get_element_fe(var, dim);
+        fe->get_JxW();
+        fe->get_phi();
+        fe->get_xyz();
+
+        auto side_fe = c.get_side_fe(var, dim);
+        side_fe->get_JxW();
+        side_fe->get_phi();
+        side_fe->get_xyz();
+      }
+}
+
 void RBEIMConstruction::update_system()
 {
   libMesh::out << "Updating RB matrices" << std::endl;
