@@ -69,7 +69,7 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
 {
 }
 
-void ExodusII_IO::set_reading_extra_integer_vars(const std::vector<std::string> & extra_integer_vars)
+void ExodusII_IO::set_extra_integer_vars(const std::vector<std::string> & extra_integer_vars)
 {
   _extra_integer_vars = extra_integer_vars;
 }

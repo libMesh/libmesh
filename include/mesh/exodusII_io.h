@@ -304,11 +304,11 @@ public:
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
-   * Set the elemental variables in the Exodus file that to be read into extra
+   * Set the elemental variables in the Exodus file to be read into extra
    * element integers. The names of these elemental variables will be used to
    * name the extra element integers.
    */
-  void set_reading_extra_integer_vars(const std::vector<std::string> & extra_integer_vars);
+  void set_extra_integer_vars(const std::vector<std::string> & extra_integer_vars);
 
   /**
    * Sets the list of variable names to be included in the output.
