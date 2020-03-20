@@ -69,6 +69,10 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
 {
 }
 
+void ExodusII_IO::set_extra_integer_vars(const std::vector<std::string> & extra_integer_vars)
+{
+  _extra_integer_vars = extra_integer_vars;
+}
 
 void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_variables,
                                        bool allow_empty)
@@ -146,6 +150,11 @@ void ExodusII_IO::read (const std::string & fname)
   // Get a reference to the mesh we are reading
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
+  // Add extra integers into the mesh
+  std::vector<unsigned int> extra_ids;
+  for (auto & name : _extra_integer_vars)
+    extra_ids.push_back(mesh.add_elem_integer(name));
+
   // Clear any existing mesh data
   mesh.clear();
 
@@ -212,6 +221,14 @@ void ExodusII_IO::read (const std::string & fname)
   // an elem_num_map, the identity map is returned by this call.
   exio_helper->read_elem_num_map();
 
+  // Read variables for extra integer IDs
+  std::vector<std::map<dof_id_type, Real>> elem_ids(extra_ids.size());
+  // We use the last time step to load the IDs
+  exio_helper->read_num_time_steps();
+  unsigned int last_step = exio_helper->num_time_steps;
+  for (unsigned int i = 0; i < extra_ids.size(); i++)
+    exio_helper->read_elemental_var_values(_extra_integer_vars[i], last_step, elem_ids[i]);
+
   // Read in the element connectivity for each block.
   int nelem_last_block = 0;
 
@@ -262,6 +279,10 @@ void ExodusII_IO::read (const std::string & fname)
                               << " which is different from the (zero-based) Exodus ID " \
                               << exodus_id-1                            \
                               << "!");
+
+          // Assign extra integer IDs
+          for (auto & id : extra_ids)
+            elem->set_extra_integer(id, std::round(elem_ids[id][elem->id()]));
 
           // Set all the nodes for this element
           for (int k=0; k<exio_helper->num_nodes_per_elem; k++)
