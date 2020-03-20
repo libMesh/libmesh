@@ -47,6 +47,9 @@ void print_helper(std::ostream & os, const std::vector<P> * param);
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<std::vector<P>> * param);
 
+template<typename P1, typename P2, typename C, typename A>
+void print_helper(std::ostream & os, const std::map<P1, P2, C, A> * param);
+
 /**
  * This class provides the ability to map between
  * arbitrary, user-defined strings and several data
@@ -564,6 +567,22 @@ void print_helper(std::ostream & os, const std::vector<std::vector<P>> * param)
     for (const auto & p : pv)
       os << p << " ";
 }
+
+//non-member map print function
+template<typename P1, typename P2, typename C, typename A>
+void print_helper(std::ostream & os, const std::map<P1, P2, C, A> * param)
+{
+  os << '{';
+  std::size_t sz = param->size();
+  for (auto KV : *param)
+    {
+      os << '\'' << KV.first << "\' => \'" << KV.second << '\'';
+      if (--sz)
+        os << ", ";
+    }
+  os << '}';
+}
+
 
 } // namespace libMesh
 
