@@ -275,6 +275,11 @@ protected:
   virtual Real get_RB_error_bound() override;
 
   /**
+   * Pre-request FE data needed for calculations.
+   */
+  virtual void init_context(FEMContext &) override;
+
+  /**
    * Loop over the training set and compute the parametrized function for each
    * training index.
    */
