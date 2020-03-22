@@ -125,6 +125,12 @@ Quad4::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+Quad4::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
+}
+
 bool Quad4::has_affine_map() const
 {
   Point v = this->point(3) - this->point(0);

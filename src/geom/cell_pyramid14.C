@@ -61,7 +61,17 @@ const unsigned int Pyramid14::edge_nodes_map[Pyramid14::num_edges][Pyramid14::no
     {3, 4, 12}  // Edge 7
   };
 
-
+const unsigned int Pyramid14::edge_sides_map[Pyramid14::num_edges][2] =
+  {
+    {0, 4}, // Edge 0
+    {1, 4}, // Edge 1
+    {2, 4}, // Edge 2
+    {3, 4}, // Edge 3
+    {0, 3}, // Edge 4
+    {0, 1}, // Edge 5
+    {1, 2}, // Edge 6
+    {2, 3}  // Edge 7
+  };
 
 // ------------------------------------------------------------
 // Pyramid14 class member functions
@@ -110,6 +120,13 @@ Pyramid14::nodes_on_side(const unsigned int s) const
   libmesh_assert_less(s, n_sides());
   auto trim = (s == 4) ? 0 : 3;
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
+}
+
+std::vector<unsigned>
+Pyramid14::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 bool Pyramid14::is_node_on_edge(const unsigned int n,

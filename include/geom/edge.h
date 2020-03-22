@@ -176,6 +176,11 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
+
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override final
+  { return {}; }
+
 protected:
 
   /**

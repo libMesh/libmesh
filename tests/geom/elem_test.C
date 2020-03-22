@@ -76,10 +76,34 @@ public:
         CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.max()));
       }
   }
+
+  void test_maps()
+  {
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      {
+        for (const auto edge : elem->edge_index_range())
+          for (const auto side_on_edge : elem->sides_on_edge(edge))
+            for (const auto node_on_edge : elem->nodes_on_edge(edge))
+              CPPUNIT_ASSERT(elem->is_node_on_side(node_on_edge, side_on_edge));
+
+        for (const auto side : elem->side_index_range())
+          for (const auto node_on_side : elem->nodes_on_side(side))
+            CPPUNIT_ASSERT(elem->is_node_on_side(node_on_side, side));
+
+        for (const auto edge : elem->edge_index_range())
+          for (const auto node_on_edge : elem->nodes_on_edge(edge))
+            CPPUNIT_ASSERT(elem->is_node_on_edge(node_on_edge, edge));
+
+        for (const auto edge : elem->edge_index_range())
+          for (const auto side_on_edge : elem->sides_on_edge(edge))
+            CPPUNIT_ASSERT(elem->is_edge_on_side(edge, side_on_edge));
+      }
+  }
 };
 
 #define ELEMTEST                                \
-  CPPUNIT_TEST( test_bounding_box )
+  CPPUNIT_TEST( test_bounding_box );            \
+  CPPUNIT_TEST( test_maps );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \

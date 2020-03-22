@@ -185,6 +185,12 @@ public:
   { return (e == s); }
 
   /**
+   * sides_on_edge is trivial in 2D.
+   */
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final
+  { return {e}; }
+
+  /**
    * \returns A quantitative assessment of element quality based on
    * the quality metric \p q specified by the user.
    */

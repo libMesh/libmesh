@@ -182,6 +182,18 @@ public:
     return {0};
   }
 
+  virtual std::vector<unsigned int> nodes_on_edge(const unsigned int) const override
+  {
+    libmesh_not_implemented();
+    return {0};
+  }
+
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override
+  {
+    libmesh_not_implemented();
+    return {0};
+  }
+
   virtual bool is_node_on_edge(const unsigned int,
                                const unsigned int) const override
   { libmesh_not_implemented(); return false; }

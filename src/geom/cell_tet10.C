@@ -56,6 +56,15 @@ const unsigned int Tet10::edge_nodes_map[Tet10::num_edges][Tet10::nodes_per_edge
     {2, 3, 9}  // Edge 5
   };
 
+const unsigned int Tet10::edge_sides_map[Tet10::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {1, 3}, // Edge 3
+    {1, 2}, // Edge 4
+    {2, 3}  // Edge 5
+  };
 
 
 // ------------------------------------------------------------
@@ -94,6 +103,13 @@ Tet10::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+}
+
+std::vector<unsigned>
+Tet10::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 bool Tet10::is_node_on_edge(const unsigned int n,

@@ -57,6 +57,15 @@ const unsigned int Tet4::edge_nodes_map[Tet4::num_edges][Tet4::nodes_per_edge] =
     {2, 3}  // Edge 5
   };
 
+const unsigned int Tet4::edge_sides_map[Tet4::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {1, 3}, // Edge 3
+    {1, 2}, // Edge 4
+    {2, 3}  // Edge 5
+  };
 
 // ------------------------------------------------------------
 // Tet4 class member functions
@@ -137,6 +146,13 @@ Tet4::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+}
+
+std::vector<unsigned>
+Tet4::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 Order Tet4::default_order() const

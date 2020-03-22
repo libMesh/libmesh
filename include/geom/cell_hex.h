@@ -165,6 +165,7 @@ public:
    */
   virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const override;
 
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
 
 protected:
 

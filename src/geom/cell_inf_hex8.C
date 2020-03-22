@@ -64,6 +64,18 @@ const unsigned int InfHex8::edge_nodes_map[InfHex8::num_edges][InfHex8::nodes_pe
     {3, 7}  // Edge 7
   };
 
+const unsigned int InfHex8::edge_sides_map[InfHex8::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {1, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {0, 4}, // Edge 3
+    {1, 4}, // Edge 4
+    {1, 2}, // Edge 5
+    {2, 3}, // Edge 6
+    {3, 4}  // Edge 7
+  };
+
 
 // ------------------------------------------------------------
 // InfHex8 class member functions
@@ -101,6 +113,13 @@ InfHex8::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+}
+
+std::vector<unsigned>
+InfHex8::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 bool InfHex8::is_node_on_edge(const unsigned int n,

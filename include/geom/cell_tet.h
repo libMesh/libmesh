@@ -171,6 +171,7 @@ public:
    */
   void select_diagonal (const Diagonal diag) const;
 
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
 
 
 #ifdef LIBMESH_ENABLE_AMR

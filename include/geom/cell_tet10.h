@@ -114,6 +114,8 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
+
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
@@ -218,6 +220,11 @@ public:
    * element node numbers.
    */
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
+
+  /**
+   * This maps each edge to the sides that contain said edge.
+   */
+  static const unsigned int edge_sides_map[num_edges][2];
 
   /**
    * A specialization for computing the volume of a Tet10.

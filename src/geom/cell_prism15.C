@@ -61,6 +61,18 @@ const unsigned int Prism15::edge_nodes_map[Prism15::num_edges][Prism15::nodes_pe
     {3, 5, 14}  // Edge 8
   };
 
+const unsigned int Prism15::edge_sides_map[Prism15::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {1, 3}, // Edge 3
+    {1, 2}, // Edge 4
+    {2, 3}, // Edge 5
+    {1, 4}, // Edge 6
+    {2, 4}, // Edge 7
+    {3, 4}  // Edge 8
+  };
 
 // ------------------------------------------------------------
 // Prism15 class member functions
@@ -99,6 +111,13 @@ Prism15::nodes_on_side(const unsigned int s) const
   libmesh_assert_less(s, n_sides());
   auto trim = (s > 0 && s < 4) ? 0 : 2;
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
+}
+
+std::vector<unsigned>
+Prism15::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 bool Prism15::is_node_on_edge(const unsigned int n,
