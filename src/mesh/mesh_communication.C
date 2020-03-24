@@ -1228,8 +1228,9 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
   // Inform new elements of their neighbors,
   // while resetting all remote_elem links on
   // the ranks which did the gather.
-  mesh.find_neighbors(root_id == DofObject::invalid_processor_id ||
-                      root_id == mesh.processor_id());
+  if (mesh.allow_find_neighbors())
+    mesh.find_neighbors(root_id == DofObject::invalid_processor_id ||
+                        root_id == mesh.processor_id());
 
   // All done, but let's make sure it's done correctly
 
