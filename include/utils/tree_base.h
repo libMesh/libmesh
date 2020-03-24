@@ -22,9 +22,12 @@
 
 // Local includes
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/id_types.h" // subdomain_id_type
+#include "libmesh/libmesh_common.h" // TOLERANCE
 
 // C++ includes
 #include <set>
+#include <ostream>
 
 namespace libMesh
 {
@@ -69,13 +72,13 @@ protected:
    * Constructor.  Protected.
    */
   explicit
-  TreeBase (const MeshBase & m);
+  TreeBase (const MeshBase & m) : mesh(m) {}
 
 public:
   /**
    * Destructor.
    */
-  virtual ~TreeBase() {}
+  virtual ~TreeBase() = default;
 
   /**
    * Prints the nodes.
@@ -112,7 +115,6 @@ public:
                              const std::set<subdomain_id_type> * allowed_subdomains = nullptr,
                              Real relative_tol = TOLERANCE) const = 0;
 
-
 protected:
 
   /**
@@ -121,16 +123,6 @@ protected:
    */
   const MeshBase & mesh;
 };
-
-// ------------------------------------------------------------
-// TreeBase class inline methods
-
-// constructor
-inline
-TreeBase::TreeBase (const MeshBase & m) :
-  mesh(m)
-{
-}
 
 } // namespace libMesh
 

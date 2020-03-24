@@ -75,11 +75,79 @@ bool TreeNode<N>::insert (const Elem * elem)
   // We first want to find the corners of the cuboid surrounding the cell.
   const BoundingBox bbox = elem->loose_bounding_box();
 
+  // If we are using a QuadTree, it's either because LIBMESH_DIM==2 or
+  // we have a planar xy mesh.  Either way, the bounding box
+  // comparison in this case needs to do something slightly different
+  // for the z-coordinate.
+  bool bboxes_intersect = false;
+
+  if (N == 8) // OctTree
+    bboxes_intersect = this->bounding_box.intersects(bbox);
+  else if (N == 4) // QuadTree
+    {
+      // Perform a specialized BoundingBox intersection check that
+      // ignores z-coords.  Copied from geom/bounding_box.C Check for
+      // "real" intersection in the x and y directions, then check
+      // that the z-coordinate is "close".
+
+      // Helper macro
+#define IS_BETWEEN(min, check, max)             \
+      ((min) <= (check) && (check) <= (max))
+
+      // Make local variables first to make things more clear in a moment
+      const Real & elem_min_x = bbox.first(0);
+      const Real & elem_max_x = bbox.second(0);
+      const Real & tree_min_x = this->bounding_box.first(0);
+      const Real & tree_max_x = this->bounding_box.second(0);
+
+      const Real & elem_min_y = bbox.first(1);
+      const Real & elem_max_y = bbox.second(1);
+      const Real & tree_min_y = this->bounding_box.first(1);
+      const Real & tree_max_y = this->bounding_box.second(1);
+
+      bool x_int =
+        IS_BETWEEN(elem_min_x, tree_min_x, elem_max_x) ||
+        IS_BETWEEN(elem_min_x, tree_max_x, elem_max_x) ||
+        IS_BETWEEN(tree_min_x, elem_min_x, tree_max_x) ||
+        IS_BETWEEN(tree_min_x, elem_max_x, tree_max_x);
+
+      bool y_int =
+        IS_BETWEEN(elem_min_y, tree_min_y, elem_max_y) ||
+        IS_BETWEEN(elem_min_y, tree_max_y, elem_max_y) ||
+        IS_BETWEEN(tree_min_y, elem_min_y, tree_max_y) ||
+        IS_BETWEEN(tree_min_y, elem_max_y, tree_max_y);
+
+      // When LIBMESH_DIM==3, check that the z-coordinates of the elem
+      // bbox and the tree bbox are "close" since the QuadTree is
+      // meant to work in the case when the mesh is planar_xy but not
+      // necessarily lying in the z=0 plane.
+      bool z_match = true;
+      if (LIBMESH_DIM == 3)
+        {
+          const Real & elem_min_z = bbox.first(2);
+          const Real & elem_max_z = bbox.second(2);
+          const Real & tree_min_z = this->bounding_box.first(2);
+          const Real & tree_max_z = this->bounding_box.second(2);
+
+          z_match =
+            (std::abs(elem_min_z - elem_max_z) < TOLERANCE) &&
+            (std::abs(tree_min_z - tree_max_z) < TOLERANCE) &&
+            (std::abs(elem_min_z - tree_max_z) < TOLERANCE);
+        }
+
+      bboxes_intersect = z_match && x_int && y_int;
+    }
+  else // binary tree
+    {
+      // TODO: implement 1D bounding box intersection check
+      libmesh_not_implemented();
+    }
+
   // Next, find out whether this cuboid has got non-empty intersection
   // with the bounding box of the current tree node.
   //
   // If not, we should not care about this element.
-  if (!this->bounding_box.intersects(bbox))
+  if (!bboxes_intersect)
     return false;
 
   // Only add the element if we are active
