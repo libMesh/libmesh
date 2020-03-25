@@ -47,6 +47,14 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
+protected:
+  std::unique_ptr<UnstructuredMesh> new_mesh (bool is_replicated)
+  {
+    if (is_replicated)
+      return libmesh_make_unique<ReplicatedMesh>(*TestCommWorld);
+    return libmesh_make_unique<DistributedMesh>(*TestCommWorld);
+  }
+
 public:
   void setUp() {}
 
@@ -86,7 +94,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1)));
         break;
-      default:
+      default: // QUAD8
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1) - n*n));
       }
@@ -177,138 +185,43 @@ public:
     CPPUNIT_ASSERT(bbox.max()(2) >= Real(7.0));
   }
 
-  void buildLineEdge2 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildLine(rep, 6, EDGE2);
-    testBuildLine(dist, 6, EDGE2);
+  typedef void (MeshGenerationTest::*Builder)(UnstructuredMesh&, unsigned int, ElemType);
+
+  void tester(Builder f, unsigned int n, ElemType type)
+  {
+    for (int is_replicated = 0; is_replicated != 2; ++is_replicated)
+      {
+        for (int skip_renumber = 0 ; skip_renumber != 2; ++skip_renumber)
+          {
+            std::unique_ptr<UnstructuredMesh> mesh =
+              new_mesh(is_replicated);
+            mesh->allow_renumbering(!skip_renumber);
+            (this->*f)(*mesh, n, type);
+          }
+      }
   }
 
-  void buildLineEdge3 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildLine(rep, 6, EDGE3);
-    testBuildLine(dist, 6, EDGE3);
-  }
+  void buildLineEdge2 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE2); }
+  void buildLineEdge3 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE3); }
+  void buildLineEdge4 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE4); }
 
-  void buildLineEdge4 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildLine(rep, 6, EDGE3);
-    testBuildLine(dist, 6, EDGE3);
-  }
+  void buildSquareTri3 ()    { tester(&MeshGenerationTest::testBuildSquare, 3, TRI3); }
+  void buildSquareTri6 ()    { tester(&MeshGenerationTest::testBuildSquare, 4, TRI6); }
+  void buildSquareQuad4 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD4); }
+  void buildSquareQuad8 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD8); }
+  void buildSquareQuad9 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD9); }
 
-  void buildSquareTri3 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildSquare(rep, 4, TRI3);
-    testBuildSquare(dist, 4, TRI3);
-  }
-
-  void buildSquareTri6 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildSquare(rep, 4, TRI6);
-    testBuildSquare(dist, 4, TRI6);
-  }
-
-  void buildSquareQuad4 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildSquare(rep, 4, QUAD4);
-    testBuildSquare(dist, 4, QUAD4);
-  }
-
-  void buildSquareQuad8 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildSquare(rep, 4, QUAD8);
-    testBuildSquare(dist, 4, QUAD8);
-  }
-
-  void buildSquareQuad9 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildSquare(rep, 4, QUAD9);
-    testBuildSquare(dist, 4, QUAD9);
-  }
-
-  void buildCubeTet4 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, TET4);
-    testBuildCube(dist, 2, TET4);
-  }
-
-  void buildCubeTet10 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, TET10);
-    testBuildCube(dist, 2, TET10);
-  }
-
-  void buildCubeHex8 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, HEX8);
-    testBuildCube(dist, 2, HEX8);
-  }
-
-  void buildCubeHex20 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, HEX20);
-    testBuildCube(dist, 2, HEX20);
-  }
-
-  void buildCubeHex27 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, HEX27);
-    testBuildCube(dist, 2, HEX27);
-  }
-
-  void buildCubePrism6 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, PRISM6);
-    testBuildCube(dist, 2, PRISM6);
-  }
-
-  void buildCubePrism15 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, PRISM15);
-    testBuildCube(dist, 2, PRISM15);
-  }
-
-  void buildCubePrism18 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, PRISM18);
-    testBuildCube(dist, 2, PRISM18);
-  }
- 
-  void buildCubePyramid5 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, PYRAMID5);
-    testBuildCube(dist, 2, PYRAMID5);
-  }
-   
-  void buildCubePyramid13 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, PYRAMID13);
-    testBuildCube(dist, 2, PYRAMID13);
-  }
- 
-  void buildCubePyramid14 () {
-    ReplicatedMesh rep(*TestCommWorld);
-    DistributedMesh dist(*TestCommWorld);
-    testBuildCube(rep, 2, PYRAMID14);
-    testBuildCube(dist, 2, PYRAMID14);
-  }
+  void buildCubeTet4 ()      { tester(&MeshGenerationTest::testBuildCube, 2, TET4); }
+  void buildCubeTet10 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET10); }
+  void buildCubeHex8 ()      { tester(&MeshGenerationTest::testBuildCube, 2, HEX8); }
+  void buildCubeHex20 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX20); }
+  void buildCubeHex27 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX27); }
+  void buildCubePrism6 ()    { tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
+  void buildCubePrism15 ()   { tester(&MeshGenerationTest::testBuildCube, 2, PRISM15); }
+  void buildCubePrism18 ()   { tester(&MeshGenerationTest::testBuildCube, 2, PRISM18); }
+  void buildCubePyramid5 ()  { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID5); }
+  void buildCubePyramid13 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID13); }
+  void buildCubePyramid14 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID14); }
 };
 
 
