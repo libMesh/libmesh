@@ -789,6 +789,12 @@ public:
                                const bool reset_current_list    = true) = 0;
 
   /**
+   * Removes any orphaned nodes, nodes not connected to any elements.
+   * Typically done automatically in prepare_for_use
+   */
+  void remove_orphaned_nodes ();
+
+  /**
    * After partitioning a mesh it is useful to renumber the nodes and elements
    * so that they lie in contiguous blocks on the processors.  This method
    * does just that.
