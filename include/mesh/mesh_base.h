@@ -1022,13 +1022,17 @@ public:
    *  4.) call \p cache_elem_dims()
    *
    * The argument to skip renumbering is now deprecated - to prevent a
-   * mesh from being renumbered, set allow_renumbering(false).
+   * mesh from being renumbered, set allow_renumbering(false). The argument to skip
+   * finding neighbors is also deprecated. To prevent find_neighbors, set
+   * allow_find_neighbors(false)
    *
    * If this is a distributed mesh, local copies of remote elements
    * will be deleted here - to keep those elements replicated during
    * preparation, set allow_remote_element_removal(false).
    */
-  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false, const bool skip_find_neighbors=false);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements);
+  void prepare_for_use ();
 
   /**
    * Call the default partitioner (currently \p metis_partition()).
@@ -1070,6 +1074,13 @@ public:
    */
   void allow_renumbering(bool allow) { _skip_renumber_nodes_and_elements = !allow; }
   bool allow_renumbering() const { return !_skip_renumber_nodes_and_elements; }
+
+  /**
+   * If \p false is passed then this mesh will no longer work to find element
+   * neighbors when being prepared for use
+   */
+  void allow_find_neighbors(bool allow) { _skip_find_neighbors = !allow; }
+  bool allow_find_neighbors() const { return !_skip_find_neighbors; }
 
   /**
    * If false is passed in then this mesh will no longer have remote
@@ -1790,6 +1801,11 @@ protected:
    * This is set when prepare_for_use() is called.
    */
   bool _skip_renumber_nodes_and_elements;
+
+  /**
+   * If this is \p true then we will skip \p find_neighbors in \p prepare_for_use
+   */
+  bool _skip_find_neighbors;
 
   /**
    * If this is false then even on DistributedMesh remote elements

@@ -66,6 +66,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_noncritical_partitioning(false),
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
+  _skip_find_neighbors(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
   _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
@@ -95,7 +96,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #endif
   _skip_noncritical_partitioning(false),
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false),
+  _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
+  _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(true),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
@@ -337,6 +339,35 @@ void MeshBase::remove_orphaned_nodes ()
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
+  libmesh_deprecated();
+
+  // We only respect the users wish if they tell us to skip renumbering. If they tell us not to
+  // skip renumbering but someone previously called allow_renumbering(false), then the latter takes
+  // precedence
+  if (skip_renumber_nodes_and_elements)
+    this->allow_renumbering(false);
+
+  // We always accept the user's value for skip_find_neighbors, in contrast to skip_renumber
+  this->allow_find_neighbors(!skip_find_neighbors);
+
+  this->prepare_for_use();
+}
+
+void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
+{
+  libmesh_deprecated();
+
+  // We only respect the users wish if they tell us to skip renumbering. If they tell us not to
+  // skip renumbering but someone previously called allow_renumbering(false), then the latter takes
+  // precedence
+  if (skip_renumber_nodes_and_elements)
+    this->allow_renumbering(false);
+
+  this->prepare_for_use();
+}
+
+void MeshBase::prepare_for_use ()
+{
   LOG_SCOPE("prepare_for_use()", "MeshBase");
 
   parallel_object_only();
@@ -355,20 +386,11 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, _skip_renumber_nodes_and_elements is false.
   //
-  // We may currently change that by passing
-  // skip_renumber_nodes_and_elements==true to this function, but we
-  // should use the allow_renumbering() accessor instead.
-  //
   // Instances where you if prepare_for_use() should not renumber the nodes
   // and elements include reading in e.g. an xda/r or gmv file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
 
-  if (skip_renumber_nodes_and_elements)
-    {
-      libmesh_deprecated();
-      this->allow_renumbering(false);
-    }
 
   // Mesh modification operations might not leave us with consistent
   // id counts, or might leave us with orphaned nodes we're no longer
@@ -383,7 +405,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
     }
 
   // Let all the elements find their neighbors
-  if (!skip_find_neighbors)
+  if (!_skip_find_neighbors)
     this->find_neighbors();
 
   // The user may have set boundary conditions.  We require that the

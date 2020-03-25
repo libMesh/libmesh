@@ -574,7 +574,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
       _mesh.libmesh_assert_valid_parallel_ids();
 #endif
 
-      _mesh.prepare_for_use (/*skip_renumber =*/false);
+      _mesh.allow_find_neighbors(true);
+      _mesh.prepare_for_use ();
 
       if (_face_level_mismatch_limit)
         libmesh_assert(test_level_one(true));
@@ -673,7 +674,10 @@ bool MeshRefinement::coarsen_elements ()
 
   // Finally, the new mesh may need to be prepared for use
   if (mesh_changed)
-    _mesh.prepare_for_use (/*skip_renumber =*/false);
+  {
+    _mesh.allow_find_neighbors(true);
+    _mesh.prepare_for_use ();
+  }
 
   return mesh_changed;
 }
@@ -746,7 +750,10 @@ bool MeshRefinement::refine_elements ()
 
   // Finally, the new mesh needs to be prepared for use
   if (mesh_changed)
-    _mesh.prepare_for_use (/*skip_renumber =*/false);
+  {
+    _mesh.allow_find_neighbors(true);
+    _mesh.prepare_for_use ();
+  }
 
   return mesh_changed;
 }
@@ -1699,7 +1706,10 @@ void MeshRefinement::uniformly_refine (unsigned int n)
 
   // Finally, the new mesh probably needs to be prepared for use
   if (n > 0)
-    _mesh.prepare_for_use (/*skip_renumber =*/false);
+  {
+    _mesh.allow_find_neighbors(true);
+    _mesh.prepare_for_use ();
+  }
 }
 
 
@@ -1787,7 +1797,10 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
 
   // Finally, the new mesh probably needs to be prepared for use
   if (n > 0)
-    _mesh.prepare_for_use (/*skip_renumber =*/false);
+  {
+    _mesh.allow_find_neighbors(true);
+    _mesh.prepare_for_use ();
+  }
 }
 
 

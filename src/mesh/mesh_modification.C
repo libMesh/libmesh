@@ -1100,7 +1100,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
 
   // Prepare the newly created mesh for use.
-  mesh.prepare_for_use(/*skip_renumber =*/ false);
+  mesh.allow_find_neighbors(true);
+  mesh.prepare_for_use();
 
   // Let the new_elements and new_bndry_elements vectors go out of scope.
 }
@@ -1368,7 +1369,8 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
                                       saved_bc_ids[e]);
 
   // Trim unused and renumber nodes and elements
-  mesh.prepare_for_use(/*skip_renumber =*/ false);
+  mesh.allow_find_neighbors(true);
+  mesh.prepare_for_use();
 }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

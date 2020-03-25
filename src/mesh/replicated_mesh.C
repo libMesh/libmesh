@@ -1428,7 +1428,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
         }
     }
 
-  this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false, skip_find_neighbors);
+  this->allow_find_neighbors(!skip_find_neighbors);
+  this->prepare_for_use();
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh
