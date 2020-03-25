@@ -315,6 +315,26 @@ bool MeshBase::has_node_integer(const std::string & name) const
 
 
 
+void MeshBase::remove_orphaned_nodes ()
+{
+  LOG_SCOPE("remove_orphaned_nodes()", "MeshBase");
+
+  // Will hold the set of nodes that are currently connected to elements
+  std::unordered_set<Node *> connected_nodes;
+
+  // Loop over the elements.  Find which nodes are connected to at
+  // least one of them.
+  for (const auto & element : this->element_ptr_range())
+    for (auto & n : element->node_ref_range())
+      connected_nodes.insert(&n);
+
+  for (const auto & node : this->node_ptr_range())
+    if (!connected_nodes.count(node))
+      this->delete_node(node);
+}
+
+
+
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
   LOG_SCOPE("prepare_for_use()", "MeshBase");
@@ -351,11 +371,16 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
     }
 
   // Mesh modification operations might not leave us with consistent
-  // id counts, but our partitioner might need that consistency.
+  // id counts, or might leave us with orphaned nodes we're no longer
+  // using, but our partitioner might need that consistency and/or
+  // might be confused by orphaned nodes.
   if (!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
   else
-    this->update_parallel_id_counts();
+    {
+      this->remove_orphaned_nodes();
+      this->update_parallel_id_counts();
+    }
 
   // Let all the elements find their neighbors
   if (!skip_find_neighbors)
