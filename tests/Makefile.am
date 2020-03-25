@@ -55,6 +55,7 @@ unit_tests_sources = \
   mesh/checkpoint.C \
   mesh/contains_point.C \
   mesh/extra_integers.C \
+  mesh/mesh_generation_test.C \
   mesh/mesh_input.C \
   mesh/mesh_function.C \
   mesh/mesh_stitch.C \
