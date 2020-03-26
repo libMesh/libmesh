@@ -181,7 +181,7 @@ const Point & ReplicatedMesh::point (const dof_id_type i) const
 
 const Node * ReplicatedMesh::node_ptr (const dof_id_type i) const
 {
-  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert_less (i, this->max_node_id());
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
@@ -193,7 +193,7 @@ const Node * ReplicatedMesh::node_ptr (const dof_id_type i) const
 
 Node * ReplicatedMesh::node_ptr (const dof_id_type i)
 {
-  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert_less (i, this->max_node_id());
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
@@ -205,7 +205,7 @@ Node * ReplicatedMesh::node_ptr (const dof_id_type i)
 
 const Node * ReplicatedMesh::query_node_ptr (const dof_id_type i) const
 {
-  if (i >= this->n_nodes())
+  if (i >= this->max_node_id())
     return nullptr;
   libmesh_assert (_nodes[i] == nullptr ||
                   _nodes[i]->id() == i); // This will change soon
@@ -218,7 +218,7 @@ const Node * ReplicatedMesh::query_node_ptr (const dof_id_type i) const
 
 Node * ReplicatedMesh::query_node_ptr (const dof_id_type i)
 {
-  if (i >= this->n_nodes())
+  if (i >= this->max_node_id())
     return nullptr;
   libmesh_assert (_nodes[i] == nullptr ||
                   _nodes[i]->id() == i); // This will change soon
@@ -231,7 +231,7 @@ Node * ReplicatedMesh::query_node_ptr (const dof_id_type i)
 
 const Elem * ReplicatedMesh::elem_ptr (const dof_id_type i) const
 {
-  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert_less (i, this->max_elem_id());
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
@@ -243,7 +243,7 @@ const Elem * ReplicatedMesh::elem_ptr (const dof_id_type i) const
 
 Elem * ReplicatedMesh::elem_ptr (const dof_id_type i)
 {
-  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert_less (i, this->max_elem_id());
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
@@ -255,7 +255,7 @@ Elem * ReplicatedMesh::elem_ptr (const dof_id_type i)
 
 const Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i) const
 {
-  if (i >= this->n_elem())
+  if (i >= this->max_elem_id())
     return nullptr;
   libmesh_assert (_elements[i] == nullptr ||
                   _elements[i]->id() == i); // This will change soon
@@ -268,7 +268,7 @@ const Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i) const
 
 Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i)
 {
-  if (i >= this->n_elem())
+  if (i >= this->max_elem_id())
     return nullptr;
   libmesh_assert (_elements[i] == nullptr ||
                   _elements[i]->id() == i); // This will change soon
