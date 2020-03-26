@@ -643,6 +643,7 @@ void ReplicatedMesh::clear ()
   for (auto & elem : _elements)
     delete elem;
 
+  _n_elem = 0;
   _elements.clear();
 
   // clear the nodes data structure
@@ -652,6 +653,7 @@ void ReplicatedMesh::clear ()
   for (auto & node : _nodes)
     delete node;
 
+  _n_nodes = 0;
   _nodes.clear();
 }
 
