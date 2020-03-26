@@ -105,10 +105,8 @@ protected:
       elem_bottom->set_node(3) = _mesh->node_ptr(0);
     }
 
-    // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequently,
-    // it's going use skip_renumber=false.
-    _mesh->prepare_for_use(false /*skip_renumber*/);
+    _mesh->allow_renumbering(true);
+    _mesh->prepare_for_use();
 
     // get a point locator
     _point_locator = _mesh->sub_point_locator();

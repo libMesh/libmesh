@@ -285,7 +285,8 @@ public:
     bi.add_shellface(elem_top, 0, 10);
     bi.add_shellface(elem_bottom, 1, 20);
 
-    mesh.prepare_for_use(false /*skip_renumber*/);
+    mesh.allow_renumbering(true);
+    mesh.prepare_for_use();
 
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), bi.n_shellface_conds());
 
