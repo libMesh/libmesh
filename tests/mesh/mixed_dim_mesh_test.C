@@ -88,10 +88,8 @@ protected:
       edge->subdomain_id() = 1;
     }
 
-    // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequently,
-    // it's going use skip_renumber=false.
-    _mesh->prepare_for_use(false /*skip_renumber*/);
+    _mesh->allow_renumbering(true);
+    _mesh->prepare_for_use();
   }
 
 public:
@@ -476,10 +474,8 @@ protected:
       edge->subdomain_id() = 1;
     }
 
-    // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequently,
-    // it's going use skip_renumber=false.
-    _mesh->prepare_for_use(false /*skip_renumber*/);
+    _mesh->allow_renumbering(true);
+    _mesh->prepare_for_use();
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -707,10 +703,8 @@ protected:
 
     }
 
-    // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequently,
-    // it's going use skip_renumber=false.
-    _mesh->prepare_for_use(false /*skip_renumber*/);
+    _mesh->allow_renumbering(true);
+    _mesh->prepare_for_use();
 
 #ifdef LIBMESH_ENABLE_AMR
     //Flag the bottom element for refinement
@@ -937,10 +931,8 @@ protected:
       quad->subdomain_id() = 1;
     }
 
-    // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequently,
-    // it's going use skip_renumber=false.
-    _mesh->prepare_for_use(false /*skip_renumber*/);
+    _mesh->allow_renumbering(true);
+    _mesh->prepare_for_use();
 
 #ifdef LIBMESH_ENABLE_AMR
     //Flag the bottom element for refinement

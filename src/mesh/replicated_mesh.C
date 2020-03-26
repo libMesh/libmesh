@@ -84,7 +84,8 @@ public:
 // ReplicatedMesh class member functions
 ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
                                 unsigned char d) :
-  UnstructuredMesh (comm_in,d)
+  UnstructuredMesh (comm_in,d),
+  _n_nodes(0), _n_elem(0)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   // In serial we just need to reset the next unique id to zero
@@ -106,7 +107,8 @@ ReplicatedMesh::~ReplicatedMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
-  UnstructuredMesh (other_mesh)
+  UnstructuredMesh (other_mesh),
+  _n_nodes(0), _n_elem(0) // copy_* will increment this
 {
   this->copy_nodes_and_elements(other_mesh, true);
 
@@ -141,7 +143,8 @@ ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
 
 
 ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
-  UnstructuredMesh (other_mesh)
+  UnstructuredMesh (other_mesh),
+  _n_nodes(0), _n_elem(0) // copy_* will increment this
 {
   this->copy_nodes_and_elements(other_mesh, true);
 
@@ -181,7 +184,7 @@ const Point & ReplicatedMesh::point (const dof_id_type i) const
 
 const Node * ReplicatedMesh::node_ptr (const dof_id_type i) const
 {
-  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert_less (i, this->max_node_id());
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
@@ -193,7 +196,7 @@ const Node * ReplicatedMesh::node_ptr (const dof_id_type i) const
 
 Node * ReplicatedMesh::node_ptr (const dof_id_type i)
 {
-  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert_less (i, this->max_node_id());
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
@@ -205,7 +208,7 @@ Node * ReplicatedMesh::node_ptr (const dof_id_type i)
 
 const Node * ReplicatedMesh::query_node_ptr (const dof_id_type i) const
 {
-  if (i >= this->n_nodes())
+  if (i >= this->max_node_id())
     return nullptr;
   libmesh_assert (_nodes[i] == nullptr ||
                   _nodes[i]->id() == i); // This will change soon
@@ -218,7 +221,7 @@ const Node * ReplicatedMesh::query_node_ptr (const dof_id_type i) const
 
 Node * ReplicatedMesh::query_node_ptr (const dof_id_type i)
 {
-  if (i >= this->n_nodes())
+  if (i >= this->max_node_id())
     return nullptr;
   libmesh_assert (_nodes[i] == nullptr ||
                   _nodes[i]->id() == i); // This will change soon
@@ -231,7 +234,7 @@ Node * ReplicatedMesh::query_node_ptr (const dof_id_type i)
 
 const Elem * ReplicatedMesh::elem_ptr (const dof_id_type i) const
 {
-  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert_less (i, this->max_elem_id());
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
@@ -243,7 +246,7 @@ const Elem * ReplicatedMesh::elem_ptr (const dof_id_type i) const
 
 Elem * ReplicatedMesh::elem_ptr (const dof_id_type i)
 {
-  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert_less (i, this->max_elem_id());
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
@@ -255,7 +258,7 @@ Elem * ReplicatedMesh::elem_ptr (const dof_id_type i)
 
 const Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i) const
 {
-  if (i >= this->n_elem())
+  if (i >= this->max_elem_id())
     return nullptr;
   libmesh_assert (_elements[i] == nullptr ||
                   _elements[i]->id() == i); // This will change soon
@@ -268,7 +271,7 @@ const Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i) const
 
 Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i)
 {
-  if (i >= this->n_elem())
+  if (i >= this->max_elem_id())
     return nullptr;
   libmesh_assert (_elements[i] == nullptr ||
                   _elements[i]->id() == i); // This will change soon
@@ -310,6 +313,7 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
       _elements.resize(id+1, nullptr);
     }
 
+  ++_n_elem;
   _elements[id] = e;
 
   // Make sure any new element is given space for any extra integers
@@ -350,7 +354,8 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
       this->delete_elem(oldelem);
     }
 
-  _elements[e->id()] = e;
+  ++_n_elem;
+  _elements[eid] = e;
 
   // Make sure any new element is given space for any extra integers
   // we've requested
@@ -407,6 +412,7 @@ void ReplicatedMesh::delete_elem(Elem * e)
   this->get_boundary_info().remove(e);
 
   // delete the element
+  --_n_elem;
   delete e;
 
   // explicitly zero the pointer
@@ -471,6 +477,7 @@ Node * ReplicatedMesh::add_point (const Point & p,
         n->set_unique_id() = _next_unique_id++;
 #endif
 
+      ++_n_nodes;
       if (id == DofObject::invalid_id)
         _nodes.back() = n;
       else
@@ -500,6 +507,7 @@ Node * ReplicatedMesh::add_node (Node * n)
 
   n->add_extra_integers(_node_integer_names.size());
 
+  ++_n_nodes;
   _nodes.push_back(n);
 
   return n;
@@ -551,6 +559,7 @@ Node * ReplicatedMesh::insert_node(Node * n)
 
   // We have enough space and this spot isn't already occupied by
   // another node, so go ahead and add it.
+  ++_n_nodes;
   _nodes[ n->id() ] = n;
 
   // If we made it this far, we just inserted the node the user handed
@@ -598,6 +607,7 @@ void ReplicatedMesh::delete_node(Node * n)
   this->get_boundary_info().remove(n);
 
   // delete the node
+  --_n_nodes;
   delete n;
 
   // explicitly zero the pointer
@@ -777,6 +787,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
                 this->get_boundary_info().remove (nd);
 
                 // delete the node
+                --_n_nodes;
                 delete nd;
                 nd = nullptr;
               }
@@ -810,6 +821,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
             this->get_boundary_info().remove (node);
 
             // delete the node
+            --_n_nodes;
             delete node;
             node = nullptr;
           }
