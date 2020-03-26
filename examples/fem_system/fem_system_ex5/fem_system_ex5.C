@@ -114,12 +114,14 @@ int main (int argc, char ** argv)
   // Declare a default FEType here to override if needed for IGA later
   FEType fe_type;
 
+  const std::string iga_filename = infile("iga_filename","DIE!");
+
   // Load an IGA pressurized cylinder mesh or build a cantilever mesh
   if (use_iga)
     {
       libMesh::out << "\nReading IGA mesh.\n" << std::endl;
       if (mesh.processor_id() == 0)
-        dyna_io.read("PressurizedCyl_Patch6_256Elem.bxt");
+        dyna_io.read(iga_filename);
       MeshCommunication().broadcast (mesh);
       mesh.prepare_for_use();
 
