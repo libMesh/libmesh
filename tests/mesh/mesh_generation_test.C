@@ -63,7 +63,7 @@ public:
   void testBuildLine(UnstructuredMesh & mesh, unsigned int n, ElemType type)
   {
     MeshTools::Generation::build_line (mesh, n, -1.0, 2.0, type);
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n);
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n));
     CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                          cast_int<dof_id_type>((Elem::type_to_n_nodes_map[type]-1)*n + 1));
 
