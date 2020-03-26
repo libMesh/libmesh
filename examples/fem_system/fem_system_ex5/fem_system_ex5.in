@@ -18,3 +18,6 @@ solver_quiet = false
 relative_step_tolerance = 1e-3
 
 relative_residual_tolerance = 1.e-3
+
+# File to open when doing an IGA run
+iga_filename = 'PressurizedCyl_Patch6_256Elem.bxt'
