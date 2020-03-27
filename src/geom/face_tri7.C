@@ -343,12 +343,12 @@ BoundingBox Tri7::loose_bounding_box () const
 
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
-      Real center = this->point(0)(d);
+      auto center = this->point(0)(d);
       for (unsigned int p=1; p != 6; ++p)
         center += this->point(p)(d);
       center /= 6;
 
-      Real hd = std::abs(center - this->point(0)(d));
+      auto hd = std::abs(center - this->point(0)(d));
       for (unsigned int p=1; p != 6; ++p)
         hd = std::max(hd, std::abs(center - this->point(p)(d)));
 

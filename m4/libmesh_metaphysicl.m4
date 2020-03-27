@@ -30,8 +30,8 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
                enablemetaphysicl=yes
                build_metaphysicl=no],
               [AS_IF([test "x$build_metaphysicl" = "xyes"],
-                     [METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
-                      METAPHYSICL_INC="-I$top_srcdir/contrib/metaphysicl/src/numerics/include -I$top_srcdir/contrib/metaphysicl/src/core/include -I$top_srcdir/contrib/metaphysicl/src/utilities/include"],
+                     [METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include -I\$(top_builddir)/contrib/metaphysicl/src/utilities/include"
+                      METAPHYSICL_INC="-I$top_srcdir/contrib/metaphysicl/src/numerics/include -I$top_srcdir/contrib/metaphysicl/src/core/include -I$top_srcdir/contrib/metaphysicl/src/utilities/include -I$top_builddir/contrib/metaphysicl/src/utilities/include"],
                      [METAPHYSICL_INCLUDE="-I$METAPHYSICL_DIR/include"
                       METAPHYSICL_INC="-I$METAPHYSICL_DIR/include"])]
              )

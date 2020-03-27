@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/gnuplot_io.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -116,12 +117,12 @@ void GnuPlotIO::write_solution(const std::string & fname,
           // if el is the left edge of the mesh, print its left node position
           if (el->neighbor_ptr(0) == nullptr)
             {
-              x_min = (el->point(0))(0);
+              x_min = MetaPhysicL::raw_value((el->point(0))(0));
               xtics_stream << "\"\" " << x_min << ", \\\n";
             }
           if (el->neighbor_ptr(1) == nullptr)
             {
-              x_max = (el->point(1))(0);
+              x_max = MetaPhysicL::raw_value((el->point(1))(0));
             }
           xtics_stream << "\"\" " << (el->point(1))(0);
 
@@ -176,7 +177,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
             for (unsigned int c=0; c<n_vars; c++)
               values.push_back((*soln)[global_id*n_vars + c]);
 
-            node_map[the_mesh.point(global_id)(0)] = values;
+            node_map[MetaPhysicL::raw_value(the_mesh.point(global_id)(0))] = values;
           }
 
       for (const auto & pr : node_map)

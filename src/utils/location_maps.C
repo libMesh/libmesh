@@ -24,6 +24,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
+#include "libmesh/raw_type.h"
 
 // C++ Includes
 #include <limits>
@@ -67,9 +68,9 @@ void LocationMap<T>::init(MeshBase & mesh)
       {
         // Expand the bounding box if necessary
         _lower_bound[i] = std::min(_lower_bound[i],
-                                   (*node)(i));
+                                   MetaPhysicL::raw_value((*node)(i)));
         _upper_bound[i] = std::max(_upper_bound[i],
-                                   (*node)(i));
+                                   MetaPhysicL::raw_value((*node)(i)));
       }
 
   // On a parallel mesh we might not yet have a full bounding box
@@ -146,8 +147,10 @@ T * LocationMap<T>::find(const Point & p,
 
 
 template <typename T>
-unsigned int LocationMap<T>::key(const Point & p)
+unsigned int LocationMap<T>::key(const Point & point)
 {
+  const auto & p = MetaPhysicL::raw_value(point);
+
   Real xscaled = 0., yscaled = 0., zscaled = 0.;
 
   Real deltax = _upper_bound[0] - _lower_bound[0];

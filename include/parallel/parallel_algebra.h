@@ -34,6 +34,11 @@
 #include "timpi/op_function.h"
 #include "timpi/standard_type.h"
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+#include "metaphysicl/parallel_dualnumber.h"
+#include "metaphysicl/parallel_semidynamicsparsenumberarray.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <memory>
@@ -210,7 +215,7 @@ public:
         ex = temp.get();
       }
 
-    StandardType<libMesh::Real> T_type(&((*ex)(0)));
+    StandardType<libMesh::GeomReal> T_type(&((*ex)(0)));
 
     int blocklength = LIBMESH_DIM;
     MPI_Aint displs, start;

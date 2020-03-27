@@ -313,7 +313,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
       con.pre_fe_reinit(sys, &elem_ref);
 
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
-      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const auto & phi = elem_fe->get_phi();
 
       elem_fe->reinit(&elem_ref);
 
@@ -328,7 +328,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
           phi_i_qp_vec[counter].resize(phi.size());
           for(auto i : index_range(phi))
-            phi_i_qp_vec[counter][i] = phi[i][qp];
+            phi_i_qp_vec[counter][i] = MetaPhysicL::raw_value(phi[i][qp]);
 
           if (requires_xyz_perturbations)
             {
@@ -428,7 +428,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
           auto side_fe = con.get_side_fe(/*var=*/0, elem_ref.dim());
           side_fe->reinit(&elem_ref, side_index);
 
-          const std::vector<std::vector<Real>> & phi = side_fe->get_phi();
+          const auto & phi = side_fe->get_phi();
           for (auto qp : index_range(xyz_vec))
             {
               mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
@@ -442,7 +442,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
 
               phi_i_qp_vec[counter].resize(phi.size());
               for(auto i : index_range(phi))
-                phi_i_qp_vec[counter][i] = phi[i][qp];
+                phi_i_qp_vec[counter][i] = MetaPhysicL::raw_value(phi[i][qp]);
 
               if (requires_xyz_perturbations)
                 {
@@ -462,7 +462,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
       else if (side_type == 1)
         {
           auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
-          const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+          const auto & phi = elem_fe->get_phi();
 
           elem_fe->reinit(&elem_ref);
 
@@ -479,7 +479,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
 
               phi_i_qp_vec[counter].resize(phi.size());
               for(auto i : index_range(phi))
-                phi_i_qp_vec[counter][i] = phi[i][qp];
+                phi_i_qp_vec[counter][i] = MetaPhysicL::raw_value(phi[i][qp]);
 
               if (requires_xyz_perturbations)
                 {
@@ -638,7 +638,7 @@ std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation
       const Elem & elem_ref = sys.get_mesh().elem_ref(elem_id);
 
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
-      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const auto & phi = elem_fe->get_phi();
 
       Point obs_pt_ref_coords =
         FEMap::inverse_map(
@@ -656,7 +656,7 @@ std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation
 
       phi_i_qp_vec[obs_pt_idx].resize(phi.size());
       for(auto i : index_range(phi))
-        phi_i_qp_vec[obs_pt_idx][i] = phi[i][/*qp*/ 0];
+        phi_i_qp_vec[obs_pt_idx][i] = MetaPhysicL::raw_value(phi[i][/*qp*/ 0]);
     }
 
   std::vector<std::vector<std::vector<Number>>> obs_pt_values;

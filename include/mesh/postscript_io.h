@@ -122,7 +122,7 @@ private:
   /**
    * Amount to add to every (x,y) point to place it in Postscript coordinates.
    */
-  Point _offset;
+  RawPoint _offset;
 
   /**
    * Amount by which to stretch each point to place it in Postscript coordinates.
@@ -132,7 +132,7 @@ private:
   /**
    * A point object used for temporary calculations
    */
-  Point _current_point;
+  RawPoint _current_point;
 
   /**
    * Drawing style-independent data for a single cell.  This can be

@@ -34,6 +34,7 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/utility.h"
 #include "libmesh/int_range.h"
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <iostream>
@@ -571,14 +572,14 @@ void CheckpointIO::write_nodes (Xdr & io,
       io.data(unique_id, "# unique id");
 #endif
 
-      coords[0] = (*node)(0);
+      coords[0] = MetaPhysicL::raw_value((*node)(0));
 
 #if LIBMESH_DIM > 1
-      coords[1] = (*node)(1);
+      coords[1] = MetaPhysicL::raw_value((*node)(1));
 #endif
 
 #if LIBMESH_DIM > 2
-      coords[2] = (*node)(2);
+      coords[2] = MetaPhysicL::raw_value((*node)(2));
 #endif
 
       io.data_stream(coords.data(), LIBMESH_DIM, 3);

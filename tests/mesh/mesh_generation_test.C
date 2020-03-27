@@ -4,6 +4,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_tools.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -95,8 +96,8 @@ public:
                          cast_int<dof_id_type>((Elem::type_to_n_nodes_map[type]-1)*n + 1));
 
     BoundingBox bbox = MeshTools::create_bounding_box(mesh);
-    CPPUNIT_ASSERT_EQUAL(bbox.min()(0), Real(-1.0));
-    CPPUNIT_ASSERT_EQUAL(bbox.max()(0), Real(2.0));
+    CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(bbox.min()(0)), Real(-1.0));
+    CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(bbox.max()(0)), Real(2.0));
 
     // Do serial assertions *after* all parallel assertions, so we
     // stay in sync after failure on only some processor(s)

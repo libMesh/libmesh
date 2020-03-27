@@ -31,16 +31,16 @@ LIBMESH_DEFAULT_VECTORIZED_FE(3,MONOMIAL)
 
 
 template <>
-Real FE<3,MONOMIAL>::shape(const ElemType,
+GeomReal FE<3,MONOMIAL>::shape(const ElemType,
                            const Order libmesh_dbg_var(order),
                            const unsigned int i,
                            const Point & p)
 {
 #if LIBMESH_DIM == 3
 
-  const Real xi   = p(0);
-  const Real eta  = p(1);
-  const Real zeta = p(2);
+  const GeomReal xi   = p(0);
+  const GeomReal eta  = p(1);
+  const GeomReal zeta = p(2);
 
   libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
                        (static_cast<unsigned int>(order)+2)*
@@ -167,7 +167,7 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
       for (; block < i2; block += (o-nz+1)) { nz++; }
       const unsigned int nx = block - i2;
       const unsigned int ny = o - nx - nz;
-      Real val = 1.;
+      GeomReal val = 1.;
       for (unsigned int index=0; index != nx; index++)
         val *= xi;
       for (unsigned int index=0; index != ny; index++)
@@ -187,7 +187,7 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
 
 
 template <>
-Real FE<3,MONOMIAL>::shape(const Elem * elem,
+GeomReal FE<3,MONOMIAL>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
                            const Point & p,
@@ -202,7 +202,7 @@ Real FE<3,MONOMIAL>::shape(const Elem * elem,
 
 
 template <>
-Real FE<3,MONOMIAL>::shape(const FEType fet,
+GeomReal FE<3,MONOMIAL>::shape(const FEType fet,
                            const Elem * elem,
                            const unsigned int i,
                            const Point & p,
@@ -216,7 +216,7 @@ Real FE<3,MONOMIAL>::shape(const FEType fet,
 
 
 template <>
-Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
+GeomReal FE<3,MONOMIAL>::shape_deriv(const ElemType,
                                  const Order libmesh_dbg_var(order),
                                  const unsigned int i,
                                  const unsigned int j,
@@ -231,9 +231,9 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
                        (static_cast<unsigned int>(order)+3)/6);
 
 
-  const Real xi   = p(0);
-  const Real eta  = p(1);
-  const Real zeta = p(2);
+  const GeomReal xi   = p(0);
+  const GeomReal eta  = p(1);
+  const GeomReal zeta = p(2);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (j)
@@ -361,7 +361,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = nx;
+            GeomReal val = nx;
             for (unsigned int index=1; index < nx; index++)
               val *= xi;
             for (unsigned int index=0; index != ny; index++)
@@ -496,7 +496,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = ny;
+            GeomReal val = ny;
             for (unsigned int index=0; index != nx; index++)
               val *= xi;
             for (unsigned int index=1; index < ny; index++)
@@ -631,7 +631,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = nz;
+            GeomReal val = nz;
             for (unsigned int index=0; index != nx; index++)
               val *= xi;
             for (unsigned int index=0; index != ny; index++)
@@ -656,7 +656,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<3,MONOMIAL>::shape_deriv(const Elem * elem,
+GeomReal FE<3,MONOMIAL>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -671,7 +671,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<3,MONOMIAL>::shape_deriv(const FEType fet,
+GeomReal FE<3,MONOMIAL>::shape_deriv(const FEType fet,
                                  const Elem * elem,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -687,7 +687,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
+GeomReal FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
                                         const Order libmesh_dbg_var(order),
                                         const unsigned int i,
                                         const unsigned int j,
@@ -701,9 +701,9 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
                        (static_cast<unsigned int>(order)+2)*
                        (static_cast<unsigned int>(order)+3)/6);
 
-  const Real xi   = p(0);
-  const Real eta  = p(1);
-  const Real zeta = p(2);
+  const GeomReal xi   = p(0);
+  const GeomReal eta  = p(1);
+  const GeomReal zeta = p(2);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (j)
@@ -796,7 +796,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = nx * (nx - 1);
+            GeomReal val = nx * (nx - 1);
             for (unsigned int index=2; index < nx; index++)
               val *= xi;
             for (unsigned int index=0; index != ny; index++)
@@ -902,7 +902,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = nx * ny;
+            GeomReal val = nx * ny;
             for (unsigned int index=1; index < nx; index++)
               val *= xi;
             for (unsigned int index=1; index < ny; index++)
@@ -1007,7 +1007,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = ny * (ny - 1);
+            GeomReal val = ny * (ny - 1);
             for (unsigned int index=0; index != nx; index++)
               val *= xi;
             for (unsigned int index=2; index < ny; index++)
@@ -1113,7 +1113,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = nx * nz;
+            GeomReal val = nx * nz;
             for (unsigned int index=1; index < nx; index++)
               val *= xi;
             for (unsigned int index=0; index != ny; index++)
@@ -1218,7 +1218,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = ny * nz;
+            GeomReal val = ny * nz;
             for (unsigned int index=0; index != nx; index++)
               val *= xi;
             for (unsigned int index=1; index < ny; index++)
@@ -1312,7 +1312,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
             for (; block < i2; block += (o-nz+1)) { nz++; }
             const unsigned int nx = block - i2;
             const unsigned int ny = o - nx - nz;
-            Real val = nz * (nz - 1);
+            GeomReal val = nz * (nz - 1);
             for (unsigned int index=0; index != nx; index++)
               val *= xi;
             for (unsigned int index=0; index != ny; index++)
@@ -1337,7 +1337,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<3,MONOMIAL>::shape_second_deriv(const Elem * elem,
+GeomReal FE<3,MONOMIAL>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
@@ -1352,7 +1352,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<3,MONOMIAL>::shape_second_deriv(const FEType fet,
+GeomReal FE<3,MONOMIAL>::shape_second_deriv(const FEType fet,
                                         const Elem * elem,
                                         const unsigned int i,
                                         const unsigned int j,

@@ -30,6 +30,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/raw_type.h"
 
 
 using namespace libMesh;
@@ -155,11 +156,11 @@ void assemble(EquationSystems & es,
 
 
   // These are references to cell-specific data
-  const std::vector<Real> & JxW_face                   = fe_face->get_JxW();
-  const std::vector<Real> & JxW                        = fe->get_JxW();
-  const std::vector<Point> & q_point                   = fe->get_xyz();
-  const std::vector<std::vector<Real>> & phi          = fe->get_phi();
-  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
+  const auto & JxW_face = MetaPhysicL::raw_value(fe_face->get_JxW());
+  const auto & JxW      = MetaPhysicL::raw_value(fe->get_JxW());
+  const auto & q_point  = MetaPhysicL::raw_value(fe->get_xyz());
+  const auto & phi      = MetaPhysicL::raw_value(fe->get_phi());
+  const auto & dphi     = MetaPhysicL::raw_value(fe->get_dphi());
 
   std::vector<dof_id_type> dof_indices_U;
   std::vector<dof_id_type> dof_indices_V;

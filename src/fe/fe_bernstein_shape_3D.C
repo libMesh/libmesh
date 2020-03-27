@@ -64,7 +64,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(3,BERNSTEIN)
 
 
 template <>
-Real FE<3,BERNSTEIN>::shape(const Elem * elem,
+GeomReal FE<3,BERNSTEIN>::shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
                             const Point & p,
@@ -84,13 +84,13 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
                               const unsigned int * hex_i1,
                               const unsigned int * hex_i2) {
     // Compute hex shape functions as a tensor-product
-    const Real xi    = p_in(0);
-    const Real eta   = p_in(1);
-    const Real zeta  = p_in(2);
+    const auto xi    = p_in(0);
+    const auto eta   = p_in(1);
+    const auto zeta  = p_in(2);
     Point p_to_remap = p_in;
-    Real & xi_mapped = p_to_remap(0);
-    Real & eta_mapped = p_to_remap(1);
-    Real & zeta_mapped = p_to_remap(2);
+    auto & xi_mapped = p_to_remap(0);
+    auto & eta_mapped = p_to_remap(1);
+    auto & zeta_mapped = p_to_remap(2);
 
     // handle the edge orientation
     {
@@ -592,10 +592,10 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               libmesh_assert_less (i, 4);
 
               // Area coordinates
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              const GeomReal zeta1 = p(0);
+              const GeomReal zeta2 = p(1);
+              const GeomReal zeta3 = p(2);
+              const GeomReal zeta0 = 1. - zeta1 - zeta2 - zeta3;
 
               switch(i)
                 {
@@ -617,9 +617,9 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               libmesh_assert_less (i, 8);
 
               // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              const GeomReal xi   = p(0);
+              const GeomReal eta  = p(1);
+              const GeomReal zeta = p(2);
 
               // The only way to make any sense of this
               // is to look at the mgflo/mg2/mgf documentation
@@ -655,10 +655,10 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               libmesh_assert_less (i, 10);
 
               // Area coordinates
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              const GeomReal zeta1 = p(0);
+              const GeomReal zeta2 = p(1);
+              const GeomReal zeta3 = p(2);
+              const GeomReal zeta0 = 1. - zeta1 - zeta2 - zeta3;
 
               switch(i)
                 {
@@ -684,9 +684,9 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               libmesh_assert_less (i, 20);
 
               // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              const GeomReal xi   = p(0);
+              const GeomReal eta  = p(1);
+              const GeomReal zeta = p(2);
 
               return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[i], xi)*
                       FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[i], eta)*
@@ -727,9 +727,9 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               libmesh_assert_less (i, 27);
 
               // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              const GeomReal xi   = p(0);
+              const GeomReal eta  = p(1);
+              const GeomReal zeta = p(2);
 
               // The only way to make any sense of this
               // is to look at the mgflo/mg2/mgf documentation
@@ -765,10 +765,10 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
             //       libmesh_assert_less (i, 20);
 
             //       // Area coordinates
-            //       const Real zeta1 = p(0);
-            //       const Real zeta2 = p(1);
-            //       const Real zeta3 = p(2);
-            //       const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+            //       const GeomReal zeta1 = p(0);
+            //       const GeomReal zeta2 = p(1);
+            //       const GeomReal zeta3 = p(2);
+            //       const GeomReal zeta0 = 1. - zeta1 - zeta2 - zeta3;
 
 
             //       unsigned int shape=i;
@@ -896,7 +896,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
 
 template <>
-Real FE<3,BERNSTEIN>::shape(const ElemType,
+GeomReal FE<3,BERNSTEIN>::shape(const ElemType,
                             const Order,
                             const unsigned int,
                             const Point &)
@@ -907,7 +907,7 @@ Real FE<3,BERNSTEIN>::shape(const ElemType,
 
 
 template <>
-Real FE<3,BERNSTEIN>::shape(const FEType fet,
+GeomReal FE<3,BERNSTEIN>::shape(const FEType fet,
                             const Elem * elem,
                             const unsigned int i,
                             const Point & p,
@@ -917,7 +917,7 @@ Real FE<3,BERNSTEIN>::shape(const FEType fet,
 }
 
 template <>
-Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
+GeomReal FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
                                   const Order order,
                                   const unsigned int i,
                                   const unsigned int j,
@@ -958,9 +958,9 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               libmesh_assert_less (i, 8);
 
               // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              const GeomReal xi   = p(0);
+              const GeomReal eta  = p(1);
+              const GeomReal zeta = p(2);
 
               // The only way to make any sense of this
               // is to look at the mgflo/mg2/mgf documentation
@@ -1020,9 +1020,9 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               libmesh_assert_less (i, 20);
 
               // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              const GeomReal xi   = p(0);
+              const GeomReal eta  = p(1);
+              const GeomReal zeta = p(2);
 
               switch (j)
                 {
@@ -1139,9 +1139,9 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               libmesh_assert_less (i, 27);
 
               // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              const GeomReal xi   = p(0);
+              const GeomReal eta  = p(1);
+              const GeomReal zeta = p(2);
 
               // The only way to make any sense of this
               // is to look at the mgflo/mg2/mgf documentation
@@ -1245,12 +1245,12 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             }
 
             //       // Compute hex shape functions as a tensor-product
-            //       const Real xi    = p(0);
-            //       const Real eta   = p(1);
-            //       const Real zeta  = p(2);
-            //       Real xi_mapped   = p(0);
-            //       Real eta_mapped  = p(1);
-            //       Real zeta_mapped = p(2);
+            //       const GeomReal xi    = p(0);
+            //       const GeomReal eta   = p(1);
+            //       const GeomReal zeta  = p(2);
+            //       GeomReal xi_mapped   = p(0);
+            //       GeomReal eta_mapped  = p(1);
+            //       GeomReal zeta_mapped = p(2);
 
             //       // The only way to make any sense of this
             //       // is to look at the mgflo/mg2/mgf documentation
@@ -1781,12 +1781,12 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             }
 
             //       // Compute hex shape functions as a tensor-product
-            //       const Real xi    = p(0);
-            //       const Real eta   = p(1);
-            //       const Real zeta  = p(2);
-            //       Real xi_mapped   = p(0);
-            //       Real eta_mapped  = p(1);
-            //       Real zeta_mapped = p(2);
+            //       const GeomReal xi    = p(0);
+            //       const GeomReal eta   = p(1);
+            //       const GeomReal zeta  = p(2);
+            //       GeomReal xi_mapped   = p(0);
+            //       GeomReal eta_mapped  = p(1);
+            //       GeomReal zeta_mapped = p(2);
 
             //       // The only way to make any sense of this
             //       // is to look at the mgflo/mg2/mgf documentation
@@ -2317,7 +2317,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<3,BERNSTEIN>::shape_deriv(const ElemType,
+GeomReal FE<3,BERNSTEIN>::shape_deriv(const ElemType,
                                   const Order,
                                   const unsigned int,
                                   const unsigned int,
@@ -2328,7 +2328,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const ElemType,
 }
 
 template <>
-Real FE<3,BERNSTEIN>::shape_deriv(const FEType fet,
+GeomReal FE<3,BERNSTEIN>::shape_deriv(const FEType fet,
                                   const Elem * elem,
                                   const unsigned int i,
                                   const unsigned int j,
@@ -2344,7 +2344,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem * elem,
+GeomReal FE<3,BERNSTEIN>::shape_second_deriv(const Elem * elem,
                                          const Order order,
                                          const unsigned int i,
                                          const unsigned int j,
@@ -2357,7 +2357,7 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<3,BERNSTEIN>::shape_second_deriv(const ElemType,
+GeomReal FE<3,BERNSTEIN>::shape_second_deriv(const ElemType,
                                          const Order,
                                          const unsigned int,
                                          const unsigned int,
@@ -2369,7 +2369,7 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<3,BERNSTEIN>::shape_second_deriv(const FEType fet,
+GeomReal FE<3,BERNSTEIN>::shape_second_deriv(const FEType fet,
                                          const Elem * elem,
                                          const unsigned int i,
                                          const unsigned int j,

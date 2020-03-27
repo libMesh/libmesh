@@ -39,6 +39,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/raw_type.h"
 
 // TIMPI includes
 #include "timpi/parallel_sync.h"
@@ -519,7 +520,7 @@ private:
 template <typename Output,
           void (FEMContext::*point_output) (unsigned int,
                                             const Point &,
-                                            Output &,
+                                            typename MakeOutput<Output>::type &,
                                             const Real) const>
 class OldSolutionBase
 {
@@ -645,7 +646,7 @@ protected:
             // have no quadrature locations which are within 1e-5 of
             // the element subdivision boundary but are not exactly on
             // that boundary.
-            const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
+            const Real master_tol = out_of_elem_tol / MetaPhysicL::raw_value(elem.hmax()) * 2;
 
             for (auto & child : elem.child_ref_range())
               if (child.close_to_point(p, master_tol))
@@ -671,7 +672,7 @@ protected:
       {
         libmesh_assert(old_context.has_elem());
 
-        const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
+        const Real master_tol = out_of_elem_tol / MetaPhysicL::raw_value(elem.hmax()) * 2;
 
         if (!old_context.get_elem().close_to_point(p, master_tol))
           {
@@ -714,7 +715,7 @@ protected:
 template <typename Output,
           void (FEMContext::*point_output) (unsigned int,
                                             const Point &,
-                                            Output &,
+                                            typename MakeOutput<Output>::type &,
                                             const Real) const>
 class OldSolutionValue : public OldSolutionBase<Output, point_output>
 {
@@ -766,9 +767,11 @@ public:
     libmesh_assert_less(i, this->component_to_var.size());
     unsigned int var = this->component_to_var[i];
 
-    Output n;
+    // Potentially make dual type
+    typename MakeOutput<Output>::type n;
+
     (this->old_context.*point_output)(var, p, n, this->out_of_elem_tol);
-    return n;
+    return MetaPhysicL::raw_value(n);
   }
 
   template <typename T = Output,
@@ -1181,7 +1184,7 @@ eval_at_node(const FEMContext &,
 template <typename Output,
           void (FEMContext::*point_output) (unsigned int,
                                             const Point &,
-                                            Output &,
+                                            typename MakeOutput<Output>::type &,
                                             const Real) const>
 const Real OldSolutionBase<Output, point_output>::out_of_elem_tol = 10 * TOLERANCE;
 
@@ -2160,7 +2163,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                       // This delta_x used to be TOLERANCE*hmin, but
                       // the factor of 10 improved the accuracy in
                       // some unit test projections
-                      Real delta_x = TOLERANCE * 10 * elem.hmin();
+                      Real delta_x = TOLERANCE * 10 * MetaPhysicL::raw_value(elem.hmin());
 
                       Point nxminus = elem.point(n),
                             nxplus = elem.point(n);
@@ -2966,8 +2969,8 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::co
    const Node * node,
    const FEGenericBase<typename FFunctor::RealType> & fe)
 {
-  const auto & JxW = fe.get_JxW();
-  const auto & phi = fe.get_phi();
+  const auto & JxW = MetaPhysicL::raw_value(fe.get_JxW());
+  const auto & phi = MetaPhysicL::raw_value(fe.get_phi());
   const std::vector<std::vector<typename FEGenericBase<typename FFunctor::RealType>::OutputGradient>> * dphi = nullptr;
   const std::vector<Point> & xyz_values = fe.get_xyz();
   const FEContinuity cont = fe.get_continuity();
@@ -3054,12 +3057,12 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::co
               if (cont == C_ONE)
                 {
                   if (dof_is_fixed[sidej])
-                    Fe(freei) -= ( TensorTools::inner_product((*dphi)[i][qp],
-                                                              (*dphi)[j][qp]) ) *
+                    Fe(freei) -= ( TensorTools::inner_product(MetaPhysicL::raw_value((*dphi)[i][qp]),
+                                                              MetaPhysicL::raw_value((*dphi)[j][qp])) ) *
                       JxW[qp] * Uinvolved(sidej);
                   else
-                    Ke(freei,freej) += ( TensorTools::inner_product((*dphi)[i][qp],
-                                                                    (*dphi)[j][qp]) )
+                    Ke(freei,freej) += ( TensorTools::inner_product(MetaPhysicL::raw_value((*dphi)[i][qp]),
+                                                                    MetaPhysicL::raw_value((*dphi)[j][qp])) )
                       * JxW[qp];
                 }
               if (!dof_is_fixed[sidej])
@@ -3068,7 +3071,7 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::co
           Fe(freei) += phi[i][qp] * fineval * JxW[qp];
           if (cont == C_ONE)
             Fe(freei) += (TensorTools::inner_product(finegrad,
-                                                     (*dphi)[i][qp]) ) *
+                                                     MetaPhysicL::raw_value((*dphi)[i][qp])) ) *
               JxW[qp];
           freei++;
         }

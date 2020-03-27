@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_vector.h" // required to instantiate a DenseVector<> below
 #include "libmesh/fem_context.h"
+#include "libmesh/compare_types.h"
 
 // C++ includes
 #include <memory>
@@ -42,7 +43,7 @@ class Point;
  * \author Roy Stogner
  * \date 2012
  */
-template <typename Output=Number>
+template <typename Output=GeomNumber>
 class FEMFunctionBase
 {
 protected:
@@ -125,6 +126,26 @@ public:
                            unsigned int i,
                            const Point & p,
                            Real time=0.);
+
+  /**
+   * Helper function for converting a dual type to a non-dual Output
+   */
+  template <typename T,
+            typename std::enable_if<!IsDual<Output>::value && IsDual<T>::value,
+                                    int>::type = 0>
+  static auto dual_converter(const T &in) -> typename MetaPhysicL::RawType<T>::value_type {
+    return MetaPhysicL::raw_value(in);
+  }
+
+  /**
+   * Template overload for all the other cases
+   */
+  template <typename T,
+            typename std::enable_if<
+                !(!IsDual<Output>::value && IsDual<T>::value), int>::type = 0>
+  static const T & dual_converter(const T &in) {
+    return in;
+  }
 };
 
 template <typename Output>

@@ -35,6 +35,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/raw_type.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -75,7 +76,7 @@ void HPCoarsenTest::add_projection(const System & system,
   fe_coarse->reinit(coarse, &coarse_qpoints);
 
   const unsigned int n_coarse_dofs =
-    cast_int<unsigned int>(phi_coarse->size());
+    cast_int<unsigned int>(phi_coarse.size());
 
   if (Uc.size() == 0)
     {
@@ -86,7 +87,7 @@ void HPCoarsenTest::add_projection(const System & system,
       Uc.resize(n_coarse_dofs);
       Uc.zero();
     }
-  libmesh_assert_equal_to (Uc.size(), phi_coarse->size());
+  libmesh_assert_equal_to (Uc.size(), phi_coarse.size());
 
   // Loop over the quadrature points
   for (auto qp : make_range(qrule->n_points()))
@@ -99,36 +100,36 @@ void HPCoarsenTest::add_projection(const System & system,
       for (unsigned int i=0; i != n_dofs; i++)
         {
           dof_id_type dof_num = dof_indices[i];
-          val += (*phi)[i][qp] *
+          val += phi[i][qp] *
             system.current_solution(dof_num);
           if (cont == C_ZERO || cont == C_ONE)
-            grad.add_scaled((*dphi)[i][qp],system.current_solution(dof_num));
+            grad.add_scaled(dphi[i][qp],system.current_solution(dof_num));
           if (cont == C_ONE)
-            hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+            hess.add_scaled(d2phi[i][qp], system.current_solution(dof_num));
         }
 
       // The projection matrix and vector
       for (auto i : index_range(Fe))
         {
-          Fe(i) += (*JxW)[qp] *
-            (*phi_coarse)[i][qp]*val;
+          Fe(i) += JxW[qp] *
+            phi_coarse[i][qp]*val;
           if (cont == C_ZERO || cont == C_ONE)
-            Fe(i) += (*JxW)[qp] *
-              (grad*(*dphi_coarse)[i][qp]);
+            Fe(i) += JxW[qp] *
+              (grad*dphi_coarse[i][qp]);
           if (cont == C_ONE)
-            Fe(i) += (*JxW)[qp] *
-              hess.contract((*d2phi_coarse)[i][qp]);
+            Fe(i) += JxW[qp] *
+              hess.contract(d2phi_coarse[i][qp]);
 
           for (auto j : index_range(Fe))
             {
-              Ke(i,j) += (*JxW)[qp] *
-                (*phi_coarse)[i][qp]*(*phi_coarse)[j][qp];
+              Ke(i,j) += JxW[qp] *
+                phi_coarse[i][qp]*phi_coarse[j][qp];
               if (cont == C_ZERO || cont == C_ONE)
-                Ke(i,j) += (*JxW)[qp] *
-                  (*dphi_coarse)[i][qp]*(*dphi_coarse)[j][qp];
+                Ke(i,j) += JxW[qp] *
+                  dphi_coarse[i][qp]*dphi_coarse[j][qp];
               if (cont == C_ONE)
-                Ke(i,j) += (*JxW)[qp] *
-                  ((*d2phi_coarse)[i][qp].contract((*d2phi_coarse)[j][qp]));
+                Ke(i,j) += JxW[qp] *
+                  (d2phi_coarse[i][qp].contract(d2phi_coarse[j][qp]));
             }
         }
     }
@@ -206,26 +207,26 @@ void HPCoarsenTest::select_refinement (System & system)
 
       // We will always do the integration
       // on the fine elements.  Get their Jacobian values, etc..
-      JxW = &(fe->get_JxW());
-      xyz_values = &(fe->get_xyz());
+      JxW = MetaPhysicL::raw_value(fe->get_JxW());
+      xyz_values = &fe->get_xyz();
 
       // The shape functions
-      phi = &(fe->get_phi());
-      phi_coarse = &(fe_coarse->get_phi());
+      phi = MetaPhysicL::raw_value(fe->get_phi());
+      phi_coarse = MetaPhysicL::raw_value(fe_coarse->get_phi());
 
       // The shape function derivatives
       if (cont == C_ZERO || cont == C_ONE)
         {
-          dphi = &(fe->get_dphi());
-          dphi_coarse = &(fe_coarse->get_dphi());
+          dphi = MetaPhysicL::raw_value(fe->get_dphi());
+          dphi_coarse = MetaPhysicL::raw_value(fe_coarse->get_dphi());
         }
 
       // The shape function second derivatives
       if (cont == C_ONE)
         {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          d2phi = &(fe->get_d2phi());
-          d2phi_coarse = &(fe_coarse->get_d2phi());
+          d2phi = MetaPhysicL::raw_value(fe->get_d2phi());
+          d2phi_coarse = MetaPhysicL::raw_value(fe_coarse->get_d2phi());
 #else
           libmesh_error_msg("Minimization of H2 error without second derivatives is not possible.");
 #endif
@@ -308,7 +309,7 @@ void HPCoarsenTest::select_refinement (System & system)
               fe_coarse->reinit(elem, &(qrule->get_points()));
 
               const unsigned int n_coarse_dofs =
-                cast_int<unsigned int>(phi_coarse->size());
+                cast_int<unsigned int>(phi_coarse.size());
 
               elem->hack_p_level(old_elem_level);
 
@@ -328,36 +329,36 @@ void HPCoarsenTest::select_refinement (System & system)
                   for (unsigned int i=0; i != n_dofs; i++)
                     {
                       dof_id_type dof_num = dof_indices[i];
-                      val += (*phi)[i][qp] *
+                      val += phi[i][qp] *
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
+                        grad.add_scaled(dphi[i][qp], system.current_solution(dof_num));
                       if (cont == C_ONE)
-                        hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+                        hess.add_scaled(d2phi[i][qp], system.current_solution(dof_num));
                     }
 
                   // The projection matrix and vector
                   for (auto i : index_range(Fe))
                     {
-                      Fe(i) += (*JxW)[qp] *
-                        (*phi_coarse)[i][qp]*val;
+                      Fe(i) += JxW[qp] *
+                        phi_coarse[i][qp]*val;
                       if (cont == C_ZERO || cont == C_ONE)
-                        Fe(i) += (*JxW)[qp] *
-                          grad * (*dphi_coarse)[i][qp];
+                        Fe(i) += JxW[qp] *
+                          grad * dphi_coarse[i][qp];
                       if (cont == C_ONE)
-                        Fe(i) += (*JxW)[qp] *
-                          hess.contract((*d2phi_coarse)[i][qp]);
+                        Fe(i) += JxW[qp] *
+                          hess.contract(d2phi_coarse[i][qp]);
 
                       for (auto j : index_range(Fe))
                         {
-                          Ke(i,j) += (*JxW)[qp] *
-                            (*phi_coarse)[i][qp]*(*phi_coarse)[j][qp];
+                          Ke(i,j) += JxW[qp] *
+                            phi_coarse[i][qp]*phi_coarse[j][qp];
                           if (cont == C_ZERO || cont == C_ONE)
-                            Ke(i,j) += (*JxW)[qp] *
-                              (*dphi_coarse)[i][qp]*(*dphi_coarse)[j][qp];
+                            Ke(i,j) += JxW[qp] *
+                              dphi_coarse[i][qp]*dphi_coarse[j][qp];
                           if (cont == C_ONE)
-                            Ke(i,j) += (*JxW)[qp] *
-                              ((*d2phi_coarse)[i][qp].contract((*d2phi_coarse)[j][qp]));
+                            Ke(i,j) += JxW[qp] *
+                              (d2phi_coarse[i][qp].contract(d2phi_coarse[j][qp]));
                         }
                     }
                 }
@@ -375,12 +376,12 @@ void HPCoarsenTest::select_refinement (System & system)
               for (unsigned int i=0; i<n_dofs; i++)
                 {
                   const dof_id_type dof_num = dof_indices[i];
-                  value_error += (*phi)[i][qp] *
+                  value_error += phi[i][qp] *
                     system.current_solution(dof_num);
                   if (cont == C_ZERO || cont == C_ONE)
-                    grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
+                    grad_error.add_scaled(dphi[i][qp], system.current_solution(dof_num));
                   if (cont == C_ONE)
-                    hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+                    hessian_error.add_scaled(d2phi[i][qp], system.current_solution(dof_num));
                 }
               if (elem->p_level() == 0)
                 {
@@ -390,25 +391,25 @@ void HPCoarsenTest::select_refinement (System & system)
                 {
                   for (auto i : index_range(Up))
                     {
-                      value_error -= (*phi_coarse)[i][qp] * Up(i);
+                      value_error -= phi_coarse[i][qp] * Up(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error.subtract_scaled((*dphi_coarse)[i][qp], Up(i));
+                        grad_error.subtract_scaled(dphi_coarse[i][qp], Up(i));
                       if (cont == C_ONE)
-                        hessian_error.subtract_scaled((*d2phi_coarse)[i][qp], Up(i));
+                        hessian_error.subtract_scaled(d2phi_coarse[i][qp], Up(i));
                     }
                 }
 
               p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                 (component_scale[var] *
-                 (*JxW)[qp] * TensorTools::norm_sq(value_error));
+                 JxW[qp] * TensorTools::norm_sq(value_error));
               if (cont == C_ZERO || cont == C_ONE)
                 p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                   (component_scale[var] *
-                   (*JxW)[qp] * grad_error.norm_sq());
+                   JxW[qp] * grad_error.norm_sq());
               if (cont == C_ONE)
                 p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                   (component_scale[var] *
-                   (*JxW)[qp] * hessian_error.norm_sq());
+                   JxW[qp] * hessian_error.norm_sq());
             }
 
           // Calculate this variable's contribution to the h
@@ -434,7 +435,7 @@ void HPCoarsenTest::select_refinement (System & system)
 
               // The number of DOFS on the coarse element
               unsigned int n_coarse_dofs =
-                cast_int<unsigned int>(phi_coarse->size());
+                cast_int<unsigned int>(phi_coarse.size());
 
               // Loop over the quadrature points
               for (unsigned int qp=0; qp<n_qp; qp++)
@@ -447,34 +448,34 @@ void HPCoarsenTest::select_refinement (System & system)
                   for (unsigned int i=0; i != n_dofs; ++i)
                     {
                       const dof_id_type dof_num = dof_indices[i];
-                      value_error += (*phi)[i][qp] *
+                      value_error += phi[i][qp] *
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
+                        grad_error.add_scaled(dphi[i][qp], system.current_solution(dof_num));
                       if (cont == C_ONE)
-                        hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+                        hessian_error.add_scaled(d2phi[i][qp], system.current_solution(dof_num));
                     }
 
                   for (unsigned int i=0; i != n_coarse_dofs; ++i)
                     {
-                      value_error -= (*phi_coarse)[i][qp] * Uc(i);
+                      value_error -= phi_coarse[i][qp] * Uc(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error.subtract_scaled((*dphi_coarse)[i][qp], Uc(i));
+                        grad_error.subtract_scaled(dphi_coarse[i][qp], Uc(i));
                       if (cont == C_ONE)
-                        hessian_error.subtract_scaled((*d2phi_coarse)[i][qp], Uc(i));
+                        hessian_error.subtract_scaled(d2phi_coarse[i][qp], Uc(i));
                     }
 
                   h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                     (component_scale[var] *
-                     (*JxW)[qp] * TensorTools::norm_sq(value_error));
+                     JxW[qp] * TensorTools::norm_sq(value_error));
                   if (cont == C_ZERO || cont == C_ONE)
                     h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                       (component_scale[var] *
-                       (*JxW)[qp] * grad_error.norm_sq());
+                       JxW[qp] * grad_error.norm_sq());
                   if (cont == C_ONE)
                     h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                       (component_scale[var] *
-                       (*JxW)[qp] * hessian_error.norm_sq());
+                       JxW[qp] * hessian_error.norm_sq());
                 }
 
             }

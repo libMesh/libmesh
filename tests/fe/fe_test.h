@@ -15,6 +15,7 @@
 #include <libmesh/numeric_vector.h>
 #include <libmesh/system.h>
 #include <libmesh/quadrature_gauss.h>
+#include <libmesh/raw_type.h>
 
 #include <vector>
 
@@ -43,10 +44,11 @@ class SkewFunc : public FunctionBase<Real>
   { libmesh_not_implemented(); } // scalar-only API
 
   // Skew in x based on y, y based on z
-  void operator() (const Point & p,
+  void operator() (const Point & p_in,
                    const Real time,
                    DenseVector<Real> & output)
   {
+    const auto & p = MetaPhysicL::raw_value(p_in);
     output.resize(3);
     output(0) = p(0);
 #if LIBMESH_DIM > 0
@@ -62,25 +64,27 @@ class SkewFunc : public FunctionBase<Real>
 
 
 inline
-Number linear_test (const Point& p,
-                    const Parameters&,
-                    const std::string&,
-                    const std::string&)
+Real linear_test (const Point& point,
+                  const Parameters&,
+                  const std::string&,
+                  const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
-  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+  const auto & p = MetaPhysicL::raw_value(point);
+
+  const Real x = p(0);
+  const Real y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
   return x + 0.25*y + 0.0625*z;
 }
 
 inline
-Gradient linear_test_grad (const Point&,
-                           const Parameters&,
-                           const std::string&,
-                           const std::string&)
+RealGradient linear_test_grad (const Point&,
+                               const Parameters&,
+                               const std::string&,
+                               const std::string&)
 {
-  Gradient grad = 1;
+  RealGradient grad = 1;
   if (LIBMESH_DIM > 1)
     grad(1) = 0.25;
   if (LIBMESH_DIM > 2)
@@ -91,29 +95,33 @@ Gradient linear_test_grad (const Point&,
 
 
 inline
-Number quadratic_test (const Point& p,
-                       const Parameters&,
-                       const std::string&,
-                       const std::string&)
+Real quadratic_test (const Point& point,
+                     const Parameters&,
+                     const std::string&,
+                     const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
-  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+  const auto & p = MetaPhysicL::raw_value(point);
+
+  const Real x = p(0);
+  const Real y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
   return x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y + 0.0625*x*z + 0.03125*y*z;
 }
 
 inline
-Gradient quadratic_test_grad (const Point & p,
-                              const Parameters&,
-                              const std::string&,
-                              const std::string&)
+RealGradient quadratic_test_grad (const Point & point,
+                                  const Parameters&,
+                                  const std::string&,
+                                  const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
-  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+  const auto & p = MetaPhysicL::raw_value(point);
 
-  Gradient grad = 2*x + 0.125*y + 0.0625*z;
+  const Real x = p(0);
+  const Real y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+  RealGradient grad = 2*x + 0.125*y + 0.0625*z;
   if (LIBMESH_DIM > 1)
     grad(1) = y + 0.125*x + 0.03125*z;
   if (LIBMESH_DIM > 2)
@@ -124,11 +132,12 @@ Gradient quadratic_test_grad (const Point & p,
 
 
 inline
-Number fe_cubic_test (const Point& p,
+Number fe_cubic_test (const Point& p_in,
                       const Parameters&,
                       const std::string&,
                       const std::string&)
 {
+  const auto & p = MetaPhysicL::raw_value(p_in);
   const Real & x = p(0);
   const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
   const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
@@ -137,11 +146,12 @@ Number fe_cubic_test (const Point& p,
 }
 
 inline
-Gradient fe_cubic_test_grad (const Point & p,
+Gradient fe_cubic_test_grad (const Point & p_in,
                              const Parameters&,
                              const std::string&,
                              const std::string&)
 {
+  const auto & p = MetaPhysicL::raw_value(p_in);
   const Real & x = p(0);
   const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
   const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
@@ -157,11 +167,12 @@ Gradient fe_cubic_test_grad (const Point & p,
 
 
 inline
-Number fe_quartic_test (const Point& p,
+Number fe_quartic_test (const Point& p_in,
                         const Parameters&,
                         const std::string&,
                         const std::string&)
 {
+  const auto & p = MetaPhysicL::raw_value(p_in);
   const Real & x = p(0);
   const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
   const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
@@ -170,11 +181,12 @@ Number fe_quartic_test (const Point& p,
 }
 
 inline
-Gradient fe_quartic_test_grad (const Point & p,
+Gradient fe_quartic_test_grad (const Point & p_in,
                                const Parameters&,
                                const std::string&,
                                const std::string&)
 {
+  const auto & p = MetaPhysicL::raw_value(p_in);
   const Real & x = p(0);
   const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
   const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
@@ -196,14 +208,15 @@ Gradient fe_quartic_test_grad (const Point & p,
 static const Real rational_w = 0.75;
 
 inline
-Number rational_test (const Point& p,
-                      const Parameters&,
-                      const std::string&,
-                      const std::string&)
+Real rational_test (const Point& point,
+                    const Parameters&,
+                    const std::string&,
+                    const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
-  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+  const auto & p = MetaPhysicL::raw_value(point);
+  const Real x = p(0);
+  const Real y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
   const Real denom = ((1-x)*(1-x)+x*x+2*rational_w*x*(1-x))*
                      ((1-y)*(1-y)+y*y+2*rational_w*y*(1-y))*
@@ -213,14 +226,16 @@ Number rational_test (const Point& p,
 }
 
 inline
-Gradient rational_test_grad (const Point& p,
-                             const Parameters&,
-                             const std::string&,
-                             const std::string&)
+RealGradient rational_test_grad (const Point& point,
+                                 const Parameters&,
+                                 const std::string&,
+                                 const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
-  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+  const auto & p = MetaPhysicL::raw_value(point);
+
+  const Real x = p(0);
+  const Real y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
   const Real xpoly = (1-x)*(1-x)+x*x+2*rational_w*x*(1-x);
   const Real xderiv = -2*(1-x)+2*x+2*rational_w*(1-2*x);
@@ -233,7 +248,7 @@ Gradient rational_test_grad (const Point& p,
 
   const Real numer = (x + 0.25*y + 0.0625*z);
 
-  Gradient grad_n = 1, grad_d = xderiv * ypoly * zpoly;
+  RealGradient grad_n = 1, grad_d = xderiv * ypoly * zpoly;
   if (LIBMESH_DIM > 1)
     {
       grad_n(1) = 0.25;
@@ -245,7 +260,7 @@ Gradient rational_test_grad (const Point& p,
       grad_d(2) = xpoly * ypoly * zderiv;
     }
 
-  Gradient grad = (grad_n - numer * grad_d / denom) / denom;
+  RealGradient grad = (grad_n - numer * grad_d / denom) / denom;
 
   return grad;
 }
@@ -276,9 +291,10 @@ protected:
 
   QGauss * _qrule;
 
-  static RealGradient true_gradient(Point p)
+  static RealGradient true_gradient(Point p_in)
   {
     Parameters dummy;
+    const auto & p = MetaPhysicL::raw_value(p_in);
 
     Gradient true_grad;
     RealGradient returnval;
@@ -314,8 +330,9 @@ protected:
   }
 
 
-  static RealTensor true_hessian(Point p)
+  static RealTensor true_hessian(Point p_in)
   {
+    const auto & p = MetaPhysicL::raw_value(p_in);
     const Real & x = p(0);
     const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
     const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
@@ -579,7 +596,7 @@ public:
       {
         Real phi_sum = 0;
         for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-          phi_sum += this->_fe->get_phi()[d][qp];
+          phi_sum += MetaPhysicL::raw_value(this->_fe->get_phi()[d][qp]);
         if (phi_sum < (1 - TOLERANCE) || phi_sum > (1 + TOLERANCE))
         {
           satisfies_partition_of_unity = false;
@@ -647,13 +664,14 @@ public:
   {
     LOG_UNIT_TEST;
 
-    auto f = [this](Point p)
+    auto f = [this](Point p_in)
       {
         Parameters dummy;
+        const auto & p = MetaPhysicL::raw_value(p_in);
 
         Number u = 0;
         for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-          u += this->_fe->get_phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+          u += MetaPhysicL::raw_value(this->_fe->get_phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 
         Number true_u;
 
@@ -696,23 +714,24 @@ public:
   {
     LOG_UNIT_TEST;
 
-    auto f = [this](Point p)
+    auto f = [this](Point p_in)
       {
         Parameters dummy;
+        const auto & p = MetaPhysicL::raw_value(p_in);
 
         Gradient grad_u = 0;
         for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-          grad_u += this->_fe->get_dphi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+          grad_u += MetaPhysicL::raw_value(this->_fe->get_dphi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 
         RealGradient true_grad = this->true_gradient(p);
 
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)),
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(grad_u(0))),
                                 true_grad(0), this->_grad_tol);
         if (this->_dim > 1)
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)),
+          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(grad_u(1))),
                                   true_grad(1), this->_grad_tol);
         if (this->_dim > 2)
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
+          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(grad_u(2))),
                                   true_grad(2), this->_grad_tol);
       };
 
@@ -730,12 +749,12 @@ public:
         Number grad_u_x = 0, grad_u_y = 0, grad_u_z = 0;
         for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
           {
-            grad_u_x += this->_fe->get_dphidx()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            grad_u_x += MetaPhysicL::raw_value(this->_fe->get_dphidx()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #if LIBMESH_DIM > 1
-            grad_u_y += this->_fe->get_dphidy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            grad_u_y += MetaPhysicL::raw_value(this->_fe->get_dphidy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
 #if LIBMESH_DIM > 2
-            grad_u_z += this->_fe->get_dphidz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            grad_u_z += MetaPhysicL::raw_value(this->_fe->get_dphidz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
           }
 
@@ -768,7 +787,7 @@ public:
       {
         Tensor hess_u;
         for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-          hess_u += this->_fe->get_d2phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+          hess_u += MetaPhysicL::raw_value(this->_fe->get_d2phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 
         // TODO: Yeah we'll test the ugly expressions later.
         if (family == RATIONAL_BERNSTEIN && order > 1)
@@ -776,16 +795,16 @@ public:
 
         RealTensor true_hess = this->true_hessian(p);
 
-        LIBMESH_ASSERT_FP_EQUAL(true_hess(0,0), libmesh_real(hess_u(0,0)),
+        LIBMESH_ASSERT_FP_EQUAL(true_hess(0,0), libmesh_real(MetaPhysicL::raw_value(hess_u(0,0))),
                                 this->_hess_tol);
         if (this->_dim > 1)
-          {
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(0,1), libmesh_real(hess_u(0,1)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(1,1), libmesh_real(hess_u(1,1)),
-                                    this->_hess_tol);
+        {
+          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(hess_u(0,1))), libmesh_real(MetaPhysicL::raw_value(hess_u(1,0))),
+                                  this->_hess_tol);
+          LIBMESH_ASSERT_FP_EQUAL(true_hess(0,1), libmesh_real(MetaPhysicL::raw_value(hess_u(0,1))),
+                                  this->_hess_tol);
+          LIBMESH_ASSERT_FP_EQUAL(true_hess(1,1), libmesh_real(MetaPhysicL::raw_value(hess_u(1,1))),
+                                  this->_hess_tol);
           }
         if (this->_dim > 2)
           {
@@ -821,15 +840,15 @@ public:
                hess_u_xz = 0, hess_u_yz = 0, hess_u_zz = 0;
         for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
           {
-            hess_u_xx += this->_fe->get_d2phidx2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_xx += MetaPhysicL::raw_value(this->_fe->get_d2phidx2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #if LIBMESH_DIM > 1
-            hess_u_xy += this->_fe->get_d2phidxdy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-            hess_u_yy += this->_fe->get_d2phidy2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_xy += MetaPhysicL::raw_value(this->_fe->get_d2phidxdy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
+            hess_u_yy += MetaPhysicL::raw_value(this->_fe->get_d2phidy2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
 #if LIBMESH_DIM > 2
-            hess_u_xz += this->_fe->get_d2phidxdz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-            hess_u_yz += this->_fe->get_d2phidydz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-            hess_u_zz += this->_fe->get_d2phidz2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_xz += MetaPhysicL::raw_value(this->_fe->get_d2phidxdz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
+            hess_u_yz += MetaPhysicL::raw_value(this->_fe->get_d2phidydz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
+            hess_u_zz += MetaPhysicL::raw_value(this->_fe->get_d2phidz2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
           }
 

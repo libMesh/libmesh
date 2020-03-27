@@ -2394,7 +2394,7 @@ void RBConstruction::get_output_vectors(std::map<std::string, NumericVector<Numb
 
 std::unique_ptr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
 {
-  ZeroFunction<> zf;
+  ZeroFunction<Number> zf;
 
   std::set<boundary_id_type> dirichlet_ids;
   std::vector<unsigned int> variables;

@@ -783,9 +783,33 @@ private:
   void _right_multiply_transpose (const DenseMatrix<T2> & A);
 };
 
+template <>
+DenseMatrix<GeomReal>::DenseMatrix(const unsigned int new_m, const unsigned int new_n);
 
+// template <>
+// inline
+// void
+// DenseMatrix<GeomReal>::right_multiply(const DenseMatrixBase<GeomReal> &)
+// {
+//   libmesh_error_msg("Where you calling me from?!");
+// }
 
+// template <>
+// inline
+// void
+// DenseMatrix<GeomReal>::left_multiply(const DenseMatrixBase<GeomReal> &)
+// {
+//   libmesh_error_msg("Where you calling me from?!");
+// }
 
+// template <>
+// inline
+// void
+// DenseMatrix<GeomReal>::vector_mult(DenseVector<GeomReal> &,
+//                                    const DenseVector<GeomReal> &)
+// {
+//   libmesh_error_msg("Where are you calling me from?!");
+// }
 
 // ------------------------------------------------------------
 /**

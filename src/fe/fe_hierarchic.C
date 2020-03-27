@@ -36,7 +36,7 @@ namespace {
 void hierarchic_nodal_soln(const Elem * elem,
                            const Order order,
                            const std::vector<Number> & elem_soln,
-                           std::vector<Number> & nodal_soln)
+                           std::vector<GeomNumber> & nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -374,7 +374,6 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
 // Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(HIERARCHIC, hierarchic_nodal_soln)
 LIBMESH_FE_SIDE_NODAL_SOLN(HIERARCHIC)
-
 
 // Full specialization of n_dofs() function for every dimension
 template <> unsigned int FE<0,HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return hierarchic_n_dofs(t, o); }

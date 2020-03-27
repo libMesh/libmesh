@@ -18,6 +18,7 @@
 #include "libmesh/first_order_unsteady_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -49,9 +50,9 @@ bool FirstOrderUnsteadySolver::compute_second_order_eqns(bool compute_jacobian, 
       FEBase * elem_fe = nullptr;
       context.get_element_fe( var, elem_fe );
 
-      const std::vector<Real> & JxW = elem_fe->get_JxW();
+      const auto & JxW = MetaPhysicL::raw_value(elem_fe->get_JxW());
 
-      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const auto & phi = MetaPhysicL::raw_value(elem_fe->get_phi());
 
       const unsigned int n_dofs = cast_int<unsigned int>
         (context.get_dof_indices(dot_var).size());
@@ -62,9 +63,12 @@ bool FirstOrderUnsteadySolver::compute_second_order_eqns(bool compute_jacobian, 
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
         {
-          Number udot, v;
-          context.interior_rate(var, qp, udot);
-          context.interior_value(dot_var, qp, v);
+          // below methods only instantianted for GeomNumbers
+          GeomNumber dual_udot, dual_v;
+          context.interior_rate(var, qp, dual_udot);
+          context.interior_value(dot_var, qp, dual_v);
+          Number udot = MetaPhysicL::raw_value(dual_udot),
+            v = MetaPhysicL::raw_value(dual_v);
 
           for (unsigned int i = 0; i < n_dofs; i++)
             {

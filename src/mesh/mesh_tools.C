@@ -566,9 +566,16 @@ MeshTools::create_bounding_box (const MeshBase & mesh)
   // And combine with our local elements
   find_bbox.bbox().union_with(MeshTools::create_local_bounding_box(mesh));
 
+  // We cannot call Communicator::min/max for non StandardTypes
+  RawPoint min = MetaPhysicL::raw_value(find_bbox.min());
+  RawPoint max = MetaPhysicL::raw_value(find_bbox.max());
+
   // Compare the bounding boxes across processors
-  mesh.comm().min(find_bbox.min());
-  mesh.comm().max(find_bbox.max());
+  mesh.comm().min(min);
+  mesh.comm().max(max);
+
+  find_bbox.min() = min;
+  find_bbox.max() = max;
 
   return find_bbox.bbox();
 }
@@ -593,9 +600,16 @@ MeshTools::create_nodal_bounding_box (const MeshBase & mesh)
                                             mesh.local_nodes_end()),
                             find_bbox);
 
+  // We cannot call Communicator::min/max for non StandardTypes
+  RawPoint min = MetaPhysicL::raw_value(find_bbox.min());
+  RawPoint max = MetaPhysicL::raw_value(find_bbox.max());
+
   // Compare the bounding boxes across processors
-  mesh.comm().min(find_bbox.min());
-  mesh.comm().max(find_bbox.max());
+  mesh.comm().min(min);
+  mesh.comm().max(max);
+
+  find_bbox.min() = min;
+  find_bbox.max() = max;
 
   return find_bbox.bbox();
 }
@@ -607,10 +621,10 @@ MeshTools::bounding_sphere(const MeshBase & mesh)
 {
   libMesh::BoundingBox bbox = MeshTools::create_bounding_box(mesh);
 
-  const Real  diag = (bbox.second - bbox.first).norm();
-  const Point cent = (bbox.second + bbox.first)/2;
+  const auto  diag = (bbox.second - bbox.first).norm();
+  const auto center = (bbox.second + bbox.first)/2;
 
-  return Sphere (cent, .5*diag);
+  return Sphere (center, .5*diag);
 }
 
 
@@ -645,9 +659,16 @@ MeshTools::create_processor_bounding_box (const MeshBase & mesh,
                                             mesh.pid_elements_end(pid)),
                             find_bbox);
 
+  // We cannot call Communicator::min/max for non StandardTypes
+  RawPoint min = MetaPhysicL::raw_value(find_bbox.min());
+  RawPoint max = MetaPhysicL::raw_value(find_bbox.max());
+
   // Compare the bounding boxes across processors
-  mesh.comm().min(find_bbox.min());
-  mesh.comm().max(find_bbox.max());
+  mesh.comm().min(min);
+  mesh.comm().max(max);
+
+  find_bbox.min() = min;
+  find_bbox.max() = max;
 
   return find_bbox.bbox();
 }
@@ -661,10 +682,10 @@ MeshTools::processor_bounding_sphere (const MeshBase & mesh,
   libMesh::BoundingBox bbox =
     MeshTools::create_processor_bounding_box(mesh, pid);
 
-  const Real  diag = (bbox.second - bbox.first).norm();
-  const Point cent = (bbox.second + bbox.first)/2;
+  const auto  diag = (bbox.second - bbox.first).norm();
+  const auto center = (bbox.second + bbox.first)/2;
 
-  return Sphere (cent, .5*diag);
+  return Sphere (center, .5*diag);
 }
 
 
@@ -684,9 +705,16 @@ MeshTools::create_subdomain_bounding_box (const MeshBase & mesh,
                      mesh.active_local_subdomain_elements_end(sid)),
      find_bbox);
 
+  // We cannot call Communicator::min/max for non StandardTypes
+  RawPoint min = MetaPhysicL::raw_value(find_bbox.min());
+  RawPoint max = MetaPhysicL::raw_value(find_bbox.max());
+
   // Compare the bounding boxes across processors
-  mesh.comm().min(find_bbox.min());
-  mesh.comm().max(find_bbox.max());
+  mesh.comm().min(min);
+  mesh.comm().max(max);
+
+  find_bbox.min() = min;
+  find_bbox.max() = max;
 
   return find_bbox.bbox();
 }
@@ -700,10 +728,10 @@ MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
   libMesh::BoundingBox bbox =
     MeshTools::create_subdomain_bounding_box(mesh, sid);
 
-  const Real  diag = (bbox.second - bbox.first).norm();
-  const Point cent = (bbox.second + bbox.first)/2;
+  const auto  diag = (bbox.second - bbox.first).norm();
+  const auto center = (bbox.second + bbox.first)/2;
 
-  return Sphere (cent, .5*diag);
+  return Sphere (center, .5*diag);
 }
 
 

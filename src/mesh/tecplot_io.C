@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/int_range.h"
+#include "libmesh/raw_type.h"
 
 #ifdef LIBMESH_HAVE_TECPLOT_API
 extern "C" {
@@ -461,9 +462,9 @@ void TecplotIO::write_binary (const std::string & fname,
   // understand what is going on
   for (auto v : make_range(the_mesh.n_nodes()))
     {
-      tm.nd(0,v) = static_cast<float>(the_mesh.point(v)(0));
-      tm.nd(1,v) = static_cast<float>(the_mesh.point(v)(1));
-      tm.nd(2,v) = static_cast<float>(the_mesh.point(v)(2));
+      tm.nd(0,v) = static_cast<float>(MetaPhysicL::raw_value(the_mesh.point(v)(0)));
+      tm.nd(1,v) = static_cast<float>(MetaPhysicL::raw_value(the_mesh.point(v)(1)));
+      tm.nd(2,v) = static_cast<float>(MetaPhysicL::raw_value(the_mesh.point(v)(2)));
 
       if ((vec != nullptr) &&
           (solution_names != nullptr))

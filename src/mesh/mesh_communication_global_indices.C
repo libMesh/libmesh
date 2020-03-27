@@ -31,6 +31,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
 #include "libmesh/node_range.h"
+#include "libmesh/raw_type.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -49,29 +50,33 @@ using namespace libMesh;
 
 // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
 // [0,max_inttype]^3 for computing Hilbert keys
-void get_hilbert_coords (const Point & p,
+void get_hilbert_coords (const Point & point,
                          const libMesh::BoundingBox & bbox,
                          CFixBitVec icoords[3])
 {
   static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
 
+  const auto p = MetaPhysicL::raw_value(point),
+    bb_first = MetaPhysicL::raw_value(bbox.first),
+    bb_second = MetaPhysicL::raw_value(bbox.second);
+
   const long double // put (x,y,z) in [0,1]^3 (don't divide by 0)
     x = static_cast<long double>
-        ((bbox.first(0) == bbox.second(0)) ? 0. :
-         (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
+        ((bb_first(0) == bb_second(0)) ? 0. :
+         (p(0)-bb_first(0))/(bb_second(0)-bb_first(0))),
 
 #if LIBMESH_DIM > 1
     y = static_cast<long double>
-        ((bbox.first(1) == bbox.second(1)) ? 0. :
-         (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
+        ((bb_first(1) == bb_second(1)) ? 0. :
+         (p(1)-bb_first(1))/(bb_second(1)-bb_first(1))),
 #else
     y = 0.,
 #endif
 
 #if LIBMESH_DIM > 2
     z = static_cast<long double>
-        ((bbox.first(2) == bbox.second(2)) ? 0. :
-         (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
+        ((bb_first(2) == bb_second(2)) ? 0. :
+         (p(2)-bb_first(2))/(bb_second(2)-bb_first(2)));
 #else
   z = 0.;
 #endif
@@ -897,7 +902,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
                           static_cast<Real>(output[2].racks()[0]) / max_int_as_real);
 
               // Convert the points from [0,1]^3 to their actual (x,y,z) locations
-              Real
+              GeomReal
                 xmin = bbox.first(0),
                 xmax = bbox.second(0),
                 ymin = bbox.first(1),

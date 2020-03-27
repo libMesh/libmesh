@@ -3,6 +3,7 @@
 #include <libmesh/quadrature.h>
 #include <libmesh/string_to_enum.h>
 #include <libmesh/utility.h>
+#include <libmesh/raw_value.h>
 
 #include <iomanip>
 #include <numeric> // std::iota
@@ -154,7 +155,7 @@ private:
     Real sum = 0.;
     for (unsigned int qp=0; qp<qrule.n_points(); qp++)
       {
-        const Point p = qrule.qp(qp);
+        const auto p = MetaPhysicL::raw_value(qrule.qp(qp));
         Real val = qrule.w(qp) * std::pow(p(0),xp);
         if (qrule.get_dim() > 1)
           val *= std::pow(p(1),yp);
@@ -487,7 +488,7 @@ public:
                 // usual monomials.
                 Real sumq = 0.;
                 for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-                  sumq += qrule->w(qp) * std::pow(qrule->qp(qp)(0), testpower);
+                  sumq += qrule->w(qp) * std::pow(raw_value(qrule->qp(qp)(0)), testpower);
 
                 // Make sure that the computed integral agrees with the "true" value
                 LIBMESH_ASSERT_REALS_EQUAL(true_integrals[qt][testpower], sumq, quadrature_tolerance);

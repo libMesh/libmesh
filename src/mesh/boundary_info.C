@@ -30,6 +30,7 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/raw_type.h"
 
 // TIMPI includes
 #include "timpi/parallel_sync.h"
@@ -391,7 +392,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       for (auto side : interior_parent->side_index_range())
         {
           interior_parent_side = &side_builder(*interior_parent, side);
-          Real va_distance = (boundary_elem->vertex_average() - interior_parent_side->vertex_average()).norm();
+          auto va_distance = (boundary_elem->vertex_average() - interior_parent_side->vertex_average()).norm();
 
           if (va_distance < (tolerance * boundary_elem->hmin()))
             {

@@ -43,9 +43,21 @@ struct RawFieldType<Number>
 };
 
 template <>
+struct RawFieldType<GeomNumber>
+{
+  typedef GeomNumber type;
+};
+
+template <>
 struct RawFieldType<Gradient>
 {
   typedef Number type;
+};
+
+template <>
+struct RawFieldType<GeomNumberGradient>
+{
+  typedef GeomNumber type;
 };
 
 template <>
@@ -54,10 +66,22 @@ struct RawFieldType<Tensor>
   typedef Number type;
 };
 
+template <>
+struct RawFieldType<GeomNumberTensor>
+{
+  typedef GeomNumber type;
+};
+
 template<>
 struct RawFieldType<TypeNTensor<3, Number>>
 {
   typedef Number type;
+};
+
+template<>
+struct RawFieldType<TypeNTensor<3, GeomNumber>>
+{
+  typedef GeomNumber type;
 };
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
@@ -83,6 +107,30 @@ template<>
 struct RawFieldType<TypeNTensor<3, Real>>
 {
   typedef Real type;
+};
+
+template <>
+struct RawFieldType<GeomReal>
+{
+  typedef GeomReal type;
+};
+
+template <>
+struct RawFieldType<GeomRealGradient>
+{
+  typedef GeomReal type;
+};
+
+template <>
+struct RawFieldType<GeomRealTensor>
+{
+  typedef GeomReal type;
+};
+
+template<>
+struct RawFieldType<TypeNTensor<3, GeomReal>>
+{
+  typedef GeomReal type;
 };
 #endif
 

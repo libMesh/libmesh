@@ -22,6 +22,7 @@
 
 // The library configuration options
 #include "libmesh/libmesh_config.h"
+#include "libmesh/raw_type.h" // for MetaPhysicL::RawType definition
 
 // Use actual timestamps or constant dummies (to aid ccache)
 #ifdef LIBMESH_ENABLE_TIMESTAMPS
@@ -73,6 +74,10 @@
 
 // C++ headers
 #include <iomanip> // setprecision, in assertion macros
+#ifdef LIBMESH_HAVE_METAPHYSICL
+// Temporary
+#include "metaphysicl/dualsemidynamicsparsenumberarray.h"
+#endif
 
 namespace libMesh
 {
@@ -135,6 +140,13 @@ DIE A HORRIBLE DEATH HERE...
 
 typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+// Temporary
+typedef MetaPhysicL::DualNumber<Real, MetaPhysicL::SemiDynamicSparseNumberArray<Real, dof_id_type, MetaPhysicL::NWrapper<300>>> GeomReal;
+#else
+typedef Real GeomReal;
+#endif
+
 // Define a corresponding tolerance.  This is what should be
 // considered "good enough" when doing floating point comparisons.
 // For example, v == 0 is changed to std::abs(v) < TOLERANCE.
@@ -172,6 +184,11 @@ static constexpr Real TOLERANCE = 1.e-6;
 typedef std::complex<Real> Complex;
 typedef std::complex<Real> COMPLEX;
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+typedef MetaPhysicL::DualNumber<std::complex<Real>, MetaPhysicL::SemiDynamicSparseNumberArray<std::complex<Real>, dof_id_type, MetaPhysicL::NWrapper<300>>> GeomComplex;
+#else
+typedef Complex GeomComplex;
+#endif
 
 // Helper functions for complex/real numbers
 // to clean up #ifdef LIBMESH_USE_COMPLEX_NUMBERS elsewhere
@@ -205,8 +222,10 @@ inline bool libmesh_isinf(std::complex<T> a)
 // the library was configures
 #if   defined (LIBMESH_USE_REAL_NUMBERS)
 typedef Real Number;
+typedef GeomReal GeomNumber;
 #elif defined (LIBMESH_USE_COMPLEX_NUMBERS)
 typedef Complex Number;
+typedef GeomComplex GeomNumber;
 #else
 DIE A HORRIBLE DEATH HERE...
 #endif
@@ -337,6 +356,47 @@ struct casting_compare {
   {
     return Comp<T1>()(e1, e2);
   }
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+  template <typename T1, typename T2, typename D1, bool asd>
+  bool operator()(const MetaPhysicL::DualNumber<T1, D1, asd> & e1, const T2 & e2) const
+  {
+    typedef typename std::decay<typename MetaPhysicL::RawType<MetaPhysicL::DualNumber<T1, D1, asd>>
+                                ::value_type>::type DT1;
+    typedef typename std::decay<T2>::type DT2;
+    return (Comp<DT2>()(static_cast<DT2>(MetaPhysicL::raw_value(e1)), e2) &&
+            Comp<DT1>()(MetaPhysicL::raw_value(e1), static_cast<DT1>(e2)));
+  }
+
+  template <typename T1, typename T2, typename D2, bool asd>
+  bool operator()(const T1 & e1, const MetaPhysicL::DualNumber<T2, D2, asd> & e2) const
+  {
+    typedef typename std::decay<T1>::type DT1;
+    typedef typename std::decay<typename MetaPhysicL::RawType<MetaPhysicL::DualNumber<T2, D2, asd>>
+                                ::value_type>::type DT2;
+    return (Comp<DT2>()(static_cast<DT2>(e1), MetaPhysicL::raw_value(e2)) &&
+            Comp<DT1>()(e1, static_cast<DT1>(MetaPhysicL::raw_value(e2))));
+  }
+
+  template <typename T1, typename D1, bool asd1>
+  bool operator()(const MetaPhysicL::DualNumber<T1, D1, asd1> & e1, const MetaPhysicL::DualNumber<T1,D1, asd1> & e2) const
+  {
+    typedef typename std::decay<typename MetaPhysicL::RawType<MetaPhysicL::DualNumber<T1, D1, asd1>>
+                                ::value_type>::type DT1;
+    return Comp<DT1>()(MetaPhysicL::raw_value(e1), MetaPhysicL::raw_value(e2));
+  }
+
+  template <typename T1, typename T2, typename D1, typename D2, bool asd1, bool asd2>
+  bool operator()(const MetaPhysicL::DualNumber<T1, D1, asd1> & e1, const MetaPhysicL::DualNumber<T2,D2, asd2> & e2) const
+  {
+    typedef typename std::decay<typename MetaPhysicL::RawType<MetaPhysicL::DualNumber<T1, D1, asd1>>
+                                ::value_type>::type DT1;
+    typedef typename std::decay<typename MetaPhysicL::RawType<MetaPhysicL::DualNumber<T2, D2, asd2>>
+                                ::value_type>::type DT2;
+    return (Comp<DT2>()(static_cast<DT2>(MetaPhysicL::raw_value(e1)), MetaPhysicL::raw_value(e2)) &&
+            Comp<DT1>()(MetaPhysicL::raw_value(e1), static_cast<DT1>(MetaPhysicL::raw_value(e2))));
+  }
+#endif
 };
 
 #define libmesh_assert_less_msg(expr1,expr2, msg)                       \

@@ -7,6 +7,7 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh_refinement.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -31,15 +32,16 @@ public:
   }
 
   virtual Number operator() (const FEMContext & c,
-                             const Point & p,
+                             const Point & point,
                              const Real /*time*/ = 0.) override
   {
     using std::abs;
 
-    const Real & x = p(0);
-    const Real & y = p(1);
-    const Point centroid = c.get_elem().vertex_average();
-    const Real sign = centroid(1)/std::abs(centroid(1));
+    const auto p = MetaPhysicL::raw_value(point);
+    const auto & x = p(0);
+    const auto & y = p(1);
+    const auto centroid = MetaPhysicL::raw_value(c.get_elem().vertex_average());
+    const auto sign = centroid(1)/std::abs(centroid(1));
 
     // For testing we want something discontinuous on the slit,
     // continuous everywhere else, and bilinear on all coarse quads
@@ -366,7 +368,7 @@ public:
           {
             const Number exact_val = slitfunc(context, xyz[qp]);
 
-            const Number discrete_val = context.interior_value(0, qp);
+            const Number discrete_val = MetaPhysicL::raw_value(context.interior_value(0, qp));
 
             LIBMESH_ASSERT_FP_EQUAL(libmesh_real(exact_val),
                                     libmesh_real(discrete_val),
@@ -436,7 +438,7 @@ public:
           {
             const Number exact_val = slitfunc(context, xyz[qp]);
 
-            const Number discrete_val = context.interior_value(0, qp);
+            const Number discrete_val = MetaPhysicL::raw_value(context.interior_value(0, qp));
 
             LIBMESH_ASSERT_FP_EQUAL(libmesh_real(exact_val),
                                     libmesh_real(discrete_val),

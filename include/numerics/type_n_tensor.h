@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/type_vector.h"
 #include "libmesh/tuple_of.h"
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -328,6 +329,21 @@ operator / (const Scalar &, const TypeNTensor<N, T> &)
 
 
 } // namespace libMesh
+
+namespace MetaPhysicL
+{
+template <unsigned int N, typename T>
+struct RawType<libMesh::TypeNTensor<N, T>>
+{
+  typedef libMesh::TypeNTensor<N, typename RawType<T>::value_type> value_type;
+
+  static value_type value (const libMesh::TypeNTensor<N, T> &)
+    {
+      libmesh_not_implemented();
+      return {};
+    }
+};
+}
 
 
 #endif // LIBMESH_TYPE_N_TENSOR_H

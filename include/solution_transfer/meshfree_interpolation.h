@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/raw_type.h"
 #ifdef LIBMESH_HAVE_NANOFLANN
 #  include "libmesh/ignore_warnings.h"
 #  include "libmesh/nanoflann.hpp"
@@ -265,9 +266,9 @@ protected:
 
       const Point & p(_pts[idx]);
 
-      if (dim==0) return p(0);
-      if (dim==1) return p(1);
-      return p(2);
+      if (dim==0) return MetaPhysicL::raw_value(p(0));
+      if (dim==1) return MetaPhysicL::raw_value(p(1));
+      return MetaPhysicL::raw_value(p(2));
     }
 
     /**

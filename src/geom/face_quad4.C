@@ -163,7 +163,7 @@ bool Quad4::has_invertible_map(Real tol) const
   // used for FEM calculations.) We use this as a "reference" vector
   // and compare the sign of dot(n,f) at each vertex.
   Point n = v1 + Real(.5) * (v2 + v3);
-  Real norm_n = n.norm();
+  auto norm_n = n.norm();
 
   // If the Jacobian vector at the midpoint of the element is zero,
   // then it must be either zero for the entire element, or change
@@ -179,7 +179,7 @@ bool Quad4::has_invertible_map(Real tol) const
   // Compute scalar quantity n * (v1 + xi*v2 + eta*v3) at each
   // vertex. If it is non-zero and has the same sign at each
   // vertex, the the element is invertible, otherwise it is not.
-  std::array<Real, 4> vertex_vals;
+  std::array<GeomReal, 4> vertex_vals;
   unsigned int ctr = 0;
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
@@ -192,8 +192,8 @@ bool Quad4::has_invertible_map(Real tol) const
   // std::cout << std::endl;
 
   auto result = std::minmax_element(vertex_vals.begin(), vertex_vals.end());
-  Real min_vertex = *(result.first);
-  Real max_vertex = *(result.second);
+  auto min_vertex = *(result.first);
+  auto max_vertex = *(result.second);
 
   // Debugging
   // std::cout << "min_vertex=" << min_vertex << std::endl;
@@ -292,12 +292,12 @@ Point Quad4::true_centroid () const
   const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
 
   // Nodal areas
-  Real A0 = 0., A1 = 0., A2 = 0., A3 = 0.;
+  GeomReal A0 = 0., A1 = 0., A2 = 0., A3 = 0.;
 
   for (const auto & xi : q)
     for (const auto & eta : q)
       {
-        Real jxw = cross_norm(eta*a1 + b1, xi*a2 + b2);
+        auto jxw = cross_norm(eta*a1 + b1, xi*a2 + b2);
 
         A0 += jxw * (1-xi) * (1-eta); // 4 * phi_0
         A1 += jxw * (1+xi) * (1-eta); // 4 * phi_1
@@ -313,7 +313,7 @@ Point Quad4::true_centroid () const
 
 
 
-Real Quad4::volume () const
+GeomReal Quad4::volume () const
 {
   // Make copies of our points.  It makes the subsequent calculations a bit
   // shorter and avoids dereferencing the same pointer multiple times.
@@ -341,7 +341,7 @@ Real Quad4::volume () const
   // all equal to 1.
   const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
 
-  Real vol=0.;
+  GeomReal vol=0.;
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
       vol += cross_norm(q[j]*a1 + b1,

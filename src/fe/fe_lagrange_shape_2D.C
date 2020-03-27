@@ -30,13 +30,13 @@ namespace
 using namespace libMesh;
 
 template <FEFamily T>
-Real fe_lagrange_2D_shape(const ElemType,
+GeomReal fe_lagrange_2D_shape(const ElemType,
                           const Order order,
                           const unsigned int i,
                           const Point & p);
 
 template <FEFamily T>
-Real fe_lagrange_2D_shape_deriv(const ElemType type,
+GeomReal fe_lagrange_2D_shape_deriv(const ElemType type,
                                 const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
@@ -45,7 +45,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <FEFamily T>
-Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
+GeomReal fe_lagrange_2D_shape_second_deriv(const ElemType type,
                                        const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
@@ -66,7 +66,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(2,L2_LAGRANGE)
 
 
 template <>
-Real FE<2,LAGRANGE>::shape(const ElemType type,
+GeomReal FE<2,LAGRANGE>::shape(const ElemType type,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
@@ -77,7 +77,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
+GeomReal FE<2,L2_LAGRANGE>::shape(const ElemType type,
                               const Order order,
                               const unsigned int i,
                               const Point & p)
@@ -87,7 +87,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape(const Elem * elem,
+GeomReal FE<2,LAGRANGE>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
                            const Point & p,
@@ -102,7 +102,7 @@ Real FE<2,LAGRANGE>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape(const Elem * elem,
+GeomReal FE<2,L2_LAGRANGE>::shape(const Elem * elem,
                               const Order order,
                               const unsigned int i,
                               const Point & p,
@@ -116,7 +116,7 @@ Real FE<2,L2_LAGRANGE>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape(const FEType fet,
+GeomReal FE<2,LAGRANGE>::shape(const FEType fet,
                            const Elem * elem,
                            const unsigned int i,
                            const Point & p,
@@ -129,7 +129,7 @@ Real FE<2,LAGRANGE>::shape(const FEType fet,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape(const FEType fet,
+GeomReal FE<2,L2_LAGRANGE>::shape(const FEType fet,
                               const Elem * elem,
                               const unsigned int i,
                               const Point & p,
@@ -141,7 +141,7 @@ Real FE<2,L2_LAGRANGE>::shape(const FEType fet,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
+GeomReal FE<2,LAGRANGE>::shape_deriv(const ElemType type,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -153,7 +153,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
+GeomReal FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
@@ -165,7 +165,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape_deriv(const Elem * elem,
+GeomReal FE<2,LAGRANGE>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -181,7 +181,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape_deriv(const Elem * elem,
+GeomReal FE<2,L2_LAGRANGE>::shape_deriv(const Elem * elem,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
@@ -197,7 +197,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape_deriv(const FEType fet,
+GeomReal FE<2,LAGRANGE>::shape_deriv(const FEType fet,
                                  const Elem * elem,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -211,7 +211,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape_deriv(const FEType fet,
+GeomReal FE<2,L2_LAGRANGE>::shape_deriv(const FEType fet,
                                     const Elem * elem,
                                     const unsigned int i,
                                     const unsigned int j,
@@ -227,7 +227,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
+GeomReal FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
@@ -239,7 +239,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
+GeomReal FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -251,7 +251,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const Elem * elem,
+GeomReal FE<2,LAGRANGE>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
@@ -267,7 +267,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
+GeomReal FE<2,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -282,7 +282,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const FEType fet,
+GeomReal FE<2,LAGRANGE>::shape_second_deriv(const FEType fet,
                                         const Elem * elem,
                                         const unsigned int i,
                                         const unsigned int j,
@@ -296,7 +296,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const FEType fet,
 
 
 template <>
-Real FE<2,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
+GeomReal FE<2,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
                                            const Elem * elem,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -320,7 +320,7 @@ namespace
 using namespace libMesh;
 
 template <FEFamily T>
-Real fe_lagrange_2D_shape(const ElemType type,
+GeomReal fe_lagrange_2D_shape(const ElemType type,
                           const Order order,
                           const unsigned int i,
                           const Point & p)
@@ -341,8 +341,8 @@ Real fe_lagrange_2D_shape(const ElemType type,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 4);
 
@@ -359,9 +359,9 @@ Real fe_lagrange_2D_shape(const ElemType type,
           case TRI6:
           case TRI7:
             {
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
+              const GeomReal zeta1 = p(0);
+              const GeomReal zeta2 = p(1);
+              const GeomReal zeta0 = 1. - zeta1 - zeta2;
 
               libmesh_assert_less (i, 3);
 
@@ -395,8 +395,8 @@ Real fe_lagrange_2D_shape(const ElemType type,
           case QUAD8:
           case QUADSHELL8:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 8);
 
@@ -439,8 +439,8 @@ Real fe_lagrange_2D_shape(const ElemType type,
             {
 
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 9);
 
@@ -459,9 +459,9 @@ Real fe_lagrange_2D_shape(const ElemType type,
           case TRI6:
           case TRI7:
             {
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
+              const GeomReal zeta1 = p(0);
+              const GeomReal zeta2 = p(1);
+              const GeomReal zeta0 = 1. - zeta1 - zeta2;
 
               libmesh_assert_less (i, 6);
 
@@ -504,10 +504,10 @@ Real fe_lagrange_2D_shape(const ElemType type,
           {
           case TRI7:
             {
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
-              const Real bubble_27th = zeta0*zeta1*zeta2;
+              const auto zeta1 = p(0);
+              const auto zeta2 = p(1);
+              const auto zeta0 = 1. - zeta1 - zeta2;
+              const auto bubble_27th = zeta0*zeta1*zeta2;
 
               libmesh_assert_less (i, 7);
 
@@ -559,7 +559,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
 
 
 template <FEFamily T>
-Real fe_lagrange_2D_shape_deriv(const ElemType type,
+GeomReal fe_lagrange_2D_shape_deriv(const ElemType type,
                                 const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
@@ -583,8 +583,8 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 4);
 
@@ -616,13 +616,13 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
             {
               libmesh_assert_less (i, 3);
 
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
+              const GeomReal dzeta0dxi  = -1.;
+              const GeomReal dzeta1dxi  = 1.;
+              const GeomReal dzeta2dxi  = 0.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
+              const GeomReal dzeta0deta = -1.;
+              const GeomReal dzeta1deta = 0.;
+              const GeomReal dzeta2deta = 1.;
 
               switch (j)
                 {
@@ -681,8 +681,8 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
           case QUAD8:
           case QUADSHELL8:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 8);
 
@@ -772,8 +772,8 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 9);
 
@@ -807,17 +807,17 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
             {
               libmesh_assert_less (i, 6);
 
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
+              const GeomReal zeta1 = p(0);
+              const GeomReal zeta2 = p(1);
+              const GeomReal zeta0 = 1. - zeta1 - zeta2;
 
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
+              const GeomReal dzeta0dxi  = -1.;
+              const GeomReal dzeta1dxi  = 1.;
+              const GeomReal dzeta2dxi  = 0.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
+              const GeomReal dzeta0deta = -1.;
+              const GeomReal dzeta1deta = 0.;
+              const GeomReal dzeta2deta = 1.;
 
               switch(j)
                 {
@@ -895,20 +895,20 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
             {
               libmesh_assert_less (i, 7);
 
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
-              // const Real bubble_27th = zeta0*zeta1*zeta2;
+              const auto zeta1 = p(0);
+              const auto zeta2 = p(1);
+              const auto zeta0 = 1. - zeta1 - zeta2;
+              // const auto bubble_27th = zeta0*zeta1*zeta2;
 
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
-              const Real dbubbledxi = zeta2 * (1. - 2.*zeta1 - zeta2);
+              const auto dzeta0dxi  = -1.;
+              const auto dzeta1dxi  = 1.;
+              const auto dzeta2dxi  = 0.;
+              const auto dbubbledxi = zeta2 * (1. - 2.*zeta1 - zeta2);
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
-              const Real dbubbledeta= zeta1 * (1. - zeta1 - 2.*zeta2);
+              const auto dzeta0deta = -1.;
+              const auto dzeta1deta = 0.;
+              const auto dzeta2deta = 1.;
+              const auto dbubbledeta= zeta1 * (1. - zeta1 - 2.*zeta2);
 
               switch(j)
                 {
@@ -998,7 +998,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <FEFamily T>
-Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
+GeomReal fe_lagrange_2D_shape_second_deriv(const ElemType type,
                                        const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
@@ -1025,8 +1025,8 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 4);
 
@@ -1078,8 +1078,8 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
           case QUAD8:
           case QUADSHELL8:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (j, 3);
 
@@ -1187,8 +1187,8 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
           case QUAD9:
             {
               // Compute QUAD9 second derivatives as tensor product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 9);
 
@@ -1225,13 +1225,13 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
           case TRI6:
           case TRI7:
             {
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
+              const GeomReal dzeta0dxi  = -1.;
+              const GeomReal dzeta1dxi  = 1.;
+              const GeomReal dzeta2dxi  = 0.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
+              const GeomReal dzeta0deta = -1.;
+              const GeomReal dzeta1deta = 0.;
+              const GeomReal dzeta2deta = 1.;
 
               libmesh_assert_less (j, 3);
 
@@ -1345,23 +1345,23 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
           case TRI6:
           case TRI7:
             {
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              // const Real zeta0 = 1. - zeta1 - zeta2;
+              const auto zeta1 = p(0);
+              const auto zeta2 = p(1);
+              // const auto zeta0 = 1. - zeta1 - zeta2;
 
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
-              // const Real dbubbledxi = zeta2 * (1. - 2.*zeta1 - zeta2);
-              const Real d2bubbledxi2 = -2. * zeta2;
+              const auto dzeta0dxi  = -1.;
+              const auto dzeta1dxi  = 1.;
+              const auto dzeta2dxi  = 0.;
+              // const auto dbubbledxi = zeta2 * (1. - 2.*zeta1 - zeta2);
+              const auto d2bubbledxi2 = -2. * zeta2;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
-              // const Real dbubbledeta= zeta1 * (1. - zeta1 - 2.*zeta2);
-              const Real d2bubbledeta2 = -2. * zeta1;
+              const auto dzeta0deta = -1.;
+              const auto dzeta1deta = 0.;
+              const auto dzeta2deta = 1.;
+              // const auto dbubbledeta= zeta1 * (1. - zeta1 - 2.*zeta2);
+              const auto d2bubbledeta2 = -2. * zeta1;
 
-              const Real d2bubbledxideta = (1. - 2.*zeta1 - 2.*zeta2);
+              const auto d2bubbledxideta = (1. - 2.*zeta1 - 2.*zeta2);
 
               libmesh_assert_less (j, 3);
 

@@ -28,9 +28,9 @@ namespace
 using namespace libMesh;
 
 // Compute the static coefficients for an element
-void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & dxdxi
+void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<GeomReal>> & dxdxi
 #ifdef DEBUG
-                           , std::vector<Real> & dxdeta, std::vector<Real> & dydxi
+                           , std::vector<GeomReal> & dxdeta, std::vector<GeomReal> & dydxi
 #endif
                            )
 {
@@ -57,9 +57,9 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
 #endif
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = shape_deriv_ptr
+          const GeomReal ddxi = shape_deriv_ptr
             (map_fe_type, elem, i, 0, dofpt[p], /*add_p_level=*/false);
-          const Real ddeta = shape_deriv_ptr
+          const GeomReal ddeta = shape_deriv_ptr
             (map_fe_type, elem, i, 1, dofpt[p], /*add_p_level=*/false);
 
           dxdxi[0][p] += elem->point(i)(0) * ddxi;
@@ -75,22 +75,22 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
       libmesh_assert(dxdxi[1][p]);
       // No non-rectilinear or non-axis-aligned elements!
 #ifdef DEBUG
-      libmesh_assert_less (std::abs(dxdeta[p]), 1e-9);
-      libmesh_assert_less (std::abs(dydxi[p]), 1e-9);
+      libmesh_assert_less (MetaPhysicL::raw_value(std::abs(dxdeta[p])), 1e-9);
+      libmesh_assert_less (MetaPhysicL::raw_value(std::abs(dydxi[p])), 1e-9);
 #endif
     }
 }
 
 
 
-Real hermite_bases_2D (std::vector<unsigned int> & bases1D,
-                       const std::vector<std::vector<Real>> & dxdxi,
+GeomReal hermite_bases_2D (std::vector<unsigned int> & bases1D,
+                       const std::vector<std::vector<GeomReal>> & dxdxi,
                        const Order & o,
                        unsigned int i)
 {
   bases1D.clear();
   bases1D.resize(2,0);
-  Real coef = 1.0;
+  GeomReal coef = 1.0;
 
   unsigned int e = o-3;
 
@@ -192,7 +192,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(2,HERMITE)
 
 
 template <>
-Real FE<2,HERMITE>::shape(const Elem * elem,
+GeomReal FE<2,HERMITE>::shape(const Elem * elem,
                           const Order order,
                           const unsigned int i,
                           const Point & p,
@@ -200,10 +200,10 @@ Real FE<2,HERMITE>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  std::vector<std::vector<Real>> dxdxi(2, std::vector<Real>(2, 0));
+  std::vector<std::vector<GeomReal>> dxdxi(2, std::vector<GeomReal>(2, 0));
 
 #ifdef DEBUG
-  std::vector<Real> dxdeta(2), dydxi(2);
+  std::vector<GeomReal> dxdeta(2), dydxi(2);
 #endif
 
   hermite_compute_coefs(elem,dxdxi
@@ -231,7 +231,7 @@ Real FE<2,HERMITE>::shape(const Elem * elem,
 
         std::vector<unsigned int> bases1D;
 
-        Real coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
+        GeomReal coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
 
         return coef * FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
           FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
@@ -244,7 +244,7 @@ Real FE<2,HERMITE>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,HERMITE>::shape(const ElemType,
+GeomReal FE<2,HERMITE>::shape(const ElemType,
                           const Order,
                           const unsigned int,
                           const Point &)
@@ -255,7 +255,7 @@ Real FE<2,HERMITE>::shape(const ElemType,
 
 
 template <>
-Real FE<2,HERMITE>::shape(const FEType fet,
+GeomReal FE<2,HERMITE>::shape(const FEType fet,
                           const Elem * elem,
                           const unsigned int i,
                           const Point & p,
@@ -266,7 +266,7 @@ Real FE<2,HERMITE>::shape(const FEType fet,
 
 
 template <>
-Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
+GeomReal FE<2,HERMITE>::shape_deriv(const Elem * elem,
                                 const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
@@ -276,10 +276,10 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1);
 
-  std::vector<std::vector<Real>> dxdxi(2, std::vector<Real>(2, 0));
+  std::vector<std::vector<GeomReal>> dxdxi(2, std::vector<GeomReal>(2, 0));
 
 #ifdef DEBUG
-  std::vector<Real> dxdeta(2), dydxi(2);
+  std::vector<GeomReal> dxdeta(2), dydxi(2);
 #endif
 
   hermite_compute_coefs(elem,dxdxi
@@ -307,7 +307,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
 
         std::vector<unsigned int> bases1D;
 
-        Real coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
+        GeomReal coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
 
         switch (j)
           {
@@ -330,7 +330,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,HERMITE>::shape_deriv(const ElemType,
+GeomReal FE<2,HERMITE>::shape_deriv(const ElemType,
                                 const Order,
                                 const unsigned int,
                                 const unsigned int,
@@ -342,7 +342,7 @@ Real FE<2,HERMITE>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,HERMITE>::shape_deriv(const FEType fet,
+GeomReal FE<2,HERMITE>::shape_deriv(const FEType fet,
                                 const Elem * elem,
                                 const unsigned int i,
                                 const unsigned int j,
@@ -359,7 +359,7 @@ Real FE<2,HERMITE>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
+GeomReal FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
                                        const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
@@ -369,10 +369,10 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1 || j == 2);
 
-  std::vector<std::vector<Real>> dxdxi(2, std::vector<Real>(2, 0));
+  std::vector<std::vector<GeomReal>> dxdxi(2, std::vector<GeomReal>(2, 0));
 
 #ifdef DEBUG
-  std::vector<Real> dxdeta(2), dydxi(2);
+  std::vector<GeomReal> dxdeta(2), dydxi(2);
 #endif
 
   hermite_compute_coefs(elem,dxdxi
@@ -400,7 +400,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
 
         std::vector<unsigned int> bases1D;
 
-        Real coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
+        GeomReal coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
 
         switch (j)
           {
@@ -427,7 +427,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,HERMITE>::shape_second_deriv(const ElemType,
+GeomReal FE<2,HERMITE>::shape_second_deriv(const ElemType,
                                        const Order,
                                        const unsigned int,
                                        const unsigned int,
@@ -439,7 +439,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<2,HERMITE>::shape_second_deriv(const FEType fet,
+GeomReal FE<2,HERMITE>::shape_second_deriv(const FEType fet,
                                        const Elem * elem,
                                        const unsigned int i,
                                        const unsigned int j,

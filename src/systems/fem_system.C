@@ -33,6 +33,7 @@
 #include "libmesh/time_solver.h"
 #include "libmesh/unsteady_solver.h" // For eulerian_residual
 #include "libmesh/fe_interface.h"
+#include "libmesh/raw_type.h"
 
 namespace {
 using namespace libMesh;
@@ -1190,7 +1191,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 
   Real numerical_point_h = 0.;
   if (_mesh_sys == this)
-    numerical_point_h = numerical_jacobian_h * context.get_elem().hmin();
+    numerical_point_h = numerical_jacobian_h * MetaPhysicL::raw_value(context.get_elem().hmin());
 
   const unsigned int n_dofs =
     cast_int<unsigned int>(context.get_dof_indices().size());
@@ -1220,7 +1221,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           context.get_elem_solution(v)(j) -= my_h;
 
           // Make sure to catch any moving mesh terms
-          Real * coord = nullptr;
+          GeomReal * coord = nullptr;
           if (_mesh_sys == this)
             {
               if (_mesh_x_var == v)

@@ -307,12 +307,12 @@ BoundingBox Tri6::loose_bounding_box () const
 
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
-      Real center = this->point(0)(d);
+      GeomReal center = this->point(0)(d);
       for (unsigned int p=1; p != 6; ++p)
         center += this->point(p)(d);
       center /= 6;
 
-      Real hd = std::abs(center - this->point(0)(d));
+      GeomReal hd = std::abs(center - this->point(0)(d));
       for (unsigned int p=1; p != 6; ++p)
         hd = std::max(hd, std::abs(center - this->point(p)(d)));
 
@@ -325,13 +325,13 @@ BoundingBox Tri6::loose_bounding_box () const
 
 
 
-Real Tri6::volume () const
+GeomReal Tri6::volume () const
 {
   // This specialization is good for Lagrange mappings only
   if (this->mapping_type() != LAGRANGE_MAP)
     return this->Elem::volume();
 
-  Real vol=0.;
+  GeomReal vol=0.;
 
 #if LIBMESH_DIM > 1
   // Make copies of our points.  It makes the subsequent calculations a bit

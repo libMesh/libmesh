@@ -37,20 +37,20 @@ static const Elem * old_elem_ptr = nullptr;
 // Coefficient naming: d(1)d(2n) is the coefficient of the
 // global shape function corresponding to value 1 in terms of the
 // local shape function corresponding to normal derivative 2
-static Real d1xd1x, d2xd2x;
+static GeomReal d1xd1x, d2xd2x;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-Real clough_raw_shape_second_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
                                    const Point & p);
 
 #endif
 
-Real clough_raw_shape_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
                             const Point & p);
-Real clough_raw_shape(const unsigned int basis_num,
+GeomReal clough_raw_shape(const unsigned int basis_num,
                       const Point & p);
 
 
@@ -83,8 +83,8 @@ void clough_compute_coefs(const Elem * elem)
   dofpt.push_back(Point(1));
 
   // Mapping functions - first derivatives at each dofpt
-  std::vector<Real> dxdxi(2);
-  std::vector<Real> dxidx(2);
+  std::vector<GeomReal> dxdxi(2);
+  std::vector<GeomReal> dxidx(2);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(map_fe_type, elem);
@@ -93,7 +93,7 @@ void clough_compute_coefs(const Elem * elem)
     {
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = shape_deriv_ptr
+          const GeomReal ddxi = shape_deriv_ptr
             (map_fe_type, elem, i, 0, dofpt[p], /*add_p_level=*/false);
           dxdxi[p] += dofpt[p](0) * ddxi;
         }
@@ -122,11 +122,11 @@ void clough_compute_coefs(const Elem * elem)
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 // Return shape function second derivatives on the unit interval
-Real clough_raw_shape_second_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
                                    const Point & p)
 {
-  Real xi = p(0);
+  GeomReal xi = p(0);
 
   switch (deriv_type)
     {
@@ -158,11 +158,11 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
 #endif
 
 
-Real clough_raw_shape_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
                             const Point & p)
 {
-  Real xi = p(0);
+  GeomReal xi = p(0);
 
   switch (deriv_type)
     {
@@ -189,10 +189,10 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
     }
 }
 
-Real clough_raw_shape(const unsigned int basis_num,
+GeomReal clough_raw_shape(const unsigned int basis_num,
                       const Point & p)
 {
-  Real xi = p(0);
+  GeomReal xi = p(0);
 
   switch (basis_num)
     {
@@ -223,7 +223,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(1,CLOUGH)
 
 
 template <>
-Real FE<1,CLOUGH>::shape(const Elem * elem,
+GeomReal FE<1,CLOUGH>::shape(const Elem * elem,
                          const Order order,
                          const unsigned int i,
                          const Point & p,
@@ -278,7 +278,7 @@ Real FE<1,CLOUGH>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,CLOUGH>::shape(const ElemType,
+GeomReal FE<1,CLOUGH>::shape(const ElemType,
                          const Order,
                          const unsigned int,
                          const Point &)
@@ -288,7 +288,7 @@ Real FE<1,CLOUGH>::shape(const ElemType,
 }
 
 template <>
-Real FE<1,CLOUGH>::shape(const FEType fet,
+GeomReal FE<1,CLOUGH>::shape(const FEType fet,
                          const Elem * elem,
                          const unsigned int i,
                          const Point & p,
@@ -301,7 +301,7 @@ Real FE<1,CLOUGH>::shape(const FEType fet,
 
 
 template <>
-Real FE<1,CLOUGH>::shape_deriv(const ElemType,
+GeomReal FE<1,CLOUGH>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
                                const unsigned int,
@@ -314,7 +314,7 @@ Real FE<1,CLOUGH>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
+GeomReal FE<1,CLOUGH>::shape_deriv(const Elem * elem,
                                const Order order,
                                const unsigned int i,
                                const unsigned int j,
@@ -367,7 +367,7 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,CLOUGH>::shape_deriv(const FEType fet,
+GeomReal FE<1,CLOUGH>::shape_deriv(const FEType fet,
                                const Elem * elem,
                                const unsigned int i,
                                const unsigned int j,
@@ -382,7 +382,7 @@ Real FE<1,CLOUGH>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
+GeomReal FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
                                       const unsigned int j,
@@ -435,7 +435,7 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,CLOUGH>::shape_second_deriv(const ElemType,
+GeomReal FE<1,CLOUGH>::shape_second_deriv(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -446,7 +446,7 @@ Real FE<1,CLOUGH>::shape_second_deriv(const ElemType,
 }
 
 template <>
-Real FE<1,CLOUGH>::shape_second_deriv(const FEType fet,
+GeomReal FE<1,CLOUGH>::shape_second_deriv(const FEType fet,
                                       const Elem * elem,
                                       const unsigned int i,
                                       const unsigned int j,

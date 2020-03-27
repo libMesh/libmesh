@@ -45,7 +45,7 @@ monomial_vec_nodal_soln(const Elem * elem,
                         const Order order,
                         const std::vector<Number> & elem_soln,
                         const int dim,
-                        std::vector<Number> & nodal_soln)
+                        std::vector<GeomNumber> & nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -130,7 +130,7 @@ void
 FE<0, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<GeomNumber> & nodal_soln)
 {
   FE<0, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln);
 }
@@ -140,7 +140,7 @@ void
 FE<1, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<GeomNumber> & nodal_soln)
 {
   FE<1, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln);
 }
@@ -150,7 +150,7 @@ void
 FE<2, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<GeomNumber> & nodal_soln)
 {
   monomial_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln);
 }
@@ -160,7 +160,7 @@ void
 FE<3, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<GeomNumber> & nodal_soln)
 {
   monomial_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln);
 }
@@ -172,264 +172,264 @@ LIBMESH_FE_SIDE_NODAL_SOLN(MONOMIAL_VEC)
 
 // 0-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<0, MONOMIAL_VEC>::shape(const ElemType type,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
 {
-  Real value = FE<0, MONOMIAL>::shape(type, order, i, p);
-  return libMesh::RealVectorValue(value);
+  GeomReal value = FE<0, MONOMIAL>::shape(type, order, i, p);
+  return libMesh::GeomRealVectorValue(value);
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<0, MONOMIAL_VEC>::shape_deriv(const ElemType type,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
                                  const Point & p)
 {
-  Real value = FE<0, MONOMIAL>::shape_deriv(type, order, i, j, p);
-  return libMesh::RealVectorValue(value);
+  GeomReal value = FE<0, MONOMIAL>::shape_deriv(type, order, i, j, p);
+  return libMesh::GeomRealVectorValue(value);
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<0, MONOMIAL_VEC>::shape_second_deriv(const ElemType type,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
                                         const Point & p)
 {
-  Real value = FE<0, MONOMIAL>::shape_second_deriv(type, order, i, j, p);
-  return libMesh::RealVectorValue(value);
+  GeomReal value = FE<0, MONOMIAL>::shape_second_deriv(type, order, i, j, p);
+  return libMesh::GeomRealVectorValue(value);
 }
 #endif
 
 // 1-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<1, MONOMIAL_VEC>::shape(const ElemType type,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
 {
-  Real value = FE<1, MONOMIAL>::shape(type, order, i, p);
-  return libMesh::RealVectorValue(value);
+  GeomReal value = FE<1, MONOMIAL>::shape(type, order, i, p);
+  return libMesh::GeomRealVectorValue(value);
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<1, MONOMIAL_VEC>::shape_deriv(const ElemType type,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
                                  const Point & p)
 {
-  Real value = FE<1, MONOMIAL>::shape_deriv(type, order, i, j, p);
-  return libMesh::RealVectorValue(value);
+  GeomReal value = FE<1, MONOMIAL>::shape_deriv(type, order, i, j, p);
+  return libMesh::GeomRealVectorValue(value);
 }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<1, MONOMIAL_VEC>::shape_second_deriv(const ElemType type,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
                                         const Point & p)
 {
-  Real value = FE<1, MONOMIAL>::shape_second_deriv(type, order, i, j, p);
-  return libMesh::RealVectorValue(value);
+  GeomReal value = FE<1, MONOMIAL>::shape_second_deriv(type, order, i, j, p);
+  return libMesh::GeomRealVectorValue(value);
 }
 
 #endif
 
 // 2-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<2, MONOMIAL_VEC>::shape(const ElemType type,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
 {
-  Real value = FE<2, MONOMIAL>::shape(type, order, i / 2, p);
+  GeomReal value = FE<2, MONOMIAL>::shape(type, order, i / 2, p);
 
   switch (i % 2)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<2, MONOMIAL_VEC>::shape_deriv(const ElemType type,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
                                  const Point & p)
 {
-  Real value = FE<2, MONOMIAL>::shape_deriv(type, order, i / 2, j, p);
+  GeomReal value = FE<2, MONOMIAL>::shape_deriv(type, order, i / 2, j, p);
 
   switch (i % 2)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<2, MONOMIAL_VEC>::shape_second_deriv(const ElemType type,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
                                         const Point & p)
 {
-  Real value = FE<2, MONOMIAL>::shape_second_deriv(type, order, i / 2, j, p);
+  GeomReal value = FE<2, MONOMIAL>::shape_second_deriv(type, order, i / 2, j, p);
 
   switch (i % 2)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #endif
 
 // 3-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<3, MONOMIAL_VEC>::shape(const ElemType type,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
 {
-  Real value = FE<3, MONOMIAL>::shape(type, order, i / 3, p);
+  GeomReal value = FE<3, MONOMIAL>::shape(type, order, i / 3, p);
 
   switch (i % 3)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     case 2:
-      return libMesh::RealVectorValue(Real(0), Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<3, MONOMIAL_VEC>::shape_deriv(const ElemType type,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
                                  const Point & p)
 {
-  Real value = FE<3, MONOMIAL>::shape_deriv(type, order, i / 3, j, p);
+  GeomReal value = FE<3, MONOMIAL>::shape_deriv(type, order, i / 3, j, p);
 
   switch (i % 3)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     case 2:
-      return libMesh::RealVectorValue(Real(0), Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<3, MONOMIAL_VEC>::shape_second_deriv(const ElemType type,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
                                         const Point & p)
 {
-  Real value = FE<3, MONOMIAL>::shape_second_deriv(type, order, i / 3, j, p);
+  GeomReal value = FE<3, MONOMIAL>::shape_second_deriv(type, order, i / 3, j, p);
 
   switch (i % 3)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     case 2:
-      return libMesh::RealVectorValue(Real(0), Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #endif
 
 // 0-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<0, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
                            const Point & p,
                            const bool add_p_level)
 {
-  Real value =
+  GeomReal value =
       FE<0, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
-  return libMesh::RealVectorValue(value);
+  return libMesh::GeomRealVectorValue(value);
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<0, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
@@ -437,15 +437,15 @@ FE<0, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Point & p,
                                  const bool add_p_level)
 {
-  Real value = FE<0, MONOMIAL>::shape_deriv(
+  GeomReal value = FE<0, MONOMIAL>::shape_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealVectorValue(value);
+  return libMesh::GeomRealVectorValue(value);
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<0, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
@@ -453,28 +453,28 @@ FE<0, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Point & p,
                                         const bool add_p_level)
 {
-  Real value = FE<0, MONOMIAL>::shape_second_deriv(
+  GeomReal value = FE<0, MONOMIAL>::shape_second_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealVectorValue(value);
+  return libMesh::GeomRealVectorValue(value);
 }
 
 #endif
 
 // 1-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<1, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
                            const Point & p,
                            const bool add_p_level)
 {
-  Real value =
+  GeomReal value =
       FE<1, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
-  return libMesh::RealVectorValue(value);
+  return libMesh::GeomRealVectorValue(value);
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<1, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
@@ -482,14 +482,14 @@ FE<1, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Point & p,
                                  const bool add_p_level)
 {
-  Real value = FE<1, MONOMIAL>::shape_deriv(
+  GeomReal value = FE<1, MONOMIAL>::shape_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealVectorValue(value);
+  return libMesh::GeomRealVectorValue(value);
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<1, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
@@ -497,42 +497,42 @@ FE<1, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Point & p,
                                         const bool add_p_level)
 {
-  Real value = FE<1, MONOMIAL>::shape_second_deriv(
+  GeomReal value = FE<1, MONOMIAL>::shape_second_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealVectorValue(value);
+  return libMesh::GeomRealVectorValue(value);
 }
 
 #endif
 
 // 2-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<2, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
                            const Point & p,
                            const bool add_p_level)
 {
-  Real value =
+  GeomReal value =
       FE<2, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 2, p);
 
   switch (i % 2)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<2, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
@@ -540,28 +540,28 @@ FE<2, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Point & p,
                                  const bool add_p_level)
 {
-  Real value = FE<2, MONOMIAL>::shape_deriv(
+  GeomReal value = FE<2, MONOMIAL>::shape_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 2, j, p);
 
   switch (i % 2)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<2, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
@@ -569,59 +569,59 @@ FE<2, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Point & p,
                                         const bool add_p_level)
 {
-  Real value = FE<2, MONOMIAL>::shape_second_deriv(
+  GeomReal value = FE<2, MONOMIAL>::shape_second_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 2, j, p);
 
   switch (i % 2)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #endif
 
 // 3-D
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<3, MONOMIAL_VEC>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
                            const Point & p,
                            const bool add_p_level)
 {
-  Real value =
+  GeomReal value =
       FE<3, MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 3, p);
 
   switch (i % 3)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     case 2:
-      return libMesh::RealVectorValue(Real(0), Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<3, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
@@ -629,32 +629,32 @@ FE<3, MONOMIAL_VEC>::shape_deriv(const Elem * elem,
                                  const Point & p,
                                  const bool add_p_level)
 {
-  Real value = FE<3, MONOMIAL>::shape_deriv(
+  GeomReal value = FE<3, MONOMIAL>::shape_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 3, j, p);
 
   switch (i % 3)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     case 2:
-      return libMesh::RealVectorValue(Real(0), Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-RealVectorValue
+GeomRealVectorValue
 FE<3, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
@@ -662,26 +662,26 @@ FE<3, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
                                         const Point & p,
                                         const bool add_p_level)
 {
-  Real value = FE<3, MONOMIAL>::shape_second_deriv(
+  GeomReal value = FE<3, MONOMIAL>::shape_second_deriv(
       elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i / 3, j, p);
 
   switch (i % 3)
   {
     case 0:
-      return libMesh::RealVectorValue(value);
+      return libMesh::GeomRealVectorValue(value);
 
     case 1:
-      return libMesh::RealVectorValue(Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), value);
 
     case 2:
-      return libMesh::RealVectorValue(Real(0), Real(0), value);
+      return libMesh::GeomRealVectorValue(GeomReal(0), GeomReal(0), value);
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
   }
 
   // dummy
-  return libMesh::RealVectorValue();
+  return libMesh::GeomRealVectorValue();
 }
 
 #endif

@@ -342,7 +342,7 @@ public:
    */
   static void nodal_soln(const Elem * elem, const Order o,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> & nodal_soln);
+                         std::vector<GeomNumber> & nodal_soln);
 
   /**
    * Build the nodal soln on one side from the (full) element soln.
@@ -353,7 +353,7 @@ public:
   static void side_nodal_soln(const Elem * elem, const Order o,
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln_on_side);
+                              std::vector<GeomNumber> & nodal_soln_on_side);
 
   /**
    * \returns The number of shape functions associated with
@@ -700,7 +700,7 @@ protected:
   static void default_side_nodal_soln(const Elem * elem, const Order o,
                                       const unsigned int side,
                                       const std::vector<Number> & elem_soln,
-                                      std::vector<Number> & nodal_soln_on_side);
+                                      std::vector<GeomNumber> & nodal_soln_on_side);
 
   /**
    * An array of the node locations on the last
@@ -767,13 +767,13 @@ public:
   /**
    * 1D hermite functions on unit interval
    */
-  static Real hermite_raw_shape_second_deriv(const unsigned int basis_num,
-                                             const Real xi);
+  static GeomReal hermite_raw_shape_second_deriv(const unsigned int basis_num,
+                                             const GeomReal xi);
 #endif
-  static Real hermite_raw_shape_deriv(const unsigned int basis_num,
-                                      const Real xi);
-  static Real hermite_raw_shape(const unsigned int basis_num,
-                                const Real xi);
+  static GeomReal hermite_raw_shape_deriv(const unsigned int basis_num,
+                                      const GeomReal xi);
+  static GeomReal hermite_raw_shape(const unsigned int basis_num,
+                                const GeomReal xi);
 };
 
 
@@ -785,14 +785,14 @@ public:
  * inside FESubdivision::init_shape_functions
  */
 template <>
-Real FE<2,SUBDIVISION>::shape(const Elem * elem,
+GeomReal FE<2,SUBDIVISION>::shape(const Elem * elem,
                               const Order order,
                               const unsigned int i,
                               const Point & p,
                               const bool add_p_level);
 
 template <>
-Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
+GeomReal FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
@@ -801,7 +801,7 @@ Real FE<2,SUBDIVISION>::shape_deriv(const Elem * elem,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template <>
-Real FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
+GeomReal FE<2,SUBDIVISION>::shape_second_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -869,9 +869,9 @@ public:
    * element, evaluated at the barycentric coordinates \p v,
    * \p w.
    */
-  static Real regular_shape(const unsigned int i,
-                            const Real v,
-                            const Real w);
+  static GeomReal regular_shape(const unsigned int i,
+                            const GeomReal v,
+                            const GeomReal w);
 
   /**
    * \returns The \f$ j^{th} \f$ derivative of the \f$ i^{th}
@@ -879,10 +879,10 @@ public:
    * Loop subdivision element, evaluated at the barycentric
    * coordinates \p v, \p w.
    */
-  static Real regular_shape_deriv(const unsigned int i,
+  static GeomReal regular_shape_deriv(const unsigned int i,
                                   const unsigned int j,
-                                  const Real v,
-                                  const Real w);
+                                  const GeomReal v,
+                                  const GeomReal w);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -891,10 +891,10 @@ public:
    * a regular Loop subdivision element, evaluated at the
    * barycentric coordinates \p v, \p w.
    */
-  static Real regular_shape_second_deriv(const unsigned int i,
+  static GeomReal regular_shape_second_deriv(const unsigned int i,
                                          const unsigned int j,
-                                         const Real v,
-                                         const Real w);
+                                         const GeomReal v,
+                                         const GeomReal w);
 
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVE
@@ -1365,7 +1365,7 @@ OutputShape fe_fdm_second_deriv(const ElemType type,
 void lagrange_nodal_soln(const Elem * elem,
                          const Order order,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> &       nodal_soln);
+                         std::vector<GeomNumber> & nodal_soln);
 
 /**
  * Helper functions for Discontinuous-Pn type basis functions.
@@ -1378,7 +1378,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o);
 // shapes[i][j] is shape function phi_i at point p[j]
 void rational_fe_weighted_shapes(const Elem * elem,
                                  const FEType underlying_fe_type,
-                                 std::vector<std::vector<Real>> & shapes,
+                                 std::vector<std::vector<GeomReal>> & shapes,
                                  const std::vector<Point> & p,
                                  const bool add_p_level);
 
@@ -1386,41 +1386,41 @@ void rational_fe_weighted_shapes(const Elem * elem,
 // derivs[j][i][q] is dphi_i/dxi_j at p[q]
 void rational_fe_weighted_shapes_derivs(const Elem * elem,
                                         const FEType fe_type,
-                                        std::vector<std::vector<Real>> & shapes,
-                                        std::vector<std::vector<std::vector<Real>>> & derivs,
+                                        std::vector<std::vector<GeomReal>> & shapes,
+                                        std::vector<std::vector<std::vector<GeomReal>>> & derivs,
                                         const std::vector<Point> & p,
                                         const bool add_p_level);
 
-Real rational_fe_shape(const Elem & elem,
-                       const FEType underlying_fe_type,
-                       const unsigned int i,
-                       const Point & p,
-                       const bool add_p_level);
+GeomReal rational_fe_shape(const Elem & elem,
+                           const FEType underlying_fe_type,
+                           const unsigned int i,
+                           const Point & p,
+                           const bool add_p_level);
 
-Real rational_fe_shape_deriv(const Elem & elem,
-                             const FEType underlying_fe_type,
-                             const unsigned int i,
-                             const unsigned int j,
-                             const Point & p,
-                             const bool add_p_level);
+GeomReal rational_fe_shape_deriv(const Elem & elem,
+                                 const FEType underlying_fe_type,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p,
+                                 const bool add_p_level);
 
-Real rational_fe_shape_second_deriv(const Elem & elem,
-                                    const FEType underlying_fe_type,
-                                    const unsigned int i,
-                                    const unsigned int j,
-                                    const Point & p,
-                                    const bool add_p_level);
+GeomReal rational_fe_shape_second_deriv(const Elem & elem,
+                                        const FEType underlying_fe_type,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p,
+                                        const bool add_p_level);
 
 void rational_all_shapes (const Elem & elem,
                           const FEType underlying_fe_type,
                           const std::vector<Point> & p,
-                          std::vector<std::vector<Real>> & v,
+                          std::vector<std::vector<GeomReal>> & v,
                           const bool add_p_level);
 
 void rational_all_shape_derivs (const Elem & elem,
                                 const FEType underlying_fe_type,
                                 const std::vector<Point> & p,
-                                std::vector<std::vector<Real>> * comps[3],
+                                std::vector<std::vector<GeomReal>> * comps[3],
                                 const bool add_p_level);
 
 } // namespace libMesh

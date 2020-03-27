@@ -177,14 +177,14 @@ public:
   /**
    * An optimized method for computing the area of a 3-node triangle.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * \returns The minimum and maximum angles for the triangle
    * (in radians) in a std::pair.  The first entry in the pair
    * is the minimum angle, the second entry is the max angle.
    */
-  std::pair<Real, Real> min_and_max_angle() const;
+  std::pair<GeomReal, GeomReal> min_and_max_angle() const;
 
   /**
    * Specialization for tri3 elements. These elements are guaranteed to be planar

@@ -5,6 +5,7 @@
 #include <libmesh/newton_solver.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/parallel.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -152,7 +153,9 @@ public:
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       {
         libMesh::Number udot;
-        c.interior_rate(_u_var,qp,udot);
+        libMesh::GeomNumber dual_udot;
+        c.interior_rate(_u_var,qp,dual_udot);
+        udot = MetaPhysicL::raw_value(dual_udot);
 
         Number Mval = this->M(c,qp);
 
@@ -213,7 +216,9 @@ public:
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       {
         libMesh::Number udot;
-        c.interior_rate(_u_var,qp,udot);
+        libMesh::GeomNumber dual_udot;
+        c.interior_rate(_u_var,qp,dual_udot);
+        udot = MetaPhysicL::raw_value(dual_udot);
 
         Number Cval = this->C(c,qp);
 
@@ -244,7 +249,9 @@ public:
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       {
         libMesh::Number uddot;
-        c.interior_accel(_u_var,qp,uddot);
+        libMesh::GeomNumber dual_uddot;
+        c.interior_accel(_u_var,qp,dual_uddot);
+        uddot = MetaPhysicL::raw_value(dual_uddot);
 
         Number Mval = this->M(c,qp);
 
@@ -322,7 +329,9 @@ public:
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       {
         libMesh::Number udot;
-        c.interior_rate(v_var,qp,udot);
+        libMesh::GeomNumber dual_udot;
+        c.interior_rate(v_var,qp,dual_udot);
+        udot = MetaPhysicL::raw_value(dual_udot);
 
         Number Cval = this->C(c,qp);
 
@@ -356,7 +365,9 @@ public:
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       {
         libMesh::Number uddot;
-        c.interior_accel(v_var,qp,uddot);
+        libMesh::GeomNumber dual_uddot;
+        c.interior_accel(v_var,qp,dual_uddot);
+        uddot = MetaPhysicL::raw_value(dual_uddot);
 
         Number Mval = this->M(c,qp);
 

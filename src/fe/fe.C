@@ -695,9 +695,9 @@ void
 FE<Dim,T>::default_side_nodal_soln(const Elem * elem, const Order o,
                                    const unsigned int side,
                                    const std::vector<Number> & elem_soln,
-                                   std::vector<Number> & nodal_soln_on_side)
+                                   std::vector<GeomNumber> & nodal_soln_on_side)
 {
-  std::vector<Number> full_nodal_soln;
+  std::vector<GeomNumber> full_nodal_soln;
   nodal_soln(elem, o, elem_soln, full_nodal_soln);
   const std::vector<unsigned int> side_nodes =
     elem->nodes_on_side(side);
@@ -998,7 +998,7 @@ fe_fdm_second_deriv(const ElemType type,
 
 void rational_fe_weighted_shapes(const Elem * elem,
                                  const FEType underlying_fe_type,
-                                 std::vector<std::vector<Real>> & shapes,
+                                 std::vector<std::vector<GeomReal>> & shapes,
                                  const std::vector<Point> & p,
                                  const bool add_p_level)
 {
@@ -1036,8 +1036,8 @@ void rational_fe_weighted_shapes(const Elem * elem,
 
 void rational_fe_weighted_shapes_derivs(const Elem * elem,
                                         const FEType fe_type,
-                                        std::vector<std::vector<Real>> & shapes,
-                                        std::vector<std::vector<std::vector<Real>>> & derivs,
+                                        std::vector<std::vector<GeomReal>> & shapes,
+                                        std::vector<std::vector<std::vector<GeomReal>>> & derivs,
                                         const std::vector<Point> & p,
                                         const bool add_p_level)
 {
@@ -1086,11 +1086,11 @@ void rational_fe_weighted_shapes_derivs(const Elem * elem,
 }
 
 
-Real rational_fe_shape(const Elem & elem,
-                       const FEType underlying_fe_type,
-                       const unsigned int i,
-                       const Point & p,
-                       const bool add_p_level)
+GeomReal rational_fe_shape(const Elem & elem,
+                           const FEType underlying_fe_type,
+                           const unsigned int i,
+                           const Point & p,
+                           const bool add_p_level)
 {
   int extra_order = add_p_level * elem.p_level();
 
@@ -1099,17 +1099,15 @@ Real rational_fe_shape(const Elem & elem,
 
   libmesh_assert_equal_to (n_sf, elem.n_nodes());
 
-  std::vector<Real> node_weights(n_sf);
-
   const unsigned char datum_index = elem.mapping_data();
 
-  Real weighted_shape_i = 0, weighted_sum = 0;
+  GeomReal weighted_shape_i = 0, weighted_sum = 0;
 
   for (unsigned int sf=0; sf<n_sf; sf++)
     {
-      Real node_weight =
+      auto node_weight =
         elem.node_ref(sf).get_extra_datum<Real>(datum_index);
-      Real weighted_shape = node_weight *
+      auto weighted_shape = node_weight *
         FEInterface::shape(underlying_fe_type, extra_order, &elem, sf, p);
       weighted_sum += weighted_shape;
       if (sf == i)
@@ -1120,12 +1118,12 @@ Real rational_fe_shape(const Elem & elem,
 }
 
 
-Real rational_fe_shape_deriv(const Elem & elem,
-                             const FEType underlying_fe_type,
-                             const unsigned int i,
-                             const unsigned int j,
-                             const Point & p,
-                             const bool add_p_level)
+GeomReal rational_fe_shape_deriv(const Elem & elem,
+                                 const FEType underlying_fe_type,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   libmesh_assert_less(j, elem.dim());
 
@@ -1144,14 +1142,14 @@ Real rational_fe_shape_deriv(const Elem & elem,
     node_weights[n] =
       elem.node_ref(n).get_extra_datum<Real>(datum_index);
 
-  Real weighted_shape_i = 0, weighted_sum = 0,
-       weighted_grad_i = 0, weighted_grad_sum = 0;
+  GeomReal weighted_shape_i = 0, weighted_sum = 0,
+    weighted_grad_i = 0, weighted_grad_sum = 0;
 
   for (unsigned int sf=0; sf<n_sf; sf++)
     {
-      Real weighted_shape = node_weights[sf] *
+      auto weighted_shape = node_weights[sf] *
         FEInterface::shape(underlying_fe_type, extra_order, &elem, sf, p);
-      Real weighted_grad = node_weights[sf] *
+      auto weighted_grad = node_weights[sf] *
         FEInterface::shape_deriv(underlying_fe_type, extra_order, &elem, sf, j, p);
       weighted_sum += weighted_shape;
       weighted_grad_sum += weighted_grad;
@@ -1169,12 +1167,12 @@ Real rational_fe_shape_deriv(const Elem & elem,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-Real rational_fe_shape_second_deriv(const Elem & elem,
-                                    const FEType underlying_fe_type,
-                                    const unsigned int i,
-                                    const unsigned int j,
-                                    const Point & p,
-                                    const bool add_p_level)
+GeomReal rational_fe_shape_second_deriv(const Elem & elem,
+                                        const FEType underlying_fe_type,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p,
+                                        const bool add_p_level)
 {
   unsigned int j1, j2;
   switch (j)
@@ -1226,25 +1224,25 @@ Real rational_fe_shape_second_deriv(const Elem & elem,
     node_weights[n] =
       elem.node_ref(n).get_extra_datum<Real>(datum_index);
 
-  Real weighted_shape_i = 0, weighted_sum = 0,
-       weighted_grada_i = 0, weighted_grada_sum = 0,
-       weighted_gradb_i = 0, weighted_gradb_sum = 0,
-       weighted_hess_i = 0, weighted_hess_sum = 0;
+  GeomReal weighted_shape_i = 0, weighted_sum = 0,
+    weighted_grada_i = 0, weighted_grada_sum = 0,
+    weighted_gradb_i = 0, weighted_gradb_sum = 0,
+    weighted_hess_i = 0, weighted_hess_sum = 0;
 
   for (unsigned int sf=0; sf<n_sf; sf++)
     {
-      Real weighted_shape = node_weights[sf] *
+      auto weighted_shape = node_weights[sf] *
         FEInterface::shape(underlying_fe_type, extra_order, &elem, sf,
                            p);
-      Real weighted_grada = node_weights[sf] *
+      auto weighted_grada = node_weights[sf] *
         FEInterface::shape_deriv(underlying_fe_type, extra_order,
                                  &elem, sf, j1, p);
-      Real weighted_hess = node_weights[sf] *
+      auto weighted_hess = node_weights[sf] *
         FEInterface::shape_second_deriv(underlying_fe_type,
                                         extra_order, &elem, sf, j, p);
       weighted_sum += weighted_shape;
       weighted_grada_sum += weighted_grada;
-      Real weighted_gradb = weighted_grada;
+      auto weighted_gradb = weighted_grada;
       if (j1 != j2)
         {
           weighted_gradb = (j1 == j2) ? weighted_grada :
@@ -1278,15 +1276,15 @@ Real rational_fe_shape_second_deriv(const Elem & elem,
 void rational_all_shapes (const Elem & elem,
                           const FEType underlying_fe_type,
                           const std::vector<Point> & p,
-                          std::vector<std::vector<Real>> & v,
+                          std::vector<std::vector<GeomReal>> & v,
                           const bool add_p_level)
 {
-  std::vector<std::vector<Real>> shapes;
+  std::vector<std::vector<GeomReal>> shapes;
 
   rational_fe_weighted_shapes(&elem, underlying_fe_type, shapes, p,
                               add_p_level);
 
-  std::vector<Real> shape_sums(p.size(), 0);
+  std::vector<GeomReal> shape_sums(p.size(), 0);
 
   for (auto i : index_range(v))
     {
@@ -1307,19 +1305,19 @@ void rational_all_shapes (const Elem & elem,
 void rational_all_shape_derivs (const Elem & elem,
                                 const FEType underlying_fe_type,
                                 const std::vector<Point> & p,
-                                std::vector<std::vector<Real>> * comps[3],
+                                std::vector<std::vector<GeomReal>> * comps[3],
                                 const bool add_p_level)
 {
   const int my_dim = elem.dim();
 
-  std::vector<std::vector<Real>> shapes;
-  std::vector<std::vector<std::vector<Real>>> derivs(my_dim);
+  std::vector<std::vector<GeomReal>> shapes;
+  std::vector<std::vector<std::vector<GeomReal>>> derivs(my_dim);
 
   rational_fe_weighted_shapes_derivs(&elem, underlying_fe_type,
                                      shapes, derivs, p, add_p_level);
 
-  std::vector<Real> shape_sums(p.size(), 0);
-  std::vector<std::vector<Real>> shape_deriv_sums(my_dim);
+  std::vector<GeomReal> shape_sums(p.size(), 0);
+  std::vector<std::vector<GeomReal>> shape_deriv_sums(my_dim);
   for (int d=0; d != my_dim; ++d)
     shape_deriv_sums[d].resize(p.size());
 
@@ -1355,48 +1353,48 @@ void rational_all_shape_derivs (const Elem & elem,
 
 
 template
-Real fe_fdm_deriv<Real>(const Elem *, const Order, const unsigned int,
+GeomReal fe_fdm_deriv<GeomReal>(const Elem *, const Order, const unsigned int,
                         const unsigned int, const Point &, const bool,
-                        Real(*shape_func)
+                        GeomReal(*shape_func)
                           (const Elem *, const Order, const unsigned int,
                            const Point &, const bool));
 
 template
-Real fe_fdm_deriv<Real>(const ElemType, const Order, const unsigned int,
+GeomReal fe_fdm_deriv<GeomReal>(const ElemType, const Order, const unsigned int,
                         const unsigned int, const Point &,
-                        Real(*shape_func)
+                        GeomReal(*shape_func)
                           (const ElemType, const Order, const unsigned int,
                            const Point &));
 
 template
-RealGradient
-fe_fdm_deriv<RealGradient>(const Elem *, const Order, const unsigned int,
+GeomRealGradient
+fe_fdm_deriv<GeomRealGradient>(const Elem *, const Order, const unsigned int,
                            const unsigned int, const Point &, const bool,
-                           RealGradient(*shape_func)
+                           GeomRealGradient(*shape_func)
                              (const Elem *, const Order, const unsigned int,
                               const Point &, const bool));
 
 template
-Real
-fe_fdm_second_deriv<Real>(const ElemType, const Order, const unsigned int,
+GeomReal
+fe_fdm_second_deriv<GeomReal>(const ElemType, const Order, const unsigned int,
                           const unsigned int, const Point &,
-                          Real(*shape_func)
+                          GeomReal(*shape_func)
                             (const ElemType, const Order, const unsigned int,
                              const unsigned int, const Point &));
 
 template
-Real
-fe_fdm_second_deriv<Real>(const Elem *, const Order, const unsigned int,
+GeomReal
+fe_fdm_second_deriv<GeomReal>(const Elem *, const Order, const unsigned int,
                           const unsigned int, const Point &, const bool,
-                          Real(*shape_func)
+                          GeomReal(*shape_func)
                             (const Elem *, const Order, const unsigned int,
                              const unsigned int, const Point &, const bool));
 
 template
-RealGradient
-fe_fdm_second_deriv<RealGradient>(const Elem *, const Order, const unsigned int,
+GeomRealGradient
+fe_fdm_second_deriv<GeomRealGradient>(const Elem *, const Order, const unsigned int,
                            const unsigned int, const Point &, const bool,
-                           RealGradient(*shape_func)
+                           GeomRealGradient(*shape_func)
                              (const Elem *, const Order, const unsigned int,
                               const unsigned int, const Point &, const bool));
 

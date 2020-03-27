@@ -202,9 +202,9 @@ void QConical::conical_product_pyramid()
     for (unsigned int j=0; j<np; ++j)
       for (unsigned int k=0; k<np; ++k, ++q)
         {
-          const Real xi=gauss1D.qp(i)(0);
-          const Real yj=gauss1D.qp(j)(0);
-          const Real zk=jac1D.qp(k)(0);
+          const auto xi=gauss1D.qp(i)(0);
+          const auto yj=gauss1D.qp(j)(0);
+          const auto zk=jac1D.qp(k)(0);
 
           _points[q](0) = (1.-zk) * xi;
           _points[q](1) = (1.-zk) * yj;

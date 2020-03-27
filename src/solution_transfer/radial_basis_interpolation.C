@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_tools.h" // BoundingBox
 #include "libmesh/radial_basis_functions.h"
+#include "libmesh/raw_type.h"
 
 #ifdef LIBMESH_HAVE_EIGEN
 # include "libmesh/ignore_warnings.h"
@@ -97,7 +98,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
 
   // Construct the Radial Basis Function, giving it the size of the domain
   if (_r_override < 0)
-    _r_bbox = (_src_bbox.max() - _src_bbox.min()).norm();
+    _r_bbox = MetaPhysicL::raw_value((_src_bbox.max() - _src_bbox.min()).norm());
   else
     _r_bbox = _r_override;
 
@@ -130,7 +131,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
         {
           const Point & x_j (_src_pts[j]);
 
-          const Real r_ij = (x_j - x_i).norm();
+          const Real r_ij = MetaPhysicL::raw_value((x_j - x_i).norm());
 
           A(i,j) = A(j,i) = rbf(r_ij);
         }
@@ -204,7 +205,7 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
         {
           const Point & x_i(_src_pts[i]);
           const Real
-            r_i   = (p - x_i).norm(),
+            r_i   = MetaPhysicL::raw_value((p - x_i).norm()),
             phi_i = rbf(r_i);
 
           for (unsigned int var=0; var<n_vars; var++)

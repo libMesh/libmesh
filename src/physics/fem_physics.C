@@ -30,6 +30,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/time_solver.h"
 #include "libmesh/unsteady_solver.h" // For eulerian_residual
+#include "libmesh/raw_type.h"
 
 
 namespace libMesh
@@ -212,9 +213,9 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
       FEBase * elem_fe = nullptr;
       context.get_element_fe( var, elem_fe );
 
-      const std::vector<Real> & JxW = elem_fe->get_JxW();
+      const auto & JxW = MetaPhysicL::raw_value(elem_fe->get_JxW());
 
-      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const auto & phi = MetaPhysicL::raw_value(elem_fe->get_phi());
 
       const unsigned int n_dofs = cast_int<unsigned int>
         (context.get_dof_indices(var).size());
@@ -224,8 +225,9 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
         {
-          Number uprime;
-          context.interior_rate(var, qp, uprime);
+          GeomNumber dual_uprime;
+          context.interior_rate(var, qp, dual_uprime);
+          Number uprime = MetaPhysicL::raw_value(dual_uprime);
           const Number JxWxU = JxW[qp] * uprime;
           for (unsigned int i = 0; i != n_dofs; ++i)
             {

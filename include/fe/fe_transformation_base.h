@@ -18,10 +18,39 @@
 #ifndef LIBMESH_FE_TRANSFORMATION_BASE_H
 #define LIBMESH_FE_TRANSFORMATION_BASE_H
 
-#include "libmesh/fe_base.h"
+#include "libmesh/libmesh_common.h"
+
+#include <memory>
 
 namespace libMesh
 {
+template <typename>
+class VectorValue;
+typedef VectorValue<Real> RealVectorValue;
+template <typename T>
+class TensorValue;
+typedef TensorValue<Real> RealTensorValue;
+class Elem;
+class Point;
+
+template <typename>
+struct MakeOutput;
+
+template <>
+struct MakeOutput<Real>
+{
+  typedef GeomReal type;
+};
+template <>
+struct MakeOutput<RealVectorValue>
+{
+  typedef VectorValue<GeomReal> type;
+};
+template <>
+struct MakeOutput<RealTensorValue>
+{
+  typedef TensorValue<GeomReal> type;
+};
 
 //Forward Declarations
 template<typename T> class FEGenericBase;
@@ -38,10 +67,11 @@ class FEType;
  * \author Paul T. Bauman
  * \date 2012
  */
-template<typename OutputShape>
+template<typename OutputType>
 class FETransformationBase
 {
 public:
+  typedef typename MakeOutput<OutputType>::type OutputShape;
 
   FETransformationBase() = default;
   virtual ~FETransformationBase() = default;
@@ -49,22 +79,22 @@ public:
   /**
    * Builds an FETransformation object based on the finite element type
    */
-  static std::unique_ptr<FETransformationBase<OutputShape>> build(const FEType & type);
+  static std::unique_ptr<FETransformationBase<OutputType>> build(const FEType & type);
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const = 0;
+  virtual void init_map_phi(const FEGenericBase<OutputType> & fe) const = 0;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const = 0;
+  virtual void init_map_dphi(const FEGenericBase<OutputType> & fe) const = 0;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const = 0;
+  virtual void init_map_d2phi(const FEGenericBase<OutputType> & fe) const = 0;
 
   /**
    * Evaluates shape functions in physical coordinates based on proper
@@ -73,7 +103,7 @@ public:
   virtual void map_phi(const unsigned int dim,
                        const Elem * const elem,
                        const std::vector<Point> & qp,
-                       const FEGenericBase<OutputShape> & fe,
+                       const FEGenericBase<OutputType> & fe,
                        std::vector<std::vector<OutputShape>> & phi) const = 0;
 
   /**
@@ -83,8 +113,8 @@ public:
   virtual void map_dphi(const unsigned int dim,
                         const Elem * const elem,
                         const std::vector<Point> & qp,
-                        const FEGenericBase<OutputShape> & fe,
-                        std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & dphi,
+                        const FEGenericBase<OutputType> & fe,
+                        std::vector<std::vector<typename FEGenericBase<OutputType>::OutputGradient>> & dphi,
                         std::vector<std::vector<OutputShape>> & dphidx,
                         std::vector<std::vector<OutputShape>> & dphidy,
                         std::vector<std::vector<OutputShape>> & dphidz) const = 0;
@@ -96,8 +126,8 @@ public:
    */
   virtual void map_d2phi(const unsigned int dim,
                          const std::vector<Point> & qp,
-                         const FEGenericBase<OutputShape> & fe,
-                         std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> & d2phi,
+                         const FEGenericBase<OutputType> & fe,
+                         std::vector<std::vector<typename FEGenericBase<OutputType>::OutputTensor>> & d2phi,
                          std::vector<std::vector<OutputShape>> & d2phidx2,
                          std::vector<std::vector<OutputShape>> & d2phidxdy,
                          std::vector<std::vector<OutputShape>> & d2phidxdz,
@@ -114,7 +144,7 @@ public:
   virtual void map_curl(const unsigned int dim,
                         const Elem * const elem,
                         const std::vector<Point> & qp,
-                        const FEGenericBase<OutputShape> & fe,
+                        const FEGenericBase<OutputType> & fe,
                         std::vector<std::vector<OutputShape>> & curl_phi) const = 0;
 
   /**
@@ -124,8 +154,8 @@ public:
   virtual void map_div(const unsigned int dim,
                        const Elem * const elem,
                        const std::vector<Point> & qp,
-                       const FEGenericBase<OutputShape> & fe,
-                       std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> & div_phi) const = 0;
+                       const FEGenericBase<OutputType> & fe,
+                       std::vector<std::vector<typename FEGenericBase<OutputType>::OutputDivergence>> & div_phi) const = 0;
 
 }; // class FETransformationBase
 

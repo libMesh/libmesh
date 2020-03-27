@@ -26,8 +26,8 @@
 
 namespace libMesh
 {
-// Small helper function to make contains_point() more readable.
-inline bool is_between(Real min, Real check, Real max)
+// Small helper function to make intersects() more readable.
+inline bool is_between(const GeomReal & min, const GeomReal & check, const GeomReal & max)
 {
   return min <= check && check <= max;
 }
@@ -35,15 +35,15 @@ inline bool is_between(Real min, Real check, Real max)
 bool BoundingBox::contains_point (const Point & p) const
 {
   // Make local variables first to make things more clear in a moment
-  Real my_min_x = this->first(0);
-  Real my_max_x = this->second(0);
+  const GeomReal & my_min_x = this->first(0);
+  const GeomReal & my_max_x = this->second(0);
   bool x_int = is_between(my_min_x, p(0), my_max_x);
 
   bool intersection_true = x_int;
 
 #if LIBMESH_DIM > 1
-  Real my_min_y = this->first(1);
-  Real my_max_y = this->second(1);
+  const GeomReal & my_min_y = this->first(1);
+  const GeomReal & my_max_y = this->second(1);
   bool y_int = is_between(my_min_y, p(1), my_max_y);
 
   intersection_true = intersection_true && y_int;
@@ -51,8 +51,8 @@ bool BoundingBox::contains_point (const Point & p) const
 
 
 #if LIBMESH_DIM > 2
-  Real my_min_z = this->first(2);
-  Real my_max_z = this->second(2);
+  const GeomReal & my_min_z = this->first(2);
+  const GeomReal & my_max_z = this->second(2);
   bool z_int = is_between(my_min_z, p(2), my_max_z);
 
   intersection_true = intersection_true && z_int;
@@ -97,14 +97,14 @@ void BoundingBox::union_with (const BoundingBox & other_box)
 
 
 
-Real BoundingBox::signed_distance(const Point & p) const
+GeomReal BoundingBox::signed_distance(const Point & p) const
 {
   if (contains_point(p))
     {
       // Sign convention: if Point is inside the bbox, the distance is
       // negative. We then find the smallest distance to the different
       // sides of the box and return that.
-      Real min_dist = std::numeric_limits<Real>::max();
+      GeomReal min_dist = std::numeric_limits<Real>::max();
 
       for (unsigned int dir=0; dir<LIBMESH_DIM; ++dir)
         {
@@ -116,7 +116,7 @@ Real BoundingBox::signed_distance(const Point & p) const
     }
   else // p is outside the box
     {
-      Real dx[3] = {0., 0., 0.};
+      GeomReal dx[3] = {0., 0., 0.};
 
       // Compute distance "above"/"below" the box in each
       // direction. If the point is somewhere in between the (min,
@@ -136,7 +136,7 @@ Real BoundingBox::signed_distance(const Point & p) const
 
 void BoundingBox::scale(const Real factor)
 {
-  Real append;
+  GeomReal append;
   for (unsigned int dim = 0; dim != LIBMESH_DIM; ++dim)
   {
     if (this->first(dim) != std::numeric_limits<Real>::max() &&

@@ -6,6 +6,7 @@
 #include <libmesh/mesh_function.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/elem.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -18,10 +19,10 @@ Number projection_function (const Point & p,
                             const std::string &,
                             const std::string &)
 {
-  return
-    cos(.5*libMesh::pi*p(0)) *
-    sin(.5*libMesh::pi*p(1)) *
-    cos(.5*libMesh::pi*p(2));
+  return MetaPhysicL::raw_value(
+    cos(.5*libMesh::pi*MetaPhysicL::raw_value(p(0))) *
+    sin(.5*libMesh::pi*MetaPhysicL::raw_value(p(1))) *
+    cos(.5*libMesh::pi*MetaPhysicL::raw_value(p(2))));
 }
 
 Number trilinear_function (const Point & p,
@@ -29,7 +30,7 @@ Number trilinear_function (const Point & p,
                            const std::string &,
                            const std::string &)
 {
-  return 8*p(0) + 80*p(1) + 800*p(2);
+  return MetaPhysicL::raw_value(8*p(0) + 80*p(1) + 800*p(2));
 }
 
 
@@ -75,7 +76,7 @@ public:
     // Set a subdomain id for all elements, based on location.
     for (auto & elem : mesh.active_element_ptr_range())
       {
-        Point c = elem->vertex_average();
+        const auto &  c = MetaPhysicL::raw_value(elem->vertex_average());
         elem->subdomain_id() =
           subdomain_id_type(c(0)*4) + subdomain_id_type(c(1)*4)*10;
       }
@@ -89,10 +90,10 @@ public:
     es.init();
     sys.project_solution(trilinear_function, nullptr, es.parameters);
 
-    MeshFunction mesh_function (sys.get_equation_systems(),
-                                *sys.current_local_solution,
-                                sys.get_dof_map(),
-                                u_var);
+    MeshFunction<Number> mesh_function (sys.get_equation_systems(),
+                                        *sys.current_local_solution,
+                                        sys.get_dof_map(),
+                                        u_var);
 
     // Checkerboard pattern
     const std::set<subdomain_id_type> sbdids1 {0,2,11,13,20,22,31,33};
@@ -194,10 +195,10 @@ public:
     std::vector<unsigned int> variables {u_var};
 
     auto mesh_function =
-      std::make_unique<MeshFunction>(sys.get_equation_systems(),
-                                        *mesh_function_vector,
-                                        sys.get_dof_map(),
-                                        variables);
+      std::make_unique<MeshFunction<Number>>(sys.get_equation_systems(),
+                                             *mesh_function_vector,
+                                             sys.get_dof_map(),
+                                             variables);
 
     mesh_function->init();
     mesh_function->set_point_locator_tolerance(0.0001);

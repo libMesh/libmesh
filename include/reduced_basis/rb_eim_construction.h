@@ -244,8 +244,8 @@ public:
   /**
    * Get the interior and side quadrature weights.
    */
-  const std::unordered_map<dof_id_type, std::vector<Real> > & get_local_quad_point_JxW();
-  const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > & get_local_side_quad_point_JxW();
+  const std::unordered_map<dof_id_type, std::vector<GeomReal> > & get_local_quad_point_JxW();
+  const std::map<std::pair<dof_id_type,unsigned int>, std::vector<GeomReal> > & get_local_side_quad_point_JxW();
 
   /**
    * Get the number of parametrized functions used for training.
@@ -502,7 +502,7 @@ private:
    * generally will not start at zero.
    */
   std::unordered_map<dof_id_type, std::vector<Point> > _local_quad_point_locations;
-  std::unordered_map<dof_id_type, std::vector<Real> > _local_quad_point_JxW;
+  std::unordered_map<dof_id_type, std::vector<GeomReal> > _local_quad_point_JxW;
   std::unordered_map<dof_id_type, subdomain_id_type > _local_quad_point_subdomain_ids;
 
   /**
@@ -518,7 +518,7 @@ private:
    * Same as above except for side data.
    */
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<Point> > _local_side_quad_point_locations;
-  std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > _local_side_quad_point_JxW;
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<GeomReal> > _local_side_quad_point_JxW;
   std::map<std::pair<dof_id_type,unsigned int>, subdomain_id_type > _local_side_quad_point_subdomain_ids;
   std::map<std::pair<dof_id_type,unsigned int>, boundary_id_type > _local_side_quad_point_boundary_ids;
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > _local_side_quad_point_locations_perturbations;

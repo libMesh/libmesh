@@ -36,7 +36,7 @@ namespace {
 void hermite_nodal_soln(const Elem * elem,
                         const Order order,
                         const std::vector<Number> & elem_soln,
-                        std::vector<Number> & nodal_soln)
+                        std::vector<GeomNumber> & nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -276,7 +276,6 @@ unsigned int hermite_n_dofs_per_elem(const ElemType t,
 // Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(HERMITE, hermite_nodal_soln)
 LIBMESH_FE_SIDE_NODAL_SOLN(HERMITE)
-
 
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.

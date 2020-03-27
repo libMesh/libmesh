@@ -127,16 +127,16 @@ bool Edge4::has_invertible_map(Real tol) const
   // changes sign within the element. Either way, the element is not
   // invertible. Note: use <= tol, so that if someone passes 0 for tol
   // it still works.
-  Real c_norm = c.norm();
+  auto c_norm = c.norm();
   if (c_norm <= tol)
     return false;
 
   // Coefficients of the quadratic scalar function
   // j(xi) := dot(c.unit(), dx/dxi)
   //        = alpha*xi^2 + beta*xi + gamma
-  Real alpha = (a * c) / c_norm;
-  Real beta = (b * c) / c_norm;
-  Real gamma = c_norm;
+  auto alpha = (a * c) / c_norm;
+  auto beta = (b * c) / c_norm;
+  auto gamma = c_norm;
 
   // If alpha and beta are both (approximately) zero, then the
   // Jacobian is actually constant but it's not zero (as we already
@@ -153,13 +153,13 @@ bool Edge4::has_invertible_map(Real tol) const
       // Debugging:
       // libMesh::out << "alpha = " << alpha << ", std::abs(alpha) <= tol" << std::endl;
 
-      Real xi_0 = -gamma / beta;
+      auto xi_0 = -gamma / beta;
       return ((xi_0 < -1.) || (xi_0 > 1.));
     }
 
   // If alpha is not (approximately) zero, then j(xi) is quadratic
   // and we need to solve for the roots.
-  Real sqrt_term = beta*beta - 4*alpha*gamma;
+  auto sqrt_term = beta*beta - 4*alpha*gamma;
 
   // Debugging:
   // libMesh::out << "sqrt_term = " << sqrt_term << std::endl;
@@ -170,7 +170,7 @@ bool Edge4::has_invertible_map(Real tol) const
     return true;
 
   sqrt_term = std::sqrt(sqrt_term);
-  Real
+  auto
     xi_1 = 0.5 * (-beta + sqrt_term) / alpha,
     xi_2 = 0.5 * (-beta - sqrt_term) / alpha;
 
@@ -277,8 +277,8 @@ BoundingBox Edge4::loose_bounding_box () const
 
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
-      Real center = (this->point(2)(d) + this->point(3)(d))/2;
-      Real hd = std::max(std::abs(center - this->point(0)(d)),
+      GeomReal center = (this->point(2)(d) + this->point(3)(d))/2;
+      GeomReal hd = std::max(std::abs(center - this->point(0)(d)),
                          std::abs(center - this->point(1)(d)));
 
       pmin(d) = center - hd;
@@ -300,7 +300,7 @@ dof_id_type Edge4::key () const
 
 
 
-Real Edge4::volume () const
+GeomReal Edge4::volume () const
 {
   // Make copies of our points.  It makes the subsequent calculations a bit
   // shorter and avoids dereferencing the same pointer multiple times.
@@ -329,7 +329,7 @@ Real Edge4::volume () const
                      (18 + std::sqrt(30.)) / 36,
                      (18 - std::sqrt(30.)) / 36};
 
-  Real vol=0.;
+  GeomReal vol=0.;
   for (unsigned int i=0; i<N; ++i)
     vol += w[i] * (q[i]*q[i]*a1 + q[i]*b1 + c1).norm();
 

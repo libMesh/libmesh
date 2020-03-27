@@ -117,7 +117,7 @@ protected:
    * Pointer to function that provides BC information.
    */
   std::pair<bool,Real> (* _bc_function) (const System & system,
-                                         const Point & p,
+                                         const Point & point,
                                          const std::string & var_name);
 };
 

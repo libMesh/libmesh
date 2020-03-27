@@ -31,7 +31,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(1,L2_LAGRANGE)
 
 
 template <>
-Real FE<1,LAGRANGE>::shape(const ElemType,
+GeomReal FE<1,LAGRANGE>::shape(const ElemType,
                            const Order order,
                            const unsigned int i,
                            const Point & p)
@@ -40,7 +40,7 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
 }
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape(const ElemType,
+GeomReal FE<1,L2_LAGRANGE>::shape(const ElemType,
                               const Order order,
                               const unsigned int i,
                               const Point & p)
@@ -50,7 +50,7 @@ Real FE<1,L2_LAGRANGE>::shape(const ElemType,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape(const Elem * elem,
+GeomReal FE<1,LAGRANGE>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
                            const Point & p,
@@ -64,7 +64,7 @@ Real FE<1,LAGRANGE>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape(const FEType fet,
+GeomReal FE<1,LAGRANGE>::shape(const FEType fet,
                            const Elem * elem,
                            const unsigned int i,
                            const Point & p,
@@ -75,7 +75,7 @@ Real FE<1,LAGRANGE>::shape(const FEType fet,
 }
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape(const Elem * elem,
+GeomReal FE<1,L2_LAGRANGE>::shape(const Elem * elem,
                               const Order order,
                               const unsigned int i,
                               const Point & p,
@@ -87,7 +87,7 @@ Real FE<1,L2_LAGRANGE>::shape(const Elem * elem,
 }
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape(const FEType fet,
+GeomReal FE<1,L2_LAGRANGE>::shape(const FEType fet,
                               const Elem * elem,
                               const unsigned int i,
                               const Point & p,
@@ -100,7 +100,7 @@ Real FE<1,L2_LAGRANGE>::shape(const FEType fet,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
+GeomReal FE<1,LAGRANGE>::shape_deriv(const ElemType,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -112,7 +112,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
+GeomReal FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
@@ -124,7 +124,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
+GeomReal FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -139,7 +139,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape_deriv(const Elem * elem,
+GeomReal FE<1,L2_LAGRANGE>::shape_deriv(const Elem * elem,
                                     const Order order,
                                     const unsigned int i,
                                     const unsigned int j,
@@ -153,7 +153,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape_deriv(const FEType fet,
+GeomReal FE<1,LAGRANGE>::shape_deriv(const FEType fet,
                                  const Elem * elem,
                                  const unsigned int i,
                                  const unsigned int j,
@@ -166,7 +166,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape_deriv(const FEType fet,
+GeomReal FE<1,L2_LAGRANGE>::shape_deriv(const FEType fet,
                                     const Elem * elem,
                                     const unsigned int i,
                                     const unsigned int j,
@@ -181,7 +181,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
+GeomReal FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
@@ -193,7 +193,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape_second_deriv(const ElemType,
+GeomReal FE<1,L2_LAGRANGE>::shape_second_deriv(const ElemType,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -205,7 +205,7 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape_second_deriv(const Elem * elem,
+GeomReal FE<1,LAGRANGE>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
@@ -220,7 +220,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
+GeomReal FE<1,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -234,7 +234,7 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,LAGRANGE>::shape_second_deriv(const FEType fet,
+GeomReal FE<1,LAGRANGE>::shape_second_deriv(const FEType fet,
                                         const Elem * elem,
                                         const unsigned int i,
                                         const unsigned int j,
@@ -247,7 +247,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const FEType fet,
 
 
 template <>
-Real FE<1,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
+GeomReal FE<1,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
                                            const Elem * elem,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -261,4 +261,3 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 } // namespace libMesh
-

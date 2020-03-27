@@ -20,6 +20,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -27,7 +28,7 @@ namespace libMesh
 // An excellent discussion of Nedelec shape functions is given in
 // http://www.dealii.org/developer/reports/nedelec/nedelec.pdf
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
                                       const Point & p,
@@ -49,59 +50,59 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
             {
               libmesh_assert_less (i, 4);
 
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               // Even with a loose inverse_map tolerance we ought to
               // be nearly on the element interior in master
               // coordinates
-              libmesh_assert_less_equal ( std::fabs(xi), 1.0+10*TOLERANCE );
-              libmesh_assert_less_equal ( std::fabs(eta), 1.0+10*TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(MetaPhysicL::raw_value(xi)), 1.0+10*TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(MetaPhysicL::raw_value(eta)), 1.0+10*TOLERANCE );
 
               switch(i)
                 {
                 case 0:
                   {
                     if (elem->point(0) > elem->point(1))
-                      return RealGradient( -0.25*(1.0-eta), 0.0 );
+                      return GeomRealGradient( -0.25*(1.0-eta), 0.0 );
                     else
-                      return RealGradient( 0.25*(1.0-eta), 0.0 );
+                      return GeomRealGradient( 0.25*(1.0-eta), 0.0 );
                   }
                 case 1:
                   {
                     if (elem->point(1) > elem->point(2))
-                      return RealGradient( 0.0, -0.25*(1.0+xi) );
+                      return GeomRealGradient( 0.0, -0.25*(1.0+xi) );
                     else
-                      return RealGradient( 0.0, 0.25*(1.0+xi) );
+                      return GeomRealGradient( 0.0, 0.25*(1.0+xi) );
                   }
 
                 case 2:
                   {
                     if (elem->point(2) > elem->point(3))
-                      return RealGradient( 0.25*(1.0+eta), 0.0 );
+                      return GeomRealGradient( 0.25*(1.0+eta), 0.0 );
                     else
-                      return RealGradient( -0.25*(1.0+eta), 0.0 );
+                      return GeomRealGradient( -0.25*(1.0+eta), 0.0 );
                   }
                 case 3:
                   {
                     if (elem->point(3) > elem->point(0))
-                      return RealGradient( 0.0, -0.25*(xi-1.0) );
+                      return GeomRealGradient( 0.0, -0.25*(xi-1.0) );
                     else
-                      return RealGradient( 0.0, 0.25*(xi-1.0) );
+                      return GeomRealGradient( 0.0, 0.25*(xi-1.0) );
                   }
 
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
 
-              return RealGradient();
+              return GeomRealGradient();
             }
 
           case TRI6:
           case TRI7:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 3);
 
@@ -110,24 +111,24 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                 case 0:
                   {
                     if (elem->point(0) > elem->point(1))
-                      return RealGradient( -1.0+eta, -xi );
+                      return GeomRealGradient( -1.0+eta, -xi );
                     else
-                      return RealGradient( 1.0-eta, xi );
+                      return GeomRealGradient( 1.0-eta, xi );
                   }
                 case 1:
                   {
                     if (elem->point(1) > elem->point(2))
-                      return RealGradient( eta, -xi );
+                      return GeomRealGradient( eta, -xi );
                     else
-                      return RealGradient( -eta, xi );
+                      return GeomRealGradient( -eta, xi );
                   }
 
                 case 2:
                   {
                     if (elem->point(2) > elem->point(0))
-                      return RealGradient( eta, -xi+1.0 );
+                      return GeomRealGradient( eta, -xi+1.0 );
                     else
-                      return RealGradient( -eta, xi-1.0 );
+                      return GeomRealGradient( -eta, xi-1.0 );
                   }
 
                 default:
@@ -154,18 +155,18 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
 
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape(const ElemType,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const Point &)
 {
   libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
-  return RealGradient();
+  return GeomRealGradient();
 }
 
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape(const FEType fet,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape(const FEType fet,
                                       const Elem * elem,
                                       const unsigned int i,
                                       const Point & p,
@@ -175,7 +176,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const FEType fet,
 }
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                                             const Order order,
                                             const unsigned int i,
                                             const unsigned int j,
@@ -209,20 +210,20 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                       {
                       case 0:
                       case 2:
-                        return RealGradient();
+                        return GeomRealGradient();
                       case 1:
                         {
                           if (elem->point(1) > elem->point(2))
-                            return RealGradient( 0.0, -0.25 );
+                            return GeomRealGradient( 0.0, -0.25 );
                           else
-                            return RealGradient( 0.0, 0.25 );
+                            return GeomRealGradient( 0.0, 0.25 );
                         }
                       case 3:
                         {
                           if (elem->point(3) > elem->point(0))
-                            return RealGradient( 0.0, -0.25 );
+                            return GeomRealGradient( 0.0, -0.25 );
                           else
-                            return RealGradient( 0.0, 0.25 );
+                            return GeomRealGradient( 0.0, 0.25 );
                         }
                       default:
                         libmesh_error_msg("Invalid i = " << i);
@@ -236,20 +237,20 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                       {
                       case 1:
                       case 3:
-                        return RealGradient();
+                        return GeomRealGradient();
                       case 0:
                         {
                           if (elem->point(0) > elem->point(1))
-                            return RealGradient( 0.25 );
+                            return GeomRealGradient( 0.25 );
                           else
-                            return RealGradient( -0.25 );
+                            return GeomRealGradient( -0.25 );
                         }
                       case 2:
                         {
                           if (elem->point(2) > elem->point(3))
-                            return RealGradient( 0.25 );
+                            return GeomRealGradient( 0.25 );
                           else
-                            return RealGradient( -0.25 );
+                            return GeomRealGradient( -0.25 );
                         }
                       default:
                         libmesh_error_msg("Invalid i = " << i);
@@ -260,7 +261,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                   libmesh_error_msg("Invalid j = " << j);
                 }
 
-              return RealGradient();
+              return GeomRealGradient();
             }
 
           case TRI6:
@@ -300,12 +301,12 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                   // d()/dxi
                 case 0:
                   {
-                    return RealGradient( 0.0, f*1.0);
+                    return GeomRealGradient( 0.0, f*1.0);
                   }
                   // d()/deta
                 case 1:
                   {
-                    return RealGradient( f*(-1.0) );
+                    return GeomRealGradient( f*(-1.0) );
                   }
                 default:
                   libmesh_error_msg("Invalid j = " << j);
@@ -329,18 +330,18 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
 
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const ElemType,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape_deriv(const ElemType,
                                             const Order,
                                             const unsigned int,
                                             const unsigned int,
                                             const Point &)
 {
   libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
-  return RealGradient();
+  return GeomRealGradient();
 }
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const FEType fet,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape_deriv(const FEType fet,
                                             const Elem * elem,
                                             const unsigned int i,
                                             const unsigned int j,
@@ -357,7 +358,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                                                    const Order order,
                                                    const unsigned int libmesh_dbg_var(i),
                                                    const unsigned int libmesh_dbg_var(j),
@@ -386,7 +387,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
             {
               libmesh_assert_less (i, 4);
               // All second derivatives for linear quads are zero.
-              return RealGradient();
+              return GeomRealGradient();
             }
 
           case TRI6:
@@ -394,7 +395,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
             {
               libmesh_assert_less (i, 3);
               // All second derivatives for linear triangles are zero.
-              return RealGradient();
+              return GeomRealGradient();
             }
 
           default:
@@ -419,19 +420,19 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
                                                    const Order,
                                                    const unsigned int,
                                                    const unsigned int,
                                                    const Point &)
 {
   libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
-  return RealGradient();
+  return GeomRealGradient();
 }
 
 
 template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const FEType fet,
+GeomRealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const FEType fet,
                                                    const Elem * elem,
                                                    const unsigned int i,
                                                    const unsigned int j,

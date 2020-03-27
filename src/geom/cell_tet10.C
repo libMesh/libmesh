@@ -624,7 +624,7 @@ Real Tet10::embedding_matrix (const unsigned int i,
 
 
 
-Real Tet10::volume () const
+GeomReal Tet10::volume () const
 {
   // This specialization is good for Lagrange mappings only
   if (this->mapping_type() != LAGRANGE_MAP)
@@ -719,7 +719,7 @@ Real Tet10::volume () const
       Real(1.2764656212038543100867773351792e-01L)
     };
 
-  Real vol = 0.;
+  GeomReal vol = 0.;
   for (int q=0; q<N; ++q)
     {
       // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.

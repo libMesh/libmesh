@@ -254,11 +254,14 @@ public:
             for (const auto d : make_range(LIBMESH_DIM))
               {
                 // Getting a little FP error from Pyramid18
-                LIBMESH_ASSERT_FP_EQUAL(centroid(d), new_centroid(d),
+                LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(centroid(d)),
+                                        MetaPhysicL::raw_value(new_centroid(d)),
                                         TOLERANCE*std::sqrt(TOLERANCE));
-                LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
+                LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(vertex_avg(d)),
+                                        MetaPhysicL::raw_value(new_vertex_avg(d)),
                                         TOLERANCE*TOLERANCE);
-                LIBMESH_ASSERT_FP_EQUAL(quasicc(d), new_quasicc(d),
+                LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(quasicc(d)),
+                                        MetaPhysicL::raw_value(new_quasicc(d)),
                                         TOLERANCE*TOLERANCE);
               }
           }
@@ -331,7 +334,8 @@ public:
 
         const Point new_vertex_avg = elem->vertex_average();
         for (const auto d : make_range(LIBMESH_DIM))
-          LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
+          LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(vertex_avg(d)),
+                                  MetaPhysicL::raw_value(new_vertex_avg(d)),
                                   TOLERANCE*TOLERANCE);
       }
   }
@@ -395,7 +399,8 @@ public:
 
         const Point new_vertex_avg = elem->vertex_average();
         for (const auto d : make_range(LIBMESH_DIM))
-          LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
+          LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(vertex_avg(d)),
+                                  MetaPhysicL::raw_value(new_vertex_avg(d)),
                                   TOLERANCE*TOLERANCE);
       }
   }

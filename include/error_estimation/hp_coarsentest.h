@@ -130,14 +130,14 @@ protected:
   /**
    * The shape functions and their derivatives
    */
-  const std::vector<std::vector<Real>> * phi, * phi_coarse;
-  const std::vector<std::vector<RealGradient>> * dphi, * dphi_coarse;
-  const std::vector<std::vector<RealTensor>> * d2phi, * d2phi_coarse;
+  std::vector<std::vector<Real>> phi, phi_coarse;
+  std::vector<std::vector<RealGradient>> dphi, dphi_coarse;
+  std::vector<std::vector<RealTensor>> d2phi, d2phi_coarse;
 
   /**
    * Mapping jacobians
    */
-  const std::vector<Real> * JxW;
+  std::vector<Real> JxW;
 
   /**
    * Quadrature locations

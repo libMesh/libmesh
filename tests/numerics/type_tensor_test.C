@@ -108,7 +108,7 @@ private:
     LOG_UNIT_TEST;
 
     {
-      Point x(1, 0, 0);
+      RawPoint x(1, 0, 0);
       const auto R = RealTensorValue::extrinsic_rotation_matrix(90, 0, 0);
       auto rotated = R * x;
       constexpr auto tol = TOLERANCE * TOLERANCE;
@@ -124,7 +124,7 @@ private:
     }
 
     {
-      Point x(1, 1, 1);
+      RawPoint x(1, 1, 1);
       const auto R = RealTensorValue::extrinsic_rotation_matrix(90, 90, 90);
       auto rotated = R * x;
 

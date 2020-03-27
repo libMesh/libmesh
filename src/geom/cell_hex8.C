@@ -384,13 +384,13 @@ Point Hex8::centroid_from_points(
   static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
 
   // Compute nodal volumes
-  std::array<Real, Hex8::num_nodes> V{};
+  std::array<GeomReal, Hex8::num_nodes> V{};
 
   for (const auto & xi : q)
     for (const auto & eta : q)
       for (const auto & zeta : q)
       {
-        Real jxw = triple_product(a1*eta*zeta + b1*eta + c1*zeta + d1,
+        auto jxw = triple_product(a1*eta*zeta + b1*eta + c1*zeta + d1,
                                   a2*xi*zeta  + b2*xi  + c2*zeta + d2,
                                   a3*xi*eta   + b3*xi  + c3*eta  + d3);
 
@@ -416,7 +416,7 @@ Point Hex8::true_centroid () const
 }
 
 
-Real Hex8::volume () const
+GeomReal Hex8::volume () const
 {
   // Make copies of our points.  It makes the subsequent calculations a bit
   // shorter and avoids dereferencing the same pointer multiple times.

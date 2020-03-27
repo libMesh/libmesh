@@ -24,6 +24,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h"
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <time.h> // for clock_t, clock()
@@ -239,7 +240,7 @@ int VariationalMeshSmoother::writegr(const Array2D<Real> & R)
         // For each node set its X Y [Z] coordinates
         for (unsigned int j=0; j<_dim; j++)
           {
-            Real distance = R[i][j] - node_ref(j);
+            Real distance = R[i][j] - MetaPhysicL::raw_value(node_ref(j));
 
             // Save the squares of the distance
             total_dist += Utility::pow<2>(distance);
@@ -294,7 +295,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
 
         // For each node grab its X Y [Z] coordinates
         for (unsigned int j=0; j<_dim; j++)
-          R[i][j] = node_ref(j);
+          R[i][j] = MetaPhysicL::raw_value(node_ref(j));
 
         // Set the Proper Mask
         // Internal nodes are 0
@@ -311,8 +312,8 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
                 MeshTools::find_nodal_neighbors(_mesh, node_ref, nodes_to_elem_map, neighbors);
 
                 // Grab the x,y coordinates
-                Real x = node_ref(0);
-                Real y = node_ref(1);
+                Real x = MetaPhysicL::raw_value(node_ref(0));
+                Real y = MetaPhysicL::raw_value(node_ref(1));
 
                 // Theta will represent the atan2 angle (meaning with the proper quadrant in mind)
                 // of the neighbor node in a system where the current node is at the origin
@@ -324,7 +325,8 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
                   {
                     // Note that the x and y values of this node are subtracted off
                     // this centers the system around this node
-                    theta = atan2((*neighbor)(1)-y, (*neighbor)(0)-x);
+                    theta = atan2(MetaPhysicL::raw_value((*neighbor)(1))-y,
+                                  MetaPhysicL::raw_value((*neighbor)(0))-x);
 
                     // Save it for later
                     thetas.push_back(theta);
@@ -4040,7 +4042,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
                 // tri
                 basisA(Q, 3, K, Q, 1);
 
-                Point a1, a2;
+                RealVectorValue a1, a2;
                 for (int k=0; k<2; k++)
                   for (int l=0; l<3; l++)
                     {
@@ -4109,11 +4111,11 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
 
                     // "dx"
-                    Point a1(first_neighbor_x - node_x,
+                    RealVectorValue a1(first_neighbor_x - node_x,
                              second_neighbor_x - node_x);
 
                     // "dy"
-                    Point a2(first_neighbor_y - node_y,
+                    RealVectorValue a2(first_neighbor_y - node_y,
                              second_neighbor_y - node_y);
 
                     det = jac2(a1(0), a1(1), a2(0), a2(1));
@@ -4161,7 +4163,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
                 // tetr
                 basisA(Q, 4, K, Q, 1);
 
-                Point a1, a2, a3;
+                RealVectorValue a1, a2, a3;
 
                 for (int k=0; k<3; k++)
                   for (int l=0; l<4; l++)
@@ -4250,19 +4252,19 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
                       third_neighbor_z = R[cells[i][third_neighbor_index]][2];
 
                     // "dx"
-                    Point a1(first_neighbor_x - node_x,
-                             second_neighbor_x - node_x,
-                             third_neighbor_x - node_x);
+                    RealVectorValue a1(first_neighbor_x - node_x,
+                                       second_neighbor_x - node_x,
+                                       third_neighbor_x - node_x);
 
                     // "dy"
-                    Point a2(first_neighbor_y - node_y,
-                             second_neighbor_y - node_y,
-                             third_neighbor_y - node_y);
+                    RealVectorValue a2(first_neighbor_y - node_y,
+                                       second_neighbor_y - node_y,
+                                       third_neighbor_y - node_y);
 
                     // "dz"
-                    Point a3(first_neighbor_z - node_z,
-                             second_neighbor_z - node_z,
-                             third_neighbor_z - node_z);
+                    RealVectorValue a3(first_neighbor_z - node_z,
+                                       second_neighbor_z - node_z,
+                                       third_neighbor_z - node_z);
 
                     det = jac3(a1(0), a1(1), a1(2),
                                a2(0), a2(1), a2(2),

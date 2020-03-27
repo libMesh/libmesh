@@ -29,8 +29,8 @@ namespace libMesh
 {
 
 inline
-Real fe_lagrange_1D_linear_shape(const unsigned int i,
-                                 const Real xi)
+GeomReal fe_lagrange_1D_linear_shape(const unsigned int i,
+                                 const GeomReal xi)
 {
   libmesh_assert_less (i, 2);
 
@@ -50,8 +50,8 @@ Real fe_lagrange_1D_linear_shape(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_quadratic_shape(const unsigned int i,
-                                    const Real xi)
+GeomReal fe_lagrange_1D_quadratic_shape(const unsigned int i,
+                                    const GeomReal xi)
 {
   libmesh_assert_less (i, 3);
 
@@ -74,8 +74,8 @@ Real fe_lagrange_1D_quadratic_shape(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_cubic_shape(const unsigned int i,
-                                const Real xi)
+GeomReal fe_lagrange_1D_cubic_shape(const unsigned int i,
+                                const GeomReal xi)
 {
   libmesh_assert_less (i, 4);
 
@@ -101,9 +101,9 @@ Real fe_lagrange_1D_cubic_shape(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_shape(const Order order,
+GeomReal fe_lagrange_1D_shape(const Order order,
                           const unsigned int i,
-                          const Real xi)
+                          const GeomReal xi)
 {
   switch (order)
     {
@@ -127,9 +127,9 @@ Real fe_lagrange_1D_shape(const Order order,
 
 
 inline
-Real fe_lagrange_1D_linear_shape_deriv(const unsigned int i,
+GeomReal fe_lagrange_1D_linear_shape_deriv(const unsigned int i,
                                        const unsigned int libmesh_dbg_var(j),
-                                       const Real)
+                                       const GeomReal)
 {
   // only d()/dxi in 1D!
   libmesh_assert_equal_to (j, 0);
@@ -151,9 +151,9 @@ Real fe_lagrange_1D_linear_shape_deriv(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_quadratic_shape_deriv(const unsigned int i,
+GeomReal fe_lagrange_1D_quadratic_shape_deriv(const unsigned int i,
                                           const unsigned int libmesh_dbg_var(j),
-                                          const Real xi)
+                                          const GeomReal xi)
 {
   // only d()/dxi in 1D!
   libmesh_assert_equal_to (j, 0);
@@ -178,9 +178,9 @@ Real fe_lagrange_1D_quadratic_shape_deriv(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
+GeomReal fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
                                       const unsigned int libmesh_dbg_var(j),
-                                      const Real xi)
+                                      const GeomReal xi)
 {
   // only d()/dxi in 1D!
   libmesh_assert_equal_to (j, 0);
@@ -209,10 +209,10 @@ Real fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_shape_deriv(const Order order,
+GeomReal fe_lagrange_1D_shape_deriv(const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
-                                const Real xi)
+                                const GeomReal xi)
 {
   switch (order)
     {
@@ -237,9 +237,9 @@ Real fe_lagrange_1D_shape_deriv(const Order order,
 
 
 inline
-Real fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
+GeomReal fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
                                                  const unsigned int libmesh_dbg_var(j),
-                                                 const Real)
+                                                 const GeomReal)
 {
   // Don't need to switch on j.  1D shape functions
   // depend on xi only!
@@ -263,9 +263,9 @@ Real fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
+GeomReal fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
                                              const unsigned int libmesh_dbg_var(j),
-                                             const Real xi)
+                                             const GeomReal xi)
 {
   // Don't need to switch on j.  1D shape functions
   // depend on xi only!
@@ -293,10 +293,10 @@ Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
 
 
 inline
-Real fe_lagrange_1D_shape_second_deriv(const Order order,
+GeomReal fe_lagrange_1D_shape_second_deriv(const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
-                                       const Real xi)
+                                       const GeomReal xi)
 {
   switch (order)
     {

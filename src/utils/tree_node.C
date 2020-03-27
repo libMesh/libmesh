@@ -26,6 +26,7 @@
 #include "libmesh/tree_node.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/elem.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -95,15 +96,14 @@ bool TreeNode<N>::insert (const Elem * elem)
       ((min) <= (check) && (check) <= (max))
 
       // Make local variables first to make things more clear in a moment
-      const Real & elem_min_x = bbox.first(0);
-      const Real & elem_max_x = bbox.second(0);
-      const Real & tree_min_x = this->bounding_box.first(0);
-      const Real & tree_max_x = this->bounding_box.second(0);
-
-      const Real & elem_min_y = bbox.first(1);
-      const Real & elem_max_y = bbox.second(1);
-      const Real & tree_min_y = this->bounding_box.first(1);
-      const Real & tree_max_y = this->bounding_box.second(1);
+      const auto elem_min_x = MetaPhysicL::raw_value(bbox.first(0));
+      const auto elem_max_x = MetaPhysicL::raw_value(bbox.second(0));
+      const auto tree_min_x = MetaPhysicL::raw_value(this->bounding_box.first(0));
+      const auto tree_max_x = MetaPhysicL::raw_value(this->bounding_box.second(0));
+      const auto elem_min_y = MetaPhysicL::raw_value(bbox.first(1));
+      const auto elem_max_y = MetaPhysicL::raw_value(bbox.second(1));
+      const auto tree_min_y = MetaPhysicL::raw_value(this->bounding_box.first(1));
+      const auto tree_max_y = MetaPhysicL::raw_value(this->bounding_box.second(1));
 
       bool x_int =
         IS_BETWEEN(elem_min_x, tree_min_x, elem_max_x) ||
@@ -124,10 +124,10 @@ bool TreeNode<N>::insert (const Elem * elem)
       bool z_match = true;
       if (LIBMESH_DIM == 3)
         {
-          const Real & elem_min_z = bbox.first(2);
-          const Real & elem_max_z = bbox.second(2);
-          const Real & tree_min_z = this->bounding_box.first(2);
-          const Real & tree_max_z = this->bounding_box.second(2);
+          const auto elem_min_z = MetaPhysicL::raw_value(bbox.first(2));
+          const auto elem_max_z = MetaPhysicL::raw_value(bbox.second(2));
+          const auto tree_min_z = MetaPhysicL::raw_value(this->bounding_box.first(2));
+          const auto tree_max_z = MetaPhysicL::raw_value(this->bounding_box.second(2));
 
           z_match =
             (std::abs(elem_min_z - elem_max_z) < TOLERANCE) &&
@@ -265,8 +265,8 @@ template <unsigned int N>
 bool TreeNode<N>::bounds_point (const Point & p,
                                 Real relative_tol) const
 {
-  const Point & min = bounding_box.first;
-  const Point & max = bounding_box.second;
+  const auto & min = MetaPhysicL::raw_value(bounding_box.first);
+  const auto & max = MetaPhysicL::raw_value(bounding_box.second);
 
   const Real tol = (max - min).norm() * relative_tol;
 
@@ -297,17 +297,16 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
       // How to refine an OctTree Node
     case 8:
       {
-        const Real xmin = bounding_box.first(0);
-        const Real ymin = bounding_box.first(1);
-        const Real zmin = bounding_box.first(2);
+        const auto xmin = MetaPhysicL::raw_value(bounding_box.first(0));
+        const auto ymin = MetaPhysicL::raw_value(bounding_box.first(1));
+        const auto zmin = MetaPhysicL::raw_value(bounding_box.first(2));
+        const auto xmax = MetaPhysicL::raw_value(bounding_box.second(0));
+        const auto ymax = MetaPhysicL::raw_value(bounding_box.second(1));
+        const auto zmax = MetaPhysicL::raw_value(bounding_box.second(2));
 
-        const Real xmax = bounding_box.second(0);
-        const Real ymax = bounding_box.second(1);
-        const Real zmax = bounding_box.second(2);
-
-        const Real xc = .5*(xmin + xmax);
-        const Real yc = .5*(ymin + ymax);
-        const Real zc = .5*(zmin + zmax);
+        const auto xc = .5*(xmin + xmax);
+        const auto yc = .5*(ymin + ymax);
+        const auto zc = .5*(zmin + zmax);
 
         switch (c)
           {
@@ -345,14 +344,13 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
       // How to refine an QuadTree Node
     case 4:
       {
-        const Real xmin = bounding_box.first(0);
-        const Real ymin = bounding_box.first(1);
+        const auto xmin = MetaPhysicL::raw_value(bounding_box.first(0));
+        const auto ymin = MetaPhysicL::raw_value(bounding_box.first(1));
+        const auto xmax = MetaPhysicL::raw_value(bounding_box.second(0));
+        const auto ymax = MetaPhysicL::raw_value(bounding_box.second(1));
 
-        const Real xmax = bounding_box.second(0);
-        const Real ymax = bounding_box.second(1);
-
-        const Real xc = .5*(xmin + xmax);
-        const Real yc = .5*(ymin + ymax);
+        const auto xc = .5*(xmin + xmax);
+        const auto yc = .5*(ymin + ymax);
 
         switch (c)
           {
@@ -378,11 +376,10 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
       // How to refine a BinaryTree Node
     case 2:
       {
-        const Real xmin = bounding_box.first(0);
+        const auto xmin = MetaPhysicL::raw_value(bounding_box.first(0));
+        const auto xmax = MetaPhysicL::raw_value(bounding_box.second(0));
 
-        const Real xmax = bounding_box.second(0);
-
-        const Real xc = .5*(xmin + xmax);
+        const auto xc = .5*(xmin + xmax);
 
         switch (c)
           {

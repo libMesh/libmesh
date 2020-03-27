@@ -967,7 +967,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                 dof_object.processor_id() == DofObject::invalid_processor_id);
       };
 
-      Real volume = 0;
+      GeomReal volume = 0;
 
       // Add bounding box information
       const auto bbox = global ? MeshTools::create_bounding_box(*this) : MeshTools::create_local_bounding_box(*this);
@@ -1078,7 +1078,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
       struct SidesetInfo
       {
         std::size_t num_sides = 0;
-        Real volume = 0;
+        GeomReal volume = 0;
         std::set<int> side_elem_types;
         std::set<int> elem_types;
         std::set<dof_id_type> elem_ids;
@@ -1268,7 +1268,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
       struct SubdomainInfo
       {
         std::size_t num_elems = 0;
-        Real volume = 0;
+        GeomReal volume = 0;
         std::set<int> elem_types;
         std::set<dof_id_type> active_node_ids;
 #ifdef LIBMESH_ENABLE_AMR

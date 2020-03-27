@@ -292,7 +292,7 @@ public:
    * For \p InfFE, use \p get_JxWxdecay_sq() instead.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_JxW() const
+  const std::vector<GeomReal> & get_JxW() const
   { calculate_map = true; return this->_fe_map->get_JxW(); }
 
   /**
@@ -300,7 +300,7 @@ public:
    * points.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_dxyzdxi() const
+  const std::vector<GeomRealGradient> & get_dxyzdxi() const
   { calculate_map = true; return this->_fe_map->get_dxyzdxi(); }
 
   /**
@@ -308,7 +308,7 @@ public:
    * points.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_dxyzdeta() const
+  const std::vector<GeomRealGradient> & get_dxyzdeta() const
   { calculate_map = true; return this->_fe_map->get_dxyzdeta(); }
 
   /**
@@ -316,7 +316,7 @@ public:
    * points.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_dxyzdzeta() const
+  const std::vector<GeomRealGradient> & get_dxyzdzeta() const
   { return _fe_map->get_dxyzdzeta(); }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -325,42 +325,42 @@ public:
    * \returns The second partial derivatives in xi.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_d2xyzdxi2() const
+  const std::vector<GeomRealGradient> & get_d2xyzdxi2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxi2(); }
 
   /**
    * \returns The second partial derivatives in eta.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_d2xyzdeta2() const
+  const std::vector<GeomRealGradient> & get_d2xyzdeta2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdeta2(); }
 
   /**
    * \returns The second partial derivatives in zeta.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_d2xyzdzeta2() const
+  const std::vector<GeomRealGradient> & get_d2xyzdzeta2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdzeta2(); }
 
   /**
    * \returns The second partial derivatives in xi-eta.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_d2xyzdxideta() const
+  const std::vector<GeomRealGradient> & get_d2xyzdxideta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxideta(); }
 
   /**
    * \returns The second partial derivatives in xi-zeta.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_d2xyzdxidzeta() const
+  const std::vector<GeomRealGradient> & get_d2xyzdxidzeta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxidzeta(); }
 
   /**
    * \returns The second partial derivatives in eta-zeta.
    */
   virtual_for_inffe
-  const std::vector<RealGradient> & get_d2xyzdetadzeta() const
+  const std::vector<GeomRealGradient> & get_d2xyzdetadzeta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdetadzeta(); }
 
 #endif
@@ -370,7 +370,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_dxidx() const
+  const std::vector<GeomReal> & get_dxidx() const
   { calculate_map = true; return this->_fe_map->get_dxidx(); }
 
   /**
@@ -378,7 +378,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_dxidy() const
+  const std::vector<GeomReal> & get_dxidy() const
   { calculate_map = true; return this->_fe_map->get_dxidy(); }
 
   /**
@@ -386,7 +386,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_dxidz() const
+  const std::vector<GeomReal> & get_dxidz() const
   { calculate_map = true; return this->_fe_map->get_dxidz(); }
 
   /**
@@ -394,7 +394,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_detadx() const
+  const std::vector<GeomReal> & get_detadx() const
   { calculate_map = true; return this->_fe_map->get_detadx(); }
 
   /**
@@ -402,7 +402,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_detady() const
+  const std::vector<GeomReal> & get_detady() const
   { calculate_map = true; return this->_fe_map->get_detady(); }
 
   /**
@@ -410,7 +410,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_detadz() const
+  const std::vector<GeomReal> & get_detadz() const
   { calculate_map = true; return this->_fe_map->get_detadz(); }
 
   /**
@@ -418,7 +418,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_dzetadx() const
+  const std::vector<GeomReal> & get_dzetadx() const
   { calculate_map = true; return this->_fe_map->get_dzetadx(); }
 
   /**
@@ -426,7 +426,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_dzetady() const
+  const std::vector<GeomReal> & get_dzetady() const
   { calculate_map = true; return this->_fe_map->get_dzetady(); }
 
   /**
@@ -434,7 +434,7 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_dzetadz() const
+  const std::vector<GeomReal> & get_dzetadz() const
   { calculate_map = true; return this->_fe_map->get_dzetadz(); }
 
   /**
@@ -456,7 +456,7 @@ public:
    * \returns The curvatures for use in face integration.
    */
   virtual_for_inffe
-  const std::vector<Real> & get_curvatures() const
+  const std::vector<GeomReal> & get_curvatures() const
   { calculate_map = true; return this->_fe_map->get_curvatures();}
 
 #endif

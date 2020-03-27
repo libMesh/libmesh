@@ -32,7 +32,7 @@ Point Face::quasicircumcenter () const
 
   // We have to use vertex-polygon area rather than real area if we
   // want this to be consistent for faces with curved edges
-  Real total_area = 0;
+  GeomReal total_area = 0;
   Point weighted_cc_sum;
 
   for (auto v : make_range(2u, this->n_vertices()))
@@ -43,8 +43,8 @@ Point Face::quasicircumcenter () const
       const Point a = p1-p0;
       const Point b = p2-p0;
       const Point axb = a.cross(b);
-      const Real norm2_axb = axb.norm_sq();
-      const Real area = sqrt(norm2_axb)/2;
+      const auto norm2_axb = axb.norm_sq();
+      const auto area = std::sqrt(norm2_axb)/2;
 
       const Point cc_minus_p0 = ((a.norm_sq() * b - b.norm_sq() * a).cross(axb)) / 2 / norm2_axb;
 

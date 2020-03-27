@@ -192,7 +192,7 @@ public:
   /**
    * Specialized function for computing the element volume.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * Builds a bounding box out of the nodal positions

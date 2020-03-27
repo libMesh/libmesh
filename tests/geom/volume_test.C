@@ -9,6 +9,7 @@
 #include <libmesh/node.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/tensor_value.h>
+#include <libmesh/raw_type.h>
 
 // unit test includes
 #include "test_comm.h"
@@ -52,7 +53,7 @@ public:
     // The true_centroid() == vertex_average() == (1/3, 1/3) for reference Tri3
     {
       const Elem & tri3 = ReferenceElem::get(TRI3);
-      Point true_centroid = tri3.true_centroid();
+      const auto true_centroid = MetaPhysicL::raw_value(tri3.true_centroid());
       LIBMESH_ASSERT_FP_EQUAL(Real(1)/3, true_centroid(0), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(Real(1)/3, true_centroid(1), TOLERANCE*TOLERANCE);
     }
@@ -65,12 +66,12 @@ public:
     // Test Quad4::true_centroid() override
     {
       const Elem & quad4 = ReferenceElem::get(QUAD4);
-      Point true_centroid = quad4.true_centroid();
+      const auto true_centroid = MetaPhysicL::raw_value(quad4.true_centroid());
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
 
       // Compare to centroid computed via generic base class implementation
-      Point base_class_centroid = quad4.Elem::true_centroid();
+      const auto base_class_centroid = MetaPhysicL::raw_value(quad4.Elem::true_centroid());
       CPPUNIT_ASSERT(true_centroid.absolute_fuzzy_equals(base_class_centroid, TOLERANCE*TOLERANCE));
     }
 
@@ -91,8 +92,8 @@ public:
 
       for (const auto & elem : mesh.element_ptr_range())
         {
-          Point derived_centroid = elem->true_centroid();
-          Point base_centroid = elem->Elem::true_centroid();
+          const auto derived_centroid = MetaPhysicL::raw_value(elem->true_centroid());
+          const auto base_centroid = MetaPhysicL::raw_value(elem->Elem::true_centroid());
 
           // Debugging: check results in detail
           // auto flags = libMesh::out.flags();
@@ -103,8 +104,8 @@ public:
 
           CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
 
-          Real derived_volume = elem->volume();
-          Real base_volume = elem->Elem::volume();
+          const auto derived_volume = MetaPhysicL::raw_value(elem->volume());
+          const auto base_volume = MetaPhysicL::raw_value(elem->Elem::volume());
           LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
         }
     }
@@ -117,7 +118,7 @@ public:
     // Test Pyramid5::true_centroid() gives the correct result for a reference element
     {
       const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
-      Point true_centroid = pyr5.true_centroid();
+      const auto true_centroid = MetaPhysicL::raw_value(pyr5.true_centroid());
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0.25, true_centroid(2), TOLERANCE*TOLERANCE);
@@ -147,7 +148,7 @@ public:
                                         HEX20);
       Elem * hex20 = mesh.elem_ptr(0);
       hex20->set_p_level(1);
-      Point true_centroid = hex20->true_centroid();
+      const auto true_centroid = MetaPhysicL::raw_value(hex20->true_centroid());
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(2), TOLERANCE*TOLERANCE);
@@ -168,7 +169,7 @@ public:
       return;
 
     // Check unperturbed, straight edge case
-    LIBMESH_ASSERT_FP_EQUAL(1.0, edge3->volume(), TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(1.0, MetaPhysicL::raw_value(edge3->volume()), TOLERANCE*TOLERANCE);
 
     // Get references to the individual Edge3 nodes
     auto & middle_node = edge3->node_ref(2);
@@ -178,25 +179,27 @@ public:
     // not change the volume because it's still a straight line
     // element.
     middle_node = Point(0.5 + 1.e-3, 0., 0.);
-    LIBMESH_ASSERT_FP_EQUAL(1.0, edge3->volume(), TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(1.0, MetaPhysicL::raw_value(edge3->volume()), TOLERANCE*TOLERANCE);
 
     // Check middle node perturbed in -x direction case. This should
     // not change the volume because it's still a straight line
     // element.
     middle_node = Point(0.5 - 1.e-3, 0., 0.);
-    LIBMESH_ASSERT_FP_EQUAL(1.0, edge3->volume(), TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(1.0, MetaPhysicL::raw_value(edge3->volume()), TOLERANCE*TOLERANCE);
 
     // Check volume of actual curved element against pre-computed value.
     middle_node = Point(0.5, 0.25, 0.);
     right_node = Point(1., 1., 0.);
-    LIBMESH_ASSERT_FP_EQUAL(1.4789428575446, edge3->volume(), TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(1.4789428575446, MetaPhysicL::raw_value(edge3->volume()), TOLERANCE);
 
     // Compare with volume computed by base class Elem::volume() call
     // which uses quadrature.  We don't expect this to have full
     // floating point accuracy.
     middle_node = Point(0.5, 0.1, 0.);
     right_node = Point(1., 0., 0.);
-    LIBMESH_ASSERT_FP_EQUAL(edge3->Elem::volume(), edge3->volume(), std::sqrt(TOLERANCE));
+    LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(edge3->Elem::volume()),
+                            MetaPhysicL::raw_value(edge3->volume()),
+                            std::sqrt(TOLERANCE));
   }
 
   void testEdge3Invertible()
@@ -416,8 +419,8 @@ protected:
 
       for (const auto & elem : mesh.element_ptr_range())
         {
-          Point derived_centroid = elem->true_centroid();
-          Point base_centroid = elem->Elem::true_centroid();
+          const auto derived_centroid = MetaPhysicL::raw_value(elem->true_centroid());
+          const auto base_centroid = MetaPhysicL::raw_value(elem->Elem::true_centroid());
 
           // Debugging: check results in detail
           // auto flags = libMesh::out.flags();
@@ -429,8 +432,8 @@ protected:
           CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
 
           // Make sure that base class and "optimized" routines for computing the cell volume agree
-          Real derived_volume = elem->volume();
-          Real base_volume = elem->Elem::volume();
+          const auto derived_volume = MetaPhysicL::raw_value(elem->volume());
+          const auto base_volume = MetaPhysicL::raw_value(elem->Elem::volume());
           LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
         }
     }

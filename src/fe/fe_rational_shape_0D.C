@@ -31,7 +31,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(0,RATIONAL_BERNSTEIN)
 
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape(const ElemType,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape(const ElemType,
                                      const Order,
                                      const unsigned int libmesh_dbg_var(i),
                                      const Point &)
@@ -43,7 +43,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape(const ElemType,
 
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape(const Elem *,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape(const Elem *,
                                      const Order,
                                      const unsigned int libmesh_dbg_var(i),
                                      const Point &,
@@ -54,7 +54,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape(const Elem *,
 }
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape(const FEType,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape(const FEType,
                                      const Elem *,
                                      const unsigned int libmesh_dbg_var(i),
                                      const Point &,
@@ -66,7 +66,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape(const FEType,
 
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
                                            const Order,
                                            const unsigned int,
                                            const unsigned int,
@@ -79,7 +79,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const Elem *,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const Elem *,
                                            const Order,
                                            const unsigned int,
                                            const unsigned int,
@@ -93,7 +93,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const Elem *,
 
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const FEType,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const FEType,
                                            const Elem *,
                                            const unsigned int,
                                            const unsigned int,
@@ -108,7 +108,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape_deriv(const FEType,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
                                                   const Order,
                                                   const unsigned int,
                                                   const unsigned int,
@@ -121,7 +121,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem *,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem *,
                                                   const Order,
                                                   const unsigned int,
                                                   const unsigned int,
@@ -135,7 +135,7 @@ Real FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem *,
 
 
 template <>
-Real FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType,
+GeomReal FE<0,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType,
                                                   const Elem *,
                                                   const unsigned int,
                                                   const unsigned int,

@@ -1,10 +1,11 @@
 // libmesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/fe.h"
-#include "libmesh/quadrature_gauss.h"
-#include "libmesh/mesh_generation.h"
-#include "libmesh/mesh.h"
+#include <libmesh/libmesh.h>
+#include <libmesh/edge_edge2.h>
+#include <libmesh/fe.h>
+#include <libmesh/quadrature_gauss.h>
+#include <libmesh/mesh_generation.h>
+#include <libmesh/mesh.h>
+#include <libmesh/raw_type.h>
 
 // unit test includes
 #include "test_comm.h"
@@ -39,7 +40,7 @@ public:
 
     _fe->reinit(_elem);
 
-    const DenseMatrix<Real> & dual_coeff = _fe->get_dual_coeff();
+    const auto & dual_coeff = MetaPhysicL::raw_value(_fe->get_dual_coeff());
 
     CPPUNIT_ASSERT_EQUAL(dual_coeff.m(), unsigned(2));
     CPPUNIT_ASSERT_EQUAL(dual_coeff.n(), unsigned(2));
@@ -58,13 +59,15 @@ public:
     CPPUNIT_ASSERT_EQUAL(qpoints.size(), dual_phi[0].size());
 
     for (auto qp : index_range(dual_phi[0]))
-      LIBMESH_ASSERT_FP_EQUAL(1./2. * (1. - 3.*qpoints[qp](0)), dual_phi[0][qp],
+      LIBMESH_ASSERT_FP_EQUAL(1./2. * (1. - 3.*MetaPhysicL::raw_value(qpoints[qp](0))),
+                              MetaPhysicL::raw_value(dual_phi[0][qp]),
         TOLERANCE*TOLERANCE);
 
     CPPUNIT_ASSERT_EQUAL(qpoints.size(), dual_phi[1].size());
 
     for (auto qp : index_range(dual_phi[1]))
-      LIBMESH_ASSERT_FP_EQUAL(1./2. * (1. + 3.*qpoints[qp](0)), dual_phi[1][qp],
+      LIBMESH_ASSERT_FP_EQUAL(1./2. * (1. + 3.*MetaPhysicL::raw_value(qpoints[qp](0))),
+                              MetaPhysicL::raw_value(dual_phi[1][qp]),
         TOLERANCE*TOLERANCE);
   }
 

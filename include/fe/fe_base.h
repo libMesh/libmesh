@@ -31,6 +31,7 @@
 #include "libmesh/type_n_tensor.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/dense_matrix.h"
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <cstddef>
@@ -116,14 +117,22 @@ public:
    * Convenient typedefs for gradients of output, hessians of output,
    * and potentially-complex-valued versions of same.
    */
-  typedef OutputType                                                      OutputShape;
-  typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
-  typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
-  typedef typename TensorTools::DecrementRank<OutputShape>::type          OutputDivergence;
-  typedef typename TensorTools::MakeNumber<OutputShape>::type             OutputNumber;
-  typedef typename TensorTools::IncrementRank<OutputNumber>::type         OutputNumberGradient;
-  typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
-  typedef typename TensorTools::DecrementRank<OutputNumber>::type         OutputNumberDivergence;
+  typedef typename MakeOutput<OutputType>::type                             OutputShape;
+  typedef typename MetaPhysicL::RawType<OutputShape>::value_type            RawOutputShape;
+  typedef typename TensorTools::IncrementRank<OutputShape>::type            OutputGradient;
+  typedef typename MetaPhysicL::RawType<OutputGradient>::value_type         RawOutputGradient;
+  typedef typename TensorTools::IncrementRank<OutputGradient>::type         OutputTensor;
+  typedef typename TensorTools::DecrementRank<OutputShape>::type            OutputDivergence;
+  typedef typename MetaPhysicL::RawType<OutputDivergence>::value_type       RawOutputDivergence;
+
+  typedef typename TensorTools::MakeNumber<OutputShape>::type               OutputNumber;
+  typedef typename MetaPhysicL::RawType<OutputNumber>::value_type           RawOutputNumber;
+  typedef typename TensorTools::IncrementRank<OutputNumber>::type           OutputNumberGradient;
+  typedef typename MetaPhysicL::RawType<OutputNumberGradient>::value_type   RawOutputNumberGradient;
+  typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type   OutputNumberTensor;
+  typedef typename MetaPhysicL::RawType<OutputNumberTensor>::value_type     RawOutputNumberTensor;
+  typedef typename TensorTools::DecrementRank<OutputNumber>::type           OutputNumberDivergence;
+  typedef typename MetaPhysicL::RawType<OutputNumberDivergence>::value_type RawOutputNumberDivergence;
 
 
 
@@ -241,7 +250,7 @@ public:
   virtual void request_dual_dphi() const override
   { get_dual_dphi(); }
 
-  const DenseMatrix<Real> & get_dual_coeff() const
+  const DenseMatrix<GeomReal> & get_dual_coeff() const
   { return dual_coeff; }
 
   /**
@@ -623,7 +632,7 @@ protected:
   /**
    * Coefficient matrix for the dual basis.
    */
-  mutable DenseMatrix<Real> dual_coeff;
+  DenseMatrix<GeomReal> dual_coeff;
 
   /**
    * Shape function curl values. Only defined for vector types.
@@ -816,8 +825,6 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs(const std::vector<Real> & /*
 // Typedefs for convenience and backwards compatibility
 typedef FEGenericBase<Real> FEBase;
 typedef FEGenericBase<RealGradient> FEVectorBase;
-
-
 
 
 // ------------------------------------------------------------

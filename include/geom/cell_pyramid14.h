@@ -244,7 +244,7 @@ public:
   /**
    * Specialization for computing the volume of a Pyramid14.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   virtual void permute(unsigned int perm_num) override final;
 

@@ -33,6 +33,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/utility.h"
+#include "libmesh/raw_type.h"
 
 #ifdef LIBMESH_HAVE_NANOFLANN
 #include "libmesh/nanoflann.hpp"
@@ -282,7 +283,7 @@ public:
       libmesh_assert_less (idx, _nodes.size());
       libmesh_assert_less (dim, 3);
 
-      const Point & p(_nodes[idx].first);
+      const auto p = MetaPhysicL::raw_value(_nodes[idx].first);
 
       if (dim==0) return p(0);
       if (dim==1) return p(1);
@@ -820,7 +821,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             }
 
           // For node comparisons we'll need a sensible tolerance
-          Real node_tolerance = current_elem->hmin() * TOLERANCE;
+          Real node_tolerance = MetaPhysicL::raw_value(current_elem->hmin()) * TOLERANCE;
 
           // Otherwise our interior_parent should be a child of our
           // parent's interior_parent.
@@ -1803,7 +1804,7 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
       // While finding nodes on the boundary, also find the minimum edge length
       // of all faces on both boundaries.  This will later be used in relative
       // distance checks when stitching nodes.
-      Real h_min = std::numeric_limits<Real>::max();
+      GeomReal h_min = std::numeric_limits<Real>::max();
       bool h_min_updated = false;
 
       // Loop below fills in these sets for the two meshes.
@@ -1843,7 +1844,7 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                           {
                             for (const auto & elem : mesh_array[i]->active_element_ptr_range())
                               {
-                                Real current_h_min = elem->hmin();
+                                auto current_h_min = elem->hmin();
                                 if (current_h_min > 0.)
                                   {
                                     h_min = current_h_min;
@@ -1996,7 +1997,9 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
           // Loop over other mesh. For each node, find its nearest neighbor in this mesh, and fill in the maps.
           for (auto node : other_boundary_node_ids)
           {
-            const Real query_pt[] = {other_mesh->point(node)(0), other_mesh->point(node)(1), other_mesh->point(node)(2)};
+            const Real query_pt[] = {MetaPhysicL::raw_value(other_mesh->point(node)(0)),
+              MetaPhysicL::raw_value(other_mesh->point(node)(1)),
+              MetaPhysicL::raw_value(other_mesh->point(node)(2))};
             this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index, &ret_dist_sqr);
             if (ret_dist_sqr < TOLERANCE*TOLERANCE)
             {
@@ -2040,7 +2043,7 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
             {
               const Node & other_node = other_mesh->node_ref(other_node_id);
 
-              Real node_distance = (this_node - other_node).norm();
+              auto node_distance = (this_node - other_node).norm();
 
               if (node_distance < tol*h_min)
               {

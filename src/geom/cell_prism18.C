@@ -615,7 +615,7 @@ Prism18::second_order_child_vertex (const unsigned int n) const
 
 
 
-Real Prism18::volume () const
+GeomReal Prism18::volume () const
 {
   // This specialization is good for Lagrange mappings only
   if (this->mapping_type() != LAGRANGE_MAP)
@@ -770,7 +770,7 @@ Real Prism18::volume () const
       {2, 0, 1}
     };
 
-  Real vol = 0.;
+  GeomReal vol = 0.;
   for (int i=0; i<N2D; ++i)
     for (int j=0; j<N1D; ++j)
       {

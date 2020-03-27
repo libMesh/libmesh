@@ -124,18 +124,18 @@ bool Edge3::has_invertible_map(Real tol) const
 
   // 1.) If b.b==0, then the endpoints of the Edge3 are at the same
   //     location, and the map is therefore not invertible.
-  Real b_norm2 = b.norm_sq();
+  auto b_norm2 = b.norm_sq();
   if (b_norm2 <= tol*tol)
     return false;
 
   // 2.) If a.b==0, but b != 0 (see above), then the element is
   //     invertible but we don't want to divide by zero in the
   //     formula, so simply return true.
-  Real ab = a * b;
+  auto ab = a * b;
   if (std::abs(ab) <= tol*tol)
     return true;
 
-  Real xi_m = -b_norm2 / ab;
+  auto xi_m = -b_norm2 / ab;
   return (xi_m < -1.) || (xi_m > 1.);
 }
 
@@ -225,43 +225,43 @@ Edge3::second_order_child_vertex (const unsigned int) const
 
 
 
-Real Edge3::volume () const
+GeomReal Edge3::volume () const
 {
   // Finding the (exact) length of a general quadratic element
   // is a surprisingly complicated formula.
   Point A = this->point(0) + this->point(1) - 2*this->point(2);
   Point B = (this->point(1) - this->point(0))/2;
 
-  const Real a = A.norm_sq();
-  const Real c = B.norm_sq();
+  const GeomReal a = A.norm_sq();
+  const GeomReal c = B.norm_sq();
 
   // Degenerate straight line case
   if (a == 0.)
     return 2. * std::sqrt(c);
 
-  const Real b = -2.*std::abs(A*B);
+  const GeomReal b = -2.*std::abs(A*B);
 
-  const Real sqrt_term1 = a - b + c;
-  const Real sqrt_term2 = a + b + c;
+  const GeomReal sqrt_term1 = a - b + c;
+  const GeomReal sqrt_term2 = a + b + c;
 
   // Fall back on straight line case instead of computing nan
   // Note: b can be positive or negative so we have to check both cases.
   if (sqrt_term1 < 0. || sqrt_term2 < 0.)
     return 2. * std::sqrt(c);
 
-  const Real r1 = std::sqrt(sqrt_term1);
-  const Real r2 = std::sqrt(sqrt_term2);
-  const Real rsum = r1 + r2;
-  const Real root_a = std::sqrt(a);
-  const Real b_over_root_a = b / root_a;
+  const GeomReal r1 = std::sqrt(sqrt_term1);
+  const GeomReal r2 = std::sqrt(sqrt_term2);
+  const GeomReal rsum = r1 + r2;
+  const GeomReal root_a = std::sqrt(a);
+  const GeomReal b_over_root_a = b / root_a;
 
   // Pre-compute the denominator of the log term. If it's zero, fall
   // back on the straight line case.
-  const Real log_term_denom = -root_a - 0.5*b_over_root_a + r2;
+  const GeomReal log_term_denom = -root_a - 0.5*b_over_root_a + r2;
   if (log_term_denom == 0. || rsum == 0.)
     return 2. * std::sqrt(c);
 
-  Real log1p_arg = 2*(root_a - b/rsum) / log_term_denom;
+  GeomReal log1p_arg = 2*(root_a - b/rsum) / log_term_denom;
 
   return
     0.5*(rsum + b_over_root_a*b_over_root_a/rsum +
@@ -279,8 +279,8 @@ BoundingBox Edge3::loose_bounding_box () const
 
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
-      Real center = this->point(2)(d);
-      Real hd = std::max(std::abs(center - this->point(0)(d)),
+      GeomReal center = this->point(2)(d);
+      GeomReal hd = std::max(std::abs(center - this->point(0)(d)),
                          std::abs(center - this->point(1)(d)));
 
       pmin(d) = center - hd;

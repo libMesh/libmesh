@@ -78,7 +78,7 @@ class GradientMeshFunction : public FunctionBase<Gradient>
 {
 public:
   // Constructor
-  GradientMeshFunction(const MeshFunction & _mesh_function);
+  GradientMeshFunction(const MeshFunction<Number> & _mesh_function);
 
   // Destructor
   virtual ~GradientMeshFunction () { }
@@ -98,7 +98,7 @@ public:
 private:
 
   // Local copy of the passed in mesh function.
-  std::unique_ptr<MeshFunction> mesh_function;
+  std::unique_ptr<MeshFunction<Number>> mesh_function;
 
 };
 }

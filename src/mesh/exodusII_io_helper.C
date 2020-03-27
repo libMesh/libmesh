@@ -2493,7 +2493,8 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
   y.reserve(num_nodes);
   z.reserve(num_nodes);
 
-  auto push_node = [this](const Point & p) {
+  auto push_node = [this](const Point & p_in) {
+    const auto p = MetaPhysicL::raw_value(p_in);
     x.push_back(p(0) + _coordinate_offset(0));
 
 #if LIBMESH_DIM > 1
@@ -4766,9 +4767,9 @@ void ExodusII_IO_Helper::write_as_dimension(unsigned dim)
 
 
 
-void ExodusII_IO_Helper::set_coordinate_offset(Point p)
+void ExodusII_IO_Helper::set_coordinate_offset(const Point & p)
 {
-  _coordinate_offset = p;
+  _coordinate_offset = MetaPhysicL::raw_value(p);
 }
 
 

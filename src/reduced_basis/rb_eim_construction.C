@@ -852,12 +852,12 @@ const RBEIMEvaluation::NodeDataMap & RBEIMConstruction::get_node_parametrized_fu
   return _local_node_parametrized_functions_for_training[training_index];
 }
 
-const std::unordered_map<dof_id_type, std::vector<Real> > & RBEIMConstruction::get_local_quad_point_JxW()
+const std::unordered_map<dof_id_type, std::vector<GeomReal> > & RBEIMConstruction::get_local_quad_point_JxW()
 {
   return _local_quad_point_JxW;
 }
 
-const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > & RBEIMConstruction::get_local_side_quad_point_JxW()
+const std::map<std::pair<dof_id_type,unsigned int>, std::vector<GeomReal> > & RBEIMConstruction::get_local_side_quad_point_JxW()
 {
   return _local_side_quad_point_JxW;
 }
@@ -1371,13 +1371,13 @@ void RBEIMConstruction::initialize_qp_data()
 
           // elem_fe is used for shellface data
           auto elem_fe = context.get_element_fe(/*var=*/0, elem->dim());
-          const std::vector<Real> & JxW = elem_fe->get_JxW();
-          const std::vector<Point> & xyz = elem_fe->get_xyz();
+          const auto & JxW = elem_fe->get_JxW();
+          const auto & xyz = elem_fe->get_xyz();
 
           // side_fe is used for element side data
           auto side_fe = context.get_side_fe(/*var=*/0, elem->dim());
-          const std::vector<Real> & JxW_side = side_fe->get_JxW();
-          const std::vector< Point > & xyz_side = side_fe->get_xyz();
+          const auto & JxW_side = side_fe->get_JxW();
+          const auto & xyz_side = side_fe->get_xyz();
 
           for (context.side = 0;
                context.side != context.get_elem().n_sides();
@@ -1635,8 +1635,8 @@ void RBEIMConstruction::initialize_qp_data()
       for (const auto & elem : mesh.active_local_element_ptr_range())
         {
           auto elem_fe = context.get_element_fe(/*var=*/0, elem->dim());
-          const std::vector<Real> & JxW = elem_fe->get_JxW();
-          const std::vector<Point> & xyz = elem_fe->get_xyz();
+          const auto & JxW = elem_fe->get_JxW();
+          const auto & xyz = elem_fe->get_xyz();
 
           dof_id_type elem_id = elem->id();
 
@@ -1790,7 +1790,7 @@ RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
           const std::vector<Number> & w_qp = w_comp_and_qp[comp];
 
           for (unsigned int qp : index_range(JxW))
-            val += JxW[qp] * v_qp[qp] * libmesh_conj(w_qp[qp]);
+            val += MetaPhysicL::raw_value(JxW[qp]) * v_qp[qp] * libmesh_conj(w_qp[qp]);
         }
     }
 
@@ -1816,7 +1816,7 @@ RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataM
           const std::vector<Number> & w_qp = w_comp_and_qp[comp];
 
           for (unsigned int qp : index_range(JxW))
-            val += JxW[qp] * v_qp[qp] * libmesh_conj(w_qp[qp]);
+            val += MetaPhysicL::raw_value(JxW[qp]) * v_qp[qp] * libmesh_conj(w_qp[qp]);
         }
     }
 
@@ -1970,7 +1970,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
 
       unsigned int side_type = libmesh_map_find(_local_side_quad_point_side_types, elem_and_side);
 
-      std::vector<std::vector<Real>> phi;
+      std::vector<std::vector<GeomReal>> phi;
       // side_type == 0 --> standard side
       // side_type == 1 --> shellface
       if (side_type == 0)
@@ -2013,7 +2013,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
 
                   optimal_point_phi_i_qp.resize(phi.size());
                   for(auto i : index_range(phi))
-                    optimal_point_phi_i_qp[i] = phi[i][qp];
+                    optimal_point_phi_i_qp[i] = MetaPhysicL::raw_value(phi[i][qp]);
 
                   const auto & point_list =
                     libmesh_map_find(_local_side_quad_point_locations, elem_and_side);
@@ -2251,7 +2251,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
       con.pre_fe_reinit(*this, &elem_ref);
 
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
-      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const auto & phi = elem_fe->get_phi();
 
       elem_fe->reinit(&elem_ref);
 
@@ -2274,7 +2274,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
                   optimal_point_phi_i_qp.resize(phi.size());
                   for(auto i : index_range(phi))
-                    optimal_point_phi_i_qp[i] = phi[i][qp];
+                    optimal_point_phi_i_qp[i] = MetaPhysicL::raw_value(phi[i][qp]);
 
                   const auto & point_list =
                     libmesh_map_find(_local_quad_point_locations, elem_id);

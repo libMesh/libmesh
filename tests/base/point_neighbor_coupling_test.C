@@ -6,6 +6,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/default_coupling.h>
 #include <libmesh/point_neighbor_coupling.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -15,14 +16,16 @@ using namespace libMesh;
 
 
 
-Number cubic_point_neighbor_coupling_test (const Point& p,
+Number cubic_point_neighbor_coupling_test (const Point& point,
                                            const Parameters&,
                                            const std::string&,
                                            const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
-  const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
+  const auto & p = MetaPhysicL::raw_value(point);
+
+  const auto x = p(0);
+  const auto y = LIBMESH_DIM > 1 ? p(1) : 0;
+  const auto z = LIBMESH_DIM > 2 ? p(2) : 0;
 
   return x*(1-x)*(1-x) + x*x*(1-y) + x*(1-y)*(1-z) + y*(1-y)*z + z*(1-z)*(1-z);
 }
@@ -132,8 +135,8 @@ public:
 
                   Point p = n3->vertex_average();
 
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
-                                          libmesh_real(cubic_point_neighbor_coupling_test(p,es.parameters,"","")),
+                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(sys.point_value(0,p,n3))),
+                                          libmesh_real(MetaPhysicL::raw_value(cubic_point_neighbor_coupling_test(p,es.parameters,"",""))),
                                           TOLERANCE*TOLERANCE);
                 }
             }

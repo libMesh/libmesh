@@ -20,6 +20,7 @@
 
 #include "libmesh/fe_transformation_base.h"
 #include "libmesh/compare_types.h"
+#include "libmesh/fe_base.h"
 
 namespace libMesh
 {
@@ -36,30 +37,31 @@ class Elem;
  * \author Paul T. Bauman
  * \date 2012
  */
-template<typename OutputShape>
-class H1FETransformation : public FETransformationBase<OutputShape>
+template<typename OutputType>
+class H1FETransformation : public FETransformationBase<OutputType>
 {
 public:
+  using typename FETransformationBase<OutputType>::OutputShape;
 
   H1FETransformation()
-    : FETransformationBase<OutputShape>() {}
+    : FETransformationBase<OutputType>() {}
 
   virtual ~H1FETransformation() = default;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const override;
+  virtual void init_map_phi(const FEGenericBase<OutputType> & fe) const override;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const override;
+  virtual void init_map_dphi(const FEGenericBase<OutputType> & fe) const override;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const override;
+  virtual void init_map_d2phi(const FEGenericBase<OutputType> & fe) const override;
 
   /**
    * Evaluates shape functions in physical coordinates for H1
@@ -68,7 +70,7 @@ public:
   virtual void map_phi(const unsigned int,
                        const Elem * const,
                        const std::vector<Point> &,
-                       const FEGenericBase<OutputShape> &,
+                       const FEGenericBase<OutputType> &,
                        std::vector<std::vector<OutputShape>> &) const override;
 
   /**
@@ -78,8 +80,8 @@ public:
   virtual void map_dphi(const unsigned int dim,
                         const Elem * const elem,
                         const std::vector<Point> & qp,
-                        const FEGenericBase<OutputShape> & fe,
-                        std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & dphi,
+                        const FEGenericBase<OutputType> & fe,
+                        std::vector<std::vector<typename FEGenericBase<OutputType>::OutputGradient>> & dphi,
                         std::vector<std::vector<OutputShape>> & dphidx,
                         std::vector<std::vector<OutputShape>> & dphidy,
                         std::vector<std::vector<OutputShape>> & dphidz) const override;
@@ -91,8 +93,8 @@ public:
    */
   virtual void map_d2phi(const unsigned int dim,
                          const std::vector<Point> & qp,
-                         const FEGenericBase<OutputShape> & fe,
-                         std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> & d2phi,
+                         const FEGenericBase<OutputType> & fe,
+                         std::vector<std::vector<typename FEGenericBase<OutputType>::OutputTensor>> & d2phi,
                          std::vector<std::vector<OutputShape>> & d2phidx2,
                          std::vector<std::vector<OutputShape>> & d2phidxdy,
                          std::vector<std::vector<OutputShape>> & d2phidxdz,
@@ -108,7 +110,7 @@ public:
   virtual void map_curl(const unsigned int dim,
                         const Elem * const elem,
                         const std::vector<Point> & qp,
-                        const FEGenericBase<OutputShape> & fe,
+                        const FEGenericBase<OutputType> & fe,
                         std::vector<std::vector<OutputShape>> & curl_phi) const override;
 
   /**
@@ -118,8 +120,8 @@ public:
   virtual void map_div(const unsigned int dim,
                        const Elem * const elem,
                        const std::vector<Point> & qp,
-                       const FEGenericBase<OutputShape> & fe,
-                       std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> & div_phi) const override;
+                       const FEGenericBase<OutputType> & fe,
+                       std::vector<std::vector<typename FEGenericBase<OutputType>::OutputDivergence>> & div_phi) const override;
 
 }; // class H1FETransformation
 

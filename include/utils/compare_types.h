@@ -64,30 +64,43 @@ struct ScalarTraits {
   static const bool value = false;
 };
 
+template <typename T>
+struct FixedSizeTraits {
+  static const bool value = false;
+};
+
 #define ScalarTraits_true(type)                                 \
   template<>                                                    \
   struct ScalarTraits<type> { static const bool value = true; }
 #define RealTraits_true(type)                                   \
   template<>                                                    \
   struct RealTraits<type> { static const bool value = true; }
+#define FixedSizeTraits_true(type) \
+  template <>                      \
+  struct FixedSizeTraits<type> { static const bool value = true; }
+#define ScalarFixedSizeTraits_true(type) \
+  ScalarTraits_true(type);               \
+  FixedSizeTraits_true(type)
 
-ScalarTraits_true(char);
-ScalarTraits_true(short);
-ScalarTraits_true(int);
-ScalarTraits_true(long);
-ScalarTraits_true(unsigned char);
-ScalarTraits_true(unsigned short);
-ScalarTraits_true(unsigned int);
-ScalarTraits_true(unsigned long);
-ScalarTraits_true(float);
-ScalarTraits_true(double);
-ScalarTraits_true(long double);
+ScalarFixedSizeTraits_true(char);
+ScalarFixedSizeTraits_true(short);
+ScalarFixedSizeTraits_true(int);
+ScalarFixedSizeTraits_true(long);
+ScalarFixedSizeTraits_true(unsigned char);
+ScalarFixedSizeTraits_true(unsigned short);
+ScalarFixedSizeTraits_true(unsigned int);
+ScalarFixedSizeTraits_true(unsigned long);
+ScalarFixedSizeTraits_true(float);
+ScalarFixedSizeTraits_true(double);
+ScalarFixedSizeTraits_true(long double);
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-ScalarTraits_true(Real);
+ScalarFixedSizeTraits_true(Real);
 #endif
 
 template<typename T>
 struct ScalarTraits<std::complex<T>> { static const bool value = ScalarTraits<T>::value; };
+template <typename T>
+struct FixedSizeTraits<std::complex<T>> { static const bool value = FixedSizeTraits<T>::value; };
 
 // List of classes for which instantiations of std::complex are defined, e.g. where
 // TensorTools::MakeNumber will always make sense
@@ -212,6 +225,22 @@ SUPERTYPE(long double, Real);
   };
 */
 
+/**
+ * Helper struct that can be useful for determing whether raw_value conversions need to occur in
+ * things like Functions (say if the Function is of type Function<Real> but we are returning the
+ * component of a Point where GeomReal is of dual type
+ */
+template <typename>
+struct IsDual
+{
+  static constexpr bool value = false;
+};
+
+template <template <typename> class W, typename T>
+struct IsDual<W<T>>
+{
+  static constexpr bool value = IsDual<T>::value;
+};
 } // namespace libMesh
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -278,6 +307,12 @@ template <typename T, typename D, bool asd>
 struct ScalarTraits<MetaPhysicL::DualNumber<T, D, asd>>
 {
   static const bool value = ScalarTraits<T>::value;
+};
+
+template <typename T, typename D, bool asd>
+struct IsDual<MetaPhysicL::DualNumber<T,D,asd>>
+{
+  static constexpr bool value = true;
 };
 } // namespace libMesh
 

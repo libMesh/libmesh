@@ -284,7 +284,7 @@ Point Pyramid5::true_centroid () const
 
 
 
-Real Pyramid5::volume () const
+GeomReal Pyramid5::volume () const
 {
   // The pyramid with a bilinear base has volume given by the
   // formula in: "Calculation of the Volume of a General Hexahedron

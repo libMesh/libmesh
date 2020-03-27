@@ -21,6 +21,7 @@
 #include "libmesh/face_tri3.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -192,7 +193,7 @@ Point Tri3::true_centroid () const
   return Elem::vertex_average();
 }
 
-Real Tri3::volume () const
+GeomReal Tri3::volume () const
 {
   // 3-node triangles have the following formula for computing the area
   return 0.5 * cross_norm(point(1) - point(0),
@@ -201,26 +202,26 @@ Real Tri3::volume () const
 
 
 
-std::pair<Real, Real> Tri3::min_and_max_angle() const
+std::pair<GeomReal, GeomReal> Tri3::min_and_max_angle() const
 {
   Point v10 ( this->point(1) - this->point(0) );
   Point v20 ( this->point(2) - this->point(0) );
   Point v21 ( this->point(2) - this->point(1) );
 
-  const Real
+  const GeomReal
     len_10=v10.norm(),
     len_20=v20.norm(),
     len_21=v21.norm();
 
-  const Real
+  const GeomReal
     theta0=std::acos(( v10*v20)/len_10/len_20),
     theta1=std::acos((-v10*v21)/len_10/len_21),
     theta2=libMesh::pi - theta0 - theta1
     ;
 
-  libmesh_assert_greater (theta0, 0.);
-  libmesh_assert_greater (theta1, 0.);
-  libmesh_assert_greater (theta2, 0.);
+  libmesh_assert_greater (MetaPhysicL::raw_value(theta0), 0.);
+  libmesh_assert_greater (MetaPhysicL::raw_value(theta1), 0.);
+  libmesh_assert_greater (MetaPhysicL::raw_value(theta2), 0.);
 
   return std::make_pair(std::min(theta0, std::min(theta1,theta2)),
                         std::max(theta0, std::max(theta1,theta2)));
@@ -237,20 +238,20 @@ bool Tri3::contains_point (const Point & p, Real tol) const
   Point v2 = p - this->point(0);
 
   // Compute dot products
-  Real dot00 = v0 * v0;
-  Real dot01 = v0 * v1;
-  Real dot02 = v0 * v2;
-  Real dot11 = v1 * v1;
-  Real dot12 = v1 * v2;
+  GeomReal dot00 = v0 * v0;
+  GeomReal dot01 = v0 * v1;
+  GeomReal dot02 = v0 * v2;
+  GeomReal dot11 = v1 * v1;
+  GeomReal dot12 = v1 * v2;
 
   // Out of plane check
   if (std::abs(triple_product(v2, v0, v1)) / std::max(dot00, dot11) > tol)
     return false;
 
   // Compute barycentric coordinates
-  Real invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
-  Real u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-  Real v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+  GeomReal invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+  GeomReal u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+  GeomReal v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
   // Check if point is in triangle
   return (u > -tol) && (v > -tol) && (u + v < 1 + tol);

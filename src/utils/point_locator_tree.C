@@ -133,8 +133,8 @@ void PointLocatorTree::init (Trees::BuildType build_type)
               BoundingBox bbox = MeshTools::create_bounding_box(this->_mesh);
 
               const Real
-                Dx = bbox.second(0) - bbox.first(0),
-                Dz = bbox.second(2) - bbox.first(2);
+                Dx = MetaPhysicL::raw_value(bbox.second(0) - bbox.first(0)),
+                Dz = MetaPhysicL::raw_value(bbox.second(2) - bbox.first(2));
 
               // In order to satisfy is_planar_xy the mesh should be planar and should
               // also be in the z=0 plane, since otherwise it is incorrect to use a

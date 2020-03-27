@@ -142,9 +142,9 @@ public:
         {
           Number u = 0;
           for (auto d : index_range(phi))
-            u += phi[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            u += MetaPhysicL::raw_value(phi[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 
-          const Point p = xyz[qp];
+          const auto & p = MetaPhysicL::raw_value(xyz[qp]);
           Real x = p(0),
                y = LIBMESH_DIM > 1 ? p(1) : 0,
                z = LIBMESH_DIM > 2 ? p(2) : 0;
@@ -205,7 +205,7 @@ public:
         {
           Gradient grad_u = 0;
           for (auto d : index_range(dphi))
-            grad_u += dphi[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            grad_u += MetaPhysicL::raw_value(dphi[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 
           const Point p = xyz[qp];
 
@@ -217,7 +217,7 @@ public:
           // triangles, tets, prisms, pyramids...)
           Point n = normals[qp];
 
-          const Gradient tangential_grad_u = grad_u - ((grad_u * n) * n);
+          const Gradient tangential_grad_u = MetaPhysicL::raw_value(grad_u - ((grad_u * n) * n));
 
           if (family == RATIONAL_BERNSTEIN && order > 1)
             {
@@ -229,7 +229,7 @@ public:
           if (order == 0)
             true_grad.zero();
 
-          const Gradient true_tangential_grad = true_grad - ((true_grad * n) * n);
+          const Gradient true_tangential_grad = MetaPhysicL::raw_value(true_grad - ((true_grad * n) * n));
 
           LIBMESH_ASSERT_FP_EQUAL(libmesh_real(tangential_grad_u(0)),
                                   libmesh_real(true_tangential_grad(0)),
@@ -281,12 +281,12 @@ public:
           Number grad_u_x = 0, grad_u_y = 0, grad_u_z = 0;
           for (auto d : index_range(dphidx))
             {
-              grad_u_x += dphidx[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+              grad_u_x += MetaPhysicL::raw_value(dphidx[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #if LIBMESH_DIM > 1
-              grad_u_y += dphidy[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+              grad_u_y += MetaPhysicL::raw_value(dphidy[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
 #if LIBMESH_DIM > 2
-              grad_u_z += dphidz[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+              grad_u_z += MetaPhysicL::raw_value(dphidz[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
             }
 
@@ -298,7 +298,7 @@ public:
           // transformation, and could be just about anything for a
           // skew transformation (as occurs when we build meshes with
           // triangles, tets, prisms, pyramids...)
-          Point n = normals[qp];
+          const auto & n = MetaPhysicL::raw_value(normals[qp]);
 
           const Gradient grad_u {grad_u_x, grad_u_y, grad_u_z};
           const Gradient tangential_grad_u = grad_u - ((grad_u * n) * n);
@@ -362,7 +362,7 @@ public:
         {
           Tensor hess_u;
           for (auto d : index_range(d2phi))
-            hess_u += d2phi[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u += MetaPhysicL::raw_value(d2phi[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 
           // We can only trust the tangential-tangential components of
           // hessians, t1'*H*t2 for tangential vectors t1 and t2, to
@@ -371,8 +371,8 @@ public:
           // element transformation, but could be just about anything
           // for a skew transformation (as occurs when we build meshes
           // with triangles, tets, prisms, pyramids...)
-          Point n = normals[qp];
-          hess_u = tangential_hessian(hess_u, n);
+          const auto & n = MetaPhysicL::raw_value(normals[qp]);
+          hess_u = MetaPhysicL::raw_value(tangential_hessian(hess_u, n));
 
           if (family == RATIONAL_BERNSTEIN && order > 1)
             {
@@ -384,7 +384,7 @@ public:
           RealTensor true_hess = this->true_hessian(p);
 
           // Subtract off values only relevant in normal directions
-          RealTensor tangential_hess = tangential_hessian(true_hess, n);
+          RealTensor tangential_hess = MetaPhysicL::raw_value(tangential_hessian(true_hess, n));
 
           LIBMESH_ASSERT_FP_EQUAL(tangential_hess(0,0), libmesh_real(hess_u(0,0)),
                                   this->_hess_tol);
@@ -461,15 +461,15 @@ public:
           Tensor hess_u;
           for (auto d : index_range(d2phidx2))
             {
-              hess_u(0,0) += d2phidx2[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+              hess_u(0,0) += MetaPhysicL::raw_value(d2phidx2[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #if LIBMESH_DIM > 1
-              hess_u(0,1) += d2phidxdy[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-              hess_u(1,1) += d2phidy2[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+              hess_u(0,1) += MetaPhysicL::raw_value(d2phidxdy[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
+              hess_u(1,1) += MetaPhysicL::raw_value(d2phidy2[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
 #if LIBMESH_DIM > 2
-              hess_u(0,2) += d2phidxdz[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-              hess_u(1,2) += d2phidydz[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-              hess_u(2,2) += d2phidz2[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+              hess_u(0,2) += MetaPhysicL::raw_value(d2phidxdz[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
+              hess_u(1,2) += MetaPhysicL::raw_value(d2phidydz[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
+              hess_u(2,2) += MetaPhysicL::raw_value(d2phidz2[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]));
 #endif
             }
 
@@ -488,7 +488,7 @@ public:
           // element transformation, but could be just about anything
           // for a skew transformation (as occurs when we build meshes
           // with triangles, tets, prisms, pyramids...)
-          Point n = normals[qp];
+          const auto & n = MetaPhysicL::raw_value(normals[qp]);
           hess_u = tangential_hessian(hess_u, n);
 
           if (family == RATIONAL_BERNSTEIN && order > 1)

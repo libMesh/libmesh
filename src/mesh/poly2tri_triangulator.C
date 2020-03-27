@@ -33,6 +33,7 @@
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h"
+#include "libmesh/raw_type.h"
 
 // poly2tri includes
 #include "poly2tri/poly2tri.h"
@@ -48,8 +49,10 @@ struct P2TPointCompare
   }
 };
 
-p2t::Point to_p2t(const libMesh::Point & p)
+p2t::Point to_p2t(const libMesh::Point & p_in)
 {
+  const auto p = MetaPhysicL::raw_value(p_in);
+
 #if LIBMESH_DIM > 2
   libmesh_error_msg_if
     (p(2) != 0,
@@ -97,30 +100,30 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
 
       // Calculate intersection parameters (fractions of the distance
       // along each segment)
-      const Real raydx = target(0)-source(0),
+      const auto raydx = target(0)-source(0),
                  raydy = target(1)-source(1),
                  edgedx = v1(0)-v0(0),
                  edgedy = v1(1)-v0(1);
-      const Real denom = edgedx * raydy - edgedy * raydx;
+      const auto denom = edgedx * raydy - edgedy * raydx;
 
       // divide-by-zero means the segments are parallel
       if (denom == 0)
         continue;
 
-      const Real one_over_denom = 1 / denom;
+      const auto one_over_denom = 1 / denom;
 
-      const Real targetsdx = v1(0)-target(0),
+      const auto targetsdx = v1(0)-target(0),
                  targetsdy = v1(1)-target(1);
 
-      const Real t_num = targetsdx * raydy -
+      const auto t_num = targetsdx * raydy -
                          targetsdy * raydx;
-      const Real t = t_num * one_over_denom;
+      const auto t = t_num * one_over_denom;
 
       if (t < -TOLERANCE || t > 1 + TOLERANCE)
         continue;
 
-      const Real u_num = targetsdx * edgedy - targetsdy * edgedx;
-      const Real u = u_num * one_over_denom;
+      const auto u_num = targetsdx * edgedy - targetsdy * edgedx;
+      const auto u = u_num * one_over_denom;
 
       if (u < -TOLERANCE || u > 1 + TOLERANCE)
         continue;
@@ -131,9 +134,9 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
       // infinitesimally concave, p2t::CDT::Triangulate throws a "null
       // triangle" exception.  So let's try to be infinitesimally
       // convex instead.
-      const Real ray_fraction = (1-u) * (1+TOLERANCE*TOLERANCE);
+      const auto ray_fraction = (1-u) * (1+TOLERANCE*TOLERANCE);
 */
-      const Real ray_fraction = (1-u);
+      const auto ray_fraction = (1-u);
 
       source(0) += raydx * ray_fraction;
       source(1) += raydy * ray_fraction;
@@ -364,7 +367,8 @@ void Poly2TriTriangulator::triangulate_current_points()
                                "Triangulator segments reference nonexistent node id " <<
                                segment_start);
 
-          outer_boundary_points.emplace_back((*node)(0), (*node)(1));
+          outer_boundary_points.emplace_back(MetaPhysicL::raw_value((*node)(0)),
+                                             MetaPhysicL::raw_value((*node)(1)));
           p2t::Point * pt = &outer_boundary_points.back();
 
           // We're not going to support overlapping nodes on the boundary
@@ -589,7 +593,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // an updated this->segments to retriangulate with.  If we have to
   // add new hole points, we'll use this to insert points into an
   // ArbitraryHole.
-  std::unordered_map<Point, Node *> next_boundary_node;
+  std::unordered_map<RawPoint, Node *> next_boundary_node;
 
   BoundaryInfo & boundary_info = _mesh.get_boundary_info();
 
@@ -640,7 +644,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
         libmesh_assert(old_segment_end);
         libmesh_assert(old_segment_end->valid_id());
 
-        auto it = next_boundary_node.find(*old_segment_start);
+        auto it = next_boundary_node.find(MetaPhysicL::raw_value(static_cast<Point &>(*old_segment_start)));
         if (it != next_boundary_node.end())
           {
             libmesh_assert(it->second == old_segment_end);
@@ -654,10 +658,10 @@ bool Poly2TriTriangulator::insert_refinement_points()
                            (_holes && !_holes->empty()) ||
                            (old_segment_end->id() ==
                             old_segment_start->id() + 1));
-            next_boundary_node[*old_segment_start] = new_node;
+            next_boundary_node[MetaPhysicL::raw_value(static_cast<Point &>(*old_segment_start))] = new_node;
           }
 
-        next_boundary_node[*new_node] = old_segment_end;
+        next_boundary_node[MetaPhysicL::raw_value(static_cast<Point &>(*new_node))] = old_segment_end;
       };
 
       // Let's find a triangle containing our new point, or at least
@@ -710,18 +714,18 @@ bool Poly2TriTriangulator::insert_refinement_points()
       if (side == invalid_uint && !new_node)
         {
           unsigned int worst_side = libMesh::invalid_uint;
-          Real worst_cos = 1;
+          GeomReal worst_cos = 1;
           for (auto s : make_range(3u))
             {
               // We never snap to a non-domain-boundary
               if (cavity_elem->neighbor_ptr(s))
                 continue;
 
-              Real ax = cavity_elem->point(s)(0) - new_pt(0),
+              auto ax = cavity_elem->point(s)(0) - new_pt(0),
                    ay = cavity_elem->point(s)(1) - new_pt(1),
                    bx = cavity_elem->point((s+1)%3)(0) - new_pt(0),
                    by = cavity_elem->point((s+1)%3)(1) - new_pt(1);
-              const Real my_cos = (ax*bx+ay*by) /
+              const auto my_cos = (ax*bx+ay*by) /
                                   std::sqrt(ax*ax+ay*ay) /
                                   std::sqrt(bx*bx+by*by);
 
@@ -989,7 +993,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
               // Connect to any newly inserted nodes
               Node * this_node = &node;
-              auto it = next_boundary_node.find(*this_node);
+              auto it = next_boundary_node.find(MetaPhysicL::raw_value(static_cast<Point &>(*this_node)));
               while (it != next_boundary_node.end())
                 {
                   libmesh_assert(this_node->valid_id());
@@ -1006,7 +1010,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   if (this_node->id() == this->segments.front().first)
                     break;
 
-                  it = next_boundary_node.find(*this_node);
+                  it = next_boundary_node.find(MetaPhysicL::raw_value(static_cast<Point &>(*this_node)));
                 }
             }
 
@@ -1028,7 +1032,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
           do
             {
               const dof_id_type node_id = node->id();
-              auto it = next_boundary_node.find(*node);
+              auto it = next_boundary_node.find(MetaPhysicL::raw_value(static_cast<Point &>(*node)));
               if (it == next_boundary_node.end())
                 {
                   while (node_id != old_it->first)
@@ -1059,7 +1063,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
               bool hole_point_insertion = false;
                 for (auto p : make_range(hole->n_points()))
-                  if (next_boundary_node.count(hole->point(p)))
+                  if (next_boundary_node.count(MetaPhysicL::raw_value(static_cast<const Point &>(hole->point(p)))))
                     {
                       hole_point_insertion = true;
                       break;
@@ -1083,7 +1087,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
               // new points inserted
               bool point_inserted = false;
               for (const Point & point : arb.get_points())
-                if (next_boundary_node.count(point))
+                if (next_boundary_node.count(MetaPhysicL::raw_value(point)))
                   {
                     point_inserted = true;
                     break;
@@ -1133,7 +1137,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                        point != new_points.front()))
                     push_back_new_point(point);
 
-                  auto it = next_boundary_node.find(point);
+                  auto it = next_boundary_node.find(MetaPhysicL::raw_value(point));
                   while (it != next_boundary_node.end())
                     {
                       point = *it->second;
@@ -1143,7 +1147,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                           point == *point_it)
                         ++point_it;
                       push_back_new_point(point);
-                      it = next_boundary_node.find(point);
+                      it = next_boundary_node.find(MetaPhysicL::raw_value(point));
                     }
                 }
 
@@ -1165,14 +1169,14 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
 bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
 {
-  const Real min_area_target = this->desired_area();
+  const auto min_area_target = this->desired_area();
   FunctionBase<Real> * area_func = this->get_desired_area_function();
 
   // If this isn't a question, why are we here?
   libmesh_assert(min_area_target > 0 ||
                  area_func != nullptr);
 
-  const Real area = elem.volume();
+  const auto area = elem.volume();
 
   // If we don't have position-dependent area targets we can make a
   // decision quickly
@@ -1185,7 +1189,7 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
   // vertices first
   for (auto v : make_range(elem.n_vertices()))
     {
-      const Real local_area_target = (*area_func)(elem.point(v));
+      const auto local_area_target = (*area_func)(elem.point(v));
       libmesh_error_msg_if
         (local_area_target <= 0,
          "Non-positive desired element areas are unachievable");

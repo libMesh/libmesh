@@ -26,6 +26,7 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/vector_value.h"
+#include "libmesh/raw_type.h"
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "libmesh/tensor_value.h"
@@ -121,7 +122,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Number interior_value(unsigned int var, unsigned int qp) const;
+  GeomNumber interior_value(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The value of the solution variable \p var at the quadrature
@@ -129,7 +130,7 @@ public:
    *
    * \note This API currently is present for backward compatibility.
    */
-  Number side_value(unsigned int var, unsigned int qp) const;
+  GeomNumber side_value(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The value of the solution variable \p var at the physical
@@ -137,7 +138,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Number point_value(unsigned int var, const Point & p) const;
+  GeomNumber point_value(unsigned int var, const Point & p) const;
 
   /**
    * \returns The gradient of the solution variable \p var at the quadrature
@@ -145,7 +146,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Gradient interior_gradient(unsigned int var, unsigned int qp) const;
+  GeomNumberGradient interior_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The gradient of the solution variable \p var at the quadrature
@@ -153,7 +154,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Gradient side_gradient(unsigned int var, unsigned int qp) const;
+  GeomNumberGradient side_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The gradient of the solution variable \p var at the physical
@@ -161,7 +162,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Gradient point_gradient(unsigned int var, const Point & p) const;
+  GeomNumberGradient point_gradient(unsigned int var, const Point & p) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -170,7 +171,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Tensor interior_hessian(unsigned int var, unsigned int qp) const;
+  GeomNumberTensor interior_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The hessian of the solution variable \p var at the quadrature
@@ -178,7 +179,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Tensor side_hessian(unsigned int var, unsigned int qp) const;
+  GeomNumberTensor side_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The hessian of the solution variable \p var at the physical
@@ -186,7 +187,7 @@ public:
    *
    * \note This API currently present for backward compatibility.
    */
-  Tensor point_hessian(unsigned int var, const Point & p) const;
+  GeomNumberTensor point_hessian(unsigned int var, const Point & p) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -196,7 +197,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Number fixed_interior_value(unsigned int var, unsigned int qp) const;
+  GeomNumber fixed_interior_value(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The value of the fixed_solution variable \p var at the quadrature
@@ -204,7 +205,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Number fixed_side_value(unsigned int var, unsigned int qp) const;
+  GeomNumber fixed_side_value(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The value of the fixed_solution variable \p var at the physical
@@ -212,7 +213,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Number fixed_point_value(unsigned int var, const Point & p) const;
+  GeomNumber fixed_point_value(unsigned int var, const Point & p) const;
 
   /**
    * \returns The gradient of the fixed_solution variable \p var at the quadrature
@@ -220,7 +221,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Gradient fixed_interior_gradient(unsigned int var, unsigned int qp) const;
+  GeomNumberGradient fixed_interior_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The gradient of the fixed_solution variable \p var at the quadrature
@@ -228,7 +229,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Gradient fixed_side_gradient(unsigned int var, unsigned int qp) const;
+  GeomNumberGradient fixed_side_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The gradient of the fixed_solution variable \p var at the physical
@@ -236,7 +237,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Gradient fixed_point_gradient(unsigned int var, const Point & p) const;
+  GeomNumberGradient fixed_point_gradient(unsigned int var, const Point & p) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -245,7 +246,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Tensor fixed_interior_hessian(unsigned int var, unsigned int qp) const;
+  GeomNumberTensor fixed_interior_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The hessian of the fixed_solution variable \p var at the quadrature
@@ -253,7 +254,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Tensor fixed_side_hessian(unsigned int var, unsigned int qp) const;
+  GeomNumberTensor fixed_side_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * \returns The hessian of the fixed_solution variable \p var at the physical
@@ -261,7 +262,7 @@ public:
    *
    * \note This API is currently present for backward compatibility.
    */
-  Tensor fixed_point_hessian (unsigned int var, const Point & p) const;
+  GeomNumberTensor fixed_point_hessian (unsigned int var, const Point & p) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -1107,12 +1108,13 @@ protected:
   template <typename OutputType>
   struct FENeeded
   {
+    typedef typename MetaPhysicL::RawType<OutputType>::value_type RawType;
     // Rank decrementer helper types
-    typedef typename TensorTools::DecrementRank<OutputType>::type Rank1Decrement;
+    typedef typename TensorTools::DecrementRank<RawType>::type Rank1Decrement;
     typedef typename TensorTools::DecrementRank<Rank1Decrement>::type Rank2Decrement;
 
     // Typedefs for "Value getter" function pointer
-    typedef typename TensorTools::MakeReal<OutputType>::type value_shape;
+    typedef typename TensorTools::MakeReal<RawType>::type value_shape;
     typedef FEGenericBase<value_shape> value_base;
     typedef void (FEMContext::*value_getter) (unsigned int, value_base *&, unsigned short) const;
 
