@@ -102,16 +102,18 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   ParallelObject(parent),
   ex_id(0),
   ex_err(0),
-  num_dim(0),
+  header_info(), // zero-initialize
+  title(header_info.title),
+  num_dim(header_info.num_dim),
+  num_nodes(header_info.num_nodes),
+  num_elem(header_info.num_elem),
+  num_elem_blk(header_info.num_elem_blk),
+  num_edge(header_info.num_edge),
+  num_edge_blk(header_info.num_edge_blk),
+  num_node_sets(header_info.num_node_sets),
+  num_side_sets(header_info.num_side_sets),
   num_global_vars(0),
   num_sideset_vars(0),
-  num_nodes(0),
-  num_elem(0),
-  num_elem_blk(0),
-  num_edge(0),
-  num_edge_blk(0),
-  num_node_sets(0),
-  num_side_sets(0),
   num_elem_this_blk(0),
   num_nodes_per_elem(0),
   num_attr(0),
@@ -529,7 +531,8 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
 
 
 
-void ExodusII_IO_Helper::read_header()
+ExodusHeaderInfo
+ExodusII_IO_Helper::read_header() const
 {
   // Read init params using newer API that reads into a struct.  For
   // backwards compatibility, assign local member values from struct
@@ -537,21 +540,35 @@ void ExodusII_IO_Helper::read_header()
   // read edge and face block/set information if it's present in the
   // file.
   exII::ex_init_params params = {};
-  ex_err = exII::ex_get_init_ext(ex_id, &params);
-  EX_CHECK_ERR(ex_err, "Error retrieving header info.");
+  int err_flag = exII::ex_get_init_ext(ex_id, &params);
+  EX_CHECK_ERR(err_flag, "Error retrieving header info.");
 
-  // "title" has MAX_LINE_LENGTH+1 characters, but the last one is reserved
-  // for null termination so we only copy MAX_LINE_LENGTH chars.
-  title.assign(params.title, params.title + MAX_LINE_LENGTH);
-  num_dim = params.num_dim;
-  num_nodes = params.num_nodes;
-  num_elem = params.num_elem;
-  num_elem_blk = params.num_elem_blk;
-  num_node_sets = params.num_node_sets;
-  num_side_sets = params.num_side_sets;
-  num_edge_blk = params.num_edge_blk;
-  num_edge = params.num_edge;
+  // Extract required data into our struct
+  ExodusHeaderInfo h;
+  h.title.assign(params.title, params.title + MAX_LINE_LENGTH);
+  h.num_dim = params.num_dim;
+  h.num_nodes = params.num_nodes;
+  h.num_elem = params.num_elem;
+  h.num_elem_blk = params.num_elem_blk;
+  h.num_node_sets = params.num_node_sets;
+  h.num_side_sets = params.num_side_sets;
+  h.num_edge_blk = params.num_edge_blk;
+  h.num_edge = params.num_edge;
 
+  // And return it
+  return h;
+}
+
+
+
+void ExodusII_IO_Helper::read_and_store_header_info()
+{
+  // Read header params from file, storing them in this class's
+  // ExodusHeaderInfo struct.  This automatically updates the local
+  // num_dim, num_elem, etc. referenes.
+  this->header_info = this->read_header();
+
+  // Read the number of timesteps which are present in the file
   this->read_num_time_steps();
 
   ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);

@@ -200,7 +200,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   //  num_elem_blk
   //  num_node_sets
   //  num_side_sets
-  nemhelper->read_header();
+  nemhelper->read_and_store_header_info();
   nemhelper->print_header();
 
   // Get global information: number of nodes, elems, blocks, nodesets and sidesets
@@ -944,7 +944,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
   // Read *local* sideset info the same way it is done in
   // exodusII_io_helper.  May be called any time after
-  // nem_helper->read_header(); This sets num_side_sets and resizes
+  // nem_helper->read_and_store_header_info(); This sets num_side_sets and resizes
   // elem_list, side_list, and id_list to num_elem_all_sidesets.  Note
   // that there appears to be the same number of sidesets in each file
   // but they all have different numbers of entries (some are empty).
@@ -1282,7 +1282,7 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
           // fields, such as the number of nodes and the number of
           // elements, are correctly initialized for the subsequent
           // call to write the nodal solution.
-          nemhelper->read_header();
+          nemhelper->read_and_store_header_info();
         }
       else
         {

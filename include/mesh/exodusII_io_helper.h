@@ -27,6 +27,7 @@
 #include "libmesh/point.h"
 #include "libmesh/boundary_info.h" // BoundaryInfo::BCTuple
 #include "libmesh/enum_elem_type.h" // INVALID_ELEM
+#include "libmesh/exodus_header_info.h"
 
 // C++ includes
 #include <iostream>
@@ -119,9 +120,16 @@ public:
   void open(const char * filename, bool read_only);
 
   /**
-   * Reads an \p ExodusII mesh file header.
+   * Reads an \p ExodusII mesh file header, leaving this object's
+   * internal data structures unchanged.
    */
-  void read_header();
+  ExodusHeaderInfo read_header() const;
+
+  /**
+   * Reads an \p ExodusII mesh file header, and stores required
+   * information on this object.
+   */
+  void read_and_store_header_info();
 
   /**
    * Reads the QA records from an ExodusII file.  We can use this to
@@ -501,36 +509,42 @@ public:
   // General error flag
   int ex_err;
 
+  // struct which contains data fields from the Exodus file header
+  ExodusHeaderInfo header_info;
+
+  // Problem title (Use vector<char> to emulate a char *)
+  std::vector<char> & title;
+
   // Number of dimensions in the mesh
-  int num_dim;
+  int & num_dim;
+
+  // Total number of nodes in the mesh
+  int & num_nodes;
+
+  // Total number of elements in the mesh
+  int & num_elem;
+
+  // Total number of element blocks
+  int & num_elem_blk;
+
+  // Total number of edges
+  int & num_edge;
+
+  // Total number of edge blocks. The sum of the number of edges in
+  // each block must equal num_edge.
+  int & num_edge_blk;
+
+  // Total number of node sets
+  int & num_node_sets;
+
+  // Total number of element sets
+  int & num_side_sets;
 
   // Number of global variables
   int num_global_vars;
 
   // Number of sideset variables
   int num_sideset_vars;
-
-  // Total number of nodes in the mesh
-  int num_nodes;
-
-  // Total number of elements in the mesh
-  int num_elem;
-
-  // Total number of element blocks
-  int num_elem_blk;
-
-  // Total number of edges
-  int num_edge;
-
-  // Total number of edge blocks. The sum of the number of edges in
-  // each block must equal num_edge.
-  int num_edge_blk;
-
-  // Total number of node sets
-  int num_node_sets;
-
-  // Total number of element sets
-  int num_side_sets;
 
   // Number of elements in this block
   int num_elem_this_blk;
@@ -613,9 +627,6 @@ public:
 
   // z locations of node points
   std::vector<Real> z;
-
-  //  Problem title (Use vector<char> to emulate a char *)
-  std::vector<char> title;
 
   // Type of element in a given block
   std::vector<char> elem_type;
@@ -830,11 +841,6 @@ private:
   std::map<ElemType, ExodusII_IO_Helper::Conversion> conversion_map;
   void init_conversion_map();
 };
-
-
-
-
-
 
 
 

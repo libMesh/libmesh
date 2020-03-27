@@ -144,7 +144,6 @@ ExodusII_IO::~ExodusII_IO ()
 }
 
 
-
 void ExodusII_IO::read (const std::string & fname)
 {
   // Get a reference to the mesh we are reading
@@ -166,7 +165,7 @@ void ExodusII_IO::read (const std::string & fname)
   exio_helper->open(fname.c_str(), /*read_only=*/true);
 
   // Get header information from exodus file
-  exio_helper->read_header();
+  exio_helper->read_and_store_header_info();
 
   // Read the QA records
   exio_helper->read_qa_records();
@@ -448,6 +447,43 @@ void ExodusII_IO::read (const std::string & fname)
                       << mesh.mesh_dimension()                        \
                       << "D support.");
 #endif
+}
+
+
+
+ExodusHeaderInfo
+ExodusII_IO::read_header (const std::string & fname)
+{
+  // We will need the Communicator of the Mesh we were created with.
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  // Eventual return value
+  ExodusHeaderInfo header_info;
+
+  // File I/O is done on processor 0, then broadcast to other procs
+  if (mesh.processor_id() == 0)
+    {
+      // Open the exodus file in EX_READ mode
+      exio_helper->open(fname.c_str(), /*read_only=*/true);
+
+      // Get header information from exodus file without updating the
+      // Helper object's internal data structures.
+      header_info = exio_helper->read_header();
+
+      // Close the file, we are now done with it. The goal is to keep the
+      // exio_helper object unchanged while calling this function,
+      // although it can't quite be marked "const" because we do have to
+      // actually open/close the file. This way, it should be possible to
+      // use the same ExodusII_IO object to read the headers of multiple
+      // different mesh files.
+      exio_helper->close();
+    }
+
+  // Broadcast header_info to other procs before returning
+  header_info.broadcast(mesh.comm());
+
+  // Return the information we read back to the user.
+  return header_info;
 }
 
 
@@ -1508,7 +1544,7 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
           // or exio_helper->initialize_nodal_variables(), but we do need to set up
           // certain aspects of the Helper object itself, such as the number of nodes
           // and elements.  We do that by reading the header...
-          exio_helper->read_header();
+          exio_helper->read_and_store_header_info();
 
           // ...and reading the block info
           exio_helper->read_block_info();
@@ -1574,13 +1610,18 @@ ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
 
 
 
-ExodusII_IO::~ExodusII_IO ()
-{
-}
+ExodusII_IO::~ExodusII_IO () = default;
 
 
 
 void ExodusII_IO::read (const std::string &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
+ExodusHeaderInfo ExodusII_IO::read_header (const std::string &)
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
