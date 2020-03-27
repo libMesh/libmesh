@@ -1238,6 +1238,11 @@ void ExodusII_IO_Helper::close()
           ex_err = exII::ex_close(ex_id);
           EX_CHECK_ERR(ex_err, "Error closing Exodus file.");
           message("Exodus file closed successfully.");
+
+          // Now that the file is closed, it's no longer opened for
+          // reading or writing.
+          opened_for_writing = false;
+          opened_for_reading = false;
         }
     }
 }
