@@ -165,7 +165,8 @@ DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
       other_boundary_info.get_nodeset_name(node_bnd_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  _next_unique_id = other_mesh.parallel_max_unique_id();
+  _next_unique_id = other_mesh.parallel_max_unique_id() +
+                    this->processor_id();
 #endif
   this->update_parallel_id_counts();
 }
@@ -745,7 +746,7 @@ Node * DistributedMesh::add_node (Node * n)
       if (processor_id() == n->processor_id())
         {
           n->set_unique_id() = _next_unique_id;
-          _next_unique_id += this->n_processors();
+          _next_unique_id += this->n_processors() + 1;
         }
       else
         {
