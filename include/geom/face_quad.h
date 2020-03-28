@@ -80,6 +80,11 @@ public:
   }
 
   /**
+   * \returns \p QUAD.
+   */
+  virtual BaseElemType base_type () const override final { return QUAD; }
+
+  /**
    * \returns 4.  All quad-derivatives are guaranteed to have at
    * least 4 nodes.
    */

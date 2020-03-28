@@ -68,6 +68,11 @@ public:
   }
 
   /**
+   * \returns \p PRISM.
+   */
+  virtual BaseElemType base_type () const override final { return PRISM; }
+
+  /**
    * \returns 6.  All prism-derivatives are guaranteed to have at
    * least 6 nodes.
    */

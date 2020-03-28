@@ -81,6 +81,11 @@ public:
   }
 
   /**
+   * \returns \p TRI.
+   */
+  virtual BaseElemType base_type () const override final { return TRI; }
+
+  /**
    * \returns 3.  All tri-derivatives are guaranteed to have at
    * least 3 nodes.
    */

@@ -78,6 +78,11 @@ public:
   }
 
   /**
+   * \returns \p INFHEX.
+   */
+  virtual BaseElemType base_type () const override final { return INFHEX; }
+
+  /**
    * \returns 5.  Infinite elements have one side less
    * than their conventional counterparts, since one
    * side is supposed to be located at infinity.

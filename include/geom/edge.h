@@ -64,6 +64,11 @@ public:
   virtual unsigned short dim () const override final { return 1; }
 
   /**
+   * \returns \p EDGE.
+   */
+  virtual BaseElemType base_type () const override { return EDGE; }
+
+  /**
    * \returns 2. Every edge is guaranteed to have at least 2 nodes.
    */
   virtual unsigned int n_nodes() const override { return 2; }

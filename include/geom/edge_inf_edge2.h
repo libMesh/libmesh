@@ -77,6 +77,11 @@ public:
   }
 
   /**
+   * \returns \p INFEDGE.
+   */
+  virtual BaseElemType base_type () const override final { return INFEDGE; }
+
+  /**
    * \returns 1.
    */
   virtual unsigned int n_sub_elem() const override { return 1; }

@@ -581,6 +581,12 @@ public:
   virtual ElemType type () const = 0;
 
   /**
+   * \returns The base type of element that has been derived from
+   * this base class.
+   */
+  virtual BaseElemType base_type () const = 0;
+
+  /**
    * \returns The dimensionality of the object.
    */
   virtual unsigned short dim () const = 0;

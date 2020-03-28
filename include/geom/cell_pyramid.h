@@ -72,6 +72,11 @@ public:
   }
 
   /**
+   * \returns \p PYRAMID.
+   */
+  virtual BaseElemType base_type () const override final { return PYRAMID; }
+
+  /**
    * \returns 5.  All pyramid-derivatives are guaranteed to have at
    * least 5 nodes.
    */

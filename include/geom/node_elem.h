@@ -73,6 +73,11 @@ public:
   virtual unsigned short dim () const override { return 0; }
 
   /**
+   * \returns \p NODE.
+   */
+  virtual BaseElemType base_type () const override final { return NODE; }
+
+  /**
    * \returns 1.
    */
   virtual unsigned int n_nodes() const override { return 1; }

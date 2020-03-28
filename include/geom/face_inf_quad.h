@@ -95,6 +95,11 @@ public:
   virtual unsigned short dim() const override final { return 2; }
 
   /**
+   * \returns \p INFQUAD.
+   */
+  virtual BaseElemType base_type () const override final { return INFQUAD; }
+
+  /**
    * \returns 3.  Infinite faces have one side less
    * than their conventional counterparts, since one
    * side is supposed to be located at infinity.

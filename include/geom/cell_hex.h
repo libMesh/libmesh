@@ -68,6 +68,11 @@ public:
   }
 
   /**
+   * \returns \p HEX.
+   */
+  virtual BaseElemType base_type () const override final { return HEX; }
+
+  /**
    * \returns 6.
    */
   virtual unsigned int n_sides() const override final { return 6; }

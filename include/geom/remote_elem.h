@@ -113,6 +113,9 @@ public:
   virtual ElemType type () const override
   { return REMOTEELEM; }
 
+  virtual BaseElemType base_type () const override
+  { return REMOTE; }
+
   virtual unsigned short dim () const override
   { libmesh_not_implemented(); return 0; }
 

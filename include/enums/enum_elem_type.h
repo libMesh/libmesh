@@ -84,6 +84,37 @@ enum ElemMappingType : unsigned char {
   RATIONAL_BERNSTEIN_MAP,
   INVALID_MAP };
 
+/**
+ * Defines an \p enum for geometric element base types.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum BaseElemType : int;
+ * reducing header file dependencies.
+ */
+ enum BaseElemType : int {
+                    // 1D
+                    EDGE = 0,
+                    // 2D
+                    TRI = 1,
+                    QUAD = 2,
+                    // 3D
+                    TET = 3,
+                    HEX = 4,
+                    PRISM = 5,
+                    PYRAMID = 6,
+                    // Infinite Elems
+                    INFEDGE = 7,
+                    INFQUAD = 8,
+                    INFHEX = 9,
+                    INFPRISM = 10,
+                    // 0D
+                    NODE = 11,
+                    // Miscellaneous Elems
+                    REMOTE = 12,
+                    // Invalid
+                    INVALID_BASE_ELEM};   // should always be last
+
 }
 
 #endif

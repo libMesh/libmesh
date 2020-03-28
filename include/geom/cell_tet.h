@@ -69,6 +69,11 @@ public:
   }
 
   /**
+   * \returns \p TET.
+   */
+  virtual BaseElemType base_type () const override final { return TET; }
+
+  /**
    * \returns 4.
    */
   virtual unsigned int n_sides() const override final { return 4; }
