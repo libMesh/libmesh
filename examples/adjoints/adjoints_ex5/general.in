@@ -10,6 +10,9 @@ n_timesteps = 10
 # Solve a transient instead of a steady problem?
 transient = true
 
+# For the unsteady adjoints, are we storing solution in memory or on disk ?
+solution_history_type = file
+
 # The interval between our timesteps
 deltat = 0.1
 

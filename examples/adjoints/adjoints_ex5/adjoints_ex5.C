@@ -17,12 +17,12 @@
 
 
 
-// Adjoints Example 5 - SolutionHistory, General Localized Vectors and Unsteady Adjoints.
+// Adjoints Example 5 - SolutionHistory (both Memory and File), General Localized Vectors and Unsteady Adjoints.
 // \author Vikram Garg
-// \date 2013
+// \date 2020
 //
-// This example showcases three new capabilities in libMesh. The
-// primary motivation is adjoint sensitivity analysis for unsteady
+// This example showcases the solution storage and retrival capabilities of libMesh, in the context of
+// unsteady adjoints. The primary motivation is adjoint sensitivity analysis for unsteady
 // problems. The PDE we are interested in is the simple 2-d heat
 // equation:
 // partial(T)/partial(t) - K Laplacian(T) = 0
@@ -53,10 +53,10 @@
 // initial condition and solving the transpose of the discrete primal
 // problem at the last nonlinear solve of the corresponding primal
 // timestep. This necessitates the storage of the primal solution at
-// all timesteps, which is accomplished here using a
-// MemorySolutionHistory object. As the name suggests, this object
+// all timesteps, which is accomplished here using either a
+// MemorySolutionHistory or a FileSolutionHistory object. As the name suggests, this object
 // simply stores the primal solution (and other vectors we may choose
-// to save), so that we can retrieve them later, whenever necessary.
+// to save) in memory or disk, so that we can retrieve them later, whenever necessary.
 
 // The discrete adjoint system for implicit time steppers requires the
 // localization of vectors other than system.solution, which is
@@ -104,6 +104,7 @@
 // SolutionHistory Includes
 #include "libmesh/solution_history.h"
 #include "libmesh/memory_solution_history.h"
+#include "libmesh/file_solution_history.h"
 
 // C++ includes
 #include <iostream>
@@ -212,9 +213,19 @@ void set_system_parameters(HeatSystem & system,
   else
     system.time_solver = libmesh_make_unique<SteadySolver>(system);
 
-  // The Memory Solution History object we will set the system SolutionHistory object to
-  MemorySolutionHistory heatsystem_solution_history(system);
-  system.time_solver->set_solution_history(heatsystem_solution_history);
+  // The Memory/File Solution History object we will set the system SolutionHistory object to
+  if(param.solution_history_type == "memory")
+    {
+      MemorySolutionHistory heatsystem_solution_history(system);
+      system.time_solver->set_solution_history(heatsystem_solution_history);
+    }
+  else if (param.solution_history_type == "file")
+    {
+      FileSolutionHistory heatsystem_solution_history(system);
+      system.time_solver->set_solution_history(heatsystem_solution_history);
+    }
+  else
+    libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
     param.deltat_reductions;
@@ -387,13 +398,18 @@ int main (int argc, char ** argv)
   // Tell the library not to save adjoint solutions during the forward
   // solve
   //
-  // Tell the library not to project this vector, and hence, memory
+  // Tell the library not to project this vector, and hence, memory/file
   // solution history to not save it.
   //
   // Make this vector ghosted so we can localize it to each element
   // later.
   const std::string & adjoint_solution_name = "adjoint_solution0";
   system.add_vector("adjoint_solution0", false, GHOSTED);
+
+  // To keep the number of vectors consistent between the primal and adjoint
+  // loops, we will also pre-add the adjoint rhs vector
+  const std::string & adjoint_rhs_name = "adjoint_rhs0";
+  system.add_vector("adjoint_rhs0", false, GHOSTED);  
 
   // Close up any resources initial.C needed
   finish_initialization();
@@ -512,14 +528,25 @@ int main (int argc, char ** argv)
                        << ", time = "
                        << system.time
                        << std::endl;
-
           // The adjoint_advance_timestep function calls the retrieve
           // function of the memory_solution_history class via the
           // memory_solution_history object we declared earlier.  The
           // retrieve function sets the system primal vectors to their
           // values at the current timestep.
           libMesh::out << "Retrieving solutions at time t=" << system.time << std::endl;
+                               
+          // Reading in the primal xdas overwrites the adjoint solution with zero
+          // So swap to retain the old adjoint solution
+          NumericVector<Number> & dual_solution_last = system.get_adjoint_solution(0);
+
+          std::unique_ptr<NumericVector<Number>> dual_solution_copy = NumericVector<Number>::build(init.comm());
+          dual_solution_copy->init(dual_solution_last.size(), true, SERIAL);
+          *dual_solution_copy = dual_solution_last;
+         
           system.time_solver->adjoint_advance_timestep();
+
+          // Swap back the copy of the last adjoint solution back in place
+          dual_solution_last.swap(*dual_solution_copy);   
 
           // Output the H1 norm of the retrieved solution
           libMesh::out << "|U("
@@ -536,7 +563,7 @@ int main (int argc, char ** argv)
 
           system.set_adjoint_already_solved(false);
 
-          system.adjoint_solve();
+          system.adjoint_solve();         
 
           // Now that we have solved the adjoint, set the
           // adjoint_already_solved boolean to true, so we dont solve

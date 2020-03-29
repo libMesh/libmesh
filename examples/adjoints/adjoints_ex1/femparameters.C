@@ -29,6 +29,7 @@ FEMParameters::FEMParameters(const Parallel::Communicator & comm_in) :
   transient(true),
   deltat_reductions(0),
   timesolver_core("euler"),
+  solution_history_type("memory"),
   end_time(std::numeric_limits<Real>::max()),
   deltat(0.0001), timesolver_theta(0.5),
   timesolver_maxgrowth(0.), timesolver_tolerance(0.),
@@ -169,6 +170,7 @@ void FEMParameters::read(GetPot & input,
   GETPOT_INPUT(transient);
   GETPOT_INT_INPUT(deltat_reductions);
   GETPOT_INPUT(timesolver_core);
+  GETPOT_INPUT(solution_history_type);
   GETPOT_INPUT(end_time);
   GETPOT_INPUT(deltat);
   GETPOT_INPUT(timesolver_theta);
