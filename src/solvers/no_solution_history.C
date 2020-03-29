@@ -21,7 +21,7 @@
 namespace libMesh
 {
 
-void NoSolutionHistory::store()
+void NoSolutionHistory::store(bool is_adjoint_solve)
 {
   // Do nothing
 }

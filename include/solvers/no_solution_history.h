@@ -49,7 +49,7 @@ public:
   /**
    * Virtual function store which we will be overriding
    */
-  virtual void store() override;
+  virtual void store(bool is_adjoint_solve) override;
 
   /**
    * Virtual function retrieve which we will be overriding

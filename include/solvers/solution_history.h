@@ -50,7 +50,7 @@ public:
   /**
    * Function to store a solution, pure virtual
    */
-  virtual void store() = 0;
+  virtual void store(bool is_adjoint_solve) = 0;
 
   /**
    * Function to retrieve a solution, pure virtual

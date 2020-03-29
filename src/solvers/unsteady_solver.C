@@ -156,7 +156,7 @@ void UnsteadySolver::advance_timestep ()
       // Store the solution, does nothing by default
       // User has to attach appropriate solution_history object for this to
       // actually store anything anywhere
-      solution_history->store();
+      solution_history->store(false);
 
       _system.time += _system.deltat;
     }
@@ -182,7 +182,7 @@ void UnsteadySolver::adjoint_advance_timestep ()
   if (!first_adjoint_step)
     {
       // Call the store function to store the last adjoint before decrementing the time
-      solution_history->store();
+      solution_history->store(true);
       // Decrement the system time
       _system.time -= _system.deltat;
     }
