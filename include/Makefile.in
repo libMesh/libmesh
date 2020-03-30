@@ -754,6 +754,7 @@ include_HEADERS = \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \
         mesh/exodusII_io_helper.h \
+        mesh/exodus_header_info.h \
         mesh/fro_io.h \
         mesh/gmsh_io.h \
         mesh/gmv_io.h \

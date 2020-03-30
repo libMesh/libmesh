@@ -1839,7 +1839,8 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
-	write_edgeset_data.e $(am__append_12) $(am__append_13)
+	write_edgeset_data.e read_header_test.e $(am__append_12) \
+	$(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
