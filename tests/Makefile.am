@@ -229,7 +229,8 @@ CLEANFILES = cube_mesh.xda \
 	     mesh_with_soln.e \
 	     elemental_from_nodal.e \
              write_sideset_data.e \
-             write_edgeset_data.e
+             write_edgeset_data.e \
+             read_header_test.e
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
