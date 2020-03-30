@@ -87,7 +87,7 @@ public:
   /**
    * Fills: num_nodes_global, num_elems_global, num_elem_blks_global,
    * num_node_sets_global, num_side_sets_global
-   * Call after: read_header()
+   * Call after: read_and_store_header_info()
    * Call before: Any other get_* function from this class
    */
   void get_init_global();

@@ -27,6 +27,7 @@
 #include "libmesh/mesh_output.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/boundary_info.h" // BoundaryInfo::BCTuple
+#include "libmesh/exodus_header_info.h"
 
 namespace libMesh
 {
@@ -75,6 +76,25 @@ public:
    * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.
    */
   virtual void read (const std::string & name) override;
+
+  /**
+   * Read only the header information, instead of the entire
+   * mesh. After the header is read, the file is closed and the
+   * MeshBase object remains unchanged. This capability is useful if
+   * you only need to know the mesh "metadata" and should be faster
+   * than reading in all the nodes and elems.
+   *
+   * The header information currently includes:
+   * .) Title string
+   * .) Mesh spatial dimension
+   * .) Number of nodes
+   * .) Number of elements
+   * .) Number of element blocks
+   * .) Number of node sets
+   * .) Number of side sets
+   * .) Number of edge blocks/edges
+   */
+  ExodusHeaderInfo read_header (const std::string & name);
 
   /**
    * This method implements writing a mesh to a specified file.

@@ -165,6 +165,7 @@ BUILT_SOURCES = \
         ensight_io.h \
         exodusII_io.h \
         exodusII_io_helper.h \
+        exodus_header_info.h \
         fro_io.h \
         gmsh_io.h \
         gmv_io.h \
@@ -1023,6 +1024,9 @@ exodusII_io.h: $(top_srcdir)/include/mesh/exodusII_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exodusII_io_helper.h: $(top_srcdir)/include/mesh/exodusII_io_helper.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+exodus_header_info.h: $(top_srcdir)/include/mesh/exodus_header_info.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fro_io.h: $(top_srcdir)/include/mesh/fro_io.h

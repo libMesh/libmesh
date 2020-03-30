@@ -542,20 +542,20 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
 	surface.h abaqus_io.h boundary_info.h boundary_mesh.h \
 	checkpoint_io.h distributed_mesh.h dyna_io.h ensight_io.h \
-	exodusII_io.h exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h \
-	gnuplot_io.h inf_elem_builder.h matlab_io.h medit_io.h mesh.h \
-	mesh_base.h mesh_communication.h mesh_function.h \
-	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
-	mesh_modification.h mesh_output.h mesh_refinement.h \
-	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
-	mesh_smoother_vsmoother.h mesh_subdivision_support.h \
-	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
-	mesh_triangle_holes.h mesh_triangle_interface.h \
-	mesh_triangle_wrapper.h namebased_io.h nemesis_io.h \
-	nemesis_io_helper.h off_io.h parallel_mesh.h patch.h \
-	postscript_io.h replicated_mesh.h serial_mesh.h \
-	sync_refinement_flags.h tecplot_io.h tetgen_io.h ucd_io.h \
-	unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
+	exodusII_io.h exodusII_io_helper.h exodus_header_info.h \
+	fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h inf_elem_builder.h \
+	matlab_io.h medit_io.h mesh.h mesh_base.h mesh_communication.h \
+	mesh_function.h mesh_generation.h mesh_input.h \
+	mesh_inserter_iterator.h mesh_modification.h mesh_output.h \
+	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
+	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
+	mesh_subdivision_support.h mesh_tetgen_interface.h \
+	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
+	mesh_triangle_interface.h mesh_triangle_wrapper.h \
+	namebased_io.h nemesis_io.h nemesis_io_helper.h off_io.h \
+	parallel_mesh.h patch.h postscript_io.h replicated_mesh.h \
+	serial_mesh.h sync_refinement_flags.h tecplot_io.h tetgen_io.h \
+	ucd_io.h unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
 	analytic_function.h composite_fem_function.h \
 	composite_function.h const_fem_function.h const_function.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
@@ -1365,6 +1365,9 @@ exodusII_io.h: $(top_srcdir)/include/mesh/exodusII_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exodusII_io_helper.h: $(top_srcdir)/include/mesh/exodusII_io_helper.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+exodus_header_info.h: $(top_srcdir)/include/mesh/exodus_header_info.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fro_io.h: $(top_srcdir)/include/mesh/fro_io.h

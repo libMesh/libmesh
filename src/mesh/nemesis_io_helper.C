@@ -2394,10 +2394,10 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
       write_nodal_values(3*c+2,imag_parts,timestep);
       write_nodal_values(3*c+3,magnitudes,timestep);
 #else
-      std::vector<Number> cur_soln(num_nodes);
+      std::vector<Number> cur_soln(this->num_nodes);
 
       // Copy out this variable's solution
-      for (int i=0; i<num_nodes; i++)
+      for (int i=0; i<this->num_nodes; i++)
         cur_soln[i] = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
 
       write_nodal_values(c+1,cur_soln,timestep);
@@ -2430,9 +2430,9 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
         cast_int<int>(std::distance(output_names.begin(), pos));
 
       // Fill up a std::vector with the dofs for the current variable
-      std::vector<numeric_index_type> required_indices(num_nodes);
+      std::vector<numeric_index_type> required_indices(this->num_nodes);
 
-      for (int i=0; i<num_nodes; i++)
+      for (int i=0; i<this->num_nodes; i++)
         required_indices[i] = static_cast<dof_id_type>(this->exodus_node_num_to_libmesh[i]) * num_vars + c;
 
       // Get the dof values required to write just our local part of
@@ -2495,18 +2495,18 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
         cast_int<int>(std::distance(output_names.begin(), pos));
 
       // Fill up a std::vector with the dofs for the current variable
-      std::vector<numeric_index_type> required_indices(num_nodes);
+      std::vector<numeric_index_type> required_indices(this->num_nodes);
 
       const FEType type = sys.variable_type(var);
       if (type.family == SCALAR)
         {
           std::vector<numeric_index_type> scalar_indices;
           sys.get_dof_map().SCALAR_dof_indices(scalar_indices, var);
-          for (int i=0; i<num_nodes; i++)
+          for (int i=0; i<this->num_nodes; i++)
             required_indices[i] = scalar_indices[0];
         }
       else
-        for (int i=0; i<num_nodes; i++)
+        for (int i=0; i<this->num_nodes; i++)
           {
             const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]);
             required_indices[i] = node.dof_number(sys_num, var, 0);
