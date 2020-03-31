@@ -504,13 +504,14 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           // Pick a unique id in parallel
           Node & bnode = _mesh.node_ref(dof);
           dof_id_type new_id = bnode.id() + old_max_node_id;
-          Node * new_node =
-            this->_mesh.add_point(p, new_id,
-                                  bnode.processor_id());
+          std::unique_ptr<Node> new_node = Node::build(p, new_id);
+          new_node->processor_id() = bnode.processor_id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           new_node->set_unique_id(old_max_unique_id + bnode.id());
 #endif
-          outer_nodes[dof] = new_node;
+
+          outer_nodes[dof] =
+            this->_mesh.add_node(std::move(new_node));
         }
     }
 
