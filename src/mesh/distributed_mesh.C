@@ -510,6 +510,13 @@ Elem * DistributedMesh::add_elem (Elem * e)
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
     }
+  else
+    {
+      _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
+      _next_unique_id =
+        ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
+    }
 #endif
 
   // Unpartitioned elems should be added on every processor
@@ -566,6 +573,13 @@ Elem * DistributedMesh::insert_elem (Elem * e)
           e->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
+    }
+  else
+    {
+      _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
+      _next_unique_id =
+        ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
     }
 #endif
 
@@ -753,6 +767,13 @@ Node * DistributedMesh::add_node (Node * n)
           n->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
+    }
+  else
+    {
+      _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
+      _next_unique_id =
+        ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
     }
 #endif
 
