@@ -489,20 +489,35 @@ Node * ReplicatedMesh::add_point (const Point & p,
 Node * ReplicatedMesh::add_node (Node * n)
 {
   libmesh_assert(n);
-  // We only append points with ReplicatedMesh
-  libmesh_assert(!n->valid_id() || n->id() == _nodes.size());
 
-  n->set_id (cast_int<dof_id_type>(_nodes.size()));
+  // If the user requests a valid id, either set the existing
+  // container entry or resize the container to fit the new node.
+  const dof_id_type id = n->id();
+  if (id != DofObject::invalid_id)
+    {
+      if (id < _nodes.size())
+        libmesh_assert(!_nodes[id]);
+      else
+        _nodes.resize(id+1); // default nullptr
+
+      _nodes[id] = n;
+    }
+  else
+    {
+      n->set_id (cast_int<dof_id_type>(_nodes.size()));
+      _nodes.push_back(n);
+    }
+
+  ++_n_nodes;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!n->valid_unique_id())
     n->set_unique_id() = _next_unique_id++;
+  else
+   _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
 
   n->add_extra_integers(_node_integer_names.size());
-
-  ++_n_nodes;
-  _nodes.push_back(n);
 
   return n;
 }
