@@ -440,12 +440,6 @@ Node * ReplicatedMesh::add_point (const Point & p,
                                   const dof_id_type id,
                                   const processor_id_type proc_id)
 {
-  //   // We only append points with ReplicatedMesh
-  //   libmesh_assert(id == DofObject::invalid_id || id == _nodes.size());
-  //   Node *n = Node::build(p, _nodes.size()).release();
-  //   n->processor_id() = proc_id;
-  //   _nodes.push_back (n);
-
   Node * n = nullptr;
 
   // If the user requests a valid id, either
