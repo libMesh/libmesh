@@ -596,11 +596,13 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           el->processor_id() = belem.processor_id();
 
           // We'd better not have elements with more than 6 sides
-          libmesh_assert_less_equal(el->n_sides(), 6);
-          el->set_id (belem.id() * 6 + p.second + old_max_elem_id);
+          const unsigned int max_sides = 6;
+          libmesh_assert_less_equal(el->n_sides(), max_sides);
+          el->set_id (belem.id() * max_sides + p.second + old_max_elem_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          el->set_unique_id(old_max_unique_id + old_max_node_id + belem.id());
+          el->set_unique_id(old_max_unique_id + old_max_node_id +
+                            belem.id() * max_sides + p.second);
 #endif
 
           // If we have a remote neighbor on a boundary element side
