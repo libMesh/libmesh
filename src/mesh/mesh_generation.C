@@ -2204,7 +2204,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
             elem->unique_id() :
             orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + orig_nodes + elem->id();
 
-          new_elem->set_unique_id() = uid;
+          new_elem->set_unique_id(uid);
 #endif
 
           if (!elem_subdomain)
