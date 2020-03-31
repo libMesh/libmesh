@@ -508,7 +508,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
             this->_mesh.add_point(p, new_id,
                                   bnode.processor_id());
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          new_node->set_unique_id() = old_max_unique_id + bnode.id();
+          new_node->set_unique_id(old_max_unique_id + bnode.id());
 #endif
           outer_nodes[dof] = new_node;
         }
@@ -599,7 +599,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           el->set_id (belem.id() * 6 + p.second + old_max_elem_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          el->set_unique_id() = old_max_unique_id + old_max_node_id + belem.id();
+          el->set_unique_id(old_max_unique_id + old_max_node_id + belem.id());
 #endif
 
           // If we have a remote neighbor on a boundary element side

@@ -501,12 +501,12 @@ Elem * DistributedMesh::add_elem (Elem * e)
     {
       if (processor_id() == e->processor_id())
         {
-          e->set_unique_id() = _next_unique_id;
+          e->set_unique_id(_next_unique_id);
           _next_unique_id += this->n_processors() + 1;
         }
       else
         {
-          e->set_unique_id() = _next_unpartitioned_unique_id;
+          e->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
     }
@@ -558,12 +558,12 @@ Elem * DistributedMesh::insert_elem (Elem * e)
     {
       if (processor_id() == e->processor_id())
         {
-          e->set_unique_id() = _next_unique_id;
+          e->set_unique_id(_next_unique_id);
           _next_unique_id += this->n_processors() + 1;
         }
       else
         {
-          e->set_unique_id() = _next_unpartitioned_unique_id;
+          e->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
     }
@@ -745,12 +745,12 @@ Node * DistributedMesh::add_node (Node * n)
     {
       if (processor_id() == n->processor_id())
         {
-          n->set_unique_id() = _next_unique_id;
+          n->set_unique_id(_next_unique_id);
           _next_unique_id += this->n_processors() + 1;
         }
       else
         {
-          n->set_unique_id() = _next_unpartitioned_unique_id;
+          n->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
     }
@@ -1242,7 +1242,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
           libmesh_assert (obj);
           libmesh_assert_equal_to (obj->processor_id(), pid);
           if (!obj->valid_unique_id() && data[i] != DofObject::invalid_unique_id)
-            obj->set_unique_id() = (data[i]);
+            obj->set_unique_id(data[i]);
         }
     };
 

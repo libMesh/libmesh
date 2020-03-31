@@ -296,7 +296,7 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!e->valid_unique_id())
-    e->set_unique_id() = _next_unique_id++;
+    e->set_unique_id(_next_unique_id++);
   else
    _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
 #endif
@@ -341,7 +341,7 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!e->valid_unique_id())
-    e->set_unique_id() = _next_unique_id++;
+    e->set_unique_id(_next_unique_id++);
   else
    _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
 #endif
@@ -470,7 +470,7 @@ Node * ReplicatedMesh::add_point (const Point & p,
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       if (!n->valid_unique_id())
-        n->set_unique_id() = _next_unique_id++;
+        n->set_unique_id(_next_unique_id++);
       else
        _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
@@ -516,7 +516,7 @@ Node * ReplicatedMesh::add_node (Node * n)
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!n->valid_unique_id())
-    n->set_unique_id() = _next_unique_id++;
+    n->set_unique_id(_next_unique_id++);
   else
    _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
@@ -565,7 +565,7 @@ Node * ReplicatedMesh::insert_node(Node * n)
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!n->valid_unique_id())
-    n->set_unique_id() = _next_unique_id++;
+    n->set_unique_id(_next_unique_id++);
   else
    _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif

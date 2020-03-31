@@ -117,8 +117,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
                                   oldn->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        newn->set_unique_id() =
-          oldn->unique_id() + unique_id_offset;
+        newn->set_unique_id(oldn->unique_id() + unique_id_offset);
 #endif
       }
   }

@@ -1601,7 +1601,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
           elem->set_id() = e;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          elem->set_unique_id() = unique_id;
+          elem->set_unique_id(unique_id);
 #endif
           elem->processor_id() = proc_id;
           elem->subdomain_id() = subdomain_id;
@@ -1629,7 +1629,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
               else
                 {
                   std::unique_ptr<Node> new_node = Node::build(Point(), global_node_number);
-                  new_node->set_unique_id() = 2*global_node_number+1;
+                  new_node->set_unique_id(2*global_node_number+1);
                   elem->set_node(n) = mesh.add_node(std::move(new_node));
                 }
             }
@@ -1792,11 +1792,9 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
                 {
                   libmesh_assert_equal_to (*pos.first, n);
                   if (_field_width == 8)
-                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
-                      = unique_64[idx];
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id(unique_64[idx]);
                   else
-                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
-                      = unique_32[idx];
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id(unique_32[idx]);
                 }
             }
 #endif // LIBMESH_ENABLE_UNIQUE_ID

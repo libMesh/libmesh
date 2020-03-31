@@ -2005,7 +2005,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
             node->unique_id() :
             orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + node->id();
 
-          new_node->set_unique_id() = uid;
+          new_node->set_unique_id(uid);
 #endif
 
           cross_section_boundary_info.boundary_ids(node, ids_to_copy);

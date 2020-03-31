@@ -1098,7 +1098,7 @@ void CheckpointIO::read_nodes (Xdr & io)
             mesh.add_point(p, id, pid);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          node->set_unique_id() = unique_id;
+          node->set_unique_id(unique_id);
 #endif
 
           libmesh_assert_equal_to(n_extra_integers, node->n_extra_integers());
@@ -1241,7 +1241,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
           auto elem = Elem::build(elem_type, parent);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          elem->set_unique_id() = unique_id;
+          elem->set_unique_id(unique_id);
 #endif
 
           if (elem->dim() > highest_elem_dim)

@@ -1036,7 +1036,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               subelem[i]->set_id( max_orig_id + 6*elem->id() + i );
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              subelem[i]->set_unique_id() = max_unique_id + max_subelems*elem->unique_id() + i;
+              subelem[i]->set_unique_id(max_unique_id + max_subelems*elem->unique_id() + i);
 #endif
 
               // Prepare to add the newly-created simplices
@@ -1306,7 +1306,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
       // the Mesh may try to create them for you...
       copy->set_id( elem->id() );
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      copy->set_unique_id() = elem->unique_id();
+      copy->set_unique_id(elem->unique_id());
 #endif
 
       // This element could have boundary info or DistributedMesh

@@ -271,7 +271,7 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
       node->set_id() = id;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      node->set_unique_id() = unique_id;
+      node->set_unique_id(unique_id);
 #endif
       node->processor_id() = processor_id;
 
