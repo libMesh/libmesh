@@ -23,7 +23,9 @@
 // Local includes
 #include "libmesh/type_tensor.h"
 
-// C++ includes
+#ifdef LIBMESH_HAVE_METAPHYSICL
+#include "metaphysicl/raw_type.h"
+#endif
 
 namespace libMesh
 {
@@ -275,5 +277,26 @@ TensorValue<T>::TensorValue (const TypeTensor<Real> & p_re,
 
 
 } // namespace libMesh
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename T>
+struct RawType<libMesh::TensorValue<T>>
+{
+  typedef libMesh::TensorValue<typename RawType<T>::value_type> value_type;
+
+  static value_type value (const libMesh::TensorValue<T> & in)
+    {
+      value_type ret;
+      for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
+        for (unsigned int j = 0; j < LIBMESH_DIM; ++j)
+          ret(i,j) = raw_value(in(i,j));
+
+      return ret;
+    }
+};
+}
+#endif
 
 #endif // LIBMESH_TENSOR_VALUE_H

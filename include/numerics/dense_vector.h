@@ -32,6 +32,10 @@
 #include "libmesh/restore_warnings.h"
 #endif
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+#include "metaphysicl/raw_type.h"
+#endif
+
 // C++ includes
 #include <vector>
 
@@ -681,5 +685,25 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
 }
 
 } // namespace libMesh
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename T>
+struct RawType<libMesh::DenseVector<T>>
+{
+  typedef libMesh::DenseVector<typename RawType<T>::value_type> value_type;
+
+  static value_type value (const libMesh::DenseVector<T> & in)
+    {
+      value_type ret(in.size());
+      for (unsigned int i = 0; i < in.size(); ++i)
+          ret(i) = raw_value(in(i));
+
+      return ret;
+    }
+};
+}
+#endif
 
 #endif // LIBMESH_DENSE_VECTOR_H

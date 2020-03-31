@@ -43,6 +43,7 @@
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/dualnumber_forward.h"
+#include "metaphysicl/raw_type.h"
 
 namespace std
 {
@@ -1157,7 +1158,26 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 } // namespace libMesh
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename T>
+struct RawType<libMesh::DenseMatrix<T>>
+{
+  typedef libMesh::DenseMatrix<typename RawType<T>::value_type> value_type;
 
+  static value_type value (const libMesh::DenseMatrix<T> & in)
+    {
+      value_type ret(in.m(), in.n());
+      for (unsigned int i = 0; i < in.m(); ++i)
+        for (unsigned int j = 0; j < in.n(); ++j)
+          ret(i,j) = raw_value(in(i,j));
+
+      return ret;
+    }
+};
+}
+#endif
 
 
 #endif // LIBMESH_DENSE_MATRIX_H
