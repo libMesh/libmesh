@@ -847,9 +847,10 @@ void Nemesis_IO::read (const std::string & base_filename)
           uelem->subdomain_id() = subdomain_id;
           uelem->processor_id() = this->processor_id();
           uelem->set_id()       = my_next_elem++;
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          uelem->set_unique_id(uelem->id());
-#endif
+
+          // Leave unique_id numbering up to the mesh; with each
+          // element pre-partitioned our automatic assignment won't
+          // create any conflicts.
 
           // Mark that we have seen an element of the current element's
           // dimension.
