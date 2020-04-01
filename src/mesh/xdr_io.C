@@ -1566,9 +1566,9 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           // We are on all processors here, so the mesh can easily
           // assign consistent unique ids if the file doesn't specify
-          // them later.  We'll use even numbers for elements and odd
-          // for nodes.
-          unique_id_type unique_id = e*2;
+          // them later.  We'll use element ids for elements and start
+          // past those for nodes.
+          unique_id_type unique_id = e;
 #endif
           if (read_unique_id)
             {
@@ -1629,7 +1629,10 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
               else
                 {
                   std::unique_ptr<Node> new_node = Node::build(Point(), global_node_number);
-                  new_node->set_unique_id(2*global_node_number+1);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+                  // If we have to overwrite this it'll happen later
+                  new_node->set_unique_id(n_elem + global_node_number);
+#endif
                   elem->set_node(n) = mesh.add_node(std::move(new_node));
                 }
             }
