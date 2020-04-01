@@ -693,6 +693,13 @@ unique_id_type ReplicatedMesh::parallel_max_unique_id() const
   this->comm().max(max_local);
   return max_local;
 }
+
+
+
+void ReplicatedMesh::set_next_unique_id(unique_id_type id)
+{
+  _next_unique_id = id;
+}
 #endif
 
 

@@ -272,6 +272,19 @@ unique_id_type DistributedMesh::parallel_max_unique_id() const
   this->comm().max(max_local);
   return max_local;
 }
+
+
+
+void DistributedMesh::set_next_unique_id(unique_id_type id)
+{
+  _next_unique_id = id;
+  _next_unpartitioned_unique_id =
+    ((_next_unique_id-1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->n_processors();
+  _next_unique_id =
+    ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->processor_id();
+}
 #endif
 
 

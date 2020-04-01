@@ -322,9 +322,15 @@ public:
   unique_id_type next_unique_id() { return _next_unique_id; }
 
   /**
-   * Sets the next unique id to be used.
+   * Sets the next available unique id to be used.  On a
+   * ReplicatedMesh, or when adding unpartitioned objects to a
+   * DistributedMesh, this must be kept in sync on all processors.
+   *
+   * On a DistributedMesh, other unique_id values (larger than this
+   * one) may be chosen next, to allow unique_id assignment without
+   * communication.
    */
-  void set_next_unique_id(unique_id_type id) { _next_unique_id = id; }
+  virtual void set_next_unique_id(unique_id_type id) = 0;
 #endif
 
   /**
