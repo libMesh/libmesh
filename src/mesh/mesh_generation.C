@@ -1991,25 +1991,31 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
     {
       for (unsigned int k=0; k != order*nz+1; ++k)
         {
-          Node * new_node =
-            mesh.add_point(*node +
-                           (extrusion_vector * k / nz / order),
-                           node->id() + (k * orig_nodes),
-                           node->processor_id());
+          const dof_id_type new_node_id = node->id() + k * orig_nodes;
+          Node * my_node = mesh.query_node_ptr(new_node_id);
+          if (!my_node)
+            {
+              std::unique_ptr<Node> new_node = Node::build
+                (*node + (extrusion_vector * k / nz / order),
+                 new_node_id);
+              new_node->processor_id() = node->processor_id();
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          // Let's give the base of the extruded mesh the same
-          // unique_ids as the source mesh, in case anyone finds that
-          // a useful map to preserve.
-          const unique_id_type uid = (k == 0) ?
-            node->unique_id() :
-            orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + node->id();
+              // Let's give the base of the extruded mesh the same
+              // unique_ids as the source mesh, in case anyone finds that
+              // a useful map to preserve.
+              const unique_id_type uid = (k == 0) ?
+                node->unique_id() :
+                orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + node->id();
 
-          new_node->set_unique_id(uid);
+              new_node->set_unique_id(uid);
 #endif
 
-          cross_section_boundary_info.boundary_ids(node, ids_to_copy);
-          boundary_info.add_node(new_node, ids_to_copy);
+              cross_section_boundary_info.boundary_ids(node, ids_to_copy);
+              boundary_info.add_node(new_node.get(), ids_to_copy);
+
+              mesh.add_node(std::move(new_node));
+            }
         }
     }
 
