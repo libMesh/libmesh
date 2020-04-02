@@ -54,7 +54,7 @@ public:
   /**
    * Virtual function retrieve which we will be overriding
    */
-  virtual void retrieve() override;
+  virtual void retrieve(bool is_adjoint_solve) override;
 
   /**
    * Definition of the clone function needed for the setter function

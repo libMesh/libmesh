@@ -55,7 +55,7 @@ public:
   /**
    * Function to retrieve a solution, pure virtual
    */
-  virtual void retrieve() = 0;
+  virtual void retrieve(bool is_adjoint_solve) = 0;
 
   /**
    * Cloning function for a std::unique_ptr, pure virtual, used in the

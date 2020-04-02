@@ -63,7 +63,7 @@ public:
   /**
    * Virtual function retrieve which we will be overriding to retrieve timesteps
    */
-  virtual void retrieve() override;
+  virtual void retrieve(bool is_adjoint_solve) override;
 
   /**
    * Typedef for Stored Solutions iterator, a list of pairs of the current

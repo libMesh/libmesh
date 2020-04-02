@@ -128,7 +128,7 @@ void MemorySolutionHistory::store(bool is_adjoint_solve)
     saved_vectors[_solution] = _system.solution->clone();
 }
 
-void MemorySolutionHistory::retrieve()
+void MemorySolutionHistory::retrieve(bool is_adjoint_solve)
 {
   this->find_stored_entry();
 
