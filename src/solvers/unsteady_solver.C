@@ -193,7 +193,7 @@ void UnsteadySolver::adjoint_advance_timestep ()
 
   // Retrieve the primal solution vectors at this time using the
   // solution_history object
-  solution_history->retrieve();
+  solution_history->retrieve(true);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize
@@ -204,7 +204,7 @@ void UnsteadySolver::adjoint_advance_timestep ()
 void UnsteadySolver::retrieve_timestep()
 {
   // Retrieve all the stored vectors at the current time
-  solution_history->retrieve();
+  solution_history->retrieve(false);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize
