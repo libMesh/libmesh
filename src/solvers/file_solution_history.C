@@ -138,7 +138,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve)
 
 }
 
-void FileSolutionHistory::retrieve()
+void FileSolutionHistory::retrieve(bool is_adjoint_solve)
 {
   this->find_stored_entry();
 
@@ -159,9 +159,28 @@ void FileSolutionHistory::retrieve()
       return;
     }
 
-  // Read in the primal solution stored at the current recovery time from the disk
-  _system.get_equation_systems().read (stored_sols->second, READ, EquationSystems::READ_DATA | EquationSystems::READ_ADDITIONAL_DATA);
 
+  // If we are doing an adjoint solve, we read in the primal solution,
+  // but this overwrites the adjoint solution with zero, so we swap
+  // the last adjoint solution out to prevent this zeroing
+  if(is_adjoint_solve)
+  {
+    // Reading in the primal xdas overwrites the adjoint solution with zero
+    // So swap to retain the old adjoint solution
+    std::unique_ptr<NumericVector<Number>> dual_solution_copy = _system.get_adjoint_solution(0).clone();
+
+    // Read in the primal solution stored at the current recovery time from the disk
+    _system.get_equation_systems().read (stored_sols->second, READ, EquationSystems::READ_DATA | EquationSystems::READ_ADDITIONAL_DATA);
+
+    // Swap back the copy of the last adjoint solution back in place
+    _system.get_adjoint_solution(0).swap(*dual_solution_copy); 
+  }
+  else
+  {
+    // Read in the primal solution stored at the current recovery time from the disk
+    _system.get_equation_systems().read (stored_sols->second, READ, EquationSystems::READ_DATA | EquationSystems::READ_ADDITIONAL_DATA);
+  }
+  
   // We need to call update to put system in a consistent state
   // with the solution that was read in
   _system.update();
