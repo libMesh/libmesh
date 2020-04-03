@@ -329,6 +329,9 @@ int main (int argc, char ** argv)
   }
   GetPot infile("general.in");
 
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+  
   // Read in parameters from the input file
   FEMParameters param(init.comm());
   param.read(infile);
