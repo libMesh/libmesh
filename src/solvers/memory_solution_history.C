@@ -64,7 +64,7 @@ void MemorySolutionHistory::find_stored_entry()
 
 // This functions saves all the 'projection-worthy' system vectors for
 // future use
-void MemorySolutionHistory::store()
+void MemorySolutionHistory::store(bool /* is_adjoint_solve */)
 {
   this->find_stored_entry();
 
@@ -128,7 +128,7 @@ void MemorySolutionHistory::store()
     saved_vectors[_solution] = _system.solution->clone();
 }
 
-void MemorySolutionHistory::retrieve()
+void MemorySolutionHistory::retrieve(bool /* is_adjoint_solve */)
 {
   this->find_stored_entry();
 

@@ -1,4 +1,4 @@
-# Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
+# Do not edit - automatically generated from rebuild_libmesh_SOURCES.sh
 libmesh_SOURCES =  \
         src/base/default_coupling.C \
         src/base/dirichlet_boundary.C \
@@ -359,6 +359,7 @@ libmesh_SOURCES =  \
         src/solvers/eigen_time_solver.C \
         src/solvers/euler2_solver.C \
         src/solvers/euler_solver.C \
+        src/solvers/file_solution_history.C \
         src/solvers/first_order_unsteady_solver.C \
         src/solvers/laspack_linear_solver.C \
         src/solvers/linear_solver.C \
