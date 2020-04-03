@@ -534,19 +534,8 @@ int main (int argc, char ** argv)
           // retrieve function sets the system primal vectors to their
           // values at the current timestep.
           libMesh::out << "Retrieving solutions at time t=" << system.time << std::endl;
-                               
-          // Reading in the primal xdas overwrites the adjoint solution with zero
-          // So swap to retain the old adjoint solution
-          NumericVector<Number> & dual_solution_last = system.get_adjoint_solution(0);
-
-          std::unique_ptr<NumericVector<Number>> dual_solution_copy = NumericVector<Number>::build(init.comm());
-          dual_solution_copy->init(dual_solution_last.size(), true, SERIAL);
-          *dual_solution_copy = dual_solution_last;
-         
+                                        
           system.time_solver->adjoint_advance_timestep();
-
-          // Swap back the copy of the last adjoint solution back in place
-          dual_solution_last.swap(*dual_solution_copy);   
 
           // Output the H1 norm of the retrieved solution
           libMesh::out << "|U("
