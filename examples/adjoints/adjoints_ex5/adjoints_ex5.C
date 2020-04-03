@@ -331,7 +331,7 @@ int main (int argc, char ** argv)
 
   // But allow the command line to override it.
   infile.parse_command_line(argc, argv);
-  
+
   // Read in parameters from the input file
   FEMParameters param(init.comm());
   param.read(infile);
@@ -412,7 +412,7 @@ int main (int argc, char ** argv)
   // To keep the number of vectors consistent between the primal and adjoint
   // loops, we will also pre-add the adjoint rhs vector
   const std::string & adjoint_rhs_name = "adjoint_rhs0";
-  system.add_vector("adjoint_rhs0", false, GHOSTED);  
+  system.add_vector("adjoint_rhs0", false, GHOSTED);
 
   // Close up any resources initial.C needed
   finish_initialization();
@@ -537,7 +537,7 @@ int main (int argc, char ** argv)
           // retrieve function sets the system primal vectors to their
           // values at the current timestep.
           libMesh::out << "Retrieving solutions at time t=" << system.time << std::endl;
-                                        
+
           system.time_solver->adjoint_advance_timestep();
 
           // Output the H1 norm of the retrieved solution
@@ -555,7 +555,7 @@ int main (int argc, char ** argv)
 
           system.set_adjoint_already_solved(false);
 
-          system.adjoint_solve();         
+          system.adjoint_solve();
 
           // Now that we have solved the adjoint, set the
           // adjoint_already_solved boolean to true, so we dont solve

@@ -69,11 +69,11 @@ public:
   virtual void retrieve(bool is_adjoint_solve) override;
 
   /**
-   * Typedef for Stored Solutions iterator, a list of pairs of the 
+   * Typedef for Stored Solutions iterator, a list of pairs of the
    * system time and filenames of the stored solutions
-   */  
+   */
   typedef std::pair<Real, std::string> pair_type;
-  typedef std::list<pair_type> list_type;  
+  typedef std::list<pair_type> list_type;
   typedef list_type::iterator stored_solutions_iterator;
 
   /**
