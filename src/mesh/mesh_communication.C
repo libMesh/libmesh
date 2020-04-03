@@ -1448,7 +1448,7 @@ struct SyncUniqueIds
       {
         DofObjSubclass * d = (mesh.*query)(ids[i]);
         libmesh_assert(d);
-        d->set_unique_id() = unique_ids[i];
+        d->set_unique_id(unique_ids[i]);
       }
   }
 };

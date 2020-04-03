@@ -117,8 +117,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
                                   oldn->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        newn->set_unique_id() =
-          oldn->unique_id() + unique_id_offset;
+        newn->set_unique_id(oldn->unique_id() + unique_id_offset);
 #endif
       }
   }
@@ -189,8 +188,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
                                 old->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        el->set_unique_id() =
-          old->unique_id() + unique_id_offset;
+        el->set_unique_id(old->unique_id() + unique_id_offset);
 #endif
 
         //Hold onto it
@@ -743,7 +741,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
       auto uelem = Elem::build(old_elem->type());
       uelem->set_id() = old_elem->id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      uelem->set_unique_id() = old_elem->unique_id();
+      uelem->set_unique_id(old_elem->unique_id());
 #endif
       uelem->subdomain_id() = old_elem->subdomain_id();
       uelem->processor_id() = old_elem->processor_id();
@@ -774,7 +772,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
                 newn->set_extra_integer(i, old_elem->node_ptr(n)->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              newn->set_unique_id() = old_elem->node_ptr(n)->unique_id();
+              newn->set_unique_id(old_elem->node_ptr(n)->unique_id());
 #endif
             }
 
@@ -970,7 +968,7 @@ void UnstructuredMesh::all_first_order ()
        */
       lo_elem->set_id(so_elem->id());
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      lo_elem->set_unique_id() = so_elem->unique_id();
+      lo_elem->set_unique_id(so_elem->unique_id());
 #endif
       lo_elem->processor_id() = so_elem->processor_id();
       lo_elem->subdomain_id() = so_elem->subdomain_id();
@@ -1296,7 +1294,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        */
       so_elem->set_id(lo_elem->id());
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      so_elem->set_unique_id() = lo_elem->unique_id();
+      so_elem->set_unique_id(lo_elem->unique_id());
 #endif
       so_elem->processor_id() = lo_pid;
       so_elem->subdomain_id() = lo_elem->subdomain_id();

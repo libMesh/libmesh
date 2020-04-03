@@ -201,6 +201,41 @@ void assert_semiverify_dofobj(const Parallel::Communicator & communicator,
       libmesh_assert(communicator.semiverify(p_vdid));
     }
 }
+
+
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+void assert_dofobj_unique_id(const Parallel::Communicator & comm,
+                             const DofObject * d,
+                             const std::unordered_set<unique_id_type> & unique_ids)
+{
+  // Duplicating some semiverify code here so we can reuse
+  // tempmin,tempmax afterward
+
+  unique_id_type tempmin, tempmax;
+  if (d)
+    {
+      tempmin = tempmax = d->unique_id();
+    }
+  else
+    {
+      TIMPI::Attributes<unique_id_type>::set_highest(tempmin);
+      TIMPI::Attributes<unique_id_type>::set_lowest(tempmax);
+    }
+  comm.min(tempmin);
+  comm.max(tempmax);
+  bool invalid = d && ((d->unique_id() != tempmin) ||
+                       (d->unique_id() != tempmax));
+  comm.max(invalid);
+
+  // First verify that everything is in sync
+  libmesh_assert(!invalid);
+
+  // Then verify that any remote id doesn't duplicate a local one.
+  if (!d && tempmin == tempmax)
+    libmesh_assert(!unique_ids.count(tempmin));
+}
+#endif // LIBMESH_ENABLE_UNIQUE_ID
 #endif // DEBUG
 
 }
@@ -1638,16 +1673,39 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 
   libmesh_parallel_only(mesh.comm());
 
+  // First collect all the unique_ids we can see and make sure there's
+  // no duplicates
+  std::unordered_set<unique_id_type> semilocal_unique_ids;
+  dof_id_type n_semilocal_obj = 0;
+
+  for (auto const & elem : mesh.active_element_ptr_range())
+    {
+      libmesh_assert (!semilocal_unique_ids.count(elem->unique_id()));
+      semilocal_unique_ids.insert(elem->unique_id());
+      ++n_semilocal_obj;
+    }
+
+  for (auto const & node : mesh.node_ptr_range())
+    {
+      libmesh_assert (!semilocal_unique_ids.count(node->unique_id()));
+      semilocal_unique_ids.insert(node->unique_id());
+      ++n_semilocal_obj;
+    }
+
+  // Then make sure elements are all in sync and remote elements don't
+  // duplicate semilocal
+
   dof_id_type pmax_elem_id = mesh.max_elem_id();
   mesh.comm().max(pmax_elem_id);
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
       const Elem * elem = mesh.query_elem_ptr(i);
-      const unique_id_type unique_id = elem ? elem->unique_id() : 0;
-      const unique_id_type * uid_ptr = elem ? &unique_id : nullptr;
-      libmesh_assert(mesh.comm().semiverify(uid_ptr));
+      assert_dofobj_unique_id(mesh.comm(), elem, semilocal_unique_ids);
     }
+
+  // Then make sure nodes are all in sync and remote elements don't
+  // duplicate semilocal
 
   dof_id_type pmax_node_id = mesh.max_node_id();
   mesh.comm().max(pmax_node_id);
@@ -1655,9 +1713,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
   for (dof_id_type i=0; i != pmax_node_id; ++i)
     {
       const Node * node = mesh.query_node_ptr(i);
-      const unique_id_type unique_id = node ? node->unique_id() : 0;
-      const unique_id_type * uid_ptr = node ? &unique_id : nullptr;
-      libmesh_assert(mesh.comm().semiverify(uid_ptr));
+      assert_dofobj_unique_id(mesh.comm(), node, semilocal_unique_ids);
     }
 }
 #endif

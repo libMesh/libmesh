@@ -272,6 +272,19 @@ unique_id_type DistributedMesh::parallel_max_unique_id() const
   this->comm().max(max_local);
   return max_local;
 }
+
+
+
+void DistributedMesh::set_next_unique_id(unique_id_type id)
+{
+  _next_unique_id = id;
+  _next_unpartitioned_unique_id =
+    ((_next_unique_id-1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->n_processors();
+  _next_unique_id =
+    ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->processor_id();
+}
 #endif
 
 
@@ -501,14 +514,21 @@ Elem * DistributedMesh::add_elem (Elem * e)
     {
       if (processor_id() == e->processor_id())
         {
-          e->set_unique_id() = _next_unique_id;
+          e->set_unique_id(_next_unique_id);
           _next_unique_id += this->n_processors() + 1;
         }
       else
         {
-          e->set_unique_id() = _next_unpartitioned_unique_id;
+          e->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
+    }
+  else
+    {
+      _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
+      _next_unique_id =
+        ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
     }
 #endif
 
@@ -558,14 +578,21 @@ Elem * DistributedMesh::insert_elem (Elem * e)
     {
       if (processor_id() == e->processor_id())
         {
-          e->set_unique_id() = _next_unique_id;
+          e->set_unique_id(_next_unique_id);
           _next_unique_id += this->n_processors() + 1;
         }
       else
         {
-          e->set_unique_id() = _next_unpartitioned_unique_id;
+          e->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
+    }
+  else
+    {
+      _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
+      _next_unique_id =
+        ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
     }
 #endif
 
@@ -745,14 +772,21 @@ Node * DistributedMesh::add_node (Node * n)
     {
       if (processor_id() == n->processor_id())
         {
-          n->set_unique_id() = _next_unique_id;
+          n->set_unique_id(_next_unique_id);
           _next_unique_id += this->n_processors() + 1;
         }
       else
         {
-          n->set_unique_id() = _next_unpartitioned_unique_id;
+          n->set_unique_id(_next_unpartitioned_unique_id);
           _next_unpartitioned_unique_id += this->n_processors() + 1;
         }
+    }
+  else
+    {
+      _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
+      _next_unique_id =
+        ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
     }
 #endif
 
@@ -1242,7 +1276,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
           libmesh_assert (obj);
           libmesh_assert_equal_to (obj->processor_id(), pid);
           if (!obj->valid_unique_id() && data[i] != DofObject::invalid_unique_id)
-            obj->set_unique_id() = (data[i]);
+            obj->set_unique_id(data[i]);
         }
     };
 

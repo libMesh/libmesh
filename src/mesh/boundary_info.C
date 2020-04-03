@@ -495,7 +495,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       side->set_id(new_side_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      side->set_unique_id() = old_max_unique_id + new_side_id;
+      side->set_unique_id(old_max_unique_id + new_side_id);
 #endif
 
       // Add the side

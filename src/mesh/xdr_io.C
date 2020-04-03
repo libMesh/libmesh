@@ -1564,9 +1564,10 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
         {
           const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          // We are on all processors here, so we can easily assign
-          // consistent unique ids if the file doesn't specify them
-          // later.
+          // We are on all processors here, so the mesh can easily
+          // assign consistent unique ids if the file doesn't specify
+          // them later.  We'll use element ids for elements and start
+          // past those for nodes.
           unique_id_type unique_id = e;
 #endif
           if (read_unique_id)
@@ -1600,7 +1601,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
           elem->set_id() = e;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          elem->set_unique_id() = unique_id;
+          elem->set_unique_id(unique_id);
 #endif
           elem->processor_id() = proc_id;
           elem->subdomain_id() = subdomain_id;
@@ -1621,8 +1622,19 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
               const dof_id_type global_node_number =
                 cast_int<dof_id_type>(*it);
 
-              elem->set_node(n) =
-                mesh.add_point (Point(), global_node_number);
+              Node *node = mesh.query_node_ptr(global_node_number);
+
+              if (node)
+                elem->set_node(n) = node;
+              else
+                {
+                  std::unique_ptr<Node> new_node = Node::build(Point(), global_node_number);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+                  // If we have to overwrite this it'll happen later
+                  new_node->set_unique_id(n_elem + global_node_number);
+#endif
+                  elem->set_node(n) = mesh.add_node(std::move(new_node));
+                }
             }
 
           elems_of_dimension[elem->dim()] = true;
@@ -1734,9 +1746,26 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
 
       this->comm().broadcast (read_unique_ids);
 
-      // If no unique ids are in the file, we're done.
+      // If no node unique ids are in the file, well, we already
+      // assigned our own ... *but*, our ids might conflict with the
+      // file-assigned element unique ids.  Let's check on that.
+      // Should be easy since we're serialized.
       if (!read_unique_ids)
-        return;
+        {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          unique_id_type max_elem_unique_id = 0;
+          for (auto & elem : mesh.element_ptr_range())
+            max_elem_unique_id = std::max(max_elem_unique_id,
+                                          elem->unique_id()+1);
+          if (max_elem_unique_id > mesh.n_elem())
+            {
+              for (auto & node : mesh.node_ptr_range())
+                node->set_unique_id(max_elem_unique_id + node->id());
+            }
+          mesh.set_next_unique_id(max_elem_unique_id + mesh.n_nodes());
+#endif
+          return;
+        }
 
       std::vector<uint32_t> unique_32;
       std::vector<uint64_t> unique_64;
@@ -1783,11 +1812,9 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
                 {
                   libmesh_assert_equal_to (*pos.first, n);
                   if (_field_width == 8)
-                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
-                      = unique_64[idx];
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id(unique_64[idx]);
                   else
-                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
-                      = unique_32[idx];
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id(unique_32[idx]);
                 }
             }
 #endif // LIBMESH_ENABLE_UNIQUE_ID
