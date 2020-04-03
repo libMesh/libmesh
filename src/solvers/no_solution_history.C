@@ -21,12 +21,12 @@
 namespace libMesh
 {
 
-void NoSolutionHistory::store(bool is_adjoint_solve)
+void NoSolutionHistory::store(bool /* is_adjoint_solve */)
 {
   // Do nothing
 }
 
-void NoSolutionHistory::retrieve(bool is_adjoint_solve)
+void NoSolutionHistory::retrieve(bool /* is_adjoint_solve */)
 {
   // Nothing was stored, so nothing can be retrieved
   libmesh_not_implemented();
