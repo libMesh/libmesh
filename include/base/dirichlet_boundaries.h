@@ -160,10 +160,17 @@ public:
                     VariableIndexing type = SYSTEM_VARIABLE_ORDER);
 
   /**
-   * Copy constructor.  Deep copies (clones) functors; shallow copies
-   * any System reference
+   * Copy assignment/constructor.  Deep copies (clones) functors;
+   * shallow copies any System reference
    */
   DirichletBoundary (const DirichletBoundary & dirichlet_in);
+  DirichletBoundary & operator= (const DirichletBoundary &);
+
+  /**
+   * This class is default move-assignable and move-constructible.
+   */
+  DirichletBoundary (DirichletBoundary &&) = default;
+  DirichletBoundary & operator= (DirichletBoundary &&) = default;
 
   /**
    * Standard destructor

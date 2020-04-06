@@ -196,7 +196,16 @@ DirichletBoundary(const DirichletBoundary & d_in) :
 }
 
 
-DirichletBoundary::~DirichletBoundary () {}
+DirichletBoundary & DirichletBoundary::operator= (const DirichletBoundary & rhs)
+{
+  // Implementation in terms of the copy constructor to avoid code duplication.
+  DirichletBoundary tmp(rhs);
+  std::swap(tmp, *this); // class must be "MoveAssignable" and "MoveConstructible" for std::swap to work.
+  return *this;
+}
+
+
+DirichletBoundary::~DirichletBoundary () = default;
 
 } // namespace libMesh
 
