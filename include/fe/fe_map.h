@@ -160,8 +160,22 @@ public:
    * how close is "good enough."  The map inversion iteration
    * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
    * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
-   * The parameter secure (always assumed false in non-debug mode)
-   * switches on integrity-checks on the mapped points.
+   *
+   * When secure==true, the following checks are enabled:
+   *
+   * In DEBUG mode only:
+   * .) dim==1,2: throw an error if det(J) <= 0 for any Newton iteration.
+   * .) Print warning for every iteration beyond max_cnt in which the Newton scheme has not converged.
+   * .) Print a warning if p != map(inverse_map(p)) to within tolerance.
+   * .) Print a warning if the inverse-mapped point is not on the reference element to within tolerance.
+   *
+   * In !DEBUG mode only:
+   * .) Print a _single_ warning (1 warning for the entire simulation)
+   *    if the Newton scheme ever requiers more than max_cnt iterations.
+   *
+   * In both DEBUG and !DEBUG modes:
+   * .) dim==3: Throw an exception for singular Jacobian.
+   * .) Throw an error if the Newton iteration has not converged in 2*max_cnt iterations.
    */
   static Point inverse_map (const unsigned int dim,
                             const Elem * elem,
@@ -174,12 +188,8 @@ public:
    * physical_points vector) and finds their location on the reference
    * element for the input element \p elem.  The values on the
    * reference element are returned in the vector \p
-   * reference_points. The optional parameter \p tolerance defines how
-   * close is "good enough."  The map inversion iteration computes the
-   * sequence \f$ \{ p_n \} \f$, and the iteration is terminated when
-   * \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
-   * The parameter secure (always assumed false in non-debug mode)
-   * switches on integrity-checks on the mapped points.
+   * reference_points. The other parameters have the same meaning
+   * as the single Point version of inverse_map() above.
    */
   static void inverse_map (unsigned int dim,
                            const Elem * elem,
