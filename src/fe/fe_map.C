@@ -1661,12 +1661,17 @@ Point FEMap::inverse_map (const unsigned int dim,
                           const Elem * elem,
                           const Point & physical_point,
                           const Real tolerance,
-                          const bool secure)
+                          const bool secure,
+                          const bool extra_checks)
 {
   libmesh_assert(elem);
   libmesh_assert_greater_equal (tolerance, 0.);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  // TODO: possibly use the extra_checks parameter in InfFEMap::inverse_map() as well.
+  libmesh_ignore(extra_checks);
+
   if (elem->infinite())
     return InfFEMap::inverse_map(dim, elem, physical_point, tolerance,
                                  secure);
@@ -2000,10 +2005,10 @@ Point FEMap::inverse_map (const unsigned int dim,
 
 
 
-  //  If we are in debug mode do two sanity checks.
+  //  If we are in debug mode and the user requested it, do two extra sanity checks.
 #ifdef DEBUG
 
-  if (secure)
+  if (extra_checks)
     {
       // Make sure the point \p p on the reference element actually
       // does map to the point \p physical_point within a tolerance.
@@ -2050,14 +2055,16 @@ void FEMap::inverse_map (const unsigned int dim,
                          const std::vector<Point> & physical_points,
                          std::vector<Point> &       reference_points,
                          const Real tolerance,
-                         const bool secure)
+                         const bool secure,
+                         const bool extra_checks)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
     {
-      InfFEMap::inverse_map(dim, elem, physical_points, reference_points, tolerance, secure);
-      return;
-      // libmesh_not_implemented();
+      // TODO: possibly use the extra_checks parameter in InfFEMap::inverse_map() as well.
+      libmesh_ignore(extra_checks);
+
+      return InfFEMap::inverse_map(dim, elem, physical_points, reference_points, tolerance, secure);
     }
 #endif
 
@@ -2073,7 +2080,7 @@ void FEMap::inverse_map (const unsigned int dim,
   // element of each point in physical space
   for (std::size_t p=0; p<n_points; p++)
     reference_points[p] =
-      inverse_map (dim, elem, physical_points[p], tolerance, secure);
+      inverse_map (dim, elem, physical_points[p], tolerance, secure, extra_checks);
 }
 
 

@@ -161,27 +161,32 @@ public:
    * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
    * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
    *
-   * When secure==true, the following checks are enabled:
+   * When secure == true, the following checks are enabled:
    *
    * In DEBUG mode only:
    * .) dim==1,2: throw an error if det(J) <= 0 for any Newton iteration.
    * .) Print warning for every iteration beyond max_cnt in which the Newton scheme has not converged.
-   * .) Print a warning if p != map(inverse_map(p)) to within tolerance.
-   * .) Print a warning if the inverse-mapped point is not on the reference element to within tolerance.
    *
    * In !DEBUG mode only:
    * .) Print a _single_ warning (1 warning for the entire simulation)
-   *    if the Newton scheme ever requiers more than max_cnt iterations.
+   *    if the Newton scheme ever requires more than max_cnt iterations.
    *
    * In both DEBUG and !DEBUG modes:
    * .) dim==3: Throw an exception for singular Jacobian.
    * .) Throw an error if the Newton iteration has not converged in 2*max_cnt iterations.
+   *
+   * In addition to the checks above, the "extra_checks" parameter can
+   * be used to turn on some additional tests. In particular, when
+   * extra_checks == true *and* compiled in DEBUG mode:
+   * .) Print a warning if p != map(inverse_map(p)) to within tolerance.
+   * .) Print a warning if the inverse-mapped point is not on the reference element to within tolerance.
    */
   static Point inverse_map (const unsigned int dim,
                             const Elem * elem,
                             const Point & p,
                             const Real tolerance = TOLERANCE,
-                            const bool secure = true);
+                            const bool secure = true,
+                            const bool extra_checks = true);
 
   /**
    * Takes a number points in physical space (in the \p
@@ -196,7 +201,8 @@ public:
                            const std::vector<Point> & physical_points,
                            std::vector<Point> &       reference_points,
                            const Real tolerance = TOLERANCE,
-                           const bool secure = true);
+                           const bool secure = true,
+                           const bool extra_checks = true);
 
   /**
    * \returns The \p xyz spatial locations of the quadrature
