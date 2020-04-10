@@ -2207,7 +2207,8 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
                                                 this,
                                                 p,
                                                 0.1*map_tol, // <- this is |dx| tolerance, the Newton residual should be ~ |dx|^2
-                                                /*secure=*/ false);
+                                                /*secure=*/ false,
+                                                /*extra_checks=*/ false);
 
   // Check that the refspace point maps back to p!  This is only necessary
   // for 1D and 2D elements, 3D elements always live in 3D.

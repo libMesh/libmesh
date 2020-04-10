@@ -424,7 +424,7 @@ public:
                             const Real tolerance = TOLERANCE,
                             const bool secure = true) {
     // libmesh_deprecated(); // soon
-    return FEMap::inverse_map(Dim, elem, p, tolerance, secure);
+    return FEMap::inverse_map(Dim, elem, p, tolerance, secure, secure);
   }
 
   static void inverse_map (const Elem * elem,
@@ -434,7 +434,7 @@ public:
                            const bool secure = true) {
     // libmesh_deprecated(); // soon
     FEMap::inverse_map(Dim, elem, physical_points, reference_points,
-                       tolerance, secure);
+                       tolerance, secure, secure);
   }
 
   /**
