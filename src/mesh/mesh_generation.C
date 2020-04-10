@@ -1936,8 +1936,11 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
 
   // The meshes could probably use some smoothing.
-  LaplaceMeshSmoother smoother(mesh);
-  smoother.smooth(n_smooth);
+  if (mesh.mesh_dimension() > 1)
+    {
+      LaplaceMeshSmoother smoother(mesh);
+      smoother.smooth(n_smooth);
+    }
 
   // We'll give the whole sphere surface a boundary id of 0
   for (const auto & elem : mesh.active_element_ptr_range())
