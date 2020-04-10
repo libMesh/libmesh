@@ -2724,7 +2724,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
   // communicate those too.
   const unsigned int max_qoi_num =
     _adjoint_constraint_values.empty() ?
-    0 : _adjoint_constraint_values.rbegin()->first;
+    0 : _adjoint_constraint_values.rbegin()->first+1;
 
   // We might have calculated constraints for constrained dofs
   // which have support on other processors.
@@ -3992,7 +3992,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
   // communicate those too.
   const unsigned int max_qoi_num =
     _adjoint_constraint_values.empty() ?
-    0 : _adjoint_constraint_values.rbegin()->first;
+    0 : _adjoint_constraint_values.rbegin()->first+1;
 
   // We have to keep recursing while the unexpanded set is
   // nonempty on *any* processor
