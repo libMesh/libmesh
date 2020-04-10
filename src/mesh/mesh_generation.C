@@ -1867,6 +1867,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // Loop over the elements, refine, pop nodes to boundary.
   for (unsigned int r=0; r<nr; r++)
     {
+      // A DistributedMesh needs a little prep before refinement
+      if (!mesh.is_replicated())
+        mesh.prepare_for_use();
+
       mesh_refinement.uniformly_refine(1);
 
       for (const auto & elem : mesh.active_element_ptr_range())
@@ -1882,6 +1886,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
             }
     }
 
+  // A DistributedMesh needs a little prep before flattening
+  if (!mesh.is_replicated())
+    mesh.prepare_for_use();
+
   // The mesh now contains a refinement hierarchy due to the refinements
   // used to generate the grid.  In order to call other support functions
   // like all_tri() and all_second_order, you need a "flat" mesh file (with no
@@ -1893,6 +1901,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     {
       if ((type == TRI6) || (type == TRI3))
         {
+          // A DistributedMesh needs a little prep before all_tri()
+          if (!mesh.is_replicated())
+            mesh.prepare_for_use();
+
           MeshTools::Modification::all_tri(mesh);
         }
     }
