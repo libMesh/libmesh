@@ -2060,7 +2060,7 @@ Number System::point_value(unsigned int var,
 
   FEType fe_type = dof_map.variable_type(var);
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h.
+  // Map the physical co-ordinates to the master co-ordinates
   Point coor = FEMap::inverse_map(e.dim(), &e, p);
 
   // get the shape function value via the FEInterface to also handle the case
@@ -2193,7 +2193,7 @@ Gradient System::point_gradient(unsigned int var,
 
   FEType fe_type = dof_map.variable_type(var);
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h.
+  // Map the physical co-ordinates to the master co-ordinates
   Point coor = FEMap::inverse_map(dim, &e, p);
 
   // get the shape function value via the FEInterface to also handle the case
@@ -2341,7 +2341,7 @@ Tensor System::point_hessian(unsigned int var,
   // Build a FE again so we can calculate u(p)
   std::unique_ptr<FEBase> fe (FEBase::build(e.dim(), fe_type));
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Map the physical co-ordinates to the master co-ordinates
   // Build a vector of point co-ordinates to send to reinit
   std::vector<Point> coor(1, FEMap::inverse_map(e.dim(), &e, p));
 
