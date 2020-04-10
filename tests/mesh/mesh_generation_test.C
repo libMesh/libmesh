@@ -24,12 +24,22 @@ public:
   CPPUNIT_TEST( buildLineEdge2 );
   CPPUNIT_TEST( buildLineEdge3 );
   CPPUNIT_TEST( buildLineEdge4 );
+#  ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( buildSphereEdge2 );
+  CPPUNIT_TEST( buildSphereEdge3 );
+// CPPUNIT_TEST( buildSphereEdge4 ); Doesn't work with AMR yet
+#  endif
+
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( buildSquareTri3 );
   CPPUNIT_TEST( buildSquareTri6 );
   CPPUNIT_TEST( buildSquareQuad4 );
   CPPUNIT_TEST( buildSquareQuad8 );
   CPPUNIT_TEST( buildSquareQuad9 );
+#  ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( buildSphereTri3 );
+  CPPUNIT_TEST( buildSphereQuad4 );
+#  endif
 #endif
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( buildCubeTet4 );
@@ -43,6 +53,10 @@ public:
   CPPUNIT_TEST( buildCubePyramid5 );
   CPPUNIT_TEST( buildCubePyramid13 );
   CPPUNIT_TEST( buildCubePyramid14 );
+#  ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( buildSphereHex8 );
+//  CPPUNIT_TEST( buildSphereHex27 );
+#  endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -185,6 +199,17 @@ public:
     CPPUNIT_ASSERT(bbox.max()(2) >= Real(7.0));
   }
 
+  void testBuildSphere(unsigned int n_ref, ElemType type)
+  {
+    ReplicatedMesh rmesh(*TestCommWorld);
+    MeshTools::Generation::build_sphere (rmesh, 2.0, n_ref, type);
+
+    DistributedMesh dmesh(*TestCommWorld);
+    dmesh.allow_renumbering(false);
+    MeshTools::Generation::build_sphere (dmesh, 2.0, n_ref, type);
+  }
+
+
   typedef void (MeshGenerationTest::*Builder)(UnstructuredMesh&, unsigned int, ElemType);
 
   void tester(Builder f, unsigned int n, ElemType type)
@@ -205,11 +230,18 @@ public:
   void buildLineEdge3 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE3); }
   void buildLineEdge4 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE4); }
 
+  void buildSphereEdge2 ()     { testBuildSphere(2, EDGE2); }
+  void buildSphereEdge3 ()     { testBuildSphere(2, EDGE3); }
+  void buildSphereEdge4 ()     { testBuildSphere(2, EDGE4); }
+
   void buildSquareTri3 ()    { tester(&MeshGenerationTest::testBuildSquare, 3, TRI3); }
   void buildSquareTri6 ()    { tester(&MeshGenerationTest::testBuildSquare, 4, TRI6); }
   void buildSquareQuad4 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD4); }
   void buildSquareQuad8 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD8); }
   void buildSquareQuad9 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD9); }
+
+  void buildSphereTri3 ()     { testBuildSphere(2, TRI3); }
+  void buildSphereQuad4 ()     { testBuildSphere(2, QUAD4); }
 
   void buildCubeTet4 ()      { tester(&MeshGenerationTest::testBuildCube, 2, TET4); }
   void buildCubeTet10 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET10); }
@@ -222,6 +254,9 @@ public:
   void buildCubePyramid5 ()  { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID5); }
   void buildCubePyramid13 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID13); }
   void buildCubePyramid14 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID14); }
+
+  void buildSphereHex8 ()     { testBuildSphere(2, HEX8); }
+  void buildSphereHex27 ()     { testBuildSphere(2, HEX27); }
 };
 
 
