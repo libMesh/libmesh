@@ -280,6 +280,8 @@ void MeshTools::Modification::scale (MeshBase & mesh,
 
 void MeshTools::Modification::all_tri (MeshBase & mesh)
 {
+  libmesh_assert(mesh.is_prepared() || mesh.is_replicated());
+
   // The number of elements in the original mesh before any additions
   // or deletions.
   const dof_id_type n_orig_elem = mesh.n_elem();
@@ -1262,6 +1264,8 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::Modification::flatten(MeshBase & mesh)
 {
+  libmesh_assert(mesh.is_prepared() || mesh.is_replicated());
+
   // Algorithm:
   // .) For each active element in the mesh: construct a
   //    copy which is the same in every way *except* it is
