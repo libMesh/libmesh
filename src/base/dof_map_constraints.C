@@ -3448,29 +3448,37 @@ void DofMap::process_constraints (MeshBase & mesh)
           }
 
         if (rhsit == _primal_constraint_values.end())
-          if (constraint_rhs != Number(0))
-            _primal_constraint_values[*i] = constraint_rhs;
-          else
-            _primal_constraint_values.erase(*i);
+          {
+            if (constraint_rhs != Number(0))
+              _primal_constraint_values[*i] = constraint_rhs;
+            else
+              _primal_constraint_values.erase(*i);
+          }
         else
-          if (constraint_rhs != Number(0))
-            rhsit->second = constraint_rhs;
-          else
-             _primal_constraint_values.erase(rhsit);
+          {
+            if (constraint_rhs != Number(0))
+              rhsit->second = constraint_rhs;
+            else
+              _primal_constraint_values.erase(rhsit);
+          }
 
         // Finally fill in the adjoint constraints for each adjoint variable if possible
         for ( unsigned int j = 0; j < max_qoi_num; j++)
           {
             if(adjoint_rhs_iterators[j] == _adjoint_constraints_maps[j]->end())
-              if (adjoint_constraint_rhs[j] != Number(0))
-                 (*_adjoint_constraints_maps[j])[*i] = adjoint_constraint_rhs[j];
-              else
-                _adjoint_constraints_maps[j]->erase(*i);
+              {
+                if (adjoint_constraint_rhs[j] != Number(0))
+                   (*_adjoint_constraints_maps[j])[*i] = adjoint_constraint_rhs[j];
+                else
+                  _adjoint_constraints_maps[j]->erase(*i);
+              }
             else
-              if (adjoint_constraint_rhs[j] != Number(0))
-                adjoint_rhs_iterators[j]->second = adjoint_constraint_rhs[j];
-              else
-                _adjoint_constraints_maps[j]->erase(adjoint_rhs_iterators[j]);
+              {
+                if (adjoint_constraint_rhs[j] != Number(0))
+                  adjoint_rhs_iterators[j]->second = adjoint_constraint_rhs[j];
+                else
+                  _adjoint_constraints_maps[j]->erase(adjoint_rhs_iterators[j]);
+              }
           }
 
         if (constraints_to_expand.empty())
