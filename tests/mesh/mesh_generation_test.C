@@ -55,7 +55,7 @@ public:
   CPPUNIT_TEST( buildCubePyramid14 );
 #  ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( buildSphereHex8 );
-//  CPPUNIT_TEST( buildSphereHex27 );
+  CPPUNIT_TEST( buildSphereHex27 );
 #  endif
 #endif
 
