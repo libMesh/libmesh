@@ -1051,6 +1051,16 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_so_nodes;
 
   /*
+   * The maximum number of new second order nodes we might be adding,
+   * for use when picking unique unique_id values later
+   */
+  unsigned int max_new_nodes_per_elem;
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    unique_id_type max_unique_id = this->parallel_max_unique_id();
+#endif
+
+  /*
    * for speed-up of the \p add_point() method, we
    * can reserve memory.  Guess the number of additional
    * nodes for different dimensions
@@ -1063,6 +1073,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
+      max_new_nodes_per_elem = 3 - 2;
       this->reserve_nodes(static_cast<unsigned int>
                           (1.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1072,6 +1083,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * in 2D, either refine from Tri3 to Tri6 (double the nodes)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
+      max_new_nodes_per_elem = 9 - 4;
       this->reserve_nodes(static_cast<unsigned int>
                           (2*static_cast<double>(this->n_nodes())));
       break;
@@ -1084,6 +1096,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * quite some nodes, and since we do not want to overburden the memory by
        * a too conservative guess, use the lower bound
        */
+      max_new_nodes_per_elem = 27 - 8;
       this->reserve_nodes(static_cast<unsigned int>
                           (2.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1211,9 +1224,11 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
               new_location /= static_cast<Real>(n_adjacent_vertices);
 
               /* Add the new point to the mesh.
+               *
                * If we are on a serialized mesh, then we're doing this
                * all in sync, and the node processor_id will be
                * consistent between processors.
+               *
                * If we are on a distributed mesh, we can fix
                * inconsistent processor ids later, but only if every
                * processor gives new nodes a *locally* consistent
@@ -1223,6 +1238,29 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
                */
               Node * so_node = this->add_point
                 (new_location, DofObject::invalid_id, lo_pid);
+
+              /* Come up with a unique unique_id for a potentially new
+               * node.  On a distributed mesh we don't yet know what
+               * processor_id will definitely own it, so we can't let
+               * the pid determine the unique_id.  But we're not
+               * adding unpartitioned nodes in sync, so we can't let
+               * the mesh autodetermine a unique_id for a new
+               * unpartitioned node either.  So we have to pick unique
+               * unique_id values manually.
+               *
+               * We don't have to pick the *same* unique_id value as
+               * will be picked on other processors, though; we'll
+               * sync up each node later.  We just need to make sure
+               * we don't duplicate any unique_id that might be chosen
+               * by the same process elsewhere.
+               */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+              unique_id_type new_unique_id = max_unique_id +
+                max_new_nodes_per_elem * lo_elem->id() +
+                son - son_begin;
+
+              so_node->set_unique_id(new_unique_id);
+#endif
 
               /*
                * insert the new node with its defining vertex
@@ -1303,6 +1341,13 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
   // we can clear the map
   adj_vertices_to_so_nodes.clear();
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  const unique_id_type new_max_unique_id = max_unique_id +
+    max_new_nodes_per_elem * this->n_elem();
+  this->set_next_unique_id(new_max_unique_id);
+#endif
+
 
 
   STOP_LOG("all_second_order()", "Mesh");
