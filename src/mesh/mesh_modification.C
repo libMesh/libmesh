@@ -280,6 +280,8 @@ void MeshTools::Modification::scale (MeshBase & mesh,
 
 void MeshTools::Modification::all_tri (MeshBase & mesh)
 {
+  libmesh_assert(mesh.is_prepared() || mesh.is_replicated());
+
   // The number of elements in the original mesh before any additions
   // or deletions.
   const dof_id_type n_orig_elem = mesh.n_elem();
@@ -953,7 +955,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
         // remote_elem links to the new elements.
         bool mesh_is_serial = mesh.is_serial();
 
-        if (mesh_has_boundary_data || mesh_is_serial)
+        if (mesh_has_boundary_data || !mesh_is_serial)
           {
             // Container to key boundary IDs handed back by the BoundaryInfo object.
             std::vector<boundary_id_type> bc_ids;
@@ -961,60 +963,59 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             for (auto sn : elem->side_index_range())
               {
                 mesh.get_boundary_info().boundary_ids(elem, sn, bc_ids);
-                for (const auto & b_id : bc_ids)
-                  {
-                    if (mesh_is_serial && b_id == BoundaryInfo::invalid_id)
-                      continue;
 
-                    // Make a sorted list of node ids for elem->side(sn)
-                    std::unique_ptr<Elem> elem_side = elem->build_side_ptr(sn);
-                    std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
-                    for (unsigned int esn=0,
-                         n_esn = cast_int<unsigned int>(elem_side_nodes.size());
-                         esn != n_esn; ++esn)
-                      elem_side_nodes[esn] = elem_side->node_id(esn);
-                    std::sort(elem_side_nodes.begin(), elem_side_nodes.end());
+                if (bc_ids.empty() && elem->neighbor_ptr(sn) != remote_elem)
+                  continue;
 
-                    for (unsigned int i=0; i != max_subelems; ++i)
-                      if (subelem[i])
+                // Make a sorted list of node ids for elem->side(sn)
+                std::unique_ptr<Elem> elem_side = elem->build_side_ptr(sn);
+                std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
+                for (unsigned int esn=0,
+                     n_esn = cast_int<unsigned int>(elem_side_nodes.size());
+                     esn != n_esn; ++esn)
+                  elem_side_nodes[esn] = elem_side->node_id(esn);
+                std::sort(elem_side_nodes.begin(), elem_side_nodes.end());
+
+                for (unsigned int i=0; i != max_subelems; ++i)
+                  if (subelem[i])
+                    {
+                      for (auto subside : subelem[i]->side_index_range())
                         {
-                          for (auto subside : subelem[i]->side_index_range())
+                          std::unique_ptr<Elem> subside_elem = subelem[i]->build_side_ptr(subside);
+
+                          // Make a list of *vertex* node ids for this subside, see if they are all present
+                          // in elem->side(sn).  Note 1: we can't just compare elem->key(sn) to
+                          // subelem[i]->key(subside) in the Prism cases, since the new side is
+                          // a different type.  Note 2: we only use vertex nodes since, in the future,
+                          // a Hex20 or Prism15's QUAD8 face may be split into two Tri6 faces, and the
+                          // original face will not contain the mid-edge node.
+                          std::vector<dof_id_type> subside_nodes(subside_elem->n_vertices());
+                          for (unsigned int ssn=0,
+                               n_ssn = cast_int<unsigned int>(subside_nodes.size());
+                               ssn != n_ssn; ++ssn)
+                            subside_nodes[ssn] = subside_elem->node_id(ssn);
+                          std::sort(subside_nodes.begin(), subside_nodes.end());
+
+                          // std::includes returns true if every element of the second sorted range is
+                          // contained in the first sorted range.
+                          if (std::includes(elem_side_nodes.begin(), elem_side_nodes.end(),
+                                            subside_nodes.begin(), subside_nodes.end()))
                             {
-                              std::unique_ptr<Elem> subside_elem = subelem[i]->build_side_ptr(subside);
+                              for (const auto & b_id : bc_ids)
+                                if (b_id != BoundaryInfo::invalid_id)
+                                  {
+                                    new_bndry_ids.push_back(b_id);
+                                    new_bndry_elements.push_back(subelem[i].get());
+                                    new_bndry_sides.push_back(subside);
+                                  }
 
-                              // Make a list of *vertex* node ids for this subside, see if they are all present
-                              // in elem->side(sn).  Note 1: we can't just compare elem->key(sn) to
-                              // subelem[i]->key(subside) in the Prism cases, since the new side is
-                              // a different type.  Note 2: we only use vertex nodes since, in the future,
-                              // a Hex20 or Prism15's QUAD8 face may be split into two Tri6 faces, and the
-                              // original face will not contain the mid-edge node.
-                              std::vector<dof_id_type> subside_nodes(subside_elem->n_vertices());
-                              for (unsigned int ssn=0,
-                                   n_ssn = cast_int<unsigned int>(subside_nodes.size());
-                                   ssn != n_ssn; ++ssn)
-                                subside_nodes[ssn] = subside_elem->node_id(ssn);
-                              std::sort(subside_nodes.begin(), subside_nodes.end());
-
-                              // std::includes returns true if every element of the second sorted range is
-                              // contained in the first sorted range.
-                              if (std::includes(elem_side_nodes.begin(), elem_side_nodes.end(),
-                                                subside_nodes.begin(), subside_nodes.end()))
-                                {
-                                  if (b_id != BoundaryInfo::invalid_id)
-                                    {
-                                      new_bndry_ids.push_back(b_id);
-                                      new_bndry_elements.push_back(subelem[i].get());
-                                      new_bndry_sides.push_back(subside);
-                                    }
-
-                                  // If the original element had a RemoteElem neighbor on side 'sn',
-                                  // then the subelem has one on side 'subside'.
-                                  if (elem->neighbor_ptr(sn) == remote_elem)
-                                    subelem[i]->set_neighbor(subside, const_cast<RemoteElem*>(remote_elem));
-                                }
+                              // If the original element had a RemoteElem neighbor on side 'sn',
+                              // then the subelem has one on side 'subside'.
+                              if (elem->neighbor_ptr(sn) == remote_elem)
+                                subelem[i]->set_neighbor(subside, const_cast<RemoteElem*>(remote_elem));
                             }
                         }
-                  } // end for loop over boundary IDs
+                    } // end for loop over subelem
               } // end for loop over sides
 
             // Remove the original element from the BoundaryInfo structure.
@@ -1263,6 +1264,8 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::Modification::flatten(MeshBase & mesh)
 {
+  libmesh_assert(mesh.is_prepared() || mesh.is_replicated());
+
   // Algorithm:
   // .) For each active element in the mesh: construct a
   //    copy which is the same in every way *except* it is
