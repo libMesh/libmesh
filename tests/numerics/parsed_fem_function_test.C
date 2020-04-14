@@ -93,7 +93,9 @@ public:
       {
         c->get_element_fe(0)->get_phi();
         c->get_element_fe(0)->get_dphi();
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         c->get_element_fe(0)->get_d2phi();
+#endif
         c->pre_fe_reinit(*sys, elem);
         c->elem_fe_reinit();
 

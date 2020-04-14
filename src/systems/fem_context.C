@@ -2002,7 +2002,9 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
     case -1:
       fe_new->get_phi();
       fe_new->get_dphi();
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       fe_new->get_d2phi();
+#endif
       fe_new->get_curl_phi();
       break;
     case 0:
@@ -2012,7 +2014,12 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
       fe_new->get_dphi();
       break;
     case 2:
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       fe_new->get_d2phi();
+#else
+      // here a different configuration is required.
+      libmesh_not_implemented();
+#endif
       break;
     case 3:
       fe_new->get_curl_phi();
