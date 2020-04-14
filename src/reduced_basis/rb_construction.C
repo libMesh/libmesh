@@ -733,10 +733,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
         }
 
       // Do any required user post-processing before symmetrizing
-      // and/or applying constraints. Only do the post processing
-      // if we are applying the dof constraints.
-      if (apply_dof_constraints)
-        this->post_process_elem_matrix_and_vector(context);
+      // and/or applying constraints.
+      this->post_process_elem_matrix_and_vector(context);
 
       // Need to symmetrize before imposing
       // periodic constraints
