@@ -17,11 +17,6 @@
 
 
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::sqrt
-
-
 // Local includes
 #include "libmesh/mesh_generation.h"
 #include "libmesh/unstructured_mesh.h"
@@ -54,6 +49,13 @@
 #include "libmesh/enum_order.h"
 #include "libmesh/int_range.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_ghost_sync.h"
+
+// C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath> // for std::sqrt
+#include <unordered_set>
+
 
 namespace libMesh
 {
@@ -1538,6 +1540,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
+  // Building while distributed is a little more complicated
+  const bool is_replicated = mesh.is_replicated();
+
   // Sphere is centered at origin by default
   const Point cent;
 
@@ -1867,8 +1872,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // Loop over the elements, refine, pop nodes to boundary.
   for (unsigned int r=0; r<nr; r++)
     {
-      // A DistributedMesh needs a little prep before refinement
-      if (!mesh.is_replicated())
+      // A DistributedMesh needs a little prep before refinement, and
+      // may need us to keep track of ghost node movement.
+      std::unordered_set<dof_id_type> moved_ghost_nodes;
+      if (!is_replicated)
         mesh.prepare_for_use();
 
       mesh_refinement.uniformly_refine(1);
@@ -1879,15 +1886,56 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
             {
               std::unique_ptr<Elem> side(elem->build_side_ptr(s));
 
-              // Pop each point to the sphere boundary
+              // Pop each point to the sphere boundary.  Keep track of
+              // any points we don't own, so we can push their "moved"
+              // status to their owners.
               for (auto n : side->node_index_range())
-                side->point(n) =
-                  sphere.closest_point(side->point(n));
+                {
+                  Node & side_node = side->node_ref(n);
+                  side_node =
+                    sphere.closest_point(side->point(n));
+
+                  if (!is_replicated &&
+                      side_node.processor_id() != mesh.processor_id())
+                    moved_ghost_nodes.insert(side_node.id());
+                }
             }
+
+      if (!is_replicated)
+        {
+          std::map<processor_id_type, std::vector<dof_id_type>> moved_nodes_map;
+          for (auto id : moved_ghost_nodes)
+            {
+              const Node & node = mesh.node_ref(id);
+              moved_nodes_map[node.processor_id()].push_back(node.id());
+            }
+
+          auto action_functor =
+            [& mesh, & sphere]
+            (processor_id_type /* pid */,
+             const std::vector<dof_id_type> & my_moved_nodes)
+            {
+              for (auto id : my_moved_nodes)
+                {
+                  Node & node = mesh.node_ref(id);
+                  node = sphere.closest_point(node);
+                }
+            };
+
+          // First get new node positions to their owners
+          Parallel::push_parallel_vector_data
+            (mesh.comm(), moved_nodes_map, action_functor);
+
+          // Then get node positions to anyone else with them ghosted
+          SyncNodalPositions sync_object(mesh);
+          Parallel::sync_dofobject_data_by_id
+            (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(),
+             sync_object);
+        }
     }
 
   // A DistributedMesh needs a little prep before flattening
-  if (!mesh.is_replicated())
+  if (is_replicated)
     mesh.prepare_for_use();
 
   // The mesh now contains a refinement hierarchy due to the refinements
@@ -1902,7 +1950,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       if ((type == TRI6) || (type == TRI3))
         {
           // A DistributedMesh needs a little prep before all_tri()
-          if (!mesh.is_replicated())
+          if (is_replicated)
             mesh.prepare_for_use();
 
           MeshTools::Modification::all_tri(mesh);
