@@ -244,14 +244,38 @@ public:
   /**
    * \returns The \p xyz spatial locations of the quadrature
    * points on the element.
+   *
+   * It is overwritten by infinite elements since there
+   * \p FEMap cannot be used to compute \p xyz.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Point> & get_xyz() const
   { calculate_map = true; return this->_fe_map->get_xyz(); }
+
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  /**
+   * This function is the variant of \p get_JxW() for \p InfFE.
+   * Since J diverges there, a respectize decay-function must be
+   * applied to obtain well-defined quantities.
+   *
+   * For FE, it is equivalent to the common \p get_JxW().
+   */
+  virtual const std::vector<Real> & get_JxWxdecay_sq () const
+  { return get_JxW();}
+#endif
 
   /**
    * \returns The element Jacobian times the quadrature weight for
    * each quadrature point.
+   *
+   * For \p InfFE, use \p get_JxWxdecay_sq() instead.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_JxW() const
   { calculate_map = true; return this->_fe_map->get_JxW(); }
 
@@ -259,6 +283,9 @@ public:
    * \returns The element tangents in xi-direction at the quadrature
    * points.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_dxyzdxi() const
   { calculate_map = true; return this->_fe_map->get_dxyzdxi(); }
 
@@ -266,6 +293,9 @@ public:
    * \returns The element tangents in eta-direction at the quadrature
    * points.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_dxyzdeta() const
   { calculate_map = true; return this->_fe_map->get_dxyzdeta(); }
 
@@ -273,6 +303,9 @@ public:
    * \returns The element tangents in zeta-direction at the quadrature
    * points.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_dxyzdzeta() const
   { return _fe_map->get_dxyzdzeta(); }
 
@@ -281,36 +314,54 @@ public:
   /**
    * \returns The second partial derivatives in xi.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_d2xyzdxi2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxi2(); }
 
   /**
    * \returns The second partial derivatives in eta.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_d2xyzdeta2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdeta2(); }
 
   /**
    * \returns The second partial derivatives in zeta.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_d2xyzdzeta2() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdzeta2(); }
 
   /**
    * \returns The second partial derivatives in xi-eta.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_d2xyzdxideta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxideta(); }
 
   /**
    * \returns The second partial derivatives in xi-zeta.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_d2xyzdxidzeta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdxidzeta(); }
 
   /**
    * \returns The second partial derivatives in eta-zeta.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<RealGradient> & get_d2xyzdetadzeta() const
   { calculate_map = true; return this->_fe_map->get_d2xyzdetadzeta(); }
 
@@ -320,6 +371,9 @@ public:
    * \returns The dxi/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_dxidx() const
   { calculate_map = true; return this->_fe_map->get_dxidx(); }
 
@@ -327,6 +381,9 @@ public:
    * \returns The dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_dxidy() const
   { calculate_map = true; return this->_fe_map->get_dxidy(); }
 
@@ -334,6 +391,9 @@ public:
    * \returns The dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_dxidz() const
   { calculate_map = true; return this->_fe_map->get_dxidz(); }
 
@@ -341,6 +401,9 @@ public:
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_detadx() const
   { calculate_map = true; return this->_fe_map->get_detadx(); }
 
@@ -348,6 +411,9 @@ public:
    * \returns The deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_detady() const
   { calculate_map = true; return this->_fe_map->get_detady(); }
 
@@ -355,6 +421,9 @@ public:
    * \returns The deta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_detadz() const
   { calculate_map = true; return this->_fe_map->get_detadz(); }
 
@@ -362,6 +431,9 @@ public:
    * \returns The dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_dzetadx() const
   { calculate_map = true; return this->_fe_map->get_dzetadx(); }
 
@@ -369,6 +441,9 @@ public:
    * \returns The dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_dzetady() const
   { calculate_map = true; return this->_fe_map->get_dzetady(); }
 
@@ -376,18 +451,27 @@ public:
    * \returns The dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_dzetadz() const
   { calculate_map = true; return this->_fe_map->get_dzetadz(); }
 
   /**
    * \returns The tangent vectors for face integration.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<std::vector<Point>> & get_tangents() const
   { calculate_map = true; return this->_fe_map->get_tangents(); }
 
   /**
    * \returns The outward pointing normal vectors for face integration.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Point> & get_normals() const
   { calculate_map = true; return this->_fe_map->get_normals(); }
 
@@ -395,6 +479,9 @@ public:
   /**
    * \returns The curvatures for use in face integration.
    */
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  virtual
+#endif
   const std::vector<Real> & get_curvatures() const
   { calculate_map = true; return this->_fe_map->get_curvatures();}
 
@@ -465,6 +552,8 @@ public:
 
   /**
    * \returns The mapping object
+   *
+   * \note for InfFE, this gives a useless object.
    */
   const FEMap & get_fe_map() const { return *_fe_map.get(); }
   FEMap & get_fe_map() { return *_fe_map.get(); }
