@@ -1372,6 +1372,13 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
       libmesh_error_msg("ERROR: DOF " << dof_number << " was already constrained!");
 
   libmesh_assert_less(dof_number, this->n_dofs());
+
+  // There is an implied "1" on the diagonal of the constraint row, and the user
+  // should not try to manually set _any_ value on the diagonal.
+  libmesh_assert_msg(!constraint_row.count(dof_number),
+                     "Error: constraint_row for dof " << dof_number <<
+                     " should not contain an entry for dof " << dof_number);
+
 #ifndef NDEBUG
   for (const auto & pr : constraint_row)
     libmesh_assert_less(pr.first, this->n_dofs());
