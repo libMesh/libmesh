@@ -464,7 +464,11 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       count++;
     }
 
-  std::vector<unsigned int> n_training_samples_per_param(num_params);
+  // n_training_samples_per_param has 3 entries, but entries after "num_params"
+  // are unused so we just set their value to 1. We need to set it to 1 (rather
+  // than 0) so that we don't skip the inner part of the triply-nested loop over
+  // n_training_samples_per_param below.
+  std::vector<unsigned int> n_training_samples_per_param(3);
   for(unsigned int param=0; param<3; param++)
     {
       if(param < num_params)
