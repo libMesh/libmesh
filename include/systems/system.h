@@ -1703,6 +1703,18 @@ public:
    */
   void zero_variable (NumericVector<Number> & v, unsigned int var_num) const;
 
+  /**
+   * Setter and getter functions for project_with_constraints boolean
+   */
+  bool get_project_with_constraints()
+  {
+    return project_with_constraints;
+  }
+
+  void set_project_with_constraints(bool _project_with_constraints)
+  {
+    project_with_constraints = _project_with_constraints;
+  }
 
   /**
    * \returns A writable reference to a boolean that determines if this system
@@ -2057,6 +2069,11 @@ private:
    * \p true, then \p EquationSystems::write will ignore this system.
    */
   bool _hide_output;
+
+  /**
+   * Do we want to apply constraints while projecting vectors ?
+   */
+  bool project_with_constraints;
 };
 
 

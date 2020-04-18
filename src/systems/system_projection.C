@@ -455,12 +455,20 @@ void System::project_vector (const NumericVector<Number> & old_v,
       new_v.close();
     }
 
-  if (is_adjoint == -1)
-    this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
-  else if (is_adjoint >= 0)
-    this->get_dof_map().enforce_adjoint_constraints_exactly(new_v,
-                                                            is_adjoint);
 
+  // Apply constraints only if we we are asked to
+  if(this->project_with_constraints)
+  {
+    if (is_adjoint == -1)
+    {
+      this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
+    }
+    else if (is_adjoint >= 0)
+    {
+      this->get_dof_map().enforce_adjoint_constraints_exactly(new_v,
+                                                            is_adjoint);
+    }
+  }
 #else
 
   // AMR is disabled: simply copy the vector

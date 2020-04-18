@@ -92,7 +92,8 @@ System::System (EquationSystems & es,
   _identify_variable_groups         (true),
   _additional_data_written          (false),
   adjoint_already_solved            (false),
-  _hide_output                      (false)
+  _hide_output                      (false),
+  project_with_constraints          (true)
 {
 }
 
