@@ -190,6 +190,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Make sure the solution is projected when we refine the mesh
   system.project_solution_on_reinit() = true;
 
+  // And we need to make sure we dont reapply constraints after refining the mesh
+  bool old_project_with_constraints_setting;
+  old_project_with_constraints_setting = system.get_project_with_constraints();
+
+  system.set_project_with_constraints(false);
+
   // And it'll be best to avoid any repartitioning
   std::unique_ptr<Partitioner> old_partitioner(mesh.partitioner().release());
 
@@ -279,10 +285,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     if (swapping_physics)
       dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
-    // Rebuild the rhs with the projected primal solution, constraints
-    // have to be applied to get the correct error estimate since error
-    // on the Dirichlet boundary is zero
-    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+    // Rebuild the rhs with the projected primal solution, do not apply constraints
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
 
     // Swap back if needed
     if (swapping_physics)
@@ -563,6 +567,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // Restore old solutions and clean up the heap
   system.project_solution_on_reinit() = old_projection_setting;
+  system.set_project_with_constraints(old_project_with_constraints_setting);
 
   // Restore the coarse solution vectors and delete their copies
   *system.solution = *coarse_solution;
