@@ -191,25 +191,40 @@ Real Edge3::volume () const
   const Real c = B.norm_sq();
 
   // Degenerate straight line case
-  if (a < TOLERANCE*TOLERANCE)
+  if (a == 0.)
     return 2. * std::sqrt(c);
 
   const Real b = 2.*(A*B);
   const Real ba=b/a;
   const Real ca=c/a;
 
-  libmesh_assert (1.-ba+ca>0.);
+  const Real sqrt_term1 = 1. - ba + ca;
+  const Real sqrt_term2 = 1. + ba + ca;
 
-  const Real s1 = std::sqrt(1. - ba + ca);
-  const Real s2 = std::sqrt(1. + ba + ca);
+  // Fall back on straight line case instead of computing nan
+  // Note: b can be positive or negative so we have to check both cases.
+  if (sqrt_term1 < 0. || sqrt_term2 < 0.)
+    return 2. * std::sqrt(c);
 
-  Real log_term = (1. - 0.5*ba + s1) / (-1. - 0.5*ba + s2);
-  libmesh_assert(!libmesh_isnan(log_term) && log_term > 0.);
+  const Real s1 = std::sqrt(sqrt_term1);
+  const Real s2 = std::sqrt(sqrt_term2);
+
+  // Pre-compute the denominator of the log term. If it's zero, fall
+  // back on the straight line case.
+  const Real log_term_denom = -1. - 0.5*ba + s2;
+  if (log_term_denom == 0.)
+    return 2. * std::sqrt(c);
+
+  Real log_term = (1. - 0.5*ba + s1) / log_term_denom;
+
+  // Fall back on straight line case instead of taking the log of zero
+  // or a negative number.
+  if (log_term <= 0.)
+    return 2. * std::sqrt(c);
 
   return 0.5*std::sqrt(a)*((1.-0.5*ba)*s1 +
                            (1.+0.5*ba)*s2 +
-                           (ca - 0.25*ba*ba)*std::log(log_term)
-                           );
+                           (ca - 0.25*ba*ba)*std::log(log_term));
 }
 
 
