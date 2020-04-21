@@ -188,7 +188,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // the user is treating them in their code
   // The adjoint lift function we have defined above is set to be preserved
   // by default
-  std::vector<bool> old_adjoints_projection_settings;
+  std::vector<bool> old_adjoints_projection_settings(system.n_qois());
   for (auto j : IntRange<unsigned int>(0, system.n_qois()))
     {
       if (_qoi_set.has_index(j))
@@ -198,13 +198,11 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           auto old_adjoint_vector_projection_setting = system.vector_preservation(adjoint_vector_name);
 
           // Save for restoration later on
-          old_adjoints_projection_settings.push_back(old_adjoint_vector_projection_setting);
+          old_adjoints_projection_settings[j] = old_adjoint_vector_projection_setting;
 
           // Set the preservation to true for the upcoming reinits
           system.set_vector_preservation(adjoint_vector_name, true);
         }
-      else
-        old_adjoints_projection_settings.push_back(NULL);
     }
 
   // And we'll need to temporarily change solution projection settings
