@@ -198,13 +198,13 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           auto old_adjoint_vector_projection_setting = system.vector_preservation(adjoint_vector_name);
 
           // Save for restoration later on
-          old_adjoints_projection_settings.emplace_back(old_adjoint_vector_projection_setting);
+          old_adjoints_projection_settings.push_back(old_adjoint_vector_projection_setting);
 
           // Set the preservation to true for the upcoming reinits
           system.set_vector_preservation(adjoint_vector_name, true);
         }
       else
-        old_adjoints_projection_settings.emplace_back(NULL);
+        old_adjoints_projection_settings.push_back(NULL);
     }
 
   // And we'll need to temporarily change solution projection settings
