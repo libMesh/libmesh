@@ -81,8 +81,7 @@ int main (int argc, char ** argv)
 #endif
 
   std::vector<std::string> names;
-  std::vector<std::string> var_names;
-  std::vector<Number>      soln;
+  std::vector<std::string> output_names;
 
   // Check for minimum number of command line args
   if (argc < 3)
@@ -100,10 +99,7 @@ int main (int argc, char ** argv)
     {
       std::string tmp;
       tmp = command_line.next(tmp);
-      if (names.empty())
-        names.push_back(tmp);
-      else
-        libmesh_error_msg("ERROR: Input name must precede output name!");
+      names.push_back(tmp);
     }
 
   // Output file name
@@ -111,10 +107,7 @@ int main (int argc, char ** argv)
     {
       std::string tmp;
       tmp = command_line.next(tmp);
-      if (!names.empty())
-        names.push_back(tmp);
-      else
-        libmesh_error_msg("ERROR: Input name must precede output name!");
+      output_names.push_back(tmp);
     }
 
   // Get the mesh distortion factor
@@ -233,10 +226,6 @@ int main (int argc, char ** argv)
 
   if (addinfelems)
     {
-      if (names.size() == 3)
-        libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
-                          << "not compatible with solution import.");
-
       if (write_bndry != BM_DISABLED)
         libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
                           << "not compatible with writing boundary conditions.");
@@ -442,7 +431,7 @@ int main (int argc, char ** argv)
 
 
   // Possibly write the mesh
-  if (names.size() >= 2)
+  if (output_names.size())
     {
       // When the mesh got refined, it is likely that
       // the user does _not_ want to write also
@@ -462,22 +451,15 @@ int main (int argc, char ** argv)
              mesh.active_elements_begin(),
              mesh.active_elements_end());
 
-          // now write the new_mesh
-          if (names.size() == 2)
-            new_mesh.write(names[1]);
-          else if (names.size() == 3)
-            new_mesh.write(names[1], soln, var_names);
-          else
-            libmesh_error_msg("Invalid names.size() = " << names.size());
+          // now write the new_mesh in as many formats as requested
+          for (auto & output_name : output_names)
+            new_mesh.write(output_name);
         }
       else
         {
-          if (names.size() == 2)
-            mesh.write(names[1]);
-          else if (names.size() == 3)
-            mesh.write(names[1], soln, var_names);
-          else
-            libmesh_error_msg("Invalid names.size() = " << names.size());
+          // Write the new_mesh in as many formats as requested
+          for (auto & output_name : output_names)
+            mesh.write(output_name);
         }
 
 
@@ -488,19 +470,18 @@ int main (int argc, char ** argv)
           BoundaryMesh boundary_mesh
             (mesh.comm(), cast_int<unsigned char>(mesh.mesh_dimension()-1));
 
-          std::string boundary_name = "bndry_";
-          boundary_name += names[1];
-
           if (write_bndry == BM_MESH_ONLY)
             mesh.get_boundary_info().sync(boundary_mesh);
 
           else
             libmesh_error_msg("Invalid value write_bndry = " << write_bndry);
 
-          if (names.size() == 2)
-            boundary_mesh.write(boundary_name);
-          else if (names.size() == 3)
-            boundary_mesh.write(boundary_name, soln, var_names);
+          // Write the mesh in as many formats as requested
+          for (auto boundary_name : output_names)
+            {
+              boundary_name = "bndry_" + boundary_name;
+              boundary_mesh.write(boundary_name);
+            }
         }
     }
 
