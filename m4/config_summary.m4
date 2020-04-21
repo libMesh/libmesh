@@ -30,21 +30,21 @@ AS_ECHO(["Build Methods...................... : $METHODS"])
 AS_ECHO([])
 for method in ${METHODS}; do
      AS_CASE("${method}",
-             [opt],   [AS_ECHO(["CPPFLAGS...(opt)................... : $CPPFLAGS_OPT $CPPFLAGS"])
-                       AS_ECHO(["CXXFLAGS...(opt)................... : $CXXFLAGS_OPT $CXXFLAGS"])
-                       AS_ECHO(["CFLAGS.....(opt)................... : $CFLAGS_OPT $CFLAGS"])],
-             [devel], [AS_ECHO(["CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL $CPPFLAGS"])
-                       AS_ECHO(["CXXFLAGS...(devel)................. : $CXXFLAGS_DEVEL $CXXFLAGS"])
-                       AS_ECHO(["CFLAGS.....(devel)................. : $CFLAGS_DEVEL $CFLAGS"])],
-             [dbg],   [AS_ECHO(["CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG $CPPFLAGS"])
-                       AS_ECHO(["CXXFLAGS...(dbg)................... : $CXXFLAGS_DBG $CXXFLAGS"])
-                       AS_ECHO(["CFLAGS.....(dbg)................... : $CFLAGS_DBG $CFLAGS"])],
-             [prof],  [AS_ECHO(["CPPFLAGS...(prof).................. : $CPPFLAGS_PROF $CPPFLAGS"])
-                       AS_ECHO(["CXXFLAGS...(prof).................. : $CXXFLAGS_PROF $CXXFLAGS"])
-                       AS_ECHO(["CFLAGS.....(prof).................. : $CFLAGS_PROF $CFLAGS"])],
-             [oprof], [AS_ECHO(["CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF $CPPFLAGS"])
-                       AS_ECHO(["CXXFLAGS...(oprof)................. : $CXXFLAGS_OPROF $CXXFLAGS"])
-                       AS_ECHO(["CFLAGS.....(oprof)................. : $CFLAGS_OPROF $CFLAGS"])])
+             [opt],   [AS_ECHO(["CPPFLAGS...(opt)................... : $CPPFLAGS_OPT"])
+                       AS_ECHO(["CXXFLAGS...(opt)................... : $CXXFLAGS_OPT"])
+                       AS_ECHO(["CFLAGS.....(opt)................... : $CFLAGS_OPT"])],
+             [devel], [AS_ECHO(["CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL"])
+                       AS_ECHO(["CXXFLAGS...(devel)................. : $CXXFLAGS_DEVEL"])
+                       AS_ECHO(["CFLAGS.....(devel)................. : $CFLAGS_DEVEL"])],
+             [dbg],   [AS_ECHO(["CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG"])
+                       AS_ECHO(["CXXFLAGS...(dbg)................... : $CXXFLAGS_DBG"])
+                       AS_ECHO(["CFLAGS.....(dbg)................... : $CFLAGS_DBG"])],
+             [prof],  [AS_ECHO(["CPPFLAGS...(prof).................. : $CPPFLAGS_PROF"])
+                       AS_ECHO(["CXXFLAGS...(prof).................. : $CXXFLAGS_PROF"])
+                       AS_ECHO(["CFLAGS.....(prof).................. : $CFLAGS_PROF"])],
+             [oprof], [AS_ECHO(["CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF"])
+                       AS_ECHO(["CXXFLAGS...(oprof)................. : $CXXFLAGS_OPROF"])
+                       AS_ECHO(["CFLAGS.....(oprof)................. : $CFLAGS_OPROF"])])
 
      dnl blank line
      AS_ECHO([])
