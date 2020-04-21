@@ -183,6 +183,30 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   std::unique_ptr<NumericVector<Number>> coarse_solution = system.solution->clone();
   std::unique_ptr<NumericVector<Number>> coarse_local_solution = system.current_local_solution->clone();
 
+  // We need to make sure that the coarse adjoint vectors used in the
+  // calculations below are preserved during reinit, regardless of how
+  // the user is treating them in their code
+  // The adjoint lift function we have defined above is set to be preserved
+  // by default
+  std::vector<bool> old_adjoints_projection_settings;
+  for (auto j : IntRange<unsigned int>(0, system.n_qois()))
+    {
+      if (_qoi_set.has_index(j))
+        {
+          // Get the vector preservation setting for this adjoint vector
+          auto adjoint_vector_name = system.vector_name(system.get_adjoint_solution(j));
+          auto old_adjoint_vector_projection_setting = system.vector_preservation(adjoint_vector_name);
+
+          // Save for restoration later on
+          old_adjoints_projection_settings.emplace_back(old_adjoint_vector_projection_setting);
+
+          // Set the preservation to true for the upcoming reinits
+          system.set_vector_preservation(adjoint_vector_name, true);
+        }
+      else
+        old_adjoints_projection_settings.emplace_back(NULL);
+    }
+
   // And we'll need to temporarily change solution projection settings
   bool old_projection_setting;
   old_projection_setting = system.project_solution_on_reinit();
@@ -568,6 +592,16 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Restore old solutions and clean up the heap
   system.project_solution_on_reinit() = old_projection_setting;
   system.set_project_with_constraints(old_project_with_constraints_setting);
+
+  // Restore the adjoint vector preservation settings
+  for (auto j : IntRange<unsigned int>(0, system.n_qois()))
+    {
+      if (_qoi_set.has_index(j))
+        {
+          auto adjoint_vector_name = system.vector_name(system.get_adjoint_solution(j));
+          system.set_vector_preservation(adjoint_vector_name, old_adjoints_projection_settings[j]);
+        }
+    }
 
   // Restore the coarse solution vectors and delete their copies
   *system.solution = *coarse_solution;
