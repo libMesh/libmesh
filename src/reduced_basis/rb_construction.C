@@ -732,9 +732,24 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
             }
         }
 
-      // Do any required user post-processing before symmetrizing
-      // and/or applying constraints.
-      this->post_process_elem_matrix_and_vector(context);
+      // Do any required user post-processing before symmetrizing and/or applying
+      // constraints.
+      //
+      // We only do this if apply_dof_constraints is true because we want to be
+      // able to set apply_dof_constraints=false in order to obtain a matrix
+      // A with no dof constraints or dof transformations, as opposed to C^T A C,
+      // which includes constraints and/or dof transformations. Here C refers to
+      // the matrix that imposes dof constraints and transformations on the
+      // solution u.
+      //
+      // Matrices such as A are what we store in our "non_dirichlet" operators, and
+      // they are useful for computing terms such as (C u_i)^T A (C u_j) (e.g. see
+      // update_RB_system_matrices()),  where C u is the result of a "truth_solve",
+      // which includes calls to both enforce_constraints_exactly() and
+      // post_process_truth_solution(). If we use C^T A C to compute these terms then
+      // we would "double apply" the matrix C, which can give incorrect results.
+      if (apply_dof_constraints)
+        this->post_process_elem_matrix_and_vector(context);
 
       // Need to symmetrize before imposing
       // periodic constraints
@@ -746,6 +761,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           context.get_elem_jacobian() *= 0.5;
         }
 
+      // As discussed above, we can set apply_dof_constraints=false to
+      // get A instead of C^T A C
       if (apply_dof_constraints)
         {
           // Apply constraints, e.g. Dirichlet and periodic constraints
