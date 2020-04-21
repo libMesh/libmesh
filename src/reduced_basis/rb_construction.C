@@ -1151,6 +1151,12 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
       // Perform an Offline truth solve for the current parameter
       truth_solve(-1);
 
+      if(solution->l2_norm() == 0.)
+        {
+          libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
+          break;
+        }
+
       // Add orthogonal part of the snapshot to the RB space
       libMesh::out << "Enriching the RB space" << std::endl;
       enrich_RB_space();
