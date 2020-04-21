@@ -183,12 +183,40 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   std::unique_ptr<NumericVector<Number>> coarse_solution = system.solution->clone();
   std::unique_ptr<NumericVector<Number>> coarse_local_solution = system.current_local_solution->clone();
 
+  // We need to make sure that the coarse adjoint vectors used in the
+  // calculations below are preserved during reinit, regardless of how
+  // the user is treating them in their code
+  // The adjoint lift function we have defined above is set to be preserved
+  // by default
+  std::vector<bool> old_adjoints_projection_settings(system.n_qois());
+  for (auto j : IntRange<unsigned int>(0, system.n_qois()))
+    {
+      if (_qoi_set.has_index(j))
+        {
+          // Get the vector preservation setting for this adjoint vector
+          auto adjoint_vector_name = system.vector_name(system.get_adjoint_solution(j));
+          auto old_adjoint_vector_projection_setting = system.vector_preservation(adjoint_vector_name);
+
+          // Save for restoration later on
+          old_adjoints_projection_settings[j] = old_adjoint_vector_projection_setting;
+
+          // Set the preservation to true for the upcoming reinits
+          system.set_vector_preservation(adjoint_vector_name, true);
+        }
+    }
+
   // And we'll need to temporarily change solution projection settings
   bool old_projection_setting;
   old_projection_setting = system.project_solution_on_reinit();
 
   // Make sure the solution is projected when we refine the mesh
   system.project_solution_on_reinit() = true;
+
+  // And we need to make sure we dont reapply constraints after refining the mesh
+  bool old_project_with_constraints_setting;
+  old_project_with_constraints_setting = system.get_project_with_constraints();
+
+  system.set_project_with_constraints(false);
 
   // And it'll be best to avoid any repartitioning
   std::unique_ptr<Partitioner> old_partitioner(mesh.partitioner().release());
@@ -279,10 +307,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     if (swapping_physics)
       dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
-    // Rebuild the rhs with the projected primal solution, constraints
-    // have to be applied to get the correct error estimate since error
-    // on the Dirichlet boundary is zero
-    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+    // Rebuild the rhs with the projected primal solution, do not apply constraints
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
 
     // Swap back if needed
     if (swapping_physics)
@@ -563,6 +589,17 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // Restore old solutions and clean up the heap
   system.project_solution_on_reinit() = old_projection_setting;
+  system.set_project_with_constraints(old_project_with_constraints_setting);
+
+  // Restore the adjoint vector preservation settings
+  for (auto j : IntRange<unsigned int>(0, system.n_qois()))
+    {
+      if (_qoi_set.has_index(j))
+        {
+          auto adjoint_vector_name = system.vector_name(system.get_adjoint_solution(j));
+          system.set_vector_preservation(adjoint_vector_name, old_adjoints_projection_settings[j]);
+        }
+    }
 
   // Restore the coarse solution vectors and delete their copies
   *system.solution = *coarse_solution;

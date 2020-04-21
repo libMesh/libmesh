@@ -283,9 +283,6 @@ int main (int argc, char ** argv)
 
   equation_systems.init ();
 
-  // Add an adjoint_solution0 vector to the system
-  system.add_vector("adjoint_solution0", false, GHOSTED);
-
   // Print information about the mesh and system to the screen.
   mesh.print_info();
   equation_systems.print_info();
