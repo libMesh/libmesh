@@ -72,6 +72,7 @@ RBConstruction::RBConstruction (EquationSystems & es,
     skip_degenerate_sides(true),
     compute_RB_inner_product(false),
     store_non_dirichlet_operators(false),
+    store_untransformed_basis(false),
     use_empty_rb_solve_in_greedy(true),
     Fq_representor_innerprods_computed(false),
     Nmax(0),
@@ -1425,6 +1426,11 @@ Real RBConstruction::truth_solve(int plot_solution)
 {
   LOG_SCOPE("truth_solve()", "RBConstruction");
 
+  if(store_untransformed_basis && !_untransformed_solution)
+  {
+    _untransformed_solution = solution->zero_clone();
+  }
+
   truth_assembly();
 
   // truth_assembly assembles into matrix and rhs, so use those for the solve
@@ -1443,6 +1449,11 @@ Real RBConstruction::truth_solve(int plot_solution)
 
       if (assert_convergence)
         check_convergence(*get_linear_solver());
+    }
+
+  if (store_untransformed_basis)
+    {
+      *_untransformed_solution = *solution;
     }
 
   // Call user-defined post-processing routines on the truth solution.
@@ -1516,9 +1527,14 @@ void RBConstruction::enrich_RB_space()
 {
   LOG_SCOPE("enrich_RB_space()", "RBConstruction");
 
-  auto new_bf = NumericVector<Number>::build(this->comm());
-  new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-  *new_bf = *solution;
+  auto new_bf = solution->clone();
+
+  std::unique_ptr<NumericVector<Number>> new_untransformed_bf;
+  if (store_untransformed_basis)
+    {
+      new_untransformed_bf = _untransformed_solution->clone();
+      libmesh_assert_equal_to(_untransformed_basis_functions.size(), get_rb_evaluation().get_n_basis_functions());
+    }
 
   for (unsigned int index=0; index<get_rb_evaluation().get_n_basis_functions(); index++)
     {
@@ -1527,6 +1543,11 @@ void RBConstruction::enrich_RB_space()
       Number scalar =
         inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(index));
       new_bf->add(-scalar, get_rb_evaluation().get_basis_function(index));
+
+      if (store_untransformed_basis)
+        {
+          new_untransformed_bf->add(-scalar, *_untransformed_basis_functions[index]);
+        }
     }
 
   // Normalize new_bf
@@ -1536,14 +1557,29 @@ void RBConstruction::enrich_RB_space()
   if (new_bf_norm == 0.)
     {
       new_bf->zero(); // avoid potential nan's
+
+      if (store_untransformed_basis)
+        {
+          new_untransformed_bf->zero();
+        }
     }
   else
     {
       new_bf->scale(1./new_bf_norm);
+
+      if (store_untransformed_basis)
+        {
+          new_untransformed_bf->scale(1./new_bf_norm);
+        }
     }
 
   // load the new basis function into the basis_functions vector.
   get_rb_evaluation().basis_functions.emplace_back( std::move(new_bf) );
+
+  if (store_untransformed_basis)
+    {
+      _untransformed_basis_functions.emplace_back( std::move(new_untransformed_bf) );
+    }
 }
 
 void RBConstruction::update_system()
@@ -1739,6 +1775,11 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
+  if (store_untransformed_basis)
+    {
+      libmesh_assert_equal_to(_untransformed_basis_functions.size(), get_rb_evaluation().get_n_basis_functions());
+    }
+
   for (unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
     {
       for (unsigned int i=(RB_size-delta_N); i<RB_size; i++)
@@ -1754,7 +1795,14 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
                          get_rb_evaluation().Aq_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
           rhs->zero();
-          get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
+          if (!store_untransformed_basis)
+            {
+              get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
+            }
+          else
+            {
+              get_Aq(q_a)->vector_mult(*rhs, *_untransformed_basis_functions[i]);
+            }
           rhs->scale(-1.);
 
           if (!is_quiet())
@@ -2029,9 +2077,21 @@ Real RBConstruction::compute_residual_dual_norm_slow(const unsigned int N)
   std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(comm());
   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
+  if (store_untransformed_basis)
+    {
+      libmesh_assert_equal_to(_untransformed_basis_functions.size(), get_rb_evaluation().get_n_basis_functions());
+    }
+
   for (unsigned int i=0; i<N; i++)
   {
-    RB_sol->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
+    if (!store_untransformed_basis)
+      {
+        RB_sol->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
+      }
+    else
+      {
+        RB_sol->add(get_rb_evaluation().RB_solution(i), *_untransformed_basis_functions[i]);
+      }
   }
 
   this->truth_assembly();
