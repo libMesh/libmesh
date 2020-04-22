@@ -244,8 +244,8 @@ AS_IF(
                   enablempi=no
                 ])
     AC_LANG_POP([C++])
-    LIBS=$tmpCPPFLAGS
-    CPPFLAGS=$tmpLIBS
+    LIBS=$tmpLIBS
+    CPPFLAGS=$tmpCPPFLAGS
   ],
   dnl We weren't supplied --with-mpi and no MPI environment variables were set. Also we didn't
   dnl get any MPI info from a PETSc install. Let's check to see if CXX natively supports MPI
