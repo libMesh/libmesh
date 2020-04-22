@@ -786,6 +786,7 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
     ierr = VecDuplicate(v,x); CHKERRQ(ierr);
   }
   ierr = PetscObjectCompose((PetscObject)*x,"DM",(PetscObject)dm); CHKERRQ(ierr);
+  ierr = VecSetDM(*x, dm);CHKERRQ(ierr);
   PetscFunctionReturn(0);
 }
 
