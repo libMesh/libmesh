@@ -94,21 +94,24 @@ int main (int argc, char ** argv)
   if (command_line.search(2, "-h", "-?"))
     usage(argv[0]);
 
-  // Input file name
-  if (command_line.search(1, "-i"))
+  // Input file name(s)
+  command_line.disable_loop();
+  while (command_line.search(1, "-i"))
     {
       std::string tmp;
       tmp = command_line.next(tmp);
       names.push_back(tmp);
     }
+  command_line.reset_cursor();
 
   // Output file name
-  if (command_line.search(1, "-o"))
+  while (command_line.search(1, "-o"))
     {
       std::string tmp;
       tmp = command_line.next(tmp);
       output_names.push_back(tmp);
     }
+  command_line.enable_loop();
 
   // Get the mesh distortion factor
   if (command_line.search(1, "-D"))
@@ -209,8 +212,40 @@ int main (int argc, char ** argv)
 
       if (verbose)
         {
+          libMesh::out << "Mesh " << names[0] << ":" << std::endl;
           mesh.print_info();
           mesh.get_boundary_info().print_summary();
+        }
+
+      for (unsigned int i=1; i < names.size(); ++i)
+        {
+          Mesh extra_mesh(init.comm());
+          extra_mesh.read(names[i]);
+
+          if (verbose)
+            {
+              libMesh::out << "Mesh " << names[i] << ":" << std::endl;
+              extra_mesh.print_info();
+              extra_mesh.get_boundary_info().print_summary();
+            }
+
+          unique_id_type max_uid = 0;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          max_uid = mesh.parallel_max_unique_id();
+#endif
+
+          mesh.copy_nodes_and_elements(extra_mesh, false,
+                                       mesh.max_elem_id(),
+                                       mesh.max_node_id(),
+                                       max_uid);
+          mesh.prepare_for_use();
+
+          if (verbose)
+            {
+              libMesh::out << "Combined Mesh:" << std::endl;
+              mesh.print_info();
+              mesh.get_boundary_info().print_summary();
+            }
         }
     }
 
