@@ -218,7 +218,7 @@ Real Edge3::volume () const
 
   Real log1p_arg = 2*(root_a - b/rsum) / log_term_denom;
 
-  return 
+  return
     0.5*(rsum + b_over_root_a*b_over_root_a/rsum +
         (c-0.25*b_over_root_a*b_over_root_a)*std::log1p(log1p_arg)/root_a);
 }
