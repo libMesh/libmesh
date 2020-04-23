@@ -513,7 +513,10 @@ void RBEIMConstruction::plot_parametrized_functions_in_training_set(const std::s
     }
 }
 
-
+bool RBEIMConstruction::check_if_zero_truth_solve()
+{
+  return (get_explicit_system().solution->l2_norm() == 0.);
+}
 
 Real RBEIMConstruction::compute_best_fit_error()
 {
