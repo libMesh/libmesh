@@ -1152,10 +1152,22 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
       // Perform an Offline truth solve for the current parameter
       truth_solve(-1);
 
-      if(solution->l2_norm() == 0.)
+      if (solution->l2_norm() == 0.)
         {
-          libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
-          break;
+          if (count==0 && !use_empty_rb_solve_in_greedy)
+            {
+              // Do nothing in this case because when we are not using
+              // an empty RB solve in the greedy then the first solve
+              // that is performed is at a randomly selected parameter
+              // value which could give a zero solution, but this does
+              // not imply that we have converged. This situation can
+              // occur in RBEIMConstruction, for example.
+            }
+            else
+            {
+              libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
+              break;
+            }
         }
 
       // Add orthogonal part of the snapshot to the RB space
