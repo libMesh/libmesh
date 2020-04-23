@@ -563,6 +563,15 @@ public:
   bool exit_on_repeated_greedy_parameters;
 
   /**
+   * Boolean flag to indicate whether we exit the greedy if
+   * we encounter a zero basis function. We do this by
+   * default, but in some cases (e.g. RBEIMConstruction)
+   * we do not since a zero basis function in EIM does not
+   * necessarily indicate that we have converged.
+   */
+  bool exit_on_zero_basis_function;
+
+  /**
    * Boolean flag to indicate whether we impose "fluxes"
    * (i.e. element boundary contributions to the weak form)
    * on internal element boundaries in the assembly routines.

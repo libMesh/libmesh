@@ -64,6 +64,11 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
   // "rb space" with EIM
   use_empty_rb_solve_in_greedy = false;
 
+  // Do not exit the greedy when we encounter a zero
+  // basis function, since in the case of EIM this does
+  // not necessarily mean that we have converged
+  exit_on_zero_basis_function = false;
+
   // Indicate that we need to compute the RB
   // inner product matrix in this case
   compute_RB_inner_product = true;

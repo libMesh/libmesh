@@ -68,6 +68,7 @@ RBConstruction::RBConstruction (EquationSystems & es,
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     skip_residual_in_train_reduced_basis(false),
     exit_on_repeated_greedy_parameters(true),
+    exit_on_zero_basis_function(true),
     impose_internal_fluxes(false),
     skip_degenerate_sides(true),
     compute_RB_inner_product(false),
@@ -1152,22 +1153,10 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
       // Perform an Offline truth solve for the current parameter
       truth_solve(-1);
 
-      if (solution->l2_norm() == 0.)
+      if (exit_on_zero_basis_function && (solution->l2_norm() == 0.))
         {
-          if (count==0 && !use_empty_rb_solve_in_greedy)
-            {
-              // Do nothing in this case because when we are not using
-              // an empty RB solve in the greedy then the first solve
-              // that is performed is at a randomly selected parameter
-              // value which could give a zero solution, but this does
-              // not imply that we have converged. This situation can
-              // occur in RBEIMConstruction, for example.
-            }
-            else
-            {
-              libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
-              break;
-            }
+          libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
+          break;
         }
 
       // Add orthogonal part of the snapshot to the RB space
