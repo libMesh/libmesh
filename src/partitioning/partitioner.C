@@ -40,8 +40,9 @@
 #include "libmesh/restore_warnings.h"
 #endif
 
-
 namespace {
+
+dof_id_type problem_node_id = DofObject::invalid_id;
 
 using namespace libMesh;
 
@@ -74,9 +75,15 @@ struct CorrectProcIds
 
             // Return the node's correct processor id,
             data[i] = node.processor_id();
+if (node.id() == problem_node_id)
+  std::cerr << "Found pid " << node.processor_id() << std::endl;
           }
         else
+{
           data[i] = DofObject::invalid_processor_id;
+if (ids[i] == problem_node_id)
+  std::cerr << "Found invalid pid" << std::endl;
+}
       }
   }
 
@@ -104,9 +111,22 @@ struct CorrectProcIds
               {
                 proc_id = new_proc_id;
                 bad_pids.erase(it);
+
+if (ids[i] == problem_node_id)
+  std::cerr << "Newly-valid pid " << new_proc_id << " overwrites " << proc_id << std::endl;
+
               }
             else
+{
+if (ids[i] == problem_node_id)
+  std::cerr << "Choosing pid " << new_proc_id << " versus " << proc_id << std::endl;
+
               proc_id = node.choose_processor_id(proc_id, new_proc_id);
+
+if (ids[i] == problem_node_id)
+  std::cerr << "Chose pid " << proc_id << std::endl;
+
+}
 
             if (proc_id == new_proc_id)
               data_changed = true;
@@ -797,7 +817,11 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       for (Node & node : elem->node_ref_range())
         {
           processor_id_type & pid = node.processor_id();
+if (node.id() == problem_node_id)
+  std::cerr << "See good node with pid " << pid << " on elem " << elem->id() << " pid " << elem->processor_id() << std::endl;
           pid = node.choose_processor_id(pid, elem->processor_id());
+if (node.id() == problem_node_id)
+  std::cerr << "Chose good pid " << pid << std::endl;
         }
     }
 
@@ -876,9 +900,15 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
               // Consider updating the processor id on this element's nodes
               for (Node & node : elem->node_ref_range())
                 {
+if (node.id() == problem_node_id)
+  std::cerr << "Considering pid " << node.processor_id() << " via elem " << elem->id() << std::endl;
                   processor_id_type & pid = node.processor_id();
                   if (bad_pids.count(node.id()))
+{
                     pid = node.choose_processor_id(pid, elem_pid);
+if (node.id() == problem_node_id)
+  std::cerr << "Chose better bad pid " << pid << std::endl;
+}
                   else if (!is_serial)
                     potential_pids[elem_pid][node.id()] = pid;
                 }
@@ -918,6 +948,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
           Parallel::push_parallel_vector_data
             (mesh.comm(), potential_pids_vecs, pids_action_functor);
 
+if (problem_node_id != DofObject::invalid_id)
+  std::cerr << "Synching with bad_pids" << std::endl;
+
           // Using default libMesh options, we'll just need to sync
           // between processors now.  The catch here is that we can't
           // initially trust Node::choose_processor_id() because some
@@ -927,6 +960,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
             (mesh, mesh.elements_begin(), mesh.elements_end(),
              Parallel::SyncEverything(), Parallel::SyncEverything(),
              correct_pids);
+
+if (problem_node_id != DofObject::invalid_id)
+  std::cerr << "Synching without bad_pids" << std::endl;
 
           // But once we've got all the non-temporary pids synced, we
           // may need to sync again to get any pids on nodes only
