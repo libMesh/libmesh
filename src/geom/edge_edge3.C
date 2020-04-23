@@ -194,37 +194,33 @@ Real Edge3::volume () const
   if (a == 0.)
     return 2. * std::sqrt(c);
 
-  const Real b = 2.*(A*B);
-  const Real ba=b/a;
-  const Real ca=c/a;
+  const Real b = -2.*std::abs(A*B);
 
-  const Real sqrt_term1 = 1. - ba + ca;
-  const Real sqrt_term2 = 1. + ba + ca;
+  const Real sqrt_term1 = a - b + c;
+  const Real sqrt_term2 = a + b + c;
 
   // Fall back on straight line case instead of computing nan
   // Note: b can be positive or negative so we have to check both cases.
   if (sqrt_term1 < 0. || sqrt_term2 < 0.)
     return 2. * std::sqrt(c);
 
-  const Real s1 = std::sqrt(sqrt_term1);
-  const Real s2 = std::sqrt(sqrt_term2);
+  const Real r1 = std::sqrt(sqrt_term1);
+  const Real r2 = std::sqrt(sqrt_term2);
+  const Real rsum = r1 + r2;
+  const Real root_a = std::sqrt(a);
+  const Real b_over_root_a = b / root_a;
 
   // Pre-compute the denominator of the log term. If it's zero, fall
   // back on the straight line case.
-  const Real log_term_denom = -1. - 0.5*ba + s2;
-  if (log_term_denom == 0.)
+  const Real log_term_denom = -root_a - 0.5*b_over_root_a + r2;
+  if (log_term_denom == 0. || rsum == 0.)
     return 2. * std::sqrt(c);
 
-  Real log_term = (1. - 0.5*ba + s1) / log_term_denom;
+  Real log1p_arg = 2*(root_a - b/rsum) / log_term_denom;
 
-  // Fall back on straight line case instead of taking the log of zero
-  // or a negative number.
-  if (log_term <= 0.)
-    return 2. * std::sqrt(c);
-
-  return 0.5*std::sqrt(a)*((1.-0.5*ba)*s1 +
-                           (1.+0.5*ba)*s2 +
-                           (ca - 0.25*ba*ba)*std::log(log_term));
+  return
+    0.5*(rsum + b_over_root_a*b_over_root_a/rsum +
+        (c-0.25*b_over_root_a*b_over_root_a)*std::log1p(log1p_arg)/root_a);
 }
 
 
