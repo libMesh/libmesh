@@ -40,7 +40,7 @@
 #include "libmesh/restore_warnings.h"
 #endif
 
-const dof_id_type problem_node_id = DofObject::invalid_id;
+#define problem_node_id DofObject::invalid_id
 
 namespace {
 
