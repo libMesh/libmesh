@@ -2010,6 +2010,24 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
       const Node * node = mesh.query_node_ptr(i);
       const processor_id_type pid = node ? node->processor_id() : 0;
 
+      bool good_pid =
+        mesh.comm().semiverify (node ? &pid : nullptr);
+      if (!good_pid)
+        {
+          std::ostringstream err_msg;
+          if (node)
+            err_msg << "[" << mesh.processor_id() << "] sees pid " << pid << " on node " << i;
+          else
+            err_msg << "[" << mesh.processor_id() << "] doesn't see node " << i;
+
+          std::vector<std::string> recvstrings;
+          mesh.comm().gather(0, err_msg.str(), recvstrings);
+          if (mesh.processor_id() == 0)
+            for (auto & str : recvstrings)
+              std::cerr << str << std::endl;
+          mesh.comm().barrier();
+        }
+
       libmesh_assert(mesh.comm().semiverify (node ? &pid : nullptr));
     }
 }
