@@ -81,8 +81,7 @@ int main (int argc, char ** argv)
 #endif
 
   std::vector<std::string> names;
-  std::vector<std::string> var_names;
-  std::vector<Number>      soln;
+  std::vector<std::string> output_names;
 
   // Check for minimum number of command line args
   if (argc < 3)
@@ -95,27 +94,24 @@ int main (int argc, char ** argv)
   if (command_line.search(2, "-h", "-?"))
     usage(argv[0]);
 
-  // Input file name
-  if (command_line.search(1, "-i"))
+  // Input file name(s)
+  command_line.disable_loop();
+  while (command_line.search(1, "-i"))
     {
       std::string tmp;
       tmp = command_line.next(tmp);
-      if (names.empty())
-        names.push_back(tmp);
-      else
-        libmesh_error_msg("ERROR: Input name must precede output name!");
+      names.push_back(tmp);
     }
+  command_line.reset_cursor();
 
   // Output file name
-  if (command_line.search(1, "-o"))
+  while (command_line.search(1, "-o"))
     {
       std::string tmp;
       tmp = command_line.next(tmp);
-      if (!names.empty())
-        names.push_back(tmp);
-      else
-        libmesh_error_msg("ERROR: Input name must precede output name!");
+      output_names.push_back(tmp);
     }
+  command_line.enable_loop();
 
   // Get the mesh distortion factor
   if (command_line.search(1, "-D"))
@@ -216,8 +212,40 @@ int main (int argc, char ** argv)
 
       if (verbose)
         {
+          libMesh::out << "Mesh " << names[0] << ":" << std::endl;
           mesh.print_info();
           mesh.get_boundary_info().print_summary();
+        }
+
+      for (unsigned int i=1; i < names.size(); ++i)
+        {
+          Mesh extra_mesh(init.comm());
+          extra_mesh.read(names[i]);
+
+          if (verbose)
+            {
+              libMesh::out << "Mesh " << names[i] << ":" << std::endl;
+              extra_mesh.print_info();
+              extra_mesh.get_boundary_info().print_summary();
+            }
+
+          unique_id_type max_uid = 0;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          max_uid = mesh.parallel_max_unique_id();
+#endif
+
+          mesh.copy_nodes_and_elements(extra_mesh, false,
+                                       mesh.max_elem_id(),
+                                       mesh.max_node_id(),
+                                       max_uid);
+          mesh.prepare_for_use();
+
+          if (verbose)
+            {
+              libMesh::out << "Combined Mesh:" << std::endl;
+              mesh.print_info();
+              mesh.get_boundary_info().print_summary();
+            }
         }
     }
 
@@ -233,10 +261,6 @@ int main (int argc, char ** argv)
 
   if (addinfelems)
     {
-      if (names.size() == 3)
-        libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
-                          << "not compatible with solution import.");
-
       if (write_bndry != BM_DISABLED)
         libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
                           << "not compatible with writing boundary conditions.");
@@ -442,7 +466,7 @@ int main (int argc, char ** argv)
 
 
   // Possibly write the mesh
-  if (names.size() >= 2)
+  if (output_names.size())
     {
       // When the mesh got refined, it is likely that
       // the user does _not_ want to write also
@@ -462,22 +486,15 @@ int main (int argc, char ** argv)
              mesh.active_elements_begin(),
              mesh.active_elements_end());
 
-          // now write the new_mesh
-          if (names.size() == 2)
-            new_mesh.write(names[1]);
-          else if (names.size() == 3)
-            new_mesh.write(names[1], soln, var_names);
-          else
-            libmesh_error_msg("Invalid names.size() = " << names.size());
+          // now write the new_mesh in as many formats as requested
+          for (auto & output_name : output_names)
+            new_mesh.write(output_name);
         }
       else
         {
-          if (names.size() == 2)
-            mesh.write(names[1]);
-          else if (names.size() == 3)
-            mesh.write(names[1], soln, var_names);
-          else
-            libmesh_error_msg("Invalid names.size() = " << names.size());
+          // Write the new_mesh in as many formats as requested
+          for (auto & output_name : output_names)
+            mesh.write(output_name);
         }
 
 
@@ -488,19 +505,18 @@ int main (int argc, char ** argv)
           BoundaryMesh boundary_mesh
             (mesh.comm(), cast_int<unsigned char>(mesh.mesh_dimension()-1));
 
-          std::string boundary_name = "bndry_";
-          boundary_name += names[1];
-
           if (write_bndry == BM_MESH_ONLY)
             mesh.get_boundary_info().sync(boundary_mesh);
 
           else
             libmesh_error_msg("Invalid value write_bndry = " << write_bndry);
 
-          if (names.size() == 2)
-            boundary_mesh.write(boundary_name);
-          else if (names.size() == 3)
-            boundary_mesh.write(boundary_name, soln, var_names);
+          // Write the mesh in as many formats as requested
+          for (auto boundary_name : output_names)
+            {
+              boundary_name = "bndry_" + boundary_name;
+              boundary_mesh.write(boundary_name);
+            }
         }
     }
 
@@ -517,9 +533,9 @@ void usage(const std::string & prog_name)
            << " [options] ...\n"
            << "\n"
            << "options:\n"
-           << "    -d <dim>                      <dim>-dimensional mesh\n"
-           << "    -i <string>                   Input file name\n"
-           << "    -o <string>                   Output file name\n"
+           << "    -i <string>                   Input file name, one option per file\n"
+           << "                                    Multiple files get concatenated"
+           << "    -o <string>                   Output file name, one option per file\n"
            << "\n    -b                            Write the boundary conditions\n"
            << "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
            << "    -h                            Print help menu\n"
@@ -527,9 +543,7 @@ void usage(const std::string & prog_name)
 #ifdef LIBMESH_ENABLE_AMR
            << "    -r <count>                    Globally refine <count> times\n"
 #endif
-           << "    -t (-d 2 only)                Convert to triangles first\n"
-           << "                                  (allows to write .unv file of the\n"
-           << "                                  boundary with the correct node ids)\n"
+           << "    -t                            Convert to triangles/tetrahedra\n"
            << "    -v                            Verbose\n"
            << "    -q <metric>                   Evaluates the named element quality metric\n"
            << "    -1                            Converts a mesh of higher order elements\n"
@@ -556,26 +570,28 @@ void usage(const std::string & prog_name)
            << " formats.  File types are inferred from file extensions.  For example,\n"
            << " the command:\n"
            << "\n"
-           << "  ./meshtool -d 2 -i in.e -o out.plt\n"
+           << "  ./meshtool -i in.e -o out.plt\n"
            << "\n"
-           << " will read a 2D mesh in the ExodusII format (from Cubit, for example)\n"
+           << " will read a mesh in the ExodusII format (from Cubit, for example)\n"
            << " from the file in.e.  It will then write the mesh in the Tecplot\n"
            << " binary format to out.plt.\n"
            << "\n"
            << " and\n"
            << "\n"
-           << "  ./meshtool -d 3 -i cylinder.msh -o out.e -2\n"
+           << "  ./meshtool -i cylinder.msh -i square.xda -o out.e -2\n"
            << "\n"
-           << " will read the Gmsh formatted mesh file cylinder.msh, convert\n"
-           << " the elements to second-order, and write the output in Exodus format\n"
-           << " to out.e.\n"
+           << " will read the Gmsh formatted mesh file cylinder.msh, concatenate\n"
+           << " the elements and nodes (with shifted id numbers) from the libMesh\n"
+           << " mesh file square.xda, convert all first-order elements from both\n"
+           << " to second-order, and write the combined mesh in Exodus format to\n"
+           << " out.e.\n"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
            << "\n"
            << " and\n"
            << "\n"
-           << "  ./meshtool -d 3 -i dry.unv -o packed.gmv -a -x 30.5 -y -10.5 -X\n"
+           << "  ./meshtool -i dry.unv -o packed.gmv -a -x 30.5 -y -10.5 -X\n"
            << "\n"
-           << " will read a 3D Universal file, determine the z-coordinate of the origin\n"
+           << " will read a Universal file, determine the z-coordinate of the origin\n"
            << " automatically, e.g. z_origin = 3., build infinite elements with the\n"
            << " origin (30.5, -10.5, 3.) on top of volume elements, while preserving\n"
            << " a symmetry plane through (30.5, -10.5, 3.) perpendicular to x.\n"
@@ -583,34 +599,37 @@ void usage(const std::string & prog_name)
            << " If not, infinite elements are not correctly built!\n"
 #endif
            << "\n"
-           << " Currently this program supports the following formats:\n"
+           << " This program supports the I/O formats:\n"
            << "\n"
-           << "INPUT:\n"
-           << "     .e   -- Sandia's ExodusII binary grid format\n"
-           << "     .inp -- Abaqus mesh file\n"
-           << "     .msh -- GMSH ASCII file\n"
-           << "     .ucd -- AVS unstructured ASCII grid format\n"
-           << "     .unv -- SDRC I-Deas Universal File ASCII format\n"
-           << "     .xda -- libMesh human-readable ASCII format\n"
-           << "     .xdr -- libMesh binary format\n"
-           << "\n"
-           << "OUTPUT:\n"
-           << "     .dat   -- Tecplot ASCII format\n"
-           << "     .e     -- Sandia's ExodusII format\n"
-           << "     .exd   -- Sandia's ExodusII format\n"
-           << "     .fro   -- ACDL's .fro format\n"
-           << "     .gmv   -- LANL's General Mesh Viewer format\n"
-           << "     .mesh  -- MEdit mesh format\n"
-           << "     .msh   -- GMSH ASCII file\n"
-           << "     .plt   -- Tecplot binary format\n"
-           << "     .poly  -- TetGen ASCII file\n"
-           << "     .pvtu  -- Paraview VTK format\n"
-           << "     .ucd   -- AVS's ASCII UCD format\n"
-           << "     .unv   -- I-deas Universal format\n"
-           << "     .xda   -- libMesh ASCII format\n"
-           << "     .xdr   -- libMesh binary format\n"
-           << "     .gz    -- any above format gzipped\n"
-           << "     .bz2   -- any above format bzip2'ed\n"
+           << "     *.cpa   -- libMesh ASCII checkpoint format\n"
+           << "     *.cpr   -- libMesh binary checkpoint format,\n"
+           << "     *.e     -- Sandia's ExodusII format\n"
+           << "     *.exd   -- Sandia's ExodusII format\n"
+           << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
+           << "     *.mesh  -- MEdit mesh format\n"
+           << "     *.msh   -- GMSH ASCII file\n"
+           << "     *.n     -- Sandia's Nemesis format\n"
+           << "     *.nem   -- Sandia's Nemesis format\n"
+           << "     *.plt   -- Tecplot binary file\n"
+           << "     *.poly  -- TetGen ASCII file\n"
+           << "     *.ucd   -- AVS's ASCII UCD format\n"
+           << "     *.ugrid -- Kelly's DIVA ASCII format\n"
+           << "     *.unv   -- I-deas Universal format\n"
+           << "     *.vtu   -- VTK (paraview-readable) format\n"
+           << "     *.xda   -- libMesh ASCII format\n"
+           << "     *.xdr   -- libMesh binary format,\n"
+           << "\n   As well as for input only:\n\n" \
+           << "     *.bext  -- Bezier files in DYNA format\n" \
+           << "     *.bxt   -- Bezier files in DYNA format\n" \
+           << "     *.inp   -- Abaqus .inp format\n" \
+           << "     *.mat   -- Matlab triangular ASCII file\n" \
+           << "     *.off   -- OOGL OFF surface format\n" \
+           << "     *.ogl   -- OOGL OFF surface format\n" \
+           << "     *.oogl  -- OOGL OFF surface format\n" \
+           << "\n   As well as for output only:\n\n" \
+           << "     *.dat   -- Tecplot ASCII file\n"
+           << "     *.fro   -- ACDL's surface triangulation file\n"
+           << "     *.poly  -- TetGen ASCII file\n"
            << "\n";
 
   libMesh::out << helpList.str();
