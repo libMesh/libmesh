@@ -425,6 +425,11 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vec
   vector.close();
 }
 
+bool RBConstruction::check_if_zero_truth_solve()
+{
+  return (solution->l2_norm() == 0.);
+}
+
 void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
                                                 bool skip_vector_assembly)
 {
@@ -1152,22 +1157,10 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
       // Perform an Offline truth solve for the current parameter
       truth_solve(-1);
 
-      if (solution->l2_norm() == 0.)
+      if (check_if_zero_truth_solve())
         {
-          if (count==0 && !use_empty_rb_solve_in_greedy)
-            {
-              // Do nothing in this case because when we are not using
-              // an empty RB solve in the greedy then the first solve
-              // that is performed is at a randomly selected parameter
-              // value which could give a zero solution, but this does
-              // not imply that we have converged. This situation can
-              // occur in RBEIMConstruction, for example.
-            }
-            else
-            {
-              libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
-              break;
-            }
+          libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
+          break;
         }
 
       // Add orthogonal part of the snapshot to the RB space

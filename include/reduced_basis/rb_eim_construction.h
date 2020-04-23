@@ -229,6 +229,11 @@ public:
    */
   void plot_parametrized_functions_in_training_set(const std::string & pathname);
 
+  /**
+   * @return true if the most recent truth solve gave a zero solution.
+   */
+  bool check_if_zero_truth_solve() override;
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**

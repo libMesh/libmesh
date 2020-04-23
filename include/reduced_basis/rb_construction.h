@@ -471,6 +471,11 @@ public:
    */
   void zero_constrained_dofs_on_vector(NumericVector<Number> & vector);
 
+  /**
+   * @return true if the most recent truth solve gave a zero solution.
+   */
+  virtual bool check_if_zero_truth_solve();
+
 #ifdef LIBMESH_ENABLE_DIRICHLET
   /**
    * It's helpful to be able to generate a DirichletBoundary that stores a ZeroFunction in order
