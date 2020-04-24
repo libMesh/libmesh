@@ -443,9 +443,12 @@ AX_ALL_STATIC
 # --------------------------------------------------------------
 AX_SPLIT_VERSION
 
+# Strip any '-pre' suffix from version; our code expects a number
+LIBMESH_NUMERIC_POINT_VERSION=`echo "$AX_POINT_VERSION" | $SED 's/-.*//'`
+
 AC_DEFINE_UNQUOTED(MAJOR_VERSION,            [$AX_MAJOR_VERSION],  [libMesh major version number])
 AC_DEFINE_UNQUOTED(MINOR_VERSION,            [$AX_MINOR_VERSION],  [libMesh minor version number])
-AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$AX_POINT_VERSION],  [libMesh micro version number])
+AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$LIBMESH_NUMERIC_POINT_VERSION],  [libMesh micro version number])
 AC_DEFINE_UNQUOTED(LIB_VERSION,              ["$VERSION"],         [libMesh version number])
 AC_DEFINE_UNQUOTED(LIB_RELEASE,              ["$BUILD_DEVSTATUS"], [libMesh source code version])
 AC_DEFINE_UNQUOTED(CXX,                      ["$CXX"],             [C++ compiler])
