@@ -4932,7 +4932,7 @@ elif test -r ${PETSC_DIR}/lib/petsc/conf/petscvariables; then :
                   PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
 fi
 
-                    if test "x$PETSC_MPI" != x; then :
+          if test "x$PETSC_MPI" != x; then :
 
 
 else
@@ -29498,7 +29498,7 @@ fi
 
     AX_MAJOR_VERSION=`echo "$VERSION" | $SED 's/\([^.][^.]*\).*/\1/'`
     AX_MINOR_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.\([^.][^.]*\).*/\1/'`
-    AX_POINT_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.[^.][^.]*.\(.*\)/\1/' | cut -c 1`
+    AX_POINT_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.[^.][^.]*.\(.*\)/\1/'`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking Major version" >&5
 $as_echo_n "checking Major version... " >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AX_MAJOR_VERSION" >&5
@@ -29513,6 +29513,9 @@ $as_echo_n "checking Point version... " >&6; }
 $as_echo "$AX_POINT_VERSION" >&6; }
 
 
+# Strip any '-pre' suffix from version; our code expects a number
+LIBMESH_NUMERIC_POINT_VERSION=`echo "$AX_POINT_VERSION" | $SED 's/-.*//'`
+
 
 cat >>confdefs.h <<_ACEOF
 #define MAJOR_VERSION $AX_MAJOR_VERSION
@@ -29525,7 +29528,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define MICRO_VERSION $AX_POINT_VERSION
+#define MICRO_VERSION $LIBMESH_NUMERIC_POINT_VERSION
 _ACEOF
 
 
@@ -43923,7 +43926,6 @@ $as_echo X"$ac_prefix_conf_OUT" |
       rm -f "$ac_prefix_conf_OUT"
       mv $tmp/pconfig.h "$ac_prefix_conf_OUT"
     fi
-    cp conftest.prefix _configs.sed
   else
     as_fn_error $? "input file $ac_prefix_conf_INP does not exist - skip generating $ac_prefix_conf_OUT" "$LINENO" 5
   fi
