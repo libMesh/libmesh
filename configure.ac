@@ -131,7 +131,7 @@ COMPILER_CONTROL_ARGS
 # Scrape PETSc configure information for their CXX, MPI_INCLUDE, MPI_LIB,
 # PETSCLINKLIBS, PETSCINCLUDEDIRS, and other variables
 #-----------------------------------------------------------------------
-SCRAPE_PETSC_CONFIGURE
+ACSM_SCRAPE_PETSC_CONFIGURE
 
 # --------------------------------------------------------------
 # Set our preferred compilers
@@ -569,7 +569,7 @@ LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 
 
 # Query configuration environment
-AX_SUMMARIZE_ENV
+ACSM_SUMMARIZE_ENV
 
 # Each example gets a makefile
 AS_IF([test "x$enableexamples" = "xyes"],

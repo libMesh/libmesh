@@ -153,7 +153,7 @@ AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # -------------------------------------------------------------
 AS_IF([test "x$enablempi" = xyes],
       [
-        ACX_MPI
+        ACSM_MPI
         AS_IF([test "x$enablempi" = xyes],
               [
                 AS_IF([test x"$MPI_INCLUDES" = x],,[libmesh_optional_INCLUDES="$MPI_INCLUDES $libmesh_optional_INCLUDES"])

@@ -3,7 +3,7 @@
 # try to verify the installation yet. We need to establish
 # a compiler first
 #---------------------------------------------------------
-AC_DEFUN([SCRAPE_PETSC_CONFIGURE],
+AC_DEFUN([ACSM_SCRAPE_PETSC_CONFIGURE],
 [
   dnl We need to verify that we've done AC_ARG_ENABLE(petsc)
   dnl which occurs in COMPILER_CONTROL_ARGS
@@ -52,7 +52,6 @@ AC_DEFUN([SCRAPE_PETSC_CONFIGURE],
                 [test -r ${PETSC_DIR}/lib/petsc/conf/petscvariables], dnl 3.6.x
                 [PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`])
 
-          dnl If we couldn't snoop MPI from PETSc, fall back on ACX_MPI.
           AS_IF([test "x$PETSC_MPI" != x],
                 [
                 ],

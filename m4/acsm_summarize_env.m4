@@ -2,16 +2,12 @@
 #
 #   Queries configuration environment.
 #
-#   AX_SUMMARIZE_ENV([, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
+#   ACSM_SUMMARIZE_ENV([, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 #
 # DESCRIPTION
 #
 #   Queries compile environment and SVN revision for use in configure summary
 #   and pre-processing macros.
-#
-# LAST MODIFICATION
-#
-#   git log -n1 m4/config_environment.m4
 #
 # COPYLEFT
 #
@@ -21,7 +17,7 @@
 #   permitted in any medium without royalty provided the copyright notice
 #   and this notice are preserved.
 
-AC_DEFUN([AX_SUMMARIZE_ENV],
+AC_DEFUN([ACSM_SUMMARIZE_ENV],
 [
 
 AC_CANONICAL_HOST

@@ -1,3 +1,5 @@
+# AutoConf-SubModule macro ACSM_TEST_SANITIZE_FLAGS
+#
 # Test that a simple test program can be compiled with the sanitizer
 # options.
 #
@@ -18,7 +20,7 @@
 #
 # so there is no way to tell if it supports address
 # sanitizer just from the version info.
-AC_DEFUN([LIBMESH_TEST_SANITIZE_FLAGS],
+AC_DEFUN([ACSM_TEST_SANITIZE_FLAGS],
   [
     # Save current lang and CXXFLAGS values
     AC_LANG_PUSH([C++])

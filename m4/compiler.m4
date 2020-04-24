@@ -3,7 +3,7 @@
 AC_DEFUN([LIBMESH_SET_COMPILERS],
 [
   AC_REQUIRE([COMPILER_CONTROL_ARGS])
-  AC_REQUIRE([SCRAPE_PETSC_CONFIGURE])
+  AC_REQUIRE([ACSM_SCRAPE_PETSC_CONFIGURE])
 
   # --------------------------------------------------------------
   # look for a decent C compiler or honor --with-cc=...
@@ -411,9 +411,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           dnl compilers that support the address sanitizer, and they use the
           dnl same set of flags.  If the set of flags used by Clang and GCC ever
           dnl diverges, we'll need to set up separate flags and test them in the
-          dnl case blocks below...  The LIBMESH_TEST_SANITIZE_FLAGS function sets
+          dnl case blocks below...  The ACSM_TEST_SANITIZE_FLAGS function sets
           dnl the variable have_address_sanitizer to either "no" or "yes"
-          LIBMESH_TEST_SANITIZE_FLAGS([$COMMON_SANITIZE_OPTIONS])
+          ACSM_TEST_SANITIZE_FLAGS([$COMMON_SANITIZE_OPTIONS])
 
           dnl Enable the address sanitizer stuff if the test code compiled
           AS_IF([test "x$have_address_sanitizer" = xyes],
