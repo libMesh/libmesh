@@ -2,7 +2,7 @@
 #
 #   Add code coverage support with gcov/lcov.
 #
-#   AX_CODE_COVERAGE()
+#   ACSM_CODE_COVERAGE()
 #
 # DESCRIPTION
 #
@@ -22,7 +22,7 @@
 #   permitted in any medium without royalty provided the copyright notice
 #   and this notice are preserved.
 
-AC_DEFUN([AX_CODE_COVERAGE],
+AC_DEFUN([ACSM_CODE_COVERAGE],
 [
 
 AC_ARG_ENABLE(coverage, AS_HELP_STRING([--enable-coverage],[configure code coverage analysis tools]))

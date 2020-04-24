@@ -230,7 +230,7 @@ LIBMESH_SET_CXX_FLAGS
 # Checks for code coverage
 # this must be done after we look for our own compilers
 #------------------------------------------------------
-AX_CODE_COVERAGE
+ACSM_CODE_COVERAGE
 libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
 libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
 
