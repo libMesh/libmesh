@@ -33,7 +33,9 @@ public:
     MeshTools::Generation::build_line (mesh, /*nelem=*/1, 0., 1., EDGE3);
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(3), mesh.n_nodes());
 
-    auto edge3 = mesh.elem_ptr(0);
+    auto edge3 = mesh.query_elem_ptr(0);
+    if (!edge3) // We may be on a distributed mesh
+      return;
 
     // Check unperturbed, straight edge case
     LIBMESH_ASSERT_FP_EQUAL(1.0, edge3->volume(), TOLERANCE*TOLERANCE);
