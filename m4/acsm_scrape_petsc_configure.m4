@@ -6,8 +6,8 @@
 AC_DEFUN([ACSM_SCRAPE_PETSC_CONFIGURE],
 [
   dnl We need to verify that we've done AC_ARG_ENABLE(petsc)
-  dnl which occurs in COMPILER_CONTROL_ARGS
-  AC_REQUIRE([COMPILER_CONTROL_ARGS])
+  dnl which occurs in ACSM_COMPILER_CONTROL_ARGS
+  AC_REQUIRE([ACSM_COMPILER_CONTROL_ARGS])
 
   # Trump --enable-petsc with --disable-mpi
   AS_IF([test "x$enablempi" = xno],

@@ -3,8 +3,8 @@ dnl check for the required MPI library
 dnl ---------------------------------------------------------------------------
 AC_DEFUN([ACSM_MPI], [
 dnl We need to verify that we've done AC_ARG_ENABLE(mpi) and AC_ARG_WITH(mpi)
-dnl which occur in COMPILER_CONTROL_ARGS
-AC_REQUIRE([COMPILER_CONTROL_ARGS])
+dnl which occur in ACSM_COMPILER_CONTROL_ARGS
+AC_REQUIRE([ACSM_COMPILER_CONTROL_ARGS])
 
 
 AS_IF(

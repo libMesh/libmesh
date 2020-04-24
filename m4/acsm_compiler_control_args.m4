@@ -1,4 +1,4 @@
-AC_DEFUN([COMPILER_CONTROL_ARGS],
+AC_DEFUN([ACSM_COMPILER_CONTROL_ARGS],
 [
 # -------------------------------------------------------------------
 # MPI -- enabled by default.  Check for it now so we can be somewhat
