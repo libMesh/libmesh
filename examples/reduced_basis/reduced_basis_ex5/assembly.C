@@ -17,6 +17,9 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/node.h"
 
+// C++ includes
+#include <functional>
+
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 // Bring in bits from the libMesh namespace.
@@ -347,32 +350,25 @@ void InnerProductAssembly::interior_assembly(FEMContext & c)
   // quadrature points.
   const std::vector<std::vector<RealGradient>>& dphi = elem_fe->get_dphi();
 
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
-  const unsigned int n_v_dofs = c.get_dof_indices(v_var).size();
-  const unsigned int n_w_dofs = c.get_dof_indices(w_var).size();
+  // (u_var, v_var, w_var) all have the same number of dofs
+  const unsigned int n_dofs = c.get_dof_indices(u_var).size();
 
   // Now we will build the affine operator
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
-  DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_var, u_var);
-  DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_var, v_var);
-  DenseSubMatrix<Number> & Kww = c.get_elem_jacobian(w_var, w_var);
+  // Get references to stiffness matrix diagonal blocks
+  std::reference_wrapper<DenseSubMatrix<Number>> Kdiag[3] =
+    {
+      c.get_elem_jacobian(u_var, u_var),
+      c.get_elem_jacobian(v_var, v_var),
+      c.get_elem_jacobian(w_var, w_var)
+    };
 
   for (unsigned int qp=0; qp<n_qpoints; qp++)
-    {
-      for (unsigned int i=0; i<n_u_dofs; i++)
-        for (unsigned int j=0; j<n_u_dofs; j++)
-          Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-
-      for (unsigned int i=0; i<n_v_dofs; i++)
-        for (unsigned int j=0; j<n_v_dofs; j++)
-          Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-
-      for (unsigned int i=0; i<n_w_dofs; i++)
-        for (unsigned int j=0; j<n_w_dofs; j++)
-          Kww(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-    }
+    for (unsigned int d=0; d<3; ++d)
+      for (unsigned int i=0; i<n_dofs; i++)
+        for (unsigned int j=0; j<n_dofs; j++)
+          Kdiag[d](i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 }
 
 #endif // LIBMESH_ENABLE_DIRICHLET

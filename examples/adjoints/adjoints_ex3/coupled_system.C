@@ -16,6 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// Example includes
+#include "coupled_system.h"
+
+// libMesh includes
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/fe_base.h"
@@ -29,7 +33,8 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
-#include "coupled_system.h"
+// C++ includes
+#include <functional> // std::reference_wrapper
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -241,17 +246,42 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   const unsigned int n_u_dofs = c.n_dof_indices(u_var);
   libmesh_assert_equal_to (n_u_dofs, c.n_dof_indices(v_var));
 
-  // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_var, u_var);
-  DenseSubMatrix<Number> & Kup = c.get_elem_jacobian(u_var, p_var);
-  DenseSubVector<Number> & Fu = c.get_elem_residual(u_var);
+  // Stokes equation stiffness matrix diagonal blocks. There is no
+  // uv/vu coupling for linear Stokes.
+  std::reference_wrapper<DenseSubMatrix<Number>> Kdiag[2] =
+    {
+      c.get_elem_jacobian(u_var, u_var),
+      c.get_elem_jacobian(v_var, v_var)
+    };
 
-  DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_var, v_var);
-  DenseSubMatrix<Number> & Kvp = c.get_elem_jacobian(v_var, p_var);
-  DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
+  // Stokes equation velocity-pressure coupling blocks
+  // Kup
+  // Kvp
+  std::reference_wrapper<DenseSubMatrix<Number>> B[2] =
+    {
+      c.get_elem_jacobian(u_var, p_var),
+      c.get_elem_jacobian(v_var, p_var),
+    };
 
-  DenseSubMatrix<Number> & KCu = c.get_elem_jacobian(C_var, u_var);
-  DenseSubMatrix<Number> & KCv = c.get_elem_jacobian(C_var, v_var);
+  // Stokes equation residuals
+  // Fu
+  // Fv
+  std::reference_wrapper<DenseSubVector<Number>> F[2] =
+    {
+      c.get_elem_residual(u_var),
+      c.get_elem_residual(v_var)
+    };
+
+  // Concentration/velocity coupling blocks
+  // KCu
+  // KCv
+  std::reference_wrapper<DenseSubMatrix<Number>> C[2] =
+    {
+      c.get_elem_jacobian(C_var, u_var),
+      c.get_elem_jacobian(C_var, v_var)
+    };
+
+  // Concentration diagonal block and residual
   DenseSubMatrix<Number> & KCC = c.get_elem_jacobian(C_var, C_var);
   DenseSubVector<Number> & FC = c.get_elem_residual(C_var);
 
@@ -263,21 +293,22 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   // weight functions.
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  // Store (grad_u, grad_v) at current Newton iterate
+  Gradient grad_uv[2];
+
+  // Velocity at current Newton iterate
+  NumberVectorValue U;
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
-      // Compute the solution & its gradient at the old Newton iterate
-      Number p = c.interior_value(p_var, qp),
-        u = c.interior_value(u_var, qp),
-        v = c.interior_value(v_var, qp);
-      Gradient grad_u = c.interior_gradient(u_var, qp),
-        grad_v = c.interior_gradient(v_var, qp),
-        grad_C = c.interior_gradient(C_var, qp);
+      // Compute the solution & its gradient at the current Newton iterate
+      Number p = c.interior_value(p_var, qp);
+      Gradient grad_C = c.interior_gradient(C_var, qp);
 
-      // Definitions for convenience.  It is sometimes simpler to do a
-      // dot product if you have the full vector at your disposal.
-      NumberVectorValue U (u, v);
-      const Number C_x = grad_C(0);
-      const Number C_y = grad_C(1);
+      c.interior_value(u_var, qp, U(0));
+      c.interior_value(v_var, qp, U(1));
+      c.interior_gradient(u_var, qp, grad_uv[0]);
+      c.interior_gradient(v_var, qp, grad_uv[1]);
 
       // First, an i-loop over the velocity degrees of freedom.
       // We know that n_u_dofs == n_v_dofs so we can compute contributions
@@ -285,13 +316,10 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
           // Stokes equations residuals
-          Fu(i) += JxW[qp] *
-            (p*dphi[i][qp](0) -                // pressure term
-             (grad_u*dphi[i][qp]));            // diffusion term
-
-          Fv(i) += JxW[qp] *
-            (p*dphi[i][qp](1) -                // pressure term
-             (grad_v*dphi[i][qp]));            // diffusion term
+          for (unsigned int d=0; d<2; ++d)
+            F[d](i) += JxW[qp] *
+              (p*dphi[i][qp](d) -                // pressure term
+               (grad_uv[d]*dphi[i][qp]));        // diffusion term
 
           // Concentration Equation Residual
           FC(i) += JxW[qp] *
@@ -305,17 +333,18 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
             {
               libmesh_assert (c.elem_solution_derivative == 1.0);
 
-              // Matrix contributions for the uu and vv couplings.
               for (unsigned int j=0; j != n_u_dofs; j++)
                 {
-                  Kuu(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); // diffusion term
+                  for (unsigned int d=0; d<2; ++d)
+                    {
+                      // Matrix contributions for the uu and vv couplings.
+                      Kdiag[d](i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp]));
 
-                  Kvv(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); // diffusion term
+                      // Matrix contributions for the Cu and Cv couplings.
+                      C[d](i,j) += JxW[qp] * ((phi[j][qp]*grad_C(d))*phi[i][qp]);
+                    }
 
-                  KCu(i,j) += JxW[qp] * ((phi[j][qp]*C_x)*phi[i][qp]); // convection term
-
-                  KCv(i,j) += JxW[qp] * ((phi[j][qp]*C_y)*phi[i][qp]); // convection term
-
+                  // Concentration equation Jacobian contribution
                   KCC(i,j) += JxW[qp]*
                     ((U*dphi[j][qp])*phi[i][qp] +            // nonlinear term (convection)
                      (1./Peclet)*(dphi[j][qp]*dphi[i][qp])); // diffusion term
@@ -323,10 +352,8 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
               // Matrix contributions for the up and vp couplings.
               for (unsigned int j=0; j != n_p_dofs; j++)
-                {
-                  Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
-                  Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
-                }
+                for (unsigned int d=0; d<2; ++d)
+                  B[d](i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](d);
             }
         }
     } // end of the quadrature point qp-loop
@@ -363,36 +390,43 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
   const unsigned int n_u_dofs = c.n_dof_indices(u_var);
   const unsigned int n_p_dofs = c.n_dof_indices(p_var);
 
+  // pressure-velocity coupling blocks
+  // Kpu Kpv
+  std::reference_wrapper<DenseSubMatrix<Number>> B[2] =
+    {
+      c.get_elem_jacobian(p_var, u_var),
+      c.get_elem_jacobian(p_var, v_var)
+    };
+
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> & Kpu = c.get_elem_jacobian(p_var, u_var);
-  DenseSubMatrix<Number> & Kpv = c.get_elem_jacobian(p_var, v_var);
   DenseSubVector<Number> & Fp = c.get_elem_residual(p_var);
 
   // Add the constraint given by the continuity equation
   unsigned int n_qpoints = c.get_element_qrule().n_points();
+
+  // Store (grad_u, grad_v) at current Newton iterate
+  Gradient grad_uv[2];
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the velocity gradient at the old Newton iterate
-      Gradient
-        grad_u = c.interior_gradient(u_var, qp),
-        grad_v = c.interior_gradient(v_var, qp);
+      c.interior_gradient(u_var, qp, grad_uv[0]),
+      c.interior_gradient(v_var, qp, grad_uv[1]);
 
       // Now a loop over the pressure degrees of freedom.  This
       // computes the contributions of the continuity equation.
       for (unsigned int i=0; i != n_p_dofs; i++)
         {
-          Fp(i) += JxW[qp] * psi[i][qp] *
-            (grad_u(0) + grad_v(1));
+          for (unsigned int d=0; d<2; ++d)
+            Fp(i) += JxW[qp] * psi[i][qp] * grad_uv[d](d);
 
           if (request_jacobian && c.elem_solution_derivative)
             {
               libmesh_assert (c.elem_solution_derivative == 1.0);
 
               for (unsigned int j=0; j != n_u_dofs; j++)
-                {
-                  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-                }
+                for (unsigned int d=0; d<2; ++d)
+                  B[d](i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](d);
             }
         }
     } // end of the quadrature point qp-loop
