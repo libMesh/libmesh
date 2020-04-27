@@ -42,10 +42,11 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
   // mesh, output files full of garbage are the result.
   libmesh_assert_equal_to(&es.get_mesh(), _obj);
 
-  // A non-renumbered mesh may not have a contiguous numbering, and
-  // that needs to be fixed before we can build a solution vector.
-  if (my_mesh.max_elem_id() != my_mesh.n_elem() ||
-      my_mesh.max_node_id() != my_mesh.n_nodes())
+  // A non-parallel format, non-renumbered mesh may not have a contiguous
+  // numbering, and that needs to be fixed before we can build a solution vector.
+  if (!_is_parallel_format &&
+      (my_mesh.max_elem_id() != my_mesh.n_elem() ||
+       my_mesh.max_node_id() != my_mesh.n_nodes()))
     {
       // If we were allowed to renumber then we should have already
       // been properly renumbered...
