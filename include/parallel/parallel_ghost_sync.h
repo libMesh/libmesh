@@ -31,6 +31,10 @@
 #include "timpi/communicator.h"
 #include "timpi/parallel_sync.h"
 
+// C++ includes
+#include <map> // FIXME - pid > comm.size() breaks with unordered_map
+#include <vector>
+
 
 namespace libMesh
 {
@@ -248,8 +252,8 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
 #endif
 
   // Count the objects to ask each processor about
-  std::vector<dof_id_type>
-    ghost_objects_from_proc(comm.size(), 0);
+  std::map<processor_id_type, dof_id_type>
+    ghost_objects_from_proc;
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -269,12 +273,15 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (auto p : IntRange<processor_id_type>(0, comm.size()))
-    if (p != comm.rank() && ghost_objects_from_proc[p])
-      {
-        requested_objs_pt[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
-      }
+  for (auto pair : ghost_objects_from_proc)
+    {
+      const processor_id_type p = pair.first;
+      if (p != comm.rank())
+        {
+          requested_objs_pt[p].reserve(pair.second);
+          requested_objs_id[p].reserve(pair.second);
+        }
+    }
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -288,6 +295,11 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
       requested_objs_pt[obj_procid].push_back(p);
       requested_objs_id[obj_procid].push_back(obj->id());
     }
+
+  std::map<const std::vector<Point> *, processor_id_type>
+    requested_objs_pt_inv;
+  for (auto & pair : requested_objs_pt)
+    requested_objs_pt_inv[&pair.second] = pair.first;
 
   auto gather_functor =
     [&location_map, &sync]
@@ -317,12 +329,17 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
     };
 
   auto action_functor =
-    [&sync, &requested_objs_id]
-    (processor_id_type pid, const std::vector<Point> &,
+    [&sync, &requested_objs_id,
+     &requested_objs_pt_inv]
+    (processor_id_type /* pid */, const std::vector<Point> & point_request,
      const std::vector<typename SyncFunctor::datum> & data)
     {
+      // With splits working on more pids than ranks, query_pid may not equal pid
+      const processor_id_type query_pid =
+        requested_objs_pt_inv[&point_request];
+
       // Let the user process the results
-      sync.act_on_data(requested_objs_id[pid], data);
+      sync.act_on_data(requested_objs_id[query_pid], data);
     };
 
   // Trade requests with other processors
@@ -356,8 +373,8 @@ void sync_dofobject_data_by_id(const Communicator & comm,
   libmesh_parallel_only(comm);
 
   // Count the objects to ask each processor about
-  std::vector<dof_id_type>
-    ghost_objects_from_proc(comm.size(), 0);
+  std::map<processor_id_type, dof_id_type>
+    ghost_objects_from_proc;
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -380,9 +397,12 @@ void sync_dofobject_data_by_id(const Communicator & comm,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (auto p : IntRange<processor_id_type>(0, comm.size()))
-    if (p != comm.rank() && ghost_objects_from_proc[p])
-      requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
+  for (auto pair : ghost_objects_from_proc)
+    {
+      const processor_id_type p = pair.first;
+      if (p != comm.rank())
+        requested_objs_id[p].reserve(pair.second);
+    }
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -439,8 +459,8 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
   libmesh_parallel_only(comm);
 
   // Count the objects to ask each processor about
-  std::vector<dof_id_type>
-    ghost_objects_from_proc(comm.size(), 0);
+  std::map<processor_id_type, dof_id_type>
+    ghost_objects_from_proc;
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -464,12 +484,15 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (auto p : IntRange<processor_id_type>(0, comm.size()))
-    if (p != comm.rank() && ghost_objects_from_proc[p])
-      {
-        requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_parent_id_child_num[p].reserve(ghost_objects_from_proc[p]);
-      }
+  for (auto pair : ghost_objects_from_proc)
+    {
+      const processor_id_type p = pair.first;
+      if (p != comm.rank())
+        {
+          requested_objs_id[p].reserve(pair.second);
+          requested_objs_parent_id_child_num[p].reserve(pair.second);
+        }
+    }
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -486,6 +509,11 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
       requested_objs_parent_id_child_num[obj_procid].emplace_back
         (parent->id(), cast_int<unsigned char>(parent->which_child_am_i(elem)));
     }
+
+  std::map<const std::vector<std::pair<dof_id_type,unsigned char>> *, processor_id_type>
+    requested_objs_parent_id_child_num_inv;
+  for (auto & pair : requested_objs_parent_id_child_num)
+    requested_objs_parent_id_child_num_inv[&pair.second] = pair.first;
 
   auto gather_functor =
     [&mesh, &sync]
@@ -511,13 +539,18 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
     };
 
   auto action_functor =
-    [&sync, &requested_objs_id]
-    (processor_id_type pid,
-     const std::vector<std::pair<dof_id_type, unsigned char>> &,
+    [&sync, &requested_objs_id,
+     &requested_objs_parent_id_child_num_inv]
+    (processor_id_type /* pid */,
+     const std::vector<std::pair<dof_id_type, unsigned char>> & parent_id_child_num_request,
      const std::vector<typename SyncFunctor::datum> & data)
     {
+      // With splits working on more pids than ranks, query_pid may not equal pid
+      const processor_id_type query_pid =
+        requested_objs_parent_id_child_num_inv[&parent_id_child_num_request];
+
       // Let the user process the results
-      sync.act_on_data(requested_objs_id[pid], data);
+      sync.act_on_data(requested_objs_id[query_pid], data);
     };
 
   // Trade requests with other processors
@@ -552,8 +585,8 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   const Communicator & comm (mesh.comm());
 
   // Count the objects to ask each processor about
-  std::vector<dof_id_type>
-    ghost_objects_from_proc(comm.size(), 0);
+  std::map<processor_id_type, dof_id_type>
+    ghost_objects_from_proc;
 
   for (const auto & elem : as_range(range_begin, range_end))
     {
@@ -606,11 +639,12 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (auto p : IntRange<processor_id_type>(0, comm.size()))
-    if (p != comm.rank() && ghost_objects_from_proc[p])
-      {
+  for (auto pair : ghost_objects_from_proc)
+    {
+      const processor_id_type p = pair.first;
+      if (p != comm.rank())
         requested_objs_elem_id_node_num[p].reserve(ghost_objects_from_proc[p]);
-      }
+    }
 
   for (const auto & elem : as_range(range_begin, range_end))
     {
@@ -700,13 +734,10 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
 
   auto action_functor =
     [&sync, &mesh, &requested_objs_elem_id_node_num, &data_changed]
-    (processor_id_type pid,
-     const std::vector<std::pair<dof_id_type, unsigned char>> &,
+    (processor_id_type /* pid */,
+     const std::vector<std::pair<dof_id_type, unsigned char>> & elem_id_node_num,
      const std::vector<typename SyncFunctor::datum> & data)
     {
-      const auto & elem_id_node_num =
-        requested_objs_elem_id_node_num[pid];
-
       const std::size_t data_size = data.size();
 
       libmesh_assert_equal_to(elem_id_node_num.size(), data_size);
