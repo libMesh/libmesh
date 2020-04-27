@@ -115,6 +115,13 @@ void init_eletypes ()
   if (eletypes.empty())
     {
       {
+        // NODEELEM
+        const unsigned int   node_map[] = {0}; // identity
+        const unsigned short side_map[] = {0}; // identity
+        add_eletype_entry(NODEELEM, node_map, 1, side_map, 1);
+      }
+
+      {
         // EDGE2
         const unsigned int   node_map[] = {0,1}; // identity
         const unsigned short side_map[] = {0,1}; // identity
@@ -383,11 +390,16 @@ void AbaqusIO::read (const std::string & fname)
               // Get the name from the Name=Foo label.  This will be the map key.
               std::string sideset_name = this->parse_label(s, "name");
 
+              // Some (all?) surfaces also declare a type, which can
+              // help us figure out how they should be parsed, so we
+              // pass this to the read_sideset() function.
+              std::string sideset_type = this->parse_label(s, "type");
+
               // Process any lines of comments that may be present
               this->process_and_discard_comments();
 
               // Read the sideset IDs
-              this->read_sideset(sideset_name, _sideset_ids);
+              this->read_sideset(sideset_name, sideset_type, _sideset_ids);
             }
 
           continue;
@@ -619,6 +631,14 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
       elem_type = TET10;
       n_nodes_per_elem = 10;
       elems_of_dimension[3] = true;
+    }
+  else if (upper.find("MASS") != std::string::npos)
+    {
+      // "MASS" elements are used to indicate point masses in Abaqus
+      // models. These are mapped to NODEELEMs in libmesh.
+      elem_type = NODEELEM;
+      n_nodes_per_elem = 1;
+      elems_of_dimension[0] = true;
     }
   else
     libmesh_error_msg("Unrecognized element type: " << upper);
@@ -853,7 +873,9 @@ void AbaqusIO::generate_ids(std::string set_name, container_t & container)
 
 
 
-void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & container)
+void AbaqusIO::read_sideset(const std::string & sideset_name,
+                            const std::string & sideset_type,
+                            sideset_container_t & container)
 {
   // Grab a reference to a vector that will hold all the IDs
   std::vector<std::pair<dof_id_type, unsigned>> & id_storage = container[sideset_name];
@@ -866,8 +888,6 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
   // Read until the start of another section is detected, or EOF is encountered
   while (_in.peek() != '*' && _in.peek() != EOF)
     {
-      // This line is of the form: "391, S2" or "Elset_1, S3"
-
       // Read first string up to and including the comma, which is discarded.
       std::getline(_in, elem_id_or_set, ',');
 
@@ -875,29 +895,52 @@ void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & cont
       // string, since some Abaqus files may have this.
       strip_ws(elem_id_or_set);
 
-      // Read the character "S", followed by the side id. Note: the >> operator
-      // eats whitespace until it reaches a valid character, so this should work
-      // whether or not there is a space after the previous comma.
-      _in >> c >> side_id;
-
-      // Try to convert first string to an integer.
-      dof_id_type elem_id;
-      bool success = string_to_num(elem_id_or_set, elem_id);
-
-      if (success)
+      // Handle sidesets of type "NODE"
+      if (sideset_type == "NODE")
         {
-          // if the side set is of the form of "391, S2"
-          id_storage.emplace_back(elem_id, side_id);
-        }
-      else
-        {
-          // if the side set is of the form of "Elset_1, S3"
-          const auto & vec = libmesh_map_find(_elemset_ids, elem_id_or_set);
-          for (const auto & elem_id_in_elset : vec)
-            id_storage.emplace_back(elem_id_in_elset, side_id);
+          // Create a sideset from a nodeset. This is not currently
+          // supported, so print a warning and keep going.
+          auto it = _nodeset_ids.find(elem_id_or_set);
+
+          if (it != _nodeset_ids.end())
+            {
+              libMesh::out << "Warning: skipped creating a sideset from a "
+                           << "nodeset, this is not yet supported."
+                           << std::endl;
+            }
         }
 
-      // Extract remaining characters on line including newline
+      // Otherwise, we assume it's a sideset of the form: "391, S2" or "Elset_1, S3".
+      // If it's not one of these forms, we'll throw an error instead
+      // of letting the stream get into a bad state.
+      else // sideset_type != "NODE"
+        {
+          // Read the character "S", followed by the side id. Note: the >> operator
+          // eats whitespace until it reaches a valid character, so this should work
+          // whether or not there is a space after the previous comma.
+          _in >> c >> side_id;
+
+          // Try to convert first string to an integer.
+          dof_id_type elem_id;
+          bool success = string_to_num(elem_id_or_set, elem_id);
+
+          if (success)
+            {
+              // if the side set is of the form of "391, S2"
+              id_storage.emplace_back(elem_id, side_id);
+            }
+
+          if (!success)
+            {
+              // if the side set is of the form of "Elset_1, S3"
+              const auto & vec = libmesh_map_find(_elemset_ids, elem_id_or_set);
+              for (const auto & elem_id_in_elset : vec)
+                id_storage.emplace_back(elem_id_in_elset, side_id);
+            }
+        }
+
+      // Successful or not, we extract the remaining characters on the
+      // line, including the newline, to (hopefully) go to the next section.
       std::getline(_in, dummy);
     } // while
 }
@@ -1103,6 +1146,12 @@ void AbaqusIO::assign_sideset_ids()
             // dimension seen, we can break out of this for loop --
             // this elset does not contain sideset information.
             if (elem.dim() == max_dim)
+              break;
+
+            // If the element dimension is zero, this elset contains
+            // NodeElems which AFAIK are not used for sidesets, they
+            // are only used to define point masses.
+            if (elem.dim() == 0)
               break;
 
             // We can only handle elements that are *exactly*

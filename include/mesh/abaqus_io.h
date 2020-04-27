@@ -156,7 +156,9 @@ private:
    * by a "*Surface" section in the file, and then a list of element ID
    * and side IDs for the set.
    */
-  void read_sideset(std::string sideset_name, sideset_container_t & container);
+  void read_sideset(const std::string & sideset_name,
+                    const std::string & sideset_type,
+                    sideset_container_t & container);
 
   /**
    * This function assigns boundary IDs to node sets based on the
