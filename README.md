@@ -1,3 +1,6 @@
+## IMPORTANT -- READ BEFORE BUILDING! 
+Do not download a GitHub-generated "ZIP" archive. These do not contain the required submodules, and therefore cannot be used to build libmesh. Use only git clones or "release" tarballs when following these instructions.
+
 ## Build Instructions
 The default is to build libmesh "out of tree," i.e. within a separate `build` directory, rather than in the source tree itself. This simplifies the process of having multiple, independently-configured builds.
 1. `cd` to location of libmesh clone or extracted tarball.
