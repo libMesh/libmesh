@@ -1,4 +1,4 @@
-## IMPORTANT -- READ BEFORE BUILDING! 
+## IMPORTANT -- READ BEFORE BUILDING!
 Do not download a GitHub-generated "ZIP" archive. These do not contain the required submodules, and therefore cannot be used to build libmesh. Use only git clones or "release" tarballs when following these instructions.
 
 ## Build Instructions
