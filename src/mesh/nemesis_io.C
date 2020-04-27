@@ -1370,8 +1370,11 @@ void Nemesis_IO::write_nodal_data (const std::string & base_filename,
 
   this->prepare_to_write_nodal_data(base_filename, output_names);
 
-  std::vector<std::pair<unsigned int, unsigned int>> var_nums =
-    es.find_variable_numbers(output_names);
+  std::vector<std::pair<unsigned int, unsigned int>> var_nums;
+  // If we pass in an empty vector below, it will return all of the
+  // var nums in es, which we don't want.
+  if (!output_names.empty())
+    var_nums = es.find_variable_numbers(output_names);
 
   nemhelper->write_nodal_solution(es, var_nums, _timestep, output_names);
 }
