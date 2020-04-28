@@ -428,6 +428,7 @@ void init_elemquality_to_enum ()
       elemquality_to_enum["ASPECT_RATIO_GAMMA" ]=ASPECT_RATIO_GAMMA;
       elemquality_to_enum["SIZE"               ]=SIZE;
       elemquality_to_enum["JACOBIAN"           ]=JACOBIAN;
+      elemquality_to_enum["TWIST"              ]=TWIST;
     }
 }
 
