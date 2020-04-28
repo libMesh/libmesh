@@ -103,6 +103,7 @@ public:
    * the subdomains searched.
    */
   virtual const Elem * operator() (const Point & p,
+                                   bool use_cache = true,
                                    const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const = 0;
 
   /**
