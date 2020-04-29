@@ -1662,15 +1662,18 @@ Point FEMap::inverse_map (const unsigned int dim,
                           const Point & physical_point,
                           const Real tolerance,
                           const bool secure,
-                          const bool extra_checks)
+                          const bool
+                          extra_checks
+                          )
 {
   libmesh_assert(elem);
   libmesh_assert_greater_equal (tolerance, 0.);
 
+  libmesh_ignore(extra_checks);
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   // TODO: possibly use the extra_checks parameter in InfFEMap::inverse_map() as well.
-  libmesh_ignore(extra_checks);
 
   if (elem->infinite())
     return InfFEMap::inverse_map(dim, elem, physical_point, tolerance,
