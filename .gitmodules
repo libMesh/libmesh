@@ -6,4 +6,4 @@
 	url = ../../libMesh/TIMPI
 [submodule "m4/autoconf-submodule"]
 	path = m4/autoconf-submodule
-	url = git@github.com:libMesh/autoconf-submodule
+	url = ../../libMesh/autoconf-submodule
