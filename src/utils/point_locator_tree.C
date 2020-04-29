@@ -189,8 +189,8 @@ void PointLocatorTree::init (Trees::BuildType build_type)
 }
 
 const Elem * PointLocatorTree::operator() (const Point & p,
-                                           bool use_cache,
-                                           const std::set<subdomain_id_type> * allowed_subdomains) const
+                                           const std::set<subdomain_id_type> * allowed_subdomains,
+                                           bool use_cache) const
 {
   libmesh_assert (this->_initialized);
 
