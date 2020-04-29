@@ -40,7 +40,7 @@ libmesh_installed_LIBS=""
 # --------------------------------------------------------------
 # TIMPI is required
 # --------------------------------------------------------------
-AS_IF([test -r $top_srcdir/contrib/timpi/README],
+AS_IF([test -r $top_srcdir/contrib/timpi/README -a -r $top_srcdir/contrib/timpi/m4/autoconf-submodule/acsm_mpi.m4],
 [
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
@@ -49,7 +49,7 @@ AS_IF([test -r $top_srcdir/contrib/timpi/README],
   libmesh_contrib_INCLUDES="-I\$(top_builddir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
 ],
 [
-  AC_MSG_ERROR([You must run "git submodule update --init contrib/timpi" before configuring libmesh])
+  AC_MSG_ERROR([You must run "git submodule update --init --recursive" before configuring libmesh])
 ])
 
 
