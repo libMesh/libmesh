@@ -69,7 +69,11 @@ AC_DEFUN([CONFIGURE_BOOST],
         [
           AS_IF([test "x$install_internal_boost" = "xyes"],
                 [libmesh_contrib_INCLUDES="$BOOST_INCLUDE $libmesh_contrib_INCLUDES"],
-                [libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"])
+                [
+                   BOOST_CPPFLAGS=$(sed -e "s/^-I/-isystem/g" <<< $BOOST_CPPFLAGS)
+                   BOOST_CPPFLAGS=$(sed -e "s/ ^-I/ -isystem/g" <<< $BOOST_CPPFLAGS)
+                   libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
+                ])
         ])
 
   AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_BOOST, test x$install_internal_boost = xyes)
