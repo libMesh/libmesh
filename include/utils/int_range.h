@@ -139,6 +139,40 @@ IntRange<numeric_index_type> index_range(const NumericVector<T> & vec)
   return {vec.first_local_index(), vec.last_local_index()};
 }
 
+
+
+/**
+ * The 2-parameter make_range() helper function returns an IntRange<T>
+ * when both input parameters are of type T. This saves a bit of
+ * typing over calling the IntRange<T> constructor directly.
+ */
+template <typename T>
+IntRange<T> make_range(T beg, T end)
+{
+  return {beg, end};
+}
+
+
+
+/**
+ * The 1-parameter version of make_range() saves even more typing in
+ * the common case of a 0 starting point. Example usage:
+ *
+ * for (auto i : make_range(10))
+ *
+ * will loop from 0 to 9. In more realistic cases such as:
+ *
+ * for (auto i : make_range(foo()))
+ *
+ * this construction guarantees that the function foo() is called
+ * exactly once rather than once per loop iteration.
+ */
+template <typename T>
+IntRange<T> make_range(T end)
+{
+  return {T(0), end};
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_INT_RANGE_H
