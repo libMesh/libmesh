@@ -40,7 +40,7 @@ libmesh_installed_LIBS=""
 # --------------------------------------------------------------
 # TIMPI is required
 # --------------------------------------------------------------
-AS_IF([test -r $top_srcdir/contrib/timpi/README -a -r $top_srcdir/contrib/timpi/m4/autoconf-submodule/acsm_mpi.m4],
+AS_IF([test -r $top_srcdir/contrib/timpi/README && test -r $top_srcdir/contrib/timpi/m4/autoconf-submodule/acsm_mpi.m4],
 [
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
