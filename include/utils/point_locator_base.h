@@ -103,8 +103,7 @@ public:
    * the subdomains searched.
    */
   virtual const Elem * operator() (const Point & p,
-                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr,
-                                   bool use_cache = true) const = 0;
+                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const = 0;
 
   /**
    * Locates a set of elements in proximity to the point with global coordinates
