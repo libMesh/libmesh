@@ -33612,7 +33612,11 @@ fi
           if test "x$install_internal_boost" = "xyes"; then :
   libmesh_contrib_INCLUDES="$BOOST_INCLUDE $libmesh_contrib_INCLUDES"
 else
-  libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
+
+                   BOOST_CPPFLAGS=$(sed -e "s/^-I/-isystem/g" <<< $BOOST_CPPFLAGS)
+                   BOOST_CPPFLAGS=$(sed -e "s/ ^-I/ -isystem/g" <<< $BOOST_CPPFLAGS)
+                   libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
+
 fi
 
 fi
