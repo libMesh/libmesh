@@ -1736,37 +1736,38 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
         }
     }
 
+  // Check for node unique ids
+  unsigned short read_unique_ids = false;
+
   if (version_at_least_0_9_6())
     {
-      // Check for node unique ids
-      unsigned short read_unique_ids;
-
       if (this->processor_id() == 0)
         io.data (read_unique_ids);
 
       this->comm().broadcast (read_unique_ids);
+    }
 
-      // If no node unique ids are in the file, well, we already
-      // assigned our own ... *but*, our ids might conflict with the
-      // file-assigned element unique ids.  Let's check on that.
-      // Should be easy since we're serialized.
-      if (!read_unique_ids)
-        {
+  // If no node unique ids are in the file, well, we already
+  // assigned our own ... *but*, our ids might conflict with the
+  // file-assigned element unique ids.  Let's check on that.
+  // Should be easy since we're serialized.
+  if (!read_unique_ids)
+    {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          unique_id_type max_elem_unique_id = 0;
-          for (auto & elem : mesh.element_ptr_range())
-            max_elem_unique_id = std::max(max_elem_unique_id,
-                                          elem->unique_id()+1);
-          if (max_elem_unique_id > mesh.n_elem())
-            {
-              for (auto & node : mesh.node_ptr_range())
-                node->set_unique_id(max_elem_unique_id + node->id());
-            }
-          mesh.set_next_unique_id(max_elem_unique_id + mesh.n_nodes());
-#endif
-          return;
+      unique_id_type max_elem_unique_id = 0;
+      for (auto & elem : mesh.element_ptr_range())
+        max_elem_unique_id = std::max(max_elem_unique_id,
+                                      elem->unique_id()+1);
+      if (max_elem_unique_id > mesh.n_elem())
+        {
+          for (auto & node : mesh.node_ptr_range())
+            node->set_unique_id(max_elem_unique_id + node->id());
         }
-
+      mesh.set_next_unique_id(max_elem_unique_id + mesh.n_nodes());
+#endif
+    }
+  else
+    {
       std::vector<uint32_t> unique_32;
       std::vector<uint64_t> unique_64;
 
