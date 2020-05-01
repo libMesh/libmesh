@@ -124,6 +124,7 @@ pub_2020 = [
   '2020-02-01', 34,
   '2020-03-01', 44,
   '2020-04-01', 57,
+  '2020-05-01', 75,
 ]
 
 """
@@ -163,4 +164,4 @@ ax1.set_xticklabels(['Year Start', 'Year End'])
 # Axis labels
 ax1.set_ylabel('N. Publications')
 ax1.legend(loc='upper left', prop=fontP)
-plt.savefig('libmesh_publications_monthly.pdf', format='pdf')
+plt.savefig('libmesh_citations_monthly.pdf', format='pdf')
