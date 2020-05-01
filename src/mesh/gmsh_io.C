@@ -880,7 +880,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
   out_stream << "$Nodes\n";
   out_stream << mesh.n_nodes() << '\n';
 
-  for (auto v : IntRange<unsigned int>(0, mesh.n_nodes()))
+  for (auto v : make_range(mesh.n_nodes()))
     out_stream << mesh.node_ref(v).id()+1 << " "
                << mesh.node_ref(v)(0) << " "
                << mesh.node_ref(v)(1) << " "

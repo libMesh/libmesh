@@ -460,7 +460,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
     n_send_node_pairs=0,      n_send_elem_pairs=0,
     n_recv_node_pairs=0,      n_recv_elem_pairs=0;
 
-  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+  for (auto pid : make_range(mesh.n_processors()))
     {
       if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
         {
@@ -601,7 +601,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   // A list of all the processors which *may* contain neighboring elements.
   // (for development simplicity, just make this the identity map)
   std::vector<processor_id_type> adjacent_processors;
-  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+  for (auto pid : make_range(mesh.n_processors()))
     if (pid != mesh.processor_id())
       adjacent_processors.push_back (pid);
 
@@ -635,7 +635,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                 {
                   elem->build_side_ptr(side, s);
 
-                  for (auto n : IntRange<unsigned int>(0, side->n_vertices()))
+                  for (auto n : make_range(side->n_vertices()))
                     my_interface_node_set.insert (side->node_id(n));
                 }
           }
@@ -789,7 +789,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             {
               std::size_t n_shared_nodes = 0;
 
-              for (auto n : IntRange<unsigned int>(0, elem->n_vertices()))
+              for (auto n : make_range(elem->n_vertices()))
                 if (std::binary_search (common_interface_node_list.begin(),
                                         common_interface_node_list.end(),
                                         elem->node_id(n)))

@@ -358,7 +358,7 @@ void System::read_legacy_data (Xdr & io,
 
         // First reorder the nodal DOF values
         for (auto & node : this->get_mesh().node_ptr_range())
-          for (auto index : IntRange<unsigned int>(0, node->n_comp(sys,var)))
+          for (auto index : make_range(node->n_comp(sys,var)))
             {
               libmesh_assert_not_equal_to (node->dof_number(sys, var, index),
                                            DofObject::invalid_id);
@@ -371,7 +371,7 @@ void System::read_legacy_data (Xdr & io,
 
         // Then reorder the element DOF values
         for (auto & elem : this->get_mesh().active_element_ptr_range())
-          for (auto index : IntRange<unsigned int>(0, elem->n_comp(sys,var)))
+          for (auto index : make_range(elem->n_comp(sys,var)))
             {
               libmesh_assert_not_equal_to (elem->dof_number(sys, var, index),
                                            DofObject::invalid_id);
@@ -448,7 +448,7 @@ void System::read_legacy_data (Xdr & io,
                   const unsigned int var = _written_var_indices[data_var];
                   // First reorder the nodal DOF values
                   for (auto & node : this->get_mesh().node_ptr_range())
-                    for (auto index : IntRange<unsigned int>(0, node->n_comp(sys,var)))
+                    for (auto index : make_range(node->n_comp(sys,var)))
                       {
                         libmesh_assert_not_equal_to (node->dof_number(sys, var, index),
                                                      DofObject::invalid_id);
@@ -461,7 +461,7 @@ void System::read_legacy_data (Xdr & io,
 
                   // Then reorder the element DOF values
                   for (auto & elem : this->get_mesh().active_element_ptr_range())
-                    for (auto index : IntRange<unsigned int>(0, elem->n_comp(sys,var)))
+                    for (auto index : make_range(elem->n_comp(sys,var)))
                       {
                         libmesh_assert_not_equal_to (elem->dof_number(sys, var, index),
                                                      DofObject::invalid_id);
@@ -572,7 +572,7 @@ void System::read_parallel_data (Xdr & io,
         {
           // First read the node DOF values
           for (const auto & node : ordered_nodes)
-            for (auto comp : IntRange<unsigned int>(0, node->n_comp(sys_num,var)))
+            for (auto comp : make_range(node->n_comp(sys_num,var)))
               {
                 libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                              DofObject::invalid_id);
@@ -582,7 +582,7 @@ void System::read_parallel_data (Xdr & io,
 
           // Then read the element DOF values
           for (const auto & elem : ordered_elements)
-            for (auto comp : IntRange<unsigned int>(0, elem->n_comp(sys_num,var)))
+            for (auto comp : make_range(elem->n_comp(sys_num,var)))
               {
                 libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                              DofObject::invalid_id);
@@ -659,7 +659,7 @@ void System::read_parallel_data (Xdr & io,
                     {
                       // First read the node DOF values
                       for (const auto & node : ordered_nodes)
-                        for (auto comp : IntRange<unsigned int>(0, node->n_comp(sys_num,var)))
+                        for (auto comp : make_range(node->n_comp(sys_num,var)))
                           {
                             libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                                          DofObject::invalid_id);
@@ -669,7 +669,7 @@ void System::read_parallel_data (Xdr & io,
 
                       // Then read the element DOF values
                       for (const auto & elem : ordered_elements)
-                        for (auto comp : IntRange<unsigned int>(0, elem->n_comp(sys_num,var)))
+                        for (auto comp : make_range(elem->n_comp(sys_num,var)))
                           {
                             libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                                          DofObject::invalid_id);
@@ -1038,7 +1038,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
           n_read_values += input_vals.size();
 
           // pack data replies for each processor
-          for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto proc : make_range(this->n_processors()))
             {
               const std::vector<dof_id_type> & ids (recv_ids[proc]);
               std::vector<Number> & vals (send_vals[proc]);
@@ -1357,7 +1357,7 @@ void System::write_header (Xdr & io,
   }
 
 
-  for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+  for (auto var : make_range(this->n_vars()))
     {
       // 6.)
       // Write the name of the var-th variable
@@ -1569,7 +1569,7 @@ void System::write_parallel_data (Xdr & io,
       {
         // First write the node DOF values
         for (const auto & node : ordered_nodes)
-          for (auto comp : IntRange<unsigned int>(0, node->n_comp(sys_num,var)))
+          for (auto comp : make_range(node->n_comp(sys_num,var)))
             {
               libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                            DofObject::invalid_id);
@@ -1579,7 +1579,7 @@ void System::write_parallel_data (Xdr & io,
 
         // Then write the element DOF values
         for (const auto & elem : ordered_elements)
-          for (auto comp : IntRange<unsigned int>(0, elem->n_comp(sys_num,var)))
+          for (auto comp : make_range(elem->n_comp(sys_num,var)))
             {
               libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                            DofObject::invalid_id);
@@ -1589,7 +1589,7 @@ void System::write_parallel_data (Xdr & io,
       }
 
   // Finally, write the SCALAR data on the last processor
-  for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+  for (auto var : make_range(this->n_vars()))
     if (this->variable(var).type().family == SCALAR)
       {
         if (this->processor_id() == (this->n_processors()-1))
@@ -1633,7 +1633,7 @@ void System::write_parallel_data (Xdr & io,
               {
                 // First write the node DOF values
                 for (const auto & node : ordered_nodes)
-                  for (auto comp : IntRange<unsigned int>(0, node->n_comp(sys_num,var)))
+                  for (auto comp : make_range(node->n_comp(sys_num,var)))
                     {
                       libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
@@ -1643,7 +1643,7 @@ void System::write_parallel_data (Xdr & io,
 
                 // Then write the element DOF values
                 for (const auto & elem : ordered_elements)
-                  for (auto comp : IntRange<unsigned int>(0, elem->n_comp(sys_num,var)))
+                  for (auto comp : make_range(elem->n_comp(sys_num,var)))
                     {
                       libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
@@ -1653,7 +1653,7 @@ void System::write_parallel_data (Xdr & io,
               }
 
           // Finally, write the SCALAR data on the last processor
-          for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+          for (auto var : make_range(this->n_vars()))
             if (this->variable(var).type().family == SCALAR)
               {
                 if (this->processor_id() == (this->n_processors()-1))
@@ -1838,7 +1838,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
   if (var_to_write == libMesh::invalid_uint)
     {
       vars_to_write.clear(); /**/ vars_to_write.reserve(this->n_vars());
-      for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+      for (auto var : make_range(this->n_vars()))
         vars_to_write.push_back(var);
     }
 
@@ -2039,7 +2039,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
           output_vals.resize(n_val_recvd_blk);
 
           // pack data from all processors into output values
-          for (auto proc : IntRange<unsigned int>(0, this->n_processors()))
+          for (auto proc : make_range(this->n_processors()))
             {
               const std::vector<dof_id_type> & ids (recv_ids [proc]);
               const std::vector<Number>      & vals(recv_vals[proc]);
@@ -2181,7 +2181,7 @@ dof_id_type System::write_serialized_vector (Xdr & io,
 
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
-  for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+  for (auto var : make_range(this->n_vars()))
     if (this->variable(var).type().family == SCALAR)
       {
         written_length +=
@@ -2268,7 +2268,7 @@ std::size_t System::read_serialized_vectors (Xdr & io,
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
   for (NumericVector<Number> * vec : vectors)
-    for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+    for (auto var : make_range(this->n_vars()))
       if (this->variable(var).type().family == SCALAR)
         {
           libmesh_assert_not_equal_to (vec, 0);
@@ -2337,7 +2337,7 @@ std::size_t System::write_serialized_vectors (Xdr & io,
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
   for (const NumericVector<Number> * vec : vectors)
-    for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+    for (auto var : make_range(this->n_vars()))
       if (this->variable(var).type().family == SCALAR)
         {
           libmesh_assert_not_equal_to (vec, 0);

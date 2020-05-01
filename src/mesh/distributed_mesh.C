@@ -1163,7 +1163,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   // We know how many objects live on each processor, so reserve() space for
   // each.
   auto ghost_end = ghost_objects_from_proc.end();
-  for (auto p : IntRange<processor_id_type>(0, this->n_processors()))
+  for (auto p : make_range(this->n_processors()))
     if (p != this->processor_id())
       {
         const auto p_it = ghost_objects_from_proc.find(p);
@@ -1288,7 +1288,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 
   // Next set unpartitioned object ids
   next_id = 0;
-  for (auto i : IntRange<processor_id_type>(0, this->n_processors()))
+  for (auto i : make_range(this->n_processors()))
     next_id += objects_on_proc[i];
   for (it = objects.begin(); it != end; ++it)
     {

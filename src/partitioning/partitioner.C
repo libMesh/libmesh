@@ -293,7 +293,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
   // find the target subdomain sizes
   std::vector<dof_id_type> subdomain_bounds(mesh.n_processors());
 
-  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+  for (auto pid : make_range(mesh.n_processors()))
     {
       dof_id_type tgt_subdomain_size = 0;
 
@@ -1010,7 +1010,7 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
       (mesh.comm(), mesh.active_elements_begin(), mesh.active_elements_end(), sync);
 
   dof_id_type pid_offset=0;
-  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+  for (auto pid : make_range(mesh.n_processors()))
     {
       for (const auto & elem : as_range(mesh.active_pid_elements_begin(pid),
                                         mesh.active_pid_elements_end(pid)))
@@ -1063,7 +1063,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
   _find_global_index_by_pid_map(mesh);
 
   dof_id_type first_local_elem = 0;
-  for (auto pid : IntRange<processor_id_type>(0, mesh.processor_id()))
+  for (auto pid : make_range(mesh.processor_id()))
      first_local_elem += _n_active_elem_on_proc[pid];
 
   _dual_graph.clear();
@@ -1192,7 +1192,7 @@ void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<
   libmesh_parallel_only(mesh.comm());
 
   dof_id_type first_local_elem = 0;
-  for (auto pid : IntRange<processor_id_type>(0, mesh.processor_id()))
+  for (auto pid : make_range(mesh.processor_id()))
     first_local_elem += _n_active_elem_on_proc[pid];
 
 #ifndef NDEBUG

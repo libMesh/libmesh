@@ -334,7 +334,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
                 mask[i] = 1;
 
                 // Search through neighbor nodes looking for two that form a straight line with this node
-                for (auto a : IntRange<std::size_t>(0, thetas.size()-1))
+                for (auto a : make_range(thetas.size()-1))
                   {
                     // Only try each pairing once
                     for (auto b : IntRange<std::size_t>(a+1, thetas.size()))
@@ -395,7 +395,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
               {
                 // Grab nodes that do exist
               case 3:  // Tri
-                for (auto k : IntRange<unsigned int>(0, elem->n_vertices()))
+                for (auto k : make_range(elem->n_vertices()))
                   cells[i][k] = elem->node_id(k);
 
                 num = elem->n_vertices();
@@ -420,7 +420,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
               {
                 // Tet 4
               case 4:
-                for (auto k : IntRange<unsigned int>(0, elem->n_vertices()))
+                for (auto k : make_range(elem->n_vertices()))
                   cells[i][k] = elem->node_id(k);
                 num = elem->n_vertices();
                 break;
@@ -445,7 +445,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
           }
 
         // Fill in the rest with -1
-        for (auto j : IntRange<int>(num, cast_int<int>(cells[i].size())))
+        for (auto j : make_range(num, cast_int<int>(cells[i].size())))
           cells[i][j] = -1;
 
         // Mask it with 0 to state that this is an active element
@@ -1953,7 +1953,7 @@ Real VariationalMeshSmoother::minJ(Array2D<Real> & R,
           G[i][j] = 0;  // adaptation metric G is held constant throughout minJ run
           if (adp < 0)
             {
-              for (auto k : IntRange<int>(0, std::abs(adp)))
+              for (auto k : make_range(std::abs(adp)))
                 G[i][j] += afun[i*(-adp)+k];  // cell-based adaptivity is computed here
             }
         }
@@ -2722,7 +2722,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
             {
               G[i][j] = 0;
               if (adp < 0)
-                for (auto k : IntRange<int>(0, std::abs(adp)))
+                for (auto k : make_range(std::abs(adp)))
                   G[i][j] += afun[i*(-adp) + k];
             }
 

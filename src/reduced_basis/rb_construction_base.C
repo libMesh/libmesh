@@ -385,7 +385,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
       NumericVector<Number> * training_vector = pr.second.get();
 
       numeric_index_type first_index = training_vector->first_local_index();
-      for (auto i : IntRange<numeric_index_type>(0, training_vector->local_size()))
+      for (auto i : make_range(training_vector->local_size()))
         {
           numeric_index_type index = first_index + i;
           Real random_number = static_cast<Real>(std::rand()) / RAND_MAX; // in range [0,1]

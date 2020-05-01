@@ -610,8 +610,8 @@ void DenseMatrix<T>::get_transpose (DenseMatrix<T> & dest) const
 {
   dest.resize(this->n(), this->m());
 
-  for (auto i : IntRange<unsigned int>(0, dest.m()))
-    for (auto j : IntRange<unsigned int>(0, dest.n()))
+  for (auto i : make_range(dest.m()))
+    for (auto j : make_range(dest.n()))
       dest(i,j) = (*this)(j,i);
 }
 
@@ -913,7 +913,7 @@ T DenseMatrix<T>::det ()
   // the power (of 10) of the determinant in a separate variable
   // and maintain an order 1 value for the determinant itself.
   unsigned int n_interchanges = 0;
-  for (auto i : IntRange<unsigned int>(0, this->m()))
+  for (auto i : make_range(this->m()))
     {
       if (this->_decomposition_type==LU)
         if (_pivots[i] != static_cast<pivot_index_t>(i))

@@ -89,7 +89,7 @@ void HPCoarsenTest::add_projection(const System & system,
   libmesh_assert_equal_to (Uc.size(), phi_coarse->size());
 
   // Loop over the quadrature points
-  for (auto qp : IntRange<unsigned int>(0, qrule->n_points()))
+  for (auto qp : make_range(qrule->n_points()))
     {
       // The solution value at the quadrature point
       Number val = libMesh::zero;
@@ -318,7 +318,7 @@ void HPCoarsenTest::select_refinement (System & system)
               Fe.zero();
 
               // Loop over the quadrature points
-              for (auto qp : IntRange<unsigned int>(0, qrule->n_points()))
+              for (auto qp : make_range(qrule->n_points()))
                 {
                   // The solution value at the quadrature point
                   Number val = libMesh::zero;

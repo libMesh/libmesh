@@ -104,7 +104,7 @@ set_var_nums (const std::set<unsigned int> * const var_nums)
     _var_nums = *var_nums;
 
   else
-    for (auto i : IntRange<unsigned int>(0, _system.n_vars()))
+    for (auto i : make_range(_system.n_vars()))
       _var_nums.insert(i);
 }
 
@@ -127,7 +127,7 @@ init (const SubdomainSelection & subdomain_selection)
           {
             dof_map.dof_indices (elem, dof_indices, var_num);
             for (const auto & dof : dof_indices)
-              for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
+              for (auto proc : make_range(this->n_processors()))
                 if ((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
                   dof_ids_per_processor[proc].push_back(dof);
           }
@@ -135,10 +135,10 @@ init (const SubdomainSelection & subdomain_selection)
 
   /* Distribute information among processors.  */
   std::vector<Parallel::Request> request_per_processor(this->n_processors());
-  for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
+  for (auto proc : make_range(this->n_processors()))
     if (proc!=this->processor_id())
       this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
-  for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
+  for (auto proc : make_range(this->n_processors()))
     {
       std::vector<dof_id_type> received_dofs;
       if (proc==this->processor_id())
@@ -155,7 +155,7 @@ init (const SubdomainSelection & subdomain_selection)
   std::vector<unsigned int> (_dof_ids.begin(), new_end).swap (_dof_ids);
 
   /* Wait for sends to be complete.  */
-  for (auto proc : IntRange<processor_id_type>(0, this->n_processors()))
+  for (auto proc : make_range(this->n_processors()))
     {
       if (proc!=this->processor_id())
         {

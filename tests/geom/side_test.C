@@ -66,7 +66,7 @@ public:
 
   void testIsNodeOnSide()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
         for (auto n : elem.node_index_range())
@@ -94,7 +94,7 @@ public:
 
   void testNodesOnSide()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
         std::vector<unsigned int> side_nodes = elem.nodes_on_side(s);
@@ -118,7 +118,7 @@ public:
 
   void testSidePtr()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.side_ptr(s);
 
@@ -131,7 +131,7 @@ public:
   {
     std::unique_ptr<Elem> side;
 
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         elem.side_ptr(side, s);
 
@@ -142,7 +142,7 @@ public:
 
   void testBuildSidePtr()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
 
@@ -154,7 +154,7 @@ public:
   {
     std::unique_ptr<Elem> side;
 
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         elem.build_side_ptr(side, s);
         std::unique_ptr<Elem> side_new = elem.build_side_ptr(s);

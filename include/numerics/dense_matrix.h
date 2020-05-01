@@ -932,7 +932,7 @@ template<typename T>
 inline
 void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
 {
-  for (auto i : IntRange<unsigned int>(0, this->m()))
+  for (auto i : make_range(this->m()))
     (*this)(i, col) *= factor;
 }
 
@@ -959,8 +959,8 @@ DenseMatrix<T>::add (const T2 factor,
   libmesh_assert_equal_to (this->m(), mat.m());
   libmesh_assert_equal_to (this->n(), mat.n());
 
-  for (auto i : IntRange<unsigned int>(0, this->m()))
-    for (auto j : IntRange<unsigned int>(0, this->n()))
+  for (auto i : make_range(this->m()))
+    for (auto j : make_range(this->n()))
       (*this)(i,j) += factor * mat(i,j);
 }
 
@@ -1138,14 +1138,14 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 //   // move the known value into the RHS
 //   // and zero the column
-//   for (auto i : IntRange<unsigned int>(0, this->m()))
+//   for (auto i : make_range(this->m()))
 //     {
 //       rhs(i) -= ((*this)(i,jv))*val;
 //       (*this)(i,jv) = 0.;
 //     }
 
 //   // zero the row
-//   for (auto j : IntRange<unsigned int>(0, this->n()))
+//   for (auto j : make_range(this->n()))
 //     (*this)(iv,j) = 0.;
 
 //   (*this)(iv,jv) = 1.;

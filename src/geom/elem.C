@@ -549,7 +549,7 @@ unsigned int Elem::which_node_am_i(unsigned int side,
 bool Elem::contains_vertex_of(const Elem * e) const
 {
   // Our vertices are the first numbered nodes
-  for (auto n : IntRange<unsigned int>(0, e->n_vertices()))
+  for (auto n : make_range(e->n_vertices()))
     if (this->contains_point(e->point(n)))
       return true;
   return false;
@@ -562,7 +562,7 @@ bool Elem::contains_edge_of(const Elem * e) const
   unsigned int num_contained_edges = 0;
 
   // Our vertices are the first numbered nodes
-  for (auto n : IntRange<unsigned int>(0, e->n_vertices()))
+  for (auto n : make_range(e->n_vertices()))
     {
       if (this->contains_point(e->point(n)))
         {
@@ -1315,7 +1315,7 @@ void Elem::write_connectivity (std::ostream & out_stream,
         // This connectivity vector will be used repeatedly instead
         // of being reconstructed inside the loop.
         std::vector<dof_id_type> conn;
-        for (auto sc : IntRange<unsigned int>(0, this->n_sub_elem()))
+        for (auto sc : make_range(this->n_sub_elem()))
           {
             this->connectivity(sc, TECPLOT, conn);
 
@@ -2055,7 +2055,7 @@ Elem::bracketing_nodes(unsigned int child,
           // This only doesn't break horribly because we add children
           // and nodes in straightforward + hierarchical orders...
           for (unsigned int c=0; c <= child; ++c)
-            for (auto n : IntRange<unsigned int>(0, this->n_nodes_in_child(c)))
+            for (auto n : make_range(this->n_nodes_in_child(c)))
               {
                 if (c == child && n == child_node)
                   break;
@@ -2322,9 +2322,9 @@ std::string Elem::get_info () const
       ;
 
   oss << "   DoFs=";
-  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
-    for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
-      for (auto c : IntRange<unsigned int>(0, this->n_comp(s,v)))
+  for (auto s : make_range(this->n_systems()))
+    for (auto v : make_range(this->n_vars(s)))
+      for (auto c : make_range(this->n_comp(s,v)))
         oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
 
 

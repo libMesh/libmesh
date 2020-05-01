@@ -409,7 +409,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+          for (auto var : make_range(this->n_vars()))
             if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
@@ -435,7 +435,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
-      for (auto i : IntRange<dof_id_type>(0, dist_v->size()))
+      for (auto i : make_range(dist_v->size()))
         if (new_vector(i) != 0.0)
           dist_v->set(i, new_vector(i));
 
@@ -988,7 +988,7 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+          for (auto var : make_range(this->n_vars()))
             if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
@@ -1146,7 +1146,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
       FEMContext context( *this );
 
       const DofMap & dof_map = this->get_dof_map();
-      for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+      for (auto var : make_range(this->n_vars()))
         if (this->variable(var).type().family == SCALAR)
           {
             // FIXME: We reinit with an arbitrary element in case the user
@@ -1438,7 +1438,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
 
   // Loop over all the variables we've been requested to project
-  for (auto v : IntRange<std::size_t>(0, variables.size()))
+  for (auto v : make_range(variables.size()))
     {
       const unsigned int var = variables[v];
 
@@ -1767,7 +1767,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 // Some edge dofs are on nodes and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
+                for (auto i : make_range(n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 

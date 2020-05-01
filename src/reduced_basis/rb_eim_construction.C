@@ -292,7 +292,7 @@ void RBEIMConstruction::load_rb_solution()
                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
   RBEvaluation & rbe = get_rb_evaluation();
-  for (auto i : IntRange<unsigned int>(0, rbe.RB_solution.size()))
+  for (auto i : make_range(rbe.RB_solution.size()))
     get_explicit_system().solution->add(rbe.RB_solution(i),
                                         rbe.get_basis_function(i));
 
@@ -856,7 +856,7 @@ void RBEIMConstruction::set_explicit_sys_subvector(NumericVector<Number> & dest,
   localized_source->init(this->n_dofs(), false, SERIAL);
   source.localize(*localized_source);
 
-  for (auto i : IntRange<dof_id_type>(0, _dof_map_between_systems[var].size()))
+  for (auto i : make_range(_dof_map_between_systems[var].size()))
     {
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];
@@ -876,7 +876,7 @@ void RBEIMConstruction::get_explicit_sys_subvector(NumericVector<Number> & dest,
 {
   LOG_SCOPE("get_explicit_sys_subvector()", "RBEIMConstruction");
 
-  for (auto i : IntRange<dof_id_type>(0, _dof_map_between_systems[var].size()))
+  for (auto i : make_range(_dof_map_between_systems[var].size()))
     {
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];

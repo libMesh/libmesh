@@ -311,7 +311,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma)
 
   // Copy the singular values into sigma, ignore U_val and VT_val
   sigma.resize(cast_int<unsigned int>(sigma_val.size()));
-  for (auto i : IntRange<int>(0, sigma.size()))
+  for (auto i : make_range(sigma.size()))
     sigma(i) = sigma_val[i];
 }
 
@@ -375,7 +375,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma,
 
   // Copy the singular values into sigma.
   sigma.resize(cast_int<unsigned int>(sigma_val.size()));
-  for (auto i : IntRange<int>(0, sigma.size()))
+  for (auto i : make_range(sigma.size()))
     sigma(i) = sigma_val[i];
 }
 
@@ -495,7 +495,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   // numbers to LAPACKgesvd_, but _val may contain Reals so we copy to Number below to
   // handle both the real-valued and complex-valued cases.
   std::vector<Number> val_copy(_val.size());
-  for (auto i : IntRange<int>(0, _val.size()))
+  for (auto i : make_range(_val.size()))
     val_copy[i] = _val[i];
 
   std::vector<Real> RWORK(5 * min_MN);
@@ -588,7 +588,7 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // now.  x needs to be long enough to hold both the (Nx1) solution
   // vector or the (Mx1) rhs, so size it to the max of those.
   x.resize(max_MN);
-  for (auto i : IntRange<int>(0, rhs.size()))
+  for (auto i : make_range(rhs.size()))
     x(i) = rhs(i);
 
   // Make the syntax below simpler by grabbing a reference to this array.
@@ -714,8 +714,8 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   // the same.
   if (VL || VR)
     {
-      for (auto i : IntRange<int>(0, this->_m))
-        for (auto j : IntRange<int>(0, i))
+      for (auto i : make_range(this->_m))
+        for (auto j : make_range(i))
           std::swap((*this)(i,j), (*this)(j,i));
     }
 
@@ -871,15 +871,15 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   // transpose it in place before handing it back.
   if (VR)
     {
-      for (auto i : IntRange<int>(0, N))
-        for (auto j : IntRange<int>(0, i))
+      for (auto i : make_range(N))
+        for (auto j : make_range(i))
           std::swap((*VR)(i,j), (*VR)(j,i));
     }
 
   if (VL)
     {
-      for (auto i : IntRange<int>(0, N))
-        for (auto j : IntRange<int>(0, i))
+      for (auto i : make_range(N))
+        for (auto j : make_range(i))
           std::swap((*VL)(i,j), (*VL)(j,i));
     }
 }
