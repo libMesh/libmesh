@@ -32,6 +32,47 @@ bool is_between(Real min, Real check, Real max)
   return min <= check && check <= max;
 }
 
+BoundingBox::BoundingBox (const Point & new_min,
+                          const Point & new_max)
+{
+  Real xmin = std::min(new_min(0), new_max(0));
+  Real xmax = std::max(new_min(0), new_max(0));
+  this->first(0) = xmin;
+  this->second(0) = xmax;
+#if LIBMESH_DIM > 1
+  Real ymin = std::min(new_min(1), new_max(1));
+  Real ymax = std::max(new_min(1), new_max(1));
+  this->first(1) = ymin;
+  this->second(1) = ymax;
+#endif
+#if LIBMESH_DIM > 2
+  Real zmin = std::min(new_min(2), new_max(2));
+  Real zmax = std::max(new_min(2), new_max(2));
+  this->first(2) = zmin;
+  this->second(2) = zmax;
+#endif
+}
+
+BoundingBox::BoundingBox (const std::pair<Point, Point> & bbox)
+{
+  Real xmin = std::min(bbox.first(0), bbox.second(0));
+  Real xmax = std::max(bbox.first(0), bbox.second(0));
+  this->first(0) = xmin;
+  this->second(0) = xmax;
+#if LIBMESH_DIM > 1
+  Real ymin = std::min(bbox.first(1), bbox.second(1));
+  Real ymax = std::max(bbox.first(1), bbox.second(1));
+  this->first(1) = ymin;
+  this->second(1) = ymax;
+#endif
+#if LIBMESH_DIM > 2
+  Real zmin = std::min(bbox.first(2), bbox.second(2));
+  Real zmax = std::max(bbox.first(2), bbox.second(2));
+  this->first(2) = zmin;
+  this->second(2) = zmax;
+#endif
+}
+
 bool BoundingBox::intersects (const BoundingBox & other_box) const
 {
   // Make local variables first to make things more clear in a moment

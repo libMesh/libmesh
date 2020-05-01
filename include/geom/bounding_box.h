@@ -42,13 +42,9 @@ class BoundingBox : public std::pair<Point, Point>
 public:
 
   BoundingBox (const Point & new_min,
-               const Point & new_max) :
-    std::pair<Point, Point>(new_min, new_max)
-  {}
+               const Point & new_max);
 
-  BoundingBox (const std::pair<Point, Point> & bbox) :
-    std::pair<Point, Point> (bbox)
-  {}
+  BoundingBox (const std::pair<Point, Point> & bbox);
 
   /**
    * Default constructor sets invalid bounds.
