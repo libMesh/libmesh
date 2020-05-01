@@ -45,7 +45,7 @@ ExactSolution::ExactSolution(const EquationSystems & es) :
 {
   // Initialize the _errors data structure which holds all
   // the eventual values of the error.
-  for (auto sys : IntRange<unsigned int>(0, _equation_systems.n_systems()))
+  for (auto sys : make_range(_equation_systems.n_systems()))
     {
       // Reference to the system
       const System & system = _equation_systems.get_system(sys);
@@ -56,7 +56,7 @@ ExactSolution::ExactSolution(const EquationSystems & es) :
       // The SystemErrorMap to be inserted
       ExactSolution::SystemErrorMap sem;
 
-      for (auto var : IntRange<unsigned int>(0, system.n_vars()))
+      for (auto var : make_range(system.n_vars()))
         {
           // The name of this variable
           const std::string & var_name = system.variable_name(var);
@@ -98,7 +98,7 @@ void ExactSolution::attach_exact_value (ValueFunctionPointer fptr)
   // entry for each system.
   _exact_values.clear();
 
-  for (auto sys : IntRange<unsigned int>(0, _equation_systems.n_systems()))
+  for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
       _exact_values.emplace_back(libmesh_make_unique<WrappedFunction<Number>>(system, fptr, &_equation_systems.parameters));
@@ -139,7 +139,7 @@ void ExactSolution::attach_exact_deriv (GradientFunctionPointer gptr)
   // entry for each system.
   _exact_derivs.clear();
 
-  for (auto sys : IntRange<unsigned int>(0, _equation_systems.n_systems()))
+  for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
       _exact_derivs.emplace_back(libmesh_make_unique<WrappedFunction<Gradient>>(system, gptr, &_equation_systems.parameters));
@@ -180,7 +180,7 @@ void ExactSolution::attach_exact_hessian (HessianFunctionPointer hptr)
   // entry for each system.
   _exact_hessians.clear();
 
-  for (auto sys : IntRange<unsigned int>(0, _equation_systems.n_systems()))
+  for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
       _exact_hessians.emplace_back(libmesh_make_unique<WrappedFunction<Tensor>>(system, hptr, &_equation_systems.parameters));

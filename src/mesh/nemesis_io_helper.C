@@ -271,12 +271,12 @@ void Nemesis_IO_Helper::get_elem_map()
   if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] elem_mapi[i] = ";
-      for (auto i : IntRange<int>(0, num_internal_elems-1))
+      for (auto i : make_range(num_internal_elems-1))
         libMesh::out << elem_mapi[i] << ", ";
       libMesh::out << "... " << elem_mapi.back() << std::endl;
 
       libMesh::out << "[" << this->processor_id() << "] elem_mapb[i] = ";
-      for (auto i : IntRange<int>(0, std::min(10, num_border_elems-1)))
+      for (auto i : make_range(std::min(10, num_border_elems-1)))
         libMesh::out << elem_mapb[i] << ", ";
       libMesh::out << "... " << elem_mapb.back() << std::endl;
     }
@@ -1794,7 +1794,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
           // the same block...
           libmesh_assert_equal_to (elem.n_nodes(), Elem::build(conv.libmesh_elem_type(), nullptr)->n_nodes());
 
-          for (auto j : IntRange<int>(0, this->num_nodes_per_elem))
+          for (auto j : make_range(this->num_nodes_per_elem))
             {
               const unsigned int connect_index   = (i*this->num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_node_map(j);
@@ -2234,7 +2234,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
   z.resize(local_num_nodes);
 
   // Just loop over our list outputting the nodes the way we built the map
-  for (auto i : IntRange<int>(0, local_num_nodes))
+  for (auto i : make_range(local_num_nodes))
     {
       const Point & pt = mesh.point(this->exodus_node_num_to_libmesh[i]);
       x[i]=pt(0);
@@ -2295,7 +2295,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
 
       // Loop over all blocks, even if we don't have elements in each block.
       // If we don't have elements we need to write out a 0 for that block...
-      for (auto i : IntRange<int>(0, this->num_elem_blks_global))
+      for (auto i : make_range(this->num_elem_blks_global))
         {
           // Even if there are no elements for this block on the current
           // processor, we still want to write its name to file, if

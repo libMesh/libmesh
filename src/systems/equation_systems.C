@@ -498,7 +498,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
         if (!use_current_system || pos->second->hide_output())
           continue;
 
-        for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+        for (auto vn : make_range(pos->second->n_vars()))
           {
             if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
@@ -533,7 +533,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
       if (!use_current_system || pos->second->hide_output())
         continue;
 
-      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+      for (auto vn : make_range(pos->second->n_vars()))
         {
           const std::string & var_name = pos->second->variable_name(vn);
           const FEType & fe_type = pos->second->variable_type(vn);
@@ -626,7 +626,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         if (!use_current_system || pos->second->hide_output())
           continue;
 
-        for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+        for (auto vn : make_range(pos->second->n_vars()))
           {
             if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
@@ -697,7 +697,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
       //Could this be replaced by a/some convenience methods?[PB]
       unsigned int n_scalar_vars = 0;
       unsigned int n_vector_vars = 0;
-      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+      for (auto vn : make_range(pos->second->n_vars()))
         {
           if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
             n_vector_vars++;
@@ -851,7 +851,7 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
 
   for (; pos != end; ++pos)
     {
-      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+      for (auto vn : make_range(pos->second->n_vars()))
         {
           const std::string & var_name = pos->second->variable_name(vn);
 
@@ -1071,7 +1071,7 @@ EquationSystems::build_discontinuous_solution_vector
 
       // Loop over all variables in this System and check whether we
       // are supposed to use each one.
-      for (auto var_id : IntRange<unsigned int>(0, system->n_vars()))
+      for (auto var_id : make_range(system->n_vars()))
         {
           bool use_current_var = (var_names == nullptr);
           if (!use_current_var)

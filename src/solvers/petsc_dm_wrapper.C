@@ -744,7 +744,7 @@ namespace libMesh
     CHKERRABORT(system.comm().get(),ierr);
 
     // Set the actual names of all the field variables
-    for (auto v : IntRange<unsigned int>(0, system.n_vars()))
+    for (auto v : make_range(system.n_vars()))
       {
         ierr = PetscSectionSetFieldName( section, v, system.variable_name(v).c_str() );
         CHKERRABORT(system.comm().get(),ierr);
@@ -958,7 +958,7 @@ namespace libMesh
             // Loop through all the variables and cache the scalar ones. We cache the
             // SCALAR variable index along with the local point to make it easier when
             // we have to register dofs with the PetscSection
-            for (auto v : IntRange<unsigned int>(0, system.n_vars()))
+            for (auto v : make_range(system.n_vars()))
               {
                 if( system.variable(v).type().family == SCALAR )
                   {
@@ -1049,7 +1049,7 @@ namespace libMesh
     unsigned int total_n_dofs_at_dofobject = 0;
 
     // We are assuming variables are also numbered 0 to n_vars()-1
-    for (auto v : IntRange<unsigned int>(0, system.n_vars()))
+    for (auto v : make_range(system.n_vars()))
       {
         unsigned int n_dofs_at_dofobject = dof_object.n_dofs(system.number(), v);
 

@@ -956,7 +956,7 @@ void NumericVector<Complex>::print_global(std::ostream & os) const
 
   os << "Size\tglobal =  " << this->size() << std::endl;
   os << "#\tReal part\t\tImaginary part" << std::endl;
-  for (auto i : IntRange<numeric_index_type>(0, v.size()))
+  for (auto i : make_range(v.size()))
     os << i << "\t"
        << v[i].real() << "\t\t"
        << v[i].imag() << std::endl;
@@ -978,7 +978,7 @@ void NumericVector<T>::print_global(std::ostream & os) const
 
   os << "Size\tglobal =  " << this->size() << std::endl;
   os << "#\tValue" << std::endl;
-  for (auto i : IntRange<numeric_index_type>(0, v.size()))
+  for (auto i : make_range(v.size()))
     os << i << "\t" << v[i] << std::endl;
 }
 

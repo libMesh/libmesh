@@ -534,7 +534,7 @@ public:
   {
     // We'll be queried for components but we'll typically be looking
     // up data by variables, and those indices don't always match
-    for (auto v : IntRange<unsigned int>(0, sys.n_vars()))
+    for (auto v : make_range(sys.n_vars()))
       {
         const unsigned int vcomp = sys.variable_scalar_number(v,0);
         if (vcomp >= component_to_var.size())
@@ -560,7 +560,7 @@ public:
     c.set_algebraic_type(FEMContext::DOFS_ONLY);
 
     // Loop over variables, to prerequest
-    for (auto var : IntRange<unsigned int>(0, sys.n_vars()))
+    for (auto var : make_range(sys.n_vars()))
       {
         FEAbstract * fe = nullptr;
         const std::set<unsigned char> & elem_dims =
@@ -2427,7 +2427,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
       unsigned short node_num = elem.n_vertices()+side_num;
       // In 3D only some sides may have nodes
       if (dim == 3)
-        for (auto n : IntRange<unsigned int>(0, elem.n_nodes()))
+        for (auto n : make_range(elem.n_nodes()))
           {
             if (!elem.is_face(n))
               continue;
@@ -2904,7 +2904,7 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::co
   DenseVector<typename FFunctor::ValuePushType> Uinvolved(n_involved_dofs);
   std::vector<char> dof_is_fixed(n_involved_dofs, false); // bools
 
-  for (auto i : IntRange<unsigned int>(0, n_involved_dofs))
+  for (auto i : make_range(n_involved_dofs))
     {
       const dof_id_type id = dof_indices_var[involved_dofs[i]];
       auto iter = ids_to_save.find(id);

@@ -333,11 +333,11 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
 
     // write the nodes
     out_stream << "nodes " << mesh.n_nodes() << "\n";
-    for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+    for (auto n : make_range(mesh.n_nodes()))
       out_stream << mesh.point(n)(0) << " ";
     out_stream << "\n";
 
-    for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+    for (auto n : make_range(mesh.n_nodes()))
 #if LIBMESH_DIM > 1
       out_stream << mesh.point(n)(1) << " ";
 #else
@@ -345,7 +345,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
 #endif
     out_stream << "\n";
 
-    for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+    for (auto n : make_range(mesh.n_nodes()))
 #if LIBMESH_DIM > 2
       out_stream << mesh.point(n)(2) << " ";
 #else
@@ -406,7 +406,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
             // it is a non-const function.
                      << " 0\n";
 
-          for (auto proc : IntRange<unsigned int>(0, mesh.n_partitions()))
+          for (auto proc : make_range(mesh.n_partitions()))
             out_stream << "proc_" << proc << "\n";
 
           // FIXME - don't we need to use an ElementDefinition here? - RHS
@@ -517,7 +517,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
           // this is the real part
           out_stream << "r_" << (*solution_names)[c] << " 1\n";
 
-          for (auto n : IntRange<dof_id_type>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << (*v)[n*n_vars + c].real() << " ";
 
           out_stream << "\n\n";
@@ -525,14 +525,14 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
           // this is the imaginary part
           out_stream << "i_" << (*solution_names)[c] << " 1\n";
 
-          for (auto n : IntRange<dof_id_type>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << (*v)[n*n_vars + c].imag() << " ";
 
           out_stream << "\n\n";
 
           // this is the magnitude
           out_stream << "a_" << (*solution_names)[c] << " 1\n";
-          for (auto n : IntRange<dof_id_type>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << std::abs((*v)[n*n_vars + c]) << " ";
 
           out_stream << "\n\n";
@@ -541,7 +541,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
 
           out_stream << (*solution_names)[c] << " 1\n";
 
-          for (auto n : IntRange<dof_id_type>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << (*v)[n*n_vars + c] << " ";
 
           out_stream << "\n\n";
@@ -622,12 +622,12 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 
     out_stream << "gmvinput ascii\n\n";
     out_stream << "nodes " << mesh.n_nodes() << '\n';
-    for (auto n : IntRange<dof_id_type>(0, mesh.n_nodes()))
+    for (auto n : make_range(mesh.n_nodes()))
       out_stream << mesh.point(n)(0) << " ";
 
     out_stream << '\n';
 
-    for (auto n : IntRange<dof_id_type>(0, mesh.n_nodes()))
+    for (auto n : make_range(mesh.n_nodes()))
 #if LIBMESH_DIM > 1
       out_stream << mesh.point(n)(1) << " ";
 #else
@@ -636,7 +636,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 
     out_stream << '\n';
 
-    for (auto n : IntRange<dof_id_type>(0, mesh.n_nodes()))
+    for (auto n : make_range(mesh.n_nodes()))
 #if LIBMESH_DIM > 2
       out_stream << mesh.point(n)(2) << " ";
 #else
@@ -671,7 +671,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           case 1:
             {
               if (this->subdivide_second_order())
-                for (auto se : IntRange<unsigned int>(0, elem->n_sub_elem()))
+                for (auto se : make_range(elem->n_sub_elem()))
                   {
                     out_stream << "line 2\n";
                     elem->connectivity(se, TECPLOT, conn);
@@ -704,7 +704,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           case 2:
             {
               if (this->subdivide_second_order())
-                for (auto se : IntRange<unsigned int>(0, elem->n_sub_elem()))
+                for (auto se : make_range(elem->n_sub_elem()))
                   {
                     // Quad elements
                     if ((elem->type() == QUAD4) ||
@@ -792,7 +792,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           case 3:
             {
               if (this->subdivide_second_order())
-                for (auto se : IntRange<unsigned int>(0, elem->n_sub_elem()))
+                for (auto se : make_range(elem->n_sub_elem()))
                   {
 
 #ifndef  LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1038,7 +1038,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                      << sbdid_map.size()
                      << " 0\n";
 
-          for (auto sbdid : IntRange<std::size_t>(0, sbdid_map.size()))
+          for (auto sbdid : make_range(sbdid_map.size()))
             out_stream << "proc_" << sbdid << "\n";
 
           for (const auto & elem : mesh.active_element_ptr_range())
@@ -1061,7 +1061,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                      << mesh.n_partitions()
                      << " 0"<< '\n';
 
-          for (auto proc : IntRange<unsigned int>(0, mesh.n_partitions()))
+          for (auto proc : make_range(mesh.n_partitions()))
             out_stream << "proc_" << proc << '\n';
 
           for (const auto & elem : mesh.active_element_ptr_range())
@@ -1175,7 +1175,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           // this is the real part
           out_stream << "r_" << (*solution_names)[c] << " 1\n";
 
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << (*v)[n*n_vars + c].real() << " ";
 
           out_stream << '\n' << '\n';
@@ -1184,14 +1184,14 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           // this is the imaginary part
           out_stream << "i_" << (*solution_names)[c] << " 1\n";
 
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << (*v)[n*n_vars + c].imag() << " ";
 
           out_stream << '\n' << '\n';
 
           // this is the magnitude
           out_stream << "a_" << (*solution_names)[c] << " 1\n";
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << std::abs((*v)[n*n_vars + c]) << " ";
 
           out_stream << '\n' << '\n';
@@ -1200,7 +1200,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 
           out_stream << (*solution_names)[c] << " 1\n";
 
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             out_stream << (*v)[n*n_vars + c] << " ";
 
           out_stream << '\n' << '\n';
@@ -1272,12 +1272,12 @@ void GMVIO::write_binary (const std::string & fname,
 
     // write the x coordinate
     std::vector<float> temp(mesh.n_nodes());
-    for (auto v : IntRange<unsigned int>(0, mesh.n_nodes()))
+    for (auto v : make_range(mesh.n_nodes()))
       temp[v] = static_cast<float>(mesh.point(v)(0));
     out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
     // write the y coordinate
-    for (auto v : IntRange<unsigned int>(0, mesh.n_nodes()))
+    for (auto v : make_range(mesh.n_nodes()))
       {
 #if LIBMESH_DIM > 1
         temp[v] = static_cast<float>(mesh.point(v)(1));
@@ -1288,7 +1288,7 @@ void GMVIO::write_binary (const std::string & fname,
     out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
     // write the z coordinate
-    for (auto v : IntRange<unsigned int>(0, mesh.n_nodes()))
+    for (auto v : make_range(mesh.n_nodes()))
       {
 #if LIBMESH_DIM > 2
         temp[v] = static_cast<float>(mesh.point(v)(2));
@@ -1370,7 +1370,7 @@ void GMVIO::write_binary (const std::string & fname,
           tmpint = 0; // IDs are cell based
           out_stream.write(reinterpret_cast<char *>(&tmpint), sizeof(unsigned int));
 
-          for (auto proc : IntRange<unsigned int>(0, mesh.n_processors()))
+          for (auto proc : make_range(mesh.n_processors()))
             {
               // We have to write exactly 8 bytes.  This means that
               // the processor id can be up to 3 characters long, and
@@ -1476,7 +1476,7 @@ void GMVIO::write_binary (const std::string & fname,
           unsigned int tempint = 1; // always do nodal data
           out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             temp[n] = static_cast<float>( (*vec)[n*n_vars + c].real() );
 
           out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
@@ -1491,7 +1491,7 @@ void GMVIO::write_binary (const std::string & fname,
 
           out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             temp[n] = static_cast<float>( (*vec)[n*n_vars + c].imag() );
 
           out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
@@ -1504,7 +1504,7 @@ void GMVIO::write_binary (const std::string & fname,
 
           out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             temp[n] = static_cast<float>(std::abs((*vec)[n*n_vars + c]));
 
           out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
@@ -1517,7 +1517,7 @@ void GMVIO::write_binary (const std::string & fname,
           unsigned int tempint = 1; // always do nodal data
           out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
-          for (auto n : IntRange<unsigned int>(0, mesh.n_nodes()))
+          for (auto n : make_range(mesh.n_nodes()))
             temp[n] = static_cast<float>((*vec)[n*n_vars + c]);
 
           out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
@@ -1772,7 +1772,7 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
                      << mesh.n_processors()
                      << " 0"<< std::endl;
 
-          for (auto proc : IntRange<unsigned int>(0, mesh.n_processors()))
+          for (auto proc : make_range(mesh.n_processors()))
             out_stream << "proc_" << proc << std::endl;
 
           for (const auto & elem : mesh.active_element_ptr_range())
@@ -2180,7 +2180,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
 
   // For each entry in the nodal data map, try to find a system
   // that has the same variable key name.
-  for (auto sys : IntRange<unsigned int>(0, es.n_systems()))
+  for (auto sys : make_range(es.n_systems()))
     {
       // Get a generic reference to the current System
       System & system = es.get_system(sys);

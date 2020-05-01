@@ -203,7 +203,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
               if (cached_nodes.size() != elem->n_nodes())
                 cached_nodes_still_fit = false;
               else
-                for (auto n : IntRange<unsigned int>(1, elem->n_nodes()))
+                for (auto n : make_range(1u, elem->n_nodes()))
                   {
                     if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals
                         ((cached_nodes[n] - cached_nodes[0]), 1e-13))

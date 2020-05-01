@@ -360,8 +360,7 @@ void DynaIO::read_mesh(std::istream & in)
               block_global_nodes.resize(block_n_elem[n_elem_blocks_read]);
               block_constraint_rows.resize(block_n_elem[n_elem_blocks_read]);
 
-              for (auto e : IntRange<dyna_int_type>
-                   (0, block_n_elem[n_elem_blocks_read]))
+              for (auto e : make_range(block_n_elem[n_elem_blocks_read]))
                 {
                   block_global_nodes[e].resize(block_n_nodes[n_elem_blocks_read]);
                   block_constraint_rows[e].resize(block_n_coef_vec[n_elem_blocks_read]);
@@ -544,12 +543,12 @@ void DynaIO::read_mesh(std::istream & in)
   // calculated from multiple neighboring elements.
   std::map<std::vector<std::pair<dof_id_type, Real>>, Node *> local_nodes;
 
-  for (auto block_num : IntRange<dyna_int_type>(0, n_elem_blocks))
+  for (auto block_num : make_range(n_elem_blocks))
     {
       elem_constraint_mat[block_num].resize(block_n_elem[block_num]);
 
       for (auto elem_num :
-           IntRange<dyna_int_type>(0, block_n_elem[block_num]))
+           make_range(block_n_elem[block_num]))
         {
           // Consult the import element table to determine which element to build
           auto eletypes_it =
@@ -576,11 +575,11 @@ void DynaIO::read_mesh(std::istream & in)
 
           my_constraint_mat.resize(block_n_coef_vec[block_num]);
           for (auto spline_node_index :
-               IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+               make_range(block_n_coef_vec[block_num]))
             my_constraint_mat[spline_node_index].resize(elem->n_nodes());
 
           for (auto spline_node_index :
-               IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+               make_range(block_n_coef_vec[block_num]))
             {
               // Find which coef block this elem's vectors are from
               const dyna_int_type elem_coef_vec_index =
@@ -609,13 +608,13 @@ void DynaIO::read_mesh(std::istream & in)
                                   elem->n_nodes() << " nodes");
 
               for (auto elem_node_index :
-                   IntRange<dyna_int_type>(0, elem->n_nodes()))
+                   make_range(elem->n_nodes()))
                 my_constraint_mat[spline_node_index][elem_node_index] =
                   dense_constraint_vecs[0][elem_coef_vec_index][elem_node_index];
             }
 
           for (auto elem_node_index :
-               IntRange<dyna_int_type>(0, elem->n_nodes()))
+               make_range(elem->n_nodes()))
             {
               dof_id_type global_node_idx = DofObject::invalid_id;
 
@@ -625,7 +624,7 @@ void DynaIO::read_mesh(std::istream & in)
               std::vector<std::pair<dof_id_type, Real>> key;
 
               for (auto spline_node_index :
-                   IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+                   make_range(block_n_coef_vec[block_num]))
                 {
                   const dyna_int_type elem_coef_vec_index =
                     my_constraint_rows[spline_node_index];
@@ -657,7 +656,7 @@ void DynaIO::read_mesh(std::istream & in)
                   std::vector<std::pair<dof_id_type, Real>> constraint_row;
 
                   for (auto spline_node_index :
-                       IntRange<dyna_int_type>(0, block_n_coef_vec[block_num]))
+                       make_range(block_n_coef_vec[block_num]))
                     {
                       const dof_id_type my_node_idx =
                         my_global_nodes[spline_node_index];

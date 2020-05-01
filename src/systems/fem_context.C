@@ -82,7 +82,7 @@ FEType FEMContext::find_hardest_fe_type()
   const System & sys = this->get_system();
   FEType hardest_fe_type = sys.variable_type(0);
 
-  for (auto i : IntRange<unsigned int>(0, sys.n_vars()))
+  for (auto i : make_range(sys.n_vars()))
     {
       FEType fe_type = sys.variable_type(i);
 
@@ -1719,7 +1719,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;
-    for (auto i : IntRange<unsigned int>(0, sys.n_vars()))
+    for (auto i : make_range(sys.n_vars()))
       {
         if (algebraic_type() == CURRENT ||
             algebraic_type() == DOFS_ONLY)
@@ -1834,7 +1834,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
 
           // Initialize the per-variable data for elem.
           unsigned int sub_dofs = 0;
-          for (auto i : IntRange<unsigned int>(0, sys.n_vars()))
+          for (auto i : make_range(sys.n_vars()))
             {
               const unsigned int n_dofs_var = cast_int<unsigned int>
                 (this->get_dof_indices(i).size());

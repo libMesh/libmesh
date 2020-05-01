@@ -1607,7 +1607,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
         // If the DOF is constrained
         if (this->is_constrained_dof(elem_dofs[i]))
           {
-            for (auto j : IntRange<unsigned int>(0, matrix.n()))
+            for (auto j : make_range(matrix.n()))
               matrix(i,j) = 0.;
 
             matrix(i,i) = 1.;
@@ -1678,7 +1678,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
            i != n_elem_dofs; i++)
         if (this->is_constrained_dof(elem_dofs[i]))
           {
-            for (auto j : IntRange<unsigned int>(0, matrix.n()))
+            for (auto j : make_range(matrix.n()))
               matrix(i,j) = 0.;
 
             // If the DOF is constrained
@@ -1781,7 +1781,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
 
           if (this->is_constrained_dof(dof_id))
             {
-              for (auto j : IntRange<unsigned int>(0, matrix.n()))
+              for (auto j : make_range(matrix.n()))
                 matrix(i,j) = 0.;
 
               // If the DOF is constrained
@@ -1961,7 +1961,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
            i != n_row_dofs; i++)
         if (this->is_constrained_dof(row_dofs[i]))
           {
-            for (auto j : IntRange<unsigned int>(0, matrix.n()))
+            for (auto j : make_range(matrix.n()))
               {
                 if (row_dofs[i] != col_dofs[j])
                   matrix(i,j) = 0.;
@@ -2416,7 +2416,7 @@ DofMap::max_constraint_error (const System & system,
       libmesh_assert_equal_to (C.m(), raw_dof_indices.size());
       libmesh_assert_equal_to (C.n(), local_dof_indices.size());
 
-      for (auto i : IntRange<unsigned int>(0, C.m()))
+      for (auto i : make_range(C.m()))
         {
           // Recalculate any constrained dof owned by this processor
           dof_id_type global_dof = raw_dof_indices[i];
@@ -2437,7 +2437,7 @@ DofMap::max_constraint_error (const System & system,
               if (rhsit != _primal_constraint_values.end())
                 exact_value = rhsit->second;
 
-              for (auto j : IntRange<unsigned int>(0, C.n()))
+              for (auto j : make_range(C.n()))
                 {
                   if (local_dof_indices[j] != global_dof)
                     exact_value += C(i,j) *

@@ -105,7 +105,7 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem & sys)
   DofMap & dofmap = dlm->sys->get_dof_map();
   dlm->varids->clear();
   dlm->varnames->clear();
-  for (auto v : IntRange<unsigned int>(0, dofmap.n_variables())) {
+  for (auto v : make_range(dofmap.n_variables())) {
     std::string vname = dofmap.variable(v).name();
     dlm->varids->insert(std::pair<std::string,unsigned int>(vname,v));
     dlm->varnames->insert(std::pair<unsigned int,std::string>(v,vname));

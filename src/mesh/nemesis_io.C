@@ -424,7 +424,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   std::vector<unsigned int>
     all_num_nodes_i_must_number (this->n_processors());
 
-  for (auto pid : IntRange<unsigned int>(0, this->n_processors()))
+  for (auto pid : make_range(this->n_processors()))
     all_num_nodes_i_must_number[pid] = all_loadbal_data[8*pid + 7];
 
   // The sum of all the entries in this vector should sum to the number of global nodes
@@ -433,7 +433,7 @@ void Nemesis_IO::read (const std::string & base_filename)
                                   0) == nemhelper->num_nodes_global);
 
   unsigned int my_next_node = 0;
-  for (auto pid : IntRange<unsigned int>(0, this->processor_id()))
+  for (auto pid : make_range(this->processor_id()))
     my_next_node += all_num_nodes_i_must_number[pid];
 
   const unsigned int my_node_offset = my_next_node;
@@ -767,7 +767,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // Compute my_elem_offset, the amount by which to offset the local elem numbering
   // on my processor.
   unsigned int my_next_elem = 0;
-  for (auto pid : IntRange<unsigned int>(0, this->processor_id()))
+  for (auto pid : make_range(this->processor_id()))
     my_next_elem += (all_loadbal_data[8*pid + 3]+  // num_internal_elems, proc pid
                      all_loadbal_data[8*pid + 4]); // num_border_elems, proc pid
   const unsigned int my_elem_offset = my_next_elem;

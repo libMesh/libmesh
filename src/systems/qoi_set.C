@@ -35,7 +35,7 @@ QoISet::QoISet(const System & sys) : _indices(sys.n_qois(), true) {}
 std::size_t QoISet::size (const System & sys) const
 {
   std::size_t qoi_count = 0;
-  for (auto i : IntRange<unsigned int>(0, sys.n_qois()))
+  for (auto i : make_range(sys.n_qois()))
     if (this->has_index(i))
       qoi_count++;
   return qoi_count;

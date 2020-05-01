@@ -700,14 +700,14 @@ void DofObject::invalidate_dofs (const unsigned int sys_num)
   // If the user does not specify the system number...
   if (sys_num >= n_sys)
     {
-      for (auto s : IntRange<unsigned int>(0, n_sys))
-        for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(s)))
+      for (auto s : make_range(n_sys))
+        for (auto vg : make_range(this->n_var_groups(s)))
           if (this->n_comp_group(s,vg))
             this->set_vg_dof_base(s,vg,invalid_id);
     }
   // ...otherwise invalidate the dofs for all systems
   else
-    for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(sys_num)))
+    for (auto vg : make_range(this->n_var_groups(sys_num)))
       if (this->n_comp_group(sys_num,vg))
         this->set_vg_dof_base(sys_num,vg,invalid_id);
 }
@@ -758,7 +758,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 
   // Count all variables
   if (var == libMesh::invalid_uint)
-    for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
+    for (auto v : make_range(this->n_vars(s)))
       num += this->n_comp(s,v);
 
   // Only count specified variable
@@ -1160,7 +1160,7 @@ bool DofObject::has_dofs (const unsigned int sys) const
 {
   if (sys == libMesh::invalid_uint)
     {
-      for (auto s : IntRange<unsigned int>(0, this->n_systems()))
+      for (auto s : make_range(this->n_systems()))
         if (this->n_vars(s))
           return true;
     }

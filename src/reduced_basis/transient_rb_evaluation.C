@@ -93,7 +93,7 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
 
   // Initialize the initial condition storage
   RB_initial_condition_all_N.resize(Nmax);
-  for (auto i : IntRange<unsigned int>(0, RB_initial_condition_all_N.size()))
+  for (auto i : make_range(RB_initial_condition_all_N.size()))
     {
       // The i^th row holds a vector of lenght i+1
       RB_initial_condition_all_N[i].resize(i+1);
