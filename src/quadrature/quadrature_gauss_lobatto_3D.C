@@ -20,6 +20,7 @@
 // Local includes
 #include "libmesh/quadrature_gauss_lobatto.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/quadrature_gauss.h"
 
 namespace libMesh
 {
@@ -40,12 +41,21 @@ void QGaussLobatto::init_3D(const ElemType, unsigned int)
         return;
       }
 
-      // We *could* fall back to a Gauss type rule for other types
-      // elements, but the assumption here is that the user has asked
-      // for a Gauss-Lobatto rule, i.e. a rule with integration points
-      // on the element boundary, for a reason.
+      // We fall back on a Gauss type rule for other types of elements,
+      // but we warn the user (once) that we are doing this instead of
+      // silently switching out quadrature rules on them.
     default:
-      libmesh_error_msg("ERROR: Unsupported type: " << Utility::enum_to_string(_type));
+      {
+        libmesh_warning("Warning: QGaussLobatto falling back on QGauss rule "
+                        "for unsupported Elem type: " << Utility::enum_to_string(_type));
+
+        QGauss gauss_rule(_dim, _order);
+        gauss_rule.init(_type, _p_level);
+
+        // Swap points and weights with the about-to-be destroyed rule.
+        _points.swap (gauss_rule.get_points() );
+        _weights.swap(gauss_rule.get_weights());
+      }
     }
 }
 
