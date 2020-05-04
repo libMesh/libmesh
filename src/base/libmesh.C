@@ -330,12 +330,8 @@ void libmesh_terminate_handler()
 
 
 
-#ifndef LIBMESH_HAVE_MPI
-LibMeshInit::LibMeshInit (int argc, const char * const * argv)
-#else
 LibMeshInit::LibMeshInit (int argc, const char * const * argv,
-                          MPI_Comm COMM_WORLD_IN)
-#endif
+                          TIMPI::communicator COMM_WORLD_IN, int n_threads)
 {
   // should _not_ be initialized already.
   libmesh_assert (!libMesh::initialized());
@@ -355,15 +351,15 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     // multithreading competition.  If you would like to use MPI and multithreading
     // at the same time then (n_mpi_processes_per_node)x(n_threads) should be the
     //  number of processing cores per node.
-    std::vector<std::string> n_threads(2);
-    n_threads[0] = "--n_threads";
-    n_threads[1] = "--n-threads";
+    std::vector<std::string> n_threads_opt(2);
+    n_threads_opt[0] = "--n_threads";
+    n_threads_opt[1] = "--n-threads";
     libMesh::libMeshPrivateData::_n_threads =
-      libMesh::command_line_value (n_threads, -1);
+      libMesh::command_line_value(n_threads_opt, n_threads);
 
     if (libMesh::libMeshPrivateData::_n_threads == -1)
       {
-        for (auto & option : n_threads)
+        for (auto & option : n_threads_opt)
           if (command_line->search(option))
             libmesh_error_msg("Detected option " << option <<
                               " with no value.  Did you forget '='?");
@@ -479,6 +475,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   libmesh_parallel_only(this->comm());
 
 #else
+  libmesh_ignore(COMM_WORLD_IN);
   this->_comm = new Parallel::Communicator(); // So comm() doesn't dereference null
 #endif
 
