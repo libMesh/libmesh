@@ -38,9 +38,13 @@ libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
-# TIMPI is required
+# TIMPI is required - so we should be able to see our TIMPI submodule.
+# If our version of TIMPI doesn't have AM MAINTAINER MODE set, then we
+# need its autoconf submodule initialized too.
 # --------------------------------------------------------------
-AS_IF([test -r $top_srcdir/contrib/timpi/README && test -r $top_srcdir/contrib/timpi/m4/autoconf-submodule/acsm_mpi.m4],
+AS_IF([test -r $top_srcdir/contrib/timpi/README &&
+       (test -r $top_srcdir/contrib/timpi/m4/autoconf-submodule/acsm_mpi.m4 ||
+        grep "^AM""_MAINTAINER_MODE" $top_srcdir/contrib/timpi/configure.ac >/dev/null)],
 [
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
