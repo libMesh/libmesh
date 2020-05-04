@@ -2021,7 +2021,7 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
 
 
 std::vector<BoundaryInfo::BCTuple>
-BoundaryInfo::build_side_list() const
+BoundaryInfo::build_side_list(BCTupleSortBy sort_by) const
 {
   std::vector<BCTuple> bc_triples;
   bc_triples.reserve(_boundary_side_id.size());
@@ -2033,7 +2033,16 @@ BoundaryInfo::build_side_list() const
   // the _boundary_side_id multimap are in, and in particular might be
   // in different orders on different processors. To avoid this
   // inconsistency, we'll sort using the default operator< for tuples.
-  std::sort(bc_triples.begin(), bc_triples.end());
+  if (sort_by == ELEM_ID)
+    std::sort(bc_triples.begin(), bc_triples.end());
+  else if (sort_by == SIDE_ID)
+    std::sort(bc_triples.begin(), bc_triples.end(),
+              [](const BCTuple & left, const BCTuple & right)
+              {return std::get<1>(left) < std::get<1>(right);});
+  else if (sort_by == BOUNDARY_ID)
+    std::sort(bc_triples.begin(), bc_triples.end(),
+              [](const BCTuple & left, const BCTuple & right)
+              {return std::get<2>(left) < std::get<2>(right);});
 
   return bc_triples;
 }
