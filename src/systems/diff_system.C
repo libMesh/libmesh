@@ -353,6 +353,11 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
 void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics )
 {
   std::swap(this->_diff_physics, swap_physics);
+
+  // If the physics has been swapped, we will reassemble
+  // the matrix from scratch before doing an adjoint solve
+  // rather than just transposing
+  this->disable_cache();
 }
 
 
