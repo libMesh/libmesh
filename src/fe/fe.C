@@ -284,7 +284,11 @@ void FE<Dim,T>::reinit(const Elem * elem,
       else
         this->compute_shape_functions(elem,this->qrule->get_points());
       if (this->calculate_dual)
+      {
+        if (T != LAGRANGE)
+          libmesh_warning("dual calculations have only been verified for the LAGRANGE family");
         this->compute_dual_shape_functions();
+      }
     }
 }
 

@@ -746,32 +746,31 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
 
   const std::vector<Real> JxW = this->get_JxW();
 
-  for (unsigned int i = 0; i < sz; i++)
+  for (auto i : index_range(phi))
   {
-    for (unsigned int qp = 0; qp <phi[0].size(); qp++)
+    for (auto qp : index_range(phi[i]))
     {
       D(i,i) += JxW[qp]*phi[i][qp];
-      for (unsigned int j = 0; j < sz; j++)
+      for (auto j : index_range(phi))
       A(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
     }
   }
 
   // dual_coeff = A^-1*D
-  for (unsigned int j = 0; j < sz; j++)
+  for (auto j : index_range(phi))
   {
     DenseVector<Number> Dcol(sz), coeffcol(sz);
-    for (unsigned int i = 0; i < sz; i++)
+    for (auto i : index_range(phi))
     Dcol(i) = D(i, j);
     A.lu_solve(Dcol, coeffcol);
 
-    for (unsigned int row = 0; row < sz; row++)
+    for (auto row : index_range(phi))
     dual_coeff(row, j)=coeffcol(row);
   }
 
   // initialize dual basis
-  for (unsigned int qp = 0; qp < phi[0].size(); qp++)
-  for (unsigned int j = 0; j<sz; j++)
-  for (unsigned int i = 0; i<sz; i++)
+  for (auto j : index_range(phi))
+  for (auto qp : index_range(phi[j]))
   {
     if (calculate_phi)
     dual_phi[j][qp]=.0;
@@ -782,9 +781,9 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
   }
 
   // compute dual basis
-  for (unsigned int qp = 0; qp < phi[0].size(); qp++)
-  for (unsigned int j = 0; j<sz; j++)
-  for (unsigned int i = 0; i<sz; i++)
+  for (auto j : index_range(phi))
+  for (auto i : index_range(phi))
+  for (auto qp : index_range(phi[j]))
   {
     if (calculate_phi)
     dual_phi[j][qp]+=dual_coeff(i,j)*phi[i][qp];
