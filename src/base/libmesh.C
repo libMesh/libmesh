@@ -330,12 +330,8 @@ void libmesh_terminate_handler()
 
 
 
-#ifndef LIBMESH_HAVE_MPI
-LibMeshInit::LibMeshInit (int argc, const char * const * argv, int n_threads)
-#else
 LibMeshInit::LibMeshInit (int argc, const char * const * argv,
-                          MPI_Comm COMM_WORLD_IN, int n_threads)
-#endif
+                          TIMPI::communicator COMM_WORLD_IN, int n_threads)
 {
   // should _not_ be initialized already.
   libmesh_assert (!libMesh::initialized());
@@ -479,6 +475,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   libmesh_parallel_only(this->comm());
 
 #else
+  libmesh_ignore(COMM_WORLD_IN);
   this->_comm = new Parallel::Communicator(); // So comm() doesn't dereference null
 #endif
 
