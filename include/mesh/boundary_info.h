@@ -673,8 +673,8 @@ public:
    * potentially be in different orders on different procs.
    */
   typedef std::tuple<dof_id_type, boundary_id_type> NodeBCTuple;
-  enum NodeBCTupleSortBy : int {NODE_ID, BOUNDARY_ID, UNSORTED};
-  std::vector<NodeBCTuple> build_node_list(NodeBCTupleSortBy sort_by = NODE_ID) const;
+  enum class NodeBCTupleSortBy {NODE_ID, BOUNDARY_ID, UNSORTED};
+  std::vector<NodeBCTuple> build_node_list(NodeBCTupleSortBy sort_by = NodeBCTupleSortBy::NODE_ID) const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
@@ -716,8 +716,8 @@ public:
    * different processors when running in parallel.
    */
   typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> BCTuple;
-  enum BCTupleSortBy : int {ELEM_ID, SIDE_ID, BOUNDARY_ID, UNSORTED};
-  std::vector<BCTuple> build_side_list(BCTupleSortBy sort_by = ELEM_ID) const;
+  enum class BCTupleSortBy {ELEM_ID, SIDE_ID, BOUNDARY_ID, UNSORTED};
+  std::vector<BCTuple> build_side_list(BCTupleSortBy sort_by = BCTupleSortBy::ELEM_ID) const;
 
   /**
    * Creates a list of active element numbers, sides, and ids for those sides.
