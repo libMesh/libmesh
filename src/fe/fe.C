@@ -283,6 +283,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
         this->compute_shape_functions (elem,*pts);
       else
         this->compute_shape_functions(elem,this->qrule->get_points());
+      if (this->calculate_dual)
+        this->compute_dual_shape_functions();
     }
 }
 
@@ -321,6 +323,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
               break;
             }
           this->phi.resize     (n_approx_shape_functions);
+          if (this->dual_phi.size() == n_approx_shape_functions)
+            {
+              old_n_qp = n_approx_shape_functions ? this->dual_phi[0].size() : 0;
+              break;
+            }
+          this->dual_phi.resize     (n_approx_shape_functions);
         }
 
       if (this->calculate_dphi)
@@ -330,6 +338,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
               old_n_qp = n_approx_shape_functions ? this->dphi[0].size() : 0;
               break;
             }
+          if (this->dual_dphi.size() == n_approx_shape_functions)
+            {
+              old_n_qp = n_approx_shape_functions ? this->dual_dphi[0].size() : 0;
+              break;
+            }
+          this->dual_dphi.resize    (n_approx_shape_functions);
           this->dphi.resize    (n_approx_shape_functions);
           this->dphidx.resize  (n_approx_shape_functions);
           this->dphidy.resize  (n_approx_shape_functions);
@@ -369,6 +383,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
               old_n_qp = n_approx_shape_functions ? this->d2phi[0].size() : 0;
               break;
             }
+          if (this->dual_d2phi.size() == n_approx_shape_functions)
+            {
+              old_n_qp = n_approx_shape_functions ? this->dual_d2phi[0].size() : 0;
+              break;
+            }
+          this->dual_d2phi.resize     (n_approx_shape_functions);
           this->d2phi.resize     (n_approx_shape_functions);
           this->d2phidx2.resize  (n_approx_shape_functions);
           this->d2phidxdy.resize (n_approx_shape_functions);
@@ -400,10 +420,15 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
     for (unsigned int i=0; i<n_approx_shape_functions; i++)
       {
         if (this->calculate_phi)
+        {
           this->phi[i].resize         (n_qp);
+          this->dual_phi[i].resize    (n_qp);
+        }
+
         if (this->calculate_dphi)
           {
             this->dphi[i].resize        (n_qp);
+            this->dual_dphi[i].resize        (n_qp);
             this->dphidx[i].resize      (n_qp);
             this->dphidy[i].resize      (n_qp);
             this->dphidz[i].resize      (n_qp);
@@ -431,6 +456,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
         if (this->calculate_d2phi)
           {
             this->d2phi[i].resize     (n_qp);
+            this->dual_d2phi[i].resize     (n_qp);
             this->d2phidx2[i].resize  (n_qp);
             this->d2phidxdy[i].resize (n_qp);
             this->d2phidxdz[i].resize (n_qp);

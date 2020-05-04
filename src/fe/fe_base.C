@@ -730,6 +730,70 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
     this->_fe_trans->map_div(this->dim, elem, qp, (*this), this->div_phi);
 }
 
+template <>
+void FEGenericBase<Real>::compute_dual_shape_functions ()
+{
+  // Start logging the shape function computation
+  LOG_SCOPE("compute_dual_shape_functions()", "FE");
+
+  unsigned int sz=phi.size();
+  if(!sz)
+  libmesh_error_msg("ERROR:  dual basis should be computed after the primal basis");
+
+  //compute dual basis coefficient (dual_coeff)
+  dual_coeff.resize(sz, sz);
+  DenseMatrix<Real> A(sz, sz), D(sz, sz);
+
+  const std::vector<Real> JxW = this->get_JxW();
+
+  for (unsigned int i = 0; i < sz; i++)
+  {
+    for (unsigned int qp = 0; qp <phi[0].size(); qp++)
+    {
+      D(i,i) += JxW[qp]*phi[i][qp];
+      for (unsigned int j = 0; j < sz; j++)
+      A(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
+    }
+  }
+
+  // dual_coeff = A^-1*D
+  for (unsigned int j = 0; j < sz; j++)
+  {
+    DenseVector<Number> Dcol(sz), coeffcol(sz);
+    for (unsigned int i = 0; i < sz; i++)
+    Dcol(i) = D(i, j);
+    A.lu_solve(Dcol, coeffcol);
+
+    for (unsigned int row = 0; row < sz; row++)
+    dual_coeff(row, j)=coeffcol(row);
+  }
+
+  // initialize dual basis
+  for (unsigned int qp = 0; qp < phi[0].size(); qp++)
+  for (unsigned int j = 0; j<sz; j++)
+  for (unsigned int i = 0; i<sz; i++)
+  {
+    if (calculate_phi)
+    dual_phi[j][qp]=.0;
+    if (calculate_dphi)
+    dual_dphi[j][qp]=.0;
+    if (calculate_d2phi)
+    dual_d2phi[j][qp]=.0;
+  }
+
+  // compute dual basis
+  for (unsigned int qp = 0; qp < phi[0].size(); qp++)
+  for (unsigned int j = 0; j<sz; j++)
+  for (unsigned int i = 0; i<sz; i++)
+  {
+    if (calculate_phi)
+    dual_phi[j][qp]+=dual_coeff(i,j)*phi[i][qp];
+    if (calculate_dphi)
+    dual_dphi[j][qp]+=dual_coeff(i,j)*dphi[i][qp];
+    if (calculate_d2phi)
+    dual_d2phi[j][qp]+=dual_coeff(i,j)*d2phi[i][qp];
+  }
+}
 
 template <typename OutputType>
 void FEGenericBase<OutputType>::print_phi(std::ostream & os) const
@@ -737,6 +801,14 @@ void FEGenericBase<OutputType>::print_phi(std::ostream & os) const
   for (auto i : index_range(phi))
     for (auto j : index_range(phi[i]))
       os << " phi[" << i << "][" << j << "]=" << phi[i][j] << std::endl;
+}
+
+template <typename OutputType>
+void FEGenericBase<OutputType>::print_dual_phi(std::ostream & os) const
+{
+  for (auto i : index_range(dual_phi))
+    for (auto j : index_range(dual_phi[i]))
+      os << " dual_phi[" << i << "][" << j << "]=" << dual_phi[i][j] << std::endl;
 }
 
 
@@ -748,6 +820,14 @@ void FEGenericBase<OutputType>::print_dphi(std::ostream & os) const
   for (auto i : index_range(dphi))
     for (auto j : index_range(dphi[i]))
       os << " dphi[" << i << "][" << j << "]=" << dphi[i][j];
+}
+
+template <typename OutputType>
+void FEGenericBase<OutputType>::print_dual_dphi(std::ostream & os) const
+{
+  for (auto i : index_range(dphi))
+    for (auto j : index_range(dphi[i]))
+      os << " dual_dphi[" << i << "][" << j << "]=" << dual_dphi[i][j];
 }
 
 
@@ -834,6 +914,14 @@ void FEGenericBase<OutputType>::print_d2phi(std::ostream & os) const
   for (auto i : index_range(dphi))
     for (auto j : index_range(dphi[i]))
       os << " d2phi[" << i << "][" << j << "]=" << d2phi[i][j];
+}
+
+template <typename OutputType>
+void FEGenericBase<OutputType>::print_dual_d2phi(std::ostream & os) const
+{
+  for (auto i : index_range(dual_d2phi))
+    for (auto j : index_range(dual_d2phi[i]))
+      os << " dual_d2phi[" << i << "][" << j << "]=" << dual_d2phi[i][j];
 }
 
 #endif
