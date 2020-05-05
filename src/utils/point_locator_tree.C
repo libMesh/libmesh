@@ -188,8 +188,6 @@ void PointLocatorTree::init (Trees::BuildType build_type)
   this->_initialized = true;
 }
 
-
-
 const Elem * PointLocatorTree::operator() (const Point & p,
                                            const std::set<subdomain_id_type> * allowed_subdomains) const
 {
@@ -200,8 +198,15 @@ const Elem * PointLocatorTree::operator() (const Point & p,
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
   if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = nullptr;
 
+  if (this->_element != nullptr) {
+    if (_use_contains_point_tol && !(this->_element->contains_point(p, _contains_point_tol)))
+      this->_element = nullptr;
+    else if (!(this->_element->contains_point(p)))
+      this->_element = nullptr;
+  }
+
   // First check the element from last time before asking the tree
-  if (this->_element==nullptr || !(this->_element->contains_point(p)))
+  if (this->_element==nullptr)
     {
       // ask the tree
       if (_use_contains_point_tol)
