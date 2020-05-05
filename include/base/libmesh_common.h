@@ -103,10 +103,6 @@ void report_error(const char * file, int line, const char * date, const char * t
 #  undef COMPLEX
 #endif
 
-#ifdef MPI_REAL
-#  undef MPI_REAL
-#endif
-
 // Check to see if TOLERANCE has been defined by another
 // package, if so we might want to change the name...
 #ifdef TOLERANCE
@@ -126,30 +122,27 @@ typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 
 #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
 static const Real TOLERANCE = 2.5e-3;
-# define MPI_REAL MPI_FLOAT
 # if defined (LIBMESH_DEFAULT_TRIPLE_PRECISION) || \
      defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
 #  error Cannot define multiple precision levels
 # endif
 #endif
+
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
 static const Real TOLERANCE = 1.e-8;
-# define MPI_REAL MPI_LONG_DOUBLE
 # if defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
 #  error Cannot define multiple precision levels
 # endif
 #endif
+
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 static const Real TOLERANCE = 1.e-11;
-# ifdef LIBMESH_HAVE_MPI
-#  define MPI_REAL libMesh::Parallel::StandardType<Real>()
-# endif
 #endif
+
 #if !defined (LIBMESH_DEFAULT_SINGLE_PRECISION) && \
     !defined (LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
     !defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
 static const Real TOLERANCE = 1.e-6;
-# define MPI_REAL MPI_DOUBLE
 #endif
 
 // Define the type to use for complex numbers
