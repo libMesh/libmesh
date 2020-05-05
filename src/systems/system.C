@@ -1175,12 +1175,71 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
           libmesh_error_msg("ERROR: incompatible variable " << ovar << " has already been added for this system!");
         }
 
+  // Optimize for VariableGroups here - if the user is adding multiple
+  // variables of the same FEType and subdomain restriction, catch
+  // that here and add them as members of the same VariableGroup.
+  //
+  // start by setting this flag to whatever the user has requested
+  // and then consider the conditions which should negate it.
+  bool should_be_in_vg = this->identify_variable_groups();
+
+  // No variable groups, nothing to add to
+  if (!this->n_variable_groups())
+    should_be_in_vg = false;
+  else
+    {
+      VariableGroup & vg(_variable_groups.back());
+
+      // get a pointer to their subdomain restriction, if any.
+      const std::set<subdomain_id_type> * const
+        their_active_subdomains (vg.implicitly_active() ?
+                                 nullptr : &vg.active_subdomains());
+
+      // Different types?
+      if (vg.type() != type)
+        should_be_in_vg = false;
+
+      // they are restricted, we aren't?
+      if (their_active_subdomains &&
+          (!active_subdomains || (active_subdomains && active_subdomains->empty())))
+        should_be_in_vg = false;
+
+      // they aren't restricted, we are?
+      if (!their_active_subdomains && (active_subdomains && !active_subdomains->empty()))
+        should_be_in_vg = false;
+
+      if (their_active_subdomains && active_subdomains)
+        // restricted to different sets?
+        if (*their_active_subdomains != *active_subdomains)
+          should_be_in_vg = false;
+
+      // If after all that none of the conditions were violated,
+      // append the variables to the vg and we're done
+      if (should_be_in_vg)
+        {
+          unsigned short curr_n_vars = cast_int<unsigned short>
+            (this->n_vars());
+
+          for (auto ovar : vars)
+            {
+              curr_n_vars = cast_int<unsigned short> (this->n_vars());
+
+              vg.append (ovar);
+
+              _variables.push_back(vg(vg.n_variables()-1));
+              _variable_numbers[ovar] = curr_n_vars;
+            }
+          return curr_n_vars;
+        }
+    }
+
   const unsigned short curr_n_vars = cast_int<unsigned short>
     (this->n_vars());
 
   const unsigned int next_first_component = this->n_components();
 
-  // Add the variable group to the list
+  // We weren't able to add to an existing variable group, so
+  // add a new variable group to the list
   _variable_groups.push_back((active_subdomains == nullptr) ?
                              VariableGroup(this, vars, curr_n_vars,
                                            next_first_component, type) :
