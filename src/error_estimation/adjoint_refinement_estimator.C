@@ -111,8 +111,25 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // Solve the adjoint problem(s) on the coarse FE space
   // Only if the user didn't already solve it for us
+  // If _adjoint_evaluation_physics pointer is not null, swap
+  // the current physics with the one held by _adjoint_evaluation_physics
+  // before assembling the adjoint problem
   if (!system.is_adjoint_already_solved())
+  {
+    // Swap the physics if needed, note that the current physics pointer
+    // held by the system will be pointed to by _adjoint_evalation_physics after swapping
+    const bool swapping_physics = _adjoint_evaluation_physics;
+    if (swapping_physics)
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
+
+    // Solve the adjoint problem, remember physics swap also resets the cache, so
+    // we will assemble again, otherwise we just take the transpose
     system.adjoint_solve(_qoi_set);
+
+    // Swap back if needed, recall that _adjoint_evaluation_physics now holds the pointer to the pre-swap physics
+    if (swapping_physics)
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
+  }
 
   // Loop over all the adjoint problems and, if any have heterogenous
   // Dirichlet conditions, get the corresponding coarse lift
@@ -318,8 +335,18 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
   projected_residual.close();
 
+  const bool swapping_physics = _adjoint_evaluation_physics;
+  if (swapping_physics)
+    dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
+
   // Solve the adjoint problem(s) on the refined FE space
+  // The matrix will be reassembled again because we have refined the mesh
   system.adjoint_solve(_qoi_set);
+
+  // Swap back if needed, recall that _adjoint_evaluation_physics now holds the pointer
+  // to the pre-swap physics
+  if (swapping_physics)
+    dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
 
   // Now that we have the refined adjoint solution and the projected primal solution,
   // we first compute the global QoI error estimate

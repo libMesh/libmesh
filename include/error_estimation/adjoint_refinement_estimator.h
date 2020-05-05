@@ -133,6 +133,19 @@ public:
   void set_residual_evaluation_physics(DifferentiablePhysics* set_physics)
   { this->_residual_evaluation_physics = set_physics; }
 
+  /**
+   * \returns A pointer to the DifferentiablePhysics object or \p nullptr if
+   * no external Physics object is attached.
+   */
+  DifferentiablePhysics * get_adjoint_evaluation_physics()
+  { return this->_adjoint_evaluation_physics; }
+
+  /**
+   * Set the _adjoint_evaluation_physics member to argument
+   */
+  void set_adjoint_evaluation_physics(DifferentiablePhysics* set_physics)
+  { this->_adjoint_evaluation_physics = set_physics; }
+
 protected:
 
   /**
@@ -140,6 +153,12 @@ protected:
    * Defaults to nullptr for backwards compatibility.
    */
   DifferentiablePhysics * _residual_evaluation_physics;
+
+  /**
+   * Pointer to object to use for adjoint assembly.
+   * Defaults to nullptr for backwards compatibility.
+   */
+  DifferentiablePhysics * _adjoint_evaluation_physics;
 
   /* A vector to hold the computed global QoI error estimate */
   std::vector<Number> computed_global_QoI_errors;
