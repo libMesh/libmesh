@@ -75,6 +75,7 @@ AdjointRefinementEstimator::AdjointRefinementEstimator() :
   number_h_refinements(1),
   number_p_refinements(0),
   _residual_evaluation_physics(nullptr),
+  _adjoint_evaluation_physics(nullptr),
   _qoi_set(QoISet())
 {
   // We're not actually going to use error_norm; our norms are
@@ -276,7 +277,13 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Uniformly refine the mesh
   MeshRefinement mesh_refinement(mesh);
 
-  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  // We only need to worry about Galerkin orthogonality if we
+  // are estimating discretization error in a single model setting
+  {
+    const bool swapping_physics = _adjoint_evaluation_physics;
+    if(!swapping_physics)
+      libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  }
 
   // FIXME: this may break if there is more than one System
   // on this mesh but estimate_error was still called instead of
@@ -578,7 +585,13 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   system.project_solution_on_reinit() = false;
 
   // Uniformly coarsen the mesh, without projecting the solution
-  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  // Only need to do this if we are estimating discretization error
+  // with a single physics residual
+  {
+   const bool swapping_physics = _adjoint_evaluation_physics;
+    if(!swapping_physics)
+    libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  }
 
   for (unsigned int i = 0; i != number_h_refinements; ++i)
     {
