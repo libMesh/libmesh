@@ -670,11 +670,11 @@ public:
    * The "sort_by" parameter controls how the resulting list of tuples
    * is sorted.  It is possible (but not recommended) to choose
    * UNSORTED, since in that case the resulting vectors will
-   * potentially be in different ordres on different procs.
+   * potentially be in different orders on different procs.
    */
   typedef std::tuple<dof_id_type, boundary_id_type> NodeBCTuple;
-  enum NodeBCTupleSortBy : int {NODE_ID, BOUNDARY_ID, UNSORTED};
-  std::vector<NodeBCTuple> build_node_list(NodeBCTupleSortBy sort_by = NODE_ID) const;
+  enum class NodeBCTupleSortBy {NODE_ID, BOUNDARY_ID, UNSORTED};
+  std::vector<NodeBCTuple> build_node_list(NodeBCTupleSortBy sort_by = NodeBCTupleSortBy::NODE_ID) const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
@@ -708,9 +708,16 @@ public:
    * As above, but the library creates and fills in a vector of
    * (elem-id, side-id, bc-id) triplets and returns it to the user,
    * taking advantage of guaranteed RVO.
+   *
+   * The returned vector is sorted by element id by default, but this
+   * can be changed by passing SIDE_ID, BOUNDARY_ID, or UNSORTED to
+   * this function. Note: choosing UNSORTED is not recommended since
+   * the resulting list will potentially be in different orders on
+   * different processors when running in parallel.
    */
   typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> BCTuple;
-  std::vector<BCTuple> build_side_list() const;
+  enum class BCTupleSortBy {ELEM_ID, SIDE_ID, BOUNDARY_ID, UNSORTED};
+  std::vector<BCTuple> build_side_list(BCTupleSortBy sort_by = BCTupleSortBy::ELEM_ID) const;
 
   /**
    * Creates a list of active element numbers, sides, and ids for those sides.
