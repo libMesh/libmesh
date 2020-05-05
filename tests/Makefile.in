@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -89,8 +90,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-
-#EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = \
 @LIBMESH_ENABLE_FPARSER_TRUE@	fparser/autodiff.C
 
@@ -238,10 +237,12 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
+	utils/vectormap_test.C 1_quad.dyn 25_quad.bxt \
+	fparser/autodiff.C
 am__dirstamp = $(am__leading_dot)dirstamp
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
-am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
+am__objects_1 =
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_2 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
+am__objects_3 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-dof_map_test.$(OBJEXT) \
 	base/unit_tests_dbg-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_dbg-getpot_test.$(OBJEXT) \
@@ -325,8 +326,9 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	systems/unit_tests_dbg-systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-parameters_test.$(OBJEXT) \
 	utils/unit_tests_dbg-point_locator_test.$(OBJEXT) \
-	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
+	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_3)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -388,9 +390,10 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_3 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
-am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
+	utils/vectormap_test.C 1_quad.dyn 25_quad.bxt \
+	fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_4 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
+am__objects_5 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-dof_map_test.$(OBJEXT) \
 	base/unit_tests_devel-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_devel-getpot_test.$(OBJEXT) \
@@ -475,8 +478,8 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	utils/unit_tests_devel-parameters_test.$(OBJEXT) \
 	utils/unit_tests_devel-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT) \
-	$(am__objects_3)
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_devel_OBJECTS = $(am__objects_4)
+	$(am__objects_1) $(am__objects_4)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_devel_OBJECTS = $(am__objects_5)
 unit_tests_devel_OBJECTS = $(am_unit_tests_devel_OBJECTS)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_DEPENDENCIES = $(top_builddir)/libmesh_devel.la
 unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -534,9 +537,10 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_5 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
-am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
+	utils/vectormap_test.C 1_quad.dyn 25_quad.bxt \
+	fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_6 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
+am__objects_7 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-dof_map_test.$(OBJEXT) \
 	base/unit_tests_oprof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
@@ -621,8 +625,8 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	utils/unit_tests_oprof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_oprof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT) \
-	$(am__objects_5)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS = $(am__objects_6)
+	$(am__objects_1) $(am__objects_6)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS = $(am__objects_7)
 unit_tests_oprof_OBJECTS = $(am_unit_tests_oprof_OBJECTS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_DEPENDENCIES = $(top_builddir)/libmesh_oprof.la
 unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -680,9 +684,10 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_7 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
-am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
+	utils/vectormap_test.C 1_quad.dyn 25_quad.bxt \
+	fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_8 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
+am__objects_9 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-dof_map_test.$(OBJEXT) \
 	base/unit_tests_opt-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_opt-getpot_test.$(OBJEXT) \
@@ -766,8 +771,9 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	systems/unit_tests_opt-systems_test.$(OBJEXT) \
 	utils/unit_tests_opt-parameters_test.$(OBJEXT) \
 	utils/unit_tests_opt-point_locator_test.$(OBJEXT) \
-	utils/unit_tests_opt-vectormap_test.$(OBJEXT) $(am__objects_7)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_8)
+	utils/unit_tests_opt-vectormap_test.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_8)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_9)
 unit_tests_opt_OBJECTS = $(am_unit_tests_opt_OBJECTS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DEPENDENCIES = $(top_builddir)/libmesh_opt.la
 unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -825,9 +831,10 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_9 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
-am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
+	utils/vectormap_test.C 1_quad.dyn 25_quad.bxt \
+	fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_10 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
+am__objects_11 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-dof_map_test.$(OBJEXT) \
 	base/unit_tests_prof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_prof-getpot_test.$(OBJEXT) \
@@ -912,8 +919,8 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	utils/unit_tests_prof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_prof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT) \
-	$(am__objects_9)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_10)
+	$(am__objects_1) $(am__objects_10)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_11)
 unit_tests_prof_OBJECTS = $(am_unit_tests_prof_OBJECTS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DEPENDENCIES = $(top_builddir)/libmesh_prof.la
 unit_tests_prof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -1415,6 +1422,41 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(unit_tests_dbgdir)" \
+	"$(DESTDIR)$(unit_tests_develdir)" \
+	"$(DESTDIR)$(unit_tests_oprofdir)" \
+	"$(DESTDIR)$(unit_tests_optdir)" \
+	"$(DESTDIR)$(unit_tests_profdir)"
+DATA = $(unit_tests_dbg_DATA) $(unit_tests_devel_DATA) \
+	$(unit_tests_oprof_DATA) $(unit_tests_opt_DATA) \
+	$(unit_tests_prof_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -1705,7 +1747,11 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
-datadir = @datadir@
+
+#EXTRA_DIST = base/getpot_test_input.in
+
+# Make sure any data goes in "make dist"
+datadir = $(install_dir)
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
@@ -1827,27 +1873,40 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C $(am__append_1)
+	utils/vectormap_test.C $(data) $(am__append_1)
+data = 1_quad.dyn \
+       25_quad.bxt
+
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbgdir = $(datadir)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_DATA = $(data)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_SOURCES = $(unit_tests_sources)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_LDADD = $(top_builddir)/libmesh_devel.la
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_develdir = $(datadir)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_SOURCES = $(unit_tests_sources)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_LDADD = $(top_builddir)/libmesh_prof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_profdir = $(datadir)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_SOURCES = $(unit_tests_sources)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprofdir = $(datadir)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_optdir = $(datadir)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
@@ -9397,6 +9456,111 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-unit_tests_dbgDATA: $(unit_tests_dbg_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_dbg_DATA)'; test -n "$(unit_tests_dbgdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_dbgdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_dbgdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_dbgdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_dbgdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_dbgDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_dbg_DATA)'; test -n "$(unit_tests_dbgdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_dbgdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_develDATA: $(unit_tests_devel_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_devel_DATA)'; test -n "$(unit_tests_develdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_develdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_develdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_develdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_develdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_develDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_devel_DATA)'; test -n "$(unit_tests_develdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_develdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_oprofDATA: $(unit_tests_oprof_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_oprof_DATA)'; test -n "$(unit_tests_oprofdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_oprofdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_oprofdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_oprofdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_oprofdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_oprofDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_oprof_DATA)'; test -n "$(unit_tests_oprofdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_oprofdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_optDATA: $(unit_tests_opt_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_opt_DATA)'; test -n "$(unit_tests_optdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_optdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_optdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_optdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_optdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_optDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_opt_DATA)'; test -n "$(unit_tests_optdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_optdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_profDATA: $(unit_tests_prof_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_prof_DATA)'; test -n "$(unit_tests_profdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_profdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_profdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_profdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_profdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_profDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_prof_DATA)'; test -n "$(unit_tests_profdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_profdir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -9581,8 +9745,11 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(PROGRAMS) $(DATA)
 installdirs:
+	for dir in "$(DESTDIR)$(unit_tests_dbgdir)" "$(DESTDIR)$(unit_tests_develdir)" "$(DESTDIR)$(unit_tests_oprofdir)" "$(DESTDIR)$(unit_tests_optdir)" "$(DESTDIR)$(unit_tests_profdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
@@ -10092,7 +10259,9 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-unit_tests_dbgDATA \
+	install-unit_tests_develDATA install-unit_tests_oprofDATA \
+	install-unit_tests_optDATA install-unit_tests_profDATA
 
 install-dvi: install-dvi-am
 
@@ -10567,7 +10736,9 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-unit_tests_dbgDATA \
+	uninstall-unit_tests_develDATA uninstall-unit_tests_oprofDATA \
+	uninstall-unit_tests_optDATA uninstall-unit_tests_profDATA
 
 .MAKE: all check check-am install install-am install-strip
 
@@ -10580,11 +10751,16 @@ uninstall-am:
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am
+	install-ps install-ps-am install-strip \
+	install-unit_tests_dbgDATA install-unit_tests_develDATA \
+	install-unit_tests_oprofDATA install-unit_tests_optDATA \
+	install-unit_tests_profDATA installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-unit_tests_dbgDATA \
+	uninstall-unit_tests_develDATA uninstall-unit_tests_oprofDATA \
+	uninstall-unit_tests_optDATA uninstall-unit_tests_profDATA
 
 .PRECIOUS: Makefile
 
