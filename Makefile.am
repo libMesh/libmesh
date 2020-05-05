@@ -4,7 +4,7 @@
 SUBDIRS = include #src
 
 AUTOMAKE_OPTIONS = subdir-objects
-ACLOCAL_AMFLAGS  = -I m4
+ACLOCAL_AMFLAGS  = -I m4 -I m4/autoconf-submodule
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_LDFLAGS       = $(libmesh_LDFLAGS)
 
@@ -56,15 +56,37 @@ EXTRA_DIST = reference_elements \
              contrib/bin/strip_dup_incl_paths.pl \
              contrib/bin/strip_dup_libs.pl \
              CITATION \
-             contrib/metaphysicl/README
+             contrib/metaphysicl/README \
+             m4/autoconf-submodule/ax_split_version.m4 \
+             contrib/timpi/m4/autoconf-submodule/ax_split_version.m4 \
+             contrib/metaphysicl/m4/autoconf-submodule/ax_split_version.m4
 
-# If the metaphysicl submodule has not been initialized, throw an
-# error during "make dist". We need the submodule to be properly
-# initalized so that the sources can be copied into the distribution,
-# and trying to do it "on the fly" is too complicated.
+# If our submodules have not all been initialized, throw an
+# error during "make dist". We need the submodules (and their
+# submodules) to be properly initalized so that the sources can be
+# copied into the distribution, and trying to do it "on the fly" is
+# too complicated.
 contrib/metaphysicl/README:
 	@echo ""
-	@echo "Error: You must run git submodule update --init contrib/metaphysicl first"
+	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+m4/autoconf-submodule/ax_split_version.m4:
+	@echo ""
+	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/timpi/m4/autoconf-submodule/ax_split_version.m4:
+	@echo ""
+	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/metaphysicl/m4/autoconf-submodule/ax_split_version.m4:
+	@echo ""
+	@echo "Error: You must run git submodule update --init --recursive first"
 	@echo ""
 	@exit 1
 

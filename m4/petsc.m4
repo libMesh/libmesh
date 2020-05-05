@@ -4,7 +4,7 @@
 AC_DEFUN([CONFIGURE_PETSC],
 [
   dnl Require having scraped PETSc CXX, includes, and libs
-  AC_REQUIRE([SCRAPE_PETSC_CONFIGURE])
+  AC_REQUIRE([ACSM_SCRAPE_PETSC_CONFIGURE])
   dnl Require having set a compiler so we can check headers,
   dnl try compiles, try links, etc.
   AC_REQUIRE([LIBMESH_SET_COMPILERS])

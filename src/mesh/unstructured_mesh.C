@@ -1261,6 +1261,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
               so_node->set_unique_id(new_unique_id);
 #endif
+              libmesh_ignore(max_new_nodes_per_elem);
 
               /*
                * insert the new node with its defining vertex
