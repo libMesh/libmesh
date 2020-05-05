@@ -3828,7 +3828,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
         ids_offsets = pushed_node_ids_offsets[pid];
       keys_vals.resize(ids_size);
       ids_offsets.resize(ids_size);
-      std::set<const Node *> & nodes = pushed_nodes[pid];
+      std::set<const Node *> nodes;
 
       std::size_t push_i;
       std::set<dof_id_type>::const_iterator it;
@@ -3856,6 +3856,10 @@ void DofMap::scatter_constraints(MeshBase & mesh)
           ids_offsets[push_i].first = *it;
           ids_offsets[push_i].second = _node_constraints[constrained].second;
         }
+
+      auto & pid_nodes = pushed_nodes[pid];
+      pid_nodes.reserve(nodes.size());
+      pid_nodes.insert(pid_nodes.end(), nodes.begin(), nodes.end());
     }
 
   auto node_ids_offsets_action_functor =
@@ -3880,21 +3884,20 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   Parallel::push_parallel_vector_data
     (this->comm(), pushed_node_keys_vals, node_keys_vals_action_functor);
 
+  auto insert_nodes_functor =
+    [this]
+    (processor_id_type /* pid */,
+     const std::vector<Node *> & nodes)
+    {
+      for (Node * node : nodes)
+        mesh.add_node(node);
+    };
+
   // Constraining nodes might not even exist on our subset of a
   // distributed mesh, so let's make them exist.
-  std::vector<Parallel::Request> send_requests;
   if (!mesh.is_serial())
-    {
-      for (auto & pid_id_pair : pushed_node_ids_offsets)
-        {
-          const processor_id_type pid = pid_id_pair.first;
-          send_requests.push_back(Parallel::Request());
-          this->comm().send_packed_range
-            (pid, &mesh,
-             pushed_nodes[pid].begin(), pushed_nodes[pid].end(),
-             send_requests.back(), range_tag);
-        }
-    }
+    Parallel::push_parallel_packed_range
+      (this->comm(), pushed_nodes, &mesh, insert_nodes_functor);
 
   for (auto & pid_id_pair : pushed_node_ids_offsets_to_me)
     {
@@ -3904,11 +3907,6 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
       libmesh_assert_equal_to
         (ids_offsets.size(), keys_vals.size());
-
-      if (!mesh.is_serial())
-        this->comm().receive_packed_range
-          (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
-           (Node**)nullptr, range_tag);
 
       // Add the node constraints that I've been sent
       for (auto i : index_range(ids_offsets))
