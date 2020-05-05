@@ -759,7 +759,7 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
   // dual_coeff = A^-1*D
   for (auto j : index_range(phi))
   {
-    DenseVector<Number> Dcol(sz), coeffcol(sz);
+    DenseVector<Real> Dcol(sz), coeffcol(sz);
     for (auto i : index_range(phi))
     Dcol(i) = D(i, j);
     A.lu_solve(Dcol, coeffcol);
