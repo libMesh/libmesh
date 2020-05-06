@@ -700,6 +700,9 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point> & qp,
 
   }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (this->calculate_dual)
+    this->init_dual_shape_functions(n_approx_shape_functions, n_qp);
 }
 
 
