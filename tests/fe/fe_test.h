@@ -12,6 +12,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/system.h>
+#include <libmesh/quadrature_gauss.h>
 
 #include <vector>
 
@@ -165,6 +166,8 @@ private:
 
   Real value_tol, grad_tol, hess_tol;
 
+  QGauss * _qrule;
+
 public:
   void setUp()
   {
@@ -273,6 +276,10 @@ public:
 
 #endif
 
+    // Create quadrature rule for use in computing dual shape coefficients
+    _qrule = new QGauss(_dim, fe_type.default_quadrature_order());
+    _fe->attach_quadrature_rule(_qrule);
+
     auto rng = _mesh->active_local_element_ptr_range();
     _elem = rng.begin() == rng.end() ? nullptr : *(rng.begin());
 
@@ -296,6 +303,7 @@ public:
     delete _fe;
     delete _es;
     delete _mesh;
+    delete _qrule;
   }
 
   void testU()
@@ -331,6 +339,13 @@ public:
 
             std::vector<Point> master_points
               (1, FEMap::inverse_map(_dim, _elem, p));
+
+            if (family == LAGRANGE && order == 1)
+              _fe->get_dual_phi();
+
+            if (family == LAGRANGE && order == 1)
+              // reinit using the default quadrature rule in order to calculate the dual coefficients
+              _fe->reinit(_elem);
 
             _fe->reinit(_elem, &master_points);
 
