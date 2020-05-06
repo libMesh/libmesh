@@ -287,6 +287,13 @@ void FE<Dim,T>::reinit(const Elem * elem,
       {
         if (T != LAGRANGE)
           libmesh_warning("dual calculations have only been verified for the LAGRANGE family");
+
+        // In order for the matrices for the biorthogonality condition to be
+        // non-singular, the dual basis coefficients must be computed when the
+        // primal shape functions are evaluated with a quadrature rule
+        if (!pts)
+          this->compute_dual_shape_coeffs();
+
         this->compute_dual_shape_functions();
       }
     }

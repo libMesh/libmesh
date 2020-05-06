@@ -539,10 +539,17 @@ protected:
   virtual void compute_shape_functions(const Elem * elem, const std::vector<Point> & qp) override;
 
   /**
+   * Compute the dual basis coefficients \p dual_coeff
+   */
+  void compute_dual_shape_coeffs();
+
+  /**
    * Compute \p dual_phi, \p dual_dphi, \p dual_d2phi
-   * Should be called after the primal basis being computed
+   * It is only valid for this to be called after reinit has occured with a
+   * quadrature rule
    */
   void compute_dual_shape_functions();
+
   /**
    * Object that handles computing shape function values, gradients, etc
    * in the physical domain.
@@ -726,13 +733,32 @@ private:
 
 };
 
-
+// --------------------------------------------------------------------
+// Generic templates. We specialize for OutputType = Real, so these are
+// only used for OutputType = RealVectorValue
 template <typename OutputType>
 void FEGenericBase<OutputType>::compute_dual_shape_functions ()
-{}
+{
+  libmesh_error_msg(
+      "Computation of dual shape functions for vector finite element "
+      "families is not currently implemented");
+}
+
+template <typename OutputType>
+void FEGenericBase<OutputType>::compute_dual_shape_coeffs ()
+{
+  libmesh_error_msg(
+      "Computation of dual shape functions for vector finite element "
+      "families is not currently implemented");
+}
+
+// -----------------------------------------------------------
+// Forward declaration of specialization
+template <>
+void FEGenericBase<Real>::compute_dual_shape_functions();
 
 template <>
-void FEGenericBase<Real>::compute_dual_shape_functions ();
+void FEGenericBase<Real>::compute_dual_shape_coeffs();
 
 
 // Typedefs for convenience and backwards compatibility

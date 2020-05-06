@@ -731,14 +731,14 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
 }
 
 template <>
-void FEGenericBase<Real>::compute_dual_shape_functions ()
+void FEGenericBase<Real>::compute_dual_shape_coeffs ()
 {
-  // Start logging the shape function computation
-  LOG_SCOPE("compute_dual_shape_functions()", "FE");
+  // Start logging the dual coeff computation
+  LOG_SCOPE("compute_dual_shape_coeffs()", "FE");
 
   unsigned int sz=phi.size();
   if(!sz)
-  libmesh_error_msg("ERROR:  dual basis should be computed after the primal basis");
+    libmesh_error_msg("ERROR:  dual basis should be computed after the primal basis");
 
   //compute dual basis coefficient (dual_coeff)
   dual_coeff.resize(sz, sz);
@@ -747,51 +747,58 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
   const std::vector<Real> JxW = this->get_JxW();
 
   for (auto i : index_range(phi))
-  {
     for (auto qp : index_range(phi[i]))
     {
       D(i,i) += JxW[qp]*phi[i][qp];
       for (auto j : index_range(phi))
-      A(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
+        A(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
     }
-  }
 
   // dual_coeff = A^-1*D
   for (auto j : index_range(phi))
   {
     DenseVector<Real> Dcol(sz), coeffcol(sz);
     for (auto i : index_range(phi))
-    Dcol(i) = D(i, j);
+      Dcol(i) = D(i, j);
     A.lu_solve(Dcol, coeffcol);
 
     for (auto row : index_range(phi))
-    dual_coeff(row, j)=coeffcol(row);
+      dual_coeff(row, j)=coeffcol(row);
   }
+}
+
+template <>
+void FEGenericBase<Real>::compute_dual_shape_functions ()
+{
+  // Start logging the shape function computation
+  LOG_SCOPE("compute_dual_shape_functions()", "FE");
+
+  // The dual coeffs matrix should have the same size as phi
+  libmesh_assert(dual_coeff.m() == phi.size());
+  libmesh_assert(dual_coeff.n() == phi.size());
 
   // initialize dual basis
   for (auto j : index_range(phi))
-  for (auto qp : index_range(phi[j]))
-  {
-    if (calculate_phi)
-    dual_phi[j][qp]=.0;
-    if (calculate_dphi)
-    dual_dphi[j][qp]=.0;
-    if (calculate_d2phi)
-    dual_d2phi[j][qp]=.0;
-  }
+    for (auto qp : index_range(phi[j]))
+    {
+      dual_phi[j][qp] = 0;
+      if (calculate_dphi)
+        dual_dphi[j][qp] = 0;
+      if (calculate_d2phi)
+        dual_d2phi[j][qp] = 0;
+    }
 
   // compute dual basis
   for (auto j : index_range(phi))
-  for (auto i : index_range(phi))
-  for (auto qp : index_range(phi[j]))
-  {
-    if (calculate_phi)
-    dual_phi[j][qp]+=dual_coeff(i,j)*phi[i][qp];
-    if (calculate_dphi)
-    dual_dphi[j][qp]+=dual_coeff(i,j)*dphi[i][qp];
-    if (calculate_d2phi)
-    dual_d2phi[j][qp]+=dual_coeff(i,j)*d2phi[i][qp];
-  }
+    for (auto i : index_range(phi))
+      for (auto qp : index_range(phi[j]))
+      {
+        dual_phi[j][qp] += dual_coeff(i, j) * phi[i][qp];
+        if (calculate_dphi)
+          dual_dphi[j][qp] += dual_coeff(i, j) * dphi[i][qp];
+        if (calculate_d2phi)
+          dual_d2phi[j][qp] += dual_coeff(i, j) * d2phi[i][qp];
+      }
 }
 
 template <typename OutputType>
