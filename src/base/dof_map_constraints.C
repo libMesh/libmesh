@@ -4319,7 +4319,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
     pushed_node_keys_vals, pushed_node_keys_vals_to_me;
   std::map<processor_id_type, std::vector<std::pair<dof_id_type, Point>>>
     pushed_node_ids_offsets, pushed_node_ids_offsets_to_me;
-  std::map<processor_id_type, std::set<const Node *>> pushed_nodes;
+  std::map<processor_id_type, std::set<Node *>> pushed_node_sets;
 
   for (auto & pid_id_pair : pushed_node_ids)
     {
@@ -4334,14 +4334,14 @@ void DofMap::scatter_constraints(MeshBase & mesh)
         ids_offsets = pushed_node_ids_offsets[pid];
       keys_vals.resize(ids_size);
       ids_offsets.resize(ids_size);
-      std::set<const Node *> & nodes = pushed_nodes[pid];
+      std::set<Node *> nodes;
 
       std::size_t push_i;
       std::set<dof_id_type>::const_iterator it;
       for (push_i = 0, it = pid_ids.begin();
            it != pid_ids.end(); ++push_i, ++it)
         {
-          const Node * constrained = mesh.node_ptr(*it);
+          Node * constrained = mesh.node_ptr(*it);
 
           if (constrained->processor_id() != pid)
             nodes.insert(constrained);
@@ -4351,7 +4351,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
           keys_vals[push_i].reserve(row_size);
           for (const auto & j : row)
             {
-              const Node * constraining = j.first;
+              Node * constraining = const_cast<Node *>(j.first);
 
               keys_vals[push_i].emplace_back(constraining->id(), j.second);
 
@@ -4361,6 +4361,12 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
           ids_offsets[push_i].first = *it;
           ids_offsets[push_i].second = _node_constraints[constrained].second;
+        }
+
+      if (!mesh.is_serial())
+        {
+          auto & pid_nodes = pushed_node_sets[pid];
+          pid_nodes.insert(nodes.begin(), nodes.end());
         }
     }
 
@@ -4388,19 +4394,18 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
   // Constraining nodes might not even exist on our subset of a
   // distributed mesh, so let's make them exist.
-  std::vector<Parallel::Request> send_requests;
-  if (!mesh.is_serial())
+  auto insert_nodes_functor =
+    [& mesh]
+    (processor_id_type /* pid */,
+     const std::set<Node *> & nodes)
     {
-      for (auto & pid_id_pair : pushed_node_ids_offsets)
-        {
-          const processor_id_type pid = pid_id_pair.first;
-          send_requests.push_back(Parallel::Request());
-          this->comm().send_packed_range
-            (pid, &mesh,
-             pushed_nodes[pid].begin(), pushed_nodes[pid].end(),
-             send_requests.back(), range_tag);
-        }
-    }
+      for (Node * node : nodes)
+        mesh.add_node(node);
+    };
+
+  if (!mesh.is_serial())
+    Parallel::push_parallel_packed_range
+      (this->comm(), pushed_node_sets, &mesh, insert_nodes_functor);
 
   for (auto & pid_id_pair : pushed_node_ids_offsets_to_me)
     {
@@ -4437,9 +4442,6 @@ void DofMap::scatter_constraints(MeshBase & mesh)
             }
         }
     }
-
-  Parallel::wait(send_requests);
-
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // Next we need to push constraints to processors which don't own
