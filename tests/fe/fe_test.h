@@ -318,6 +318,12 @@ public:
 
     Parameters dummy;
 
+    // Request dual calculations
+    _fe->get_dual_phi();
+
+    // reinit using the default quadrature rule in order to calculate the dual coefficients
+    _fe->reinit(_elem);
+
     // These tests require exceptions to be enabled because a
     // TypeTensor::solve() call down in Elem::contains_point()
     // actually throws a non-fatal exception for a certain Point which
@@ -340,13 +346,7 @@ public:
             std::vector<Point> master_points
               (1, FEMap::inverse_map(_dim, _elem, p));
 
-            if (family == LAGRANGE && order == 1)
-              _fe->get_dual_phi();
-
-            if (family == LAGRANGE && order == 1)
-              // reinit using the default quadrature rule in order to calculate the dual coefficients
-              _fe->reinit(_elem);
-
+            // Reinit at point to test against analytic solution
             _fe->reinit(_elem, &master_points);
 
             Number u = 0;
