@@ -1019,6 +1019,7 @@ include_HEADERS = \
         utils/compare_types.h \
         utils/enum_to_string.h \
         utils/error_vector.h \
+        utils/hashing.h \
         utils/hashword.h \
         utils/ignore_warnings.h \
         utils/int_range.h \
