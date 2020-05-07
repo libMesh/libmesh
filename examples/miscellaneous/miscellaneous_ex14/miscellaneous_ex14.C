@@ -213,7 +213,7 @@ int main (int argc, char** argv)
   EigenSystem & eig_sys = eq_sys.add_system<EigenSystem> ("EigenSE");
 
   //set the complete type of the variable
-  FEType fe_type(SECOND, LAGRANGE, SECOND, JACOBI_20_00, CARTESIAN);
+  FEType fe_type(SECOND, LAGRANGE, FOURTH, JACOBI_20_00, CARTESIAN);
 
   // Name the variable of interest 'phi' and approximate it as \p fe_type.
   eig_sys.add_variable("phi", fe_type);
@@ -384,10 +384,7 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
 
   // set parameters used for the infinite elements:
   es.parameters.set<Real>("speed")=137.0359991;
-  es.parameters.set<Number>("current frequency")=es.parameters.get<Real>("speed")*ik/(2*pi);
-
-  Number potval;
-  Number temp;
+  es.parameters.set<Number>("current frequency")=es.parameters.get<Real>("speed")*sqrt(2.*E)/(2*pi);
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -435,16 +432,16 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
         }
 
       // The element Jacobian * quadrature weight at each integration point.
-      const std::vector<Real>& JxW = cfe->get_JxW();
+      const std::vector<Real> & JxW = cfe->get_JxWxdecay_sq();
 
       // The element shape functions evaluated at the quadrature points.
-      const std::vector<std::vector<Real> >& phi = cfe->get_phi();
-      const std::vector<std::vector<RealGradient> >& dphi = cfe->get_dphi();
+      const std::vector<std::vector<Real>> & phi = cfe->get_phi_over_decayxR();
+      const std::vector<std::vector<RealGradient>> & dphi = cfe->get_dphi_over_decayxR();
       const std::vector<Point>& q_point = cfe->get_xyz();
       // get extra data needed for infinite elements
       const std::vector<RealGradient>& dphase = cfe->get_dphase();
-      const std::vector<Real>& weight = cfe->get_Sobolev_weight(); // in publication called D
-      const std::vector<RealGradient>& dweight = cfe->get_Sobolev_dweight();
+      const std::vector<Real> &         weight  = cfe->get_Sobolev_weightxR_sq();
+      const std::vector<RealGradient> & dweight = cfe->get_Sobolev_dweightxR_sq();
 
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
@@ -469,7 +466,7 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
         {
 
           // compute the Coulomb potential
-          potval=-1./(q_point[qp]).norm();
+          Number potval=-1./(q_point[qp]).norm();
 
           // Now, get number of shape functions that are nonzero at this point::
           unsigned int n_sf = cfe->n_shape_functions();
@@ -482,13 +479,14 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
                   // This is just the of derivatives of shape functions i and j.
                   // For finite elements, dweight==0 and dphase==0, thus
                   // temp=dphi[i][qp]*dphi[j][qp].
-                  temp = (dweight[qp]*phi[i][qp]+weight[qp]*(dphi[i][qp]-ik*dphase[qp]*phi[i][qp]))
-                    *(dphi[j][qp]+ik*dphase[qp]*phi[j][qp]);
+                  Number temp = (dweight[qp]*phi[i][qp]+weight[qp]*(dphi[i][qp]-ik*dphase[qp]*phi[i][qp]))
+                                *(dphi[j][qp]+ik*dphase[qp]*phi[j][qp]);
 
                   // assemble the Hamiltonian: H=1/2 Nabla^2 + V
                   H(i,j) += JxW[qp]*(0.5*temp + potval*weight[qp]*phi[i][qp]*phi[j][qp]);
+
                   // assemble the mass matrix:
-                  M(i,j)+= JxW[qp]*weight[qp]*phi[i][qp]*phi[j][qp];
+                  M(i,j) += JxW[qp]*weight[qp]*phi[i][qp]*phi[j][qp];
                 }
             }
         }
@@ -530,8 +528,14 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
          //dof_map.dof_indices (elem, dof_indices_lm,lm_num);
          dof_map.dof_indices (elem, dof_indices);
 
+         /*
+          * Here we use an inconsistent setup: the Jacobian is weighted while all other quantities are
+          * not weighted.
+          * But on the base face all weights are one; thus, it is only a formal problem.
+          */
+
          // Having the correct face, we can start initializing all quantities:
-         const std::vector<Real>& JxW = face_fe->get_JxW();
+         const std::vector<Real>& JxW = face_fe->get_JxWxdecay_sq();
          const std::vector<Point>& q_point = face_fe->get_xyz();
          const std::vector<std::vector<RealGradient> >& dphi = face_fe->get_dphi();
          const std::vector<std::vector<Real> >& phi = face_fe->get_phi();
@@ -785,7 +789,7 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
 
       // check that the solution is close to the analytic answer.
       // Comparing abs(soln) because there is a degree of freedom in the global phase.
-      libmesh_assert_less(std::abs(std::abs(soln)-0.081*exp(-q_point.norm())), .0011);
+      libmesh_assert_less(std::abs(std::abs(soln)-0.08*exp(-q_point.norm())), .002);
 
     }
 #endif //LIBMESH_ENABLE_INFINITE_ELEMENTS
