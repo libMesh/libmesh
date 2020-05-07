@@ -610,7 +610,10 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
       const unsigned int ns = hdr >= 0 ? hdr : (-hdr-1);
       for (unsigned int i=1; i < ns; ++i)
         {
-          libmesh_assert_greater_equal (_idx_buf[i], _idx_buf[i-1]);
+          if (hdr > 0 || i > 1)
+            libmesh_assert_greater_equal (_idx_buf[i], _idx_buf[i-1]);
+          else
+            libmesh_assert_greater_equal (_idx_buf[i], ns);
           libmesh_assert_equal_to ((_idx_buf[i] - _idx_buf[i-1])%2, 0);
           libmesh_assert_less_equal (_idx_buf[i], _idx_buf.size());
         }
