@@ -434,6 +434,7 @@ BUILT_SOURCES = \
         compare_types.h \
         enum_to_string.h \
         error_vector.h \
+        hashing.h \
         hashword.h \
         ignore_warnings.h \
         int_range.h \
@@ -1832,6 +1833,9 @@ enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 error_vector.h: $(top_srcdir)/include/utils/error_vector.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+hashing.h: $(top_srcdir)/include/utils/hashing.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hashword.h: $(top_srcdir)/include/utils/hashword.h
