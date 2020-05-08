@@ -113,6 +113,12 @@ public:
   virtual std::pair<Real, Real> get_eigenpair (dof_id_type i);
 
   /**
+   * \returns Real and imaginary part of the ith eigenvalue but
+   * does not copy the respective eigen vector to the solution vector.
+   */
+  virtual std::pair<Real, Real> get_eigenvalue (dof_id_type i);
+
+  /**
    * \returns \p "Eigen".  Helps in identifying
    * the system type in an equation system file.
    */

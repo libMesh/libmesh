@@ -336,6 +336,11 @@ std::pair<Real, Real> EigenSystem::get_eigenpair (dof_id_type i)
   return eigen_solver->get_eigenpair (i, *solution);
 }
 
+std::pair<Real, Real> EigenSystem::get_eigenvalue (dof_id_type i)
+{
+  return eigen_solver->get_eigenvalue (i);
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC
