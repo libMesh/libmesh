@@ -116,6 +116,18 @@ public:
                    const double tol,
                    const unsigned int m_its) override;
 
+   /**
+    * Same as above except that precond is a ShellMatrix
+    * in this case.
+    */
+   virtual std::pair<unsigned int, unsigned int>
+   solve_standard (ShellMatrix<T> & shell_matrix,
+                   ShellMatrix<T> & precond,
+                   int nev,
+                   int ncv,
+                   const double tol,
+                   const unsigned int m_its) override;
+
 
   /**
    * This function calls the SLEPc solver to compute
@@ -195,6 +207,14 @@ public:
                     const double tol,
                     const unsigned int m_its) override;
 
+  virtual std::pair<unsigned int, unsigned int>
+  solve_generalized(ShellMatrix<T> & matrix_A,
+                    ShellMatrix<T> & matrix_B,
+                    ShellMatrix<T> & precond,
+                    int nev,
+                    int ncv,
+                    const double tol,
+                    const unsigned int m_its) override;
 
   /**
    * \returns The real and imaginary part of the ith eigenvalue and

@@ -166,6 +166,16 @@ public:
   void use_shell_matrices(bool use_shell_matrices) { _use_shell_matrices = use_shell_matrices; }
 
   /**
+   * \returns \p true if a shell preconditioning matrix is used
+   */
+  bool use_shell_precond_matrix() const { return _use_shell_precond_matrix; }
+
+  /**
+   * Set a flag to use a shell preconditioning matrix
+   */
+  void use_shell_precond_matrix(bool use_shell_precond_matrix) { _use_shell_precond_matrix = use_shell_precond_matrix; }
+
+  /**
    * The system matrix for standard eigenvalue problems.
    */
   std::unique_ptr<SparseMatrix<Number>> matrix_A;
@@ -189,6 +199,11 @@ public:
    * A preconditioning matrix
    */
   std::unique_ptr<SparseMatrix<Number>> precond_matrix;
+
+  /**
+   * A preconditioning shell matrix
+   */
+  std::unique_ptr<ShellMatrix<Number>> shell_precond_matrix;
 
   /**
    * The EigenSolver, defining which interface, i.e solver
@@ -253,6 +268,11 @@ private:
    * A boolean flag to indicate whether or not to use shell matrices
    */
   bool _use_shell_matrices;
+
+  /**
+   * A boolean flag to indicate whether or not to use a shell preconditioning matrix
+   */
+  bool _use_shell_precond_matrix;
 };
 
 
