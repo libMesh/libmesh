@@ -290,9 +290,13 @@ void FE<Dim,T>::reinit(const Elem * elem,
 
         // In order for the matrices for the biorthogonality condition to be
         // non-singular, the dual basis coefficients must be computed when the
-        // primal shape functions are evaluated with a quadrature rule
-        if (!pts)
-          this->compute_dual_shape_coeffs();
+        // primal shape functions are evaluated with a quadrature rule. *But* a
+        // user may be reiniting with integration points from a mortar segment,
+        // which is valid, so a simple `if (!pts)` check is not
+        // appropriate. We're just gonna have to trust the user on this one. If
+        // they "screw up" we'll throw an exception from the LU decomposition,
+        // and they can choose to handle it or not
+        this->compute_dual_shape_coeffs();
 
         this->compute_dual_shape_functions();
       }

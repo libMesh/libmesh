@@ -23,7 +23,8 @@
   CPPUNIT_TEST( testGradU );                    \
   CPPUNIT_TEST( testGradUComp );                \
   CPPUNIT_TEST( testHessU );                    \
-  CPPUNIT_TEST( testHessUComp );
+  CPPUNIT_TEST( testHessUComp );                \
+  CPPUNIT_TEST( testDualDoesntScreamAndDie );
 
 using namespace libMesh;
 
@@ -318,12 +319,6 @@ public:
 
     Parameters dummy;
 
-    // Request dual calculations
-    _fe->get_dual_phi();
-
-    // reinit using the default quadrature rule in order to calculate the dual coefficients
-    _fe->reinit(_elem);
-
     // These tests require exceptions to be enabled because a
     // TypeTensor::solve() call down in Elem::contains_point()
     // actually throws a non-fatal exception for a certain Point which
@@ -372,6 +367,24 @@ public:
           }
 #endif
   }
+
+  void testDualDoesntScreamAndDie()
+  {
+    // Clough-Tocher elements still don't work multithreaded
+    if (family == CLOUGH && libMesh::n_threads() > 1)
+      return;
+
+    // Handle the "more processors than elements" case
+    if (!_elem)
+      return;
+
+    // Request dual calculations
+    _fe->get_dual_phi();
+
+    // reinit using the default quadrature rule in order to calculate the dual coefficients
+    _fe->reinit(_elem);
+  }
+
 
   void testGradU()
   {
