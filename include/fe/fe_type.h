@@ -26,15 +26,18 @@
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_fe_family.h" // LAGRANGE
 #include "libmesh/enum_inf_map_type.h" // CARTESIAN
+#include "libmesh/hashing.h"
 
 // C++ includes
 #include <memory>
+#include <functional>
 
 namespace libMesh
 {
 
 // Forward declarations
 class QBase;
+class FEType;
 
 /**
  * This provides a shim class that wraps the Order enum.
@@ -86,6 +89,7 @@ private:
    */
   int _order;
 
+  friend struct std::hash<FEType>;
 };
 
 /**
@@ -363,5 +367,20 @@ Order FEType::unweighted_quadrature_order () const
 
 } // namespace libMesh
 
+namespace std
+{
+template <>
+struct hash<libMesh::FEType>
+{
+  std::size_t operator()(const libMesh::FEType & fe_type) const
+    {
+      std::size_t seed = 0;
+      // Old compiler versions seem to need the static_cast
+      libMesh::boostcopy::hash_combine(seed, static_cast<int>(fe_type.family));
+      libMesh::boostcopy::hash_combine(seed, fe_type.order._order);
+      return seed;
+    }
+};
+}
 
 #endif // LIBMESH_FE_TYPE_H
