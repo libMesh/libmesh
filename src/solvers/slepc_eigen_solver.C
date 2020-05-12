@@ -176,7 +176,40 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * precond = dynamic_cast<PetscMatrix<T> *>(&precond_in);
 
-  PetscShellMatrix<T> * matrix = static_cast<PetscShellMatrix<T> *> (&shell_matrix);
+  if (!precond)
+    libmesh_error_msg("Error: input preconditioning matrix to solve_standard() must be a PetscMatrix.");
+
+  PetscShellMatrix<T> * matrix = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix);
+
+  if (!matrix)
+    libmesh_error_msg("Error: input operator matrix to solve_standard() must be a PetscShellMatrix.");
+
+  return _solve_standard_helper(matrix->mat(), precond->mat(), nev, ncv, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, unsigned int>
+SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
+                                     ShellMatrix<T> & precond_in,
+                                     int nev,                  // number of requested eigenpairs
+                                     int ncv,                  // number of basis vectors
+                                     const double tol,         // solver tolerance
+                                     const unsigned int m_its) // maximum number of iterations
+{
+  this->clear ();
+
+  this->init ();
+
+  // Make sure the SparseMatrix passed in is really a PetscMatrix
+  PetscShellMatrix<T> * precond = dynamic_cast<PetscShellMatrix<T> *>(&precond_in);
+
+  if (!precond)
+    libmesh_error_msg("Error: input preconditioning matrix to solve_standard() must be a PetscShellMatrix.");
+
+  PetscShellMatrix<T> * matrix = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix);
+
+  if (!matrix)
+    libmesh_error_msg("Error: input operator matrix to solve_standard() must be a PetscShellMatrix.");
 
   return _solve_standard_helper(matrix->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
@@ -506,11 +539,53 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T> * precond = static_cast<PetscMatrix<T> *>(&precond_in);
+  PetscMatrix<T> * precond = dynamic_cast<PetscMatrix<T> *>(&precond_in);
 
-  PetscShellMatrix<T> * matrix_A = static_cast<PetscShellMatrix<T> *> (&shell_matrix_A);
+  if (!precond)
+    libmesh_error_msg("Error: input preconditioning matrix to solve_generalized() must be of type PetscMatrix.");
 
-  PetscShellMatrix<T> * matrix_B = static_cast<PetscShellMatrix<T> *> (&shell_matrix_B);
+  PetscShellMatrix<T> * matrix_A = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_A);
+
+  if (!matrix_A)
+    libmesh_error_msg("Error: input operator A to solve_generalized() must be of type PetscShellMatrix.");
+
+  PetscShellMatrix<T> * matrix_B = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_B);
+
+  if (!matrix_B)
+    libmesh_error_msg("Error: input operator B to solve_generalized() must be of type PetscShellMatrix.");
+
+  return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), precond->mat(), nev, ncv, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, unsigned int>
+SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
+                                        ShellMatrix<T> & shell_matrix_B,
+                                        ShellMatrix<T> & precond_in,
+                                        int nev,                  // number of requested eigenpairs
+                                        int ncv,                  // number of basis vectors
+                                        const double tol,         // solver tolerance
+                                        const unsigned int m_its) // maximum number of iterations
+{
+  this->clear();
+
+  this->init ();
+
+  // Make sure the ShellMatrix passed in is really a PetscShellMatrix
+  PetscShellMatrix<T> * precond = dynamic_cast<PetscShellMatrix<T> *>(&precond_in);
+
+  if (!precond)
+    libmesh_error_msg("Error: input preconditioning matrix to solve_generalized() must be of type PetscShellMatrix.");
+
+  PetscShellMatrix<T> * matrix_A = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_A);
+
+  if (!matrix_A)
+    libmesh_error_msg("Error: input operator A to solve_generalized() must be of type PetscShellMatrix.");
+
+  PetscShellMatrix<T> * matrix_B = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_B);
+
+  if (!matrix_B)
+    libmesh_error_msg("Error: input operator B to solve_generalized() must be of type PetscShellMatrix.");
 
   return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
