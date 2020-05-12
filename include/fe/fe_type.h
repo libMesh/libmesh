@@ -82,6 +82,24 @@ public:
     return _order;
   }
 
+  /**
+   * Overload for helping intel be able to add OrderWrappers
+   * and p levels all over the library
+   */
+  Order operator+(unsigned int rhs)
+    {
+      return static_cast<Order>(_order + rhs);
+    }
+
+  /**
+   * Overload for helping intel be able to subtract OrderWrappers
+   * and p levels all over the library
+   */
+  Order operator-(unsigned int rhs)
+    {
+      return static_cast<Order>(_order - rhs);
+    }
+
 private:
 
   /**
@@ -169,6 +187,24 @@ inline std::ostream & operator << (std::ostream & os, const OrderWrapper & order
 {
   os << order.get_order();
   return os;
+}
+
+/**
+ * Overload + operator for helping intel be able to add OrderWrappers
+ * and p levels all over the library
+ */
+inline Order operator+(unsigned int lhs, const OrderWrapper & rhs)
+{
+  return static_cast<Order>(lhs + rhs.get_order());
+}
+
+/**
+ * Overload + operator for helping intel be able to subtract OrderWrappers
+ * and p levels all over the library
+ */
+inline Order operator-(unsigned int lhs, const OrderWrapper & rhs)
+{
+  return static_cast<Order>(lhs - rhs.get_order());
 }
 
 /**
