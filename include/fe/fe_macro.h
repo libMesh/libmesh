@@ -48,7 +48,8 @@
   template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
   template void         FE<2,SUBDIVISION>::reinit(const Elem *,const std::vector<Point> * const,const std::vector<Real> * const); \
   template void         FE<2,SUBDIVISION>::init_base_shape_functions(const std::vector<Point> &, const Elem *); \
-  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *)
+  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
+  template void         FE<2,SUBDIVISION>::init_dual_shape_functions(unsigned int, unsigned int)
 
 #else // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -58,7 +59,8 @@
   template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase *); \
   template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
   template void         FE<2,SUBDIVISION>::reinit(const Elem *,const std::vector<Point> * const,const std::vector<Real> * const); \
-  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *)
+  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
+  template void         FE<2,SUBDIVISION>::init_dual_shape_functions(unsigned int, unsigned int)
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 

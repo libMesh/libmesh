@@ -324,6 +324,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->compute_shape_functions (inf_elem,*pts);
     }
 
+  if (this->calculate_dual)
+    libmesh_not_implemented_msg("Dual shape support for infinite elements is "
+                                "not currently implemented");
 }
 
 

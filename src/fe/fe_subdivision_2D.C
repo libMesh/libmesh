@@ -647,6 +647,9 @@ void FESubdivision::init_shape_functions(const std::vector<Point> & qp,
   this->_fe_map->get_d2phideta2_map()   = d2phideta2;
   this->_fe_map->get_d2phidxideta_map() = d2phidxideta;
 #endif
+
+  if (this->calculate_dual)
+    this->init_dual_shape_functions(n_approx_shape_functions, n_qp);
 }
 
 

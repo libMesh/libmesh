@@ -571,6 +571,11 @@ protected:
   virtual void init_shape_functions(const std::vector<Point> & qp,
                                     const Elem * e);
 
+  /**
+   * Init \p dual_phi and potentially \p dual_dphi, \p dual_d2phi
+   */
+  void init_dual_shape_functions(unsigned int n_shapes, unsigned int n_qp);
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**

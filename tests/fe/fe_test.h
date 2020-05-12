@@ -12,6 +12,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/system.h>
+#include <libmesh/quadrature_gauss.h>
 
 #include <vector>
 
@@ -22,7 +23,8 @@
   CPPUNIT_TEST( testGradU );                    \
   CPPUNIT_TEST( testGradUComp );                \
   CPPUNIT_TEST( testHessU );                    \
-  CPPUNIT_TEST( testHessUComp );
+  CPPUNIT_TEST( testHessUComp );                \
+  CPPUNIT_TEST( testDualDoesntScreamAndDie );
 
 using namespace libMesh;
 
@@ -165,6 +167,8 @@ private:
 
   Real value_tol, grad_tol, hess_tol;
 
+  QGauss * _qrule;
+
 public:
   void setUp()
   {
@@ -273,6 +277,10 @@ public:
 
 #endif
 
+    // Create quadrature rule for use in computing dual shape coefficients
+    _qrule = new QGauss(_dim, fe_type.default_quadrature_order());
+    _fe->attach_quadrature_rule(_qrule);
+
     auto rng = _mesh->active_local_element_ptr_range();
     _elem = rng.begin() == rng.end() ? nullptr : *(rng.begin());
 
@@ -296,6 +304,7 @@ public:
     delete _fe;
     delete _es;
     delete _mesh;
+    delete _qrule;
   }
 
   void testU()
@@ -332,6 +341,7 @@ public:
             std::vector<Point> master_points
               (1, FEMap::inverse_map(_dim, _elem, p));
 
+            // Reinit at point to test against analytic solution
             _fe->reinit(_elem, &master_points);
 
             Number u = 0;
@@ -357,6 +367,24 @@ public:
           }
 #endif
   }
+
+  void testDualDoesntScreamAndDie()
+  {
+    // Clough-Tocher elements still don't work multithreaded
+    if (family == CLOUGH && libMesh::n_threads() > 1)
+      return;
+
+    // Handle the "more processors than elements" case
+    if (!_elem)
+      return;
+
+    // Request dual calculations
+    _fe->get_dual_phi();
+
+    // reinit using the default quadrature rule in order to calculate the dual coefficients
+    _fe->reinit(_elem);
+  }
+
 
   void testGradU()
   {

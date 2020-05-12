@@ -283,10 +283,55 @@ void FE<Dim,T>::reinit(const Elem * elem,
         this->compute_shape_functions (elem,*pts);
       else
         this->compute_shape_functions(elem,this->qrule->get_points());
+      if (this->calculate_dual)
+      {
+        if (T != LAGRANGE)
+          libmesh_warning("dual calculations have only been verified for the LAGRANGE family");
+
+        // In order for the matrices for the biorthogonality condition to be
+        // non-singular, the dual basis coefficients must be computed when the
+        // primal shape functions are evaluated with a quadrature rule. *But* a
+        // user may be reiniting with integration points from a mortar segment,
+        // which is valid, so a simple `if (!pts)` check is not
+        // appropriate. We're just gonna have to trust the user on this one. If
+        // they "screw up" we'll throw an exception from the LU decomposition,
+        // and they can choose to handle it or not
+        this->compute_dual_shape_coeffs();
+
+        this->compute_dual_shape_functions();
+      }
     }
 }
 
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::init_dual_shape_functions(const unsigned int n_shapes, const unsigned int n_qp)
+{
+  if (!this->calculate_dual)
+    return;
 
+  libmesh_assert_msg(this->calculate_phi,
+                     "dual shape function calculation relies on "
+                     "primal shape functions being calculated");
+
+  this->dual_phi.resize(n_shapes);
+  if (this->calculate_dphi)
+    this->dual_dphi.resize(n_shapes);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  if (this->calculate_d2phi)
+    this->dual_d2phi.resize(n_shapes);
+#endif
+
+  for (auto i : index_range(this->dual_phi))
+  {
+    this->dual_phi[i].resize(n_qp);
+    if (this->calculate_dphi)
+      this->dual_dphi[i].resize(n_qp);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  if (this->calculate_d2phi)
+    this->dual_d2phi[i].resize(n_qp);
+#endif
+  }
+}
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
@@ -322,7 +367,6 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
             }
           this->phi.resize     (n_approx_shape_functions);
         }
-
       if (this->calculate_dphi)
         {
           if (this->dphi.size() == n_approx_shape_functions)
@@ -369,6 +413,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
               old_n_qp = n_approx_shape_functions ? this->d2phi[0].size() : 0;
               break;
             }
+
           this->d2phi.resize     (n_approx_shape_functions);
           this->d2phidx2.resize  (n_approx_shape_functions);
           this->d2phidxdy.resize (n_approx_shape_functions);
@@ -401,6 +446,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       {
         if (this->calculate_phi)
           this->phi[i].resize         (n_qp);
+
         if (this->calculate_dphi)
           {
             this->dphi[i].resize        (n_qp);
@@ -568,6 +614,9 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
     default:
       libmesh_error_msg("Invalid dimension Dim = " << Dim);
     }
+
+  if (this->calculate_dual)
+    this->init_dual_shape_functions(n_approx_shape_functions, n_qp);
 }
 
 
