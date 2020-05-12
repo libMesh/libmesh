@@ -571,7 +571,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                           dnl       Well, duh, when the tested value is computed...  OK when it
                           dnl       was from an assignment.
                           AS_CASE("$GXX_VERSION",
-                                  [intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x],
+                                  [intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x | intel_icc_v19.x],
                                   [
                                     PROFILING_FLAGS="-p"
                                     CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
