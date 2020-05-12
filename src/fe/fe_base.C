@@ -767,12 +767,10 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs ()
   }
 
 #ifndef NDEBUG
-  if (A.det() < TOLERANCE * TOLERANCE)
-    libmesh_warning("The determinant of the coefficient matrix for dual "
-                    "calculations is less than "
-                    << TOLERANCE * TOLERANCE
-                    << ". Are you using a proper "
-                       "set of integration points for your element?");
+  Real abs_det_A = std::abs(A.det());
+  if (abs_det_A < TOLERANCE * TOLERANCE)
+    libmesh_warning("|det(A)| = " << abs_det_A << " for the dual basis function coefficient matrix is small. "
+                    "Are you using a proper set of integration points for your element?");
 #endif
 }
 
