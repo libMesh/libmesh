@@ -1183,29 +1183,33 @@ public:
      * input function \p f gives the arbitrary solution.
      */
 
+    // Check for a quick return in case there's no work to be done.
+    if (dirichlets.empty())
+      return;
+
     // Figure out which System the DirichletBoundary objects are
-    // defined for. Verify that all Variables are defined on the same
-    // System.
+    // defined for. We break out of the loop as soon as we encounter a
+    // valid System pointer, the assumption is thus that all Variables
+    // are defined on the same System.
     System * system = nullptr;
     for (const auto & dirichlet : dirichlets)
       for (const auto & var : dirichlet->variables)
         {
           const Variable & variable = dof_map.variable(var);
-          auto current_system = variable.system();
+          system = variable.system();
 
-          if (!system)
-            system = current_system;
-          else if (current_system != system)
-            libmesh_error_msg("All variables should be defined on the same System");
+          if (system)
+            goto done;
         }
 
-    // If we found no System it could be because there are no
-    // DirichletBoundary objects or there are DirichletBoundaries but
-    // they have no Variables defined on them? This seems like a
-    // strange situation but it would also imply there is nothing to
-    // be done, so let's just return in that case.
+    // If we found no System, it could be because none of the
+    // Variables have one defined, or because there are
+    // DirichletBoundary objects with no Variables defined on
+    // them. These situations both indicate a likely error in the
+    // setup of a problem, so let's throw an error in this case.
+  done:
     if (!system)
-      return;
+      libmesh_error_msg("Valid System not found for any Variables.");
 
     // Construct a FEMContext object for the System on which the
     // Variables in our DirichletBoundary objects are defined. This
