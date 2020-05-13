@@ -760,20 +760,11 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs ()
     DenseVector<Real> Dcol(sz), coeffcol(sz);
     for (auto i : index_range(phi))
       Dcol(i) = D(i, j);
-    A.lu_solve(Dcol, coeffcol);
+    A.cholesky_solve(Dcol, coeffcol);
 
     for (auto row : index_range(phi))
       dual_coeff(row, j)=coeffcol(row);
   }
-
-#ifndef NDEBUG
-  if (A.det() < TOLERANCE * TOLERANCE)
-    libmesh_warning("The determinant of the coefficient matrix for dual "
-                    "calculations is less than "
-                    << TOLERANCE * TOLERANCE
-                    << ". Are you using a proper "
-                       "set of integration points for your element?");
-#endif
 }
 
 template <>
