@@ -1056,7 +1056,7 @@ public:
    * by storing the D-dimensional parent.  This method provides access to that
    * element.
    *
-   * This method is not safe to call if this->dim() == LIBMESH_DIM; in
+   * This method returns nullptr if this->dim() == LIBMESH_DIM; in
    * such cases no data storage for an interior parent pointer has
    * been allocated.
    */
