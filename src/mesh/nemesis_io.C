@@ -1284,6 +1284,13 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
           // elements, are correctly initialized for the subsequent
           // call to write the nodal solution.
           nemhelper->read_and_store_header_info();
+
+          // ...and reading the block info
+          nemhelper->read_block_info();
+
+          // ...and rebuild the "exodus_node_num_to_libmesh" map
+          nemhelper->compute_num_global_elem_blocks(mesh);
+          nemhelper->build_element_and_node_maps(mesh);
         }
       else
         {
