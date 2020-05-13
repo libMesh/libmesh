@@ -770,7 +770,8 @@ void Elem::find_interior_neighbors(std::set<Elem *> & neighbor_set)
 const Elem * Elem::interior_parent () const
 {
   // interior parents make no sense for full-dimensional elements.
-  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  if (this->dim() >= LIBMESH_DIM)
+      return nullptr;
 
   // they USED TO BE only good for level-0 elements, but we now
   // support keeping interior_parent() valid on refined boundary
@@ -805,7 +806,9 @@ const Elem * Elem::interior_parent () const
 Elem * Elem::interior_parent ()
 {
   // See the const version for comments
-  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  if (this->dim() >= LIBMESH_DIM)
+      return nullptr;
+
   Elem * interior_p = _elemlinks[1+this->n_sides()];
 
   libmesh_assert (!interior_p ||
