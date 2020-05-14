@@ -254,7 +254,7 @@ private:
   DofMap                  & dof_map;
   const MeshBase          & mesh;
   const Real               time;
-  const DirichletBoundary  dirichlet;
+  const DirichletBoundaries & dirichlets;
 
   const AddConstraint     & add_fn;
 
@@ -296,7 +296,9 @@ private:
   void apply_dirichlet_impl(const ConstElemRange & range,
                             const unsigned int var,
                             const Variable & variable,
-                            const FEType & fe_type) const
+                            const FEType & fe_type,
+                            const DirichletBoundary & dirichlet,
+                            FEMContext & fem_context) const
   {
     typedef OutputType                                                      OutputShape;
     typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
@@ -343,31 +345,10 @@ private:
     const unsigned int var_component =
       variable.first_scalar_number();
 
-    // Get FE objects of the appropriate type
-    std::unique_ptr<FEGenericBase<OutputType>> fe = FEGenericBase<OutputType>::build(dim, fe_type);
+    // The type of projections done depend on the FE's continuity.
+    FEContinuity cont = FEInterface::get_continuity(fe_type);
 
-    // Set tolerance on underlying FEMap object. This will allow us to
-    // avoid spurious negative Jacobian errors while imposing BCs by
-    // simply ignoring them. This should only be required in certain
-    // special cases, see the DirichletBoundaries comments on this
-    // parameter for more information.
-    fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
-
-    // Prepare variables for projection
-    std::unique_ptr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
-    std::unique_ptr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
-    std::unique_ptr<QBase> qrule (fe_type.default_quadrature_rule(dim));
-
-    // The values of the shape functions at the quadrature
-    // points
-    const std::vector<std::vector<OutputShape>> & phi = fe->get_phi();
-
-    // The gradients of the shape functions at the quadrature
-    // points on the child element.
-    const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
-
-    const FEContinuity cont = fe->get_continuity();
-
+    // Make sure we have the right data available for C1 projections
     if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
       {
         // We'll need gradient data for a C1 projection
@@ -378,21 +359,7 @@ private:
         libmesh_assert(!(g && g_fem));
         libmesh_assert(!(f && g_fem));
         libmesh_assert(!(f_fem && g));
-
-        const std::vector<std::vector<OutputGradient>> & ref_dphi = fe->get_dphi();
-        dphi = &ref_dphi;
       }
-
-    // The Jacobian * quadrature weight at the quadrature points
-    const std::vector<Real> & JxW = fe->get_JxW();
-
-    // The XYZ locations of the quadrature points
-    const std::vector<Point> & xyz_values = fe->get_xyz();
-
-    // The global DOF indices
-    std::vector<dof_id_type> dof_indices;
-    // Side/edge local DOF indices
-    std::vector<unsigned int> side_dofs;
 
     // If our supplied functions require a FEMContext, and if we have
     // an initialized solution to use with that FEMContext, then
@@ -535,9 +502,12 @@ private:
         if (f_system && context.get())
           context->pre_fe_reinit(*f_system, elem);
 
-        // Update the DOF indices for this element based on
-        // the current mesh
-        dof_map.dof_indices (elem, dof_indices, var);
+        // Also pre-init the fem_context() we were passed on the current Elem.
+        fem_context.pre_fe_reinit(fem_context.get_system(), elem);
+
+        // Get a reference to the DOF indices for the current element
+        const std::vector<dof_id_type> & dof_indices =
+          fem_context.get_dof_indices(var);
 
         // The number of DOFs on the element
         const unsigned int n_dofs =
@@ -720,26 +690,56 @@ private:
               }
             else
               libmesh_error_msg("Unknown continuity cont = " << cont);
-          }
+          } // end for (n=0..n_nodes)
 
         // In 3D, project any edge values next
         if (dim > 2 && cont != DISCONTINUOUS)
+        {
+          // Get a pointer to the 1 dimensional (edge) FE for the current
+          // var which is stored in the fem_context. This will only be
+          // different from side_fe in 3D.
+          FEGenericBase<OutputType> * edge_fe = nullptr;
+          fem_context.get_edge_fe(var, edge_fe);
+
+          // Set tolerance on underlying FEMap object. This will allow us to
+          // avoid spurious negative Jacobian errors while imposing BCs by
+          // simply ignoring them. This should only be required in certain
+          // special cases, see the DirichletBoundaries comments on this
+          // parameter for more information.
+          edge_fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
+
+          // Pre-request FE data
+          const std::vector<std::vector<OutputShape>> & phi = edge_fe->get_phi();
+          const std::vector<Point> & xyz_values = edge_fe->get_xyz();
+          const std::vector<Real> & JxW = edge_fe->get_JxW();
+
+          // Only pre-request gradients for C1 projections
+          const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
+          if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
+            {
+              const std::vector<std::vector<OutputGradient>> & ref_dphi = edge_fe->get_dphi();
+              dphi = &ref_dphi;
+            }
+
+          // Vector to hold edge local DOF indices
+          std::vector<unsigned int> edge_dofs;
+
           for (unsigned int e=0; e != n_edges; ++e)
             {
               if (!is_boundary_edge[e])
                 continue;
 
               FEInterface::dofs_on_edge(elem, dim, fe_type, e,
-                                        side_dofs);
+                                        edge_dofs);
 
-              const unsigned int n_side_dofs =
-                cast_int<unsigned int>(side_dofs.size());
+              const unsigned int n_edge_dofs =
+                cast_int<unsigned int>(edge_dofs.size());
 
               // Some edge dofs are on nodes and already
               // fixed, others are free to calculate
               unsigned int free_dofs = 0;
-              for (unsigned int i=0; i != n_side_dofs; ++i)
-                if (!dof_is_fixed[side_dofs[i]])
+              for (unsigned int i=0; i != n_edge_dofs; ++i)
+                if (!dof_is_fixed[edge_dofs[i]])
                   free_dof[free_dofs++] = i;
 
               // There may be nothing to project
@@ -752,9 +752,8 @@ private:
               DenseVector<Number> Uedge(free_dofs);
 
               // Initialize FE data on the edge
-              fe->attach_quadrature_rule (qedgerule.get());
-              fe->edge_reinit (elem, e);
-              const unsigned int n_qp = qedgerule->n_points();
+              edge_fe->edge_reinit(elem, e);
+              const unsigned int n_qp = fem_context.get_edge_qrule().n_points();
 
               // Loop over the quadrature points
               for (unsigned int qp=0; qp<n_qp; qp++)
@@ -797,15 +796,15 @@ private:
                                       xyz_values[qp], time)(c);
 
                   // Form edge projection matrix
-                  for (unsigned int sidei=0, freei=0; sidei != n_side_dofs; ++sidei)
+                  for (unsigned int sidei=0, freei=0; sidei != n_edge_dofs; ++sidei)
                     {
-                      unsigned int i = side_dofs[sidei];
+                      unsigned int i = edge_dofs[sidei];
                       // fixed DoFs aren't test functions
                       if (dof_is_fixed[i])
                         continue;
-                      for (unsigned int sidej=0, freej=0; sidej != n_side_dofs; ++sidej)
+                      for (unsigned int sidej=0, freej=0; sidej != n_edge_dofs; ++sidej)
                         {
-                          unsigned int j = side_dofs[sidej];
+                          unsigned int j = edge_dofs[sidej];
                           if (dof_is_fixed[j])
                             Fe(freei) -= phi[i][qp] * phi[j][qp] *
                               JxW[qp] * Ue(j);
@@ -837,16 +836,44 @@ private:
               // Transfer new edge solutions to element
               for (unsigned int i=0; i != free_dofs; ++i)
                 {
-                  Number & ui = Ue(side_dofs[free_dof[i]]);
+                  Number & ui = Ue(edge_dofs[free_dof[i]]);
                   libmesh_assert(std::abs(ui) < TOLERANCE ||
                                  std::abs(ui - Uedge(i)) < TOLERANCE);
                   ui = Uedge(i);
-                  dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                  dof_is_fixed[edge_dofs[free_dof[i]]] = true;
                 }
-            }
+            } // end for (e = 0..n_edges)
+        } // end if (dim > 2 && cont != DISCONTINUOUS)
 
         // Project any side values (edges in 2D, faces in 3D)
         if (dim > 1 && cont != DISCONTINUOUS)
+        {
+          FEGenericBase<OutputType> * side_fe = nullptr;
+          fem_context.get_side_fe(var, side_fe);
+
+          // Set tolerance on underlying FEMap object. This will allow us to
+          // avoid spurious negative Jacobian errors while imposing BCs by
+          // simply ignoring them. This should only be required in certain
+          // special cases, see the DirichletBoundaries comments on this
+          // parameter for more information.
+          side_fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
+
+          // Pre-request FE data
+          const std::vector<std::vector<OutputShape>> & phi = side_fe->get_phi();
+          const std::vector<Point> & xyz_values = side_fe->get_xyz();
+          const std::vector<Real> & JxW = side_fe->get_JxW();
+
+          // Only pre-request gradients for C1 projections
+          const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
+          if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
+            {
+              const std::vector<std::vector<OutputGradient>> & ref_dphi = side_fe->get_dphi();
+              dphi = &ref_dphi;
+            }
+
+          // Vector to hold side local DOF indices
+          std::vector<unsigned int> side_dofs;
+
           for (unsigned int s=0; s != n_sides; ++s)
             {
               if (!is_boundary_side[s])
@@ -875,9 +902,8 @@ private:
               DenseVector<Number> Uside(free_dofs);
 
               // Initialize FE data on the side
-              fe->attach_quadrature_rule (qsiderule.get());
-              fe->reinit (elem, s);
-              const unsigned int n_qp = qsiderule->n_points();
+              side_fe->reinit(elem, s);
+              const unsigned int n_qp = fem_context.get_side_qrule().n_points();
 
               // Loop over the quadrature points
               for (unsigned int qp=0; qp<n_qp; qp++)
@@ -966,10 +992,35 @@ private:
                   ui = Uside(i);
                   dof_is_fixed[side_dofs[free_dof[i]]] = true;
                 }
-            }
+            } // end for (s = 0..n_sides)
+        } // end if (dim > 1 && cont != DISCONTINUOUS)
 
         // Project any shellface values
         if (dim == 2 && cont != DISCONTINUOUS)
+        {
+          FEGenericBase<OutputType> * fe = nullptr;
+          fem_context.get_element_fe(var, fe, dim);
+
+          // Set tolerance on underlying FEMap object. This will allow us to
+          // avoid spurious negative Jacobian errors while imposing BCs by
+          // simply ignoring them. This should only be required in certain
+          // special cases, see the DirichletBoundaries comments on this
+          // parameter for more information.
+          fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
+
+          // Pre-request FE data
+          const std::vector<std::vector<OutputShape>> & phi = fe->get_phi();
+          const std::vector<Point> & xyz_values = fe->get_xyz();
+          const std::vector<Real> & JxW = fe->get_JxW();
+
+          // Only pre-request gradients for C1 projections
+          const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
+          if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
+            {
+              const std::vector<std::vector<OutputGradient>> & ref_dphi = fe->get_dphi();
+              dphi = &ref_dphi;
+            }
+
           for (unsigned int shellface=0; shellface != 2; ++shellface)
             {
               if (!is_boundary_shellface[shellface])
@@ -996,9 +1047,8 @@ private:
               DenseVector<Number> Ushellface(free_dofs);
 
               // Initialize FE data on the element
-              fe->attach_quadrature_rule (qrule.get());
               fe->reinit (elem);
-              const unsigned int n_qp = qrule->n_points();
+              const unsigned int n_qp = fem_context.get_element_qrule().n_points();
 
               // Loop over the quadrature points
               for (unsigned int qp=0; qp<n_qp; qp++)
@@ -1089,7 +1139,8 @@ private:
                   ui = Ushellface(i);
                   dof_is_fixed[shellface_dofs[free_dof[i]]] = true;
                 }
-            }
+            } // end for (shellface = 0..2)
+        } // end if (dim == 2 && cont != DISCONTINUOUS)
 
         // Lock the DofConstraints since it is shared among threads.
         {
@@ -1102,7 +1153,7 @@ private:
                 add_fn (dof_indices[i], empty_row, Ue(i));
             }
         }
-      }
+      } // end for (elem : range)
 
   } // apply_dirichlet_impl
 
@@ -1110,20 +1161,19 @@ public:
   ConstrainDirichlet (DofMap & dof_map_in,
                       const MeshBase & mesh_in,
                       const Real time_in,
-                      const DirichletBoundary & dirichlet_in,
+                      const DirichletBoundaries & dirichlets_in,
                       const AddConstraint & add_in) :
     dof_map(dof_map_in),
     mesh(mesh_in),
     time(time_in),
-    dirichlet(dirichlet_in),
+    dirichlets(dirichlets_in),
     add_fn(add_in) { }
 
-  ConstrainDirichlet (const ConstrainDirichlet & in) :
-    dof_map(in.dof_map),
-    mesh(in.mesh),
-    time(in.time),
-    dirichlet(in.dirichlet),
-    add_fn(in.add_fn) { }
+  // This class can be default copy/move constructed/assigned.
+  ConstrainDirichlet (ConstrainDirichlet &&) = default;
+  ConstrainDirichlet (const ConstrainDirichlet &) = default;
+  ConstrainDirichlet & operator= (const ConstrainDirichlet &) = default;
+  ConstrainDirichlet & operator= (ConstrainDirichlet &&) = default;
 
   void operator()(const ConstElemRange & range) const
   {
@@ -1133,32 +1183,84 @@ public:
      * input function \p f gives the arbitrary solution.
      */
 
-    // Loop over all the variables we've been requested to project
-    for (const auto & var : dirichlet.variables)
+    // Check for a quick return in case there's no work to be done.
+    if (dirichlets.empty())
+      return;
+
+    // Figure out which System the DirichletBoundary objects are
+    // defined for. We break out of the loop as soon as we encounter a
+    // valid System pointer, the assumption is thus that all Variables
+    // are defined on the same System.
+    System * system = nullptr;
+    for (const auto & dirichlet : dirichlets)
+      for (const auto & var : dirichlet->variables)
+        {
+          const Variable & variable = dof_map.variable(var);
+          system = variable.system();
+
+          if (system)
+            goto done;
+        }
+
+    // If we found no System, it could be because none of the
+    // Variables have one defined, or because there are
+    // DirichletBoundary objects with no Variables defined on
+    // them. These situations both indicate a likely error in the
+    // setup of a problem, so let's throw an error in this case.
+  done:
+    if (!system)
+      libmesh_error_msg("Valid System not found for any Variables.");
+
+    // Construct a FEMContext object for the System on which the
+    // Variables in our DirichletBoundary objects are defined. This
+    // will be used in the apply_dirichlet_impl() function.
+    auto fem_context = libmesh_make_unique<FEMContext>(*system);
+
+    // At the time we are using this FEMContext, the current_local_solution
+    // vector is not initialized, but also we don't need it, so set
+    // the algebraic_type flag to DOFS_ONLY.
+    fem_context->set_algebraic_type(FEMContext::DOFS_ONLY);
+
+    // Loop over all the DirichletBoundary objects we have
+    for (const auto & dirichlet : dirichlets)
       {
-        const Variable & variable = dof_map.variable(var);
+        // TODO: Add sanity check that the boundary ids associated
+        // with the DirichletBoundary objects are actually present in
+        // the mesh. Currently this is a private function on DofMap so
+        // we can't call it here, but maybe it could be made public.
+        // dof_map.check_dirichlet_bcid_consistency(mesh, *dirichlet);
 
-        const FEType & fe_type = variable.type();
-
-        if (fe_type.family == SCALAR)
-          continue;
-
-        switch( FEInterface::field_type( fe_type ) )
+        // Loop over all the variables which this DirichletBoundary object is responsible for
+        for (const auto & var : dirichlet->variables)
           {
-          case TYPE_SCALAR:
-            {
-              this->apply_dirichlet_impl<Real>( range, var, variable, fe_type );
-              break;
-            }
-          case TYPE_VECTOR:
-            {
-              this->apply_dirichlet_impl<RealGradient>( range, var, variable, fe_type );
-              break;
-            }
-          default:
-            libmesh_error_msg("Unknown field type!");
-          }
+            const Variable & variable = dof_map.variable(var);
 
+            const FEType & fe_type = variable.type();
+
+            if (fe_type.family == SCALAR)
+              continue;
+
+            switch( FEInterface::field_type( fe_type ) )
+              {
+              case TYPE_SCALAR:
+                {
+                  // FIXME: the Elem loop is down inside of apply_dirichlet_impl(), and we want to move
+                  // the loops over DirichletBoundary objects and vars down into that function, so we
+                  // actually need to pass the entire "dirichlets" object to the apply_dirichlet_impl()
+                  // function now rather than looping over it externally and calling apply_dirichlet_impl
+                  // multiple times...
+                  this->apply_dirichlet_impl<Real>( range, var, variable, fe_type, *dirichlet, *fem_context );
+                  break;
+                }
+              case TYPE_VECTOR:
+                {
+                  this->apply_dirichlet_impl<RealGradient>( range, var, variable, fe_type, *dirichlet, *fem_context );
+                  break;
+                }
+              default:
+                libmesh_error_msg("Unknown field type!");
+              }
+          }
       }
   }
 
@@ -1320,40 +1422,22 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
                                                variable_number));
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  for (DirichletBoundaries::iterator
-         i = _dirichlet_boundaries->begin();
-       i != _dirichlet_boundaries->end(); ++i, range.reset())
-    {
-      // Sanity check that the boundary ids associated with the DirichletBoundary
-      // objects are actually present in the mesh
-      this->check_dirichlet_bcid_consistency(mesh,**i);
 
+  // Threaded loop over local over elems applying all Dirichlet BCs
+  Threads::parallel_for
+    (range,
+     ConstrainDirichlet(*this, mesh, time, *_dirichlet_boundaries,
+                        AddPrimalConstraint(*this)));
+
+  // Threaded loop over local over elems per QOI applying all adjoint
+  // Dirichlet BCs.  Note that the ConstElemRange is reset before each
+  // execution of Threads::parallel_for().
+  for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
+    {
       Threads::parallel_for
-        (range,
-         ConstrainDirichlet(*this, mesh, time, **i,
-                            AddPrimalConstraint(*this))
-         );
-    }
-
-  for (unsigned int qoi_index = 0,
-       n_qois = cast_int<unsigned int>(_adjoint_dirichlet_boundaries.size());
-       qoi_index != n_qois; ++qoi_index)
-    {
-      for (DirichletBoundaries::iterator
-             i = _adjoint_dirichlet_boundaries[qoi_index]->begin();
-           i != _adjoint_dirichlet_boundaries[qoi_index]->end();
-           ++i, range.reset())
-        {
-          // Sanity check that the boundary ids associated with the DirichletBoundary
-          // objects are actually present in the mesh
-          this->check_dirichlet_bcid_consistency(mesh,**i);
-
-          Threads::parallel_for
-            (range,
-             ConstrainDirichlet(*this, mesh, time, **i,
-                                AddAdjointConstraint(*this, qoi_index))
-             );
-        }
+        (range.reset(),
+         ConstrainDirichlet(*this, mesh, time, *(_adjoint_dirichlet_boundaries[qoi_index]),
+                            AddAdjointConstraint(*this, qoi_index)));
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
