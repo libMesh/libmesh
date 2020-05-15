@@ -1,7 +1,6 @@
 #include "fparser_ad.hh"
 #include "extrasrc/fpaux.hh"
 #include "extrasrc/fptypes.hh"
-#include "extrasrc/fpaux.hh"
 #include <stdlib.h>
 #include "Faddeeva.hh"
 
@@ -103,7 +102,7 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     mRegisteredDerivatives(cpy.mRegisteredDerivatives),
     ad(new ADImplementation<Value_t>(this))
 {
-  pImmed = this->mData->mImmed.empty() ? NULL : &(this->mData->mImmed[0]);
+  updatePImmed();
 }
 
 template<typename Value_t>
@@ -176,7 +175,6 @@ void FunctionParserADBase<Value_t>::setZero()
   this->mData->mImmed[0] = Value_t(0);
 }
 
-
 // this is a namespaced function because we cannot easily export CodeTree in the
 // public interface of the FunctionParserADBase class in its installed state in libMesh
 // as the codetree.hh header is not installed (part of FPoptimizer)
@@ -209,7 +207,6 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTr
   tree.Rehash();
   return tree;
 }
-
 
 // return the derivative of func and put it into diff
 template<typename Value_t>
@@ -618,7 +615,12 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
   if (compiledFunction == NULL)
     return FunctionParserBase<Value_t>::Eval(Vars);
   else
-    return (*compiledFunction)(Vars, pImmed, Epsilon<Value_t>::value);
+  {
+    Value_t ret;
+    (*reinterpret_cast<CompiledFunctionPtr<Value_t>>(compiledFunction))(
+        &ret, Vars, pImmed, Epsilon<Value_t>::value);
+    return ret;
+  }
 }
 
 // JIT compile for supported types
@@ -633,19 +635,22 @@ template<typename Value_t>
 std::string FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
 {
   FParserJIT::Hash hasher;
+  hasher.addData(std::string("version 2.0"));
   hasher.addData(this->mData->mByteCode);
   hasher.addData(Value_t_name);
   return hasher.get();
 }
 
 template<typename Value_t>
-bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name)
+bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name,
+                                                     const std::string & extra_options,
+                                                     const std::string & extra_headers)
 {
   // set compiled function pointer to zero to avoid stale values if JIT compilation fails
   compiledFunction = NULL;
 
   // get a pointer to the mImmed values
-  pImmed = this->mData->mImmed.empty() ? NULL : &(this->mData->mImmed[0]);
+  updatePImmed();
 
   // drop out if the ByteCode is empty
   if (isEmpty())
@@ -677,28 +682,28 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   }
 
   // opening the cached file did not work. (re)build it.
-  compiler.source()  << "#define _USE_MATH_DEFINES\n#include <cmath>\n";
+  compiler.source() << "#define _USE_MATH_DEFINES\n#include <cmath>\n" << extra_headers;
   if (!JITCodeGen(compiler.source(), fname, Value_t_name))
     return false;
 
   // run compiler
 #ifndef NDEBUG
-  if (!compiler.run("-g"))
+  if (!compiler.run("-g " + extra_options))
 #else
-  if (!compiler.run(""))
+  if (!compiler.run(extra_options))
 #endif
     return false;
 
   // fetch function pointer
   try {
-    *(void **) (&compiledFunction) = compiler.getFunction(fname);
-  } catch(std::exception &e) {
+    compiledFunction = compiler.getFunction(fname);
+  } catch (std::exception &e) {
     std::cerr << "Error binding JIT compiled function\n" << e.what() << '\n';
     return false;
   }
 
   // clear evalerror (this will not get set again by the JIT code)
-  this->mData->mEvalErrorType = 0;
+  clearEvalError();
 
   return true;
 }
@@ -709,9 +714,10 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
   // get a reference to the stored bytecode
   const std::vector<unsigned>& ByteCode = this->mData->mByteCode;
 
-  ccout << "extern \"C\" " << Value_t_name << ' '
-        << fname << "(const " << Value_t_name << " *params, const double *immed, const double eps) {\n"
-        << Value_t_name << " r, s[" << this->mData->mStackSize << "];\n";
+  ccout << "extern \"C\" void " << fname
+        << "(" << Value_t_name << " * ret, const " << Value_t_name
+        << " *params, const double *immed, const double eps) {\n"
+        << Value_t_name << " s[" << this->mData->mStackSize << "];\n";
 
   // determine all jump targets in the current program
   std::vector<bool> jumpTarget(ByteCode.size(), false);
@@ -984,7 +990,7 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
         }
     }
   }
-  ccout << "return s[" << sp << "]; }\n";
+  ccout << "*ret = s[" << sp << "]; }\n";
   return true;
 }
 
@@ -1118,9 +1124,9 @@ bool Compiler::run(const std::string & compiler_options)
   // run compiler
 #if defined(__GNUC__) && defined(__APPLE__) && !defined(__INTEL_COMPILER)
   // gcc on OSX does neither need nor accept the  -rdynamic switch
-  std::string command = FPARSER_JIT_COMPILER" -O2 -shared -fPIC ";
+  std::string command = FPARSER_JIT_COMPILER " -O2 -shared -fPIC ";
 #else
-  std::string command = FPARSER_JIT_COMPILER" -O2 -shared -rdynamic -fPIC ";
+  std::string command = FPARSER_JIT_COMPILER " -O2 -shared -rdynamic -fPIC ";
 #endif
   command += ccname_cc + " " + compiler_options + " -o " + _objectname;
   status = system(command.c_str());
@@ -1178,6 +1184,11 @@ void * Compiler::getFunction(const std::string & fname)
 }
 
 #endif // LIBMESH_HAVE_FPARSER_JIT
+
+template <typename Value_t>
+void FunctionParserADBase<Value_t>::updatePImmed() {
+  pImmed = this->mData->mImmed.empty() ? NULL : &(this->mData->mImmed[0]);
+}
 
 template<typename Value_t>
 void FunctionParserADBase<Value_t>::Serialize(std::ostream & ostr)
