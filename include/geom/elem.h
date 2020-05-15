@@ -56,6 +56,7 @@ enum Order : int;
 #include <set>
 #include <vector>
 #include <memory>
+#include <array>
 
 namespace libMesh
 {
@@ -2737,31 +2738,9 @@ dof_id_type Elem::compute_key (dof_id_type n0,
                                dof_id_type n1,
                                dof_id_type n2)
 {
-  // Order the numbers such that n0 < n1 < n2.
-  // We'll do it in 3 steps like this:
-  //
-  //     n0         n1                n2
-  //     min(n0,n1) max(n0,n1)        n2
-  //     min(n0,n1) min(n2,max(n0,n1) max(n2,max(n0,n1)
-  //           |\   /|                  |
-  //           | \ / |                  |
-  //           |  /  |                  |
-  //           | /  \|                  |
-  //  gb min= min   max              gb max
-
-  // Step 1
-  if (n0 > n1) std::swap (n0, n1);
-
-  // Step 2
-  if (n1 > n2) std::swap (n1, n2);
-
-  // Step 3
-  if (n0 > n1) std::swap (n0, n1);
-
-  libmesh_assert ((n0 < n1) && (n1 < n2));
-
-  dof_id_type array[3] = {n0, n1, n2};
-  return Utility::hashword(array, 3);
+  std::array<dof_id_type, 3> array = {n0, n1, n2};
+  std::sort(array.begin(), array.end());
+  return Utility::hashword(array);
 }
 
 
@@ -2772,26 +2751,9 @@ dof_id_type Elem::compute_key (dof_id_type n0,
                                dof_id_type n2,
                                dof_id_type n3)
 {
-  // Sort first
-  // Step 1
-  if (n0 > n1) std::swap (n0, n1);
-
-  // Step 2
-  if (n2 > n3) std::swap (n2, n3);
-
-  // Step 3
-  if (n0 > n2) std::swap (n0, n2);
-
-  // Step 4
-  if (n1 > n3) std::swap (n1, n3);
-
-  // Finally sort step 5
-  if (n1 > n2) std::swap (n1, n2);
-
-  libmesh_assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
-
-  dof_id_type array[4] = {n0, n1, n2, n3};
-  return Utility::hashword(array, 4);
+  std::array<dof_id_type, 4> array = {n0, n1, n2, n3};
+  std::sort(array.begin(), array.end());
+  return Utility::hashword(array);
 }
 
 
