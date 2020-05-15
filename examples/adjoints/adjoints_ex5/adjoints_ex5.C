@@ -40,7 +40,7 @@
 // The exact value of this sensitivity is:
 // dQ/dK = int_{domain} du/dK sin(pi*x) sin(pi*y) dx dy
 // = int_{domain} (-2*pi^2 * exp(-K pi^2) ) sin^2(pi*x) sin^2(pi*y) dx dy
-// = (-2*pi^2 * exp(-K 2*pi^2) )/4 = -0.49022 
+// = (-2*pi^2 * exp(-K 2*pi^2) )/4 = -0.49022 (K = 1.e-3)
 
 // For this QoI, the continuous adjoint problem reads,
 // -partial(z)/partial(t) - K Laplacian(z) = 0
@@ -684,7 +684,7 @@ int main (int argc, char ** argv)
       // getting are what they should be
       // The 2e-4 tolerance is chosen to ensure success even with
       // 32-bit floats
-      if(std::abs(sensitivity_0_0 - (-5.37173)) >= 2.e-4)
+      if(std::abs(sensitivity_0_0 - (-4.8269)) >= 2.e-4)
         libmesh_error_msg("Mismatch in sensitivity gold value!");
 
 #ifdef NDEBUG
