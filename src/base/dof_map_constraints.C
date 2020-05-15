@@ -292,14 +292,206 @@ private:
     return g->component(i, p, time);
   }
 
+
+
+  /**
+   * Handy struct to pass around BoundaryInfo for a single Elem.
+   * Must be created with a reference to a BoundaryInfo object.
+   */
+  struct SingleElemBoundaryInfo
+  {
+    SingleElemBoundaryInfo(const BoundaryInfo & bi,
+                           const std::map<boundary_id_type, std::set<DirichletBoundary *>> & map_in) :
+      boundary_info(bi),
+      boundary_id_to_dirichlet_boundaries(map_in),
+      elem(nullptr),
+      n_sides(0),
+      n_edges(0),
+      n_nodes(0)
+    {}
+
+    const BoundaryInfo & boundary_info;
+    const std::map<boundary_id_type, std::set<DirichletBoundary *>> & boundary_id_to_dirichlet_boundaries;
+    const Elem * elem;
+
+    unsigned short n_sides;
+    unsigned short n_edges;
+    unsigned short n_nodes;
+
+    std::vector<bool> is_boundary_node;
+    std::vector<bool> is_boundary_edge;
+    std::vector<bool> is_boundary_side;
+    std::vector<bool> is_boundary_shellface;
+
+    std::vector<bool> is_boundary_nodeset;
+
+    // The DirichletBoundary objects which have at least one boundary
+    // id related to this Elem.
+    std::set<DirichletBoundary *> dbs;
+
+    /**
+     * Given a single Elem, fills the SingleElemBoundaryInfo struct with
+     * required data.
+     *
+     * @return true if this Elem has _any_ boundary ids associated with
+     * it, false otherwise.
+     */
+    bool reinit(const Elem * elem_in)
+    {
+      elem = elem_in;
+
+      n_sides = elem->n_sides();
+      n_edges = elem->n_edges();
+      n_nodes = elem->n_nodes();
+
+      // Find out which nodes, edges, sides and shellfaces are on a requested
+      // boundary:
+      is_boundary_node.assign(n_nodes, false);
+      is_boundary_edge.assign(n_edges, false);
+      is_boundary_side.assign(n_sides, false);
+      is_boundary_shellface.assign(2, false);
+
+      // We also maintain a separate list of nodeset-based boundary nodes
+      is_boundary_nodeset.assign(n_nodes, false);
+
+      // Clear any DirichletBoundaries from the previous Elem
+      dbs.clear();
+
+      // Update has_dirichlet_constraint below, and if it remains false then
+      // we can skip this element since there are not constraints to impose.
+      bool has_dirichlet_constraint = false;
+
+      // Container to catch boundary ids handed back for sides,
+      // nodes, and edges in the loops below.
+      std::vector<boundary_id_type> ids_vec;
+
+      for (unsigned char s = 0; s != n_sides; ++s)
+        {
+          // First see if this side has been requested
+          boundary_info.boundary_ids (elem, s, ids_vec);
+
+          bool do_this_side = false;
+          for (const auto & bc_id : ids_vec)
+            {
+              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_dirichlet_boundaries.end())
+                {
+                  do_this_side = true;
+
+                  // We need to loop over all DirichletBoundary objects associated with bc_id
+                  dbs.insert(it->second.begin(), it->second.end());
+                }
+            }
+
+          if (!do_this_side)
+            continue;
+
+          is_boundary_side[s] = true;
+          has_dirichlet_constraint = true;
+
+          // Then see what nodes and what edges are on it
+          for (unsigned int n = 0; n != n_nodes; ++n)
+            if (elem->is_node_on_side(n,s))
+              is_boundary_node[n] = true;
+          for (unsigned int e = 0; e != n_edges; ++e)
+            if (elem->is_edge_on_side(e,s))
+              is_boundary_edge[e] = true;
+        }
+
+      // We can also impose Dirichlet boundary conditions on nodes, so we should
+      // also independently check whether the nodes have been requested
+      for (unsigned int n=0; n != n_nodes; ++n)
+        {
+          boundary_info.boundary_ids (elem->node_ptr(n), ids_vec);
+
+          for (const auto & bc_id : ids_vec)
+            {
+              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_dirichlet_boundaries.end())
+                {
+                  is_boundary_node[n] = true;
+                  is_boundary_nodeset[n] = true;
+                  has_dirichlet_constraint = true;
+
+                  // We need to loop over all DirichletBoundary objects associated with bc_id
+                  dbs.insert(it->second.begin(), it->second.end());
+                }
+            }
+        }
+
+      // We can also impose Dirichlet boundary conditions on edges, so we should
+      // also independently check whether the edges have been requested
+      for (unsigned short e=0; e != n_edges; ++e)
+        {
+          boundary_info.edge_boundary_ids (elem, e, ids_vec);
+
+          bool do_this_side = false;
+          for (const auto & bc_id : ids_vec)
+            {
+              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_dirichlet_boundaries.end())
+                {
+                  do_this_side = true;
+
+                  // We need to loop over all DirichletBoundary objects associated with bc_id
+                  dbs.insert(it->second.begin(), it->second.end());
+                }
+            }
+
+          if (!do_this_side)
+            continue;
+
+          is_boundary_edge[e] = true;
+          has_dirichlet_constraint = true;
+
+          // Then see what nodes are on it
+          for (unsigned int n = 0; n != n_nodes; ++n)
+            if (elem->is_node_on_edge(n,e))
+              is_boundary_node[n] = true;
+        }
+
+      // We can also impose Dirichlet boundary conditions on shellfaces, so we should
+      // also independently check whether the shellfaces have been requested
+      for (unsigned short shellface=0; shellface != 2; ++shellface)
+        {
+          boundary_info.shellface_boundary_ids (elem, shellface, ids_vec);
+
+          for (const auto & bc_id : ids_vec)
+            {
+              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_dirichlet_boundaries.end())
+                {
+                  is_boundary_shellface[shellface] = true;
+                  has_dirichlet_constraint = true;
+
+                  // We need to loop over all DirichletBoundary objects associated with bc_id
+                  dbs.insert(it->second.begin(), it->second.end());
+                }
+            }
+        }
+
+      return has_dirichlet_constraint;
+    } // SingleElemBoundaryInfo::reinit()
+
+  }; // struct SingleElemBoundaryInfo
+
+
+
+
   template<typename OutputType>
-  void apply_dirichlet_impl(const ConstElemRange & range,
-                            const unsigned int var,
+  void apply_dirichlet_impl(const SingleElemBoundaryInfo & sebi,
                             const Variable & variable,
-                            const FEType & fe_type,
                             const DirichletBoundary & dirichlet,
                             FEMContext & fem_context) const
   {
+    // Get pointer to the Elem we are currently working on
+    const Elem * elem = sebi.elem;
+
+    // Per-subdomain variables don't need to be projected on
+    // elements where they're not active
+    if (!variable.active_on_subdomain(elem->subdomain_id()))
+      return;
+
     typedef OutputType                                                      OutputShape;
     typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
     //typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
@@ -314,8 +506,6 @@ private:
     FEMFunctionBase<Gradient> * g_fem = dirichlet.g_fem.get();
 
     const System * f_system = dirichlet.f_system;
-
-    const std::set<boundary_id_type> & b = dirichlet.b;
 
     // We need data to project
     libmesh_assert(f || f_fem);
@@ -337,13 +527,17 @@ private:
     // The dimensionality of the current mesh
     const unsigned int dim = mesh.mesh_dimension();
 
-    // Boundary info for the current mesh
-    const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+    // Get a reference to the fe_type associated with this variable
+    const FEType & fe_type = variable.type();
 
+    // Dimension of the vector-valued FE (1 for scalar-valued FEs)
     unsigned int n_vec_dim = FEInterface::n_vec_dim(mesh, fe_type);
 
     const unsigned int var_component =
       variable.first_scalar_number();
+
+    // Get this Variable's number, as determined by the System.
+    const unsigned int var = variable.number();
 
     // The type of projections done depend on the FE's continuity.
     FEContinuity cont = FEInterface::get_continuity(fe_type);
@@ -378,122 +572,8 @@ private:
       }
 
     // Iterate over all the elements in the range
-    for (const auto & elem : range)
-      {
-        // We only calculate Dirichlet constraints on active
-        // elements
-        if (!elem->active())
-          continue;
-
-        // Per-subdomain variables don't need to be projected on
-        // elements where they're not active
-        if (!variable.active_on_subdomain(elem->subdomain_id()))
-          continue;
-
-        const unsigned short n_sides = elem->n_sides();
-        const unsigned short n_edges = elem->n_edges();
-        const unsigned short n_nodes = elem->n_nodes();
-
-        // Find out which nodes, edges, sides and shellfaces are on a requested
-        // boundary:
-        std::vector<bool> is_boundary_node(n_nodes, false),
-          is_boundary_edge(n_edges, false),
-          is_boundary_side(n_sides, false),
-          is_boundary_shellface(2, false);
-
-        // We also maintain a separate list of nodeset-based boundary nodes
-        std::vector<bool> is_boundary_nodeset(n_nodes, false);
-
-        // Update has_dirichlet_constraint below, and if it remains false then
-        // we can skip this element since there are not constraints to impose.
-        bool has_dirichlet_constraint = false;
-
-        // Container to catch boundary ids handed back for sides,
-        // nodes, and edges in the loops below.
-        std::vector<boundary_id_type> ids_vec;
-
-        for (unsigned char s = 0; s != n_sides; ++s)
-          {
-            // First see if this side has been requested
-            boundary_info.boundary_ids (elem, s, ids_vec);
-
-            bool do_this_side = false;
-            for (const auto & bc_id : ids_vec)
-              if (b.count(bc_id))
-                {
-                  do_this_side = true;
-                  break;
-                }
-            if (!do_this_side)
-              continue;
-
-            is_boundary_side[s] = true;
-            has_dirichlet_constraint = true;
-
-            // Then see what nodes and what edges are on it
-            for (unsigned int n = 0; n != n_nodes; ++n)
-              if (elem->is_node_on_side(n,s))
-                is_boundary_node[n] = true;
-            for (unsigned int e = 0; e != n_edges; ++e)
-              if (elem->is_edge_on_side(e,s))
-                is_boundary_edge[e] = true;
-          }
-
-        // We can also impose Dirichlet boundary conditions on nodes, so we should
-        // also independently check whether the nodes have been requested
-        for (unsigned int n=0; n != n_nodes; ++n)
-          {
-            boundary_info.boundary_ids (elem->node_ptr(n), ids_vec);
-
-            for (const auto & bc_id : ids_vec)
-              if (b.count(bc_id))
-                {
-                  is_boundary_node[n] = true;
-                  is_boundary_nodeset[n] = true;
-                  has_dirichlet_constraint = true;
-                  break;
-                }
-          }
-
-        // We can also impose Dirichlet boundary conditions on edges, so we should
-        // also independently check whether the edges have been requested
-        for (unsigned short e=0; e != n_edges; ++e)
-          {
-            boundary_info.edge_boundary_ids (elem, e, ids_vec);
-
-            for (const auto & bc_id : ids_vec)
-              if (b.count(bc_id))
-                {
-                  is_boundary_edge[e] = true;
-                  has_dirichlet_constraint = true;
-
-                  for (unsigned int n = 0; n != n_nodes; ++n)
-                    if (elem->is_node_on_edge(n,e))
-                      is_boundary_node[n] = true;
-
-                  break;
-                }
-          }
-
-        // We can also impose Dirichlet boundary conditions on shellfaces, so we should
-        // also independently check whether the shellfaces have been requested
-        for (unsigned short shellface=0; shellface != 2; ++shellface)
-          {
-            boundary_info.shellface_boundary_ids (elem, shellface, ids_vec);
-
-            for (const auto & bc_id : ids_vec)
-              if (b.count(bc_id))
-                {
-                  is_boundary_shellface[shellface] = true;
-                  has_dirichlet_constraint = true;
-                  break;
-                }
-          }
-
-        if(!has_dirichlet_constraint)
-          {
-            continue;
-          }
+//    for (const auto & elem : range)
+//      {
 
         // There's a chicken-and-egg problem with FEMFunction-based
         // Dirichlet constraints: we can't evaluate the FEMFunction
@@ -542,15 +622,15 @@ private:
         // need to interpolate them directly, even if they're non-vertex
         // nodes.
         unsigned int current_dof = 0;
-        for (unsigned int n=0; n!= n_nodes; ++n)
+        for (unsigned int n=0; n!= sebi.n_nodes; ++n)
           {
             // FIXME: this should go through the DofMap,
             // not duplicate dof_indices code badly!
             const unsigned int nc =
               FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
                                            n);
-            if ((!elem->is_vertex(n) || !is_boundary_node[n]) &&
-                !is_boundary_nodeset[n])
+            if ((!elem->is_vertex(n) || !sebi.is_boundary_node[n]) &&
+                !sebi.is_boundary_nodeset[n])
               {
                 current_dof += nc;
                 continue;
@@ -732,9 +812,9 @@ private:
           // Vector to hold edge local DOF indices
           std::vector<unsigned int> edge_dofs;
 
-          for (unsigned int e=0; e != n_edges; ++e)
+          for (unsigned int e=0; e != sebi.n_edges; ++e)
             {
-              if (!is_boundary_edge[e])
+              if (!sebi.is_boundary_edge[e])
                 continue;
 
               FEInterface::dofs_on_edge(elem, dim, fe_type, e,
@@ -882,9 +962,9 @@ private:
           // Vector to hold side local DOF indices
           std::vector<unsigned int> side_dofs;
 
-          for (unsigned int s=0; s != n_sides; ++s)
+          for (unsigned int s=0; s != sebi.n_sides; ++s)
             {
-              if (!is_boundary_side[s])
+              if (!sebi.is_boundary_side[s])
                 continue;
 
               FEInterface::dofs_on_side(elem, dim, fe_type, s,
@@ -1031,7 +1111,7 @@ private:
 
           for (unsigned int shellface=0; shellface != 2; ++shellface)
             {
-              if (!is_boundary_shellface[shellface])
+              if (!sebi.is_boundary_shellface[shellface])
                 continue;
 
               // A shellface has the same dof indices as the element itself
@@ -1161,7 +1241,7 @@ private:
                 add_fn (dof_indices[i], empty_row, Ue(i));
             }
         }
-      } // end for (elem : range)
+        //      } // end for (elem : range)
 
   } // apply_dirichlet_impl
 
@@ -1183,6 +1263,8 @@ public:
   ConstrainDirichlet & operator= (const ConstrainDirichlet &) = default;
   ConstrainDirichlet & operator= (ConstrainDirichlet &&) = default;
 
+
+
   void operator()(const ConstElemRange & range) const
   {
     /**
@@ -1200,22 +1282,36 @@ public:
     // valid System pointer, the assumption is thus that all Variables
     // are defined on the same System.
     System * system = nullptr;
-    for (const auto & dirichlet : dirichlets)
-      for (const auto & var : dirichlet->variables)
-        {
-          const Variable & variable = dof_map.variable(var);
-          system = variable.system();
 
-          if (system)
-            goto done;
-        }
+    // Map from boundary_id -> set<DirichletBoundary*> objects which
+    // are active on that boundary_id. Later we will use this to determine
+    // which DirichletBoundary objects to loop over for each Elem.
+    std::map<boundary_id_type, std::set<DirichletBoundary *>>
+      boundary_id_to_dirichlet_boundaries;
+
+    for (const auto & dirichlet : dirichlets)
+      {
+        // Construct mapping from boundary_id -> DirichletBoundary
+        for (const auto & b_id : dirichlet->b)
+          boundary_id_to_dirichlet_boundaries[b_id].insert(dirichlet);
+
+        for (const auto & var : dirichlet->variables)
+          {
+            const Variable & variable = dof_map.variable(var);
+            auto current_system = variable.system();
+
+            if (!system)
+              system = current_system;
+            else if (current_system != system)
+              libmesh_error_msg("All variables should be defined on the same System");
+          }
+      }
 
     // If we found no System, it could be because none of the
     // Variables have one defined, or because there are
     // DirichletBoundary objects with no Variables defined on
     // them. These situations both indicate a likely error in the
     // setup of a problem, so let's throw an error in this case.
-  done:
     if (!system)
       libmesh_error_msg("Valid System not found for any Variables.");
 
@@ -1229,8 +1325,28 @@ public:
     // the algebraic_type flag to DOFS_ONLY.
     fem_context->set_algebraic_type(FEMContext::DOFS_ONLY);
 
-    // Loop over all the DirichletBoundary objects we have
-    for (const auto & dirichlet : dirichlets)
+    // Boundary info for the current mesh
+    const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+    // This object keeps track of the BoundaryInfo for a single Elem
+    SingleElemBoundaryInfo sebi(boundary_info, boundary_id_to_dirichlet_boundaries);
+
+    // Iterate over all the elements in the range
+    for (const auto & elem : range)
+    {
+      // We only calculate Dirichlet constraints on active
+      // elements
+      if (!elem->active())
+        continue;
+
+      // Reinitialize BoundaryInfo data structures for the current elem
+      bool has_dirichlet_constraint = sebi.reinit(elem);
+
+      // If this Elem has no boundary ids, go to the next one.
+      if (!has_dirichlet_constraint)
+        continue;
+
+      for (const auto & dirichlet : sebi.dbs)
       {
         // TODO: Add sanity check that the boundary ids associated
         // with the DirichletBoundary objects are actually present in
@@ -1243,6 +1359,10 @@ public:
           {
             const Variable & variable = dof_map.variable(var);
 
+            // Make sure that the Variable and the DofMap agree on
+            // what number this variable is.
+            libmesh_assert_equal_to(variable.number(), var);
+
             const FEType & fe_type = variable.type();
 
             if (fe_type.family == SCALAR)
@@ -1252,17 +1372,12 @@ public:
               {
               case TYPE_SCALAR:
                 {
-                  // FIXME: the Elem loop is down inside of apply_dirichlet_impl(), and we want to move
-                  // the loops over DirichletBoundary objects and vars down into that function, so we
-                  // actually need to pass the entire "dirichlets" object to the apply_dirichlet_impl()
-                  // function now rather than looping over it externally and calling apply_dirichlet_impl
-                  // multiple times...
-                  this->apply_dirichlet_impl<Real>( range, var, variable, fe_type, *dirichlet, *fem_context );
+                  this->apply_dirichlet_impl<Real>( sebi, variable, *dirichlet, *fem_context );
                   break;
                 }
               case TYPE_VECTOR:
                 {
-                  this->apply_dirichlet_impl<RealGradient>( range, var, variable, fe_type, *dirichlet, *fem_context );
+                  this->apply_dirichlet_impl<RealGradient>( sebi, variable, *dirichlet, *fem_context );
                   break;
                 }
               default:
@@ -1270,7 +1385,8 @@ public:
               }
           }
       }
-  }
+  } // for (elem : range)
+  } // operator()
 
 }; // class ConstrainDirichlet
 
