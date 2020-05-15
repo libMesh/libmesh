@@ -31,11 +31,16 @@
 // T(boundary;t) = 0
 
 // For these initial and boundary conditions, the exact solution
-// u = exp(-K pi^2 t) * sin(pi*x) * sin(pi*y)
+// u = exp(-K 2*pi^2 t) * sin(pi*x) * sin(pi*y)
 
 // We specify our Quantity of Interest (QoI) as
 // Q(u) = int_{domain} u(x,y;1) sin(pi*x) sin(pi*y) dx dy, and
 // are interested in computing the sensitivity dQ/dK
+
+// The exact value of this sensitivity is:
+// dQ/dK = int_{domain} du/dK sin(pi*x) sin(pi*y) dx dy
+// = int_{domain} (-2*pi^2 * exp(-K pi^2) ) sin^2(pi*x) sin^2(pi*y) dx dy
+// = (-2*pi^2 * exp(-K 2*pi^2) )/4 = -0.49022 
 
 // For this QoI, the continuous adjoint problem reads,
 // -partial(z)/partial(t) - K Laplacian(z) = 0
