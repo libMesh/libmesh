@@ -295,8 +295,10 @@ private:
 
 
   /**
-   * Handy struct to pass around BoundaryInfo for a single Elem.
-   * Must be created with a reference to a BoundaryInfo object.
+   * Handy struct to pass around BoundaryInfo for a single Elem.  Must
+   * be created with a reference to a BoundaryInfo object and a map
+   * from boundary_id -> set<DirichletBoundary *> objects involving
+   * that id.
    */
   struct SingleElemBoundaryInfo
   {
@@ -318,12 +320,15 @@ private:
     unsigned short n_edges;
     unsigned short n_nodes;
 
-    std::vector<bool> is_boundary_node;
-    std::vector<bool> is_boundary_edge;
-    std::vector<bool> is_boundary_side;
-    std::vector<bool> is_boundary_shellface;
+    // Mapping from DirichletBoundary objects which are active on this
+    // element to sides/nodes/edges/shellfaces of this element which
+    // they are active on.
+    std::map<const DirichletBoundary *, std::vector<bool>> is_boundary_node_map;
+    std::map<const DirichletBoundary *, std::vector<bool>> is_boundary_side_map;
+    std::map<const DirichletBoundary *, std::vector<bool>> is_boundary_edge_map;
+    std::map<const DirichletBoundary *, std::vector<bool>> is_boundary_shellface_map;
 
-    std::vector<bool> is_boundary_nodeset;
+    std::map<const DirichletBoundary *, std::vector<bool>> is_boundary_nodeset_map;
 
     // The DirichletBoundary objects which have at least one boundary
     // id related to this Elem.
@@ -344,15 +349,12 @@ private:
       n_edges = elem->n_edges();
       n_nodes = elem->n_nodes();
 
-      // Find out which nodes, edges, sides and shellfaces are on a requested
-      // boundary:
-      is_boundary_node.assign(n_nodes, false);
-      is_boundary_edge.assign(n_edges, false);
-      is_boundary_side.assign(n_sides, false);
-      is_boundary_shellface.assign(2, false);
-
-      // We also maintain a separate list of nodeset-based boundary nodes
-      is_boundary_nodeset.assign(n_nodes, false);
+      // objects and node/side/edge/shellface ids.
+      is_boundary_node_map.clear();
+      is_boundary_side_map.clear();
+      is_boundary_edge_map.clear();
+      is_boundary_shellface_map.clear();
+      is_boundary_nodeset_map.clear();
 
       // Clear any DirichletBoundaries from the previous Elem
       dbs.clear();
@@ -378,25 +380,72 @@ private:
                 {
                   do_this_side = true;
 
-                  // We need to loop over all DirichletBoundary objects associated with bc_id
+                  // Associate every DirichletBoundary object that has this bc_id with the current Elem
                   dbs.insert(it->second.begin(), it->second.end());
+
+                  // Turn on the flag for the current side for each DirichletBoundary
+                  for (const auto & db : it->second)
+                    {
+                      // Attempt to emplace an empty vector. If there
+                      // is already an entry, the insertion will fail
+                      // and we'll get an iterator back to the
+                      // existing entry. Either way, we'll then set
+                      // index s of that vector to "true".
+                      auto pr = is_boundary_side_map.emplace(db, std::vector<bool>(n_sides, false));
+                      pr.first->second[s] = true;
+                    }
                 }
             }
 
           if (!do_this_side)
             continue;
 
-          is_boundary_side[s] = true;
           has_dirichlet_constraint = true;
 
-          // Then see what nodes and what edges are on it
+          // Then determine what nodes are on this side
           for (unsigned int n = 0; n != n_nodes; ++n)
             if (elem->is_node_on_side(n,s))
-              is_boundary_node[n] = true;
+              {
+                // Attempt to emplace an empty vector. If there is
+                // already an entry, the insertion will fail and we'll
+                // get an iterator back to the existing entry. Either
+                // way, we'll then set index n of that vector to
+                // "true".
+                for (const auto & db : dbs)
+                  {
+                    // Only add this as a boundary node for this db if
+                    // it is also a boundary side for this db.
+                    auto side_it = is_boundary_side_map.find(db);
+                    if (side_it != is_boundary_side_map.end() && side_it->second[s])
+                      {
+                        auto pr = is_boundary_node_map.emplace(db, std::vector<bool>(n_nodes, false));
+                        pr.first->second[n] = true;
+                      }
+                  }
+              }
+
+          // Finally determine what edges are on this side
           for (unsigned int e = 0; e != n_edges; ++e)
             if (elem->is_edge_on_side(e,s))
-              is_boundary_edge[e] = true;
-        }
+              {
+                // Attempt to emplace an empty vector. If there is
+                // already an entry, the insertion will fail and we'll
+                // get an iterator back to the existing entry. Either
+                // way, we'll then set index e of that vector to
+                // "true".
+                for (const auto & db : dbs)
+                  {
+                    // Only add this as a boundary edge for this db if
+                    // it is also a boundary side for this db.
+                    auto side_it = is_boundary_side_map.find(db);
+                    if (side_it != is_boundary_side_map.end() && side_it->second[s])
+                      {
+                        auto pr = is_boundary_edge_map.emplace(db, std::vector<bool>(n_edges, false));
+                        pr.first->second[e] = true;
+                      }
+                  }
+              }
+        } // for (s = 0..n_sides)
 
       // We can also impose Dirichlet boundary conditions on nodes, so we should
       // also independently check whether the nodes have been requested
@@ -409,15 +458,23 @@ private:
               auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
               if (it != boundary_id_to_dirichlet_boundaries.end())
                 {
-                  is_boundary_node[n] = true;
-                  is_boundary_nodeset[n] = true;
-                  has_dirichlet_constraint = true;
-
-                  // We need to loop over all DirichletBoundary objects associated with bc_id
+                  // Associate every DirichletBoundary object that has this bc_id with the current Elem
                   dbs.insert(it->second.begin(), it->second.end());
+
+                  // Turn on the flag for the current node for each DirichletBoundary
+                  for (const auto & db : it->second)
+                    {
+                      auto pr = is_boundary_node_map.emplace(db, std::vector<bool>(n_nodes, false));
+                      pr.first->second[n] = true;
+
+                      auto pr2 = is_boundary_nodeset_map.emplace(db, std::vector<bool>(n_nodes, false));
+                      pr2.first->second[n] = true;
+                    }
+
+                  has_dirichlet_constraint = true;
                 }
             }
-        }
+        } // for (n = 0..n_nodes)
 
       // We can also impose Dirichlet boundary conditions on edges, so we should
       // also independently check whether the edges have been requested
@@ -435,19 +492,42 @@ private:
 
                   // We need to loop over all DirichletBoundary objects associated with bc_id
                   dbs.insert(it->second.begin(), it->second.end());
+
+                  // Turn on the flag for the current edge for each DirichletBoundary
+                  for (const auto & db : it->second)
+                    {
+                      auto pr = is_boundary_edge_map.emplace(db, std::vector<bool>(n_edges, false));
+                      pr.first->second[e] = true;
+                    }
                 }
             }
 
           if (!do_this_side)
             continue;
 
-          is_boundary_edge[e] = true;
           has_dirichlet_constraint = true;
 
-          // Then see what nodes are on it
+          // Then determine what nodes are on this edge
           for (unsigned int n = 0; n != n_nodes; ++n)
             if (elem->is_node_on_edge(n,e))
-              is_boundary_node[n] = true;
+              {
+                // Attempt to emplace an empty vector. If there is
+                // already an entry, the insertion will fail and we'll
+                // get an iterator back to the existing entry. Either
+                // way, we'll then set index n of that vector to
+                // "true".
+                for (const auto & db : dbs)
+                  {
+                    // Only add this as a boundary node for this db if
+                    // it is also a boundary edge for this db.
+                    auto edge_it = is_boundary_edge_map.find(db);
+                    if (edge_it != is_boundary_edge_map.end() && edge_it->second[e])
+                      {
+                        auto pr = is_boundary_node_map.emplace(db, std::vector<bool>(n_nodes, false));
+                        pr.first->second[n] = true;
+                      }
+                  }
+              }
         }
 
       // We can also impose Dirichlet boundary conditions on shellfaces, so we should
@@ -461,14 +541,20 @@ private:
               auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
               if (it != boundary_id_to_dirichlet_boundaries.end())
                 {
-                  is_boundary_shellface[shellface] = true;
                   has_dirichlet_constraint = true;
 
                   // We need to loop over all DirichletBoundary objects associated with bc_id
                   dbs.insert(it->second.begin(), it->second.end());
+
+                  // Turn on the flag for the current shellface for each DirichletBoundary
+                  for (const auto & db : it->second)
+                    {
+                      auto pr = is_boundary_shellface_map.emplace(db, std::vector<bool>(/*n_shellfaces=*/2, false));
+                      pr.first->second[shellface] = true;
+                    }
                 }
             }
-        }
+        } // for (shellface = 0..2)
 
       return has_dirichlet_constraint;
     } // SingleElemBoundaryInfo::reinit()
@@ -623,10 +709,30 @@ private:
         // FIXME: this should go through the DofMap,
         // not duplicate dof_indices code badly!
         const unsigned int nc =
-          FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
-                                       n);
-        if ((!elem->is_vertex(n) || !sebi.is_boundary_node[n]) &&
-            !sebi.is_boundary_nodeset[n])
+          FEInterface::n_dofs_at_node (dim, fe_type, elem_type, n);
+
+        // Get a reference to the "is_boundary_node" flags for the
+        // current DirichletBoundary object.  In case the map does not
+        // contain an entry for this DirichletBoundary object, it
+        // means there are no boundary nodes active.
+        auto is_boundary_node_it = sebi.is_boundary_node_map.find(&dirichlet);
+
+        // The current n is not a boundary node if either there is no
+        // boundary_node_map for this DirichletBoundary object, or if
+        // there is but the entry in the corresponding vector is
+        // false.
+        const bool not_boundary_node =
+          (is_boundary_node_it == sebi.is_boundary_node_map.end() ||
+           !is_boundary_node_it->second[n]);
+
+        // Same thing for nodesets
+        auto is_boundary_nodeset_it = sebi.is_boundary_nodeset_map.find(&dirichlet);
+        const bool not_boundary_nodeset =
+          (is_boundary_nodeset_it == sebi.is_boundary_nodeset_map.end() ||
+           !is_boundary_nodeset_it->second[n]);
+
+        if ((!elem->is_vertex(n) || not_boundary_node) &&
+            not_boundary_nodeset)
           {
             current_dof += nc;
             continue;
@@ -808,9 +914,16 @@ private:
         // Vector to hold edge local DOF indices
         std::vector<unsigned int> edge_dofs;
 
+        // Get a reference to the "is_boundary_edge" flags for the
+        // current DirichletBoundary object.  In case the map does not
+        // contain an entry for this DirichletBoundary object, it
+        // means there are no boundary edges active.
+        auto is_boundary_edge_it = sebi.is_boundary_edge_map.find(&dirichlet);
+
         for (unsigned int e=0; e != sebi.n_edges; ++e)
           {
-            if (!sebi.is_boundary_edge[e])
+            if (is_boundary_edge_it == sebi.is_boundary_edge_map.end() ||
+                !is_boundary_edge_it->second[e])
               continue;
 
             FEInterface::dofs_on_edge(elem, dim, fe_type, e,
@@ -958,9 +1071,16 @@ private:
         // Vector to hold side local DOF indices
         std::vector<unsigned int> side_dofs;
 
+        // Get a reference to the "is_boundary_side" flags for the
+        // current DirichletBoundary object.  In case the map does not
+        // contain an entry for this DirichletBoundary object, it
+        // means there are no boundary sides active.
+        auto is_boundary_side_it = sebi.is_boundary_side_map.find(&dirichlet);
+
         for (unsigned int s=0; s != sebi.n_sides; ++s)
           {
-            if (!sebi.is_boundary_side[s])
+            if (is_boundary_side_it == sebi.is_boundary_side_map.end() ||
+                !is_boundary_side_it->second[s])
               continue;
 
             FEInterface::dofs_on_side(elem, dim, fe_type, s,
@@ -1071,9 +1191,11 @@ private:
             for (unsigned int i=0; i != free_dofs; ++i)
               {
                 Number & ui = Ue(side_dofs[free_dof[i]]);
+
                 libmesh_assert(std::abs(ui) < TOLERANCE ||
                                std::abs(ui - Uside(i)) < TOLERANCE);
                 ui = Uside(i);
+
                 dof_is_fixed[side_dofs[free_dof[i]]] = true;
               }
           } // end for (s = 0..n_sides)
@@ -1105,9 +1227,16 @@ private:
             dphi = &ref_dphi;
           }
 
+        // Get a reference to the "is_boundary_shellface" flags for the
+        // current DirichletBoundary object.  In case the map does not
+        // contain an entry for this DirichletBoundary object, it
+        // means there are no boundary shellfaces active.
+        auto is_boundary_shellface_it = sebi.is_boundary_shellface_map.find(&dirichlet);
+
         for (unsigned int shellface=0; shellface != 2; ++shellface)
           {
-            if (!sebi.is_boundary_shellface[shellface])
+            if (is_boundary_shellface_it == sebi.is_boundary_shellface_map.end() ||
+                !is_boundary_shellface_it->second[shellface])
               continue;
 
             // A shellface has the same dof indices as the element itself
@@ -1550,6 +1679,7 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   // Threaded loop over local over elems per QOI applying all adjoint
   // Dirichlet BCs.  Note that the ConstElemRange is reset before each
   // execution of Threads::parallel_for().
+
   for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
     {
       Threads::parallel_for
