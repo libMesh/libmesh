@@ -451,6 +451,7 @@ private:
                   is_boundary_node[n] = true;
                   is_boundary_nodeset[n] = true;
                   has_dirichlet_constraint = true;
+                  break;
                 }
           }
 
@@ -469,6 +470,8 @@ private:
                   for (unsigned int n = 0; n != n_nodes; ++n)
                     if (elem->is_node_on_edge(n,e))
                       is_boundary_node[n] = true;
+
+                  break;
                 }
           }
 
@@ -483,6 +486,7 @@ private:
                 {
                   is_boundary_shellface[shellface] = true;
                   has_dirichlet_constraint = true;
+                  break;
                 }
           }
 
