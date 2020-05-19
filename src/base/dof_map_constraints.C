@@ -465,6 +465,10 @@ private:
                 {
                   is_boundary_edge[e] = true;
                   has_dirichlet_constraint = true;
+
+                  for (unsigned int n = 0; n != n_nodes; ++n)
+                    if (elem->is_node_on_edge(n,e))
+                      is_boundary_node[n] = true;
                 }
           }
 
