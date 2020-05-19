@@ -55,7 +55,16 @@ public:
   // Sensitivity Calculation
   Number & compute_final_sensitivity()
   {
-    final_sensitivity = -(R_plus_dp - R_minus_dp)/(2*dp);
+    final_sensitivity = 0.0;
+
+    // Use the trapezoidal rule to compute the sensitivity integral
+    for(unsigned int i = 0; i < R_plus_dp.size()-1; i++)
+    {
+      Real left_contribution = -(R_plus_dp[i] - R_minus_dp[i])/(2.*dp);
+      Real right_contribution = -(R_plus_dp[i+1] - R_minus_dp[i+1])/(2.*dp);
+
+      final_sensitivity += (left_contribution + right_contribution)/2.;
+    }
 
     return final_sensitivity;
   }
@@ -128,8 +137,8 @@ protected:
   bool _analytic_jacobians;
 
   // Variables to hold the perturbed residuals
-  Number R_plus_dp;
-  Number R_minus_dp;
+  std::vector<Number> R_plus_dp;
+  std::vector<Number> R_minus_dp;
 
   // Perturbation parameter
   Real dp;
