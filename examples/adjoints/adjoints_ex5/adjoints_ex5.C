@@ -31,11 +31,16 @@
 // T(boundary;t) = 0
 
 // For these initial and boundary conditions, the exact solution
-// u = exp(-K pi^2 t) * sin(pi*x) * sin(pi*y)
+// u = exp(-K 2*pi^2 t) * sin(pi*x) * sin(pi*y)
 
 // We specify our Quantity of Interest (QoI) as
 // Q(u) = int_{domain} u(x,y;1) sin(pi*x) sin(pi*y) dx dy, and
 // are interested in computing the sensitivity dQ/dK
+
+// The exact value of this sensitivity is:
+// dQ/dK = int_{domain} du/dK sin(pi*x) sin(pi*y) dx dy
+// = int_{domain} (-2*pi^2 * exp(-K pi^2) ) sin^2(pi*x) sin^2(pi*y) dx dy
+// = (-2*pi^2 * exp(-K 2*pi^2) )/4 = -4.9022 (K = 1.0e-3)
 
 // For this QoI, the continuous adjoint problem reads,
 // -partial(z)/partial(t) - K Laplacian(z) = 0
@@ -45,7 +50,7 @@
 // T(boundary;t) = 0
 
 // which has the exact solution,
-// z = exp(-K pi^2 (1 - t)) * sin(pi*x) * sin(pi*y)
+// z = exp(-K 2*pi^2 (1 - t)) * sin(pi*x) * sin(pi*y)
 // which is the mirror image in time of the forward solution
 
 // For an adjoint consistent space-time formulation, the discrete
@@ -679,7 +684,7 @@ int main (int argc, char ** argv)
       // getting are what they should be
       // The 2e-4 tolerance is chosen to ensure success even with
       // 32-bit floats
-      if(std::abs(sensitivity_0_0 - (-5.37173)) >= 2.e-4)
+      if(std::abs(sensitivity_0_0 - (-4.83551)) >= 2.e-4)
         libmesh_error_msg("Mismatch in sensitivity gold value!");
 
 #ifdef NDEBUG
