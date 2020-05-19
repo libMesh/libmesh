@@ -542,8 +542,8 @@ int main (int argc, char ** argv)
                        << system.time
                        << std::endl;
 
-	  // Output the H1 norm of the retrieved primal solution from the last call
-	  // to adjoint_advance_timestep
+          // Output the H1 norm of the retrieved primal solution from the last call
+        // to adjoint_advance_timestep
           libMesh::out << "|U("
                        << system.time
                        << ")|= "
@@ -565,9 +565,9 @@ int main (int argc, char ** argv)
           // unnecessarily in the error estimator
           system.set_adjoint_already_solved(true);
 
-	  libMesh::out << "Saving adjoint and retrieving primal solutions at time t=" << system.time - system.deltat << std::endl;
+  libMesh::out << "Saving adjoint and retrieving primal solutions at time t=" << system.time - system.deltat << std::endl;
 
-	  // The adjoint_advance_timestep function calls the retrieve and store
+  // The adjoint_advance_timestep function calls the retrieve and store
           // function of the memory_solution_history class via the
           // memory_solution_history object we declared earlier.  The
           // retrieve function sets the system primal vectors to their
@@ -630,7 +630,7 @@ int main (int argc, char ** argv)
           //             << system.time
           //             << ")|= "
           //             << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-	  //            << std::endl;
+  //            << std::endl;
 
           libMesh::out << "|Z("
                        << system.time
