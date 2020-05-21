@@ -535,6 +535,7 @@ private:
       for (unsigned short shellface=0; shellface != 2; ++shellface)
         {
           boundary_info.shellface_boundary_ids (elem, shellface, ids_vec);
+          bool do_this_shellface = false;
 
           for (const auto & bc_id : ids_vec)
             {
@@ -542,6 +543,7 @@ private:
               if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   has_dirichlet_constraint = true;
+                  do_this_shellface = true;
 
                   // We need to loop over all DirichletBoundary objects associated with bc_id
                   ordered_dbs.insert(it->second.begin(), it->second.end());
@@ -554,6 +556,23 @@ private:
                     }
                 }
             }
+
+          if (do_this_shellface)
+            {
+              // Shellface BCs induce BCs on all the nodes of a shell Elem
+              for (unsigned int n = 0; n != n_nodes; ++n)
+                for (const auto & db_pair : ordered_dbs)
+                  {
+                    // Only add this as a boundary node for this db if
+                    // it is also a boundary shellface for this db.
+                    auto side_it = is_boundary_shellface_map.find(db_pair.second);
+                    if (side_it != is_boundary_shellface_map.end() && side_it->second[shellface])
+                      {
+                        auto pr = is_boundary_node_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
+                        pr.first->second[n] = true;
+                      }
+                  }
+            }
         } // for (shellface = 0..2)
 
       return has_dirichlet_constraint;
@@ -561,6 +580,156 @@ private:
 
   }; // struct SingleElemBoundaryInfo
 
+
+
+  template<typename OutputType>
+  void apply_lagrange_dirichlet_impl(const SingleElemBoundaryInfo & sebi,
+                            const Variable & variable,
+                            const DirichletBoundary & dirichlet,
+                            FEMContext & fem_context) const
+  {
+    // Get pointer to the Elem we are currently working on
+    const Elem * elem = sebi.elem;
+
+    // Per-subdomain variables don't need to be projected on
+    // elements where they're not active
+    if (!variable.active_on_subdomain(elem->subdomain_id()))
+      return;
+
+    FunctionBase<Number> * f = dirichlet.f.get();
+    FEMFunctionBase<Number> * f_fem = dirichlet.f_fem.get();
+
+    const System * f_system = dirichlet.f_system;
+
+    // We need data to project
+    libmesh_assert(f || f_fem);
+    libmesh_assert(!(f && f_fem));
+
+    // Iff our data depends on a system, we should have it.
+    libmesh_assert(!(f && f_system));
+    libmesh_assert(!(f_fem && !f_system));
+
+    // The dimensionality of the current mesh
+    const unsigned int dim = mesh.mesh_dimension();
+
+    // The new element coefficients. For Lagrange FEs, these are the
+    // nodal values.
+    DenseVector<Number> Ue;
+
+    // Get a reference to the fe_type associated with this variable
+    const FEType & fe_type = variable.type();
+
+    // Dimension of the vector-valued FE (1 for scalar-valued FEs)
+    unsigned int n_vec_dim = FEInterface::n_vec_dim(mesh, fe_type);
+
+    const unsigned int var_component =
+      variable.first_scalar_number();
+
+    // Get this Variable's number, as determined by the System.
+    const unsigned int var = variable.number();
+
+    // If our supplied functions require a FEMContext, and if we have
+    // an initialized solution to use with that FEMContext, then
+    // create one
+    std::unique_ptr<FEMContext> context;
+    if (f_fem)
+      {
+        libmesh_assert(f_system);
+        if (f_system->current_local_solution->initialized())
+          {
+            context = libmesh_make_unique<FEMContext>(*f_system);
+            f_fem->init_context(*context);
+          }
+      }
+
+    if (f_system && context.get())
+      context->pre_fe_reinit(*f_system, elem);
+
+    // Also pre-init the fem_context() we were passed on the current Elem.
+    fem_context.pre_fe_reinit(fem_context.get_system(), elem);
+
+    // Get a reference to the DOF indices for the current element
+    const std::vector<dof_id_type> & dof_indices =
+      fem_context.get_dof_indices(var);
+
+    // The number of DOFs on the element
+    const unsigned int n_dofs =
+      cast_int<unsigned int>(dof_indices.size());
+
+    // Fixed vs. free DoFs on edge/face projections
+    std::vector<char> dof_is_fixed(n_dofs, false); // bools
+
+    // The element type
+    const ElemType elem_type = elem->type();
+
+    // Zero the interpolated values
+    Ue.resize (n_dofs); Ue.zero();
+
+    // For Lagrange elements, side, edge, and shellface BCs all
+    // "induce" boundary conditions on the nodes of those entities.
+    // In SingleElemBoundaryInfo::reinit(), we therefore set entries
+    // in the "is_boundary_node_map" container based on side and
+    // shellface BCs, Then, when we actually apply constraints, we
+    // only have to check whether any Nodes are in this container, and
+    // compute values as necessary.
+    unsigned int current_dof = 0;
+    for (unsigned int n=0; n!= sebi.n_nodes; ++n)
+      {
+        // For Lagrange this can return 0 (in case of a lower-order FE
+        // on a higher-order Elem) or 1.
+        const unsigned int nc =
+          FEInterface::n_dofs_at_node (dim, fe_type, elem_type, n);
+
+        // If there are no DOFs at this node, then it doesn't matter
+        // if it's technically a boundary node or not, there's nothing
+        // to constrain.
+        if (!nc)
+          continue;
+
+        // Check whether the current node is a boundary node
+        auto is_boundary_node_it = sebi.is_boundary_node_map.find(&dirichlet);
+        const bool is_boundary_node =
+          (is_boundary_node_it != sebi.is_boundary_node_map.end() &&
+           is_boundary_node_it->second[n]);
+
+        // Check whether the current node is in a boundary nodeset
+        auto is_boundary_nodeset_it = sebi.is_boundary_nodeset_map.find(&dirichlet);
+        const bool is_boundary_nodeset =
+          (is_boundary_nodeset_it != sebi.is_boundary_nodeset_map.end() &&
+           is_boundary_nodeset_it->second[n]);
+
+        // If node is neither a boundary node or from a boundary nodeset, go to the next one.
+        if ( !(is_boundary_node || is_boundary_nodeset) )
+          {
+            current_dof += nc;
+            continue;
+          }
+
+        // Compute function values, storing them in Ue
+        libmesh_assert_equal_to (nc, n_vec_dim);
+        for (unsigned int c = 0; c < n_vec_dim; c++)
+          {
+            Ue(current_dof+c) =
+              f_component(f, f_fem, context.get(), var_component+c,
+                          elem->point(n), time);
+            dof_is_fixed[current_dof+c] = true;
+          }
+        current_dof += n_vec_dim;
+      } // end for (n=0..n_nodes)
+
+    // Lock the DofConstraints since it is shared among threads.
+    {
+      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+      for (unsigned int i = 0; i < n_dofs; i++)
+        {
+          DofConstraintRow empty_row;
+          if (dof_is_fixed[i] && !libmesh_isnan(Ue(i)))
+            add_fn (dof_indices[i], empty_row, Ue(i));
+        }
+    }
+
+  } // apply_lagrange_dirichlet_impl
 
 
 
@@ -1501,7 +1670,13 @@ public:
                   {
                   case TYPE_SCALAR:
                     {
-                      this->apply_dirichlet_impl<Real>( sebi, variable, *dirichlet, *fem_context );
+                      // For Lagrange FEs we don't need to do a full
+                      // blown projection, we can just interpolate
+                      // values directly.
+                      if (fe_type.family == LAGRANGE)
+                        this->apply_lagrange_dirichlet_impl<Real>( sebi, variable, *dirichlet, *fem_context );
+                      else
+                        this->apply_dirichlet_impl<Real>( sebi, variable, *dirichlet, *fem_context );
                       break;
                     }
                   case TYPE_VECTOR:
