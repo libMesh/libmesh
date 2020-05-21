@@ -144,11 +144,25 @@ protected:
   bool JITCodeGen(std::ostream & ccout, const std::string & fname, const std::string & Value_t_name);
 
   /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
-  bool JITCompileHelper(const std::string &);
+  bool JITCompileHelper(const std::string & Value_t_name,
+                        const std::string & extra_options = "",
+                        const std::string & extra_headers = "");
 #endif // LIBMESH_HAVE_FPARSER_JIT
 
+  /// function pointer type alias. This permits a Real Value_t function to be compiled
+  /// to support dual numbers
+  template <typename ActualValue_t>
+  using CompiledFunctionPtr = void (*)(ActualValue_t *, const ActualValue_t *,
+                                       const Value_t *, const Value_t);
+
+  /// update pointer to immediate data
+  void updatePImmed();
+
+  /// clear the runtime evaluation error flag
+  void clearEvalError() { this->mData->mEvalErrorType = 0; }
+
   /// JIT function pointer
-  Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
+  void *compiledFunction;
 
   /// pointer to the mImmed values (or NULL if the mImmed vector is empty)
   Value_t * pImmed;
