@@ -181,8 +181,7 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
       std::unique_ptr<NumericVector<Number>> R_minus = this->rhs->clone();
 
       // The contribution at a single time step would be [f(z;p+dp) - <partialu/partialt, z>(p+dp) - <g(u),z>(p+dp)] * dt
-      // But since we compute the residual already scaled by dt, there is no need for the * dt
-      R_minus_dp += -R_minus->dot(this->get_adjoint_solution(0));
+      R_minus_dp.push_back(-R_minus->dot(this->get_adjoint_solution(0))*this->deltat);
 
       *parameters_in[j] = old_parameter + dp;
 
@@ -192,7 +191,7 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
 
       std::unique_ptr<NumericVector<Number>> R_plus = this->rhs->clone();
 
-      R_plus_dp += -R_plus->dot(this->get_adjoint_solution(0));
+      R_plus_dp.push_back(-R_plus->dot(this->get_adjoint_solution(0))*this->deltat);
 
       *parameters_in[j] = old_parameter;
     }

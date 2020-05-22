@@ -31,11 +31,16 @@
 // T(boundary;t) = 0
 
 // For these initial and boundary conditions, the exact solution
-// u = exp(-K pi^2 t) * sin(pi*x) * sin(pi*y)
+// u = exp(-K 2*pi^2 t) * sin(pi*x) * sin(pi*y)
 
 // We specify our Quantity of Interest (QoI) as
 // Q(u) = int_{domain} u(x,y;1) sin(pi*x) sin(pi*y) dx dy, and
 // are interested in computing the sensitivity dQ/dK
+
+// The exact value of this sensitivity is:
+// dQ/dK = int_{domain} du/dK sin(pi*x) sin(pi*y) dx dy
+// = int_{domain} (-2*pi^2 * exp(-K pi^2) ) sin^2(pi*x) sin^2(pi*y) dx dy
+// = (-2*pi^2 * exp(-K 2*pi^2) )/4 = -4.9022 (K = 1.0e-3)
 
 // For this QoI, the continuous adjoint problem reads,
 // -partial(z)/partial(t) - K Laplacian(z) = 0
@@ -45,7 +50,7 @@
 // T(boundary;t) = 0
 
 // which has the exact solution,
-// z = exp(-K pi^2 (1 - t)) * sin(pi*x) * sin(pi*y)
+// z = exp(-K 2*pi^2 (1 - t)) * sin(pi*x) * sin(pi*y)
 // which is the mirror image in time of the forward solution
 
 // For an adjoint consistent space-time formulation, the discrete
@@ -479,22 +484,23 @@ int main (int argc, char ** argv)
                    << ")"
                    <<std::endl;
 
+      // Edit
       // Need to call adjoint_advance_timestep once for the initial condition setup
-      libMesh::out<<"Retrieving solutions at time t="<<system.time<<std::endl;
-      system.time_solver->adjoint_advance_timestep();
+      //libMesh::out<<"Retrieving solutions at time t="<<system.time<<std::endl;
+      //system.time_solver->adjoint_advance_timestep();
 
       // Output the H1 norm of the retrieved solutions (u^i and u^i+1)
-      libMesh::out << "|U("
-                   << system.time + system.deltat
-                   << ")|= "
-                   << system.calculate_norm(*system.solution, 0, H1)
-                   << std::endl;
+      //libMesh::out << "|U("
+      //              << system.time + system.deltat
+      //              << ")|= "
+      //              << system.calculate_norm(*system.solution, 0, H1)
+      //              << std::endl;
 
-      libMesh::out << "|U("
-                   << system.time
-                   << ")|= "
-                   << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-                   << std::endl;
+      // libMesh::out << "|U("
+      //              << system.time
+      //              << ")|= "
+      //              << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+      //              << std::endl;
 
       // The first thing we have to do is to apply the adjoint initial
       // condition. The user should supply these. Here they are specified
@@ -516,6 +522,10 @@ int main (int argc, char ** argv)
                    << std::endl
                    << std::endl;
 
+      // Call the adjoint advance timestep here to save the adjoint
+      // initial conditions to disk
+      system.time_solver->adjoint_advance_timestep();
+
       write_output(equation_systems, param.n_timesteps, "dual", param);
 
       // Now that the adjoint initial condition is set, we will start the
@@ -531,24 +541,17 @@ int main (int argc, char ** argv)
                        << ", time = "
                        << system.time
                        << std::endl;
-          // The adjoint_advance_timestep function calls the retrieve
-          // function of the memory_solution_history class via the
-          // memory_solution_history object we declared earlier.  The
-          // retrieve function sets the system primal vectors to their
-          // values at the current timestep.
-          libMesh::out << "Retrieving solutions at time t=" << system.time << std::endl;
 
-          system.time_solver->adjoint_advance_timestep();
-
-          // Output the H1 norm of the retrieved solution
+          // Output the H1 norm of the retrieved primal solution from the last call
+        // to adjoint_advance_timestep
           libMesh::out << "|U("
-                       << system.time + system.deltat
+                       << system.time
                        << ")|= "
                        << system.calculate_norm(*system.solution, 0, H1)
                        << std::endl;
 
           libMesh::out << "|U("
-                       << system.time
+                       << system.time - system.deltat
                        << ")|= "
                        << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
                        << std::endl;
@@ -561,6 +564,15 @@ int main (int argc, char ** argv)
           // adjoint_already_solved boolean to true, so we dont solve
           // unnecessarily in the error estimator
           system.set_adjoint_already_solved(true);
+
+  libMesh::out << "Saving adjoint and retrieving primal solutions at time t=" << system.time - system.deltat << std::endl;
+
+  // The adjoint_advance_timestep function calls the retrieve and store
+          // function of the memory_solution_history class via the
+          // memory_solution_history object we declared earlier.  The
+          // retrieve function sets the system primal vectors to their
+          // values at the current time instance.
+          system.time_solver->adjoint_advance_timestep();
 
           libMesh::out << "|Z("
                        << system.time
@@ -609,16 +621,16 @@ int main (int argc, char ** argv)
           system.time_solver->retrieve_timestep();
 
           libMesh::out << "|U("
-                       << system.time + system.deltat
+                       << system.time
                        << ")|= "
                        << system.calculate_norm(*system.solution, 0, H1)
                        << std::endl;
 
-          libMesh::out << "|U("
-                       << system.time
-                       << ")|= "
-                       << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-                       << std::endl;
+          //libMesh::out << "|U("
+          //             << system.time
+          //             << ")|= "
+          //             << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+  //            << std::endl;
 
           libMesh::out << "|Z("
                        << system.time
@@ -644,16 +656,16 @@ int main (int argc, char ** argv)
       system.time_solver->retrieve_timestep();
 
       libMesh::out << "|U("
-                   << system.time + system.deltat
+                   << system.time
                    << ")|= "
                    << system.calculate_norm(*system.solution, 0, H1)
                    << std::endl;
 
-      libMesh::out << "|U("
-                   << system.time
-                   << ")|= "
-                   << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-                   << std::endl;
+      //libMesh::out << "|U("
+      //            << system.time
+      //           << ")|= "
+      //           << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+      //            << std::endl;
 
       libMesh::out << "|Z("
                    << system.time
@@ -679,7 +691,7 @@ int main (int argc, char ** argv)
       // getting are what they should be
       // The 2e-4 tolerance is chosen to ensure success even with
       // 32-bit floats
-      if(std::abs(sensitivity_0_0 - (-5.37173)) >= 2.e-4)
+      if(std::abs(sensitivity_0_0 - (-4.83551)) >= 2.e-4)
         libmesh_error_msg("Mismatch in sensitivity gold value!");
 
 #ifdef NDEBUG
