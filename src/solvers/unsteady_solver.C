@@ -158,11 +158,6 @@ void UnsteadySolver::advance_timestep ()
       // We call advance_timestep in user code after solve, so any solutions
       // we will be storing will be for the next time instance
       _system.time += _system.deltat;
-
-      // If the user has attached a memory or file solution history
-      // object to the solver, this will store the current solution
-      // indexed with the current time
-      solution_history->store(false);
     }
     else
     {
@@ -170,10 +165,13 @@ void UnsteadySolver::advance_timestep ()
       // via solve, the very first solve. All we are doing here is storing
       // the initial condition. The actual solution computed via this solve
       // will be stored when we call advance_timestep in the user's timestep loop
-      solution_history->store(false);
-
       first_solve = false;
     }
+
+  // If the user has attached a memory or file solution history object
+  // to the solver, this will store the current solution indexed with
+  // the current time
+  solution_history->store(false);
 
   NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
@@ -199,27 +197,23 @@ void UnsteadySolver::adjoint_advance_timestep ()
       // The adjoint system has been solved. We need to store the adjoint solution and
       // load the primal solutions for the next time instance (t - delta_ti).
       _system.time -= _system.deltat;
-
-      // Retrieve the primal solution vectors at this new time instance (t - delta_ti)). These provide the
-      // data to solve the adjoint problem for the next time instance (t - delta_ti - delta_ti+1).
-      solution_history->retrieve(true);
-
-      // Call the store function to store the adjoint we have computed in this time step for the time instance (t - delta_ti)
-      solution_history->store(true);
     }
   else
     {
-      // Retrieve the primal solution vectors at the initial adjoint time.
-      // They provide the data to assemble the adjoint matrix and solve for the
-      // adjoint at the next time instance.
-      solution_history->retrieve(true);
-
       // The first adjoint step simply saves the given adjoint initial condition
       // So there is a store, but no solve, no actual timestep, so no need to change system time
-      solution_history->store(true);
-
       first_adjoint_step = false;
     }
+
+  // Retrieve the primal solution vectors at this new (or for
+  // first_adjoint_step, initial) time instance. These provide the
+  // data to solve the adjoint problem for the next time instance.
+  solution_history->retrieve(true);
+
+  // Call the store function to store the adjoint we have computed (or
+  // for first_adjoint_step, the adjoint initial condition) in this
+  // time step for the time instance.
+  solution_history->store(true);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize
