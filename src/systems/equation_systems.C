@@ -38,6 +38,8 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 
+#include <numeric> // std::iota
+
 // Include the systems before this one to avoid
 // overlapping forward declarations.
 #include "libmesh/equation_systems.h"
@@ -890,8 +892,8 @@ EquationSystems::find_variable_numbers
   libmesh_assert (this->n_systems());
 
   // If the names vector has entries, we will only populate the soln vector
-  // with names included in that list.  Note: The names vector may be
-  // reordered upon exiting this function
+  // with names included in that list.  Note: The names vector and var_nums
+  // vector pairs are reordered alphabetically upon exiting this function.
   std::vector<std::pair<unsigned int, unsigned int>> var_nums;
   std::vector<std::string> filter_names = names;
   bool is_filter_names = !filter_names.empty();
@@ -919,8 +921,6 @@ EquationSystems::find_variable_numbers
         }
     }
 
-  std::sort(var_nums.begin(), var_nums.end());
-
   for (const auto & var_num : var_nums)
     {
       const std::string & name =
@@ -929,7 +929,24 @@ EquationSystems::find_variable_numbers
         names.push_back(name);
     }
 
-  return var_nums;
+  // Sort the var_nums vector pairs alphabetically based on the variable name
+  std::vector<unsigned int> sort_index(names.size());
+  std::iota(sort_index.begin(), sort_index.end(), 0);
+  std::sort(sort_index.begin(), sort_index.end(), [&](const auto & lhs, const auto & rhs) {
+    return names[lhs] < names[rhs];} );
+
+  std::vector<std::pair<unsigned int, unsigned int>> var_nums_sorted(var_nums.size());
+  for (auto i : index_range(var_nums_sorted))
+    {
+      var_nums_sorted[i].first = var_nums[sort_index[i]].first;
+      var_nums_sorted[i].second = var_nums[sort_index[i]].second;
+    }
+
+  // Also sort the names vector
+  std::sort(names.begin(), names.end());
+
+  // Return the sorted vector pairs
+  return var_nums_sorted;
 }
 
 
