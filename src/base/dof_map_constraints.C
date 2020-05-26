@@ -303,9 +303,9 @@ private:
   struct SingleElemBoundaryInfo
   {
     SingleElemBoundaryInfo(const BoundaryInfo & bi,
-                           const std::map<boundary_id_type, std::set<DirichletBoundary *>> & map_in) :
+                           const std::map<boundary_id_type, std::set<std::pair<unsigned int, DirichletBoundary *>>> & ordered_map_in) :
       boundary_info(bi),
-      boundary_id_to_dirichlet_boundaries(map_in),
+      boundary_id_to_ordered_dirichlet_boundaries(ordered_map_in),
       elem(nullptr),
       n_sides(0),
       n_edges(0),
@@ -313,7 +313,7 @@ private:
     {}
 
     const BoundaryInfo & boundary_info;
-    const std::map<boundary_id_type, std::set<DirichletBoundary *>> & boundary_id_to_dirichlet_boundaries;
+    const std::map<boundary_id_type, std::set<std::pair<unsigned int, DirichletBoundary *>>> & boundary_id_to_ordered_dirichlet_boundaries;
     const Elem * elem;
 
     unsigned short n_sides;
@@ -330,9 +330,9 @@ private:
 
     std::map<const DirichletBoundary *, std::vector<bool>> is_boundary_nodeset_map;
 
-    // The DirichletBoundary objects which have at least one boundary
+    // The set of (dirichlet_id, DirichletBoundary) pairs which have at least one boundary
     // id related to this Elem.
-    std::set<DirichletBoundary *> dbs;
+    std::set<std::pair<unsigned int, DirichletBoundary *>> ordered_dbs;
 
     /**
      * Given a single Elem, fills the SingleElemBoundaryInfo struct with
@@ -357,7 +357,7 @@ private:
       is_boundary_nodeset_map.clear();
 
       // Clear any DirichletBoundaries from the previous Elem
-      dbs.clear();
+      ordered_dbs.clear();
 
       // Update has_dirichlet_constraint below, and if it remains false then
       // we can skip this element since there are not constraints to impose.
@@ -375,23 +375,23 @@ private:
           bool do_this_side = false;
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_dirichlet_boundaries.end())
+              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   do_this_side = true;
 
                   // Associate every DirichletBoundary object that has this bc_id with the current Elem
-                  dbs.insert(it->second.begin(), it->second.end());
+                  ordered_dbs.insert(it->second.begin(), it->second.end());
 
                   // Turn on the flag for the current side for each DirichletBoundary
-                  for (const auto & db : it->second)
+                  for (const auto & db_pair : it->second)
                     {
                       // Attempt to emplace an empty vector. If there
                       // is already an entry, the insertion will fail
                       // and we'll get an iterator back to the
                       // existing entry. Either way, we'll then set
                       // index s of that vector to "true".
-                      auto pr = is_boundary_side_map.emplace(db, std::vector<bool>(n_sides, false));
+                      auto pr = is_boundary_side_map.emplace(db_pair.second, std::vector<bool>(n_sides, false));
                       pr.first->second[s] = true;
                     }
                 }
@@ -411,14 +411,14 @@ private:
                 // get an iterator back to the existing entry. Either
                 // way, we'll then set index n of that vector to
                 // "true".
-                for (const auto & db : dbs)
+                for (const auto & db_pair : ordered_dbs)
                   {
                     // Only add this as a boundary node for this db if
                     // it is also a boundary side for this db.
-                    auto side_it = is_boundary_side_map.find(db);
+                    auto side_it = is_boundary_side_map.find(db_pair.second);
                     if (side_it != is_boundary_side_map.end() && side_it->second[s])
                       {
-                        auto pr = is_boundary_node_map.emplace(db, std::vector<bool>(n_nodes, false));
+                        auto pr = is_boundary_node_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
                         pr.first->second[n] = true;
                       }
                   }
@@ -433,14 +433,14 @@ private:
                 // get an iterator back to the existing entry. Either
                 // way, we'll then set index e of that vector to
                 // "true".
-                for (const auto & db : dbs)
+                for (const auto & db_pair : ordered_dbs)
                   {
                     // Only add this as a boundary edge for this db if
                     // it is also a boundary side for this db.
-                    auto side_it = is_boundary_side_map.find(db);
+                    auto side_it = is_boundary_side_map.find(db_pair.second);
                     if (side_it != is_boundary_side_map.end() && side_it->second[s])
                       {
-                        auto pr = is_boundary_edge_map.emplace(db, std::vector<bool>(n_edges, false));
+                        auto pr = is_boundary_edge_map.emplace(db_pair.second, std::vector<bool>(n_edges, false));
                         pr.first->second[e] = true;
                       }
                   }
@@ -455,19 +455,19 @@ private:
 
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_dirichlet_boundaries.end())
+              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   // Associate every DirichletBoundary object that has this bc_id with the current Elem
-                  dbs.insert(it->second.begin(), it->second.end());
+                  ordered_dbs.insert(it->second.begin(), it->second.end());
 
                   // Turn on the flag for the current node for each DirichletBoundary
-                  for (const auto & db : it->second)
+                  for (const auto & db_pair : it->second)
                     {
-                      auto pr = is_boundary_node_map.emplace(db, std::vector<bool>(n_nodes, false));
+                      auto pr = is_boundary_node_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
                       pr.first->second[n] = true;
 
-                      auto pr2 = is_boundary_nodeset_map.emplace(db, std::vector<bool>(n_nodes, false));
+                      auto pr2 = is_boundary_nodeset_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
                       pr2.first->second[n] = true;
                     }
 
@@ -485,18 +485,18 @@ private:
           bool do_this_side = false;
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_dirichlet_boundaries.end())
+              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   do_this_side = true;
 
                   // We need to loop over all DirichletBoundary objects associated with bc_id
-                  dbs.insert(it->second.begin(), it->second.end());
+                  ordered_dbs.insert(it->second.begin(), it->second.end());
 
                   // Turn on the flag for the current edge for each DirichletBoundary
-                  for (const auto & db : it->second)
+                  for (const auto & db_pair : it->second)
                     {
-                      auto pr = is_boundary_edge_map.emplace(db, std::vector<bool>(n_edges, false));
+                      auto pr = is_boundary_edge_map.emplace(db_pair.second, std::vector<bool>(n_edges, false));
                       pr.first->second[e] = true;
                     }
                 }
@@ -516,14 +516,14 @@ private:
                 // get an iterator back to the existing entry. Either
                 // way, we'll then set index n of that vector to
                 // "true".
-                for (const auto & db : dbs)
+                for (const auto & db_pair : ordered_dbs)
                   {
                     // Only add this as a boundary node for this db if
                     // it is also a boundary edge for this db.
-                    auto edge_it = is_boundary_edge_map.find(db);
+                    auto edge_it = is_boundary_edge_map.find(db_pair.second);
                     if (edge_it != is_boundary_edge_map.end() && edge_it->second[e])
                       {
-                        auto pr = is_boundary_node_map.emplace(db, std::vector<bool>(n_nodes, false));
+                        auto pr = is_boundary_node_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
                         pr.first->second[n] = true;
                       }
                   }
@@ -538,18 +538,18 @@ private:
 
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_dirichlet_boundaries.end())
+              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   has_dirichlet_constraint = true;
 
                   // We need to loop over all DirichletBoundary objects associated with bc_id
-                  dbs.insert(it->second.begin(), it->second.end());
+                  ordered_dbs.insert(it->second.begin(), it->second.end());
 
                   // Turn on the flag for the current shellface for each DirichletBoundary
-                  for (const auto & db : it->second)
+                  for (const auto & db_pair : it->second)
                     {
-                      auto pr = is_boundary_shellface_map.emplace(db, std::vector<bool>(/*n_shellfaces=*/2, false));
+                      auto pr = is_boundary_shellface_map.emplace(db_pair.second, std::vector<bool>(/*n_shellfaces=*/2, false));
                       pr.first->second[shellface] = true;
                     }
                 }
@@ -1406,17 +1406,20 @@ public:
     // are defined on the same System.
     System * system = nullptr;
 
-    // Map from boundary_id -> set<DirichletBoundary*> objects which
+    // Map from boundary_id -> set<pair<id,DirichletBoundary*>> objects which
     // are active on that boundary_id. Later we will use this to determine
     // which DirichletBoundary objects to loop over for each Elem.
-    std::map<boundary_id_type, std::set<DirichletBoundary *>>
-      boundary_id_to_dirichlet_boundaries;
+    std::map<boundary_id_type, std::set<std::pair<unsigned int, DirichletBoundary *>>>
+      boundary_id_to_ordered_dirichlet_boundaries;
 
-    for (const auto & dirichlet : dirichlets)
+    for (auto dirichlet_id : index_range(dirichlets))
       {
-        // Construct mapping from boundary_id -> DirichletBoundary
+        // Pointer to the current DirichletBoundary object
+        const auto & dirichlet = dirichlets[dirichlet_id];
+
+        // Construct mapping from boundary_id -> (dirichlet_id, DirichletBoundary)
         for (const auto & b_id : dirichlet->b)
-          boundary_id_to_dirichlet_boundaries[b_id].insert(dirichlet);
+          boundary_id_to_ordered_dirichlet_boundaries[b_id].emplace(dirichlet_id, dirichlet);
 
         for (const auto & var : dirichlet->variables)
           {
@@ -1452,7 +1455,7 @@ public:
     const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
     // This object keeps track of the BoundaryInfo for a single Elem
-    SingleElemBoundaryInfo sebi(boundary_info, boundary_id_to_dirichlet_boundaries);
+    SingleElemBoundaryInfo sebi(boundary_info, boundary_id_to_ordered_dirichlet_boundaries);
 
     // Iterate over all the elements in the range
     for (const auto & elem : range)
@@ -1469,8 +1472,11 @@ public:
         if (!has_dirichlet_constraint)
           continue;
 
-        for (const auto & dirichlet : sebi.dbs)
+        for (const auto & db_pair : sebi.ordered_dbs)
           {
+            // Get pointer to the DirichletBoundary object
+            const auto & dirichlet = db_pair.second;
+
             // TODO: Add sanity check that the boundary ids associated
             // with the DirichletBoundary objects are actually present in
             // the mesh. Currently this is a private function on DofMap so
@@ -1507,7 +1513,7 @@ public:
                     libmesh_error_msg("Unknown field type!");
                   }
               } // for (var : variables)
-          } // for (dirichlet : dbs)
+          } // for (db_pair : ordered_dbs)
       } // for (elem : range)
   } // operator()
 
