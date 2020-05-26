@@ -6984,6 +6984,10 @@ fi
 
                   GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
                   case "$GXX_VERSION_STRING" in #(
+  *20.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 20 >>>" >&5
+$as_echo "<<< C++ compiler is Intel(R) icc 20 >>>" >&6; }
+                            GXX_VERSION=intel_icc_v20.x ;; #(
   *19.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 19 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 19 >>>" >&6; }
@@ -8270,7 +8274,7 @@ else
                           PARANOID_FLAGS="$PARANOID_FLAGS -Wwrite-strings"
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         case "$GXX_VERSION" in #(
-  intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x) :
+  intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x | intel_icc_v19.x | intel_icc_v20.x) :
 
                                     PROFILING_FLAGS="-p"
                                     CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
