@@ -368,20 +368,8 @@ public:
                         const boundary_id_type id) const;
 
   /**
-   * \returns The boundary ids associated with \p Node \p node.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> boundary_ids (const Node * node) const;
-#endif
-
-  /**
    * Fills a user-provided std::vector with the boundary ids associated
    * with \p Node \p node.
-   *
-   * This is the non-deprecated version of the function.
    */
   void boundary_ids (const Node * node,
                      std::vector<boundary_id_type> & vec_to_fill) const;
@@ -405,22 +393,6 @@ public:
    * element \p elem.
    *
    * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> edge_boundary_ids (const Elem * const elem,
-                                                   const unsigned short int edge) const;
-#endif
-
-  /**
-   * \returns The list of boundary ids associated with the \p edge edge of
-   * element \p elem.
-   *
-   * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * This is the non-deprecated version of the function.
    */
   void edge_boundary_ids (const Elem * const elem,
                           const unsigned short int edge,
@@ -434,25 +406,6 @@ public:
    * such as a child's inheritance of its ancestors' boundary id.
    *
    * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem * const elem,
-                                                       const unsigned short int edge) const;
-#endif
-
-  /**
-   * \returns The list of raw boundary ids associated with the \p edge
-   * edge of element \p elem.
-   *
-   * These ids are "raw" because they exclude ids which are implicit,
-   * such as a child's inheritance of its ancestors' boundary id.
-   *
-   * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * This is the non-deprecated version of the function.
    */
   void raw_edge_boundary_ids (const Elem * const elem,
                               const unsigned short int edge,
@@ -526,20 +479,6 @@ public:
   /**
    * \returns The list of boundary ids associated with the \p side side of
    * element \p elem.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> boundary_ids (const Elem * const elem,
-                                              const unsigned short int side) const;
-#endif
-
-  /**
-   * \returns The list of boundary ids associated with the \p side side of
-   * element \p elem.
-   *
-   * This is the non-deprecated version of the function.
    */
   void boundary_ids (const Elem * const elem,
                      const unsigned short int side,
@@ -551,23 +490,6 @@ public:
    *
    * These ids are "raw" because they exclude ids which are implicit,
    * such as a child's inheritance of its ancestors' boundary id.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> raw_boundary_ids (const Elem * const elem,
-                                                  const unsigned short int side) const;
-#endif
-
-  /**
-   * \returns The list of raw boundary ids associated with the \p side
-   * side of element \p elem.
-   *
-   * These ids are "raw" because they exclude ids which are implicit,
-   * such as a child's inheritance of its ancestors' boundary id.
-   *
-   * This is the non-deprecated version of the function.
    */
   void raw_boundary_ids (const Elem * const elem,
                          const unsigned short int side,
