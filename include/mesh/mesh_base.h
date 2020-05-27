@@ -1217,16 +1217,6 @@ public:
   unsigned int recalculate_n_partitions();
 
   /**
-   * \returns A pointer to a \p PointLocatorBase object for this
-   * mesh, constructing a master PointLocator first if necessary.
-   *
-   * \deprecated This should never be used in threaded or non-parallel_only code.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  const PointLocatorBase & point_locator () const;
-#endif
-
-  /**
    * \returns A pointer to a subordinate \p PointLocatorBase object
    * for this mesh, constructing a master PointLocator first if
    * necessary.  This should not be used in threaded or
