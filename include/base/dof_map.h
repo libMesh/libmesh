@@ -1307,6 +1307,16 @@ public:
 
   /**
    * Adds a copy of the specified Dirichlet boundary to the system.
+   *
+   * The constraints implied by DirichletBoundary objects are imposed
+   * in the same order in which DirichletBoundary objects are added to
+   * the DofMap. When multiple DirichletBoundary objects would impose
+   * competing constraints on a given DOF, the *first*
+   * DirichletBoundary to constrain the DOF "wins". This distinction
+   * is important when e.g. two surfaces (sidesets) intersect. The
+   * nodes on the intersection will be constrained according to
+   * whichever sideset's DirichletBoundary object was added to the
+   * DofMap first.
    */
   void add_dirichlet_boundary (const DirichletBoundary & dirichlet_boundary);
 
