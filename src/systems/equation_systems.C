@@ -424,25 +424,6 @@ System & EquationSystems::add_system (const std::string & sys_type,
 
 
 
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void EquationSystems::delete_system (const std::string & name)
-{
-  libmesh_deprecated();
-
-  if (!_systems.count(name))
-    libmesh_error_msg("ERROR: no system named " << name);
-
-  delete _systems[name];
-
-  _systems.erase (name);
-}
-#endif
-
-
-
 void EquationSystems::solve ()
 {
   libmesh_assert (this->n_systems());

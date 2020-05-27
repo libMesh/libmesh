@@ -222,18 +222,6 @@ public:
   T_sys & add_system (const std::string & name);
 
   /**
-   * Remove the system named \p name from the systems array.
-   *
-   * \deprecated This function may not work as intended and has not
-   * been actively tested over the years. If you need the ability to
-   * delete a System from an EquationSystems object, it could probably
-   * be added.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  void delete_system (const std::string & name);
-#endif
-
-  /**
    * \returns The total number of variables in all
    * systems.
    */
