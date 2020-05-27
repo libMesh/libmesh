@@ -558,16 +558,6 @@ inline Tnew cast_ref(Told & oldvar)
 #endif
 }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <typename Tnew, typename Told>
-inline Tnew libmesh_cast_ref(Told & oldvar)
-{
-  // we use the less redundantly named libMesh::cast_ref now
-  libmesh_deprecated();
-  return cast_ref<Tnew>(oldvar);
-}
-#endif
-
 // We use two different function names to avoid an odd overloading
 // ambiguity bug with icc 10.1.008
 template <typename Tnew, typename Told>
@@ -592,12 +582,16 @@ inline Tnew cast_ptr (Told * oldvar)
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename Tnew, typename Told>
 inline Tnew libmesh_cast_ptr (Told * oldvar)
 {
+  libmesh_deprecated();
+
   // we use the less redundantly named libMesh::cast_ptr now
   return cast_ptr<Tnew>(oldvar);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 // cast_int asserts that the value of the castee is within the
