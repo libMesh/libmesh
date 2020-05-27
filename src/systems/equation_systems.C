@@ -932,8 +932,9 @@ EquationSystems::find_variable_numbers
   // Sort the var_nums vector pairs alphabetically based on the variable name
   std::vector<unsigned int> sort_index(names.size());
   std::iota(sort_index.begin(), sort_index.end(), 0);
-  std::sort(sort_index.begin(), sort_index.end(), [&](const auto & lhs, const auto & rhs) {
-    return names[lhs] < names[rhs];} );
+  std::sort(sort_index.begin(), sort_index.end(),
+            [&](const unsigned int & lhs, const unsigned  & rhs)
+            {return names[lhs] < names[rhs];});
 
   std::vector<std::pair<unsigned int, unsigned int>> var_nums_sorted(var_nums.size());
   for (auto i : index_range(var_nums_sorted))
