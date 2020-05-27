@@ -666,24 +666,6 @@ public:
 #endif //LIBMESH_ENABLE_AMR
 
   /**
-   * \returns The last dof index that is local to processor \p proc.
-   *
-   * \deprecated This function returns nonsense in the rare case where
-   * \p proc has no local dof indices.  Use end_dof() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  dof_id_type last_dof(const processor_id_type proc) const
-  {
-    libmesh_deprecated();
-    libmesh_assert_less (proc, _end_df.size());
-    return cast_int<dof_id_type>(_end_df[proc] - 1);
-  }
-
-  dof_id_type last_dof() const
-  { return this->last_dof(this->processor_id()); }
-#endif
-
-  /**
    * \returns The first dof index that is after all indices local to
    * processor \p proc.
    *
