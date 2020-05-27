@@ -62,33 +62,6 @@ namespace MeshTools
 {
 
 /**
- * Backwards compatibility with forward declarations.
- *
- * \deprecated Use libMesh::BoundingBox instead.
- */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-class BoundingBox : public libMesh::BoundingBox
-{
-public:
-  BoundingBox (const Point & new_min,
-               const Point & new_max) :
-    libMesh::BoundingBox(new_min, new_max) {
-    libmesh_deprecated(); // Switch to libMesh::BoundingBox
-  }
-
-  BoundingBox (const std::pair<Point, Point> & bbox) :
-    libMesh::BoundingBox(bbox) {
-    libmesh_deprecated(); // Switch to libMesh::BoundingBox
-  }
-
-  BoundingBox () {
-    libmesh_deprecated(); // Switch to libMesh::BoundingBox
-  }
-};
-#endif
-
-
-/**
  * \returns The sum over all the elements of the number
  * of nodes per element.
  *
@@ -174,21 +147,7 @@ std::unordered_set<dof_id_type> find_boundary_nodes(const MeshBase & mesh);
 std::unordered_set<dof_id_type> find_block_boundary_nodes(const MeshBase & mesh);
 
 /**
- * \returns Two points defining a cartesian box that bounds the
- * mesh.  The first entry in the pair is the minimum, the second
- * is the maximum.
- *
- * \deprecated Use create_bounding_box() instead.
- */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-BoundingBox
-bounding_box (const MeshBase & mesh);
-#endif
-
-/**
- * The same functionality as the deprecated MeshTools::bounding_box().
- *
- * \returns The non-deprecated libMesh::BoundingBox type.
+ * \returns A BoundingBox that bounds the mesh.
  */
 libMesh::BoundingBox
 create_bounding_box (const MeshBase & mesh);
@@ -221,21 +180,8 @@ libMesh::BoundingBox
 create_local_bounding_box (const MeshBase & mesh);
 
 /**
- * \returns Two points defining a cartesian box that bounds the
- * elements belonging to processor pid.
- *
- * \deprecated Use create_processor_bounding_box() instead.
- */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-BoundingBox
-processor_bounding_box (const MeshBase & mesh,
-                        const processor_id_type pid);
-#endif
-
-/**
- * The same functionality as the deprecated MeshTools::processor_bounding_box().
- *
- * \returns The non-deprecated libMesh::BoundingBox type.
+ * \returns A BoundingBox that bounds the elements belonging to
+ * processor pid.
  */
 libMesh::BoundingBox
 create_processor_bounding_box (const MeshBase & mesh,
@@ -249,22 +195,8 @@ processor_bounding_sphere (const MeshBase & mesh,
                            const processor_id_type pid);
 
 /**
- * \returns Two points defining a Cartesian box that bounds the
- * elements belonging to subdomain sid.
- *
- * \deprecated Use create_subdomain_bounding_box() instead.
- */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-BoundingBox
-subdomain_bounding_box (const MeshBase & mesh,
-                        const subdomain_id_type sid);
-#endif
-
-
-/**
- * The same functionality as the deprecated MeshTools::subdomain_bounding_box().
- *
- * \returns The non-deprecated libMesh::BoundingBox type.
+ * \returns A BoundingBox that bounds the elements belonging to
+ * subdomain sid.
  */
 libMesh::BoundingBox
 create_subdomain_bounding_box (const MeshBase & mesh,

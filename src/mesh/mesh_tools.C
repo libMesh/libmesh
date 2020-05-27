@@ -407,19 +407,6 @@ MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-MeshTools::BoundingBox
-MeshTools::bounding_box(const MeshBase & mesh)
-{
-  // This function is deprecated.  It simply calls
-  // create_bounding_box() and converts the result to a
-  // MeshTools::BoundingBox.
-  libmesh_deprecated();
-  return MeshTools::create_bounding_box(mesh);
-}
-#endif
-
-
 
 libMesh::BoundingBox
 MeshTools::create_bounding_box (const MeshBase & mesh)
@@ -500,18 +487,6 @@ MeshTools::create_local_bounding_box (const MeshBase & mesh)
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-MeshTools::BoundingBox
-MeshTools::processor_bounding_box (const MeshBase & mesh,
-                                   const processor_id_type pid)
-{
-  libmesh_deprecated();
-  return MeshTools::create_processor_bounding_box(mesh, pid);
-}
-#endif
-
-
-
 libMesh::BoundingBox
 MeshTools::create_processor_bounding_box (const MeshBase & mesh,
                                           const processor_id_type pid)
@@ -549,18 +524,6 @@ MeshTools::processor_bounding_sphere (const MeshBase & mesh,
 
   return Sphere (cent, .5*diag);
 }
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-MeshTools::BoundingBox
-MeshTools::subdomain_bounding_box (const MeshBase & mesh,
-                                   const subdomain_id_type sid)
-{
-  libmesh_deprecated();
-  return MeshTools::create_subdomain_bounding_box(mesh, sid);
-}
-#endif
 
 
 
