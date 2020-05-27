@@ -1169,26 +1169,6 @@ void BoundaryInfo::raw_shellface_boundary_ids (const Elem * const elem,
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-boundary_id_type BoundaryInfo::boundary_id(const Elem * const elem,
-                                           const unsigned short int side) const
-{
-  libmesh_deprecated();
-
-  std::vector<boundary_id_type> ids;
-  this->boundary_ids(elem, side, ids);
-
-  // If the set is empty, return invalid_id
-  if (ids.empty())
-    return invalid_id;
-
-  // Otherwise, just return the first id we came across for this
-  // element on this side.
-  return *(ids.begin());
-}
-#endif
-
-
 
 bool BoundaryInfo::has_boundary_id(const Elem * const elem,
                                    const unsigned short int side,

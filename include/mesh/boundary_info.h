@@ -452,24 +452,6 @@ public:
                         const boundary_id_type id) const;
 
   /**
-   * \returns The boundary id associated with the \p side side of
-   * element \p elem, or \p invalid_id if the \p side does not have an
-   * associated boundary id.
-   *
-   * \note Only one id per side is allowed, however multiple sides per
-   * element are allowed.
-   *
-   * \deprecated Asking for just one boundary id means your code isn't
-   * safe to use on meshes with overlapping boundary ids.  Try using
-   * BoundaryInfo::boundary_ids() or BoundaryInfo::has_boundary_id()
-   * instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  boundary_id_type boundary_id (const Elem * const elem,
-                                const unsigned short int side) const;
-#endif
-
-  /**
    * \returns The number of boundary ids associated with the \p side
    * side of element \p elem.
    */
