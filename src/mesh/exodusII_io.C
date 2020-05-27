@@ -83,18 +83,6 @@ void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_v
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void ExodusII_IO::copy_nodal_solution(System & system,
-                                      std::string var_name,
-                                      unsigned int timestep)
-{
-  libmesh_deprecated();
-  copy_nodal_solution(system, var_name, var_name, timestep);
-}
-#endif
-
-
-
 void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
                                                const EquationSystems & es,
                                                const std::set<std::string> * system_names)
