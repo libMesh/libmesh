@@ -112,17 +112,6 @@ public:
   bool intersects (const BoundingBox &, Real abstol) const;
 
   /**
-   * \returns \p true if the other bounding box has a non-empty
-   * intersection with this bounding box.
-   *
-   * \deprecated Use the BoundingBox::intersects() function instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  bool intersect (const BoundingBox & b) const
-  { libmesh_deprecated(); return this->intersects(b); }
-#endif
-
-  /**
    * \returns \p true if the bounding box contains the given point.
    */
   bool contains_point (const Point &) const;
