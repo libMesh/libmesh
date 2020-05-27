@@ -284,7 +284,12 @@ dof_id_type MeshTools::weight(const MeshBase & mesh, const processor_id_type pid
 void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
                                          std::vector<std::vector<dof_id_type>> & nodes_to_elem_map)
 {
-  nodes_to_elem_map.resize (mesh.n_nodes());
+  // A vector indexed over all nodes is too inefficient to use for a
+  // distributed mesh.  Use the unordered_map API instead.
+  if (!mesh.is_serial())
+    libmesh_deprecated();
+
+  nodes_to_elem_map.resize (mesh.max_node_id());
 
   for (const auto & elem : mesh.element_ptr_range())
     for (auto & node : elem->node_ref_range())
@@ -301,7 +306,12 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
                                          std::vector<std::vector<const Elem *>> & nodes_to_elem_map)
 {
-  nodes_to_elem_map.resize (mesh.n_nodes());
+  // A vector indexed over all nodes is too inefficient to use for a
+  // distributed mesh.  Use the unordered_map API instead.
+  if (!mesh.is_serial())
+    libmesh_deprecated();
+
+  nodes_to_elem_map.resize (mesh.max_node_id());
 
   for (const auto & elem : mesh.element_ptr_range())
     for (auto & node : elem->node_ref_range())
