@@ -103,10 +103,6 @@ private:
 
 #  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
-#ifdef LIBMESH_ENABLE_DEPRECATED
-#  define PALIBMESH_USE_LOG(a,b)   { libmesh_deprecated(); }
-#  define RESTART_LOG(a,b) { libmesh_deprecated(); }
-#endif
 #  define LOG_SCOPE(a,b)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b);
 #  define LOG_SCOPE_IF(a,b,enabled)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b,enabled);
 #  define LOG_SCOPE_WITH(a,b,logger)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b,true,&logger);
