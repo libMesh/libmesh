@@ -77,27 +77,6 @@ Preconditioner<T>::build_preconditioner(const libMesh::Parallel::Communicator & 
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-
-template <typename T>
-Preconditioner<T> *
-Preconditioner<T>::build(const libMesh::Parallel::Communicator & comm,
-                         const SolverPackage solver_package)
-{
-  // You should be calling build_preconditioner() instead.
-  libmesh_deprecated();
-
-  // Call the non-deprecated method
-  std::unique_ptr<Preconditioner<T>> ptr =
-    Preconditioner<T>::build_preconditioner(comm, solver_package);
-
-  // Vaya con dios
-  return ptr.release();
-}
-
-#endif
-
-
 //------------------------------------------------------------------
 // Explicit instantiations
 template class Preconditioner<Number>;
