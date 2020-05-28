@@ -62,22 +62,6 @@ public:
   { libmesh_assert(_ptr); return *_ptr; }
 
   /**
-   * Reseater: change the location of the parameter we access.
-   *
-   * \deprecated This is included for backward compatibility, but
-   * should no longer be used.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual ParameterAccessor<T> &
-  operator= (T * new_ptr) override
-  {
-    libmesh_deprecated();
-    _ptr = new_ptr;
-    return *this;
-  }
-#endif
-
-  /**
    * \returns A new copy of the accessor.
    */
   virtual std::unique_ptr<ParameterAccessor<T>> clone() const override

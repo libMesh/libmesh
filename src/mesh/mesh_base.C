@@ -695,27 +695,6 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-const PointLocatorBase & MeshBase::point_locator () const
-{
-  libmesh_deprecated();
-
-  if (_point_locator.get() == nullptr)
-    {
-      // PointLocator construction may not be safe within threads
-      libmesh_assert(!Threads::in_threads);
-
-      _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
-
-      if (_point_locator_close_to_point_tol > 0.)
-        _point_locator->set_close_to_point_tol(_point_locator_close_to_point_tol);
-    }
-
-  return *_point_locator;
-}
-#endif
-
-
 std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
   // If there's no master point locator, then we need one.

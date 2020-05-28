@@ -149,7 +149,7 @@ public:
 
   void testAssignment()
   {
-    DerivedClass avector = (*m_1_1_1);
+    DerivedClass avector {*basem_1_1_1};
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
       CPPUNIT_ASSERT_EQUAL( T(1), (avector)(i) );
@@ -181,7 +181,7 @@ public:
 
   void testScalarMultAssign()
   {
-    DerivedClass avector = (*m_1_1_1);
+    DerivedClass avector {*basem_1_1_1};
     avector*=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
@@ -190,7 +190,7 @@ public:
 
   void testScalarDivAssign()
   {
-    DerivedClass avector = (*m_1_1_1);
+    DerivedClass avector {*basem_1_1_1};
     avector/=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
@@ -208,7 +208,7 @@ public:
 
   void testVectorAddScaled()
   {
-    DerivedClass avector = (*m_1_1_1);
+    DerivedClass avector {*basem_1_1_1};
     avector.add_scaled((*m_1_1_1),0.5);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
@@ -234,7 +234,7 @@ public:
 
   void testVectorAddAssign()
   {
-    DerivedClass avector = (*m_1_1_1);
+    DerivedClass avector {*basem_1_1_1};
     avector+=(*m_1_1_1);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
@@ -243,7 +243,7 @@ public:
 
   void testVectorSubAssign()
   {
-    DerivedClass avector = (*m_1_1_1);
+    DerivedClass avector {*basem_1_1_1};
     avector-=(*m_n1_1_n1);
 
     LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
@@ -322,7 +322,7 @@ public:
 
   void testAssignmentBase()
   {
-    TypeVector<T> avector = (*m_1_1_1);
+    TypeVector<T> avector = (*basem_1_1_1);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
       CPPUNIT_ASSERT_EQUAL( T(1), (avector)(i) );

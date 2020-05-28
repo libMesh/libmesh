@@ -467,35 +467,6 @@ public:
   }
 
   /**
-   * \returns A constant reference (for reading only) to the
-   * \f$ i^{th} \f$ node, which should be present in this processor's
-   * subset of the mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named node_ref() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual const Node & node (const dof_id_type i) const
-  {
-    libmesh_deprecated();
-    return *this->node_ptr(i);
-  }
-#endif
-
-  /**
-   * \returns A reference to the \f$ i^{th} \f$ node, which should be
-   * present in this processor's subset of the mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named node_ref() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual Node & node (const dof_id_type i)
-  {
-    libmesh_deprecated();
-    return *this->node_ptr(i);
-  }
-#endif
-
-  /**
    * \returns A pointer to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
@@ -551,35 +522,6 @@ public:
   virtual Elem * elem_ptr (const dof_id_type i) = 0;
 
   /**
-   * \returns A pointer to the \f$ i^{th} \f$ element, which should be
-   * present in this processor's subset of the mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual const Elem * elem (const dof_id_type i) const
-  {
-    libmesh_deprecated();
-    return this->elem_ptr(i);
-  }
-#endif
-
-  /**
-   * \returns A writable pointer to the \f$ i^{th} \f$ element, which
-   * should be present in this processor's subset of the mesh data
-   * structure.
-   *
-   * \deprecated Use the less confusingly-named elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual Elem * elem (const dof_id_type i)
-  {
-    libmesh_deprecated();
-    return this->elem_ptr(i);
-  }
-#endif
-
-  /**
    * \returns A pointer to the \f$ i^{th} \f$ element, or nullptr if no
    * such element exists in this processor's mesh data structure.
    */
@@ -590,34 +532,6 @@ public:
    * if no such element exists in this processor's mesh data structure.
    */
   virtual Elem * query_elem_ptr (const dof_id_type i) = 0;
-
-  /**
-   * \returns A pointer to the \f$ i^{th} \f$ element, or nullptr if no
-   * such element exists in this processor's mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named query_elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual const Elem * query_elem (const dof_id_type i) const
-  {
-    libmesh_deprecated();
-    return this->query_elem_ptr(i);
-  }
-#endif
-
-  /**
-   * \returns A writable pointer to the \f$ i^{th} \f$ element, or nullptr
-   * if no such element exists in this processor's mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named query_elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual Elem * query_elem (const dof_id_type i)
-  {
-    libmesh_deprecated();
-    return this->query_elem_ptr(i);
-  }
-#endif
 
   /**
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
@@ -1301,16 +1215,6 @@ public:
    * this function.
    */
   unsigned int recalculate_n_partitions();
-
-  /**
-   * \returns A pointer to a \p PointLocatorBase object for this
-   * mesh, constructing a master PointLocator first if necessary.
-   *
-   * \deprecated This should never be used in threaded or non-parallel_only code.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  const PointLocatorBase & point_locator () const;
-#endif
 
   /**
    * \returns A pointer to a subordinate \p PointLocatorBase object

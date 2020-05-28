@@ -28,18 +28,6 @@
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-#undef parallel_only
-#ifndef NDEBUG
-#define parallel_only() do {                                            \
-    libmesh_deprecated();                                               \
-    libmesh_assert(CommWorld.verify(std::string(__FILE__)));            \
-    libmesh_assert(CommWorld.verify(std::to_string(__LINE__))); } while (0)
-#else
-#define parallel_only()  ((void) 0)
-#endif
-#endif
-
 #undef libmesh_parallel_only
 #ifndef NDEBUG
 #define libmesh_parallel_only(comm_obj) do {                            \
@@ -51,18 +39,6 @@
 
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-#undef parallel_only_on
-#ifndef NDEBUG
-#define parallel_only_on(comm_arg) do {                                 \
-    libmesh_deprecated();                                               \
-    libmesh_assert(CommWorld.verify(std::string(__FILE__), comm_arg));  \
-    libmesh_assert(CommWorld.verify(std::to_string(__LINE__), comm_arg)); } while (0)
-#else
-#define parallel_only_on(comm_arg)  ((void) 0)
-#endif
-#endif
 
 #undef libmesh_parallel_only_on
 #ifndef NDEBUG

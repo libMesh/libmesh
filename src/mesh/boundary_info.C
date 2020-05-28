@@ -994,19 +994,6 @@ bool BoundaryInfo::has_boundary_id(const Node * const node,
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node * node) const
-{
-  libmesh_deprecated();
-
-  std::vector<boundary_id_type> ids;
-  this->boundary_ids(node, ids);
-  return ids;
-}
-#endif
-
-
-
 void BoundaryInfo::boundary_ids (const Node * node,
                                  std::vector<boundary_id_type> & vec_to_fill) const
 {
@@ -1024,20 +1011,6 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node * node) const
   auto pos = _boundary_node_id.equal_range(node);
   return cast_int<unsigned int>(std::distance(pos.first, pos.second));
 }
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem * const elem,
-                                                               const unsigned short int edge) const
-{
-  libmesh_deprecated();
-
-  std::vector<boundary_id_type> ids;
-  this->edge_boundary_ids(elem, edge, ids);
-  return ids;
-}
-#endif
 
 
 
@@ -1105,20 +1078,6 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem * const elem,
   this->edge_boundary_ids(elem, edge, ids);
   return cast_int<unsigned int>(ids.size());
 }
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem * const elem,
-                                                                   const unsigned short int edge) const
-{
-  libmesh_deprecated();
-
-  std::vector<boundary_id_type> ids;
-  this->raw_edge_boundary_ids(elem, edge, ids);
-  return ids;
-}
-#endif
 
 
 
@@ -1210,26 +1169,6 @@ void BoundaryInfo::raw_shellface_boundary_ids (const Elem * const elem,
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-boundary_id_type BoundaryInfo::boundary_id(const Elem * const elem,
-                                           const unsigned short int side) const
-{
-  libmesh_deprecated();
-
-  std::vector<boundary_id_type> ids;
-  this->boundary_ids(elem, side, ids);
-
-  // If the set is empty, return invalid_id
-  if (ids.empty())
-    return invalid_id;
-
-  // Otherwise, just return the first id we came across for this
-  // element on this side.
-  return *(ids.begin());
-}
-#endif
-
-
 
 bool BoundaryInfo::has_boundary_id(const Elem * const elem,
                                    const unsigned short int side,
@@ -1239,20 +1178,6 @@ bool BoundaryInfo::has_boundary_id(const Elem * const elem,
   this->boundary_ids(elem, side, ids);
   return (std::find(ids.begin(), ids.end(), id) != ids.end());
 }
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem * const elem,
-                                                          const unsigned short int side) const
-{
-  libmesh_deprecated();
-
-  std::vector<boundary_id_type> ids;
-  this->boundary_ids(elem, side, ids);
-  return ids;
-}
-#endif
 
 
 
@@ -1300,20 +1225,6 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem * const elem,
   this->boundary_ids(elem, side, ids);
   return cast_int<unsigned int>(ids.size());
 }
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem * const elem,
-                                                              const unsigned short int side) const
-{
-  libmesh_deprecated();
-
-  std::vector<boundary_id_type> ids;
-  this->raw_boundary_ids(elem, side, ids);
-  return ids;
-}
-#endif
 
 
 

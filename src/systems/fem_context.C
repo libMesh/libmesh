@@ -257,14 +257,6 @@ bool FEMContext::has_side_boundary_id(boundary_id_type id) const
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
-{
-  libmesh_deprecated();
-  return _boundary_info.boundary_ids(&(this->get_elem()), side);
-}
-#endif
-
 
 void FEMContext::side_boundary_ids(std::vector<boundary_id_type> & vec_to_fill) const
 {

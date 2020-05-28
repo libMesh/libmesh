@@ -173,16 +173,6 @@ public:
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. the sum of the
    * entry magnitudes squared.
-   *
-   * \deprecated Use the norm_sq() function instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  auto size_sq() const -> decltype(std::norm(T())) { libmesh_deprecated(); return 0.;}
-#endif
-
-  /**
-   * \returns The Frobenius norm of the tensor squared, i.e. the sum of the
-   * entry magnitudes squared.
    */
   auto norm_sq() const -> decltype(std::norm(T())) { return 0.;}
 

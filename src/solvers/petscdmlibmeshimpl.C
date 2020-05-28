@@ -597,8 +597,8 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   NonlinearImplicitSystem * _sys;
   ierr = DMlibMeshGetSystem(dm, _sys);CHKERRQ(ierr);
   NonlinearImplicitSystem & sys = *_sys;
-  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.solution.get());
-  PetscVector<Number> & R_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.rhs);
+  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+  PetscVector<Number> & R_sys = *cast_ptr<PetscVector<Number> *>(sys.rhs);
   PetscVector<Number> X_global(x, _sys->comm()), R(r, _sys->comm());
 
   // Use the systems update() to get a good local version of the parallel solution
@@ -665,8 +665,8 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 
   PetscMatrix<Number> the_pc(pc,sys.comm());
   PetscMatrix<Number> Jac(jac,sys.comm());
-  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.solution.get());
-  PetscMatrix<Number> & Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number> *>(sys.matrix);
+  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+  PetscMatrix<Number> & Jac_sys = *cast_ptr<PetscMatrix<Number> *>(sys.matrix);
   PetscVector<Number> X_global(x, sys.comm());
 
   // Set the dof maps
