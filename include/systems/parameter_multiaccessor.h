@@ -67,18 +67,6 @@ public:
   }
 
   /**
-   * A simple reseater won't work with a multi-accessor
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual ParameterAccessor<T> &
-  operator= (T * /* new_ptr */) override
-  {
-    libmesh_error();
-    return *this;
-  }
-#endif
-
-  /**
    * Setter: change the value of the parameter we access.
    */
   virtual void set (const T & new_value) override

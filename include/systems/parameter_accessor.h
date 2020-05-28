@@ -72,16 +72,6 @@ public:
   virtual const T & get () const = 0;
 
   /**
-   * Reseater: change the location of the parameter we access.
-   * This is included for backward compatibility, but will be
-   * deprecated in some classes and not implemented in others.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual ParameterAccessor<T> &
-  operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
-#endif
-
-  /**
    * Proxy: for backward compatibility, we allow codes to treat a
    * ParameterAccessor as if it were a simple pointer-to-value.  We
    * can't safely allow "Number * n = parameter_vector[p]" to compile,
