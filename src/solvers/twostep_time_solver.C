@@ -47,8 +47,14 @@ void TwostepTimeSolver::solve()
 {
   libmesh_assert(core_time_solver.get());
 
-  // The core_time_solver will handle any first_solve actions
-  first_solve = false;
+  // All actual solution history operations are handled by the outer
+  // solver, so the outer solver has to call advance_timestep and 
+  // call solution_history->store to store the initial conditions
+  if (first_solve)
+    {
+      advance_timestep();
+      first_solve = false;
+    }
 
   // We may have to repeat timesteps entirely if our error is bad
   // enough
