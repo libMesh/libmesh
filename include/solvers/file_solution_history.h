@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/numeric_vector.h"
+#include "libmesh/diff_system.h"
 #include "libmesh/solution_history.h"
 #include "libmesh/enum_xdr_mode.h"
 #include "libmesh/equation_systems.h"
@@ -33,6 +34,9 @@
 
 namespace libMesh
 {
+
+// Forward Declarations
+class DifferentiableSystem;
 
 /**
  * Subclass of Solution History that stores the solutions
