@@ -793,11 +793,6 @@ const Elem * Elem::interior_parent () const
                   (interior_p == remote_elem) ||
                   (interior_p->dim() > this->dim()));
 
-  // We require consistency between AMR of interior and of boundary
-  // elements
-  if (interior_p && (interior_p != remote_elem))
-    libmesh_assert_less_equal (interior_p->level(), this->level());
-
   return interior_p;
 }
 
@@ -814,8 +809,6 @@ Elem * Elem::interior_parent ()
   libmesh_assert (!interior_p ||
                   (interior_p == remote_elem) ||
                   (interior_p->dim() > this->dim()));
-  if (interior_p && (interior_p != remote_elem))
-    libmesh_assert_less_equal (interior_p->level(), this->level());
 
   return interior_p;
 }
