@@ -665,6 +665,11 @@ private:
     // Zero the interpolated values
     Ue.resize (n_dofs); Ue.zero();
 
+    // We have to use a small trick to ensure that FEInterface::n_dofs_at_node()
+    // returns the right number of DOFs when Elem::p_level() is elevated.
+    FEType p_refined_fe_type = fe_type;
+    p_refined_fe_type.order = static_cast<Order>(p_refined_fe_type.order + elem->p_level());
+
     // For Lagrange elements, side, edge, and shellface BCs all
     // "induce" boundary conditions on the nodes of those entities.
     // In SingleElemBoundaryInfo::reinit(), we therefore set entries
@@ -678,7 +683,7 @@ private:
         // For Lagrange this can return 0 (in case of a lower-order FE
         // on a higher-order Elem) or 1.
         const unsigned int nc =
-          FEInterface::n_dofs_at_node (dim, fe_type, elem_type, n);
+          FEInterface::n_dofs_at_node (dim, p_refined_fe_type, elem_type, n);
 
         // If there are no DOFs at this node, then it doesn't matter
         // if it's technically a boundary node or not, there's nothing
