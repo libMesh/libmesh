@@ -2738,7 +2738,7 @@ dof_id_type Elem::compute_key (dof_id_type n0,
                                dof_id_type n1,
                                dof_id_type n2)
 {
-  std::array<dof_id_type, 3> array = {n0, n1, n2};
+  std::array<dof_id_type, 3> array = {{n0, n1, n2}};
   std::sort(array.begin(), array.end());
   return Utility::hashword(array);
 }
@@ -2751,7 +2751,7 @@ dof_id_type Elem::compute_key (dof_id_type n0,
                                dof_id_type n2,
                                dof_id_type n3)
 {
-  std::array<dof_id_type, 4> array = {n0, n1, n2, n3};
+  std::array<dof_id_type, 4> array = {{n0, n1, n2, n3}};
   std::sort(array.begin(), array.end());
   return Utility::hashword(array);
 }
