@@ -18,6 +18,8 @@
 // Local includes
 #include "libmesh/memory_solution_history.h"
 
+#include "libmesh/diff_system.h"
+
 #include <cmath>
 
 namespace libMesh
@@ -150,7 +152,14 @@ void MemorySolutionHistory::retrieve(bool is_adjoint_solve)
 
       Real _decremented_time = stored_sols_decrement_time->first;
 
-      dynamic_cast<DifferentiableSystem &>(_system).deltat = _current_time - _decremented_time;
+      try
+      {
+        dynamic_cast<DifferentiableSystem &>(_system).deltat = _current_time - _decremented_time;
+      }
+      catch(const std::bad_cast& e)
+      {
+        // For a non-diff system, only fixed time step sizes are supported as of now.
+      }
     }
   }
   else
@@ -165,7 +174,14 @@ void MemorySolutionHistory::retrieve(bool is_adjoint_solve)
 
       Real _incremented_time = stored_sols_increment_time->first;
 
-      dynamic_cast<DifferentiableSystem &>(_system).deltat = _incremented_time - _current_time;
+      try
+      {
+        dynamic_cast<DifferentiableSystem &>(_system).deltat = _incremented_time - _current_time;
+      }
+      catch(const std::bad_cast& e)
+      {
+        // For a non-diff system, only fixed time step sizes are supported as of now.
+      }
     }
   }
 
