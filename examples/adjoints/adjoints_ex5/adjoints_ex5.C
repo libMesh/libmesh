@@ -173,8 +173,15 @@ void write_output(EquationSystems & es,
 #endif
 }
 
-void set_system_parameters(FEMSystem &system, FEMParameters &param)
+void set_system_parameters(HeatSystem &system, FEMParameters &param)
 {
+  // Use the prescribed FE type
+  system.fe_family() = param.fe_family[0];
+  system.fe_order() = param.fe_order[0];
+
+  // Use analytical jacobians?
+  system.analytic_jacobians() = param.analytic_jacobians;
+
   // Verify analytic jacobians against numerical ones?
   system.verify_analytic_jacobians = param.verify_analytic_jacobians;
   system.numerical_jacobian_h = param.numerical_jacobian_h;
@@ -187,6 +194,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
   system.print_jacobian_norms    = param.print_jacobian_norms;
   system.print_jacobians         = param.print_jacobians;
   system.print_element_jacobians = param.print_element_jacobians;
+  system.print_element_residuals = param.print_element_residuals;
 
   // Solve this as a time-dependent or steady system
   if (param.transient)
@@ -222,10 +230,10 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
           timesolver->component_norm   = SystemNorm(param.timesolver_norm);
 
           timesolver->core_time_solver =
-            UniquePtr<UnsteadySolver>(innersolver);
+            std::unique_ptr<UnsteadySolver>(innersolver);
 
           system.time_solver =
-            UniquePtr<UnsteadySolver>(timesolver);
+            std::unique_ptr<UnsteadySolver>(timesolver);
 
           // The Memory/File Solution History object we will set the system SolutionHistory object to
           if(param.solution_history_type == "memory")
@@ -245,7 +253,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
       else
       {
         system.time_solver =
-          UniquePtr<TimeSolver>(innersolver);
+          std::unique_ptr<TimeSolver>(innersolver);
 
         // The Memory/File Solution History object we will set the system SolutionHistory object to
         if(param.solution_history_type == "memory")
@@ -269,7 +277,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
     }
   else
     system.time_solver =
-      UniquePtr<TimeSolver>(new SteadySolver(system));
+      std::unique_ptr<TimeSolver>(new SteadySolver(system));
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
                                         param.deltat_reductions;
@@ -310,15 +318,15 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
     {
 #ifdef LIBMESH_HAVE_PETSC
       PetscDiffSolver *solver = new PetscDiffSolver(system);
-      system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
+      system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
 #else
-      libmesh_error();
+      libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
     }
   else
     {
       NewtonSolver *solver = new NewtonSolver(system);
-      system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
+      system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
 
       solver->quiet                       = param.solver_quiet;
       solver->verbose                     = param.solver_verbose;
