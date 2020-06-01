@@ -66,6 +66,12 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   // when we enter for the first time.
   if (s == 0)
     current_fe_type.radial_order = 0;
+  else
+     /**
+      * After the recent larger changes, this case was not tested.
+      * It might work, but maybe it gives wrong results.
+      */
+     libmesh_not_implemented();
 
   if (current_fe_type.radial_order != fe_type.radial_order)
     {
@@ -101,7 +107,6 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   //  - normal, tangents: They are not considered
   // This is done below:
   compute_face_functions();
-
 }
 
 
@@ -207,63 +212,16 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
           // - either the base element or it has a 1D base + radial direction.
           if (inf_side->infinite())
             qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
-                                        radial_qp[rp](0),
-                                        0.);
+                                        0.,
+                                        radial_qp[rp](0));
           else
             qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
                                         base_qp[bp](1),
-                                        0.);
+                                        -1.);
         }
   }
 
-  // compute the shape function and derivative values
-  // at the points qp
-  if (inf_side->infinite())
-    this->reinit  (inf_side, &qp);
-  else
-    { //FIXME: need a \p FE for inf_fe that is reinitialized.
-      UniquePtr<FEBase> fe (FEBase::build(inf_side->dim(), this->fe_type));
-
-      const std::vector<Real>& fe_JxW = fe->get_JxW();
-      // The element shape functions evaluated at the quadrature points.
-      const std::vector<std::vector<Real> >& fe_phi = fe->get_phi();
-      const std::vector<std::vector<RealGradient> >& fe_dphi = fe->get_dphi();
-
-      const std::vector<std::vector<Point>> & fe_tangents = fe->get_tangents();
-      const std::vector<Point>& fe_xyz = fe->get_xyz();
-
-      fe->reinit(inf_side, &qp);
-      JxWxdecay = fe_JxW; // decay=1 at the base element
-      this->xyz=  fe_xyz;
-      this->phi=  fe_phi;
-      this->phixr=fe_phi;
-      this->dphi=      fe_dphi;
-      this->dphixr=    fe_dphi;
-      this->dphixr_sq= fe_dphi;
-
-      this->dxidx_map = fe->get_dxidx();
-      this->dxidy_map = fe->get_dxidy();
-      this->dxidz_map = fe->get_dxidz();
-      this->detadx_map =  fe->get_detadx();
-      this->detady_map =  fe->get_detady();
-      this->detadz_map =  fe->get_detadz();
-
-      this->dxidx_map_scaled = fe->get_dxidx();
-      this->dxidy_map_scaled = fe->get_dxidy();
-      this->dxidz_map_scaled = fe->get_dxidz();
-      this->detadx_map_scaled =  fe->get_detadx();
-      this->detady_map_scaled =  fe->get_detady();
-      this->detadz_map_scaled =  fe->get_detadz();
-
-      this->weight =      fe->get_Sobolev_weight();
-      this->weightxr_sq = fe->get_Sobolev_weight();
-      this->dweight =     fe->get_Sobolev_dweight();
-      this->dweightxr_sq =fe->get_Sobolev_dweight();
-      this->dphase =      fe->get_dphase();
-
-      this->tangents = fe_tangents;
-      this->normals = fe->get_normals();
-    }
+  this->reinit(inf_side->parent(), &qp);
 
 }
 
@@ -322,35 +280,45 @@ void InfFE<Dim,T_radial,T_base>::compute_face_functions()
                 //
                 // J^-1 = ________1________   / g22  -g21 \  / dxi/dx  dxi/dy   dxi/dz \.
                 //        g11*g22 - g21*g12   \-g12  g11  /  \ deta/dx deta/dy deta/dz /.
+                const std::vector<Real> & base_dxidx = base_fe->get_dxidx();
+                const std::vector<Real> & base_dxidy = base_fe->get_dxidy();
+                const std::vector<Real> & base_dxidz = base_fe->get_dxidz();
+                const std::vector<Real> & base_detadx = base_fe->get_detadx();
+                const std::vector<Real> & base_detady = base_fe->get_detady();
+                const std::vector<Real> & base_detadz = base_fe->get_detadz();
 
-                const Real g11 = (dxidx_map_scaled[p]*dxidx_map_scaled[p] +
-                                  dxidy_map_scaled[p]*dxidy_map_scaled[p] +
-                                  dxidz_map_scaled[p]*dxidz_map_scaled[p]);
-                const Real g12 = (dxidx_map_scaled[p]*detadx_map_scaled[p] +
-                                  dxidy_map_scaled[p]*detady_map_scaled[p] +
-                                  dxidz_map_scaled[p]*detadz_map_scaled[p]);
+                const Real g11 = (base_dxidx[p]*base_dxidx[p] +
+                                  base_dxidy[p]*base_dxidy[p] +
+                                  base_dxidz[p]*base_dxidz[p]);
+                const Real g12 = (base_dxidx[p]*base_detadx[p] +
+                                  base_dxidy[p]*base_detady[p] +
+                                  base_dxidz[p]*base_detadz[p]);
                 const Real g21 = g12;
-                const Real g22 = (detadx_map_scaled[p]*detadx_map_scaled[p] +
-                                  detady_map_scaled[p]*detady_map_scaled[p] +
-                                  detadz_map_scaled[p]*detadz_map_scaled[p]);
+                const Real g22 = (base_detadx[p]*base_detadx[p] +
+                                  base_detady[p]*base_detady[p] +
+                                  base_detadz[p]*base_detadz[p]);
 
                 // det is scaled by r^6
                 const Real det = (g11*g22 - g12*g21);
 
                 // scaled by r^-3
-                Point dxyzdxi_map((g22*dxidx_map_scaled[p]-g21*detadx_map_scaled[p])/det,
-                                  (g22*dxidy_map_scaled[p]-g21*detady_map_scaled[p])/det,
-                                  (g22*dxidz_map_scaled[p]-g21*detadz_map_scaled[p])/det);
+                Point dxyzdxi_map((g22*base_dxidx[p]-g21*base_detadx[p])/det,
+                                  (g22*base_dxidy[p]-g21*base_detady[p])/det,
+                                  (g22*base_dxidz[p]-g21*base_detadz[p])/det);
 
+                Point dxyzdeta_map((g11*base_detadx[p] - g12*base_dxidx[p])/det,
+                                   (g11*base_detady[p] - g12*base_dxidy[p])/det,
+                                   (g11*base_detadz[p] - g12*base_dxidz[p])/det);
                 // scaled by r^-2
-                Point dxyzdeta_map((g11*detadx_map_scaled[p] - g12*dxidx_map_scaled[p])/det,
-                                   (g11*detady_map_scaled[p] - g12*dxidy_map_scaled[p])/det,
-                                   (g11*detadz_map_scaled[p] - g12*dxidz_map_scaled[p])/det);
 
-                const Point n  = dxyzdxi_map.cross(dxyzdeta_map);
-                this->normals[p]     = n.unit();
                 this->tangents[p][0] = dxyzdxi_map.unit();
-                this->tangents[p][1] = n.cross(dxyzdxi_map).unit();
+
+                this->tangents[p][1] = (dxyzdeta_map - (dxyzdeta_map*tangents[p][0])*tangents[p][0] ).unit();
+
+                this->normals[p]     = tangents[p][0].cross(tangents[p][1]).unit();
+                // recompute JxW using the 2D Jacobian:
+                this->JxWxdecay[p] = _total_qrule_weights[p]/std::sqrt(det);
+                this->JxW[p] = JxWxdecay[p];
               }
 
 

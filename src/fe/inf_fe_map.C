@@ -27,43 +27,11 @@
 #include "libmesh/inf_fe_macro.h"
 #include "libmesh/libmesh_logging.h"
 
-#include "libmesh/dense_matrix.h"
-#include "libmesh/analytic_function.h" // for DenseVector
+#include "libmesh/type_tensor.h"
 
 namespace libMesh
 {
 
-   // local helper-function solving Ax=b in 3D.
-bool system_solve_3x3(DenseMatrix<libMesh::Real> & A, DenseVector<libMesh::Real> & b, DenseVector<libMesh::Real> & x)
-{
-  bool has_soln = false;
-  libMesh::Real det =   A(0,0) * (A(1,1)*A(2,2) - A(1,2)*A(2,1))
-    - A(0,1) * (A(1,0)*A(2,2) - A(1,2)*A(2,0))
-    + A(0,2) * (A(1,0)*A(2,1) - A(1,1)*A(2,0));
-
-  if (std::abs(det) >= std::numeric_limits<libMesh::Real>::epsilon()*10.0)
-    {
-      libMesh::DenseMatrix<libMesh::Real> A_inv(3,3);
-
-      A_inv(0, 0) = (A(1,1)*A(2,2) - A(1,2)*A(2,1)) / det;
-      A_inv(0, 1) = (A(0,2)*A(2,1) - A(0,1)*A(2,2)) / det;
-      A_inv(0, 2) = (A(0,1)*A(1,2) - A(0,2)*A(1,1)) / det;
-
-      A_inv(1, 0) = (A(1,2)*A(2,0) - A(1,0)*A(2,2)) / det;
-      A_inv(1, 1) = (A(0,0)*A(2,2) - A(0,2)*A(2,0)) / det;
-      A_inv(1, 2) = (A(1,0)*A(0,2) - A(0,0)*A(1,2)) / det;
-
-      A_inv(2, 0) = (A(1,0)*A(2,1) - A(1,1)*A(2,0)) / det;
-      A_inv(2, 1) = (A(0,1)*A(2,0) - A(0,0)*A(2,1)) / det;
-      A_inv(2, 2) = (A(0,0)*A(1,1) - A(0,1)*A(1,0)) / det;
-
-      A_inv.vector_mult(x,b);
-
-      has_soln = true;
-    }
-
-  return has_soln;
-}
 // ------------------------------------------------------------
 // InfFE static class members concerned with coordinate
 // mapping
@@ -185,14 +153,6 @@ Point InfFEMap::inverse_map (const unsigned int dim,
         if (libmesh_isinf(c_factor))
           return p;
 
-        // The intersection should always be between the origin and the physical point.
-        // It can become positive close to the border, but should
-        // be only very small.
-        //  So as in the case above, we can be sufficiently sure here
-        // that \p physical_point is not in this element:
-        if (c_factor > 0.01)
-          return p;
-
         // Compute the intersection with
         // {intersection} = {physical_point} + c*({physical_point}-{o}).
         intersection.add_scaled(physical_point,1.+c_factor);
@@ -206,60 +166,44 @@ Point InfFEMap::inverse_map (const unsigned int dim,
             // the number of shape functions needed for the base_elem
             unsigned int n_sf = FE<2,LAGRANGE>::n_shape_functions(base_elem->type(),base_elem->default_order());
 
-            // shape functions and derivatives w.r.t reference coordinate
-            std::vector<Real> phi(n_sf);
-            std::vector<Real> dphi_dxi(n_sf);
-            std::vector<Real> dphi_deta(n_sf);
-
             // guess base element coordinates: p=xi,eta,0
+            // in first iteration, never run with 'secure' to avoid false warnings.
             Point ref_point= FEMap::inverse_map(dim-1, base_elem.get(), intersection,
-                                                tolerance, secure);
+                                                tolerance, false);
 
             // Newton iteration
-            for(unsigned int it=0; it<iter_max; it++)
+            for(unsigned int it=0; it<iter_max; ++it)
               {
                 // Get the shape function and derivative values at the reference coordinate
                 // phi.size() == dphi.size()
-                for(unsigned int i=0; i<phi.size(); i++)
-                  {
-
-                    phi[i] = FE<2,LAGRANGE>::shape(base_elem->type(),
-                                                   base_elem->default_order(),
-                                                   i,
-                                                   ref_point);
-
-                    dphi_dxi[i] = FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
-                                                              base_elem->default_order(),
-                                                              i,
-                                                              0, // d()/dxi
-                                                              ref_point);
-
-                    dphi_deta[i] = FE<2,LAGRANGE>::shape_deriv( base_elem->type(),
-                                                                base_elem->default_order(),
-                                                                i,
-                                                                1, // d()/deta
-                                                                ref_point);
-                  } // for i
                 Point dxyz_dxi;
                 Point dxyz_deta;
 
                 Point intersection_guess;
-
-                for(unsigned int i=0; i<phi.size(); i++)
+                for(unsigned int i=0; i<n_sf; ++i)
                   {
-                    intersection_guess += (*(base_elem->node_ptr(i))) * phi[i];
-                    dxyz_dxi += (*(base_elem->node_ptr(i))) * dphi_dxi[i];
-                    dxyz_deta += (*(base_elem->node_ptr(i))) * dphi_deta[i];
-                  }
 
+                    intersection_guess += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape(base_elem->type(),
+                                                                                         base_elem->default_order(),
+                                                                                         i,
+                                                                                         ref_point);
 
-                DenseVector<Real> F(3);
-                F(0) =physical_point(0) + c_factor*(physical_point-o)(0) - intersection_guess(0);
-                F(1) =physical_point(1) + c_factor*(physical_point-o)(1) - intersection_guess(1);
-                F(2) =physical_point(2) + c_factor*(physical_point-o)(2) - intersection_guess(2);
+                    dxyz_dxi += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                                                                                     base_elem->default_order(),
+                                                                                     i,
+                                                                                     0, // d()/dxi
+                                                                                     ref_point);
 
+                    dxyz_deta+= base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                                                                                     base_elem->default_order(),
+                                                                                     i,
+                                                                                     1, // d()/deta
+                                                                                     ref_point);
+                  } // for i
 
-                DenseMatrix<Real> J(3,3);
+                TypeVector<Real> F(physical_point + c_factor*(physical_point-o) - intersection_guess);
+
+                TypeTensor<Real> J;
                 J(0,0) = (physical_point-o)(0);
                 J(0,1) = -dxyz_dxi(0);
                 J(0,2) = -dxyz_deta(0);
@@ -271,24 +215,22 @@ Point InfFEMap::inverse_map (const unsigned int dim,
                 J(2,2) = -dxyz_deta(2);
 
                 // delta will be the newton step
-                DenseVector<Real> delta(3);
-                bool has_soln = system_solve_3x3(J,F,delta);
-
-                if (!has_soln)
-                  libmesh_error_msg("no intersection found: bad problem!");
-
+                TypeVector<Real> delta;
+                J.solve(F,delta);
 
                 // check for convergence
-                Real tol = std::min( TOLERANCE, TOLERANCE*base_elem->hmax() );
-                if ( delta.l2_norm() < tol )
+                Real tol = std::min( TOLERANCE0.01, TOLERANCE*base_elem->hmax() );
+                if ( delta.norm() < tol )
                   {
                     // newton solver converged, now make sure it converged to a point on the base_elem
                     if (base_elem->contains_point(intersection_guess,TOLERANCE*0.1))
                       {
-                        intersection(0) = intersection_guess(0);
-                        intersection(1) = intersection_guess(1);
-                        intersection(2) = intersection_guess(2);
+                        intersection = intersection_guess;
                       }
+                    //else
+                    //  {
+                    //     err<<" Error: inverse_map failed!"<<std::endl;
+                    //  }
                     break; // break out of 'for it'
                   }
                 else
@@ -353,7 +295,7 @@ Point InfFEMap::inverse_map (const unsigned int dim,
   p(dim-1)=v;
 #ifdef DEBUG
   // first check whether we are in the reference-element:
-  if (-1.-1.e-5 < v && v < 1.)
+  if ((-1.-1.e-5 < v && v < 1.) || secure)
     {
       const Point check = map (dim, inf_elem, p);
       const Point diff  = physical_point - check;
