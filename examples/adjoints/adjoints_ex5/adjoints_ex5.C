@@ -173,8 +173,7 @@ void write_output(EquationSystems & es,
 #endif
 }
 
-void set_system_parameters(HeatSystem & system,
-                           FEMParameters & param)
+void set_system_parameters(HeatSystem &system, FEMParameters &param)
 {
   // Use the prescribed FE type
   system.fe_family() = param.fe_family[0];
@@ -201,7 +200,15 @@ void set_system_parameters(HeatSystem & system,
   if (param.transient)
     {
       UnsteadySolver *innersolver;
-      if (param.timesolver_core == "euler")
+      if (param.timesolver_core == "euler2")
+        {
+          Euler2Solver *euler2solver =
+            new Euler2Solver(system);
+
+          euler2solver->theta = param.timesolver_theta;
+          innersolver = euler2solver;
+        }
+      else if (param.timesolver_core == "euler")
         {
           EulerSolver *eulersolver =
             new EulerSolver(system);
@@ -212,31 +219,71 @@ void set_system_parameters(HeatSystem & system,
       else
         libmesh_error_msg("This example (and unsteady adjoints in libMesh) only support Backward Euler and explicit methods.");
 
-      system.time_solver =
-        std::unique_ptr<TimeSolver>(innersolver);
-    }
-  else
-    system.time_solver = libmesh_make_unique<SteadySolver>(system);
+      if (param.timesolver_tolerance)
+        {
+          TwostepTimeSolver *timesolver =
+            new TwostepTimeSolver(system);
 
-  // The Memory/File Solution History object we will set the system SolutionHistory object to
-  if(param.solution_history_type == "memory")
-    {
-      MemorySolutionHistory heatsystem_solution_history(system);
-      system.time_solver->set_solution_history(heatsystem_solution_history);
-    }
-  else if (param.solution_history_type == "file")
-    {
-      FileSolutionHistory heatsystem_solution_history(system);
-      system.time_solver->set_solution_history(heatsystem_solution_history);
+          timesolver->max_growth       = param.timesolver_maxgrowth;
+          timesolver->target_tolerance = param.timesolver_tolerance;
+          timesolver->upper_tolerance  = param.timesolver_upper_tolerance;
+          timesolver->component_norm   = SystemNorm(param.timesolver_norm);
+
+          timesolver->core_time_solver =
+            std::unique_ptr<UnsteadySolver>(innersolver);
+
+          system.time_solver =
+            std::unique_ptr<UnsteadySolver>(timesolver);
+
+          // The Memory/File Solution History object we will set the system SolutionHistory object to
+          if(param.solution_history_type == "memory")
+          {
+            MemorySolutionHistory heatsystem_solution_history(system);
+            system.time_solver->set_solution_history(heatsystem_solution_history);
+          }
+          else if (param.solution_history_type == "file")
+          {
+            FileSolutionHistory heatsystem_solution_history(system);
+            system.time_solver->set_solution_history(heatsystem_solution_history);
+          }
+          else
+          libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
+
+        }
+      else
+      {
+        system.time_solver =
+          std::unique_ptr<TimeSolver>(innersolver);
+
+        // The Memory/File Solution History object we will set the system SolutionHistory object to
+        if(param.solution_history_type == "memory")
+        {
+          MemorySolutionHistory heatsystem_solution_history(system);
+          system.time_solver->set_solution_history(heatsystem_solution_history);
+        }
+        else if (param.solution_history_type == "file")
+        {
+          FileSolutionHistory heatsystem_solution_history(system);
+          system.time_solver->set_solution_history(heatsystem_solution_history);
+        }
+        else
+        libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
+
+        // The Memory/File Solution History object we will set the system SolutionHistory object to
+        FileSolutionHistory heatsystem_solution_history(system);
+        system.time_solver->set_solution_history(heatsystem_solution_history);
+
+      }
     }
   else
-    libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
+    system.time_solver =
+      std::unique_ptr<TimeSolver>(new SteadySolver(system));
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
-    param.deltat_reductions;
+                                        param.deltat_reductions;
   system.time_solver->quiet           = param.time_solver_quiet;
 
-#ifdef LIBMESH_ENABLE_DIRICHLET
+ #ifdef LIBMESH_ENABLE_DIRICHLET
   // Create any Dirichlet boundary conditions
   typedef
     std::map<boundary_id_type, FunctionBase<Number> *>::
@@ -258,7 +305,7 @@ void set_system_parameters(HeatSystem & system,
         libMesh::out << param.dirichlet_condition_variables[b][vi];
       libMesh::out << std::endl;
     }
-#endif // LIBMESH_ENABLE_DIRICHLET
+ #endif // LIBMESH_ENABLE_DIRICHLET
 
   // Set the time stepping options
   system.deltat = param.deltat;
@@ -691,9 +738,19 @@ int main (int argc, char ** argv)
       // getting are what they should be
       // The 2e-4 tolerance is chosen to ensure success even with
       // 32-bit floats
-      if(std::abs(sensitivity_0_0 - (-4.83551)) >= 2.e-4)
-        libmesh_error_msg("Mismatch in sensitivity gold value!");
+      if(param.timesolver_tolerance)
+      {
+        if(std::abs(system.time - (1.00285)) >= 2.e-4)
+        libmesh_error_msg("Mismatch in end time reached by adaptive timestepper!");
 
+        if(std::abs(sensitivity_0_0 - (-4.85298)) >= 2.e-4)
+        libmesh_error_msg("Mismatch in sensitivity gold value!");
+      }
+      else
+      {
+        if(std::abs(sensitivity_0_0 - (-4.83551)) >= 2.e-4)
+        libmesh_error_msg("Mismatch in sensitivity gold value!");
+      }
 #ifdef NDEBUG
     }
   catch (...)

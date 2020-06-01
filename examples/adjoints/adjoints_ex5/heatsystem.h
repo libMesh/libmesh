@@ -39,8 +39,6 @@ public:
       _fe_family("LAGRANGE"),
       _fe_order(1),
       _analytic_jacobians(true),
-      R_plus_dp(0.0),
-      R_minus_dp(0.0),
       dp(1.e-6)
   { qoi.resize(1); }
 
@@ -63,7 +61,7 @@ public:
       Number left_contribution = -(R_plus_dp[i] - R_minus_dp[i])/(2.*dp);
       Number right_contribution = -(R_plus_dp[i+1] - R_minus_dp[i+1])/(2.*dp);
 
-      final_sensitivity += (left_contribution + right_contribution)/2.;
+      final_sensitivity += ( (left_contribution + right_contribution)/2. )*deltat_vector[i];
     }
 
     return final_sensitivity;
@@ -139,6 +137,9 @@ protected:
   // Variables to hold the perturbed residuals
   std::vector<Number> R_plus_dp;
   std::vector<Number> R_minus_dp;
+
+  // A vector to hold the possibly adaptive deltats
+  std::vector<Number> deltat_vector;
 
   // Perturbation parameter
   Number dp;

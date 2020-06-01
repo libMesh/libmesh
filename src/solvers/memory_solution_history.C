@@ -18,6 +18,8 @@
 // Local includes
 #include "libmesh/memory_solution_history.h"
 
+#include "libmesh/diff_system.h"
+
 #include <cmath>
 
 namespace libMesh
@@ -128,9 +130,60 @@ void MemorySolutionHistory::store(bool /* is_adjoint_solve */)
     saved_vectors[_solution] = _system.solution->clone();
 }
 
-void MemorySolutionHistory::retrieve(bool /* is_adjoint_solve */)
+void MemorySolutionHistory::retrieve(bool is_adjoint_solve)
 {
   this->find_stored_entry();
+
+  // To set the deltat while using adaptive timestepping, we will utilize
+  // consecutive time entries in the stored solutions iterator
+  Real _current_time = stored_sols->first;
+
+  // If we are solving the adjoint, we are moving backwards, so decrement time
+  // else we are moving forwards, so increment time
+  if(is_adjoint_solve)
+  {
+    stored_solutions_iterator stored_sols_decrement_time = stored_sols;
+
+    // Recovering deltats needs two different entries from the the
+    // stored solutions map
+    if(stored_sols_decrement_time != stored_solutions.begin())
+    {
+      stored_sols_decrement_time--;
+
+      Real _decremented_time = stored_sols_decrement_time->first;
+
+      try
+      {
+        dynamic_cast<DifferentiableSystem &>(_system).deltat = _current_time - _decremented_time;
+      }
+      catch(const std::bad_cast& e)
+      {
+        // For a non-diff system, only fixed time step sizes are supported as of now.
+      }
+    }
+  }
+  else
+  {
+    stored_solutions_iterator stored_sols_increment_time = stored_sols;
+
+    // Recovering deltats needs two different entries from the the
+    // stored solutions map
+    if(stored_sols_increment_time != std::prev(stored_solutions.end()) )
+    {
+      stored_sols_increment_time++;
+
+      Real _incremented_time = stored_sols_increment_time->first;
+
+      try
+      {
+        dynamic_cast<DifferentiableSystem &>(_system).deltat = _incremented_time - _current_time;
+      }
+      catch(const std::bad_cast& e)
+      {
+        // For a non-diff system, only fixed time step sizes are supported as of now.
+      }
+    }
+  }
 
   // Get the time at which we are recovering the solution vectors
   Real recovery_time = stored_sols->first;

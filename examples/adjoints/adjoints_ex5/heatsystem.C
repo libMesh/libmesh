@@ -168,6 +168,9 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
 {
   this->update();
 
+  // Get the timestep size
+  deltat_vector.push_back(this->deltat);
+
   for (std::size_t j=0, Np = parameters_in.size(); j != Np; ++j)
     {
       Number old_parameter = *parameters_in[j];
@@ -181,7 +184,8 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
       std::unique_ptr<NumericVector<Number>> R_minus = this->rhs->clone();
 
       // The contribution at a single time step would be [f(z;p+dp) - <partialu/partialt, z>(p+dp) - <g(u),z>(p+dp)] * dt
-      R_minus_dp.push_back(-R_minus->dot(this->get_adjoint_solution(0))*this->deltat);
+      // dt can vary per timestep, so its stored and multiplied separately during the integration
+      R_minus_dp.push_back(-R_minus->dot(this->get_adjoint_solution(0)));
 
       *parameters_in[j] = old_parameter + dp;
 
@@ -191,7 +195,7 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
 
       std::unique_ptr<NumericVector<Number>> R_plus = this->rhs->clone();
 
-      R_plus_dp.push_back(-R_plus->dot(this->get_adjoint_solution(0))*this->deltat);
+      R_plus_dp.push_back(-R_plus->dot(this->get_adjoint_solution(0)));
 
       *parameters_in[j] = old_parameter;
     }

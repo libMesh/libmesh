@@ -17,6 +17,7 @@
 
 #include "libmesh/adaptive_time_solver.h"
 #include "libmesh/diff_system.h"
+#include "libmesh/dof_map.h"
 #include "libmesh/numeric_vector.h"
 
 namespace libMesh
@@ -86,6 +87,28 @@ void AdaptiveTimeSolver::reinit()
 
 void AdaptiveTimeSolver::advance_timestep ()
 {
+  // The first access of advance_timestep happens via solve, not user code
+  // It is used here to store any initial conditions data
+  if (!first_solve)
+    {
+      // We call advance_timestep in user code after solve, so any solutions
+      // we will be storing will be for the next time instance
+      _system.time += _system.deltat;
+    }
+    else
+    {
+      // We are here because of a call to advance_timestep that happens
+      // via solve, the very first solve. All we are doing here is storing
+      // the initial condition. The actual solution computed via this solve
+      // will be stored when we call advance_timestep in the user's timestep loop
+      first_solve = false;
+    }
+
+  // If the user has attached a memory or file solution history object
+  // to the solver, this will store the current solution indexed with
+  // the current time
+  solution_history->store(false);
+
   NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> & nonlinear_solution =
@@ -93,8 +116,9 @@ void AdaptiveTimeSolver::advance_timestep ()
 
   old_nonlinear_soln = nonlinear_solution;
 
-  if (!first_solve)
-    _system.time += last_deltat;
+  old_nonlinear_soln.localize
+    (*old_local_nonlinear_solution,
+     _system.get_dof_map().get_send_list());
 }
 
 

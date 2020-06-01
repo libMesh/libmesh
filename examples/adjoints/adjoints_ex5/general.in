@@ -18,7 +18,9 @@ deltat = 0.1
 
 # The tolerance to use with adaptive timestepping
 # Make this 0 to use a constant deltat
-timesolver_tolerance = 0.
+timesolver_tolerance = 0.0
+timesolver_upper_tolerance = 0.0
+timesolver_maxgrowth = 1.09
 
 # The theta to use (i.e. 0.5 = Crank-Nicholson, 1.0 = Backward Euler)
 timesolver_theta = 1.0
