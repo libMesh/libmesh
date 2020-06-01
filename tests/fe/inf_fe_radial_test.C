@@ -7,6 +7,8 @@
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/elem.h"
 #include "libmesh/inf_fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/jacobi_polynomials.h"
 
 // unit test includes
 #include "test_comm.h"
@@ -16,8 +18,42 @@
 #include <vector>
 
 #include "libmesh_cppunit.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/analytic_function.h" // for DenseVector
+#include "libmesh/fe.h"
 
 using namespace libMesh;
+
+bool system_solve_3x3(DenseMatrix<libMesh::Real> & A, DenseVector<libMesh::Real> & b, DenseVector<libMesh::Real> & x)
+{
+  bool has_soln = false;
+  libMesh::Real det =   A(0,0) * (A(1,1)*A(2,2) - A(1,2)*A(2,1))
+    - A(0,1) * (A(1,0)*A(2,2) - A(1,2)*A(2,0))
+    + A(0,2) * (A(1,0)*A(2,1) - A(1,1)*A(2,0));
+
+  if (std::abs(det) >= std::numeric_limits<libMesh::Real>::epsilon()*10.0)
+    {
+      libMesh::DenseMatrix<libMesh::Real> A_inv(3,3);
+
+      A_inv(0, 0) = (A(1,1)*A(2,2) - A(1,2)*A(2,1)) / det;
+      A_inv(0, 1) = (A(0,2)*A(2,1) - A(0,1)*A(2,2)) / det;
+      A_inv(0, 2) = (A(0,1)*A(1,2) - A(0,2)*A(1,1)) / det;
+
+      A_inv(1, 0) = (A(1,2)*A(2,0) - A(1,0)*A(2,2)) / det;
+      A_inv(1, 1) = (A(0,0)*A(2,2) - A(0,2)*A(2,0)) / det;
+      A_inv(1, 2) = (A(1,0)*A(0,2) - A(0,0)*A(1,2)) / det;
+
+      A_inv(2, 0) = (A(1,0)*A(2,1) - A(1,1)*A(2,0)) / det;
+      A_inv(2, 1) = (A(0,1)*A(2,0) - A(0,0)*A(2,1)) / det;
+      A_inv(2, 2) = (A(0,0)*A(1,1) - A(0,1)*A(1,0)) / det;
+
+      A_inv.vector_mult(x,b);
+
+      has_soln = true;
+    }
+
+  return has_soln;
+}
 
 /**
  * This class is for unit testing the "radial" basis function
@@ -34,6 +70,7 @@ class InfFERadialTest : public CppUnit::TestCase
 public:
   CPPUNIT_TEST_SUITE( InfFERadialTest );
   CPPUNIT_TEST( testDifferentOrders );
+  CPPUNIT_TEST( testInfQuants );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -54,6 +91,151 @@ public:
     unsigned int qp;
     Point grad;
   };
+
+  Point base_point(const Point fp, const Elem * e)
+  {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    libmesh_assert( e->infinite());
+    libmesh_assert_equal_to(e->dim(),3);
+    // copied from InfFE::inverse_map().
+    // This function computes the intersection of the line between the point fp
+    // and the origin of the element with its base side.
+  // The point on the reference element (which we are looking for).
+
+    // start with an invalid guess:
+    Point p;
+    p(e->dim()-1)=-2.;
+
+    Point o(e->origin());
+    Point intersection;
+
+    std::unique_ptr<const libMesh::Elem> base_elem = e->side_ptr(0);
+
+    const Point xi ( base_elem->point(1) - base_elem->point(0));
+    const Point eta( base_elem->point(2) - base_elem->point(0));
+    const Point zeta( fp - o);
+    // normal vector of the base elements plane (normalisation cancels in this case)
+    Point n(xi.cross(eta));
+    Real c_factor = (base_elem->point(0) - o)*n/(zeta*n) - 1.;
+
+        if (libmesh_isinf(c_factor))
+          return p;
+
+        if (c_factor > 0.01)
+          return p;
+
+        // Compute the intersection with
+        // {intersection} = {fp} + c*({fp}-{o}).
+        intersection.add_scaled(fp,1.+c_factor);
+        intersection.add_scaled(o,-c_factor);
+
+        // For non-planar elements, the intersecting point is not as easy to obtain.
+        if (!base_elem->has_affine_map())
+          {
+            unsigned int iter_max = 20;
+
+            // the number of shape functions needed for the base_elem
+            unsigned int n_sf = FE<2,LAGRANGE>::n_shape_functions(base_elem->type(),base_elem->default_order());
+
+            // shape functions and derivatives w.r.t reference coordinate
+            std::vector<Real> phi(n_sf);
+            std::vector<Real> dphi_dxi(n_sf);
+            std::vector<Real> dphi_deta(n_sf);
+
+            // guess base element coordinates: p=xi,eta,0
+            Point ref_point= FEMap::inverse_map(e->dim()-1, base_elem.get(), intersection);
+
+            // Newton iteration
+            for(unsigned int it=0; it<iter_max; it++)
+              {
+                // Get the shape function and derivative values at the reference coordinate
+                // phi.size() == dphi.size()
+                for(unsigned int i=0; i<phi.size(); i++)
+                  {
+
+                    phi[i] = FE<2,LAGRANGE>::shape(base_elem->type(),
+                                                   base_elem->default_order(),
+                                                   i,
+                                                   ref_point);
+
+                    dphi_dxi[i] = FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                                                              base_elem->default_order(),
+                                                              i,
+                                                              0, // d()/dxi
+                                                              ref_point);
+
+                    dphi_deta[i] = FE<2,LAGRANGE>::shape_deriv( base_elem->type(),
+                                                                base_elem->default_order(),
+                                                                i,
+                                                                1, // d()/deta
+                                                                ref_point);
+                  } // for i
+                Point dxyz_dxi;
+                Point dxyz_deta;
+
+                Point intersection_guess;
+
+                for(unsigned int i=0; i<phi.size(); i++)
+                  {
+                    intersection_guess += (*(base_elem->node_ptr(i))) * phi[i];
+                    dxyz_dxi += (*(base_elem->node_ptr(i))) * dphi_dxi[i];
+                    dxyz_deta += (*(base_elem->node_ptr(i))) * dphi_deta[i];
+                  }
+
+
+                DenseVector<Real> F(3);
+                F(0) =fp(0) + c_factor*(fp-o)(0) - intersection_guess(0);
+                F(1) =fp(1) + c_factor*(fp-o)(1) - intersection_guess(1);
+                F(2) =fp(2) + c_factor*(fp-o)(2) - intersection_guess(2);
+
+
+                DenseMatrix<Real> J(3,3);
+                J(0,0) = (fp-o)(0);
+                J(0,1) = -dxyz_dxi(0);
+                J(0,2) = -dxyz_deta(0);
+                J(1,0) = (fp-o)(1);
+                J(1,1) = -dxyz_dxi(1);
+                J(1,2) = -dxyz_deta(1);
+                J(2,0) = (fp-o)(2);
+                J(2,1) = -dxyz_dxi(2);
+                J(2,2) = -dxyz_deta(2);
+
+                // delta will be the newton step
+                DenseVector<Real> delta(3);
+                bool has_soln = system_solve_3x3(J,F,delta);
+
+                if (!has_soln)
+                  libmesh_error_msg("no intersection found: bad problem!");
+
+
+                // check for convergence
+                Real tol = std::min( TOLERANCE, TOLERANCE*base_elem->hmax() );
+                if ( delta.l2_norm() < tol )
+                  {
+                    // newton solver converged, now make sure it converged to a point on the base_elem
+                    if (base_elem->contains_point(intersection_guess,TOLERANCE*0.1))
+                      {
+                        intersection(0) = intersection_guess(0);
+                        intersection(1) = intersection_guess(1);
+                        intersection(2) = intersection_guess(2);
+                      }
+                    break; // break out of 'for it'
+                  }
+                else
+                  {
+                    c_factor     -= delta(0);
+                    ref_point(0) -= delta(1);
+                    ref_point(1) -= delta(2);
+                  }
+
+              }
+          }
+        return intersection;
+#else
+        // lets make the compilers happy:
+        return Point(0.,0.,0.);
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+  }
 
   typedef std::vector<TabulatedVal> TabulatedVals;
   typedef std::vector<TabulatedGrad> TabulatedGrads;
@@ -79,6 +261,129 @@ public:
     testSingleOrder(FOURTH, JACOBI_30_00);
   }
 
+  void testInfQuants ()
+  {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+   // std::cout << "Called testSingleOrder with radial_order = "
+   //           << radial_order
+   //           << std::endl;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_cube
+      (mesh,
+       /*nx=*/3, /*ny=*/2, /*nz=*/5,
+       /*xmin=*/0., /*xmax=*/2.,
+       /*ymin=*/-1., /*ymax=*/1.,
+       /*zmin=*/-4., /*zmax=*/-2.,
+       TET10);
+
+    InfElemBuilder::InfElemOriginValue com_x;
+    InfElemBuilder::InfElemOriginValue com_y;
+    InfElemBuilder::InfElemOriginValue com_z;
+    com_x.first=true;
+    com_y.first=true;
+    com_z.first=true;
+    com_x.second=0.0;
+    com_y.second=-.5;
+    com_z.second=0.0;
+
+    const unsigned int n_fem =mesh.n_elem();
+
+    InfElemBuilder builder(mesh);
+    builder.build_inf_elem(com_x, com_y, com_z,
+                           false,  false,  false,
+                           true, libmesh_nullptr);
+
+    // Get pointer to the first infinite Elem.
+    const Elem * infinite_elem = mesh.elem_ptr(n_fem);
+    if (!infinite_elem || !infinite_elem->infinite())
+      libmesh_error_msg("Error setting Elem pointer.");
+
+    // We will construct FEs, etc. of the same dimension as the mesh elements.
+    auto dim = mesh.mesh_dimension();
+
+    FEType fe_type(/*Order*/FIRST,
+                   /*FEFamily*/LAGRANGE,
+                   /*radial order*/FIRST,
+                   /*radial_family*/LAGRANGE,
+                   /*inf_map*/CARTESIAN);
+
+    // Construct FE, quadrature rule, etc.
+    std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
+    QGauss qrule (dim, fe_type.default_quadrature_order());
+    inf_fe->attach_quadrature_rule(&qrule);
+
+    const std::vector<Point>& _qpoint = inf_fe->get_xyz();
+    const std::vector<Real> & _weight = inf_fe->get_Sobolev_weight();
+    const std::vector<RealGradient>& dweight = inf_fe->get_Sobolev_dweight();
+    const std::vector<Real>& dxidx = inf_fe->get_dxidx();
+    const std::vector<Real>& dxidy = inf_fe->get_dxidy();
+    const std::vector<Real>& dxidz = inf_fe->get_dxidz();
+    const std::vector<Real>& detadx = inf_fe->get_detadx();
+    const std::vector<Real>& detady = inf_fe->get_detady();
+    const std::vector<Real>& detadz = inf_fe->get_detadz();
+    const std::vector<Real>& dzetadx = inf_fe->get_dzetadx();
+    const std::vector<Real>& dzetady = inf_fe->get_dzetady();
+    const std::vector<Real>& dzetadz = inf_fe->get_dzetadz();
+    const std::vector<RealGradient>& dphase  = inf_fe->get_dphase();
+    // Reinit on infinite elem
+    inf_fe->reinit(infinite_elem);
+
+    for(unsigned int qp =0 ; qp < _weight.size() ; ++qp)
+      {
+        /**
+         * dphase = r/|r| where r is the vector from the 'origin' to  the point of interest
+         * Sob. weight = b*b/(r*r)  with b being the vector of the elements base to the origin.
+         *                          Since Sobolev weight is 1 for finite elements, it gives a
+         *                          continuous function.
+         * its derivative, thus, -2*b*b*r/(r**4)
+         */
+
+        const Point b = base_point(_qpoint[qp], infinite_elem) - infinite_elem->origin();
+        const Point p = _qpoint[qp] - infinite_elem ->origin();
+        const Point rp = FEInterface::inverse_map(3, fe_type, infinite_elem, _qpoint[qp] );
+        const Point again_qp = FEInterface::map(3, fe_type, infinite_elem, rp);
+        //const Point rb = FEInterface::inverse_map(3, fe_type, infinite_elem, b+infinite_elem->origin());
+        const Real v=rp(2);
+
+        // check that map() does the opposite from inverse_map
+        LIBMESH_ASSERT_FP_EQUAL(again_qp(0), _qpoint[qp](0), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(again_qp(1), _qpoint[qp](1), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(again_qp(2), _qpoint[qp](2), TOLERANCE);
+
+        const Point normal(dzetadx[qp],
+                           dzetady[qp],
+                           dzetadz[qp]);
+
+        // check that dweight is in direction of base elements normal
+        // (holds when the base_elem has an affine map)
+        LIBMESH_ASSERT_FP_EQUAL(normal*dweight[qp], -normal.norm()*dweight[qp].norm(), TOLERANCE);
+
+        if (rp(2) < -.85)
+          // close to the base, dphase is normal
+          LIBMESH_ASSERT_FP_EQUAL(normal*dphase[qp], normal.norm()*dphase[qp].norm(), 3e-4);
+        else if (rp(2) > .85)
+          // 'very far away' dphase goes in radial direction
+          LIBMESH_ASSERT_FP_EQUAL(p*dphase[qp]/p.norm(), dphase[qp].norm(), 1e-4);
+
+        // check that the mapped radial coordinate corresponds to a/r
+        //   - b: radius of the FEM-region (locally, i.e. distance of the projected base point)
+        //   - p: distance of the point from origin
+        LIBMESH_ASSERT_FP_EQUAL(b.norm()/p.norm(), (1.-v)/2., TOLERANCE);
+
+        // this is how weight is defined;
+        LIBMESH_ASSERT_FP_EQUAL(b.norm_sq()/p.norm_sq(), _weight[qp], TOLERANCE);
+
+        const Point e_xi(dxidx[qp], dxidy[qp], dxidz[qp]);
+        const Point e_eta(detadx[qp], detady[qp], detadz[qp]);
+
+        LIBMESH_ASSERT_FP_EQUAL(0., b*e_xi,TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(0., b*e_eta,TOLERANCE);
+      }
+
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+  }
+
   void testSingleOrder (Order radial_order,
                         FEFamily radial_family)
   {
@@ -88,6 +393,7 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     // std::cout << "Called testSingleOrder with radial_order = "
     //           << radial_order
+    //           << " radial_family: "<<radial_family
     //           << std::endl;
 
     ReplicatedMesh mesh(*TestCommWorld);
@@ -191,7 +497,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     // Arbitrarily selected LEGENDRE reference values.
     ////////////////////////////////////////////////////////////////////////////////
-    tabulated_vals[std::make_pair(FIRST, LEGENDRE)] =
+    tabulated_vals[std::make_pair(FIRST, LEGENDRE)] = /* LEGENDRE = 14 */
       {
         {0,9,0.0550016}, {1,5,0.41674},   {2,8,0.0147376}, {3,7,0.111665},
         {4,6,0.0737011}, {5,1,0.0803773}, {6,11,0.275056}, {7,15,0.021537}
@@ -219,22 +525,22 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     tabulated_grads[std::make_pair(FIRST, LEGENDRE)] =
       {
-        {0,9,Point(-0.0429458, -0.0115073, 0.)},
-        {1,5,Point(0.177013, -0.177013, -0.483609)},
-        {2,8,Point(0.0115073, 0.0115073, 0.00842393)},
-        {3,7,Point(-0.177013, 0.0474305, 0.)},
-        {4,6,Point(-0.031305, -0.116832,  0.10025)},
-        {5,1,Point(0.0474191, -0.0474191, 0.872917)},
-        {6,11,Point(0.0575466, 0.0575466, -0.11251)},
-        {7,15,Point(-0.00353805, 0.000948017, 0.000111572)}
+        {0,9,Point(-0.0429458,-0.0115073,0.)},
+        {1,5,Point(0.177013,-0.177013,-0.483609)},
+        {2,8,Point(0.0115073,0.0115073,0.00842393)},
+        {3,7,Point(-0.177013,0.0474305,0.)},
+        {4,6,Point(-0.031305,-0.116832,0.10025)},
+        {5,1,Point(0.0474191,-0.0474191,0.872917)},
+        {6,11,Point(0.0575466,0.0575466,-0.11251)},
+        {7,15,Point(-0.00353805,0.000948017,0.000111572)},
       };
 
     tabulated_grads[std::make_pair(SECOND, LEGENDRE)] =
       {
         {0,3,Point(-0.0959817, -0.0959817, 0.0702635)},
         {1,6,Point(0.0625228, -0.0625228, 0.0457699)},
-        {2,2,Point(0.358209, 0.0959817, -2.77556e-17)},
-        {3,7,Point(-0.233338, 0.0625228, -6.93889e-17)},
+        {2,2,Point(0.358209, 0.0959817, 0.)},
+        {3,7,Point(-0.233338, 0.0625228, 0.)},
         {4,12,Point(-0.0323071, -0.0323071, -0.0729771)},
         {5,5,Point(0.248523, 0.0665915, -0.245097)},
         {6,0,Point(0.0336072, -0.00900502, 0.288589)},
@@ -264,7 +570,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     // Arbitrarily selected JACOBI_20_00 reference values.
     ////////////////////////////////////////////////////////////////////////////////
-    tabulated_vals[std::make_pair(FIRST, JACOBI_20_00)] =
+    tabulated_vals[std::make_pair(FIRST, JACOBI_20_00)] = /* JACOBI_20_00 = 12 */
       {
         // These values are the same as Legendre
         {0,9,0.0550016}, {1,5,0.41674},   {2,8,0.0147376}, {3,7,0.111665},
@@ -313,8 +619,8 @@ public:
         // These values are the same as Legendre
         {0,3,Point(-0.0959817, -0.0959817, 0.0702635)},
         {1,6,Point(0.0625228, -0.0625228, 0.0457699)},
-        {2,2,Point(0.358209, 0.0959817, -2.77556e-17)},
-        {3,7,Point(-0.233338, 0.0625228, -6.93889e-17)},
+        {2,2,Point(0.358209, 0.0959817, 0.)},
+        {3,7,Point(-0.233338, 0.0625228, 0.)},
         // These values are different from Legendre
         {4,12,Point(-0.0646142, -0.0646142, -0.145954)},
         {5,5,Point(0.352076, 0.0943384, -0.233431)},
@@ -345,7 +651,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     // Arbitrarily selected JACOBI_30_00 reference values.
     ////////////////////////////////////////////////////////////////////////////////
-    tabulated_vals[std::make_pair(FIRST, JACOBI_30_00)] =
+    tabulated_vals[std::make_pair(FIRST, JACOBI_30_00)] = /* JACOBI_30_00 = 13 */
       {
         // These values are the same as Legendre
         {0,9,0.0550016}, {1,5,0.41674},   {2,8,0.0147376}, {3,7,0.111665},
@@ -394,8 +700,8 @@ public:
         // These values are the same as Legendre
         {0,3,Point(-0.0959817, -0.0959817, 0.0702635)},
         {1,6,Point(0.0625228, -0.0625228, 0.0457699)},
-        {2,2,Point(0.358209, 0.0959817, -2.77556e-17)},
-        {3,7,Point(-0.233338, 0.0625228, -6.93889e-17)},
+        {2,2,Point(0.358209, 0.0959817, 0.)},
+        {3,7,Point(-0.233338, 0.0625228, 0.)},
         // These values are different from Legendre
         {4,12,Point(-0.0807678,-0.0807678,-0.182443)},
         {5,5,Point(0.385213,0.103218,-0.175079)},
@@ -412,7 +718,7 @@ public:
         {12,9,Point(0.0184475,0.0688471,-0.254748)},
         {13,6,Point(-0.230424,0.230424,1.15264)},
         {14,20,Point(-0.000965042,0.00360159,0.000183379)},
-        {15,15,Point(-0.0423204,0.0113397,0.12514)},
+        {15,15,Point(-0.0423204,0.0113397,0.12514)}
       };
 
     tabulated_grads[std::make_pair(FOURTH, JACOBI_30_00)] =
@@ -420,7 +726,7 @@ public:
         {16,3,Point(-0.0476508,0.012768,0.771323)},
         {17,10,Point(0.333487,-0.333487,1.01421)},
         {18,14,Point(0,0,0)},
-        {19,27,Point(-0.00698362,0.00187126,0.000667664)},
+        {19,27,Point(-0.00698362,0.00187126,-0.00228396)},
       };
   }
 
