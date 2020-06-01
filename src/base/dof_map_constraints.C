@@ -3320,6 +3320,10 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                 for (auto & kv : pushed_keys_vals_to_me[i])
                   {
                     libmesh_assert_less(kv.first, this->n_dofs());
+
+                    // Don't create an obviously-cyclic constraint
+                    libmesh_assert_not_equal_to(constrained, kv.first);
+
                     row[kv.first] = kv.second;
                   }
 
@@ -3993,8 +3997,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       if (constrained_proc_id != this->processor_id())
         continue;
 
-      DofConstraintRow & row = i.second;
-      for (auto & j : row)
+      const DofConstraintRow & row = i.second;
+      for (const auto & j : row)
         {
           const dof_id_type constraining = j.first;
 
@@ -4044,7 +4048,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
                it != pid_ids.end(); ++push_i, ++it)
             {
               const dof_id_type constrained = *it;
-              DofConstraintRow & row = _dof_constraints[constrained];
+              const DofConstraintRow & row = _dof_constraints[constrained];
               keys_vals[push_i].assign(row.begin(), row.end());
 
               DofConstraintValueMap::const_iterator rhsit =
@@ -4109,6 +4113,10 @@ void DofMap::scatter_constraints(MeshBase & mesh)
                   for (auto & key_val : keys_vals[i])
                     {
                       libmesh_assert_less(key_val.first, this->n_dofs());
+
+                      // Don't create an obviously-cyclic constraint
+                      libmesh_assert_not_equal_to(constrained, key_val.first);
+
                       row[key_val.first] = key_val.second;
                     }
                   if (ids_rhss[i].second != Number(0))
@@ -4289,7 +4297,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   for (auto & i : _dof_constraints)
     {
       const dof_id_type constrained = i.first;
-      DofConstraintRow & row = i.second;
+      const DofConstraintRow & row = i.second;
       for (const auto & j : row)
         {
           const dof_id_type constraining = j.first;
@@ -4497,7 +4505,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
               dof_id_type constrained = ids[i];
               if (_dof_constraints.count(constrained))
                 {
-                  DofConstraintRow & row = _dof_constraints[constrained];
+                  const DofConstraintRow & row = _dof_constraints[constrained];
                   std::size_t row_size = row.size();
                   data[i].reserve(row_size);
                   for (const auto & j : row)
@@ -4605,6 +4613,10 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                   for (auto & pair : data[i])
                     {
                       libmesh_assert_less(pair.first, this->n_dofs());
+
+                      // Don't create an obviously-cyclic constraint
+                      libmesh_assert_not_equal_to(constrained, pair.first);
+
                       row[pair.first] = pair.second;
                     }
 

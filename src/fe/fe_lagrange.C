@@ -795,6 +795,10 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                   if ((std::abs(their_dof_value) > 1.e-5) &&
                       (std::abs(their_dof_value) < .999))
                     {
+                      // That should be enough to make sure it isn't a
+                      // self-constraint
+                      libmesh_assert_not_equal_to(my_dof_g, their_dof_g);
+
                       constraint_row->emplace(their_dof_g, their_dof_value);
                     }
 #ifdef DEBUG
