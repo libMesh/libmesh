@@ -867,6 +867,11 @@ private:
     // Zero the interpolated values
     Ue.resize (n_dofs); Ue.zero();
 
+    // We have to use a small trick to ensure that FEInterface::n_dofs_at_node()
+    // returns the right number of DOFs when Elem::p_level() is elevated.
+    FEType p_refined_fe_type = fe_type;
+    p_refined_fe_type.order = static_cast<Order>(p_refined_fe_type.order + elem->p_level());
+
     // In general, we need a series of
     // projections to ensure a unique and continuous
     // solution.  We start by interpolating boundary nodes, then
@@ -883,7 +888,7 @@ private:
         // FIXME: this should go through the DofMap,
         // not duplicate dof_indices code badly!
         const unsigned int nc =
-          FEInterface::n_dofs_at_node (dim, fe_type, elem_type, n);
+          FEInterface::n_dofs_at_node (dim, p_refined_fe_type, elem_type, n);
 
         // Get a reference to the "is_boundary_node" flags for the
         // current DirichletBoundary object.  In case the map does not
