@@ -2370,23 +2370,25 @@ void DofMap::_dof_indices (const Elem & elem,
       const bool is_inf          = elem.infinite();
 #endif
 
-      // Increase the polynomial order on p refined elements
-      FEType fe_type = var.type();
-      fe_type.order = static_cast<Order>(fe_type.order + p_level);
-
       const bool extra_hanging_dofs =
-        FEInterface::extra_hanging_dofs(fe_type);
+        FEInterface::extra_hanging_dofs(var.type());
 
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
-      if (fe_type.family == SUBDIVISION)
+      if (var.type().family == SUBDIVISION)
         tot_size += n_nodes;
       else
-        tot_size += FEInterface::n_dofs(dim,fe_type,type);
+        // FIXME: Is the passed-in p_level just elem.p_level()? If so,
+        // this seems redundant.
+        tot_size += FEInterface::n_dofs(var.type(), p_level, &elem);
 #endif
 
+      // Increase the polynomial order on p refined elements
+      FEType p_refined_fe_type = var.type();
+      p_refined_fe_type.order = static_cast<Order>(p_refined_fe_type.order + p_level);
+
       const FEInterface::n_dofs_at_node_ptr ndan =
-        FEInterface::n_dofs_at_node_function(dim, fe_type);
+        FEInterface::n_dofs_at_node_function(dim, p_refined_fe_type);
 
       // Get the node-based DOF numbers
       for (unsigned int n=0; n != n_nodes; n++)
@@ -2410,9 +2412,9 @@ void DofMap::_dof_indices (const Elem & elem,
           const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
             is_inf ?
-            FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
+            FEInterface::n_dofs_at_node(dim, p_refined_fe_type, type, n) :
 #endif
-            ndan (type, fe_type.order, n);
+            ndan (type, p_refined_fe_type.order, n);
 
           // If this is a non-vertex on a hanging node with extra
           // degrees of freedom, we use the non-vertex dofs (which
@@ -2454,7 +2456,7 @@ void DofMap::_dof_indices (const Elem & elem,
 
       // If there are any element-based DOF numbers, get them
       const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
-                                                           fe_type,
+                                                           p_refined_fe_type,
                                                            type);
       // We should never have fewer dofs than necessary on an
       // element unless we're getting indices on a parent element,
@@ -2475,7 +2477,7 @@ void DofMap::_dof_indices (const Elem & elem,
             }
           else
             {
-              libmesh_assert(!elem.active() || fe_type.family == LAGRANGE || fe_type.family == SUBDIVISION);
+              libmesh_assert(!elem.active() || p_refined_fe_type.family == LAGRANGE || p_refined_fe_type.family == SUBDIVISION);
               di.resize(di.size() + nc, DofObject::invalid_id);
             }
         }

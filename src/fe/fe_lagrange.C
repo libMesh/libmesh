@@ -681,7 +681,6 @@ void lagrange_compute_constraints (DofConstraints & constraints,
     return;
 
   FEType fe_type = dof_map.variable_type(variable_number);
-  fe_type.order = static_cast<Order>(fe_type.order + elem->p_level());
 
   // Pull objects out of the loop to reduce heap operations
   std::vector<dof_id_type> my_dof_indices, parent_dof_indices;
@@ -719,9 +718,9 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                                variable_number);
 
           const unsigned int n_side_dofs =
-            FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
+            FEInterface::n_dofs(fe_type, my_side.get());
           const unsigned int n_parent_side_dofs =
-            FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
+            FEInterface::n_dofs(fe_type, parent_side.get());
           for (unsigned int my_dof=0; my_dof != n_side_dofs; my_dof++)
             {
               libmesh_assert_less (my_dof, my_side->n_nodes());
@@ -786,7 +785,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
 
                   const Real their_dof_value = FEInterface::shape(Dim-1,
                                                                   fe_type,
-                                                                  parent_side->type(),
+                                                                  parent_side.get(),
                                                                   their_dof,
                                                                   mapped_point);
 

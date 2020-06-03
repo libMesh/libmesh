@@ -505,16 +505,14 @@ void HPCoarsenTest::select_refinement (System & system)
 
           // FIXME: we're overestimating the number of DOFs added by h
           // refinement
-          FEType elem_fe_type = fe_type;
-          elem_fe_type.order =
-            static_cast<Order>(fe_type.order + elem->p_level());
-          dofs_per_elem +=
-            FEInterface::n_dofs(dim, elem_fe_type, elem->type());
 
-          elem_fe_type.order =
-            static_cast<Order>(fe_type.order + elem->p_level() + 1);
+          // Compute number of DOFs for elem at current p_level()
+          dofs_per_elem +=
+            FEInterface::n_dofs(fe_type, elem);
+
+          // Compute number of DOFs for elem at current p_level() + 1
           dofs_per_p_elem +=
-            FEInterface::n_dofs(dim, elem_fe_type, elem->type());
+            FEInterface::n_dofs(fe_type, elem->p_level() + 1, elem);
         }
 
       const unsigned int new_h_dofs = dofs_per_elem *
