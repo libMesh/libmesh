@@ -232,7 +232,9 @@ std::unique_ptr<Elem> Quad8::build_side_ptr (const unsigned int i,
     {
       std::unique_ptr<Elem> edge = libmesh_make_unique<Edge3>();
       edge->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      edge->set_p_level(this->p_level());
+#endif
       // Set the nodes
       for (auto n : edge->node_index_range())
         edge->set_node(n) = this->node_ptr(Quad8::side_nodes_map[i][n]);

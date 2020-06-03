@@ -226,7 +226,9 @@ std::unique_ptr<Elem> Pyramid13::build_side_ptr (const unsigned int i, bool prox
         }
 
       face->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      face->set_p_level(this->p_level());
+#endif
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Pyramid13::side_nodes_map[i][n]);

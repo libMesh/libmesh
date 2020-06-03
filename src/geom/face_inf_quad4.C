@@ -234,7 +234,9 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
         }
 
       edge->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      edge->set_p_level(this->p_level());
+#endif
       // Set the nodes
       for (auto n : edge->node_index_range())
         edge->set_node(n) = this->node_ptr(InfQuad4::side_nodes_map[i][n]);
@@ -281,7 +283,9 @@ void InfQuad4::build_side_ptr (std::unique_ptr<Elem> & side,
     }
 
   side->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+  side->set_p_level(this->p_level());
+#endif
   // Set the nodes
   for (auto n : side->node_index_range())
     side->set_node(n) = this->node_ptr(InfQuad4::side_nodes_map[i][n]);

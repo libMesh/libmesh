@@ -61,7 +61,9 @@ void Edge::side_ptr (std::unique_ptr<Elem> & side,
   else
     {
       side->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      side->set_p_level(this->p_level());
+#endif
       side->set_node(0) = this->node_ptr(i);
     }
 }
