@@ -140,7 +140,9 @@ std::unique_ptr<Elem> Tri3::build_side_ptr (const unsigned int i,
     {
       std::unique_ptr<Elem> edge = libmesh_make_unique<Edge2>();
       edge->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      edge->set_p_level(this->p_level());
+#endif
       // Set the nodes
       for (auto n : edge->node_index_range())
         edge->set_node(n) = this->node_ptr(Tri3::side_nodes_map[i][n]);

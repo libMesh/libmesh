@@ -2297,7 +2297,9 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
   else
     {
       side->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      side->set_p_level(this->p_level());
+#endif
       for (auto n : side->node_index_range())
         side->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
     }

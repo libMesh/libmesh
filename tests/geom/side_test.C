@@ -54,6 +54,12 @@ private:
 public:
   void setUp() {
     elem.set_id() = 0;
+#ifdef LIBMESH_ENABLE_AMR
+    // Do tests with an Elem having a non-default p_level to ensure
+    // that sides which are built have a matching p_level. p-refinement
+    // is only avaiable if LIBMESH_ENABLE_AMR is defined.
+    elem.set_p_level(1);
+#endif
     Point dummy;
     for (auto i : elem.node_index_range())
       {
@@ -147,6 +153,12 @@ public:
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
 
         CPPUNIT_ASSERT(side->type() == side_type);
+        CPPUNIT_ASSERT(side->subdomain_id() == elem.subdomain_id());
+
+#ifdef LIBMESH_ENABLE_AMR
+        // p-refinement is only avaiable if LIBMESH_ENABLE_AMR is defined.
+        CPPUNIT_ASSERT(side->p_level() == elem.p_level());
+#endif
       }
   }
 

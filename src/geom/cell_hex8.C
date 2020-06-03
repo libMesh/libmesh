@@ -170,7 +170,9 @@ std::unique_ptr<Elem> Hex8::build_side_ptr (const unsigned int i,
     {
       std::unique_ptr<Elem> face = libmesh_make_unique<Quad4>();
       face->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      face->set_p_level(this->p_level());
+#endif
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);
 
