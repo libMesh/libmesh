@@ -130,7 +130,6 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
 
       mesh.insert_elem(std::move(tri));
     }
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use();
 
   if (mesh_has_boundary_data)
@@ -150,14 +149,12 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
                                           new_boundary_ids[s]);
     }
 
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use();
 }
 
 
 void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghosted)
 {
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use();
 
   // convert all mesh elements to subdivision elements
@@ -174,7 +171,6 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
       tag_boundary_ghosts(mesh);
     }
 
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use();
 
   std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;

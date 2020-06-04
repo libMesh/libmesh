@@ -242,6 +242,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
   //But in the long term, use the same renumbering and partitioning
   //policies as our source mesh.
+  this->allow_find_neighbors(other_mesh.allow_find_neighbors());
   this->allow_renumbering(other_mesh.allow_renumbering());
   this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
   this->skip_partitioning(other_mesh._skip_all_partitioning);
@@ -642,8 +643,10 @@ void UnstructuredMesh::read (const std::string & name,
     }
 
   // Done reading the mesh.  Now prepare it for use.
+  const bool old_allow_find_neighbors = this->allow_find_neighbors();
   this->allow_find_neighbors(!skip_find_neighbors);
   this->prepare_for_use();
+  this->allow_find_neighbors(old_allow_find_neighbors);
 }
 
 
@@ -789,7 +792,6 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
     } // end loop over elements
 
   // Prepare the new_mesh for use
-  new_mesh.allow_find_neighbors(true);
   new_mesh.prepare_for_use();
 }
 
@@ -992,7 +994,6 @@ void UnstructuredMesh::all_first_order ()
   Partitioner::set_node_processor_ids(*this);
 
   // delete or renumber nodes if desired
-  this->allow_find_neighbors(true);
   this->prepare_for_use();
 }
 
@@ -1380,7 +1381,6 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
     }
 
   // renumber nodes, elements etc
-  this->allow_find_neighbors(true);
   this->prepare_for_use();
 }
 

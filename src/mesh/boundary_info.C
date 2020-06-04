@@ -307,7 +307,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   boundary_mesh.partitioner().reset(nullptr);
 
   // Make boundary_mesh nodes and elements contiguous
-  boundary_mesh.allow_find_neighbors(true);
   boundary_mesh.prepare_for_use();
 
   // and finally distribute element partitioning to the nodes
