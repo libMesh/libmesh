@@ -348,9 +348,12 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
     this->allow_renumbering(false);
 
   // We always accept the user's value for skip_find_neighbors, in contrast to skip_renumber
+  const bool old_allow_find_neighbors = this->allow_find_neighbors();
   this->allow_find_neighbors(!skip_find_neighbors);
 
   this->prepare_for_use();
+
+  this->allow_find_neighbors(old_allow_find_neighbors);
 }
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
