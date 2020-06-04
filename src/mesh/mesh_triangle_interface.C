@@ -409,7 +409,6 @@ void TriangleInterface::triangulate()
   // Prepare the mesh for use before returning.  This ensures (among
   // other things) that it is partitioned and therefore users can
   // iterate over local elements, etc.
-  _mesh.allow_find_neighbors(true);
   _mesh.prepare_for_use();
 }
 

@@ -1408,7 +1408,6 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use ();
 }
 
@@ -2000,7 +1999,6 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use();
 }
 
@@ -2332,7 +2330,6 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   STOP_LOG("build_extrusion()", "MeshTools::Generation");
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use();
 }
 

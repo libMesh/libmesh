@@ -792,7 +792,6 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
     } // end loop over elements
 
   // Prepare the new_mesh for use
-  new_mesh.allow_find_neighbors(true);
   new_mesh.prepare_for_use();
 }
 
@@ -995,7 +994,6 @@ void UnstructuredMesh::all_first_order ()
   Partitioner::set_node_processor_ids(*this);
 
   // delete or renumber nodes if desired
-  this->allow_find_neighbors(true);
   this->prepare_for_use();
 }
 
@@ -1383,7 +1381,6 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
     }
 
   // renumber nodes, elements etc
-  this->allow_find_neighbors(true);
   this->prepare_for_use();
 }
 

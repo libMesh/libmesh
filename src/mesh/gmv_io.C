@@ -2020,7 +2020,6 @@ void GMVIO::read (const std::string & name)
   // other parts of the simulation which rely on the original
   // ordering.
   mesh.allow_renumbering(false);
-  mesh.allow_find_neighbors(true);
   mesh.prepare_for_use();
 #endif
 }
