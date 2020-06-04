@@ -908,7 +908,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                my_side_n < n_side_nodes;
                my_side_n++)
             {
-              libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+              libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
 
               const Node * my_node = my_nodes[my_side_n];
 
@@ -925,14 +925,14 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                    their_side_n < n_side_nodes;
                    their_side_n++)
                 {
-                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
+                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, parent_side.get()));
 
                   const Node * their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
 
                   const Real their_value = FEInterface::shape(Dim-1,
                                                               fe_type,
-                                                              parent_side->type(),
+                                                              parent_side.get(),
                                                               their_side_n,
                                                               mapped_point);
 
@@ -1077,7 +1077,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                        my_side_n < n_side_nodes;
                        my_side_n++)
                     {
-                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
 
                       const Node * my_node = my_nodes[my_side_n];
 
@@ -1106,7 +1106,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                            their_side_n < n_side_nodes;
                            their_side_n++)
                         {
-                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, neigh_side.get()));
 
                           const Node * their_node = neigh_nodes[their_side_n];
 
@@ -1127,7 +1127,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                                  orig_side_n < n_side_nodes;
                                  orig_side_n++)
                               {
-                                libmesh_assert_less (orig_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                                libmesh_assert_less (orig_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
 
                                 const Node * orig_node = my_nodes[orig_side_n];
 
@@ -1141,7 +1141,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                        my_side_n < n_side_nodes;
                        my_side_n++)
                     {
-                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
 
                       if (skip_constraint[my_side_n])
                         continue;
@@ -1160,14 +1160,14 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                            their_side_n < n_side_nodes;
                            their_side_n++)
                         {
-                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, neigh_side.get()));
 
                           const Node * their_node = neigh_nodes[their_side_n];
                           libmesh_assert(their_node);
 
                           const Real their_value = FEInterface::shape(Dim-1,
                                                                       fe_type,
-                                                                      neigh_side->type(),
+                                                                      neigh_side.get(),
                                                                       their_side_n,
                                                                       mapped_point);
 

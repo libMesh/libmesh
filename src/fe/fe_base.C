@@ -1002,19 +1002,17 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   const std::vector<Point> & xyz_values =
     fe->get_xyz();
 
-
-
-  FEType fe_type = base_fe_type, temp_fe_type;
-  const ElemType elem_type = elem->type();
-  fe_type.order = static_cast<Order>(fe_type.order +
-                                     elem->max_descendant_p_level());
-
   // Number of nodes on parent element
   const unsigned int n_nodes = elem->n_nodes();
 
   // Number of dofs on parent element
   const unsigned int new_n_dofs =
-    FEInterface::n_dofs(dim, fe_type, elem_type);
+    FEInterface::n_dofs(base_fe_type, elem->max_descendant_p_level(), elem);
+
+  FEType fe_type = base_fe_type, temp_fe_type;
+  const ElemType elem_type = elem->type();
+  fe_type.order = static_cast<Order>(fe_type.order +
+                                     elem->max_descendant_p_level());
 
   // Fixed vs. free DoFs on edge/face projections
   std::vector<char> dof_is_fixed(new_n_dofs, false); // bools

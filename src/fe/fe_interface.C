@@ -479,6 +479,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
                                  const FEType & fe_t,
                                  const ElemType t)
 {
+  // TODO:
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(t))
@@ -499,9 +502,59 @@ FEInterface::n_dofs (const unsigned int dim,
                      const FEType & fe_t,
                      const Elem * elem)
 {
+  // TODO:
+  // libmesh_deprecated();
+
   FEType p_refined_fe_t = fe_t;
   p_refined_fe_t.order = static_cast<Order>(p_refined_fe_t.order + elem->p_level());
   return FEInterface::n_dofs(dim, p_refined_fe_t, elem->type());
+}
+
+
+
+unsigned int
+FEInterface::n_dofs(const FEType & fe_t,
+                    const Elem * elem)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  // FIXME: Can/should InfElems account for p_level()?
+  if (is_InfFE_elem(elem->type()))
+    return ifem_n_dofs(dim, fe_t, elem->type());
+
+#endif
+
+  // Account for Elem::p_level() when computing total_order
+  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+
+  fe_with_vec_switch(n_dofs(elem->type(), total_order));
+}
+
+
+
+unsigned int
+FEInterface::n_dofs(const FEType & fe_t,
+                    int extra_order,
+                    const Elem * elem)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  // FIXME: Can/should InfElems account for p_level()?
+  if (is_InfFE_elem(elem->type()))
+    return ifem_n_dofs(dim, fe_t, elem->type());
+
+#endif
+
+  // Elem::p_level() is ignored, extra_order is used instead.
+  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+
+  fe_with_vec_switch(n_dofs(elem->type(), total_order));
 }
 
 
