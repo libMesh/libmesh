@@ -95,6 +95,8 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the total order of the element.
+   *
+   * \deprecated Use n_dofs(const FEType &, Elem*) or n_dofs(const FEType &, int, Elem*) instead.
    */
   static unsigned int n_dofs(const unsigned int dim,
                              const FEType & fe_t,
@@ -106,9 +108,30 @@ public:
    * users from needing to trick FEInterface::n_dofs() into giving them
    * the right number of dofs when working with p-refined elements. See,
    * e.g. FEInterface::compute_data().
+   *
+   * \deprecated Use n_dofs(const FEType &, Elem*) or n_dofs(const FEType &, int, Elem*) instead.
    */
   static unsigned int n_dofs(const unsigned int dim,
                              const FEType & fe_t,
+                             const Elem * elem);
+
+  /**
+   * \returns The number of DOFs for \p elem for finite element type \p fe_t
+   *
+   * The p_level() of \p elem is accounted for internally by
+   * increasing the Order of the passed-in FEType as necessary.
+   */
+  static unsigned int n_dofs(const FEType & fe_t,
+                             const Elem * elem);
+
+  /**
+   * \returns The number of DOFs for \p elem for finite element type \p fe_t
+   *
+   * \note The p_level() of \elem is ignored and instead a total Order given
+   * by fet_t.order + extra_order is used in determining the number of DOFs.
+   */
+  static unsigned int n_dofs(const FEType & fe_t,
+                             int extra_order,
                              const Elem * elem);
 
   /**
