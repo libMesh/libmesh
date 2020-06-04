@@ -71,8 +71,7 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
                                       const FEType & fe_t,
                                       const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   switch (dim)
     {
