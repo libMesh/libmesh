@@ -966,7 +966,7 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
           ccout << "if (s[" << sp-- << "] < 0.5) ";
 
         if (ip >= ByteCode.size())
-          ccout << "return s[" << sp << "];\n";
+          ccout << "*ret = s[" << sp << "]; return;\n";
         else
         {
           ccout << "goto l" << ip << ";\n";
