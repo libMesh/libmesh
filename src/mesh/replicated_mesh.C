@@ -1464,8 +1464,10 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
         }
     }
 
+  const bool old_allow_find_neighbors = this->allow_find_neighbors();
   this->allow_find_neighbors(!skip_find_neighbors);
   this->prepare_for_use();
+  this->allow_find_neighbors(old_allow_find_neighbors);
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh
