@@ -25,6 +25,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_interface_macros.h"
 #include "libmesh/inf_fe.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {
@@ -70,6 +71,9 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
                                       const FEType & fe_t,
                                       const ElemType t)
 {
+  // TODO:
+  // libmesh_deprecated();
+
   switch (dim)
     {
       // 1D
@@ -94,6 +98,35 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
     }
 }
 
+
+
+unsigned int
+FEInterface::ifem_n_dofs(const FEType & fe_t,
+                         const Elem * elem)
+{
+  switch (elem->dim())
+    {
+      // 1D
+    case 1:
+      /*
+       * Since InfFE<Dim,T_radial,T_map>::n_dofs(...)
+       * is actually independent of T_radial and T_map, we can use
+       * just any T_radial and T_map
+       */
+      return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, elem->type());
+
+      // 2D
+    case 2:
+      return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, elem->type());
+
+      // 3D
+    case 3:
+      return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, elem->type());
+
+    default:
+      libmesh_error_msg("Unsupported dim = " << elem->dim());
+    }
+}
 
 
 

@@ -577,9 +577,16 @@ private:
                                              const FEType & fe_t,
                                              const ElemType t);
 
+  /**
+   * \deprecated Call the version of ifem_n_dofs() which takes a
+   * pointer-to-Elem instead.
+   */
   static unsigned int ifem_n_dofs(const unsigned int dim,
                                   const FEType & fe_t,
                                   const ElemType t);
+
+  static unsigned int ifem_n_dofs(const FEType & fe_t,
+                                  const Elem * elem);
 
   static unsigned int ifem_n_dofs_at_node(const unsigned int dim,
                                           const FEType & fe_t,
