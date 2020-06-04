@@ -521,9 +521,9 @@ FEInterface::n_dofs(const FEType & fe_t,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  // FIXME: Can/should InfElems account for p_level()?
+  // InfElems currently don't support p_level()
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs(dim, fe_t, elem->type());
+    return ifem_n_dofs(fe_t, elem);
 
 #endif
 
@@ -545,9 +545,9 @@ FEInterface::n_dofs(const FEType & fe_t,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  // FIXME: Can/should InfElems account for p_level()?
+  // InfElems currently don't support p_level()
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs(dim, fe_t, elem->type());
+    return ifem_n_dofs(fe_t, elem);
 
 #endif
 
