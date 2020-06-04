@@ -379,9 +379,15 @@ public:
    * infinite element.  Currently, we have \p o_radial+1 modes in
    * radial direction, and \code FE<Dim-1,T>::n_dofs(...) \endcode
    * in the base.
+   *
+   * \deprecated Call the version of this function that takes an Elem*
+   * instead for consistency with other FEInterface::n_dofs() methods.
    */
   static unsigned int n_dofs(const FEType & fet,
                              const ElemType inf_elem_type);
+
+  static unsigned int n_dofs(const FEType & fet,
+                             const Elem * inf_elem);
 
   /**
    * \returns The number of dofs at infinite element node \p n
