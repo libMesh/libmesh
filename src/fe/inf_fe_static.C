@@ -58,8 +58,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
                                                 const ElemType inf_elem_type)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
