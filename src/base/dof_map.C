@@ -2677,7 +2677,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                           is_inf ?
                           FEInterface::n_dofs_at_node(var.type(), elem->p_level() + p_adjustment, elem, n) :
 #endif
-                          ndan (type, fe_type.order, n);
+                          ndan (type, static_cast<Order>(var.type().order + elem->p_level() + p_adjustment), n);
 
                         const int n_comp = old_dof_obj->n_comp_group(sys_num,vg);
 
