@@ -157,10 +157,21 @@ public:
   /**
    * \returns A function which evaluates n_dofs_at_node for the
    * requested FE type and dimension.
+   *
+   * \deprecated Use the version of this function that takes an Elem*
+   * for consistency. The behavior is otherwise exactly the same,
+   * since this function does not depend on the Elem::p_level().
    */
   static n_dofs_at_node_ptr
   n_dofs_at_node_function(const unsigned int dim,
                           const FEType & fe_t);
+
+  /**
+   * Non-deprecated version of function above.
+   */
+  static n_dofs_at_node_ptr
+  n_dofs_at_node_function(const FEType & fe_t,
+                          const Elem * elem);
 
   /**
    * \returns The number of dofs at node n for a finite element

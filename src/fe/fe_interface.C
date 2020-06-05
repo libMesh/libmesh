@@ -583,6 +583,20 @@ FEInterface::n_dofs_at_node_ptr
 FEInterface::n_dofs_at_node_function(const unsigned int dim,
                                      const FEType & fe_t)
 {
+  libmesh_deprecated();
+
+  fe_with_vec_switch(n_dofs_at_node);
+}
+
+
+
+FEInterface::n_dofs_at_node_ptr
+FEInterface::n_dofs_at_node_function(const FEType & fe_t,
+                                     const Elem * elem)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
   fe_with_vec_switch(n_dofs_at_node);
 }
 
