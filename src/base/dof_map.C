@@ -2347,7 +2347,6 @@ void DofMap::_dof_indices (const Elem & elem,
     {
       const ElemType type        = elem.type();
       const unsigned int sys_num = this->sys_number();
-      const unsigned int dim     = elem.dim();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       const bool is_inf          = elem.infinite();
 #endif
@@ -2366,10 +2365,6 @@ void DofMap::_dof_indices (const Elem & elem,
         // this seems redundant.
         tot_size += FEInterface::n_dofs(fe_type, p_level, &elem);
 #endif
-
-      // Increase the polynomial order on p refined elements
-      FEType p_refined_fe_type = var.type();
-      p_refined_fe_type.order = static_cast<Order>(p_refined_fe_type.order + p_level);
 
       // The total Order is not required when getting the function
       // pointer, it is only needed when the function is called (see
@@ -2442,9 +2437,8 @@ void DofMap::_dof_indices (const Elem & elem,
         }
 
       // If there are any element-based DOF numbers, get them
-      const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
-                                                           p_refined_fe_type,
-                                                           type);
+      const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, p_level, &elem);
+
       // We should never have fewer dofs than necessary on an
       // element unless we're getting indices on a parent element,
       // and we should never need those indices
