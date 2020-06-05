@@ -2276,9 +2276,6 @@ void DofMap::_node_dof_indices (const Elem & elem,
 
   LOG_SCOPE("_node_dof_indices()", "DofMap");
 
-  const ElemType type = elem.type();
-  const unsigned int dim = elem.dim();
-
   const unsigned int sys_num = this->sys_number();
   const std::pair<unsigned int, unsigned int>
     vg_and_offset = obj.var_to_vg_and_offset(sys_num,vn);
@@ -2288,8 +2285,6 @@ void DofMap::_node_dof_indices (const Elem & elem,
 
   const VariableGroup & var = this->variable_group(vg);
   FEType fe_type = var.type();
-  fe_type.order = static_cast<Order>(fe_type.order +
-                                     elem.p_level());
   const bool extra_hanging_dofs =
     FEInterface::extra_hanging_dofs(fe_type);
 
@@ -2298,7 +2293,7 @@ void DofMap::_node_dof_indices (const Elem & elem,
   // it can falsely identify a DOF at the mid-edge node. This is why
   // we go through FEInterface instead of obj->n_comp() directly.
   const unsigned int nc =
-    FEInterface::n_dofs_at_node(dim, fe_type, type, n);
+    FEInterface::n_dofs_at_node(fe_type, &elem, n);
 
   // If this is a non-vertex on a hanging node with extra
   // degrees of freedom, we use the non-vertex dofs (which
