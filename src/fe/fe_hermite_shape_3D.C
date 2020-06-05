@@ -42,9 +42,10 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
   const ElemType mapping_elem_type (elem->type());
   const FEType map_fe_type(elem->default_order(), mapping_family);
 
+  // Note: we explicitly don't consider the elem->p_level() when
+  // computing the number of mapping shape functions.
   const int n_mapping_shape_functions =
-    FEInterface::n_shape_functions (3, map_fe_type,
-                                    mapping_elem_type);
+    FEInterface::n_shape_functions (map_fe_type, /*extra_order=*/0, elem);
 
   static const Point dofpt[2] = {Point(-1,-1,-1), Point(1,1,1)};
 
