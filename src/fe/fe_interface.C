@@ -479,8 +479,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
                                  const FEType & fe_t,
                                  const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -502,8 +501,7 @@ FEInterface::n_dofs (const unsigned int dim,
                      const FEType & fe_t,
                      const Elem * elem)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   FEType p_refined_fe_t = fe_t;
   p_refined_fe_t.order = static_cast<Order>(p_refined_fe_t.order + elem->p_level());
@@ -521,9 +519,9 @@ FEInterface::n_dofs(const FEType & fe_t,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  // FIXME: Can/should InfElems account for p_level()?
+  // InfElems currently don't support p_level()
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs(dim, fe_t, elem->type());
+    return ifem_n_dofs(fe_t, elem);
 
 #endif
 
@@ -545,9 +543,9 @@ FEInterface::n_dofs(const FEType & fe_t,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  // FIXME: Can/should InfElems account for p_level()?
+  // InfElems currently don't support p_level()
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs(dim, fe_t, elem->type());
+    return ifem_n_dofs(fe_t, elem);
 
 #endif
 

@@ -58,6 +58,8 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
                                                 const ElemType inf_elem_type)
 {
+  libmesh_deprecated();
+
   const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
   if (Dim > 1)
@@ -69,6 +71,21 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
 
 
 
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType & fet,
+                                               const Elem * inf_elem)
+{
+  // The "base" Elem is a non-infinite Elem corresponding to side 0 of
+  // the InfElem. This builds a "lightweight" proxy and so should be
+  // relatively fast.
+  auto base_elem = inf_elem->build_side_ptr(0);
+
+  if (Dim > 1)
+    return FEInterface::n_dofs(fet, base_elem.get()) *
+      InfFERadial::n_dofs(fet.radial_order);
+  else
+    return InfFERadial::n_dofs(fet.radial_order);
+}
 
 
 
@@ -1114,6 +1131,9 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
