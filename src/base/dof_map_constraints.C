@@ -1559,13 +1559,14 @@ public:
     dirichlets(dirichlets_in),
     add_fn(add_in) { }
 
-  // This class can be default copy/move constructed/assigned.
+  // This class can be default copy/move constructed.
   ConstrainDirichlet (ConstrainDirichlet &&) = default;
   ConstrainDirichlet (const ConstrainDirichlet &) = default;
-  ConstrainDirichlet & operator= (const ConstrainDirichlet &) = default;
-  ConstrainDirichlet & operator= (ConstrainDirichlet &&) = default;
 
-
+  // This class cannot be default copy/move assigned because it
+  // contains reference members.
+  ConstrainDirichlet & operator= (const ConstrainDirichlet &) = delete;
+  ConstrainDirichlet & operator= (ConstrainDirichlet &&) = delete;
 
   void operator()(const ConstElemRange & range) const
   {
