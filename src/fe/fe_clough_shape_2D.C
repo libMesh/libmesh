@@ -89,8 +89,10 @@ void clough_compute_coefs(const Elem * elem)
 
   const FEType map_fe_type(mapping_order, mapping_family);
 
+  // Note: we explicitly don't consider the elem->p_level() when
+  // computing the number of mapping shape functions.
   const int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(2, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, elem);
 
   // Degrees of freedom are at vertices and edge midpoints
   std::vector<Point> dofpt;
