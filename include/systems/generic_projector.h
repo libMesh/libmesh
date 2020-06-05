@@ -2202,7 +2202,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                   // shape functions
                   libmesh_assert_equal_to
                     (FEInterface::n_dofs_at_node
-                      (dim, base_fe_type, elem.type(),
+                      (base_fe_type, &elem,
                        elem.get_node_index(&vertex)),
                     (unsigned int)(1 + dim));
                   const FValue val =
