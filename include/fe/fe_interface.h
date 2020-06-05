@@ -171,6 +171,16 @@ public:
                                      const unsigned int n);
 
   /**
+   * \returns The number of dofs at node n for a finite element
+   * of type \p fe_t. Ignores Elem::p_level() and computes a total Order
+   * given by fe_t.order + extra_order when determining the number of DOFs.
+   */
+  static unsigned int n_dofs_at_node(const FEType & fe_t,
+                                     const int extra_order,
+                                     const Elem * elem,
+                                     const unsigned int n);
+
+  /**
    * \returns The number of dofs interior to the element,
    * not associated with any interior nodes.
    * Automatically decides which finite element class to use.

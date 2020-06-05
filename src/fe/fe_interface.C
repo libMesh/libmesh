@@ -611,6 +611,30 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 
 
 
+unsigned int
+FEInterface::n_dofs_at_node(const FEType & fe_t,
+                            const int extra_order,
+                            const Elem * elem,
+                            const unsigned int n)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (is_InfFE_elem(elem->type()))
+    return ifem_n_dofs_at_node(dim, fe_t, elem->type(), n);
+
+#endif
+
+  // Ignore Elem::p_level() and instead use extra_order to compute total_order.
+  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+
+  fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
+}
+
+
+
 unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
                                           const FEType & fe_t,
                                           const ElemType t)
