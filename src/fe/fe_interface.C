@@ -453,6 +453,8 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
                                             const FEType & fe_t,
                                             const ElemType t)
 {
+  // TODO:
+  // libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /*
@@ -472,6 +474,59 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 }
 
 
+
+unsigned int
+FEInterface::n_shape_functions(const FEType & fe_t,
+                               const Elem * elem)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  /*
+   * Since the FEType, stored in DofMap/(some System child), has to
+   * be the _same_ for InfFE and FE, we have to catch calls
+   * to infinite elements through the element type.
+   */
+
+  if (is_InfFE_elem(elem->type()))
+    return ifem_n_shape_functions(dim, fe_t, elem->type());
+
+#endif
+
+  // Account for Elem::p_level() when computing total_order
+  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+
+  fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
+}
+
+
+
+unsigned int
+FEInterface::n_shape_functions(const FEType & fe_t,
+                               const int extra_order,
+                               const Elem * elem)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  /*
+   * Since the FEType, stored in DofMap/(some System child), has to
+   * be the _same_ for InfFE and FE, we have to catch calls
+   * to infinite elements through the element type.
+   */
+
+  if (is_InfFE_elem(elem->type()))
+    return ifem_n_shape_functions(dim, fe_t, elem->type());
+
+#endif
+
+  // Ignore Elem::p_level() and instead use extra_order to compute total_order.
+  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+
+  fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
+}
 
 
 

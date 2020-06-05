@@ -84,10 +84,26 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the total order of the element.
+   *
+   * \deprecated Call the version of this function taking an Elem* instead.
    */
   static unsigned int n_shape_functions(const unsigned int dim,
                                         const FEType & fe_t,
                                         const ElemType t);
+
+  /**
+   * Non-deprecated version of function above.
+   */
+  static unsigned int n_shape_functions(const FEType & fe_t,
+                                        const Elem * elem);
+
+  /**
+   * Same as above, but ignores the elem->p_level() and uses the
+   * specified extra_order instead.
+   */
+  static unsigned int n_shape_functions(const FEType & fe_t,
+                                        const int extra_order,
+                                        const Elem * elem);
 
   /**
    * \returns The number of shape functions associated with this
