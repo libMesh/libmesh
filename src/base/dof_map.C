@@ -2650,10 +2650,12 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       {
                         p_adjustment = 1;
                       }
+
+                    // Compute the net amount of "extra" order, including Elem::p_level()
+                    int extra_order = elem->p_level() + p_adjustment;
+
                     FEType fe_type = var.type();
-                    fe_type.order = static_cast<Order>(fe_type.order +
-                                                       elem->p_level() +
-                                                       p_adjustment);
+                    fe_type.order = static_cast<Order>(fe_type.order + extra_order);
 
                     const bool extra_hanging_dofs =
                       FEInterface::extra_hanging_dofs(fe_type);
@@ -2675,9 +2677,9 @@ void DofMap::old_dof_indices (const Elem * const elem,
                         const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                           is_inf ?
-                          FEInterface::n_dofs_at_node(var.type(), elem->p_level() + p_adjustment, elem, n) :
+                          FEInterface::n_dofs_at_node(var.type(), extra_order, elem, n) :
 #endif
-                          ndan (type, static_cast<Order>(var.type().order + elem->p_level() + p_adjustment), n);
+                          ndan (type, static_cast<Order>(var.type().order + extra_order), n);
 
                         const int n_comp = old_dof_obj->n_comp_group(sys_num,vg);
 
