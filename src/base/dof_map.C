@@ -611,7 +611,6 @@ void DofMap::reinit(MeshBase & mesh)
             continue;
 
           const ElemType type = elem->type();
-          const unsigned int dim = elem->dim();
 
           FEType fe_type = base_fe_type;
 
@@ -646,9 +645,6 @@ void DofMap::reinit(MeshBase & mesh)
             }
 #endif
 
-          fe_type.order = static_cast<Order>(fe_type.order +
-                                             elem->p_level());
-
           // Allocate the vertex DOFs
           for (auto n : elem->node_index_range())
             {
@@ -660,8 +656,7 @@ void DofMap::reinit(MeshBase & mesh)
                     node.n_comp_group(sys_num, vg);
 
                   const unsigned int vertex_dofs =
-                    std::max(FEInterface::n_dofs_at_node(dim, fe_type,
-                                                         type, n),
+                    std::max(FEInterface::n_dofs_at_node(fe_type, elem, n),
                              old_node_dofs);
 
                   // Some discontinuous FEs have no vertex dofs
@@ -718,7 +713,7 @@ void DofMap::reinit(MeshBase & mesh)
                 cast_int<unsigned int>(node.vg_dof_base (sys_num,vg)):0;
 
               const unsigned int new_node_dofs =
-                FEInterface::n_dofs_at_node(dim, fe_type, type, n);
+                FEInterface::n_dofs_at_node(base_fe_type, elem, n);
 
               // We've already allocated vertex DOFs
               if (elem->is_vertex(n))
