@@ -100,8 +100,6 @@ public:
    */
   ExodusII_IO_Helper (const ExodusII_IO_Helper &) = default;
   ExodusII_IO_Helper (ExodusII_IO_Helper &&) = default;
-  ExodusII_IO_Helper & operator= (const ExodusII_IO_Helper &) = default;
-  ExodusII_IO_Helper & operator= (ExodusII_IO_Helper &&) = default;
   virtual ~ExodusII_IO_Helper();
 
   /**

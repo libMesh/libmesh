@@ -733,7 +733,7 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   bool data_changed = false;
 
   auto action_functor =
-    [&sync, &mesh, &requested_objs_elem_id_node_num, &data_changed]
+    [&sync, &mesh, &data_changed]
     (processor_id_type /* pid */,
      const std::vector<std::pair<dof_id_type, unsigned char>> & elem_id_node_num,
      const std::vector<typename SyncFunctor::datum> & data)

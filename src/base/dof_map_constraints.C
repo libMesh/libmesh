@@ -1562,8 +1562,6 @@ public:
   // This class can be default copy/move constructed/assigned.
   ConstrainDirichlet (ConstrainDirichlet &&) = default;
   ConstrainDirichlet (const ConstrainDirichlet &) = default;
-  ConstrainDirichlet & operator= (const ConstrainDirichlet &) = default;
-  ConstrainDirichlet & operator= (ConstrainDirichlet &&) = default;
 
 
 
