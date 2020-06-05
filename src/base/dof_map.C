@@ -2402,7 +2402,7 @@ void DofMap::_dof_indices (const Elem & elem,
           const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
             is_inf ?
-            FEInterface::n_dofs_at_node(dim, p_refined_fe_type, type, n) :
+            FEInterface::n_dofs_at_node(var.type(), p_level, &elem, n) :
 #endif
             ndan (type, p_refined_fe_type.order, n);
 
