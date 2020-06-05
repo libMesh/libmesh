@@ -694,13 +694,6 @@ void DofMap::reinit(MeshBase & mesh)
           if (!vg_description.active_on_subdomain(elem->subdomain_id()))
             continue;
 
-          const ElemType type = elem->type();
-          const unsigned int dim = elem->dim();
-
-          FEType fe_type = base_fe_type;
-          fe_type.order = static_cast<Order>(fe_type.order +
-                                             elem->p_level());
-
           // Allocate the edge and face DOFs
           for (auto n : elem->node_index_range())
             {
@@ -791,8 +784,7 @@ void DofMap::reinit(MeshBase & mesh)
             }
           // Allocate the element DOFs
           const unsigned int dofs_per_elem =
-            FEInterface::n_dofs_per_elem(dim, fe_type,
-                                         type);
+            FEInterface::n_dofs_per_elem(base_fe_type, elem);
 
           elem->set_n_comp_group(sys_num, vg, dofs_per_elem);
 
