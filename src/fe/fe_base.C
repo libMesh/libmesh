@@ -1009,11 +1009,6 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   const unsigned int new_n_dofs =
     FEInterface::n_dofs(base_fe_type, elem->max_descendant_p_level(), elem);
 
-  FEType fe_type = base_fe_type, temp_fe_type;
-  const ElemType elem_type = elem->type();
-  fe_type.order = static_cast<Order>(fe_type.order +
-                                     elem->max_descendant_p_level());
-
   // Fixed vs. free DoFs on edge/face projections
   std::vector<char> dof_is_fixed(new_n_dofs, false); // bools
   std::vector<int> free_dof(new_n_dofs, 0);
@@ -1044,31 +1039,23 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
         // FIXME: this should go through the DofMap,
         // not duplicate dof_indices code badly!
         const unsigned int my_nc =
-          FEInterface::n_dofs_at_node (dim, fe_type,
-                                       elem_type, n);
+          FEInterface::n_dofs_at_node (base_fe_type, elem->max_descendant_p_level(), elem, n);
         if (!elem->is_vertex(n))
           {
             current_dof += my_nc;
             continue;
           }
 
-        temp_fe_type = base_fe_type;
         // We're assuming here that child n shares vertex n,
         // which is wrong on non-simplices right now
         // ... but this code isn't necessary except on elements
         // where p refinement creates more vertex dofs; we have
         // no such elements yet.
-        /*
-          if (elem->child_ptr(n)->p_level() < elem->p_level())
-          {
-          temp_fe_type.order =
-          static_cast<Order>(temp_fe_type.order +
-          elem->child_ptr(n)->p_level());
-          }
-        */
+        int extra_order = 0;
+        // if (elem->child_ptr(n)->p_level() < elem->p_level())
+        //   extra_order = elem->child_ptr(n)->p_level();
         const unsigned int nc =
-          FEInterface::n_dofs_at_node (dim, temp_fe_type,
-                                       elem_type, n);
+          FEInterface::n_dofs_at_node (base_fe_type, extra_order, elem, n);
         for (unsigned int i=0; i!= nc; ++i)
           {
             Ue(current_dof) =
@@ -1078,6 +1065,10 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
           }
       }
   }
+
+  FEType fe_type = base_fe_type, temp_fe_type;
+  fe_type.order = static_cast<Order>(fe_type.order +
+                                     elem->max_descendant_p_level());
 
   // In 3D, project any edge values next
   if (dim > 2 && cont != DISCONTINUOUS)
