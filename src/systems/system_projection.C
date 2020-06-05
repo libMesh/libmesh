@@ -631,9 +631,8 @@ public:
       *elem.parent() : elem;
 
     // If there are any element-based DOF numbers, get them
-    const unsigned int nc = FEInterface::n_dofs_per_elem(elem.dim(),
-                                                         fe_type,
-                                                         elem.type());
+    const unsigned int nc =
+      FEInterface::n_dofs_per_elem(fe_type, &elem);
 
     std::vector<dof_id_type> old_dof_indices(nc);
     indices.resize(nc);
