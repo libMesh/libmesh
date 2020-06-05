@@ -2564,7 +2564,6 @@ void DofMap::old_dof_indices (const Elem * const elem,
   const ElemType type              = elem->type();
   const unsigned int sys_num       = this->sys_number();
   const unsigned int n_var_groups  = this->n_variable_groups();
-  const unsigned int dim           = elem->dim();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   const bool is_inf                = elem->infinite();
 #endif
@@ -2641,7 +2640,6 @@ void DofMap::old_dof_indices (const Elem * const elem,
                     int extra_order = elem->p_level() + p_adjustment;
 
                     FEType fe_type = var.type();
-                    fe_type.order = static_cast<Order>(fe_type.order + extra_order);
 
                     const bool extra_hanging_dofs =
                       FEInterface::extra_hanging_dofs(fe_type);
@@ -2709,9 +2707,8 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       }
 
                     // If there are any element-based DOF numbers, get them
-                    const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
-                                                                         fe_type,
-                                                                         type);
+                    const unsigned int nc =
+                      FEInterface::n_dofs_per_elem(fe_type, extra_order, elem);
 
                     // We should never have fewer dofs than necessary on an
                     // element unless we're getting indices on a parent element
