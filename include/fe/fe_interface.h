@@ -211,6 +211,13 @@ public:
                                       const Elem * elem);
 
   /**
+   * Same thing but internally elem->p_level() is ignored and extra_order is used instead.
+   */
+  static unsigned int n_dofs_per_elem(const FEType & fe_t,
+                                      const int extra_order,
+                                      const Elem * elem);
+
+  /**
    * Fills the vector di with the local degree of freedom indices
    * associated with side \p s of element \p elem
    * Automatically decides which finite element class to use.
