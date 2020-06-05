@@ -2383,7 +2383,7 @@ void DofMap::_dof_indices (const Elem & elem,
       // pointer, it is only needed when the function is called (see
       // below).
       const FEInterface::n_dofs_at_node_ptr ndan =
-        FEInterface::n_dofs_at_node_function(dim, fe_type);
+        FEInterface::n_dofs_at_node_function(fe_type, &elem);
 
       // Get the node-based DOF numbers
       for (unsigned int n=0; n != n_nodes; n++)
@@ -2661,7 +2661,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       FEInterface::extra_hanging_dofs(fe_type);
 
                     const FEInterface::n_dofs_at_node_ptr ndan =
-                      FEInterface::n_dofs_at_node_function(dim, fe_type);
+                      FEInterface::n_dofs_at_node_function(fe_type, elem);
 
                     // Get the node-based DOF numbers
                     for (unsigned int n=0; n<n_nodes; n++)
