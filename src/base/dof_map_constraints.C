@@ -4909,13 +4909,7 @@ void DofMap::constrain_p_dofs (unsigned int var,
   libmesh_assert_less (s, elem->n_sides());
 
   const unsigned int sys_num = this->sys_number();
-  const unsigned int dim = elem->dim();
-  ElemType type = elem->type();
-  FEType low_p_fe_type = this->variable_type(var);
-  FEType high_p_fe_type = this->variable_type(var);
-  low_p_fe_type.order = static_cast<Order>(low_p_fe_type.order + p);
-  high_p_fe_type.order = static_cast<Order>(high_p_fe_type.order +
-                                            elem->p_level());
+  FEType fe_type = this->variable_type(var);
 
   const unsigned int n_nodes = elem->n_nodes();
   for (unsigned int n = 0; n != n_nodes; ++n)
@@ -4923,9 +4917,9 @@ void DofMap::constrain_p_dofs (unsigned int var,
       {
         const Node & node = elem->node_ref(n);
         const unsigned int low_nc =
-          FEInterface::n_dofs_at_node (dim, low_p_fe_type, type, n);
+          FEInterface::n_dofs_at_node (fe_type, p, elem, n);
         const unsigned int high_nc =
-          FEInterface::n_dofs_at_node (dim, high_p_fe_type, type, n);
+          FEInterface::n_dofs_at_node (fe_type, elem, n);
 
         // since we may be running this method concurrently
         // on multiple threads we need to acquire a lock
