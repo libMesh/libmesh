@@ -609,9 +609,6 @@ private:
     libmesh_assert(!(f && f_system));
     libmesh_assert(!(f_fem && !f_system));
 
-    // The dimensionality of the current mesh
-    const unsigned int dim = mesh.mesh_dimension();
-
     // The new element coefficients. For Lagrange FEs, these are the
     // nodal values.
     DenseVector<Number> Ue;
@@ -659,16 +656,8 @@ private:
     // Fixed vs. free DoFs on edge/face projections
     std::vector<char> dof_is_fixed(n_dofs, false); // bools
 
-    // The element type
-    const ElemType elem_type = elem->type();
-
     // Zero the interpolated values
     Ue.resize (n_dofs); Ue.zero();
-
-    // We have to use a small trick to ensure that FEInterface::n_dofs_at_node()
-    // returns the right number of DOFs when Elem::p_level() is elevated.
-    FEType p_refined_fe_type = fe_type;
-    p_refined_fe_type.order = static_cast<Order>(p_refined_fe_type.order + elem->p_level());
 
     // For Lagrange elements, side, edge, and shellface BCs all
     // "induce" boundary conditions on the nodes of those entities.
@@ -681,9 +670,10 @@ private:
     for (unsigned int n=0; n!= sebi.n_nodes; ++n)
       {
         // For Lagrange this can return 0 (in case of a lower-order FE
-        // on a higher-order Elem) or 1.
+        // on a higher-order Elem) or 1. This function accounts for the
+        // Elem::p_level() internally.
         const unsigned int nc =
-          FEInterface::n_dofs_at_node (dim, p_refined_fe_type, elem_type, n);
+          FEInterface::n_dofs_at_node (fe_type, elem, n);
 
         // If there are no DOFs at this node, then it doesn't matter
         // if it's technically a boundary node or not, there's nothing
@@ -861,16 +851,8 @@ private:
     std::vector<char> dof_is_fixed(n_dofs, false); // bools
     std::vector<int> free_dof(n_dofs, 0);
 
-    // The element type
-    const ElemType elem_type = elem->type();
-
     // Zero the interpolated values
     Ue.resize (n_dofs); Ue.zero();
-
-    // We have to use a small trick to ensure that FEInterface::n_dofs_at_node()
-    // returns the right number of DOFs when Elem::p_level() is elevated.
-    FEType p_refined_fe_type = fe_type;
-    p_refined_fe_type.order = static_cast<Order>(p_refined_fe_type.order + elem->p_level());
 
     // In general, we need a series of
     // projections to ensure a unique and continuous
@@ -887,8 +869,11 @@ private:
       {
         // FIXME: this should go through the DofMap,
         // not duplicate dof_indices code badly!
+
+        // Get the number of DOFs at this node, accounting for
+        // Elem::p_level() internally.
         const unsigned int nc =
-          FEInterface::n_dofs_at_node (dim, p_refined_fe_type, elem_type, n);
+          FEInterface::n_dofs_at_node (fe_type, elem, n);
 
         // Get a reference to the "is_boundary_node" flags for the
         // current DirichletBoundary object.  In case the map does not
