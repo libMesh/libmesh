@@ -2363,6 +2363,8 @@ void DofMap::_dof_indices (const Elem & elem,
       const bool extra_hanging_dofs =
         FEInterface::extra_hanging_dofs(var.type());
 
+      FEType fe_type = var.type();
+
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
       if (var.type().family == SUBDIVISION)
@@ -2370,15 +2372,18 @@ void DofMap::_dof_indices (const Elem & elem,
       else
         // FIXME: Is the passed-in p_level just elem.p_level()? If so,
         // this seems redundant.
-        tot_size += FEInterface::n_dofs(var.type(), p_level, &elem);
+        tot_size += FEInterface::n_dofs(fe_type, p_level, &elem);
 #endif
 
       // Increase the polynomial order on p refined elements
       FEType p_refined_fe_type = var.type();
       p_refined_fe_type.order = static_cast<Order>(p_refined_fe_type.order + p_level);
 
+      // The total Order is not required when getting the function
+      // pointer, it is only needed when the function is called (see
+      // below).
       const FEInterface::n_dofs_at_node_ptr ndan =
-        FEInterface::n_dofs_at_node_function(dim, p_refined_fe_type);
+        FEInterface::n_dofs_at_node_function(dim, fe_type);
 
       // Get the node-based DOF numbers
       for (unsigned int n=0; n != n_nodes; n++)
@@ -2402,9 +2407,9 @@ void DofMap::_dof_indices (const Elem & elem,
           const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
             is_inf ?
-            FEInterface::n_dofs_at_node(var.type(), p_level, &elem, n) :
+            FEInterface::n_dofs_at_node(fe_type, p_level, &elem, n) :
 #endif
-            ndan (type, p_refined_fe_type.order, n);
+            ndan (type, static_cast<Order>(fe_type.order + p_level), n);
 
           // If this is a non-vertex on a hanging node with extra
           // degrees of freedom, we use the non-vertex dofs (which
@@ -2467,7 +2472,7 @@ void DofMap::_dof_indices (const Elem & elem,
             }
           else
             {
-              libmesh_assert(!elem.active() || p_refined_fe_type.family == LAGRANGE || p_refined_fe_type.family == SUBDIVISION);
+              libmesh_assert(!elem.active() || fe_type.family == LAGRANGE || fe_type.family == SUBDIVISION);
               di.resize(di.size() + nc, DofObject::invalid_id);
             }
         }
