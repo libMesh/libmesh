@@ -18,42 +18,10 @@
 #include <vector>
 
 #include "libmesh_cppunit.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/analytic_function.h" // for DenseVector
+#include "libmesh/type_tensor.h"
 #include "libmesh/fe.h"
 
 using namespace libMesh;
-
-bool system_solve_3x3(DenseMatrix<libMesh::Real> & A, DenseVector<libMesh::Real> & b, DenseVector<libMesh::Real> & x)
-{
-  bool has_soln = false;
-  libMesh::Real det =   A(0,0) * (A(1,1)*A(2,2) - A(1,2)*A(2,1))
-    - A(0,1) * (A(1,0)*A(2,2) - A(1,2)*A(2,0))
-    + A(0,2) * (A(1,0)*A(2,1) - A(1,1)*A(2,0));
-
-  if (std::abs(det) >= std::numeric_limits<libMesh::Real>::epsilon()*10.0)
-    {
-      libMesh::DenseMatrix<libMesh::Real> A_inv(3,3);
-
-      A_inv(0, 0) = (A(1,1)*A(2,2) - A(1,2)*A(2,1)) / det;
-      A_inv(0, 1) = (A(0,2)*A(2,1) - A(0,1)*A(2,2)) / det;
-      A_inv(0, 2) = (A(0,1)*A(1,2) - A(0,2)*A(1,1)) / det;
-
-      A_inv(1, 0) = (A(1,2)*A(2,0) - A(1,0)*A(2,2)) / det;
-      A_inv(1, 1) = (A(0,0)*A(2,2) - A(0,2)*A(2,0)) / det;
-      A_inv(1, 2) = (A(1,0)*A(0,2) - A(0,0)*A(1,2)) / det;
-
-      A_inv(2, 0) = (A(1,0)*A(2,1) - A(1,1)*A(2,0)) / det;
-      A_inv(2, 1) = (A(0,1)*A(2,0) - A(0,0)*A(2,1)) / det;
-      A_inv(2, 2) = (A(0,0)*A(1,1) - A(0,1)*A(1,0)) / det;
-
-      A_inv.vector_mult(x,b);
-
-      has_soln = true;
-    }
-
-  return has_soln;
-}
 
 /**
  * This class is for unit testing the "radial" basis function
@@ -183,14 +151,8 @@ public:
                 dxyz_deta += (*(base_elem->node_ptr(i))) * dphi_deta[i];
               }
 
-
-            DenseVector<Real> F(3);
-            F(0) =fp(0) + c_factor*(fp-o)(0) - intersection_guess(0);
-            F(1) =fp(1) + c_factor*(fp-o)(1) - intersection_guess(1);
-            F(2) =fp(2) + c_factor*(fp-o)(2) - intersection_guess(2);
-
-
-            DenseMatrix<Real> J(3,3);
+            TypeVector<Real> F(fp + c_factor*(fp-o) - intersection_guess);
+            TypeTensor<Real> J;
             J(0,0) = (fp-o)(0);
             J(0,1) = -dxyz_dxi(0);
             J(0,2) = -dxyz_deta(0);
@@ -202,16 +164,12 @@ public:
             J(2,2) = -dxyz_deta(2);
 
             // delta will be the newton step
-            DenseVector<Real> delta(3);
-            bool has_soln = system_solve_3x3(J,F,delta);
-
-            if (!has_soln)
-              libmesh_error_msg("no intersection found: bad problem!");
-
+            TypeVector<Real> delta;
+            J.solve(F,delta);
 
             // check for convergence
             Real tol = std::min( TOLERANCE, TOLERANCE*base_elem->hmax() );
-            if ( delta.l2_norm() < tol )
+            if ( delta.norm() < tol )
               {
                 // newton solver converged, now make sure it converged to a point on the base_elem
                 if (base_elem->contains_point(intersection_guess,TOLERANCE*0.1))
