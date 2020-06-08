@@ -407,8 +407,9 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
+  // Do not use the p_level(), if any, that is inherited by the side.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, side);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -535,8 +536,9 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
+  // Do not use the p_level(), if any, that is inherited by the side.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, edge);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -607,9 +609,10 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
   const FEFamily mapping_family = FEMap::map_fe_type(*side);
   const Order    mapping_order     (side->default_order());
   const FEType map_fe_type(mapping_order, mapping_family);
-  const ElemType mapping_elem_type (side->type());
+
+  // Do not use the p_level(), if any, that is inherited by the side.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(dim, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, side);
 
   switch (dim)
     {
