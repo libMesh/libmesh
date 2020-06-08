@@ -127,9 +127,10 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
 
   // Number of shape functions used to construct the map
   // (Lagrange shape functions are used for mapping)
+  // Do not consider the Elem::p_level(), if any, when computing the
+  // number of shape functions.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions (Dim, map_fe_type,
-                                    mapping_elem_type);
+    FEInterface::n_shape_functions (map_fe_type, /*extra_order=*/0, elem);
 
   // Maybe we already have correctly-sized data?  Check data sizes,
   // and get ready to break out of a "loop" if all these resize()
@@ -2105,7 +2106,9 @@ Point FEMap::map (const unsigned int dim,
   const ElemType type     = elem->type();
   const FEType fe_type (elem->default_order(), mapping_family);
 
-  const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
+  // Do not consider the Elem::p_level(), if any, when computing the
+  // number of shape functions.
+  const unsigned int n_sf = FEInterface::n_shape_functions(fe_type, /*extra_order=*/0, elem);
 
   FEInterface::shape_ptr shape_ptr =
     FEInterface::shape_function(dim, fe_type, type);
@@ -2137,7 +2140,11 @@ Point FEMap::map_deriv (const unsigned int dim,
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const ElemType type     = elem->type();
   const FEType fe_type (elem->default_order(), mapping_family);
-  const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
+
+  // Do not consider the Elem::p_level(), if any, when computing the
+  // number of shape functions.
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(fe_type, /*total_order=*/0, elem);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(dim, fe_type, type);

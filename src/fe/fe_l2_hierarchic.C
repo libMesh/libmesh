@@ -47,7 +47,8 @@ void l2_hierarchic_nodal_soln(const Elem * elem,
   const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(totalorder, L2_HIERARCHIC);
+  FEType fe_type(order, L2_HIERARCHIC);
+  FEType p_refined_fe_type(totalorder, L2_HIERARCHIC);
 
   switch (totalorder)
     {
@@ -69,10 +70,8 @@ void l2_hierarchic_nodal_soln(const Elem * elem,
       // explicitly.
     default:
       {
-
         const unsigned int n_sf =
-          // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+          FEInterface::n_shape_functions(fe_type, elem);
 
         std::vector<Point> refspace_nodes;
         FEBase::get_refspace_nodes(elem_type,refspace_nodes);
@@ -88,8 +87,7 @@ void l2_hierarchic_nodal_soln(const Elem * elem,
             // u_i = Sum (alpha_i phi_i)
             for (unsigned int i=0; i<n_sf; i++)
               nodal_soln[n] += elem_soln[i] *
-                // FE<Dim,T>::shape(elem, order, i, mapped_point);
-                FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+                FEInterface::shape(Dim, p_refined_fe_type, elem, i, refspace_nodes[n]);
           }
 
         return;

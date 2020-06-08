@@ -47,11 +47,12 @@ void nedelec_one_nodal_soln(const Elem * elem,
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType elem_type   = elem->type();
 
-  const Order totalorder = static_cast<Order>(order+elem->p_level());
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   nodal_soln.resize(n_nodes*dim);
 
-  FEType fe_type(totalorder, NEDELEC_ONE);
+  FEType fe_type(order, NEDELEC_ONE);
+  FEType p_refined_fe_type(totalorder, NEDELEC_ONE);
 
   switch (totalorder)
     {
@@ -106,7 +107,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
           } // switch(elem_type)
 
         const unsigned int n_sf =
-          FEInterface::n_shape_functions(dim, fe_type, elem_type);
+          FEInterface::n_shape_functions(fe_type, elem);
 
         std::vector<Point> refspace_nodes;
         FEVectorBase::get_refspace_nodes(elem_type,refspace_nodes);
@@ -115,7 +116,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
 
         // Need to create new fe object so the shape function as the FETransformation
         // applied to it.
-        std::unique_ptr<FEVectorBase> vis_fe = FEVectorBase::build(dim,fe_type);
+        std::unique_ptr<FEVectorBase> vis_fe = FEVectorBase::build(dim, p_refined_fe_type);
 
         const std::vector<std::vector<RealGradient>> & vis_phi = vis_fe->get_phi();
 
