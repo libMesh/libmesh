@@ -841,9 +841,7 @@ public:
       *elem.parent() : elem;
 
     // If there are any element-based DOF numbers, get them
-    const unsigned int nc = FEInterface::n_dofs_per_elem(elem.dim(),
-                                                         fe_type,
-                                                         elem.type());
+    const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, &elem);
 
     std::vector<dof_id_type> old_dof_indices(nc);
     indices.resize(nc);
@@ -1546,11 +1544,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           if (!var.active_on_subdomain(elem->subdomain_id()))
             continue;
           FEType fe_type = var.type();
-          FEType p_refined_fe_type = var.type();
-          p_refined_fe_type.order =
-            libMesh::Order (p_refined_fe_type.order + elem->p_level());
-
-          const ElemType elem_type = elem->type();
 
           if (FEInterface::n_dofs_at_node(fe_type, elem, 0))
             vertex_vars.insert(vertex_vars.end(), v_num);
@@ -1580,7 +1573,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
                       }
             }
 
-          if (FEInterface::n_dofs_per_elem(dim, p_refined_fe_type, elem_type) ||
+          if (FEInterface::n_dofs_per_elem(fe_type, elem) ||
               (has_interior_nodes &&
                FEInterface::n_dofs_at_node(fe_type, elem, n_nodes-1)))
             {

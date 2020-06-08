@@ -197,10 +197,25 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the total order of the element.
+   *
+   * \deprecated Call the version of this function that takes an Elem* instead.
    */
   static unsigned int n_dofs_per_elem(const unsigned int dim,
                                       const FEType & fe_t,
                                       const ElemType t);
+
+  /**
+   * The non-deprecated version of the function above.
+   */
+  static unsigned int n_dofs_per_elem(const FEType & fe_t,
+                                      const Elem * elem);
+
+  /**
+   * Same thing but internally elem->p_level() is ignored and extra_order is used instead.
+   */
+  static unsigned int n_dofs_per_elem(const FEType & fe_t,
+                                      const int extra_order,
+                                      const Elem * elem);
 
   /**
    * Fills the vector di with the local degree of freedom indices
