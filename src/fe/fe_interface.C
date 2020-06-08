@@ -910,6 +910,9 @@ Real FEInterface::shape(const unsigned int dim,
                         const unsigned int i,
                         const Point & p)
 {
+  // TODO:
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(t))
@@ -928,6 +931,9 @@ Real FEInterface::shape(const unsigned int dim,
                         const unsigned int i,
                         const Point & p)
 {
+  // TODO:
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem && is_InfFE_elem(elem->type()))
@@ -939,6 +945,65 @@ Real FEInterface::shape(const unsigned int dim,
 
   fe_switch(shape(elem,o,i,p));
 }
+
+
+
+Real
+FEInterface::shape(const FEType & fe_t,
+                   const Elem * elem,
+                   const unsigned int i,
+                   const Point & p)
+{
+  // dim is required by the fe_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (elem && is_InfFE_elem(elem->type()))
+    return ifem_shape(dim, fe_t, elem, i, p);
+
+#endif
+
+  // Account for Elem::p_level() when computing total_order
+  //
+  // Note: When calling FE<X,Y>::shape(ElemType, order, unsigned, Point),
+  // we are responsible for computing the total order ourselves.  See
+  // fe.h for more details.
+  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+
+  fe_switch(shape(elem->type(), total_order, i, p));
+}
+
+
+
+Real
+FEInterface::shape(const FEType & fe_t,
+                   int extra_order,
+                   const Elem * elem,
+                   const unsigned int i,
+                   const Point & p)
+{
+  // dim is required by the fe_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (elem && is_InfFE_elem(elem->type()))
+    return ifem_shape(dim, fe_t, elem, i, p);
+
+#endif
+
+  // Ignore Elem::p_level() and instead use extra_order to compute total_order.
+  //
+  // Note: When calling FE<X,Y>::shape(ElemType, order, unsigned, Point),
+  // we are responsible for computing the total order ourselves.  See
+  // fe.h for more details.
+  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+
+  fe_switch(shape(elem->type(), total_order, i, p));
+}
+
+
 
 template<>
 void FEInterface::shape<Real>(const unsigned int dim,
