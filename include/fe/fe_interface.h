@@ -381,6 +381,10 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Use the version of this function that accounts for
+   * Elem::p_level() internally or the version which takes an
+   * extra_order parameter.
    */
   template<typename OutputType>
   static void shape(const unsigned int dim,
@@ -398,10 +402,37 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Use the version of this function that accounts for
+   * Elem::p_level() internally or the version which takes an
+   * extra_order parameter.
    */
   template<typename OutputType>
   static void shape(const unsigned int dim,
                     const FEType & fe_t,
+                    const Elem * elem,
+                    const unsigned int i,
+                    const Point & p,
+                    OutputType & phi);
+
+  /**
+   * Non-deprecated version of templated shape() function that
+   * accounts for Elem::p_level() internally.
+   */
+  template<typename OutputType>
+  static void shape(const FEType & fe_t,
+                    const Elem * elem,
+                    const unsigned int i,
+                    const Point & p,
+                    OutputType & phi);
+
+  /**
+   * Non-deprecated version of templated shape() function that ignores
+   * Elem::p_level() and instead uses extra_order internally.
+   */
+  template<typename OutputType>
+  static void shape(const FEType & fe_t,
+                    int extra_order,
                     const Elem * elem,
                     const unsigned int i,
                     const Point & p,
