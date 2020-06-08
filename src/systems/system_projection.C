@@ -1578,9 +1578,6 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
           std::vector<char> dof_is_fixed(n_dofs, false); // bools
           std::vector<int> free_dof(n_dofs, 0);
 
-          // The element type
-          const ElemType elem_type = elem->type();
-
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
@@ -1596,9 +1593,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
             {
               // FIXME: this should go through the DofMap,
               // not duplicate dof_indices code badly!
+
+              // This call takes into account elem->p_level() internally.
               const unsigned int nc =
-                FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
-                                             n);
+                FEInterface::n_dofs_at_node (fe_type, elem, n);
+
               if ((!elem->is_vertex(n) || !is_boundary_node[n]) &&
                   !is_boundary_nodeset[n])
                 {

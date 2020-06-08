@@ -140,6 +140,10 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the total order of the element.
+   *
+   * \deprecated Call the version of n_dofs_at_node() taking an Elem *
+   * instead, this one accounts for Elem::p_level() internally rather
+   * than requiring the user to do it.
    */
   static unsigned int n_dofs_at_node(const unsigned int dim,
                                      const FEType & fe_t,
@@ -153,10 +157,39 @@ public:
   /**
    * \returns A function which evaluates n_dofs_at_node for the
    * requested FE type and dimension.
+   *
+   * \deprecated Use the version of this function that takes an Elem*
+   * for consistency. The behavior is otherwise exactly the same,
+   * since this function does not depend on the Elem::p_level().
    */
   static n_dofs_at_node_ptr
   n_dofs_at_node_function(const unsigned int dim,
                           const FEType & fe_t);
+
+  /**
+   * Non-deprecated version of function above.
+   */
+  static n_dofs_at_node_ptr
+  n_dofs_at_node_function(const FEType & fe_t,
+                          const Elem * elem);
+
+  /**
+   * \returns The number of dofs at node n for a finite element
+   * of type \p fe_t. Accounts for Elem::p_level() internally.
+   */
+  static unsigned int n_dofs_at_node(const FEType & fe_t,
+                                     const Elem * elem,
+                                     const unsigned int n);
+
+  /**
+   * \returns The number of dofs at node n for a finite element
+   * of type \p fe_t. Ignores Elem::p_level() and computes a total Order
+   * given by fe_t.order + extra_order when determining the number of DOFs.
+   */
+  static unsigned int n_dofs_at_node(const FEType & fe_t,
+                                     const int extra_order,
+                                     const Elem * elem,
+                                     const unsigned int n);
 
   /**
    * \returns The number of dofs interior to the element,

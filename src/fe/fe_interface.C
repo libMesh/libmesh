@@ -562,6 +562,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
                                          const ElemType t,
                                          const unsigned int n)
 {
+  // TODO:
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(t))
@@ -580,11 +583,69 @@ FEInterface::n_dofs_at_node_ptr
 FEInterface::n_dofs_at_node_function(const unsigned int dim,
                                      const FEType & fe_t)
 {
+  libmesh_deprecated();
+
   fe_with_vec_switch(n_dofs_at_node);
 }
 
 
 
+FEInterface::n_dofs_at_node_ptr
+FEInterface::n_dofs_at_node_function(const FEType & fe_t,
+                                     const Elem * elem)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+  fe_with_vec_switch(n_dofs_at_node);
+}
+
+
+
+unsigned int
+FEInterface::n_dofs_at_node(const FEType & fe_t,
+                            const Elem * elem,
+                            const unsigned int n)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (is_InfFE_elem(elem->type()))
+    return ifem_n_dofs_at_node(dim, fe_t, elem->type(), n);
+
+#endif
+
+  // Account for Elem::p_level() when computing total_order
+  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+
+  fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
+}
+
+
+
+unsigned int
+FEInterface::n_dofs_at_node(const FEType & fe_t,
+                            const int extra_order,
+                            const Elem * elem,
+                            const unsigned int n)
+{
+  // dim is required by the fe_with_vec_switch macro
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (is_InfFE_elem(elem->type()))
+    return ifem_n_dofs_at_node(dim, fe_t, elem->type(), n);
+
+#endif
+
+  // Ignore Elem::p_level() and instead use extra_order to compute total_order.
+  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+
+  fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
+}
 
 
 
