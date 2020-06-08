@@ -244,7 +244,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
   compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
 
   if (Dim > 1)
-    return FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
+    return FEInterface::shape(fet, base_el.get(), i_base, p)
       * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
       * InfFERadial::decay(Dim,v);
   else
@@ -357,7 +357,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
         + InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
         * InfFERadial::decay_deriv(v);
 
-      return FEInterface::shape(Dim-1, fe_t, base_el.get(), i_base, p)*RadialDeriv;
+      return FEInterface::shape(fe_t, base_el.get(), i_base, p)*RadialDeriv;
     }
   return FEInterface::shape_deriv(Dim-1, fe_t, base_el.get(), i_base, j, p)
     * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
@@ -504,7 +504,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
 
           data.shape[i] = (InfFERadial::decay(Dim,v)                                    /* (1.-v)/2. in 3D          */
-                           * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)   /* S_n(s,t)                 */
+                           * FEInterface::shape(fet, base_el.get(), i_base, p)          /* S_n(s,t)                 */
                            * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
                            * time_harmonic;                                             /* e^(i*k*phase(s,t,v)      */
 
@@ -526,7 +526,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
                 }
               data.dshape[i](Dim-1)  = (InfFERadial::decay_deriv(v) * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
                                         +InfFERadial::decay(Dim,v) * InfFE<Dim,T_radial,T_map>::eval_deriv(v, o_radial, i_radial))
-                                        * FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p) * time_harmonic;
+                                        * FEInterface::shape(fet, base_el.get(), i_base, p) * time_harmonic;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
               // derivative of time_harmonic (works for harmonic behavior only):
