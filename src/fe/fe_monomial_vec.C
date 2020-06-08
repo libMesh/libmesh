@@ -94,7 +94,6 @@ monomial_vec_nodal_soln(const Elem * elem,
     {
       // FEType object to be passed to various FEInterface functions below.
       FEType fe_type(order, MONOMIAL);
-      FEType p_refined_fe_type(totalorder, MONOMIAL);
 
       const unsigned int n_sf = FEInterface::n_shape_functions(fe_type, elem);
 
@@ -113,7 +112,7 @@ monomial_vec_nodal_soln(const Elem * elem,
           // u_i = Sum (alpha_i phi_i)
           for (unsigned int i = 0; i < n_sf; i++)
             nodal_soln[d + dim * n] += elem_soln[d + dim * i] *
-                                       FEInterface::shape(dim, p_refined_fe_type, elem, i, refspace_nodes[n]);
+                                       FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
         }
 
       return;
