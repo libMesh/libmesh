@@ -48,7 +48,8 @@ void rational_nodal_soln(const Elem * elem,
   const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(totalorder, _underlying_fe_family);
+  FEType fe_type(order, _underlying_fe_family);
+  FEType p_refined_fe_type(totalorder, _underlying_fe_family);
 
   switch (totalorder)
     {
@@ -71,7 +72,7 @@ void rational_nodal_soln(const Elem * elem,
     default:
       {
         const unsigned int n_sf =
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+          FEInterface::n_shape_functions(fe_type, elem);
 
         std::vector<Point> refspace_nodes;
         FEBase::get_refspace_nodes(elem_type,refspace_nodes);
@@ -92,7 +93,7 @@ void rational_nodal_soln(const Elem * elem,
             for (unsigned int i=0; i<n_sf; i++)
               {
                 weighted_shape[i] = node_weights[i] *
-                  FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+                  FEInterface::shape(Dim, p_refined_fe_type, elem, i, refspace_nodes[n]);
                 weighted_sum += weighted_shape[i];
               }
 
