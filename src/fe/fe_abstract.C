@@ -908,7 +908,8 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                my_side_n < n_side_nodes;
                my_side_n++)
             {
-              libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
+              // Do not use the p_level(), if any, that is inherited by the side.
+              libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, my_side.get()));
 
               const Node * my_node = my_nodes[my_side_n];
 
@@ -925,7 +926,8 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                    their_side_n < n_side_nodes;
                    their_side_n++)
                 {
-                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, parent_side.get()));
+                  // Do not use the p_level(), if any, that is inherited by the side.
+                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, parent_side.get()));
 
                   const Node * their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
@@ -1077,7 +1079,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                        my_side_n < n_side_nodes;
                        my_side_n++)
                     {
-                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
+                      // Do not use the p_level(), if any, that is inherited by the side.
+                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, my_side.get()));
 
                       const Node * my_node = my_nodes[my_side_n];
 
@@ -1106,7 +1109,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                            their_side_n < n_side_nodes;
                            their_side_n++)
                         {
-                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, neigh_side.get()));
+                          // Do not use the p_level(), if any, that is inherited by the side.
+                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, neigh_side.get()));
 
                           const Node * their_node = neigh_nodes[their_side_n];
 
@@ -1127,7 +1131,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                                  orig_side_n < n_side_nodes;
                                  orig_side_n++)
                               {
-                                libmesh_assert_less (orig_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
+                                // Do not use the p_level(), if any, that is inherited by the side.
+                                libmesh_assert_less (orig_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, my_side.get()));
 
                                 const Node * orig_node = my_nodes[orig_side_n];
 
@@ -1141,7 +1146,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                        my_side_n < n_side_nodes;
                        my_side_n++)
                     {
-                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, my_side.get()));
+                      // Do not use the p_level(), if any, that is inherited by the side.
+                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, my_side.get()));
 
                       if (skip_constraint[my_side_n])
                         continue;
@@ -1160,7 +1166,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                            their_side_n < n_side_nodes;
                            their_side_n++)
                         {
-                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, neigh_side.get()));
+                          // Do not use the p_level(), if any, that is inherited by the side.
+                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, neigh_side.get()));
 
                           const Node * their_node = neigh_nodes[their_side_n];
                           libmesh_assert(their_node);
