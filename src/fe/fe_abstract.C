@@ -934,7 +934,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
 
                   const Real their_value = FEInterface::shape(Dim-1,
                                                               fe_type,
-                                                              parent_side.get(),
+                                                              parent_side->type(),
                                                               their_side_n,
                                                               mapped_point);
 
@@ -1174,7 +1174,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
 
                           const Real their_value = FEInterface::shape(Dim-1,
                                                                       fe_type,
-                                                                      neigh_side.get(),
+                                                                      neigh_side->type(),
                                                                       their_side_n,
                                                                       mapped_point);
 
