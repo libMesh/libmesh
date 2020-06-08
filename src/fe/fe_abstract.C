@@ -932,9 +932,10 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                   const Node * their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
 
-                  const Real their_value = FEInterface::shape(Dim-1,
-                                                              fe_type,
-                                                              parent_side->type(),
+                  // Do not use the p_level(), if any, that is inherited by the side.
+                  const Real their_value = FEInterface::shape(fe_type,
+                                                              /*extra_order=*/0,
+                                                              parent_side.get(),
                                                               their_side_n,
                                                               mapped_point);
 
@@ -1172,9 +1173,10 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                           const Node * their_node = neigh_nodes[their_side_n];
                           libmesh_assert(their_node);
 
-                          const Real their_value = FEInterface::shape(Dim-1,
-                                                                      fe_type,
-                                                                      neigh_side->type(),
+                          // Do not use the p_level(), if any, that is inherited by the side.
+                          const Real their_value = FEInterface::shape(fe_type,
+                                                                      /*extra_order=*/0,
+                                                                      neigh_side.get(),
                                                                       their_side_n,
                                                                       mapped_point);
 
