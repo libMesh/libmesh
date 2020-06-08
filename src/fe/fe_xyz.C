@@ -42,8 +42,6 @@ void xyz_nodal_soln(const Elem * elem,
 {
   const unsigned int n_nodes = elem->n_nodes();
 
-  const ElemType elem_type = elem->type();
-
   nodal_soln.resize(n_nodes);
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
@@ -69,11 +67,11 @@ void xyz_nodal_soln(const Elem * elem,
     default:
       {
         // FEType object to be passed to various FEInterface functions below.
-        FEType fe_type(totalorder, XYZ);
+        FEType fe_type(order, XYZ);
+        FEType p_refined_fe_type(totalorder, XYZ);
 
         const unsigned int n_sf =
-          // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+          FEInterface::n_shape_functions(fe_type, elem);
 
         for (unsigned int n=0; n<n_nodes; n++)
           {
@@ -85,8 +83,7 @@ void xyz_nodal_soln(const Elem * elem,
             // u_i = Sum (alpha_i phi_i)
             for (unsigned int i=0; i<n_sf; i++)
               nodal_soln[n] += elem_soln[i] *
-                // FE<Dim,T>::shape(elem, order, i, elem->point(n));
-                FEInterface::shape(Dim, fe_type, elem, i, elem->point(n));
+                FEInterface::shape(Dim, p_refined_fe_type, elem, i, elem->point(n));
           }
 
         return;
