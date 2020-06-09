@@ -49,11 +49,9 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
   libmesh_assert(elem);
 
   int extra_order = add_p_level * elem->p_level();
-  const Order totalorder = static_cast<Order>(order + extra_order);
 
   // FEType object to be passed to various FEInterface functions below.
   FEType fe_type(order, _underlying_fe_family);
-  FEType p_refined_fe_type(totalorder, _underlying_fe_family);
 
   const unsigned int n_sf =
     FEInterface::n_shape_functions(fe_type, extra_order, elem);
@@ -73,7 +71,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
   for (unsigned int sf=0; sf<n_sf; sf++)
     {
       Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(1, p_refined_fe_type, elem, sf, p);
+        FEInterface::shape(fe_type, extra_order, elem, sf, p);
       weighted_sum += weighted_shape;
       if (sf == i)
         weighted_shape_i = weighted_shape;
@@ -146,7 +144,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
   for (unsigned int sf=0; sf<n_sf; sf++)
     {
       Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(1, p_refined_fe_type, elem, sf, p);
+        FEInterface::shape(fe_type, extra_order, elem, sf, p);
       Real weighted_grad = node_weights[sf] *
         FEInterface::shape_deriv(1, p_refined_fe_type, elem, sf, 0, p);
       weighted_sum += weighted_shape;
@@ -234,7 +232,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
   for (unsigned int sf=0; sf<n_sf; sf++)
     {
       Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(1, p_refined_fe_type, elem, sf, p);
+        FEInterface::shape(fe_type, extra_order, elem, sf, p);
       Real weighted_grad = node_weights[sf] *
         FEInterface::shape_deriv(1, p_refined_fe_type, elem, sf, 0, p);
       Real weighted_hess = node_weights[sf] *

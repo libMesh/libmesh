@@ -476,7 +476,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
       std::vector<Real> point_phi(n_p_dofs);
       for (unsigned int i=0; i != n_p_dofs; i++)
         {
-          point_phi[i] = FEInterface::shape(dim, fe_type, &c.get_elem(), i, p_master);
+          point_phi[i] = FEInterface::shape(fe_type, &c.get_elem(), i, p_master);
         }
 
       for (unsigned int i=0; i != n_p_dofs; i++)

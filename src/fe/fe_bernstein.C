@@ -39,8 +39,7 @@ namespace {
 void bernstein_nodal_soln(const Elem * elem,
                           const Order order,
                           const std::vector<Number> & elem_soln,
-                          std::vector<Number> &       nodal_soln,
-                          unsigned Dim)
+                          std::vector<Number> & nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -52,7 +51,6 @@ void bernstein_nodal_soln(const Elem * elem,
 
   // FEType object to be passed to various FEInterface functions below.
   FEType fe_type(order, BERNSTEIN);
-  FEType p_refined_fe_type(totalorder, BERNSTEIN);
 
   switch (totalorder)
     {
@@ -96,7 +94,7 @@ void bernstein_nodal_soln(const Elem * elem,
             // u_i = Sum (alpha_i phi_i)
             for (unsigned int i=0; i<n_sf; i++)
               nodal_soln[n] += elem_soln[i] *
-                FEInterface::shape(Dim, p_refined_fe_type, elem, i, refspace_nodes[n]);
+                FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
           }
 
         return;
@@ -388,28 +386,28 @@ void FE<0,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
                                  const std::vector<Number> & elem_soln,
                                  std::vector<Number> & nodal_soln)
-{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
+{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<1,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
                                  const std::vector<Number> & elem_soln,
                                  std::vector<Number> & nodal_soln)
-{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
+{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<2,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
                                  const std::vector<Number> & elem_soln,
                                  std::vector<Number> & nodal_soln)
-{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
+{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<3,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
                                  const std::vector<Number> & elem_soln,
                                  std::vector<Number> & nodal_soln)
-{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
+{ bernstein_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 
 // Full specialization of n_dofs() function for every dimension

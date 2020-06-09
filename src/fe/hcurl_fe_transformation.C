@@ -86,8 +86,10 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
               // Need to temporarily cache reference shape functions
               // TODO: PB: Might be worth trying to build phi_ref separately to see
               //           if we can get vectorization
+              // We are computing mapping basis functions, so we explicitly ignore
+              // any non-zero p_level() the Elem might have.
               OutputShape phi_ref;
-              FEInterface::shape<OutputShape>(2, fe.get_fe_type(), elem, i, qp[p], phi_ref);
+              FEInterface::shape(fe.get_fe_type(), /*extra_order=*/0, elem, i, qp[p], phi_ref);
 
               phi[i][p](0) = dxidx_map[p]*phi_ref.slice(0) + detadx_map[p]*phi_ref.slice(1);
 
@@ -128,8 +130,10 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
               // Need to temporarily cache reference shape functions
               // TODO: PB: Might be worth trying to build phi_ref separately to see
               //           if we can get vectorization
+              // We are computing mapping basis functions, so we explicitly ignore
+              // any non-zero p_level() the Elem might have.
               OutputShape phi_ref;
-              FEInterface::shape<OutputShape>(3, fe.get_fe_type(), elem, i, qp[p], phi_ref);
+              FEInterface::shape(fe.get_fe_type(), /*extra_order=*/0, elem, i, qp[p], phi_ref);
 
               phi[i][p].slice(0) = dxidx_map[p]*phi_ref.slice(0) + detadx_map[p]*phi_ref.slice(1)
                 + dzetadx_map[p]*phi_ref.slice(2);
