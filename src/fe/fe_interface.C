@@ -964,14 +964,13 @@ FEInterface::shape(const FEType & fe_t,
 
 #endif
 
-  // Account for Elem::p_level() when computing total_order
+  // We are calling
   //
-  // Note: When calling FE<X,Y>::shape(ElemType, order, unsigned, Point),
-  // we are responsible for computing the total order ourselves.  See
-  // fe.h for more details.
-  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
-
-  fe_switch(shape(elem->type(), total_order, i, p));
+  // FE<X,Y>::shape(Elem *, Order, unsigned, Point, true)
+  //
+  // with the last parameter set to "true" so that the Elem::p_level()
+  // is accounted for internally. See fe.h for more details.
+  fe_switch(shape(elem, fe_t.order, i, p, true));
 }
 
 
@@ -993,14 +992,16 @@ FEInterface::shape(const FEType & fe_t,
 
 #endif
 
-  // Ignore Elem::p_level() and instead use extra_order to compute total_order.
+  // We are calling
   //
-  // Note: When calling FE<X,Y>::shape(ElemType, order, unsigned, Point),
-  // we are responsible for computing the total order ourselves.  See
-  // fe.h for more details.
+  // FE<X,Y>::shape(Elem *, Order, unsigned, Point, false)
+  //
+  // with the last parameter set to "false" so that the
+  // Elem::p_level() is not used internally and the "total_order" that
+  // we compute is used instead. See fe.h for more details.
   auto total_order = static_cast<Order>(fe_t.order + extra_order);
 
-  fe_switch(shape(elem->type(), total_order, i, p));
+  fe_switch(shape(elem, total_order, i, p, false));
 }
 
 
@@ -1114,24 +1115,21 @@ void FEInterface::shape<Real>(const FEType & fe_t,
 
 #endif
 
-  // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
-
-  // Below we call FE<X,Y>::shape(ElemType, Order, unsigned, Point)
-  // which requires us to compute the total Order ourselves./
+  // Below we call FE<X,Y>::shape(Elem *, Order, unsigned, Point, true)
+  // so that the Elem::p_level() is accounted for internally.
   switch(dim)
     {
     case 0:
-      fe_scalar_vec_error_switch(0, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(0, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     case 1:
-      fe_scalar_vec_error_switch(1, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(1, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     case 2:
-      fe_scalar_vec_error_switch(2, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(2, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     case 3:
-      fe_scalar_vec_error_switch(3, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(3, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     default:
       libmesh_error_msg("Invalid dimension = " << dim);
@@ -1164,21 +1162,25 @@ void FEInterface::shape<Real>(const FEType & fe_t,
   // Ignore Elem::p_level() and instead use extra_order to compute total_order
   auto total_order = static_cast<Order>(fe_t.order + extra_order);
 
-  // Below we call FE<X,Y>::shape(ElemType, Order, unsigned, Point)
-  // which requires us to compute the total Order ourselves./
+  // Below we call
+  //
+  // FE<X,Y>::shape(Elem *, Order, unsigned, Point, false)
+  //
+  // so that the Elem::p_level() is ignored and the total_order that
+  // we compute is used instead.
   switch(dim)
     {
     case 0:
-      fe_scalar_vec_error_switch(0, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(0, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     case 1:
-      fe_scalar_vec_error_switch(1, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(1, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     case 2:
-      fe_scalar_vec_error_switch(2, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(2, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     case 3:
-      fe_scalar_vec_error_switch(3, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_scalar_vec_error_switch(3, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     default:
       libmesh_error_msg("Invalid dimension = " << dim);
@@ -1335,22 +1337,26 @@ void FEInterface::shape<RealGradient>(const FEType & fe_t,
 
   auto dim = elem->dim();
 
-  // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+  // We are calling
+  //
+  // FE<X,Y>::shape(Elem *, Order, unsigned, Point, true)
+  //
+  // with the last parameter set to "true" so that the Elem::p_level()
+  // is accounted for internally. See fe.h for more details.
 
   switch(dim)
     {
     case 0:
-      fe_vector_scalar_error_switch(0, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(0, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     case 1:
-      fe_vector_scalar_error_switch(1, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(1, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     case 2:
-      fe_vector_scalar_error_switch(2, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(2, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     case 3:
-      fe_vector_scalar_error_switch(3, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(3, shape(elem, fe_t.order, i, p, true), phi = , ; break;);
       break;
     default:
       libmesh_error_msg("Invalid dimension = " << dim);
@@ -1377,22 +1383,28 @@ void FEInterface::shape<RealGradient>(const FEType & fe_t,
 
   auto dim = elem->dim();
 
-  // Ignore Elem::p_level() and use extra_order to compute total_order
+  // We are calling
+  //
+  // FE<X,Y>::shape(Elem *, Order, unsigned, Point, false)
+  //
+  // with the last parameter set to "false" so that the
+  // Elem::p_level() is not used internally and the "total_order" that
+  // we compute is used instead. See fe.h for more details.
   auto total_order = static_cast<Order>(fe_t.order + extra_order);
 
   switch(dim)
     {
     case 0:
-      fe_vector_scalar_error_switch(0, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(0, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     case 1:
-      fe_vector_scalar_error_switch(1, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(1, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     case 2:
-      fe_vector_scalar_error_switch(2, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(2, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     case 3:
-      fe_vector_scalar_error_switch(3, shape(elem->type(), total_order, i, p), phi = , ; break;);
+      fe_vector_scalar_error_switch(3, shape(elem, total_order, i, p, false), phi = , ; break;);
       break;
     default:
       libmesh_error_msg("Invalid dimension = " << dim);
