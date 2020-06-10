@@ -653,6 +653,11 @@ public:
                                  const unsigned int j,
                                  const Point & p);
 
+  /**
+   * Typedef for pointer to a function that returns FE shape function second derivative values.
+   * The \p p_level() of the passed-in \p elem is accounted for internally when
+   * the \p add_p_level flag is set to true. For more information, see fe.h.
+   */
   typedef Real (*shape_second_deriv_ptr) (const FEType fet,
                                           const Elem * elem,
                                           const unsigned int i,
@@ -663,11 +668,21 @@ public:
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
+   *
+   * \deprecated Call the version of this function that takes an Elem * instead.
    */
   static shape_second_deriv_ptr
   shape_second_deriv_function(const unsigned int dim,
                               const FEType & fe_t,
                               const ElemType t);
+
+  /**
+   * Non-deprecated version of the function above.
+   */
+  static shape_second_deriv_ptr
+  shape_second_deriv_function(const FEType & fe_t,
+                              const Elem * elem);
+
 #endif
 
   /**

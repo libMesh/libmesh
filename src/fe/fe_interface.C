@@ -1855,12 +1855,31 @@ FEInterface::shape_second_deriv_function(const unsigned int dim,
                                          const FEType & fe_t,
                                          const ElemType libmesh_inf_var(t))
 {
+  // TODO
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
     libmesh_not_implemented();
 #endif
   fe_switch(shape_second_deriv);
 }
+
+
+
+FEInterface::shape_second_deriv_ptr
+FEInterface::shape_second_deriv_function(const FEType & fe_t,
+                                         const Elem * elem)
+{
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(elem->type()))
+    libmesh_not_implemented();
+#endif
+  fe_switch(shape_second_deriv);
+}
+
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
