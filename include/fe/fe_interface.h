@@ -463,6 +463,11 @@ public:
                          std::vector<std::vector<OutputType>> & phi,
                          const bool add_p_level = true);
 
+  /**
+   * Typedef for pointer to a function that returns FE shape function values.
+   * The \p p_level() of the passed-in \p elem is accounted for internally when
+   * the \p add_p_level flag is set to true. For more information, see fe.h.
+   */
   typedef Real (*shape_ptr) (const FEType fe_t,
                              const Elem * elem,
                              const unsigned int i,
@@ -472,11 +477,20 @@ public:
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
+   *
+   * \deprecated Call the version of this function taking an Elem* instead.
    */
   static shape_ptr
   shape_function(const unsigned int dim,
                  const FEType & fe_t,
                  const ElemType t);
+
+  /**
+   * Non-deprecated version of function above.
+   */
+  static shape_ptr
+  shape_function(const FEType & fe_t,
+                 const Elem * elem);
 
 
   /**

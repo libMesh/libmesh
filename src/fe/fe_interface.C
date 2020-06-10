@@ -1508,6 +1508,22 @@ FEInterface::shape_function(const unsigned int dim,
 }
 
 
+
+FEInterface::shape_ptr
+FEInterface::shape_function(const FEType & fe_t,
+                            const Elem * elem)
+{
+  // dim is needed by the fe_switch macros below
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(elem->type()))
+    inf_fe_switch(shape);
+#endif
+  fe_switch(shape);
+}
+
+
 Real FEInterface::shape_deriv(const unsigned int dim,
                               const FEType & fe_t,
                               const ElemType t,
