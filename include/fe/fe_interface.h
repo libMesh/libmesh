@@ -239,6 +239,9 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void dofs_on_side(const Elem * const elem,
                            const unsigned int dim,
@@ -252,6 +255,9 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void dofs_on_edge(const Elem * const elem,
                            const unsigned int dim,
@@ -268,7 +274,12 @@ public:
    * \p nodal_soln should not be used, the vector
    * \p nodal_soln is returned empty.
    *
-   * On a p-refined element, \p fe_t.order should be the base order of the element.
+   * \note On a p-refined element, \p fe_t.order should be the base
+   * order of the element. The Elem::p_level(), if any, is accounted
+   * for internally by this routine.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void nodal_soln(const unsigned int dim,
                          const FEType & fe_t,
@@ -704,6 +715,9 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the base
    * order of the element.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void compute_data(const unsigned int dim,
                            const FEType & fe_t,
