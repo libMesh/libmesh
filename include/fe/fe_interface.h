@@ -492,7 +492,6 @@ public:
   shape_function(const FEType & fe_t,
                  const Elem * elem);
 
-
   /**
    * \returns The \f$ j^{th} \f$ coordinate of the gradient of
    * the \f$ i^{th} \f$ shape function at point \p p.
@@ -502,6 +501,8 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Call the version of this function taking an Elem* instead.
    */
   static Real shape_deriv(const unsigned int dim,
                           const FEType & fe_t,
@@ -519,6 +520,8 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Call the version of this function taking an Elem* instead.
    */
   static Real shape_deriv (const unsigned int dim,
                            const FEType & fe_t,
@@ -526,6 +529,25 @@ public:
                            const unsigned int i,
                            const unsigned int j,
                            const Point & p);
+
+  /**
+   * Non-deprecated version of function above.
+   */
+  static Real shape_deriv(const FEType & fe_t,
+                          const Elem * elem,
+                          const unsigned int i,
+                          const unsigned int j,
+                          const Point & p);
+
+  /**
+   * Non-deprecated version of function above.
+   */
+  static Real shape_deriv(const FEType & fe_t,
+                          int extra_order,
+                          const Elem * elem,
+                          const unsigned int i,
+                          const unsigned int j,
+                          const Point & p);
 
   typedef Real (*shape_deriv_ptr) (const FEType fet,
                                    const Elem * elem,
