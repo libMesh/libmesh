@@ -122,7 +122,6 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   // The element type and order to use in
   // the map
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType mapping_elem_type (elem->type());
   const FEType map_fe_type(elem->default_order(), mapping_family);
 
   // Number of shape functions used to construct the map
@@ -243,7 +242,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
-    FEInterface::shape_second_deriv_function(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::shape_second_deriv_function(map_fe_type, elem);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   switch (Dim)
