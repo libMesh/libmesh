@@ -2093,6 +2093,7 @@ Point FEMap::map (const unsigned int dim,
                   const Point & reference_point)
 {
   libmesh_assert(elem);
+  libmesh_ignore(dim);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
