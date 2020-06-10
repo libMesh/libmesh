@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
-#include <algorithm> // for std::sort
+#include <algorithm> // for std::stable_sort
 
 // Local includes
 #include "libmesh/centroid_partitioner.h"
@@ -60,9 +60,9 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
     {
     case X:
       {
-        std::sort(_elem_centroids.begin(),
-                  _elem_centroids.end(),
-                  CentroidPartitioner::sort_x);
+        std::stable_sort(_elem_centroids.begin(),
+                         _elem_centroids.end(),
+                         CentroidPartitioner::sort_x);
 
         break;
       }
@@ -70,9 +70,9 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
 
     case Y:
       {
-        std::sort(_elem_centroids.begin(),
-                  _elem_centroids.end(),
-                  CentroidPartitioner::sort_y);
+        std::stable_sort(_elem_centroids.begin(),
+                         _elem_centroids.end(),
+                         CentroidPartitioner::sort_y);
 
         break;
 
@@ -81,9 +81,9 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
 
     case Z:
       {
-        std::sort(_elem_centroids.begin(),
-                  _elem_centroids.end(),
-                  CentroidPartitioner::sort_z);
+        std::stable_sort(_elem_centroids.begin(),
+                         _elem_centroids.end(),
+                         CentroidPartitioner::sort_z);
 
         break;
       }
@@ -91,9 +91,9 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
 
     case RADIAL:
       {
-        std::sort(_elem_centroids.begin(),
-                  _elem_centroids.end(),
-                  CentroidPartitioner::sort_radial);
+        std::stable_sort(_elem_centroids.begin(),
+                         _elem_centroids.end(),
+                         CentroidPartitioner::sort_radial);
 
         break;
       }
