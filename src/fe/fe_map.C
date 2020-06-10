@@ -236,7 +236,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   bool is_linear = elem->is_linear();
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::shape_function(map_fe_type, elem);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(Dim, map_fe_type, mapping_elem_type);
@@ -2103,7 +2103,6 @@ Point FEMap::map (const unsigned int dim,
   Point p;
 
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType type     = elem->type();
   const FEType fe_type (elem->default_order(), mapping_family);
 
   // Do not consider the Elem::p_level(), if any, when computing the
@@ -2111,7 +2110,7 @@ Point FEMap::map (const unsigned int dim,
   const unsigned int n_sf = FEInterface::n_shape_functions(fe_type, /*extra_order=*/0, elem);
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(dim, fe_type, type);
+    FEInterface::shape_function(fe_type, elem);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)

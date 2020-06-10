@@ -440,7 +440,7 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
     }
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(Dim-1, map_fe_type,mapping_elem_type);
+    FEInterface::shape_function(map_fe_type, side);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(Dim-1, map_fe_type,mapping_elem_type);
@@ -552,7 +552,7 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
 #endif
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(1, map_fe_type, mapping_elem_type);
+    FEInterface::shape_function(map_fe_type, edge);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(1, map_fe_type, mapping_elem_type);
