@@ -239,7 +239,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
     FEInterface::shape_function(map_fe_type, elem);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::shape_deriv_function(map_fe_type, elem);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
@@ -2128,6 +2128,7 @@ Point FEMap::map_deriv (const unsigned int dim,
                         const Point & reference_point)
 {
   libmesh_assert(elem);
+  libmesh_ignore(dim);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
@@ -2137,7 +2138,6 @@ Point FEMap::map_deriv (const unsigned int dim,
   Point p;
 
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType type     = elem->type();
   const FEType fe_type (elem->default_order(), mapping_family);
 
   // Do not consider the Elem::p_level(), if any, when computing the
@@ -2146,13 +2146,13 @@ Point FEMap::map_deriv (const unsigned int dim,
     FEInterface::n_shape_functions(fe_type, /*total_order=*/0, elem);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(dim, fe_type, type);
+    FEInterface::shape_deriv_function(fe_type, elem);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
                   shape_deriv_ptr(fe_type, elem, i, j, reference_point,
-                                  false));
+                                  /*add_p_level=*/false));
 
   return p;
 }
