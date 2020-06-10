@@ -443,8 +443,18 @@ public:
    * at point \p p. This method allows you to specify the dimension,
    * element type, and order directly.
    *
-   * \note On a p-refined element, \p fe_t.order should be the total
-   * order of the element.
+   * \note Pass \p true for \p add_p_level if you want the Elem::p_level()
+   * to be accounted for internally, pass false if you want fe_t.order to
+   * be used instead.
+   *
+   * \todo To be consistent with the other non-deprecated FEInterface
+   * routines, the shapes() and all_shapes() APIs should be updated so
+   * that they do not take \p dim as a parameter. This is a relatively
+   * large changeset with little benefit if we go the deprecation
+   * route, so it would probably be cleaner to just break backwards
+   * compatibility...  these functions seem to mainly be used
+   * internally by the library and changing them is unlikely to break
+   * application codes.
    */
   template<typename OutputType>
   static void shapes(const unsigned int dim,
