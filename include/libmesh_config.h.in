@@ -451,8 +451,11 @@
    */
 #undef HAVE_NEMESIS_API
 
-/* Flag indicating whether the library will be compiled with Netcdf support */
+/* Flag indicating whether the library will be compiled with NetCDF support */
 #undef HAVE_NETCDF
+
+/* Define to 1 if you have the <netcdf.h> header file. */
+#undef HAVE_NETCDF_H
 
 /* Flag indicating whether the library will be compiled with NLOPT support */
 #undef HAVE_NLOPT
