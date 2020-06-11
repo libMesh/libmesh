@@ -37667,6 +37667,10 @@ fi
 
       if test "x$enableparmetis" = "xyes"; then :
 
+                              if test "x$petsc_have_parmetis" = "x"; then :
+  petsc_have_parmetis=0
+fi
+
 
                     if test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -gt 0; then :
 
