@@ -19,6 +19,10 @@ AC_DEFUN([CONFIGURE_PARMETIS],
   dnl where it might be installed...
   AS_IF([test "x$enableparmetis" = "xyes"],
         [
+          dnl Initialize $petsc_have_parmetis to 0 if not already set. It may be unset
+          dnl if the user configured with --disable-petsc
+          AS_IF([test "x$petsc_have_parmetis" = "x"], [petsc_have_parmetis=0])
+
           dnl We consider 4 different combinations of METIS/ParMETIS support in PETSc.
 
           dnl Case A: PETSc is built with both METIS and ParMETIS support. In this case we use both.
