@@ -639,7 +639,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
 
         // We need to look back at the full edge to figure out the normal
         // vector
-        const Elem * elem = side->parent();
+        const Elem * elem = side->interior_parent();
         libmesh_assert (elem);
         if (calculate_dxyz)
           {
@@ -755,7 +755,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                 // For a 2D element living in 3D, there is a second tangent.
                 // For the second tangent, we need to refer to the full
                 // element's (not just the edge's) Jacobian.
-                const Elem * elem = side->parent();
+                const Elem * elem = side->interior_parent();
                 libmesh_assert(elem);
 
                 // Inverse map xyz[p] to a reference point on the parent...

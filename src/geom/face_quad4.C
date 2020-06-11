@@ -149,24 +149,7 @@ Order Quad4::default_order() const
 std::unique_ptr<Elem> Quad4::build_side_ptr (const unsigned int i,
                                              bool proxy)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (proxy)
-    return libmesh_make_unique<Side<Edge2,Quad4>>(this,i);
-
-  else
-    {
-      std::unique_ptr<Elem> edge = libmesh_make_unique<Edge2>();
-      edge->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      edge->set_p_level(this->p_level());
-#endif
-      // Set the nodes
-      for (auto n : edge->node_index_range())
-        edge->set_node(n) = this->node_ptr(Quad4::side_nodes_map[i][n]);
-
-      return edge;
-    }
+  return this->simple_build_side_ptr<Edge2, Quad4>(i, proxy);
 }
 
 

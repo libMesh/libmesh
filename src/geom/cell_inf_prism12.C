@@ -175,19 +175,26 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
 {
   libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> face;
   if (proxy)
     {
       switch (i)
         {
           // base
         case 0:
-          return libmesh_make_unique<Side<Tri6,InfPrism12>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Tri6,InfPrism12>>(this,i);
+            break;
+          }
 
           // ifem sides
         case 1:
         case 2:
         case 3:
-          return libmesh_make_unique<Side<InfQuad6,InfPrism12>>(this,i);
+          {
+            face = libmesh_make_unique<Side<InfQuad6,InfPrism12>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -196,9 +203,6 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> face;
-
       switch (i)
         {
         case 0: // the triangular face at z=-1, base face
@@ -219,16 +223,15 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      face->set_p_level(this->p_level());
-#endif
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(InfPrism12::side_nodes_map[i][n]);
-
-      return face;
     }
+
+  face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 
