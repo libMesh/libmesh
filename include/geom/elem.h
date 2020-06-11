@@ -69,6 +69,8 @@ class Elem;
 class PeriodicBoundaries;
 class PointLocatorBase;
 #endif
+template <class SideType, class ParentType>
+class Side;
 
 
 /**
@@ -1716,6 +1718,14 @@ protected:
   /**
    * An implementation for simple (all sides equal) elements
    */
+  template <typename Sideclass, typename Subclass>
+  std::unique_ptr<Elem>
+  simple_build_side_ptr(const unsigned int i,
+                        bool proxy);
+
+  /**
+   * An implementation for simple (all sides equal) elements
+   */
   template <typename Subclass>
   void simple_build_side_ptr(std::unique_ptr<Elem> & side,
                              const unsigned int i,
@@ -2276,6 +2286,32 @@ Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->build_side_ptr(e, i);
   elem.reset(e.release());
+}
+
+
+
+template <typename Sideclass, typename Subclass>
+inline
+std::unique_ptr<Elem>
+Elem::simple_build_side_ptr (const unsigned int i,
+                             bool proxy)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  std::unique_ptr<Elem> face;
+  if (proxy)
+    face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+  else
+    {
+      face = libmesh_make_unique<Sideclass>(this);
+      for (auto n : face->node_index_range())
+        face->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+    }
+
+  face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 
