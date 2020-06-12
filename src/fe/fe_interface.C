@@ -1715,7 +1715,7 @@ void FEInterface::compute_data(const unsigned int dim,
 
 #endif
 
-  const unsigned int n_dof = n_dofs (dim, fe_t, elem);
+  const unsigned int n_dof = n_dofs (fe_t, elem);
   const Point & p = data.p;
   data.shape.resize(n_dof);
 
