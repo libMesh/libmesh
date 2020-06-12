@@ -2,6 +2,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
+cxxflags_extra = @CXXFLAGS_OPROF@
 
 Name: libmesh
 Description: The libMesh Finite Element Library
@@ -10,6 +11,6 @@ Version: @VERSION@
 Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_oprof -ltimpi_oprof \
       @libmesh_installed_LIBS@ @libmesh_optional_LIBS@
 Libs.private:
-Cflags: @CPPFLAGS_OPROF@ @CXXFLAGS_OPROF@ \
+Cflags: @CPPFLAGS_OPROF@ \
         -I${includedir} \
 	@libmesh_optional_INCLUDES@
