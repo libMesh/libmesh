@@ -2569,6 +2569,8 @@ const std::vector< Number >& RBConstruction::get_evaluated_thetas(unsigned int t
 
 void RBConstruction::preevaluate_thetas()
 {
+  LOG_SCOPE("preevaluate_thetas()", "RBConstruction");
+
   _evaluated_thetas.resize(get_local_n_training_samples());
 
   auto & rb_theta_expansion = get_rb_evaluation().get_rb_theta_expansion();
