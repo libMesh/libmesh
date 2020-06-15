@@ -212,7 +212,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
 }
 
 Real RBEvaluation::rb_solve(unsigned int N,
-                            const std::vector< Number >* evaluated_thetas)
+                            const std::vector<Number> * evaluated_thetas)
 {
   LOG_SCOPE("rb_solve()", "RBEvaluation");
 
@@ -318,13 +318,13 @@ Real RBEvaluation::get_error_bound_normalization()
   return normalization;
 }
 
- Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
+Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
   return compute_residual_dual_norm(N, nullptr);
 }
 
 Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
-                                              const std::vector< Number >* evaluated_thetas)
+                                              const std::vector<Number> * evaluated_thetas)
 {
   LOG_SCOPE("compute_residual_dual_norm()", "RBEvaluation");
 

@@ -2556,7 +2556,8 @@ void RBConstruction::set_current_training_parameter_index(unsigned int index)
   _current_training_parameter_index = index;
 }
 
-const std::vector< Number >& RBConstruction::get_evaluated_thetas(unsigned int training_parameter_index) const
+const std::vector<Number> &
+RBConstruction::get_evaluated_thetas(unsigned int training_parameter_index) const
 {
   const numeric_index_type first_index = get_first_local_training_index();
   libmesh_assert(training_parameter_index >= first_index);

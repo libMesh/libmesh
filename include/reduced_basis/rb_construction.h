@@ -821,7 +821,7 @@ protected:
   /**
    * Return the evaluated theta functions at the given training parameter index.
    */
-  const std::vector< Number >& get_evaluated_thetas(unsigned int training_parameter_index) const;
+  const std::vector<Number> & get_evaluated_thetas(unsigned int training_parameter_index) const;
 
   /*
    * Pre-evaluate the theta functions on the entire (local) training parameter set.
@@ -973,8 +973,7 @@ private:
    * can be used to store all of our theta functions at training samples
    * instead of re-evaluating the same values repeatedly during training.
    */
-  std::vector< std::vector< Number > > _evaluated_thetas;
-
+  std::vector<std::vector<Number>> _evaluated_thetas;
 };
 
 } // namespace libMesh
