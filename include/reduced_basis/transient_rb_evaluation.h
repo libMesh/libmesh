@@ -87,6 +87,7 @@ public:
    * with the N basis functions. Overridden
    * to perform a time-dependent solve.
    */
+  using RBEvaluation::rb_solve;
   virtual Real rb_solve(unsigned int N) override;
 
   /**
@@ -114,6 +115,7 @@ public:
    * saved in RB_solution. This function uses the cached time-independent
    * data.
    */
+  using RBEvaluation::compute_residual_dual_norm;
   virtual Real compute_residual_dual_norm(const unsigned int N) override;
 
   /**

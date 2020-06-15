@@ -114,6 +114,7 @@ public:
    * solution coefficients in the member RB_solution.
    * \returns The EIM a posteriori error bound.
    */
+  using RBEvaluation::rb_solve;
   virtual Real rb_solve(unsigned int N) override;
 
   /**
