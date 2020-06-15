@@ -85,7 +85,8 @@ RBConstruction::RBConstruction (EquationSystems & es,
     rel_training_tolerance(1.e-4),
     abs_training_tolerance(1.e-12),
     normalize_rb_bound_in_greedy(false),
-    RB_training_type("Greedy")
+    RB_training_type("Greedy"),
+    _preevaluate_thetas_flag(false)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -1110,6 +1111,9 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
       return 0.;
     }
 
+  // Optionally pre-evaluate the theta functions on the entire (local) training parameter set.
+  if (get_preevaluate_thetas_flag())
+    preevaluate_thetas();
 
   if(!skip_residual_in_train_reduced_basis)
     {
@@ -1597,7 +1601,17 @@ Real RBConstruction::get_RB_error_bound()
 {
   get_rb_evaluation().set_parameters( get_parameters() );
 
-  Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
+  Real error_bound = 0.;
+  if (get_preevaluate_thetas_flag())
+    {
+      // Obtain the pre-evaluated theta functions from the current training parameter index
+      const auto & evaluated_thetas = get_evaluated_thetas(get_current_training_parameter_index());
+      error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions(),
+                                                 &evaluated_thetas);
+    }
+  else
+    error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
+
 
   if (normalize_rb_bound_in_greedy)
     {
@@ -1666,6 +1680,12 @@ Real RBConstruction::compute_max_error_bound()
       // Load training parameter i, this is only loaded
       // locally since the RB solves are local.
       set_params_from_training_set( first_index+i );
+
+      // In case we pre-evaluate the theta functions,
+      // also keep track of the current training parameter index.
+      if (get_preevaluate_thetas_flag())
+        set_current_training_parameter_index(first_index+i);
+
 
       training_error_bounds[i] = get_RB_error_bound();
 
@@ -2514,6 +2534,64 @@ bool RBConstruction::get_convergence_assertion_flag() const
 void RBConstruction::set_convergence_assertion_flag(bool flag)
 {
   assert_convergence = flag;
+}
+
+bool RBConstruction::get_preevaluate_thetas_flag() const
+{
+  return _preevaluate_thetas_flag;
+}
+
+void RBConstruction::set_preevaluate_thetas_flag(bool flag)
+{
+  _preevaluate_thetas_flag = flag;
+}
+
+unsigned int RBConstruction::get_current_training_parameter_index() const
+{
+  return _current_training_parameter_index;
+}
+
+void RBConstruction::set_current_training_parameter_index(unsigned int index)
+{
+  _current_training_parameter_index = index;
+}
+
+const std::vector<Number> &
+RBConstruction::get_evaluated_thetas(unsigned int training_parameter_index) const
+{
+  const numeric_index_type first_index = get_first_local_training_index();
+  libmesh_assert(training_parameter_index >= first_index);
+
+  const numeric_index_type local_index = training_parameter_index - first_index;
+  libmesh_assert(local_index < _evaluated_thetas.size());
+
+  return _evaluated_thetas[local_index];
+}
+
+void RBConstruction::preevaluate_thetas()
+{
+  LOG_SCOPE("preevaluate_thetas()", "RBConstruction");
+
+  _evaluated_thetas.resize(get_local_n_training_samples());
+
+  auto & rb_theta_expansion = get_rb_evaluation().get_rb_theta_expansion();
+  const unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
+  const unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
+
+  const numeric_index_type first_index = get_first_local_training_index();
+  for (unsigned int i=0; i<get_local_n_training_samples(); i++)
+    {
+      // Load training parameter i, this is only loaded
+      // locally since the RB solves are local.
+      set_params_from_training_set( first_index+i );
+      const RBParameters & mu = get_parameters();
+
+      _evaluated_thetas[i].resize(n_A_terms + n_F_terms);
+      for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
+        _evaluated_thetas[i][q_a] = rb_theta_expansion.eval_A_theta(q_a, mu);
+      for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
+        _evaluated_thetas[i][n_A_terms + q_f] = rb_theta_expansion.eval_F_theta(q_f, mu);
+    }
 }
 
 } // namespace libMesh

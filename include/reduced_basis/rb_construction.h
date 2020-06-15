@@ -490,6 +490,13 @@ public:
    */
   void set_convergence_assertion_flag(bool flag);
 
+  /**
+   * Get/set flag to pre-evaluate the theta functions
+   */
+  bool get_preevaluate_thetas_flag() const;
+  void set_preevaluate_thetas_flag(bool flag);
+
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -805,6 +812,22 @@ protected:
    */
   void check_convergence(LinearSolver<Number> & input_solver);
 
+  /**
+   * Get/set the current training parameter index
+   */
+  unsigned int get_current_training_parameter_index() const;
+  void set_current_training_parameter_index(unsigned int index);
+
+  /**
+   * Return the evaluated theta functions at the given training parameter index.
+   */
+  const std::vector<Number> & get_evaluated_thetas(unsigned int training_parameter_index) const;
+
+  /*
+   * Pre-evaluate the theta functions on the entire (local) training parameter set.
+   */
+  void preevaluate_thetas();
+
   //----------- PROTECTED DATA MEMBERS -----------//
 
   /**
@@ -935,6 +958,22 @@ private:
    */
   std::unique_ptr<NumericVector<Number>> _untransformed_solution;
 
+  /**
+   * Flag to indicate if we preevaluate the theta functions
+   */
+  bool _preevaluate_thetas_flag;
+
+  /**
+   * The current training parameter index during reduced basis training.
+   */
+  unsigned int _current_training_parameter_index;
+
+  /**
+   * Storage of evaluated theta functions at a set of parameters. This
+   * can be used to store all of our theta functions at training samples
+   * instead of re-evaluating the same values repeatedly during training.
+   */
+  std::vector<std::vector<Number>> _evaluated_thetas;
 };
 
 } // namespace libMesh
