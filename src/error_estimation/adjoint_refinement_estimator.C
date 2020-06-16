@@ -256,7 +256,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         }
 #endif // NDEBUG
 
-  // Uniformly refine the mesh
+  // A mesh refinement object to handle uniform refinements if needed
   MeshRefinement mesh_refinement(mesh);
 
   libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
