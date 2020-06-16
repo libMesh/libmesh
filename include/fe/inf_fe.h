@@ -407,9 +407,15 @@ public:
   /**
    * \returns The number of dofs interior to the element,
    * not associated with any interior nodes.
+   *
+   * \deprecated Call the version of this function that takes an Elem*
+   * instead for consistency with other FEInterface::n_dofs() methods.
    */
   static unsigned int n_dofs_per_elem(const FEType & fet,
                                       const ElemType inf_elem_type);
+
+  static unsigned int n_dofs_per_elem(const FEType & fet,
+                                      const Elem * inf_elem);
 
   /**
    * \returns The continuity of the element.

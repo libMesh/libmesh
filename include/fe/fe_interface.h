@@ -837,9 +837,16 @@ private:
                                           const Elem * elem,
                                           const unsigned int n);
 
+  /**
+   * \deprecated Call the version of ifem_n_dofs_per_elem() which
+   * takes a pointer-to-Elem instead.
+   */
   static unsigned int ifem_n_dofs_per_elem(const unsigned int dim,
                                            const FEType & fe_t,
                                            const ElemType t);
+
+  static unsigned int ifem_n_dofs_per_elem(const FEType & fe_t,
+                                           const Elem * elem);
 
   static void ifem_nodal_soln(const unsigned int dim,
                               const FEType & fe_t,
