@@ -197,6 +197,11 @@ void UnsteadySolver::adjoint_advance_timestep ()
       // The adjoint system has been solved. We need to store the adjoint solution and
       // load the primal solutions for the next time instance (t - delta_ti).
       _system.time -= _system.deltat;
+
+      if(_system.time < 0.0)
+      {
+        libmesh_error_msg("Error ! Time has become negative.");
+      }
     }
   else
     {
