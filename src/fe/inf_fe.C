@@ -507,7 +507,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
     for (unsigned int n=0; n<n_total_approx_shape_functions; n++)
       {
         compute_shape_indices (this->fe_type,
-                               inf_elem_type,
+                               inf_elem,
                                n,
                                _base_shape_index[n],
                                _radial_shape_index[n]);
