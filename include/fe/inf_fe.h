@@ -369,10 +369,17 @@ public:
   /**
    * \returns The number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
+   *
+   * \deprecated Call the version of this function that takes a
+   * pointer-to-Elem instead.
    */
   static unsigned int n_shape_functions (const FEType & fet,
                                          const ElemType t)
   { return n_dofs(fet, t); }
+
+  static unsigned int n_shape_functions (const FEType & fet,
+                                         const Elem * inf_elem)
+  { return n_dofs(fet, inf_elem); }
 
   /**
    * \returns The number of shape functions associated with this

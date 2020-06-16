@@ -490,7 +490,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
    */
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_shape_functions(dim, fe_t, elem->type());
+    return ifem_n_shape_functions(fe_t, elem);
 
 #endif
 
@@ -518,7 +518,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
    */
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_shape_functions(dim, fe_t, elem->type());
+    return ifem_n_shape_functions(fe_t, elem);
 
 #endif
 

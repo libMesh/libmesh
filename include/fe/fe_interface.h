@@ -809,9 +809,16 @@ private:
    * the calls to \p FE and \p InfFE.
    */
 
+  /**
+   * \deprecated Call the version of ifem_n_shape_functions() which
+   * takes a pointer-to-Elem instead.
+   */
   static unsigned int ifem_n_shape_functions(const unsigned int dim,
                                              const FEType & fe_t,
                                              const ElemType t);
+
+  static unsigned int ifem_n_shape_functions(const FEType & fe_t,
+                                             const Elem * elem);
 
   /**
    * \deprecated Call the version of ifem_n_dofs() which takes a
