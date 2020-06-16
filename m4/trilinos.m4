@@ -294,7 +294,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
                 [NOX_MAKEFILE_EXPORT=$withnoxdir/packages/nox/Makefile.export.nox],
                 [enablenox=no])
 
-          AS_IF([test "$enablenox" != "xno"],
+          AS_IF([test "x$enablenox" != "xno"],
                 [
                   enablenox=yes
                   AC_DEFINE(TRILINOS_HAVE_NOX, 1, [Flag indicating whether the library shall be compiled to use the Nox solver collection])
