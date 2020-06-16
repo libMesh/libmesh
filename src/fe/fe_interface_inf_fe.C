@@ -748,7 +748,10 @@ Real FEInterface::ifem_shape_deriv (const unsigned int dim,
                                     const unsigned int j,
                                     const Point & p)
 {
-   inf_fe_switch(shape_deriv(fe_t, elem, i, j, p));
+  // TODO:
+  // libmesh_deprecated();
+
+  inf_fe_switch(shape_deriv(fe_t, elem, i, j, p));
 }
 
 
@@ -759,7 +762,24 @@ Real FEInterface::ifem_shape_deriv(const unsigned int dim,
                                    const unsigned int j,
                                    const Point & p)
 {
-   inf_fe_switch(shape_deriv(fe_t, t, i, j, p));
+  // TODO:
+  // libmesh_deprecated();
+
+  inf_fe_switch(shape_deriv(fe_t, t, i, j, p));
+}
+
+
+
+Real FEInterface::ifem_shape_deriv (const FEType & fe_t,
+                                    const Elem * elem,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p)
+{
+  // The inf_fe_switch macro requires a "dim" parameter.
+  auto dim = elem->dim();
+
+  inf_fe_switch(shape_deriv(fe_t, elem, i, j, p));
 }
 
 

@@ -1566,7 +1566,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem->infinite()){
-    return ifem_shape_deriv(dim, fe_t, elem, i, j, p);
+    return ifem_shape_deriv(fe_t, elem, i, j, p);
   }
 
 #endif
@@ -1603,7 +1603,7 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type())){
-    return ifem_shape_deriv(dim, fe_t, elem->type(), i, j, p);
+    return ifem_shape_deriv(fe_t, elem, i, j, p);
   }
 
 #endif
@@ -1632,7 +1632,7 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem->infinite()){
-    return ifem_shape_deriv(dim, fe_t, elem, i, j, p);
+    return ifem_shape_deriv(fe_t, elem, i, j, p);
   }
 
 #endif

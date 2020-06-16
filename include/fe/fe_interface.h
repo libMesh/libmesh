@@ -904,6 +904,10 @@ private:
                          const unsigned int i,
                          const Point & p);
 
+  /**
+   * \deprecated Call version that takes a pointer-to-Elem and does
+   * not require an explicit dim parameter instead.
+   */
   static Real ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
                                const ElemType t,
@@ -911,8 +915,18 @@ private:
                                const unsigned int j,
                                const Point & p);
 
+  /**
+   * \deprecated Call version that takes a pointer-to-Elem and does
+   * not require an explicit dim parameter instead.
+   */
   static Real ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
+                               const Elem * elem,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point & p);
+
+  static Real ifem_shape_deriv(const FEType & fe_t,
                                const Elem * elem,
                                const unsigned int i,
                                const unsigned int j,
