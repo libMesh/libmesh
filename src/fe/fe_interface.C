@@ -668,7 +668,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs_at_node(dim, fe_t, elem->type(), n);
+    return ifem_n_dofs_at_node(fe_t, elem, n);
 
 #endif
 
@@ -692,7 +692,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs_at_node(dim, fe_t, elem->type(), n);
+    return ifem_n_dofs_at_node(fe_t, elem, n);
 
 #endif
 

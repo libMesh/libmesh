@@ -94,6 +94,9 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
                                                         const ElemType inf_elem_type,
                                                         const unsigned int n)
 {
+  // TODO:
+  // libmesh_deprecated();
+
   const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
   unsigned int n_base, n_radial;
@@ -115,6 +118,25 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
 
 
 
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
+                                                        const Elem * inf_elem,
+                                                        const unsigned int n)
+{
+  // The "base" Elem is a non-infinite Elem corresponding to side 0 of
+  // the InfElem. This builds a "lightweight" proxy and so should be
+  // relatively fast.
+  auto base_elem = inf_elem->build_side_ptr(0);
+
+  unsigned int n_base, n_radial;
+  compute_node_indices(inf_elem->type(), n, n_base, n_radial);
+
+  if (Dim > 1)
+    return FEInterface::n_dofs_at_node(fet, base_elem.get(), n_base)
+      * InfFERadial::n_dofs_at_node(fet.radial_order, n_radial);
+  else
+    return InfFERadial::n_dofs_at_node(fet.radial_order, n_radial);
+}
 
 
 
@@ -1140,6 +1162,9 @@ INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));

@@ -392,9 +392,16 @@ public:
   /**
    * \returns The number of dofs at infinite element node \p n
    * (not dof!) for an element of type \p t and order \p o.
+   *
+   * \deprecated Call the version of this function that takes an Elem*
+   * instead for consistency with other FEInterface::n_dofs() methods.
    */
   static unsigned int n_dofs_at_node(const FEType & fet,
                                      const ElemType inf_elem_type,
+                                     const unsigned int n);
+
+  static unsigned int n_dofs_at_node(const FEType & fet,
+                                     const Elem * inf_elem,
                                      const unsigned int n);
 
   /**

@@ -134,6 +134,9 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
                                               const ElemType t,
                                               const unsigned int n)
 {
+  // TODO:
+  // libmesh_deprecated();
+
   switch (dim)
     {
       // 1D
@@ -155,6 +158,36 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
 
     default:
       libmesh_error_msg("Unsupported dim = " << dim);
+    }
+}
+
+
+
+unsigned int FEInterface::ifem_n_dofs_at_node(const FEType & fe_t,
+                                              const Elem * elem,
+                                              const unsigned int n)
+{
+  switch (elem->dim())
+    {
+      // 1D
+    case 1:
+      /*
+       * Since InfFE<Dim,T_radial,T_map>::n_dofs_at_node(...)
+       * is actually independent of T_radial and T_map, we can use
+       * just any T_radial and T_map
+       */
+      return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, elem, n);
+
+      // 2D
+    case 2:
+      return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, elem, n);
+
+      // 3D
+    case 3:
+      return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, elem, n);
+
+    default:
+      libmesh_error_msg("Unsupported dim = " << elem->dim());
     }
 }
 
