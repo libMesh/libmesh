@@ -40,14 +40,14 @@ void FileSolutionHistory::find_stored_entry()
 
   libmesh_assert (stored_sols != stored_solutions.end());
 
-  if (std::abs(stored_sols->first - _system.time) < TOLERANCE)
+  if (std::abs(stored_sols->first - _system.time) < TOLERANCE*sqrt(TOLERANCE))
     return;
 
   // If we're not at the front, check the previous entry
   if (stored_sols != stored_solutions.begin())
     {
       stored_solutions_iterator test_it = stored_sols;
-      if (std::abs((--test_it)->first - _system.time) < TOLERANCE)
+      if (std::abs((--test_it)->first - _system.time) < TOLERANCE*sqrt(TOLERANCE))
         {
           --stored_sols;
           return;
@@ -58,7 +58,7 @@ void FileSolutionHistory::find_stored_entry()
   stored_solutions_iterator test_it = stored_sols;
   if ((++test_it) != stored_solutions.end())
     {
-      if (std::abs(test_it->first - _system.time) < TOLERANCE)
+      if (std::abs(test_it->first - _system.time) < TOLERANCE*sqrt(TOLERANCE))
         {
           ++stored_sols;
           return;
@@ -80,7 +80,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve)
     }
 
   // If we're past the end we can create a new entry
-  if (_system.time - stored_sols->first > TOLERANCE )
+  if (_system.time - stored_sols->first > TOLERANCE*sqrt(TOLERANCE) )
     {
 #ifndef NDEBUG
       ++stored_sols;
@@ -92,7 +92,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve)
     }
 
   // If we're before the beginning we can create a new entry
-  else if (stored_sols->first - _system.time > TOLERANCE)
+  else if (stored_sols->first - _system.time > TOLERANCE*sqrt(TOLERANCE))
     {
       libmesh_assert (stored_sols == stored_solutions.begin());
       stored_solutions.emplace_front( _system.time, std::string() );
@@ -100,7 +100,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve)
     }
 
   // We don't support inserting entries elsewhere
-  libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE);
+  libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE*sqrt(TOLERANCE));
 
   // The name of the file to in which we store the solution from the current timestep
   std::string & solution_filename = stored_sols->second;
