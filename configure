@@ -663,6 +663,8 @@ CPPUNIT_CFLAGS
 CPPUNIT_CONFIG
 LIBMESH_ENABLE_FPARSER_FALSE
 LIBMESH_ENABLE_FPARSER_TRUE
+FPARSER_NO_PSABI_FALSE
+FPARSER_NO_PSABI_TRUE
 FPARSER_SUPPORT_JIT_FALSE
 FPARSER_SUPPORT_JIT_TRUE
 FPARSER_SUPPORT_DEBUGGING_FALSE
@@ -40987,6 +40989,14 @@ else
   FPARSER_SUPPORT_JIT_FALSE=
 fi
 
+       if test "$GXX" = "yes" && test "x$REAL_GXX" != "x"; then
+  FPARSER_NO_PSABI_TRUE=
+  FPARSER_NO_PSABI_FALSE='#'
+else
+  FPARSER_NO_PSABI_TRUE='#'
+  FPARSER_NO_PSABI_FALSE=
+fi
+
 
 if test $enablefparser = yes; then :
   libmesh_contrib_INCLUDES="$FPARSER_INCLUDE $libmesh_contrib_INCLUDES"
@@ -41973,6 +41983,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${FPARSER_SUPPORT_JIT_TRUE}" && test -z "${FPARSER_SUPPORT_JIT_FALSE}"; then
   as_fn_error $? "conditional \"FPARSER_SUPPORT_JIT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${FPARSER_NO_PSABI_TRUE}" && test -z "${FPARSER_NO_PSABI_FALSE}"; then
+  as_fn_error $? "conditional \"FPARSER_NO_PSABI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_FPARSER_TRUE}" && test -z "${LIBMESH_ENABLE_FPARSER_FALSE}"; then
