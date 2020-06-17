@@ -77,7 +77,9 @@ std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
   std::unique_ptr<Elem> nodeelem = libmesh_make_unique<NodeElem>(this);
   nodeelem->set_node(0) = this->node_ptr(i);
 
+#ifndef LIBMESH_ENABLE_DEPRECATED
   nodeelem->set_parent(nullptr);
+#endif
   nodeelem->set_interior_parent(this);
 
   return nodeelem;

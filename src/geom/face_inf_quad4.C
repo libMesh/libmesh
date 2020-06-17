@@ -242,7 +242,10 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
         edge->set_node(n) = this->node_ptr(InfQuad4::side_nodes_map[i][n]);
     }
 
-  edge->set_parent(nullptr);
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    edge->set_parent(nullptr);
   edge->set_interior_parent(this);
 
   return edge;

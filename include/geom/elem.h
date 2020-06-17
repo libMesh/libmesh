@@ -2308,7 +2308,10 @@ Elem::simple_build_side_ptr (const unsigned int i,
         face->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
     }
 
-  face->set_parent(nullptr);
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
   face->set_interior_parent(this);
 
   return face;
