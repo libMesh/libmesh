@@ -96,7 +96,7 @@ FPOPTIMIZER_CC_FILES=\
 EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptimizer/fpoptimizer_footer.txt
 
 
-pkg_sources = fparser.cc fparser_ad.cc Faddeeva.cc Faddeeva.hh
+pkg_sources = fparser.cc fparser_ad.cc Faddeeva.cc Faddeeva.hh ignore_opcode_warnings.hh restore_opcode_warnings.hh
 pkg_sources += lib/sha1.cpp
 if FPARSER_SUPPORT_JIT
   pkg_cppflags += -DFPARSER_JIT_COMPILER="\"$(CXX) $(CXXFLAGS)\""
@@ -104,6 +104,12 @@ endif
 
 pkg_cppflags += $(FEATURE_FLAGS)
 
+# For GCC, the -Wno-psabi flag disables the warning:
+# "the ABI of passing structure with complex float member has changed in GCC 4.4"
+# which some fparser source files trigger.
+if FPARSER_NO_PSABI
+  pkg_cppflags += -Wno-psabi
+endif
 
 # util/tree_grammar_parser is a utility which is required to build
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed

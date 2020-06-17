@@ -22,6 +22,16 @@ using namespace FPoptimizer_CodeTree;
 
 #include "lib/sha1.h"
 
+// There are several case statements in this file where we
+// intentionally want to fall through, so let's not get warned about
+// each one.
+#ifdef __GNUC__
+#if (__GNUC__ > 6)
+#  pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+#endif
+
+
 /**
  * The internals of the automatic differentiation algorithm are encapsulated in this class
  * and hidden from the public interface, as the installed FParser version does not have access

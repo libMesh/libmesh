@@ -1472,6 +1472,15 @@ namespace FPoptimizer_ByteCode
 #line 1 "fpoptimizer/bytecodesynth.cc"
 // line removed for fpoptimizer.cc: #include "bytecodesynth.hh"
 
+// There are several case statements in this file where we
+// intentionally want to fall through, so let's not get warned about
+// each one.
+#ifdef __GNUC__
+#if (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+#endif
+
 #ifdef FP_SUPPORT_OPTIMIZER
 
 // line removed for fpoptimizer.cc: #include "opcodename.hh"
@@ -8161,6 +8170,15 @@ namespace FPoptimizer_Grammar
 // line removed for fpoptimizer.cc: #include "extrasrc/fptypes.hh"
 // line removed for fpoptimizer.cc: #include "../lib/crc32.hh"
 
+// There are several case statements in this file where we
+// intentionally want to fall through, so let's not get warned about
+// each one.
+#ifdef __GNUC__
+#if (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+#endif
+
 #ifdef FP_SUPPORT_OPTIMIZER
 
 using namespace FUNCTIONPARSERTYPES;
@@ -8906,6 +8924,15 @@ namespace FPoptimizer_CodeTree
 
 // line removed for fpoptimizer.cc: #include "consts.hh"
 // line removed for fpoptimizer.cc: #include "fparser.hh"
+
+// There are several case statements in this file where we
+// intentionally want to fall through, so let's not get warned about
+// each one.
+#ifdef __GNUC__
+#if (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+#endif
 
 #ifdef FP_SUPPORT_OPTIMIZER
 
