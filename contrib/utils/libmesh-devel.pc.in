@@ -9,8 +9,7 @@ Requires: @libmesh_pkgconfig_requires@
 Version: @VERSION@
 Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_devel -ltimpi_devel \
       @libmesh_installed_LIBS@ @libmesh_optional_LIBS@
-Libs.private: 
+Libs.private:
 Cflags: @CPPFLAGS_DEVEL@ @CXXFLAGS_DEVEL@ \
-        -I${includedir} -I${includedir}/contrib \
+        -I${includedir} \
 	@libmesh_optional_INCLUDES@
-
