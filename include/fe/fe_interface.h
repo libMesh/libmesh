@@ -239,6 +239,9 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void dofs_on_side(const Elem * const elem,
                            const unsigned int dim,
@@ -252,6 +255,9 @@ public:
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void dofs_on_edge(const Elem * const elem,
                            const unsigned int dim,
@@ -268,7 +274,12 @@ public:
    * \p nodal_soln should not be used, the vector
    * \p nodal_soln is returned empty.
    *
-   * On a p-refined element, \p fe_t.order should be the base order of the element.
+   * \note On a p-refined element, \p fe_t.order should be the base
+   * order of the element. The Elem::p_level(), if any, is accounted
+   * for internally by this routine.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void nodal_soln(const unsigned int dim,
                          const FEType & fe_t,
@@ -443,8 +454,18 @@ public:
    * at point \p p. This method allows you to specify the dimension,
    * element type, and order directly.
    *
-   * \note On a p-refined element, \p fe_t.order should be the total
-   * order of the element.
+   * \note Pass \p true for \p add_p_level if you want the Elem::p_level()
+   * to be accounted for internally, pass false if you want fe_t.order to
+   * be used instead.
+   *
+   * \todo To be consistent with the other non-deprecated FEInterface
+   * routines, the shapes() and all_shapes() APIs should be updated so
+   * that they do not take \p dim as a parameter. This is a relatively
+   * large changeset with little benefit if we go the deprecation
+   * route, so it would probably be cleaner to just break backwards
+   * compatibility...  these functions seem to mainly be used
+   * internally by the library and changing them is unlikely to break
+   * application codes.
    */
   template<typename OutputType>
   static void shapes(const unsigned int dim,
@@ -463,6 +484,11 @@ public:
                          std::vector<std::vector<OutputType>> & phi,
                          const bool add_p_level = true);
 
+  /**
+   * Typedef for pointer to a function that returns FE shape function values.
+   * The \p p_level() of the passed-in \p elem is accounted for internally when
+   * the \p add_p_level flag is set to true. For more information, see fe.h.
+   */
   typedef Real (*shape_ptr) (const FEType fe_t,
                              const Elem * elem,
                              const unsigned int i,
@@ -472,12 +498,20 @@ public:
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
+   *
+   * \deprecated Call the version of this function taking an Elem* instead.
    */
   static shape_ptr
   shape_function(const unsigned int dim,
                  const FEType & fe_t,
                  const ElemType t);
 
+  /**
+   * Non-deprecated version of function above.
+   */
+  static shape_ptr
+  shape_function(const FEType & fe_t,
+                 const Elem * elem);
 
   /**
    * \returns The \f$ j^{th} \f$ coordinate of the gradient of
@@ -488,6 +522,8 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Call the version of this function taking an Elem* instead.
    */
   static Real shape_deriv(const unsigned int dim,
                           const FEType & fe_t,
@@ -505,6 +541,8 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Call the version of this function taking an Elem* instead.
    */
   static Real shape_deriv (const unsigned int dim,
                            const FEType & fe_t,
@@ -513,6 +551,30 @@ public:
                            const unsigned int j,
                            const Point & p);
 
+  /**
+   * Non-deprecated version of function above.
+   */
+  static Real shape_deriv(const FEType & fe_t,
+                          const Elem * elem,
+                          const unsigned int i,
+                          const unsigned int j,
+                          const Point & p);
+
+  /**
+   * Non-deprecated version of function above.
+   */
+  static Real shape_deriv(const FEType & fe_t,
+                          int extra_order,
+                          const Elem * elem,
+                          const unsigned int i,
+                          const unsigned int j,
+                          const Point & p);
+
+  /**
+   * Typedef for pointer to a function that returns FE shape function derivative values.
+   * The \p p_level() of the passed-in \p elem is accounted for internally when
+   * the \p add_p_level flag is set to true. For more information, see fe.h.
+   */
   typedef Real (*shape_deriv_ptr) (const FEType fet,
                                    const Elem * elem,
                                    const unsigned int i,
@@ -523,11 +585,20 @@ public:
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
+   *
+   * \deprecated Call the version of this function taking an Elem * instead.
    */
   static shape_deriv_ptr
   shape_deriv_function(const unsigned int dim,
                        const FEType & fe_t,
                        const ElemType t);
+
+  /**
+   * Non-deprecated version of the function above.
+   */
+  static shape_deriv_ptr
+  shape_deriv_function(const FEType & fe_t,
+                       const Elem * elem);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -548,6 +619,9 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Call version of this function which does not require
+   * \p dim and takes an Elem * instead.
    */
   static Real shape_second_deriv(const unsigned int dim,
                                  const FEType & fe_t,
@@ -570,6 +644,9 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
+   *
+   * \deprecated Call version of this function which does not require
+   * \p dim and takes an Elem * instead.
    */
   static Real shape_second_deriv (const unsigned int dim,
                                   const FEType & fe_t,
@@ -578,6 +655,30 @@ public:
                                   const unsigned int j,
                                   const Point & p);
 
+  /**
+   * Non-deprecated version of function above.
+   */
+  static Real shape_second_deriv(const FEType & fe_t,
+                                 const Elem * elem,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p);
+
+  /**
+   * Non-deprecated version of function above taking an \p extra_order parameter.
+   */
+  static Real shape_second_deriv(const FEType & fe_t,
+                                 int extra_order,
+                                 const Elem * elem,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point & p);
+
+  /**
+   * Typedef for pointer to a function that returns FE shape function second derivative values.
+   * The \p p_level() of the passed-in \p elem is accounted for internally when
+   * the \p add_p_level flag is set to true. For more information, see fe.h.
+   */
   typedef Real (*shape_second_deriv_ptr) (const FEType fet,
                                           const Elem * elem,
                                           const unsigned int i,
@@ -588,11 +689,21 @@ public:
   /**
    * \returns A function which evaluates shape for the
    * requested FE type and dimension.
+   *
+   * \deprecated Call the version of this function that takes an Elem * instead.
    */
   static shape_second_deriv_ptr
   shape_second_deriv_function(const unsigned int dim,
                               const FEType & fe_t,
                               const ElemType t);
+
+  /**
+   * Non-deprecated version of the function above.
+   */
+  static shape_second_deriv_ptr
+  shape_second_deriv_function(const FEType & fe_t,
+                              const Elem * elem);
+
 #endif
 
   /**
@@ -604,6 +715,9 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the base
    * order of the element.
+   *
+   * \todo For consistency with other FEInterface routines, this function
+   * should be updated so that it does not take a \p dim argument.
    */
   static void compute_data(const unsigned int dim,
                            const FEType & fe_t,

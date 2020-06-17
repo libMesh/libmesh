@@ -1498,11 +1498,30 @@ FEInterface::shape_function(const unsigned int dim,
                             const FEType & fe_t,
                             const ElemType libmesh_inf_var(t))
 {
+  // TODO
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
    {
     inf_fe_switch(shape);
    }
+#endif
+  fe_switch(shape);
+}
+
+
+
+FEInterface::shape_ptr
+FEInterface::shape_function(const FEType & fe_t,
+                            const Elem * elem)
+{
+  // dim is needed by the fe_switch macros below
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(elem->type()))
+    inf_fe_switch(shape);
 #endif
   fe_switch(shape);
 }
@@ -1515,6 +1534,9 @@ Real FEInterface::shape_deriv(const unsigned int dim,
                               const unsigned int j,
                               const Point & p)
 {
+  // TODO
+  // libmesh_deprecated();
+
   libmesh_assert_greater (dim,j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -1537,6 +1559,9 @@ Real FEInterface::shape_deriv(const unsigned int dim,
                               const unsigned int j,
                               const Point & p)
 {
+  // TODO
+  // libmesh_deprecated();
+
   libmesh_assert_greater (dim,j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -1565,13 +1590,107 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 }
 
 
+
+Real FEInterface::shape_deriv(const FEType & fe_t,
+                              const Elem * elem,
+                              const unsigned int i,
+                              const unsigned int j,
+                              const Point & p)
+{
+  auto dim = elem->dim();
+
+  libmesh_assert_greater (dim, j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (is_InfFE_elem(elem->type())){
+    return ifem_shape_deriv(dim, fe_t, elem->type(), i, j, p);
+  }
+
+#endif
+
+  // Account for Elem::p_level() when computing total order. Note: we are calling
+  // FE::shape_deriv() with the final argument == true so that the Elem::p_level()
+  // is accounted for automatically internally.
+  fe_switch(shape_deriv(elem, fe_t.order, i, j, p, true));
+
+  // We'll never get here
+  return 0;
+}
+
+
+
+Real FEInterface::shape_deriv(const FEType & fe_t,
+                              int extra_order,
+                              const Elem * elem,
+                              const unsigned int i,
+                              const unsigned int j,
+                              const Point & p)
+{
+  auto dim = elem->dim();
+
+  libmesh_assert_greater (dim, j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (elem->infinite()){
+    return ifem_shape_deriv(dim, fe_t, elem, i, j, p);
+  }
+
+#endif
+
+  // Ignore Elem::p_level() when computing total order, use
+  // extra_order instead.
+  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+
+  // We call shape_deriv() with the final argument == false so that
+  // the Elem::p_level() is ignored internally.
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_deriv(elem, total_order, i, j, p, false), return , ;);
+    case 1:
+      fe_family_switch (1, shape_deriv(elem, total_order, i, j, p, false), return , ;);
+    case 2:
+      fe_family_switch (2, shape_deriv(elem, total_order, i, j, p, false), return , ;);
+    case 3:
+      fe_family_switch (3, shape_deriv(elem, total_order, i, j, p, false), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+
+  // We'll never get here
+  return 0;
+}
+
+
+
 FEInterface::shape_deriv_ptr
 FEInterface::shape_deriv_function(const unsigned int dim,
                                   const FEType & fe_t,
                                   const ElemType libmesh_inf_var(t))
 {
+  // TODO
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
+  {
+    inf_fe_switch(shape_deriv);
+  }
+#endif
+  fe_switch(shape_deriv);
+}
+
+
+
+FEInterface::shape_deriv_ptr
+FEInterface::shape_deriv_function(const FEType & fe_t,
+                                  const Elem * elem)
+{
+  // dim is needed by the fe_switch macros below
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(elem->type()))
   {
     inf_fe_switch(shape_deriv);
   }
@@ -1588,6 +1707,9 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
+  // TODO:
+  // libmesh_deprecated();
+
   libmesh_assert_greater_equal (dim*(dim-1),j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
@@ -1620,6 +1742,9 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
+  // TODO:
+  // libmesh_deprecated();
+
   libmesh_assert_greater_equal (dim*(dim-1),j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
@@ -1645,17 +1770,116 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
 }
 
 
+
+Real FEInterface::shape_second_deriv(const FEType & fe_t,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p)
+{
+  auto dim = elem->dim();
+
+  libmesh_assert_greater_equal (dim*(dim-1),j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(elem->type()))
+    libmesh_not_implemented();
+#endif
+
+  // We are calling FE::shape_second_deriv() with the final argument
+  // == true so that the Elem::p_level() is accounted for
+  // automatically internally.
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_second_deriv(elem, fe_t.order, i, j, p, true), return , ;);
+    case 1:
+      fe_family_switch (1, shape_second_deriv(elem, fe_t.order, i, j, p, true), return , ;);
+    case 2:
+      fe_family_switch (2, shape_second_deriv(elem, fe_t.order, i, j, p, true), return , ;);
+    case 3:
+      fe_family_switch (3, shape_second_deriv(elem, fe_t.order, i, j, p, true), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+
+  // We'll never get here
+  return 0;
+}
+
+
+
+Real FEInterface::shape_second_deriv(const FEType & fe_t,
+                                     int extra_order,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p)
+{
+  auto dim = elem->dim();
+
+  libmesh_assert_greater_equal (dim*(dim-1),j);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    libmesh_not_implemented();
+#endif
+
+  // Ignore Elem::p_level() when computing total order, use
+  // extra_order instead.
+  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+
+  // We are calling FE::shape_second_deriv() with the final argument
+  // == false so that the Elem::p_level() is ignored and the
+  // total_order we compute is used instead.
+  switch(dim)
+    {
+    case 0:
+      fe_family_switch (0, shape_second_deriv(elem, total_order, i, j, p, false), return , ;);
+    case 1:
+      fe_family_switch (1, shape_second_deriv(elem, total_order, i, j, p, false), return , ;);
+    case 2:
+      fe_family_switch (2, shape_second_deriv(elem, total_order, i, j, p, false), return , ;);
+    case 3:
+      fe_family_switch (3, shape_second_deriv(elem, total_order, i, j, p, false), return , ;);
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+
+  // We'll never get here
+  return 0;
+}
+
+
+
 FEInterface::shape_second_deriv_ptr
 FEInterface::shape_second_deriv_function(const unsigned int dim,
                                          const FEType & fe_t,
                                          const ElemType libmesh_inf_var(t))
 {
+  // TODO
+  // libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
     libmesh_not_implemented();
 #endif
   fe_switch(shape_second_deriv);
 }
+
+
+
+FEInterface::shape_second_deriv_ptr
+FEInterface::shape_second_deriv_function(const FEType & fe_t,
+                                         const Elem * elem)
+{
+  auto dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (is_InfFE_elem(elem->type()))
+    libmesh_not_implemented();
+#endif
+  fe_switch(shape_second_deriv);
+}
+
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 

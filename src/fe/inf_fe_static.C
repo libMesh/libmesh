@@ -359,7 +359,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
 
       return FEInterface::shape(fe_t, base_el.get(), i_base, p)*RadialDeriv;
     }
-  return FEInterface::shape_deriv(Dim-1, fe_t, base_el.get(), i_base, j, p)
+  return FEInterface::shape_deriv(fe_t, base_el.get(), i_base, j, p)
     * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
     * InfFERadial::decay(Dim,v);
 }
@@ -512,14 +512,14 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           if (data.need_derivative())
             {
               data.dshape[i](0)     = (InfFERadial::decay(Dim,v)
-                                       * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 0, p)
+                                       * FEInterface::shape_deriv(fet, base_el.get(), i_base, 0, p)
                                        * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
                                        * time_harmonic;
 
               if (Dim > 2)
                 {
                   data.dshape[i](1)   = (InfFERadial::decay(Dim,v)
-                                         * FEInterface::shape_deriv(Dim-1, fet, base_el.get(), i_base, 1, p)
+                                         * FEInterface::shape_deriv(fet, base_el.get(), i_base, 1, p)
                                          * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))
                                          * time_harmonic;
 

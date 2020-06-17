@@ -33,7 +33,6 @@ using namespace libMesh;
 void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
 {
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType mapping_elem_type (elem->type());
   const FEType map_fe_type(elem->default_order(), mapping_family);
 
   // Note: we explicitly don't consider the elem->p_level() when
@@ -42,16 +41,14 @@ void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
     FEInterface::n_shape_functions (map_fe_type, /*extra_order=*/0, elem);
 
   // Degrees of freedom are at vertices and edge midpoints
-  std::vector<Point> dofpt;
-  dofpt.push_back(Point(-1));
-  dofpt.push_back(Point(1));
+  static const Point dofpt[2] = {Point(-1), Point(1)};
 
   // Mapping functions - first derivatives at each dofpt
   std::vector<Real> dxdxi(2);
   std::vector<Real> dxidx(2);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(1, map_fe_type, mapping_elem_type);
+    FEInterface::shape_deriv_function(map_fe_type, elem);
 
   for (int p = 0; p != 2; ++p)
     {
@@ -59,13 +56,12 @@ void hermite_compute_coefs(const Elem * elem, Real & d1xd1x, Real & d2xd2x)
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = shape_deriv_ptr
-            (map_fe_type, elem, i, 0, dofpt[p], false);
+            (map_fe_type, elem, i, 0, dofpt[p], /*add_p_level=*/false);
           dxdxi[p] += elem->point(i)(0) * ddxi;
         }
     }
 
   // Calculate derivative scaling factors
-
   d1xd1x = dxdxi[0];
   d2xd2x = dxdxi[1];
 }
