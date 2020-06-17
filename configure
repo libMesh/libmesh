@@ -35652,7 +35652,7 @@ else
   enablenox=no
 fi
 
-          if test "$enablenox" != "xno"; then :
+          if test "x$enablenox" != "xno"; then :
 
                   enablenox=yes
 
