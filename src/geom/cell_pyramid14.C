@@ -209,6 +209,7 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
 {
   libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> face;
   if (proxy)
     {
       switch (i)
@@ -217,10 +218,16 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
         case 1:
         case 2:
         case 3:
-          return libmesh_make_unique<Side<Tri6,Pyramid14>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Tri6,Pyramid14>>(this,i);
+            break;
+          }
 
         case 4:
-          return libmesh_make_unique<Side<Quad9,Pyramid14>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Quad9,Pyramid14>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -229,9 +236,6 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> face;
-
       switch (i)
         {
         case 0: // triangular face 1
@@ -251,16 +255,18 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      face->set_p_level(this->p_level());
-#endif
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Pyramid14::side_nodes_map[i][n]);
-
-      return face;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 

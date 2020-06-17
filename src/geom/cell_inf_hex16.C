@@ -181,20 +181,27 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
 {
   libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> face;
   if (proxy)
     {
       switch (i)
         {
           // base
         case 0:
-          return libmesh_make_unique<Side<Quad8,InfHex16>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Quad8,InfHex16>>(this,i);
+            break;
+          }
 
           // ifem sides
         case 1:
         case 2:
         case 3:
         case 4:
-          return libmesh_make_unique<Side<InfQuad6,InfHex16>>(this,i);
+          {
+            face = libmesh_make_unique<Side<InfQuad6,InfHex16>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -203,16 +210,13 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> face;
-
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
         {
           // the base face
         case 0:
           {
-            face = libmesh_make_unique<Quad8>();
+            face = libmesh_make_unique<Quad8>(this);
             break;
           }
 
@@ -222,7 +226,7 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
         case 3:
         case 4:
           {
-            face = libmesh_make_unique<InfQuad6>();
+            face = libmesh_make_unique<InfQuad6>(this);
             break;
           }
 
@@ -230,16 +234,18 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      face->set_p_level(this->p_level());
-#endif
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(InfHex16::side_nodes_map[i][n]);
-
-      return face;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 

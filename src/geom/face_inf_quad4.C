@@ -190,18 +190,25 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
 {
   // libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> edge;
   if (proxy)
     {
       switch (i)
         {
           // base
         case 0:
-          return libmesh_make_unique<Side<Edge2,InfQuad4>>(this,i);
+          {
+            edge = libmesh_make_unique<Side<Edge2,InfQuad4>>(this,i);
+            break;
+          }
 
           // ifem edges
         case 1:
         case 2:
-          return libmesh_make_unique<Side<InfEdge2,InfQuad4>>(this,i);
+          {
+            edge = libmesh_make_unique<Side<InfEdge2,InfQuad4>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -210,9 +217,6 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> edge;
-
       switch (i)
         {
         case 0:
@@ -233,16 +237,18 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      edge->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      edge->set_p_level(this->p_level());
-#endif
       // Set the nodes
       for (auto n : edge->node_index_range())
         edge->set_node(n) = this->node_ptr(InfQuad4::side_nodes_map[i][n]);
-
-      return edge;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    edge->set_parent(nullptr);
+  edge->set_interior_parent(this);
+
+  return edge;
 }
 
 

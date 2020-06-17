@@ -184,23 +184,7 @@ Order Hex20::default_order() const
 std::unique_ptr<Elem> Hex20::build_side_ptr (const unsigned int i,
                                              bool proxy )
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (proxy)
-    return libmesh_make_unique<Side<Quad8,Hex20>>(this,i);
-
-  else
-    {
-      std::unique_ptr<Elem> face = libmesh_make_unique<Quad8>();
-      face->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      face->set_p_level(this->p_level());
-#endif
-      for (auto n : face->node_index_range())
-        face->set_node(n) = this->node_ptr(Hex20::side_nodes_map[i][n]);
-
-      return face;
-    }
+  return this->simple_build_side_ptr<Quad8, Hex20>(i, proxy);
 }
 
 

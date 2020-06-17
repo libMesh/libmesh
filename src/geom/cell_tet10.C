@@ -213,23 +213,7 @@ unsigned int Tet10::local_edge_node(unsigned int edge,
 std::unique_ptr<Elem> Tet10::build_side_ptr (const unsigned int i,
                                              bool proxy)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (proxy)
-    return libmesh_make_unique<Side<Tri6,Tet10>>(this,i);
-
-  else
-    {
-      std::unique_ptr<Elem> face = libmesh_make_unique<Tri6>();
-      face->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      face->set_p_level(this->p_level());
-#endif
-      for (auto n : face->node_index_range())
-        face->set_node(n) = this->node_ptr(Tet10::side_nodes_map[i][n]);
-
-      return face;
-    }
+  return this->simple_build_side_ptr<Tri6, Tet10>(i, proxy);
 }
 
 
