@@ -784,8 +784,10 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
       dual_phi[j][qp] = 0;
       if (calculate_dphi)
         dual_dphi[j][qp] = 0;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (calculate_d2phi)
         dual_d2phi[j][qp] = 0;
+#endif
     }
 
   // compute dual basis
@@ -796,8 +798,10 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
         dual_phi[j][qp] += dual_coeff(i, j) * phi[i][qp];
         if (calculate_dphi)
           dual_dphi[j][qp] += dual_coeff(i, j) * dphi[i][qp];
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (calculate_d2phi)
           dual_d2phi[j][qp] += dual_coeff(i, j) * d2phi[i][qp];
+#endif
       }
 }
 
