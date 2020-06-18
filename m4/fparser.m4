@@ -90,4 +90,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
   AM_CONDITIONAL(FPARSER_DEVEL,                test x$enablefparserdevel = xyes)
   AM_CONDITIONAL(FPARSER_SUPPORT_DEBUGGING,    test x$enablefparserdebugging = xyes)
   AM_CONDITIONAL(FPARSER_SUPPORT_JIT,    test x$enablefparserjit = xyes)
+  dnl Turn on the -Wno_psabi flag when compiling with GCC to avoid warning:
+  dnl "the ABI of passing structure with complex float member has changed in GCC 4.4"
+  AM_CONDITIONAL(FPARSER_NO_PSABI, test "$GXX" = "yes" && test "x$REAL_GXX" != "x")
 ])
