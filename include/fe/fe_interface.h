@@ -809,9 +809,16 @@ private:
    * the calls to \p FE and \p InfFE.
    */
 
+  /**
+   * \deprecated Call the version of ifem_n_shape_functions() which
+   * takes a pointer-to-Elem instead.
+   */
   static unsigned int ifem_n_shape_functions(const unsigned int dim,
                                              const FEType & fe_t,
                                              const ElemType t);
+
+  static unsigned int ifem_n_shape_functions(const FEType & fe_t,
+                                             const Elem * elem);
 
   /**
    * \deprecated Call the version of ifem_n_dofs() which takes a
@@ -824,14 +831,29 @@ private:
   static unsigned int ifem_n_dofs(const FEType & fe_t,
                                   const Elem * elem);
 
+  /**
+   * \deprecated Call the version of ifem_n_dofs_at_node() which takes
+   * a pointer-to-Elem instead.
+   */
   static unsigned int ifem_n_dofs_at_node(const unsigned int dim,
                                           const FEType & fe_t,
                                           const ElemType t,
                                           const unsigned int n);
 
+  static unsigned int ifem_n_dofs_at_node(const FEType & fe_t,
+                                          const Elem * elem,
+                                          const unsigned int n);
+
+  /**
+   * \deprecated Call the version of ifem_n_dofs_per_elem() which
+   * takes a pointer-to-Elem instead.
+   */
   static unsigned int ifem_n_dofs_per_elem(const unsigned int dim,
                                            const FEType & fe_t,
                                            const ElemType t);
+
+  static unsigned int ifem_n_dofs_per_elem(const FEType & fe_t,
+                                           const Elem * elem);
 
   static void ifem_nodal_soln(const unsigned int dim,
                               const FEType & fe_t,
@@ -864,19 +886,35 @@ private:
                                         const ElemType t,
                                         const Real eps);
 
+  /**
+   * \deprecated Call version that takes a pointer-to-Elem and does
+   * not require an explicit dim parameter instead.
+   */
   static Real ifem_shape(const unsigned int dim,
                          const FEType & fe_t,
                          const ElemType t,
                          const unsigned int i,
                          const Point & p);
 
+  /**
+   * \deprecated Call version that takes a pointer-to-Elem and does
+   * not require an explicit dim parameter instead.
+   */
   static Real ifem_shape(const unsigned int dim,
                          const FEType & fe_t,
                          const Elem * elem,
                          const unsigned int i,
                          const Point & p);
 
+  static Real ifem_shape(const FEType & fe_t,
+                         const Elem * t,
+                         const unsigned int i,
+                         const Point & p);
 
+  /**
+   * \deprecated Call version that takes a pointer-to-Elem and does
+   * not require an explicit dim parameter instead.
+   */
   static Real ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
                                const ElemType t,
@@ -884,8 +922,18 @@ private:
                                const unsigned int j,
                                const Point & p);
 
+  /**
+   * \deprecated Call version that takes a pointer-to-Elem and does
+   * not require an explicit dim parameter instead.
+   */
   static Real ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
+                               const Elem * elem,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point & p);
+
+  static Real ifem_shape_deriv(const FEType & fe_t,
                                const Elem * elem,
                                const unsigned int i,
                                const unsigned int j,

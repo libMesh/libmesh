@@ -490,7 +490,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
    */
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_shape_functions(dim, fe_t, elem->type());
+    return ifem_n_shape_functions(fe_t, elem);
 
 #endif
 
@@ -518,7 +518,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
    */
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_shape_functions(dim, fe_t, elem->type());
+    return ifem_n_shape_functions(fe_t, elem);
 
 #endif
 
@@ -668,7 +668,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs_at_node(dim, fe_t, elem->type(), n);
+    return ifem_n_dofs_at_node(fe_t, elem, n);
 
 #endif
 
@@ -692,7 +692,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs_at_node(dim, fe_t, elem->type(), n);
+    return ifem_n_dofs_at_node(fe_t, elem, n);
 
 #endif
 
@@ -735,7 +735,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs_per_elem(dim, fe_t, elem->type());
+    return ifem_n_dofs_per_elem(fe_t, elem);
 
 #endif
 
@@ -758,7 +758,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
-    return ifem_n_dofs_per_elem(dim, fe_t, elem->type());
+    return ifem_n_dofs_per_elem(fe_t, elem);
 
 #endif
 
@@ -937,7 +937,7 @@ Real FEInterface::shape(const unsigned int dim,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem && is_InfFE_elem(elem->type()))
-    return ifem_shape(dim, fe_t, elem, i, p);
+    return ifem_shape(fe_t, elem, i, p);
 
 #endif
 
@@ -960,7 +960,7 @@ FEInterface::shape(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem && is_InfFE_elem(elem->type()))
-    return ifem_shape(dim, fe_t, elem, i, p);
+    return ifem_shape(fe_t, elem, i, p);
 
 #endif
 
@@ -988,7 +988,7 @@ FEInterface::shape(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem && is_InfFE_elem(elem->type()))
-    return ifem_shape(dim, fe_t, elem, i, p);
+    return ifem_shape(fe_t, elem, i, p);
 
 #endif
 
@@ -1065,7 +1065,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
   if (elem && is_InfFE_elem(elem->type()))
     {
-      phi = ifem_shape(dim, fe_t, elem, i, p);
+      phi = ifem_shape(fe_t, elem, i, p);
       return;
     }
 #endif
@@ -1109,7 +1109,7 @@ void FEInterface::shape<Real>(const FEType & fe_t,
 
   if (is_InfFE_elem(elem->type()))
     {
-      phi = ifem_shape(dim, fe_t, elem->type(), i, p);
+      phi = ifem_shape(fe_t, elem, i, p);
       return;
     }
 
@@ -1153,7 +1153,7 @@ void FEInterface::shape<Real>(const FEType & fe_t,
 
   if (is_InfFE_elem(elem->type()))
     {
-      phi = ifem_shape(dim, fe_t, elem->type(), i, p);
+      phi = ifem_shape(fe_t, elem, i, p);
       return;
     }
 
@@ -1205,7 +1205,7 @@ void FEInterface::shapes<Real>(const unsigned int dim,
       FEType elevated = fe_t;
       elevated.order = static_cast<Order>(fe_t.order + add_p_level * elem->p_level());
       for (auto qpi : index_range(p))
-        phi[qpi] = ifem_shape(dim, elevated, elem, i, p[qpi]);
+        phi[qpi] = ifem_shape(elevated, elem, i, p[qpi]);
       return;
     }
 #endif
@@ -1566,7 +1566,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem->infinite()){
-    return ifem_shape_deriv(dim, fe_t, elem, i, j, p);
+    return ifem_shape_deriv(fe_t, elem, i, j, p);
   }
 
 #endif
@@ -1603,7 +1603,7 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type())){
-    return ifem_shape_deriv(dim, fe_t, elem->type(), i, j, p);
+    return ifem_shape_deriv(fe_t, elem, i, j, p);
   }
 
 #endif
@@ -1632,7 +1632,7 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem->infinite()){
-    return ifem_shape_deriv(dim, fe_t, elem, i, j, p);
+    return ifem_shape_deriv(fe_t, elem, i, j, p);
   }
 
 #endif
