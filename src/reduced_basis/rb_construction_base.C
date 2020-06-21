@@ -109,6 +109,10 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
+
+  if(training_parameters.empty())
+    return 0;
+
   return training_parameters.begin()->second->local_size();
 }
 
@@ -116,6 +120,10 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
+
+  if(training_parameters.empty())
+    return 0;
+
   return training_parameters.begin()->second->first_local_index();
 }
 
@@ -123,6 +131,10 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_last_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
+
+  if(training_parameters.empty())
+    return 0;
+
   return training_parameters.begin()->second->last_local_index();
 }
 
