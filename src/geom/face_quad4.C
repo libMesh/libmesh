@@ -157,19 +157,7 @@ std::unique_ptr<Elem> Quad4::build_side_ptr (const unsigned int i,
 void Quad4::build_side_ptr (std::unique_ptr<Elem> & side,
                             const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (!side.get() || side->type() != EDGE2)
-    side = this->build_side_ptr(i, false);
-  else
-    {
-      side->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      side->set_p_level(this->p_level());
-#endif
-      for (auto n : side->node_index_range())
-        side->set_node(n) = this->node_ptr(Quad4::side_nodes_map[i][n]);
-    }
+  this->simple_build_side_ptr<Quad4>(side, i, EDGE2);
 }
 
 
