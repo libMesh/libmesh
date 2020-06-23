@@ -496,9 +496,9 @@ Node * ReplicatedMesh::add_node (Node * n)
 
   // If the user requests a valid id, either set the existing
   // container entry or resize the container to fit the new node.
-  const dof_id_type id = n->id();
-  if (id != DofObject::invalid_id)
+  if (n->valid_id())
     {
+      const dof_id_type id = n->id();
       if (id < _nodes.size())
         libmesh_assert(!_nodes[id]);
       else
