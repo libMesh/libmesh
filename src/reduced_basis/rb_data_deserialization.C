@@ -880,11 +880,9 @@ void load_elem_into_mesh(RBData::MeshElem::Reader mesh_elem_reader,
 
   for (unsigned int i=0; i < n_points; ++i)
     {
-      libMesh::Node * node = new libMesh::Node(mesh_elem_point_list[i].getX(),
-                                               mesh_elem_point_list[i].getY(),
-                                               mesh_elem_point_list[i].getZ());
-
-      mesh.add_node(node);
+      libMesh::Node * node = mesh.add_point(mesh_elem_point_list[i].getX(),
+                                            mesh_elem_point_list[i].getY(),
+                                            mesh_elem_point_list[i].getZ());
 
       elem->set_node(i) = node;
     }
