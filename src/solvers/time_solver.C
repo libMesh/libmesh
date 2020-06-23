@@ -98,6 +98,10 @@ void TimeSolver::set_solution_history (const SolutionHistory & _solution_history
   solution_history = _solution_history.clone();
 }
 
+std::shared_ptr<SolutionHistory> TimeSolver::get_solution_history ()
+{
+  return solution_history;
+}
 void TimeSolver::advance_timestep ()
 {
 }

@@ -226,6 +226,19 @@ public:
   void set_solution_history(const SolutionHistory & _solution_history);
 
   /**
+   * A setter function for the replace_stored_entry boolen owned by
+   * the solution history object
+   * */
+  void set_solution_history_replace_stored_entry(bool val)
+  { solution_history->set_replace_last_stored(val); }
+
+  /**
+   * A getter function that returns a reference to the solution history
+   * object owned by TimeSolver
+   * */
+  std::shared_ptr<SolutionHistory> get_solution_history();
+
+  /**
    * Accessor for querying whether we need to do a primal
    * or adjoint solve
    */
@@ -261,7 +274,7 @@ protected:
    * NoSolutionHistory, which the user can override by declaring a
    * different kind of SolutionHistory in the application
    */
-  std::unique_ptr<SolutionHistory> solution_history;
+  std::shared_ptr<SolutionHistory> solution_history;
 
   /**
    * Definitions of argument types for use in refactoring subclasses.
