@@ -40,7 +40,7 @@ public:
    * Constructor
    */
   SolutionHistory() :
-    overwrite_previously_stored(false) {}
+    overwrite_previously_stored(false), replace_last_stored(false) {}
 
   /**
    * Destructor
@@ -61,7 +61,7 @@ public:
    * Cloning function for a std::unique_ptr, pure virtual, used in the
    * setter function in time_solver.C
    */
-  virtual std::unique_ptr<SolutionHistory > clone() const = 0;
+  virtual std::shared_ptr<SolutionHistory > clone() const = 0;
 
   /**
    * Turn on overwrite_previously_stored to overwrite any
@@ -70,11 +70,22 @@ public:
   void set_overwrite_previously_stored (bool val)
   { overwrite_previously_stored = val; }
 
+  /**
+   * Turn on replace_last_stored to replace the last entry
+   * in the SolutionHistory data structure
+   */
+  void set_replace_last_stored (bool val)
+  { replace_last_stored = val; }
+
 protected:
 
   // Flag to specify whether we want to overwrite previously stored
   // vectors at a given time or not
   bool overwrite_previously_stored;
+
+  // Flag to specify whether we want to store the incoming solution
+  // in a new SolutionHistory entry or replace the last entry
+  bool replace_last_stored;
 };
 
 } // end namespace libMesh
