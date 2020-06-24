@@ -498,16 +498,19 @@ int main (int argc, char ** argv)
           // Solve the forward problem at time t, to obtain the solution at time t + dt
           system.solve();
 
+          // Advance to the next timestep in a transient problem
+          // Increments the time, stores the solution and localizes the old nonlinear solution
+          // for the non-adaptive time solver, does nothing if the time solver
+          // is adaptive
+          libMesh::out << "Advancing timestep" << std::endl << std::endl;
+          system.time_solver->advance_timestep();
+
           // Output the H1 norm of the computed solution
           libMesh::out << "|U("
-                       << system.time + system.deltat
+                       << system.time
                        << ")|= "
                        << system.calculate_norm(*system.solution, 0, H1)
                        << std::endl;
-
-          // Advance to the next timestep in a transient problem
-          libMesh::out << "Advancing timestep" << std::endl << std::endl;
-          system.time_solver->advance_timestep();
 
           // Write out this timestep
           write_output(equation_systems, t_step+1, "primal", param);
@@ -578,9 +581,10 @@ int main (int argc, char ** argv)
       // Now that the adjoint initial condition is set, we will start the
       // backwards in time adjoint integration
 
-      // For loop stepping backwards in time
-      for (unsigned int t_step=param.initial_timestep;
-           t_step != param.initial_timestep + param.n_timesteps; ++t_step)
+      // A backwards in time while loop
+      unsigned int t_step = 0;
+
+      while(system.time > 0)
         {
           //A pretty update message
           libMesh::out << " Solving adjoint time step "
@@ -641,8 +645,13 @@ int main (int argc, char ** argv)
 
           // Swap back
           primal_solution.swap(dual_solution_0);
+
+          t_step = t_step + 1;
         }
       // End adjoint timestep loop
+
+      // The total number of timesteps
+      unsigned int total_number_timesteps = t_step;
 
       // Now that we have computed both the primal and adjoint solutions, we compute the sensitivities to the parameter p
       // dQ/dp = partialQ/partialp - partialR/partialp
@@ -654,8 +663,8 @@ int main (int argc, char ** argv)
 
       // Now we begin the timestep loop to compute the time-accurate
       // adjoint sensitivities
-      for (unsigned int t_step=param.initial_timestep;
-           t_step != param.initial_timestep + param.n_timesteps; ++t_step)
+      for (unsigned int t_step=0;
+           t_step != total_number_timesteps; ++t_step)
         {
           // A pretty update message
           libMesh::out << "Retrieving "
@@ -740,10 +749,10 @@ int main (int argc, char ** argv)
       // 32-bit floats
       if(param.timesolver_tolerance)
       {
-        if(std::abs(system.time - (1.00285)) >= 2.e-4)
+        if(std::abs(system.time - (1.0089)) >= 2.e-4)
         libmesh_error_msg("Mismatch in end time reached by adaptive timestepper!");
 
-        if(std::abs(sensitivity_0_0 - (-4.85298)) >= 2.e-4)
+        if(std::abs(sensitivity_0_0 - (-4.87767)) >= 2.e-4)
         libmesh_error_msg("Mismatch in sensitivity gold value!");
       }
       else
