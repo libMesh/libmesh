@@ -663,12 +663,12 @@ int main (int argc, char ** argv)
 
       // Now we begin the timestep loop to compute the time-accurate
       // adjoint sensitivities
-      for (unsigned int t_step=0;
-           t_step != total_number_timesteps; ++t_step)
+      for (unsigned int t_step_counter=0;
+           t_step_counter != total_number_timesteps; ++t_step_counter)
         {
           // A pretty update message
           libMesh::out << "Retrieving "
-                       << t_step
+                       << t_step_counter
                        << ", time = "
                        << system.time
                        << std::endl;
