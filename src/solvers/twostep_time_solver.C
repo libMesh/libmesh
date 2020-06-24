@@ -47,9 +47,6 @@ void TwostepTimeSolver::solve()
 {
   libmesh_assert(core_time_solver.get());
 
-  // All actual solution history operations are handled by the outer
-  // solver, so the outer solver has to call advance_timestep and
-  // call solution_history->store to store the initial conditions
   if (first_solve)
     {
       advance_timestep();
@@ -63,6 +60,15 @@ void TwostepTimeSolver::solve()
   // Calculating error values each time
   Real single_norm(0.), double_norm(0.), error_norm(0.),
     relative_error(0.);
+
+  // A boolean to check whether we are in the first attempt to time integrate
+  bool first_attempt_to_timestep = true;
+
+  // The loop below will change system time and deltat based on calculations
+  // We will need to save these for calculating the deltat for the next timestep
+  // once the while loop converges
+  Real old_time;
+  Real old_deltat;
 
   while (!max_tolerance_met)
     {
@@ -105,11 +111,28 @@ void TwostepTimeSolver::solve()
       // do *something* if it happens
       core_time_solver->reduce_deltat_on_diffsolver_failure = 0;
 
-      Real old_time = _system.time;
-      Real old_deltat = _system.deltat;
+      old_time = _system.time;
+      old_deltat = _system.deltat;
       _system.deltat *= 0.5;
+
+      // Attempt the 'half timestep solve'
       core_time_solver->solve();
+
+      // If we are saving solution histories, the core time solver
+      // will write out half solutions, and these solves can be attempted
+      // repeatedly. So aside from the first attempt to timestep, where
+      // solution history will create a new entry in its data structure,
+      // we will ask solution history to replace rather than emplace.
+      if(!first_attempt_to_timestep)
+        core_time_solver->set_solution_history_replace_stored_entry(true);
+
       core_time_solver->advance_timestep();
+
+      // Default for any solution history object has to be to append, not replace
+      core_time_solver->set_solution_history_replace_stored_entry(false);
+
+      // Attempt the second half timestep solve, solution history for this solution
+      // comes into play only if we match the tolerance, so outside the while loop
       core_time_solver->solve();
 
       single_norm = calculate_norm(_system, *_system.solution);
@@ -121,13 +144,6 @@ void TwostepTimeSolver::solve()
       // Reset the core_time_solver's reduce_deltat... value.
       core_time_solver->reduce_deltat_on_diffsolver_failure =
         this->reduce_deltat_on_diffsolver_failure;
-
-      // But then back off just in case our advance_timestep() isn't
-      // called.
-      // FIXME: this probably doesn't work with multistep methods
-      _system.get_vector("_old_nonlinear_solution") = *old_solution;
-      _system.time = old_time;
-      _system.deltat = old_deltat;
 
       // Find the relative error
       *double_solution -= *(_system.solution);
@@ -150,7 +166,7 @@ void TwostepTimeSolver::solve()
                        << (error_norm / _system.deltat /
                            std::max(double_norm, single_norm))
                        << std::endl;
-          libMesh::out << "old delta t = " << _system.deltat << std::endl;
+          libMesh::out << "old delta t = " << old_deltat << std::endl;
         }
 
       // If our upper tolerance is negative, that means we want to set
@@ -162,6 +178,12 @@ void TwostepTimeSolver::solve()
       // repeat this timestep entirely
       if (this->upper_tolerance && relative_error > this->upper_tolerance)
         {
+          // We will be retrying this timestep with deltat/2, so restore all the necessary state.
+          // FIXME: this probably doesn't work with multistep methods
+          _system.get_vector("_old_nonlinear_solution") = *old_solution;
+          _system.time = old_time;
+          _system.deltat = old_deltat;
+
           // Reset the initial guess for our next try
           *(_system.solution) =
             _system.get_vector("_old_nonlinear_solution");
@@ -179,12 +201,20 @@ void TwostepTimeSolver::solve()
         }
       else
         max_tolerance_met = true;
+
+      // If we are here, this is not the first attempt to timestep
+      first_attempt_to_timestep = false;
     }
 
+  // Now that we have the converged full solution, advance the timestep and store it
+  core_time_solver->advance_timestep();
 
-  // Otherwise, compare the relative error to the tolerance
-  // and adjust deltat
-  last_deltat = _system.deltat;
+  // Now that we have computed the solution for the next time, computed relevant error
+  // quantities and advanced the timestep, we can go back and compute the deltat for the
+  // the next timestep
+  // First restore the last deltat, since we will directly scale the system.deltat with
+  // the expansion/shrinkage factor we end up with
+  _system.deltat = old_deltat;
 
   // If our target tolerance is negative, that means we want to set
   // it based on the first successful time step
