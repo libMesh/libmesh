@@ -77,25 +77,45 @@ void MemorySolutionHistory::store(bool /* is_adjoint_solve */)
       stored_sols = stored_solutions.begin();
     }
 
-  // If we're past the end we can create a new entry
-  if (_system.time - stored_sols->first > TOLERANCE )
+  // If we are asked to replace the last stored entry do so, otherwise
+  // create a new entry
+  if (replace_last_stored)
+  {
+    // Check that stored_solutions is not empty
+    #ifndef NDEBUG
+    libmesh_assert (stored_solutions.begin() != stored_solutions.end());
+    #endif
+
+    list_type::reverse_iterator stored_sols_last;
+    stored_sols_last = stored_solutions.rbegin();
+    stored_solutions.erase(std::next(stored_sols_last).base());
+    stored_solutions.emplace_back(_system.time, map_type());
+    stored_sols = stored_solutions.end();
+    --stored_sols;
+  }
+  else
+  {
+    // If we're past the end we can create a new entry
+    if (_system.time - stored_sols->first > TOLERANCE )
     {
-#ifndef NDEBUG
+      #ifndef NDEBUG
       ++stored_sols;
       libmesh_assert (stored_sols == stored_solutions.end());
-#endif
+      #endif
+
       stored_solutions.emplace_back(_system.time, map_type());
       stored_sols = stored_solutions.end();
       --stored_sols;
     }
 
-  // If we're before the beginning we can create a new entry
-  else if (stored_sols->first - _system.time > TOLERANCE)
+    // If we're before the beginning we can create a new entry
+    else if (stored_sols->first - _system.time > TOLERANCE)
     {
       libmesh_assert (stored_sols == stored_solutions.begin());
       stored_solutions.emplace_front(_system.time, map_type());
       stored_sols = stored_solutions.begin();
     }
+  }
 
   // We don't support inserting entries elsewhere
   libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE);
