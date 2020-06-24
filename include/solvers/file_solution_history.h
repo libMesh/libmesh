@@ -79,7 +79,7 @@ public:
   /**
    * Definition of the clone function needed for the setter function
    */
-  virtual std::unique_ptr<SolutionHistory > clone() const override
+  virtual std::shared_ptr<SolutionHistory > clone() const override
   {
     return libmesh_make_unique<FileSolutionHistory>(_system);
   }

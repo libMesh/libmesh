@@ -72,11 +72,12 @@ public:
   typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>> map_type;
   typedef std::list<std::pair<Real, map_type>> list_type;
   typedef list_type::iterator stored_solutions_iterator;
+  //typedef list_type::reverse_iterator stored_solutions_reverse_iterator;
 
   /**
    * Definition of the clone function needed for the setter function
    */
-  virtual std::unique_ptr<SolutionHistory > clone() const override
+  virtual std::shared_ptr<SolutionHistory > clone() const override
   {
     return libmesh_make_unique<MemorySolutionHistory>(_system);
   }
