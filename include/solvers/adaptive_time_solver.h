@@ -74,6 +74,10 @@ public:
 
   virtual void advance_timestep() override;
 
+  virtual void adjoint_advance_timestep() override;
+
+  virtual void retrieve_timestep() override;
+
   /**
    * This method is passed on to the core_time_solver
    */

@@ -19,6 +19,7 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/no_solution_history.h"
 
 namespace libMesh
 {
@@ -64,6 +65,16 @@ void AdaptiveTimeSolver::init()
   // needs to handle new vectors, diff_solver->init(), etc
   core_time_solver->init();
 
+  // Set the core_time_solver's solution history object to be the same one as
+  // that for the outer adaptive time solver
+  core_time_solver->set_solution_history(*(this->get_solution_history()));
+
+  // Now that we have set the SolutionHistory object for the coretimesolver,
+  // we set the SolutionHistory type for the timesolver to be NoSolutionHistory
+  // All storage and retrieval will be handled by the coretimesolver directly.
+  NoSolutionHistory outersolver_solution_history;
+  this->set_solution_history(outersolver_solution_history);
+
   // As an UnsteadySolver, we have an old_local_nonlinear_solution, but it
   // isn't pointing to the right place - fix it
   //
@@ -87,27 +98,31 @@ void AdaptiveTimeSolver::reinit()
 
 void AdaptiveTimeSolver::advance_timestep ()
 {
-  // The first access of advance_timestep happens via solve, not user code
-  // It is used here to store any initial conditions data
-  if (!first_solve)
-    {
-      // We call advance_timestep in user code after solve, so any solutions
-      // we will be storing will be for the next time instance
-      _system.time += _system.deltat;
-    }
-    else
-    {
-      // We are here because of a call to advance_timestep that happens
-      // via solve, the very first solve. All we are doing here is storing
-      // the initial condition. The actual solution computed via this solve
-      // will be stored when we call advance_timestep in the user's timestep loop
-      first_solve = false;
-    }
+  // // The first access of advance_timestep happens via solve, not user code
+  // // It is used here to store any initial conditions data
+  // //if (!first_solve)
+  //   {
+  //     // We call advance_timestep in user code after solve, so any solutions
+  //     // we will be storing will be for the next time instance
+  //     _system.time += _system.deltat;
+  //   }
+  //   else
+  //   {
+  //     // We are here because of a call to advance_timestep that happens
+  //     // via solve, the very first solve. All we are doing here is storing
+  //     // the initial condition. The actual solution computed via this solve
+  //     // will be stored when we call advance_timestep in the user's timestep loop
+  //     first_solve = false;
+  //   }
 
   // If the user has attached a memory or file solution history object
   // to the solver, this will store the current solution indexed with
   // the current time
-  solution_history->store(false);
+  // Remember that for the adaptive time solver, all SH operations
+  // are handled by the core_time_solver's SH object
+  // The outer solver's SH object is turned into a dummy NSH object
+  // after it has been used to initialize the core_time_solver's SH object
+  //core_time_solver->advance_timestep();
 
   NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
@@ -121,7 +136,28 @@ void AdaptiveTimeSolver::advance_timestep ()
      _system.get_dof_map().get_send_list());
 }
 
+void AdaptiveTimeSolver::adjoint_advance_timestep ()
+{
+  // Call the core time solver's adjoint_advance_timestep
+  core_time_solver->adjoint_advance_timestep();
 
+  // Dont forget to localize the old_nonlinear_solution !
+  _system.get_vector("_old_nonlinear_solution").localize
+    (*old_local_nonlinear_solution,
+     _system.get_dof_map().get_send_list());
+}
+
+void AdaptiveTimeSolver::retrieve_timestep ()
+{
+  // Ask the core time solver to retrieve all the stored vectors
+  // at the current time
+  core_time_solver->retrieve_timestep();
+
+  // Dont forget to localize the old_nonlinear_solution !
+  _system.get_vector("_old_nonlinear_solution").localize
+    (*old_local_nonlinear_solution,
+     _system.get_dof_map().get_send_list());
+}
 
 Real AdaptiveTimeSolver::error_order () const
 {
