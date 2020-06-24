@@ -1201,6 +1201,53 @@ void PetscMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 }
 
 
+template <typename T>
+void PetscMatrix<T>::mat_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out)
+{
+  libmesh_assert (this->initialized());
+
+   // sanity check.
+   libmesh_assert_equal_to (this->n(), X_in.m());
+   libmesh_assert_equal_to (this->m(), Y_out.m());
+   libmesh_assert_equal_to (X_in.n(), Y_out.n());
+
+   const PetscMatrix<T> * X = cast_ptr<const PetscMatrix<T> *> (&X_in);
+   PetscMatrix<T> * Y = cast_ptr<PetscMatrix<T> *> (&Y_out);
+
+   libmesh_assert (X);
+   libmesh_assert (Y);
+
+   PetscErrorCode ierr=0;
+
+   // the matrix from which we copy the values has to be assembled/closed
+   libmesh_assert(X->closed());
+
+   semiparallel_only();
+
+   ierr = MatMatMult(_mat, X->_mat, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Y->_mat);
+   LIBMESH_CHKERR(ierr);
+
+}
+
+template <typename T>
+void PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
+                        const std::vector<numeric_index_type> & rows,
+                        const std::vector<numeric_index_type> & cols,
+                        const T scalar)
+{
+  libmesh_assert_equal_to(spm.m(), rows.size());
+  libmesh_assert_equal_to(spm.n(), cols.size());
+
+  for(unsigned int i = 0; i<rows.size(); ++i)
+  {
+    std::vector<numeric_index_type> indices;
+    std::vector<T> values;
+    spm.get_row(i, indices, values);
+    for (unsigned int j=0; j<indices.size(); ++j)
+      this->add (rows[i], cols[indices[j]], scalar*values[j]);
+  }
+}
+
 
 
 template <typename T>
