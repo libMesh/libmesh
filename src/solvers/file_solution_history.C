@@ -40,30 +40,22 @@ void FileSolutionHistory::find_stored_entry(Real time)
 
   libmesh_assert (stored_sols != stored_solutions.end());
 
-  if (std::abs(stored_sols->first - time) < TOLERANCE)
-    return;
+  // We will use the map::lower_bound operation to find the least key, which
+  // is the least upper bound among all the keys for the time of our interest.
+  // (key before map::lower_bound) < time < map::lower_bound, one of these
+  // will be within TOLERANCE of time (unless we are creating a new map entry)
+  stored_solutions_iterator lower_bound_it = stored_solutions.lower_bound(time);
 
-  // If we're not at the front, check the previous entry
-  if (stored_sols != stored_solutions.begin())
-    {
-      stored_solutions_iterator test_it = stored_sols;
-      if (std::abs((--test_it)->first - time) < TOLERANCE)
-        {
-          --stored_sols;
-          return;
-        }
-    }
+  // Set the stored sols iterator to whichever key is within TOLERANCE of time
+  if(std::abs(lower_bound_it->first - time) < TOLERANCE)
+  {
+    stored_sols = stored_solutions.find(time);
+  }
+  else if(std::abs((--lower_bound_it)->first - time) < TOLERANCE)
+  {
+    stored_sols = stored_solutions.find(time);
+  }
 
-  // If we're not at the end, check the subsequent entry
-  stored_solutions_iterator test_it = stored_sols;
-  if ((++test_it) != stored_solutions.end())
-    {
-      if (std::abs(test_it->first - time) < TOLERANCE)
-        {
-          ++stored_sols;
-          return;
-        }
-    }
 }
 
 // This functions writes the solution at the current system time to disk
