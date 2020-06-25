@@ -31,21 +31,21 @@ MemorySolutionHistory::~MemorySolutionHistory ()
 
 // This function finds, if it can, the entry where we're supposed to
 // be storing data
-void MemorySolutionHistory::find_stored_entry()
+void MemorySolutionHistory::find_stored_entry(Real time)
 {
   if (stored_solutions.begin() == stored_solutions.end())
     return;
 
   libmesh_assert (stored_sols != stored_solutions.end());
 
-  if (std::abs(stored_sols->first - _system.time) < TOLERANCE)
+  if (std::abs(stored_sols->first - time) < TOLERANCE)
     return;
 
   // If we're not at the front, check the previous entry
   if (stored_sols != stored_solutions.begin())
     {
       stored_solutions_iterator test_it = stored_sols;
-      if (std::abs((--test_it)->first - _system.time) < TOLERANCE)
+      if (std::abs((--test_it)->first - time) < TOLERANCE)
         {
           --stored_sols;
           return;
@@ -56,7 +56,7 @@ void MemorySolutionHistory::find_stored_entry()
   stored_solutions_iterator test_it = stored_sols;
   if ((++test_it) != stored_solutions.end())
     {
-      if (std::abs(test_it->first - _system.time) < TOLERANCE)
+      if (std::abs(test_it->first - time) < TOLERANCE)
         {
           ++stored_sols;
           return;
@@ -66,39 +66,39 @@ void MemorySolutionHistory::find_stored_entry()
 
 // This functions saves all the 'projection-worthy' system vectors for
 // future use
-void MemorySolutionHistory::store(bool /* is_adjoint_solve */)
+void MemorySolutionHistory::store(bool /* is_adjoint_solve */, Real time)
 {
-  this->find_stored_entry();
+  this->find_stored_entry(time);
 
   // In an empty history we create the first entry
   if (stored_solutions.begin() == stored_solutions.end())
     {
-      stored_solutions.emplace_back(_system.time, map_type());
+      stored_solutions.emplace_back(time, map_type());
       stored_sols = stored_solutions.begin();
     }
 
   // If we're past the end we can create a new entry
-  if (_system.time - stored_sols->first > TOLERANCE )
+  if (time - stored_sols->first > TOLERANCE )
     {
 #ifndef NDEBUG
       ++stored_sols;
       libmesh_assert (stored_sols == stored_solutions.end());
 #endif
-      stored_solutions.emplace_back(_system.time, map_type());
+      stored_solutions.emplace_back(time, map_type());
       stored_sols = stored_solutions.end();
       --stored_sols;
     }
 
   // If we're before the beginning we can create a new entry
-  else if (stored_sols->first - _system.time > TOLERANCE)
+  else if (stored_sols->first - time > TOLERANCE)
     {
       libmesh_assert (stored_sols == stored_solutions.begin());
-      stored_solutions.emplace_front(_system.time, map_type());
+      stored_solutions.emplace_front(time, map_type());
       stored_sols = stored_solutions.begin();
     }
 
   // We don't support inserting entries elsewhere
-  libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE);
+  libmesh_assert(std::abs(stored_sols->first - time) < TOLERANCE);
 
   // Map of stored vectors for this solution step
   std::map<std::string, std::unique_ptr<NumericVector<Number>>> & saved_vectors = stored_sols->second;
@@ -130,9 +130,9 @@ void MemorySolutionHistory::store(bool /* is_adjoint_solve */)
     saved_vectors[_solution] = _system.solution->clone();
 }
 
-void MemorySolutionHistory::retrieve(bool is_adjoint_solve)
+void MemorySolutionHistory::retrieve(bool is_adjoint_solve, Real time)
 {
-  this->find_stored_entry();
+  this->find_stored_entry(time);
 
   // To set the deltat while using adaptive timestepping, we will utilize
   // consecutive time entries in the stored solutions iterator
@@ -195,7 +195,7 @@ void MemorySolutionHistory::retrieve(bool is_adjoint_solve)
   // Do we not have a solution for this time?  Then
   // there's nothing to do.
   if (stored_sols == stored_solutions.end() ||
-      std::abs(recovery_time - _system.time) > TOLERANCE)
+      std::abs(recovery_time - time) > TOLERANCE)
     {
       //libMesh::out << "No more solutions to recover ! We are at time t = " <<
       //                     _system.time << std::endl;

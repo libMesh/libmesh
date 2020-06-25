@@ -33,21 +33,21 @@ FileSolutionHistory::~FileSolutionHistory ()
 
 // This function finds, if it can, the entry where we're supposed to
 // be storing data
-void FileSolutionHistory::find_stored_entry()
+void FileSolutionHistory::find_stored_entry(Real time)
 {
   if (stored_solutions.begin() == stored_solutions.end())
     return;
 
   libmesh_assert (stored_sols != stored_solutions.end());
 
-  if (std::abs(stored_sols->first - _system.time) < TOLERANCE)
+  if (std::abs(stored_sols->first - time) < TOLERANCE)
     return;
 
   // If we're not at the front, check the previous entry
   if (stored_sols != stored_solutions.begin())
     {
       stored_solutions_iterator test_it = stored_sols;
-      if (std::abs((--test_it)->first - _system.time) < TOLERANCE)
+      if (std::abs((--test_it)->first - time) < TOLERANCE)
         {
           --stored_sols;
           return;
@@ -58,7 +58,7 @@ void FileSolutionHistory::find_stored_entry()
   stored_solutions_iterator test_it = stored_sols;
   if ((++test_it) != stored_solutions.end())
     {
-      if (std::abs(test_it->first - _system.time) < TOLERANCE)
+      if (std::abs(test_it->first - time) < TOLERANCE)
         {
           ++stored_sols;
           return;
@@ -67,47 +67,47 @@ void FileSolutionHistory::find_stored_entry()
 }
 
 // This functions writes the solution at the current system time to disk
-void FileSolutionHistory::store(bool is_adjoint_solve)
+void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
 {
   // This will map the stored_sols iterator to the current time
-  this->find_stored_entry();
+  this->find_stored_entry(time);
 
   // In an empty history we create the first entry
   if (stored_solutions.begin() == stored_solutions.end())
     {
-      stored_solutions.emplace_back( _system.time, std::string()  );
+      stored_solutions.emplace_back( time, std::string()  );
       stored_sols = stored_solutions.begin();
     }
 
   // If we're past the end we can create a new entry
-  if (_system.time - stored_sols->first > TOLERANCE )
+  if (time - stored_sols->first > TOLERANCE )
     {
 #ifndef NDEBUG
       ++stored_sols;
       libmesh_assert (stored_sols == stored_solutions.end());
 #endif
-      stored_solutions.emplace_back( _system.time, std::string() );
+      stored_solutions.emplace_back( time, std::string() );
       stored_sols = stored_solutions.end();
       --stored_sols;
     }
 
   // If we're before the beginning we can create a new entry
-  else if (stored_sols->first - _system.time > TOLERANCE)
+  else if (stored_sols->first - time > TOLERANCE)
     {
       libmesh_assert (stored_sols == stored_solutions.begin());
-      stored_solutions.emplace_front( _system.time, std::string() );
+      stored_solutions.emplace_front( time, std::string() );
       stored_sols = stored_solutions.begin();
     }
 
   // We don't support inserting entries elsewhere
-  libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE);
+  libmesh_assert(std::abs(stored_sols->first - time) < TOLERANCE);
 
   // The name of the file to in which we store the solution from the current timestep
   std::string & solution_filename = stored_sols->second;
 
   // This iterator will be used to check if we have already assigned a timestamp for this time key
   // If we have, we are in the adjoint loop, if we have not, we are in the primal loop
-  timeTotimestamp_iterator = timeTotimestamp.find(_system.time);
+  timeTotimestamp_iterator = timeTotimestamp.find(time);
 
   // Associate the localTimestamp to the current time, if we are in the primal solve loop
   // Then increment the localTimestamp
@@ -120,7 +120,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve)
     // Write the current primal solution out to file
     _system.get_equation_systems().write (solution_filename, WRITE, EquationSystems::WRITE_DATA | EquationSystems::WRITE_ADDITIONAL_DATA);
 
-    timeTotimestamp.insert( std::pair<Real, unsigned int>(_system.time, localTimestamp) );
+    timeTotimestamp.insert( std::pair<Real, unsigned int>(time, localTimestamp) );
 
     ++localTimestamp;
   }
@@ -140,9 +140,9 @@ void FileSolutionHistory::store(bool is_adjoint_solve)
 
 }
 
-void FileSolutionHistory::retrieve(bool is_adjoint_solve)
+void FileSolutionHistory::retrieve(bool is_adjoint_solve, Real time)
 {
-  this->find_stored_entry();
+  this->find_stored_entry(time);
 
   // To set the deltat while using adaptive timestepping, we will utilize
   // consecutive time entries in the stored solutions iterator
@@ -201,7 +201,7 @@ void FileSolutionHistory::retrieve(bool is_adjoint_solve)
   // Do we not have a solution for this time?  Then
   // there's nothing to do.
   if (stored_sols == stored_solutions.end() ||
-      std::abs(recovery_time - _system.time) > TOLERANCE)
+      std::abs(recovery_time - time) > TOLERANCE)
     {
       //libMesh::out << "No more solutions to recover ! We are at time t = " <<
       //                     _system.time << std::endl;

@@ -58,12 +58,12 @@ public:
   /**
    * Virtual function store which we will be overriding to store timesteps
    */
-  virtual void store(bool is_adjoint_solve) override;
+  virtual void store(bool is_adjoint_solve, Real time) override;
 
   /**
    * Virtual function retrieve which we will be overriding to retrieve timesteps
    */
-  virtual void retrieve(bool is_adjoint_solve) override;
+  virtual void retrieve(bool is_adjoint_solve, Real time) override;
 
   /**
    * Typedef for Stored Solutions iterator, a list of pairs of the current
@@ -91,7 +91,7 @@ private:
   stored_solutions_iterator stored_sols;
 
   // A helper function to locate entries at a given time
-  void find_stored_entry();
+  void find_stored_entry(Real time);
 
   // A system reference
   System & _system ;
