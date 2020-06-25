@@ -75,7 +75,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
   // In an empty history we create the first entry
   if (stored_solutions.begin() == stored_solutions.end())
     {
-      stored_solutions.emplace_back( time, std::string()  );
+      stored_solutions[time] = std::string();
       stored_sols = stored_solutions.begin();
     }
 
@@ -86,7 +86,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
       ++stored_sols;
       libmesh_assert (stored_sols == stored_solutions.end());
 #endif
-      stored_solutions.emplace_back( time, std::string() );
+      stored_solutions[time] = std::string();
       stored_sols = stored_solutions.end();
       --stored_sols;
     }
@@ -95,7 +95,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
   else if (stored_sols->first - time > TOLERANCE)
     {
       libmesh_assert (stored_sols == stored_solutions.begin());
-      stored_solutions.emplace_front( time, std::string() );
+      stored_solutions[time] = std::string();
       stored_sols = stored_solutions.begin();
     }
 

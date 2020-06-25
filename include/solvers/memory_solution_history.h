@@ -70,8 +70,8 @@ public:
    * system time, map of strings and saved vectors
    */
   typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>> map_type;
-  typedef std::list<std::pair<Real, map_type>> list_type;
-  typedef list_type::iterator stored_solutions_iterator;
+  typedef std::map<Real, map_type> map_map_type;
+  typedef map_map_type::iterator stored_solutions_iterator;
 
   /**
    * Definition of the clone function needed for the setter function
@@ -85,7 +85,7 @@ private:
 
   // This list of pairs will hold the current time and stored vectors
   // from each timestep
-  list_type stored_solutions;
+  map_map_type stored_solutions;
 
   // The stored solutions iterator
   stored_solutions_iterator stored_sols;

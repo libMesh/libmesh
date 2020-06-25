@@ -72,9 +72,8 @@ public:
    * Typedef for Stored Solutions iterator, a list of pairs of the
    * system time and filenames of the stored solutions
    */
-  typedef std::pair<Real, std::string> pair_type;
-  typedef std::list<pair_type> list_type;
-  typedef list_type::iterator stored_solutions_iterator;
+  typedef std::map<Real, std::string> map_type;
+  typedef map_type::iterator stored_solutions_iterator;
 
   /**
    * Definition of the clone function needed for the setter function
@@ -87,7 +86,7 @@ public:
 private:
 
   // This list of pairs will hold the timestamp and filename of each stored solution
-  list_type stored_solutions;
+  map_type stored_solutions;
 
   // The stored solutions iterator
   stored_solutions_iterator stored_sols;
