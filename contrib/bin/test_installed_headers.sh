@@ -119,22 +119,10 @@ fi
 # loop over each header and fork tests
 returnval=0
 nrunning=0
+ntotal=0
 runninglist=""
 for header_to_test in $HEADERS_TO_TEST ; do
-
-    # skip the files that live in contrib that we are installing when testing
-    # from the source tree - paths will not be correct
-    if (test "x$testing_installed_tree" = "xno"); then
-        if (test "x`dirname $header_to_test`" = "xcontrib"); then
-            continue
-        fi
-    fi
-
-    if [ $nrunning -lt $n_concurrent ]; then
-        test_header $header_to_test &
-        runninglist="$runninglist $!"
-        nrunning=$(($nrunning+1))
-    else
+    if [ $nrunning -ge $n_concurrent ]; then
         for pid in $runninglist ; do
             wait $pid
             # accumulate the number of failed tests
@@ -143,8 +131,18 @@ for header_to_test in $HEADERS_TO_TEST ; do
         nrunning=0
         runninglist=""
     fi
+
+    test_header $header_to_test &
+    runninglist="$runninglist $!"
+    nrunning=$(($nrunning+1))
+    ntotal=$(($ntotal+1))
 done
 
-wait
+for pid in $runninglist ; do
+    wait $pid
+    returnval=$(($returnval+$?))
+done
+
+echo "$returnval failed tests of $ntotal header files"
 
 exit $returnval
