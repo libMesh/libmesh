@@ -107,7 +107,7 @@ void AdaptiveTimeSolver::advance_timestep ()
   // If the user has attached a memory or file solution history object
   // to the solver, this will store the current solution indexed with
   // the current time
-  solution_history->store(false);
+  solution_history->store(false, _system.time);
 
   NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");

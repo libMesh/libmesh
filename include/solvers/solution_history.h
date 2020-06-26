@@ -50,12 +50,17 @@ public:
   /**
    * Function to store a solution, pure virtual
    */
-  virtual void store(bool is_adjoint_solve) = 0;
+  virtual void store(bool is_adjoint_solve, Real time) = 0;
 
   /**
    * Function to retrieve a solution, pure virtual
    */
-  virtual void retrieve(bool is_adjoint_solve) = 0;
+  virtual void retrieve(bool is_adjoint_solve, Real time) = 0;
+
+  /**
+   * Function to erase solution at a given time, pure virtual
+   */
+  virtual void erase(Real time) = 0;
 
   /**
    * Cloning function for a std::unique_ptr, pure virtual, used in the

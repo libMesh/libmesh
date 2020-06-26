@@ -58,20 +58,25 @@ public:
   /**
    * Virtual function store which we will be overriding to store timesteps
    */
-  virtual void store(bool is_adjoint_solve) override;
+  virtual void store(bool is_adjoint_solve, Real time) override;
 
   /**
    * Virtual function retrieve which we will be overriding to retrieve timesteps
    */
-  virtual void retrieve(bool is_adjoint_solve) override;
+  virtual void retrieve(bool is_adjoint_solve, Real time) override;
+
+  /**
+   * Virtual function retrieve which we will be overriding to erase timesteps
+   */
+  virtual void erase(Real time) override;
 
   /**
    * Typedef for Stored Solutions iterator, a list of pairs of the current
    * system time, map of strings and saved vectors
    */
   typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>> map_type;
-  typedef std::list<std::pair<Real, map_type>> list_type;
-  typedef list_type::iterator stored_solutions_iterator;
+  typedef std::map<Real, map_type> map_map_type;
+  typedef map_map_type::iterator stored_solutions_iterator;
 
   /**
    * Definition of the clone function needed for the setter function
@@ -85,13 +90,13 @@ private:
 
   // This list of pairs will hold the current time and stored vectors
   // from each timestep
-  list_type stored_solutions;
+  map_map_type stored_solutions;
 
   // The stored solutions iterator
   stored_solutions_iterator stored_sols;
 
   // A helper function to locate entries at a given time
-  void find_stored_entry();
+  void find_stored_entry(Real time);
 
   // A system reference
   System & _system ;

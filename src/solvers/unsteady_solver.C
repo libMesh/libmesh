@@ -171,7 +171,7 @@ void UnsteadySolver::advance_timestep ()
   // If the user has attached a memory or file solution history object
   // to the solver, this will store the current solution indexed with
   // the current time
-  solution_history->store(false);
+  solution_history->store(false, _system.time);
 
   NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
@@ -208,12 +208,12 @@ void UnsteadySolver::adjoint_advance_timestep ()
   // Retrieve the primal solution vectors at this new (or for
   // first_adjoint_step, initial) time instance. These provide the
   // data to solve the adjoint problem for the next time instance.
-  solution_history->retrieve(true);
+  solution_history->retrieve(true, _system.time);
 
   // Call the store function to store the adjoint we have computed (or
   // for first_adjoint_step, the adjoint initial condition) in this
   // time step for the time instance.
-  solution_history->store(true);
+  solution_history->store(true, _system.time);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize
@@ -224,7 +224,7 @@ void UnsteadySolver::adjoint_advance_timestep ()
 void UnsteadySolver::retrieve_timestep()
 {
   // Retrieve all the stored vectors at the current time
-  solution_history->retrieve(false);
+  solution_history->retrieve(false, _system.time);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize

@@ -49,12 +49,18 @@ public:
   /**
    * Virtual function store which we will be overriding
    */
-  virtual void store(bool is_adjoint_solve) override;
+  virtual void store(bool is_adjoint_solve, Real time) override;
 
   /**
    * Virtual function retrieve which we will be overriding
    */
-  virtual void retrieve(bool is_adjoint_solve) override;
+  virtual void retrieve(bool is_adjoint_solve, Real time) override;
+
+  /**
+   * Virtual function erase which we will be overriding
+   */
+  virtual void erase(Real time) override;
+
 
   /**
    * Definition of the clone function needed for the setter function
