@@ -69,6 +69,11 @@ public:
   virtual void retrieve(bool is_adjoint_solve, Real time) override;
 
   /**
+   * Virtual function retrieve which we will be overriding to erase timesteps
+   */
+  virtual void erase(Real time) override;
+
+  /**
    * Typedef for Stored Solutions iterator, a list of pairs of the
    * system time and filenames of the stored solutions
    */

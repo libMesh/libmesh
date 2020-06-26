@@ -217,4 +217,13 @@ void MemorySolutionHistory::retrieve(bool is_adjoint_solve, Real time)
   *(_system.solution) = *(saved_vectors[_solution]);
 }
 
+void MemorySolutionHistory::erase(Real time)
+{
+  stored_solutions_iterator stored_sols_erase_it;
+
+  stored_sols_erase_it = stored_solutions.find(time);
+
+  stored_solutions.erase(stored_sols_erase_it);
+}
+
 }
