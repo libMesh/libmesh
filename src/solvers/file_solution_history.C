@@ -23,6 +23,7 @@
 #include "libmesh/diff_system.h"
 
 #include <cmath>
+#include <iterator>
 
 namespace libMesh
 {
