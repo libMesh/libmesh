@@ -152,6 +152,9 @@ void BoundaryInfo::clear()
   _node_boundary_ids.clear();
   _edge_boundary_ids.clear();
   _shellface_boundary_ids.clear();
+  _ss_id_to_name.clear();
+  _ns_id_to_name.clear();
+  _es_id_to_name.clear();
 }
 
 
