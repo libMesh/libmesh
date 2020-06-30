@@ -23,6 +23,7 @@
 #include "libmesh/diff_system.h"
 
 #include <cmath>
+#include <iterator>
 
 namespace libMesh
 {
@@ -32,7 +33,8 @@ FileSolutionHistory::~FileSolutionHistory ()
 }
 
 // This function finds, if it can, the entry where we're supposed to
-// be storing data
+// be storing data, leaves stored_sols unchanged if it cant find an entry
+// with the key corresponding to time.
 void FileSolutionHistory::find_stored_entry(Real time)
 {
   if (stored_solutions.begin() == stored_solutions.end())
@@ -40,21 +42,48 @@ void FileSolutionHistory::find_stored_entry(Real time)
 
   libmesh_assert (stored_sols != stored_solutions.end());
 
-  // We will use the map::lower_bound operation to find the least key, which
-  // is the least upper bound among all the keys for the time of our interest.
+  // We will use the map::lower_bound operation to find the key which
+  // is the least upper bound among all existing keys for time.
   // (key before map::lower_bound) < time < map::lower_bound, one of these
-  // will be within TOLERANCE of time (unless we are creating a new map entry)
+  // should be within TOLERANCE of time (unless we are creating a new map entry)
+  // If the lower bound iterator points to:
+  // begin -> we are looking for the solution at the initial time
+  // end -> we are creating a new entry
+  // anything else, we are looking for an existing entry
   stored_solutions_iterator lower_bound_it = stored_solutions.lower_bound(time);
 
-  // Set the stored sols iterator to whichever key is within TOLERANCE of time
+  // For the key right before the lower bound
+  stored_solutions_iterator lower_bound_it_decremented;
+
+  // If we are at end, we are creating a new entry, nothing more to do
+  if(lower_bound_it == stored_solutions.end())
+  {
+    return;
+  }
+  else if(lower_bound_it == stored_solutions.begin()) // At the beginning, so we cant go back any further
+  {
+    stored_sols = stored_solutions.begin();
+    return;
+  }
+  else // A decremented iterator, to perform the sandwich test for the key closest to time
+  {
+    lower_bound_it_decremented = std::prev(lower_bound_it);
+  }
+
+  // Set the stored sols iterator as per the key which is within TOLERANCE of time
   if(std::abs(lower_bound_it->first - time) < TOLERANCE)
   {
-    stored_sols = stored_solutions.find(time);
+    stored_sols = lower_bound_it;
   }
-  else if(std::abs((--lower_bound_it)->first - time) < TOLERANCE)
+  else if(std::abs(lower_bound_it_decremented->first - time) < TOLERANCE)
   {
-    stored_sols = stored_solutions.find(time);
+    stored_sols = lower_bound_it_decremented;
   }
+  else
+  {
+    libmesh_error_msg("Failed to set stored solutions iterator to a valid value.");
+  }
+
 
 }
 

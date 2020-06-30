@@ -167,7 +167,9 @@ std::pair<unsigned int, Real> DifferentiableSystem::adjoint_solve (const QoISet 
   // we are solving the adjoint problem
   this->get_time_solver().set_is_adjoint(true);
 
-  return this->ImplicitSystem::adjoint_solve(qoi_indices);
+  return time_solver->adjoint_solve(qoi_indices);
+
+  //return this->ImplicitSystem::adjoint_solve(qoi_indices);
 }
 
 
