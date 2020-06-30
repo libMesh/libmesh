@@ -727,20 +727,22 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
 void RBEIMConstruction::init_context_with_sys(FEMContext & c, System & sys)
 {
-  // default implementation of init_context
-  // for compute_best_fit
-  for (unsigned int var=0; var<sys.n_vars(); var++)
-    {
-      FEBase * elem_fe = nullptr;
-      c.get_element_fe( var, elem_fe );
-      elem_fe->get_JxW();
-      elem_fe->get_phi();
-      elem_fe->get_xyz();
+  // default implementation of init_context for compute_best_fit. We
+  // pre-request FE data for all element dimensions present in the
+  // mesh.
+  for (int dim=1; dim<=3; ++dim)
+    if (sys.get_mesh().elem_dimensions().count(dim))
+      for (unsigned int var=0; var<sys.n_vars(); var++)
+        {
+          auto elem_fe = c.get_element_fe(var, dim);
+          elem_fe->get_JxW();
+          elem_fe->get_phi();
+          elem_fe->get_xyz();
 
-      FEBase * side_fe = nullptr;
-      c.get_side_fe( var, side_fe );
-      side_fe->get_nothing();
-    }
+          // Explicitly request nothing to be computed for sides.
+          auto side_fe = c.get_side_fe(var, dim);
+          side_fe->get_nothing();
+        }
 }
 
 void RBEIMConstruction::update_RB_system_matrices()
