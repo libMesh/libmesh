@@ -102,6 +102,14 @@ void TimeSolver::advance_timestep ()
 {
 }
 
+std::pair<unsigned int, Real> TimeSolver::adjoint_solve (const QoISet & qoi_indices)
+{
+  libmesh_assert(this->diff_solver().get());
+  libmesh_assert_equal_to (&(this->diff_solver()->system()), &(this->system()));
+
+  return this->_system.ImplicitSystem::adjoint_solve(qoi_indices);
+}
+
 void TimeSolver::adjoint_advance_timestep ()
 {
 }

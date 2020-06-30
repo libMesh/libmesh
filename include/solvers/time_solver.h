@@ -26,6 +26,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/solution_history.h"
+#include "libmesh/qoi_set.h"
 
 // C++ includes
 #include <memory>
@@ -109,6 +110,12 @@ public:
    * time step selection may require some solve() steps to be repeated.
    */
   virtual void advance_timestep ();
+
+  /**
+   * This method solves for the adjoint solution at the next adjoint timestep
+   * (or a steady state adjoint solve)
+   */
+  virtual std::pair<unsigned int, Real> adjoint_solve (const QoISet & qoi_indices);
 
   /**
    * This method advances the adjoint solution to the previous
