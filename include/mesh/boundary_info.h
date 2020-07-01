@@ -69,9 +69,12 @@ protected:
 
 public:
   /**
-   * Actual copying operation.
+   * Copy assignment operator
    *
-   * \note The copy will have a reference to the same Mesh as the original.
+   * \note \p this will still reference the same MeshBase it was
+   * constructed with.  Boundary data copied from other_boundary_info
+   * will refer to objects in this mesh which have the same
+   * DofObject::id() as the corresponding objects in the other mesh.
    */
   BoundaryInfo & operator=(const BoundaryInfo & other_boundary_info);
 

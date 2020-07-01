@@ -129,6 +129,10 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
   _edge_boundary_ids = other_boundary_info._edge_boundary_ids;
   _shellface_boundary_ids = other_boundary_info._shellface_boundary_ids;
 
+  _ss_id_to_name = other_boundary_info._ss_id_to_name;
+  _ns_id_to_name = other_boundary_info._ns_id_to_name;
+  _es_id_to_name = other_boundary_info._es_id_to_name;
+
   return *this;
 }
 
@@ -148,6 +152,9 @@ void BoundaryInfo::clear()
   _node_boundary_ids.clear();
   _edge_boundary_ids.clear();
   _shellface_boundary_ids.clear();
+  _ss_id_to_name.clear();
+  _ns_id_to_name.clear();
+  _es_id_to_name.clear();
 }
 
 

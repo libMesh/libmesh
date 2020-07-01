@@ -2029,6 +2029,13 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
   const BoundaryInfo & cross_section_boundary_info = cross_section.get_boundary_info();
 
+  // Copy name maps from old to new boundary.  We won't copy the whole
+  // BoundaryInfo because that copies bc ids too, and we need to set
+  // those more carefully.
+  boundary_info.set_sideset_name_map() = cross_section_boundary_info.get_sideset_name_map();
+  boundary_info.set_nodeset_name_map() = cross_section_boundary_info.get_nodeset_name_map();
+  boundary_info.set_edgeset_name_map() = cross_section_boundary_info.get_edgeset_name_map();
+
   // If cross_section is distributed, so is its extrusion
   if (!cross_section.is_serial())
     mesh.delete_remote_elements();
