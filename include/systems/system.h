@@ -31,6 +31,7 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_value.h" // For point_hessian
 #include "libmesh/variable.h"
+#include "libmesh/enum_matrix_build_type.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -70,6 +71,7 @@ class Parameters;
 class ParameterVector;
 class Point;
 class SensitivityData;
+class Matrix;
 template <typename T> class NumericVector;
 template <typename T> class SparseMatrix;
 template <typename T> class VectorValue;
@@ -1736,6 +1738,51 @@ public:
    */
   void projection_matrix (SparseMatrix<Number> & proj_mat) const;
 #endif // LIBMESH_HAVE_METAPHYSICL
+
+  /**
+   * Adds an auxiliary matrix to the system. Must be implemented in derived classes
+   */
+  virtual Matrix & add_matrix(const std::string &,
+                              ParallelType = PARALLEL,
+                              MatrixBuildType = MatrixBuildType::AUTOMATIC)
+    {
+      libmesh_error_msg("The current system object does not support matrix addition");
+    }
+
+  /**
+   * Check whether a matrix exists in the system
+   *
+   * Must be implemented in derived classes
+   */
+  virtual bool have_matrix(const std::string &) const
+    {
+      libmesh_error_msg("The current system object does not support matrix addition");
+    }
+
+  /**
+   * \returns A const reference to an auxiliary matrix
+   *
+   * None of these matrices is involved in the solution process.
+   *
+   * Must be implemented in derived classes
+   */
+  virtual const Matrix & get_matrix (const std::string &) const
+    {
+      libmesh_error_msg("The current system object does not support matrix addition/retrieval");
+    }
+
+  /**
+   * \returns A writable reference to an auxiliary matrix
+   *
+   * None of these matrices is involved in the solution process.
+   *
+   * Must be implemented in derived classes
+   */
+  virtual Matrix & get_matrix (const std::string &)
+    {
+      libmesh_error_msg("The current system object does not support matrix addition/retrieval");
+    }
+
 
 protected:
 

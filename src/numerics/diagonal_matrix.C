@@ -32,6 +32,9 @@ DiagonalMatrix<T>::DiagonalMatrix(const Parallel::Communicator & comm_in) : Spar
 }
 
 template <typename T>
+DiagonalMatrix<T>::~DiagonalMatrix() = default;
+
+template <typename T>
 DiagonalMatrix<T> &
 DiagonalMatrix<T>::operator=(const NumericVector<T> & vec)
 {

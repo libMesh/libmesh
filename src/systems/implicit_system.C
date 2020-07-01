@@ -31,6 +31,7 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/diagonal_matrix.h"
 #include "libmesh/utility.h"
 
 namespace libMesh
@@ -200,7 +201,8 @@ void ImplicitSystem::assemble ()
 
 
 SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name,
-                                                   const ParallelType type)
+                                                   const ParallelType type,
+                                                   const MatrixBuildType mat_build_type)
 {
   // only add matrices before initializing...
   libmesh_error_msg_if(!_can_add_matrices,
@@ -212,7 +214,12 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name,
     return *(_matrices[mat_name]);
 
   // Otherwise build the matrix and return it.
-  SparseMatrix<Number> * buf = SparseMatrix<Number>::build(this->comm()).release();
+  SparseMatrix<Number> * buf;
+  if (mat_build_type == MatrixBuildType::AUTOMATIC)
+    buf = SparseMatrix<Number>::build(this->comm()).release();
+  else if (mat_build_type == MatrixBuildType::DIAGONAL)
+    buf = libmesh_make_unique<DiagonalMatrix<Number>>(this->comm()).release();
+
   _matrices.emplace(mat_name, buf);
   _matrix_types.emplace(mat_name, type);
 

@@ -26,11 +26,13 @@
 #include "libmesh/eigen_system.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/diagonal_matrix.h"
 #include "libmesh/shell_matrix.h"
 #include "libmesh/eigen_solver.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/enum_eigen_solver_type.h"
+#include "libmesh/utility.h" // libmesh_map_find
 
 namespace libMesh
 {
@@ -375,6 +377,39 @@ std::pair<Real, Real> EigenSystem::get_eigenvalue (dof_id_type i)
 void EigenSystem::set_initial_space (NumericVector<Number> & initial_space_in)
 {
   eigen_solver->set_initial_space (initial_space_in);
+}
+
+
+Matrix & EigenSystem::add_matrix (const std::string & mat_name,
+                                     const ParallelType,
+                                     const MatrixBuildType mat_build_type)
+{
+  // Return the matrix if it is already there.
+  if (this->have_matrix(mat_name))
+    return *(_matrices[mat_name]);
+
+  // Otherwise build the matrix and return it.
+  Matrix * buf;
+  if (mat_build_type == MatrixBuildType::AUTOMATIC)
+    buf = SparseMatrix<Number>::build(this->comm()).release();
+  else if (mat_build_type == MatrixBuildType::DIAGONAL)
+    buf = libmesh_make_unique<DiagonalMatrix<Number>>(this->comm()).release();
+
+  _matrices.emplace(mat_name, buf);
+
+  return *buf;
+}
+
+
+const Matrix & EigenSystem::get_matrix (const std::string & mat_name) const
+{
+  return *(libmesh_map_find(_matrices, mat_name));
+}
+
+
+Matrix & EigenSystem::get_matrix (const std::string & mat_name)
+{
+  return *(libmesh_map_find(_matrices, mat_name));
 }
 
 } // namespace libMesh

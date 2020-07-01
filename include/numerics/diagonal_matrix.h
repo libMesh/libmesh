@@ -55,6 +55,8 @@ public:
    */
   explicit DiagonalMatrix(const Parallel::Communicator & comm);
 
+  ~DiagonalMatrix();
+
   /**
    * unique pointers can be moved but not copied
    */

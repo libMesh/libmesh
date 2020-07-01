@@ -25,8 +25,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/id_types.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/parallel_object.h"
+#include "libmesh/matrix.h"
 #include "libmesh/enum_parallel_type.h"
 
 // C++ includes
@@ -61,8 +60,7 @@ std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m);
  * \date 2003
  */
 template <typename T>
-class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T>>,
-                     public ParallelObject
+class SparseMatrix : public Matrix
 {
 public:
   /**

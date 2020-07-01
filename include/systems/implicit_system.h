@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/explicit_system.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/sparse_matrix.h" // Have to tell compiler that SparseMatrix is derived from Matrix
 
 // C++ includes
 #include <cstddef>
@@ -32,7 +33,6 @@ namespace libMesh
 
 // Forward declarations
 template <typename T> class LinearSolver;
-template <typename T> class SparseMatrix;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, coefficient
@@ -319,9 +319,12 @@ public:
    * use the templated \p add_matrix method instead
    *
    * @param type The serial/parallel/ghosted type of the matrix
+   * @param mat_build_type The matrix type to build
    *
    */
-  SparseMatrix<Number> & add_matrix (const std::string & mat_name, ParallelType type = PARALLEL);
+  SparseMatrix<Number> & add_matrix (const std::string & mat_name,
+                                     ParallelType type = PARALLEL,
+                                     MatrixBuildType mat_build_type = MatrixBuildType::AUTOMATIC) override;
 
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
@@ -349,7 +352,7 @@ public:
    * \returns \p true if this \p System has a matrix associated with the
    * given name, \p false otherwise.
    */
-  bool have_matrix (const std::string & mat_name) const;
+  bool have_matrix (const std::string & mat_name) const override;
 
   /**
    * \returns A const pointer to this system's additional matrix
@@ -373,7 +376,7 @@ public:
    * Access is only granted when the matrix is already properly
    * initialized.
    */
-  const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
+  const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const override;
 
   /**
    * \returns A writable reference to this system's additional matrix
@@ -383,7 +386,7 @@ public:
    * Access is only granted when the matrix is already properly
    * initialized.
    */
-  SparseMatrix<Number> & get_matrix (const std::string & mat_name);
+  SparseMatrix<Number> & get_matrix (const std::string & mat_name) override;
 
   /**
    * \returns The number of matrices handled by this system
