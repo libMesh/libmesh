@@ -57,6 +57,7 @@ include_HEADERS =  \
         enums/enum_fe_family.h \
         enums/enum_inf_map_type.h \
         enums/enum_io_package.h \
+        enums/enum_matrix_build_type.h \
         enums/enum_norm_type.h \
         enums/enum_order.h \
         enums/enum_parallel_type.h \
@@ -241,6 +242,7 @@ include_HEADERS =  \
         numerics/eigen_sparse_vector.h \
         numerics/fem_function_base.h \
         numerics/function_base.h \
+        numerics/matrix.h \
         numerics/numeric_vector.h \
         numerics/parsed_fem_function.h \
         numerics/parsed_fem_function_parameter.h \

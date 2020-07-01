@@ -47,6 +47,7 @@ BUILT_SOURCES = \
         enum_fe_family.h \
         enum_inf_map_type.h \
         enum_io_package.h \
+        enum_matrix_build_type.h \
         enum_norm_type.h \
         enum_order.h \
         enum_parallel_type.h \
@@ -234,6 +235,7 @@ BUILT_SOURCES = \
         function_base.h \
         laspack_matrix.h \
         laspack_vector.h \
+        matrix.h \
         numeric_vector.h \
         parsed_fem_function.h \
         parsed_fem_function_parameter.h \
@@ -671,6 +673,9 @@ enum_inf_map_type.h: $(top_srcdir)/include/enums/enum_inf_map_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_io_package.h: $(top_srcdir)/include/enums/enum_io_package.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+enum_matrix_build_type.h: $(top_srcdir)/include/enums/enum_matrix_build_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_norm_type.h: $(top_srcdir)/include/enums/enum_norm_type.h
@@ -1232,6 +1237,9 @@ laspack_matrix.h: $(top_srcdir)/include/numerics/laspack_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 laspack_vector.h: $(top_srcdir)/include/numerics/laspack_vector.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+matrix.h: $(top_srcdir)/include/numerics/matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 numeric_vector.h: $(top_srcdir)/include/numerics/numeric_vector.h
