@@ -590,6 +590,10 @@ void Elem::find_point_neighbors(const Point & p,
   std::set<const Elem *> untested_set, next_untested_set;
   untested_set.insert(this);
 
+#ifdef LIBMESH_ENABLE_AMR
+  std::vector<const Elem *> active_neighbor_children;
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
   while (!untested_set.empty())
     {
       // Loop over all the elements in the patch that haven't already
@@ -602,34 +606,34 @@ void Elem::find_point_neighbors(const Point & p,
                 {
                   if (current_neighbor->active())                // ... if it is active
                     {
-                      if (current_neighbor->contains_point(p))   // ... and touches p
+                      auto it = neighbor_set.lower_bound(current_neighbor);
+                      if ((it == neighbor_set.end() || *it != current_neighbor) &&
+                          current_neighbor->contains_point(p))   // ... don't have and touches p
                         {
-                          // Make sure we'll test it
-                          if (!neighbor_set.count(current_neighbor))
-                            next_untested_set.insert (current_neighbor);
-
-                          // And add it
-                          neighbor_set.insert (current_neighbor);
+                          // Add it and test it
+                          next_untested_set.insert(current_neighbor);
+                          neighbor_set.emplace_hint(it, current_neighbor);
                         }
                     }
 #ifdef LIBMESH_ENABLE_AMR
                   else                                 // ... the neighbor is *not* active,
                     {                                  // ... so add *all* neighboring
                                                        // active children that touch p
-                      std::vector<const Elem *> active_neighbor_children;
-
+                      active_neighbor_children.clear();
                       current_neighbor->active_family_tree_by_neighbor
                         (active_neighbor_children, elem);
 
                       for (const auto & current_child : active_neighbor_children)
-                          if (current_child->contains_point(p))
+                        {
+                          auto it = neighbor_set.lower_bound(current_child);
+                          if ((it == neighbor_set.end() || *it != current_child) &&
+                              current_child->contains_point(p))
                             {
-                              // Make sure we'll test it
-                              if (!neighbor_set.count(current_child))
-                                next_untested_set.insert (current_child);
-
-                              neighbor_set.insert (current_child);
+                              // Add it and test it
+                              next_untested_set.insert(current_child);
+                              neighbor_set.emplace_hint(it, current_child);
                             }
+                        }
                     }
 #endif // #ifdef LIBMESH_ENABLE_AMR
                 }
