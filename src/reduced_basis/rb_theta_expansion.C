@@ -135,7 +135,7 @@ std::vector<Number> RBThetaExpansion::eval_A_theta(unsigned int q,
 
   libmesh_assert(_A_theta_vector[q]);
 
-  return _A_theta_vector[q]->evaluate( mus );
+  return _A_theta_vector[q]->evaluate_vec(mus);
 }
 
 Number RBThetaExpansion::eval_F_theta(unsigned int q,
@@ -157,7 +157,7 @@ std::vector<Number> RBThetaExpansion::eval_F_theta(unsigned int q,
 
   libmesh_assert(_F_theta_vector[q]);
 
-  return _F_theta_vector[q]->evaluate( mus );
+  return _F_theta_vector[q]->evaluate_vec(mus);
 }
 
 Number RBThetaExpansion::eval_output_theta(unsigned int output_index,

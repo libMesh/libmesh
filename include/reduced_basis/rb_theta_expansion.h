@@ -67,7 +67,7 @@ public:
    * Evaluate theta_q_a at multiple parameters simultaneously.
    */
   virtual std::vector<Number> eval_A_theta(unsigned int q,
-                                           const std::vector<RBParameters>& mus);
+                                           const std::vector<RBParameters> & mus);
 
   /**
    * Evaluate theta_q_f at the current parameter.
@@ -79,7 +79,7 @@ public:
    * Evaluate theta_q_f at multiple parameters simultaneously.
    */
   virtual std::vector<Number> eval_F_theta(unsigned int q,
-                                           const std::vector<RBParameters>& mus);
+                                           const std::vector<RBParameters> & mus);
 
   /**
    * Evaluate theta_q_l at the current parameter.

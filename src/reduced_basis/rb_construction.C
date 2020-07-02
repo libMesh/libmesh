@@ -46,7 +46,6 @@
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/utility.h"
-#include "libmesh/int_range.h"
 
 // C++ includes
 #include <sys/types.h>
@@ -2594,14 +2593,14 @@ void RBConstruction::preevaluate_thetas()
   for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
     {
       const auto A_vals = rb_theta_expansion.eval_A_theta(q_a, mus);
-      for (unsigned int i=0; i<get_local_n_training_samples(); i++)
+      for (auto i : make_range(get_local_n_training_samples()))
         _evaluated_thetas[i][q_a] = A_vals[i];
     }
 
   for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
     {
       const auto F_vals = rb_theta_expansion.eval_F_theta(q_f, mus);
-      for (unsigned int i=0; i<get_local_n_training_samples(); i++)
+      for (auto i : make_range(get_local_n_training_samples()))
         _evaluated_thetas[i][n_A_terms + q_f] = F_vals[i];
     }
 }
