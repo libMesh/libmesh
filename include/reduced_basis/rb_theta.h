@@ -23,14 +23,13 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/rb_parameters.h"
 
 // C++ includes
 #include <vector>
 
 namespace libMesh
 {
-
-class RBParameters;
 
 /**
  * This class is part of the rbOOmit framework.
@@ -71,6 +70,19 @@ public:
    * to provide problem dependent behavior.
    */
   virtual Number evaluate(const RBParameters &) { return 1.; }
+
+  /*
+   * Evaluate the functor object for multiple given parameters simultaneously.
+   * Override to obtain problem-dependent behavior.
+   */
+  virtual std::vector<Number> evaluate(const std::vector<RBParameters>& mus)
+  {
+    std::vector<Number> result(mus.size());
+    for ( unsigned int i = 0; i < mus.size(); ++i )
+      result[i] = evaluate(mus[i]);
+
+    return result;
+  }
 };
 
 }
