@@ -46,7 +46,6 @@
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/utility.h"
-#include "libmesh/int_range.h"
 
 // C++ includes
 #include <sys/types.h>
@@ -2578,19 +2577,31 @@ void RBConstruction::preevaluate_thetas()
   const unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
   const unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
 
+  // Collect all training parameters
+  std::vector<RBParameters> mus(get_local_n_training_samples());
   const numeric_index_type first_index = get_first_local_training_index();
   for (unsigned int i=0; i<get_local_n_training_samples(); i++)
     {
       // Load training parameter i, this is only loaded
       // locally since the RB solves are local.
       set_params_from_training_set( first_index+i );
-      const RBParameters & mu = get_parameters();
-
+      mus[i] = get_parameters();
       _evaluated_thetas[i].resize(n_A_terms + n_F_terms);
-      for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
-        _evaluated_thetas[i][q_a] = rb_theta_expansion.eval_A_theta(q_a, mu);
-      for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
-        _evaluated_thetas[i][n_A_terms + q_f] = rb_theta_expansion.eval_F_theta(q_f, mu);
+    }
+
+  // Evaluate thetas for all training parameters simultaneously
+  for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
+    {
+      const auto A_vals = rb_theta_expansion.eval_A_theta(q_a, mus);
+      for (auto i : make_range(get_local_n_training_samples()))
+        _evaluated_thetas[i][q_a] = A_vals[i];
+    }
+
+  for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
+    {
+      const auto F_vals = rb_theta_expansion.eval_F_theta(q_f, mus);
+      for (auto i : make_range(get_local_n_training_samples()))
+        _evaluated_thetas[i][n_A_terms + q_f] = F_vals[i];
     }
 }
 

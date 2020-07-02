@@ -127,6 +127,17 @@ Number RBThetaExpansion::eval_A_theta(unsigned int q,
   return _A_theta_vector[q]->evaluate( mu );
 }
 
+std::vector<Number> RBThetaExpansion::eval_A_theta(unsigned int q,
+                                                   const std::vector<RBParameters> & mus)
+{
+  if (q >= get_n_A_terms())
+    libmesh_error_msg("Error: We must have q < get_n_A_terms in eval_A_theta.");
+
+  libmesh_assert(_A_theta_vector[q]);
+
+  return _A_theta_vector[q]->evaluate_vec(mus);
+}
+
 Number RBThetaExpansion::eval_F_theta(unsigned int q,
                                       const RBParameters & mu)
 {
@@ -136,6 +147,17 @@ Number RBThetaExpansion::eval_F_theta(unsigned int q,
   libmesh_assert(_F_theta_vector[q]);
 
   return _F_theta_vector[q]->evaluate( mu );
+}
+
+std::vector<Number> RBThetaExpansion::eval_F_theta(unsigned int q,
+                                                   const std::vector<RBParameters> & mus)
+{
+  if (q >= get_n_F_terms())
+    libmesh_error_msg("Error: We must have q < get_n_F_terms in eval_F_theta.");
+
+  libmesh_assert(_F_theta_vector[q]);
+
+  return _F_theta_vector[q]->evaluate_vec(mus);
 }
 
 Number RBThetaExpansion::eval_output_theta(unsigned int output_index,
