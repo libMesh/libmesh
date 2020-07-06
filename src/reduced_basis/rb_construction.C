@@ -2573,6 +2573,9 @@ void RBConstruction::preevaluate_thetas()
 
   _evaluated_thetas.resize(get_local_n_training_samples());
 
+  if ( get_local_n_training_samples() == 0 )
+    return;
+
   auto & rb_theta_expansion = get_rb_evaluation().get_rb_theta_expansion();
   const unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
   const unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
