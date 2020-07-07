@@ -68,7 +68,7 @@ class PlotData(object):
     # Convert date strings into numbers.
     date_nums = []
     for d in date_strings:
-      date_nums.append(date2num(datetime.strptime(d, '%Y-%b-%d')))
+      date_nums.append(date2num(datetime.strptime(d.decode('UTF-8'), '%Y-%b-%d')))
 
     # Initialize an array with 1, 7, 14, ...
     N = len(date_strings)
@@ -134,8 +134,8 @@ class PlotData(object):
     # Generate date numbers at monthly intervals starting from '2014-Feb-17'
     now = datetime.now()
     month_intervals = [735281] # date2num for '2014-Feb-17'
-    for yr in xrange(2014, now.year+1):
-      for mo in xrange(1, 13):
+    for yr in range(2014, now.year+1):
+      for mo in range(1, 13):
         # Skip Jan 2014
         if (yr==2014 and mo==1):
           continue
