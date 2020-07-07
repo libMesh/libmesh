@@ -136,7 +136,7 @@ def plot_one_year(year, data, color):
     x = []
     y = []
     start_date = datetime.datetime.strptime(str(year) + '-01-01', '%Y-%m-%d')
-    for i in xrange(0, len(data), 2):
+    for i in range(0, len(data), 2):
         end_date = datetime.datetime.strptime(data[i], '%Y-%m-%d')
         # Compute the number of months between two dates:
         num_months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)

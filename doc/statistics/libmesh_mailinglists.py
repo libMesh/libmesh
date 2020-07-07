@@ -338,7 +338,7 @@ year_labels = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017', '
 # trial and error because it lined up the tick marks fairly well, but I don't
 # understand the logic behind it.
 xticks = [.55]
-for i in xrange(1, len(year_labels)):
+for i in range(1, len(year_labels)):
   xticks.append(xticks[i-1] + 24) # 2 years = 24 months
 
 # Center the ticks slightly
