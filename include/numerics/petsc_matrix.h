@@ -242,16 +242,16 @@ public:
   /**
    * Compute Y = A*X for matrix \p X.
    */
-  void mat_mult (SparseMatrix<T> & X, SparseMatrix<T> & Y);
+  virtual void matrix_matrix_mult (SparseMatrix<T> & X, SparseMatrix<T> & Y) override;
 
   /**
-   * Add \p scalar* \p spm to the rows and cols of this matrix (A):
-   * A(rows[i], cols[j]) += scalar * spm(i,j)
-   */
+    * Add \p scalar* \p spm to the rows and cols of this matrix (A):
+    * A(rows[i], cols[j]) += scalar * spm(i,j)
+    */
   void add_sparse_matrix (const SparseMatrix<T> & spm,
-                          const std::vector<numeric_index_type> & rows,
-                          const std::vector<numeric_index_type> & cols,
-                          const T scalar);
+                          const std::map<numeric_index_type,numeric_index_type> & row_ltog,
+                          const std::map<numeric_index_type,numeric_index_type> & col_ltog,
+                          const T scalar) override;
 
   virtual T operator () (const numeric_index_type i,
                          const numeric_index_type j) const override;

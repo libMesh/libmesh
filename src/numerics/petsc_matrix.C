@@ -30,6 +30,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/parallel.h"
+#include "libmesh/utility.h"
 
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
@@ -1202,7 +1203,7 @@ void PetscMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 
 
 template <typename T>
-void PetscMatrix<T>::mat_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out)
+void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out)
 {
   libmesh_assert (this->initialized());
 
@@ -1213,9 +1214,6 @@ void PetscMatrix<T>::mat_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out)
 
    const PetscMatrix<T> * X = cast_ptr<const PetscMatrix<T> *> (&X_in);
    PetscMatrix<T> * Y = cast_ptr<PetscMatrix<T> *> (&Y_out);
-
-   libmesh_assert (X);
-   libmesh_assert (Y);
 
    PetscErrorCode ierr=0;
 
@@ -1231,24 +1229,53 @@ void PetscMatrix<T>::mat_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out)
 
 template <typename T>
 void PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
-                        const std::vector<numeric_index_type> & rows,
-                        const std::vector<numeric_index_type> & cols,
+                        const std::map<numeric_index_type, numeric_index_type> & row_ltog,
+                        const std::map<numeric_index_type, numeric_index_type> & col_ltog,
                         const T scalar)
 {
-  libmesh_assert_equal_to(spm.m(), rows.size());
-  libmesh_assert_equal_to(spm.n(), cols.size());
+  libmesh_assert_equal_to(spm.m(), row_ltog.size());
+  libmesh_assert_equal_to(spm.n(), col_ltog.size());
+  // make sure matrix has larger size than spm
+  libmesh_assert_greater_equal(this->m(), spm.m());
+  libmesh_assert_greater_equal(this->n(),spm.n());
 
-  for(unsigned int i = 0; i<rows.size(); ++i)
+  if(!this->closed())
+    this->close();
+
+  PetscErrorCode ierr=0;
+
+  const PetscMatrix<T> * pscm=cast_ptr<const PetscMatrix<T> *>(&spm);
+
+  PetscInt ncols=0;
+
+  const PetscInt *lcols;
+  const PetscScalar *vals;
+
+  std::vector<PetscInt> gcols;
+  std::vector<PetscScalar> values;
+
+  for (auto ltog: row_ltog)
   {
-    std::vector<numeric_index_type> indices;
-    std::vector<T> values;
-    spm.get_row(i, indices, values);
-    for (unsigned int j=0; j<indices.size(); ++j)
-      this->add (rows[i], cols[indices[j]], scalar*values[j]);
+    PetscInt grow[]={static_cast<PetscInt>(ltog.second)}; // global row index
+
+    ierr = MatGetRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals);
+    LIBMESH_CHKERR(ierr);
+    // get global indices (gcols) from lcols, increment values = vals*scalar
+    gcols.resize(ncols);
+    values.resize(ncols);
+    for (auto i : index_range(gcols))
+    {
+      gcols[i] = libmesh_map_find(col_ltog, lcols[i]);
+      values[i] = scalar*vals[i];
+    }
+    ierr=MatSetValues(_mat, 1, grow, ncols, gcols.data(), values.data(),  ADD_VALUES);
+    LIBMESH_CHKERR(ierr);
+    ierr  = MatRestoreRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals);
+    LIBMESH_CHKERR(ierr);
   }
+  // Note: We are not closing the matrix because it is expensive to do so when adding multiple sparse matrices.
+  //       Remember to manually close the matrix once all changes to the matrix have been made.
 }
-
-
 
 template <typename T>
 T PetscMatrix<T>::operator () (const numeric_index_type i_in,
