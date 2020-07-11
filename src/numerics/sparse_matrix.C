@@ -50,6 +50,7 @@ SparseMatrix<T>::SparseMatrix (const Parallel::Communicator & comm_in) :
 
 
 
+
 // default implementation is to fall back to non-blocked method
 template <typename T>
 void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> & dm,

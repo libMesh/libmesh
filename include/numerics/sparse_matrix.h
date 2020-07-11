@@ -291,10 +291,10 @@ public:
    * A(rows[i], cols[j]) += scalar * spm(i,j)
    */
   virtual void add_sparse_matrix (const SparseMatrix<T> & /*spm*/,
-                          const std::map<numeric_index_type, numeric_index_type> & /*rows*/,
-                          const std::map<numeric_index_type, numeric_index_type> & /*cols*/,
-                          const T /*scalar*/)
-  {libmesh_not_implemented();}
+                                  const std::map<numeric_index_type, numeric_index_type> & /*rows*/,
+                                  const std::map<numeric_index_type, numeric_index_type> & /*cols*/,
+                                  const T /*scalar*/)
+  { libmesh_not_implemented(); }
 
   /**
    * \returns A copy of matrix entry \p (i,j).
