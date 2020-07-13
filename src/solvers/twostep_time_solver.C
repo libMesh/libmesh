@@ -21,6 +21,7 @@
 #include "libmesh/euler_solver.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
@@ -64,6 +65,12 @@ void TwostepTimeSolver::solve()
   Real single_norm(0.), double_norm(0.), error_norm(0.),
     relative_error(0.);
 
+  // The loop below will change system time and deltat based on calculations.
+  // We will need to save these for calculating the deltat for the next timestep
+  // after the while loop has converged.
+  Real old_time;
+  Real old_deltat;
+
   while (!max_tolerance_met)
     {
       // If we've been asked to reduce deltat if necessary, make sure
@@ -105,11 +112,18 @@ void TwostepTimeSolver::solve()
       // do *something* if it happens
       core_time_solver->reduce_deltat_on_diffsolver_failure = 0;
 
-      Real old_time = _system.time;
-      Real old_deltat = _system.deltat;
+      old_time = _system.time;
+      old_deltat = _system.deltat;
       _system.deltat *= 0.5;
+
+      // Attempt the 'half timestep solve'
       core_time_solver->solve();
+
+      // Increment system.time, and save the half solution to solution history
       core_time_solver->advance_timestep();
+
+      // Attempt the second half timestep solve, solution history for this solution
+      // comes into play only if we match the tolerance, so outside the while loop
       core_time_solver->solve();
 
       single_norm = calculate_norm(_system, *_system.solution);
@@ -121,13 +135,6 @@ void TwostepTimeSolver::solve()
       // Reset the core_time_solver's reduce_deltat... value.
       core_time_solver->reduce_deltat_on_diffsolver_failure =
         this->reduce_deltat_on_diffsolver_failure;
-
-      // But then back off just in case our advance_timestep() isn't
-      // called.
-      // FIXME: this probably doesn't work with multistep methods
-      _system.get_vector("_old_nonlinear_solution") = *old_solution;
-      _system.time = old_time;
-      _system.deltat = old_deltat;
 
       // Find the relative error
       *double_solution -= *(_system.solution);
@@ -150,7 +157,7 @@ void TwostepTimeSolver::solve()
                        << (error_norm / _system.deltat /
                            std::max(double_norm, single_norm))
                        << std::endl;
-          libMesh::out << "old delta t = " << _system.deltat << std::endl;
+          libMesh::out << "old delta t = " << old_deltat << std::endl;
         }
 
       // If our upper tolerance is negative, that means we want to set
@@ -162,6 +169,19 @@ void TwostepTimeSolver::solve()
       // repeat this timestep entirely
       if (this->upper_tolerance && relative_error > this->upper_tolerance)
         {
+          // If we are saving solution histories, the core time solver
+          // will save half solutions, and these solves can be attempted
+          // repeatedly. If we failed to meet the tolerance, erase the
+          // half solution from solution history.
+          core_time_solver->get_solution_history().erase(_system.time);
+
+          // We will be retrying this timestep with deltat/2, so restore
+          // all the necessary state.
+          // FIXME: this probably doesn't work with multistep methods
+          _system.get_vector("_old_nonlinear_solution") = *old_solution;
+          _system.time = old_time;
+          _system.deltat = old_deltat;
+
           // Reset the initial guess for our next try
           *(_system.solution) =
             _system.get_vector("_old_nonlinear_solution");
@@ -179,12 +199,22 @@ void TwostepTimeSolver::solve()
         }
       else
         max_tolerance_met = true;
+
     }
 
+  // Now that we have the converged full timestep solution, advance the time step
+  // and store it
+  core_time_solver->advance_timestep();
 
-  // Otherwise, compare the relative error to the tolerance
-  // and adjust deltat
-  last_deltat = _system.deltat;
+  // We ended up taking two half steps of size system.deltat to
+  // march our last time step.
+  this->completedtimestep_deltat = 2.0*_system.deltat;
+
+  // TimeSolver::solve methods should leave system.time unchanged
+  _system.time = old_time;
+
+  // Compare the relative error to the tolerance and adjust deltat
+  _system.deltat = old_deltat;
 
   // If our target tolerance is negative, that means we want to set
   // it based on the first successful time step
@@ -255,6 +285,105 @@ void TwostepTimeSolver::solve()
     {
       libMesh::out << "new delta t = " << _system.deltat << std::endl;
     }
+}
+
+std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & qoi_indices)
+{
+  // The adjoint timestepping mirrors the scheme used for the forward problem
+  // So the deltat, once set by solution history, will not be changed
+  Real old_time = _system.time;
+
+  // Take the first adjoint 'half timestep'
+  core_time_solver->adjoint_solve(qoi_indices);
+
+  // Adjoint advance the timestep
+  core_time_solver->adjoint_advance_timestep();
+
+  // The second half timestep
+  std::pair<unsigned int, Real> full_adjoint_output = core_time_solver->adjoint_solve(qoi_indices);
+
+  // Tell our timesolver the combined deltat before adjoint advance timestep updates it
+  this->completedtimestep_deltat = 2.0*_system.deltat;
+
+  // Adjoint advance again so solution history saves the adjoint
+  core_time_solver->adjoint_advance_timestep();
+
+  // Reset the system.time
+  _system.time = old_time;
+
+  return full_adjoint_output;
+}
+
+void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
+{
+  // We are using the midpoint rule to integrate each timestep
+  // (f(t_j) + f(t_j+1/2))/2 (t_j+1/2 - t_j) + (f(t_j+1/2) + f(t_j+1))/2 (t_j+1 - t_j+1/2)
+
+  // Get t_j
+  Real time_left = _system.time;
+
+  // Left side sensitivities to hold f(t_j)
+  SensitivityData sensitivities_left(qois, _system, parameter_vector);
+
+  // Get f(t_j)
+  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_left);
+
+  // Advance to t_j+1/2
+  _system.time = _system.time + _system.deltat;
+
+  // Get t_j+1/2
+  Real time_middle = _system.time;
+
+  // Middle sensitivities f(t_j+1/2)
+  SensitivityData sensitivities_middle(qois, _system, parameter_vector);
+
+  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+  _system.remove_vector("sensitivity_rhs0");
+
+  // Retrieve the primal and adjoint solutions at the current timestep
+  core_time_solver->retrieve_timestep();
+
+  // The deltat to be used for any residual evaluation needs to be the old deltat used to
+  // march the last timestep, not the one for the next step. So save this deltat, for use in assembling the residual.
+  Real old_deltat = _system.deltat;
+
+  // Get f(t_j+1/2)
+  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_middle);
+
+  // Advance to t_j+1
+  _system.time = _system.time + _system.deltat;
+
+  // Get t_j+1
+  Real time_right = _system.time;
+
+  // Right sensitivities f(t_j+1)
+  SensitivityData sensitivities_right(qois, _system, parameter_vector);
+
+  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+  _system.remove_vector("sensitivity_rhs0");
+
+  // Retrieve the primal and adjoint solutions at the current timestep
+  core_time_solver->retrieve_timestep();
+
+  // We now have the deltat for the next time march, save it because we will use the old deltat to assemble the residual.
+  Real new_deltat = _system.deltat;
+
+  // For the residual evaluation use old deltat
+  _system.deltat = old_deltat;
+
+  // Get f(t_j+1)
+  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_right);
+
+  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+  _system.remove_vector("sensitivity_rhs0");
+
+  // Get the contributions for each sensitivity from this timestep
+  for(unsigned int i = 0; i != qois.size(_system); i++)
+    for(unsigned int j = 0; j != parameter_vector.size(); j++)
+     sensitivities[i][j] = ( (sensitivities_left[i][j] + sensitivities_middle[i][j])/2. )*(time_middle - time_left) + ( (sensitivities_middle[i][j] + sensitivities_right[i][j])/2. )*(time_right - time_middle);
+
+  // For the next time march, use the new delta t
+  _system.deltat = new_deltat;
 }
 
 } // namespace libMesh
