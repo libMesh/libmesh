@@ -185,7 +185,10 @@ void UnsteadySolver::advance_timestep ()
      _system.get_dof_map().get_send_list());
 }
 
-
+std::pair<unsigned int, Real> UnsteadySolver::adjoint_solve(const QoISet & qoi_indices)
+{
+  return _system.ImplicitSystem::adjoint_solve(qoi_indices);
+}
 
 void UnsteadySolver::adjoint_advance_timestep ()
 {
@@ -230,6 +233,48 @@ void UnsteadySolver::retrieve_timestep()
   _system.get_vector("_old_nonlinear_solution").localize
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
+}
+
+void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
+{
+  // We are using the midpoint rule to integrate each timestep
+  // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+
+  // Get t_j
+  Real time_left = _system.time;
+
+  // Left side sensitivities to hold f(t_j)
+  SensitivityData sensitivities_left(qois, _system, parameter_vector);
+
+  // Get f(t_j)
+  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_left);
+
+  // Advance to t_j+1
+  _system.time = _system.time + _system.deltat;
+
+  // Get t_j+1
+  Real time_right = _system.time;
+
+  // Right side sensitivities f(t_j+1)
+  SensitivityData sensitivities_right(qois, _system, parameter_vector);
+
+  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+  _system.remove_vector("sensitivity_rhs0");
+
+  // Retrieve the primal and adjoint solutions at the current timestep
+  retrieve_timestep();
+
+  // Get f(t_j+1)
+  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_right);
+
+  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+  _system.remove_vector("sensitivity_rhs0");
+
+  // Get the contributions for each sensitivity from this timestep
+  for(unsigned int i = 0; i != qois.size(_system); i++)
+    for(unsigned int j = 0; j != parameter_vector.size(); j++)
+     sensitivities[i][j] = ( (sensitivities_left[i][j] + sensitivities_right[i][j])/2. )*(time_right - time_left);
+
 }
 
 
