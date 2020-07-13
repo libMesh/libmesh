@@ -498,12 +498,24 @@ int main (int argc, char ** argv)
           // Solve the forward problem at time t, to obtain the solution at time t + dt
           system.solve();
 
-          // Output the H1 norm of the computed solution
-          libMesh::out << "|U("
-                       << system.time + system.deltat
-                       << ")|= "
-                       << system.calculate_norm(*system.solution, 0, H1)
-                       << std::endl;
+          if(param.timesolver_tolerance)
+          {
+            // Output the H1 norm of the computed solution
+            libMesh::out << "|U("
+                         << system.time + dynamic_cast<AdaptiveTimeSolver &>(*(system.time_solver)).completedtimestep_deltat
+                         << ")|= "
+                         << system.calculate_norm(*system.solution, 0, H1)
+                         << std::endl;
+          }
+          else
+          {
+            // Output the H1 norm of the computed solution
+            libMesh::out << "|U("
+                         << system.time + system.deltat
+                         << ")|= "
+                         << system.calculate_norm(*system.solution, 0, H1)
+                         << std::endl;
+          }
 
           // Advance to the next timestep in a transient problem
           libMesh::out << "Advancing timestep" << std::endl << std::endl;
@@ -530,24 +542,6 @@ int main (int argc, char ** argv)
                    << system.time
                    << ")"
                    <<std::endl;
-
-      // Edit
-      // Need to call adjoint_advance_timestep once for the initial condition setup
-      //libMesh::out<<"Retrieving solutions at time t="<<system.time<<std::endl;
-      //system.time_solver->adjoint_advance_timestep();
-
-      // Output the H1 norm of the retrieved solutions (u^i and u^i+1)
-      //libMesh::out << "|U("
-      //              << system.time + system.deltat
-      //              << ")|= "
-      //              << system.calculate_norm(*system.solution, 0, H1)
-      //              << std::endl;
-
-      // libMesh::out << "|U("
-      //              << system.time
-      //              << ")|= "
-      //              << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-      //              << std::endl;
 
       // The first thing we have to do is to apply the adjoint initial
       // condition. The user should supply these. Here they are specified
@@ -597,11 +591,22 @@ int main (int argc, char ** argv)
                        << system.calculate_norm(*system.solution, 0, H1)
                        << std::endl;
 
-          libMesh::out << "|U("
-                       << system.time - system.deltat
-                       << ")|= "
-                       << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-                       << std::endl;
+          if(param.timesolver_tolerance)
+          {
+            libMesh::out << "|U("
+                         << system.time - ((dynamic_cast<AdaptiveTimeSolver &>(*(system.time_solver)).completedtimestep_deltat)/2.)
+                         << ")|= "
+                         << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                         << std::endl;
+          }
+          else
+          {
+            libMesh::out << "|U("
+                         << system.time - system.deltat
+                         << ")|= "
+                         << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                         << std::endl;
+          }
 
           system.set_adjoint_already_solved(false);
 
@@ -645,62 +650,32 @@ int main (int argc, char ** argv)
       // End adjoint timestep loop
 
       // Now that we have computed both the primal and adjoint solutions, we compute the sensitivities to the parameter p
-      // dQ/dp = partialQ/partialp - partialR/partialp
-      // partialQ/partialp = (Q(p+dp) - Q(p-dp))/(2*dp), this is not supported by the library yet
-      // partialR/partialp = (R(u,z;p+dp) - R(u,z;p-dp))/(2*dp), where
-      // R(u,z;p+dp) = int_{0}^{T} f(z;p+dp) - <partialu/partialt, z>(p+dp) - <g(u),z>(p+dp)
-      // To do this we need to step forward in time, and compute the perturbed R at each time step and accumulate it
-      // Then once all time steps are over, we can compute (R(u,z;p+dp) - R(u,z;p-dp))/(2*dp)
+      // dQ/dp = int_{0}^{T} partialQ/partialp - partialR/partialp(u,z;p) dt
+      // The quantity partialQ/partialp - partialR/partialp(u,z;p) is evaluated internally by the ImplicitSystem::adjoint_qoi_parameter_sensitivity function.
+      // This sensitivity evaluation is called internally by an overloaded TimeSolver::integrate_adjoint_sensitivity method which we call below.
 
-      // Now we begin the timestep loop to compute the time-accurate
-      // adjoint sensitivities
-      for (unsigned int t_step=param.initial_timestep;
-           t_step != param.initial_timestep + param.n_timesteps; ++t_step)
-        {
-          // A pretty update message
-          libMesh::out << "Retrieving "
-                       << t_step
-                       << ", time = "
-                       << system.time
-                       << std::endl;
+      // Prepare the quantities we need to pass to TimeSolver::integrate_adjoint_sensitivity
+      QoISet qois;
 
-          // Retrieve the primal and adjoint solutions at the current timestep
-          system.time_solver->retrieve_timestep();
+      std::vector<unsigned int> qoi_indices;
+      qoi_indices.push_back(0);
+      qois.add_indices(qoi_indices);
+      qois.set_weight(0, 1.0);
 
-          libMesh::out << "|U("
-                       << system.time
-                       << ")|= "
-                       << system.calculate_norm(*system.solution, 0, H1)
-                       << std::endl;
+      // A SensitivityData object
+      SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
-          //libMesh::out << "|U("
-          //             << system.time
-          //             << ")|= "
-          //             << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-  //            << std::endl;
-
-          libMesh::out << "|Z("
-                       << system.time
-                       << ")|= "
-                       << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
-                       << std::endl
-                       << std::endl;
-
-          // Call the postprocess function which we have overloaded to compute
-          // accumulate the perturbed residuals
-          dynamic_cast<HeatSystem &>(system).perturb_accumulate_residuals(dynamic_cast<HeatSystem &>(system).get_parameter_vector());
-
-          // Move the system time forward (retrieve_timestep does not do this)
-          system.time += system.deltat;
-        }
-
-      // A pretty update message
-      libMesh::out << "Retrieving final time = "
-                   << system.time
-                   << std::endl;
+      // Accumulator for the time integrated total sensitivity
+      Real total_sensitivity = 0.0;
 
       // Retrieve the primal and adjoint solutions at the current timestep
       system.time_solver->retrieve_timestep();
+
+      // A pretty update message
+      libMesh::out << "Retrieved, "
+               << "time = "
+               << system.time
+               << std::endl;
 
       libMesh::out << "|U("
                    << system.time
@@ -708,11 +683,11 @@ int main (int argc, char ** argv)
                    << system.calculate_norm(*system.solution, 0, H1)
                    << std::endl;
 
-      //libMesh::out << "|U("
-      //            << system.time
-      //           << ")|= "
-      //           << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-      //            << std::endl;
+      libMesh::out << "|U_old("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                   << std::endl;
 
       libMesh::out << "|Z("
                    << system.time
@@ -721,17 +696,47 @@ int main (int argc, char ** argv)
                    << std::endl
                    << std::endl;
 
-      // Call the postprocess function which we have overloaded to compute
-      // accumulate the perturbed residuals
-      dynamic_cast<HeatSystem &>(system).perturb_accumulate_residuals(dynamic_cast<HeatSystem &>(system).get_parameter_vector());
+      // Now we begin the timestep loop to compute the time-accurate
+      // adjoint sensitivities
+      for (unsigned int t_step=param.initial_timestep;
+           t_step != param.initial_timestep + param.n_timesteps; ++t_step)
+        {
+          // Call the postprocess function which we have overloaded to compute
+          // accumulate the perturbed residuals
+          system.time_solver->integrate_adjoint_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
-      // Now that we computed the accumulated, perturbed residuals, we can compute the
-      // approximate sensitivity
-      Number sensitivity_0_0 = (dynamic_cast<HeatSystem &>(system)).compute_final_sensitivity();
+          // A pretty update message
+          libMesh::out << "Retrieved, "
+               << "time = "
+               << system.time
+               << std::endl;
+
+          libMesh::out << "|U("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(*system.solution, 0, H1)
+                   << std::endl;
+
+          libMesh::out << "|U_old("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                   << std::endl;
+
+          libMesh::out << "|Z("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
+                   << std::endl
+                   << std::endl;
+
+          // Add the contribution of the current timestep to the total sensitivity
+          total_sensitivity += sensitivities[0][0];
+        }
 
       // Print it out
       libMesh::out << "Sensitivity of QoI 0 w.r.t parameter 0 is: "
-                   << sensitivity_0_0
+                   << total_sensitivity
                    << std::endl;
 
       // Hard coded test to ensure that the actual numbers we are
@@ -740,15 +745,15 @@ int main (int argc, char ** argv)
       // 32-bit floats
       if(param.timesolver_tolerance)
       {
-        if(std::abs(system.time - (1.00285)) >= 2.e-4)
+        if(std::abs(system.time - (1.0089)) >= 2.e-4)
         libmesh_error_msg("Mismatch in end time reached by adaptive timestepper!");
 
-        if(std::abs(sensitivity_0_0 - (-4.85298)) >= 2.e-4)
+        if(std::abs(total_sensitivity - 4.87767) >= 2.e-4)
         libmesh_error_msg("Mismatch in sensitivity gold value!");
       }
       else
       {
-        if(std::abs(sensitivity_0_0 - (-4.83551)) >= 2.e-4)
+        if(std::abs(total_sensitivity - 4.83551) >= 2.e-4)
         libmesh_error_msg("Mismatch in sensitivity gold value!");
       }
 #ifdef NDEBUG
