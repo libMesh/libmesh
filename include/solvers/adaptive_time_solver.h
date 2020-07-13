@@ -72,7 +72,15 @@ public:
 
   virtual void solve() override = 0;
 
+  virtual std::pair<unsigned int, Real> adjoint_solve (const QoISet & qoi_indices) override = 0;
+
   virtual void advance_timestep() override;
+
+  virtual void adjoint_advance_timestep() override;
+
+  virtual void retrieve_timestep() override;
+
+  virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override = 0;
 
   /**
    * This method is passed on to the core_time_solver
@@ -179,6 +187,14 @@ public:
    * unlimited.
    */
   Real max_growth;
+
+  /**
+   * The adaptive time solver's have two notions of deltat. The deltat the solver
+   * ended up using for the completed timestep. And the deltat the solver determined
+   * would be workable for the coming timestep. The latter gets set as system.deltat.
+   * We need a variable to save the deltat used for the completed timesteo.
+   * */
+  Real completedtimestep_deltat;
 
   /**
    * This flag, which is true by default, grows (shrinks) the timestep
