@@ -666,7 +666,7 @@ int main (int argc, char ** argv)
       SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
       // Accumulator for the time integrated total sensitivity
-      Real total_sensitivity = 0.0;
+      Number total_sensitivity = 0.0;
 
       // Retrieve the primal and adjoint solutions at the current timestep
       system.time_solver->retrieve_timestep();
