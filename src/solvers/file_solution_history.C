@@ -40,7 +40,7 @@ void FileSolutionHistory::find_stored_entry(Real time)
   if (stored_solutions.begin() == stored_solutions.end())
     return;
 
-  libmesh_assert (stored_sols != stored_solutions.end());
+  //libmesh_assert (stored_sols != stored_solutions.end());
 
   // We will use the map::lower_bound operation to find the key which
   // is the least upper bound among all existing keys for time.
@@ -259,11 +259,25 @@ void FileSolutionHistory::retrieve(bool is_adjoint_solve, Real time)
 
 void FileSolutionHistory::erase(Real time)
 {
-  stored_solutions_iterator stored_sols_erase_it;
+  // We cant erase the stored_sols iterator which is used in other places
+  // So save its current value for the future
+  stored_solutions_iterator stored_sols_last = stored_sols;
 
-  stored_sols_erase_it = stored_solutions.find(time);
+  // This will map the stored_sols iterator to the current time
+  this->find_stored_entry(time);
 
-  stored_solutions.erase(stored_sols_erase_it);
+  // map::erase behaviour is undefined if the iterator is pointing
+  // to a non-existent element.
+  libmesh_assert(stored_sols != stored_solutions.end());
+
+  // We want to keep using the stored_sols iterator, so we have to create
+  // a new one to erase the concerned entry
+  stored_solutions_iterator stored_sols_copy = stored_sols;
+  stored_sols = stored_sols_last;
+  stored_sols--;
+
+  stored_solutions.erase(stored_sols_copy);
+
 }
 
 }
