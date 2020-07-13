@@ -98,6 +98,11 @@ void TimeSolver::set_solution_history (const SolutionHistory & _solution_history
   solution_history = _solution_history.clone();
 }
 
+SolutionHistory & TimeSolver::get_solution_history ()
+{
+  return *solution_history;
+}
+
 void TimeSolver::advance_timestep ()
 {
 }
@@ -108,6 +113,14 @@ std::pair<unsigned int, Real> TimeSolver::adjoint_solve (const QoISet & qoi_indi
   libmesh_assert_equal_to (&(this->diff_solver()->system()), &(this->system()));
 
   return this->_system.ImplicitSystem::adjoint_solve(qoi_indices);
+}
+
+void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
+{
+  // Base class assumes a direct steady state sensitivity calculation
+  this->_system.ImplicitSystem::adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities);
+
+  return;
 }
 
 void TimeSolver::adjoint_advance_timestep ()

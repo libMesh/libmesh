@@ -28,6 +28,10 @@
 #include "libmesh/solution_history.h"
 #include "libmesh/qoi_set.h"
 
+// Sensitivity Calculation related includes
+#include "libmesh/parameter_vector.h"
+#include "libmesh/sensitivity_data.h"
+
 // C++ includes
 #include <memory>
 
@@ -131,6 +135,12 @@ public:
   virtual void retrieve_timestep();
 
   /**
+   * A method to integrate the adjoint sensitivity w.r.t a given parameter
+   * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
+   */
+  virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities);
+
+  /**
    * This method uses the DifferentiablePhysics
    * element_time_derivative(), element_constraint(), and
    * mass_residual() to build a full residual on an element.  What
@@ -231,6 +241,12 @@ public:
    * other than save no solution history
    */
   void set_solution_history(const SolutionHistory & _solution_history);
+
+  /**
+￼   * A getter function that returns a reference to the solution history
+￼   * object owned by TimeSolver
+￼   * */
+  SolutionHistory & get_solution_history();
 
   /**
    * Accessor for querying whether we need to do a primal
