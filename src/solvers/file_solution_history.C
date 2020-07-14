@@ -40,8 +40,6 @@ void FileSolutionHistory::find_stored_entry(Real time)
   if (stored_solutions.begin() == stored_solutions.end())
     return;
 
-  //libmesh_assert (stored_sols != stored_solutions.end());
-
   // We will use the map::lower_bound operation to find the key which
   // is the least upper bound among all existing keys for time.
   // (key before map::lower_bound) < time < map::lower_bound, one of these
@@ -273,8 +271,10 @@ void FileSolutionHistory::erase(Real time)
   // We want to keep using the stored_sols iterator, so we have to create
   // a new one to erase the concerned entry
   stored_solutions_iterator stored_sols_copy = stored_sols;
-  stored_sols = stored_sols_last;
-  stored_sols--;
+
+  // If we're asking to erase the entry at stored_sols, then move stored_sols somewhere safer first
+  if(stored_sols == stored_sols_last)
+    stored_sols--;
 
   stored_solutions.erase(stored_sols_copy);
 
