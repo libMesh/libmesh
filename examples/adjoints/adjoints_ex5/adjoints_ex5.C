@@ -106,6 +106,8 @@
 #include "libmesh/gmv_io.h"
 #include "libmesh/exodusII_io.h"
 
+#include "libmesh/sensitivity_data.h"
+
 // SolutionHistory Includes
 #include "libmesh/solution_history.h"
 #include "libmesh/memory_solution_history.h"

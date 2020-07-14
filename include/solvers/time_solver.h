@@ -22,12 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/linear_solver.h"
-#include "libmesh/numeric_vector.h"
 #include "libmesh/reference_counted_object.h"
-#include "libmesh/solution_history.h"
-#include "libmesh/qoi_set.h"
-#include "libmesh/sensitivity_data.h"
 
 // C++ includes
 #include <memory>
@@ -41,7 +36,13 @@ class DiffSolver;
 class DifferentiablePhysics;
 class DifferentiableSystem;
 class ParameterVector;
+class SensitivityData;
+class SolutionHistory;
 class SystemNorm;
+class QoISet;
+
+template <typename T>
+class LinearSolver;
 
 /**
  * This is a generic class that defines a solver to handle

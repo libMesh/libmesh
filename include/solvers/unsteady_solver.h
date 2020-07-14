@@ -22,7 +22,6 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/numeric_vector.h"
 #include "libmesh/time_solver.h"
 
 // C++ includes
@@ -30,6 +29,9 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+template <typename T> class NumericVector;
 
 /**
  * This is a generic class that defines a solver to handle

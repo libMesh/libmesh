@@ -21,6 +21,7 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/time_solver.h"
 #include "libmesh/newton_solver.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/sparse_matrix.h"
 
 namespace libMesh

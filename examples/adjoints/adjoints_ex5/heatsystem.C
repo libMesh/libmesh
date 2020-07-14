@@ -32,6 +32,7 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/numeric_vector.h"
 
 void HeatSystem::init_data ()
 {
