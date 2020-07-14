@@ -51,9 +51,15 @@ Number RBEIMTheta::evaluate(const RBParameters & mu)
       rb_eim_eval.set_parameters(mu);
     }
 
-  rb_eim_eval.rb_solve(rb_eim_eval.get_n_basis_functions());
+  rb_eim_eval.rb_eim_solve(rb_eim_eval.get_n_basis_functions());
 
-  return rb_eim_eval.RB_solution(index);
+  const DenseVector<Number> & eim_solution = rb_eim_eval.get_rb_eim_solution();
+  if(index >= eim_solution.size())
+  {
+    libmesh_error_msg("Error: Invalid EIM solution index, " + std::to_string(index));
+  }
+
+  return eim_solution(index);
 }
 
 }

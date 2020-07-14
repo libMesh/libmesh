@@ -186,17 +186,12 @@ void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
       RBData::RBEIMEvaluationReal::Builder rb_eim_eval_builder =
         message.initRoot<RBData::RBEIMEvaluationReal>();
-      RBData::RBEvaluationReal::Builder rb_eval_builder =
-        rb_eim_eval_builder.initRbEvaluation();
 #else
       RBData::RBEIMEvaluationComplex::Builder rb_eim_eval_builder =
         message.initRoot<RBData::RBEIMEvaluationComplex>();
-      RBData::RBEvaluationComplex::Builder rb_eval_builder =
-        rb_eim_eval_builder.initRbEvaluation();
 #endif
 
       add_rb_eim_evaluation_data_to_builder(_rb_eim_eval,
-                                            rb_eval_builder,
                                             rb_eim_eval_builder);
 
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
@@ -598,14 +593,21 @@ void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation & trans_r
 
 }
 
-template <typename RBEvaluationBuilderNumber, typename RBEIMEvaluationBuilderNumber>
+template <typename RBEIMEvaluationBuilderNumber>
 void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
-                                           RBEvaluationBuilderNumber & rb_evaluation_builder,
                                            RBEIMEvaluationBuilderNumber & rb_eim_evaluation_builder)
 {
-  add_rb_evaluation_data_to_builder(rb_eim_evaluation, rb_evaluation_builder);
+  // Number of basis functions
+    unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
+  rb_eim_evaluation_builder.setNBfs(n_bfs);
 
-  unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
+  auto parameter_ranges_list =
+    rb_eim_evaluation_builder.initParameterRanges();
+  auto discrete_parameters_list =
+    rb_eim_evaluation_builder.initDiscreteParameters();
+  add_parameter_ranges_to_builder(rb_eim_evaluation,
+                                  parameter_ranges_list,
+                                  discrete_parameters_list);
 
   // EIM interpolation matrix
   {
@@ -621,44 +623,53 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
           unsigned int offset = i*(i+1)/2 + j;
           set_scalar_in_list(interpolation_matrix_list,
                              offset,
-                             rb_eim_evaluation.interpolation_matrix(i,j));
+                             rb_eim_evaluation.get_interpolation_matrix()(i,j));
         }
   }
 
   // Interpolation points
   {
     auto interpolation_points_list =
-      rb_eim_evaluation_builder.initInterpolationPoints(n_bfs);
+      rb_eim_evaluation_builder.initInterpolationXyz(n_bfs);
     for (unsigned int i=0; i < n_bfs; ++i)
-      add_point_to_builder(rb_eim_evaluation.interpolation_points[i],
+      add_point_to_builder(rb_eim_evaluation.get_interpolation_points_xyz(i),
                            interpolation_points_list[i]);
   }
 
-  // Interpolation points variables
+  // Interpolation points comps
   {
-    auto interpolation_points_var_list =
-      rb_eim_evaluation_builder.initInterpolationPointsVar(n_bfs);
+    auto interpolation_points_comp_list =
+      rb_eim_evaluation_builder.initInterpolationComp(n_bfs);
     for (unsigned int i=0; i<n_bfs; ++i)
-      interpolation_points_var_list.set(i,
-                                        rb_eim_evaluation.interpolation_points_var[i]);
+      interpolation_points_comp_list.set(i,
+                                         rb_eim_evaluation.get_interpolation_points_comp(i));
   }
 
-  // Interpolation elements
+  // Interpolation points subdomain IDs
   {
-    unsigned int n_interpolation_elems =
-      rb_eim_evaluation.interpolation_points_elem.size();
-    auto interpolation_points_elem_list =
-      rb_eim_evaluation_builder.initInterpolationPointsElems(n_interpolation_elems);
+    auto interpolation_points_subdomain_id_list =
+      rb_eim_evaluation_builder.initInterpolationSubdomainId(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_subdomain_id_list.set(i,
+                                                 rb_eim_evaluation.get_interpolation_points_subdomain_id(i));
+  }
 
-    if (n_interpolation_elems != n_bfs)
-      libmesh_error_msg("The number of elements should match the number of basis functions");
+  // Interpolation points element IDs
+  {
+    auto interpolation_points_elem_id_list =
+      rb_eim_evaluation_builder.initInterpolationElemId(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_elem_id_list.set(i,
+                                            rb_eim_evaluation.get_interpolation_points_elem_id(i));
+  }
 
-    for (unsigned int i=0; i<n_interpolation_elems; ++i)
-      {
-        const libMesh::Elem & elem = *rb_eim_evaluation.interpolation_points_elem[i];
-        auto mesh_elem_builder = interpolation_points_elem_list[i];
-        add_elem_to_builder(elem, mesh_elem_builder);
-      }
+  // Interpolation points quadrature point indices
+  {
+    auto interpolation_points_qp_list =
+      rb_eim_evaluation_builder.initInterpolationQp(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_qp_list.set(i,
+                                       rb_eim_evaluation.get_interpolation_points_qp(i));
   }
 }
 
@@ -744,22 +755,6 @@ void add_point_to_builder(const Point & point, RBData::Point3D::Builder point_bu
 
   if (LIBMESH_DIM >= 3)
     point_builder.setZ(point(2));
-}
-
-void add_elem_to_builder(const libMesh::Elem & elem, RBData::MeshElem::Builder mesh_elem_builder)
-{
-  std::string elem_type_string = libMesh::Utility::enum_to_string(elem.type());
-
-  mesh_elem_builder.setType(elem_type_string.c_str());
-  mesh_elem_builder.setSubdomainId(elem.subdomain_id());
-
-  unsigned int n_points = elem.n_nodes();
-  auto mesh_elem_point_list = mesh_elem_builder.initPoints(n_points);
-
-  for (unsigned int j=0; j < n_points; ++j)
-    {
-      add_point_to_builder(elem.node_ref(j), mesh_elem_point_list[j]);
-    }
 }
 
 // ---- Helper functions for adding data to capnp Builders (END) ----

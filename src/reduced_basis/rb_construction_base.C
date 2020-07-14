@@ -638,5 +638,6 @@ template class RBConstructionBase<CondensedEigenSystem>;
 #endif
 
 template class RBConstructionBase<LinearImplicitSystem>;
+template class RBConstructionBase<System>;
 
 } // namespace libMesh

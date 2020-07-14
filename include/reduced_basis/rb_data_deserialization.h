@@ -220,9 +220,8 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
  * Load an EIM RB evaluation from a corresponding reader structure in the buffer.
  * Templated to deal with both Real and Complex numbers.
  */
-template <typename RBEvaluationReaderNumber, typename RBEIMEvaluationReaderNumber>
+template <typename RBEIMEvaluationReaderNumber>
 void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_eval,
-                                 RBEvaluationReaderNumber & rb_evaluation_reader,
                                  RBEIMEvaluationReaderNumber & rb_eim_eval_reader);
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
@@ -241,13 +240,6 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
  * Helper function that loads point data.
  */
 void load_point(RBData::Point3D::Reader point_reader, Point & point);
-
-/**
- * Helper function that loads element data.
- */
-void load_elem_into_mesh(RBData::MeshElem::Reader mesh_elem_reader,
-                         libMesh::Elem * elem,
-                         libMesh::ReplicatedMesh & mesh);
 
 } // namespace RBDataDeserialization
 

@@ -215,9 +215,8 @@ void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation & trans_r
  * Add data for an RBEIMEvaluation to the builder.
  * Templated to deal with both Real and Complex numbers.
  */
-template <typename RBEvaluationBuilderNumber, typename RBEIMEvaluationBuilderNumber>
+template <typename RBEIMEvaluationBuilderNumber>
 void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_eval,
-                                           RBEvaluationBuilderNumber & rb_eval_builder,
                                            RBEIMEvaluationBuilderNumber & rb_eim_eval_builder);
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
@@ -237,12 +236,6 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
  */
 void add_point_to_builder(const Point & point,
                           RBData::Point3D::Builder point_builder);
-
-/**
- * Helper function that adds element data.
- */
-void add_elem_to_builder(const Elem & elem,
-                         RBData::MeshElem::Builder mesh_elem_builder);
 
 } // namespace RBDataSerialization
 

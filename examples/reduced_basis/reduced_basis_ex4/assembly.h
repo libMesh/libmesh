@@ -38,9 +38,14 @@ using libMesh::FEBase;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {
-  virtual Number evaluate(const RBParameters & mu,
-                          const Point & p,
-                          const Elem &)
+  unsigned int get_n_components() const
+  {
+    return 1;
+  }
+
+  Number evaluate(const RBParameters & mu,
+                  const Point & p,
+                  subdomain_id_type /*subdomain_id*/)
   {
     Real center_x = mu.get_value("center_x");
     Real center_y = mu.get_value("center_y");

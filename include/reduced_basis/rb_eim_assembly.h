@@ -34,9 +34,8 @@
 namespace libMesh
 {
 
-class Elem;
 class RBParameters;
-class RBEIMConstruction;
+class RBEIMEvaluation;
 
 /**
  * This class provides functionality required to define an assembly
@@ -53,7 +52,7 @@ public:
   /**
    * Constructor.
    */
-  RBEIMAssembly(RBEIMConstruction & rb_eim_con_in,
+  RBEIMAssembly(RBEIMEvaluation & rb_eim_eval_in,
                 unsigned int basis_function_index_in);
 
   /**
@@ -62,58 +61,30 @@ public:
   virtual ~RBEIMAssembly();
 
   /**
-   * Evaluate variable \p var_number of this object's EIM basis function
-   * at the points \p points, where the points are in reference coordinates.
-   * Fill \p values with the basis function values.
+   * Return the basis function values for all quadrature points for variable \p var
+   * on element \p elem_id.
    */
-  virtual void evaluate_basis_function(unsigned int var,
-                                       const Elem & element,
-                                       const std::vector<Point> & points,
-                                       std::vector<Number> & values);
+  void evaluate_basis_function(dof_id_type elem_id,
+                               unsigned int var,
+                               std::vector<Number> & values);
 
   /**
-   * Get a reference to the RBEIMConstruction object.
+   * Get a reference to the RBEIMEvaluation object.
    */
-  RBEIMConstruction & get_rb_eim_construction();
-
-  /**
-   * Get a reference to the ghosted_basis_function.
-   */
-  NumericVector<Number> & get_ghosted_basis_function();
-
-  /**
-   * Retrieve the FE object.
-   */
-  FEBase & get_fe();
+  RBEIMEvaluation & get_rb_eim_evaluation();
 
 private:
 
   /**
-   * Initialize the FE object.
+   * The RBEIMEvaluation that stores the EIM basis functions that we use
+   * in evaluate_basis_function().
    */
-  void initialize_fe();
-
-  /**
-   * The RBEIMConstruction object that this RBEIMAssembly is based on.
-   */
-  RBEIMConstruction & _rb_eim_con;
+  RBEIMEvaluation & _rb_eim_eval;
 
   /**
    * The EIM basis function index (from rb_eim_eval) for this assembly object.
    */
   unsigned int _basis_function_index;
-
-  /**
-   * The basis function that we sample to evaluate the
-   * empirical interpolation approximation. This will be a GHOSTED
-   * vector to facilitate interpolation in the case of multiple processors.
-   */
-  std::unique_ptr<NumericVector<Number>> _ghosted_basis_function;
-
-  /**
-   * We store an FE object so we can easily reinit in evaluate_basis_function.
-   */
-  std::unique_ptr<FEBase> _fe;
 
 };
 

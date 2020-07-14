@@ -37,12 +37,6 @@ struct Point3D @0xde7dfcf8ecccaa90 {
   z @2 :Real;
 }
 
-struct MeshElem @0xcd01b7bd6045605d {
-  type         @0 :Text;
-  points       @1 :List(Point3D);
-  subdomainId  @2 :Integer;
-}
-
 struct RBSCMEvaluation @0xb8dd038628a64b16 {
   parameterRanges    @0 :ParameterRanges;
   discreteParameters @1 :DiscreteParameterList;
@@ -110,18 +104,24 @@ struct TransientRBEvaluationComplex @0x856e1656058c2e19 {
 }
 
 struct RBEIMEvaluationReal @0xf8121d2237427a80 {
-  rbEvaluation                @0 :RBEvaluationReal;
-  interpolationElemIds        @1 :List(Integer);
-  interpolationMatrix         @2 :List(Real);
-  interpolationPointsElems    @3 :List(MeshElem);
-  interpolationPointsVar      @4 :List(Integer);
-  interpolationPoints         @5 :List(Point3D);
+  nBfs                     @0 :Integer;
+  parameterRanges          @1 :ParameterRanges;
+  discreteParameters       @2 :DiscreteParameterList;
+  interpolationXyz         @3 :List(Point3D);
+  interpolationComp        @4 :List(Integer);
+  interpolationSubdomainId @5 :List(Integer);
+  interpolationElemId      @6 :List(Integer);
+  interpolationQp          @7 :List(Integer);
+  interpolationMatrix      @8 :List(Real);
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
-  rbEvaluation                @0 :RBEvaluationComplex;
-  interpolationElemIds        @1 :List(Integer);
-  interpolationMatrix         @2 :List(Complex);
-  interpolationPointsElems    @3 :List(MeshElem);
-  interpolationPointsVar      @4 :List(Integer);
-  interpolationPoints         @5 :List(Point3D);
+  nBfs                     @0 :Integer;
+  parameterRanges          @1 :ParameterRanges;
+  discreteParameters       @2 :DiscreteParameterList;
+  interpolationXyz         @3 :List(Point3D);
+  interpolationComp        @4 :List(Integer);
+  interpolationSubdomainId @5 :List(Integer);
+  interpolationElemId      @6 :List(Integer);
+  interpolationQp          @7 :List(Integer);
+  interpolationMatrix      @8 :List(Complex);
 }

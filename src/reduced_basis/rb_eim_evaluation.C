@@ -31,177 +31,173 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/elem.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "timpi/parallel_implementation.h"
 
 namespace libMesh
 {
 
-RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator & comm_in)
-  :
-  RBEvaluation(comm_in),
-  _previous_N(0),
-  _previous_error_bound(-1),
-  _interpolation_points_mesh(comm_in)
+RBEIMEvaluation::RBEIMEvaluation(const Parallel::Communicator & comm)
+:
+ParallelObject(comm),
+evaluate_eim_error_bound(true)
 {
-  // Indicate that we need to compute the RB
-  // inner product matrix in this case
-  compute_RB_inner_product = true;
-
-  // initialize to the empty RBThetaExpansion object
-  set_rb_theta_expansion(_empty_rb_theta_expansion);
-
-  // Let's not renumber the _interpolation_points_mesh
-  _interpolation_points_mesh.allow_renumbering(false);
 }
 
 RBEIMEvaluation::~RBEIMEvaluation()
 {
-  this->clear();
 }
 
 void RBEIMEvaluation::clear()
 {
-  Parent::clear();
+  _interpolation_points_xyz.clear();
+  _interpolation_points_comp.clear();
+  _interpolation_points_subdomain_id.clear();
+  _interpolation_points_elem_id.clear();
+  _interpolation_points_qp.clear();
 
-  interpolation_points.clear();
-  interpolation_points_var.clear();
-  interpolation_points_elem.clear();
-  _interpolation_points_mesh.clear();
+  _interpolation_matrix.resize(0,0);
 
   // Delete any RBTheta objects that were created
   _rb_eim_theta_objects.clear();
 }
 
-void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
-                                             bool resize_error_bound_data)
+void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
 {
-  Parent::resize_data_structures(Nmax, resize_error_bound_data);
-
   // Resize the data structures relevant to the EIM system
-  interpolation_points.clear();
-  interpolation_points_var.clear();
-  interpolation_points_elem.clear();
-  interpolation_matrix.resize(Nmax,Nmax);
+  _interpolation_points_xyz.clear();
+  _interpolation_points_comp.clear();
+  _interpolation_points_subdomain_id.clear();
+  _interpolation_points_elem_id.clear();
+  _interpolation_points_qp.clear();
+
+  _interpolation_matrix.resize(Nmax,Nmax);
 }
 
-void RBEIMEvaluation::attach_parametrized_function(RBParametrizedFunction * pf)
+void RBEIMEvaluation::set_parametrized_function(std::unique_ptr<RBParametrizedFunction> pf)
 {
-  _parametrized_functions.push_back(pf);
+  _parametrized_function = std::move(pf);
 }
 
-unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
+RBParametrizedFunction & RBEIMEvaluation::get_parametrized_function()
 {
-  return cast_int<unsigned int>
-    (_parametrized_functions.size());
+  if(!_parametrized_function)
+    libmesh_error_msg("Parametrized function not initialized yet");
+
+  return *_parametrized_function;
 }
 
-ReplicatedMesh & RBEIMEvaluation::get_interpolation_points_mesh()
+Real RBEIMEvaluation::rb_eim_solve(unsigned int N)
 {
-  return _interpolation_points_mesh;
-}
-
-Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index,
-                                                       const Point & p,
-                                                       const Elem & elem)
-{
-  if (var_index >= get_n_parametrized_functions())
-    libmesh_error_msg("Error: We must have var_index < get_n_parametrized_functions() in evaluate_parametrized_function.");
-
-  return _parametrized_functions[var_index]->evaluate(get_parameters(), p, elem);
-}
-
-Real RBEIMEvaluation::rb_solve(unsigned int N)
-{
-  // Short-circuit if we are using the same parameters and value of N
-  if ((_previous_parameters == get_parameters()) && (_previous_N == N))
-    {
-      return _previous_error_bound;
-    }
-
-  // Otherwise, update _previous parameters, _previous_N
-  _previous_parameters = get_parameters();
-  _previous_N = N;
-
-  LOG_SCOPE("rb_solve()", "RBEIMEvaluation");
+  LOG_SCOPE("rb_eim_solve()", "RBEIMEvaluation");
 
   if (N > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+    libmesh_error_msg("Error: N cannot be larger than the number of basis functions in rb_solve");
 
   if (N==0)
-    libmesh_error_msg("ERROR: N must be greater than 0 in rb_solve");
+    libmesh_error_msg("Error: N must be greater than 0 in rb_solve");
 
   // Get the rhs by sampling parametrized_function
   // at the first N interpolation_points
   DenseVector<Number> EIM_rhs(N);
   for (unsigned int i=0; i<N; i++)
     {
-      EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i],
-                                                  interpolation_points[i],
-                                                  *interpolation_points_elem[i]);
+      EIM_rhs(i) = get_parametrized_function().evaluate(get_parameters(),
+                                                        _interpolation_points_comp[i],
+                                                        _interpolation_points_xyz[i],
+                                                        _interpolation_points_subdomain_id[i]);
     }
 
-
-
   DenseMatrix<Number> interpolation_matrix_N;
-  interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
+  _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
 
-  interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
+  interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solution);
 
   // Optionally evaluate an a posteriori error bound. The EIM error estimate
   // recommended in the literature is based on using "next" EIM point, so
   // we skip this if N == get_n_basis_functions()
-  if (evaluate_RB_error_bound && (N != get_n_basis_functions()))
+  if (evaluate_eim_error_bound && (N != get_n_basis_functions()))
     {
       // Compute the a posteriori error bound
       // First, sample the parametrized function at x_{N+1}
-      Number g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N],
-                                                          interpolation_points[N],
-                                                          *interpolation_points_elem[N]);
+      Number g_at_next_x = get_parametrized_function().evaluate(get_parameters(),
+                                                        _interpolation_points_comp[N],
+                                                        _interpolation_points_xyz[N],
+                                                        _interpolation_points_subdomain_id[N]);
 
       // Next, evaluate the EIM approximation at x_{N+1}
       Number EIM_approx_at_next_x = 0.;
       for (unsigned int j=0; j<N; j++)
         {
-          EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
+          EIM_approx_at_next_x += _rb_eim_solution(j) * _interpolation_matrix(N,j);
         }
 
       Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
-
-      _previous_error_bound = error_estimate;
       return error_estimate;
     }
   else // Don't evaluate an error bound
     {
-      _previous_error_bound = -1.;
       return -1.;
     }
-
 }
 
-void RBEIMEvaluation::rb_solve(DenseVector<Number> & EIM_rhs)
+void RBEIMEvaluation::rb_eim_solve(DenseVector<Number> & EIM_rhs)
 {
-  LOG_SCOPE("rb_solve()", "RBEIMEvaluation");
+  LOG_SCOPE("rb_eim_solve()", "RBEIMEvaluation");
 
   if (EIM_rhs.size() > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+    libmesh_error_msg("Error: N cannot be larger than the number of basis functions in rb_solve");
 
   if (EIM_rhs.size()==0)
-    libmesh_error_msg("ERROR: N must be greater than 0 in rb_solve");
+    libmesh_error_msg("Error: N must be greater than 0 in rb_solve");
 
   const unsigned int N = EIM_rhs.size();
   DenseMatrix<Number> interpolation_matrix_N;
-  interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
+  _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
 
-  interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
+  interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solution);
 }
 
-Real RBEIMEvaluation::get_error_bound_normalization()
+unsigned int RBEIMEvaluation::get_n_basis_functions() const
 {
-  // Just set the normalization factor to 1 in this case.
-  // Users can override this method if specific behavior
-  // is required.
+  return _local_eim_basis_functions.size();
+}
 
-  return 1.;
+void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
+{
+  _local_eim_basis_functions.resize(n_bfs);
+}
+
+void RBEIMEvaluation::decrement_vector(std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & v,
+                                       const DenseVector<Number> & coeffs)
+{
+  if(get_n_basis_functions() != coeffs.size())
+    libmesh_error_msg("Error: Number of coefficients should match number of basis functions");
+
+  for (const auto v_it : v)
+    {
+      dof_id_type elem_id = v_it.first;
+      const auto & v_comp_and_qp = v_it.second;
+      
+      for (const auto & comp : index_range(v_comp_and_qp))
+        for (unsigned int qp : index_range(v_comp_and_qp[comp]))
+          for (unsigned int i : index_range(_local_eim_basis_functions))
+            {
+              // Check that entry (elem_id,comp,qp) exists in _local_eim_basis_functions so that
+              // we get a clear error message if there is any missing data
+              auto basis_it = _local_eim_basis_functions[i].find(elem_id);
+              if (basis_it == _local_eim_basis_functions[i].end())
+                libmesh_error_msg("Error: Missing elem_id");
+
+              const auto & basis_comp_and_qp = basis_it->second;
+              if(comp >= basis_comp_and_qp.size())
+                libmesh_error_msg("Error: Invalid comp");
+              if(qp >= basis_comp_and_qp[comp].size())
+                libmesh_error_msg("Error: Invalid qp");
+
+              v[elem_id][comp][qp] -= get_rb_eim_solution()(i) * basis_comp_and_qp[comp][qp];
+            }
+    }
+
 }
 
 void RBEIMEvaluation::initialize_eim_theta_objects()
@@ -222,280 +218,192 @@ std::unique_ptr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
   return libmesh_make_unique<RBEIMTheta>(*this, index);
 }
 
-void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
-                                                         const bool read_binary_data)
+void RBEIMEvaluation::get_parametrized_function_values_at_qps(
+  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & pf,
+  dof_id_type elem_id,
+  unsigned int comp,
+  std::vector<Number> & values)
 {
-  LOG_SCOPE("legacy_write_offline_data_to_files()", "RBEIMEvaluation");
+  LOG_SCOPE("get_parametrized_function_values_at_qps()", "RBEIMConstruction");
 
-  Parent::legacy_write_offline_data_to_files(directory_name);
+  values.clear();
 
-  // Get the number of basis functions
-  unsigned int n_bfs = get_n_basis_functions();
-
-  // The writing mode: ENCODE for binary, WRITE for ASCII
-  XdrMODE mode = read_binary_data ? ENCODE : WRITE;
-
-  // The suffix to use for all the files that are written out
-  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
-
-  if (this->processor_id() == 0)
-    {
-      std::ostringstream file_name;
-
-      // Next write out the interpolation_matrix
-      file_name.str("");
-      file_name << directory_name << "/interpolation_matrix" << suffix;
-      Xdr interpolation_matrix_out(file_name.str(), mode);
-
-      for (unsigned int i=0; i<n_bfs; i++)
-        {
-          for (unsigned int j=0; j<=i; j++)
-            {
-              interpolation_matrix_out << interpolation_matrix(i,j);
-            }
-        }
-
-      // Next write out interpolation_points
-      file_name.str("");
-      file_name << directory_name << "/interpolation_points" << suffix;
-      Xdr interpolation_points_out(file_name.str(), mode);
-
-      for (unsigned int i=0; i<n_bfs; i++)
-        {
-          interpolation_points_out << interpolation_points[i](0);
-
-          if (LIBMESH_DIM >= 2)
-            interpolation_points_out << interpolation_points[i](1);
-
-          if (LIBMESH_DIM >= 3)
-            interpolation_points_out << interpolation_points[i](2);
-        }
-      interpolation_points_out.close();
-
-      // Next write out interpolation_points_var
-      file_name.str("");
-      file_name << directory_name << "/interpolation_points_var" << suffix;
-      Xdr interpolation_points_var_out(file_name.str(), mode);
-
-      for (unsigned int i=0; i<n_bfs; i++)
-        {
-          interpolation_points_var_out << interpolation_points_var[i];
-        }
-      interpolation_points_var_out.close();
-    }
-
-  // Write out the elements associated with the interpolation points.
-  // This uses mesh I/O, hence we have to do it on all processors.
-  legacy_write_out_interpolation_points_elem(directory_name);
-}
-
-void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::string & directory_name)
-{
-  _interpolation_points_mesh.clear();
-
-  // Maintain a set of node IDs to make sure we don't insert
-  // the same node into _interpolation_points_mesh more than once
-  std::set<dof_id_type> node_ids;
-  std::map<dof_id_type, dof_id_type> node_id_map;
-
-  unsigned int new_node_id = 0;
-  for (const auto & old_elem : interpolation_points_elem)
-      for (unsigned int n=0; n<old_elem->n_nodes(); n++)
-        {
-          Node & node_ref = old_elem->node_ref(n);
-          dof_id_type old_node_id = node_ref.id();
-
-          // Check if this node has already been added. This
-          // could happen if some of the elements are neighbors.
-          if (node_ids.find(old_node_id) == node_ids.end())
-            {
-              node_ids.insert(old_node_id);
-              _interpolation_points_mesh.add_point(node_ref, new_node_id, /* proc_id */ 0);
-
-              node_id_map[old_node_id] = new_node_id;
-
-              new_node_id++;
-            }
-        }
-
-  // Maintain a map of elem IDs to make sure we don't insert
-  // the same elem into _interpolation_points_mesh more than once
-  std::map<dof_id_type,dof_id_type> elem_id_map;
-  std::vector<dof_id_type> interpolation_elem_ids(interpolation_points_elem.size());
-  dof_id_type new_elem_id = 0;
-  for (auto i : index_range(interpolation_elem_ids))
-    {
-      Elem * old_elem = interpolation_points_elem[i];
-
-      dof_id_type old_elem_id = old_elem->id();
-
-      // Only insert the element into the mesh if it hasn't already been inserted
-      std::map<dof_id_type,dof_id_type>::iterator id_it = elem_id_map.find(old_elem_id);
-      if (id_it == elem_id_map.end())
-        {
-          auto new_elem = Elem::build(old_elem->type(), /*parent*/ nullptr);
-          new_elem->subdomain_id() = old_elem->subdomain_id();
-
-          // Assign all the nodes
-          for (unsigned int n=0; n<new_elem->n_nodes(); n++)
-            {
-              dof_id_type old_node_id = old_elem->node_id(n);
-              new_elem->set_node(n) =
-                _interpolation_points_mesh.node_ptr( node_id_map[old_node_id] );
-            }
-
-          // Just set all proc_ids to 0
-          new_elem->processor_id() = 0;
-
-          // Add the element to the mesh
-          Elem * added_elem = _interpolation_points_mesh.add_elem(std::move(new_elem));
-
-          // Set the id of new_elem appropriately
-          added_elem->set_id(new_elem_id);
-          interpolation_elem_ids[i] = added_elem->id();
-          elem_id_map[old_elem_id] = added_elem->id();
-
-          new_elem_id++;
-        }
-      else
-        {
-          interpolation_elem_ids[i] = id_it->second;
-        }
-
-    }
-
-  libmesh_assert(new_elem_id == _interpolation_points_mesh.n_elem());
-
-  _interpolation_points_mesh.write(directory_name + "/interpolation_points_mesh.xda");
-
-  // Also, write out the vector that tells us which element each entry
-  // of interpolation_points_elem corresponds to. This allows us to handle
-  // the case in which elements are repeated in interpolation_points_elem.
-  if (processor_id() == 0)
-    {
-      // These are just integers, so no need for a binary format here
-      std::ofstream interpolation_elem_ids_out
-        ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ofstream::out);
-
-      for (const auto & id : interpolation_elem_ids)
-        interpolation_elem_ids_out << id << std::endl;
-
-      interpolation_elem_ids_out.close();
-    }
-}
-
-void RBEIMEvaluation::legacy_read_offline_data_from_files(const std::string & directory_name,
-                                                          bool read_error_bound_data,
-                                                          const bool read_binary_data)
-{
-  LOG_SCOPE("legacy_read_offline_data_from_files()", "RBEIMEvaluation");
-
-  Parent::legacy_read_offline_data_from_files(directory_name, read_error_bound_data);
-
-  // First, find out how many basis functions we had when Greedy terminated
-  // This was set in RBSystem::read_offline_data_from_files
-  unsigned int n_bfs = this->get_n_basis_functions();
-
-  // The writing mode: DECODE for binary, READ for ASCII
-  XdrMODE mode = read_binary_data ? DECODE : READ;
-
-  // The suffix to use for all the files that are written out
-  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
-
-  // Stream for creating file names
-  std::ostringstream file_name;
-
-  // Read in the interpolation matrix
-  file_name.str("");
-  file_name << directory_name << "/interpolation_matrix" << suffix;
-  assert_file_exists(file_name.str());
-
-  Xdr interpolation_matrix_in(file_name.str(), mode);
-
-  for (unsigned int i=0; i<n_bfs; i++)
-    {
-      for (unsigned int j=0; j<=i; j++)
-        {
-          Number value;
-          interpolation_matrix_in >> value;
-          interpolation_matrix(i,j) = value;
-        }
-    }
-  interpolation_matrix_in.close();
-
-  // Next read in interpolation_points
-  file_name.str("");
-  file_name << directory_name << "/interpolation_points" << suffix;
-  assert_file_exists(file_name.str());
-
-  Xdr interpolation_points_in(file_name.str(), mode);
-
-  for (unsigned int i=0; i<n_bfs; i++)
-    {
-      Real x_val, y_val, z_val = 0.;
-      interpolation_points_in >> x_val;
-
-      if (LIBMESH_DIM >= 2)
-        interpolation_points_in >> y_val;
-
-      if (LIBMESH_DIM >= 3)
-        interpolation_points_in >> z_val;
-
-      Point p(x_val, y_val, z_val);
-      interpolation_points.push_back(p);
-    }
-  interpolation_points_in.close();
-
-  // Next read in interpolation_points_var
-  file_name.str("");
-  file_name << directory_name << "/interpolation_points_var" << suffix;
-  assert_file_exists(file_name.str());
-
-  Xdr interpolation_points_var_in(file_name.str(), mode);
-
-  for (unsigned int i=0; i<n_bfs; i++)
-    {
-      unsigned int var;
-      interpolation_points_var_in >> var;
-      interpolation_points_var.push_back(var);
-    }
-  interpolation_points_var_in.close();
-
-  // Read in the elements corresponding to the interpolation points
-  legacy_read_in_interpolation_points_elem(directory_name);
-}
-
-void RBEIMEvaluation::legacy_read_in_interpolation_points_elem(const std::string & directory_name)
-{
-  _interpolation_points_mesh.read(directory_name + "/interpolation_points_mesh.xda");
-
-  // We have an element for each EIM basis function
-  unsigned int n_bfs = this->get_n_basis_functions();
-
-  std::vector<dof_id_type> interpolation_elem_ids;
+  const auto it = pf.find(elem_id);
+  if(it != pf.end())
   {
-    // These are just integers, so no need for a binary format here
-    std::ifstream interpolation_elem_ids_in
-      ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ifstream::in);
+    const auto & comps_and_qps_on_elem = it->second;
+    if(comp >= comps_and_qps_on_elem.size())
+    {
+      libmesh_error_msg("Invalid comp index: " + std::to_string(comp));
+    }
 
-    if (!interpolation_elem_ids_in)
-      libmesh_error_msg("RB data missing: " + directory_name + "/interpolation_elem_ids.dat");
+    values = comps_and_qps_on_elem[comp];
+  }
+}
 
-    for (unsigned int i=0; i<n_bfs; i++)
-      {
-        dof_id_type elem_id;
-        interpolation_elem_ids_in >> elem_id;
-        interpolation_elem_ids.push_back(elem_id);
-      }
-    interpolation_elem_ids_in.close();
+Number RBEIMEvaluation::get_parametrized_function_value(
+  const Parallel::Communicator & comm,
+  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & pf,
+  dof_id_type elem_id,
+  unsigned int comp,
+  unsigned int qp)
+{
+  std::vector<Number> values;
+  get_parametrized_function_values_at_qps(pf, elem_id, comp, values);
+
+  // In parallel, values should only be non-empty on one processor
+  Number value = 0.;
+  if(!values.empty())
+  {
+    if(qp >= values.size())
+      libmesh_error_msg("Error: Invalid qp index");
+
+    value = values[qp];
+  }
+  comm.sum(value);
+
+  return value;
+}
+
+void RBEIMEvaluation::get_eim_basis_function_values_at_qps(unsigned int basis_function_index,
+                                                           dof_id_type elem_id,
+                                                           unsigned int comp,
+                                                           std::vector<Number> & values) const
+{
+  if(basis_function_index >= _local_eim_basis_functions.size())
+  {
+    libmesh_error_msg("Invalid basis function index: " + std::to_string(basis_function_index));
   }
 
-  interpolation_points_elem.resize(n_bfs);
-  for (unsigned int i=0; i<n_bfs; i++)
-    {
-      interpolation_points_elem[i] =
-        _interpolation_points_mesh.elem_ptr(interpolation_elem_ids[i]);
-    }
+  get_parametrized_function_values_at_qps(
+    _local_eim_basis_functions[basis_function_index],
+    elem_id,
+    comp,
+    values);
+}
+
+Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function_index,
+                                                     dof_id_type elem_id,
+                                                     unsigned int comp,
+                                                     unsigned int qp) const
+{
+  if(basis_function_index >= _local_eim_basis_functions.size())
+  {
+    libmesh_error_msg("Invalid basis function index: " + std::to_string(basis_function_index));
+  }
+
+  return get_parametrized_function_value(
+    comm(),
+    _local_eim_basis_functions[basis_function_index],
+    elem_id,
+    comp,
+    qp);
+}
+
+const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> &
+  RBEIMEvaluation::get_basis_function(unsigned int i) const
+{
+  return _local_eim_basis_functions[i];
+}
+
+const DenseVector<Number> & RBEIMEvaluation::get_rb_eim_solution() const
+{
+  return _rb_eim_solution;
+}
+
+void RBEIMEvaluation::add_interpolation_points_xyz(Point p)
+{
+  _interpolation_points_xyz.emplace_back(p);
+}
+
+void RBEIMEvaluation::add_interpolation_points_comp(unsigned int comp)
+{
+  _interpolation_points_comp.emplace_back(comp);
+}
+
+void RBEIMEvaluation::add_interpolation_points_subdomain_id(subdomain_id_type sbd_id)
+{
+  _interpolation_points_subdomain_id.emplace_back(sbd_id);
+}
+
+void RBEIMEvaluation::add_interpolation_points_elem_id(dof_id_type elem_id)
+{
+  _interpolation_points_elem_id.emplace_back(elem_id);
+}
+
+void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
+{
+  _interpolation_points_qp.emplace_back(qp);
+}
+
+Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
+{
+  if(index >= _interpolation_points_xyz.size())
+    libmesh_error_msg("Error: Invalid index");
+
+  return _interpolation_points_xyz[index];
+}
+
+unsigned int RBEIMEvaluation::get_interpolation_points_comp(unsigned int index) const
+{
+  if(index >= _interpolation_points_comp.size())
+    libmesh_error_msg("Error: Invalid index");
+
+  return _interpolation_points_comp[index];
+}
+
+subdomain_id_type RBEIMEvaluation::get_interpolation_points_subdomain_id(unsigned int index) const
+{
+  if(index >= _interpolation_points_subdomain_id.size())
+    libmesh_error_msg("Error: Invalid index");
+
+  return _interpolation_points_subdomain_id[index];
+}
+
+dof_id_type RBEIMEvaluation::get_interpolation_points_elem_id(unsigned int index) const
+{
+  if(index >= _interpolation_points_elem_id.size())
+    libmesh_error_msg("Error: Invalid index");
+
+  return _interpolation_points_elem_id[index];
+}
+
+unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) const
+{
+  if(index >= _interpolation_points_qp.size())
+    libmesh_error_msg("Error: Invalid index");
+
+  return _interpolation_points_qp[index];
+}
+
+void RBEIMEvaluation::set_interpolation_matrix_entry(unsigned int i, unsigned int j, Number value)
+{
+  if( (i >= _interpolation_matrix.m()) || (j >= _interpolation_matrix.n()) )
+    libmesh_error_msg("Error: Invalid matrix indices");
+
+  _interpolation_matrix(i,j) = value;
+}
+
+const DenseMatrix<Number> & RBEIMEvaluation::get_interpolation_matrix() const
+{
+  return _interpolation_matrix;
+}
+
+void RBEIMEvaluation::add_basis_function_and_interpolation_data(
+  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & bf,
+  Point p,
+  unsigned int comp,
+  dof_id_type elem_id,
+  subdomain_id_type subdomain_id,
+  unsigned int qp)
+{
+  _local_eim_basis_functions.emplace_back(bf);
+
+  _interpolation_points_xyz.emplace_back(p);
+  _interpolation_points_comp.emplace_back(comp);
+  _interpolation_points_elem_id.emplace_back(elem_id);
+  _interpolation_points_subdomain_id.emplace_back(subdomain_id);
+  _interpolation_points_qp.emplace_back(qp);
 }
 
 }

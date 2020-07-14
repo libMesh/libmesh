@@ -209,17 +209,12 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   RBData::RBEIMEvaluationReal::Reader rb_eim_eval_reader =
     message->getRoot<RBData::RBEIMEvaluationReal>();
-  RBData::RBEvaluationReal::Reader rb_eval_reader =
-    rb_eim_eval_reader.getRbEvaluation();
 #else
   RBData::RBEIMEvaluationComplex::Reader rb_eim_eval_reader =
     message->getRoot<RBData::RBEIMEvaluationComplex>();
-  RBData::RBEvaluationComplex::Reader rb_eval_reader =
-    rb_eim_eval_reader.getRbEvaluation();
 #endif
 
   load_rb_eim_evaluation_data(_rb_eim_eval,
-                              rb_eval_reader,
                               rb_eim_eval_reader);
 
   int error = close(fd);
@@ -671,18 +666,24 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
     }
 }
 
-template <typename RBEvaluationReaderNumber, typename RBEIMEvaluationReaderNumber>
+template <typename RBEIMEvaluationReaderNumber>
 void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
-                                 RBEvaluationReaderNumber & rb_evaluation_reader,
                                  RBEIMEvaluationReaderNumber & rb_eim_evaluation_reader)
 {
-  // We use read_error_bound_data=false here, since the RBEvaluation error bound data
-  // is not relevant to EIM.
-  load_rb_evaluation_data(rb_eim_evaluation,
-                          rb_evaluation_reader,
-                          /*read_error_bound_data*/ false);
+  // Set number of basis functions
+  unsigned int n_bfs = rb_eim_evaluation_reader.getNBfs();
+  rb_eim_evaluation.set_n_basis_functions(n_bfs);
 
-  unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
+  rb_eim_evaluation.resize_data_structures(n_bfs);
+
+  auto parameter_ranges =
+    rb_eim_evaluation_reader.getParameterRanges();
+  auto discrete_parameters_list =
+    rb_eim_evaluation_reader.getDiscreteParameters();
+
+  load_parameter_ranges(rb_eim_evaluation,
+                        parameter_ranges,
+                        discrete_parameters_list);
 
   // EIM interpolation matrix
   {
@@ -695,71 +696,80 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       for (unsigned int j=0; j<=i; ++j)
         {
           unsigned int offset = i*(i+1)/2 + j;
-          rb_eim_evaluation.interpolation_matrix(i,j) =
-            load_scalar_value(interpolation_matrix_list[offset]);
+          rb_eim_evaluation.set_interpolation_matrix_entry(
+            i,j, load_scalar_value(interpolation_matrix_list[offset]));
         }
   }
 
   // Interpolation points
   {
     auto interpolation_points_list =
-      rb_eim_evaluation_reader.getInterpolationPoints();
+      rb_eim_evaluation_reader.getInterpolationXyz();
 
     if (interpolation_points_list.size() != n_bfs)
       libmesh_error_msg("Size error while reading the eim interpolation points.");
 
-    rb_eim_evaluation.interpolation_points.resize(n_bfs);
     for (unsigned int i=0; i<n_bfs; ++i)
       {
-        load_point(interpolation_points_list[i],
-                   rb_eim_evaluation.interpolation_points[i]);
+        Point p;
+        load_point(interpolation_points_list[i], p);
+        rb_eim_evaluation.add_interpolation_points_xyz(p);
       }
   }
 
-  // Interpolation points variables
+  // Interpolation points componnents
   {
-    auto interpolation_points_var_list =
-      rb_eim_evaluation_reader.getInterpolationPointsVar();
-    rb_eim_evaluation.interpolation_points_var.resize(n_bfs);
+    auto interpolation_points_comp_list =
+      rb_eim_evaluation_reader.getInterpolationComp();
 
-    if (interpolation_points_var_list.size() != n_bfs)
-      libmesh_error_msg("Size error while reading the eim interpolation variables.");
+    if (interpolation_points_comp_list.size() != n_bfs)
+      libmesh_error_msg("Size error while reading the eim interpolation components.");
 
     for (unsigned int i=0; i<n_bfs; ++i)
       {
-        rb_eim_evaluation.interpolation_points_var[i] =
-          interpolation_points_var_list[i];
+        rb_eim_evaluation.add_interpolation_points_comp(interpolation_points_comp_list[i]);
       }
   }
 
-  // Interpolation elements
+  // Interpolation points subdomain IDs
   {
-    libMesh::dof_id_type elem_id = 0;
-    libMesh::ReplicatedMesh & interpolation_points_mesh =
-      rb_eim_evaluation.get_interpolation_points_mesh();
-    interpolation_points_mesh.clear();
+    auto interpolation_points_subdomain_id_list =
+      rb_eim_evaluation_reader.getInterpolationSubdomainId();
 
-    auto interpolation_points_elem_list =
-      rb_eim_evaluation_reader.getInterpolationPointsElems();
-    unsigned int n_interpolation_elems = interpolation_points_elem_list.size();
+    if (interpolation_points_subdomain_id_list.size() != n_bfs)
+      libmesh_error_msg("Size error while reading the eim interpolation subdomain IDs.");
 
-    if (n_interpolation_elems != n_bfs)
-      libmesh_error_msg("The number of elements should match the number of basis functions");
-
-    rb_eim_evaluation.interpolation_points_elem.resize(n_interpolation_elems);
-
-    for (unsigned int i=0; i<n_interpolation_elems; ++i)
+    for (unsigned int i=0; i<n_bfs; ++i)
       {
-        auto mesh_elem_reader = interpolation_points_elem_list[i];
-        std::string elem_type_name = mesh_elem_reader.getType().cStr();
-        libMesh::ElemType elem_type =
-          libMesh::Utility::string_to_enum<libMesh::ElemType>(elem_type_name);
+        rb_eim_evaluation.add_interpolation_points_subdomain_id(interpolation_points_subdomain_id_list[i]);
+      }
+  }
 
-        libMesh::Elem * elem = libMesh::Elem::build(elem_type).release();
-        elem->set_id(elem_id++);
-        load_elem_into_mesh(mesh_elem_reader, elem, interpolation_points_mesh);
+  // Interpolation points element IDs
+  {
+    auto interpolation_points_elem_id_list =
+      rb_eim_evaluation_reader.getInterpolationElemId();
 
-        rb_eim_evaluation.interpolation_points_elem[i] = elem;
+    if (interpolation_points_elem_id_list.size() != n_bfs)
+      libmesh_error_msg("Size error while reading the eim interpolation element IDs.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_elem_id(interpolation_points_elem_id_list[i]);
+      }
+  }
+
+  // Interpolation points quad point indices
+  {
+    auto interpolation_points_qp_list =
+      rb_eim_evaluation_reader.getInterpolationQp();
+
+    if (interpolation_points_qp_list.size() != n_bfs)
+      libmesh_error_msg("Size error while reading the eim interpolation qps.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_elem_id(interpolation_points_qp_list[i]);
       }
   }
 }
@@ -865,32 +875,6 @@ void load_point(RBData::Point3D::Reader point_reader, Point & point)
 
   if (LIBMESH_DIM >= 3)
     point(2) = point_reader.getZ();
-}
-
-
-void load_elem_into_mesh(RBData::MeshElem::Reader mesh_elem_reader,
-                         libMesh::Elem * elem,
-                         libMesh::ReplicatedMesh & mesh)
-{
-  auto mesh_elem_point_list = mesh_elem_reader.getPoints();
-  unsigned int n_points = mesh_elem_point_list.size();
-
-  if (n_points != elem->n_nodes())
-    libmesh_error_msg("Wrong number of nodes for element type");
-
-  for (unsigned int i=0; i < n_points; ++i)
-    {
-      libMesh::Node * node =
-        mesh.add_point(Point(mesh_elem_point_list[i].getX(),
-                             mesh_elem_point_list[i].getY(),
-                             mesh_elem_point_list[i].getZ()));
-
-      elem->set_node(i) = node;
-    }
-
-  elem->subdomain_id() = mesh_elem_reader.getSubdomainId();
-
-  mesh.add_elem(elem);
 }
 
 // ---- Helper functions for adding data to capnp Builders (END) ----
