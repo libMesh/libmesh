@@ -27,9 +27,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/solution_history.h"
 #include "libmesh/qoi_set.h"
-
-// Sensitivity Calculation related includes
-#include "libmesh/parameter_vector.h"
 #include "libmesh/sensitivity_data.h"
 
 // C++ includes

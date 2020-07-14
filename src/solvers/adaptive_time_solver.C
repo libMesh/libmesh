@@ -102,17 +102,17 @@ void AdaptiveTimeSolver::advance_timestep ()
   // The first access of advance_timestep happens via solve, not user code
   // It is used here to store any initial conditions data
   if (!first_solve)
-  {
-    _system.time += this->completedtimestep_deltat;
-  }
+    {
+      _system.time += this->completedtimestep_deltat;
+    }
   else
-  {
+    {
     // We are here because of a call to advance_timestep that happens
     // via solve, the very first solve. All we are doing here is storing
     // the initial condition. The actual solution computed via this solve
     // will be stored when we call advance_timestep in the user's timestep loop
     first_solve = false;
-  }
+    }
 
   // Remember that for the adaptive time solver, all SH operations
   // are handled by the core_time_solver's SH object
@@ -173,11 +173,6 @@ void AdaptiveTimeSolver::retrieve_timestep ()
   // Ask the core time solver to retrieve all the stored vectors
   // at the current time
   core_time_solver->retrieve_timestep();
-
-  // Dont forget to localize the old_nonlinear_solution !
-  _system.get_vector("_old_nonlinear_solution").localize
-    (*old_local_nonlinear_solution,
-    _system.get_dof_map().get_send_list());
 }
 
 Real AdaptiveTimeSolver::error_order () const
