@@ -319,71 +319,20 @@ void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const
   // We are using the midpoint rule to integrate each timestep
   // (f(t_j) + f(t_j+1/2))/2 (t_j+1/2 - t_j) + (f(t_j+1/2) + f(t_j+1))/2 (t_j+1 - t_j+1/2)
 
-  // Get t_j
-  Real time_left = _system.time;
+  // First half timestep
+  SensitivityData sensitivities_first_half(qois, _system, parameter_vector);
 
-  // Left side sensitivities to hold f(t_j)
-  SensitivityData sensitivities_left(qois, _system, parameter_vector);
+  core_time_solver->integrate_adjoint_sensitivity(qois, parameter_vector, sensitivities_first_half);
 
-  // Get f(t_j)
-  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_left);
+  // Second half timestep
+  SensitivityData sensitivities_second_half(qois, _system, parameter_vector);
 
-  // Advance to t_j+1/2
-  _system.time = _system.time + _system.deltat;
-
-  // Get t_j+1/2
-  Real time_middle = _system.time;
-
-  // Middle sensitivities f(t_j+1/2)
-  SensitivityData sensitivities_middle(qois, _system, parameter_vector);
-
-  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
-  _system.remove_vector("sensitivity_rhs0");
-
-  // Retrieve the primal and adjoint solutions at the current timestep
-  core_time_solver->retrieve_timestep();
-
-  // The deltat to be used for any residual evaluation needs to be the old deltat used to
-  // march the last timestep, not the one for the next step. So save this deltat, for use in assembling the residual.
-  Real old_deltat = _system.deltat;
-
-  // Get f(t_j+1/2)
-  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_middle);
-
-  // Advance to t_j+1
-  _system.time = _system.time + _system.deltat;
-
-  // Get t_j+1
-  Real time_right = _system.time;
-
-  // Right sensitivities f(t_j+1)
-  SensitivityData sensitivities_right(qois, _system, parameter_vector);
-
-  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
-  _system.remove_vector("sensitivity_rhs0");
-
-  // Retrieve the primal and adjoint solutions at the current timestep
-  core_time_solver->retrieve_timestep();
-
-  // We now have the deltat for the next time march, save it because we will use the old deltat to assemble the residual.
-  Real new_deltat = _system.deltat;
-
-  // For the residual evaluation use old deltat
-  _system.deltat = old_deltat;
-
-  // Get f(t_j+1)
-  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_right);
-
-  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
-  _system.remove_vector("sensitivity_rhs0");
+  core_time_solver->integrate_adjoint_sensitivity(qois, parameter_vector, sensitivities_second_half);
 
   // Get the contributions for each sensitivity from this timestep
   for(unsigned int i = 0; i != qois.size(_system); i++)
     for(unsigned int j = 0; j != parameter_vector.size(); j++)
-     sensitivities[i][j] = ( (sensitivities_left[i][j] + sensitivities_middle[i][j])/2. )*(time_middle - time_left) + ( (sensitivities_middle[i][j] + sensitivities_right[i][j])/2. )*(time_right - time_middle);
-
-  // For the next time march, use the new delta t
-  _system.deltat = new_deltat;
+     sensitivities[i][j] = sensitivities_first_half[i][j] + sensitivities_second_half[i][j];
 }
 
 } // namespace libMesh
