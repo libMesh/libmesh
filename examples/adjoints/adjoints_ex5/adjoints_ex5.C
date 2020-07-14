@@ -498,24 +498,13 @@ int main (int argc, char ** argv)
           // Solve the forward problem at time t, to obtain the solution at time t + dt
           system.solve();
 
-          if(param.timesolver_tolerance)
-          {
-            // Output the H1 norm of the computed solution
-            libMesh::out << "|U("
-                         << system.time + dynamic_cast<AdaptiveTimeSolver &>(*(system.time_solver)).completedtimestep_deltat
-                         << ")|= "
-                         << system.calculate_norm(*system.solution, 0, H1)
-                         << std::endl;
-          }
-          else
-          {
-            // Output the H1 norm of the computed solution
-            libMesh::out << "|U("
-                         << system.time + system.deltat
-                         << ")|= "
-                         << system.calculate_norm(*system.solution, 0, H1)
-                         << std::endl;
-          }
+
+          // Output the H1 norm of the computed solution
+          libMesh::out << "|U("
+                      << system.time + system.time_solver->last_complete_deltat()
+                      << ")|= "
+                      << system.calculate_norm(*system.solution, 0, H1)
+                      << std::endl;
 
           // Advance to the next timestep in a transient problem
           libMesh::out << "Advancing timestep" << std::endl << std::endl;
@@ -584,29 +573,18 @@ int main (int argc, char ** argv)
                        << std::endl;
 
           // Output the H1 norm of the retrieved primal solution from the last call
-        // to adjoint_advance_timestep
+          // to adjoint_advance_timestep
           libMesh::out << "|U("
                        << system.time
                        << ")|= "
                        << system.calculate_norm(*system.solution, 0, H1)
                        << std::endl;
 
-          if(param.timesolver_tolerance)
-          {
-            libMesh::out << "|U("
-                         << system.time - ((dynamic_cast<AdaptiveTimeSolver &>(*(system.time_solver)).completedtimestep_deltat)/2.)
+          libMesh::out << "|U("
+                         << system.time - (system.time_solver->last_complete_deltat())/((param.timesolver_tolerance) ? 2.0 : 1.0)
                          << ")|= "
                          << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
                          << std::endl;
-          }
-          else
-          {
-            libMesh::out << "|U("
-                         << system.time - system.deltat
-                         << ")|= "
-                         << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-                         << std::endl;
-          }
 
           system.set_adjoint_already_solved(false);
 
@@ -617,9 +595,9 @@ int main (int argc, char ** argv)
           // unnecessarily in the error estimator
           system.set_adjoint_already_solved(true);
 
-  libMesh::out << "Saving adjoint and retrieving primal solutions at time t=" << system.time - system.deltat << std::endl;
+          libMesh::out << "Saving adjoint and retrieving primal solutions at time t=" << system.time - system.deltat << std::endl;
 
-  // The adjoint_advance_timestep function calls the retrieve and store
+          // The adjoint_advance_timestep function calls the retrieve and store
           // function of the memory_solution_history class via the
           // memory_solution_history object we declared earlier.  The
           // retrieve function sets the system primal vectors to their
