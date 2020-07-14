@@ -17,17 +17,19 @@
 
 
 
+#include "libmesh/fem_context.h"
+
 #include "libmesh/boundary_info.h"
+#include "libmesh/diff_system.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/fem_context.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
-#include "libmesh/diff_system.h"
 #include "libmesh/time_solver.h"
 #include "libmesh/unsteady_solver.h" // For euler_residual
 

@@ -1,10 +1,11 @@
+#include <libmesh/auto_ptr.h> // libmesh_make_unique
 #include <libmesh/dof_map.h>
-#include <libmesh/fem_system.h>
-#include <libmesh/newton_solver.h>
 #include <libmesh/enum_solver_type.h>
 #include <libmesh/enum_preconditioner_type.h>
+#include <libmesh/fem_system.h>
+#include <libmesh/newton_solver.h>
+#include <libmesh/numeric_vector.h>
 #include <libmesh/parallel.h>
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"

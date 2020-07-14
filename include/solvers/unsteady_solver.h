@@ -22,7 +22,6 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/numeric_vector.h"
 #include "libmesh/time_solver.h"
 
 // C++ includes
@@ -30,6 +29,9 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+template <typename T> class NumericVector;
 
 /**
  * This is a generic class that defines a solver to handle
@@ -95,6 +97,12 @@ public:
   virtual void advance_timestep () override;
 
   /**
+   * This method solves for the adjoint solution at the next adjoint timestep
+   * (or a steady state adjoint solve)
+   */
+  virtual std::pair<unsigned int, Real> adjoint_solve (const QoISet & qoi_indices) override;
+
+  /**
    * This method advances the adjoint solution to the previous
    * timestep, after an adjoint_solve() has been performed.  This will
    * be done before every UnsteadySolver::adjoint_solve().
@@ -106,6 +114,13 @@ public:
    * system.time
    */
   virtual void retrieve_timestep () override;
+
+  /**
+   * A method to integrate the adjoint sensitivity w.r.t a given parameter
+   * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
+   * The midpoint rule is used to numerically integrate the timestep
+   */
+  virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override;
 
   /**
    * This method should return the expected convergence order of the
@@ -151,6 +166,14 @@ public:
    * This is not a steady-state solver.
    */
   virtual bool is_steady() const override { return false; }
+
+  /**
+   * A setter for the first_adjoint_step boolean. Needed for nested time solvers.
+   */
+  void set_first_adjoint_step(bool first_adjoint_step_setting)
+  {
+    first_adjoint_step = first_adjoint_step_setting;
+  }
 
 protected:
 

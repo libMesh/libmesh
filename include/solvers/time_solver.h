@@ -22,11 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/linear_solver.h"
-#include "libmesh/numeric_vector.h"
 #include "libmesh/reference_counted_object.h"
-#include "libmesh/solution_history.h"
-#include "libmesh/qoi_set.h"
 
 // C++ includes
 #include <memory>
@@ -40,7 +36,13 @@ class DiffSolver;
 class DifferentiablePhysics;
 class DifferentiableSystem;
 class ParameterVector;
+class SensitivityData;
+class SolutionHistory;
 class SystemNorm;
+class QoISet;
+
+template <typename T>
+class LinearSolver;
 
 /**
  * This is a generic class that defines a solver to handle
@@ -129,6 +131,12 @@ public:
    * system.time
    */
   virtual void retrieve_timestep();
+
+  /**
+   * A method to integrate the adjoint sensitivity w.r.t a given parameter
+   * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
+   */
+  virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities);
 
   /**
    * This method uses the DifferentiablePhysics
@@ -233,6 +241,12 @@ public:
   void set_solution_history(const SolutionHistory & _solution_history);
 
   /**
+￼   * A getter function that returns a reference to the solution history
+￼   * object owned by TimeSolver
+￼   * */
+  SolutionHistory & get_solution_history();
+
+  /**
    * Accessor for querying whether we need to do a primal
    * or adjoint solve
    */
@@ -245,6 +259,14 @@ public:
    */
   void set_is_adjoint(bool _is_adjoint_value)
   { _is_adjoint = _is_adjoint_value; }
+
+  /**
+   * Function to return 'last_deltat()', returns system.deltat if
+   * fixed timestep solver is used, completed_deltat if the adaptive
+   * time solver is used.
+   */
+  virtual Real last_complete_deltat();
+
 
 protected:
 
