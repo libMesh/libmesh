@@ -262,6 +262,14 @@ public:
   void set_is_adjoint(bool _is_adjoint_value)
   { _is_adjoint = _is_adjoint_value; }
 
+  /**
+   * Function to return 'last_deltat()', returns system.deltat if
+   * fixed timestep solver is used, completed_deltat if the adaptive
+   * time solver is used.
+   */
+  virtual Real last_complete_deltat();
+
+
 protected:
 
   /**

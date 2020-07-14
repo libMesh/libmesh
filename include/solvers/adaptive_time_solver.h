@@ -82,6 +82,8 @@ public:
 
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override = 0;
 
+  virtual Real last_complete_deltat() { return completedtimestep_deltat; };
+
   /**
    * This method is passed on to the core_time_solver
    */

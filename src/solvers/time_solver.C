@@ -123,6 +123,11 @@ void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const Parame
   return;
 }
 
+Real TimeSolver::last_complete_deltat()
+{
+  return _system.deltat;
+}
+
 void TimeSolver::adjoint_advance_timestep ()
 {
 }
