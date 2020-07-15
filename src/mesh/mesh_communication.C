@@ -1183,18 +1183,25 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
 
   LOG_SCOPE("(all)gather()", "MeshCommunication");
 
+  // Ensure we don't build too big a buffer at once
+  static const std::size_t approx_total_buffer_size = 1e8;
+  const std::size_t approx_each_buffer_size =
+    approx_total_buffer_size / mesh.comm().size();
+
   (root_id == DofObject::invalid_processor_id) ?
 
     mesh.comm().allgather_packed_range (&mesh,
                                         mesh.nodes_begin(),
                                         mesh.nodes_end(),
-                                        mesh_inserter_iterator<Node>(mesh)) :
+                                        mesh_inserter_iterator<Node>(mesh),
+                                        approx_each_buffer_size) :
 
     mesh.comm().gather_packed_range (root_id,
                                      &mesh,
                                      mesh.nodes_begin(),
                                      mesh.nodes_end(),
-                                     mesh_inserter_iterator<Node>(mesh));
+                                     mesh_inserter_iterator<Node>(mesh),
+                                     approx_each_buffer_size);
 
   // Gather elements from coarsest to finest, so that child
   // elements will see their parents already in place.
@@ -1206,13 +1213,15 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
       mesh.comm().allgather_packed_range (&mesh,
                                           mesh.level_elements_begin(l),
                                           mesh.level_elements_end(l),
-                                          mesh_inserter_iterator<Elem>(mesh)) :
+                                          mesh_inserter_iterator<Elem>(mesh),
+                                          approx_each_buffer_size) :
 
       mesh.comm().gather_packed_range (root_id,
                                        &mesh,
                                        mesh.level_elements_begin(l),
                                        mesh.level_elements_end(l),
-                                       mesh_inserter_iterator<Elem>(mesh));
+                                       mesh_inserter_iterator<Elem>(mesh),
+                                       approx_each_buffer_size);
 
   // If we had a point locator, it's invalid now that there are new
   // elements it can't locate.
