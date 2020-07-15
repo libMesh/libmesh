@@ -3871,13 +3871,6 @@ void DofMap::process_constraints (MeshBase & mesh)
     _adjoint_constraint_values.empty() ?
     0 : _adjoint_constraint_values.rbegin()->first+1;
 
-  // A vector to hold pointers to the adjoint constraints map for each adjoint variable
-  std::vector<DofConstraintValueMap *> _adjoint_constraints_maps;
-  _adjoint_constraints_maps.resize(max_qoi_num);
-
-  for ( unsigned int j = 0; j < max_qoi_num; j++)
-    _adjoint_constraints_maps[j] = &(_adjoint_constraint_values.find(j)->second);
-
   // Create a set containing the DOFs we already depend on
   typedef std::set<dof_id_type> RCSet;
   RCSet unexpanded_set;
@@ -3910,13 +3903,15 @@ void DofMap::process_constraints (MeshBase & mesh)
         std::vector<Number> adjoint_constraint_rhs(max_qoi_num, 0.0);
 
         // Find and gather recursive constraints for each adjoint variable
-        for ( unsigned int j = 0; j < max_qoi_num; j++)
-        {
-          adjoint_rhs_iterators[j] = _adjoint_constraints_maps[j]->find(*i);
+        for (auto & adjoint_map : _adjoint_constraint_values)
+          {
+            const std::size_t q = adjoint_map.first;
+            adjoint_rhs_iterators[q] = adjoint_map.second.find(*i);
 
-          adjoint_constraint_rhs[j] = (adjoint_rhs_iterators[j] == _adjoint_constraints_maps[j]->end()) ?
-          0 : adjoint_rhs_iterators[j]->second;
-        }
+            adjoint_constraint_rhs[q] =
+              (adjoint_rhs_iterators[q] == adjoint_map.second.end()) ?
+              0 : adjoint_rhs_iterators[q]->second;
+          }
 
         std::vector<dof_id_type> constraints_to_expand;
 
@@ -3951,13 +3946,15 @@ void DofMap::process_constraints (MeshBase & mesh)
               constraint_rhs += subrhsit->second * this_coef;
 
             // Find and gather recursive constraints for each adjoint variable
-            for ( unsigned int j = 0; j < max_qoi_num; j++)
+            for (const auto & adjoint_map : _adjoint_constraint_values)
               {
-                DofConstraintValueMap::const_iterator adjoint_subrhsit =
-                _adjoint_constraints_maps[j]->find(expandable);
+                const std::size_t q = adjoint_map.first;
 
-                if (adjoint_subrhsit != _adjoint_constraints_maps[j]->end())
-                adjoint_constraint_rhs[j] += adjoint_subrhsit->second * this_coef;
+                DofConstraintValueMap::const_iterator adjoint_subrhsit =
+                  adjoint_map.second.find(expandable);
+
+                if (adjoint_subrhsit != adjoint_map.second.end())
+                adjoint_constraint_rhs[q] += adjoint_subrhsit->second * this_coef;
               }
 
             constraint_row.erase(expandable);
@@ -3979,21 +3976,23 @@ void DofMap::process_constraints (MeshBase & mesh)
           }
 
         // Finally fill in the adjoint constraints for each adjoint variable if possible
-        for ( unsigned int j = 0; j < max_qoi_num; j++)
+        for (auto & adjoint_map : _adjoint_constraint_values)
           {
-            if(adjoint_rhs_iterators[j] == _adjoint_constraints_maps[j]->end())
+            const std::size_t q = adjoint_map.first;
+
+            if(adjoint_rhs_iterators[q] == adjoint_map.second.end())
               {
-                if (adjoint_constraint_rhs[j] != Number(0))
-                   (*_adjoint_constraints_maps[j])[*i] = adjoint_constraint_rhs[j];
+                if (adjoint_constraint_rhs[q] != Number(0))
+                   (adjoint_map.second)[*i] = adjoint_constraint_rhs[q];
                 else
-                  _adjoint_constraints_maps[j]->erase(*i);
+                  adjoint_map.second.erase(*i);
               }
             else
               {
-                if (adjoint_constraint_rhs[j] != Number(0))
-                  adjoint_rhs_iterators[j]->second = adjoint_constraint_rhs[j];
+                if (adjoint_constraint_rhs[q] != Number(0))
+                  adjoint_rhs_iterators[q]->second = adjoint_constraint_rhs[q];
                 else
-                  _adjoint_constraints_maps[j]->erase(adjoint_rhs_iterators[j]);
+                  adjoint_map.second.erase(adjoint_rhs_iterators[q]);
               }
           }
 
