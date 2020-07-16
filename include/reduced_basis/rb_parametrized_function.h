@@ -20,8 +20,12 @@
 #ifndef LIBMESH_RB_PARAMETRIZED_FUNCTION_H
 #define LIBMESH_RB_PARAMETRIZED_FUNCTION_H
 
+// libMesh includes
 #include "libmesh/libmesh_common.h"
 
+// C++ includes
+#include <unordered_map>
+#include <vector>
 
 namespace libMesh
 {
@@ -67,7 +71,7 @@ public:
    */
   virtual void vectorized_evaluate(const RBParameters & mu,
                                    const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                   std::unordered_map<dof_id_type, subdomain_id_type> sbd_ids,
+                                   const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
                                    std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & output);
 
   /**
@@ -77,7 +81,7 @@ public:
    */
   virtual void preevaluate_parametrized_function(const RBParameters & mu,
                                                  const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                                 std::unordered_map<dof_id_type, subdomain_id_type> sbd_ids);
+                                                 const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids);
 
   /**
    * Look up the preevaluate values of the parametrized function for
