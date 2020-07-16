@@ -131,7 +131,7 @@ int main (int argc, char ** argv)
   SimpleEIMEvaluation eim_rb_eval(mesh.comm());
 
   // Set the rb_eval objects for the RBConstructions
-  eim_construction.set_rb_evaluation(eim_rb_eval);
+  eim_construction.set_rb_eim_evaluation(eim_rb_eval);
   rb_construction.set_rb_evaluation(rb_eval);
 
   if (!online_mode)
@@ -141,14 +141,12 @@ int main (int argc, char ** argv)
       eim_construction.print_info();
 
       // Perform the EIM Greedy and write out the data
-      eim_construction.initialize_rb_construction();
-      eim_construction.train_reduced_basis();
+      eim_construction.initialize_eim_construction();
+      eim_construction.train_eim_approximation();
 
 #if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataSerialization::RBEIMEvaluationSerialization rb_eim_eval_writer(eim_rb_eval);
       rb_eim_eval_writer.write_to_file("rb_eim_eval.bin");
-#else
-      eim_construction.get_rb_evaluation().legacy_write_offline_data_to_files("eim_data");
 #endif
 
       // Read data from input file and print state
@@ -173,14 +171,11 @@ int main (int argc, char ** argv)
 #if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataSerialization::RBEvaluationSerialization rb_eval_writer(rb_construction.get_rb_evaluation());
       rb_eval_writer.write_to_file("rb_eval.bin");
-#else
-      rb_construction.get_rb_evaluation().legacy_write_offline_data_to_files("rb_data");
 #endif
 
       // Write out the basis functions, if requested
       if (store_basis_functions)
         {
-          // Write out the basis functions
           eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction.get_explicit_system(),
                                                                          "eim_data");
 
@@ -193,8 +188,6 @@ int main (int argc, char ** argv)
 #if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataDeserialization::RBEIMEvaluationDeserialization rb_eim_eval_reader(eim_rb_eval);
       rb_eim_eval_reader.read_from_file("rb_eim_eval.bin");
-#else
-      eim_rb_eval.legacy_read_offline_data_from_files("eim_data");
 #endif
 
       // attach the EIM theta objects to rb_eval objects
@@ -205,8 +198,6 @@ int main (int argc, char ** argv)
 #if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataDeserialization::RBEvaluationDeserialization rb_eval_reader(rb_eval);
       rb_eval_reader.read_from_file("rb_eval.bin", /*read_error_bound_data*/ true);
-#else
-      rb_eval.legacy_read_offline_data_from_files("rb_data");
 #endif
 
       // Get the parameters at which we will do a reduced basis solve
@@ -226,7 +217,6 @@ int main (int argc, char ** argv)
           eim_rb_eval.read_in_basis_functions(eim_construction.get_explicit_system(), "eim_data");
           rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
-          eim_construction.load_rb_solution();
           rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
           ExodusII_IO(mesh).write_equation_systems("RB_sol.e", equation_systems);

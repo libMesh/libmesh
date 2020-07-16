@@ -194,7 +194,7 @@ void RBEIMEvaluation::decrement_vector(std::unordered_map<dof_id_type, std::vect
               if(qp >= basis_comp_and_qp[comp].size())
                 libmesh_error_msg("Error: Invalid qp");
 
-              v[elem_id][comp][qp] -= get_rb_eim_solution()(i) * basis_comp_and_qp[comp][qp];
+              v[elem_id][comp][qp] -= coeffs(i) * basis_comp_and_qp[comp][qp];
             }
     }
 

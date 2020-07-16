@@ -26,7 +26,7 @@ using libMesh::Number;
 using libMesh::Point;
 using libMesh::RBAssemblyExpansion;
 using libMesh::RBEIMAssembly;
-using libMesh::RBEIMConstruction;
+using libMesh::RBEIMEvaluation;
 using libMesh::RBParametrizedFunction;
 using libMesh::RBParameters;
 using libMesh::RBTheta;
@@ -35,6 +35,7 @@ using libMesh::Real;
 using libMesh::RealGradient;
 using libMesh::Elem;
 using libMesh::FEBase;
+using libMesh::subdomain_id_type;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {
@@ -44,6 +45,7 @@ struct ShiftedGaussian : public RBParametrizedFunction
   }
 
   Number evaluate(const RBParameters & mu,
+                  unsigned int /*comp*/,
                   const Point & p,
                   subdomain_id_type /*subdomain_id*/)
   {
@@ -113,9 +115,9 @@ struct EIM_IP_assembly : ElemAssembly
 
 struct EIM_F : RBEIMAssembly
 {
-  EIM_F(RBEIMConstruction & rb_eim_con_in,
+  EIM_F(RBEIMEvaluation & rb_eim_eval_in,
         unsigned int basis_function_index_in) :
-    RBEIMAssembly(rb_eim_con_in,
+    RBEIMAssembly(rb_eim_eval_in,
                   basis_function_index_in)
   {}
 
@@ -138,9 +140,8 @@ struct EIM_F : RBEIMAssembly
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     std::vector<Number> eim_values;
-    evaluate_basis_function(eim_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            eim_var,
                             eim_values);
 
     for (unsigned int qp=0; qp != c.get_element_qrule().n_points(); qp++)

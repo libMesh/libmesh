@@ -155,7 +155,6 @@ public:
     unsigned int comp,
     unsigned int qp);
 
-
   /**
    * Fill up \p values with the basis function values for basis function
    * \p basis_function_index and variable \p var, at all quadrature points

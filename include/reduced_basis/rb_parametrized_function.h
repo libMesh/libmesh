@@ -63,7 +63,7 @@ public:
    */
   virtual Number evaluate(const RBParameters & mu,
                           unsigned int comp,
-                          Point xyz,
+                          const Point & xyz,
                           subdomain_id_type subdomain_id) = 0;
 
   /**

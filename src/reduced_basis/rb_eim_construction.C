@@ -60,6 +60,9 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
     _rel_training_tolerance(1.e-4),
     _abs_training_tolerance(1.e-12)
 {
+  // The training set should be the same on all processors in the
+  // case of EIM training.
+  serial_training_set = true;
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
