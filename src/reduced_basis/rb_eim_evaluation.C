@@ -17,14 +17,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-#include <sstream>
-#include <fstream>
-
 // rbOOmit includes
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_eim_theta.h"
 #include "libmesh/rb_parametrized_function.h"
+#include "libmesh/utility.h" // Utility::mkdir
 
 // libMesh includes
 #include "libmesh/xdr_cxx.h"
@@ -32,6 +29,11 @@
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/elem.h"
 #include "timpi/parallel_implementation.h"
+
+// C++ includes
+#include <sstream>
+#include <fstream>
+#include <numeric> // std::accumulate
 
 namespace libMesh
 {
@@ -43,9 +45,7 @@ evaluate_eim_error_bound(true)
 {
 }
 
-RBEIMEvaluation::~RBEIMEvaluation()
-{
-}
+RBEIMEvaluation::~RBEIMEvaluation() = default;
 
 void RBEIMEvaluation::clear()
 {
@@ -177,7 +177,7 @@ void RBEIMEvaluation::decrement_vector(std::unordered_map<dof_id_type, std::vect
     {
       dof_id_type elem_id = v_it.first;
       const auto & v_comp_and_qp = v_it.second;
-      
+
       for (const auto & comp : index_range(v_comp_and_qp))
         for (unsigned int qp : index_range(v_comp_and_qp[comp]))
           for (unsigned int i : index_range(_local_eim_basis_functions))
@@ -406,4 +406,140 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _interpolation_points_qp.emplace_back(qp);
 }
 
+void RBEIMEvaluation::
+write_out_basis_functions(const std::string & directory_name,
+                          bool write_binary_basis_functions)
+{
+  libMesh::out << "Called RBEIMEvaluation::write_out_basis_functions()" << std::endl;
+  libMesh::out << "Writing to directory: " << directory_name << std::endl;
+  libMesh::out << "write_binary_basis_functions = " << write_binary_basis_functions << std::endl;
+  libMesh::out << "_local_eim_basis_functions.size()=" << _local_eim_basis_functions.size() << std::endl;
+
+  // Debugging: Print values to screen
+  // for (auto bf : index_range(_local_eim_basis_functions))
+  //   {
+  //     libMesh::out << "Basis function " << bf << std::endl;
+  //     for (const auto & pr : _local_eim_basis_functions[bf])
+  //       {
+  //         libMesh::out << "Elem " << pr.first << std::endl;
+  //         const auto & array = pr.second;
+  //         for (auto var : index_range(array))
+  //           {
+  //             libMesh::out << "Variable " << var << std::endl;
+  //             for (auto qp : index_range(array[var]))
+  //               libMesh::out << array[var][qp] << " ";
+  //             libMesh::out << std::endl;
+  //           }
+  //       }
+  //   }
+
+  // Quick return if there is no work to do
+  if (_local_eim_basis_functions.empty())
+    return;
+
+  // Write values from processor 0 only.
+  if (this->processor_id() == 0)
+    {
+      // Make a directory to store all the data files
+      Utility::mkdir(directory_name.c_str());
+
+      // Create filename
+      std::ostringstream file_name;
+      const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
+      file_name << directory_name << "/" << "bf_data" << basis_function_suffix;
+
+      // Create XDR writer object
+      Xdr xdr(file_name.str(), write_binary_basis_functions ? ENCODE : WRITE);
+
+      // Write number of basis functions to file. Note: the
+      // Xdr::data() function takes non-const references, so you can't
+      // pass e.g. vec.size() to that interface.
+      auto n_bf = _local_eim_basis_functions.size();
+      xdr.data(n_bf, "# Number of basis functions");
+
+      // We assume that each basis function has data for the same
+      // number of elements as basis function 0, which is equal to the
+      // size of the map.
+      auto n_elem = _local_eim_basis_functions[0].size();
+      xdr.data(n_elem, "# Number of elements");
+
+      // We assume that each element has the same number of variables,
+      // and we get the number of vars from the first element of the
+      // first basis function.
+      auto n_vars = _local_eim_basis_functions[0].begin()->second.size();
+      xdr.data(n_vars, "# Number of variables");
+
+      // We assume that the list of elements for each basis function
+      // is the same as basis function 0. We also assume that all vars
+      // have the same number of qps.
+      std::vector<unsigned int> n_qp_per_elem;
+      n_qp_per_elem.reserve(n_elem);
+      for (const auto & pr : _local_eim_basis_functions[0])
+        {
+          // array[n_vars][n_qp] per Elem. We get the number of QPs
+          // for variable 0, assuming they are all the same.
+          const auto & array = pr.second;
+          n_qp_per_elem.push_back(array[0].size());
+        }
+      xdr.data(n_qp_per_elem, "# Number of QPs per Elem");
+
+      // The total amount of qp data for each var is the sum of the
+      // entries in the "n_qp_per_elem" array.
+      auto n_qp_data =
+        std::accumulate(n_qp_per_elem.begin(),
+                        n_qp_per_elem.end(),
+                        0,
+                        std::plus<unsigned int>());
+
+      // Reserve space to store continguous vectors of qp data for each var
+      std::vector<std::vector<Number>> qp_data(n_vars);
+      for (auto var : index_range(qp_data))
+        qp_data[var].reserve(n_qp_data);
+
+      // Now we construct a vector for each basis function, for each
+      // variable which is ordered according to:
+      // [ [qp vals for Elem 0], [qp vals for Elem 1], ... [qp vals for Elem N] ]
+      // and write it to file.
+      for (auto bf : index_range(_local_eim_basis_functions))
+        {
+          // Clear any data from previous bf
+          for (auto var : index_range(qp_data))
+            qp_data[var].clear();
+
+          for (const auto & pr : _local_eim_basis_functions[bf])
+            {
+              // array[n_vars][n_qp] per Elem
+              const auto & array = pr.second;
+              for (auto var : index_range(array))
+                {
+                  // Insert all qp values for this var
+                  qp_data[var].insert(/*insert at*/qp_data[var].end(),
+                                      /*data start*/array[var].begin(),
+                                      /*data end*/array[var].end());
+                }
+            }
+
+          // Write all the var values for this bf
+          for (auto var : index_range(qp_data))
+            {
+              // Debugging: print qp_data[var]
+              // libMesh::out << "Basis function " << bf << ", variable " << var << ": " << std::endl;
+              // for (const auto & val : qp_data[var])
+              //   libMesh::out << val << " ";
+              // libMesh::out << std::endl;
+
+              // Write by calling data()
+              // std::string comment = "# Basis function " + std::to_string(bf) + ", variable " + std::to_string(var);
+              // xdr.data(qp_data[var], comment.c_str());
+
+              // Write by calling data_stream(). I found that using an
+              // arbitrary line break does not work correctly, it
+              // seems to access uninitialized memory past the end of
+              // the vector if it is not a multiple of the array size?
+              xdr.data_stream(qp_data[var].data(), qp_data[var].size(), /*line_break=*/qp_data[var].size());
+            }
+        }
+    }
 }
+
+} // namespace libMesh

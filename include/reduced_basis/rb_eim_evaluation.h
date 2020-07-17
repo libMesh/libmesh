@@ -233,6 +233,19 @@ public:
    */
   bool evaluate_eim_error_bound;
 
+  /**
+   * Write out all the basis functions to file.
+   * \p sys is used for file IO
+   * \p directory_name specifies which directory to write files to
+   * \p read_binary_basis_functions indicates whether to write
+   * binary or ASCII data
+   *
+   * Note: this is not currently a virtual function and is not related
+   * to the RBEvaluation function of the same name.
+   */
+  void write_out_basis_functions(const std::string & directory_name = "offline_data",
+                                 bool write_binary_basis_functions = true);
+
 private:
 
   /**
