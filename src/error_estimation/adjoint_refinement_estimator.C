@@ -348,7 +348,9 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // Solve the adjoint problem(s) on the refined FE space
   // The matrix will be reassembled again because we have refined the mesh
-  system.adjoint_solve(_qoi_set);
+  // If we have no h or p refinements, no need to solve for a fine adjoint
+  if(number_h_refinements > 0 || number_p_refinements > 0)
+    system.adjoint_solve(_qoi_set);
 
   // Swap back if needed, recall that _adjoint_evaluation_physics now holds the pointer
   // to the pre-swap physics
