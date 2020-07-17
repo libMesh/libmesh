@@ -143,7 +143,7 @@ void TwostepTimeSolver::solve()
       // Find the relative error
       *double_solution -= *(_system.solution);
       error_norm  = calculate_norm(_system, *double_solution);
-      relative_error = error_norm / _system.deltat /
+      relative_error = error_norm / old_deltat /
         std::max(double_norm, single_norm);
 
       // If the relative error makes no sense, we're done
@@ -158,7 +158,7 @@ void TwostepTimeSolver::solve()
                            std::max(double_norm, single_norm))
                        << std::endl;
           libMesh::out << "Global relative error = "
-                       << (error_norm / _system.deltat /
+                       << (error_norm / old_deltat /
                            std::max(double_norm, single_norm))
                        << std::endl;
           libMesh::out << "old delta t = " << old_deltat << std::endl;
@@ -205,10 +205,6 @@ void TwostepTimeSolver::solve()
         max_tolerance_met = true;
 
     }
-
-  // Now that we have the converged full timestep solution, advance the time step
-  // and store it
-  core_time_solver->advance_timestep();
 
   // We ended up taking two half steps of size system.deltat to
   // march our last time step.
@@ -308,9 +304,6 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
 
   // Tell our timesolver the combined deltat before adjoint advance timestep updates it
   this->completedtimestep_deltat = 2.0*_system.deltat;
-
-  // Adjoint advance again so solution history saves the adjoint
-  core_time_solver->adjoint_advance_timestep();
 
   // Reset the system.time
   _system.time = old_time;
