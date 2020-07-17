@@ -28,8 +28,7 @@ public:
   SimpleEIMEvaluation(const libMesh::Parallel::Communicator & comm) :
     RBEIMEvaluation(comm)
   {
-    std::unique_ptr<RBParametrizedFunction> sg = std::make_unique<ShiftedGaussian>();
-    set_parametrized_function(std::move(sg));
+    set_parametrized_function(std::make_unique<ShiftedGaussian>());
   }
 };
 
