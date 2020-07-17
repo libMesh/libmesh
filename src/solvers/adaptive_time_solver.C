@@ -114,10 +114,12 @@ void AdaptiveTimeSolver::advance_timestep ()
     first_solve = false;
     }
 
-  // Remember that for the adaptive time solver, all SH operations
+  // For the adaptive time solver, all SH operations
   // are handled by the core_time_solver's SH object
-  // The outer solver's SH object is turned into a dummy NSH object
-  // after it has been used to initialize the core_time_solver's SH object
+  // Sub solution storage is handled internally by the core time solver,
+  // but the 'full step' solution is stored here to maintain consistency
+  // with the fixed timestep scheme.
+  core_time_solver->get_solution_history().store(false, _system.time);
 
   NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
@@ -144,23 +146,25 @@ void AdaptiveTimeSolver::adjoint_advance_timestep ()
     }
   else
     {
-      // After setting the initial conditions, we have to retrieve the saved primal solutions
-      core_time_solver->get_solution_history().retrieve(true, _system.time);
-
-      // And store the adjoint initial condition, apart from the initial condition these retrieval
-      // and store operations are handled by the core time solver directly
-      core_time_solver->get_solution_history().store(true, _system.time);
-
-      // We also need to tell the core time solver that the adjoint initial conditions have been set
-      core_time_solver->set_first_adjoint_step(false);
-
       // The first adjoint step simply saves the given adjoint initial condition
       // So there is a store, but no solve, no actual timestep, so no need to change system time
       first_adjoint_step = false;
     }
 
-  // For an adaptive time solver, all solution history operations are handled
-  // by the core time solver.
+  // For the adaptive time solver, all SH operations
+  // are handled by the core_time_solver's SH object
+  // Retrieve the primal solution for the next adjoint calculation,
+  // by using the core time solver's solution history object.
+  core_time_solver->get_solution_history().retrieve(true, _system.time);
+
+  // We need to update the completed timestep deltat with the newly read in deltat
+  this->completedtimestep_deltat = 2*_system.deltat;
+
+  // Store the computed full step adjoint solution for future use (sub steps are handled internally by the core time solver)
+  core_time_solver->get_solution_history().store(true, _system.time);
+
+  // We also need to tell the core time solver that the adjoint initial conditions have been set
+  core_time_solver->set_first_adjoint_step(false);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize
@@ -173,6 +177,9 @@ void AdaptiveTimeSolver::retrieve_timestep ()
   // Ask the core time solver to retrieve all the stored vectors
   // at the current time
   core_time_solver->retrieve_timestep();
+
+  // We need to update the completed timestep deltat with the newly read in deltat
+  this->completedtimestep_deltat = 2*_system.deltat;
 }
 
 Real AdaptiveTimeSolver::error_order () const
