@@ -78,8 +78,10 @@ int main (int argc, char ** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
-#ifndef LIBMESH_ENABLE_DIRICHLET
-  libmesh_example_requires(false, "--enable-dirichlet");
+  // This example requires libmesh to be configured with both
+  // DirichletBoundary and Cap'n Proto support.
+#if !defined(LIBMESH_ENABLE_DIRICHLET) || !defined(LIBMESH_HAVE_CAPNPROTO)
+  libmesh_example_requires(false, "--enable-dirichlet --enable-capnp");
 #else
 
   // Define the names of the input files we will read the problem properties from
@@ -144,10 +146,8 @@ int main (int argc, char ** argv)
       eim_construction.initialize_eim_construction();
       eim_construction.train_eim_approximation();
 
-#if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataSerialization::RBEIMEvaluationSerialization rb_eim_eval_writer(eim_rb_eval);
       rb_eim_eval_writer.write_to_file("rb_eim_eval.bin");
-#endif
 
       // Read data from input file and print state
       rb_construction.process_parameters_file(rb_parameters);
@@ -168,16 +168,15 @@ int main (int argc, char ** argv)
       rb_construction.initialize_rb_construction();
       rb_construction.train_reduced_basis();
 
-#if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataSerialization::RBEvaluationSerialization rb_eval_writer(rb_construction.get_rb_evaluation());
       rb_eval_writer.write_to_file("rb_eval.bin");
-#endif
 
       // Write out the basis functions, if requested
       if (store_basis_functions)
         {
-          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction.get_explicit_system(),
-                                                                         "eim_data");
+          // FIXME: This needs to be implemented in the new version of RBEIMEvaluation
+          // eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction.get_explicit_system(),
+          //                                                                "eim_data");
 
           rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,
                                                                         "rb_data");
@@ -185,20 +184,16 @@ int main (int argc, char ** argv)
     }
   else
     {
-#if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataDeserialization::RBEIMEvaluationDeserialization rb_eim_eval_reader(eim_rb_eval);
       rb_eim_eval_reader.read_from_file("rb_eim_eval.bin");
-#endif
 
       // attach the EIM theta objects to rb_eval objects
       eim_rb_eval.initialize_eim_theta_objects();
       rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
 
       // Read in the offline data for rb_eval
-#if defined(LIBMESH_HAVE_CAPNPROTO)
       RBDataDeserialization::RBEvaluationDeserialization rb_eval_reader(rb_eval);
       rb_eval_reader.read_from_file("rb_eval.bin", /*read_error_bound_data*/ true);
-#endif
 
       // Get the parameters at which we will do a reduced basis solve
       Real online_center_x = infile("online_center_x", 0.);
@@ -214,7 +209,10 @@ int main (int argc, char ** argv)
       if (store_basis_functions)
         {
           // read in the data from files
-          eim_rb_eval.read_in_basis_functions(eim_construction.get_explicit_system(), "eim_data");
+
+          // FIXME: This needs to be implemented in the new version of RBEIMEvaluation
+          // eim_rb_eval.read_in_basis_functions(eim_construction.get_explicit_system(), "eim_data");
+
           rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
           rb_construction.load_rb_solution();

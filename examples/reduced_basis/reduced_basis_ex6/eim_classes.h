@@ -9,6 +9,8 @@
 // Example includes
 #include "assembly.h"
 
+using libMesh::RBEIMConstruction;
+
 #ifndef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
 using libMesh::make_unique;
 #endif
@@ -23,9 +25,12 @@ public:
   SimpleEIMEvaluation(const libMesh::Parallel::Communicator & comm)
     : RBEIMEvaluation(comm)
   {
-    attach_parametrized_function(&g_x);
-    attach_parametrized_function(&g_y);
-    attach_parametrized_function(&g_z);
+    // FIXME: We can only attach a single RBParametrizedFunction by calling
+    // set_parametrized_function(). Each RBParametrizedFunction can have multiple
+    // components, though.
+    // attach_parametrized_function(&g_x);
+    // attach_parametrized_function(&g_y);
+    // attach_parametrized_function(&g_z);
   }
 
   /**
@@ -39,9 +44,9 @@ public:
   /**
    * Parametrized functions that we approximate with EIM
    */
-  Gx g_x;
-  Gy g_y;
-  Gz g_z;
+  // Gx g_x;
+  // Gy g_y;
+  // Gz g_z;
 };
 
 // A simple subclass of RBEIMConstruction.

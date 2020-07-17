@@ -35,7 +35,6 @@ using libMesh::RBParametrizedFunction;
 using libMesh::RBTheta;
 using libMesh::RBThetaExpansion;
 using libMesh::RBEIMAssembly;
-using libMesh::RBEIMConstruction;
 using libMesh::RBEIMEvaluation;
 using libMesh::RBEIMTheta;
 using libMesh::Real;
@@ -244,9 +243,9 @@ struct ThetaEIM : RBEIMTheta
 
 struct AssemblyEIM : RBEIMAssembly
 {
-  AssemblyEIM(RBEIMConstruction & rb_eim_con_in,
+  AssemblyEIM(RBEIMEvaluation & rb_eim_eval_in,
               unsigned int basis_function_index_in) :
-    RBEIMAssembly(rb_eim_con_in,
+    RBEIMAssembly(rb_eim_eval_in,
                   basis_function_index_in)
   {}
 
@@ -271,21 +270,18 @@ struct AssemblyEIM : RBEIMAssembly
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     std::vector<Number> eim_values_Gx;
-    evaluate_basis_function(Gx_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            Gx_var,
                             eim_values_Gx);
 
     std::vector<Number> eim_values_Gy;
-    evaluate_basis_function(Gy_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            Gy_var,
                             eim_values_Gy);
 
     std::vector<Number> eim_values_Gz;
-    evaluate_basis_function(Gz_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            Gz_var,
                             eim_values_Gz);
 
     for (unsigned int qp=0; qp != c.get_element_qrule().n_points(); qp++)

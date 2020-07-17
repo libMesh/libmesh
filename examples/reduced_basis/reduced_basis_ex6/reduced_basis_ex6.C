@@ -135,8 +135,10 @@ int main (int argc, char ** argv)
   // This is a 3D example
   libmesh_example_requires(3 == LIBMESH_DIM, "3D support");
 
-#ifndef LIBMESH_ENABLE_DIRICHLET
-  libmesh_example_requires(false, "--enable-dirichlet");
+  // This example requires libmesh to be configured with both
+  // DirichletBoundary and Cap'n Proto support.
+#if !defined(LIBMESH_ENABLE_DIRICHLET) || !defined(LIBMESH_HAVE_CAPNPROTO)
+  libmesh_example_requires(false, "--enable-dirichlet --enable-capnp");
 #else
 
   // Parse the input file using GetPot
