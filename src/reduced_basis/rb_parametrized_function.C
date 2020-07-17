@@ -24,11 +24,17 @@
 namespace libMesh
 {
 
+RBParametrizedFunction::RBParametrizedFunction()
+:
+requires_xyz_perturbations(false)
+{}
+
 RBParametrizedFunction::~RBParametrizedFunction() {}
 
 void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
                                                  const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
                                                  const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                                 const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb,
                                                  std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & output)
 {
   output.clear();
@@ -49,7 +55,25 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
           values[comp].resize(xyz_vec.size());
           for (unsigned int qp : index_range(xyz_vec))
             {
-              values[comp][qp] = evaluate(mu, comp, xyz_vec[qp], subdomain_id);
+               if (requires_xyz_perturbations)
+                 {
+                   auto xyz_perturb_it = all_xyz_perturb.find(elem_id);
+                   if (xyz_perturb_it == all_xyz_perturb.end())
+                     {
+                       libmesh_error_msg("Error: elem_id not found");
+                     }
+                   const std::vector<std::vector<Point>> & qps_and_perturbs = xyz_perturb_it->second;
+
+                   if (qp >= qps_and_perturbs.size())
+                     libmesh_error_msg("Error: Invalid qp");
+
+                   values[comp][qp] = evaluate(mu, comp, xyz_vec[qp], subdomain_id, qps_and_perturbs[qp]);
+                 }
+               else
+                 {
+                   std::vector<Point> empty_perturbs;
+                   values[comp][qp] = evaluate(mu, comp, xyz_vec[qp], subdomain_id, empty_perturbs);
+                 }
             }
         }
       output[elem_id] = values;
@@ -58,9 +82,10 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
 
 void RBParametrizedFunction::preevaluate_parametrized_function(const RBParameters & mu,
                                                                const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                                               const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids)
+                                                               const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                                               const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb)
 {
-  vectorized_evaluate(mu, all_xyz, sbd_ids, preevaluated_values);
+  vectorized_evaluate(mu, all_xyz, sbd_ids, all_xyz_perturb, preevaluated_values);
 }
 
 Number RBParametrizedFunction::lookup_preevaluated_value(unsigned int comp,

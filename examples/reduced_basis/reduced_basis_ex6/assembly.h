@@ -54,7 +54,8 @@ struct Gxyz : public RBParametrizedFunction
   virtual Number evaluate(const RBParameters & mu,
                           unsigned int comp,
                           const Point & p,
-                          subdomain_id_type /*subdomain_id*/)
+                          subdomain_id_type /*subdomain_id*/,
+                          const std::vector<Point> & /*p_perturb*/)
   {
     Real curvature = mu.get_value("curvature");
 

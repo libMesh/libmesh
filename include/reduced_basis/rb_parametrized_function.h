@@ -45,6 +45,11 @@ class RBParametrizedFunction
 public:
 
   /**
+   * Constructor.
+   */
+  RBParametrizedFunction();
+
+  /**
    * Virtual evaluate() gives us a vtable, so there's no cost in adding a
    * virtual destructor for safety's sake.
    */
@@ -59,29 +64,33 @@ public:
 
   /**
    * Evaluate the parametrized function at the specified point for
-   * parameter \p mu.
+   * parameter \p mu.  If requires_xyz_perturbations==false, then
+   * xyz_perturb will not be used.
    */
   virtual Number evaluate(const RBParameters & mu,
                           unsigned int comp,
                           const Point & xyz,
-                          subdomain_id_type subdomain_id) = 0;
+                          subdomain_id_type subdomain_id,
+                          const std::vector<Point> & xyz_perturb) = 0;
 
   /**
-   * Vectorized version of evaluate.
+   * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
    */
   virtual void vectorized_evaluate(const RBParameters & mu,
                                    const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
                                    const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                   const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb,
                                    std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & output);
 
   /**
    * Store the result of vectorized_evaluate. This is helpful during EIM training,
    * since we can pre-evaluate and store the parameterized function for each training
-   * sample.
+   * sample. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
    */
   virtual void preevaluate_parametrized_function(const RBParameters & mu,
                                                  const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                                 const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids);
+                                                 const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                                 const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb);
 
   /**
    * Look up the preevaluate values of the parametrized function for
@@ -96,6 +105,14 @@ public:
    *   elem_id --> comp --> qp --> value
    */
   std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> preevaluated_values;
+
+  /**
+   * Boolean to indicate whether this parametrized function requires xyz perturbations
+   * in order to evaluate function values. An example of where perturbations are
+   * required is when the parametrized function is based on finite difference
+   * approximations to derivatives.
+   */
+  bool requires_xyz_perturbations;
 };
 
 }

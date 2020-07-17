@@ -194,6 +194,7 @@ public:
   void add_interpolation_points_xyz(Point p);
   void add_interpolation_points_comp(unsigned int comp);
   void add_interpolation_points_subdomain_id(subdomain_id_type sbd_id);
+  void add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs);
   void add_interpolation_points_elem_id(dof_id_type elem_id);
   void add_interpolation_points_qp(unsigned int qp);
 
@@ -203,6 +204,7 @@ public:
   Point get_interpolation_points_xyz(unsigned int index) const;
   unsigned int get_interpolation_points_comp(unsigned int index) const;
   subdomain_id_type get_interpolation_points_subdomain_id(unsigned int index) const;
+  const std::vector<Point> & get_interpolation_points_xyz_perturbations(unsigned int index) const;
   dof_id_type get_interpolation_points_elem_id(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
 
@@ -225,7 +227,8 @@ public:
     unsigned int comp,
     dof_id_type elem_id,
     subdomain_id_type subdomain_id,
-    unsigned int qp);
+    unsigned int qp,
+    const std::vector<Point> & perturbs);
 
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds
@@ -268,6 +271,12 @@ private:
   std::vector<Point> _interpolation_points_xyz;
   std::vector<unsigned int> _interpolation_points_comp;
   std::vector<subdomain_id_type> _interpolation_points_subdomain_id;
+
+  /**
+   * We also store perturbations of the xyz locations that may be
+   * needed to evaluate finite difference approximations to derivatives.
+   */
+    std::vector<std::vector<Point>> _interpolation_points_xyz_perturbations;
 
   /**
    * We also store the element ID and qp index of each interpolation

@@ -52,6 +52,7 @@ void RBEIMEvaluation::clear()
   _interpolation_points_xyz.clear();
   _interpolation_points_comp.clear();
   _interpolation_points_subdomain_id.clear();
+  _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_qp.clear();
 
@@ -67,6 +68,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_xyz.clear();
   _interpolation_points_comp.clear();
   _interpolation_points_subdomain_id.clear();
+  _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_qp.clear();
 
@@ -104,7 +106,8 @@ Real RBEIMEvaluation::rb_eim_solve(unsigned int N)
       EIM_rhs(i) = get_parametrized_function().evaluate(get_parameters(),
                                                         _interpolation_points_comp[i],
                                                         _interpolation_points_xyz[i],
-                                                        _interpolation_points_subdomain_id[i]);
+                                                        _interpolation_points_subdomain_id[i],
+                                                        _interpolation_points_xyz_perturbations[i]);
     }
 
   DenseMatrix<Number> interpolation_matrix_N;
@@ -122,7 +125,8 @@ Real RBEIMEvaluation::rb_eim_solve(unsigned int N)
       Number g_at_next_x = get_parametrized_function().evaluate(get_parameters(),
                                                         _interpolation_points_comp[N],
                                                         _interpolation_points_xyz[N],
-                                                        _interpolation_points_subdomain_id[N]);
+                                                        _interpolation_points_subdomain_id[N],
+                                                        _interpolation_points_xyz_perturbations[N]);
 
       // Next, evaluate the EIM approximation at x_{N+1}
       Number EIM_approx_at_next_x = 0.;
@@ -326,6 +330,12 @@ void RBEIMEvaluation::add_interpolation_points_subdomain_id(subdomain_id_type sb
   _interpolation_points_subdomain_id.emplace_back(sbd_id);
 }
 
+void RBEIMEvaluation::add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs)
+{
+  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
+}
+
+
 void RBEIMEvaluation::add_interpolation_points_elem_id(dof_id_type elem_id)
 {
   _interpolation_points_elem_id.emplace_back(elem_id);
@@ -358,6 +368,14 @@ subdomain_id_type RBEIMEvaluation::get_interpolation_points_subdomain_id(unsigne
     libmesh_error_msg("Error: Invalid index");
 
   return _interpolation_points_subdomain_id[index];
+}
+
+const std::vector<Point> & RBEIMEvaluation::get_interpolation_points_xyz_perturbations(unsigned int index) const
+{
+  if(index >= _interpolation_points_xyz_perturbations.size())
+    libmesh_error_msg("Error: Invalid index");
+
+  return _interpolation_points_xyz_perturbations[index];
 }
 
 dof_id_type RBEIMEvaluation::get_interpolation_points_elem_id(unsigned int index) const
@@ -395,7 +413,8 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   unsigned int comp,
   dof_id_type elem_id,
   subdomain_id_type subdomain_id,
-  unsigned int qp)
+  unsigned int qp,
+  const std::vector<Point> & perturbs)
 {
   _local_eim_basis_functions.emplace_back(bf);
 
@@ -404,6 +423,7 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _interpolation_points_elem_id.emplace_back(elem_id);
   _interpolation_points_subdomain_id.emplace_back(subdomain_id);
   _interpolation_points_qp.emplace_back(qp);
+  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
 }
 
 void RBEIMEvaluation::

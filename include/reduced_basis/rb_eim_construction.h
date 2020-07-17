@@ -168,6 +168,12 @@ public:
   virtual void set_Nmax(unsigned int Nmax);
 
   /**
+   * Get/set the perturbation size used in finite difference calculations.
+   */
+  void set_perturbation_size(Real perturb_size);
+  Real get_perturbation_size() const;
+
+  /**
    * Enum that indicates which type of "best fit" algorithm
    * we should use.
    * a) projection: Find the best fit in the inner product
@@ -301,6 +307,20 @@ private:
   std::unordered_map<dof_id_type, std::vector<Point> > _local_quad_point_locations;
   std::unordered_map<dof_id_type, std::vector<Real> > _local_quad_point_JxW;
   std::unordered_map<dof_id_type, subdomain_id_type > _local_quad_point_subdomain_ids;
+
+  /**
+   * EIM approximations often arise when applying a geometric mapping to a Reduced Basis
+   * formulation. In this context, we often need to approximate derivates of the mapping
+   * function via EIM. In order to enable this, we also optionally store perturbations
+   * about each point in _local_quad_point_locations to enable finite difference approximation
+   * to the mapping function derivatives.
+   */
+  std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > _local_quad_point_locations_perturbations;
+
+  /**
+   * Perturbation size used in computation of perturbations of quad point locations.
+   */
+  Real _perturb_size;
 
 };
 

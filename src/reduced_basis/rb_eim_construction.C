@@ -58,7 +58,8 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _Nmax(0),
     _rel_training_tolerance(1.e-4),
-    _abs_training_tolerance(1.e-12)
+    _abs_training_tolerance(1.e-12),
+    _perturb_size(1.e-6)
 {
   // The training set should be the same on all processors in the
   // case of EIM training.
@@ -421,6 +422,16 @@ void RBEIMConstruction::set_Nmax(unsigned int Nmax)
   _Nmax = Nmax;
 }
 
+void RBEIMConstruction::set_perturbation_size(Real perturb_size)
+{
+  _perturb_size = perturb_size;
+}
+
+Real RBEIMConstruction::get_perturbation_size() const
+{
+  return _perturb_size;
+}
+
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 {
   LOG_SCOPE("compute_max_eim_error()", "RBEIMConstruction");
@@ -474,9 +485,11 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
         << (i+1) << " of " << get_n_training_samples() << std::endl;
 
       set_params_from_training_set(i);
+
       eim_eval.get_parametrized_function().preevaluate_parametrized_function(get_parameters(),
                                                                              _local_quad_point_locations,
-                                                                             _local_quad_point_subdomain_ids);
+                                                                             _local_quad_point_subdomain_ids,
+                                                                             _local_quad_point_locations_perturbations);
 
       unsigned int n_comps = eim_eval.get_parametrized_function().get_n_components();
 
@@ -507,6 +520,15 @@ void RBEIMConstruction::initialize_qp_data()
 {
   LOG_SCOPE("initialize_qp_data()", "RBEIMConstruction");
 
+  if (!get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+    {
+      libMesh::out << "Initializing quadrature point locations" << std::endl;
+    }
+  else
+    {
+      libMesh::out << "Initializing quadrature point and perturbation locations" << std::endl;
+    }
+
   // Compute truth representation via L2 projection
   const MeshBase & mesh = this->get_mesh();
 
@@ -522,6 +544,8 @@ void RBEIMConstruction::initialize_qp_data()
   _local_quad_point_subdomain_ids.clear();
   _local_quad_point_JxW.clear();
 
+  _local_quad_point_locations_perturbations.clear();
+
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       dof_id_type elem_id = elem->id();
@@ -532,6 +556,77 @@ void RBEIMConstruction::initialize_qp_data()
       _local_quad_point_locations[elem_id] = xyz;
       _local_quad_point_JxW[elem_id] = JxW;
       _local_quad_point_subdomain_ids[elem_id] = elem->subdomain_id();
+
+      if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+        {
+          std::vector<Point> xyz_perturb_vec;
+
+          for (const Point & xyz_qp : xyz)
+            {
+              if(elem->dim() == 3)
+                {
+                  Point xyz_perturb = xyz_qp;
+
+                  xyz_perturb(0) += _perturb_size;
+                  xyz_perturb_vec.emplace_back(xyz_perturb);
+                  xyz_perturb(0) -= _perturb_size;
+                  
+                  xyz_perturb(1) += _perturb_size;
+                  xyz_perturb_vec.emplace_back(xyz_perturb);
+                  xyz_perturb(1) -= _perturb_size;
+
+                  xyz_perturb(2) += _perturb_size;
+                  xyz_perturb_vec.emplace_back(xyz_perturb);
+                  xyz_perturb(2) -= _perturb_size;
+                }
+              else if(elem->dim() == 2)
+                {
+                  // In this case we assume that we have a 2D element
+                  // embedded in 3D space. In this case we have to use
+                  // the following approach to perturb xyz:
+                  //  1) inverse map xyz to the reference element
+                  //  2) perturb on the reference element in the (xi,eta) "directions"
+                  //  3) map the perturbed points back to the physical element
+                  // This approach is necessary to ensure that the perturbed points
+                  // are still in the element.
+
+                  Point xi_eta =
+                    FEMap::inverse_map(elem->dim(),
+                                      elem,
+                                      xyz_qp,
+                                      /*Newton iteration tolerance*/ TOLERANCE,
+                                      /*secure*/ true);
+
+                  // Inverse map should map back to a 2D reference domain
+                  libmesh_assert(std::abs(xi_eta(2)) < TOLERANCE);
+
+                  Point xi_eta_perturb = xi_eta;
+
+                  xi_eta_perturb(0) += _perturb_size;
+                  xyz_perturb_vec.emplace_back(
+                    FEMap::map(elem->dim(),
+                               elem,
+                               xi_eta_perturb));
+                  xi_eta_perturb(0) -= _perturb_size;
+
+                  xi_eta_perturb(1) += _perturb_size;
+                  xyz_perturb_vec.emplace_back(
+                    FEMap::map(elem->dim(),
+                               elem,
+                               xi_eta_perturb));
+                  xi_eta_perturb(1) -= _perturb_size;
+                }
+              else
+                {
+                  // We current do nothing in the dim=1 case since
+                  // we have no need for this capability so far.
+                  // Support for this case could be added if it is
+                  // needed.
+                }
+            }
+
+          _local_quad_point_locations[elem_id] = xyz_perturb_vec;
+        }
     }
 }
 
@@ -642,6 +737,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   dof_id_type optimal_elem_id = DofObject::invalid_id;
   subdomain_id_type optimal_subdomain_id = 0;
   unsigned int optimal_qp = 0;
+  std::vector<Point> optimal_point_perturbs;
 
   // Initialize largest_abs_value to be negative so that it definitely gets updated.
   Real largest_abs_value = -1.;
@@ -679,6 +775,16 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                   if(subdomain_it == _local_quad_point_subdomain_ids.end())
                     libmesh_error_msg("Error: Invalid element ID");
                   optimal_subdomain_id = subdomain_it->second;
+
+                  if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+                    {
+                      auto point_perturbs_it = _local_quad_point_locations_perturbations.find(elem_id);
+                      if(point_perturbs_it == _local_quad_point_locations_perturbations.end())
+                        libmesh_error_msg("Error: Invalid element ID");
+                      if(qp >= point_perturbs_it->second.size())
+                        libmesh_error_msg("Error: Invalid qp");
+                      optimal_point_perturbs = point_perturbs_it->second[qp];
+                    }
                 }
             }
         }
@@ -695,6 +801,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   this->comm().broadcast(optimal_elem_id, proc_ID_index);
   this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
   this->comm().broadcast(optimal_qp, proc_ID_index);
+  this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
 
   if (optimal_elem_id == DofObject::invalid_id)
     libmesh_error_msg("Error: Invalid element ID");
@@ -709,7 +816,8 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                                                      optimal_comp,
                                                      optimal_elem_id,
                                                      optimal_subdomain_id,
-                                                     optimal_qp);
+                                                     optimal_qp,
+                                                     optimal_point_perturbs);
 }
 
 void RBEIMConstruction::update_eim_matrices()
