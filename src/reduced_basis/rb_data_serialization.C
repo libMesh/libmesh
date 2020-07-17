@@ -671,6 +671,22 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       interpolation_points_qp_list.set(i,
                                        rb_eim_evaluation.get_interpolation_points_qp(i));
   }
+
+  // Interpolation points perturbations
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_builder.initInterpolationXyzPerturb(n_bfs);
+    for (unsigned int i=0; i < n_bfs; ++i)
+      {
+        const std::vector<Point> & perturbs = rb_eim_evaluation.get_interpolation_points_xyz_perturbations(i);
+        auto interpolation_points_list_inner = interpolation_points_list_outer.init(i, perturbs.size());
+
+        for (unsigned int j : index_range(perturbs))
+          {
+            add_point_to_builder(perturbs[j], interpolation_points_list_inner[j]);
+          }
+      }
+  }
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)

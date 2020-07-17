@@ -112,7 +112,8 @@ struct RBEIMEvaluationReal @0xf8121d2237427a80 {
   interpolationSubdomainId @5 :List(Integer);
   interpolationElemId      @6 :List(Integer);
   interpolationQp          @7 :List(Integer);
-  interpolationMatrix      @8 :List(Real);
+  interpolationXyzPerturb  @8 :List(List(Point3D));
+  interpolationMatrix      @9 :List(Real);
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   nBfs                     @0 :Integer;
@@ -123,5 +124,6 @@ struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   interpolationSubdomainId @5 :List(Integer);
   interpolationElemId      @6 :List(Integer);
   interpolationQp          @7 :List(Integer);
-  interpolationMatrix      @8 :List(Complex);
+  interpolationXyzPerturb  @8 :List(List(Point3D));
+  interpolationMatrix      @9 :List(Complex);
 }

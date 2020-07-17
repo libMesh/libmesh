@@ -769,7 +769,28 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     for (unsigned int i=0; i<n_bfs; ++i)
       {
-        rb_eim_evaluation.add_interpolation_points_elem_id(interpolation_points_qp_list[i]);
+        rb_eim_evaluation.add_interpolation_points_qp(interpolation_points_qp_list[i]);
+      }
+  }
+
+  // Interpolation points perturbations
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_reader.getInterpolationXyzPerturb();
+
+    if (interpolation_points_list_outer.size() != n_bfs)
+      libmesh_error_msg("Size error while reading the eim interpolation points.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        auto interpolation_points_list_inner = interpolation_points_list_outer[i];
+
+        std::vector<Point> perturbs(interpolation_points_list_inner.size());
+        for (unsigned int j=0; j<perturbs.size(); j++)
+          {
+            load_point(interpolation_points_list_inner[j], perturbs[j]);
+          }
+        rb_eim_evaluation.add_interpolation_points_xyz_perturbations(perturbs);
       }
   }
 }
