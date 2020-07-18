@@ -264,7 +264,7 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
                                  deterministic_training_in);
 }
 
-void RBEIMConstruction::train_eim_approximation()
+Real RBEIMConstruction::train_eim_approximation()
 {
   LOG_SCOPE("train_eim_approximation()", "RBConstruction");
 
@@ -283,6 +283,7 @@ void RBEIMConstruction::train_eim_approximation()
     }
 
   libMesh::out << std::endl << "---- Performing Greedy EIM basis enrichment ----" << std::endl;
+  Real abs_greedy_error = 0.;
   Real initial_greedy_error = 0.;
   bool initial_greedy_error_initialized = false;
   std::vector<RBParameters> greedy_param_list;
@@ -304,7 +305,7 @@ void RBEIMConstruction::train_eim_approximation()
 
       libMesh::out << "Computing EIM error on training set" << std::endl;
       std::pair<Real,unsigned int> max_error_pair = compute_max_eim_error();
-      Real abs_greedy_error = max_error_pair.first;
+      abs_greedy_error = max_error_pair.first;
       current_training_index = max_error_pair.second;
       set_params_from_training_set(current_training_index);
 
@@ -355,6 +356,8 @@ void RBEIMConstruction::train_eim_approximation()
             }
       }
     }
+
+  return abs_greedy_error;
 }
 
 void RBEIMConstruction::initialize_eim_assembly_objects()

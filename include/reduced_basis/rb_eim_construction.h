@@ -119,8 +119,9 @@ public:
 
   /**
    * Generate the EIM approximation for the specified parametrized function.
+   * Return the final tolerance from the training algorithm.
    */
-  void train_eim_approximation();
+  Real train_eim_approximation();
 
   /**
    * Build a vector of ElemAssembly objects that accesses the basis

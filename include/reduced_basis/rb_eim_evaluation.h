@@ -249,6 +249,19 @@ public:
   void write_out_basis_functions(const std::string & directory_name = "offline_data",
                                  bool write_binary_basis_functions = true);
 
+  /**
+   * Read in all the basis functions from file.
+   *
+   * \param sys Used for file IO.
+   * \param directory_name Specifies which directory to write files to.
+   * \param read_binary_basis_functions Indicates whether to expect binary or ASCII data.
+   *
+   * Note: this is not currently a virtual function and is not related
+   * to the RBEvaluation function of the same name.
+   */
+  void read_in_basis_functions(const std::string & directory_name = "offline_data",
+                               const bool read_binary_basis_functions = true);
+
 private:
 
   /**

@@ -562,4 +562,12 @@ write_out_basis_functions(const std::string & directory_name,
     }
 }
 
+void RBEIMEvaluation::
+read_in_basis_functions(const std::string & /*directory_name*/,
+                        const bool /*read_binary_basis_functions*/)
+{
+  // not implemented yet
+  libmesh_not_implemented();
+}
+
 } // namespace libMesh
