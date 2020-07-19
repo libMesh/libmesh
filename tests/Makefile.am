@@ -111,7 +111,8 @@ unit_tests_sources = \
   systems/systems_test.C \
   utils/parameters_test.C \
   utils/point_locator_test.C \
-  utils/vectormap_test.C
+  utils/vectormap_test.C \
+  utils/xdr_test.C
 
 #EXTRA_DIST = base/getpot_test_input.in
 
@@ -250,7 +251,8 @@ CLEANFILES = cube_mesh.xda \
 	     elemental_from_nodal.e \
              write_sideset_data.e \
              write_edgeset_data.e \
-             read_header_test.e
+             read_header_test.e \
+             output.dat
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD

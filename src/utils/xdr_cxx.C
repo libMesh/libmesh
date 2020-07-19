@@ -736,6 +736,10 @@ void Xdr::do_write(std::vector<T> & a)
   std::size_t length = a.size();
   data(length, "# vector length");
 
+  // Use scientific precision with lots of digits for the original type T.
+  *out << std::scientific
+       << std::setprecision(std::numeric_limits<T>::max_digits10);
+
   for (T & a_i : a)
     {
       libmesh_assert(out.get());
@@ -750,6 +754,10 @@ void Xdr::do_write(std::vector<std::complex<T>> & a)
 {
   std::size_t length=a.size();
   data(length, "# vector length x 2 (complex)");
+
+  // Use scientific precision with lots of digits for the original type T.
+  *out << std::scientific
+       << std::setprecision(std::numeric_limits<T>::max_digits10);
 
   for (std::complex<T> & a_i : a)
     {
