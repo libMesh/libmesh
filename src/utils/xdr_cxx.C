@@ -925,7 +925,7 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1023,7 +1023,7 @@ void Xdr::data_stream (double * val, const unsigned int len, const unsigned int 
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1123,7 +1123,7 @@ void Xdr::data_stream (float * val, const unsigned int len, const unsigned int l
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1251,7 +1251,7 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1378,7 +1378,7 @@ void Xdr::data_stream (Real * val, const unsigned int len, const unsigned int li
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1505,7 +1505,7 @@ void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1637,7 +1637,7 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
