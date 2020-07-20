@@ -980,6 +980,16 @@ void UnstructuredMesh::all_first_order ()
 #endif
       lo_elem->processor_id() = so_elem->processor_id();
       lo_elem->subdomain_id() = so_elem->subdomain_id();
+
+      const unsigned int nei = so_elem->n_extra_integers();
+      lo_elem->add_extra_integers(nei);
+      for (unsigned int i=0; i != nei; ++i)
+        lo_elem->set_extra_integer(i, so_elem->get_extra_integer(i));
+
+      // This is probably moot but shouldn't hurt
+      lo_elem->set_mapping_type(so_elem->mapping_type());
+      lo_elem->set_mapping_data(so_elem->mapping_data());
+
       this->insert_elem(std::move(lo_elem));
     }
 
