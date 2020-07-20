@@ -333,6 +333,13 @@ private:
    * Helper function mainly useful for debugging.
    */
   void print_local_eim_basis_functions() const;
+
+  /**
+   * Helper function that gathers the contents of
+   * _local_eim_basis_functions to processor 0 in preparation for
+   * printing to file.
+   */
+  void gather_bfs();
 };
 
 }

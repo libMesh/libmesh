@@ -441,9 +441,18 @@ write_out_basis_functions(const std::string & directory_name,
   // Debugging: Print values to screen
   // this->print_local_eim_basis_functions();
 
-  // Quick return if there is no work to do
-  if (_local_eim_basis_functions.empty())
+  // Quick return if there is no work to do. Note: make sure all procs
+  // agree there is no work to do.
+  bool is_empty = _local_eim_basis_functions.empty();
+  this->comm().verify(is_empty);
+
+  if (is_empty)
     return;
+
+  // Gather basis function data from other procs, storing it in
+  // _local_eim_basis_functions, so that we can then print everything
+  // from processor 0.
+  this->gather_bfs();
 
   // Write values from processor 0 only.
   if (this->processor_id() == 0)
@@ -704,6 +713,147 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
             }
         }
     }
+}
+
+void RBEIMEvaluation::gather_bfs()
+{
+  // We need to gather _local_eim_basis_functions data from other
+  // procs for printing.
+  //
+  // Ideally, this could be accomplished by simply calling:
+  // this->comm().gather(/*root_id=*/0, _local_eim_basis_functions);
+  //
+  // but the data structure seems to be too complicated for this to
+  // work automatically. (I get some error about the function called
+  // being "private within this context".) Therefore, we have to
+  // gather the information manually.
+
+  // So we can avoid calling this many times below
+  auto n_procs = this->n_processors();
+
+  // In serial there's nothing to gather
+  if (n_procs == 1)
+    return;
+
+  // Current assumption is that the number of basis functions stored on
+  // each processor is the same, the only thing that differs is the number
+  // of elements, so make sure that is the case now.
+  auto n_bf = _local_eim_basis_functions.size();
+  this->comm().verify(n_bf);
+
+  // We assume that each element has the same number of variables,
+  // and we get the number of vars from the first element of the
+  // first basis function. We also check that this number agrees on
+  // all procs.
+  auto n_vars = _local_eim_basis_functions[0].begin()->second.size();
+  this->comm().verify(n_vars);
+
+  // Gather list of Elem ids stored on each processor to proc 0.  We
+  // use basis function 0 as an example and assume all the basis
+  // functions are distributed similarly.
+  std::vector<dof_id_type> elem_ids;
+  elem_ids.reserve(_local_eim_basis_functions[0].size());
+  for (const auto & pr : _local_eim_basis_functions[0])
+    elem_ids.push_back(pr.first);
+  this->comm().gather(/*root_id=*/0, elem_ids);
+
+  // Store the number of qps per Elem on this processor. Again, use
+  // basis function 0 (and variable 0) to get this information, then
+  // apply it to all basis functions.
+  std::vector<unsigned int> n_qp_per_elem;
+  n_qp_per_elem.reserve(_local_eim_basis_functions[0].size());
+  for (const auto & pr : _local_eim_basis_functions[0])
+    {
+      // array[n_vars][n_qp] per Elem. We get the number of QPs
+      // for variable 0, assuming they are all the same.
+      const auto & array = pr.second;
+      n_qp_per_elem.push_back(array[0].size());
+    }
+
+  // Before gathering, compute the total amount of local qp data for
+  // each var, which is the sum of the entries in the "n_qp_per_elem" array.
+  // This will be used to reserve space in a vector below.
+  auto n_local_qp_data =
+    std::accumulate(n_qp_per_elem.begin(),
+                    n_qp_per_elem.end(),
+                    0u);
+
+  // Gather the number of qps per Elem for each processor onto processor 0.
+  this->comm().gather(/*root_id=*/0, n_qp_per_elem);
+
+  // Sanity check: On processor 0, this checks that we have gathered the same number
+  // of elem ids and qp counts.
+  if (elem_ids.size() != n_qp_per_elem.size())
+    libmesh_error_msg("Must gather same number of Elem ids as qps per Elem.");
+
+  // Reserve space to store contiguous vectors of qp data for each var
+  std::vector<std::vector<Number>> gathered_qp_data(n_vars);
+  for (auto var : index_range(gathered_qp_data))
+    gathered_qp_data[var].reserve(n_local_qp_data);
+
+  // Now we construct a vector for each basis function, for each
+  // variable, which is ordered according to:
+  // [ [qp vals for Elem 0], [qp vals for Elem 1], ... [qp vals for Elem N] ]
+  // and gather it to processor 0.
+  for (auto bf : index_range(_local_eim_basis_functions))
+    {
+      // Clear any data from previous bf
+      for (auto var : index_range(gathered_qp_data))
+        gathered_qp_data[var].clear();
+
+      for (const auto & pr : _local_eim_basis_functions[bf])
+        {
+          // array[n_vars][n_qp] per Elem
+          const auto & array = pr.second;
+          for (auto var : index_range(array))
+            {
+              // Insert all qp values for this var
+              gathered_qp_data[var].insert(/*insert at*/gathered_qp_data[var].end(),
+                                           /*data start*/array[var].begin(),
+                                           /*data end*/array[var].end());
+            }
+        }
+
+      // Reference to the data map for the current basis function.
+      auto & bf_map = _local_eim_basis_functions[bf];
+
+      for (auto var : index_range(gathered_qp_data))
+        {
+          // For each var, gather gathered_qp_data[var] onto processor
+          // 0. There apparently is not a gather overload for
+          // vector-of-vectors...
+          this->comm().gather(/*root_id=*/0, gathered_qp_data[var]);
+
+          // On processor 0, iterate over the gathered_qp_data[var]
+          // vector we just gathered, filling in the "small" vectors
+          // for each Elem. Note: here we ignore the fact that we
+          // already have the data on processor 0 and just overwrite
+          // it, this makes the indexing logic a bit simpler.
+          if (this->processor_id() == 0)
+            {
+              auto cursor = gathered_qp_data[var].begin();
+              for (auto i : index_range(elem_ids))
+                {
+                  auto elem_id = elem_ids[i];
+                  auto n_qp_this_elem = n_qp_per_elem[i];
+
+                  // Get reference to the [n_vars][n_qp] array for
+                  // this Elem. We assign() into the vector of
+                  // quadrature point values, which allocates space if
+                  // it doesn't already exist.
+                  auto & array = bf_map[elem_id];
+
+                  // Possibly allocate space if this is data for a new
+                  // element we haven't seen before.
+                  if (array.empty())
+                    array.resize(n_vars);
+
+                  array[var].assign(cursor, cursor + n_qp_this_elem);
+                  std::advance(cursor, n_qp_this_elem);
+                }
+            }
+        }
+    } // end loop over basis functions
 }
 
 } // namespace libMesh
