@@ -57,7 +57,7 @@ public:
    */
   virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return libmesh_make_unique<AssemblyEIM>(get_rb_eim_evaluation(), index);
+    return libmesh_make_unique<AssemblyEIM>(*this, index);
   }
 
   /**

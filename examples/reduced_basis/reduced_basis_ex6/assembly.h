@@ -35,6 +35,7 @@ using libMesh::RBParametrizedFunction;
 using libMesh::RBTheta;
 using libMesh::RBThetaExpansion;
 using libMesh::RBEIMAssembly;
+using libMesh::RBEIMConstruction;
 using libMesh::RBEIMEvaluation;
 using libMesh::RBEIMTheta;
 using libMesh::Real;
@@ -240,9 +241,9 @@ struct ThetaEIM : RBEIMTheta
 
 struct AssemblyEIM : RBEIMAssembly
 {
-  AssemblyEIM(RBEIMEvaluation & rb_eim_eval_in,
+  AssemblyEIM(RBEIMConstruction & rb_eim_con_in,
               unsigned int basis_function_index_in) :
-    RBEIMAssembly(rb_eim_eval_in,
+    RBEIMAssembly(rb_eim_con_in,
                   basis_function_index_in)
   {}
 

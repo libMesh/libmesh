@@ -62,7 +62,7 @@ public:
    */
   virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return std::make_unique<EIM_F>(get_rb_eim_evaluation(), index);
+    return std::make_unique<EIM_F>(*this, index);
   }
 };
 

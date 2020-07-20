@@ -35,7 +35,7 @@ namespace libMesh
 {
 
 class RBParameters;
-class RBEIMEvaluation;
+class RBEIMConstruction;
 
 /**
  * This class provides functionality required to define an assembly
@@ -52,7 +52,7 @@ public:
   /**
    * Constructor.
    */
-  RBEIMAssembly(RBEIMEvaluation & rb_eim_eval_in,
+  RBEIMAssembly(RBEIMConstruction & rb_eim_eval_in,
                 unsigned int basis_function_index_in);
 
   /**
@@ -71,18 +71,17 @@ public:
   /**
    * Get a reference to the RBEIMEvaluation object.
    */
-  RBEIMEvaluation & get_rb_eim_evaluation();
+  RBEIMConstruction & get_rb_eim_construction();
 
 private:
 
   /**
-   * The RBEIMEvaluation that stores the EIM basis functions that we use
-   * in evaluate_basis_function().
+   * The RBEIMConstruction that the assembly data comes from.
    */
-  RBEIMEvaluation & _rb_eim_eval;
+  RBEIMConstruction & _rb_eim_con;
 
   /**
-   * The EIM basis function index (from rb_eim_eval) for this assembly object.
+   * The EIM basis function index (from _rb_eim_con's RBEIMEvaluation) for this assembly object.
    */
   unsigned int _basis_function_index;
 

@@ -24,6 +24,7 @@
 #include "libmesh/rb_construction.h"
 #include "libmesh/rb_assembly_expansion.h"
 #include "libmesh/rb_eim_assembly.h"
+#include "libmesh/rb_eim_evaluation.h"
 
 // libMesh includes
 #include "libmesh/mesh_function.h"

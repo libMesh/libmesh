@@ -26,7 +26,7 @@ using libMesh::Number;
 using libMesh::Point;
 using libMesh::RBAssemblyExpansion;
 using libMesh::RBEIMAssembly;
-using libMesh::RBEIMEvaluation;
+using libMesh::RBEIMConstruction;
 using libMesh::RBParametrizedFunction;
 using libMesh::RBParameters;
 using libMesh::RBTheta;
@@ -116,9 +116,9 @@ struct EIM_IP_assembly : ElemAssembly
 
 struct EIM_F : RBEIMAssembly
 {
-  EIM_F(RBEIMEvaluation & rb_eim_eval_in,
+  EIM_F(RBEIMConstruction & rb_eim_con_in,
         unsigned int basis_function_index_in) :
-    RBEIMAssembly(rb_eim_eval_in,
+    RBEIMAssembly(rb_eim_con_in,
                   basis_function_index_in)
   {}
 
