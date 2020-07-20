@@ -18,6 +18,7 @@ public:
   CPPUNIT_TEST_SUITE( XdrTest );
 
   CPPUNIT_TEST( testDataVec );
+  CPPUNIT_TEST( testDataStream );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -53,6 +54,37 @@ public:
           CPPUNIT_ASSERT_EQUAL(vec_in.size(), vec.size());
 
           // Check that values were written/read with sufficient accuracy
+          for (auto i : index_range(vec_in))
+            LIBMESH_ASSERT_FP_EQUAL(vec[i], vec_in[i], TOLERANCE);
+        }
+      }
+  }
+
+  void testDataStream ()
+  {
+    std::vector<Real> vec(100);
+    for (auto i : index_range(vec))
+      vec[i] = static_cast<Real>(i+1) / vec.size();
+
+    // Test reading/writing on 1 processor
+    if (TestCommWorld->rank() == 0)
+      {
+        // Write to file. If "line_break" does not exactly divide the
+        // vector size, there will be one line with fewer values than
+        // the others.
+        {
+          Xdr xdr("output.dat", WRITE);
+          xdr.data_stream(vec.data(), vec.size(), /*line_break=*/16);
+        }
+
+        // Read from file. To use data_stream(), the storage needs to
+        // be pre-sized and the line_break parameter is ignored.
+        {
+          Xdr xdr("output.dat", READ);
+          std::vector<Real> vec_in(100);
+          xdr.data_stream(vec_in.data(), vec_in.size());
+
+          // Check that values were written/read correctly
           for (auto i : index_range(vec_in))
             LIBMESH_ASSERT_FP_EQUAL(vec[i], vec_in[i], TOLERANCE);
         }
