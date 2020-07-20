@@ -756,6 +756,9 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
       for (unsigned int i = 0; i != n_elem_ints; ++i)
         uelem->set_extra_integer(i, old_elem->get_extra_integer(i));
 
+      uelem->set_mapping_type(old_elem->mapping_type());
+      uelem->set_mapping_data(old_elem->mapping_data());
+
       Elem * new_elem = new_mesh.add_elem(std::move(uelem));
 
       libmesh_assert(new_elem);
