@@ -26,7 +26,8 @@ namespace libMesh
 
 RBParametrizedFunction::RBParametrizedFunction()
 :
-requires_xyz_perturbations(false)
+requires_xyz_perturbations(false),
+fd_delta(1.e-6)
 {}
 
 RBParametrizedFunction::~RBParametrizedFunction() {}

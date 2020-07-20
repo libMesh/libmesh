@@ -113,6 +113,12 @@ public:
    * approximations to derivatives.
    */
   bool requires_xyz_perturbations;
+
+  /**
+   * The finite difference step size in the case that this function in the case
+   * that this function uses finite differencing.
+   */
+  Real fd_delta;
 };
 
 }

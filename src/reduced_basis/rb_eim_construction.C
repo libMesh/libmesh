@@ -58,8 +58,7 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _Nmax(0),
     _rel_training_tolerance(1.e-4),
-    _abs_training_tolerance(1.e-12),
-    _perturb_size(1.e-6)
+    _abs_training_tolerance(1.e-12)
 {
   // The training set should be the same on all processors in the
   // case of EIM training.
@@ -425,16 +424,6 @@ void RBEIMConstruction::set_Nmax(unsigned int Nmax)
   _Nmax = Nmax;
 }
 
-void RBEIMConstruction::set_perturbation_size(Real perturb_size)
-{
-  _perturb_size = perturb_size;
-}
-
-Real RBEIMConstruction::get_perturbation_size() const
-{
-  return _perturb_size;
-}
-
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 {
   LOG_SCOPE("compute_max_eim_error()", "RBEIMConstruction");
@@ -562,6 +551,8 @@ void RBEIMConstruction::initialize_qp_data()
 
       if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
         {
+          Real fd_delta = get_rb_eim_evaluation().get_parametrized_function().fd_delta;
+
           std::vector<Point> xyz_perturb_vec;
 
           for (const Point & xyz_qp : xyz)
@@ -570,17 +561,17 @@ void RBEIMConstruction::initialize_qp_data()
                 {
                   Point xyz_perturb = xyz_qp;
 
-                  xyz_perturb(0) += _perturb_size;
+                  xyz_perturb(0) += fd_delta;
                   xyz_perturb_vec.emplace_back(xyz_perturb);
-                  xyz_perturb(0) -= _perturb_size;
+                  xyz_perturb(0) -= fd_delta;
                   
-                  xyz_perturb(1) += _perturb_size;
+                  xyz_perturb(1) += fd_delta;
                   xyz_perturb_vec.emplace_back(xyz_perturb);
-                  xyz_perturb(1) -= _perturb_size;
+                  xyz_perturb(1) -= fd_delta;
 
-                  xyz_perturb(2) += _perturb_size;
+                  xyz_perturb(2) += fd_delta;
                   xyz_perturb_vec.emplace_back(xyz_perturb);
-                  xyz_perturb(2) -= _perturb_size;
+                  xyz_perturb(2) -= fd_delta;
                 }
               else if(elem->dim() == 2)
                 {
@@ -605,19 +596,28 @@ void RBEIMConstruction::initialize_qp_data()
 
                   Point xi_eta_perturb = xi_eta;
 
-                  xi_eta_perturb(0) += _perturb_size;
-                  xyz_perturb_vec.emplace_back(
+                  xi_eta_perturb(0) += fd_delta;
+                  Point xyz_perturb_0 =
                     FEMap::map(elem->dim(),
                                elem,
-                               xi_eta_perturb));
-                  xi_eta_perturb(0) -= _perturb_size;
+                               xi_eta_perturb);
+                  xi_eta_perturb(0) -= fd_delta;
 
-                  xi_eta_perturb(1) += _perturb_size;
-                  xyz_perturb_vec.emplace_back(
+                  xi_eta_perturb(1) += fd_delta;
+                  Point xyz_perturb_1 =
                     FEMap::map(elem->dim(),
                                elem,
-                               xi_eta_perturb));
-                  xi_eta_perturb(1) -= _perturb_size;
+                               xi_eta_perturb);
+                  xi_eta_perturb(1) -= fd_delta;
+
+                  // Finally, we rescale xyz_perturb_0 and xyz_perturb_1 so that
+                  // (xyz_perturb - xyz_qp).norm() == fd_delta, since this is
+                  // required in order to compute finite differences correctly.
+                  Point unit_0 = (xyz_perturb_0-xyz_qp).unit();
+                  Point unit_1 = (xyz_perturb_1-xyz_qp).unit();
+
+                  xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_0);
+                  xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_1);
                 }
               else
                 {
