@@ -633,9 +633,8 @@ void RBEIMConstruction::initialize_qp_data()
     }
 }
 
-Number RBEIMConstruction::inner_product(
-  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & v,
-  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & w)
+Number
+RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
 {
   LOG_SCOPE("inner_product()", "RBEIMConstruction");
 
@@ -670,7 +669,7 @@ Number RBEIMConstruction::inner_product(
   return val;
 }
 
-Real RBEIMConstruction::get_max_abs_value(const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & v) const
+Real RBEIMConstruction::get_max_abs_value(const QpDataMap & v) const
 {
   LOG_SCOPE("get_max_abs_value()", "RBEIMConstruction");
 
@@ -871,8 +870,7 @@ Real RBEIMConstruction::compute_best_fit_error(unsigned int training_index)
 
   // Make a copy of the pre-computed solution for the specified training sample
   // since we will modify it below to compute the best fit error.
-  std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> solution =
-    _local_parametrized_functions_for_training[training_index];
+  QpDataMap solution = _local_parametrized_functions_for_training[training_index];
 
   const unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
   DenseVector<Number> best_fit_coeffs;
@@ -921,7 +919,7 @@ Real RBEIMConstruction::compute_best_fit_error(unsigned int training_index)
 }
 
 void RBEIMConstruction::scale_parametrized_function(
-    std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & local_pf,
+    QpDataMap & local_pf,
     Number scaling_factor)
 {
   LOG_SCOPE("scale_parametrized_function()", "RBEIMConstruction");

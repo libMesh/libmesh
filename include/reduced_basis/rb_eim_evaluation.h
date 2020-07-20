@@ -30,7 +30,7 @@
 
 // C++ includes
 #include <memory>
-#include <unordered_map>
+#include <map>
 
 namespace libMesh
 {
@@ -59,6 +59,11 @@ public:
    * Destructor.
    */
   virtual ~RBEIMEvaluation ();
+
+  /**
+   * Type of the data structure used to map from (elem id) -> [n_vars][n_qp] data.
+   */
+  typedef std::map<dof_id_type, std::vector<std::vector<Number>>> QpDataMap;
 
   /**
    * Clear this object.
@@ -112,7 +117,7 @@ public:
   /**
    * Subtract coeffs[i]*basis_function[i] from \p v.
    */
-  void decrement_vector(std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & v,
+  void decrement_vector(QpDataMap & v,
                         const DenseVector<Number> & coeffs);
 
   /**
@@ -139,7 +144,7 @@ public:
    * points on element \p elem_id and component \p comp.
    */
   static void get_parametrized_function_values_at_qps(
-    const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & pf,
+    const QpDataMap & pf,
     dof_id_type elem_id,
     unsigned int comp,
     std::vector<Number> & values);
@@ -150,7 +155,7 @@ public:
    */
   static Number get_parametrized_function_value(
     const Parallel::Communicator & comm,
-    const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & pf,
+    const QpDataMap & pf,
     dof_id_type elem_id,
     unsigned int comp,
     unsigned int qp);
@@ -179,8 +184,7 @@ public:
   /**
    * Get a reference to the i^th basis function.
    */
-  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> &
-    get_basis_function(unsigned int i) const;
+  const QpDataMap & get_basis_function(unsigned int i) const;
 
   /**
    * Return a const reference to the EIM solution coefficients from the most
@@ -222,7 +226,7 @@ public:
    * Add \p bf to our EIM basis.
    */
   void add_basis_function_and_interpolation_data(
-    const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & bf,
+    const QpDataMap & bf,
     Point p,
     unsigned int comp,
     dof_id_type elem_id,
@@ -260,7 +264,7 @@ public:
    * to the RBEvaluation function of the same name.
    */
   void read_in_basis_functions(const std::string & directory_name = "offline_data",
-                               const bool read_binary_basis_functions = true);
+                               bool read_binary_basis_functions = true);
 
 private:
 
@@ -322,8 +326,13 @@ private:
    * We use a map to index the element ID, since the IDs on this processor in
    * generally will not start at zero.
    */
-  std::vector<std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> > _local_eim_basis_functions;
+  std::vector<QpDataMap> _local_eim_basis_functions;
 
+  /**
+   * Print the contents of _local_eim_basis_functions to libMesh::out.
+   * Helper function mainly useful for debugging.
+   */
+  void print_local_eim_basis_functions() const;
 };
 
 }

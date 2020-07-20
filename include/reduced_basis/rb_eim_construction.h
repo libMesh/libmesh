@@ -31,6 +31,7 @@
 #include "libmesh/coupling_matrix.h"
 
 // C++ includes
+#include <map>
 
 namespace libMesh
 {
@@ -63,6 +64,11 @@ public:
    * Destructor.
    */
   virtual ~RBEIMConstruction ();
+
+  /**
+   * Type of the data structure used to map from (elem id) -> [n_vars][n_qp] data.
+   */
+  typedef RBEIMEvaluation::QpDataMap QpDataMap;
 
   /**
    * Clear this object.
@@ -211,15 +217,13 @@ private:
    * stored in _local_quad_point_JxW, so that this is equivalent to
    * computing w^t M v, where M is the mass matrix.
    */
-  Number inner_product(
-    const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & v,
-    const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & w);
+  Number inner_product(const QpDataMap & v, const QpDataMap & w);
 
   /**
    * Get the maximum absolute value from a vector stored in the format that we use
    * for basis functions.
    */
-  Real get_max_abs_value(const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & v) const;
+  Real get_max_abs_value(const QpDataMap & v) const;
 
   /**
    * Add a new basis function to the EIM approximation.
@@ -244,7 +248,7 @@ private:
    * Scale all values in \p pf by \p scaling_factor
    */
   static void scale_parametrized_function(
-    std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & local_pf,
+    QpDataMap & local_pf,
     Number scaling_factor);
 
   /**
@@ -286,8 +290,7 @@ private:
    * We use a map to index the element ID, since the IDs on this processor in
    * generally will not start at zero.
    */
-  std::vector<std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> >
-    _local_parametrized_functions_for_training;
+  std::vector<QpDataMap> _local_parametrized_functions_for_training;
 
   /**
    * The quadrature point locations, quadrature point weights (JxW), and subdomain IDs
@@ -312,7 +315,6 @@ private:
    * to the mapping function derivatives.
    */
   std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > _local_quad_point_locations_perturbations;
-
 };
 
 } // namespace libMesh

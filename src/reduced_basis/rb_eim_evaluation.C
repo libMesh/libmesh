@@ -34,6 +34,7 @@
 #include <sstream>
 #include <fstream>
 #include <numeric> // std::accumulate
+#include <iterator> // std::advance
 
 namespace libMesh
 {
@@ -171,7 +172,7 @@ void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
   _local_eim_basis_functions.resize(n_bfs);
 }
 
-void RBEIMEvaluation::decrement_vector(std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & v,
+void RBEIMEvaluation::decrement_vector(QpDataMap & v,
                                        const DenseVector<Number> & coeffs)
 {
   if(get_n_basis_functions() != coeffs.size())
@@ -223,7 +224,7 @@ std::unique_ptr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
 }
 
 void RBEIMEvaluation::get_parametrized_function_values_at_qps(
-  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & pf,
+  const QpDataMap & pf,
   dof_id_type elem_id,
   unsigned int comp,
   std::vector<Number> & values)
@@ -247,7 +248,7 @@ void RBEIMEvaluation::get_parametrized_function_values_at_qps(
 
 Number RBEIMEvaluation::get_parametrized_function_value(
   const Parallel::Communicator & comm,
-  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & pf,
+  const QpDataMap & pf,
   dof_id_type elem_id,
   unsigned int comp,
   unsigned int qp)
@@ -304,8 +305,8 @@ Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function
     qp);
 }
 
-const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> &
-  RBEIMEvaluation::get_basis_function(unsigned int i) const
+const RBEIMEvaluation::QpDataMap &
+RBEIMEvaluation::get_basis_function(unsigned int i) const
 {
   return _local_eim_basis_functions[i];
 }
@@ -408,7 +409,7 @@ const DenseMatrix<Number> & RBEIMEvaluation::get_interpolation_matrix() const
 }
 
 void RBEIMEvaluation::add_basis_function_and_interpolation_data(
-  const std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & bf,
+  const QpDataMap & bf,
   Point p,
   unsigned int comp,
   dof_id_type elem_id,
@@ -436,22 +437,7 @@ write_out_basis_functions(const std::string & directory_name,
   libMesh::out << "_local_eim_basis_functions.size()=" << _local_eim_basis_functions.size() << std::endl;
 
   // Debugging: Print values to screen
-  // for (auto bf : index_range(_local_eim_basis_functions))
-  //   {
-  //     libMesh::out << "Basis function " << bf << std::endl;
-  //     for (const auto & pr : _local_eim_basis_functions[bf])
-  //       {
-  //         libMesh::out << "Elem " << pr.first << std::endl;
-  //         const auto & array = pr.second;
-  //         for (auto var : index_range(array))
-  //           {
-  //             libMesh::out << "Variable " << var << std::endl;
-  //             for (auto qp : index_range(array[var]))
-  //               libMesh::out << array[var][qp] << " ";
-  //             libMesh::out << std::endl;
-  //           }
-  //       }
-  //   }
+  // this->print_local_eim_basis_functions();
 
   // Quick return if there is no work to do
   if (_local_eim_basis_functions.empty())
@@ -494,8 +480,22 @@ write_out_basis_functions(const std::string & directory_name,
       // have the same number of qps.
       std::vector<unsigned int> n_qp_per_elem;
       n_qp_per_elem.reserve(n_elem);
+      dof_id_type expected_elem_id = 0;
       for (const auto & pr : _local_eim_basis_functions[0])
         {
+          // Note: Currently we require that the Elems are numbered
+          // contiguously from [0..n_elem).  This allows us to avoid
+          // writing the Elem ids to the Xdr file, but if we need to
+          // generalize this assumption later, we can.
+          const auto & actual_elem_id = pr.first;
+
+          // Debugging:
+          // libMesh::err << "actual_elem_id=" << actual_elem_id << std::endl;
+          // libMesh::err << "expected_elem_id=" << expected_elem_id << std::endl;
+
+          if (actual_elem_id != expected_elem_id++)
+            libmesh_error_msg("RBEIMEvaluation currently assumes a contiguous Elem numbering starting from 0.");
+
           // array[n_vars][n_qp] per Elem. We get the number of QPs
           // for variable 0, assuming they are all the same.
           const auto & array = pr.second;
@@ -508,8 +508,7 @@ write_out_basis_functions(const std::string & directory_name,
       auto n_qp_data =
         std::accumulate(n_qp_per_elem.begin(),
                         n_qp_per_elem.end(),
-                        0,
-                        std::plus<unsigned int>());
+                        0u);
 
       // Reserve space to store continguous vectors of qp data for each var
       std::vector<std::vector<Number>> qp_data(n_vars);
@@ -563,11 +562,144 @@ write_out_basis_functions(const std::string & directory_name,
 }
 
 void RBEIMEvaluation::
-read_in_basis_functions(const std::string & /*directory_name*/,
-                        const bool /*read_binary_basis_functions*/)
+read_in_basis_functions(const std::string & directory_name,
+                        bool read_binary_basis_functions)
 {
-  // not implemented yet
-  libmesh_not_implemented();
+  // Read values on processor 0 only.
+  if (this->processor_id() == 0)
+    {
+      // Create filename
+      std::ostringstream file_name;
+      const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
+      file_name << directory_name << "/" << "bf_data" << basis_function_suffix;
+
+      // Create XDR reader object
+      Xdr xdr(file_name.str(), read_binary_basis_functions ? DECODE : READ);
+
+      // Read in the number of basis functions. The comment parameter
+      // is ignored when reading.
+      std::size_t n_bf;
+      xdr.data(n_bf);
+
+      // Debugging:
+      // libMesh::out << "Preparing to read in n_bf = " << n_bf << " basis functions." << std::endl;
+
+      // Read in the number of elements
+      std::size_t n_elem;
+      xdr.data(n_elem);
+
+      // Debugging:
+      // libMesh::out << "Reading in data for n_elem = " << n_elem << " elements." << std::endl;
+
+      // Read in the number of variables.
+      std::size_t n_vars;
+      xdr.data(n_vars);
+
+      // Debugging:
+      // libMesh::out << "Reading in data for n_vars = " << n_vars << " variables." << std::endl;
+
+      // Read in vector containing the number of QPs per elem. We can
+      // create this vector with the required size or let it be read
+      // from the file and sized for us.
+      std::vector<unsigned int> n_qp_per_elem(n_elem);
+      xdr.data(n_qp_per_elem);
+
+      // Debugging:
+      // libMesh::out << "Number of qps per elem: ";
+      // for (const auto & n_qp : n_qp_per_elem)
+      //   libMesh::out << n_qp << " ";
+      // libMesh::out << std::endl;
+
+      // The total amount of qp data for each var is the sum of the
+      // entries in the "n_qp_per_elem" array.
+      auto n_qp_data =
+        std::accumulate(n_qp_per_elem.begin(),
+                        n_qp_per_elem.end(),
+                        0u);
+
+      // Debugging:
+      // libMesh::out << "n_qp_data = " << n_qp_data << std::endl;
+
+      // Allocate space to store all required basis functions,
+      // clearing any data that may have been there previously.
+      //
+      // TODO: Do we need to also write out/read in Elem ids?
+      // Or can we assume they will always be contiguously
+      // numbered (at least on proc 0)?
+      _local_eim_basis_functions.clear();
+      _local_eim_basis_functions.resize(n_bf);
+      for (auto i : index_range(_local_eim_basis_functions))
+        for (std::size_t elem_id=0; elem_id<n_elem; ++elem_id)
+          {
+            auto & array = _local_eim_basis_functions[i][elem_id];
+            array.resize(n_vars);
+          }
+
+      // Allocate temporary storage for one var's worth of qp data.
+      std::vector<Number> qp_data;
+
+      // Read in data for each basis function
+      for (auto i : index_range(_local_eim_basis_functions))
+        {
+          // Reference to the data map for the current basis function.
+          auto & bf_map = _local_eim_basis_functions[i];
+
+          for (std::size_t var=0; var<n_vars; ++var)
+            {
+              qp_data.clear();
+              qp_data.resize(n_qp_data);
+
+              // Read data using data_stream() since that is
+              // (currently) how we write it out. The "line_break"
+              // parameter of data_stream() is ignored while reading.
+              xdr.data_stream(qp_data.data(), qp_data.size());
+
+              // Debugging
+              // libMesh::out << "Basis function " << i << ", variable " << var << ": ";
+              // for (const auto & val : qp_data)
+              //   libMesh::out << val << " ";
+              // libMesh::out << std::endl;
+
+              // Iterate over the qp_data vector, filling in the
+              // "small" vectors for each Elem.
+              auto cursor = qp_data.begin();
+              for (std::size_t elem_id=0; elem_id<n_elem; ++elem_id)
+                {
+                  // Get reference to the [n_vars][n_qp] array for
+                  // this Elem. We assign() into the vector of
+                  // quadrature point values, which allocates space if
+                  // it doesn't already exist.
+                  auto & array = bf_map[elem_id];
+                  array[var].assign(cursor, cursor + n_qp_per_elem[elem_id]);
+                  std::advance(cursor, n_qp_per_elem[elem_id]);
+                }
+            }
+        }
+
+      // Debugging: check that the data was read in correctly.
+      // this->print_local_eim_basis_functions();
+
+    } // end if processor 0
+}
+
+void RBEIMEvaluation::print_local_eim_basis_functions() const
+{
+  for (auto bf : index_range(_local_eim_basis_functions))
+    {
+      libMesh::out << "Basis function " << bf << std::endl;
+      for (const auto & pr : _local_eim_basis_functions[bf])
+        {
+          libMesh::out << "Elem " << pr.first << std::endl;
+          const auto & array = pr.second;
+          for (auto var : index_range(array))
+            {
+              libMesh::out << "Variable " << var << std::endl;
+              for (auto qp : index_range(array[var]))
+                libMesh::out << array[var][qp] << " ";
+              libMesh::out << std::endl;
+            }
+        }
+    }
 }
 
 } // namespace libMesh
