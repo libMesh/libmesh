@@ -939,13 +939,24 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             }
           } // end switch (etype)
 
-
-
-        // Be sure the correct IDs are also set for all subelems.
+        // Be sure the correct data is set for all subelems.
+        const unsigned int nei = elem->n_extra_integers();
         for (unsigned int i=0; i != max_subelems; ++i)
           if (subelem[i]) {
             subelem[i]->processor_id() = elem->processor_id();
             subelem[i]->subdomain_id() = elem->subdomain_id();
+
+            // Copy any extra element data.  Since the subelements
+            // haven't been added to the mesh yet any allocation has
+            // to be done manually.
+            subelem[i]->add_extra_integers(nei);
+            for (unsigned int i=0; i != nei; ++i)
+              subelem[i]->set_extra_integer(i, elem->get_extra_integer(i));
+
+
+            // Copy any mapping data.
+            subelem[i]->set_mapping_type(elem->mapping_type());
+            subelem[i]->set_mapping_data(elem->mapping_data());
           }
 
         // On a mesh with boundary data, we need to move that data to
@@ -1329,6 +1340,16 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
               }
         }
 
+      // Copy any extra element data.  Since the copy hasn't been
+      // added to the mesh yet any allocation has to be done manually.
+      const unsigned int nei = elem->n_extra_integers();
+      copy->add_extra_integers(nei);
+      for (unsigned int i=0; i != nei; ++i)
+        copy->set_extra_integer(i, elem->get_extra_integer(i));
+
+      // Copy any mapping data.
+      copy->set_mapping_type(elem->mapping_type());
+      copy->set_mapping_data(elem->mapping_data());
 
       // We're done with this element
       mesh.delete_elem(elem);
