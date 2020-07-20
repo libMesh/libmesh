@@ -191,6 +191,9 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         el->set_unique_id(old->unique_id() + unique_id_offset);
 #endif
 
+        el->set_mapping_type(old->mapping_type());
+        el->set_mapping_data(old->mapping_data());
+
         //Hold onto it
         if (!skip_find_neighbors)
           {
