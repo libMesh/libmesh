@@ -990,8 +990,15 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
   // elements assigned to pid which are currently stored on the calling
   // processor. This will not in general be correct for parallel meshes
   // when (pid!=mesh.processor_id()).
-  _n_active_elem_on_proc.resize(mesh.n_processors());
+  auto n_proc = mesh.n_processors();
+  _n_active_elem_on_proc.resize(n_proc);
   mesh.comm().allgather(n_active_local_elem, _n_active_elem_on_proc);
+
+  std::vector<dof_id_type> n_active_elem_before_proc(mesh.n_processors());
+
+  for (auto i : make_range(n_proc-1))
+    n_active_elem_before_proc[i+1] =
+      n_active_elem_before_proc[i] + _n_active_elem_on_proc[i];
 
   libMesh::BoundingBox bbox =
     MeshTools::create_bounding_box(mesh);
@@ -1009,18 +1016,12 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
   Parallel::sync_dofobject_data_by_id
       (mesh.comm(), mesh.active_elements_begin(), mesh.active_elements_end(), sync);
 
-  dof_id_type pid_offset=0;
-  for (auto pid : make_range(mesh.n_processors()))
+  for (const auto & elem : mesh.active_element_ptr_range())
     {
-      for (const auto & elem : as_range(mesh.active_pid_elements_begin(pid),
-                                        mesh.active_pid_elements_end(pid)))
-        {
-          libmesh_assert_less (_global_index_by_pid_map[elem->id()], _n_active_elem_on_proc[pid]);
+      const processor_id_type pid = elem->processor_id();
+      libmesh_assert_less (_global_index_by_pid_map[elem->id()], _n_active_elem_on_proc[pid]);
 
-          _global_index_by_pid_map[elem->id()] += pid_offset;
-        }
-
-      pid_offset += _n_active_elem_on_proc[pid];
+      _global_index_by_pid_map[elem->id()] += n_active_elem_before_proc[pid];
     }
 }
 
