@@ -950,8 +950,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             // haven't been added to the mesh yet any allocation has
             // to be done manually.
             subelem[i]->add_extra_integers(nei);
-            for (unsigned int i=0; i != nei; ++i)
-              subelem[i]->set_extra_integer(i, elem->get_extra_integer(i));
+            for (unsigned int ei=0; ei != nei; ++ei)
+              subelem[ei]->set_extra_integer(ei, elem->get_extra_integer(ei));
 
 
             // Copy any mapping data.
