@@ -1354,6 +1354,16 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 #endif
       so_elem->processor_id() = lo_pid;
       so_elem->subdomain_id() = lo_elem->subdomain_id();
+
+      const unsigned int nei = so_elem->n_extra_integers();
+      so_elem->add_extra_integers(nei);
+      for (unsigned int i=0; i != nei; ++i)
+        so_elem->set_extra_integer(i, lo_elem->get_extra_integer(i));
+
+      // This might not help anything but shouldn't hurt.
+      so_elem->set_mapping_type(lo_elem->mapping_type());
+      so_elem->set_mapping_data(lo_elem->mapping_data());
+
       this->insert_elem(std::move(so_elem));
     }
 
