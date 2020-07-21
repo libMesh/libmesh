@@ -552,10 +552,11 @@ void RBEIMConstruction::initialize_qp_data()
         {
           Real fd_delta = get_rb_eim_evaluation().get_parametrized_function().fd_delta;
 
-          std::vector<Point> xyz_perturb_vec;
+          std::vector<std::vector<Point>> xyz_perturb_vec_at_qps;
 
           for (const Point & xyz_qp : xyz)
             {
+              std::vector<Point> xyz_perturb_vec;
               if(elem->dim() == 3)
                 {
                   Point xyz_perturb = xyz_qp;
@@ -625,9 +626,11 @@ void RBEIMConstruction::initialize_qp_data()
                   // Support for this case could be added if it is
                   // needed.
                 }
+
+              xyz_perturb_vec_at_qps.emplace_back(xyz_perturb_vec);
             }
 
-          _local_quad_point_locations[elem_id] = xyz_perturb_vec;
+          _local_quad_point_locations_perturbations[elem_id] = xyz_perturb_vec_at_qps;
         }
     }
 }
