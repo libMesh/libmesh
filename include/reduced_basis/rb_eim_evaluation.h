@@ -37,8 +37,9 @@ namespace libMesh
 
 class RBParameters;
 class RBParametrizedFunction;
-class Elem;
 class RBTheta;
+class System;
+class Elem;
 
 /**
  * This class enables evaluation of an Empirical Interpolation Method (EIM)
@@ -256,14 +257,15 @@ public:
   /**
    * Read in all the basis functions from file.
    *
-   * \param sys Used for file IO.
+   * \param sys The Mesh in this System determines the parallel distribution of the basis functions.
    * \param directory_name Specifies which directory to write files to.
    * \param read_binary_basis_functions Indicates whether to expect binary or ASCII data.
    *
-   * Note: this is not currently a virtual function and is not related
-   * to the RBEvaluation function of the same name.
+   * Note: this is not a virtual function and is not related to the
+   * RBEvaluation function of the same name.
    */
-  void read_in_basis_functions(const std::string & directory_name = "offline_data",
+  void read_in_basis_functions(System & rb_construction,
+                               const std::string & directory_name = "offline_data",
                                bool read_binary_basis_functions = true);
 
 private:
@@ -293,7 +295,7 @@ private:
    * We also store perturbations of the xyz locations that may be
    * needed to evaluate finite difference approximations to derivatives.
    */
-    std::vector<std::vector<Point>> _interpolation_points_xyz_perturbations;
+  std::vector<std::vector<Point>> _interpolation_points_xyz_perturbations;
 
   /**
    * We also store the element ID and qp index of each interpolation
@@ -340,6 +342,13 @@ private:
    * printing to file.
    */
   void gather_bfs();
+
+  /**
+   * Helper function that distributes the entries of
+   * _local_eim_basis_functions to their respective processors after
+   * they are read in on processor 0.
+   */
+  void distribute_bfs(const System & sys);
 };
 
 }

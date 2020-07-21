@@ -178,7 +178,7 @@ int main (int argc, char ** argv)
 
         RBDataDeserialization::RBEIMEvaluationDeserialization rb_eim_eval_reader(eim_rb_eval);
         rb_eim_eval_reader.read_from_file("rb_eim_eval.bin");
-        eim_rb_eval.read_in_basis_functions("eim_data", /*binary=*/false);
+        eim_rb_eval.read_in_basis_functions(rb_construction, "eim_data", /*binary=*/false);
 
         // Read data from input file and print state
         rb_construction.process_parameters_file(rb_parameters);
