@@ -131,7 +131,6 @@ void RBEIMConstruction::print_info()
   print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
-  libMesh::out << std::endl;
 
   if (best_fit_type_flag == PROJECTION_BEST_FIT)
     {

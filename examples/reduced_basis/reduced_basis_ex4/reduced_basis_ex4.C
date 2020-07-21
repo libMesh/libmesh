@@ -92,7 +92,6 @@ int main (int argc, char ** argv)
 
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
   const unsigned int dim = 2;                      // The number of spatial dimensions
-  bool store_basis_functions = infile("store_basis_functions", false); // Do we write out basis functions?
 
   // Read the "online_mode" flag from the command line
   GetPot command_line (argc, argv);
@@ -100,88 +99,118 @@ int main (int argc, char ** argv)
   if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
 
-  // Create a mesh (just a simple square) on the default MPI
-  // communicator.  We currently have to create a ReplicatedMesh here
-  // due to a reduced_basis regression with DistributedMesh
   ReplicatedMesh mesh (init.comm(), dim);
   MeshTools::Generation::build_square (mesh,
-                                       n_elem, n_elem,
-                                       -1., 1.,
-                                       -1., 1.,
-                                       QUAD4);
-
-  // Initialize the EquationSystems object for this mesh and attach
-  // the EIM and RB Construction objects
-  EquationSystems equation_systems (mesh);
-
-  SimpleEIMConstruction & eim_construction =
-    equation_systems.add_system<SimpleEIMConstruction> ("EIM");
-  SimpleRBConstruction & rb_construction =
-    equation_systems.add_system<SimpleRBConstruction> ("RB");
-
-  // Initialize the data structures for the equation system.
-  equation_systems.init ();
-
-  // Print out some information about the "truth" discretization
-  mesh.print_info();
-  equation_systems.print_info();
-
-  // Initialize the standard RBEvaluation object
-  SimpleRBEvaluation rb_eval(mesh.comm());
-
-  // Initialize the EIM RBEvaluation object
-  SimpleEIMEvaluation eim_rb_eval(mesh.comm());
-
-  // Set the rb_eval objects for the RBConstructions
-  eim_construction.set_rb_eim_evaluation(eim_rb_eval);
-  rb_construction.set_rb_evaluation(rb_eval);
+                                      n_elem, n_elem,
+                                      -1., 1.,
+                                      -1., 1.,
+                                      QUAD4);
 
   if (!online_mode)
     {
-      // Read data from input file and print state
-      eim_construction.process_parameters_file(eim_parameters);
-      eim_construction.print_info();
+      // First run the Offline stage for the EIM approximation.
+      {
+        libMesh::out << "Perform EIM training" << std::endl << std::endl;
 
-      // Perform the EIM Greedy and write out the data
-      eim_construction.initialize_eim_construction();
-      eim_construction.train_eim_approximation();
+        // Initialize the EquationSystems object for this mesh and attach
+        // the EIM and RB Construction objects
+        EquationSystems equation_systems (mesh);
 
-      RBDataSerialization::RBEIMEvaluationSerialization rb_eim_eval_writer(eim_rb_eval);
-      rb_eim_eval_writer.write_to_file("rb_eim_eval.bin");
+        SimpleEIMConstruction & eim_construction =
+          equation_systems.add_system<SimpleEIMConstruction> ("EIM");
 
-      // Read data from input file and print state
-      rb_construction.process_parameters_file(rb_parameters);
+        // Initialize the data structures for the equation system.
+        equation_systems.init ();
 
-      // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
-      eim_rb_eval.initialize_eim_theta_objects();
-      rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+        // Print out some information about the "truth" discretization
+        mesh.print_info();
+        equation_systems.print_info();
 
-      // attach the EIM assembly objects to the RBConstruction object
-      eim_construction.initialize_eim_assembly_objects();
-      rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
+        // Initialize the EIM RBEvaluation object
+        SimpleEIMEvaluation eim_rb_eval(mesh.comm());
 
-      // Print out the state of rb_construction now that the EIM objects have been attached
-      rb_construction.print_info();
+        // Set the rb_eval objects for the RBConstructions
+        eim_construction.set_rb_eim_evaluation(eim_rb_eval);
 
-      // Need to initialize _after_ EIM greedy so that
-      // the system knows how many affine terms there are
-      rb_construction.initialize_rb_construction();
-      rb_construction.train_reduced_basis();
+        // Read data from input file and print state
+        eim_construction.process_parameters_file(eim_parameters);
+        eim_construction.print_info();
 
-      RBDataSerialization::RBEvaluationSerialization rb_eval_writer(rb_construction.get_rb_evaluation());
-      rb_eval_writer.write_to_file("rb_eval.bin");
+        // Perform the EIM Greedy and write out the data
+        eim_construction.initialize_eim_construction();
+        eim_construction.train_eim_approximation();
 
-      // Write out the basis functions, if requested
-      if (store_basis_functions)
-        {
-          eim_rb_eval.write_out_basis_functions("eim_data", /*binary=*/false);
+        RBDataSerialization::RBEIMEvaluationSerialization rb_eim_eval_writer(eim_rb_eval);
+        rb_eim_eval_writer.write_to_file("rb_eim_eval.bin");
 
-          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,
-                                                                        "rb_data");
-        }
+        // Write out the EIM basis functions
+        eim_rb_eval.write_out_basis_functions("eim_data", /*binary=*/false);
+      }
+
+      {
+        libMesh::out << std::endl << "Perform RB training" << std::endl << std::endl;
+
+        // Initialize the EquationSystems object for this mesh and attach
+        // the EIM and RB Construction objects
+        EquationSystems equation_systems (mesh);
+
+        SimpleEIMConstruction & eim_construction =
+          equation_systems.add_system<SimpleEIMConstruction> ("EIM");
+        SimpleRBConstruction & rb_construction =
+          equation_systems.add_system<SimpleRBConstruction> ("RB");
+
+        // Initialize the data structures for the equation system.
+        equation_systems.init ();
+
+        // Print out some information about the "truth" discretization
+        mesh.print_info();
+        equation_systems.print_info();
+
+        // Initialize the standard RBEvaluation object
+        SimpleRBEvaluation rb_eval(mesh.comm());
+
+        // Initialize the EIM RBEvaluation object
+        SimpleEIMEvaluation eim_rb_eval(mesh.comm());
+
+        // Set the rb_eval objects for the RBConstructions
+        eim_construction.set_rb_eim_evaluation(eim_rb_eval);
+        rb_construction.set_rb_evaluation(rb_eval);
+
+        RBDataDeserialization::RBEIMEvaluationDeserialization rb_eim_eval_reader(eim_rb_eval);
+        rb_eim_eval_reader.read_from_file("rb_eim_eval.bin");
+        eim_rb_eval.read_in_basis_functions("eim_data", /*binary=*/false);
+
+        // Read data from input file and print state
+        rb_construction.process_parameters_file(rb_parameters);
+
+        // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
+        eim_rb_eval.initialize_eim_theta_objects();
+        rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+
+        // attach the EIM assembly objects to the RBConstruction object
+        eim_construction.initialize_eim_assembly_objects();
+        rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
+
+        // Print out the state of rb_construction now that the EIM objects have been attached
+        rb_construction.print_info();
+
+        // Need to initialize _after_ EIM greedy so that
+        // the system knows how many affine terms there are
+        rb_construction.initialize_rb_construction();
+        rb_construction.train_reduced_basis();
+
+        RBDataSerialization::RBEvaluationSerialization rb_eval_writer(rb_construction.get_rb_evaluation());
+        rb_eval_writer.write_to_file("rb_eval.bin");
+
+        rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,
+                                                                      "rb_data");
+      }
     }
   else
     {
+      SimpleEIMEvaluation eim_rb_eval(mesh.comm());
+      SimpleRBEvaluation rb_eval(mesh.comm());
+
       RBDataDeserialization::RBEIMEvaluationDeserialization rb_eim_eval_reader(eim_rb_eval);
       rb_eim_eval_reader.read_from_file("rb_eim_eval.bin");
 
@@ -203,19 +232,20 @@ int main (int argc, char ** argv)
       rb_eval.print_parameters();
       rb_eval.rb_solve(rb_eval.get_n_basis_functions());
 
-      // plot the solution, if requested
-      if (store_basis_functions)
-        {
-          // read in the data from files
-          eim_rb_eval.read_in_basis_functions("eim_data", /*binary=*/false);
+      EquationSystems equation_systems (mesh);
 
-          rb_eval.read_in_basis_functions(rb_construction, "rb_data");
+      SimpleRBConstruction & rb_construction =
+        equation_systems.add_system<SimpleRBConstruction> ("RB");
 
-          rb_construction.load_rb_solution();
+      equation_systems.init ();
+
+      rb_construction.set_rb_evaluation(rb_eval);
+
+      rb_eval.read_in_basis_functions(rb_construction, "rb_data");
+      rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
           ExodusII_IO(mesh).write_equation_systems("RB_sol.e", equation_systems);
 #endif
-        }
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET

@@ -431,6 +431,8 @@ void RBEIMEvaluation::
 write_out_basis_functions(const std::string & directory_name,
                           bool write_binary_basis_functions)
 {
+  LOG_SCOPE("write_out_basis_functions()", "RBEIMEvaluation");
+
   libMesh::out << "Called RBEIMEvaluation::write_out_basis_functions()" << std::endl;
   libMesh::out << "Writing to directory: " << directory_name << std::endl;
   libMesh::out << "write_binary_basis_functions = " << write_binary_basis_functions << std::endl;
@@ -565,6 +567,8 @@ void RBEIMEvaluation::
 read_in_basis_functions(const std::string & directory_name,
                         bool read_binary_basis_functions)
 {
+  LOG_SCOPE("read_in_basis_functions()", "RBEIMEvaluation");
+
   // Read values on processor 0 only.
   if (this->processor_id() == 0)
     {
