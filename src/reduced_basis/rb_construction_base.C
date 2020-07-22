@@ -110,7 +110,7 @@ numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() cons
 {
   libmesh_assert(training_parameters_initialized);
 
-  if(training_parameters.empty())
+  if (training_parameters.empty())
     return 0;
 
   return training_parameters.begin()->second->local_size();
@@ -121,7 +121,7 @@ numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() co
 {
   libmesh_assert(training_parameters_initialized);
 
-  if(training_parameters.empty())
+  if (training_parameters.empty())
     return 0;
 
   return training_parameters.begin()->second->first_local_index();
@@ -132,7 +132,7 @@ numeric_index_type RBConstructionBase<Base>::get_last_local_training_index() con
 {
   libmesh_assert(training_parameters_initialized);
 
-  if(training_parameters.empty())
+  if (training_parameters.empty())
     return 0;
 
   return training_parameters.begin()->second->last_local_index();
@@ -196,7 +196,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
                                                               std::map<std::string,bool> log_param_scale,
                                                               bool deterministic)
 {
-  if(!is_quiet())
+  if (!is_quiet())
     {
       // Print out some info about the training set initialization
       libMesh::out << "Initializing training parameters with "
@@ -481,17 +481,17 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
   // than 0) so that we don't skip the inner part of the triply-nested loop over
   // n_training_samples_per_param below.
   std::vector<unsigned int> n_training_samples_per_param(3);
-  for(unsigned int param=0; param<3; param++)
+  for (unsigned int param=0; param<3; param++)
     {
-      if(param < num_params)
-          {
-            n_training_samples_per_param[param] =
-              static_cast<unsigned int>( std::round(std::pow(static_cast<Real>(n_training_samples_in), 1./num_params)) );
-          }
-        else
-          {
-            n_training_samples_per_param[param] = 1;
-          }
+      if (param < num_params)
+        {
+          n_training_samples_per_param[param] =
+            static_cast<unsigned int>( std::round(std::pow(static_cast<Real>(n_training_samples_in), 1./num_params)) );
+        }
+      else
+        {
+          n_training_samples_per_param[param] = 1;
+        }
     }
 
   {

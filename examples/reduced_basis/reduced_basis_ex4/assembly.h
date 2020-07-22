@@ -12,11 +12,15 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/elem.h"
+#include "libmesh/utility.h"
 
 // rbOOmit includes
 #include "libmesh/rb_assembly_expansion.h"
 #include "libmesh/rb_eim_theta.h"
 #include "libmesh/rb_parametrized_function.h"
+
+// C++ includes
+#include <cmath>
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
@@ -36,6 +40,7 @@ using libMesh::RealGradient;
 using libMesh::Elem;
 using libMesh::FEBase;
 using libMesh::subdomain_id_type;
+using libMesh::Utility::pow;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {
@@ -44,14 +49,15 @@ struct ShiftedGaussian : public RBParametrizedFunction
     return 1;
   }
 
-  std::vector<Number> evaluate(const RBParameters & mu,
-                               const Point & p,
-                               subdomain_id_type /*subdomain_id*/,
-                               const std::vector<Point> & /*p_perturb*/)
+  virtual std::vector<Number>
+  evaluate(const RBParameters & mu,
+           const Point & p,
+           subdomain_id_type /*subdomain_id*/,
+           const std::vector<Point> & /*p_perturb*/) override
   {
     Real center_x = mu.get_value("center_x");
     Real center_y = mu.get_value("center_y");
-    return std::vector<Number> {exp(-2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)))};
+    return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };
   }
 };
 

@@ -17,10 +17,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// libmesh includes
 #include "libmesh/rb_parametrized_function.h"
 #include "libmesh/int_range.h"
 #include "libmesh/point.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -31,13 +33,14 @@ requires_xyz_perturbations(false),
 fd_delta(1.e-6)
 {}
 
-RBParametrizedFunction::~RBParametrizedFunction() {}
+RBParametrizedFunction::~RBParametrizedFunction() = default;
 
-Number RBParametrizedFunction::evaluate(const RBParameters & mu,
-                                        unsigned int comp,
-                                        const Point & xyz,
-                                        subdomain_id_type subdomain_id,
-                                        const std::vector<Point> & xyz_perturb)
+Number
+RBParametrizedFunction::evaluate_comp(const RBParameters & mu,
+                                      unsigned int comp,
+                                      const Point & xyz,
+                                      subdomain_id_type subdomain_id,
+                                      const std::vector<Point> & xyz_perturb)
 {
   std::vector<Number> values = evaluate(mu, xyz, subdomain_id, xyz_perturb);
 
@@ -57,28 +60,35 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
 
   output.clear();
 
+  auto n_comp = get_n_components();
+
+  // Dummy vector to be used when xyz perturbations are not required
+  std::vector<Point> empty_perturbs;
+
   for (const auto & xyz_pair : all_xyz)
     {
       dof_id_type elem_id = xyz_pair.first;
       const std::vector<Point> & xyz_vec = xyz_pair.second;
 
-      auto sbd_it = sbd_ids.find(elem_id);
-      if (sbd_it == sbd_ids.end())
-        libmesh_error_msg("Error: elem_id not found");
-      subdomain_id_type subdomain_id = sbd_it->second;
+      subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, elem_id);
 
-      std::vector<std::vector<Number>> evaluated_values(xyz_vec.size());
+      // The amount of data to be stored for each component
+      auto n_qp = xyz_vec.size();
+
+      // Get a reference to the array[n_comp][n_qp] of data for this
+      // Elem, and properly resize it.
+      auto & array = output[elem_id];
+      array.resize(n_comp);
+      for (auto comp : index_range(array))
+        array[comp].resize(n_qp);
+
       for (unsigned int qp : index_range(xyz_vec))
         {
           std::vector<Number> evaluated_values_at_qp;
           if (requires_xyz_perturbations)
             {
-              auto xyz_perturb_it = all_xyz_perturb.find(elem_id);
-              if (xyz_perturb_it == all_xyz_perturb.end())
-                {
-                  libmesh_error_msg("Error: elem_id not found");
-                }
-              const std::vector<std::vector<Point>> & qps_and_perturbs = xyz_perturb_it->second;
+              const auto & qps_and_perturbs =
+                libmesh_map_find(all_xyz_perturb, elem_id);
 
               if (qp >= qps_and_perturbs.size())
                 libmesh_error_msg("Error: Invalid qp");
@@ -87,24 +97,12 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
             }
           else
             {
-              std::vector<Point> empty_perturbs;
               evaluated_values_at_qp = evaluate(mu, xyz_vec[qp], subdomain_id, empty_perturbs);
             }
-          evaluated_values[qp] = evaluated_values_at_qp;
+          // Copy evaluated_values_at_qp into array at position "qp"
+          for (auto comp : make_range(n_comp))
+            array[comp][qp] = evaluated_values_at_qp[comp];
         }
-
-      // The output format uses indexing in the order (comp,qp), not (qp,comp) so
-      // we transpose evaluated_values
-      std::vector<std::vector<Number>> evaluated_values_transposed(get_n_components());
-      for (unsigned int comp=0; comp<get_n_components(); comp++)
-        {
-          evaluated_values_transposed[comp].resize(xyz_vec.size());
-          for (unsigned int qp : index_range(xyz_vec))
-            {
-              evaluated_values_transposed[comp][qp] = evaluated_values[qp][comp];
-            }
-        }
-      output[elem_id] = evaluated_values_transposed;
     }
 }
 
@@ -120,11 +118,8 @@ Number RBParametrizedFunction::lookup_preevaluated_value(unsigned int comp,
                                                          dof_id_type elem_id,
                                                          unsigned int qp) const
 {
-  const auto elem_it = preevaluated_values.find(elem_id);
-  if (elem_it == preevaluated_values.end())
-    libmesh_error_msg("Error: elem_id not found");
-
-  const std::vector<std::vector<Number>> & values = elem_it->second;
+  const auto & values =
+    libmesh_map_find(preevaluated_values, elem_id);
 
   if (comp >= values.size())
     libmesh_error_msg("Error: invalid comp");

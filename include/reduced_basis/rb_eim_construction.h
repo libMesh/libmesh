@@ -31,7 +31,11 @@
 #include "libmesh/coupling_matrix.h"
 
 // C++ includes
+#include <unordered_map>
 #include <map>
+#include <string>
+#include <memory>
+#include <vector>
 
 namespace libMesh
 {
@@ -61,8 +65,15 @@ public:
                      const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains unique_ptrs, so it can't be default copy
+       constructed/assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEIMConstruction (RBEIMConstruction &&) = default;
+  RBEIMConstruction (const RBEIMConstruction &) = delete;
+  RBEIMConstruction & operator= (const RBEIMConstruction &) = delete;
+  RBEIMConstruction & operator= (RBEIMConstruction &&) = default;
   virtual ~RBEIMConstruction ();
 
   /**

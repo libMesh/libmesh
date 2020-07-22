@@ -65,9 +65,7 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
   serial_training_set = true;
 }
 
-RBEIMConstruction::~RBEIMConstruction ()
-{
-}
+RBEIMConstruction::~RBEIMConstruction () = default;
 
 void RBEIMConstruction::clear()
 {
@@ -270,7 +268,7 @@ Real RBEIMConstruction::train_eim_approximation()
 
   RBEIMEvaluation & rbe = get_rb_eim_evaluation();
   rbe.initialize_parameters(*this);
-  rbe.resize_data_structures(get_Nmax());    
+  rbe.resize_data_structures(get_Nmax());
 
   // If we are continuing from a previous training run,
   // we might already be at the max number of basis functions.
@@ -345,15 +343,22 @@ Real RBEIMConstruction::train_eim_approximation()
             break;
           }
 
-        for (auto & param : greedy_param_list)
-          if (param == get_parameters())
-            {
-              libMesh::out << "Exiting greedy because the same parameters were selected twice"
-                           << std::endl;
-              break;
-            }
+        {
+          bool do_exit = false;
+          for (auto & param : greedy_param_list)
+            if (param == get_parameters())
+              {
+                libMesh::out << "Exiting greedy because the same parameters were selected twice"
+                             << std::endl;
+                do_exit = true;
+                break;
+              }
+
+          if (do_exit)
+            break; // out of while
+        }
       }
-    }
+    } // end while(true)
 
   return abs_greedy_error;
 }
@@ -361,7 +366,7 @@ Real RBEIMConstruction::train_eim_approximation()
 void RBEIMConstruction::initialize_eim_assembly_objects()
 {
   _rb_eim_assembly_objects.clear();
-  for (unsigned int i=0; i<get_rb_eim_evaluation().get_n_basis_functions(); i++)
+  for (auto i : make_range(get_rb_eim_evaluation().get_n_basis_functions()))
     _rb_eim_assembly_objects.push_back(build_eim_assembly(i));
 }
 
@@ -381,7 +386,7 @@ void RBEIMConstruction::init_context(FEMContext & c)
 
   for (unsigned int dim=1; dim<=3; ++dim)
     if (mesh.elem_dimensions().count(dim))
-      for (unsigned int var=0; var<sys.n_vars(); ++var)
+      for (auto var : make_range(sys.n_vars()))
       {
         auto fe = c.get_element_fe(var, dim);
         fe->get_JxW();
@@ -440,7 +445,7 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
   if (get_n_training_samples() != get_local_n_training_samples())
     libmesh_error_msg("Error: Training samples should be the same on all procs");
 
-  for (unsigned int i=0; i<get_n_training_samples(); i++)
+  for (auto i : make_range(get_n_training_samples()))
     {
       Real best_fit_error = compute_best_fit_error(i);
 
@@ -470,7 +475,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
 
   _local_parametrized_functions_for_training.resize( get_n_training_samples() );
-  for (unsigned int i=0; i<get_n_training_samples(); i++)
+  for (auto i : make_range(get_n_training_samples()))
     {
       libMesh::out << "Initializing parametrized function for training sample "
         << (i+1) << " of " << get_n_training_samples() << std::endl;
@@ -484,10 +489,10 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 
       unsigned int n_comps = eim_eval.get_parametrized_function().get_n_components();
 
-      for (const auto local_quad_point_locations_it : _local_quad_point_locations)
+      for (const auto & pr : _local_quad_point_locations)
       {
-        dof_id_type elem_id = local_quad_point_locations_it.first;
-        const auto & xyz_vector = local_quad_point_locations_it.second;
+        dof_id_type elem_id = pr.first;
+        const auto & xyz_vector = pr.second;
 
         std::vector<std::vector<Number>> comps_and_qps(n_comps);
         for (unsigned int comp=0; comp<n_comps; comp++)
@@ -557,14 +562,14 @@ void RBEIMConstruction::initialize_qp_data()
           for (const Point & xyz_qp : xyz)
             {
               std::vector<Point> xyz_perturb_vec;
-              if(elem->dim() == 3)
+              if (elem->dim() == 3)
                 {
                   Point xyz_perturb = xyz_qp;
 
                   xyz_perturb(0) += fd_delta;
                   xyz_perturb_vec.emplace_back(xyz_perturb);
                   xyz_perturb(0) -= fd_delta;
-                  
+
                   xyz_perturb(1) += fd_delta;
                   xyz_perturb_vec.emplace_back(xyz_perturb);
                   xyz_perturb(1) -= fd_delta;
@@ -573,7 +578,7 @@ void RBEIMConstruction::initialize_qp_data()
                   xyz_perturb_vec.emplace_back(xyz_perturb);
                   xyz_perturb(2) -= fd_delta;
                 }
-              else if(elem->dim() == 2)
+              else if (elem->dim() == 2)
                 {
                   // In this case we assume that we have a 2D element
                   // embedded in 3D space. In this case we have to use
@@ -642,20 +647,13 @@ RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
 
   Number val = 0.;
 
-  for (const auto v_it : v)
+  for (const auto & pr : v)
     {
-      dof_id_type elem_id = v_it.first;
-      const auto & v_comp_and_qp = v_it.second;
+      dof_id_type elem_id = pr.first;
+      const auto & v_comp_and_qp = pr.second;
 
-      auto w_comp_and_qp_it = w.find(elem_id);
-      if(w_comp_and_qp_it == w.end())
-        libmesh_error_msg("Error: elem_id not found");
-      const auto & w_comp_and_qp = w_comp_and_qp_it->second;
-
-      auto _local_quad_point_JxW_it = _local_quad_point_JxW.find(elem_id);
-      if(w_comp_and_qp_it == w.end())
-        libmesh_error_msg("Error: elem_id not found");
-      const auto & JxW = _local_quad_point_JxW_it->second;
+      const auto & w_comp_and_qp = libmesh_map_find(w, elem_id);
+      const auto & JxW = libmesh_map_find(_local_quad_point_JxW, elem_id);
 
       for (const auto & comp : index_range(v_comp_and_qp))
         {
@@ -677,9 +675,9 @@ Real RBEIMConstruction::get_max_abs_value(const QpDataMap & v) const
 
   Real max_value = 0.;
 
-  for (const auto v_it : v)
+  for (const auto & pr : v)
     {
-      const auto & v_comp_and_qp = v_it.second;
+      const auto & v_comp_and_qp = pr.second;
 
       for (const auto & comp : index_range(v_comp_and_qp))
         {
@@ -746,10 +744,10 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   // Initialize largest_abs_value to be negative so that it definitely gets updated.
   Real largest_abs_value = -1.;
 
-  for (const auto local_pf_it : local_pf)
+  for (const auto & pr : local_pf)
     {
-      dof_id_type elem_id = local_pf_it.first;
-      const auto & comp_and_qp = local_pf_it.second;
+      dof_id_type elem_id = pr.first;
+      const auto & comp_and_qp = pr.second;
 
       for (const auto & comp : index_range(comp_and_qp))
         {
@@ -768,26 +766,25 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                   optimal_elem_id = elem_id;
                   optimal_qp = qp;
 
-                  auto point_it = _local_quad_point_locations.find(elem_id);
-                  if(point_it == _local_quad_point_locations.end())
-                    libmesh_error_msg("Error: Invalid element ID");
-                  if(qp >= point_it->second.size())
-                    libmesh_error_msg("Error: Invalid qp");
-                  optimal_point = point_it->second[qp];
+                  const auto & point_list =
+                    libmesh_map_find(_local_quad_point_locations, elem_id);
 
-                  auto subdomain_it = _local_quad_point_subdomain_ids.find(elem_id);
-                  if(subdomain_it == _local_quad_point_subdomain_ids.end())
-                    libmesh_error_msg("Error: Invalid element ID");
-                  optimal_subdomain_id = subdomain_it->second;
+                  if (qp >= point_list.size())
+                    libmesh_error_msg("Error: Invalid qp");
+
+                  optimal_point = point_list[qp];
+
+                  optimal_subdomain_id = libmesh_map_find(_local_quad_point_subdomain_ids, elem_id);
 
                   if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
                     {
-                      auto point_perturbs_it = _local_quad_point_locations_perturbations.find(elem_id);
-                      if(point_perturbs_it == _local_quad_point_locations_perturbations.end())
-                        libmesh_error_msg("Error: Invalid element ID");
-                      if(qp >= point_perturbs_it->second.size())
+                      const auto & perturb_list =
+                        libmesh_map_find(_local_quad_point_locations_perturbations, elem_id);
+
+                      if (qp >= perturb_list.size())
                         libmesh_error_msg("Error: Invalid qp");
-                      optimal_point_perturbs = point_perturbs_it->second[qp];
+
+                      optimal_point_perturbs = perturb_list[qp];
                     }
                 }
             }
@@ -830,6 +827,8 @@ void RBEIMConstruction::update_eim_matrices()
 
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
   unsigned int RB_size = eim_eval.get_n_basis_functions();
+
+  libmesh_assert_msg(RB_size >= 1, "Must have at least 1 basis function.");
 
   // update the matrix that is used to evaluate L2 projections
   // into the EIM approximation space
@@ -926,9 +925,9 @@ void RBEIMConstruction::scale_parametrized_function(
 {
   LOG_SCOPE("scale_parametrized_function()", "RBEIMConstruction");
 
-  for (auto local_pf_it : local_pf)
+  for (auto & pr : local_pf)
     {
-      auto & comp_and_qp = local_pf_it.second;
+      auto & comp_and_qp = pr.second;
 
       for (unsigned int comp : index_range(comp_and_qp))
         {

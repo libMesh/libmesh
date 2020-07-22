@@ -75,9 +75,7 @@ RBEvaluationSerialization::RBEvaluationSerialization(RBEvaluation & rb_eval)
 {
 }
 
-RBEvaluationSerialization::~RBEvaluationSerialization()
-{
-}
+RBEvaluationSerialization::~RBEvaluationSerialization() = default;
 
 void RBEvaluationSerialization::write_to_file(const std::string & path)
 {
@@ -120,9 +118,7 @@ TransientRBEvaluationSerialization(TransientRBEvaluation & trans_rb_eval) :
 {
 }
 
-TransientRBEvaluationSerialization::~TransientRBEvaluationSerialization()
-{
-}
+TransientRBEvaluationSerialization::~TransientRBEvaluationSerialization() = default;
 
 void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
 {
@@ -171,9 +167,7 @@ RBEIMEvaluationSerialization::RBEIMEvaluationSerialization(RBEIMEvaluation & rb_
 {
 }
 
-RBEIMEvaluationSerialization::~RBEIMEvaluationSerialization()
-{
-}
+RBEIMEvaluationSerialization::~RBEIMEvaluationSerialization() = default;
 
 void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
 {
@@ -219,9 +213,7 @@ RBSCMEvaluationSerialization::RBSCMEvaluationSerialization(RBSCMEvaluation & rb_
 {
 }
 
-RBSCMEvaluationSerialization::~RBSCMEvaluationSerialization()
-{
-}
+RBSCMEvaluationSerialization::~RBSCMEvaluationSerialization() = default;
 
 void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
 {

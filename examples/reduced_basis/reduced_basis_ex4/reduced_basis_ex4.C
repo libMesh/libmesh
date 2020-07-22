@@ -101,10 +101,13 @@ int main (int argc, char ** argv)
 
   ReplicatedMesh mesh (init.comm(), dim);
   MeshTools::Generation::build_square (mesh,
-                                      n_elem, n_elem,
-                                      -1., 1.,
-                                      -1., 1.,
-                                      QUAD4);
+                                       n_elem, n_elem,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       QUAD4);
+
+  // Set to true the write binary (XDR) files with EIM data, false to write ASCII files.
+  bool eim_binary_io = true;
 
   if (!online_mode)
     {
@@ -144,7 +147,7 @@ int main (int argc, char ** argv)
         rb_eim_eval_writer.write_to_file("rb_eim_eval.bin");
 
         // Write out the EIM basis functions
-        eim_rb_eval.write_out_basis_functions("eim_data", /*binary=*/false);
+        eim_rb_eval.write_out_basis_functions("eim_data", eim_binary_io);
       }
 
       {
@@ -178,7 +181,7 @@ int main (int argc, char ** argv)
 
         RBDataDeserialization::RBEIMEvaluationDeserialization rb_eim_eval_reader(eim_rb_eval);
         rb_eim_eval_reader.read_from_file("rb_eim_eval.bin");
-        eim_rb_eval.read_in_basis_functions(rb_construction, "eim_data", /*binary=*/false);
+        eim_rb_eval.read_in_basis_functions(rb_construction, "eim_data", eim_binary_io);
 
         // Read data from input file and print state
         rb_construction.process_parameters_file(rb_parameters);

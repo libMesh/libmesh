@@ -31,6 +31,8 @@
 // C++ includes
 #include <memory>
 #include <map>
+#include <vector>
+#include <string>
 
 namespace libMesh
 {
@@ -57,8 +59,15 @@ public:
   RBEIMEvaluation(const Parallel::Communicator & comm);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains unique_ptrs, so it can't be default copy
+       constructed/assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEIMEvaluation (RBEIMEvaluation &&) = default;
+  RBEIMEvaluation (const RBEIMEvaluation &) = delete;
+  RBEIMEvaluation & operator= (const RBEIMEvaluation &) = delete;
+  RBEIMEvaluation & operator= (RBEIMEvaluation &&) = default;
   virtual ~RBEIMEvaluation ();
 
   /**
@@ -264,7 +273,7 @@ public:
    * Note: this is not a virtual function and is not related to the
    * RBEvaluation function of the same name.
    */
-  void read_in_basis_functions(System & rb_construction,
+  void read_in_basis_functions(const System & sys,
                                const std::string & directory_name = "offline_data",
                                bool read_binary_basis_functions = true);
 

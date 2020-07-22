@@ -56,8 +56,15 @@ public:
                 unsigned int basis_function_index_in);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEIMAssembly (RBEIMAssembly &&) = default;
+  RBEIMAssembly (const RBEIMAssembly &) = default;
+  RBEIMAssembly & operator= (const RBEIMAssembly &) = delete;
+  RBEIMAssembly & operator= (RBEIMAssembly &&) = delete;
   virtual ~RBEIMAssembly();
 
   /**
@@ -84,7 +91,6 @@ private:
    * The EIM basis function index (from _rb_eim_con's RBEIMEvaluation) for this assembly object.
    */
   unsigned int _basis_function_index;
-
 };
 
 }

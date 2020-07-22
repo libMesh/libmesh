@@ -84,7 +84,7 @@ void RBEIMEvaluation::set_parametrized_function(std::unique_ptr<RBParametrizedFu
 
 RBParametrizedFunction & RBEIMEvaluation::get_parametrized_function()
 {
-  if(!_parametrized_function)
+  if (!_parametrized_function)
     libmesh_error_msg("Parametrized function not initialized yet");
 
   return *_parametrized_function;
@@ -105,11 +105,12 @@ Real RBEIMEvaluation::rb_eim_solve(unsigned int N)
   DenseVector<Number> EIM_rhs(N);
   for (unsigned int i=0; i<N; i++)
     {
-      EIM_rhs(i) = get_parametrized_function().evaluate(get_parameters(),
-                                                        _interpolation_points_comp[i],
-                                                        _interpolation_points_xyz[i],
-                                                        _interpolation_points_subdomain_id[i],
-                                                        _interpolation_points_xyz_perturbations[i]);
+      EIM_rhs(i) =
+        get_parametrized_function().evaluate_comp(get_parameters(),
+                                                  _interpolation_points_comp[i],
+                                                  _interpolation_points_xyz[i],
+                                                  _interpolation_points_subdomain_id[i],
+                                                  _interpolation_points_xyz_perturbations[i]);
     }
 
   DenseMatrix<Number> interpolation_matrix_N;
@@ -124,11 +125,12 @@ Real RBEIMEvaluation::rb_eim_solve(unsigned int N)
     {
       // Compute the a posteriori error bound
       // First, sample the parametrized function at x_{N+1}
-      Number g_at_next_x = get_parametrized_function().evaluate(get_parameters(),
-                                                        _interpolation_points_comp[N],
-                                                        _interpolation_points_xyz[N],
-                                                        _interpolation_points_subdomain_id[N],
-                                                        _interpolation_points_xyz_perturbations[N]);
+      Number g_at_next_x =
+        get_parametrized_function().evaluate_comp(get_parameters(),
+                                                  _interpolation_points_comp[N],
+                                                  _interpolation_points_xyz[N],
+                                                  _interpolation_points_subdomain_id[N],
+                                                  _interpolation_points_xyz_perturbations[N]);
 
       // Next, evaluate the EIM approximation at x_{N+1}
       Number EIM_approx_at_next_x = 0.;
@@ -176,13 +178,13 @@ void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 void RBEIMEvaluation::decrement_vector(QpDataMap & v,
                                        const DenseVector<Number> & coeffs)
 {
-  if(get_n_basis_functions() != coeffs.size())
+  if (get_n_basis_functions() != coeffs.size())
     libmesh_error_msg("Error: Number of coefficients should match number of basis functions");
 
-  for (const auto v_it : v)
+  for (auto & pr : v)
     {
-      dof_id_type elem_id = v_it.first;
-      const auto & v_comp_and_qp = v_it.second;
+      dof_id_type elem_id = pr.first;
+      auto & v_comp_and_qp = pr.second;
 
       for (const auto & comp : index_range(v_comp_and_qp))
         for (unsigned int qp : index_range(v_comp_and_qp[comp]))
@@ -190,17 +192,14 @@ void RBEIMEvaluation::decrement_vector(QpDataMap & v,
             {
               // Check that entry (elem_id,comp,qp) exists in _local_eim_basis_functions so that
               // we get a clear error message if there is any missing data
-              auto basis_it = _local_eim_basis_functions[i].find(elem_id);
-              if (basis_it == _local_eim_basis_functions[i].end())
-                libmesh_error_msg("Error: Missing elem_id");
+              const auto & basis_comp_and_qp = libmesh_map_find(_local_eim_basis_functions[i], elem_id);
 
-              const auto & basis_comp_and_qp = basis_it->second;
-              if(comp >= basis_comp_and_qp.size())
+              if (comp >= basis_comp_and_qp.size())
                 libmesh_error_msg("Error: Invalid comp");
-              if(qp >= basis_comp_and_qp[comp].size())
+              if (qp >= basis_comp_and_qp[comp].size())
                 libmesh_error_msg("Error: Invalid qp");
 
-              v[elem_id][comp][qp] -= coeffs(i) * basis_comp_and_qp[comp][qp];
+              v_comp_and_qp[comp][qp] -= coeffs(i) * basis_comp_and_qp[comp][qp];
             }
     }
 
@@ -210,7 +209,7 @@ void RBEIMEvaluation::initialize_eim_theta_objects()
 {
   // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation
   _rb_eim_theta_objects.clear();
-  for (unsigned int i=0; i<get_n_basis_functions(); i++)
+  for (auto i : make_range(get_n_basis_functions()))
     _rb_eim_theta_objects.emplace_back(build_eim_theta(i));
 }
 
@@ -235,10 +234,10 @@ void RBEIMEvaluation::get_parametrized_function_values_at_qps(
   values.clear();
 
   const auto it = pf.find(elem_id);
-  if(it != pf.end())
+  if (it != pf.end())
   {
     const auto & comps_and_qps_on_elem = it->second;
-    if(comp >= comps_and_qps_on_elem.size())
+    if (comp >= comps_and_qps_on_elem.size())
     {
       libmesh_error_msg("Invalid comp index: " + std::to_string(comp));
     }
@@ -259,9 +258,9 @@ Number RBEIMEvaluation::get_parametrized_function_value(
 
   // In parallel, values should only be non-empty on one processor
   Number value = 0.;
-  if(!values.empty())
+  if (!values.empty())
   {
-    if(qp >= values.size())
+    if (qp >= values.size())
       libmesh_error_msg("Error: Invalid qp index");
 
     value = values[qp];
@@ -276,7 +275,7 @@ void RBEIMEvaluation::get_eim_basis_function_values_at_qps(unsigned int basis_fu
                                                            unsigned int comp,
                                                            std::vector<Number> & values) const
 {
-  if(basis_function_index >= _local_eim_basis_functions.size())
+  if (basis_function_index >= _local_eim_basis_functions.size())
   {
     libmesh_error_msg("Invalid basis function index: " + std::to_string(basis_function_index));
   }
@@ -293,7 +292,7 @@ Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function
                                                      unsigned int comp,
                                                      unsigned int qp) const
 {
-  if(basis_function_index >= _local_eim_basis_functions.size())
+  if (basis_function_index >= _local_eim_basis_functions.size())
   {
     libmesh_error_msg("Invalid basis function index: " + std::to_string(basis_function_index));
   }
@@ -350,7 +349,7 @@ void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
 
 Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
 {
-  if(index >= _interpolation_points_xyz.size())
+  if (index >= _interpolation_points_xyz.size())
     libmesh_error_msg("Error: Invalid index");
 
   return _interpolation_points_xyz[index];
@@ -358,7 +357,7 @@ Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
 
 unsigned int RBEIMEvaluation::get_interpolation_points_comp(unsigned int index) const
 {
-  if(index >= _interpolation_points_comp.size())
+  if (index >= _interpolation_points_comp.size())
     libmesh_error_msg("Error: Invalid index");
 
   return _interpolation_points_comp[index];
@@ -366,7 +365,7 @@ unsigned int RBEIMEvaluation::get_interpolation_points_comp(unsigned int index) 
 
 subdomain_id_type RBEIMEvaluation::get_interpolation_points_subdomain_id(unsigned int index) const
 {
-  if(index >= _interpolation_points_subdomain_id.size())
+  if (index >= _interpolation_points_subdomain_id.size())
     libmesh_error_msg("Error: Invalid index");
 
   return _interpolation_points_subdomain_id[index];
@@ -374,7 +373,7 @@ subdomain_id_type RBEIMEvaluation::get_interpolation_points_subdomain_id(unsigne
 
 const std::vector<Point> & RBEIMEvaluation::get_interpolation_points_xyz_perturbations(unsigned int index) const
 {
-  if(index >= _interpolation_points_xyz_perturbations.size())
+  if (index >= _interpolation_points_xyz_perturbations.size())
     libmesh_error_msg("Error: Invalid index");
 
   return _interpolation_points_xyz_perturbations[index];
@@ -382,7 +381,7 @@ const std::vector<Point> & RBEIMEvaluation::get_interpolation_points_xyz_perturb
 
 dof_id_type RBEIMEvaluation::get_interpolation_points_elem_id(unsigned int index) const
 {
-  if(index >= _interpolation_points_elem_id.size())
+  if (index >= _interpolation_points_elem_id.size())
     libmesh_error_msg("Error: Invalid index");
 
   return _interpolation_points_elem_id[index];
@@ -390,7 +389,7 @@ dof_id_type RBEIMEvaluation::get_interpolation_points_elem_id(unsigned int index
 
 unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) const
 {
-  if(index >= _interpolation_points_qp.size())
+  if (index >= _interpolation_points_qp.size())
     libmesh_error_msg("Error: Invalid index");
 
   return _interpolation_points_qp[index];
@@ -398,7 +397,7 @@ unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) co
 
 void RBEIMEvaluation::set_interpolation_matrix_entry(unsigned int i, unsigned int j, Number value)
 {
-  if( (i >= _interpolation_matrix.m()) || (j >= _interpolation_matrix.n()) )
+  if ( (i >= _interpolation_matrix.m()) || (j >= _interpolation_matrix.n()) )
     libmesh_error_msg("Error: Invalid matrix indices");
 
   _interpolation_matrix(i,j) = value;
@@ -433,14 +432,6 @@ write_out_basis_functions(const std::string & directory_name,
                           bool write_binary_basis_functions)
 {
   LOG_SCOPE("write_out_basis_functions()", "RBEIMEvaluation");
-
-  libMesh::out << "Called RBEIMEvaluation::write_out_basis_functions()" << std::endl;
-  libMesh::out << "Writing to directory: " << directory_name << std::endl;
-  libMesh::out << "write_binary_basis_functions = " << write_binary_basis_functions << std::endl;
-  libMesh::out << "_local_eim_basis_functions.size()=" << _local_eim_basis_functions.size() << std::endl;
-
-  // Debugging: Print values to screen
-  // this->print_local_eim_basis_functions();
 
   // Quick return if there is no work to do. Note: make sure all procs
   // agree there is no work to do.
@@ -501,10 +492,6 @@ write_out_basis_functions(const std::string & directory_name,
           // generalize this assumption later, we can.
           const auto & actual_elem_id = pr.first;
 
-          // Debugging:
-          // libMesh::err << "actual_elem_id=" << actual_elem_id << std::endl;
-          // libMesh::err << "expected_elem_id=" << expected_elem_id << std::endl;
-
           if (actual_elem_id != expected_elem_id++)
             libmesh_error_msg("RBEIMEvaluation currently assumes a contiguous Elem numbering starting from 0.");
 
@@ -552,36 +539,20 @@ write_out_basis_functions(const std::string & directory_name,
 
           // Write all the var values for this bf
           for (auto var : index_range(qp_data))
-            {
-              // Debugging: print qp_data[var]
-              // libMesh::out << "Basis function " << bf << ", variable " << var << ": " << std::endl;
-              // for (const auto & val : qp_data[var])
-              //   libMesh::out << val << " ";
-              // libMesh::out << std::endl;
-
-              // Write by calling data()
-              // std::string comment = "# Basis function " + std::to_string(bf) + ", variable " + std::to_string(var);
-              // xdr.data(qp_data[var], comment.c_str());
-
-              // Write by calling data_stream(). I found that using an
-              // arbitrary line break does not work correctly, it
-              // seems to access uninitialized memory past the end of
-              // the vector if it is not a multiple of the array size?
-              xdr.data_stream(qp_data[var].data(), qp_data[var].size(), /*line_break=*/qp_data[var].size());
-            }
+            xdr.data_stream(qp_data[var].data(), qp_data[var].size(), /*line_break=*/qp_data[var].size());
         }
     }
 }
 
 void RBEIMEvaluation::
-read_in_basis_functions(System & rb_construction,
+read_in_basis_functions(const System & sys,
                         const std::string & directory_name,
                         bool read_binary_basis_functions)
 {
   LOG_SCOPE("read_in_basis_functions()", "RBEIMEvaluation");
 
   // Read values on processor 0 only.
-  if (this->processor_id() == 0)
+  if (sys.comm().rank() == 0)
     {
       // Create filename
       std::ostringstream file_name;
@@ -596,22 +567,13 @@ read_in_basis_functions(System & rb_construction,
       std::size_t n_bf;
       xdr.data(n_bf);
 
-      // Debugging:
-      // libMesh::out << "Preparing to read in n_bf = " << n_bf << " basis functions." << std::endl;
-
       // Read in the number of elements
       std::size_t n_elem;
       xdr.data(n_elem);
 
-      // Debugging:
-      // libMesh::out << "Reading in data for n_elem = " << n_elem << " elements." << std::endl;
-
       // Read in the number of variables.
       std::size_t n_vars;
       xdr.data(n_vars);
-
-      // Debugging:
-      // libMesh::out << "Reading in data for n_vars = " << n_vars << " variables." << std::endl;
 
       // Read in vector containing the number of QPs per elem. We can
       // create this vector with the required size or let it be read
@@ -619,21 +581,12 @@ read_in_basis_functions(System & rb_construction,
       std::vector<unsigned int> n_qp_per_elem(n_elem);
       xdr.data(n_qp_per_elem);
 
-      // Debugging:
-      // libMesh::out << "Number of qps per elem: ";
-      // for (const auto & n_qp : n_qp_per_elem)
-      //   libMesh::out << n_qp << " ";
-      // libMesh::out << std::endl;
-
       // The total amount of qp data for each var is the sum of the
       // entries in the "n_qp_per_elem" array.
       auto n_qp_data =
         std::accumulate(n_qp_per_elem.begin(),
                         n_qp_per_elem.end(),
                         0u);
-
-      // Debugging:
-      // libMesh::out << "n_qp_data = " << n_qp_data << std::endl;
 
       // Allocate space to store all required basis functions,
       // clearing any data that may have been there previously.
@@ -669,12 +622,6 @@ read_in_basis_functions(System & rb_construction,
               // parameter of data_stream() is ignored while reading.
               xdr.data_stream(qp_data.data(), qp_data.size());
 
-              // Debugging
-              // libMesh::out << "Basis function " << i << ", variable " << var << ": ";
-              // for (const auto & val : qp_data)
-              //   libMesh::out << val << " ";
-              // libMesh::out << std::endl;
-
               // Iterate over the qp_data vector, filling in the
               // "small" vectors for each Elem.
               auto cursor = qp_data.begin();
@@ -688,15 +635,12 @@ read_in_basis_functions(System & rb_construction,
                   array[var].assign(cursor, cursor + n_qp_per_elem[elem_id]);
                   std::advance(cursor, n_qp_per_elem[elem_id]);
                 }
-            }
-        }
-
-      // Debugging: check that the data was read in correctly.
-      // this->print_local_eim_basis_functions();
+            } // end for (var)
+        } // end for (i)
     } // end if processor 0
 
   // Distribute the basis function information to the processors that require it
-  this->distribute_bfs(rb_construction);
+  this->distribute_bfs(sys);
 }
 
 void RBEIMEvaluation::print_local_eim_basis_functions() const

@@ -68,8 +68,15 @@ public:
   RBEvaluationDeserialization(RBEvaluation & rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEvaluationDeserialization (RBEvaluationDeserialization &&) = default;
+  RBEvaluationDeserialization (const RBEvaluationDeserialization &) = default;
+  RBEvaluationDeserialization & operator= (const RBEvaluationDeserialization &) = delete;
+  RBEvaluationDeserialization & operator= (RBEvaluationDeserialization &&) = delete;
   virtual ~RBEvaluationDeserialization();
 
   /**
@@ -83,8 +90,9 @@ private:
    * The RBEvaluation object that we will read into.
    */
   RBEvaluation & _rb_eval;
-
 };
+
+
 
 /**
  * This class de-serializes a TransientRBEvaluation object
@@ -101,8 +109,15 @@ public:
   TransientRBEvaluationDeserialization(TransientRBEvaluation & trans_rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  TransientRBEvaluationDeserialization (TransientRBEvaluationDeserialization &&) = default;
+  TransientRBEvaluationDeserialization (const TransientRBEvaluationDeserialization &) = default;
+  TransientRBEvaluationDeserialization & operator= (const TransientRBEvaluationDeserialization &) = delete;
+  TransientRBEvaluationDeserialization & operator= (TransientRBEvaluationDeserialization &&) = delete;
   virtual ~TransientRBEvaluationDeserialization();
 
   /**
@@ -116,8 +131,9 @@ private:
    * The TransientRBEvaluation object that we will read into.
    */
   TransientRBEvaluation & _trans_rb_eval;
-
 };
+
+
 
 /**
  * This class de-serializes a RBEIMEvaluation object
@@ -134,8 +150,15 @@ public:
   RBEIMEvaluationDeserialization(RBEIMEvaluation & trans_rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEIMEvaluationDeserialization (RBEIMEvaluationDeserialization &&) = default;
+  RBEIMEvaluationDeserialization (const RBEIMEvaluationDeserialization &) = default;
+  RBEIMEvaluationDeserialization & operator= (const RBEIMEvaluationDeserialization &) = delete;
+  RBEIMEvaluationDeserialization & operator= (RBEIMEvaluationDeserialization &&) = delete;
   virtual ~RBEIMEvaluationDeserialization();
 
   /**
@@ -149,8 +172,9 @@ private:
    * The RBEIMEvaluation object we will read into.
    */
   RBEIMEvaluation & _rb_eim_eval;
-
 };
+
+
 
 // RBSCMEvaluation should only be available
 // if SLEPc and GLPK support is enabled.
@@ -171,8 +195,15 @@ public:
   RBSCMEvaluationDeserialization(RBSCMEvaluation & trans_rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBSCMEvaluationDeserialization (RBSCMEvaluationDeserialization &&) = default;
+  RBSCMEvaluationDeserialization (const RBSCMEvaluationDeserialization &) = default;
+  RBSCMEvaluationDeserialization & operator= (const RBSCMEvaluationDeserialization &) = delete;
+  RBSCMEvaluationDeserialization & operator= (RBSCMEvaluationDeserialization &&) = delete;
   virtual ~RBSCMEvaluationDeserialization();
 
   /**
@@ -186,8 +217,8 @@ private:
    * The RBSCMEvaluation object we will read into.
    */
   RBSCMEvaluation & _rb_scm_eval;
-
 };
+
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 /**

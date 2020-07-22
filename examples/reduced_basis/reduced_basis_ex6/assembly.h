@@ -52,15 +52,15 @@ struct Gxyz : public RBParametrizedFunction
     return 3;
   }
 
-  virtual std::vector<Number> evaluate(const RBParameters & mu,
-                                       const Point & p,
-                                       subdomain_id_type /*subdomain_id*/,
-                                       const std::vector<Point> & /*p_perturb*/)
+  virtual std::vector<Number>
+  evaluate(const RBParameters & mu,
+           const Point & p,
+           subdomain_id_type /*subdomain_id*/,
+           const std::vector<Point> & /*p_perturb*/) override
   {
     Real curvature = mu.get_value("curvature");
 
-    std::vector<Number> values {1. + curvature*p(0), 1. + curvature*p(0), 1./(1. + curvature*p(0))};
-    return values;
+    return {1. + curvature*p(0), 1. + curvature*p(0), 1./(1. + curvature*p(0))};
   }
 };
 
@@ -78,9 +78,8 @@ struct AssemblyA0 : ElemAssembly
   {
     std::vector<boundary_id_type> bc_ids;
     c.get_system().get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::vector<boundary_id_type>::const_iterator b =
-           bc_ids.begin(); b != bc_ids.end(); ++b)
-      if (*b == 1 || *b == 2 || *b == 3 || *b == 4)
+    for (const auto & bc_id : bc_ids)
+      if (bc_id == 1 || bc_id == 2 || bc_id == 3 || bc_id == 4)
         {
           const unsigned int u_var = 0;
 
@@ -121,9 +120,8 @@ struct AssemblyA1 : ElemAssembly
   {
     std::vector<boundary_id_type> bc_ids;
     c.get_system().get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::vector<boundary_id_type>::const_iterator b =
-           bc_ids.begin(); b != bc_ids.end(); ++b)
-      if (*b == 1 || *b == 3) // y == -0.2, y == 0.2
+    for (const auto & bc_id : bc_ids)
+      if (bc_id == 1 || bc_id == 3) // y == -0.2, y == 0.2
         {
           const unsigned int u_var = 0;
 
@@ -168,9 +166,8 @@ struct AssemblyA2 : ElemAssembly
   {
     std::vector<boundary_id_type> bc_ids;
     c.get_system().get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::vector<boundary_id_type>::const_iterator b =
-           bc_ids.begin(); b != bc_ids.end(); ++b)
-      if (*b == 2 || *b == 4) // x == 0.2, x == -0.2
+    for (const auto & bc_id : bc_ids)
+      if (bc_id == 2 || bc_id == 4) // x == 0.2, x == -0.2
         {
           const unsigned int u_var = 0;
 
@@ -187,7 +184,7 @@ struct AssemblyA2 : ElemAssembly
           // Now we will build the affine operator
           unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
-          if (*b==2)
+          if (bc_id == 2)
             {
               for (unsigned int qp=0; qp != n_sidepoints; qp++)
                 {
@@ -197,7 +194,7 @@ struct AssemblyA2 : ElemAssembly
                 }
             }
 
-          if (*b==4)
+          if (bc_id == 4)
             {
               for (unsigned int qp=0; qp != n_sidepoints; qp++)
                 {
