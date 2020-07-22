@@ -297,7 +297,78 @@ extern "C"
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
-    return libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
+    PetscErrorCode ierr = libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
+    CHKERRABORT(solver->comm().get(), ierr);
+
+#if !PETSC_VERSION_LESS_THAN(3,8,4)
+#ifndef NDEBUG
+
+    // When the user requested to reuse the nonlinear residual as the base for doing matrix-free
+    // approximation of the Jacobian, we'll do a sanity check to make sure that that was safe to do
+    if (solver->snes_mf_reuse_base() && (solver->comm().size() == 1) && (libMesh::n_threads() == 1))
+    {
+      SNES snes = solver->snes();
+
+      KSP ksp;
+      ierr = SNESGetKSP(snes, &ksp);
+      CHKERRABORT(solver->comm().get(), ierr);
+
+      PetscInt ksp_it;
+      ierr = KSPGetIterationNumber(ksp, &ksp_it);
+      CHKERRABORT(solver->comm().get(), ierr);
+
+      SNESType snes_type;
+      ierr = SNESGetType(snes, &snes_type);
+      CHKERRABORT(solver->comm().get(), ierr);
+
+      libmesh_assert_msg(snes_type, "We're being called from SNES; snes_type should be non-null");
+
+      Mat J;
+      ierr = SNESGetJacobian(snes, &J, NULL, NULL, NULL);
+      CHKERRABORT(solver->comm().get(), ierr);
+      libmesh_assert_msg(J, "We're being called from SNES; J should be non-null");
+
+      MatType mat_type;
+      ierr = MatGetType(J, &mat_type);
+      CHKERRABORT(solver->comm().get(), ierr);
+      libmesh_assert_msg(mat_type, "We're being called from SNES; mat_type should be non-null");
+
+      bool is_operator_mffd = strcmp(mat_type, MATMFFD) == 0;
+
+      if ((ksp_it == PetscInt(0)) && is_operator_mffd)
+      {
+        bool computing_base_vector = solver->computing_base_vector();
+
+        if (computing_base_vector)
+        {
+          Vec nonlinear_residual;
+
+          ierr = SNESGetFunction(snes, &nonlinear_residual, NULL, NULL);
+          CHKERRABORT(solver->comm().get(), ierr);
+
+          PetscBool vecs_equal;
+          ierr = VecEqual(r, nonlinear_residual, &vecs_equal);
+          CHKERRABORT(solver->comm().get(), ierr);
+
+          if (!(vecs_equal == PETSC_TRUE))
+            libmesh_error_msg(
+                "You requested to reuse the nonlinear residual vector as the base vector for "
+                "computing the action of the matrix-free Jacobian, but the vectors are not "
+                "the same. Your physics must have states; either remove the states "
+                "from your code or make sure that you set_mf_reuse_base(false)");
+        }
+
+        // There are always exactly two function evaluations for the zeroth ksp iteration when doing
+        // matrix-free approximation of the Jacobian action: one corresponding to the evaluation of
+        // the base vector, and the other corresponding to evaluation of the perturbed vector. So we
+        // toggle back and forth between states
+        solver->set_computing_base_vector(!computing_base_vector);
+      }
+    }
+#endif
+#endif
+
+    PetscFunctionReturn(0);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -519,7 +590,8 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _zero_out_residual(true),
   _zero_out_jacobian(true),
   _default_monitor(true),
-  _snesmf_reuse_base(true)
+  _snesmf_reuse_base(true),
+  _computing_base_vector(true)
 {
 }
 
@@ -857,8 +929,17 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   ierr = MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this);
   LIBMESH_CHKERR(ierr);
 #if !PETSC_VERSION_LESS_THAN(3,8,4)
+#ifndef NDEBUG
+  // If we're in debug mode, do not reuse the nonlinear function evaluation as the base for doing
+  // matrix-free approximations of the Jacobian action. Instead if the user requested that we reuse
+  // the base, we'll check the base function evaluation and compare it to the nonlinear residual
+  // evaluation. If they are different, then we'll error and inform the user that it's unsafe to
+  // reuse the base
+  ierr = MatSNESMFSetReuseBase(J, PETSC_FALSE);
+#else
   // Resue the residual vector from SNES
   ierr = MatSNESMFSetReuseBase(J, static_cast<PetscBool>(_snesmf_reuse_base));
+#endif
   LIBMESH_CHKERR(ierr);
 #endif
 

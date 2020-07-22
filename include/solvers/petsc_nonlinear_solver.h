@@ -169,6 +169,22 @@ public:
   void set_snesmf_reuse_base(bool state) { _snesmf_reuse_base = state; }
 
   /**
+   * @return Whether we are reusing the nonlinear function evaluation as the base for doing
+   * matrix-free approximation of the Jacobian action
+   */
+  bool snes_mf_reuse_base() const { return _snesmf_reuse_base; }
+
+  /**
+   * Set whether we are computing the base vector for matrix-free finite-differencing
+   */
+  void set_computing_base_vector(bool computing_base_vector) { _computing_base_vector = computing_base_vector; }
+
+  /**
+   * @return whether we are computing the base vector for matrix-free finite-differencing
+   */
+  bool computing_base_vector() const { return _computing_base_vector; }
+
+  /**
    * Abstract base class to be used to implement a custom line-search algorithm
    */
   class ComputeLineSearchObject
@@ -238,6 +254,12 @@ protected:
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number> *> &, sys_type &),
                             MatNullSpace *);
+
+  /**
+   * Whether we are computing the base vector for matrix-free finite differencing
+   */
+  bool _computing_base_vector;
+
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
