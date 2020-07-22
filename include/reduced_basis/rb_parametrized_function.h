@@ -66,12 +66,26 @@ public:
    * Evaluate the parametrized function at the specified point for
    * parameter \p mu.  If requires_xyz_perturbations==false, then
    * xyz_perturb will not be used.
+   *
+   * In this case we return the value for component \p comp only.
    */
   virtual Number evaluate(const RBParameters & mu,
                           unsigned int comp,
                           const Point & xyz,
                           subdomain_id_type subdomain_id,
-                          const std::vector<Point> & xyz_perturb) = 0;
+                          const std::vector<Point> & xyz_perturb);
+
+  /**
+   * Evaluate the parametrized function at the specified point for
+   * parameter \p mu.  If requires_xyz_perturbations==false, then
+   * xyz_perturb will not be used.
+   *
+   * In this case we evaluate for all components.
+   */
+  virtual std::vector<Number> evaluate(const RBParameters & mu,
+                                       const Point & xyz,
+                                       subdomain_id_type subdomain_id,
+                                       const std::vector<Point> & xyz_perturb) = 0;
 
   /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.

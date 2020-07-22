@@ -44,15 +44,14 @@ struct ShiftedGaussian : public RBParametrizedFunction
     return 1;
   }
 
-  Number evaluate(const RBParameters & mu,
-                  unsigned int /*comp*/,
-                  const Point & p,
-                  subdomain_id_type /*subdomain_id*/,
-                  const std::vector<Point> & /*p_perturb*/)
+  std::vector<Number> evaluate(const RBParameters & mu,
+                               const Point & p,
+                               subdomain_id_type /*subdomain_id*/,
+                               const std::vector<Point> & /*p_perturb*/)
   {
     Real center_x = mu.get_value("center_x");
     Real center_y = mu.get_value("center_y");
-    return exp(-2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)));
+    return std::vector<Number> {exp(-2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)))};
   }
 };
 

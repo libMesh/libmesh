@@ -52,32 +52,15 @@ struct Gxyz : public RBParametrizedFunction
     return 3;
   }
 
-  virtual Number evaluate(const RBParameters & mu,
-                          unsigned int comp,
-                          const Point & p,
-                          subdomain_id_type /*subdomain_id*/,
-                          const std::vector<Point> & /*p_perturb*/)
+  virtual std::vector<Number> evaluate(const RBParameters & mu,
+                                       const Point & p,
+                                       subdomain_id_type /*subdomain_id*/,
+                                       const std::vector<Point> & /*p_perturb*/)
   {
     Real curvature = mu.get_value("curvature");
 
-    if(comp == 0)
-    {
-      return 1. + curvature*p(0);
-    }
-    else if(comp == 1)
-    {
-      return 1. + curvature*p(0);
-    }
-    else if(comp == 2)
-    {
-      return 1./(1. + curvature*p(0));
-    }
-    else
-    {
-      libmesh_error_msg("Error: Invalid comp");
-    }
-
-    return 0.;
+    std::vector<Number> values {1. + curvature*p(0), 1. + curvature*p(0), 1./(1. + curvature*p(0))};
+    return values;
   }
 };
 

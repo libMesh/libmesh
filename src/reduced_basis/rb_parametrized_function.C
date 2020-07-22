@@ -32,6 +32,20 @@ fd_delta(1.e-6)
 
 RBParametrizedFunction::~RBParametrizedFunction() {}
 
+Number RBParametrizedFunction::evaluate(const RBParameters & mu,
+                                        unsigned int comp,
+                                        const Point & xyz,
+                                        subdomain_id_type subdomain_id,
+                                        const std::vector<Point> & xyz_perturb)
+{
+  std::vector<Number> values = evaluate(mu, xyz, subdomain_id, xyz_perturb);
+
+  if (comp >= values.size())
+    libmesh_error_msg("Error: Invalid value of comp");
+
+  return values[comp];
+}
+
 void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
                                                  const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
                                                  const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
@@ -40,10 +54,10 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
 {
   output.clear();
 
-  for (auto it : all_xyz)
+  for (const auto & xyz_pair : all_xyz)
     {
-      dof_id_type elem_id = it.first;
-      const std::vector<Point> & xyz_vec = it.second;
+      dof_id_type elem_id = xyz_pair.first;
+      const std::vector<Point> & xyz_vec = xyz_pair.second;
 
       auto sbd_it = sbd_ids.find(elem_id);
       if (sbd_it == sbd_ids.end())
