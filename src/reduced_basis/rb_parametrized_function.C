@@ -20,6 +20,7 @@
 #include "libmesh/rb_parametrized_function.h"
 #include "libmesh/int_range.h"
 #include "libmesh/point.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {
@@ -52,6 +53,8 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
                                                  const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb,
                                                  std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & output)
 {
+  LOG_SCOPE("vectorized_evaluate()", "RBParametrizedFunction");
+
   output.clear();
 
   for (const auto & xyz_pair : all_xyz)
@@ -64,34 +67,44 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
         libmesh_error_msg("Error: elem_id not found");
       subdomain_id_type subdomain_id = sbd_it->second;
 
-      std::vector<std::vector<Number>> values(get_n_components());
+      std::vector<std::vector<Number>> evaluated_values(xyz_vec.size());
+      for (unsigned int qp : index_range(xyz_vec))
+        {
+          std::vector<Number> evaluated_values_at_qp;
+          if (requires_xyz_perturbations)
+            {
+              auto xyz_perturb_it = all_xyz_perturb.find(elem_id);
+              if (xyz_perturb_it == all_xyz_perturb.end())
+                {
+                  libmesh_error_msg("Error: elem_id not found");
+                }
+              const std::vector<std::vector<Point>> & qps_and_perturbs = xyz_perturb_it->second;
+
+              if (qp >= qps_and_perturbs.size())
+                libmesh_error_msg("Error: Invalid qp");
+
+              evaluated_values_at_qp = evaluate(mu, xyz_vec[qp], subdomain_id, qps_and_perturbs[qp]);
+            }
+          else
+            {
+              std::vector<Point> empty_perturbs;
+              evaluated_values_at_qp = evaluate(mu, xyz_vec[qp], subdomain_id, empty_perturbs);
+            }
+          evaluated_values[qp] = evaluated_values_at_qp;
+        }
+
+      // The output format uses indexing in the order (comp,qp), not (qp,comp) so
+      // we transpose evaluated_values
+      std::vector<std::vector<Number>> evaluated_values_transposed(get_n_components());
       for (unsigned int comp=0; comp<get_n_components(); comp++)
         {
-          values[comp].resize(xyz_vec.size());
+          evaluated_values_transposed[comp].resize(xyz_vec.size());
           for (unsigned int qp : index_range(xyz_vec))
             {
-               if (requires_xyz_perturbations)
-                 {
-                   auto xyz_perturb_it = all_xyz_perturb.find(elem_id);
-                   if (xyz_perturb_it == all_xyz_perturb.end())
-                     {
-                       libmesh_error_msg("Error: elem_id not found");
-                     }
-                   const std::vector<std::vector<Point>> & qps_and_perturbs = xyz_perturb_it->second;
-
-                   if (qp >= qps_and_perturbs.size())
-                     libmesh_error_msg("Error: Invalid qp");
-
-                   values[comp][qp] = evaluate(mu, comp, xyz_vec[qp], subdomain_id, qps_and_perturbs[qp]);
-                 }
-               else
-                 {
-                   std::vector<Point> empty_perturbs;
-                   values[comp][qp] = evaluate(mu, comp, xyz_vec[qp], subdomain_id, empty_perturbs);
-                 }
+              evaluated_values_transposed[comp][qp] = evaluated_values[qp][comp];
             }
         }
-      output[elem_id] = values;
+      output[elem_id] = evaluated_values_transposed;
     }
 }
 
