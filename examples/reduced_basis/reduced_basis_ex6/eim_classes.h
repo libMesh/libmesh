@@ -11,10 +11,6 @@
 
 using libMesh::RBEIMConstruction;
 
-#ifndef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
-using libMesh::make_unique;
-#endif
-
 // A simple subclass of RBEIMEvaluation. Overload
 // evaluate_parametrized_function to define the
 // function that we "empirically" interpolate.
@@ -25,7 +21,7 @@ public:
   SimpleEIMEvaluation(const libMesh::Parallel::Communicator & comm)
     : RBEIMEvaluation(comm)
   {
-    set_parametrized_function(std::make_unique<Gxyz>());
+    set_parametrized_function(libmesh_make_unique<Gxyz>());
   }
 
   /**
