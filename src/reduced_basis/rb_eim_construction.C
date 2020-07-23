@@ -871,7 +871,7 @@ Real RBEIMConstruction::compute_best_fit_error(unsigned int training_index)
 
   // Make a copy of the pre-computed solution for the specified training sample
   // since we will modify it below to compute the best fit error.
-  QpDataMap solution = _local_parametrized_functions_for_training[training_index];
+  QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
 
   const unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
   DenseVector<Number> best_fit_coeffs;
@@ -885,7 +885,7 @@ Real RBEIMConstruction::compute_best_fit_error(unsigned int training_index)
         DenseVector<Number> best_fit_rhs(RB_size);
         for (unsigned int i=0; i<RB_size; i++)
           {
-            best_fit_rhs(i) = inner_product(solution, get_rb_eim_evaluation().get_basis_function(i));
+            best_fit_rhs(i) = inner_product(solution_copy, get_rb_eim_evaluation().get_basis_function(i));
           }
 
         // Now compute the best fit by an LU solve
@@ -913,9 +913,9 @@ Real RBEIMConstruction::compute_best_fit_error(unsigned int training_index)
       libmesh_error_msg("Should not reach here");
     }
 
-  get_rb_eim_evaluation().decrement_vector(solution, best_fit_coeffs);
+  get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
 
-  Real best_fit_error = get_max_abs_value(solution);
+  Real best_fit_error = get_max_abs_value(solution_copy);
   return best_fit_error;
 }
 
