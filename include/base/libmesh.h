@@ -245,9 +245,15 @@ const Number zero = 0.;
 
 /**
  * A number which is used quite often to represent
- * an invalid or uninitialized value.
+ * an invalid or uninitialized value for an unsigned integer.
  */
 const unsigned int invalid_uint = static_cast<unsigned int>(-1);
+
+/**
+ * A number which is used quite often to represent
+ * an invalid or uninitialized value for an integer.
+ */
+const int invalid_int = std::numeric_limits<int>::max();
 
 } // namespace libMesh
 
