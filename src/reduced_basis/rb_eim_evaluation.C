@@ -689,12 +689,20 @@ void RBEIMEvaluation::gather_bfs()
   auto n_bf = _local_eim_basis_functions.size();
   this->comm().verify(n_bf);
 
-  // We assume that each element has the same number of variables,
-  // and we get the number of vars from the first element of the
-  // first basis function. We also check that this number agrees on
-  // all procs.
-  auto n_vars = _local_eim_basis_functions[0].begin()->second.size();
-  this->comm().verify(n_vars);
+  // This function should never be called if there are no basis
+  // functions, so if it was, something went wrong.
+  if (!n_bf)
+    libmesh_error_msg("RBEIMEvaluation::gather_bfs() should not be called with 0 basis functions.");
+
+  // The number of variables should be the same on all processors
+  // and we can get this from _local_eim_basis_functions. However,
+  // it may be that some processors have no local elements, so on
+  // those processors we cannot look up the size from
+  // _local_eim_basis_functions. As a result we use comm().max(n_vars)
+  // to make sure all processors agree on the final value.
+  std::size_t n_vars =
+    _local_eim_basis_functions[0].empty() ? 0 : _local_eim_basis_functions[0].begin()->second.size();
+  this->comm().max(n_vars);
 
   // Gather list of Elem ids stored on each processor to proc 0.  We
   // use basis function 0 as an example and assume all the basis
