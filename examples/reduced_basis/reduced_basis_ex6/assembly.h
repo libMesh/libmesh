@@ -42,45 +42,25 @@ using libMesh::Real;
 using libMesh::RealGradient;
 using libMesh::Elem;
 using libMesh::FEBase;
+using libMesh::subdomain_id_type;
 
-struct ElemAssemblyWithConstruction : ElemAssembly
+// The function we're approximating with EIM
+struct Gxyz : public RBParametrizedFunction
 {
-  RBConstruction * rb_con;
-};
-
-// The "x component" of the function we're approximating with EIM
-struct Gx : public RBParametrizedFunction
-{
-  virtual Number evaluate(const RBParameters & mu,
-                          const Point & p,
-                          const Elem &)
+  unsigned int get_n_components() const
   {
-    Real curvature = mu.get_value("curvature");
-    return 1. + curvature*p(0);
+    return 3;
   }
-};
 
-// The "y component" of the function we're approximating with EIM
-struct Gy : public RBParametrizedFunction
-{
-  virtual Number evaluate(const RBParameters & mu,
-                          const Point & p,
-                          const Elem &)
+  virtual std::vector<Number>
+  evaluate(const RBParameters & mu,
+           const Point & p,
+           subdomain_id_type /*subdomain_id*/,
+           const std::vector<Point> & /*p_perturb*/) override
   {
     Real curvature = mu.get_value("curvature");
-    return 1. + curvature*p(0);
-  }
-};
 
-// The "z component" of the function we're approximating with EIM
-struct Gz : public RBParametrizedFunction
-{
-  virtual Number evaluate(const RBParameters & mu,
-                          const Point & p,
-                          const Elem &)
-  {
-    Real curvature = mu.get_value("curvature");
-    return 1./(1. + curvature*p(0));
+    return {1. + curvature*p(0), 1. + curvature*p(0), 1./(1. + curvature*p(0))};
   }
 };
 
@@ -92,15 +72,14 @@ struct ThetaA0 : RBTheta
   }
 };
 
-struct AssemblyA0 : ElemAssemblyWithConstruction
+struct AssemblyA0 : ElemAssembly
 {
   virtual void boundary_assembly(FEMContext & c)
   {
     std::vector<boundary_id_type> bc_ids;
-    rb_con->get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::vector<boundary_id_type>::const_iterator b =
-           bc_ids.begin(); b != bc_ids.end(); ++b)
-      if (*b == 1 || *b == 2 || *b == 3 || *b == 4)
+    c.get_system().get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
+    for (const auto & bc_id : bc_ids)
+      if (bc_id == 1 || bc_id == 2 || bc_id == 3 || bc_id == 4)
         {
           const unsigned int u_var = 0;
 
@@ -135,15 +114,14 @@ struct ThetaA1 : RBTheta
   }
 };
 
-struct AssemblyA1 : ElemAssemblyWithConstruction
+struct AssemblyA1 : ElemAssembly
 {
   virtual void boundary_assembly(FEMContext & c)
   {
     std::vector<boundary_id_type> bc_ids;
-    rb_con->get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::vector<boundary_id_type>::const_iterator b =
-           bc_ids.begin(); b != bc_ids.end(); ++b)
-      if (*b == 1 || *b == 3) // y == -0.2, y == 0.2
+    c.get_system().get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
+    for (const auto & bc_id : bc_ids)
+      if (bc_id == 1 || bc_id == 3) // y == -0.2, y == 0.2
         {
           const unsigned int u_var = 0;
 
@@ -182,15 +160,14 @@ struct ThetaA2 : RBTheta {
     return 0.2*mu.get_value("kappa") * mu.get_value("Bi") * mu.get_value("curvature");
   }
 };
-struct AssemblyA2 : ElemAssemblyWithConstruction
+struct AssemblyA2 : ElemAssembly
 {
   virtual void boundary_assembly(FEMContext & c)
   {
     std::vector<boundary_id_type> bc_ids;
-    rb_con->get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::vector<boundary_id_type>::const_iterator b =
-           bc_ids.begin(); b != bc_ids.end(); ++b)
-      if (*b == 2 || *b == 4) // x == 0.2, x == -0.2
+    c.get_system().get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
+    for (const auto & bc_id : bc_ids)
+      if (bc_id == 2 || bc_id == 4) // x == 0.2, x == -0.2
         {
           const unsigned int u_var = 0;
 
@@ -207,7 +184,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
           // Now we will build the affine operator
           unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
-          if (*b==2)
+          if (bc_id == 2)
             {
               for (unsigned int qp=0; qp != n_sidepoints; qp++)
                 {
@@ -217,7 +194,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
                 }
             }
 
-          if (*b==4)
+          if (bc_id == 4)
             {
               for (unsigned int qp=0; qp != n_sidepoints; qp++)
                 {
@@ -271,21 +248,18 @@ struct AssemblyEIM : RBEIMAssembly
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     std::vector<Number> eim_values_Gx;
-    evaluate_basis_function(Gx_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            Gx_var,
                             eim_values_Gx);
 
     std::vector<Number> eim_values_Gy;
-    evaluate_basis_function(Gy_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            Gy_var,
                             eim_values_Gy);
 
     std::vector<Number> eim_values_Gz;
-    evaluate_basis_function(Gz_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            Gz_var,
                             eim_values_Gz);
 
     for (unsigned int qp=0; qp != c.get_element_qrule().n_points(); qp++)
@@ -396,31 +370,6 @@ struct Ex6InnerProduct : ElemAssembly
   }
 };
 
-struct Ex6EIMInnerProduct : ElemAssembly
-{
-  // Use the L2 inner product to find the best fit
-  virtual void interior_assembly(FEMContext & c)
-  {
-    FEBase * elem_fe = nullptr;
-    c.get_element_fe(0, elem_fe);
-
-    const std::vector<Real> & JxW = elem_fe->get_JxW();
-
-    const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
-
-    const unsigned int n_dofs = c.get_dof_indices().size();
-
-    unsigned int n_qpoints = c.get_element_qrule().n_points();
-
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_dofs; i++)
-        for (unsigned int j=0; j != n_dofs; j++)
-          {
-            c.get_elem_jacobian()(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
-          }
-  }
-};
-
 // Define an RBThetaExpansion class for this PDE
 // The A terms depend on EIM, so we deal with them later
 struct Ex6ThetaExpansion : RBThetaExpansion
@@ -454,13 +403,8 @@ struct Ex6AssemblyExpansion : RBAssemblyExpansion
   /**
    * Constructor.
    */
-  Ex6AssemblyExpansion(RBConstruction & rb_con)
+  Ex6AssemblyExpansion()
   {
-    // Point to the RBConstruction object
-    assembly_a0.rb_con = &rb_con;
-    assembly_a1.rb_con = &rb_con;
-    assembly_a2.rb_con = &rb_con;
-
     attach_A_assembly(&assembly_a0);
     attach_A_assembly(&assembly_a1);
     attach_A_assembly(&assembly_a2);

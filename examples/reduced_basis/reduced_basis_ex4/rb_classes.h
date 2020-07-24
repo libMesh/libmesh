@@ -21,6 +21,7 @@
 #define RB_CLASSES_H
 
 #include "libmesh/rb_construction.h"
+#include "libmesh/rb_evaluation.h"
 #include "assembly.h"
 
 #ifdef LIBMESH_ENABLE_DIRICHLET

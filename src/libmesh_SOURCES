@@ -333,6 +333,7 @@ libmesh_SOURCES =  \
         src/reduced_basis/rb_evaluation.C \
         src/reduced_basis/rb_parameters.C \
         src/reduced_basis/rb_parametrized.C \
+        src/reduced_basis/rb_parametrized_function.C \
         src/reduced_basis/rb_scm_construction.C \
         src/reduced_basis/rb_scm_evaluation.C \
         src/reduced_basis/rb_temporal_discretization.C \
