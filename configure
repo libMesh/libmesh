@@ -38464,12 +38464,14 @@ else
                                                    VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                            -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                            -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor \
-                                           -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
+                                           -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor \
+                                           -lvtkCommonExecutionModel-$vtkmajorminor"
 
                                                                     VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                          -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
                                          -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML \
-                                         -lvtkParallelMPI -lvtkParallelCore"
+                                         -lvtkParallelMPI -lvtkParallelCore \
+                                         -lvtkCommonExecutionModel"
 
 fi
 
