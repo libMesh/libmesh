@@ -16,9 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <fstream>
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/vtk_io.h"
@@ -57,6 +54,10 @@
 #endif
 
 #include "libmesh/restore_warnings.h"
+
+// C++ includes
+#include <fstream>
+
 
 // A convenient macro for comparing VTK versions.  Returns 1 if the
 // current VTK version is < major.minor.subminor and zero otherwise.
@@ -237,12 +238,12 @@ void VTKIO::read (const std::string & name)
       mesh.set_mesh_dimension(i);
 
 #if LIBMESH_DIM < 3
-  if (mesh.mesh_dimension() > LIBMESH_DIM)
-    libmesh_error_msg("Cannot open dimension "  \
-                      << mesh.mesh_dimension()              \
-                      << " mesh file when configured without "  \
-                      << mesh.mesh_dimension()                  \
-                      << "D support.");
+  libmesh_error_msg_if(mesh.mesh_dimension() > LIBMESH_DIM,
+                       "Cannot open dimension "
+                       << mesh.mesh_dimension()
+                       << " mesh file when configured without "
+                       << mesh.mesh_dimension()
+                       << "D support.");
 #endif // LIBMESH_DIM < 3
 }
 
@@ -262,8 +263,8 @@ void VTKIO::write_nodal_data (const std::string & fname,
   // should not be empty, it should have been broadcast to all
   // processors by the MeshOutput base class, since VTK is a parallel
   // format.  Verify this before going further.
-  if (!names.empty() && soln.empty())
-    libmesh_error_msg("Empty soln vector in VTKIO::write_nodal_data().");
+  libmesh_error_msg_if(!names.empty() && soln.empty(),
+                       "Empty soln vector in VTKIO::write_nodal_data().");
 
   // Get a reference to the mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();

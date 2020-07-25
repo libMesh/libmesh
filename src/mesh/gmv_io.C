@@ -387,33 +387,30 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
   // optionally write the partition information
   if (this->partitioning())
     {
-      if (this->write_subdomain_id_as_material())
-        libmesh_error_msg("Not yet supported in GMVIO::write_ascii_new_impl");
+      libmesh_error_msg_if(this->write_subdomain_id_as_material(),
+                           "Not yet supported in GMVIO::write_ascii_new_impl");
 
-      else // write processor IDs as materials.  This is the default
-        {
-          out_stream << "material "
-                     << mesh.n_partitions()
-            // Note: GMV may give you errors like
-            // Error, material for cell 1 is greater than 1
-            // Error, material for cell 2 is greater than 1
-            // Error, material for cell 3 is greater than 1
-            // ... because you put the wrong number of partitions here.
-            // To ensure you write the correct number of materials, call
-            // mesh.recalculate_n_partitions() before writing out the
-            // mesh.
-            // Note: we can't call it now because the Mesh is const here and
-            // it is a non-const function.
-                     << " 0\n";
+      out_stream << "material "
+                 << mesh.n_partitions()
+        // Note: GMV may give you errors like
+        // Error, material for cell 1 is greater than 1
+        // Error, material for cell 2 is greater than 1
+        // Error, material for cell 3 is greater than 1
+        // ... because you put the wrong number of partitions here.
+        // To ensure you write the correct number of materials, call
+        // mesh.recalculate_n_partitions() before writing out the
+        // mesh.
+        // Note: we can't call it now because the Mesh is const here and
+        // it is a non-const function.
+                 << " 0\n";
 
-          for (auto proc : make_range(mesh.n_partitions()))
-            out_stream << "proc_" << proc << "\n";
+      for (auto proc : make_range(mesh.n_partitions()))
+        out_stream << "proc_" << proc << "\n";
 
-          // FIXME - don't we need to use an ElementDefinition here? - RHS
-          for (const auto & elem : mesh.active_element_ptr_range())
-            out_stream << elem->processor_id()+1 << "\n";
-          out_stream << "\n";
-        }
+      // FIXME - don't we need to use an ElementDefinition here? - RHS
+      for (const auto & elem : mesh.active_element_ptr_range())
+        out_stream << elem->processor_id()+1 << "\n";
+      out_stream << "\n";
     }
 
   // If there are *any* variables at all in the system (including
@@ -1356,42 +1353,39 @@ void GMVIO::write_binary (const std::string & fname,
   // optionally write the partition information
   if (this->partitioning())
     {
-      if (this->write_subdomain_id_as_material())
-        libmesh_error_msg("Not yet supported in GMVIO::write_binary");
+      libmesh_error_msg_if(this->write_subdomain_id_as_material(),
+                           "Not yet supported in GMVIO::write_binary");
 
-      else
+      buffer = "material";
+      out_stream.write(buffer.c_str(), buffer.size());
+
+      unsigned int tmpint = mesh.n_processors();
+      out_stream.write(reinterpret_cast<char *>(&tmpint), sizeof(unsigned int));
+
+      tmpint = 0; // IDs are cell based
+      out_stream.write(reinterpret_cast<char *>(&tmpint), sizeof(unsigned int));
+
+      for (auto proc : make_range(mesh.n_processors()))
         {
-          buffer = "material";
-          out_stream.write(buffer.c_str(), buffer.size());
-
-          unsigned int tmpint = mesh.n_processors();
-          out_stream.write(reinterpret_cast<char *>(&tmpint), sizeof(unsigned int));
-
-          tmpint = 0; // IDs are cell based
-          out_stream.write(reinterpret_cast<char *>(&tmpint), sizeof(unsigned int));
-
-          for (auto proc : make_range(mesh.n_processors()))
-            {
-              // We have to write exactly 8 bytes.  This means that
-              // the processor id can be up to 3 characters long, and
-              // we pad it with blank characters on the end.
-              std::ostringstream oss;
-              oss << "proc_" << std::setw(3) << std::left << proc;
-              out_stream.write(oss.str().c_str(), oss.str().size());
-            }
-
-          std::vector<unsigned int> proc_id (n_active_elem);
-
-          unsigned int n=0;
-
-          // We no longer write sub-elems in GMV, so just assign a
-          // processor id value to each element.
-          for (const auto & elem : mesh.active_element_ptr_range())
-            proc_id[n++] = elem->processor_id() + 1;
-
-          out_stream.write(reinterpret_cast<char *>(proc_id.data()),
-                           sizeof(unsigned int)*proc_id.size());
+          // We have to write exactly 8 bytes.  This means that
+          // the processor id can be up to 3 characters long, and
+          // we pad it with blank characters on the end.
+          std::ostringstream oss;
+          oss << "proc_" << std::setw(3) << std::left << proc;
+          out_stream.write(oss.str().c_str(), oss.str().size());
         }
+
+      std::vector<unsigned int> proc_id (n_active_elem);
+
+      unsigned int n=0;
+
+      // We no longer write sub-elems in GMV, so just assign a
+      // processor id value to each element.
+      for (const auto & elem : mesh.active_element_ptr_range())
+        proc_id[n++] = elem->processor_id() + 1;
+
+      out_stream.write(reinterpret_cast<char *>(proc_id.data()),
+                       sizeof(unsigned int)*proc_id.size());
     }
 
   // If there are *any* variables at all in the system (including
@@ -1763,23 +1757,20 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
   // optionally write the partition information
   if (write_partitioning)
     {
-      if (_write_subdomain_id_as_material)
-        libmesh_error_msg("Not yet supported in GMVIO::write_discontinuous_gmv");
+      libmesh_error_msg_if(_write_subdomain_id_as_material,
+                           "Not yet supported in GMVIO::write_discontinuous_gmv");
 
-      else
-        {
-          out_stream << "material "
-                     << mesh.n_processors()
-                     << " 0"<< std::endl;
+      out_stream << "material "
+                 << mesh.n_processors()
+                 << " 0"<< std::endl;
 
-          for (auto proc : make_range(mesh.n_processors()))
-            out_stream << "proc_" << proc << std::endl;
+      for (auto proc : make_range(mesh.n_processors()))
+        out_stream << "proc_" << proc << std::endl;
 
-          for (const auto & elem : mesh.active_element_ptr_range())
-            out_stream << elem->processor_id()+1 << std::endl;
+      for (const auto & elem : mesh.active_element_ptr_range())
+        out_stream << elem->processor_id()+1 << std::endl;
 
-          out_stream << std::endl;
-        }
+      out_stream << std::endl;
     }
 
 
@@ -1909,9 +1900,7 @@ void GMVIO::read (const std::string & name)
   // any use of this feature in LibMesh.  Nonzero return val
   // from any function usually means an error has occurred.
   int ierr = GMVLib::gmvread_open_fromfileskip(const_cast<char *>(name.c_str()));
-  if (ierr != 0)
-    libmesh_error_msg("GMVLib::gmvread_open_fromfileskip failed!");
-
+  libmesh_error_msg_if(ierr != 0, "GMVLib::gmvread_open_fromfileskip failed!");
 
   // Loop through file until GMVEND.
   int iend = 0;
@@ -1928,8 +1917,8 @@ void GMVIO::read (const std::string & name)
         }
 
       // Check for GMVERROR.
-      if (GMVLib::gmv_data.keyword == GMVERROR)
-        libmesh_error_msg("Encountered GMVERROR while reading!");
+      libmesh_error_msg_if(GMVLib::gmv_data.keyword == GMVERROR,
+                           "Encountered GMVERROR while reading!");
 
       // Process the data.
       switch (GMVLib::gmv_data.keyword)
@@ -1939,8 +1928,9 @@ void GMVIO::read (const std::string & name)
             if (GMVLib::gmv_data.num2 == NODES)
               this->_read_nodes();
 
-            else if (GMVLib::gmv_data.num2 == NODE_V)
-              libmesh_error_msg("Unsupported GMV data type NODE_V!");
+            else
+              libmesh_error_msg_if(GMVLib::gmv_data.num2 == NODE_V,
+                                   "Unsupported GMV data type NODE_V!");
 
             break;
           }
@@ -2003,12 +1993,12 @@ void GMVIO::read (const std::string & name)
       mesh.set_mesh_dimension(i);
 
 #if LIBMESH_DIM < 3
-  if (mesh.mesh_dimension() > LIBMESH_DIM)
-    libmesh_error_msg("Cannot open dimension " \
-                      << mesh.mesh_dimension()            \
-                      << " mesh file when configured without "        \
-                      << mesh.mesh_dimension()                        \
-                      << "D support.");
+  libmesh_error_msg_if(mesh.mesh_dimension() > LIBMESH_DIM,
+                       "Cannot open dimension "
+                       << mesh.mesh_dimension()
+                       << " mesh file when configured without "
+                       << mesh.mesh_dimension()
+                       << "D support.");
 #endif
 
   // Done reading in the mesh, now call find_neighbors, etc.

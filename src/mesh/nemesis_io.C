@@ -211,8 +211,8 @@ void Nemesis_IO::read (const std::string & base_filename)
   nemhelper->get_loadbal_param();
 
   // Do some error checking
-  if (nemhelper->num_external_nodes)
-    libmesh_error_msg("ERROR: there should be no external nodes in an element-based partitioning!");
+  libmesh_error_msg_if(nemhelper->num_external_nodes,
+                       "ERROR: there should be no external nodes in an element-based partitioning!");
 
   libmesh_assert_equal_to (nemhelper->num_nodes,
                            (nemhelper->num_internal_nodes +
@@ -863,12 +863,12 @@ void Nemesis_IO::read (const std::string & base_filename)
           // We are expecting the element "thrown back" by libmesh to have the ID we specified for it...
           // Check to see that really is the case.  Note that my_next_elem was post-incremented, so
           // subtract 1 when performing the check.
-          if (elem->id() != my_next_elem-1)
-            libmesh_error_msg("Unexpected ID "  \
-                              << elem->id()                             \
-                              << " set by parallel mesh. (expecting "   \
-                              << my_next_elem-1                         \
-                              << ").");
+          libmesh_error_msg_if(elem->id() != my_next_elem-1,
+                               "Unexpected ID "
+                               << elem->id()
+                               << " set by parallel mesh. (expecting "
+                               << my_next_elem-1
+                               << ").");
 
           // Set all the nodes for this element
           if (_verbose)
@@ -921,12 +921,12 @@ void Nemesis_IO::read (const std::string & base_filename)
   mesh.set_mesh_dimension(max_dim_seen);
 
 #if LIBMESH_DIM < 3
-  if (mesh.mesh_dimension() > LIBMESH_DIM)
-    libmesh_error_msg("Cannot open dimension "   \
-                      << mesh.mesh_dimension()                          \
-                      << " mesh file when configured without "          \
-                      << mesh.mesh_dimension()                          \
-                      << "D support." );
+  libmesh_error_msg_if(mesh.mesh_dimension() > LIBMESH_DIM,
+                       "Cannot open dimension "
+                       << mesh.mesh_dimension()
+                       << " mesh file when configured without "
+                       << mesh.mesh_dimension()
+                       << "D support." );
 #endif
 
 
@@ -985,9 +985,9 @@ void Nemesis_IO::read (const std::string & base_filename)
     int sum_num_elem_all_sidesets = nemhelper->num_elem_all_sidesets;
     this->comm().sum(sum_num_elem_all_sidesets);
 
-    if (sum_num_global_side_counts != sum_num_elem_all_sidesets)
-      libmesh_error_msg("Error! global side count reported by Nemesis does not " \
-                        << "match the side count reported by the individual files!");
+    libmesh_error_msg_if(sum_num_global_side_counts != sum_num_elem_all_sidesets,
+                         "Error! global side count reported by Nemesis does not "
+                         "match the side count reported by the individual files!");
   }
 #endif
 
@@ -1059,12 +1059,12 @@ void Nemesis_IO::read (const std::string & base_filename)
   // which should match nemhelper->elem_list.size().
   {
     std::size_t nbcs = mesh.get_boundary_info().n_boundary_conds();
-    if (nbcs != nemhelper->elem_list.size())
-      libmesh_error_msg("[" << this->processor_id() << "] "   \
-                        << "BoundaryInfo contains "                     \
-                        << nbcs                                         \
-                        << " boundary conditions, while the Exodus file had " \
-                        << nemhelper->elem_list.size());
+    libmesh_error_msg_if(nbcs != nemhelper->elem_list.size(),
+                         "[" << this->processor_id() << "] "
+                         << "BoundaryInfo contains "
+                         << nbcs
+                         << " boundary conditions, while the Exodus file had "
+                         << nemhelper->elem_list.size());
   }
 
   // Read global nodeset parameters?  We might be able to use this to verify
@@ -1114,8 +1114,8 @@ void Nemesis_IO::read (const std::string & base_filename)
       for (auto node : index_range(nemhelper->node_list))
         {
           // Don't run past the end of our node map!
-          if (to_uint(nemhelper->node_list[node]-1) >= nemhelper->node_num_map.size())
-            libmesh_error_msg("Error, index is past the end of node_num_map array!");
+          libmesh_error_msg_if(to_uint(nemhelper->node_list[node]-1) >= nemhelper->node_num_map.size(),
+                               "Error, index is past the end of node_num_map array!");
 
           // We should be able to use the node_num_map data structure set up previously to determine
           // the proper global node index.
@@ -1410,8 +1410,8 @@ void Nemesis_IO::write_nodal_data (const std::string &,
 
 void Nemesis_IO::write_element_data (const EquationSystems & es)
 {
-  if (!nemhelper->opened_for_writing)
-    libmesh_error_msg("ERROR, Nemesis file must be initialized before outputting elemental variables.");
+  libmesh_error_msg_if(!nemhelper->opened_for_writing,
+                       "ERROR, Nemesis file must be initialized before outputting elemental variables.");
 
   // To be (possibly) filled with a filtered list of variable names to output.
   std::vector<std::string> names;
@@ -1520,8 +1520,8 @@ void Nemesis_IO::write_nodal_data (const std::string &,
 void Nemesis_IO::write_global_data (const std::vector<Number> & soln,
                                     const std::vector<std::string> & names)
 {
-  if (!nemhelper->opened_for_writing)
-    libmesh_error_msg("ERROR, Nemesis file must be initialized before outputting global variables.");
+  libmesh_error_msg_if(!nemhelper->opened_for_writing,
+                       "ERROR, Nemesis file must be initialized before outputting global variables.");
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
@@ -1589,8 +1589,8 @@ void Nemesis_IO::write_global_data (const std::vector<Number> &,
 
 void Nemesis_IO::write_information_records (const std::vector<std::string> & records)
 {
-  if (!nemhelper->opened_for_writing)
-    libmesh_error_msg("ERROR, Nemesis file must be initialized before outputting information records.");
+  libmesh_error_msg_if(!nemhelper->opened_for_writing,
+                       "ERROR, Nemesis file must be initialized before outputting information records.");
 
   // Call the Exodus writer implementation
   nemhelper->write_information_records( records );

@@ -17,16 +17,6 @@
 
 
 
-// C++ includes
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-#include <unordered_map>
-
-// C includes
-#include <sys/types.h> // for pid_t
-#include <unistd.h>    // for getpid(), unlink()
-
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/ghosting_functor.h"
@@ -41,7 +31,15 @@
 #include "libmesh/enum_order.h"
 #include "libmesh/mesh_communication.h"
 
+// C++ includes
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+#include <unordered_map>
 
+// C includes
+#include <sys/types.h> // for pid_t
+#include <unistd.h>    // for getpid(), unlink()
 
 namespace libMesh
 {
@@ -1137,8 +1135,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   for (auto & lo_elem : element_ptr_range())
     {
       // make sure it is linear order
-      if (lo_elem->default_order() != FIRST)
-        libmesh_error_msg("ERROR: This is not a linear element: type=" << lo_elem->type());
+      libmesh_error_msg_if(lo_elem->default_order() != FIRST,
+                           "ERROR: This is not a linear element: type=" << lo_elem->type());
 
       // this does _not_ work for refined elements
       libmesh_assert_equal_to (lo_elem->level (), 0);

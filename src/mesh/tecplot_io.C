@@ -17,11 +17,6 @@
 
 
 
-// C++ includes
-#include <fstream>
-#include <iomanip>
-#include <sstream>
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
@@ -37,6 +32,10 @@ extern "C" {
 }
 #endif
 
+// C++ includes
+#include <fstream>
+#include <iomanip>
+#include <sstream>
 
 namespace libMesh
 {
@@ -215,8 +214,8 @@ unsigned TecplotIO::elem_dimension()
     elem_dims[elem->dim() - 1] = 1;
 
   // Detect and disallow (for now) the writing of mixed dimension meshes.
-  if (std::count(elem_dims.begin(), elem_dims.end(), 1) > 1)
-    libmesh_error_msg("Error, cannot write Mesh with mixed element dimensions to Tecplot file!");
+  libmesh_error_msg_if(std::count(elem_dims.begin(), elem_dims.end(), 1) > 1,
+                       "Error, cannot write Mesh with mixed element dimensions to Tecplot file!");
 
   if (elem_dims[0])
     return 1;

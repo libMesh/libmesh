@@ -15,12 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-#include <string>
-#include <cstdlib> // std::strtol
-#include <sstream>
-#include <ctype.h> // isspace
-
 // Local includes
 #include "libmesh/abaqus_io.h"
 #include "libmesh/point.h"
@@ -28,7 +22,13 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h"
+
+// C++ includes
 #include <unordered_map>
+#include <string>
+#include <cstdlib> // std::strtol
+#include <sstream>
+#include <ctype.h> // isspace
 
 // Anonymous namespace to hold mapping Data for Abaqus/libMesh element types
 namespace
@@ -276,8 +276,9 @@ void AbaqusIO::read (const std::string & fname)
           // 0.) Look for the "*Part" section
           if (upper.find("*PART") == static_cast<std::string::size_type>(0))
             {
-              if (_already_seen_part)
-                libmesh_error_msg("We currently don't support reading Abaqus files with multiple PART sections");
+              libmesh_error_msg_if
+                (_already_seen_part,
+                 "We currently don't support reading Abaqus files with multiple PART sections");
 
               _already_seen_part = true;
             }
@@ -337,8 +338,7 @@ void AbaqusIO::read (const std::string & fname)
 
               // I haven't seen an unnamed nset yet, but let's detect it
               // just in case...
-              if (nset_name == "")
-                libmesh_error_msg("Unnamed nset encountered!");
+              libmesh_error_msg_if(nset_name == "", "Unnamed nset encountered!");
 
               // Is this a "generated" nset, i.e. one which has three
               // entries corresponding to (first, last, stride)?
@@ -363,8 +363,7 @@ void AbaqusIO::read (const std::string & fname)
 
               // I haven't seen an unnamed elset yet, but let's detect it
               // just in case...
-              if (elset_name == "")
-                libmesh_error_msg("Unnamed elset encountered!");
+              libmesh_error_msg_if(elset_name == "", "Unnamed elset encountered!");
 
               // Is this a "generated" elset, i.e. one which has three
               // entries corresponding to (first, last, stride)?
@@ -651,10 +650,10 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
   // If the element definition was not found, the call above would have
   // created one with an uninitialized struct.  Check for that here...
-  if (eledef.abaqus_zero_based_node_id_to_libmesh_node_id.size() == 0)
-    libmesh_error_msg("No Abaqus->LibMesh mapping information for ElemType " \
-                      << Utility::enum_to_string(elem_type)             \
-                      << "!");
+  libmesh_error_msg_if
+    (eledef.abaqus_zero_based_node_id_to_libmesh_node_id.size() == 0,
+     "No Abaqus->LibMesh mapping information for ElemType "
+     << Utility::enum_to_string(elem_type) << "!");
 
   // We will read elements until the next line begins with *, since that will be the
   // next section.
@@ -704,10 +703,11 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
                   // If node_ptr() returns nullptr, it may mean we have not yet read the
                   // *Nodes section, though I assumed that always came before the *Elements section...
-                  if (node == nullptr)
-                    libmesh_error_msg("Error!  Mesh::node_ptr() returned nullptr.  Either no node exists with ID " \
-                                      << libmesh_global_node_id         \
-                                      << " or perhaps this input file has *Elements defined before *Nodes?");
+                  libmesh_error_msg_if
+                    (node == nullptr,
+                     "Error!  Mesh::node_ptr() returned nullptr.  Either no node exists with ID "
+                     << libmesh_global_node_id
+                     << " or perhaps this input file has *Elements defined before *Nodes?");
 
                   // Note: id_count is the zero-based abaqus (elem local) node index.  We therefore map
                   // it to a libmesh elem local node index using the element definition map
@@ -724,12 +724,13 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
         } // end while (id_count)
 
       // Ensure that we read *exactly* as many nodes as we were expecting to, no more.
-      if (id_count != n_nodes_per_elem)
-        libmesh_error_msg("Error: Needed to read " \
-                          << n_nodes_per_elem      \
-                          << " nodes, but read "   \
-                          << id_count              \
-                          << " instead!");
+      libmesh_error_msg_if
+        (id_count != n_nodes_per_elem,
+         "Error: Needed to read "
+         << n_nodes_per_elem
+         << " nodes, but read "
+         << id_count
+         << " instead!");
 
       // If we are recording Elset IDs, add this element to the correct set for later processing.
       // Make sure to add it with the Abaqus ID, not the libmesh one!
@@ -1040,8 +1041,8 @@ void AbaqusIO::assign_boundary_node_ids()
           // Get node pointer from the mesh
           Node * node = the_mesh.node_ptr(libmesh_global_node_id);
 
-          if (node == nullptr)
-            libmesh_error_msg("Error! Mesh::node_ptr() returned nullptr!");
+          libmesh_error_msg_if(node == nullptr,
+                               "Error! Mesh::node_ptr() returned nullptr!");
 
           // Add this node with the current_id (which is determined by the
           // alphabetical ordering of the map) to the BoundaryInfo object
@@ -1090,10 +1091,9 @@ void AbaqusIO::assign_sideset_ids()
 
             // If the element definition was not found, the call above would have
             // created one with an uninitialized struct.  Check for that here...
-            if (eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0)
-              libmesh_error_msg("No Abaqus->LibMesh mapping information for ElemType " \
-                                << Utility::enum_to_string(elem.type())  \
-                                << "!");
+            libmesh_error_msg_if(eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0,
+                                 "No Abaqus->LibMesh mapping information for ElemType "
+                                 << Utility::enum_to_string(elem.type()) << "!");
 
             // Add this node with the current_id (which is determined by the
             // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
@@ -1158,8 +1158,8 @@ void AbaqusIO::assign_sideset_ids()
             // one dimension lower than the max element
             // dimension.  Not sure if "edge" BCs in 3D
             // actually make sense/are required...
-            if (elem.dim()+1 != max_dim)
-              libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem.dim());
+            libmesh_error_msg_if(elem.dim()+1 != max_dim,
+                                 "ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem.dim());
 
             // Insert the current (key, pair(elem,id)) into the multimap.
             provide_bcs.emplace(elem.key(), std::make_pair(&elem, elemset_id));

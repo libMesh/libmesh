@@ -162,8 +162,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
       // Create an output stream for data file
       std::ofstream data(data_file_name.c_str());
 
-      if (!data.good())
-        libmesh_error_msg("ERROR: opening output data file " << data_file_name);
+      libmesh_error_msg_if(!data.good(), "ERROR: opening output data file " << data_file_name);
 
       // get ordered nodal data using a map
       std::map<Real, std::vector<Number>> node_map;
