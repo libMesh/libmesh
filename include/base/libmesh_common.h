@@ -430,6 +430,12 @@ struct casting_compare {
 
 #define libmesh_error() libmesh_error_msg("")
 
+#define libmesh_error_msg_if(cond, msg)         \
+  do {                                          \
+    if (cond)                                   \
+      libmesh_error_msg(msg);                   \
+  } while (0)
+
 #define libmesh_exceptionless_error_msg(msg)                            \
   do {                                                                  \
     libMesh::err << msg << std::endl;                                   \
