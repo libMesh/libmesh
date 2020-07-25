@@ -27,7 +27,11 @@ namespace libMesh
 
 // Edge3 class static member initializations
 const int Edge3::num_nodes;
+const int Edge3::num_sides;
+const int Edge3::num_edges;
 const int Edge3::num_children;
+const int Edge3::nodes_per_side;
+const int Edge3::nodes_per_edge;
 
 #ifdef LIBMESH_ENABLE_AMR
 
