@@ -661,7 +661,7 @@ RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
           const std::vector<Number> & w_qp = w_comp_and_qp[comp];
 
           for (unsigned int qp : index_range(JxW))
-            val += JxW[qp] * v_qp[qp] * w_qp[qp];
+            val += JxW[qp] * v_qp[qp] * libmesh_conj(w_qp[qp]);
         }
     }
 
@@ -836,8 +836,8 @@ void RBEIMConstruction::update_eim_matrices()
     {
       for (unsigned int j=0; j<RB_size; j++)
         {
-          Number value = inner_product(eim_eval.get_basis_function(i),
-                                       eim_eval.get_basis_function(j));
+          Number value = inner_product(eim_eval.get_basis_function(j),
+                                       eim_eval.get_basis_function(i));
 
           _eim_projection_matrix(i,j) = value;
           if (i!=j)
