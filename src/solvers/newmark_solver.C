@@ -150,13 +150,10 @@ void NewmarkSolver::set_initial_accel_avail( bool initial_accel_set )
 void NewmarkSolver::solve ()
 {
   // First, check that the initial accel was set one way or another
-  if (!_initial_accel_set)
-    {
-      std::string error = "ERROR: Must first set initial acceleration using one of:\n";
-      error += "NewmarkSolver::compute_initial_accel()\n";
-      error += "NewmarkSolver::project_initial_accel()\n";
-      libmesh_error_msg(error);
-    }
+  libmesh_error_msg_if(!_initial_accel_set,
+                       "ERROR: Must first set initial acceleration using one of:\n"
+                       "NewmarkSolver::compute_initial_accel()\n"
+                       "NewmarkSolver::project_initial_accel()\n");
 
   // That satisfied, now we can solve
   UnsteadySolver::solve();

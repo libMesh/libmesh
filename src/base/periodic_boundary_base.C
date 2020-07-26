@@ -82,10 +82,8 @@ bool PeriodicBoundaryBase::has_transformation_matrix() const
 
 const DenseMatrix<Real> & PeriodicBoundaryBase::get_transformation_matrix() const
 {
-  if(!has_transformation_matrix())
-  {
-    libmesh_error_msg("Transformation matrix is not defined");
-  }
+  libmesh_error_msg_if(!has_transformation_matrix(),
+                       "Transformation matrix is not defined");
 
   return *_transformation_matrix;
 }

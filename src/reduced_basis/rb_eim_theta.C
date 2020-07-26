@@ -54,10 +54,7 @@ Number RBEIMTheta::evaluate(const RBParameters & mu)
   rb_eim_eval.rb_eim_solve(rb_eim_eval.get_n_basis_functions());
 
   const DenseVector<Number> & eim_solution = rb_eim_eval.get_rb_eim_solution();
-  if (index >= eim_solution.size())
-  {
-    libmesh_error_msg("Error: Invalid EIM solution index, " + std::to_string(index));
-  }
+  libmesh_error_msg_if(index >= eim_solution.size(), "Error: Invalid EIM solution index, " << index);
 
   return eim_solution(index);
 }

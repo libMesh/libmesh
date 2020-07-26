@@ -255,8 +255,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
                &INFO);
 
   // Check return value for errors
-  if (INFO != 0)
-    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack LU factorization!");
+  libmesh_error_msg_if(INFO != 0, "INFO=" << INFO << ", Error during Lapack LU factorization!");
 
   // Set the flag for LU decomposition
   this->_decomposition_type = LU_BLAS_LAPACK;
@@ -504,8 +503,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
 #endif
 
   // Check return value for errors
-  if (INFO != 0)
-    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack SVD calculation!");
+  libmesh_error_msg_if(INFO != 0, "INFO=" << INFO << ", Error during Lapack SVD calculation!");
 }
 
 
@@ -658,10 +656,8 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
                pPS(WORK.data()), &LWORK, &INFO);
 
   // Check for errors in the Lapack call
-  if (INFO < 0)
-    libmesh_error_msg("Error, argument " << -INFO << " to LAPACKgelss_ had an illegal value.");
-  if (INFO > 0)
-    libmesh_error_msg("The algorithm for computing the SVD failed to converge!");
+  libmesh_error_msg_if(INFO < 0, "Error, argument " << -INFO << " to LAPACKgelss_ had an illegal value.");
+  libmesh_error_msg_if(INFO > 0, "The algorithm for computing the SVD failed to converge!");
 
   // Debugging: print singular values and information about condition number:
   // libMesh::err << "RCOND=" << RCOND << std::endl;
@@ -702,8 +698,7 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
                                   DenseMatrix<T> * VR)
 {
   // This algorithm only works for square matrices, so verify this up front.
-  if (this->m() != this->n())
-    libmesh_error_msg("Can only compute eigen-decompositions for square matrices.");
+  libmesh_error_msg_if(this->m() != this->n(), "Can only compute eigen-decompositions for square matrices.");
 
   // If the user requests left or right eigenvectors, we have to make
   // sure and pass the transpose of this matrix to Lapack, otherwise
@@ -861,8 +856,7 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
               &INFO);
 
   // Check return value for errors
-  if (INFO != 0)
-    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack eigenvalue calculation!");
+  libmesh_error_msg_if(INFO != 0, "INFO=" << INFO << ", Error during Lapack eigenvalue calculation!");
 
   // If the user requested either right or left eigenvectors, LAPACK
   // has now computed the transpose of the desired matrix, i.e. V^T
@@ -964,8 +958,7 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
                _pivots.data(), pPS(x_vec.data()), &LDB, &INFO);
 
   // Check return value for errors
-  if (INFO != 0)
-    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack LU solve!");
+  libmesh_error_msg_if(INFO != 0, "INFO=" << INFO << ", Error during Lapack LU solve!");
 
   // Don't do this if you already made a copy of b above
   // Swap b and x.  The solution will then be in x, and whatever was originally
@@ -1005,8 +998,8 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
     {
       // dest  ~ A     * arg
       // (mx1)   (mxn) * (nx1)
-      if ((dest.size() != this->m()) || (arg.size() != this->n()))
-        libmesh_error_msg("Improper input argument sizes!");
+      libmesh_error_msg_if((dest.size() != this->m()) || (arg.size() != this->n()),
+                           "Improper input argument sizes!");
     }
 
   else // trans == true
@@ -1014,8 +1007,8 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
       // Ensure that dest and arg are proper size
       // dest  ~ A^T   * arg
       // (nx1)   (nxm) * (mx1)
-      if ((dest.size() != this->n()) || (arg.size() != this->m()))
-        libmesh_error_msg("Improper input argument sizes!");
+      libmesh_error_msg_if((dest.size() != this->n()) || (arg.size() != this->m()),
+                           "Improper input argument sizes!");
     }
 
   // Calling sequence for dgemv:

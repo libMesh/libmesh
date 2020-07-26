@@ -33,9 +33,7 @@ TransientRBThetaExpansion::TransientRBThetaExpansion()
 Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
                                                const RBParameters & mu)
 {
-  if (q >= get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < get_n_M_terms in eval_M_theta.");
-
+  libmesh_error_msg_if(q >= get_n_M_terms(), "Error: We must have q < get_n_M_terms in eval_M_theta.");
   libmesh_assert(_M_theta_vector[q]);
 
   return _M_theta_vector[q]->evaluate( mu );

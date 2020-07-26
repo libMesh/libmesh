@@ -571,8 +571,7 @@ void FESubdivision::init_shape_functions(const std::vector<Point> & qp,
             }
 
           u = 1 - v - w;
-          if ((u > 1 + eps) || (u < -eps))
-            libmesh_error_msg("SUBDIVISION irregular patch: u is outside valid range!");
+          libmesh_error_msg_if((u > 1 + eps) || (u < -eps), "SUBDIVISION irregular patch: u is outside valid range!");
 
           DenseMatrix<Real> A;
           init_subdivision_matrix(A, valence);

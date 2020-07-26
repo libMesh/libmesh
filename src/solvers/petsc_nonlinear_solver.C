@@ -150,11 +150,11 @@ extern "C"
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
     // will be used, so catch that as an error
-    if (rc.solver->residual && rc.solver->residual_object)
-      libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Residual!");
+    libmesh_error_msg_if(rc.solver->residual && rc.solver->residual_object,
+                         "ERROR: cannot specify both a function and object to compute the Residual!");
 
-    if (rc.solver->matvec && rc.solver->residual_and_jacobian_object)
-      libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
+    libmesh_error_msg_if(rc.solver->matvec && rc.solver->residual_and_jacobian_object,
+                         "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
     if (rc.solver->residual != nullptr)
       rc.solver->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
@@ -350,12 +350,11 @@ extern "C"
           ierr = VecEqual(r, nonlinear_residual, &vecs_equal);
           CHKERRABORT(solver->comm().get(), ierr);
 
-          if (!(vecs_equal == PETSC_TRUE))
-            libmesh_error_msg(
-                "You requested to reuse the nonlinear residual vector as the base vector for "
-                "computing the action of the matrix-free Jacobian, but the vectors are not "
-                "the same. Your physics must have states; either remove the states "
-                "from your code or make sure that you set_mf_reuse_base(false)");
+          libmesh_error_msg_if(!(vecs_equal == PETSC_TRUE),
+                               "You requested to reuse the nonlinear residual vector as the base vector for "
+                               "computing the action of the matrix-free Jacobian, but the vectors are not "
+                               "the same. Your physics must have states; either remove the states "
+                               "from your code or make sure that you set_mf_reuse_base(false)");
         }
 
         // There are always exactly two function evaluations for the zeroth ksp iteration when doing
@@ -432,11 +431,11 @@ extern "C"
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
     // will be used, so catch that as an error
-    if (solver->jacobian && solver->jacobian_object)
-      libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Jacobian!");
+    libmesh_error_msg_if(solver->jacobian && solver->jacobian_object,
+                         "ERROR: cannot specify both a function and object to compute the Jacobian!");
 
-    if (solver->matvec && solver->residual_and_jacobian_object)
-      libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
+    libmesh_error_msg_if(solver->matvec && solver->residual_and_jacobian_object,
+                         "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
     if (solver->jacobian != nullptr)
       solver->jacobian(*sys.current_local_solution.get(), PC, sys);
@@ -516,8 +515,8 @@ extern "C"
 
     // If the user has provided both postcheck function pointer and
     // object, this is ambiguous, so throw an error.
-    if (solver->postcheck && solver->postcheck_object)
-      libmesh_error_msg("ERROR: cannot specify both a function and object for performing the solve postcheck!");
+    libmesh_error_msg_if(solver->postcheck && solver->postcheck_object,
+                         "ERROR: cannot specify both a function and object for performing the solve postcheck!");
 
     // It's also possible that we don't need to do anything at all, in
     // that case return early...

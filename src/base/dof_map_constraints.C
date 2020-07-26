@@ -1593,8 +1593,9 @@ public:
 
             if (!system)
               system = current_system;
-            else if (current_system != system)
-              libmesh_error_msg("All variables should be defined on the same System");
+            else
+              libmesh_error_msg_if(current_system != system,
+                                   "All variables should be defined on the same System");
           }
       }
 
@@ -1603,8 +1604,7 @@ public:
     // DirichletBoundary objects with no Variables defined on
     // them. These situations both indicate a likely error in the
     // setup of a problem, so let's throw an error in this case.
-    if (!system)
-      libmesh_error_msg("Valid System not found for any Variables.");
+    libmesh_error_msg_if(!system, "Valid System not found for any Variables.");
 
     // Construct a FEMContext object for the System on which the
     // Variables in our DirichletBoundary objects are defined. This
@@ -1876,9 +1876,8 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
                                  const bool forbid_constraint_overwrite)
 {
   // Optionally allow the user to overwrite constraints.  Defaults to false.
-  if (forbid_constraint_overwrite)
-    if (this->is_constrained_dof(dof_number))
-      libmesh_error_msg("ERROR: DOF " << dof_number << " was already constrained!");
+  libmesh_error_msg_if(forbid_constraint_overwrite && this->is_constrained_dof(dof_number),
+                       "ERROR: DOF " << dof_number << " was already constrained!");
 
   libmesh_assert_less(dof_number, this->n_dofs());
 
@@ -1915,8 +1914,8 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
   // Optionally allow the user to overwrite constraints.  Defaults to false.
   if (forbid_constraint_overwrite)
     {
-      if (!this->is_constrained_dof(dof_number))
-        libmesh_error_msg("ERROR: DOF " << dof_number << " has no corresponding primal constraint!");
+      libmesh_error_msg_if(!this->is_constrained_dof(dof_number),
+                           "ERROR: DOF " << dof_number << " has no corresponding primal constraint!");
 #ifndef NDEBUG
       // No way to do this without a non-normalized tolerance?
 
@@ -4074,8 +4073,7 @@ void DofMap::check_for_constraint_loops()
 
             for (const auto & item : subconstraint_row)
               {
-                if (item.first == expandable)
-                  libmesh_error_msg("Constraint loop detected");
+                libmesh_error_msg_if(item.first == expandable, "Constraint loop detected");
 
                 constraint_row[item.first] += item.second * this_coef;
               }
@@ -5066,8 +5064,8 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
       // boundaries
       mesh.comm().max(found_bcid);
 
-      if (!found_bcid)
-        libmesh_error_msg("Could not find Dirichlet boundary id " << bc_id << " in mesh!");
+      libmesh_error_msg_if(!found_bcid,
+                           "Could not find Dirichlet boundary id " << bc_id << " in mesh!");
     }
 }
 

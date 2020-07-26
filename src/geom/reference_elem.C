@@ -137,12 +137,10 @@ void read_ref_elem (const ElemType type_in,
 
   // it is entirely possible we ran out of file or encountered
   // another error.  If so, throw an error.
-  if (!in)
-    libmesh_error_msg("ERROR while creating element singleton!");
+  libmesh_error_msg_if(!in, "ERROR while creating element singleton!");
 
   // Release the pointer into the care of the singleton_cache
-  else
-    singleton_cache->elem_list.push_back (uelem.release());
+  singleton_cache->elem_list.push_back (uelem.release());
 
   // Also store it in the array.
   ref_elem_map[type_in] = singleton_cache->elem_list.back();
@@ -252,8 +250,9 @@ const Elem & get (const ElemType type_in)
 
   // Throw an error if the user asked for an ElemType that we don't
   // have a reference element for.
-  if (ref_elem_map[base_type] == nullptr || type_in == INVALID_ELEM)
-    libmesh_error_msg("No reference elem data available for ElemType " << type_in << " = " << Utility::enum_to_string(type_in) << ".");
+  libmesh_error_msg_if(ref_elem_map[base_type] == nullptr || type_in == INVALID_ELEM,
+                       "No reference elem data available for ElemType " << type_in
+                       << " = " << Utility::enum_to_string(type_in) << ".");
 
   return *ref_elem_map[base_type];
 }

@@ -203,9 +203,9 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name,
                                                    const ParallelType type)
 {
   // only add matrices before initializing...
-  if (!_can_add_matrices)
-    libmesh_error_msg("ERROR: Too late.  Cannot add matrices to the system after initialization"
-                      << "\n any more.  You should have done this earlier.");
+  libmesh_error_msg_if(!_can_add_matrices,
+                       "ERROR: Too late.  Cannot add matrices to the system after initialization"
+                       "\n any more.  You should have done this earlier.");
 
   // Return the matrix if it is already there.
   if (this->have_matrix(mat_name))

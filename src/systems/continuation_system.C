@@ -359,11 +359,11 @@ void ContinuationSystem::initialize_tangent()
 void ContinuationSystem::continuation_solve()
 {
   // Be sure the user has set the continuation parameter pointer
-  if (!continuation_parameter)
-    libmesh_error_msg("You must set the continuation_parameter pointer " \
-                      << "to a member variable of the derived class, preferably in the " \
-                      << "Derived class's init_data function.  This is how the ContinuationSystem " \
-                      << "updates the continuation parameter.");
+  libmesh_error_msg_if(!continuation_parameter,
+                       "You must set the continuation_parameter pointer "
+                       "to a member variable of the derived class, preferably in the "
+                       "Derived class's init_data function.  This is how the ContinuationSystem "
+                       "updates the continuation parameter.");
 
   // Use extra precision for all the numbers printed in this function.
   std::streamsize old_precision = libMesh::out.precision();
@@ -585,8 +585,7 @@ void ContinuationSystem::continuation_solve()
           // Not sure if this is really necessary
           rhs->close();
           const Real yrhsnorm=rhs->l2_norm();
-          if (yrhsnorm == 0.0)
-            libmesh_error_msg("||G_Lambda|| = 0");
+          libmesh_error_msg_if(yrhsnorm == 0.0, "||G_Lambda|| = 0");
 
           // We select a tolerance for the y-system which is based on the inexact Newton
           // tolerance but scaled by an extra term proportional to the RHS (which is not -> 0 in this case)
@@ -917,8 +916,7 @@ void ContinuationSystem::continuation_solve()
 
   // Check for convergence of the whole arcstep.  If not converged at this
   // point, we have no choice but to quit.
-  if (!arcstep_converged)
-    libmesh_error_msg("Arcstep failed to converge after max number of reductions! Exiting...");
+  libmesh_error_msg_if(!arcstep_converged, "Arcstep failed to converge after max number of reductions! Exiting...");
 
   // Print converged solution control parameter and max value.
   libMesh::out << "lambda_current=" << *continuation_parameter << std::endl;

@@ -328,8 +328,8 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
     // then the number of active elements is not the same as the sum over all
     // processors of the number of active elements per processor, which means
     // there must be some unpartitioned objects out there.
-    if (global_index_map.size() != _global_index_by_pid_map.size())
-      libmesh_error_msg("ERROR:  ParmetisPartitioner cannot handle unpartitioned objects!");
+    libmesh_error_msg_if(global_index_map.size() != _global_index_by_pid_map.size(),
+                         "ERROR:  ParmetisPartitioner cannot handle unpartitioned objects!");
   }
 
   // Finally, we need to initialize the vertex (partition) weights and the initial subdomain

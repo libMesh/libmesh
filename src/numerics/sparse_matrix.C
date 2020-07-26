@@ -203,8 +203,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
   libmesh_assert (this->initialized());
 
-  if (!this->_dof_map)
-    libmesh_error_msg("Error!  Trying to print a matrix with no dof_map set!");
+  libmesh_error_msg_if(!this->_dof_map, "Error!  Trying to print a matrix with no dof_map set!");
 
   // We'll print the matrix from processor 0 to make sure
   // it's serialized properly

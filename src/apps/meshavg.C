@@ -74,8 +74,8 @@ int main(int argc, char ** argv)
 
       for (auto s : index_range(sysnames))
         {
-          if (!es2.has_system(sysnames[s]))
-            libmesh_error_msg("EquationSystems object does not have " << sysnames[s]);
+          libmesh_error_msg_if(!es2.has_system(sysnames[s]),
+                               "EquationSystems object does not have " << sysnames[s]);
 
           (*summed_solutions[s]) += *es2.get_system(s).solution;
         }
