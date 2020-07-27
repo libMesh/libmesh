@@ -108,24 +108,17 @@ int main (int argc, char ** argv)
 
   // Check for proper usage.  The quadrature rule
   // must be given at run time.
-  if (argc < 3)
-    {
-      libmesh_error_msg("Usage: " << argv[0] << " -q <rule>\n"          \
-                        << "  where <rule> is one of QGAUSS, QSIMPSON, or QTRAP.");
-    }
-
+  libmesh_error_msg_if(argc < 3,
+                       "Usage: " << argv[0] << " -q <rule>\n"
+                       "  where <rule> is one of QGAUSS, QSIMPSON, or QTRAP.");
 
   // Tell the user what we are doing.
-  else
-    {
-      libMesh::out << "Running " << argv[0];
+  libMesh::out << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        libMesh::out << " " << argv[i];
+  for (int i=1; i<argc; i++)
+    libMesh::out << " " << argv[i];
 
-      libMesh::out << std::endl << std::endl;
-    }
-
+  libMesh::out << std::endl << std::endl;
 
   // Set the quadrature rule type that the user wants from argv[2]
   quad_type = static_cast<QuadratureType>(std::atoi(argv[2]));

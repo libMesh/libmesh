@@ -105,25 +105,16 @@ int main (int argc, char ** argv)
   GetPot command_line (argc, argv);
 
   // Check for proper calling arguments.
-  if (argc < 3)
-    {
-      // This handy function will print the file name, line number,
-      // specified message, and then throw an exception.
-      libmesh_error_msg("Usage:\n" << "\t " << argv[0] << " -d 2(3)" << " -n 15");
-    }
+  libmesh_error_msg_if(argc < 3, "Usage:\n" << "\t " << argv[0] << " -d 2(3)" << " -n 15");
 
   // Brief message to the user regarding the program name
   // and command line arguments.
-  else
-    {
-      libMesh::out << "Running " << argv[0];
+  libMesh::out << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        libMesh::out << " " << argv[i];
+  for (int i=1; i<argc; i++)
+    libMesh::out << " " << argv[i];
 
-      libMesh::out << std::endl << std::endl;
-    }
-
+  libMesh::out << std::endl << std::endl;
 
   // Read problem dimension from command line.  Use int
   // instead of unsigned since the GetPot overload is ambiguous
@@ -155,11 +146,9 @@ int main (int argc, char ** argv)
     family = command_line.next(family);
 
   // Cannot use discontinuous basis.
-  if ((family == "MONOMIAL") || (family == "XYZ"))
-    {
-      if (mesh.processor_id() == 0)
-        libmesh_error_msg("This example requires a C^0 (or higher) FE basis.");
-    }
+  libmesh_error_msg_if(((family == "MONOMIAL") || (family == "XYZ")) &&
+                       mesh.processor_id() == 0,
+                       "This example requires a C^0 (or higher) FE basis.");
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the square [-1,1]^D.  We instruct the mesh generator

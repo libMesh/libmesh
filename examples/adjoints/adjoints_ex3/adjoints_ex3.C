@@ -452,18 +452,18 @@ void read_output(EquationSystems & es,
           const unsigned int headersize = 25;
           char header[headersize];
           timesteps.getline (header, headersize);
-          if (strcmp(header, "vector_timesteps = [") != 0)
-            libmesh_error_msg("Bad header in out_timesteps.m:\n" << header);
+          libmesh_error_msg_if(strcmp(header, "vector_timesteps = [") != 0,
+                               "Bad header in out_timesteps.m:\n" << header);
 
           times.getline (header, headersize);
-          if (strcmp(header, "vector_time = [") != 0)
-            libmesh_error_msg("Bad header in out_time.m:\n" << header);
+          libmesh_error_msg_if(strcmp(header, "vector_time = [") != 0,
+                               "Bad header in out_time.m:\n" << header);
 
           // Read each timestep
           for (unsigned int i = 0; i != t_step; ++i)
             {
-              if (!times.good())
-                libmesh_error_msg("Error: File out_time.m is in non-good state.");
+              libmesh_error_msg_if(!times.good(), "Error: File out_time.m is in non-good state.");
+
               times >> current_time;
               timesteps >> current_timestep;
             }
@@ -741,8 +741,7 @@ int main (int argc, char ** argv)
   // Make sure the general input file exists, and parse it
   {
     std::ifstream i("general.in");
-    if (!i)
-      libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
+    libmesh_error_msg_if(!i, '[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
 
   GetPot infile("general.in");

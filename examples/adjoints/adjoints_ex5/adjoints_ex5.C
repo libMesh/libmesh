@@ -378,8 +378,7 @@ int main (int argc, char ** argv)
   // Make sure the general input file exists, and parse it
   {
     std::ifstream i("general.in");
-    if (!i)
-      libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
+    libmesh_error_msg_if(!i, '[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
   GetPot infile("general.in");
 
@@ -725,16 +724,16 @@ int main (int argc, char ** argv)
       // 32-bit floats
       if(param.timesolver_tolerance)
       {
-        if(std::abs(system.time - (1.0089)) >= 2.e-4)
-        libmesh_error_msg("Mismatch in end time reached by adaptive timestepper!");
+        libmesh_error_msg_if(std::abs(system.time - (1.0089)) >= 2.e-4,
+                             "Mismatch in end time reached by adaptive timestepper!");
 
-        if(std::abs(total_sensitivity - 4.87767) >= 2.e-4)
-        libmesh_error_msg("Mismatch in sensitivity gold value!");
+        libmesh_error_msg_if(std::abs(total_sensitivity - 4.87767) >= 2.e-4,
+                             "Mismatch in sensitivity gold value!");
       }
       else
       {
-        if(std::abs(total_sensitivity - 4.83551) >= 2.e-4)
-        libmesh_error_msg("Mismatch in sensitivity gold value!");
+        libmesh_error_msg_if(std::abs(total_sensitivity - 4.83551) >= 2.e-4,
+                             "Mismatch in sensitivity gold value!");
       }
 #ifdef NDEBUG
     }

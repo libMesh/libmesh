@@ -315,15 +315,8 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
         // we'll do it in several steps.
         for (auto i : old_elem->node_index_range())
           {
-            // Locate old node ID in the map
-            iterator it = node_id_map.find(old_elem->node_id(i));
-
-            // Check for not found
-            if (it == node_id_map.end())
-              libmesh_error_msg("Node id " << old_elem->node_id(i) << " not found in map!");
-
             // Mapping to node ID in input mesh
-            unsigned new_node_id = (*it).second;
+            unsigned int new_node_id = libmesh_map_find(node_id_map, old_elem->node_id(i));
 
             // Node pointer assigned from input mesh
             new_elem->set_node(i) = mesh.node_ptr(new_node_id);

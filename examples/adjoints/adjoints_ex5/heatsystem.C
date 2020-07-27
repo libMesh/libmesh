@@ -42,8 +42,7 @@ void HeatSystem::init_data ()
   // Make sure the input file heat.in exists, and parse it.
   {
     std::ifstream i("heat.in");
-    if (!i)
-      libmesh_error_msg('[' << this->processor_id() << "] Can't find heat.in; exiting early.");
+    libmesh_error_msg_if(!i, '[' << this->processor_id() << "] Can't find heat.in; exiting early.");
   }
   GetPot infile("heat.in");
   _k = infile("k", 1.0);
