@@ -168,8 +168,7 @@ template <class MT>
 inline
 MT & MeshInput<MT>::mesh ()
 {
-  if (_obj == nullptr)
-    libmesh_error_msg("ERROR: _obj should not be nullptr!");
+  libmesh_error_msg_if(_obj == nullptr, "ERROR: _obj should not be nullptr!");
   return *_obj;
 }
 

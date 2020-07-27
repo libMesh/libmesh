@@ -114,6 +114,19 @@ void PetscShellMatrix<T>::init ()
   LIBMESH_CHKERR(ierr);
 }
 
+template <typename T>
+bool PetscShellMatrix<T>::initialized() const
+{
+  return _is_initialized;
+}
+
+template <typename T>
+Mat PetscShellMatrix<T>::mat()
+{
+  libmesh_error_msg_if(!_mat, "A petsc shell matrix is not created yet. Please call init() first.");
+  return _mat;
+}
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class PetscShellMatrix<Number>;

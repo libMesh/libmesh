@@ -737,8 +737,8 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 {
 #if LIBMESH_DIM < 3
 
-  if (i >= LIBMESH_DIM || j >= LIBMESH_DIM)
-    libmesh_error_msg("ERROR:  You are assigning to a tensor component that is out of range for the compiled LIBMESH_DIM!");
+  libmesh_error_msg_if(i >= LIBMESH_DIM || j >= LIBMESH_DIM,
+                       "ERROR:  You are assigning to a tensor component that is out of range for the compiled LIBMESH_DIM!");
 
 #endif
 

@@ -377,8 +377,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 #else
 
   // No other options without MPI!
-  if (n != n_local)
-    libmesh_error_msg("ERROR:  MPI is required for n != n_local!");
+  libmesh_error_msg_if(n != n_local, "ERROR:  MPI is required for n != n_local!");
 
 #endif
 

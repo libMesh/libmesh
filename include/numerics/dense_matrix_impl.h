@@ -772,10 +772,8 @@ void DenseMatrix<T>::_lu_decompose ()
             std::swap( A(i,j), A(_pivots[i], j) );
         }
 
-
       // If the max abs entry found is zero, the matrix is singular
-      if (A(i,i) == libMesh::zero)
-        libmesh_error_msg("Matrix A is singular!");
+      libmesh_error_msg_if(A(i,i) == libMesh::zero, "Matrix A is singular!");
 
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!
@@ -1000,8 +998,8 @@ void DenseMatrix<T>::_cholesky_decompose ()
           if (i == j)
             {
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
-              if (A(i,j) <= 0.0)
-                libmesh_error_msg("Error! Can only use Cholesky decomposition with symmetric positive definite matrices.");
+              libmesh_error_msg_if(A(i,j) <= 0.0,
+                                   "Error! Can only use Cholesky decomposition with symmetric positive definite matrices.");
 #endif
 
               A(i,i) = std::sqrt(A(i,j));

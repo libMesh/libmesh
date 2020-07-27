@@ -157,9 +157,9 @@ public:
 
     const_iterator lower_bound = std::lower_bound (this->begin(), this->end(), to_find, FirstOrder());
 
-    if (lower_bound == this->end() || lower_bound->first != key)
-      libmesh_error_msg("Error in vectormap::operator[], key not found. "
-                        "If you are searching for values you aren't sure exist, try vectormap::find() instead.");
+    libmesh_error_msg_if(lower_bound == this->end() || lower_bound->first != key,
+                         "Error in vectormap::operator[], key not found. "
+                         "If you are searching for values you aren't sure exist, try vectormap::find() instead.");
 
     return lower_bound->second;
   }
