@@ -710,9 +710,9 @@ const Elem * MeshFunction::find_element(const Point & p,
     {
       const MeshFunction * master =
         cast_ptr<const MeshFunction *>(this->_master);
-      if (_out_of_mesh_mode!=master->_out_of_mesh_mode)
-        libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
-                          << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
+      libmesh_error_msg_if(_out_of_mesh_mode!=master->_out_of_mesh_mode,
+                           "ERROR: If you use out-of-mesh-mode in connection with master mesh "
+                           "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
     }
 #endif
 
@@ -754,9 +754,9 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
     {
       const MeshFunction * master =
         cast_ptr<const MeshFunction *>(this->_master);
-      if (_out_of_mesh_mode!=master->_out_of_mesh_mode)
-        libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
-                          << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
+      libmesh_error_msg_if(_out_of_mesh_mode!=master->_out_of_mesh_mode,
+                           "ERROR: If you use out-of-mesh-mode in connection with master mesh "
+                           "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
     }
 #endif
 

@@ -77,9 +77,9 @@ void FroIO::write (const std::string & fname)
       for (const auto & elem : the_mesh.active_element_ptr_range())
         {
           // .fro likes TRI3's
-          if (elem->type() != TRI3)
-            libmesh_error_msg("ERROR:  .fro format only valid for triangles!\n" \
-                              << "  writing of " << fname << " aborted.");
+          libmesh_error_msg_if(elem->type() != TRI3,
+                               "ERROR:  .fro format only valid for triangles!\n"
+                               << "  writing of " << fname << " aborted.");
 
           out_stream << ++e << " \t";
 

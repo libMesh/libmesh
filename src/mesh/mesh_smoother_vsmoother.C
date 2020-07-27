@@ -4009,8 +4009,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
   // generate metric file
   std::ofstream metric_file(metr.c_str());
-  if (!metric_file.good())
-    libmesh_error_msg("Error opening metric output file.");
+  libmesh_error_msg_if(!metric_file.good(), "Error opening metric output file.");
 
   // Use scientific notation with 6 digits
   metric_file << std::scientific << std::setprecision(6);
@@ -4313,8 +4312,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
   metric_file.close();
 
   std::ofstream grid_file(grid.c_str());
-  if (!grid_file.good())
-    libmesh_error_msg("Error opening file: " << grid);
+  libmesh_error_msg_if(!grid_file.good(), "Error opening file: " << grid);
 
   grid_file << _dim << "\n" << _n_nodes << "\n" << Ncells << "\n0" << std::endl;
 

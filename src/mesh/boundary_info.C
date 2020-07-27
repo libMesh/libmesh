@@ -358,8 +358,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
             }
         }
 
-      if (!found_matching_sides)
-        libmesh_error_msg("No matching side found within the specified tolerance");
+      libmesh_error_msg_if(!found_matching_sides, "No matching side found within the specified tolerance");
 
       side_id_map[boundary_elem->id()] = interior_parent_side_index;
 
@@ -647,8 +646,10 @@ void BoundaryInfo::add_node(const dof_id_type node_id,
 
   // The user could easily ask for an invalid node id, so let's throw
   // an easy-to-understand error message when this happens.
-  if (!node_ptr)
-    libmesh_error_msg("BoundaryInfo::add_node(): Could not retrieve pointer for node " << node_id << ", no boundary id was added.");
+  libmesh_error_msg_if(!node_ptr,
+                       "BoundaryInfo::add_node(): Could not retrieve pointer for node "
+                       << node_id
+                       << ", no boundary id was added.");
 
   this->add_node (node_ptr, id);
 }
@@ -658,10 +659,10 @@ void BoundaryInfo::add_node(const dof_id_type node_id,
 void BoundaryInfo::add_node(const Node * node,
                             const boundary_id_type id)
 {
-  if (id == invalid_id)
-    libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
-                      << invalid_id                                \
-                      << "\n That is reserved for internal use.");
+  libmesh_error_msg_if(id == invalid_id,
+                       "ERROR: You may not set a boundary ID of "
+                       << invalid_id
+                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
   for (const auto & pr : as_range(_boundary_node_id.equal_range(node)))
@@ -698,10 +699,10 @@ void BoundaryInfo::add_node(const Node * node,
 
   for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      if (id == invalid_id)
-        libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
-                          << invalid_id                                 \
-                          << "\n That is reserved for internal use.");
+      libmesh_error_msg_if(id == invalid_id,
+                           "ERROR: You may not set a boundary ID of "
+                           << invalid_id
+                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
       for (const auto & pr : as_range(bounds))
@@ -744,10 +745,10 @@ void BoundaryInfo::add_edge(const Elem * elem,
   // Only add BCs for level-0 elements.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  if (id == invalid_id)
-    libmesh_error_msg("ERROR: You may not set a boundary ID of "        \
-                      << invalid_id                                     \
-                      << "\n That is reserved for internal use.");
+  libmesh_error_msg_if(id == invalid_id,
+                       "ERROR: You may not set a boundary ID of "
+                       << invalid_id
+                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
   for (const auto & pr : as_range(_boundary_edge_id.equal_range(elem)))
@@ -789,10 +790,10 @@ void BoundaryInfo::add_edge(const Elem * elem,
 
   for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      if (id == invalid_id)
-        libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
-                          << invalid_id                                \
-                          << "\n That is reserved for internal use.");
+      libmesh_error_msg_if(id == invalid_id,
+                           "ERROR: You may not set a boundary ID of "
+                           << invalid_id
+                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
       for (const auto & pr : as_range(bounds))
@@ -834,10 +835,10 @@ void BoundaryInfo::add_shellface(const Elem * elem,
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
 
-  if (id == invalid_id)
-    libmesh_error_msg("ERROR: You may not set a boundary ID of "        \
-                      << invalid_id                                     \
-                      << "\n That is reserved for internal use.");
+  libmesh_error_msg_if(id == invalid_id,
+                       "ERROR: You may not set a boundary ID of "
+                       << invalid_id
+                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
   for (const auto & pr : as_range(_boundary_shellface_id.equal_range(elem)))
@@ -882,10 +883,10 @@ void BoundaryInfo::add_shellface(const Elem * elem,
 
   for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      if (id == invalid_id)
-        libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
-                          << invalid_id                                \
-                          << "\n That is reserved for internal use.");
+      libmesh_error_msg_if(id == invalid_id,
+                           "ERROR: You may not set a boundary ID of "
+                           << invalid_id
+                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
       for (const auto & pr : as_range(bounds))
@@ -923,10 +924,9 @@ void BoundaryInfo::add_side(const Elem * elem,
   // Only add BCs for level-0 elements.
   libmesh_assert_equal_to (elem->level(), 0);
 
-  if (id == invalid_id)
-    libmesh_error_msg("ERROR: You may not set a boundary ID of "        \
-                      << invalid_id                                     \
-                      << "\n That is reserved for internal use.");
+  libmesh_error_msg_if(id == invalid_id, "ERROR: You may not set a boundary ID of "
+                       << invalid_id
+                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
   for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
@@ -968,10 +968,10 @@ void BoundaryInfo::add_side(const Elem * elem,
 
   for (auto & id : as_range(unique_ids.begin(), new_end))
     {
-      if (id == invalid_id)
-        libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
-                          << invalid_id                                 \
-                          << "\n That is reserved for internal use.");
+      libmesh_error_msg_if(id == invalid_id,
+                           "ERROR: You may not set a boundary ID of "
+                           << invalid_id
+                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
       for (const auto & pr : as_range(bounds))

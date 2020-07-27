@@ -236,12 +236,12 @@ void UCDIO::read_implementation (std::istream & in)
         mesh.set_mesh_dimension(i);
 
 #if LIBMESH_DIM < 3
-    if (mesh.mesh_dimension() > LIBMESH_DIM)
-      libmesh_error_msg("Cannot open dimension " \
-                        << mesh.mesh_dimension() \
-                        << " mesh file when configured without " \
-                        << mesh.mesh_dimension() \
-                        << "D support.");
+    libmesh_error_msg_if(mesh.mesh_dimension() > LIBMESH_DIM,
+                         "Cannot open dimension "
+                         << mesh.mesh_dimension()
+                         << " mesh file when configured without "
+                         << mesh.mesh_dimension()
+                         << "D support.");
 #endif
   }
 }
@@ -255,9 +255,9 @@ void UCDIO::write_implementation (std::ostream & out_stream)
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // UCD doesn't work any dimension except 3?
-  if (mesh.mesh_dimension() != 3)
-    libmesh_error_msg("Error: Can't write boundary elements for meshes of dimension less than 3. " \
-                      << "Mesh dimension = " << mesh.mesh_dimension());
+  libmesh_error_msg_if(mesh.mesh_dimension() != 3,
+                       "Error: Can't write boundary elements for meshes of dimension less than 3. "
+                       "Mesh dimension = " << mesh.mesh_dimension());
 
   // Write header
   this->write_header(out_stream, mesh, mesh.n_elem(), 0);

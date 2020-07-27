@@ -16,14 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <iomanip>
-#include <fstream>
-#include <vector>
-
-#include <sys/types.h> // getpid
-#include <unistd.h>
-
 // Local includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
@@ -48,8 +40,14 @@
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/enum_xdr_mode.h"
-
 #include "libmesh/parallel.h" // broadcast
+
+// C++ includes
+#include <iomanip>
+#include <fstream>
+#include <vector>
+#include <sys/types.h> // getpid
+#include <unistd.h>
 
 
 namespace libMesh
@@ -87,17 +85,13 @@ void NameBasedIO::read (const std::string & name)
                 << '.' << std::setfill('0') << std::setw(field_width) << mymesh.processor_id();
 
       std::ifstream in (full_name.str().c_str());
-
-      if (!in.good())
-        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << full_name.str());
+      libmesh_error_msg_if(!in.good(), "ERROR: cannot locate specified file:\n\t" << full_name.str());
     }
   else if (name.rfind(".cp")) {} // Do error checking in the reader
   else
     {
       std::ifstream in (name.c_str());
-
-      if (!in.good())
-        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << name);
+      libmesh_error_msg_if(!in.good(), "ERROR: cannot locate specified file:\n\t" << name);
     }
 
   // Look for parallel formats first

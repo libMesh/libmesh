@@ -17,10 +17,8 @@
 
 
 
-// Local includes
-#include "libmesh/xdr_io.h"
-
 // libMesh includes
+#include "libmesh/xdr_io.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_xdr_mode.h"
@@ -114,8 +112,7 @@ XdrIO::~XdrIO ()
 
 void XdrIO::write (const std::string & name)
 {
-  if (this->legacy())
-    libmesh_error_msg("We don't support writing parallel files in the legacy format.");
+  libmesh_error_msg_if(this->legacy(), "We don't support writing parallel files in the legacy format.");
 
   Xdr io ((this->processor_id() == 0) ? name : "", this->binary() ? ENCODE : WRITE);
 
@@ -1229,8 +1226,7 @@ void XdrIO::read (const std::string & name)
   this->legacy() = !(this->version().find("libMesh") < this->version().size());
 
   // Check for a legacy version format.
-  if (this->legacy())
-    libmesh_error_msg("We no longer support reading files in the legacy format.");
+  libmesh_error_msg_if(this->legacy(), "We no longer support reading files in the legacy format.");
 
   // Read headers with the old id type if they're pre-1.3.0, or with
   // the new id type if they're post-1.3.0
@@ -1648,12 +1644,12 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
       mesh.set_mesh_dimension(i);
 
 #if LIBMESH_DIM < 3
-  if (mesh.mesh_dimension() > LIBMESH_DIM)
-    libmesh_error_msg("Cannot open dimension "              \
-                      << mesh.mesh_dimension()                          \
-                      << " mesh file when configured without "          \
-                      << mesh.mesh_dimension()                          \
-                      << "D support.");
+  libmesh_error_msg_if(mesh.mesh_dimension() > LIBMESH_DIM,
+                       "Cannot open dimension "
+                       << mesh.mesh_dimension()
+                       << " mesh file when configured without "
+                       << mesh.mesh_dimension()
+                       << "D support.");
 #endif
 }
 

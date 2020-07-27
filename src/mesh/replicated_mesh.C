@@ -538,11 +538,8 @@ Node * ReplicatedMesh::add_node (std::unique_ptr<Node> n)
 
 Node * ReplicatedMesh::insert_node(Node * n)
 {
-  if (!n)
-    libmesh_error_msg("Error, attempting to insert nullptr node.");
-
-  if (n->id() == DofObject::invalid_id)
-    libmesh_error_msg("Error, cannot insert node with invalid id.");
+  libmesh_error_msg_if(!n, "Error, attempting to insert nullptr node.");
+  libmesh_error_msg_if(n->id() == DofObject::invalid_id, "Error, cannot insert node with invalid id.");
 
   if (n->id() < _nodes.size())
     {
@@ -552,8 +549,8 @@ Node * ReplicatedMesh::insert_node(Node * n)
       // redundant insert is done, but when that happens we ought to
       // always be able to make the code more efficient by avoiding
       // the redundant insert, so let's keep screaming "Error" here.
-      if (_nodes[ n->id() ] != nullptr)
-        libmesh_error_msg("Error, cannot insert node on top of existing node.");
+      libmesh_error_msg_if(_nodes[ n->id() ] != nullptr,
+                           "Error, cannot insert node on top of existing node.");
     }
   else
     {
@@ -1096,9 +1093,9 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       // nodes on the surfaces being stitched, and we don't currently support that case.
       // (It might be possible to support, but getting it exactly right would be tricky
       // and probably not worth the extra complications to the "normal" case.)
-      if (h_min < std::numeric_limits<Real>::epsilon())
-        libmesh_error_msg("Coincident nodes detected on source and/or target "
-                          "surface, stitching meshes is not possible.");
+      libmesh_error_msg_if(h_min < std::numeric_limits<Real>::epsilon(),
+                           "Coincident nodes detected on source and/or target "
+                           "surface, stitching meshes is not possible.");
 
       // We require nanoflann for the "binary search" (really kd-tree)
       // option to work. If it's not available, turn that option off,
@@ -1154,8 +1151,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           // If the 2 maps don't have the same size, it means we have overwritten a value in node_to_node_map
           // It means one node in this mesh is the nearest neighbor of several nodes in other mesh.
           // Not possible !
-          if (node_to_node_map.size() != other_to_this_node_map.size())
-            libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
+          libmesh_error_msg_if(node_to_node_map.size() != other_to_this_node_map.size(),
+                               "Error: Found multiple matching nodes in stitch_meshes");
 #endif
         }
         else
@@ -1191,8 +1188,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
               if (node_distance < tol*h_min)
               {
                 // Make sure we didn't already find a matching node!
-                if (found_matching_nodes)
-                  libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
+                libmesh_error_msg_if(found_matching_nodes,
+                                     "Error: Found multiple matching nodes in stitch_meshes");
 
                 node_to_node_map[this_node_id] = other_node_id;
                 other_to_this_node_map[other_node_id] = this_node_id;
@@ -1239,8 +1236,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           std::size_t n_matching_nodes = node_to_node_map.size();
           std::size_t this_mesh_n_nodes = this_boundary_node_ids.size();
           std::size_t other_mesh_n_nodes = other_boundary_node_ids.size();
-          if ((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes))
-            libmesh_error_msg("Error: We expected the number of nodes to match.");
+          libmesh_error_msg_if((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes),
+                               "Error: We expected the number of nodes to match.");
         }
     }
   else
@@ -1575,8 +1572,8 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
 std::unordered_map<dof_id_type, std::vector<std::vector<Point>>>
 ReplicatedMesh::get_boundary_points() const
 {
-  if (mesh_dimension() != 2)
-    libmesh_error_msg("Error: get_boundary_points only works for 2D now");
+  libmesh_error_msg_if(mesh_dimension() != 2,
+                       "Error: get_boundary_points only works for 2D now");
 
   // find number of disconnected subdomains
   // subdomains will hold the IDs of disconnected subdomains for all elements.
@@ -1675,8 +1672,8 @@ ReplicatedMesh::get_boundary_points() const
         if (found)
           break;
       }
-      if (!found)
-        libmesh_error_msg("ERROR: mesh topology error on visiting boundary sides");
+
+      libmesh_error_msg_if(!found, "ERROR: mesh topology error on visiting boundary sides");
 
       // exit if we reach the starting point
       if (elem == eseed && s == sseed)
