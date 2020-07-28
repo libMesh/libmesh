@@ -157,8 +157,9 @@ void Nemesis_IO::read (const std::string & base_filename)
       // object, it will no longer be set... thus no extra print-outs for serial runs.
       // ExodusII_IO(this->mesh()).read (base_filename); // ambiguous when Nemesis_IO is multiply-inherited
 
+      std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
       MeshBase & mesh = MeshInput<MeshBase>::mesh();
-      ExodusII_IO(mesh).read (base_filename);
+      ExodusII_IO(mesh).read (nemesis_filename);
       return;
     }
 
