@@ -719,50 +719,6 @@ void Nemesis_IO_Helper::put_n_coord(unsigned start_node_num,
 
 
 
-
-
-
-
-
-// Note: we can't reuse the ExodusII_IO_Helper code directly, since it only runs
-// on processor 0.  TODO: We could have the body of this function as a separate
-// function and then ExodusII_IO_Helper would only call it if on processor 0...
-void Nemesis_IO_Helper::create(std::string filename)
-{
-  // Fall back on double precision when necessary since ExodusII
-  // doesn't seem to support long double
-  int
-    comp_ws = 0,
-    io_ws = 0;
-
-  if (_single_precision)
-    {
-      comp_ws = sizeof(float);
-      io_ws = sizeof(float);
-    }
-  else
-    {
-      comp_ws = cast_int<int>(std::min(sizeof(Real), sizeof(double)));
-      io_ws = cast_int<int>(std::min(sizeof(Real), sizeof(double)));
-    }
-
-  this->ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
-
-  EX_CHECK_ERR(ex_id, "Error creating Nemesis mesh file.");
-
-  if (verbose)
-    libMesh::out << "File created successfully." << std::endl;
-
-  this->opened_for_writing = true;
-}
-
-
-
-
-
-
-
-
 void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, bool /*use_discontinuous*/)
 {
   // Make sure that the reference passed in is really a DistributedMesh

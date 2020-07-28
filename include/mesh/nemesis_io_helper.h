@@ -285,12 +285,6 @@ public:
   virtual void write_nodesets(const MeshBase & mesh) override;
 
   /**
-   * This function is specialized from ExodusII_IO_Helper to create the
-   * nodal coordinates stored on the local piece of the Mesh.
-   */
-  virtual void create(std::string filename) override;
-
-  /**
    * Specialization of the initialize function from ExodusII_IO_Helper that
    * also writes global initial data to file.
    */

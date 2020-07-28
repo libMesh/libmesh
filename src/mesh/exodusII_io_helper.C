@@ -1620,7 +1620,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 
       ex_id = exII::ex_create(filename.c_str(), mode, &comp_ws, &io_ws);
 
-      EX_CHECK_ERR(ex_id, "Error creating ExodusII mesh file.");
+      EX_CHECK_ERR(ex_id, "Error creating ExodusII/Nemesis mesh file.");
 
       if (verbose)
         libMesh::out << "File created successfully." << std::endl;
