@@ -176,7 +176,8 @@ AC_DEFUN([CONFIGURE_VTK],
                  VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                            -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                            -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor \
-                                           -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
+                                           -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor \
+                                           -lvtkCommonExecutionModel-$vtkmajorminor"
 
                  dnl Some Linux distributions (Arch) install VTK without the
                  dnl "libfoo-6.x.so" naming scheme, so we try to handle that
@@ -184,7 +185,8 @@ AC_DEFUN([CONFIGURE_VTK],
                  VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                          -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
                                          -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML \
-                                         -lvtkParallelMPI -lvtkParallelCore"
+                                         -lvtkParallelMPI -lvtkParallelCore \
+                                         -lvtkCommonExecutionModel"
                ])
 
          dnl Try to compile test prog to check for existence of VTK libraries.
