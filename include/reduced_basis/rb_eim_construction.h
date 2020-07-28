@@ -67,13 +67,17 @@ public:
   /**
    * Special functions.
    * - This class contains unique_ptrs, so it can't be default copy
-       constructed/assigned.
+   *   constructed/assigned.
+   * - The base class (RBConstructionBase) move constructor and move
+   *   assignment operators are (implicitly?) deleted according to
+   *   clang-9.0, therefore it is an error to try and default them
+   *   here.
    * - The destructor is defaulted out of line.
    */
-  RBEIMConstruction (RBEIMConstruction &&) = default;
+  RBEIMConstruction (RBEIMConstruction &&) = delete;
   RBEIMConstruction (const RBEIMConstruction &) = delete;
   RBEIMConstruction & operator= (const RBEIMConstruction &) = delete;
-  RBEIMConstruction & operator= (RBEIMConstruction &&) = default;
+  RBEIMConstruction & operator= (RBEIMConstruction &&) = delete;
   virtual ~RBEIMConstruction ();
 
   /**
