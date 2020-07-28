@@ -38,6 +38,16 @@ void RBParameters::clear()
   _extra_parameters.clear();
 }
 
+const std::map<std::string, Real> & RBParameters::get_parameters_map() const
+{
+  return _parameters;
+}
+
+const std::map<std::string, Real> & RBParameters::get_extra_parameters_map() const
+{
+  return _extra_parameters;
+}
+
 Real RBParameters::get_value(const std::string & param_name) const
 {
   // find the parameter value, throwing an error if it doesn't exist.
