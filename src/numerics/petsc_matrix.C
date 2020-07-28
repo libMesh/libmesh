@@ -526,8 +526,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
 {
-  if (!this->closed())
-    libmesh_error_msg("Matrix must be closed before it can be cloned!");
+  libmesh_error_msg_if(!this->closed(), "Matrix must be closed before it can be cloned!");
 
   // Copy the nonzero pattern only
   Mat copy;
@@ -549,8 +548,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
 {
-  if (!this->closed())
-    libmesh_error_msg("Matrix must be closed before it can be cloned!");
+  libmesh_error_msg_if(!this->closed(), "Matrix must be closed before it can be cloned!");
 
   // Copy the nonzero pattern and numerical values
   Mat copy;
@@ -761,8 +759,7 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
             int fd = mkstemp(c);
 
             // Check to see that mkstemp did not fail.
-            if (fd == -1)
-              libmesh_error_msg("mkstemp failed in PetscMatrix::print_personal()");
+            libmesh_error_msg_if(fd == -1, "mkstemp failed in PetscMatrix::print_personal()");
 
             // mkstemp returns a file descriptor for an open file,
             // so let's close it before we hand it to PETSc!

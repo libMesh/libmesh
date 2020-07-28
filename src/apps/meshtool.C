@@ -261,18 +261,18 @@ int main (int argc, char ** argv)
 
   if (addinfelems)
     {
-      if (write_bndry != BM_DISABLED)
-        libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
-                          << "not compatible with writing boundary conditions.");
+      libmesh_error_msg_if(write_bndry != BM_DISABLED,
+                           "ERROR: Invalid combination: Building infinite elements\n"
+                           "not compatible with writing boundary conditions.");
 
       // Sanity checks: -X/Y/Z can only be used, when the
       // corresponding coordinate is also given (using -x/y/z)
-      if ((x_sym && !origin_x.first) ||     // claim x-symmetry, but x-coordinate of origin not given!
-          (y_sym && !origin_y.first) ||     // the same for y
-          (z_sym && !origin_z.first))       // the same for z
-        libmesh_error_msg("ERROR: When x-symmetry is requested using -X, then\n"
-                          << "the option -x <coord> also has to be given.\n"
-                          << "This holds obviously for y and z, too.");
+      libmesh_error_msg_if((x_sym && !origin_x.first) ||     // claim x-symmetry, but x-coordinate of origin not given!
+                           (y_sym && !origin_y.first) ||     // the same for y
+                           (z_sym && !origin_z.first),       // the same for z
+                           "ERROR: When x-symmetry is requested using -X, then\n"
+                           "the option -x <coord> also has to be given.\n"
+                           "This holds obviously for y and z, too.");
 
       // build infinite elements
       InfElemBuilder(mesh).build_inf_elem(origin_x, origin_y, origin_z,
@@ -284,14 +284,14 @@ int main (int argc, char ** argv)
           mesh.print_info();
           mesh.get_boundary_info().print_summary();
         }
-
     }
 
   // sanity check
-  else if ((origin_x.first ||  origin_y.first || origin_z.first) ||
-           (x_sym          ||  y_sym          || z_sym))
-    libmesh_error_msg("ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when\n"
-                      << "the option -a is also specified!");
+  else
+    libmesh_error_msg_if((origin_x.first ||  origin_y.first || origin_z.first) ||
+                         (x_sym          ||  y_sym          || z_sym),
+                         "ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when\n"
+                         "the option -a is also specified!");
 
 #endif
 

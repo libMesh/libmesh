@@ -156,12 +156,12 @@ void HPCoarsenTest::select_refinement (System & system)
   // Check for a valid component_scale
   if (!component_scale.empty())
     {
-      if (component_scale.size() != n_vars)
-        libmesh_error_msg("ERROR: component_scale is the wrong size:\n" \
-                          << " component_scale.size()=" \
-                          << component_scale.size()     \
-                          << "\n n_vars=" \
-                          << n_vars);
+      libmesh_error_msg_if(component_scale.size() != n_vars,
+                           "ERROR: component_scale is the wrong size:\n"
+                           << " component_scale.size()="
+                           << component_scale.size()
+                           << "\n n_vars="
+                           << n_vars);
     }
   else
     {

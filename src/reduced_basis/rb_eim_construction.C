@@ -88,8 +88,7 @@ void RBEIMConstruction::set_rb_eim_evaluation(RBEIMEvaluation & rb_eim_eval_in)
 
 RBEIMEvaluation & RBEIMConstruction::get_rb_eim_evaluation()
 {
-  if (!_rb_eim_eval)
-    libmesh_error_msg("Error: RBEIMEvaluation object hasn't been initialized yet");
+  libmesh_error_msg_if(!_rb_eim_eval, "Error: RBEIMEvaluation object hasn't been initialized yet");
 
   return *_rb_eim_eval;
 }
@@ -273,10 +272,8 @@ Real RBEIMConstruction::train_eim_approximation()
   // If we are continuing from a previous training run,
   // we might already be at the max number of basis functions.
   // If so, we can just return.
-  if (rbe.get_n_basis_functions() > 0)
-    {
-      libmesh_error_msg("Error: We currently only support EIM training starting from an empty basis");
-    }
+  libmesh_error_msg_if(rbe.get_n_basis_functions() > 0,
+                       "Error: We currently only support EIM training starting from an empty basis");
 
   libMesh::out << std::endl << "---- Performing Greedy EIM basis enrichment ----" << std::endl;
   Real abs_greedy_error = 0.;
@@ -442,8 +439,8 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
   unsigned int max_err_index = 0;
   Real max_err = 0.;
 
-  if (get_n_training_samples() != get_local_n_training_samples())
-    libmesh_error_msg("Error: Training samples should be the same on all procs");
+  libmesh_error_msg_if(get_n_training_samples() != get_local_n_training_samples(),
+                       "Error: Training samples should be the same on all procs");
 
   for (auto i : make_range(get_n_training_samples()))
     {
@@ -463,9 +460,9 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 {
   LOG_SCOPE("initialize_parametrized_functions_in_training_set()", "RBEIMConstruction");
 
-  if (!serial_training_set)
-    libmesh_error_msg("Error: We must have serial_training_set==true in " \
-                      << "RBEIMConstruction::initialize_parametrized_functions_in_training_set");
+  libmesh_error_msg_if(!serial_training_set,
+                       "Error: We must have serial_training_set==true in "
+                       "RBEIMConstruction::initialize_parametrized_functions_in_training_set");
 
   libMesh::out << "Initializing parametrized functions in training set..." << std::endl;
 
@@ -769,8 +766,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                   const auto & point_list =
                     libmesh_map_find(_local_quad_point_locations, elem_id);
 
-                  if (qp >= point_list.size())
-                    libmesh_error_msg("Error: Invalid qp");
+                  libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
 
                   optimal_point = point_list[qp];
 
@@ -781,8 +777,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                       const auto & perturb_list =
                         libmesh_map_find(_local_quad_point_locations_perturbations, elem_id);
 
-                      if (qp >= perturb_list.size())
-                        libmesh_error_msg("Error: Invalid qp");
+                      libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
 
                       optimal_point_perturbs = perturb_list[qp];
                     }
@@ -804,8 +799,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   this->comm().broadcast(optimal_qp, proc_ID_index);
   this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
 
-  if (optimal_elem_id == DofObject::invalid_id)
-    libmesh_error_msg("Error: Invalid element ID");
+  libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
   // Scale local_pf so that its largest value is 1.0
   scale_parametrized_function(local_pf, 1./optimal_value);

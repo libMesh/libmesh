@@ -29,8 +29,7 @@ int main(int argc, char ** argv)
 {
   using namespace libMesh;
 
-  if (argc < 2)
-    libmesh_error_msg("Usage: " << argv[0] << " function_to_eval [x] [y] [z] [t]");
+  libmesh_error_msg_if(argc < 2, "Usage: " << argv[0] << " function_to_eval [x] [y] [z] [t]");
 
   std::string function_string = argv[1];
 

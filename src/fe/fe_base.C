@@ -737,8 +737,7 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs ()
   LOG_SCOPE("compute_dual_shape_coeffs()", "FE");
 
   unsigned int sz=phi.size();
-  if(!sz)
-    libmesh_error_msg("ERROR:  dual basis should be computed after the primal basis");
+  libmesh_error_msg_if(!sz, "ERROR:  dual basis should be computed after the primal basis");
 
   //compute dual basis coefficient (dual_coeff)
   dual_coeff.resize(sz, sz);
@@ -1897,8 +1896,8 @@ compute_periodic_constraints (DofConstraints & constraints,
               // Get pointers to the element's neighbor.
               const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
 
-              if (neigh == nullptr)
-                libmesh_error_msg("PeriodicBoundaries point locator object returned nullptr!");
+              libmesh_error_msg_if(neigh == nullptr,
+                                   "PeriodicBoundaries point locator object returned nullptr!");
 
               // periodic (and possibly h refinement) constraints:
               // constrain dofs shared between

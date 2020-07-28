@@ -44,8 +44,7 @@ RBParametrizedFunction::evaluate_comp(const RBParameters & mu,
 {
   std::vector<Number> values = evaluate(mu, xyz, subdomain_id, xyz_perturb);
 
-  if (comp >= values.size())
-    libmesh_error_msg("Error: Invalid value of comp");
+  libmesh_error_msg_if(comp >= values.size(), "Error: Invalid value of comp");
 
   return values[comp];
 }
@@ -90,8 +89,7 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
               const auto & qps_and_perturbs =
                 libmesh_map_find(all_xyz_perturb, elem_id);
 
-              if (qp >= qps_and_perturbs.size())
-                libmesh_error_msg("Error: Invalid qp");
+              libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
 
               evaluated_values_at_qp = evaluate(mu, xyz_vec[qp], subdomain_id, qps_and_perturbs[qp]);
             }
@@ -121,11 +119,8 @@ Number RBParametrizedFunction::lookup_preevaluated_value(unsigned int comp,
   const auto & values =
     libmesh_map_find(preevaluated_values, elem_id);
 
-  if (comp >= values.size())
-    libmesh_error_msg("Error: invalid comp");
-
-  if (qp >= values[comp].size())
-    libmesh_error_msg("Error: invalid qp");
+  libmesh_error_msg_if(comp >= values.size(), "Error: invalid comp");
+  libmesh_error_msg_if(qp >= values[comp].size(), "Error: invalid qp");
 
   return values[comp][qp];
 }

@@ -51,8 +51,8 @@ extern "C"
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
-    if (!preconditioner->initialized())
-      libmesh_error_msg("Preconditioner not initialized!  Make sure you call init() before solve!");
+    libmesh_error_msg_if(!preconditioner->initialized(),
+                         "Preconditioner not initialized!  Make sure you call init() before solve!");
 
     preconditioner->setup();
 

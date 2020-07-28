@@ -91,9 +91,9 @@ map_find(Map & map,
          int line_number)
 {
   auto it = map.find(key);
-  if (it == map.end())
-    libmesh_error_msg("map_find() error: key not found in file "        \
-                      << filename << " on line " << line_number);
+  libmesh_error_msg_if(it == map.end(),
+                       "map_find() error: key not found in file "
+                       << filename << " on line " << line_number);
   return it->second;
 }
 
@@ -110,9 +110,9 @@ map_find(const Map & map,
          int line_number)
 {
   auto it = map.find(key);
-  if (it == map.end())
-    libmesh_error_msg("map_find() error: key not found in file "        \
-                      << filename << " on line " << line_number);
+  libmesh_error_msg_if(it == map.end(),
+                       "map_find() error: key not found in file "
+                       << filename << " on line " << line_number);
   return it->second;
 }
 
@@ -130,9 +130,9 @@ map_find(Map & map,
          int line_number)
 {
   auto it = map.find(key);
-  if (it == map.end())
-    libmesh_error_msg("map_find() error: key \"" << key << "\" not found in file " \
-                      << filename << " on line " << line_number);
+  libmesh_error_msg_if(it == map.end(),
+                       "map_find() error: key \"" << key << "\" not found in file "
+                       << filename << " on line " << line_number);
   return it->second;
 }
 
@@ -149,9 +149,9 @@ map_find(const Map & map,
          int line_number)
 {
   auto it = map.find(key);
-  if (it == map.end())
-    libmesh_error_msg("map_find() error: key \"" << key << "\" not found in file " \
-                      << filename << " on line " << line_number);
+  libmesh_error_msg_if(it == map.end(),
+                       "map_find() error: key \"" << key << "\" not found in file "
+                       << filename << " on line " << line_number);
   return it->second;
 }
 
@@ -169,10 +169,10 @@ vector_at(Vector & vec,
           const char * filename,
           int line_number)
 {
-  if (i >= vec.size())
-    libmesh_error_msg("vec_at() error: Index " << i <<
-                      " past end of vector in file " << filename <<
-                      " on line " << line_number);
+  libmesh_error_msg_if(i >= vec.size(),
+                       "vec_at() error: Index " << i <<
+                       " past end of vector in file " << filename <<
+                       " on line " << line_number);
   return vec[i];
 }
 
@@ -187,10 +187,10 @@ vector_at(const Vector & vec,
           const char * filename,
           int line_number)
 {
-  if (i >= vec.size())
-    libmesh_error_msg("vec_at() error: Index " << i <<
-                      " past end of vector in file " << filename <<
-                      " on line " << line_number);
+  libmesh_error_msg_if(i >= vec.size(),
+                       "vec_at() error: Index " << i <<
+                       " past end of vector in file " << filename <<
+                       " on line " << line_number);
   return vec[i];
 }
 

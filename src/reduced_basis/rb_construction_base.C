@@ -270,12 +270,12 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
 {
   // First, make sure that an initial training set has already been
   // generated
-  if (!training_parameters_initialized)
-    libmesh_error_msg("Error: load_training_set cannot be used to initialize parameters");
+  libmesh_error_msg_if(!training_parameters_initialized,
+                       "Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
-  if (new_training_set.size() != get_n_params())
-    libmesh_error_msg("Error: Incorrect number of parameters in load_training_set.");
+  libmesh_error_msg_if(new_training_set.size() != get_n_params(),
+                       "Error: Incorrect number of parameters in load_training_set.");
 
   // Delete the training set vectors (but don't remove the existing keys!)
   for (auto & pr : training_parameters)
@@ -503,11 +503,12 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       {
         total_samples_check *= n_samples;
       }
-    if (total_samples_check != n_training_samples_in)
-      libmesh_error_msg("Error: Number of training samples = " \
-                        << n_training_samples_in \
-                        << " does not enable a uniform grid of samples with " \
-                        << num_params << " parameters.");
+
+    libmesh_error_msg_if(total_samples_check != n_training_samples_in,
+                         "Error: Number of training samples = "
+                         << n_training_samples_in
+                         << " does not enable a uniform grid of samples with "
+                         << num_params << " parameters.");
   }
 
   // First we make a list of training samples associated with each parameter,
@@ -571,10 +572,8 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
                 unsigned int param_count = 0;
                 for (const std::string & param_name : param_names)
                   {
-                    if (!training_parameters_in.count(param_name))
-                      {
-                        libmesh_error_msg("Invalid parameter name: " + param_name);
-                      }
+                    libmesh_error_msg_if(!training_parameters_in.count(param_name), "Invalid parameter name: " + param_name);
+
                     std::unique_ptr<NumericVector<Number>> & training_vector =
                       training_parameters_in.find(param_name)->second;
 

@@ -360,9 +360,9 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     if (libMesh::libMeshPrivateData::_n_threads == -1)
       {
         for (auto & option : n_threads_opt)
-          if (command_line->search(option))
-            libmesh_error_msg("Detected option " << option <<
-                              " with no value.  Did you forget '='?");
+          libmesh_error_msg_if(command_line->search(option),
+                               "Detected option " << option <<
+                               " with no value.  Did you forget '='?");
 
         libMesh::libMeshPrivateData::_n_threads = 1;
       }

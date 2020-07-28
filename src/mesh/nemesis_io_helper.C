@@ -1757,8 +1757,8 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       std::vector<dof_id_type> & elem_ids_this_subdomain = pr.second;
 
       // The code below assumes this subdomain block is not empty, make sure that's the case!
-      if (elem_ids_this_subdomain.size() == 0)
-        libmesh_error_msg("Error, no element IDs found in subdomain " << pr.first);
+      libmesh_error_msg_if(elem_ids_this_subdomain.size() == 0,
+                           "Error, no element IDs found in subdomain " << pr.first);
 
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!

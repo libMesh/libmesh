@@ -81,12 +81,12 @@ void PerfLog::clear()
     {
       //  check that all events are closed
       for (auto pos : log)
-        if (pos.second.open)
-          libmesh_error_msg("ERROR clearing performance log for class " \
-                            << label_name                             \
-                            << "\nevent "                             \
-                            << pos.first.second                      \
-                            << " is still being monitored!");
+        libmesh_error_msg_if(pos.second.open,
+                             "ERROR clearing performance log for class "
+                             << label_name
+                             << "\nevent "
+                             << pos.first.second
+                             << " is still being monitored!");
 
       gettimeofday (&tstart, nullptr);
 

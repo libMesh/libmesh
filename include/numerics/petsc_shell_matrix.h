@@ -89,16 +89,19 @@ public:
    * \returns \p true if the matrix has been initialized,
    * \p false otherwise.
    */
-  virtual bool initialized() const { return _is_initialized; }
+  virtual bool initialized() const;
 
-  Mat mat() { if (_mat) return _mat; else libmesh_error_msg("A petsc shell matrix is not created yet. Please init() "); }
+  /**
+   * Returns a pointer to the underlying PETSc Mat object. Must call
+   * init() before this.
+   */
+  Mat mat();
 
 protected:
 
   /**
    * Petsc Shell Matrix
    */
-
   Mat  _mat;
 
   bool _is_initialized;

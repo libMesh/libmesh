@@ -695,20 +695,12 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
 {
   libmesh_assert_less (num, this->n_systems());
 
+  for (auto & pr : _systems)
+    if (pr.second->number() == num)
+      return *cast_ptr<T_sys *>(pr.second);
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
-  for (; pos != end; ++pos)
-    if (pos->second->number() == num)
-      break;
-
-  // Check for errors
-  if (pos == end)
-    libmesh_error_msg("ERROR: no system number " << num << " found!");
-
-  // Attempt dynamic cast
-  return *cast_ptr<T_sys *>(pos->second);
+  // Error if we made it here
+  libmesh_error_msg("ERROR: no system number " << num << " found!");
 }
 
 
@@ -720,19 +712,12 @@ T_sys & EquationSystems::get_system (const unsigned int num)
 {
   libmesh_assert_less (num, this->n_systems());
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  for (auto & pr : _systems)
+    if (pr.second->number() == num)
+      return *cast_ptr<T_sys *>(pr.second);
 
-  for (; pos != end; ++pos)
-    if (pos->second->number() == num)
-      break;
-
-  // Check for errors
-  if (pos == end)
-    libmesh_error_msg("ERROR: no system number " << num << " found!");
-
-  // Attempt dynamic cast
-  return *cast_ptr<T_sys *>(pos->second);
+  // Error if we made it here
+  libmesh_error_msg("ERROR: no system number " << num << " found!");
 }
 
 
@@ -747,8 +732,7 @@ const T_sys & EquationSystems::get_system (const std::string & name) const
   const_system_iterator pos = _systems.find(name);
 
   // Check for errors
-  if (pos == _systems.end())
-    libmesh_error_msg("ERROR: no system named \"" << name << "\" found!");
+  libmesh_error_msg_if(pos == _systems.end(), "ERROR: no system named \"" << name << "\" found!");
 
   // Attempt dynamic cast
   return *cast_ptr<T_sys *>(pos->second);
@@ -766,8 +750,7 @@ T_sys & EquationSystems::get_system (const std::string & name)
   system_iterator pos = _systems.find(name);
 
   // Check for errors
-  if (pos == _systems.end())
-    libmesh_error_msg("ERROR: no system named " << name << " found!");
+  libmesh_error_msg_if(pos == _systems.end(), "ERROR: no system named " << name << " found!");
 
   // Attempt dynamic cast
   return *cast_ptr<T_sys *>(pos->second);

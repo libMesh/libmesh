@@ -71,8 +71,9 @@ void Tri3Subdivision::prepare_subdivision_properties()
       if (this->node_ptr(i)->valence() != 6)
         {
           irregular_idx = i;
-          if (this->node_ptr(MeshTools::Subdivision::next[i])->valence() != 6 || this->node_ptr(MeshTools::Subdivision::prev[i])->valence() != 6)
-            libmesh_error_msg("Error: The mesh contains elements with more than one irregular vertex!");
+          libmesh_error_msg_if(this->node_ptr(MeshTools::Subdivision::next[i])->valence() != 6 ||
+                               this->node_ptr(MeshTools::Subdivision::prev[i])->valence() != 6,
+                               "Error: The mesh contains elements with more than one irregular vertex!");
         }
     }
 

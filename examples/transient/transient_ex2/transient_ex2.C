@@ -107,20 +107,15 @@ int main (int argc, char** argv)
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
   // Check for proper usage.
-  if (argc < 2)
-    libmesh_error_msg("Usage: " << argv[0] << " [meshfile]");
+  libmesh_error_msg_if(argc < 2, "Usage: " << argv[0] << " [meshfile]");
 
   // Tell the user what we are doing.
-  else
-    {
-      libMesh::out << "Running " << argv[0];
+  libMesh::out << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        libMesh::out << " " << argv[i];
+  for (int i=1; i<argc; i++)
+    libMesh::out << " " << argv[i];
 
-      libMesh::out << std::endl << std::endl;
-
-    }
+  libMesh::out << std::endl << std::endl;
 
   // LasPack solvers don't work so well for this example, Trilinos doesn't work at all.
   // PETSc and Eigen both work...

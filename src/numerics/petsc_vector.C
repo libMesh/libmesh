@@ -1455,8 +1455,8 @@ void PetscVector<T>::_get_array(bool read_only) const
 template <typename T>
 void PetscVector<T>::_restore_array() const
 {
-  if (_values_manually_retrieved)
-    libmesh_error_msg("PetscVector values were manually retrieved but are being automatically restored!");
+  libmesh_error_msg_if(_values_manually_retrieved,
+                       "PetscVector values were manually retrieved but are being automatically restored!");
 
 #ifdef LIBMESH_HAVE_CXX11_THREAD
   std::atomic_thread_fence(std::memory_order_acquire);

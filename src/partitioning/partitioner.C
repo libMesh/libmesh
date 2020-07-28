@@ -816,8 +816,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   unsigned int n_load_balance_options = load_balanced_nodes_linear;
   n_load_balance_options += load_balanced_nodes_bfs;
   n_load_balance_options += load_balanced_nodes_petscpartition;
-  if (n_load_balance_options > 1)
-    libmesh_error_msg("Cannot perform more than one load balancing type at a time");
+  libmesh_error_msg_if(n_load_balance_options > 1,
+                       "Cannot perform more than one load balancing type at a time");
 
   if (load_balanced_nodes_linear)
     set_interface_node_processor_ids_linear(mesh);

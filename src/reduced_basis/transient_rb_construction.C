@@ -286,10 +286,8 @@ void TransientRBConstruction::assemble_affine_expansion(bool skip_matrix_assembl
 
 Real TransientRBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 {
-  if (get_RB_training_type() == "POD")
-  {
-    libmesh_error_msg("POD RB training is not supported with TransientRBConstruction");
-  }
+  libmesh_error_msg_if(get_RB_training_type() == "POD",
+                       "POD RB training is not supported with TransientRBConstruction");
 
   compute_truth_projection_error = true;
   Real value = Parent::train_reduced_basis(resize_rb_eval_data);
@@ -303,22 +301,22 @@ SparseMatrix<Number> * TransientRBConstruction::get_M_q(unsigned int q)
   TransientRBThetaExpansion & trans_theta_expansion =
     cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
-  if (q >= trans_theta_expansion.get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
+  libmesh_error_msg_if(q >= trans_theta_expansion.get_n_M_terms(),
+                       "Error: We must have q < Q_m in get_M_q.");
 
   return M_q_vector[q].get();
 }
 
 SparseMatrix<Number> * TransientRBConstruction::get_non_dirichlet_M_q(unsigned int q)
 {
-  if (!store_non_dirichlet_operators)
-    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_M_q.");
+  libmesh_error_msg_if(!store_non_dirichlet_operators,
+                       "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_M_q.");
 
   TransientRBThetaExpansion & trans_theta_expansion =
     cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
-  if (q >= trans_theta_expansion.get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
+  libmesh_error_msg_if(q >= trans_theta_expansion.get_n_M_terms(),
+                       "Error: We must have q < Q_m in get_M_q.");
 
   return non_dirichlet_M_q_vector[q].get();
 }
@@ -465,8 +463,7 @@ void TransientRBConstruction::set_L2_assembly(ElemAssembly & L2_assembly_in)
 
 ElemAssembly & TransientRBConstruction::get_L2_assembly()
 {
-  if (!L2_assembly)
-    libmesh_error_msg("Error: L2_assembly hasn't been initialized yet");
+  libmesh_error_msg_if(!L2_assembly, "Error: L2_assembly hasn't been initialized yet");
 
   return *L2_assembly;
 }
@@ -479,8 +476,8 @@ void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Nu
   TransientRBAssemblyExpansion & trans_assembly_expansion =
     cast_ref<TransientRBAssemblyExpansion &>(get_rb_assembly_expansion());
 
-  if (q >= trans_theta_expansion.get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < Q_m in assemble_Mq_matrix.");
+  libmesh_error_msg_if(q >= trans_theta_expansion.get_n_M_terms(),
+                       "Error: We must have q < Q_m in assemble_Mq_matrix.");
 
   input_matrix->zero();
   add_scaled_matrix_and_vector(1.,
@@ -735,13 +732,13 @@ void TransientRBConstruction::add_IC_to_RB_space()
 {
   LOG_SCOPE("add_IC_to_RB_space()", "TransientRBConstruction");
 
-  if (get_rb_evaluation().get_n_basis_functions() > 0)
-    libmesh_error_msg("Error: Should not call TransientRBConstruction::add_IC_to_RB_space() " \
-                      << "on a system that already contains basis functions.");
+  libmesh_error_msg_if(get_rb_evaluation().get_n_basis_functions() > 0,
+                       "Error: Should not call TransientRBConstruction::add_IC_to_RB_space() "
+                       "on a system that already contains basis functions.");
 
-  if (!nonzero_initialization)
-    libmesh_error_msg("Error: Should not call TransientRBConstruction::add_IC_to_RB_space() " \
-                      << "when nonzero_initialization==false.");
+  libmesh_error_msg_if(!nonzero_initialization,
+                       "Error: Should not call TransientRBConstruction::add_IC_to_RB_space() "
+                       "when nonzero_initialization==false.");
 
   initialize_truth();
 
@@ -901,12 +898,12 @@ void TransientRBConstruction::load_rb_solution()
   TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
   DenseVector<Number> RB_solution_vector_k = trans_rb_eval.RB_temporal_solution_data[time_step];
 
-  if (RB_solution_vector_k.size() > get_rb_evaluation().get_n_basis_functions())
-    libmesh_error_msg("ERROR: rb_eval object contains " \
-                      << get_rb_evaluation().get_n_basis_functions() \
-                      << " basis functions. RB_solution vector constains " \
-                      << RB_solution_vector_k.size() \
-                      << " entries. RB_solution in TransientRBConstruction::load_rb_solution is too long!");
+  libmesh_error_msg_if(RB_solution_vector_k.size() > get_rb_evaluation().get_n_basis_functions(),
+                       "ERROR: rb_eval object contains "
+                       << get_rb_evaluation().get_n_basis_functions()
+                       << " basis functions. RB_solution vector constains "
+                       << RB_solution_vector_k.size()
+                       << " entries. RB_solution in TransientRBConstruction::load_rb_solution is too long!");
 
   for (unsigned int i=0; i<RB_solution_vector_k.size(); i++)
     solution->add(RB_solution_vector_k(i), get_rb_evaluation().get_basis_function(i));
@@ -1319,10 +1316,8 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
   // should we be worried about leaks in the locations where we're about to fill entries?
   for (std::size_t i=0; i<trans_rb_eval.M_q_representor.size(); ++i)
     for (std::size_t j=0; j<trans_rb_eval.M_q_representor[i].size(); ++j)
-      {
-        if (trans_rb_eval.M_q_representor[i][j] != nullptr)
-          libmesh_error_msg("Error, must delete existing M_q_representor before reading in from file.");
-      }
+      libmesh_error_msg_if(trans_rb_eval.M_q_representor[i][j] != nullptr,
+                           "Error, must delete existing M_q_representor before reading in from file.");
 
   // Now ready to read them in from file!
   for (std::size_t i=0; i<trans_rb_eval.M_q_representor.size(); ++i)
@@ -1337,8 +1332,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
           {
             int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-            if (stat_result != 0)
-              libmesh_error_msg("File does not exist: " << file_name.str());
+            libmesh_error_msg_if(stat_result != 0, "File does not exist: " << file_name.str());
           }
 
         Xdr aqr_data(file_name.str(),

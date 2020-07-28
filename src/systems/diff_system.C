@@ -279,8 +279,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
               else
                 libmesh_error_msg("Could not find valid boundary function!");
 
-              if (is_time_evolving_bc)
-                libmesh_error_msg("Cannot currently support time-dependent Dirichlet BC for dot variables!");
+              libmesh_error_msg_if(is_time_evolving_bc, "Cannot currently support time-dependent Dirichlet BC for dot variables!");
 
 
               DirichletBoundary * new_dbc;

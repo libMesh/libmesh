@@ -155,8 +155,8 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
 {
   LOG_SCOPE("rb_solve()", "TransientRBEvaluation");
 
-  if (N > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+  libmesh_error_msg_if(N > get_n_basis_functions(),
+                       "ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
   const RBParameters & mu = get_parameters();
 

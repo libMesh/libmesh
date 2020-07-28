@@ -113,8 +113,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
 
-  if (!matrix_A)
-    libmesh_error_msg("Error: input matrix to solve_standard() must be a PetscMatrix.");
+  libmesh_error_msg_if(!matrix_A, "Error: input matrix to solve_standard() must be a PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -176,13 +175,11 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * precond = dynamic_cast<PetscMatrix<T> *>(&precond_in);
 
-  if (!precond)
-    libmesh_error_msg("Error: input preconditioning matrix to solve_standard() must be a PetscMatrix.");
+  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_standard() must be a PetscMatrix.");
 
   PetscShellMatrix<T> * matrix = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix);
 
-  if (!matrix)
-    libmesh_error_msg("Error: input operator matrix to solve_standard() must be a PetscShellMatrix.");
+  libmesh_error_msg_if(!matrix, "Error: input operator matrix to solve_standard() must be a PetscShellMatrix.");
 
   return _solve_standard_helper(matrix->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
@@ -203,13 +200,11 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscShellMatrix<T> * precond = dynamic_cast<PetscShellMatrix<T> *>(&precond_in);
 
-  if (!precond)
-    libmesh_error_msg("Error: input preconditioning matrix to solve_standard() must be a PetscShellMatrix.");
+  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_standard() must be a PetscShellMatrix.");
 
   PetscShellMatrix<T> * matrix = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix);
 
-  if (!matrix)
-    libmesh_error_msg("Error: input operator matrix to solve_standard() must be a PetscShellMatrix.");
+  libmesh_error_msg_if(!matrix, "Error: input operator matrix to solve_standard() must be a PetscShellMatrix.");
 
   return _solve_standard_helper(matrix->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
@@ -366,8 +361,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
   PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
   PetscMatrix<T> * matrix_B = dynamic_cast<PetscMatrix<T> *>(&matrix_B_in);
 
-  if (!matrix_A || !matrix_B)
-    libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
+  libmesh_error_msg_if(!matrix_A || !matrix_B,
+                       "Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -410,8 +405,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
 
   PetscMatrix<T> * matrix_B = dynamic_cast<PetscMatrix<T> *>(&matrix_B_in);
 
-  if (!matrix_B)
-    libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
+  libmesh_error_msg_if(!matrix_B, "Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -442,8 +436,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
 
   PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
 
-  if (!matrix_A)
-    libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
+  libmesh_error_msg_if(!matrix_A, "Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -541,18 +534,15 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * precond = dynamic_cast<PetscMatrix<T> *>(&precond_in);
 
-  if (!precond)
-    libmesh_error_msg("Error: input preconditioning matrix to solve_generalized() must be of type PetscMatrix.");
+  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_generalized() must be of type PetscMatrix.");
 
   PetscShellMatrix<T> * matrix_A = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_A);
 
-  if (!matrix_A)
-    libmesh_error_msg("Error: input operator A to solve_generalized() must be of type PetscShellMatrix.");
+  libmesh_error_msg_if(!matrix_A, "Error: input operator A to solve_generalized() must be of type PetscShellMatrix.");
 
   PetscShellMatrix<T> * matrix_B = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_B);
 
-  if (!matrix_B)
-    libmesh_error_msg("Error: input operator B to solve_generalized() must be of type PetscShellMatrix.");
+  libmesh_error_msg_if(!matrix_B, "Error: input operator B to solve_generalized() must be of type PetscShellMatrix.");
 
   return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
@@ -574,18 +564,15 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
   // Make sure the ShellMatrix passed in is really a PetscShellMatrix
   PetscShellMatrix<T> * precond = dynamic_cast<PetscShellMatrix<T> *>(&precond_in);
 
-  if (!precond)
-    libmesh_error_msg("Error: input preconditioning matrix to solve_generalized() must be of type PetscShellMatrix.");
+  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_generalized() must be of type PetscShellMatrix.");
 
   PetscShellMatrix<T> * matrix_A = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_A);
 
-  if (!matrix_A)
-    libmesh_error_msg("Error: input operator A to solve_generalized() must be of type PetscShellMatrix.");
+  libmesh_error_msg_if(!matrix_A, "Error: input operator A to solve_generalized() must be of type PetscShellMatrix.");
 
   PetscShellMatrix<T> * matrix_B = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_B);
 
-  if (!matrix_B)
-    libmesh_error_msg("Error: input operator B to solve_generalized() must be of type PetscShellMatrix.");
+  libmesh_error_msg_if(!matrix_B, "Error: input operator B to solve_generalized() must be of type PetscShellMatrix.");
 
   return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
@@ -889,8 +876,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(dof_id_type i,
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T> * solution = dynamic_cast<PetscVector<T> *>(&solution_in);
 
-  if (!solution)
-    libmesh_error_msg("Error getting eigenvector: input vector must be a PetscVector.");
+  libmesh_error_msg_if(!solution, "Error getting eigenvector: input vector must be a PetscVector.");
 
   // real and imaginary part of the ith eigenvalue.
   PetscScalar kr, ki;
@@ -965,8 +951,7 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T> & deflation_ve
   PetscVector<T> * deflation_vector_petsc_vec =
     dynamic_cast<PetscVector<T> *>(&deflation_vector_in);
 
-  if (!deflation_vector_petsc_vec)
-    libmesh_error_msg("Error attaching deflation space: input vector must be a PetscVector.");
+  libmesh_error_msg_if(!deflation_vector_petsc_vec, "Error attaching deflation space: input vector must be a PetscVector.");
 
   // Get a handle for the underlying Vec.
   Vec deflation_vector = deflation_vector_petsc_vec->vec();
@@ -993,8 +978,7 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
   PetscVector<T> * initial_space_petsc_vec =
     dynamic_cast<PetscVector<T> *>(&initial_space_in);
 
-  if (!initial_space_petsc_vec)
-    libmesh_error_msg("Error attaching initial space: input vector must be a PetscVector.");
+  libmesh_error_msg_if(!initial_space_petsc_vec, "Error attaching initial space: input vector must be a PetscVector.");
 
   // Get a handle for the underlying Vec.
   Vec initial_vector = initial_space_petsc_vec->vec();

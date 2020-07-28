@@ -284,17 +284,17 @@ Real ExactSolution::error_norm(const std::string & sys_name,
       return std::sqrt(error_vals[0] + error_vals[1] + error_vals[2]);
     case HCURL:
       {
-        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          libmesh_error_msg("Cannot compute HCurl error norm of scalar-valued variables!");
-        else
-          return std::sqrt(error_vals[0] + error_vals[5]);
+        libmesh_error_msg_if(FEInterface::field_type(fe_type) == TYPE_SCALAR,
+                             "Cannot compute HCurl error norm of scalar-valued variables!");
+
+        return std::sqrt(error_vals[0] + error_vals[5]);
       }
     case HDIV:
       {
-        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          libmesh_error_msg("Cannot compute HDiv error norm of scalar-valued variables!");
-        else
-          return std::sqrt(error_vals[0] + error_vals[6]);
+        libmesh_error_msg_if(FEInterface::field_type(fe_type) == TYPE_SCALAR,
+                             "Cannot compute HDiv error norm of scalar-valued variables!");
+
+        return std::sqrt(error_vals[0] + error_vals[6]);
       }
     case H1_SEMINORM:
       return std::sqrt(error_vals[1]);
@@ -302,17 +302,17 @@ Real ExactSolution::error_norm(const std::string & sys_name,
       return std::sqrt(error_vals[2]);
     case HCURL_SEMINORM:
       {
-        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          libmesh_error_msg("Cannot compute HCurl error seminorm of scalar-valued variables!");
-        else
-          return std::sqrt(error_vals[5]);
+        libmesh_error_msg_if(FEInterface::field_type(fe_type) == TYPE_SCALAR,
+                             "Cannot compute HCurl error seminorm of scalar-valued variables!");
+
+        return std::sqrt(error_vals[5]);
       }
     case HDIV_SEMINORM:
       {
-        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          libmesh_error_msg("Cannot compute HDiv error seminorm of scalar-valued variables!");
-        else
-          return std::sqrt(error_vals[6]);
+        libmesh_error_msg_if(FEInterface::field_type(fe_type) == TYPE_SCALAR,
+                             "Cannot compute HDiv error seminorm of scalar-valued variables!");
+
+        return std::sqrt(error_vals[6]);
       }
     case L1:
       return error_vals[3];

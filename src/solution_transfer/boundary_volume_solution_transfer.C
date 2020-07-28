@@ -34,8 +34,8 @@ void BoundaryVolumeSolutionTransfer::transfer(const Variable & from_var,
     to_dimension = to_sys->get_mesh().mesh_dimension();
 
   // Sanity check
-  if (from_dimension == to_dimension)
-    libmesh_error_msg("Error: Transfer must be from volume mesh to its boundary or vice-versa!");
+  libmesh_error_msg_if(from_dimension == to_dimension,
+                       "Error: Transfer must be from volume mesh to its boundary or vice-versa!");
 
   if (from_dimension > to_dimension)
     this->transfer_volume_boundary(from_var, to_var);
@@ -80,8 +80,7 @@ transfer_volume_boundary(const Variable & from_var, const Variable & to_var)
     {
       const Elem * from_elem = to_elem->interior_parent();
 
-      if (!from_elem)
-        libmesh_error_msg("Error, transfer must be between a Mesh and its associated BoundaryMesh.");
+      libmesh_error_msg_if(!from_elem, "Error, transfer must be between a Mesh and its associated BoundaryMesh.");
 
       // loop through all nodes in each boundary element.
       for (const Node & to_node : to_elem->node_ref_range())
@@ -173,8 +172,7 @@ transfer_boundary_volume(const Variable & from_var, const Variable & to_var)
     {
       const Elem * to_elem = from_elem->interior_parent();
 
-      if (!to_elem)
-        libmesh_error_msg("Error, transfer must be between a Mesh and its associated BoundaryMesh.");
+      libmesh_error_msg_if(!to_elem, "Error, transfer must be between a Mesh and its associated BoundaryMesh.");
 
       // Get dof indices for phi2 for all nodes on this boundary element
       dof_map.dof_indices(from_elem, from_dof_indices, from_var_number);

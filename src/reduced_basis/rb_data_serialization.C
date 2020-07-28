@@ -96,14 +96,12 @@ void RBEvaluationSerialization::write_to_file(const std::string & path)
       add_rb_evaluation_data_to_builder(_rb_eval, rb_eval_builder);
 
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-      if (!fd)
-        libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+      libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
       capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
-      if (error)
-        libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+      libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);
     }
 }
 
@@ -145,14 +143,12 @@ void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
                                                   trans_rb_eval_builder);
 
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-      if (!fd)
-        libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+      libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
       capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
-      if (error)
-        libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+      libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);
     }
 }
 
@@ -189,14 +185,12 @@ void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
                                             rb_eim_eval_builder);
 
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-      if (!fd)
-        libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+      libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
       capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
-      if (error)
-        libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+      libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);
     }
 }
 
@@ -229,14 +223,12 @@ void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
       add_rb_scm_evaluation_data_to_builder(_rb_scm_eval, rb_scm_eval_builder);
 
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-      if (!fd)
-        libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+      libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
       capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
-      if (error)
-        libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+      libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);
     }
 }
 
@@ -275,8 +267,7 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
           }
       }
 
-    if (count != n_continuous_parameters)
-      libmesh_error_msg("Mismatch in number of continuous parameters");
+    libmesh_error_msg_if(count != n_continuous_parameters, "Mismatch in number of continuous parameters");
   }
 
   // Discrete parameters
@@ -306,8 +297,7 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
         ++count;
       }
 
-    if (count != n_discrete_parameters)
-      libmesh_error_msg("Mismatch in number of discrete parameters");
+    libmesh_error_msg_if(count != n_discrete_parameters, "Mismatch in number of discrete parameters");
   }
 }
 
@@ -694,16 +684,16 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
                                   discrete_parameters_list);
 
   {
-    if (rb_scm_eval.B_min.size() != rb_scm_eval.get_rb_theta_expansion().get_n_A_terms())
-      libmesh_error_msg("Size error while writing B_min");
+    libmesh_error_msg_if(rb_scm_eval.B_min.size() != rb_scm_eval.get_rb_theta_expansion().get_n_A_terms(),
+                         "Size error while writing B_min");
     auto b_min_list = rb_scm_eval_builder.initBMin( rb_scm_eval.B_min.size() );
     for (auto i : index_range(rb_scm_eval.B_min))
       b_min_list.set(i, rb_scm_eval.get_B_min(i));
   }
 
   {
-    if (rb_scm_eval.B_max.size() != rb_scm_eval.get_rb_theta_expansion().get_n_A_terms())
-      libmesh_error_msg("Size error while writing B_max");
+    libmesh_error_msg_if(rb_scm_eval.B_max.size() != rb_scm_eval.get_rb_theta_expansion().get_n_A_terms(),
+                         "Size error while writing B_max");
 
     auto b_max_list = rb_scm_eval_builder.initBMax( rb_scm_eval.B_max.size() );
     for (auto i : index_range(rb_scm_eval.B_max))

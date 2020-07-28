@@ -51,7 +51,6 @@ RBEvaluation::RBEvaluation (const Parallel::Communicator & comm_in)
   compute_RB_inner_product(false),
   rb_theta_expansion(nullptr)
 {
-
 }
 
 RBEvaluation::~RBEvaluation()
@@ -87,8 +86,8 @@ void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_
 
 RBThetaExpansion & RBEvaluation::get_rb_theta_expansion()
 {
-  if (!is_rb_theta_expansion_initialized())
-    libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
+  libmesh_error_msg_if(!is_rb_theta_expansion_initialized(),
+                       "Error: rb_theta_expansion hasn't been initialized yet");
 
   return *rb_theta_expansion;
 }
@@ -110,8 +109,8 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
 {
   LOG_SCOPE("resize_data_structures()", "RBEvaluation");
 
-  if (Nmax < this->get_n_basis_functions())
-    libmesh_error_msg("Error: Cannot set Nmax to be less than the current number of basis functions.");
+  libmesh_error_msg_if(Nmax < this->get_n_basis_functions(),
+                       "Error: Cannot set Nmax to be less than the current number of basis functions.");
 
   // Resize/clear inner product matrix
   if (compute_RB_inner_product)
@@ -216,15 +215,13 @@ Real RBEvaluation::rb_solve(unsigned int N,
 {
   LOG_SCOPE("rb_solve()", "RBEvaluation");
 
-  if (N > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+  libmesh_error_msg_if(N > get_n_basis_functions(),
+                       "ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
   // In case the theta functions have been pre-evaluated, first check the size for consistency
-  if (evaluated_thetas)
-    {
-      if (evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms())
-        libmesh_error_msg("ERROR: Evaluated thetas have wrong size");
-    }
+  libmesh_error_msg_if(evaluated_thetas &&
+                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
+                       "ERROR: Evaluated thetas have wrong size");
 
   const RBParameters & mu = get_parameters();
 
@@ -329,11 +326,9 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
   LOG_SCOPE("compute_residual_dual_norm()", "RBEvaluation");
 
   // In case the theta functions have been pre-evaluated, first check the size for consistency
-  if (evaluated_thetas)
-    {
-      if (evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms())
-        libmesh_error_msg("ERROR: Evaluated thetas have wrong size");
-    }
+  libmesh_error_msg_if(evaluated_thetas &&
+                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
+                       "ERROR: Evaluated thetas have wrong size");
 
   const RBParameters & mu = get_parameters();
 
@@ -922,8 +917,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
 
 void RBEvaluation::assert_file_exists(const std::string & file_name)
 {
-  if (!std::ifstream(file_name.c_str()))
-    libmesh_error_msg("File missing: " + file_name);
+  libmesh_error_msg_if(!std::ifstream(file_name.c_str()), "File missing: " << file_name);
 }
 
 void RBEvaluation::write_out_basis_functions(System & sys,
@@ -1074,8 +1068,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
         {
           // vectors should all be nullptr, otherwise we get a memory leak when
           // we create the new vectors in RBEvaluation::read_in_vectors.
-          if (vec)
-            libmesh_error_msg("Non-nullptr vector passed to read_in_vectors_from_multiple_files");
+          libmesh_error_msg_if(vec, "Non-nullptr vector passed to read_in_vectors_from_multiple_files");
 
           vec = NumericVector<Number>::build(sys.comm());
 
@@ -1096,8 +1089,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
           struct stat stat_info;
           int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-          if (stat_result != 0)
-            libmesh_error_msg("File does not exist: " << file_name.str());
+          libmesh_error_msg_if(stat_result != 0, "File does not exist: " << file_name.str());
         }
 
       assert_file_exists(file_name.str());
@@ -1111,8 +1103,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
         const std::string libMesh_label = "libMesh-";
         std::string::size_type lm_pos = version.find(libMesh_label);
-        if (lm_pos==std::string::npos)
-          libmesh_error_msg("version info missing in Xdr header");
+        libmesh_error_msg_if(lm_pos == std::string::npos, "version info missing in Xdr header");
 
         std::istringstream iss(version.substr(lm_pos + libMesh_label.size()));
         int ver_major = 0, ver_minor = 0, ver_patch = 0;

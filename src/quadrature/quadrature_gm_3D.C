@@ -28,11 +28,11 @@ void QGrundmann_Moller::init_3D(const ElemType, unsigned int)
 {
   // Nearly all GM rules contain negative weights, so if you are not
   // allowing rules with negative weights, we cannot continue!
-  if (!allow_rules_with_negative_weights)
-    libmesh_error_msg("You requested a Grundmann-Moller rule but\n"        \
-                      << "are not allowing rules with negative weights!\n" \
-                      << "Either select a different quadrature class or\n" \
-                      << "set allow_rules_with_negative_weights==true.");
+  libmesh_error_msg_if(!allow_rules_with_negative_weights,
+                       "You requested a Grundmann-Moller rule but\n"
+                       "are not allowing rules with negative weights!\n"
+                       "Either select a different quadrature class or\n"
+                       "set allow_rules_with_negative_weights==true.");
 
   switch (_type)
     {

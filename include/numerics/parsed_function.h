@@ -344,8 +344,8 @@ ParsedFunction<Output,OutputGradient>::getVarAddress (const std::string & variab
   const std::vector<std::string>::iterator it =
     std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
 
-  if (it == _additional_vars.end())
-    libmesh_error_msg("ERROR: Requested variable not found in parsed function");
+  libmesh_error_msg_if(it == _additional_vars.end(),
+                       "ERROR: Requested variable not found in parsed function");
 
   // Iterator Arithmetic (How far from the end of the array is our target address?)
   return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
@@ -406,10 +406,10 @@ ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inl
       fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp.AddConstant("pi", std::acos(Real(-1)));
       fp.AddConstant("e", std::exp(Real(1)));
-      if (fp.Parse(new_subexpression, variables) != -1) // -1 for success
-        libmesh_error_msg
-          ("ERROR: FunctionParser is unable to parse modified expression: "
-           << new_subexpression << '\n' << fp.ErrorMsg());
+      libmesh_error_msg_if
+        (fp.Parse(new_subexpression, variables) != -1, // -1 for success
+         "ERROR: FunctionParser is unable to parse modified expression: "
+         << new_subexpression << '\n' << fp.ErrorMsg());
 
       Output new_var_value = this->eval(fp, new_subexpression, 0);
 #ifdef NDEBUG
@@ -536,8 +536,8 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
                            std::string::npos : end - nextstart));
 
       // fparser can crash on empty expressions
-      if (_subexpressions.back().empty())
-        libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+      libmesh_error_msg_if(_subexpressions.back().empty(),
+                           "ERROR: FunctionParser is unable to parse empty expression.\n");
 
       // Parse (and optimize if possible) the subexpression.
       // Add some basic constants, to Real precision.
@@ -545,10 +545,10 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
       fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp.AddConstant("pi", std::acos(Real(-1)));
       fp.AddConstant("e", std::exp(Real(1)));
-      if (fp.Parse(_subexpressions.back(), variables) != -1) // -1 for success
-        libmesh_error_msg
-          ("ERROR: FunctionParser is unable to parse expression: "
-           << _subexpressions.back() << '\n' << fp.ErrorMsg());
+      libmesh_error_msg_if
+        (fp.Parse(_subexpressions.back(), variables) != -1, // -1 for success
+         "ERROR: FunctionParser is unable to parse expression: "
+         << _subexpressions.back() << '\n' << fp.ErrorMsg());
 
       // use of derivatives is optional. suppress error output on the console
       // use the has_derivatives() method to check if AutoDiff was successful.

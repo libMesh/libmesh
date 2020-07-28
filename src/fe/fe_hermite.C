@@ -72,8 +72,7 @@ void hermite_nodal_soln(const Elem * elem,
 unsigned int hermite_n_dofs(const ElemType t, const Order o)
 {
 #ifdef DEBUG
-  if (o < 3)
-    libmesh_error_msg("Error: Hermite elements require order>=3, but you asked for order=" << o);
+  libmesh_error_msg_if(o < 3, "Error: Hermite elements require order>=3, but you asked for order=" << o);
 #endif
 
   // Piecewise (bi/tri)cubic C1 Hermite splines

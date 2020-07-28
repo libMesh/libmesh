@@ -775,8 +775,8 @@ namespace libMesh
     // below, the PetscSection will be assuming node-major ordering
     // so let's throw an error if the user tries to use this without
     // node-major order
-    if (!libMesh::on_command_line("--node-major-dofs"))
-      libmesh_error_msg("ERROR: Must use --node-major-dofs with PetscSection!");
+    libmesh_error_msg_if(!libMesh::on_command_line("--node-major-dofs"),
+                         "ERROR: Must use --node-major-dofs with PetscSection!");
 
     //else if (!system.identify_variable_groups())
     //  ierr = PetscSectionSetUseFieldOffsets(section,PETSC_TRUE);LIBMESH_CHKERR(ierr);
