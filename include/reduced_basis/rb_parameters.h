@@ -68,6 +68,16 @@ public:
   void clear();
 
   /**
+   * Get a const reference to the map that stores all of the values.
+   */
+  const std::map<std::string, Real> & get_parameters_map() const;
+
+  /**
+   * Get a const reference to the map that stores all of the "extra" values.
+   */
+  const std::map<std::string, Real> & get_extra_parameters_map() const;
+
+  /**
    * Get the value of the specific parameter.
    */
   Real get_value(const std::string & param_name) const;
