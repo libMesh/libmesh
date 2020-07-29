@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/fem_system/fem_system_ex5" target="_blank">Open fem_system_ex5 in new tab.</a>
+<a name="output"></a>
+<br><br><br> <h1> The console output of the program: </h1>
+<pre>
+***************************************************************
+* Running Example fem_system_ex5:
+*   ./example-opt deltat=0.25 n_timesteps=5 time_solver=newmark write_interval=1 solver_quiet=false relative_step_tolerance=1e-3 relative_residual_tolerance=1.e-3 -ksp_type cg -pc_type jacobi
+***************************************************************
+
+
+Reading IGA mesh.
+
+ Mesh Information:
+  elem_dimensions()={0, 2}
+  spatial_dimension()=2
+  n_nodes()=1413
+    n_local_nodes()=1413
+  n_elem()=580
+    n_local_elem()=580
+    n_active_elem()=580
+  n_subdomains()=2
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=3
+   System #2, "Acceleration"
+    Type "Explicit"
+    Variables={ "u_accel" "v_accel" }
+    Finite Element Types="RATIONAL_BERNSTEIN"
+    Approximation Orders="SECOND"
+    n_dofs()=2826
+    n_local_dofs()=2826
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #0, "Linear Elasticity"
+    Type "Implicit"
+    Variables={ "Ux" "Uy" }
+    Finite Element Types="RATIONAL_BERNSTEIN"
+    Approximation Orders="SECOND"
+    n_dofs()=2826
+    n_local_dofs()=2826
+    n_constrained_dofs()=66
+    n_local_constrained_dofs()=66
+    n_vectors()=4
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 24.0127
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 50
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 66
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+   System #1, "Velocity"
+    Type "Explicit"
+    Variables={ "u_vel" "v_vel" }
+    Finite Element Types="RATIONAL_BERNSTEIN"
+    Approximation Orders="SECOND"
+    n_dofs()=2826
+    n_local_dofs()=2826
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 17.3841
+Linear solve starting, tolerance 0.001
+Linear solve finished, step 23, residual 180.796
+Trying full Newton step
+  Current Residual: 0.0209492
+  Nonlinear step: |du|/|u| = 1, |du| = 260597
+Assembling the System
+Nonlinear Residual: 0.0209492
+Linear solve starting, tolerance 2.09492e-05
+Linear solve finished, step 48, residual 0.00305561
+Trying full Newton step
+  Current Residual: 3.00015e-07
+  Nonlinear solver converged, step 1, residual reduction 1.7258e-08 < 0.001
+  Nonlinear solver relative step size 0.003918 > 0.001
+
+
+Solving time step 0, time = 0
+Assembling the System
+Nonlinear Residual: 34.7683
+Linear solve starting, tolerance 0.001
+Linear solve finished, step 147, residual 0.000352181
+Trying full Newton step
+  Current Residual: 0.0446599
+  Nonlinear solver relative residual 0.0012845 > 0.001
+  Nonlinear solver converged, step 0, relative step size 0.000220539 < 0.001
+
+
+Solving time step 1, time = 0.25
+Assembling the System
+Nonlinear Residual: 34.7817
+Linear solve starting, tolerance 0.001
+Linear solve finished, step 146, residual 0.000369086
+Trying full Newton step
+  Current Residual: 0.0494522
+  Nonlinear solver relative residual 0.00142179 > 0.001
+  Nonlinear solver converged, step 0, relative step size 1.25039e-05 < 0.001
+
+
+Solving time step 2, time = 0.5
+Assembling the System
+Nonlinear Residual: 36.1779
+Linear solve starting, tolerance 0.001
+Linear solve finished, step 134, residual 0.000344099
+Trying full Newton step
+  Current Residual: 0.0444696
+  Nonlinear solver relative residual 0.00122919 > 0.001
+  Nonlinear solver converged, step 0, relative step size 0.000226171 < 0.001
+
+
+Solving time step 3, time = 0.75
+Assembling the System
+Nonlinear Residual: 35.7777
+Linear solve starting, tolerance 0.001
+Linear solve finished, step 134, residual 0.000334166
+Trying full Newton step
+  Current Residual: 0.0439709
+  Nonlinear solver relative residual 0.00121541 > 0.001
+  Nonlinear solver converged, step 0, relative step size 0.000207538 < 0.001
+
+
+Solving time step 4, time = 1
+Assembling the System
+Nonlinear Residual: 34.1024
+Linear solve starting, tolerance 0.001
+Linear solve finished, step 145, residual 0.000341582
+Trying full Newton step
+  Current Residual: 0.0430732
+  Nonlinear solver relative residual 0.00119059 > 0.001
+  Nonlinear solver converged, step 0, relative step size 2.97201e-05 < 0.001
+
+
+***************************************************************
+* Done Running Example fem_system_ex5:
+*   ./example-opt deltat=0.25 n_timesteps=5 time_solver=newmark write_interval=1 solver_quiet=false relative_step_tolerance=1e-3 relative_residual_tolerance=1.e-3 -ksp_type cg -pc_type jacobi
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>
