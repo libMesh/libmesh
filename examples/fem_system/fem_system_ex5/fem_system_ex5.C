@@ -17,14 +17,16 @@
 
 
 
-// <h1>FEMSystem Example 3 - Unsteady Linear Elasticity with
-// FEMSystem</h1>
-// \author Paul Bauman
-// \date 2015
+// <h1>FEMSystem Example 5 - Unsteady Linear Elasticity with
+// IsoGeometric Analysis</h1>
+// \author Roy Stogner
+// \date 2019
 //
 // This example shows how to solve the three-dimensional transient
-// linear elasticity equations using the DifferentiableSystem class framework.
-// This is just Systems of Equations Example 6 recast.
+// linear elasticity equations with elements suitable for IsoGeometric
+// Analysis, as read from a DynaIO MeshInput.
+//
+// This is just FEMSystem Example 3 on an IGA mesh.
 
 // C++ includes
 #include <iomanip>
