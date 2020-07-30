@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/ghosting_functor.h"
+#include "libmesh/auto_ptr.h"
 
 namespace libMesh
 {
@@ -40,7 +41,21 @@ public:
   /**
    * Constructor.
    */
-  GhostPointNeighbors(const MeshBase & mesh) : _mesh(mesh) {}
+  GhostPointNeighbors(const MeshBase & mesh) : _mesh(&mesh) {}
+
+  /**
+   * Constructor.
+   */
+  GhostPointNeighbors(const GhostPointNeighbors & other) : GhostingFunctor(other), _mesh(other._mesh) {}
+
+  virtual void set_mesh(const MeshBase * mesh) override { _mesh = mesh; }
+
+  /**
+   * A clone() is needed because GhostingFunctor can not be shared between
+   * different meshes. The operations in  GhostingFunctor are mesh dependent.
+   */
+  virtual std::unique_ptr<GhostingFunctor> clone () const override
+  { return libmesh_make_unique<GhostPointNeighbors>(*this); }
 
   /**
    * For the specified range of active elements, find their point
@@ -50,11 +65,11 @@ public:
   virtual void operator() (const MeshBase::const_element_iterator & range_begin,
                            const MeshBase::const_element_iterator & range_end,
                            processor_id_type p,
-                           map_type & coupled_elements);
+                           map_type & coupled_elements) override;
 
 private:
 
-  const MeshBase & _mesh;
+  const MeshBase * _mesh;
 };
 
 } // namespace libMesh

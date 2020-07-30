@@ -46,6 +46,12 @@ public:
   SiblingCoupling() :
     _dof_coupling(nullptr) {}
 
+  /**
+   * Constructor.
+   */
+  SiblingCoupling(const SiblingCoupling & other) : GhostingFunctor(other),
+    _dof_coupling(other._dof_coupling) {}
+
   // Change coupling matrix after construction
   void set_dof_coupling(const CouplingMatrix * dof_coupling)
   { _dof_coupling = dof_coupling; }
@@ -58,6 +64,13 @@ public:
                            const MeshBase::const_element_iterator & range_end,
                            processor_id_type p,
                            map_type & coupled_elements);
+
+   /**
+    * A clone() is needed because GhostingFunctor can not be shared between
+    * different meshes. The operations in  GhostingFunctor are mesh dependent.
+    */
+   virtual std::unique_ptr<GhostingFunctor> clone () const
+   { return libmesh_make_unique<SiblingCoupling>(*this); }
 
 private:
 

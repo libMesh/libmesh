@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/ghosting_functor.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -54,6 +55,26 @@ public:
     _n_levels(0)
   {}
 
+  /**
+   * Constructor.
+   */
+  DefaultCoupling(const DefaultCoupling & other) :
+    GhostingFunctor(other),
+    _dof_coupling(other._dof_coupling),
+#ifdef LIBMESH_ENABLE_PERIODIC
+    _periodic_bcs(other._periodic_bcs),
+#endif
+    _mesh(other._mesh),
+    _n_levels(other._n_levels)
+  {}
+
+  /**
+   * A clone() is needed because GhostingFunctor can not be shared between
+   * different meshes. The operations in  GhostingFunctor are mesh dependent.
+   */
+  virtual std::unique_ptr<GhostingFunctor> clone () const override
+  { return libmesh_make_unique<DefaultCoupling>(*this); }
+
   // Change coupling matrix after construction
   void set_dof_coupling(const CouplingMatrix * dof_coupling);
 
@@ -72,7 +93,8 @@ public:
 #endif
 
   // Set MeshBase for use in checking for periodic boundary ids
-  void set_mesh(const MeshBase * mesh)
+  // It should be called if a GhostingFunctor is created via clone
+  virtual void set_mesh(const MeshBase * mesh) override
   { _mesh = mesh; }
 
   /**

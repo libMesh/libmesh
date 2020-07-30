@@ -25,6 +25,7 @@
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes
 #include <unordered_map>
@@ -160,9 +161,27 @@ public:
   GhostingFunctor() {}
 
   /**
+   * Copy Constructor
+   */
+  GhostingFunctor(const GhostingFunctor & other) : ReferenceCountedObject<GhostingFunctor>(other) {}
+
+  /**
    * Virtual destructor; this is an abstract base class.
    */
   virtual ~GhostingFunctor() {}
+
+  /**
+   * A clone() is needed because GhostingFunctor can not be shared between
+   * different meshes. The operations in  GhostingFunctor are mesh dependent.
+   */
+  virtual std::unique_ptr<GhostingFunctor> clone () const
+  { libmesh_not_implemented(); }
+
+  /**
+   * It should be called after cloning a ghosting functor.
+   * Ghosting functor is mesh dependent
+   */
+  virtual void set_mesh(const MeshBase * /*mesh*/) { libmesh_not_implemented(); }
 
   /**
    * What elements do we care about and what variables do we care

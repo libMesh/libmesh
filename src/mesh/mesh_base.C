@@ -102,9 +102,15 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
-  _ghosting_functors(other_mesh._ghosting_functors),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {
+   for (const auto & gf : other_mesh._ghosting_functors )
+   {
+     std::shared_ptr<GhostingFunctor> clone_gf = gf->clone();
+     clone_gf->set_mesh(this);
+     add_ghosting_functor(clone_gf);
+   }
+
   // Make sure we don't accidentally delete the other mesh's default
   // ghosting functor; we'll use our own if that's needed.
   if (other_mesh._ghosting_functors.count(other_mesh._default_ghosting.get()))
