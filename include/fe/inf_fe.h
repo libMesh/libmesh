@@ -572,8 +572,8 @@ public:
    */
   const std::vector<Real> & get_JxW () const override
   {
-      libmesh_not_implemented();
-      return this->JxWxdecay;
+      //libmesh_not_implemented();
+      return this->JxW;
   }
 
   /**
@@ -1014,6 +1014,7 @@ protected:
   std::vector<std::vector<RealGradient>> dphixr_sq;
 
   std::vector<Real> JxWxdecay;
+  std::vector<Real> JxW;
 
   std::vector<Point> normals;
   std::vector<std::vector<Point>> tangents;
@@ -1159,11 +1160,10 @@ private:
 
 
 // InfFERadial class inline members
-// FIXME: decay in 3D is 1/r
+// FIXME: decay in 3D is a/r
 //   thus, this function fixes the mapping v<->r explicitly.
 //   This is consistent with the current InfFEMap, which, however, is
 //   written such that more general mappings can be implemented.
-//   FIXME: the name is misleading: this is 'decay' multiplied with r.
 inline
 Real InfFERadial::decay(const unsigned int dim, const Real v)
 {
