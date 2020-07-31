@@ -26,13 +26,11 @@
 #include "libmesh/eigen_system.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/sparse_matrix.h"
-#include "libmesh/diagonal_matrix.h"
 #include "libmesh/shell_matrix.h"
 #include "libmesh/eigen_solver.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/enum_eigen_solver_type.h"
-#include "libmesh/utility.h" // libmesh_map_find
 
 namespace libMesh
 {
@@ -45,14 +43,16 @@ EigenSystem::EigenSystem (EquationSystems & es,
                           const unsigned int number_in
                           ) :
   Parent           (es, name_in, number_in),
+  matrix_A         (nullptr),
+  matrix_B         (nullptr),
+  precond_matrix   (nullptr),
   eigen_solver     (EigenSolver<Number>::build(es.comm())),
   _n_converged_eigenpairs (0),
   _n_iterations           (0),
-  _is_generalized_eigenproblem (false),
-  _eigen_problem_type (NHEP),
   _use_shell_matrices (false),
   _use_shell_precond_matrix(false)
 {
+  set_eigenproblem_type(NHEP);
 }
 
 
@@ -70,16 +70,17 @@ void EigenSystem::clear ()
   // Clear the parent data
   Parent::clear();
 
-  // Clean up the matrices
-  matrix_A.reset();
-  matrix_B.reset();
+  // The SparseMatrices are contained in _matrices
+  // and are cleared with the above call
+  matrix_A = nullptr;
+  matrix_B = nullptr;
+  precond_matrix = nullptr;
 
   // Operators
   shell_matrix_A.reset();
   shell_matrix_B.reset();
 
   // Preconditioning matrices
-  precond_matrix.reset();
   shell_precond_matrix.reset();
 
   // clear the solver
@@ -92,6 +93,13 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
   _eigen_problem_type = ept;
 
   eigen_solver->set_eigenproblem_type(ept);
+
+  if (_eigen_problem_type == GNHEP ||
+      _eigen_problem_type == GHEP  ||
+      _eigen_problem_type == GHIEP)
+    _is_generalized_eigenproblem = true;
+  else
+    _is_generalized_eigenproblem = false;
 
   // libMesh::out << "The Problem type is set to be: " << std::endl;
 
@@ -125,158 +133,85 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 
 
 
-
-void EigenSystem::init_data ()
+void EigenSystem::add_matrices ()
 {
-  // initialize parent data
-  Parent::init_data();
+  Parent::add_matrices();
 
-  // define the type of eigenproblem
-  if (_eigen_problem_type == GNHEP ||
-      _eigen_problem_type == GHEP  ||
-      _eigen_problem_type == GHIEP)
-    _is_generalized_eigenproblem = true;
+  if (_use_shell_matrices)
+  {
+    if (!shell_matrix_A)
+      shell_matrix_A = ShellMatrix<Number>::build(this->comm());
 
-  this->init_matrices();
+    if (_is_generalized_eigenproblem && !shell_matrix_B)
+      shell_matrix_B = ShellMatrix<Number>::build(this->comm());
+
+    if (_use_shell_precond_matrix)
+      {
+        if (!shell_precond_matrix)
+          shell_precond_matrix = ShellMatrix<Number>::build(this->comm());
+      }
+    else if (!precond_matrix)
+      precond_matrix = &(this->add_matrix("Eigen Preconditioner"));
+  }
+  else
+  {
+    if (!matrix_A)
+      matrix_A = &(this->add_matrix("Eigen Matrix A"));
+
+    if (_is_generalized_eigenproblem && !matrix_B)
+      matrix_B = &(this->add_matrix("Eigen Matrix B"));
+  }
 }
 
 
 
 void EigenSystem::init_matrices ()
 {
-  DofMap & dof_map = this->get_dof_map();
+  Parent::init_matrices();
 
-  if (_use_shell_matrices)
-  {
-    shell_matrix_A = ShellMatrix<Number>::build(this->comm());
-
-    shell_matrix_A->attach_dof_map(dof_map);
-
-    shell_matrix_A->init();
-
-    if (_is_generalized_eigenproblem)
+  if (shell_matrix_A)
     {
-       shell_matrix_B = ShellMatrix<Number>::build(this->comm());
-
-       shell_matrix_B->attach_dof_map(dof_map);
-
-       shell_matrix_B->init();
+      shell_matrix_A->attach_dof_map(this->get_dof_map());
+      shell_matrix_A->init();
     }
 
-    if (_use_shell_precond_matrix)
+  if (shell_matrix_B)
     {
-      shell_precond_matrix = ShellMatrix<Number>::build(this->comm());
+      shell_matrix_B->attach_dof_map(this->get_dof_map());
+      shell_matrix_B->init();
+    }
 
-      shell_precond_matrix->attach_dof_map(dof_map);
-
+  if (shell_precond_matrix)
+    {
+      shell_precond_matrix->attach_dof_map(this->get_dof_map());
       shell_precond_matrix->init();
     }
-    else
-    {
-      precond_matrix = SparseMatrix<Number>::build(this->comm());
-
-      dof_map.attach_matrix(*precond_matrix);
-
-      dof_map.compute_sparsity(this->get_mesh());
-
-      precond_matrix->init();
-
-      precond_matrix->zero();
-    }
-  }
-  else
-  {
-    // build the system matrix
-    matrix_A = SparseMatrix<Number>::build(this->comm());
-
-    dof_map.attach_matrix(*matrix_A);
-
-    // build matrix_B only in case of a
-    // generalized problem
-    if (_is_generalized_eigenproblem)
-      {
-        matrix_B = SparseMatrix<Number>::build(this->comm());
-        dof_map.attach_matrix(*matrix_B);
-      }
-
-    dof_map.compute_sparsity(this->get_mesh());
-
-    // initialize and zero system matrix
-    matrix_A->init();
-    matrix_A->zero();
-
-    // eventually initialize and zero system matrix_B
-    if (_is_generalized_eigenproblem)
-      {
-        matrix_B->init();
-        matrix_B->zero();
-      }
-  }
 }
-
 
 
 void EigenSystem::reinit ()
 {
   // initialize parent data
+  // this calls reinit on matrix_A, matrix_B, and precond_matrix (if any)
   Parent::reinit();
 
-  DofMap & dof_map = this->get_dof_map();
-
-  if (_use_shell_matrices)
-  {
-    shell_matrix_A->clear();
-
-    if (_is_generalized_eigenproblem)
-     shell_matrix_B->clear();
-
-    if (_use_shell_precond_matrix)
-      shell_precond_matrix->clear();
-    else
+  if (shell_matrix_A)
     {
-      precond_matrix->clear();
-      dof_map.clear_sparsity();
-      dof_map.compute_sparsity(this->get_mesh());
+      shell_matrix_A->clear();
+      shell_matrix_A->init();
     }
 
-    shell_matrix_A->init();
-
-    if (_is_generalized_eigenproblem)
+  if (shell_matrix_B)
+    {
+      shell_matrix_B->clear();
       shell_matrix_B->init();
-
-    if (_use_shell_precond_matrix)
-      shell_precond_matrix->init();
-    else
-    {
-      precond_matrix->init();
-      precond_matrix->zero();
     }
-  }
-  else
-  {
-    // Clear the matrices
-    matrix_A->clear();
 
-    if (_is_generalized_eigenproblem)
-      matrix_B->clear();
-
-    // Clear the sparsity pattern
-    dof_map.clear_sparsity();
-
-    // Compute the sparsity pattern for the current
-    // mesh and DOF distribution.  This also updates
-    // both matrices, \p DofMap now knows them
-    dof_map.compute_sparsity(this->get_mesh());
-
-    matrix_A->init();
-    matrix_A->zero();
-
-    if (_is_generalized_eigenproblem)
-      {
-        matrix_B->init();
-        matrix_B->zero();
-      }
-   }
+  if (shell_precond_matrix)
+    {
+      shell_precond_matrix->clear();
+      shell_precond_matrix->init();
+    }
 }
 
 
@@ -353,16 +288,6 @@ void EigenSystem::solve ()
   this->_n_iterations           = solve_data.second;
 }
 
-
-void EigenSystem::assemble ()
-{
-
-  // Assemble the linear system
-  Parent::assemble ();
-
-}
-
-
 std::pair<Real, Real> EigenSystem::get_eigenpair (dof_id_type i)
 {
   // call the eigen_solver get_eigenpair method
@@ -379,38 +304,6 @@ void EigenSystem::set_initial_space (NumericVector<Number> & initial_space_in)
   eigen_solver->set_initial_space (initial_space_in);
 }
 
-
-Matrix & EigenSystem::add_matrix (const std::string & mat_name,
-                                     const ParallelType,
-                                     const MatrixBuildType mat_build_type)
-{
-  // Return the matrix if it is already there.
-  if (this->have_matrix(mat_name))
-    return *(_matrices[mat_name]);
-
-  // Otherwise build the matrix and return it.
-  Matrix * buf;
-  if (mat_build_type == MatrixBuildType::AUTOMATIC)
-    buf = SparseMatrix<Number>::build(this->comm()).release();
-  else if (mat_build_type == MatrixBuildType::DIAGONAL)
-    buf = libmesh_make_unique<DiagonalMatrix<Number>>(this->comm()).release();
-
-  _matrices.emplace(mat_name, buf);
-
-  return *buf;
-}
-
-
-const Matrix & EigenSystem::get_matrix (const std::string & mat_name) const
-{
-  return *(libmesh_map_find(_matrices, mat_name));
-}
-
-
-Matrix & EigenSystem::get_matrix (const std::string & mat_name)
-{
-  return *(libmesh_map_find(_matrices, mat_name));
-}
 
 } // namespace libMesh
 

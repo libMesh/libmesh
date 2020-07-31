@@ -32,6 +32,7 @@
 #include "libmesh/point_locator_base.h" // For point_value
 #include "libmesh/qoi_set.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/sparse_matrix.h"
 #include "libmesh/system.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/utility.h"
@@ -39,7 +40,6 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -86,6 +86,7 @@ System::System (EquationSystems & es,
   _sys_name                         (name_in),
   _sys_number                       (number_in),
   _active                           (true),
+  _can_add_matrices                 (true),
   _solution_projection              (true),
   _basic_system_only                (false),
   _is_initialized                   (false),
@@ -231,6 +232,9 @@ void System::clear ()
     _is_initialized = false;
   }
 
+  // clear any user-added matrices
+  _matrices.clear();
+  _can_add_matrices = true;
 }
 
 
@@ -318,6 +322,58 @@ void System::init_data ()
           pr.second->init (this->n_dofs(), this->n_local_dofs(), false, type);
         }
     }
+
+  // Add matrices
+  this->add_matrices();
+
+  // Clear any existing matrices
+  for (auto & pr : _matrices)
+    pr.second->clear();
+
+  // Initialize the matrices for the system
+  this->init_matrices();
+}
+
+
+
+void System::init_matrices ()
+{
+  // no chance to add other matrices
+  _can_add_matrices = false;
+
+  // No matrices to init
+  if (_matrices.empty())
+    return;
+
+  // Check for quick return in case the first matrix
+  // (and by extension all the matrices) has already
+  // been initialized
+  if (_matrices.begin()->second->initialized())
+    return;
+
+  // Tell the matrices about the dof map, and vice versa
+  for (auto & pr : _matrices)
+    {
+      SparseMatrix<Number> & m = *(pr.second);
+      libmesh_assert (!m.initialized());
+
+      // We want to allow repeated init() on systems, but we don't
+      // want to attach the same matrix to the DofMap twice
+      if (!this->get_dof_map().is_attached(m))
+        this->get_dof_map().attach_matrix(m);
+    }
+
+  // Compute the sparsity pattern for the current
+  // mesh and DOF distribution.  This also updates
+  // additional matrices, \p DofMap now knows them
+  this->get_dof_map().compute_sparsity(this->get_mesh());
+
+  // Initialize matrices and set to zero
+  for (auto & pr : _matrices)
+    {
+      pr.second->init(_matrix_types[pr.first]);
+      pr.second->zero();
+    }
 }
 
 
@@ -392,6 +448,28 @@ void System::reinit ()
 {
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
+
+  // Clear the matrices
+  for (auto & pr : _matrices)
+    {
+      pr.second->clear();
+      pr.second->attach_dof_map(this->get_dof_map());
+    }
+
+  // Clear the sparsity pattern
+  this->get_dof_map().clear_sparsity();
+
+  // Compute the sparsity pattern for the current
+  // mesh and DOF distribution.  This also updates
+  // additional matrices, \p DofMap now knows them
+  this->get_dof_map().compute_sparsity (this->get_mesh());
+
+  // Initialize matrices and set to zero
+  for (auto & pr : _matrices)
+    {
+      pr.second->init();
+      pr.second->zero();
+    }
 }
 
 
@@ -848,6 +926,87 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 
   // Return the string associated with the current vector
   return v->first;
+}
+
+
+
+SparseMatrix<Number> & System::add_matrix (const std::string & mat_name,
+                                           const ParallelType type,
+                                           const MatrixBuildType mat_build_type)
+{
+  // only add matrices before initializing...
+  if (!_can_add_matrices)
+    libmesh_error_msg("ERROR: Too late.  Cannot add matrices to the system after initialization"
+                      << "\n any more.  You should have done this earlier.");
+
+  // Return the matrix if it is already there.
+  if (this->have_matrix(mat_name))
+    return *(_matrices[mat_name]);
+
+  // Otherwise build the matrix and return it.
+  std::unique_ptr<SparseMatrix<Number>> buf = SparseMatrix<Number>::build(this->comm(),
+                                                                          libMesh::default_solver_package(),
+                                                                          mat_build_type);
+  SparseMatrix<Number> & mat = *buf;
+
+  _matrices.emplace(mat_name, std::move(buf));
+  _matrix_types.emplace(mat_name, type);
+
+  return mat;
+}
+
+
+
+void System::remove_matrix (const std::string & mat_name)
+{
+  matrices_iterator pos = _matrices.find(mat_name);
+
+  // Return if the matrix does not exist
+  if (pos == _matrices.end())
+    return;
+
+  pos->second.reset();
+  _matrices.erase(pos);
+}
+
+
+
+const SparseMatrix<Number> * System::request_matrix (const std::string & mat_name) const
+{
+  // Make sure the matrix exists
+  const_matrices_iterator pos = _matrices.find(mat_name);
+
+  if (pos == _matrices.end())
+    return nullptr;
+
+  return pos->second.get();
+}
+
+
+
+SparseMatrix<Number> * System::request_matrix (const std::string & mat_name)
+{
+  // Make sure the matrix exists
+  matrices_iterator pos = _matrices.find(mat_name);
+
+  if (pos == _matrices.end())
+    return nullptr;
+
+  return pos->second.get();
+}
+
+
+
+const SparseMatrix<Number> & System::get_matrix (const std::string & mat_name) const
+{
+  return *libmesh_map_find(_matrices, mat_name);
+}
+
+
+
+SparseMatrix<Number> & System::get_matrix (const std::string & mat_name)
+{
+  return *libmesh_map_find(_matrices, mat_name);
 }
 
 

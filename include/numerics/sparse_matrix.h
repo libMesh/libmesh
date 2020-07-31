@@ -24,9 +24,11 @@
 // Local includes
 #include "libmesh/libmesh.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/reference_counted_object.h"
 #include "libmesh/id_types.h"
-#include "libmesh/matrix.h"
+#include "libmesh/parallel_object.h"
 #include "libmesh/enum_parallel_type.h"
+#include "libmesh/enum_matrix_build_type.h"
 
 // C++ includes
 #include <cstddef>
@@ -60,7 +62,8 @@ std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m);
  * \date 2003
  */
 template <typename T>
-class SparseMatrix : public Matrix
+class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T>>,
+                     public ParallelObject
 {
 public:
   /**
@@ -93,7 +96,8 @@ public:
    */
   static std::unique_ptr<SparseMatrix<T>>
   build(const Parallel::Communicator & comm,
-        const SolverPackage solver_package = libMesh::default_solver_package());
+        const SolverPackage solver_package = libMesh::default_solver_package(),
+        const MatrixBuildType matrix_build_type = MatrixBuildType::AUTOMATIC);
 
   /**
    * \returns \p true if the matrix has been initialized,

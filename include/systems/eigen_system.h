@@ -102,11 +102,6 @@ public:
   virtual void solve () override;
 
   /**
-   * Assembles the system matrix.
-   */
-  virtual void assemble () override;
-
-  /**
    * \returns Real and imaginary part of the ith eigenvalue and copies
    * the respective eigen vector to the solution vector.
    */
@@ -123,11 +118,6 @@ public:
    * the system type in an equation system file.
    */
   virtual std::string system_type () const override { return "Eigen"; }
-
-  /**
-   * \returns The number of matrices handled by this system
-   */
-  virtual unsigned int n_matrices () const override;
 
   /**
    * \returns The number of converged eigenpairs.
@@ -181,48 +171,14 @@ public:
   void use_shell_precond_matrix(bool use_shell_precond_matrix) { _use_shell_precond_matrix = use_shell_precond_matrix; }
 
   /**
-   * Adds the additional matrix \p mat_name to this system.
-   *
-   * @param type The serial/parallel/ghosted type of the matrix
-   * @param mat_build_type The matrix type to build
-   *
-   */
-  Matrix & add_matrix (const std::string & mat_name,
-                       ParallelType type = PARALLEL,
-                       MatrixBuildType mat_build_type = MatrixBuildType::AUTOMATIC) override;
-
-  /**
-   * \returns \p true if this \p System has a matrix associated with the
-   * given name, \p false otherwise.
-   */
-  bool have_matrix (const std::string & mat_name) const override;
-
-  /**
-   * \returns A const reference to this system's additional matrix
-   * named \p mat_name.
-   *
-   * None of these matrices is involved in the solution process.
-   */
-  const Matrix & get_matrix (const std::string & mat_name) const override;
-
-  /**
-   * \returns A writable reference to this system's additional matrix
-   * named \p mat_name.
-   *
-   * None of these matrices is involved in the solution process.
-   */
-  Matrix & get_matrix (const std::string & mat_name) override;
-
-
-  /**
    * The system matrix for standard eigenvalue problems.
    */
-  std::unique_ptr<SparseMatrix<Number>> matrix_A;
+  SparseMatrix<Number> * matrix_A;
 
   /**
    * A second system matrix for generalized eigenvalue problems.
    */
-  std::unique_ptr<SparseMatrix<Number>> matrix_B;
+  SparseMatrix<Number> * matrix_B;
 
   /**
    * The system shell matrix for standard eigenvalue problems.
@@ -237,7 +193,7 @@ public:
   /**
    * A preconditioning matrix
    */
-  std::unique_ptr<SparseMatrix<Number>> precond_matrix;
+  SparseMatrix<Number> * precond_matrix;
 
   /**
    * A preconditioning shell matrix
@@ -253,17 +209,15 @@ public:
 
 protected:
 
-
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * Adds the necessary matrices and shell matrices
    */
-  virtual void init_data () override;
+  virtual void add_matrices () override;
 
   /**
    * Initializes the matrices associated with the system
    */
-  virtual void init_matrices ();
+  virtual void init_matrices () override;
 
   /**
    * Set the _n_converged_eigenpairs member, useful for
@@ -312,32 +266,7 @@ private:
    * A boolean flag to indicate whether or not to use a shell preconditioning matrix
    */
   bool _use_shell_precond_matrix;
-
-  /**
-   * Some systems need an arbitrary number of matrices.
-   */
-  std::map<std::string, Matrix *> _matrices;
 };
-
-
-
-// ------------------------------------------------------------
-// EigenSystem inline methods
-inline
-unsigned int EigenSystem::n_matrices () const
-{
-  if (_is_generalized_eigenproblem)
-    return 2;
-
-  return 1;
-}
-
-
-inline
-bool EigenSystem::have_matrix (const std::string & mat_name) const
-{
-  return (_matrices.count(mat_name));
-}
 
 } // namespace libMesh
 

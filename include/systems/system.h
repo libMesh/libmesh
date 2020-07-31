@@ -21,6 +21,7 @@
 #define LIBMESH_SYSTEM_H
 
 // Local Includes
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/elem_range.h"
 #include "libmesh/enum_subset_solve_mode.h" // SUBSET_ZERO
 #include "libmesh/enum_parallel_type.h" // PARALLEL
@@ -1042,10 +1043,9 @@ public:
   /**
    * \returns The number of matrices
    * handled by this system.
-   *
-   * This will return 0 by default but can be overridden.
+   * This is the size of the \p _matrices map
    */
-  virtual unsigned int n_matrices () const;
+  unsigned int n_matrices () const;
 
   /**
    * \returns The number of variables in the system
@@ -1740,48 +1740,94 @@ public:
 #endif // LIBMESH_HAVE_METAPHYSICL
 
   /**
-   * Adds an auxiliary matrix to the system. Must be implemented in derived classes
+   * Matrix iterator typedefs.
    */
-  virtual Matrix & add_matrix(const std::string &,
-                              ParallelType = PARALLEL,
-                              MatrixBuildType = MatrixBuildType::AUTOMATIC)
-    {
-      libmesh_error_msg("The current system object does not support matrix addition");
-    }
+  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>>::iterator        matrices_iterator;
+  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>>::const_iterator  const_matrices_iterator;
 
   /**
-   * Check whether a matrix exists in the system
+   * Adds the additional matrix \p mat_name to this system.  Only
+   * allowed prior to \p assemble().  All additional matrices
+   * have the same sparsity pattern as the matrix used during
+   * solution.  When not \p System but the user wants to
+   * initialize the mayor matrix, then all the additional matrices,
+   * if existent, have to be initialized by the user, too.
    *
-   * Must be implemented in derived classes
+   * This non-template method will add a derived matrix type corresponding to
+   * the solver package. If the user wishes to specify the matrix type to add,
+   * use the templated \p add_matrix method instead
+   *
+   * @param mat_name A name for the matrix
+   * @param type The serial/parallel/ghosted type of the matrix
+   * @param mat_build_type The matrix type to build
+   *
    */
-  virtual bool have_matrix(const std::string &) const
-    {
-      libmesh_error_msg("The current system object does not support matrix addition");
-    }
+  SparseMatrix<Number> & add_matrix (const std::string & mat_name,
+                                     ParallelType type = PARALLEL,
+                                     MatrixBuildType mat_build_type = MatrixBuildType::AUTOMATIC);
 
   /**
-   * \returns A const reference to an auxiliary matrix
+  * Adds the additional matrix \p mat_name to this system.  Only
+  * allowed prior to \p assemble().  All additional matrices
+  * have the same sparsity pattern as the matrix used during
+  * solution.  When not \p System but the user wants to
+  * initialize the mayor matrix, then all the additional matrices,
+  * if existent, have to be initialized by the user, too.
+  *
+  * This method will create add a derived matrix of type
+  * \p MatrixType<Number>. One can use the non-templated \p add_matrix method to
+  * add a matrix corresponding to the default solver package
+  *
+  * @param mat_name A name for the matrix
+  * @param type The serial/parallel/ghosted type of the matrix
+  */
+  template <template <typename> class>
+  SparseMatrix<Number> & add_matrix (const std::string & mat_name, ParallelType = PARALLEL);
+
+  /**
+   * Removes the additional matrix \p mat_name from this system
+   */
+  void remove_matrix(const std::string & mat_name);
+
+  /**
+   * \returns \p true if this \p System has a matrix associated with the
+   * given name, \p false otherwise.
+   */
+  inline bool have_matrix (const std::string & mat_name) const { return _matrices.count(mat_name); };
+
+  /**
+   * \returns A const pointer to this system's additional matrix
+   * named \p mat_name, or \p nullptr if no matrix by that name
+   * exists.
+   */
+  const SparseMatrix<Number> * request_matrix (const std::string & mat_name) const;
+
+  /**
+   * \returns A writable pointer to this system's additional matrix
+   * named \p mat_name, or \p nullptr if no matrix by that name
+   * exists.
+   */
+  SparseMatrix<Number> * request_matrix (const std::string & mat_name);
+
+  /**
+   * \returns A const reference to this system's additional matrix
+   * named \p mat_name.
    *
    * None of these matrices is involved in the solution process.
-   *
-   * Must be implemented in derived classes
+   * Access is only granted when the matrix is already properly
+   * initialized.
    */
-  virtual const Matrix & get_matrix (const std::string &) const
-    {
-      libmesh_error_msg("The current system object does not support matrix addition/retrieval");
-    }
+  const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
 
   /**
-   * \returns A writable reference to an auxiliary matrix
+   * \returns A writable reference to this system's additional matrix
+   * named \p mat_name.
    *
    * None of these matrices is involved in the solution process.
-   *
-   * Must be implemented in derived classes
+   * Access is only granted when the matrix is already properly
+   * initialized.
    */
-  virtual Matrix & get_matrix (const std::string &)
-    {
-      libmesh_error_msg("The current system object does not support matrix addition/retrieval");
-    }
+  SparseMatrix<Number> & get_matrix (const std::string & mat_name);
 
 
 protected:
@@ -1793,6 +1839,17 @@ protected:
    * function so that all required storage will be available.
    */
   virtual void init_data ();
+
+  /**
+   * Insertion point for adding matrices in derived classes
+   * before init_matrices() is called.
+   */
+  virtual void add_matrices() {}
+
+  /**
+   * Initializes the matrices associated with this system.
+   */
+  virtual void init_matrices ();
 
   /**
    * Projects the vector defined on the old mesh onto the
@@ -2059,6 +2116,21 @@ private:
    * Holds the type of a vector
    */
   std::map<std::string, ParallelType> _vector_types;
+
+  /**
+   * Some systems need an arbitrary number of matrices.
+   */
+  std::map<std::string, std::unique_ptr<SparseMatrix<Number>>> _matrices;
+
+  /**
+   * Holds the types of the matrices
+   */
+  std::map<std::string, ParallelType> _matrix_types;
+
+  /**
+   * \p true when additional matrices may still be added, \p false otherwise.
+   */
+  bool _can_add_matrices;
 
   /**
    * Holds true if the solution vector should be projected
@@ -2350,12 +2422,6 @@ unsigned int System::n_vectors () const
 }
 
 inline
-unsigned int System::n_matrices () const
-{
-  return 0;
-}
-
-inline
 System::vectors_iterator System::vectors_begin ()
 {
   return _vectors.begin();
@@ -2460,6 +2526,36 @@ System::qoi_parameter_hessian_vector_product(const QoISet &,
                                              SensitivityData &)
 {
   libmesh_not_implemented();
+}
+
+inline
+unsigned int System::n_matrices () const
+{
+  return cast_int<unsigned int>(_matrices.size());
+}
+
+template <template <typename> class MatrixType>
+inline
+SparseMatrix<Number> &
+System::add_matrix (const std::string & mat_name,
+                    const ParallelType type)
+{
+  // only add matrices before initializing...
+  if (!_can_add_matrices)
+    libmesh_error_msg("ERROR: Too late.  Cannot add matrices to the system after initialization"
+                      << "\n any more.  You should have done this earlier.");
+
+  // Return the matrix if it is already there.
+  if (this->have_matrix(mat_name))
+    return *(_matrices[mat_name]);
+
+  // Otherwise build the matrix and return it.
+  std::unique_ptr<SparseMatrix<Number>> buf = libmesh_make_unique<MatrixType<Number>>(this->comm());
+  SparseMatrix<Number> & mat = *buf;
+  _matrices.emplace(mat_name, std::move(buf));
+  _matrix_types.emplace(mat_name, type);
+
+  return mat;
 }
 
 

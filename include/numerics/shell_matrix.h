@@ -23,9 +23,10 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/id_types.h"
-#include "libmesh/matrix.h"
+#include "libmesh/parallel_object.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
@@ -47,7 +48,8 @@ template <typename T> class NumericVector;
  * \date 2008
  */
 template <typename T>
-class ShellMatrix : public Matrix
+class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T>>,
+                    public ParallelObject
 {
 public:
   /**
@@ -123,7 +125,7 @@ protected:
 template <typename T>
 inline
 ShellMatrix<T>::ShellMatrix (const Parallel::Communicator & comm_in) :
-  Matrix(comm_in),
+  ParallelObject(comm_in),
   _dof_map(nullptr)
 {}
 
