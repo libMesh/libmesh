@@ -21,6 +21,8 @@
 #include "libmesh/type_tensor.h"
 #include "libmesh/fe.h"
 
+#include "libmesh/face_tri6.h"
+
 using namespace libMesh;
 
 /**
@@ -39,6 +41,7 @@ public:
   CPPUNIT_TEST_SUITE( InfFERadialTest );
   CPPUNIT_TEST( testDifferentOrders );
   CPPUNIT_TEST( testInfQuants );
+  CPPUNIT_TEST( testSides );
   CPPUNIT_TEST( testInfQuants_numericDeriv );
   CPPUNIT_TEST_SUITE_END();
 
@@ -202,22 +205,139 @@ public:
   std::map<KeyType, TabulatedVals> tabulated_vals;
   std::map<KeyType, TabulatedGrads> tabulated_grads;
 
-  void testDifferentOrders ()
+  void testSides()
   {
-    testSingleOrder(FIRST, LEGENDRE);
-    testSingleOrder(SECOND, LEGENDRE);
-    testSingleOrder(THIRD, LEGENDRE);
-    testSingleOrder(FOURTH, LEGENDRE);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-    testSingleOrder(FIRST, JACOBI_20_00);
-    testSingleOrder(SECOND, JACOBI_20_00);
-    testSingleOrder(THIRD, JACOBI_20_00);
-    testSingleOrder(FOURTH, JACOBI_20_00);
+    ReplicatedMesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_cube
+      (mesh,
+       /*nx=*/2, /*ny=*/2, /*nz=*/2,
+       /*xmin=*/-2., /*xmax=*/2.,
+       /*ymin=*/-1., /*ymax=*/1.,
+       /*zmin=*/-2., /*zmax=*/2.,
+       PRISM18);
 
-    testSingleOrder(FIRST, JACOBI_30_00);
-    testSingleOrder(SECOND, JACOBI_30_00);
-    testSingleOrder(THIRD, JACOBI_30_00);
-    testSingleOrder(FOURTH, JACOBI_30_00);
+    const unsigned int n_fem =mesh.n_elem();
+
+    InfElemBuilder builder(mesh);
+    builder.build_inf_elem();
+
+    // Get pointer to the first infinite Elem.
+    Elem * infinite_elem = mesh.elem_ptr(n_fem+3);
+    if (!infinite_elem || !infinite_elem->infinite())
+      libmesh_error_msg("Error setting Elem pointer.");
+
+    // We will construct FEs, etc. of the same dimension as the mesh elements.
+    auto dim = mesh.mesh_dimension();
+
+    //FEType fe_type(/*Order*/FIRST,
+    FEType fe_type(/*Order*/SECOND,
+                   /*FEFamily*/LAGRANGE,
+                   /*radial order*/FIRST,
+                   /*radial_family*/LAGRANGE,
+                   /*inf_map*/CARTESIAN);
+
+
+    // Construct FE, quadrature rule, etc.
+    std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
+    std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
+    std::unique_ptr<FEBase> fe2 (FEBase::build(dim-1, fe_type));
+    QGauss qrule (dim-1, fe_type.default_quadrature_order());
+    inf_fe->attach_quadrature_rule(&qrule);
+    fe->attach_quadrature_rule(&qrule);
+    fe2->attach_quadrature_rule(&qrule);
+
+    //find the FE neighbour of \p infinite_elem:
+    unsigned int side_num=7;
+    MeshBase::const_element_iterator           el = mesh.elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.elements_end();
+    Point side_pt = infinite_elem->side_ptr(0)->centroid();
+
+    Elem * finite_elem = infinite_elem->neighbor_ptr(0);
+    for(unsigned int i=0; i<finite_elem->n_sides(); ++i)
+      {
+        if (finite_elem->side_ptr(i)->contains_point(side_pt))
+          {
+            side_num = i;
+            break;
+          }
+      }
+    libmesh_assert(side_num < 7);
+    // in particular, side_num = 0 (used later)
+
+    // construct a 'side' element (specific to the current geometry):
+    Tri6 side_elem;
+    side_elem.set_node(0)=finite_elem->node_ptr(0);
+    side_elem.set_node(1)=finite_elem->node_ptr(2);
+    side_elem.set_node(2)=finite_elem->node_ptr(1);
+    side_elem.set_node(3)=finite_elem->node_ptr(8);
+    side_elem.set_node(4)=finite_elem->node_ptr(7);
+    side_elem.set_node(5)=finite_elem->node_ptr(6);
+
+    const std::vector<Point>& i_qpoint = inf_fe->get_xyz();
+    const std::vector<Real> & i_weight = inf_fe->get_Sobolev_weight();
+    const std::vector<Real> & i_JxW = inf_fe->get_JxWxdecay_sq();
+    const std::vector<std::vector<Real> >& i_phi  = inf_fe->get_phi();
+    const std::vector<Point> &                i_normal = inf_fe->get_normals();
+    const std::vector<std::vector<Point> >& i_tangents = inf_fe->get_tangents();
+
+    const std::vector<Point>& f_qpoint = fe->get_xyz();
+    const std::vector<Real> & f_weight = fe->get_Sobolev_weight();
+    const std::vector<Real> & f_JxW = fe->get_JxWxdecay_sq();
+    const std::vector<std::vector<Real> >& f_phi  = fe->get_phi();
+    const std::vector<Point> &                f_normal = fe->get_normals();
+    const std::vector<std::vector<Point> >& f_tangents = fe->get_tangents();
+
+    const std::vector<Point>& s_qpoint = fe2->get_xyz();
+    const std::vector<Real> & s_JxW = fe2->get_JxWxdecay_sq();
+    const std::vector<std::vector<Real> >& s_phi  = fe2->get_phi();
+
+    // Reinit on infinite elem
+    inf_fe->reinit(infinite_elem, (unsigned)0);
+    fe->reinit(finite_elem, side_num);
+    fe2->reinit(&side_elem);
+
+    LIBMESH_ASSERT_FP_EQUAL(i_weight.size(), f_weight.size(), TOLERANCE);
+    for(unsigned int qp =0 ; qp < i_weight.size() ; ++qp)
+      {
+        LIBMESH_ASSERT_FP_EQUAL(i_qpoint[qp](0), f_qpoint[qp](0), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(i_qpoint[qp](1), f_qpoint[qp](1), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(i_qpoint[qp](2), f_qpoint[qp](2), TOLERANCE);
+
+        LIBMESH_ASSERT_FP_EQUAL(s_qpoint[qp](0), f_qpoint[qp](0), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(s_qpoint[qp](1), f_qpoint[qp](1), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(s_qpoint[qp](2), f_qpoint[qp](2), TOLERANCE);
+
+        LIBMESH_ASSERT_FP_EQUAL(i_weight[qp], f_weight[qp], TOLERANCE); // this is both 1
+        LIBMESH_ASSERT_FP_EQUAL(i_JxW[qp]   , f_JxW[qp]   , TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(s_JxW[qp]   , f_JxW[qp]   , TOLERANCE);
+
+        // initialize index maps: (specific to current geometry:
+        unsigned int inf_index[] ={0, 1, 2, 6, 7, 8};
+        unsigned int fe_index[]  ={0, 2, 1, 8, 7, 6};
+        unsigned int s_index[]   ={0, 1, 2, 3, 4, 5};
+        for (unsigned int i=0; i<6; ++i)
+          {
+            LIBMESH_ASSERT_FP_EQUAL(i_phi[inf_index[i]][qp], f_phi[fe_index[i]][qp], TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(i_phi[inf_index[i]][qp], s_phi[s_index[i]][qp], TOLERANCE);
+          }
+
+        // note that infinite element normals point OUTWARD of the element
+        LIBMESH_ASSERT_FP_EQUAL(i_normal[qp](0), f_normal[qp](0), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(i_normal[qp](1), f_normal[qp](1), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(i_normal[qp](2), f_normal[qp](2), TOLERANCE);
+
+        for (unsigned int i=0; i< i_tangents[0].size(); ++i)
+          {
+            LIBMESH_ASSERT_FP_EQUAL(i_tangents[qp][i](0), f_tangents[qp][i](0), TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(i_tangents[qp][i](1), f_tangents[qp][i](1), TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(i_tangents[qp][i](2), f_tangents[qp][i](2), TOLERANCE);
+          }
+
+      }
+
+#endif
   }
 
   void testInfQuants ()
@@ -528,6 +648,24 @@ public:
       }
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+  }
+
+  void testDifferentOrders ()
+  {
+    testSingleOrder(FIRST, LEGENDRE);
+    testSingleOrder(SECOND, LEGENDRE);
+    testSingleOrder(THIRD, LEGENDRE);
+    testSingleOrder(FOURTH, LEGENDRE);
+
+    testSingleOrder(FIRST, JACOBI_20_00);
+    testSingleOrder(SECOND, JACOBI_20_00);
+    testSingleOrder(THIRD, JACOBI_20_00);
+    testSingleOrder(FOURTH, JACOBI_20_00);
+
+    testSingleOrder(FIRST, JACOBI_30_00);
+    testSingleOrder(SECOND, JACOBI_30_00);
+    testSingleOrder(THIRD, JACOBI_30_00);
+    testSingleOrder(FOURTH, JACOBI_30_00);
   }
 
   void testSingleOrder (Order radial_order,

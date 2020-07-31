@@ -219,7 +219,7 @@ Point InfFEMap::inverse_map (const unsigned int dim,
                 J.solve(F,delta);
 
                 // check for convergence
-                Real tol = std::min( TOLERANCE0.01, TOLERANCE*base_elem->hmax() );
+                Real tol = std::min( TOLERANCE*0.01, TOLERANCE*base_elem->hmax() );
                 if ( delta.norm() < tol )
                   {
                     // newton solver converged, now make sure it converged to a point on the base_elem
