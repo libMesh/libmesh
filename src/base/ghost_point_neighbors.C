@@ -106,19 +106,9 @@ void GhostPointNeighbors::operator()
     }
 
   // Connect any interior_parents who are really in our mesh
-  for (const auto & elem : _mesh->element_ptr_range())
-    {
-      std::unordered_set<const Elem *>::iterator ip_it =
-        interior_parents.find(elem);
-
-      if (ip_it != interior_parents.end())
-        {
-          coupled_elements.emplace(elem, nullcm);
-
-          // Shrink the set ASAP to speed up subsequent searches
-          interior_parents.erase(ip_it);
-        }
-    }
+  for (const auto & elem : interior_parents)
+    if (_mesh->query_elem_ptr(elem->id()) == elem)
+      coupled_elements.emplace(elem, nullcm);
 
   // Connect any active elements which are connected to our range's
   // elements' nodes by addin elements connected to nodes on active
