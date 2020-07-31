@@ -479,6 +479,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
   // shape and mapping functions, respectively
   {
     JxWxdecay.resize(_n_total_qp);
+    JxW.resize(_n_total_qp);
     xyz.resize(_n_total_qp);
     dxidx_map.resize(_n_total_qp);
     dxidy_map.resize(_n_total_qp);
@@ -800,6 +801,10 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                                      detadx_map_scaled[tp] *(dzetady_map_scaled[tp]*     dxidz_map_scaled[tp]-  dxidy_map_scaled[tp]*dzetadz_map_scaled[tp]) +
                                      dzetadx_map_scaled[tp]*(     dxidy_map_scaled[tp]* detadz_map_scaled[tp]- detady_map_scaled[tp]*  dxidz_map_scaled[tp]));
 
+              Real inv_jac = (  dxidx_map[tp]*( detady_map[tp]*dzetadz_map[tp]- dzetady_map[tp]*detadz_map[tp]) +
+                                detadx_map[tp]*(dzetady_map[tp]*  dxidz_map[tp]-  dxidy_map[tp]*dzetadz_map[tp]) +
+                                dzetadx_map[tp]*(  dxidy_map[tp]* detadz_map[tp]- detady_map[tp]*  dxidz_map[tp]));
+
               if (inv_jacxR_pow4 <= 1e-7)
                 {
                   libmesh_error_msg("ERROR: negative inverse Jacobian " \
@@ -811,6 +816,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                 }
 
               JxWxdecay[tp] = _total_qrule_weights[tp]/inv_jacxR_pow4;
+              JxW[tp] = _total_qrule_weights[tp]/inv_jac;
 
               // phase term mu(r)=i*k*(r-a).
               // skip i*k: it is added separately during matrix assembly.
@@ -832,6 +838,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                   unsigned int bi = _base_shape_index  [i];
                   unsigned int ri = _radial_shape_index[i];
                   phi      [i][tp] = S [bi][bp] * mode[ri][rp] * som[rp];
+                  phixr    [i][tp] = S [bi][bp] * mode[ri][rp];
                   dphidxi  [i][tp] = Ss[bi][bp] * mode[ri][rp] * som[rp];
                   dphideta [i][tp] = St[bi][bp] * mode[ri][rp] * som[rp];
                   dphidzeta[i][tp] = S [bi][bp]
@@ -841,7 +848,6 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                   const Real dphidxixr = Ss[bi][bp] * mode[ri][rp];
                   const Real dphidetaxr= St[bi][bp] * mode[ri][rp];
 
-                  phixr[i][tp] = S [bi][bp] * mode[ri][rp];
 
                   // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
                   dphi[i][tp](0) =
