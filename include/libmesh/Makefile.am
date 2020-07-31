@@ -235,7 +235,6 @@ BUILT_SOURCES = \
         function_base.h \
         laspack_matrix.h \
         laspack_vector.h \
-        matrix.h \
         numeric_vector.h \
         parsed_fem_function.h \
         parsed_fem_function_parameter.h \
@@ -1237,9 +1236,6 @@ laspack_matrix.h: $(top_srcdir)/include/numerics/laspack_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 laspack_vector.h: $(top_srcdir)/include/numerics/laspack_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-matrix.h: $(top_srcdir)/include/numerics/matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 numeric_vector.h: $(top_srcdir)/include/numerics/numeric_vector.h

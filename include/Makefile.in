@@ -823,7 +823,6 @@ include_HEADERS = \
         numerics/eigen_sparse_vector.h \
         numerics/fem_function_base.h \
         numerics/function_base.h \
-        numerics/matrix.h \
         numerics/numeric_vector.h \
         numerics/parsed_fem_function.h \
         numerics/parsed_fem_function_parameter.h \
