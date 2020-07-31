@@ -12,6 +12,55 @@ AC_DEFUN([CONFIGURE_PARMETIS],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-parmetis)])],
                 [enableparmetis=$enableoptional])
 
+  AC_ARG_WITH(parmetis,
+             AS_HELP_STRING([--with-parmetis=<internal,PETSc,/some/libdir>],
+                            [internal: build from contrib, PETSc: rely on PETSc]),
+             [AS_CASE("${withval}",
+                      [internal], [build_parmetis=yes],
+                      [PETSc],    [build_parmetis=petsc],
+                      [PARMETIS_LIB="-L${withval} -lparmetis"
+                       build_parmetis=no])
+              enableparmetis=yes],
+             [build_parmetis=yes])
+
+  AC_ARG_WITH(parmetis-include,
+             AS_HELP_STRING([--with-parmetis-include=</some/includedir>]),
+             [PARMETIS_INCLUDE="-I${withval}"
+              enableparmetis=yes
+              build_parmetis=no],
+             [])
+
+  dnl Initialize $petsc_have_* to 0 if not already set. They may be
+  dnl unset if the user configured with --disable-petsc
+  AS_IF([test "x$petsc_have_metis" = "x"], [petsc_have_metis=0])
+  AS_IF([test "x$petsc_have_parmetis" = "x"], [petsc_have_parmetis=0])
+
+  dnl If we're using a PETSc with its own METIS, default to using
+  dnl it's ParMETIS too or no ParMETIS at all, regardless of what the
+  dnl user specified (if anything) in --with-parmetis.
+  AS_IF([test $petsc_have_metis -gt 0],
+        [
+         AS_IF([test $petsc_have_parmetis -gt 0],
+               [AC_MSG_RESULT(<<< Using PETSc ParMETIS support to avoid PETSc conflict>>>)
+                build_parmetis=petsc],
+               [AC_MSG_RESULT(<<< Disabling ParMETIS support to avoid PETSc conflict>>>)
+                enableparmetis=no])
+        ])
+
+  dnl Conversely, if:
+  dnl .) ParMETIS is enabled in libmesh,
+  dnl .) PETSc does not have a ParMETIS or METIS, or we aren't using PETSc, and
+  dnl .) build_parmetis=petsc because user said --with-parmetis=PETSc,
+  dnl then we need to make sure that libmesh builds its own ParMETIS!
+  AS_IF([test "$enableparmetis" = "yes" && test "$build_parmetis" = "petsc"],
+        [
+          AS_IF([test "x$petsc_have_metis" = "x0" &&
+                 test "x$petsc_have_parmetis" = "x0"],
+                [build_parmetis=yes])
+          AS_IF([test "$enablepetsc" = "no"],
+                [build_parmetis=yes])
+        ])
+
   dnl Trump --enable-parmetis with --disable-mpi
   AS_IF([test "x$enablempi" = "xno"], [enableparmetis=no])
 
@@ -19,56 +68,23 @@ AC_DEFUN([CONFIGURE_PARMETIS],
   dnl where it might be installed...
   AS_IF([test "x$enableparmetis" = "xyes"],
         [
-          dnl Initialize $petsc_have_parmetis to 0 if not already set. It may be unset
-          dnl if the user configured with --disable-petsc
-          AS_IF([test "x$petsc_have_parmetis" = "x"], [petsc_have_parmetis=0])
+          AC_DEFINE(HAVE_PARMETIS, 1, [Flag indicating whether the library will be compiled with Parmetis support])
 
-          dnl We consider 4 different combinations of METIS/ParMETIS support in PETSc.
-
-          dnl Case A: PETSc is built with both METIS and ParMETIS support. In this case we use both.
-          AS_IF([test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -gt 0],
-                [
-                  AC_DEFINE(HAVE_PARMETIS, 1,
-                            [Flag indicating whether the library will be compiled with Parmetis support])
-                  build_parmetis=no
-                  AC_MSG_RESULT([<<< Configuring library with PETSc Parmetis support >>>])
-                ])
-
-          dnl Case B: PETSc is built with Metis support but no
-          dnl ParMETIS. We use their METIS and disable ParMETIS support to
-          dnl avoid mixing.
-          AS_IF([test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -eq 0],
-                [
-                  PARMETIS_INCLUDE=""
-                  PARMETIS_LIB=""
-                  build_parmetis=no
-                  enableparmetis=no
-                  AC_MSG_RESULT([<<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>])
-                ])
-
-          dnl Case C: PETSc was not built with METIS, but it was built
-          dnl with ParMETIS. I'm not sure this is actually possible, but
-          dnl if it is we will just build our own METIS and disable
-          dnl ParMETIS support to avoid mixing.
-          AS_IF([test "x$build_metis" = "xyes" && test $petsc_have_parmetis -gt 0],
-                [
-                  PARMETIS_INCLUDE=""
-                  PARMETIS_LIB=""
-                  build_parmetis=no
-                  enableparmetis=no
-                  AC_MSG_RESULT([<<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>])
-                ])
-
-          dnl Case D: We're using internal or non-PETSc external
-          dnl METIS. We build ParMETIS on our own.
-          AS_IF([test "x$build_metis" != "xpetsc" && test $petsc_have_parmetis -eq 0],
+          dnl Only put ParMETIS contrib directories into the compiler include paths if we're building our own.
+          AS_IF([test "$build_parmetis" = "yes"],
                 [
                   PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
-                  PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
-                  build_parmetis=yes
-                  AC_DEFINE(HAVE_PARMETIS, 1,
-                            [Flag indicating whether the library will be compiled with Parmetis support])
+                  PARMETIS_LIB="" # contrib Parmetis gets lumped into libcontrib
                   AC_MSG_RESULT([<<< Configuring library with internal Parmetis support >>>])
+                ],
+                [test "$build_parmetis" = "petsc"],
+                [
+                  PARMETIS_INCLUDE=""
+                  PARMETIS_LIB=""
+                  AC_MSG_RESULT([<<< Configuring library with PETSc Parmetis support >>>])
+                ],
+                [
+                  AC_MSG_RESULT([<<< Configuring library with external Parmetis support >>>])
                 ])
         ],
         [
