@@ -23,6 +23,7 @@
 #include "libmesh/point.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/utility.h"
+#include "libmesh/rb_parameters.h"
 
 namespace libMesh
 {
@@ -49,21 +50,69 @@ RBParametrizedFunction::evaluate_comp(const RBParameters & mu,
   return values[comp];
 }
 
-void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
-                                                 const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                                 const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
-                                                 const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb,
-                                                 std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & output)
+void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters> & mus,
+                                                 const std::vector<Point> & all_xyz,
+                                                 const std::vector<subdomain_id_type> & sbd_ids,
+                                                 const std::vector<std::vector<Point>> & all_xyz_perturb,
+                                                 std::vector<std::vector<std::vector<Number>>> & output)
 {
   LOG_SCOPE("vectorized_evaluate()", "RBParametrizedFunction");
 
   output.clear();
+  unsigned int n_points = all_xyz.size();
 
-  auto n_comp = get_n_components();
+  libmesh_error_msg_if(sbd_ids.size() != n_points, "Error: invalid vector sizes");
+  libmesh_error_msg_if(requires_xyz_perturbations && (all_xyz_perturb.size() != n_points), "Error: invalid vector sizes");
 
   // Dummy vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
 
+  output.resize(mus.size());
+  for ( unsigned int mu_index : index_range(mus))
+    {
+      output[mu_index].resize(n_points);
+      for (unsigned int point_index=0; point_index<n_points; point_index++)
+        {
+          if (requires_xyz_perturbations)
+            {
+              output[mu_index][point_index] = evaluate(mus[mu_index],
+                                                       all_xyz[point_index],
+                                                       sbd_ids[point_index],
+                                                       all_xyz_perturb[point_index]);
+            }
+          else
+            {
+              output[mu_index][point_index] = evaluate(mus[mu_index],
+                                                       all_xyz[point_index],
+                                                       sbd_ids[point_index],
+                                                       empty_perturbs);
+            }
+        }
+    }
+}
+
+void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBParameters & mu,
+                                                                       const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
+                                                                       const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                                                       const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb)
+{
+  mesh_to_preevaluated_values_map.clear();
+
+  unsigned int n_points = 0;
+  for (const auto & xyz_pair : all_xyz)
+  {
+    const std::vector<Point> & xyz_vec = xyz_pair.second;
+    n_points += xyz_vec.size();
+  }
+
+  std::vector<Point> all_xyz_vec(n_points);
+  std::vector<subdomain_id_type> sbd_ids_vec(n_points);
+  std::vector<std::vector<Point>> all_xyz_perturb_vec(n_points);
+
+  // Empty vector to be used when xyz perturbations are not required
+  std::vector<Point> empty_perturbs;
+
+  unsigned int counter = 0;
   for (const auto & xyz_pair : all_xyz)
     {
       dof_id_type elem_id = xyz_pair.first;
@@ -73,56 +122,54 @@ void RBParametrizedFunction::vectorized_evaluate(const RBParameters & mu,
 
       // The amount of data to be stored for each component
       auto n_qp = xyz_vec.size();
-
-      // Get a reference to the array[n_comp][n_qp] of data for this
-      // Elem, and properly resize it.
-      auto & array = output[elem_id];
-      array.resize(n_comp);
-      for (auto comp : index_range(array))
-        array[comp].resize(n_qp);
+      mesh_to_preevaluated_values_map[elem_id].resize(n_qp);
 
       for (unsigned int qp : index_range(xyz_vec))
         {
-          std::vector<Number> evaluated_values_at_qp;
+          mesh_to_preevaluated_values_map[elem_id][qp] = counter;
+
+          all_xyz_vec[counter] = xyz_vec[qp];
+          sbd_ids_vec[counter] = subdomain_id;
+
           if (requires_xyz_perturbations)
             {
               const auto & qps_and_perturbs =
                 libmesh_map_find(all_xyz_perturb, elem_id);
-
               libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
 
-              evaluated_values_at_qp = evaluate(mu, xyz_vec[qp], subdomain_id, qps_and_perturbs[qp]);
+              all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
             }
           else
             {
-              evaluated_values_at_qp = evaluate(mu, xyz_vec[qp], subdomain_id, empty_perturbs);
+              all_xyz_perturb_vec[counter] = empty_perturbs;
             }
-          // Copy evaluated_values_at_qp into array at position "qp"
-          for (auto comp : make_range(n_comp))
-            array[comp][qp] = evaluated_values_at_qp[comp];
+
+          counter++;
         }
     }
+
+  std::vector<RBParameters> mus {mu};
+  vectorized_evaluate(mus,
+                      all_xyz_vec,
+                      sbd_ids_vec,
+                      all_xyz_perturb_vec,
+                      preevaluated_values);
 }
 
-void RBParametrizedFunction::preevaluate_parametrized_function(const RBParameters & mu,
-                                                               const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                                               const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
-                                                               const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb)
+Number RBParametrizedFunction::lookup_preevaluated_value_on_mesh(unsigned int comp,
+                                                                 dof_id_type elem_id,
+                                                                 unsigned int qp) const
 {
-  vectorized_evaluate(mu, all_xyz, sbd_ids, all_xyz_perturb, preevaluated_values);
-}
+  const std::vector<unsigned int> & indices_at_qps =
+    libmesh_map_find(mesh_to_preevaluated_values_map, elem_id);
 
-Number RBParametrizedFunction::lookup_preevaluated_value(unsigned int comp,
-                                                         dof_id_type elem_id,
-                                                         unsigned int qp) const
-{
-  const auto & values =
-    libmesh_map_find(preevaluated_values, elem_id);
+  libmesh_error_msg_if(qp >= indices_at_qps.size(), "Error: invalid qp");
 
-  libmesh_error_msg_if(comp >= values.size(), "Error: invalid comp");
-  libmesh_error_msg_if(qp >= values[comp].size(), "Error: invalid qp");
+  unsigned int index = indices_at_qps[qp];
+  libmesh_error_msg_if(preevaluated_values.size() != 1, "Error: we expect only one parameter index");
+  libmesh_error_msg_if(index >= preevaluated_values[0].size(), "Error: invalid index");
 
-  return values[comp][qp];
+  return preevaluated_values[0][index][comp];
 }
 
 }

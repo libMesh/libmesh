@@ -99,35 +99,45 @@ public:
   /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
    */
-  virtual void vectorized_evaluate(const RBParameters & mu,
-                                   const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                   const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
-                                   const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb,
-                                   std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> & output);
+  virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
+                                   const std::vector<Point> & all_xyz,
+                                   const std::vector<subdomain_id_type> & sbd_ids,
+                                   const std::vector<std::vector<Point>> & all_xyz_perturb,
+                                   std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
    * Store the result of vectorized_evaluate. This is helpful during EIM training,
    * since we can pre-evaluate and store the parameterized function for each training
    * sample. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
    */
-  virtual void preevaluate_parametrized_function(const RBParameters & mu,
-                                                 const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
-                                                 const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
-                                                 const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb);
+  virtual void preevaluate_parametrized_function_on_mesh(const RBParameters & mu,
+                                                         const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
+                                                         const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                                         const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb);
 
   /**
    * Look up the preevaluate values of the parametrized function for
    * component \p comp, element \p elem_id, and quadrature point \p qp.
    */
-  virtual Number lookup_preevaluated_value(unsigned int comp,
-                                           dof_id_type elem_id,
-                                           unsigned int qp) const;
+  virtual Number lookup_preevaluated_value_on_mesh(unsigned int comp,
+                                                   dof_id_type elem_id,
+                                                   unsigned int qp) const;
 
   /**
-   * Storage for pre-evaluated values. The indexing here is:
-   *   elem_id --> comp --> qp --> value
+   * Storage for pre-evaluated values. The indexing is given by:
+   *   parameter index --> point index --> component index --> value.
    */
-  std::unordered_map<dof_id_type, std::vector<std::vector<Number>>> preevaluated_values;
+  std::vector<std::vector<std::vector<Number>>> preevaluated_values;
+
+  /**
+   * Indexing into preevaluated_values for the case where the preevaluated values
+   * were obtained from evaluations at elements/quadrature points on a mesh.
+   * The indexing here is:
+   *   elem_id --> qp --> point_index
+   * Then preevaluated_values[0][point_index] provides the vector of component values at
+   * that point.
+   */
+  std::unordered_map<dof_id_type, std::vector<unsigned int>> mesh_to_preevaluated_values_map;
 
   /**
    * Boolean to indicate whether this parametrized function requires xyz perturbations

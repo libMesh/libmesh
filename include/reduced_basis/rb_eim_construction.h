@@ -191,6 +191,12 @@ public:
   virtual void set_Nmax(unsigned int Nmax);
 
   /**
+   * Get the maximum value (across all processors) from
+   * the parametrized functions in the training set.
+   */
+  Real get_max_abs_value_in_training_set() const;
+
+  /**
    * Enum that indicates which type of "best fit" algorithm
    * we should use.
    * a) projection: Find the best fit in the inner product
@@ -306,6 +312,12 @@ private:
    * generally will not start at zero.
    */
   std::vector<QpDataMap> _local_parametrized_functions_for_training;
+
+  /**
+   * Maximum value in _local_parametrized_functions_for_training across all processors.
+   * This can be used for normalization purposes, for example.
+   */
+  Real _max_abs_value_in_training_set;
 
   /**
    * The quadrature point locations, quadrature point weights (JxW), and subdomain IDs

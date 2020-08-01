@@ -67,6 +67,11 @@ public:
   virtual Number evaluate(const RBParameters & mu) override;
 
   /**
+   * Evaluate this RBEIMTheta at all parameters in \p mus.
+   */
+  virtual std::vector<Number> evaluate_vec(const std::vector<RBParameters> & mus) override;
+
+  /**
    * The RBEIMEvaluation object that this RBEIMTheta is based on.
    */
   RBEIMEvaluation & rb_eim_eval;
