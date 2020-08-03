@@ -415,9 +415,7 @@ AC_CONFIG_FILES([contrib/metis/Makefile])
 # -------------------------------------------------------------
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
-AS_IF([test $enablemetis = yes],
-      [CONFIGURE_PARMETIS],
-      [enableparmetis=no])
+CONFIGURE_PARMETIS
 AS_IF([test $enableparmetis = yes],
       [libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
        libmesh_optional_LIBS="$PARMETIS_LIB $libmesh_optional_LIBS"])
