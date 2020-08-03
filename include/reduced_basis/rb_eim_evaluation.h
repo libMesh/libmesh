@@ -114,6 +114,12 @@ public:
   void rb_eim_solve(DenseVector<Number> & EIM_rhs);
 
   /**
+   * Perform rb_eim_solves at each mu in \p mus and store the results
+   * in _rb_eim_solutions.
+   */
+  void rb_eim_solves(const std::vector<RBParameters> & mus, unsigned int N);
+
+  /**
    * Return the current number of EIM basis functions.
    */
   unsigned int get_n_basis_functions() const;
@@ -203,6 +209,11 @@ public:
   const DenseVector<Number> & get_rb_eim_solution() const;
 
   /**
+   * Return entry \p index for each solution in _rb_eim_solutions.
+   */
+  std::vector<Number> get_rb_eim_solutions_entries(unsigned int index) const;
+
+  /**
    * Set the data associated with EIM interpolation points.
    */
   void add_interpolation_points_xyz(Point p);
@@ -280,9 +291,23 @@ public:
 private:
 
   /**
-   * The EIM solution coefficients from the most recent eim_solve().
+   * The EIM solution coefficients from the most recent rb_eim_solve().
    */
   DenseVector<Number> _rb_eim_solution;
+
+  /**
+   * The EIM solution coefficients from the most recent call to rb_eim_solves().
+   */
+  std::vector<DenseVector<Number>> _rb_eim_solutions;
+
+  /**
+   * The parameters and the number of basis functions that were used in the
+   * most recent call to rb_eim_solves(). We store this so that we can
+   * check if we can skip calling rb_eim_solves() again if the inputs
+   * haven't changed.
+   */
+  std::vector<RBParameters> _rb_eim_solves_mus;
+  unsigned int _rb_eim_solves_N;
 
   /**
    * Dense matrix that stores the lower triangular

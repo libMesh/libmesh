@@ -43,7 +43,8 @@ namespace libMesh
 RBEIMEvaluation::RBEIMEvaluation(const Parallel::Communicator & comm)
 :
 ParallelObject(comm),
-evaluate_eim_error_bound(true)
+evaluate_eim_error_bound(true),
+_rb_eim_solves_N(0)
 {
 }
 
@@ -160,6 +161,61 @@ void RBEIMEvaluation::rb_eim_solve(DenseVector<Number> & EIM_rhs)
   interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solution);
 }
 
+void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
+                                    unsigned int N)
+{
+  libmesh_error_msg_if(N > get_n_basis_functions(),
+    "Error: N cannot be larger than the number of basis functions in rb_eim_solves");
+  libmesh_error_msg_if(N==0, "Error: N must be greater than 0 in rb_eim_solves");
+
+  // If mus and N are the same as before, then we return early
+  if ((_rb_eim_solves_mus == mus) && (_rb_eim_solves_N == N))
+    return;
+
+  LOG_SCOPE("rb_eim_solves()", "RBEIMEvaluation");
+
+  _rb_eim_solves_mus = mus;
+  _rb_eim_solves_N = N;
+
+  // output all comps indexing is as follows:
+  //   mu index --> interpolation point index --> component index --> value.
+  std::vector<std::vector<std::vector<Number>>> output_all_comps;
+  get_parametrized_function().vectorized_evaluate(mus,
+                                                  _interpolation_points_xyz,
+                                                  _interpolation_points_subdomain_id,
+                                                  _interpolation_points_xyz_perturbations,
+                                                  output_all_comps);
+
+  std::vector<std::vector<Number>> evaluated_values_at_interp_points(output_all_comps.size());
+
+  for(unsigned int mu_index : index_range(evaluated_values_at_interp_points))
+    {
+      evaluated_values_at_interp_points[mu_index].resize(N);
+      for(unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
+        {
+          unsigned int comp = _interpolation_points_comp[interp_pt_index];
+
+          evaluated_values_at_interp_points[mu_index][interp_pt_index] =
+            output_all_comps[mu_index][interp_pt_index][comp];
+        }
+    }
+
+  DenseMatrix<Number> interpolation_matrix_N;
+  _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
+
+  _rb_eim_solutions.resize(mus.size());
+  for(unsigned int mu_index : index_range(mus))
+    {
+      DenseVector<Number> EIM_rhs(N);
+      for (unsigned int i=0; i<N; i++)
+        {
+          EIM_rhs(i) = evaluated_values_at_interp_points[mu_index][i];
+        }
+
+      interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[mu_index]);
+    }
+}
+
 unsigned int RBEIMEvaluation::get_n_basis_functions() const
 {
   return _local_eim_basis_functions.size();
@@ -173,6 +229,8 @@ void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 void RBEIMEvaluation::decrement_vector(QpDataMap & v,
                                        const DenseVector<Number> & coeffs)
 {
+  LOG_SCOPE("decrement_vector()", "RBEIMEvaluation");
+
   libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
                        "Error: Number of coefficients should match number of basis functions");
 
@@ -300,6 +358,20 @@ RBEIMEvaluation::get_basis_function(unsigned int i) const
 const DenseVector<Number> & RBEIMEvaluation::get_rb_eim_solution() const
 {
   return _rb_eim_solution;
+}
+
+std::vector<Number> RBEIMEvaluation::get_rb_eim_solutions_entries(unsigned int index) const
+{
+  LOG_SCOPE("get_rb_eim_solutions_entries()", "RBEIMEvaluation");
+
+  std::vector<Number> rb_eim_solutions_entries(_rb_eim_solutions.size());
+  for (unsigned int mu_index : index_range(_rb_eim_solutions))
+    {
+      libmesh_error_msg_if(index >= _rb_eim_solutions[mu_index].size(), "Error: Invalid index");
+      rb_eim_solutions_entries[mu_index] = _rb_eim_solutions[mu_index](index);
+    }
+
+  return rb_eim_solutions_entries;
 }
 
 void RBEIMEvaluation::add_interpolation_points_xyz(Point p)

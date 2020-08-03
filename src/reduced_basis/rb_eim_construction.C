@@ -58,7 +58,8 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _Nmax(0),
     _rel_training_tolerance(1.e-4),
-    _abs_training_tolerance(1.e-12)
+    _abs_training_tolerance(1.e-12),
+    _max_abs_value_in_training_set(0.)
 {
   // The training set should be the same on all processors in the
   // case of EIM training.
@@ -320,7 +321,12 @@ Real RBEIMConstruction::train_eim_approximation()
             break;
           }
 
-        if (abs_greedy_error < get_abs_training_tolerance())
+        // We scale the absolution tolerance by the maximum absolute value in our
+        // training set, because otherwise users would need to know the magnitude
+        // of the functions being considered before setting the absolute tolerance.
+        // It is more reliable to compute the relevant magnitude and scale the tolerance
+        // by that magnitude.
+        if (abs_greedy_error < (get_abs_training_tolerance() * get_max_abs_value_in_training_set()))
           {
             libMesh::out << "Absolute error tolerance reached." << std::endl;
             break;
@@ -425,6 +431,11 @@ void RBEIMConstruction::set_Nmax(unsigned int Nmax)
   _Nmax = Nmax;
 }
 
+Real RBEIMConstruction::get_max_abs_value_in_training_set() const
+{
+  return _max_abs_value_in_training_set;
+}
+
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 {
   LOG_SCOPE("compute_max_eim_error()", "RBEIMConstruction");
@@ -471,6 +482,11 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
 
+  // Keep track of the largest value in our parametrized functions
+  // in the training set. We can use this value for normalization
+  // purposes, for example.
+  _max_abs_value_in_training_set = 0.;
+
   _local_parametrized_functions_for_training.resize( get_n_training_samples() );
   for (auto i : make_range(get_n_training_samples()))
     {
@@ -479,10 +495,10 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 
       set_params_from_training_set(i);
 
-      eim_eval.get_parametrized_function().preevaluate_parametrized_function(get_parameters(),
-                                                                             _local_quad_point_locations,
-                                                                             _local_quad_point_subdomain_ids,
-                                                                             _local_quad_point_locations_perturbations);
+      eim_eval.get_parametrized_function().preevaluate_parametrized_function_on_mesh(get_parameters(),
+                                                                                     _local_quad_point_locations,
+                                                                                     _local_quad_point_subdomain_ids,
+                                                                                     _local_quad_point_locations_perturbations);
 
       unsigned int n_comps = eim_eval.get_parametrized_function().get_n_components();
 
@@ -497,8 +513,13 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
             comps_and_qps[comp].resize(xyz_vector.size());
             for (unsigned int qp : index_range(xyz_vector))
               {
-                comps_and_qps[comp][qp] =
-                  eim_eval.get_parametrized_function().lookup_preevaluated_value(comp, elem_id, qp);
+                Number value =
+                  eim_eval.get_parametrized_function().lookup_preevaluated_value_on_mesh(comp, elem_id, qp);
+                comps_and_qps[comp][qp] = value;
+
+                Real abs_value = std::abs(value);
+                if (abs_value > _max_abs_value_in_training_set)
+                  _max_abs_value_in_training_set = abs_value;
               }
           }
 
@@ -506,7 +527,11 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       }
     }
 
-  libMesh::out << "Parametrized functions in training set initialized" << std::endl << std::endl;
+  libMesh::out << "Parametrized functions in training set initialized" << std::endl;
+
+  comm().max(_max_abs_value_in_training_set);
+  libMesh::out << "Maximum absolute value in the training set: "
+    << _max_abs_value_in_training_set << std::endl << std::endl;
 }
 
 void RBEIMConstruction::initialize_qp_data()
