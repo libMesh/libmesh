@@ -107,14 +107,48 @@ public:
   virtual std::pair<Real, Real> get_eigenpair(dof_id_type i) override;
 
   /**
-   * The (condensed) system matrix for standard eigenvalue problems.
+   * \returns The name used for registration and access of the condensed A matrix.
    */
-  std::unique_ptr<SparseMatrix<Number>> condensed_matrix_A;
+  static std::string condensed_matrix_A_name() { return "Condensed Eigen Matrix A"; }
+  /**
+   * \returns The name used for registration and access of the condensed B matrix.
+   */
+  static std::string condensed_matrix_B_name() { return "Condensed Eigen Matrix B"; }
+
+  /**
+   * \returns The system matrix used for standard eigenvalue problems
+   */
+  inline SparseMatrix<Number> & get_condensed_matrix_A() const
+    {
+      libmesh_assert(condensed_matrix_A);
+      libmesh_assert_equal_to(&get_matrix(condensed_matrix_A_name()), condensed_matrix_A);
+      return *condensed_matrix_A;
+    }
+  /**
+   * \returns The second system matrix used for generalized eigenvalue problems.
+   */
+  inline SparseMatrix<Number> & get_condensed_matrix_B() const
+    {
+      libmesh_assert(condensed_matrix_B);
+      libmesh_assert_equal_to(&get_matrix(condensed_matrix_B_name()), condensed_matrix_B);
+      return *condensed_matrix_B;
+    }
+
+  /**
+   * The (condensed) system matrix for standard eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_condensed_matrix_A() instead.
+   */
+  SparseMatrix<Number> * condensed_matrix_A;
 
   /**
    * A second (condensed) system matrix for generalized eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_condensed_matrix_B() instead.
    */
-  std::unique_ptr<SparseMatrix<Number>> condensed_matrix_B;
+  SparseMatrix<Number> * condensed_matrix_B;
 
   /**
    * Vector storing the local dof indices that will not be condensed.

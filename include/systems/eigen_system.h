@@ -171,38 +171,245 @@ public:
   void use_shell_precond_matrix(bool use_shell_precond_matrix) { _use_shell_precond_matrix = use_shell_precond_matrix; }
 
   /**
+   * \returns The name used for registration and access of the A matrix.
+   */
+  static std::string matrix_A_name() { return "Eigen Matrix A"; }
+  /**
+   * \returns The name used for registration and access of the B matrix.
+   */
+  static std::string matrix_B_name() { return "Eigen Matrix B"; }
+  /**
+   * \returns The name used for registration of the preconditioning matrix.
+   */
+  static std::string precond_matrix_name() { return "Eigen Preconditioner"; }
+
+  /**
+   * \returns A const reference to the system matrix used for standard eigenvalue problems.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if !_use_shell_matrices.
+   */
+  inline const SparseMatrix<Number> & get_matrix_A() const
+    {
+      libmesh_assert(matrix_A);
+      libmesh_assert(!_use_shell_matrices);
+      libmesh_assert_equal_to(&get_matrix(matrix_A_name()), matrix_A);
+      return *matrix_A;
+    }
+  /**
+   * \returns A reference to the system matrix used for standard eigenvalue problems.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if !_use_shell_matrices.
+   */
+  inline SparseMatrix<Number> & get_matrix_A()
+    {
+      libmesh_assert(matrix_A);
+      libmesh_assert(!_use_shell_matrices);
+      libmesh_assert_equal_to(&get_matrix(matrix_A_name()), matrix_A);
+      return *matrix_A;
+    }
+
+  /**
+   * \returns A const reference to the system matrix used for generalized eigenvalue problems
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if !_use_shell_matrices and _is_generalized_eigenproblem.
+   */
+  inline const SparseMatrix<Number> & get_matrix_B() const
+    {
+      libmesh_assert(matrix_B);
+      libmesh_assert(!_use_shell_matrices);
+      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert_equal_to(&get_matrix(matrix_B_name()), matrix_B);
+      return *matrix_B;
+    }
+  /**
+   * \returns A const reference to the system matrix used for generalized eigenvalue problems
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if !_use_shell_matrices and _is_generalized_eigenproblem.
+   */
+  inline SparseMatrix<Number> & get_matrix_B()
+    {
+      libmesh_assert(matrix_B);
+      libmesh_assert(!_use_shell_matrices);
+      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert_equal_to(&get_matrix(matrix_B_name()), matrix_B);
+      return *matrix_B;
+    }
+
+  /**
+   * \returns A const reference to the preconditioning matrix.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if !_use_shell_matrices.
+   */
+  inline const SparseMatrix<Number> & get_precond_matrix() const
+    {
+      libmesh_assert(precond_matrix);
+      libmesh_assert(!_use_shell_matrices);
+      libmesh_assert_equal_to(&get_matrix(precond_matrix_name()), precond_matrix);
+      return *precond_matrix;
+    }
+  /**
+   * \returns A reference to the preconditioning matrix.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if !_use_shell_matrices.
+   */
+  inline SparseMatrix<Number> & get_precond_matrix()
+    {
+      libmesh_assert(precond_matrix);
+      libmesh_assert(!_use_shell_matrices);
+      libmesh_assert_equal_to(&get_matrix(precond_matrix_name()), precond_matrix);
+      return *precond_matrix;
+    }
+
+  /**
+   * \returns A const reference to the system shell matrix used for standard eigenvalue problems.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if _use_shell_matrices.
+   */
+  inline const ShellMatrix<Number> & get_shell_matrix_A() const
+    {
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(shell_matrix_A);
+      return *shell_matrix_A;
+    }
+  /**
+   * \returns A reference to the system shell matrix used for standard eigenvalue problems.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if _use_shell_matrices.
+   */
+  inline ShellMatrix<Number> & get_shell_matrix_A()
+    {
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(shell_matrix_A);
+      return *shell_matrix_A;
+    }
+
+  /**
+   * \returns A const reference to the system shell matrix used for generalized eigenvalue problems.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if _use_shell_matrices and _is_generalized_eigenproblem.
+   */
+  inline const ShellMatrix<Number> & get_shell_matrix_B() const
+    {
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert(shell_matrix_B);
+      return *shell_matrix_B;
+    }
+  /**
+   * \returns A reference to the system shell matrix used for generalized eigenvalue problems.
+   *
+   * This matrix should only be available (and therefore this should only be called)
+   * if _use_shell_matrices and _is_generalized_eigenproblem.
+   */
+  inline ShellMatrix<Number> & get_shell_matrix_B()
+    {
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert(shell_matrix_B);
+      return *shell_matrix_B;
+    }
+
+  /**
+   * \returns A const reference to the system shell matrix used for preconditioning.
+   */
+  inline const ShellMatrix<Number> & get_shell_precond_matrix() const
+    {
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(_use_shell_precond_matrix);
+      libmesh_assert(shell_precond_matrix);
+      return *shell_precond_matrix;
+    }
+  /**
+   * \returns A reference to the system shell matrix used for preconditioning.
+   */
+  inline ShellMatrix<Number> & get_shell_precond_matrix()
+    {
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(_use_shell_precond_matrix);
+      libmesh_assert(shell_precond_matrix);
+      return *shell_precond_matrix;
+    }
+
+  /**
+   * \returns A const reference to the EigenSolver.
+   */
+  inline const EigenSolver<Number> & get_eigen_solver() const
+    {
+      libmesh_assert(eigen_solver);
+      return *eigen_solver;
+    }
+  /**
+   * \returns A reference to the EigenSolver.
+   */
+  inline EigenSolver<Number> & get_eigen_solver()
+    {
+      libmesh_assert(eigen_solver);
+      return *eigen_solver;
+    }
+
+  /**
    * The system matrix for standard eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_matrix_A() instead.
    */
   SparseMatrix<Number> * matrix_A;
 
   /**
    * A second system matrix for generalized eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_matrix_B() instead.
    */
   SparseMatrix<Number> * matrix_B;
 
   /**
    * The system shell matrix for standard eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_shell_matrix_A() instead.
    */
   std::unique_ptr<ShellMatrix<Number>> shell_matrix_A;
 
   /**
    * A second system shell matrix for generalized eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_shell_matrix_B() instead.
    */
   std::unique_ptr<ShellMatrix<Number>> shell_matrix_B;
 
   /**
    * A preconditioning matrix
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_precond_matrix() instead.
    */
   SparseMatrix<Number> * precond_matrix;
 
   /**
    * A preconditioning shell matrix
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_shell_precond_matrix() instead.
    */
   std::unique_ptr<ShellMatrix<Number>> shell_precond_matrix;
 
   /**
    * The EigenSolver, defining which interface, i.e solver
    * package to use.
+   *
+   * Public access to this member variable will be depreacted in
+   * the future! Use get_eigen_solver instead.
    */
   std::unique_ptr<EigenSolver<Number>> eigen_solver;
 

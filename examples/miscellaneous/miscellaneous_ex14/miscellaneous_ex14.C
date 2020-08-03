@@ -235,17 +235,17 @@ int main (int argc, char** argv)
 
   // set numerical parameters for SLEPC on how to solve the system.
 #if SLEPC_VERSION_LESS_THAN(2,3,2)
-  eig_sys.eigen_solver->set_eigensolver_type(ARNOLDI);
+  eig_sys.get_eigen_solver().set_eigensolver_type(ARNOLDI);
 #else
-  eig_sys.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
+  eig_sys.get_eigen_solver().set_eigensolver_type(KRYLOVSCHUR);
 #endif
 
-  eig_sys.eigen_solver->set_position_of_spectrum(E);
+  eig_sys.get_eigen_solver().set_position_of_spectrum(E);
 
   //fetch the solver-object used internally to be able to manipulate it using the self-written class
   // to set the transformation
   SlepcEigenSolver<Number> * solver =
-    libmesh_cast_ptr<SlepcEigenSolver<Number>* >( &(*eig_sys.eigen_solver) );
+    libmesh_cast_ptr<SlepcEigenSolver<Number>* >( &eig_sys.get_eigen_solver() );
 
   // setup of our class @SlepcSolverConfiguration
   SlepcSolverConfiguration ConfigSolver(*solver);
@@ -350,8 +350,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the system matrices
-  SparseMatrix<Number>&  matrix_A = *eigen_system.matrix_A;
-  SparseMatrix<Number>&  matrix_B = *eigen_system.matrix_B;
+  SparseMatrix<Number>&  matrix_A = eigen_system.get_matrix_A();
+  SparseMatrix<Number>&  matrix_B = eigen_system.get_matrix_B();
 
   // A  Gauss quadrature rule for numerical integration.
   // Use the default quadrature order.
@@ -786,4 +786,3 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
     }
 #endif //LIBMESH_ENABLE_INFINITE_ELEMENTS
 }
-
