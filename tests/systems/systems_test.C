@@ -128,6 +128,8 @@ void assemble_matrix_and_rhs(EquationSystems& es,
 
   std::vector<dof_id_type> dof_indices;
 
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
@@ -152,7 +154,7 @@ void assemble_matrix_and_rhs(EquationSystems& es,
         Fe(i) = 1.;
       }
 
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
 
@@ -185,12 +187,12 @@ void assemble_matrix_and_rhs(EquationSystems& es,
       Fe(i) = 1.;
     }
 
-    system.matrix->add_matrix (Ke, dof_indices);
+    matrix.add_matrix (Ke, dof_indices);
     system.rhs->add_vector    (Fe, dof_indices);
   }
 
   system.rhs->close();
-  system.matrix->close();
+  matrix.close();
 }
 
 // Assembly function that uses a DGFEMContext
@@ -204,6 +206,7 @@ void assembly_with_dg_fem_context(EquationSystems& es,
   DenseVector<Number> Fe;
 
   std::vector<dof_id_type> dof_indices;
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
 
   DGFEMContext context(system);
   {
@@ -253,7 +256,7 @@ void assembly_with_dg_fem_context(EquationSystems& es,
             context.get_elem_residual()(i) += JxW[qp] * phi[i][qp];
       }
 
-      system.matrix->add_matrix (context.get_elem_jacobian(), context.get_dof_indices());
+      matrix.add_matrix (context.get_elem_jacobian(), context.get_dof_indices());
       system.rhs->add_vector (context.get_elem_residual(), context.get_dof_indices());
 
       // Element side assembly
@@ -320,21 +323,21 @@ void assembly_with_dg_fem_context(EquationSystems& es,
                       }
                 }
 
-              system.matrix->add_matrix (context.get_elem_elem_jacobian(),
-                                         context.get_dof_indices(),
-                                         context.get_dof_indices());
+              matrix.add_matrix (context.get_elem_elem_jacobian(),
+                                 context.get_dof_indices(),
+                                 context.get_dof_indices());
 
-              system.matrix->add_matrix (context.get_elem_neighbor_jacobian(),
-                                         context.get_dof_indices(),
-                                         context.get_neighbor_dof_indices());
+              matrix.add_matrix (context.get_elem_neighbor_jacobian(),
+                                 context.get_dof_indices(),
+                                 context.get_neighbor_dof_indices());
 
-              system.matrix->add_matrix (context.get_neighbor_elem_jacobian(),
-                                         context.get_neighbor_dof_indices(),
-                                         context.get_dof_indices());
+              matrix.add_matrix (context.get_neighbor_elem_jacobian(),
+                                 context.get_neighbor_dof_indices(),
+                                 context.get_dof_indices());
 
-              system.matrix->add_matrix (context.get_neighbor_neighbor_jacobian(),
-                                         context.get_neighbor_dof_indices(),
-                                         context.get_neighbor_dof_indices());
+              matrix.add_matrix (context.get_neighbor_neighbor_jacobian(),
+                                 context.get_neighbor_dof_indices(),
+                                 context.get_neighbor_dof_indices());
             }
         }
       }

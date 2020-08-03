@@ -467,6 +467,9 @@ void assemble_stokes (EquationSystems & es,
   // conditions on the velocity.
   const bool pin_pressure = es.parameters.get<bool>("pin_pressure");
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = navier_stokes_system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
   // matrix and right-hand-side contribution.  Since the mesh
@@ -648,7 +651,7 @@ void assemble_stokes (EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The SparseMatrix::add_matrix()
       // and NumericVector::add_vector() members do this for us.
-      navier_stokes_system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix                       (Ke, dof_indices);
       navier_stokes_system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
 #else

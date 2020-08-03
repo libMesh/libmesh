@@ -295,6 +295,9 @@ void assemble_wave(EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
   // contribution.
@@ -467,7 +470,7 @@ void assemble_wave(EquationSystems & es,
       // we would have to apply any hanging node constraint equations
       dof_map.constrain_element_matrix(Ke, dof_indices);
 
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix (Ke, dof_indices);
     } // end of element loop
 
   // Note that we have not applied any boundary conditions so far.

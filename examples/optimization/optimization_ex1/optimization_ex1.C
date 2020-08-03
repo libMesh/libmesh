@@ -354,7 +354,7 @@ int main (int argc, char ** argv)
 
   // We need to close the matrix so that we can use it to store the
   // Hessian during the solve.
-  system.matrix->close();
+  system.get_system_matrix().close();
   system.solve();
 
   // Print convergence information

@@ -361,6 +361,9 @@ void assemble_poisson(EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices, dof_indices2;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Now we will loop over all the "local" elements in the mesh.  We
   // will compute the element matrix and right-hand-side contribution.
   // See example 3 for a discussion of the element iterators.  Here we
@@ -586,13 +589,13 @@ void assemble_poisson(EquationSystems & es,
 
       if (dof_indices.size())
         {
-          system.matrix->add_matrix (Ke, dof_indices);
+          matrix.add_matrix         (Ke, dof_indices);
           system.rhs->add_vector    (Fe, dof_indices);
         }
 
       if (dof_indices2.size())
         {
-          system.matrix->add_matrix (Ke, dof_indices2);
+          matrix.add_matrix         (Ke, dof_indices2);
           system.rhs->add_vector    (Fe, dof_indices2);
         }
     }

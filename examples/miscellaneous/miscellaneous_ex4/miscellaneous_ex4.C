@@ -311,6 +311,9 @@ void assemble (EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
   // matrix and right-hand-side contribution.  Since the mesh
@@ -429,7 +432,7 @@ void assemble (EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The SparseMatrix::add_matrix()
       // and NumericVector::add_vector() members do this for us.
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix (Ke, dof_indices);
       system.get_matrix("Preconditioner").add_matrix (Ke, dof_indices);
       system.rhs->add_vector (Fe, dof_indices);
       system.get_vector("v").add_vector(Ve, dof_indices);
@@ -440,7 +443,7 @@ void assemble (EquationSystems & es,
   // Matrices and vectors must be closed manually.  This is necessary
   // because the matrix is not directly used as the system matrix (in
   // which case the solver closes it) but as a part of a shell matrix.
-  system.matrix->close();
+  matrix.close();
   system.get_matrix("Preconditioner").close();
   system.rhs->close();
   system.get_vector("v").close();

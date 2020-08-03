@@ -1810,22 +1810,14 @@ public:
   SparseMatrix<Number> * request_matrix (const std::string & mat_name);
 
   /**
-   * \returns A const reference to this system's additional matrix
+   * \returns A const reference to this system's matrix
    * named \p mat_name.
-   *
-   * None of these matrices is involved in the solution process.
-   * Access is only granted when the matrix is already properly
-   * initialized.
    */
   const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
 
   /**
-   * \returns A writable reference to this system's additional matrix
+   * \returns A writable reference to this system's matrix
    * named \p mat_name.
-   *
-   * None of these matrices is involved in the solution process.
-   * Access is only granted when the matrix is already properly
-   * initialized.
    */
   SparseMatrix<Number> & get_matrix (const std::string & mat_name);
 

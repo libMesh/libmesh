@@ -270,6 +270,7 @@ void assemble_poisson(EquationSystems & es,
   DenseVector<Number> Fe;
 
   std::vector<dof_id_type> dof_indices;
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
@@ -294,7 +295,7 @@ void assemble_poisson(EquationSystems & es,
 
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix         (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
 }

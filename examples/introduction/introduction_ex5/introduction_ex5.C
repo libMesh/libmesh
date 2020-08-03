@@ -301,6 +301,9 @@ void assemble_poisson(EquationSystems & es,
   DenseVector<Number> Fe;
   std::vector<dof_id_type> dof_indices;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh.
   // See example 3 for details.
   for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -377,7 +380,7 @@ void assemble_poisson(EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The SparseMatrix::add_matrix()
       // and NumericVector::add_vector() members do this for us.
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
 
     } // end of element loop

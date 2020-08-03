@@ -324,6 +324,9 @@ void assemble_shell (EquationSystems & es,
   // to degree of freedom numbers.
   const DofMap & dof_map = system.get_dof_map();
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Define data structures to contain the element stiffness matrix
   // and right-hand-side vector contribution.  Following
   // basic finite element terminology we will denote these
@@ -558,7 +561,7 @@ void assemble_shell (EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The NumericMatrix::add_matrix()
       // and NumericVector::add_vector() members do this for us.
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix         (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     } // end of non-ghost element loop
 
@@ -626,9 +629,9 @@ void assemble_shell (EquationSystems & es,
               const dof_id_type u_dof = nodes[n]->dof_number (system.number(), u_var, 0);
               const dof_id_type v_dof = nodes[n]->dof_number (system.number(), v_var, 0);
               const dof_id_type w_dof = nodes[n]->dof_number (system.number(), w_var, 0);
-              system.matrix->add (u_dof, u_dof, penalty);
-              system.matrix->add (v_dof, v_dof, penalty);
-              system.matrix->add (w_dof, w_dof, penalty);
+              matrix.add (u_dof, u_dof, penalty);
+              matrix.add (v_dof, v_dof, penalty);
+              matrix.add (w_dof, w_dof, penalty);
             }
         }
     } // end of ghost element loop

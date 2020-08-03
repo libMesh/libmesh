@@ -253,6 +253,7 @@ void assemble_poisson(EquationSystems & es,
   DenseMatrix<Number> Knn;
 
   std::vector<dof_id_type> dof_indices;
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
@@ -342,17 +343,17 @@ void assemble_poisson(EquationSystems & es,
                       for (unsigned int j=0; j<n_dofs; j++)
                         Kne(i,j) += JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_face[j][qp]);
 
-                  system.matrix->add_matrix(Kne, neighbor_dof_indices, dof_indices);
-                  system.matrix->add_matrix(Ken, dof_indices, neighbor_dof_indices);
-                  system.matrix->add_matrix(Kee, dof_indices);
-                  system.matrix->add_matrix(Knn, neighbor_dof_indices);
+                  matrix.add_matrix(Kne, neighbor_dof_indices, dof_indices);
+                  matrix.add_matrix(Ken, dof_indices, neighbor_dof_indices);
+                  matrix.add_matrix(Kee, dof_indices);
+                  matrix.add_matrix(Knn, neighbor_dof_indices);
                 }
             }
       }
 
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix         (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
 }

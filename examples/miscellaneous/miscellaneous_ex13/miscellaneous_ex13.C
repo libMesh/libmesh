@@ -421,6 +421,9 @@ void assemble_shell (EquationSystems & es,
   // to degree of freedom numbers.
   const DofMap & dof_map = system.get_dof_map();
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Define data structures to contain the element stiffness matrix.
   DenseMatrix<Number> Ke;
   DenseSubMatrix<Number> Ke_var[6][6] =
@@ -765,7 +768,7 @@ void assemble_shell (EquationSystems & es,
 
       dof_map.constrain_element_matrix_and_vector (Ke,Fe,dof_indices);
 
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix         (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
 
     }

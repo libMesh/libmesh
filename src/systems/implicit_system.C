@@ -101,7 +101,7 @@ void ImplicitSystem::add_matrices ()
   // Only need to add the matrix if it isn't there
   // already!
   if (matrix == nullptr)
-    matrix = &(this->add_matrix ("System Matrix"));
+    matrix = &(this->add_matrix (system_matrix_name()));
 
   libmesh_assert(matrix);
 }

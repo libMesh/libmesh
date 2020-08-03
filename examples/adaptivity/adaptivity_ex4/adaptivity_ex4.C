@@ -761,6 +761,9 @@ void assemble_biharmonic(EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh.  We will
   // compute the element matrix and right-hand-side contribution.  See
   // example 3 for a discussion of the element iterators.
@@ -933,7 +936,7 @@ void assemble_biharmonic(EquationSystems & es,
       LOG_SCOPE_WITH("matrix insertion", "", perf_log);
 
       dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
 
