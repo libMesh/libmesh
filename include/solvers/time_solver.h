@@ -40,6 +40,8 @@ class SensitivityData;
 class SolutionHistory;
 class SystemNorm;
 class QoISet;
+class AdjointRefinementEstimator;
+class ErrorVector;
 
 template <typename T>
 class LinearSolver;
@@ -137,6 +139,15 @@ public:
    * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
    */
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities);
+
+  /**
+   * A method to compute the adjoint refinement error estimate at the current timestep.
+   * int_{tstep_start}^{tstep_end} R(u^h,z) dt
+   * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
+   * ONLY SUPPORTED for Backward Euler.
+   */
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors);
 
   /**
    * This method uses the DifferentiablePhysics
@@ -299,6 +310,14 @@ protected:
   typedef bool (DifferentiablePhysics::*ResFuncType) (bool, DiffContext &);
 
   typedef void (DiffContext::*ReinitFuncType) (Real);
+
+protected:
+
+  /**
+   * The deltat for the last completed timestep before the current one
+   */
+  Real last_deltat;
+
 
 private:
 

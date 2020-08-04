@@ -23,6 +23,9 @@
 #include "libmesh/no_solution_history.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
+#include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/error_vector.h"
+
 namespace libMesh
 {
 
@@ -124,9 +127,27 @@ void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const Parame
   return;
 }
 
+void TimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors)
+{
+  // Base class assumes a direct steady state sensitivity calculation
+  adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error);
+
+  // Also get the spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+    {
+      // Skip this QoI if not in the QoI Set
+      if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+        {
+          global_spatial_errors.insert( std::pair<int, Real>(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j)) );
+        }
+    }
+
+  return;
+}
+
 Real TimeSolver::last_complete_deltat()
 {
-  return _system.deltat;
+  return last_deltat;
 }
 
 void TimeSolver::adjoint_advance_timestep ()
