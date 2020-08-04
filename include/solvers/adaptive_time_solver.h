@@ -82,7 +82,7 @@ public:
 
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override = 0;
 
-  virtual Real last_complete_deltat() override { return completedtimestep_deltat; }
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors) = 0;
 
   /**
    * This method is passed on to the core_time_solver
@@ -216,13 +216,6 @@ public:
   bool global_tolerance;
 
 protected:
-
-  /**
-   * We need to store the value of the last deltat used, so
-   * that advance_timestep() will increment the system time
-   * correctly.
-   */
-  Real last_deltat;
 
   /**
    * A helper function to calculate error norms
