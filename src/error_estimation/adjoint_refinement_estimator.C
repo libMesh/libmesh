@@ -125,7 +125,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
     // Solve the adjoint problem, remember physics swap also resets the cache, so
     // we will assemble again, otherwise we just take the transpose
-    system.adjoint_solve(_qoi_set);
+    (dynamic_cast<ImplicitSystem &>(system)).adjoint_solve(_qoi_set);
 
     // Swap back if needed, recall that _adjoint_evaluation_physics now holds the pointer to the pre-swap physics
     if (swapping_physics)
@@ -350,7 +350,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // The matrix will be reassembled again because we have refined the mesh
   // If we have no h or p refinements, no need to solve for a fine adjoint
   if(number_h_refinements > 0 || number_p_refinements > 0)
-    system.adjoint_solve(_qoi_set);
+    (dynamic_cast<ImplicitSystem &>(system)).adjoint_solve(_qoi_set);
 
   // Swap back if needed, recall that _adjoint_evaluation_physics now holds the pointer
   // to the pre-swap physics

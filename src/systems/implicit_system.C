@@ -527,7 +527,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
   // if we havent already or dont have an initial condition for the adjoint
   if (!this->is_adjoint_already_solved())
     {
-      this->adjoint_solve(qoi_indices);
+      this->ImplicitSystem::adjoint_solve(qoi_indices);
     }
 
   this->assemble_residual_derivatives(parameters_in);
