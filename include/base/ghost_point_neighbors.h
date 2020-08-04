@@ -41,14 +41,12 @@ public:
   /**
    * Constructor.
    */
-  GhostPointNeighbors(const MeshBase & mesh) : _mesh(&mesh) {}
+  GhostPointNeighbors(const MeshBase & mesh) : GhostingFunctor(mesh) {}
 
   /**
    * Constructor.
    */
-  GhostPointNeighbors(const GhostPointNeighbors & other) : GhostingFunctor(other), _mesh(other._mesh) {}
-
-  virtual void set_mesh(const MeshBase * mesh) override { _mesh = mesh; }
+  GhostPointNeighbors(const GhostPointNeighbors & other) : GhostingFunctor(other){}
 
   /**
    * A clone() is needed because GhostingFunctor can not be shared between
@@ -66,10 +64,6 @@ public:
                            const MeshBase::const_element_iterator & range_end,
                            processor_id_type p,
                            map_type & coupled_elements) override;
-
-private:
-
-  const MeshBase * _mesh;
 };
 
 } // namespace libMesh

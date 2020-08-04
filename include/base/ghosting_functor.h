@@ -158,12 +158,20 @@ public:
   /**
    * Constructor.  Empty in the base class.
    */
-  GhostingFunctor() {}
+  GhostingFunctor(): _mesh(nullptr) {}
+
+  /**
+   * Constructor using mesh
+   */
+  GhostingFunctor(const MeshBase & mesh): _mesh(&mesh) {}
 
   /**
    * Copy Constructor
    */
-  GhostingFunctor(const GhostingFunctor & other) : ReferenceCountedObject<GhostingFunctor>(other) {}
+  GhostingFunctor(const GhostingFunctor & other) :
+   ReferenceCountedObject<GhostingFunctor>(other),
+   _mesh (other._mesh)
+  {}
 
   /**
    * Virtual destructor; this is an abstract base class.
@@ -175,13 +183,21 @@ public:
    * different meshes. The operations in  GhostingFunctor are mesh dependent.
    */
   virtual std::unique_ptr<GhostingFunctor> clone () const
-  { libmesh_not_implemented(); }
+  // Let us return nullptr for backward compatibility.
+  // We will come back to mark this function as pure virtual
+  // once the API upgrade is done.
+  { return nullptr; }
 
   /**
    * It should be called after cloning a ghosting functor.
    * Ghosting functor is mesh dependent
    */
-  virtual void set_mesh(const MeshBase * /*mesh*/) { libmesh_not_implemented(); }
+  virtual void set_mesh(const MeshBase * mesh) { _mesh = mesh; }
+
+  /**
+   *  Return the mesh associated with ghosting functor
+   */
+  const MeshBase * get_mesh() const { return _mesh; }
 
   /**
    * What elements do we care about and what variables do we care
@@ -238,6 +254,9 @@ public:
    * after a redistribution is complete.
    */
   virtual void delete_remote_elements () {};
+
+protected:
+  const MeshBase * _mesh;
 };
 
 } // namespace libMesh

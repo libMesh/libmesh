@@ -107,8 +107,22 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
    for (const auto & gf : other_mesh._ghosting_functors )
    {
      std::shared_ptr<GhostingFunctor> clone_gf = gf->clone();
-     clone_gf->set_mesh(this);
-     add_ghosting_functor(clone_gf);
+     // Some subclasses of GhostingFunctor might not override the
+     // clone function yet. If this is the case, GhostingFunctor will
+     // return nullptr by default. The clone function should be overridden
+     // in all derived classes. This following code ("else") is written
+     // for API upgrade. That will allow users gradually to update their code.
+     // Once the API upgrade is done, we will come back and delete "else."
+     if (clone_gf)
+     {
+       clone_gf->set_mesh(this);
+       add_ghosting_functor(clone_gf);
+     }
+     else
+     {
+       libmesh_deprecated();
+       add_ghosting_functor(*gf);
+     }
    }
 
   // Make sure we don't accidentally delete the other mesh's default

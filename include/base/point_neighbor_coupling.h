@@ -50,7 +50,6 @@ public:
 #ifdef LIBMESH_ENABLE_PERIODIC
     _periodic_bcs(nullptr),
 #endif
-    _mesh(nullptr),
     _n_levels(0)
   {}
 
@@ -63,7 +62,6 @@ public:
 #ifdef LIBMESH_ENABLE_PERIODIC
     _periodic_bcs(other._periodic_bcs),
 #endif
-    _mesh(other._mesh),
     _n_levels(other._n_levels)
   {}
 
@@ -93,10 +91,6 @@ public:
   void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs)
   { _periodic_bcs = periodic_bcs; }
 #endif
-
-  // Set MeshBase for use in checking for periodic boundary ids
-  void set_mesh(const MeshBase * mesh) override
-  { _mesh = mesh; }
 
   /**
    * If we have periodic boundaries, then we'll need the mesh to have
@@ -128,7 +122,6 @@ private:
 #ifdef LIBMESH_ENABLE_PERIODIC
   const PeriodicBoundaries * _periodic_bcs;
 #endif
-  const MeshBase * _mesh;
   unsigned int _n_levels;
 };
 
