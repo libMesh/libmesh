@@ -193,7 +193,7 @@ public:
     {
       libmesh_assert(matrix_A);
       libmesh_assert(!_use_shell_matrices);
-      libmesh_assert_equal_to(&get_matrix(matrix_A_name()), matrix_A);
+      libmesh_assert(has_matrix_A());
       return *matrix_A;
     }
   /**
@@ -206,7 +206,7 @@ public:
     {
       libmesh_assert(matrix_A);
       libmesh_assert(!_use_shell_matrices);
-      libmesh_assert_equal_to(&get_matrix(matrix_A_name()), matrix_A);
+      libmesh_assert(has_matrix_A());
       return *matrix_A;
     }
 
@@ -221,7 +221,7 @@ public:
       libmesh_assert(matrix_B);
       libmesh_assert(!_use_shell_matrices);
       libmesh_assert(generalized());
-      libmesh_assert_equal_to(&get_matrix(matrix_B_name()), matrix_B);
+      libmesh_assert(has_matrix_B());
       return *matrix_B;
     }
   /**
@@ -235,7 +235,7 @@ public:
       libmesh_assert(matrix_B);
       libmesh_assert(!_use_shell_matrices);
       libmesh_assert(generalized());
-      libmesh_assert_equal_to(&get_matrix(matrix_B_name()), matrix_B);
+      libmesh_assert(has_matrix_B());
       return *matrix_B;
     }
 
@@ -248,8 +248,9 @@ public:
   inline const SparseMatrix<Number> & get_precond_matrix() const
     {
       libmesh_assert(precond_matrix);
-      libmesh_assert(!_use_shell_matrices);
-      libmesh_assert_equal_to(&get_matrix(precond_matrix_name()), precond_matrix);
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(!_use_shell_precond_matrix);
+      libmesh_assert(has_precond_matrix());
       return *precond_matrix;
     }
   /**
@@ -261,8 +262,9 @@ public:
   inline SparseMatrix<Number> & get_precond_matrix()
     {
       libmesh_assert(precond_matrix);
-      libmesh_assert(!_use_shell_matrices);
-      libmesh_assert_equal_to(&get_matrix(precond_matrix_name()), precond_matrix);
+      libmesh_assert(_use_shell_matrices);
+      libmesh_assert(!_use_shell_precond_matrix);
+      libmesh_assert(has_precond_matrix());
       return *precond_matrix;
     }
 
@@ -275,7 +277,7 @@ public:
   inline const ShellMatrix<Number> & get_shell_matrix_A() const
     {
       libmesh_assert(_use_shell_matrices);
-      libmesh_assert(shell_matrix_A);
+      libmesh_assert(has_shell_matrix_A());
       return *shell_matrix_A;
     }
   /**
@@ -287,7 +289,7 @@ public:
   inline ShellMatrix<Number> & get_shell_matrix_A()
     {
       libmesh_assert(_use_shell_matrices);
-      libmesh_assert(shell_matrix_A);
+      libmesh_assert(has_shell_matrix_A());
       return *shell_matrix_A;
     }
 
@@ -301,7 +303,7 @@ public:
     {
       libmesh_assert(_use_shell_matrices);
       libmesh_assert(generalized());
-      libmesh_assert(shell_matrix_B);
+      libmesh_assert(has_shell_matrix_B());
       return *shell_matrix_B;
     }
   /**
@@ -314,7 +316,7 @@ public:
     {
       libmesh_assert(_use_shell_matrices);
       libmesh_assert(generalized());
-      libmesh_assert(shell_matrix_B);
+      libmesh_assert(has_shell_matrix_B());
       return *shell_matrix_B;
     }
 
@@ -325,7 +327,7 @@ public:
     {
       libmesh_assert(_use_shell_matrices);
       libmesh_assert(_use_shell_precond_matrix);
-      libmesh_assert(shell_precond_matrix);
+      libmesh_assert(has_shell_precond_matrix());
       return *shell_precond_matrix;
     }
   /**
@@ -335,7 +337,7 @@ public:
     {
       libmesh_assert(_use_shell_matrices);
       libmesh_assert(_use_shell_precond_matrix);
-      libmesh_assert(shell_precond_matrix);
+      libmesh_assert(has_shell_precond_matrix());
       return *shell_precond_matrix;
     }
 
@@ -354,6 +356,57 @@ public:
     {
       libmesh_assert(eigen_solver);
       return *eigen_solver;
+    }
+
+  /**
+   * \returns Whether or not the system has matrix A
+   */
+  inline bool has_matrix_A() const
+    {
+      libmesh_assert_equal_to(request_matrix(matrix_A_name()), matrix_A);
+      return matrix_A;
+    }
+
+  /**
+   * \returns Whether or not the system has matrix B
+   */
+  inline bool has_matrix_B() const
+    {
+      libmesh_assert_equal_to(request_matrix(matrix_B_name()), matrix_B);
+      return matrix_B;
+    }
+
+  /**
+   * \returns Whether or not the system has the non-shell preconditioning matrix
+   */
+  inline bool has_precond_matrix() const
+    {
+      libmesh_assert_equal_to(request_matrix(precond_matrix_name()), precond_matrix);
+      return precond_matrix;
+    }
+
+  /**
+   * \returns Whether or not the system has the shell matrix A
+   */
+  inline bool has_shell_matrix_A() const
+    {
+      return shell_matrix_A.get();
+    }
+
+  /**
+   * \returns Whether or not the system has the shell matrix B
+   */
+  inline bool has_shell_matrix_B() const
+    {
+      return shell_matrix_B.get();
+    }
+
+  /**
+   * \returns Whether or not the system has the shell preconditioning matrix
+   */
+  inline bool has_shell_precond_matrix() const
+    {
+      return shell_precond_matrix.get();
     }
 
   /**
