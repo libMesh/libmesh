@@ -90,6 +90,9 @@ void EigenSystem::clear ()
 
 void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 {
+  if (!can_add_matrices())
+    libmesh_error_msg("ERROR: Cannot change eigen problem type after system initialization");
+
   _eigen_problem_type = ept;
 
   eigen_solver->set_eigenproblem_type(ept);

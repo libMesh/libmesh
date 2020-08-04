@@ -1844,6 +1844,11 @@ protected:
   virtual void init_matrices ();
 
   /**
+   * \returns Whether or not matrices can still be added.
+   */
+  bool can_add_matrices() const { return _can_add_matrices; }
+
+  /**
    * Projects the vector defined on the old mesh onto the
    * new mesh.
    *
