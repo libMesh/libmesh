@@ -78,6 +78,15 @@ public:
    */
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override;
 
+  /**
+   * A method to compute the adjoint refinement error estimate at the current timestep.
+   * int_{tstep_start}^{tstep_end} R(u^h,z) dt
+   * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
+   * The midpoint rule is used for the numerical integration.
+   */
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors) override;
+
 };
 
 
