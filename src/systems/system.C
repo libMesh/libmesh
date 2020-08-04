@@ -449,26 +449,29 @@ void System::reinit ()
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
 
-  // Clear the matrices
-  for (auto & pr : _matrices)
+  if (!_matrices.empty())
     {
-      pr.second->clear();
-      pr.second->attach_dof_map(this->get_dof_map());
-    }
+      // Clear the matrices
+      for (auto & pr : _matrices)
+        {
+          pr.second->clear();
+          pr.second->attach_dof_map(this->get_dof_map());
+        }
 
-  // Clear the sparsity pattern
-  this->get_dof_map().clear_sparsity();
+      // Clear the sparsity pattern
+      this->get_dof_map().clear_sparsity();
 
-  // Compute the sparsity pattern for the current
-  // mesh and DOF distribution.  This also updates
-  // additional matrices, \p DofMap now knows them
-  this->get_dof_map().compute_sparsity (this->get_mesh());
+      // Compute the sparsity pattern for the current
+      // mesh and DOF distribution.  This also updates
+      // additional matrices, \p DofMap now knows them
+      this->get_dof_map().compute_sparsity (this->get_mesh());
 
-  // Initialize matrices and set to zero
-  for (auto & pr : _matrices)
-    {
-      pr.second->init();
-      pr.second->zero();
+      // Initialize matrices and set to zero
+      for (auto & pr : _matrices)
+        {
+          pr.second->init();
+          pr.second->zero();
+        }
     }
 }
 
