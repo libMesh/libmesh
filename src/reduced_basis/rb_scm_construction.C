@@ -211,7 +211,7 @@ void RBSCMConstruction::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
   // Load the operators from the RBConstruction
   EquationSystems & es = this->get_equation_systems();
   RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
-  rb_system.add_scaled_Aq(scalar, q_a, matrix_A.get(), true);
+  rb_system.add_scaled_Aq(scalar, q_a, &get_matrix_A(), true);
 }
 
 void RBSCMConstruction::load_matrix_B()
