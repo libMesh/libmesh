@@ -49,10 +49,10 @@ EigenSystem::EigenSystem (EquationSystems & es,
   eigen_solver     (EigenSolver<Number>::build(es.comm())),
   _n_converged_eigenpairs (0),
   _n_iterations           (0),
+  _eigen_problem_type (NHEP),
   _use_shell_matrices (false),
   _use_shell_precond_matrix(false)
 {
-  set_eigenproblem_type(NHEP);
 }
 
 
@@ -97,13 +97,6 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 
   eigen_solver->set_eigenproblem_type(ept);
 
-  if (_eigen_problem_type == GNHEP ||
-      _eigen_problem_type == GHEP  ||
-      _eigen_problem_type == GHIEP)
-    _is_generalized_eigenproblem = true;
-  else
-    _is_generalized_eigenproblem = false;
-
   // libMesh::out << "The Problem type is set to be: " << std::endl;
 
   switch (_eigen_problem_type)
@@ -145,7 +138,7 @@ void EigenSystem::add_matrices ()
     if (!shell_matrix_A)
       shell_matrix_A = ShellMatrix<Number>::build(this->comm());
 
-    if (_is_generalized_eigenproblem && !shell_matrix_B)
+    if (generalized() && !shell_matrix_B)
       shell_matrix_B = ShellMatrix<Number>::build(this->comm());
 
     if (_use_shell_precond_matrix)
@@ -161,7 +154,7 @@ void EigenSystem::add_matrices ()
     if (!matrix_A)
       matrix_A = &(this->add_matrix(matrix_A_name()));
 
-    if (_is_generalized_eigenproblem && !matrix_B)
+    if (generalized() && !matrix_B)
       matrix_B = &(this->add_matrix(matrix_B_name()));
   }
 }
@@ -255,7 +248,7 @@ void EigenSystem::solve ()
   if (_use_shell_matrices)
   {
     // Generalized eigenproblem
-    if (_is_generalized_eigenproblem)
+    if (generalized())
       // Shell preconditioning matrix
       if (_use_shell_precond_matrix)
         solve_data = eigen_solver->solve_generalized (*shell_matrix_A, *shell_matrix_B,*shell_precond_matrix, nev, ncv, tol, maxits);
@@ -276,7 +269,7 @@ void EigenSystem::solve ()
   else
   {
     // Generalized eigenproblem
-    if (_is_generalized_eigenproblem)
+    if (generalized())
       solve_data = eigen_solver->solve_generalized (*matrix_A, *matrix_B, nev, ncv, tol, maxits);
 
     // Standard eigenproblem
@@ -305,6 +298,14 @@ std::pair<Real, Real> EigenSystem::get_eigenvalue (dof_id_type i)
 void EigenSystem::set_initial_space (NumericVector<Number> & initial_space_in)
 {
   eigen_solver->set_initial_space (initial_space_in);
+}
+
+
+bool EigenSystem::generalized () const
+{
+  return _eigen_problem_type == GNHEP ||
+         _eigen_problem_type == GHEP ||
+         _eigen_problem_type == GHIEP;
 }
 
 

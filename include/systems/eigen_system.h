@@ -148,7 +148,7 @@ public:
    * \returns \p true if the underlying problem is generalized
    * , false otherwise.
    */
-  bool generalized () const { return _is_generalized_eigenproblem; }
+  bool generalized () const;
 
   /**
    * \returns \p true if the shell matrices are used
@@ -214,13 +214,13 @@ public:
    * \returns A const reference to the system matrix used for generalized eigenvalue problems
    *
    * This matrix should only be available (and therefore this should only be called)
-   * if !_use_shell_matrices and _is_generalized_eigenproblem.
+   * if !_use_shell_matrices and generalized().
    */
   inline const SparseMatrix<Number> & get_matrix_B() const
     {
       libmesh_assert(matrix_B);
       libmesh_assert(!_use_shell_matrices);
-      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert(generalized());
       libmesh_assert_equal_to(&get_matrix(matrix_B_name()), matrix_B);
       return *matrix_B;
     }
@@ -228,13 +228,13 @@ public:
    * \returns A const reference to the system matrix used for generalized eigenvalue problems
    *
    * This matrix should only be available (and therefore this should only be called)
-   * if !_use_shell_matrices and _is_generalized_eigenproblem.
+   * if !_use_shell_matrices and generalized().
    */
   inline SparseMatrix<Number> & get_matrix_B()
     {
       libmesh_assert(matrix_B);
       libmesh_assert(!_use_shell_matrices);
-      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert(generalized());
       libmesh_assert_equal_to(&get_matrix(matrix_B_name()), matrix_B);
       return *matrix_B;
     }
@@ -295,12 +295,12 @@ public:
    * \returns A const reference to the system shell matrix used for generalized eigenvalue problems.
    *
    * This matrix should only be available (and therefore this should only be called)
-   * if _use_shell_matrices and _is_generalized_eigenproblem.
+   * if _use_shell_matrices and generalized().
    */
   inline const ShellMatrix<Number> & get_shell_matrix_B() const
     {
       libmesh_assert(_use_shell_matrices);
-      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert(generalized());
       libmesh_assert(shell_matrix_B);
       return *shell_matrix_B;
     }
@@ -308,12 +308,12 @@ public:
    * \returns A reference to the system shell matrix used for generalized eigenvalue problems.
    *
    * This matrix should only be available (and therefore this should only be called)
-   * if _use_shell_matrices and _is_generalized_eigenproblem.
+   * if _use_shell_matrices and generalized().
    */
   inline ShellMatrix<Number> & get_shell_matrix_B()
     {
       libmesh_assert(_use_shell_matrices);
-      libmesh_assert(_is_generalized_eigenproblem);
+      libmesh_assert(generalized());
       libmesh_assert(shell_matrix_B);
       return *shell_matrix_B;
     }
@@ -452,12 +452,6 @@ private:
    * The number of iterations of the eigen solver algorithm.
    */
   unsigned int _n_iterations;
-
-  /**
-   * A boolean flag to indicate whether we are dealing with
-   * a generalized eigenvalue problem.
-   */
-  bool _is_generalized_eigenproblem;
 
   /**
    * The type of the eigenvalue problem.
