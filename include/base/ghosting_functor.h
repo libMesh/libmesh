@@ -197,7 +197,7 @@ public:
   /**
    *  Return the mesh associated with ghosting functor
    */
-  const MeshBase * get_mesh() const { return _mesh; }
+  const MeshBase * get_mesh() const { libmesh_assert(_mesh); return _mesh; }
 
   /**
    * What elements do we care about and what variables do we care

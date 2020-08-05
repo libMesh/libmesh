@@ -34,6 +34,7 @@ void GhostPointNeighbors::operator()
    processor_id_type p,
    GhostPointNeighbors::map_type & coupled_elements)
 {
+  libmesh_assert(_mesh);
   // Using the connected_nodes set rather than point_neighbors() gives
   // us correct results even in corner cases, such as where two
   // elements meet only at a corner.  ;-)
@@ -60,6 +61,8 @@ void GhostPointNeighbors::operator()
 
   for (const auto & elem : as_range(range_begin, range_end))
     {
+      libmesh_assert(_mesh->query_elem_ptr(elem->id()) == elem);
+
       if (elem->processor_id() != p)
         coupled_elements.emplace(elem, nullcm);
 
