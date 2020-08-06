@@ -825,7 +825,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
     set_interface_node_processor_ids_BFS(mesh);
   else if (load_balanced_nodes_petscpartition)
     set_interface_node_processor_ids_petscpartitioner(mesh);
-  else
+
+   // Node balancing algorithm will response to assign owned nodes.
+   // We still need to sync PIDs
     {
       // For inactive elements, we will have already gotten most of
       // these nodes, *except* for the case of a parent with a subset
