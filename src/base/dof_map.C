@@ -1825,6 +1825,7 @@ DofMap::add_coupling_functor(GhostingFunctor & coupling_functor,
                              bool to_mesh)
 {
   _coupling_functors.insert(&coupling_functor);
+  coupling_functor.set_mesh(&_mesh);
   if (to_mesh)
     _mesh.add_ghosting_functor(coupling_functor);
 }
