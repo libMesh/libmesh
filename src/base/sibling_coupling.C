@@ -34,9 +34,13 @@ void SiblingCoupling::operator()
 {
   LOG_SCOPE("operator()", "SiblingCoupling");
 
+  libmesh_assert(_mesh);
+
   for (const auto & elem : as_range(range_begin, range_end))
     {
       std::vector<const Elem *> active_siblings;
+
+      libmesh_assert(_mesh->query_elem_ptr(elem->id()) == elem);
 
       const Elem * parent = elem->parent();
       if (!parent)
