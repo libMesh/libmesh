@@ -745,7 +745,10 @@ public:
    *
    * If the mesh already has elements, data by default is allocated in
    * each of them.  This may be expensive to do repeatedly; use
-   * add_elem_integers instead.
+   * add_elem_integers instead.  Alternatively, the \p allocate_data
+   * option can be manually set to false, but if this is done then a
+   * manual call to \p size_elem_extra_integers() will need to be done
+   * before the new space is usable.
    *
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
@@ -800,7 +803,10 @@ public:
    *
    * If the mesh already has elements, data by default is allocated in
    * each of them.  This may be expensive to do repeatedly; use
-   * add_elem_data instead.
+   * add_elem_data instead.  Alternatively, the \p allocate_data
+   * option can be manually set to false, but if this is done then a
+   * manual call to \p size_elem_extra_integers() will need to be done
+   * before the new space is usable.
    *
    * \returns The index numbers for the new data, and/or for existing
    * data if data by some of the same names has already been added.
@@ -842,7 +848,10 @@ public:
    *
    * If the mesh already has nodes, data by default is allocated in
    * each of them.  This may be expensive to do repeatedly; use
-   * add_node_integers instead.
+   * add_node_integers instead.  Alternatively, the \p allocate_data
+   * option can be manually set to false, but if this is done then a
+   * manual call to \p size_node_extra_integers() will need to be done
+   * before the new space is usable.
    *
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
@@ -897,7 +906,10 @@ public:
    *
    * If the mesh already has nodes, data by default is allocated in
    * each of them.  This may be expensive to do repeatedly; use
-   * add_node_data instead.
+   * add_node_data instead.  Alternatively, the \p allocate_data
+   * option can be manually set to false, but if this is done then a
+   * manual call to \p size_node_extra_integers() will need to be done
+   * before the new space is usable.
    *
    * \returns The starting index number for the new datum, or for the
    * existing datum if one by the same name has already been added.
