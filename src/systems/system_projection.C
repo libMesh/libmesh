@@ -1360,8 +1360,18 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
                           const unsigned int n_comp =
                             old_dofs->n_comp_group(sysnum, vg);
                           for (unsigned int c=0; c != n_comp; ++c)
-                            di.push_back
-                              (old_dofs->dof_number(sysnum, vg, vig, c, n_comp));
+                            {
+                              const dof_id_type old_id =
+                                old_dofs->dof_number(sysnum, vg, vig,
+                                                     c, n_comp);
+
+                              // We should either have no old id
+                              // (e.g. on a newly expanded subdomain)
+                              // or an id from the old system.
+                              libmesh_assert(old_id < dof_map.n_old_dofs() ||
+                                             old_id == DofObject::invalid_id);
+                              di.push_back(old_id);
+                            }
                         }
                     }
                 }
