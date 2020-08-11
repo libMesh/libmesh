@@ -318,7 +318,8 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
 
   // Make sure any new element is given space for any extra integers
   // we've requested
-  e->add_extra_integers(_elem_integer_names.size());
+  e->add_extra_integers(_elem_integer_names.size(),
+                        _elem_integer_default_values);
 
   // And set mapping type and data on any new element
   e->set_mapping_type(this->default_mapping_type());
@@ -361,7 +362,8 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
 
   // Make sure any new element is given space for any extra integers
   // we've requested
-  e->add_extra_integers(_elem_integer_names.size());
+  e->add_extra_integers(_elem_integer_names.size(),
+                        _elem_integer_default_values);
 
   // And set mapping type and data on any new element
   e->set_mapping_type(this->default_mapping_type());
@@ -466,7 +468,8 @@ Node * ReplicatedMesh::add_point (const Point & p,
                       cast_int<dof_id_type>(_nodes.size()-1) : id).release();
       n->processor_id() = proc_id;
 
-      n->add_extra_integers(_node_integer_names.size());
+      n->add_extra_integers(_node_integer_names.size(),
+                            _node_integer_default_values);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       if (!n->valid_unique_id())
@@ -521,7 +524,8 @@ Node * ReplicatedMesh::add_node (Node * n)
    _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
 
-  n->add_extra_integers(_node_integer_names.size());
+  n->add_extra_integers(_node_integer_names.size(),
+                        _node_integer_default_values);
 
   return n;
 }
@@ -567,7 +571,8 @@ Node * ReplicatedMesh::insert_node(Node * n)
    _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
 
-  n->add_extra_integers(_node_integer_names.size());
+  n->add_extra_integers(_node_integer_names.size(),
+                        _node_integer_default_values);
 
   // We have enough space and this spot isn't already occupied by
   // another node, so go ahead and add it.
