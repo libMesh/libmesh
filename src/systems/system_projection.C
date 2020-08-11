@@ -1386,8 +1386,18 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
         dof_map.old_dof_indices (elem, di);
 
       for (auto di_i : di)
-        if (di_i < first_old_dof || di_i >= end_old_dof)
-          this->send_list.push_back(di_i);
+        {
+          // If we've just expanded a subdomain for a
+          // subdomain-restricted variable, then we may have an
+          // old_dof_object that doesn't have an old DoF for every
+          // local index.
+          if (di_i == DofObject::invalid_id)
+            continue;
+
+          libmesh_assert_less(di_i, dof_map.n_old_dofs());
+          if (di_i < first_old_dof || di_i >= end_old_dof)
+            this->send_list.push_back(di_i);
+        }
     }  // end elem loop
 }
 
