@@ -2691,7 +2691,13 @@ void DofMap::old_dof_indices (const Elem * const elem,
                                 {
                                   const dof_id_type d =
                                     old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
-                                  libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
+                                  // On a newly-expanded subdomain, we
+                                  // may have some DoFs that didn't
+                                  // exist in the old system, in which
+                                  // case we can't assert this:
+                                  // libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
                                   di.push_back(d);
                                 }
                           }
@@ -2703,7 +2709,13 @@ void DofMap::old_dof_indices (const Elem * const elem,
                             {
                               const dof_id_type d =
                                 old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
-                              libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
+                              // On a newly-expanded subdomain, we
+                              // may have some DoFs that didn't
+                              // exist in the old system, in which
+                              // case we can't assert this:
+                              // libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
                               di.push_back(d);
                             }
                       }
