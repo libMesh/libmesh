@@ -403,10 +403,26 @@ public:
    * now be \p n_integers associated; this *replaces*, not augments,
    * any previous count.
    *
+   * Any newly-added values will initially be DofObject::invalid_id
+   *
    * If non-integer data is in the set, each datum of type T should be
    * counted sizeof(T)/sizeof(dof_id_type) times in \p n_integers.
    */
   void add_extra_integers (const unsigned int n_integers);
+
+  /**
+   * Assigns a set of extra integers to this \p DofObject.  There will
+   * now be \p n_integers associated; this *replaces*, not augments,
+   * any previous count.
+   *
+   * Any newly-added values will be copied from \p default_values.
+   *
+   * If non-integer data is in the set, each datum of type T should be
+   * counted sizeof(T)/sizeof(dof_id_type) times in \p n_integers, and
+   * its data should be expressed in \p default_values as per memcpy.
+   */
+  void add_extra_integers (const unsigned int n_integers,
+                           const std::vector<dof_id_type> & default_values);
 
   /**
    * Returns how many extra integers are associated to the \p DofObject
