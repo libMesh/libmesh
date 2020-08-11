@@ -1106,7 +1106,9 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
 
   // We may have set extra data only on processor 0 in a read()
   mesh.comm().broadcast(mesh._node_integer_names);
+  mesh.comm().broadcast(mesh._node_integer_default_values);
   mesh.comm().broadcast(mesh._elem_integer_names);
+  mesh.comm().broadcast(mesh._elem_integer_default_values);
 
   // We may have set mapping data only on processor 0 in a read()
   unsigned char map_type = mesh.default_mapping_type();
