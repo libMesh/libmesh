@@ -2749,8 +2749,14 @@ void DofMap::old_dof_indices (const Elem * const elem,
                           }
                         else
                           {
-                            libmesh_assert(!elem->active() || fe_type.family == LAGRANGE ||
-                                           elem->refinement_flag() == Elem::JUST_COARSENED);
+                            // We should never have fewer dofs than
+                            // necessary on an element unless we're
+                            // getting indices on a parent element, a
+                            // just-coarsened element ... or a
+                            // subdomain-restricted variable with a
+                            // just-expanded subdomain
+                            // libmesh_assert(!elem->active() || fe_type.family == LAGRANGE ||
+                            //                 elem->refinement_flag() == Elem::JUST_COARSENED);
                             di.resize(di.size() + nc, DofObject::invalid_id);
                           }
                       }
