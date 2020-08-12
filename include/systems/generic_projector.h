@@ -819,9 +819,27 @@ public:
 
     libmesh_assert_equal_to (old_indices.size(), indices.size());
 
-    values.resize(old_indices.size());
+    // We may have invalid_id in cases where no old DoF existed, e.g.
+    // due to expansion of a subdomain-restricted variable's subdomain
+    bool invalid_old_index = false;
+    for (const auto & di : old_indices)
+      if (di == DofObject::invalid_id)
+        invalid_old_index = true;
 
-    old_solution.get(old_indices, values);
+    values.resize(old_indices.size());
+    if (invalid_old_index)
+      {
+        for (auto i : index_range(old_indices))
+          {
+            const dof_id_type di = old_indices[i];
+            if (di == DofObject::invalid_id)
+              values[i] = 0;
+            else
+              values[i] = old_solution(di);
+          }
+      }
+    else
+      old_solution.get(old_indices, values);
   }
 
 
