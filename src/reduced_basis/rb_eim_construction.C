@@ -250,6 +250,31 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
   set_rel_training_tolerance(rel_training_tolerance_in);
   set_abs_training_tolerance(abs_training_tolerance_in);
 
+  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table)
+    {
+      const std::string & lookup_table_param_name =
+        get_rb_eim_evaluation().get_parametrized_function().lookup_table_param_name;
+
+      libmesh_error_msg_if(!discrete_parameter_values_in.count(lookup_table_param_name),
+        "Lookup table parameter should be discrete");
+
+      std::vector<Real> & lookup_table_param_values =
+        libmesh_map_find(discrete_parameter_values_in, lookup_table_param_name);
+      unsigned int lookup_table_size = lookup_table_param_values.size();
+
+      // Overwrite the discrete values for lookup_table_param to make sure that
+      // it is: 0, 1, 2, ..., lookup_table_size-1.
+      for (unsigned int i=0; i<lookup_table_size; i++)
+        {
+          lookup_table_param_values[i] = i;
+        }
+
+      // Also, overwrite n_training_samples_in to make sure it matches
+      // lookup_table_size so that we will get full coverage of the
+      // lookup table in our training set.
+      n_training_samples_in = lookup_table_size;
+    }
+
   // Initialize the parameter ranges and the parameters themselves
   initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
@@ -258,6 +283,19 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
                                  n_training_samples_in,
                                  log_scaling_in,
                                  deterministic_training_in);
+
+  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table)
+    {
+      // Also, now that we've initialized the training set, overwrite the training
+      // samples to ensure that we have full coverage of the lookup tbale.
+      const std::string & lookup_table_param_name =
+        get_rb_eim_evaluation().get_parametrized_function().lookup_table_param_name;
+
+      std::vector<Number> lookup_table_training_samples(n_training_samples_in);
+      std::iota(lookup_table_training_samples.begin(), lookup_table_training_samples.end(), 0);
+
+      set_training_parameter_values(lookup_table_param_name, lookup_table_training_samples);
+    }
 }
 
 Real RBEIMConstruction::train_eim_approximation()
@@ -363,6 +401,11 @@ Real RBEIMConstruction::train_eim_approximation()
       }
     } // end while(true)
 
+  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table)
+    {
+      store_eim_rhs_for_training_set();
+    }
+
   return abs_greedy_error;
 }
 
@@ -436,6 +479,43 @@ Real RBEIMConstruction::get_max_abs_value_in_training_set() const
   return _max_abs_value_in_training_set;
 }
 
+void RBEIMConstruction::store_eim_rhs_for_training_set()
+{
+  LOG_SCOPE("store_eim_rhs_for_training_set()", "RBEIMConstruction");
+
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  std::vector<DenseVector<Number>> & eim_rhs_values = get_rb_eim_evaluation().eim_rhs_values;
+  eim_rhs_values.clear();
+  eim_rhs_values.resize(get_n_training_samples());
+  for (auto i : make_range(get_n_training_samples()))
+    {
+      // Make a copy of the parametrized function for training index, since we
+      // will modify this below to give us a new basis function.
+      auto local_pf = _local_parametrized_functions_for_training[i];
+
+      unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
+      if (RB_size > 0)
+        {
+          // Get the right-hand side vector for the EIM approximation
+          // by sampling the parametrized function (stored in solution)
+          // at the interpolation points.
+          DenseVector<Number> EIM_rhs(RB_size);
+          for (unsigned int i=0; i<RB_size; i++)
+            {
+              EIM_rhs(i) =
+                RBEIMEvaluation::get_parametrized_function_value(comm(),
+                                                                 local_pf,
+                                                                 eim_eval.get_interpolation_points_elem_id(i),
+                                                                 eim_eval.get_interpolation_points_comp(i),
+                                                                 eim_eval.get_interpolation_points_qp(i));
+            }
+
+          eim_rhs_values[i] = EIM_rhs;
+        }
+    }
+}
+
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 {
   LOG_SCOPE("compute_max_eim_error()", "RBEIMConstruction");
@@ -476,6 +556,9 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
                        "RBEIMConstruction::initialize_parametrized_functions_in_training_set");
 
   libMesh::out << "Initializing parametrized functions in training set..." << std::endl;
+
+  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table)
+    get_rb_eim_evaluation().get_parametrized_function().initialize_lookup_table();
 
   // Store the locations of all quadrature points
   initialize_qp_data();

@@ -34,6 +34,7 @@
 #include "libmesh/condensed_eigen_system.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -304,6 +305,26 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
           numeric_index_type index = first_index + i;
           training_vector->set(index, new_training_set[param_name][i]);
         }
+    }
+}
+
+
+template <class Base>
+void RBConstructionBase<Base>::set_training_parameter_values(
+  const std::string & param_name, const std::vector<Number> & values)
+{
+  libmesh_error_msg_if(!training_parameters_initialized,
+    "Training parameters must be initialized before calling set_training_parameter_values");
+  libmesh_error_msg_if(values.size() != get_local_n_training_samples(),
+    "Inconsistent sizes");
+
+  auto & training_vector = libmesh_map_find(training_parameters, param_name);
+
+  numeric_index_type first_index = training_vector->first_local_index();
+  for (numeric_index_type i=0; i<get_local_n_training_samples(); i++)
+    {
+      numeric_index_type index = first_index + i;
+      training_vector->set(index, values[i]);
     }
 }
 

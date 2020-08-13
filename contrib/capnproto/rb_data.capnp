@@ -104,26 +104,28 @@ struct TransientRBEvaluationComplex @0x856e1656058c2e19 {
 }
 
 struct RBEIMEvaluationReal @0xf8121d2237427a80 {
-  nBfs                     @0 :Integer;
-  parameterRanges          @1 :ParameterRanges;
-  discreteParameters       @2 :DiscreteParameterList;
-  interpolationXyz         @3 :List(Point3D);
-  interpolationComp        @4 :List(Integer);
-  interpolationSubdomainId @5 :List(Integer);
-  interpolationElemId      @6 :List(Integer);
-  interpolationQp          @7 :List(Integer);
-  interpolationXyzPerturb  @8 :List(List(Point3D));
-  interpolationMatrix      @9 :List(Real);
+  nBfs                     @0  :Integer;
+  parameterRanges          @1  :ParameterRanges;
+  discreteParameters       @2  :DiscreteParameterList;
+  interpolationXyz         @3  :List(Point3D);
+  interpolationComp        @4  :List(Integer);
+  interpolationSubdomainId @5  :List(Integer);
+  interpolationElemId      @6  :List(Integer);
+  interpolationQp          @7  :List(Integer);
+  interpolationXyzPerturb  @8  :List(List(Point3D));
+  interpolationMatrix      @9  :List(Real);
+  eimRhsForTrainingSet     @10 :List(List(Real));
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
-  nBfs                     @0 :Integer;
-  parameterRanges          @1 :ParameterRanges;
-  discreteParameters       @2 :DiscreteParameterList;
-  interpolationXyz         @3 :List(Point3D);
-  interpolationComp        @4 :List(Integer);
-  interpolationSubdomainId @5 :List(Integer);
-  interpolationElemId      @6 :List(Integer);
-  interpolationQp          @7 :List(Integer);
-  interpolationXyzPerturb  @8 :List(List(Point3D));
-  interpolationMatrix      @9 :List(Complex);
+  nBfs                     @0  :Integer;
+  parameterRanges          @1  :ParameterRanges;
+  discreteParameters       @2  :DiscreteParameterList;
+  interpolationXyz         @3  :List(Point3D);
+  interpolationComp        @4  :List(Integer);
+  interpolationSubdomainId @5  :List(Integer);
+  interpolationElemId      @6  :List(Integer);
+  interpolationQp          @7  :List(Integer);
+  interpolationXyzPerturb  @8  :List(List(Point3D));
+  interpolationMatrix      @9  :List(Complex);
+  eimRhsForTrainingSet     @10 :List(List(Complex));
 }

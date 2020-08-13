@@ -197,6 +197,16 @@ public:
   Real get_max_abs_value_in_training_set() const;
 
   /**
+   * Get the EIM RHS vector at all parametrized functions in the training
+   * set. In some cases we want to store this data for future use. For example
+   * this is useful in the case that the parametrized function is defined
+   * based on a look-up table rather than an analytical function, since
+   * if we store the EIM RHS data, we can do Online solves without initializing
+   * the look-up table data.
+   */
+  void store_eim_rhs_for_training_set();
+
+  /**
    * Enum that indicates which type of "best fit" algorithm
    * we should use.
    * a) projection: Find the best fit in the inner product

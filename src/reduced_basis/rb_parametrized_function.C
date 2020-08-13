@@ -31,6 +31,8 @@ namespace libMesh
 RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
+is_lookup_table(false),
+lookup_table_param_name(""),
 fd_delta(1.e-6)
 {}
 
@@ -170,6 +172,11 @@ Number RBParametrizedFunction::lookup_preevaluated_value_on_mesh(unsigned int co
   libmesh_error_msg_if(index >= preevaluated_values[0].size(), "Error: invalid index");
 
   return preevaluated_values[0][index][comp];
+}
+
+void RBParametrizedFunction::initialize_lookup_table()
+{
+  // No-op by default, override in subclasses as needed
 }
 
 }

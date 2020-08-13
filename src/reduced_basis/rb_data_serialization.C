@@ -31,6 +31,7 @@
 #include "libmesh/rb_scm_evaluation.h"
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
+#include "libmesh/rb_parametrized_function.h"
 
 // Cap'n'Proto includes
 #include <capnp/serialize.h>
@@ -669,6 +670,25 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
           }
       }
   }
+
+  // Optionally store EIM rhs values for the training set
+  if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
+    {
+      const std::vector<DenseVector<Number>> & eim_rhs_values = rb_eim_evaluation.eim_rhs_values;
+
+      auto eim_rhs_list_outer =
+        rb_eim_evaluation_builder.initEimRhsForTrainingSet(eim_rhs_values.size());
+      for (unsigned int i=0; i < eim_rhs_values.size(); ++i)
+        {
+          const DenseVector<Number> & values = eim_rhs_values[i];
+          auto eim_rhs_list_inner = eim_rhs_list_outer.init(i, values.size());
+
+          for (unsigned int j : index_range(values))
+            {
+              eim_rhs_list_inner.set(j, values(j));
+            }
+        }
+    }
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)

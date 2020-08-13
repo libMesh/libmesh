@@ -124,6 +124,13 @@ public:
                                                    unsigned int qp) const;
 
   /**
+   * If this parametrized function is defined based on a lookup table then
+   * we can call this function to initialize the table. This is a no-op by
+   * default, but it can be overridden in subclasses as needed.
+   */
+  virtual void initialize_lookup_table();
+
+  /**
    * Storage for pre-evaluated values. The indexing is given by:
    *   parameter index --> point index --> component index --> value.
    */
@@ -146,6 +153,19 @@ public:
    * approximations to derivatives.
    */
   bool requires_xyz_perturbations;
+
+  /**
+   * Boolean to indicate if this parametrized function is defined based on a lookup
+   * table or not. If it is defined based on a lookup table, then the evaluation
+   * functions will access a discrete parameter to determine the index to lookup.
+   */
+  bool is_lookup_table;
+
+  /**
+   * If this is a lookup table, then lookup_table_param_name specifies the parameter
+   * that is used to index into the lookup table.
+   */
+  std::string lookup_table_param_name;
 
   /**
    * The finite difference step size in the case that this function in the case
