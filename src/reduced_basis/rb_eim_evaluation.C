@@ -180,7 +180,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   if (get_parametrized_function().is_lookup_table)
     {
       _rb_eim_solutions.resize(mus.size());
-      for (unsigned int mu_index=0; mu_index<mus.size(); mu_index++)
+      for (auto mu_index : index_range(mus))
         {
           Real lookup_table_param =
             mus[mu_index].get_value(get_parametrized_function().lookup_table_param_name);
@@ -188,13 +188,13 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
           // Cast lookup_table_param to an unsigned integer so that we can use
           // it as an index into the EIM rhs values obtained from the lookup table.
           unsigned int lookup_table_index =
-            static_cast<unsigned int>(std::round(lookup_table_param));
+            cast_int<unsigned int>(std::round(lookup_table_param));
 
           DenseVector<Number> values;
           eim_rhs_values[lookup_table_index].get_principal_subvector(N, values);
           _rb_eim_solutions[mu_index] = values;
         }
-      
+
       return;
     }
 

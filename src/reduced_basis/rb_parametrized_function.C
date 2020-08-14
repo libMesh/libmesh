@@ -32,7 +32,6 @@ RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
 is_lookup_table(false),
-lookup_table_param_name(""),
 fd_delta(1.e-6)
 {}
 

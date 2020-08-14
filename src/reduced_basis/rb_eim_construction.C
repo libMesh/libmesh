@@ -260,19 +260,15 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
 
       std::vector<Real> & lookup_table_param_values =
         libmesh_map_find(discrete_parameter_values_in, lookup_table_param_name);
-      unsigned int lookup_table_size = lookup_table_param_values.size();
 
       // Overwrite the discrete values for lookup_table_param to make sure that
-      // it is: 0, 1, 2, ..., lookup_table_size-1.
-      for (unsigned int i=0; i<lookup_table_size; i++)
-        {
-          lookup_table_param_values[i] = i;
-        }
+      // it is: 0, 1, 2, ..., size-1.
+      std::iota(lookup_table_param_values.begin(), lookup_table_param_values.end(), 0);
 
       // Also, overwrite n_training_samples_in to make sure it matches
       // lookup_table_size so that we will get full coverage of the
       // lookup table in our training set.
-      n_training_samples_in = lookup_table_size;
+      n_training_samples_in = lookup_table_param_values.size();
     }
 
   // Initialize the parameter ranges and the parameters themselves

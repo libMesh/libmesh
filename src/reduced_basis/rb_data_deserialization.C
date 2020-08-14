@@ -793,12 +793,12 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       eim_rhs_values.clear();
       eim_rhs_values.resize(eim_rhs_list_outer.size());
 
-      for (unsigned int i=0; i<eim_rhs_list_outer.size(); ++i)
+      for (auto i : make_range(eim_rhs_list_outer.size()))
         {
           auto eim_rhs_list_inner = eim_rhs_list_outer[i];
 
           DenseVector<Number> values(eim_rhs_list_inner.size());
-          for (unsigned int j=0; j<values.size(); j++)
+          for (auto j : index_range(values))
             {
               values(j) = load_scalar_value(eim_rhs_list_inner[j]);
             }

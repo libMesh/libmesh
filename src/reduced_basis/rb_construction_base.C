@@ -321,7 +321,7 @@ void RBConstructionBase<Base>::set_training_parameter_values(
   auto & training_vector = libmesh_map_find(training_parameters, param_name);
 
   numeric_index_type first_index = training_vector->first_local_index();
-  for (numeric_index_type i=0; i<get_local_n_training_samples(); i++)
+  for (auto i : make_range(get_local_n_training_samples()))
     {
       numeric_index_type index = first_index + i;
       training_vector->set(index, values[i]);

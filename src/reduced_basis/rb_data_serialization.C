@@ -678,16 +678,16 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
 
       auto eim_rhs_list_outer =
         rb_eim_evaluation_builder.initEimRhsForTrainingSet(eim_rhs_values.size());
-      for (unsigned int i=0; i < eim_rhs_values.size(); ++i)
+      for (auto i : make_range(eim_rhs_values.size()))
         {
           const DenseVector<Number> & values = eim_rhs_values[i];
           auto eim_rhs_list_inner = eim_rhs_list_outer.init(i, values.size());
 
-          for (unsigned int j : index_range(values))
+          for (auto j : index_range(values))
             {
               set_scalar_in_list(eim_rhs_list_inner,
-                                j,
-                                values(j));
+                                 j,
+                                 values(j));
             }
         }
     }
