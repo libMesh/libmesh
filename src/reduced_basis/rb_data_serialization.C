@@ -685,7 +685,9 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
 
           for (unsigned int j : index_range(values))
             {
-              eim_rhs_list_inner.set(j, values(j));
+              set_scalar_in_list(eim_rhs_list_inner,
+                                j,
+                                values(j));
             }
         }
     }
