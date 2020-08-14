@@ -34,12 +34,16 @@ public:
                              const Point & p,
                              const Real /*time*/ = 0.) override
   {
+    using std::abs;
+
     const Real & x = p(0);
     const Real & y = p(1);
     const Point centroid = c.get_elem().centroid();
     const Real sign = centroid(1)/std::abs(centroid(1));
 
-    return (1 - std::abs(1-x)) * (1-std::abs(y)) * sign;
+    // For testing we want something discontinuous on the slit,
+    // continuous everywhere else, and bilinear on all coarse quads
+    return (abs(x) + abs(2-x) - 2*abs(1-x)) * (1-abs(y)) * sign;
   }
 
   virtual void operator() (const FEMContext & c,
@@ -61,7 +65,10 @@ public:
 class SlitMeshTest : public CppUnit::TestCase {
   /**
    * The goal of this test is to ensure that a 2D mesh with nodes overlapping
-   * on opposite sides of an internal, "slit" edge is usable.
+   * on opposite sides of an internal, "slit" edge is usable.  The
+   * mesh has to be connected at more than one node on each side of
+   * the slit, however, to ensure that we can find point neighbors of
+   * each node.
    */
 public:
   CPPUNIT_TEST_SUITE( SlitMeshTest );
@@ -80,21 +87,19 @@ protected:
   {
     _mesh = new Mesh(*TestCommWorld);
 
-    // (0,1)           (1,1)           (2,1)
-    // x---------------x---------------x
-    // |               |               |
-    // |               |               |
-    // |               |               |
-    // |               |               |
-    // |               |               |
-    // x---------------x---------------x
-    // (0,0)           (1,0)          (2,0)
-    // |               |               |
-    // |               |               |
-    // |               |               |
-    // |               |               |
-    // x---------------x---------------x
-    // (0,-1)          (1,-1)         (2,-1)
+    // (-1,1)     (0,1)      (1,1)      (2,1)      (3,1)
+    // o----------o----------o----------o----------o
+    // |          |          |          |          |
+    // |          |          |          |          |
+    // |          |          |          |          |
+    // |          |          |          |          |
+    // o----------o==========8==========o----------o
+    // (-1,0)     (0,0)      (1,0)      (2,0)      (3,0)
+    // |          |          |          |          |
+    // |          |          |          |          |
+    // |          |          |          |          |
+    // o----------o----------o----------o----------o
+    // (-1,-1)    (0,-1)     (1,-1)     (2,-1)     (3,-1)
 
     _mesh->set_mesh_dimension(2);
 
@@ -104,10 +109,16 @@ protected:
     _mesh->add_point( Point(0.0, 1.0), 3 );
     _mesh->add_point( Point(0.0,-1.0), 4 );
     _mesh->add_point( Point(1.0,-1.0), 5 );
-    _mesh->add_point( Point(1.0, 0.0), 6 );
+    _mesh->add_point( Point(1.0, 0.0), 6 ); // Doubled!
     _mesh->add_point( Point(2.0, 0.0), 7 );
     _mesh->add_point( Point(2.0, 1.0), 8 );
     _mesh->add_point( Point(2.0,-1.0), 9 );
+    _mesh->add_point( Point(-1.0,-1.0), 10);
+    _mesh->add_point( Point(-1.0, 0.0), 11);
+    _mesh->add_point( Point(-1.0, 1.0), 12);
+    _mesh->add_point( Point(3.0,-1.0), 13);
+    _mesh->add_point( Point(3.0, 0.0), 14);
+    _mesh->add_point( Point(3.0, 1.0), 15);
 
     {
       Elem * elem_top_left = _mesh->add_elem(Elem::build_with_id(QUAD4, 0));
@@ -133,6 +144,30 @@ protected:
       elem_bottom_right->set_node(1) = _mesh->node_ptr(9);
       elem_bottom_right->set_node(2) = _mesh->node_ptr(7);
       elem_bottom_right->set_node(3) = _mesh->node_ptr(6);
+
+      Elem * elem_top_leftleft = _mesh->add_elem(Elem::build_with_id(QUAD4, 4));
+      elem_top_leftleft->set_node(0) = _mesh->node_ptr(11);
+      elem_top_leftleft->set_node(1) = _mesh->node_ptr(0);
+      elem_top_leftleft->set_node(2) = _mesh->node_ptr(3);
+      elem_top_leftleft->set_node(3) = _mesh->node_ptr(12);
+
+      Elem * elem_bottom_leftleft = _mesh->add_elem(Elem::build_with_id(QUAD4, 5));
+      elem_bottom_leftleft->set_node(0) = _mesh->node_ptr(10);
+      elem_bottom_leftleft->set_node(1) = _mesh->node_ptr(4);
+      elem_bottom_leftleft->set_node(2) = _mesh->node_ptr(0);
+      elem_bottom_leftleft->set_node(3) = _mesh->node_ptr(11);
+
+      Elem * elem_top_rightright = _mesh->add_elem(Elem::build_with_id(QUAD4, 6));
+      elem_top_rightright->set_node(0) = _mesh->node_ptr(7);
+      elem_top_rightright->set_node(1) = _mesh->node_ptr(14);
+      elem_top_rightright->set_node(2) = _mesh->node_ptr(15);
+      elem_top_rightright->set_node(3) = _mesh->node_ptr(8);
+
+      Elem * elem_bottom_rightright = _mesh->add_elem(Elem::build_with_id(QUAD4, 7));
+      elem_bottom_rightright->set_node(0) = _mesh->node_ptr(9);
+      elem_bottom_rightright->set_node(1) = _mesh->node_ptr(13);
+      elem_bottom_rightright->set_node(2) = _mesh->node_ptr(14);
+      elem_bottom_rightright->set_node(3) = _mesh->node_ptr(7);
     }
 
     // libMesh shouldn't renumber, or our based-on-initial-id
@@ -157,11 +192,11 @@ public:
 
   void testMesh()
   {
-    // There'd better be 4 elements
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)4, _mesh->n_elem() );
+    // There'd better be 8 elements
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)8, _mesh->n_elem() );
 
-    // There'd better still be a full 10 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)10, _mesh->n_nodes() );
+    // There'd better still be a full 16 nodes
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)16, _mesh->n_nodes() );
 
     /* The middle nodes should still be distinct between the top and
      * bottom elements */
@@ -215,12 +250,12 @@ public:
   void testMesh()
   {
 #ifdef LIBMESH_ENABLE_AMR
-    // We should have 20 total and 16 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)20, _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)16, _mesh->n_active_elem() );
+    // We should have 40 total and 32 active elements.
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)40, _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)32, _mesh->n_active_elem() );
 
-    // We should have 28 nodes, not 25 or 26
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)28, _mesh->n_nodes() );
+    // We should have 48 nodes, not 45 or 46
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)48, _mesh->n_nodes() );
 #endif
   }
 };
@@ -289,12 +324,12 @@ public:
   void testMesh()
   {
 #ifdef LIBMESH_ENABLE_AMR
-    // We should have 84 total and 64 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)(4+16+64), _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)64, _mesh->n_active_elem() );
+    // We should have 168 total and 128 active elements.
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)(8+32+128), _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)128, _mesh->n_active_elem() );
 
-    // We should have 88 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)88, _mesh->n_nodes() );
+    // We should have 160 nodes
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)160, _mesh->n_nodes() );
 #endif
   }
 
