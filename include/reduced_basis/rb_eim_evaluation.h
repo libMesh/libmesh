@@ -289,10 +289,10 @@ public:
                                bool read_binary_basis_functions = true);
 
   /**
-   * Storage for EIM rhs values in the case that we have is_lookup_table
+   * Storage for EIM solutions in the case that we have is_lookup_table==true
    * in our RBParametrizedFunction.
    */
-  std::vector<DenseVector<Number>> eim_rhs_values;
+  std::vector<DenseVector<Number>> eim_solutions;
 
 private:
 

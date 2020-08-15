@@ -399,7 +399,7 @@ Real RBEIMConstruction::train_eim_approximation()
 
   if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table)
     {
-      store_eim_rhs_for_training_set();
+      store_eim_solutions_for_training_set();
     }
 
   return abs_greedy_error;
@@ -475,15 +475,15 @@ Real RBEIMConstruction::get_max_abs_value_in_training_set() const
   return _max_abs_value_in_training_set;
 }
 
-void RBEIMConstruction::store_eim_rhs_for_training_set()
+void RBEIMConstruction::store_eim_solutions_for_training_set()
 {
-  LOG_SCOPE("store_eim_rhs_for_training_set()", "RBEIMConstruction");
+  LOG_SCOPE("store_eim_solutions_for_training_set()", "RBEIMConstruction");
 
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
 
-  std::vector<DenseVector<Number>> & eim_rhs_values = get_rb_eim_evaluation().eim_rhs_values;
-  eim_rhs_values.clear();
-  eim_rhs_values.resize(get_n_training_samples());
+  std::vector<DenseVector<Number>> & eim_solutions = get_rb_eim_evaluation().eim_solutions;
+  eim_solutions.clear();
+  eim_solutions.resize(get_n_training_samples());
   for (auto i : make_range(get_n_training_samples()))
     {
       // Make a copy of the parametrized function for training index, since we
@@ -507,7 +507,9 @@ void RBEIMConstruction::store_eim_rhs_for_training_set()
                                                                  eim_eval.get_interpolation_points_qp(i));
             }
 
-          eim_rhs_values[i] = EIM_rhs;
+          eim_eval.set_parameters( get_parameters() );
+          eim_eval.rb_eim_solve(EIM_rhs);
+          eim_solutions[i] = eim_eval.get_rb_eim_solution();
         }
     }
 }

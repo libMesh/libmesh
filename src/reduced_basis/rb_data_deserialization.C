@@ -787,11 +787,11 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
     {
       auto eim_rhs_list_outer =
-        rb_eim_evaluation_reader.getEimRhsForTrainingSet();
+        rb_eim_evaluation_reader.getEimSolutionsForTrainingSet();
 
-      std::vector<DenseVector<Number>> & eim_rhs_values = rb_eim_evaluation.eim_rhs_values;
-      eim_rhs_values.clear();
-      eim_rhs_values.resize(eim_rhs_list_outer.size());
+      std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions;
+      eim_solutions.clear();
+      eim_solutions.resize(eim_rhs_list_outer.size());
 
       for (auto i : make_range(eim_rhs_list_outer.size()))
         {
@@ -802,7 +802,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
             {
               values(j) = load_scalar_value(eim_rhs_list_inner[j]);
             }
-          eim_rhs_values[i] = values;
+          eim_solutions[i] = values;
         }
     }
 }

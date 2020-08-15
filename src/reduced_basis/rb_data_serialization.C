@@ -674,13 +674,13 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   // Optionally store EIM rhs values for the training set
   if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
     {
-      const std::vector<DenseVector<Number>> & eim_rhs_values = rb_eim_evaluation.eim_rhs_values;
+      const std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions;
 
       auto eim_rhs_list_outer =
-        rb_eim_evaluation_builder.initEimRhsForTrainingSet(eim_rhs_values.size());
-      for (auto i : make_range(eim_rhs_values.size()))
+        rb_eim_evaluation_builder.initEimSolutionsForTrainingSet(eim_solutions.size());
+      for (auto i : make_range(eim_solutions.size()))
         {
-          const DenseVector<Number> & values = eim_rhs_values[i];
+          const DenseVector<Number> & values = eim_solutions[i];
           auto eim_rhs_list_inner = eim_rhs_list_outer.init(i, values.size());
 
           for (auto j : index_range(values))
