@@ -1693,7 +1693,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       // libmesh_node_num_to_exodus[ libmesh_node_id ] returns the *Exodus* ID for that node.
       // Unlike the exodus_node_num_to_libmesh vector above, this one is a std::map
       this->libmesh_node_num_to_exodus[id] =
-        cast_int<int>(this->exodus_node_num_to_libmesh.size()); // should never be zero...
+        this->exodus_node_num_to_libmesh.size(); // should never be zero...
     }
 
   // Now we're going to loop over the subdomain map and build a few things right
@@ -1739,7 +1739,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
           // Set the number map for elements
           this->exodus_elem_num_to_libmesh.push_back(elem_id);
           this->libmesh_elem_num_to_exodus[elem_id] =
-            cast_int<int>(this->exodus_elem_num_to_libmesh.size());
+            this->exodus_elem_num_to_libmesh.size();
 
           const Elem & elem = pmesh.elem_ref(elem_id);
 
@@ -1921,7 +1921,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
     {
       // Don't try to grab a reference to the vector unless the current node is attached
       // to a local element.  Otherwise, another processor will be responsible for writing it in its nodeset.
-      std::map<int, int>::iterator it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
+      const auto it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
 
       if (it != this->libmesh_node_num_to_exodus.end())
         {
