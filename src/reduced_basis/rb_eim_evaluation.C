@@ -191,7 +191,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             cast_int<unsigned int>(std::round(lookup_table_param));
 
           DenseVector<Number> values;
-          eim_rhs_values[lookup_table_index].get_principal_subvector(N, values);
+          eim_solutions[lookup_table_index].get_principal_subvector(N, values);
           _rb_eim_solutions[mu_index] = values;
         }
 
