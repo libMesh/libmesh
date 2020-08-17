@@ -253,17 +253,6 @@ public:
                     std::vector<int> & elem_mapb);
 
   /**
-   * Writes the specified number of coordinate values starting at the specified
-   * index.
-   */
-  void put_n_coord(unsigned start_node_num,
-                   unsigned num_nodes,
-                   std::vector<Real> & x_coor,
-                   std::vector<Real> & y_coor,
-                   std::vector<Real> & z_coor);
-
-
-  /**
    * This function is specialized from ExodusII_IO_Helper to write only the
    * nodal coordinates stored on the local piece of the Mesh.
    */

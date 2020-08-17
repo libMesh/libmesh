@@ -694,31 +694,6 @@ void Nemesis_IO_Helper::put_elem_map(std::vector<int> & elem_mapi_in,
 
 
 
-
-
-
-void Nemesis_IO_Helper::put_n_coord(unsigned start_node_num,
-                                    unsigned num_nodes_in,
-                                    std::vector<Real> & x_coor,
-                                    std::vector<Real> & y_coor,
-                                    std::vector<Real> & z_coor)
-{
-  if (num_nodes_in)
-    {
-      nemesis_err_flag =
-        Nemesis::ne_put_n_coord(ex_id,
-                                start_node_num,
-                                num_nodes_in,
-                                x_coor.empty() ? nullptr : x_coor.data(),
-                                y_coor.empty() ? nullptr : y_coor.data(),
-                                z_coor.empty() ? nullptr : z_coor.data());
-
-      EX_CHECK_ERR(nemesis_err_flag, "Error writing coords to file!");
-    }
-}
-
-
-
 void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, bool /*use_discontinuous*/)
 {
   // Make sure that the reference passed in is really a DistributedMesh
