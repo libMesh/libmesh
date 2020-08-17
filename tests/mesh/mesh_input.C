@@ -7,6 +7,7 @@
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
+#include <libmesh/nemesis_io.h>
 #include <libmesh/dof_map.h>
 
 #include "test_comm.h"
@@ -41,6 +42,11 @@ public:
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif // LIBMESH_USE_COMPLEX_NUMBERS
 #endif // LIBMESH_HAVE_EXODUS_API
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  CPPUNIT_TEST( testNemesisRead );
+#endif
+
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
 
@@ -246,6 +252,33 @@ public:
 
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 #endif // LIBMESH_HAVE_EXODUS_API
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  void testNemesisRead ()
+  {
+    // first scope: write file
+    {
+      Mesh mesh(*TestCommWorld);
+      MeshTools::Generation::build_square (mesh, 3, 3, 0., 1., 0., 1.);
+      mesh.write("test_nemesis_read.nem");
+    }
+
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
+    // second scope: read file
+    {
+      Mesh mesh(*TestCommWorld);
+      Nemesis_IO nem(mesh);
+
+      nem.read("test_nemesis_read.nem");
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  dof_id_type(9));
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(16));
+    }
+  }
+#endif
+
 
   void testDynaReadElem ()
   {
