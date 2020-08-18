@@ -486,9 +486,7 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
   eim_solutions.resize(get_n_training_samples());
   for (auto i : make_range(get_n_training_samples()))
     {
-      // Make a copy of the parametrized function for training index, since we
-      // will modify this below to give us a new basis function.
-      auto local_pf = _local_parametrized_functions_for_training[i];
+      const auto & local_pf = _local_parametrized_functions_for_training[i];
 
       unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
       if (RB_size > 0)
