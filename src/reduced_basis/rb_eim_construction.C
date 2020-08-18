@@ -497,14 +497,14 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
           // by sampling the parametrized function (stored in solution)
           // at the interpolation points.
           DenseVector<Number> EIM_rhs(RB_size);
-          for (unsigned int i=0; i<RB_size; i++)
+          for (unsigned int j=0; j<RB_size; j++)
             {
-              EIM_rhs(i) =
+              EIM_rhs(j) =
                 RBEIMEvaluation::get_parametrized_function_value(comm(),
                                                                  local_pf,
-                                                                 eim_eval.get_interpolation_points_elem_id(i),
-                                                                 eim_eval.get_interpolation_points_comp(i),
-                                                                 eim_eval.get_interpolation_points_qp(i));
+                                                                 eim_eval.get_interpolation_points_elem_id(j),
+                                                                 eim_eval.get_interpolation_points_comp(j),
+                                                                 eim_eval.get_interpolation_points_qp(j));
             }
 
           eim_eval.set_parameters( get_parameters() );
