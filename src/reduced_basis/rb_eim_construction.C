@@ -486,9 +486,7 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
   eim_solutions.resize(get_n_training_samples());
   for (auto i : make_range(get_n_training_samples()))
     {
-      // Make a copy of the parametrized function for training index, since we
-      // will modify this below to give us a new basis function.
-      auto local_pf = _local_parametrized_functions_for_training[i];
+      const auto & local_pf = _local_parametrized_functions_for_training[i];
 
       unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
       if (RB_size > 0)
@@ -497,14 +495,14 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
           // by sampling the parametrized function (stored in solution)
           // at the interpolation points.
           DenseVector<Number> EIM_rhs(RB_size);
-          for (unsigned int i=0; i<RB_size; i++)
+          for (unsigned int j=0; j<RB_size; j++)
             {
-              EIM_rhs(i) =
+              EIM_rhs(j) =
                 RBEIMEvaluation::get_parametrized_function_value(comm(),
                                                                  local_pf,
-                                                                 eim_eval.get_interpolation_points_elem_id(i),
-                                                                 eim_eval.get_interpolation_points_comp(i),
-                                                                 eim_eval.get_interpolation_points_qp(i));
+                                                                 eim_eval.get_interpolation_points_elem_id(j),
+                                                                 eim_eval.get_interpolation_points_comp(j),
+                                                                 eim_eval.get_interpolation_points_qp(j));
             }
 
           eim_eval.set_parameters( get_parameters() );
