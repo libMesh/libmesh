@@ -67,11 +67,11 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   if (s == 0)
     current_fe_type.radial_order = 0;
   else
-     /**
-      * After the recent larger changes, this case was not tested.
-      * It might work, but maybe it gives wrong results.
-      */
-     libmesh_not_implemented();
+    /**
+     * After the recent larger changes, this case was not tested.
+     * It might work, but maybe it gives wrong results.
+     */
+    libmesh_not_implemented();
 
   if (current_fe_type.radial_order != fe_type.radial_order)
     {

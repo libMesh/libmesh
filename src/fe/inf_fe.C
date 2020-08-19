@@ -671,7 +671,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
 
 
   _n_total_approx_sf = InfFERadial::n_dofs(fe_type.radial_order) *
-                                base_fe->n_shape_functions();
+    base_fe->n_shape_functions();
 
 
 
