@@ -36,7 +36,6 @@ AC_CONFIG_FILES([Makefile
                  contrib/utils/Makefile
                  contrib/utils/Make.common
                  tests/Makefile
-                 contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in
                  contrib/utils/libmesh-opt.pc
                  contrib/utils/libmesh-dbg.pc
                  contrib/utils/libmesh-devel.pc
@@ -238,6 +237,8 @@ libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
 # Set compiler flags for devel, opt, etc. methods
 #-----------------------------------------------------
 LIBMESH_SET_METHODS
+
+AC_CONFIG_FILES([contrib/utils/libmesh.pc:$LIBMESH_PC_IN])
 
 # By default we merely enable some warnings, but we can turn those
 # into errors (for library code only, not contrib or external code)
