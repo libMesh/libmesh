@@ -6,8 +6,18 @@ set -e
 # there's a failure we get the most informative death possible
 ORDERED_METHODS="dbg debug devel profiling pro prof oprofile oprof optimized opt"
 
+# when run outside of the automake envionment make sure we get METHODS set
+# to something useful
+if (test "x${METHODS}" = "x"); then
+    if (test "x${METHOD}" = "x"); then
+        METHODS="@METHODS@"
+    else
+        METHODS="$METHOD"
+    fi
+fi
+
 for method in ${ORDERED_METHODS}; do
-    for mymethod in @METHODS@; do
+    for mymethod in ${METHODS}; do
         if (test "x${mymethod}" = "x${method}"); then
             MY_METHODS="${MY_METHODS} ${mymethod}"
         fi
