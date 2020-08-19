@@ -457,7 +457,7 @@ public:
    * formulation for an infinite element produces correct element
    * matrices for a mesh using both finite and infinite elements.
    */
-  const std::vector<Real> & get_Sobolev_weight() const
+  virtual const std::vector<Real> & get_Sobolev_weight() const
   { return weight; }
 
   /**
@@ -465,7 +465,7 @@ public:
    * weight at each quadrature point. See \p get_Sobolev_weight()
    * for details.  In case of \p FE initialized to all zero.
    */
-  const std::vector<RealGradient> & get_Sobolev_dweight() const
+  virtual const std::vector<RealGradient> & get_Sobolev_dweight() const
   { return dweight; }
 
   /**

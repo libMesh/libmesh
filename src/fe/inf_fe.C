@@ -451,8 +451,6 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
     _radial_shape_index.resize(_n_total_approx_sf);
     _base_shape_index.resize(_n_total_approx_sf);
 
-    const ElemType inf_elem_type = inf_elem->type();
-
     // fill the shape index map
     for (unsigned int n=0; n<_n_total_approx_sf; ++n)
       {
@@ -685,7 +683,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
 
 
   _n_total_approx_sf = InfFERadial::n_dofs(fe_type.radial_order) *
-                                base_fe->n_shape_functions();
+    base_fe->n_shape_functions();
 
 
 

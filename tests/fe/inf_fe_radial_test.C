@@ -67,132 +67,132 @@ public:
   Point base_point(const Point physical_point, const Elem * inf_elem)
   {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  libmesh_assert(inf_elem);
+    libmesh_assert(inf_elem);
 
-  // The strategy is:
-  // compute the intersection of the line
-  // physical_point - origin with the base element,
-  // find its internal coordinatels using FEMap::inverse_map():
-  // The radial part can then be computed directly later on.
+    // The strategy is:
+    // compute the intersection of the line
+    // physical_point - origin with the base element,
+    // find its internal coordinatels using FEMap::inverse_map():
+    // The radial part can then be computed directly later on.
 
-  // 1.)
-  // build a base element to do the map inversion in the base face
-  std::unique_ptr<Elem> base_elem (InfFEBase::build_elem (inf_elem));
+    // 1.)
+    // build a base element to do the map inversion in the base face
+    std::unique_ptr<Elem> base_elem (InfFEBase::build_elem (inf_elem));
 
-  // the origin of the infinite element
-  const Point o = inf_elem->origin();
-  // 2.)
-  // Now find the intersection of a plane represented by the base
-  // element nodes and the line given by the origin of the infinite
-  // element and the physical point.
-  Point intersection;
+    // the origin of the infinite element
+    const Point o = inf_elem->origin();
+    // 2.)
+    // Now find the intersection of a plane represented by the base
+    // element nodes and the line given by the origin of the infinite
+    // element and the physical point.
+    Point intersection;
 
-        const Point xi ( base_elem->point(1) - base_elem->point(0));
-        const Point eta( base_elem->point(2) - base_elem->point(0));
-        const Point zeta( physical_point - o);
+    const Point xi ( base_elem->point(1) - base_elem->point(0));
+    const Point eta( base_elem->point(2) - base_elem->point(0));
+    const Point zeta( physical_point - o);
 
-        // normal vector of the base elements plane
-        Point n(xi.cross(eta));
-        Real c_factor = (base_elem->point(0) - o)*n/(zeta*n) - 1.;
+    // normal vector of the base elements plane
+    Point n(xi.cross(eta));
+    Real c_factor = (base_elem->point(0) - o)*n/(zeta*n) - 1.;
 
-        // Check whether the above system is ill-posed.  It should
-        // only happen when \p physical_point is not in \p
-        // inf_elem. In this case, any point that is not in the
-        // element is a valid answer.
-        if (libmesh_isinf(c_factor))
-          return Point(0., 0., -2.);
+    // Check whether the above system is ill-posed.  It should
+    // only happen when \p physical_point is not in \p
+    // inf_elem. In this case, any point that is not in the
+    // element is a valid answer.
+    if (libmesh_isinf(c_factor))
+      return Point(0., 0., -2.);
 
-        // Compute the intersection with
-        // {intersection} = {physical_point} + c*({physical_point}-{o}).
-        intersection.add_scaled(physical_point,1.+c_factor);
-        intersection.add_scaled(o,-c_factor);
+    // Compute the intersection with
+    // {intersection} = {physical_point} + c*({physical_point}-{o}).
+    intersection.add_scaled(physical_point,1.+c_factor);
+    intersection.add_scaled(o,-c_factor);
 
-        if (!base_elem->has_affine_map())
+    if (!base_elem->has_affine_map())
+      {
+        unsigned int iter_max = 20;
+
+        // the number of shape functions needed for the base_elem
+        unsigned int n_sf = FE<2,LAGRANGE>::n_shape_functions(base_elem->type(),base_elem->default_order());
+
+        // guess base element coordinates: p=xi,eta,0
+        // in first iteration, never run with 'secure' to avoid false warnings.
+        Point ref_point= FEMap::inverse_map(2, base_elem.get(), intersection,
+                                            TOLERANCE, false);
+
+        // Newton iteration
+        for(unsigned int it=0; it<iter_max; ++it)
           {
-            unsigned int iter_max = 20;
+            // Get the shape function and derivative values at the reference coordinate
+            // phi.size() == dphi.size()
+            Point dxyz_dxi;
+            Point dxyz_deta;
 
-            // the number of shape functions needed for the base_elem
-            unsigned int n_sf = FE<2,LAGRANGE>::n_shape_functions(base_elem->type(),base_elem->default_order());
-
-            // guess base element coordinates: p=xi,eta,0
-            // in first iteration, never run with 'secure' to avoid false warnings.
-            Point ref_point= FEMap::inverse_map(2, base_elem.get(), intersection,
-                                                TOLERANCE, false);
-
-            // Newton iteration
-            for(unsigned int it=0; it<iter_max; ++it)
+            Point intersection_guess;
+            for(unsigned int i=0; i<n_sf; ++i)
               {
-                // Get the shape function and derivative values at the reference coordinate
-                // phi.size() == dphi.size()
-                Point dxyz_dxi;
-                Point dxyz_deta;
 
-                Point intersection_guess;
-                for(unsigned int i=0; i<n_sf; ++i)
-                  {
-
-                    intersection_guess += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape(base_elem->type(),
-                                                                                         base_elem->default_order(),
-                                                                                         i,
-                                                                                         ref_point);
-
-                    dxyz_dxi += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                intersection_guess += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape(base_elem->type(),
                                                                                      base_elem->default_order(),
                                                                                      i,
-                                                                                     0, // d()/dxi
                                                                                      ref_point);
 
-                    dxyz_deta+= base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
-                                                                                     base_elem->default_order(),
-                                                                                     i,
-                                                                                     1, // d()/deta
-                                                                                     ref_point);
-                  } // for i
+                dxyz_dxi += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                                                                                 base_elem->default_order(),
+                                                                                 i,
+                                                                                 0, // d()/dxi
+                                                                                 ref_point);
 
-                TypeVector<Real> F(physical_point + c_factor*(physical_point-o) - intersection_guess);
+                dxyz_deta+= base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                                                                                 base_elem->default_order(),
+                                                                                 i,
+                                                                                 1, // d()/deta
+                                                                                 ref_point);
+              } // for i
 
-                TypeTensor<Real> J;
-                J(0,0) = (physical_point-o)(0);
-                J(0,1) = -dxyz_dxi(0);
-                J(0,2) = -dxyz_deta(0);
-                J(1,0) = (physical_point-o)(1);
-                J(1,1) = -dxyz_dxi(1);
-                J(1,2) = -dxyz_deta(1);
-                J(2,0) = (physical_point-o)(2);
-                J(2,1) = -dxyz_dxi(2);
-                J(2,2) = -dxyz_deta(2);
+            TypeVector<Real> F(physical_point + c_factor*(physical_point-o) - intersection_guess);
 
-                // delta will be the newton step
-                TypeVector<Real> delta;
-                J.solve(F,delta);
+            TypeTensor<Real> J;
+            J(0,0) = (physical_point-o)(0);
+            J(0,1) = -dxyz_dxi(0);
+            J(0,2) = -dxyz_deta(0);
+            J(1,0) = (physical_point-o)(1);
+            J(1,1) = -dxyz_dxi(1);
+            J(1,2) = -dxyz_deta(1);
+            J(2,0) = (physical_point-o)(2);
+            J(2,1) = -dxyz_dxi(2);
+            J(2,2) = -dxyz_deta(2);
 
-                // check for convergence
-                Real tol = std::min( TOLERANCE*0.01, TOLERANCE*base_elem->hmax() );
-                if ( delta.norm() < tol )
+            // delta will be the newton step
+            TypeVector<Real> delta;
+            J.solve(F,delta);
+
+            // check for convergence
+            Real tol = std::min( TOLERANCE*0.01, TOLERANCE*base_elem->hmax() );
+            if ( delta.norm() < tol )
+              {
+                // newton solver converged, now make sure it converged to a point on the base_elem
+                if (base_elem->contains_point(intersection_guess,TOLERANCE*0.1))
                   {
-                    // newton solver converged, now make sure it converged to a point on the base_elem
-                    if (base_elem->contains_point(intersection_guess,TOLERANCE*0.1))
-                      {
-                        intersection = intersection_guess;
-                      }
-                    else
-                      {
-                         err<<" No! This inverse_map failed!"<<std::endl;
-                      }
-                    break; // break out of 'for it'
+                    intersection = intersection_guess;
                   }
                 else
                   {
-                    c_factor     -= delta(0);
-                    ref_point(0) -= delta(1);
-                    ref_point(1) -= delta(2);
+                    err<<" No! This inverse_map failed!"<<std::endl;
                   }
-
+                break; // break out of 'for it'
+              }
+            else
+              {
+                c_factor     -= delta(0);
+                ref_point(0) -= delta(1);
+                ref_point(1) -= delta(2);
               }
 
           }
 
-        return intersection;
+      }
+
+    return intersection;
 #else
     // lets make the compilers happy:
     return Point(0.,0.,-2.);
@@ -343,9 +343,9 @@ public:
   void testInfQuants ()
   {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-   // std::cout << "Called testSingleOrder with radial_order = "
-   //           << radial_order
-   //           << std::endl;
+    // std::cout << "Called testSingleOrder with radial_order = "
+    //           << radial_order
+    //           << std::endl;
 
     ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_cube
@@ -469,8 +469,8 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_sphere
-                (mesh, /*rad*/ 1,
-                 /* nr */ 2, /*type*/ HEX27);
+      (mesh, /*rad*/ 1,
+       /* nr */ 2, /*type*/ HEX27);
 
     InfElemBuilder::InfElemOriginValue com_x;
     InfElemBuilder::InfElemOriginValue com_y;
@@ -495,12 +495,12 @@ public:
       libmesh_error_msg("Error setting Elem pointer.");
     // lets overemphasize that the base element has a non-affine map:
     for (unsigned int n=8; n<12; ++n)
-    {
-       Node* node=infinite_elem->node_ptr(n);
-       // shift base-points on edges towards the center.
-       // This leads to strong 'non-affine effects'
-       *node -= 0.1*(*node-infinite_elem->origin()).unit();
-    }
+      {
+        Node* node=infinite_elem->node_ptr(n);
+        // shift base-points on edges towards the center.
+        // This leads to strong 'non-affine effects'
+        *node -= 0.1*(*node-infinite_elem->origin()).unit();
+      }
 
     // We will construct FEs, etc. of the same dimension as the mesh elements.
     auto dim = mesh.mesh_dimension();
@@ -595,7 +595,7 @@ public:
     delta = Point(1.2e-4,-2.7e-4,0.);
     for (unsigned int i=0; i<2*num_pt; i+=2)
       points[i+1]=points[i]+delta;
-    
+
     const std::vector<Real>& dzetadx = inf_fe->get_dzetadx();
     const std::vector<Real>& dzetady = inf_fe->get_dzetady();
     const std::vector<Real>& dzetadz = inf_fe->get_dzetadz();
@@ -611,9 +611,9 @@ public:
         Real weight_o = b_o.norm_sq()/(q_point[qp+1]-infinite_elem->origin()).norm_sq();
         const Real phase_i = (q_point[qp]-infinite_elem->origin()).norm() - b_i.norm();
         const Real phase_o = (q_point[qp+1]-infinite_elem->origin()).norm() - b_o.norm();
-           
+
         LIBMESH_ASSERT_FP_EQUAL(weight_o ,weight_i, TOLERANCE);
-        
+
         Point normal(dzetadx[qp],
                      dzetady[qp],
                      dzetadz[qp]);
@@ -621,17 +621,17 @@ public:
         Real a_i= (q_point[qp]-infinite_elem->origin()).norm()*0.5*(1.-points[qp](2));
 
         LIBMESH_ASSERT_FP_EQUAL(a_i, b_i.norm(), TOLERANCE*TOLERANCE);
-        
+
         // the elements normal should be orthogonal to dxyz, but in practice deviates
         // approx. 1 degree. So we must account for this error in direction.
         Real err_direct = 1.5*std::abs(dxyz*normal)/(dxyz.norm()*normal.norm());
-        
+
         Real tolerance = std::abs((dphase[qp+1]-dphase[qp])*dxyz)*0.5 + err_direct*dxyz.norm()*dphase[qp].norm();
         Real deriv_mean = (dphase[qp] + dphase[qp+1])*dxyz*0.5;
         LIBMESH_ASSERT_FP_EQUAL(phase_o - phase_i, deriv_mean, tolerance );
-       
+
         LIBMESH_ASSERT_FP_EQUAL(normal.cross(dsob_now[qp]).norm_sq(), 0.0, TOLERANCE*TOLERANCE);
-        
+
         tolerance = std::abs((dsob_now[qp+1]-dsob_now[qp])*dxyz)*.5+1e-10 + err_direct*dxyz.norm()*dsob_now[qp].norm();
         deriv_mean = (dsob_now[qp]*dxyz + dsob_now[qp+1]*dxyz)*0.5;
         LIBMESH_ASSERT_FP_EQUAL(sob_now[qp+1] - sob_now[qp], deriv_mean, tolerance);
