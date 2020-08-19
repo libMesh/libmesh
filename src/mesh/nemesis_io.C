@@ -1159,7 +1159,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // And if that didn't work, then we're actually reading into a
   // ReplicatedMesh, so forget about gathering neighboring elements
   if (mesh.is_serial())
-    return;
+    libmesh_not_implemented();
 
   // Gather neighboring elements so that the mesh has the proper "ghost" neighbor information.
   MeshCommunication().gather_neighboring_elements(cast_ref<DistributedMesh &>(mesh));

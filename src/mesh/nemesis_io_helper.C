@@ -1659,14 +1659,20 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
   for (const auto & id : nodes_attached_to_local_elems)
     {
       // I.e. given exodus_node_id,
-      // exodus_node_num_to_libmesh[ exodus_node_id ] returns the libmesh ID for that node.
-      // Note that even though most of Exodus is 1-based, this code will map an Exodus ID of
-      // zero to some libmesh node ID.  Is that a problem?
-      this->exodus_node_num_to_libmesh.push_back(id);
+      // exodus_node_num_to_libmesh[ exodus_node_id ] returns the
+      // libmesh ID for that node, plus one.
+      // Here we index libMesh IDs with an offset of 1 because they're
+      // the literal numbers that get written to the exodus file, but
+      // we index Exodus IDs with an offset of 0 because we read that
+      // exodus data into a C++ vector.  Confused yet?
+      this->exodus_node_num_to_libmesh.push_back(id+1);
 
       // Likewise, given libmesh_node_id,
-      // libmesh_node_num_to_exodus[ libmesh_node_id ] returns the *Exodus* ID for that node.
-      // Unlike the exodus_node_num_to_libmesh vector above, this one is a std::map
+      // libmesh_node_num_to_exodus[ libmesh_node_id] returns the
+      // *Exodus* ID for that node.  Unlike the
+      // exodus_node_num_to_libmesh vector above, this one is a
+      // std::map.  We're never handing a data buffer from it over to
+      // another API so we don't need to do any weird offsets with it.
       this->libmesh_node_num_to_exodus[id] =
         this->exodus_node_num_to_libmesh.size(); // should never be zero...
     }
@@ -1712,7 +1718,21 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
           auto elem_id = elem_ids_this_subdomain[i];
 
           // Set the number map for elements
-          this->exodus_elem_num_to_libmesh.push_back(elem_id);
+          // exodus_elem_num_to_libmesh[ exodus_node_id ] returns the
+          // libmesh ID for that element, plus one.
+          // Like with nodes above, we index libMesh IDs with an
+          // offset of 1 because they're the literal numbers that get
+          // written to the exodus file, but we index Exodus IDs with
+          // an offset of 0 because we read that exodus data into a
+          // C++ vector.
+          this->exodus_elem_num_to_libmesh.push_back(elem_id+1);
+
+          // Likewise, given libmesh elem_id,
+          // libmesh_elem_num_to_exodus[ elem_id ] returns the
+          // *Exodus* ID for that node.  Unlike the
+          // exodus_elem_num_to_libmesh vector above, this one is a
+          // std::map.  We're never handing a data buffer from it over to
+          // another API so we don't need to do any weird offsets with it.
           this->libmesh_elem_num_to_exodus[elem_id] =
             this->exodus_elem_num_to_libmesh.size();
 
@@ -2167,7 +2187,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
   // Just loop over our list outputting the nodes the way we built the map
   for (auto i : make_range(local_num_nodes))
     {
-      const Point & pt = mesh.point(this->exodus_node_num_to_libmesh[i]);
+      const Point & pt = mesh.point(this->exodus_node_num_to_libmesh[i]-1);
       x[i]=pt(0);
       y[i]=pt(1);
       z[i]=pt(2);
@@ -2316,7 +2336,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
 
       for (int i=0; i<num_nodes; ++i)
         {
-          Number value = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
+          Number value = values[(this->exodus_node_num_to_libmesh[i]-1)*num_vars + c];
           real_parts[i] = value.real();
           imag_parts[i] = value.imag();
           magnitudes[i] = std::abs(value);
@@ -2329,7 +2349,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
 
       // Copy out this variable's solution
       for (int i=0; i<this->num_nodes; i++)
-        cur_soln[i] = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
+        cur_soln[i] = values[(this->exodus_node_num_to_libmesh[i]-1)*num_vars + c];
 
       write_nodal_values(c+1,cur_soln,timestep);
 #endif
@@ -2364,7 +2384,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
       std::vector<numeric_index_type> required_indices(this->num_nodes);
 
       for (int i=0; i<this->num_nodes; i++)
-        required_indices[i] = static_cast<dof_id_type>(this->exodus_node_num_to_libmesh[i]) * num_vars + c;
+        required_indices[i] = static_cast<dof_id_type>(this->exodus_node_num_to_libmesh[i]-1) * num_vars + c;
 
       // Get the dof values required to write just our local part of
       // the solution vector.
@@ -2439,7 +2459,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
       else
         for (int i=0; i<this->num_nodes; i++)
           {
-            const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]);
+            const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]-1);
             required_indices[i] = node.dof_number(sys_num, var, 0);
           }
 
