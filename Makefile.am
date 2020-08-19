@@ -115,21 +115,33 @@ AUX_DIST = build-aux/install-sh \
 # Support for pkgconfig
 pkgconfigdir     = $(libdir)/pkgconfig
 pkgconfig_DATA   = contrib/utils/Make.common \
-                   contrib/utils/libmesh.pc \
-                   contrib/utils/libmesh-opt.pc \
-                   contrib/utils/libmesh-dbg.pc \
-                   contrib/utils/libmesh-devel.pc \
-                   contrib/utils/libmesh-prof.pc \
-                   contrib/utils/libmesh-oprof.pc
+                   contrib/utils/libmesh.pc
 
 configdir        = $(sysconfdir)/libmesh
 config_DATA      = contrib/utils/Make.common \
-                   contrib/utils/libmesh.pc \
-                   contrib/utils/libmesh-opt.pc \
-                   contrib/utils/libmesh-dbg.pc \
-                   contrib/utils/libmesh-devel.pc \
-                   contrib/utils/libmesh-prof.pc \
-                   contrib/utils/libmesh-oprof.pc
+                   contrib/utils/libmesh.pc
+
+# Install pkgconfig files for enabled build modes
+if LIBMESH_OPT_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-opt.pc
+  config_DATA += contrib/utils/libmesh-opt.pc
+endif
+if LIBMESH_DBG_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-dbg.pc
+  config_DATA += contrib/utils/libmesh-dbg.pc
+endif
+if LIBMESH_DEVEL_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-devel.pc
+  config_DATA += contrib/utils/libmesh-devel.pc
+endif
+if LIBMESH_PROF_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-prof.pc
+  config_DATA += contrib/utils/libmesh-prof.pc
+endif
+if LIBMESH_OPROF_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-oprof.pc
+  config_DATA += contrib/utils/libmesh-oprof.pc
+endif
 
 # install the libtool script so that dependent apps can also use it
 contribbindir      = $(prefix)/contrib/bin
