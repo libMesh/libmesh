@@ -29,6 +29,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/int_range.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/type_tensor.h"
 
 namespace libMesh
 {
@@ -653,7 +654,6 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
 
   // these vectors are needed later; initialize here already to have access to
   // n_base_qp etc.
-  const std::vector<std::vector<Real>> & S  = base_fe->phi;
   const std::vector<std::vector<Real>> & S_map  = (base_fe->get_fe_map()).get_phi_map();
 
   const unsigned int n_radial_qp = cast_int<unsigned int>(som.size());
@@ -696,6 +696,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
         // fast access to the approximation and mapping shapes of base_fe
         const std::vector<std::vector<Real>> & Ss = base_fe->dphidxi;
         const std::vector<std::vector<Real>> & St = base_fe->dphideta;
+        const std::vector<std::vector<Real>> & S  = base_fe->phi;
 
         const std::vector<Real> & base_dxidx = base_fe->get_dxidx();
         const std::vector<Real> & base_dxidy = base_fe->get_dxidy();
@@ -705,6 +706,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
         const std::vector<Real> & base_detadz = base_fe->get_detadz();
 
         const std::vector<Point> & base_xyz = base_fe->get_xyz();
+        ElemType base_type= base_elem->type();
 
         libmesh_assert_equal_to (phi.size(), _n_total_approx_sf);
         libmesh_assert_equal_to (dphidxi.size(), _n_total_approx_sf);
@@ -716,55 +718,37 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
           for (unsigned int bp=0; bp<n_base_qp; ++bp)  // over base qps
 
             { // First compute the map from base element quantities to physical space:
-              xyz[tp] = map(inf_elem,Point(base_qp[bp](0),base_qp[bp](1),radial_qp[rp](0)));
-
-              // Compute the shape function derivatives wrt x,y at the
-              // quadrature points
-              // dxi,eta dx,y,z is dictated by the base elements mapping, but decreases with a/r.
-              dxidx_map[tp] = base_dxidx[bp]*som[rp];
-              dxidy_map[tp] = base_dxidy[bp]*som[rp];
-              dxidz_map[tp] = base_dxidz[bp]*som[rp];
-
-              detadx_map[tp] =  base_detadx[bp]*som[rp];
-              detady_map[tp] =  base_detady[bp]*som[rp];
-              detadz_map[tp] =  base_detadz[bp]*som[rp];
-
-              // som = a/r
-              dxidx_map_scaled[tp] = base_dxidx[bp];
-              dxidy_map_scaled[tp] = base_dxidy[bp];
-              dxidz_map_scaled[tp] = base_dxidz[bp];
-
-              detadx_map_scaled[tp] =  base_detadx[bp];
-              detady_map_scaled[tp] =  base_detady[bp];
-              detadz_map_scaled[tp] =  base_detadz[bp];
+              xyz[tp] = InfFEMap::map(elem_dim, inf_elem, Point(base_qp[bp](0),base_qp[bp](1),radial_qp[rp](0)));
 
               const Point r(xyz[tp]-origin);
-              const Real a ((base_xyz[bp]-origin).norm());
+              const Real  a((base_xyz[bp]-origin).norm());
+              const Real  r_norm = r.norm();
 
               // check that 'som' == a/r.
-              libmesh_assert_less(std::abs(som[rp] -a/r.norm()) , 1e-7);
+              libmesh_assert_less(std::abs(som[rp] -a/r_norm) , 1e-7);
+              const Point unit_r(r/r_norm);
 
-              const Point unit_r(r/r.norm());
-              const Real dzetadr_map= 2.*a/r.norm_sq();
 
-              // When rescaling, we use r as being normalized to the base_elems coordinate,
-              // thus always start with r=1 at the FE/InfFE-boundary.
-              const Real dzetadr_mapxr_sq= 2./a;
+              // They are used for computing the normal and do not correspond to the direction of eta and xi in this element:
+              // Due to the stretch of these axes in radial direction, they are deformed.
+              Point e_xi(base_dxidx[bp],
+                         base_dxidy[bp],
+                         base_dxidz[bp]);
+              Point e_eta(base_detadx[bp],
+                          base_detady[bp],
+                          base_detadz[bp]);
 
-              Point e_eta(detadx_map[tp],
-                          detady_map[tp],
-                          detadz_map[tp]);
-              Point e_xi(dxidx_map[tp],
-                         dxidy_map[tp],
-                         dxidz_map[tp]);
+              const RealGradient normal=e_eta.cross(e_xi).unit();
 
-              RealGradient normal=e_eta.cross(e_xi);
-              normal/=normal.norm();
-
-              // grad_a divided by a/r
+              // grad a = a/r.norm() * grad_a_scaled
               RealGradient grad_a_scaled=unit_r - normal/(normal*unit_r);
 
-              if (!inf_elem->side_ptr(0)->has_affine_map())
+              const Real  dxi_er=base_dxidx[bp]* unit_r(0) + base_dxidy[bp] *unit_r(1) + base_dxidz[bp] *unit_r(2);
+              const Real deta_er=base_detadx[bp]*unit_r(0) + base_detady[bp]*unit_r(1) + base_detadz[bp]*unit_r(2);
+
+              // in case of non-affine map, further terms need to be taken into account,
+              // involving \p e_eta and \p e_xi and thus recursive computation is needed
+              if (!base_elem->has_affine_map())
                 {
                   /**
                    * The full form for 'a' is
@@ -774,36 +758,59 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                    * Here, some approximation is used:
                    */
 
-                   const unsigned int n_sf = base_fe->n_shape_functions();
-                   for (unsigned int i=0; i< n_sf; ++i)
-                   {
-                       grad_a_scaled += (FE<2,LAGRANGE>::shape_deriv(base_elem.get(),
-                                                    base_elem->default_order(),
-                                                    i, 0, base_xyz[bp]) * e_xi
-                                        +FE<2,LAGRANGE>::shape_deriv(base_elem.get(),
-                                                    base_elem->default_order(),
-                                                    i, 1, base_xyz[bp]) * e_eta )
-                                         *(normal*base_elem->node_ref(i))/(normal*unit_r*a);
-                   }
+                  const unsigned int n_sf = base_elem->n_nodes();
+                  RealGradient tmp(0.,0.,0.);
+                  for (unsigned int i=0; i< n_sf; ++i)
+                    {
+                      RealGradient dL_da_i = (FE<2,LAGRANGE>::shape_deriv(base_type,
+                                                                          base_elem->default_order(),
+                                                                          i, 0, base_qp[bp]) * e_xi
+                                              +FE<2,LAGRANGE>::shape_deriv(base_type,
+                                                                           base_elem->default_order(),
+                                                                           i, 1, base_qp[bp]) * e_eta);
+
+                      tmp += (base_elem->node_ref(i) -origin).norm()* dL_da_i;
+
+                    }
+                  libmesh_assert(tmp*unit_r < .95 ); // in a proper setup, tmp should have only a small radial component.
+                  grad_a_scaled = ( tmp - (tmp*unit_r)*unit_r ) / ( 1. - tmp*unit_r);
 
                 }
 
+
+              dxidx_map_scaled[tp] = (grad_a_scaled(0) - unit_r(0))*dxi_er +base_dxidx[bp];
+              dxidy_map_scaled[tp] = (grad_a_scaled(1) - unit_r(1))*dxi_er +base_dxidy[bp];
+              dxidz_map_scaled[tp] = (grad_a_scaled(2) - unit_r(2))*dxi_er +base_dxidz[bp];
+              dxidx_map[tp] = a/r_norm * dxidx_map_scaled[tp];
+              dxidy_map[tp] = a/r_norm * dxidy_map_scaled[tp];
+              dxidz_map[tp] = a/r_norm * dxidz_map_scaled[tp];
+
+              detadx_map_scaled[tp] = (grad_a_scaled(0) - unit_r(0))*deta_er + base_detadx[bp];
+              detady_map_scaled[tp] = (grad_a_scaled(1) - unit_r(1))*deta_er + base_detady[bp];
+              detadz_map_scaled[tp] = (grad_a_scaled(2) - unit_r(2))*deta_er + base_detadz[bp];
+              detadx_map[tp] = a/r_norm * detadx_map_scaled[tp];
+              detady_map[tp] = a/r_norm * detady_map_scaled[tp];
+              detadz_map[tp] = a/r_norm * detadz_map_scaled[tp];
+
               // dzetadx = dzetadr*dr/dx - 2/r * grad_a
               //         = dzetadr*dr/dx - 2*a/r^2 * grad_a_scaled
-              dzetadx_map[tp] =dzetadr_map*(unit_r(0) - grad_a_scaled(0));
-              dzetady_map[tp] =dzetadr_map*(unit_r(1) - grad_a_scaled(1));
-              dzetadz_map[tp] =dzetadr_map*(unit_r(2) - grad_a_scaled(2));
-              dzetadx_map_scaled[tp] =dzetadr_mapxr_sq*(unit_r(0) - grad_a_scaled(0));
-              dzetady_map_scaled[tp] =dzetadr_mapxr_sq*(unit_r(1) - grad_a_scaled(1));
-              dzetadz_map_scaled[tp] =dzetadr_mapxr_sq*(unit_r(2) - grad_a_scaled(2));
+              dzetadx_map[tp] =-2.*a/(r_norm*r_norm)*(grad_a_scaled(0) - unit_r(0));
+              dzetady_map[tp] =-2.*a/(r_norm*r_norm)*(grad_a_scaled(1) - unit_r(1));
+              dzetadz_map[tp] =-2.*a/(r_norm*r_norm)*(grad_a_scaled(2) - unit_r(2));
+              dzetadx_map_scaled[tp] =-2./a*(grad_a_scaled(0) - unit_r(0));
+              dzetady_map_scaled[tp] =-2./a*(grad_a_scaled(1) - unit_r(1));
+              dzetadz_map_scaled[tp] =-2./a*(grad_a_scaled(2) - unit_r(2));
 
-              Real inv_jacxR_pow4 = (dxidx_map_scaled[tp]  *(    detady_map_scaled[tp]*dzetadz_map_scaled[tp]- dzetady_map_scaled[tp]*detadz_map_scaled[tp]) +
-                                     detadx_map_scaled[tp] *(dzetady_map_scaled[tp]*     dxidz_map_scaled[tp]-  dxidy_map_scaled[tp]*dzetadz_map_scaled[tp]) +
-                                     dzetadx_map_scaled[tp]*(     dxidy_map_scaled[tp]* detadz_map_scaled[tp]- detady_map_scaled[tp]*  dxidz_map_scaled[tp]));
+              Real inv_jacxR_pow4 = (dxidx_map_scaled[tp]  *(  detady_map_scaled[tp]*dzetadz_map_scaled[tp]
+                                                            - dzetady_map_scaled[tp]* detadz_map_scaled[tp]) +
+                                     detadx_map_scaled[tp] *( dzetady_map_scaled[tp]*  dxidz_map_scaled[tp]
+                                                              - dxidy_map_scaled[tp]*dzetadz_map_scaled[tp]) +
+                                     dzetadx_map_scaled[tp]*(   dxidy_map_scaled[tp]* detadz_map_scaled[tp]
+                                                              -detady_map_scaled[tp]*  dxidz_map_scaled[tp]));
 
               Real inv_jac = (  dxidx_map[tp]*( detady_map[tp]*dzetadz_map[tp]- dzetady_map[tp]*detadz_map[tp]) +
-                                detadx_map[tp]*(dzetady_map[tp]*  dxidz_map[tp]-  dxidy_map[tp]*dzetadz_map[tp]) +
-                                dzetadx_map[tp]*(  dxidy_map[tp]* detadz_map[tp]- detady_map[tp]*  dxidz_map[tp]));
+                               detadx_map[tp]*(dzetady_map[tp]*  dxidz_map[tp]-  dxidy_map[tp]*dzetadz_map[tp]) +
+                              dzetadx_map[tp]*(  dxidy_map[tp]* detadz_map[tp]- detady_map[tp]*  dxidz_map[tp]));
 
               if (inv_jacxR_pow4 <= 1e-7)
                 {
@@ -820,7 +827,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
 
               // phase term mu(r)=i*k*(r-a).
               // skip i*k: it is added separately during matrix assembly.
-              dphase[tp] = unit_r - grad_a_scaled*a/r.norm();
+              dphase[tp] = unit_r - grad_a_scaled*a/r_norm;
 
               dweight[tp](0) = dweightdv[rp] * dzetadx_map[tp];
               dweight[tp](1) = dweightdv[rp] * dzetady_map[tp];
@@ -843,10 +850,6 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                   dphideta [i][tp] = St[bi][bp] * mode[ri][rp] * som[rp];
                   dphidzeta[i][tp] = S [bi][bp]
                     * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
-
-                  // temporary quantities used below. Not accessible to user-code.
-                  const Real dphidxixr = Ss[bi][bp] * mode[ri][rp];
-                  const Real dphidetaxr= St[bi][bp] * mode[ri][rp];
 
 
                   // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
@@ -878,6 +881,9 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                   dphixr[i][tp](2) = (dphidxi[i][tp]*dxidz_map_scaled[tp] +
                                       dphideta[i][tp]*detadz_map_scaled[tp] +
                                       dphidzeta[i][tp]*dzetadz_map_scaled[tp]*som[rp]);
+
+                  const Real dphidxixr = Ss[bi][bp] * mode[ri][rp];
+                  const Real dphidetaxr= St[bi][bp] * mode[ri][rp];
 
                   dphixr_sq[i][tp](0)= (dphidxixr*dxidx_map_scaled[tp] +
                                         dphidetaxr*detadx_map_scaled[tp] +
