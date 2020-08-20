@@ -97,6 +97,14 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  AM_CONDITIONAL(LIBMESH_PROF_MODE,  test x$build_prof = xyes)
  AM_CONDITIONAL(LIBMESH_OPROF_MODE, test x$build_oprof = xyes)
 
+ LIBMESH_PC_IN=""
+  # set the configuration input file for libmesh.pc
+  AS_IF([test x$build_opt = xyes], [LIBMESH_PC_IN="contrib/utils/libmesh-opt.pc.in"],
+        [test x$build_dbg = xyes], [LIBMESH_PC_IN="contrib/utils/libmesh-dbg.pc.in"],
+        [test x$build_devel = xyes], [LIBMESH_PC_IN="contrib/utils/libmesh-devel.pc.in"],
+        [test x$build_prof = xyes], [LIBMESH_PC_IN="contrib/utils/libmesh-prof.pc.in"],
+        [test x$build_oprof = xyes], [LIBMESH_PC_IN="contrib/utils/libmesh-oprof.pc.in"])
+
   dnl substitute all methods
   AC_SUBST(CPPFLAGS_DBG)
   AC_SUBST(CXXFLAGS_DBG)

@@ -3833,7 +3833,7 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Makefile contrib/utils/Make.common tests/Makefile contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc doc/Doxyfile doc/Makefile doc/html/Makefile"
+ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Makefile contrib/utils/Make.common tests/Makefile contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc doc/Doxyfile doc/Makefile doc/html/Makefile"
 
 
 ac_config_files="$ac_config_files contrib/bin/libmesh-config"
@@ -8710,6 +8710,19 @@ else
 fi
 
 
+ LIBMESH_PC_IN=""
+  # set the configuration input file for libmesh.pc
+  if test x$build_opt = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-opt.pc.in"
+elif test x$build_dbg = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-dbg.pc.in"
+elif test x$build_devel = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-devel.pc.in"
+elif test x$build_prof = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-prof.pc.in"
+elif test x$build_oprof = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-oprof.pc.in"
+fi
 
 
 
@@ -8730,6 +8743,10 @@ fi
 
 
 
+
+
+
+ac_config_files="$ac_config_files contrib/utils/libmesh.pc:$LIBMESH_PC_IN"
 
 
 # By default we merely enable some warnings, but we can turn those
@@ -43202,7 +43219,6 @@ do
     "contrib/utils/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/utils/Makefile" ;;
     "contrib/utils/Make.common") CONFIG_FILES="$CONFIG_FILES contrib/utils/Make.common" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
-    "contrib/utils/libmesh.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in" ;;
     "contrib/utils/libmesh-opt.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-opt.pc" ;;
     "contrib/utils/libmesh-dbg.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-dbg.pc" ;;
     "contrib/utils/libmesh-devel.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-devel.pc" ;;
@@ -43218,6 +43234,7 @@ do
     "include/libmesh_config.h.tmp") CONFIG_HEADERS="$CONFIG_HEADERS include/libmesh_config.h.tmp:include/libmesh_config.h.in" ;;
     "include/libmesh_config.h") CONFIG_COMMANDS="$CONFIG_COMMANDS include/libmesh_config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+    "contrib/utils/libmesh.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh.pc:$LIBMESH_PC_IN" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "contrib/boost/include/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/boost/include/Makefile" ;;
     "contrib/laspack/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/laspack/Makefile" ;;
