@@ -861,29 +861,33 @@ public:
     // If there are any element-based DOF numbers, get them
     const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, &elem);
 
-    std::vector<dof_id_type> old_dof_indices(nc);
     indices.resize(nc);
 
     // We should never have fewer dofs than necessary on an
     // element unless we're getting indices on a parent element,
-    // and we should never need those indices
+    // which we should never need, or getting indices on a newly
+    // expanded subdomain, in which case we initialize new values to
+    // zero.
     if (nc != 0)
       {
-        libmesh_assert(old_elem.old_dof_object);
+        const DofObject *old_dof_object = old_elem.old_dof_object;
+        libmesh_assert(old_dof_object);
+        libmesh_assert_greater(elem.n_systems(), sys_num);
 
         const std::pair<unsigned int, unsigned int>
           vg_and_offset = elem.var_to_vg_and_offset(sys_num,var_num);
         const unsigned int vg = vg_and_offset.first;
         const unsigned int vig = vg_and_offset.second;
 
-        const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
-        libmesh_assert_greater(elem.n_systems(), sys_num);
-        libmesh_assert_greater_equal(n_comp, nc);
+        unsigned int n_comp = old_dof_object->n_comp_group(sys_num,vg);
+        n_comp = std::min(n_comp, nc);
 
-        for (unsigned int i=0; i<nc; i++)
+        std::vector<dof_id_type> old_dof_indices(n_comp);
+
+        for (unsigned int i=0; i != n_comp; ++i)
           {
             const dof_id_type d_old =
-              old_elem.old_dof_object->dof_number(sys_num, vg, vig, i, n_comp);
+              old_dof_object->dof_number(sys_num, vg, vig, i, n_comp);
             const dof_id_type d_new =
               elem.dof_number(sys_num, vg, vig, i, n_comp);
             libmesh_assert_not_equal_to (d_old, DofObject::invalid_id);
@@ -892,11 +896,22 @@ public:
             old_dof_indices[i] = d_old;
             indices[i] = d_new;
           }
+
+        values.resize(n_comp);
+        old_solution.get(old_dof_indices, values);
+
+        for (unsigned int i=n_comp; i != nc; ++i)
+          {
+            const dof_id_type d_new =
+              elem.dof_number(sys_num, vg, vig, i, n_comp);
+            libmesh_assert_not_equal_to (d_new, DofObject::invalid_id);
+            indices[i] = d_new;
+          }
+
+        values.resize(nc, 0);
       }
-
-    values.resize(nc);
-
-    old_solution.get(old_dof_indices, values);
+    else
+      values.clear();
   }
 
 private:
