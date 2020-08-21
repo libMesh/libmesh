@@ -126,111 +126,14 @@ void TwostepTimeSolver::solve()
       _system.update();
 
       // Attempt the 'half timestep solve'
-
-      // Debugging couts
-      libMesh::out << "|U_before_half("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*_system.solution, 0, H2)
-                   << std::endl;
-      libMesh::out << "|U_before_half_old("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_vector("_old_nonlinear_solution"), 0, H2)
-                   << std::endl;
-      libMesh::out << "|U_before_half_old_local("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*old_local_nonlinear_solution, 0, H2)
-                   << std::endl;
-      // libMesh::out << "|residual_before_half("
-      //              << _system.time
-      //              << ")|= "
-      //              << _system.calculate_norm(_system.get_vector("RHS Vector"), 0, H2)
-      //              << std::endl;
-
       core_time_solver->solve();
 
-      // Debugging couts
-      libMesh::out << "|U_after_half("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*_system.solution, 0, H2)
-                   << std::endl;
-      libMesh::out << "|U_after_half_old("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_vector("_old_nonlinear_solution"), 0, H2)
-                   << std::endl;
-
-      // NumericVector<Number> & old_nonlin_vector = _system.get_vector("_old_nonlinear_solution");
-      // for(unsigned int i = 0; i < old_nonlin_vector.size(); i++)
-      //   std::cout<<"old_nonlin("<<i<<"): "<<old_nonlin_vector(i)<<std::endl;
-
       _system.update();
-
-      // Debugging couts
-      libMesh::out << "|U_old_local("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*old_local_nonlinear_solution, 0, H2)
-                   << std::endl;
-
-      (dynamic_cast<ImplicitSystem &>(_system)).assembly(true, false, false, true);
-      NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(_system)).get_vector("RHS Vector");
-      projected_residual.close();
-      libMesh::out << "|residual_after_half("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_vector("RHS Vector"), 0, H2)
-                   << std::endl;
-
-      //NumericVector<Number> & rhs_vector = _system.get_vector("RHS Vector");
-      //for(unsigned int i = 0; i < rhs_vector.size(); i++)
-      //std::cout<<"R("<<i<<"): "<<rhs_vector(i)<<std::endl;
 
       // Increment system.time, and save the half solution to solution history
       core_time_solver->advance_timestep();
 
-      // Attempt the second half timestep solve, solution history for this solution
-      // comes into play only if we match the tolerance, so outside the while loop
-      // libMesh::out << "|U_before_2half("
-      //              << _system.time
-      //              << ")|= "
-      //              << _system.calculate_norm(*_system.solution, 0, H2)
-      //              << std::endl;
-
-      // libMesh::out << "|U_before_2half_old("
-      //              << _system.time
-      //              << ")|= "
-      //              << _system.calculate_norm(_system.get_vector("_old_nonlinear_solution"), 0, H2)
-      //              << std::endl;
-
-      // libMesh::out << "|residual_before_2half("
-      //              << _system.time
-      //              << ")|= "
-      //              << _system.calculate_norm(_system.get_vector("RHS Vector"), 0, H2)
-      //              << std::endl;
-
       core_time_solver->solve();
-
-      // libMesh::out << "|U_after_2half("
-      //              << _system.time
-      //              << ")|= "
-      //              << _system.calculate_norm(*_system.solution, 0, H2)
-      //              << std::endl;
-
-      // libMesh::out << "|U_after_2half_old("
-      //              << _system.time
-      //              << ")|= "
-      //              << _system.calculate_norm(_system.get_vector("_old_nonlinear_solution"), 0, H2)
-      //              << std::endl;
-
-      // libMesh::out << "|residual_after_2half("
-      //              << _system.time
-      //              << ")|= "
-      //              << _system.calculate_norm(_system.get_vector("RHS Vector"), 0, H2)
-      //              << std::endl;
 
       single_norm = calculate_norm(_system, *_system.solution);
       if (!quiet)
