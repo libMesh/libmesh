@@ -96,7 +96,7 @@ private:
   stored_solutions_iterator stored_sols;
 
   // A helper function to locate entries at a given time
-  void find_stored_entry(Real time);
+  void find_stored_entry(Real time, bool storing = false);
 
   // A system reference
   System & _system ;
