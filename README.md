@@ -54,10 +54,10 @@ the same source tree by creating a subdirectory for each compiler build:
 
     export LIBMESH_SRC=/local/libmesh
     cd $LIBMESH_SRC
-    module load gcc/6.3
-    cd $LIBMESH_SRC && mkdir gcc-6.3 && cd gcc-6.3 && ../configure && make && make install
-    module swap gcc/6.3 intel/17.0
-    cd $LIBMESH_SRC && mkdir intel-17.0 && cd intel-17.0 && ../configure && make && make install
+    module load gcc/9.3
+    cd $LIBMESH_SRC && mkdir gcc-9.3 && cd gcc-9.3 && ../configure && make && make install
+    module swap gcc/9.3 intel/19.0
+    cd $LIBMESH_SRC && mkdir intel-19.0 && cd intel-19.0 && ../configure && make && make install
 
 
 ## Dependencies
