@@ -196,6 +196,11 @@ public:
    */
   processor_id_type choose_processor_id(processor_id_type pid1, processor_id_type pid2) const;
 
+  /**
+   * Return the total number of DOFs associated with this node.
+   */
+   unsigned int total_dofs();
+
 private:
 
   /**

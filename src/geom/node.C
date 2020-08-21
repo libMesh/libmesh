@@ -102,5 +102,14 @@ Node::choose_processor_id(processor_id_type pid1, processor_id_type pid2) const
   return std::min(pid1, pid2);
 }
 
+unsigned int
+Node::total_dofs()
+{
+  unsigned int dof_count=0;
+  for (auto s : make_range(this->n_systems()))
+    for (auto v : make_range(this->n_vars(s)))
+      dof_count += this->n_comp(s,v);
+  return dof_count;
+}
 
 } // namespace libMesh
