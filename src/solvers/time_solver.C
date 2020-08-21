@@ -129,7 +129,7 @@ void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const Parame
 
 void TimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors)
 {
-  // Base class assumes a direct steady state sensitivity calculation
+  // Base class assumes a direct steady state error estimate
   adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error);
 
   // Also get the spatially integrated errors for all the QoIs in the QoI set

@@ -144,7 +144,7 @@ public:
    * A method to compute the adjoint refinement error estimate at the current timestep.
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
    * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
-   * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
+   * Also fills in a map that links QoI indices to spatially integrated error estimates for the current timestep.
    * ONLY SUPPORTED for Backward Euler.
    */
   virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors);
@@ -278,6 +278,18 @@ public:
    */
   virtual Real last_complete_deltat();
 
+  /**
+   * Setter and getter for the final time variable
+   */
+  void set_final_time(Real set_time)
+  {
+    final_time = set_time;
+  }
+
+  Real get_final_time()
+  {
+    return final_time;
+  }
 
 protected:
 
@@ -311,13 +323,10 @@ protected:
 
   typedef void (DiffContext::*ReinitFuncType) (Real);
 
-protected:
-
   /**
    * The deltat for the last completed timestep before the current one
    */
   Real last_deltat;
-
 
 private:
 
@@ -326,6 +335,12 @@ private:
    * adjoint problem
    */
   bool _is_adjoint;
+
+  /**
+   * The final time at the completion of the timestepping, useful for adjoint
+   * time stepping and QoI postprocessing
+   */
+  Real final_time;
 
 };
 
