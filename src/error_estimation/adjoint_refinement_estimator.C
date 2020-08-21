@@ -403,6 +403,26 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         }
     }
 
+  // We are all done with Dirichlet lift vectors and they should be removed, lest we run into I/O issues later
+  for (auto j : make_range(system.n_qois()))
+    {
+      // Skip this QoI if not in the QoI Set
+      if (_qoi_set.has_index(j))
+        {
+          // Lifts are created only for adjoint dirichlet QoIs
+          if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+            {
+              // Need to create a string with current loop index to retrieve
+              // the correct vector from the liftvectors map
+              std::ostringstream liftfunc_name;
+              liftfunc_name << "adjoint_lift_function" << j;
+
+              // Remove the lift vector from system since we did not write it to file and it cannot be retrieved
+              system.remove_vector(liftfunc_name.str());
+            }
+        }
+    }
+
   // Done with the global error estimates, now construct the element wise error indicators
 
   // To get a better element wise breakdown of the error estimate,
