@@ -147,7 +147,7 @@ public:
    * Also fills in a map that links QoI indices to spatially integrated error estimates for the current timestep.
    * ONLY SUPPORTED for Backward Euler.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors);
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>());
 
   /**
    * This method uses the DifferentiablePhysics
