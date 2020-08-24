@@ -1576,6 +1576,11 @@ public:
   std::vector<Number> qoi;
 
   /**
+   * Vector to hold error estimates for qois
+   */
+  std::vector<Number> qoi_error_estimates;
+
+  /**
    * \returns The value of the solution variable \p var at the physical
    * point \p p in the mesh, without knowing a priori which element
    * contains \p p, using the degree of freedom coefficients in \p sol
