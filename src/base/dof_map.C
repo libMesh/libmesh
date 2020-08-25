@@ -1683,6 +1683,9 @@ void DofMap::prepare_send_list ()
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
   std::vector<dof_id_type> (_send_list.begin(), new_end).swap (_send_list);
+
+  // Make sure the send list has nothing invalid in it.
+  libmesh_assert(_send_list.empty() || _send_list.back() < this->n_dofs());
 }
 
 void DofMap::reinit_send_list (MeshBase & mesh)
