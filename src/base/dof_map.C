@@ -2452,13 +2452,27 @@ void DofMap::_dof_indices (const Elem & elem,
           // dofs, our dofs come in forward order coming from the
           // beginning
           else
-            for (unsigned int i=0; i<nc; i++)
-              {
-                const dof_id_type d =
-                  node.dof_number(sys_num, vg, vig, i, n_comp);
-                libmesh_assert_not_equal_to (d, DofObject::invalid_id);
-                di.push_back(d);
-              }
+            {
+              // We have a good component index only if it's being
+              // used on this FE type (nc) *and* it's available on
+              // this DofObject (n_comp).
+              const unsigned int good_nc = std::min(n_comp, nc);
+              for (unsigned int i=0; i!=good_nc; ++i)
+                {
+                  const dof_id_type d =
+                    node.dof_number(sys_num, vg, vig, i, n_comp);
+                  libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+                  libmesh_assert_less (d, this->n_dofs());
+                  di.push_back(d);
+                }
+
+              // With fewer good component indices than we need, e.g.
+              // due to subdomain expansion, the remaining expected
+              // indices are marked invalid.
+              if (n_comp < nc)
+                for (unsigned int i=n_comp; i!=nc; ++i)
+                  di.push_back(DofObject::invalid_id);
+            }
         }
 
       // If there are any element-based DOF numbers, get them
