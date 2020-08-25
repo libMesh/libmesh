@@ -340,18 +340,19 @@ void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const
      sensitivities[i][j] = sensitivities_first_half[i][j] + sensitivities_second_half[i][j];
 }
 
-void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors)
+void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant)
 {
-  // We are using the midpoint rule to integrate each timestep
+  // We are using the midpoint rule or right sided Riemman rule to integrate each timestep
   // (f(t_j) + f(t_j+1/2))/2 (t_j+1/2 - t_j) + (f(t_j+1/2) + f(t_j+1))/2 (t_j+1 - t_j+1/2)
+
+  // Create first and second half error estimate vectors of the right size
+  std::vector<Number> qoi_error_estimates_first_half(_system.qoi.size());
+  std::vector<Number> qoi_error_estimates_second_half(_system.qoi.size());
 
   // First half timestep
   ErrorVector QoI_elementwise_error_first_half;
-  std::map<int, Real> global_spatial_errors_first_half;
 
-  std::cout<<"First half timestep at: "<<_system.time<<std::endl<<std::endl;
-
-  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_first_half, global_spatial_errors_first_half);
+  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_first_half, QoI_time_instant);
 
   // Also get the first 'half step' spatially integrated errors for all the QoIs in the QoI set
   for (auto j : make_range(_system.n_qois()))
@@ -359,17 +360,14 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      global_spatial_errors_first_half.insert( std::pair<int, Real>(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j)) );
+      qoi_error_estimates_first_half[j] = (_system.qoi_error_estimates)[j];
     }
   }
 
   // Second half timestep
   ErrorVector QoI_elementwise_error_second_half;
-  std::map<int, Real> global_spatial_errors_second_half;
 
-  std::cout<<"Second half timestep at: "<<_system.time<<std::endl<<std::endl;
-
-  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_second_half, global_spatial_errors_second_half);
+  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_second_half, QoI_time_instant);
 
   // Also get the second 'half step' spatially integrated errors for all the QoIs in the QoI set
   for (auto j : make_range(_system.n_qois()))
@@ -377,7 +375,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      global_spatial_errors_second_half.insert( std::pair<int, Real>(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j)) );
+      qoi_error_estimates_second_half[j] = (_system.qoi_error_estimates)[j];
     }
   }
 
@@ -385,17 +383,12 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
   for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
     QoI_elementwise_error[i] = QoI_elementwise_error_first_half[i] + QoI_elementwise_error_second_half[i];
 
-  // Add the spatially integrated errors for all the QoIs in the QoI set
-  Real spatially_integrated_qoi_error;
-
   for (auto j : make_range(_system.n_qois()))
   {
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      spatially_integrated_qoi_error = global_spatial_errors_first_half[j] + global_spatial_errors_second_half[j];
-      std::cout<<"Spatially integrated qoi error combined: "<<spatially_integrated_qoi_error<<std::endl;
-      global_spatial_errors.insert( std::pair<int, Real>(j, spatially_integrated_qoi_error) );
+      (_system.qoi_error_estimates)[j] = qoi_error_estimates_first_half[j] + qoi_error_estimates_second_half[j];
     }
   }
 }

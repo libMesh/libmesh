@@ -85,7 +85,7 @@ public:
    * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
    * The midpoint rule is used for the numerical integration.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors) override;
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>()) override;
 
 };
 

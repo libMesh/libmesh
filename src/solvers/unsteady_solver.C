@@ -25,10 +25,8 @@
 #include "libmesh/parameter_vector.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/solution_history.h"
-
 #include "libmesh/adjoint_refinement_estimator.h"
 #include "libmesh/error_vector.h"
-#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
@@ -39,7 +37,8 @@ UnsteadySolver::UnsteadySolver (sys_type & s)
   : TimeSolver(s),
     old_local_nonlinear_solution (NumericVector<Number>::build(s.comm())),
     first_solve                  (true),
-    first_adjoint_step (true)
+    first_adjoint_step (true),
+    old_adjoint (NumericVector<Number>::build(s.comm()))
 {
 }
 
@@ -295,10 +294,18 @@ void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const Pa
 
 }
 
-void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors)
+void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant)
 {
-  // We are using the midpoint rule to integrate each timestep
-  // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+  // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
+  if(_system.qoi_error_estimates.size() != _system.qoi.size())
+      _system.qoi_error_estimates.resize(_system.qoi.size());
+
+  // There are two possibilities regarding the integration rule we need to use for time integration.
+  // If we have a instantaneous QoI, then we need to use a left sided Riemann sum, otherwise the trapezoidal rule for temporally smooth QoIs.
+
+  // Create left and right error estimate vectors of the right size
+  std::vector<Number> qoi_error_estimates_left(_system.qoi.size());
+  std::vector<Number> qoi_error_estimates_right(_system.qoi.size());
 
   // Get t_j
   Real time_left = _system.time;
@@ -307,81 +314,43 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
   ErrorVector QoI_elementwise_error_left;
   std::map<int, Real> global_spatial_errors_left;
 
-  // If we are at the initial time, the error contribution is zero
-  if(std::abs(_system.time) > TOLERANCE*sqrt(TOLERANCE))
+  // If we are at the very initial step, the error contribution is zero,
+  // otherwise the old ajoint vector has been filled and we are the left end
+  // of a subsequent timestep or sub-timestep
+  if((*old_adjoint).initialized())
   {
-    // Debugging cout
-    std::cout<<"Time: "<<_system.time<<std::endl;
-
     // For evaluating the residual, we need to use the deltat that was used
     // to get us to this solution, so we save the current deltat as next_step_deltat
     // and set _system.deltat to the last completed deltat.
-    Real next_step_deltat = _system.deltat;
-    _system.deltat = this->last_complete_deltat();
+    next_step_deltat = _system.deltat;
+    _system.deltat = last_step_deltat;
 
-    // Debugging cout
-    std::cout<<"Deltat_left: "<<_system.deltat<<std::endl;
+    // The adjoint error estimate expression for a backwards facing step
+    // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
+    NumericVector<Number> & current_adjoint = _system.get_adjoint_solution(0);
 
-    // Debugging cout
-    libMesh::out << "|U("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*_system.solution, 0, H1)
-                   << std::endl;
+    // Swap for residual weighting
+    current_adjoint.swap(*old_adjoint);
 
-    libMesh::out << "|U_old("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_vector("_old_nonlinear_solution"), 0, H1)
-                   << std::endl;
+    _system.update();
 
-    libMesh::out << "|Z("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_adjoint_solution(0), 0, H1)
-                   << std::endl
-                   << std::endl;
-
-    libMesh::out << "|residual("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_vector("RHS Vector"), 0, H1)
-                   << std::endl;
+    // The residual has to be evaluated at the last time
+    _system.time = _system.time - last_step_deltat;
 
     adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error_left);
 
+    // Shift the time back
+    _system.time = _system.time + last_step_deltat;
+
+    // Swap back the current and old adjoints
+    current_adjoint.swap(*old_adjoint);
+
+    // Set the system deltat back to what it should be to march to the next time
     _system.deltat = next_step_deltat;
 
-    std::cout<<"R(u,z)_left: "<<adjoint_refinement_error_estimator.get_global_QoI_error_estimate(0)<<std::endl<<std::endl;
   }
   else
   {
-    // Debugging cout
-    std::cout<<"Time: "<<_system.time<<std::endl;
-    std::cout<<"Deltat_left: "<<_system.deltat<<std::endl;
-
-    // Debugging cout
-    libMesh::out << "|U("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*_system.solution, 0, H1)
-                   << std::endl;
-
-    libMesh::out << "|U_old("
-                 << _system.time
-                 << ")|= "
-                 << _system.calculate_norm(_system.get_vector("_old_nonlinear_solution"), 0, H1)
-                 << std::endl;
-
-    libMesh::out << "|Z("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_adjoint_solution(0), 0, H1)
-                    << std::endl
-                    << std::endl;
-
-    std::cout<<"R(u,z)_left: "<<0.0<<std::endl<<std::endl;
-
     for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
       QoI_elementwise_error_left[i] = 0.0;
   }
@@ -395,11 +364,13 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
       // If we are at the initial time, the error contribution is zero
       if(std::abs(_system.time) > TOLERANCE*sqrt(TOLERANCE))
       {
-        global_spatial_errors_left.insert( std::pair<int, Real>(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j)) );
+        qoi_error_estimates_left[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
+        //global_spatial_errors_left.insert( std::pair<int, Real>(j, ) );
       }
       else
       {
-        global_spatial_errors_left.insert( std::pair<int, Real>(j, 0.0) );
+        qoi_error_estimates_left[j] = 0.0;
+        //global_spatial_errors_left.insert( std::pair<int, Real>(j, 0.0) );
       }
     }
   }
@@ -411,12 +382,12 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
   Real time_right = _system.time;
 
   // We will need to use the last step deltat for the weighted residual evaluation
-  Real last_step_deltat = _system.deltat;
+  last_step_deltat = _system.deltat;
 
   // The adjoint error estimate expression for a backwards facing step
   // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
   NumericVector<Number> & current_adjoint = _system.get_adjoint_solution(0);
-  std::unique_ptr<NumericVector<Number>> old_adjoint = current_adjoint.clone();
+  old_adjoint = current_adjoint.clone();
 
   // Retrieve the state and adjoint vectors for the next time instant
   retrieve_timestep();
@@ -424,83 +395,29 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
   // Swap for residual weighting
   current_adjoint.swap(*old_adjoint);
 
-  // // Dont forget to localize the old_nonlinear_solution !
-  // _system.get_vector("_old_nonlinear_solution").localize
-  //   (*old_local_nonlinear_solution,
-  //    _system.get_dof_map().get_send_list());
-
-  // NumericVector<Number> & old_nonlin_vector = _system.get_vector("_old_nonlinear_solution");
-  //   for(unsigned int i = 0; i < old_nonlin_vector.size(); i++)
-  //     std::cout<<"old_nonlin("<<i<<"): "<<old_nonlin_vector(i)<<std::endl;
-
-  // for(unsigned int i = 0; i < (*old_local_nonlinear_solution).size(); i++)
-  //   std::cout<<"old_local_nonlin("<<i<<"): "<<(*old_local_nonlinear_solution)(i)<<std::endl;
-
   // Swap out the deltats as we did for the left side
-  Real next_step_deltat = _system.deltat;
+  next_step_deltat = _system.deltat;
   _system.deltat = last_step_deltat;
 
   // Get f(t_j+1)
   ErrorVector QoI_elementwise_error_right;
   std::map<int, Real> global_spatial_errors_right;
 
-  // Debugging cout
-  std::cout<<"Time: "<<_system.time<<std::endl;
-  std::cout<<"Deltat_right: "<<_system.deltat<<std::endl;
-
-  // Debugging cout
-  libMesh::out << "|U("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*_system.solution, 0, H1)
-                   << std::endl;
-
-  libMesh::out << "|U_old("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_vector("_old_nonlinear_solution"), 0, H1)
-                   << std::endl;
-
-  libMesh::out << "|Z("
-               << _system.time
-               << ")|= "
-               << _system.calculate_norm(_system.get_adjoint_solution(0), 0, H1)
-               << std::endl
-               << std::endl;
-
   _system.update();
 
-  libMesh::out << "|U_old_local("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(*old_local_nonlinear_solution, 0, H1)
-                   << std::endl;
-
-  (dynamic_cast<ImplicitSystem &>(_system)).assembly(true, false, false, true);
-  NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(_system)).get_vector("RHS Vector");
-  projected_residual.close();
-
-  libMesh::out << "|residual("
-                   << _system.time
-                   << ")|= "
-                   << _system.calculate_norm(_system.get_vector("RHS Vector"), 0, H1)
-                   << std::endl;
-
-  // libMesh::out << "|projected_residual("
-  //                  << _system.time
-  //                  << ")|= "
-  //                  << _system.calculate_norm(projected_residual, 0, H2)
-  //                  << std::endl;
-
-  // NumericVector<Number> & rhs_vector = _system.get_vector("RHS Vector");
-  //   for(unsigned int i = 0; i < rhs_vector.size(); i++)
-  //     std::cout<<"R("<<i<<"): "<<rhs_vector(i)<<std::endl;
+  // The residual has to be evaluated at the last time
+  _system.time = _system.time - last_step_deltat;
 
   adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error_right);
 
-  std::cout<<"R(u,z)_right: "<<adjoint_refinement_error_estimator.get_global_QoI_error_estimate(0)<<std::endl<<std::endl;
+  // Shift the time back
+  _system.time = _system.time + last_step_deltat;
 
+  // Set the system deltat back to what it needs to be able to march to the next time
   _system.deltat = next_step_deltat;
+
+  // Swap back now that the residual weighting is done
+  current_adjoint.swap(*old_adjoint);
 
   // Also get the right side contributions for the spatially integrated errors for all the QoIs in the QoI set
   for (auto j : make_range(_system.n_qois()))
@@ -508,7 +425,7 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      global_spatial_errors_right.insert( std::pair<int, Real>(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j)) );
+      qoi_error_estimates_right[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
     }
   }
 
@@ -517,21 +434,27 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
     QoI_elementwise_error[i] = ((QoI_elementwise_error_right[i] + QoI_elementwise_error_left[i])/2.)*(time_right - time_left);
 
   // QoI set spatially integrated errors contribution from this timestep
-  Real spatially_integrated_qoi_error;
-
   for (auto j : make_range(_system.n_qois()))
   {
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      spatially_integrated_qoi_error = ((global_spatial_errors_left[j] + global_spatial_errors_right[j])/2.)*(time_right - time_left);
-      std::cout<<"Spatially integrated qoi error unsteady: "<<spatially_integrated_qoi_error<<std::endl;
-      global_spatial_errors.insert( std::pair<int, Real>(j, spatially_integrated_qoi_error) );
+      if(QoI_time_instant[j] == NULL)
+      {
+        (_system.qoi_error_estimates)[j] = ((qoi_error_estimates_left[j] + qoi_error_estimates_right[j])/2.)*(time_right - time_left);
+      }
+      else if(time_right <= *(QoI_time_instant[j]) + TOLERANCE)
+      {
+        (_system.qoi_error_estimates)[j] = qoi_error_estimates_right[j]*last_step_deltat;
+      }
+      else
+      {
+        (_system.qoi_error_estimates)[j] = 0.0;
+        libmesh_warning("Error estimate contribution for a time instant past the instantaneous QoI evaluation time has been set to zero.");
+      }
     }
   }
 
-  // Swap back now that the residual weighting is done
-  current_adjoint.swap(*old_adjoint);
 }
 
 Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_number)

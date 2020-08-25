@@ -120,7 +120,7 @@ public:
   /**
    * A method to integrate the adjoint sensitivity w.r.t a given parameter
    * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
-   * The midpoint rule is used to numerically integrate the timestep
+   * The trapezoidal rule is used to numerically integrate the timestep.
    */
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override;
 
@@ -129,9 +129,10 @@ public:
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
    * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
    * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
-   * The midpoint rule is used for the numerical integration.
+   * The trapezoidal rule (for temporally smooth QoI) or left Riemann sum (for an instantaneous QoI) is used
+   * for the numerical integration depending on the nature of the QoI.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::map<int, Real> & global_spatial_errors) override;
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>()) override;
 
   /**
    * This method should return the expected convergence order of the
@@ -199,6 +200,20 @@ protected:
    * (when the primal solution is to be used to set adjoint boundary conditions) and false thereafter
    */
   bool first_adjoint_step;
+
+private:
+
+  /**
+   * A pointer to a vector to hold the adjoint solution at the last time step
+   */
+  std::unique_ptr<NumericVector<Number>> old_adjoint;
+
+  /**
+   * We will need to move the system.time around to ensure that residuals
+   * are built with the right deltat and the right time.
+   */
+  Real last_step_deltat;
+  Real next_step_deltat;
 };
 
 

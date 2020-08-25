@@ -128,7 +128,10 @@ void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const Parame
   return;
 }
 
-void TimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant)
+void TimeSolver::integrate_adjoint_refinement_error_estimate
+  (AdjointRefinementEstimator & adjoint_refinement_error_estimator,
+   ErrorVector & QoI_elementwise_error,
+   std::vector<Real *> /* QoI_time_instant */)
 {
   // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
   if(_system.qoi_error_estimates.size() != _system.qoi.size())
