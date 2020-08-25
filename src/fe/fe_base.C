@@ -1895,7 +1895,8 @@ compute_periodic_constraints (DofConstraints & constraints,
           libmesh_assert(point_locator);
 
           // Get pointers to the element's neighbor.
-          const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
+          unsigned int s_neigh;
+          const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s, &s_neigh);
 
           libmesh_error_msg_if(neigh == nullptr,
                                "PeriodicBoundaries point locator object returned nullptr!");
@@ -1906,10 +1907,6 @@ compute_periodic_constraints (DofConstraints & constraints,
           // as or coarser than this element.
           if (neigh->level() <= elem->level())
             {
-              unsigned int s_neigh =
-                mesh.get_boundary_info().side_with_boundary_id(neigh, periodic->pairedboundary);
-              libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
-
 #ifdef LIBMESH_ENABLE_AMR
               // Find the minimum p level; we build the h constraint
               // matrix with this and then constrain away all higher p
