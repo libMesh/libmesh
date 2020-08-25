@@ -1038,7 +1038,12 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
               libmesh_assert(point_locator);
 
               // Get pointers to the element's neighbor.
-              const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
+              unsigned int s_neigh;
+              const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s, &s_neigh);
+
+              libmesh_error_msg_if
+                (!neigh, "PeriodicBoundaries can't find a periodic neighbor for element " <<
+                         elem->id() << " side " << s);
 
               // h refinement constraints:
               // constrain dofs shared between
@@ -1046,10 +1051,6 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
               // as or coarser than this element.
               if (neigh->level() <= elem->level())
                 {
-                  unsigned int s_neigh =
-                    mesh.get_boundary_info().side_with_boundary_id(neigh, periodic->pairedboundary);
-                  libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
-
 #ifdef LIBMESH_ENABLE_AMR
                   libmesh_assert(neigh->active());
 #endif // #ifdef LIBMESH_ENABLE_AMR
