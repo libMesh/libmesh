@@ -2450,8 +2450,10 @@ void DofMap::_dof_indices (const Elem & elem,
       const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, p_level, &elem);
 
       // We should never have fewer dofs than necessary on an
-      // element unless we're getting indices on a parent element,
-      // and we should never need those indices
+      // element unless we're getting indices on a parent element
+      // (and we should never need those indices) or off-domain for a
+      // subdomain-restricted variable (where invalid_id is the
+      // correct thing to return)
       if (nc != 0)
         {
           const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
