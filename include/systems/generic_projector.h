@@ -1361,6 +1361,11 @@ void
 GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor::insert_id(
     dof_id_type id, const InsertInput & val, processor_id_type pid)
 {
+  // We may see invalid ids when expanding a subdomain with a
+  // restricted variable
+  if (id == DofObject::invalid_id)
+    return;
+
   auto iter = new_ids_to_push.find(id);
   if (iter == new_ids_to_push.end())
     action.insert(id, val);
@@ -1406,6 +1411,12 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor::inse
   for (auto i : index_range(ids))
     {
       const dof_id_type id = ids[i];
+
+      // We may see invalid ids when expanding a subdomain with a
+      // restricted variable
+      if (id == DofObject::invalid_id)
+        continue;
+
       const InsertInput & val = vals[i];
 
       auto iter = new_ids_to_push.find(id);
