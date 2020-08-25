@@ -59,12 +59,18 @@ public:
 
   ~PeriodicBoundaries();
 
-  // The periodic neighbor of \p e in direction \p side, if it
+  // \returns the periodic neighbor of \p e in direction \p side, if it
   // exists, nullptr otherwise.
+  //
+  // If \p neigh_side is nullptr it is left alone; if not then it is
+  // used to output the side of the neighbor which corresponds to the
+  // given \p side of \p e, or invalid_uint if no possible neighbor or
+  // no corresponding side exists.
   const Elem * neighbor(boundary_id_type boundary_id,
                         const PointLocatorBase & point_locator,
                         const Elem * e,
-                        unsigned int side) const;
+                        unsigned int side,
+                        unsigned int * neigh_side = nullptr) const;
 };
 
 } // namespace libMesh
