@@ -1589,8 +1589,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
               // Insert the remote DOF indices into the send list
               for (auto d : di)
-                if (!this->local_index(d))
-                  _send_list.push_back(d);
+                if (d != DofObject::invalid_id &&
+                    !this->local_index(d))
+                  {
+                    libmesh_assert_less(d, this->n_dofs());
+                    _send_list.push_back(d);
+                  }
             }
         }
       else
@@ -1600,8 +1604,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
           // Insert the remote DOF indices into the send list
           for (const auto & dof : di)
-            if (!this->local_index(dof))
-              _send_list.push_back(dof);
+            if (dof != DofObject::invalid_id &&
+                !this->local_index(dof))
+              {
+                libmesh_assert_less(dof, this->n_dofs());
+                _send_list.push_back(dof);
+              }
         }
 
     }
@@ -1627,8 +1635,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
       // Insert the remote DOF indices into the send list
       for (const auto & dof : di)
-        if (!this->local_index(dof))
-          _send_list.push_back(dof);
+        if (dof != DofObject::invalid_id &&
+            !this->local_index(dof))
+          {
+            libmesh_assert_less(dof, this->n_dofs());
+            _send_list.push_back(dof);
+          }
     }
 }
 
