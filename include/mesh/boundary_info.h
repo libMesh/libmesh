@@ -500,6 +500,14 @@ public:
                                      const boundary_id_type boundary_id) const;
 
   /**
+   * \returns All sides of element \p elem whose associated boundary id is
+   * \p boundary_id
+   */
+  std::vector<unsigned int>
+  sides_with_boundary_id(const Elem * const elem,
+                         const boundary_id_type boundary_id) const;
+
+  /**
    * Builds the list of unique node boundary ids.
    *
    * On a ReplicatedMesh this will be all ids; on a DistributedMesh
