@@ -150,6 +150,11 @@ public:
   EigenProblemType get_eigenproblem_type () const {return _eigen_problem_type;}
 
   /**
+   * Sets an initial eigen vector
+   */
+  void set_initial_space(NumericVector<Number> & initial_space_in);
+
+  /**
    * \returns \p true if the underlying problem is generalized
    * , false otherwise.
    */

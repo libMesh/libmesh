@@ -37,6 +37,7 @@ EXTERN_C_FOR_SLEPC_END
 
 namespace libMesh
 {
+ template <typename T> class PetscVector;
 
 /**
  * This class provides an interface to the SLEPc
@@ -314,6 +315,10 @@ private:
    */
   EPS _eps;
 
+  /**
+   * A vector used for initial space. The vector will be used as the basis for EPS.
+   */
+  PetscVector<T>* _initial_space;
 };
 
 } // namespace libMesh

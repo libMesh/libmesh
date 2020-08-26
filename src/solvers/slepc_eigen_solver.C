@@ -39,7 +39,8 @@ namespace libMesh
 
 template <typename T>
 SlepcEigenSolver<T>::SlepcEigenSolver (const Parallel::Communicator & comm_in) :
-  EigenSolver<T>(comm_in)
+  EigenSolver<T>(comm_in),
+  _initial_space(nullptr)
 {
   this->_eigen_solver_type  = ARNOLDI;
   this->_eigen_problem_type = NHEP;
@@ -274,6 +275,15 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
     {
       this->_solver_configuration->configure_solver();
     }
+
+  // If an initial space is provided, let us attach it to EPS
+  if (_initial_space) {
+    // Get a handle for the underlying Vec.
+    Vec initial_vector = _initial_space->vec();
+
+    ierr = EPSSetInitialSpace(_eps, 1, &initial_vector);
+    LIBMESH_CHKERR(ierr);
+  }
 
   // Solve the eigenproblem.
   ierr = EPSSolve (_eps);
@@ -646,6 +656,15 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
       this->_solver_configuration->configure_solver();
     }
 
+  // If an initial space is provided, let us attach it to EPS
+  if (_initial_space) {
+    // Get a handle for the underlying Vec.
+    Vec initial_vector = _initial_space->vec();
+
+    ierr = EPSSetInitialSpace(_eps, 1, &initial_vector);
+    LIBMESH_CHKERR(ierr);
+  }
+
   // Solve the eigenproblem.
   ierr = EPSSolve (_eps);
   LIBMESH_CHKERR(ierr);
@@ -970,21 +989,14 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
 #if SLEPC_VERSION_LESS_THAN(3,1,0)
   libmesh_error_msg("SLEPc 3.1 is required to call EigenSolver::set_initial_space()");
 #else
-  this->init();
-
-  PetscErrorCode ierr = 0;
-
   // Make sure the input vector is actually a PetscVector
   PetscVector<T> * initial_space_petsc_vec =
-    dynamic_cast<PetscVector<T> *>(&initial_space_in);
+  dynamic_cast<PetscVector<T> *>(&initial_space_in);
 
   libmesh_error_msg_if(!initial_space_petsc_vec, "Error attaching initial space: input vector must be a PetscVector.");
 
-  // Get a handle for the underlying Vec.
-  Vec initial_vector = initial_space_petsc_vec->vec();
-
-  ierr = EPSSetInitialSpace(_eps, 1, &initial_vector);
-  LIBMESH_CHKERR(ierr);
+  // The vector is owned by caller
+  _initial_space = initial_space_petsc_vec;
 #endif
 }
 
