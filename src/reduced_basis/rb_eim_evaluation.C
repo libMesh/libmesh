@@ -360,7 +360,7 @@ Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function
                                                      unsigned int qp) const
 {
   libmesh_error_msg_if(basis_function_index >= _local_eim_basis_functions.size(),
-                       "Invalid basis function index: " + basis_function_index);
+                       "Invalid basis function index: " << basis_function_index);
 
   return get_parametrized_function_value(
     comm(),
