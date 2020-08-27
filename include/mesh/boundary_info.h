@@ -699,6 +699,19 @@ public:
   build_shellface_list() const;
 
   /**
+   * Push the boundary element change to the processors that own the element
+   */
+  void sync_push_remove_boundary_side_id(
+    std::unordered_map<processor_id_type, std::vector<std::pair<dof_id_type, unsigned int>>>
+    & elems_to_push
+  );
+
+  /**
+   * Synchronize the boundary element side across processors
+   */
+  void sync_pull_boundary_side_id();
+
+  /**
    * \returns A set of the boundary ids which exist on semilocal parts
    * of the mesh.
    *
