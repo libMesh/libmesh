@@ -59,9 +59,6 @@ void PointNeighborCoupling::operator()
 {
   LOG_SCOPE("operator()", "PointNeighborCoupling");
 
-  // Take out of libmesh_assert for an API integration
-  //libmesh_assert(_mesh);
-
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool check_periodic_bcs =
     (_periodic_bcs && !_periodic_bcs->empty());
@@ -76,11 +73,8 @@ void PointNeighborCoupling::operator()
   if (!this->_n_levels)
     {
       for (const auto & elem : as_range(range_begin, range_end))
-      {
-        //libmesh_assert(_mesh->query_elem_ptr(elem->id()) == elem);
         if (elem->processor_id() != p)
           coupled_elements.emplace(elem, _dof_coupling);
-      }
 
       return;
     }
@@ -99,7 +93,6 @@ void PointNeighborCoupling::operator()
       for (const auto & elem : elements_to_check)
         {
           std::set<const Elem *> point_neighbors;
-          //libmesh_assert(_mesh->query_elem_ptr(elem->id()) == elem);
 
           if (elem->processor_id() != p)
             coupled_elements.emplace(elem, _dof_coupling);
