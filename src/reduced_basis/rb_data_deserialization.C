@@ -30,6 +30,7 @@
 #include "libmesh/transient_rb_evaluation.h"
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_scm_evaluation.h"
+#include "libmesh/rb_parametrized_function.h"
 
 // Cap'n'Proto includes
 #include "capnp/serialize.h"
@@ -781,6 +782,29 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
         rb_eim_evaluation.add_interpolation_points_xyz_perturbations(perturbs);
       }
   }
+
+  // Optionally load EIM rhs values for the training set
+  if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
+    {
+      auto eim_rhs_list_outer =
+        rb_eim_evaluation_reader.getEimSolutionsForTrainingSet();
+
+      std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions;
+      eim_solutions.clear();
+      eim_solutions.resize(eim_rhs_list_outer.size());
+
+      for (auto i : make_range(eim_rhs_list_outer.size()))
+        {
+          auto eim_rhs_list_inner = eim_rhs_list_outer[i];
+
+          DenseVector<Number> values(eim_rhs_list_inner.size());
+          for (auto j : index_range(values))
+            {
+              values(j) = load_scalar_value(eim_rhs_list_inner[j]);
+            }
+          eim_solutions[i] = values;
+        }
+    }
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)

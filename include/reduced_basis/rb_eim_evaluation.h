@@ -288,6 +288,12 @@ public:
                                const std::string & directory_name = "offline_data",
                                bool read_binary_basis_functions = true);
 
+  /**
+   * Storage for EIM solutions in the case that we have is_lookup_table==true
+   * in our RBParametrizedFunction.
+   */
+  std::vector<DenseVector<Number>> eim_solutions;
+
 private:
 
   /**
