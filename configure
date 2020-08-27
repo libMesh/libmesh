@@ -1235,6 +1235,8 @@ enable_metis
 with_metis
 with_metis_include
 enable_parmetis
+with_parmetis
+with_parmetis_include
 enable_tetgen
 enable_triangle
 enable_qhull
@@ -2130,6 +2132,10 @@ Optional Packages:
   --with-metis=<internal,PETSc,/some/libdir>
                           internal: build from contrib, PETSc: rely on PETSc
   --with-metis-include=</some/includedir>
+
+  --with-parmetis=<internal,PETSc,/some/libdir>
+                          internal: build from contrib, PETSc: rely on PETSc
+  --with-parmetis-include=</some/includedir>
 
   --with-vtk-include=PATH Specify the path for VTK header files
   --with-vtk-lib=PATH     Specify the path for VTK libs
@@ -37527,8 +37533,8 @@ fi
 
 
       if test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling internal Metis support to avoid PETSc conflict>>>" >&5
-$as_echo "<<< Disabling internal Metis support to avoid PETSc conflict>>>" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using PETSc Metis support to avoid PETSc conflict>>>" >&5
+$as_echo "<<< Using PETSc Metis support to avoid PETSc conflict>>>" >&6; }
          build_metis=petsc
 fi
 
@@ -37646,7 +37652,6 @@ ac_config_files="$ac_config_files contrib/metis/Makefile"
 # -------------------------------------------------------------
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
-if test $enablemetis = yes; then :
 
   # Check whether --enable-parmetis was given.
 if test "${enable_parmetis+set}" = set; then :
@@ -37663,60 +37668,94 @@ else
 fi
 
 
+
+# Check whether --with-parmetis was given.
+if test "${with_parmetis+set}" = set; then :
+  withval=$with_parmetis; case "${withval}" in #(
+  internal) :
+    build_parmetis=yes ;; #(
+  PETSc) :
+    build_parmetis=petsc ;; #(
+  *) :
+    PARMETIS_LIB="-L${withval} -lparmetis"
+                       build_parmetis=no ;;
+esac
+              enableparmetis=yes
+else
+  build_parmetis=yes
+fi
+
+
+
+# Check whether --with-parmetis-include was given.
+if test "${with_parmetis_include+set}" = set; then :
+  withval=$with_parmetis_include; PARMETIS_INCLUDE="-I${withval}"
+              enableparmetis=yes
+              build_parmetis=no
+fi
+
+
+      if test "x$petsc_have_metis" = "x"; then :
+  petsc_have_metis=0
+fi
+  if test "x$petsc_have_parmetis" = "x"; then :
+  petsc_have_parmetis=0
+fi
+
+        if test $petsc_have_metis -gt 0; then :
+
+         if test $petsc_have_parmetis -gt 0; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using PETSc ParMETIS support to avoid PETSc conflict>>>" >&5
+$as_echo "<<< Using PETSc ParMETIS support to avoid PETSc conflict>>>" >&6; }
+                build_parmetis=petsc
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling ParMETIS support to avoid PETSc conflict>>>" >&5
+$as_echo "<<< Disabling ParMETIS support to avoid PETSc conflict>>>" >&6; }
+                enableparmetis=no
+fi
+
+fi
+
+            if test "$enableparmetis" = "yes" && test "$build_parmetis" = "petsc"; then :
+
+          if test "x$petsc_have_metis" = "x0" &&
+                 test "x$petsc_have_parmetis" = "x0"; then :
+  build_parmetis=yes
+fi
+          if test "$enablepetsc" = "no"; then :
+  build_parmetis=yes
+fi
+
+fi
+
     if test "x$enablempi" = "xno"; then :
   enableparmetis=no
 fi
 
       if test "x$enableparmetis" = "xyes"; then :
 
-                              if test "x$petsc_have_parmetis" = "x"; then :
-  petsc_have_parmetis=0
-fi
-
-
-                    if test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -gt 0; then :
-
 
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
 
-                  build_parmetis=no
+
+                    if test "$build_parmetis" = "yes"; then :
+
+                  PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
+                  PARMETIS_LIB="" # contrib Parmetis gets lumped into libcontrib
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with internal Parmetis support >>>" >&5
+$as_echo "<<< Configuring library with internal Parmetis support >>>" >&6; }
+
+elif test "$build_parmetis" = "petsc"; then :
+
+                  PARMETIS_INCLUDE=""
+                  PARMETIS_LIB=""
                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with PETSc Parmetis support >>>" >&5
 $as_echo "<<< Configuring library with PETSc Parmetis support >>>" >&6; }
 
-fi
+else
 
-                                        if test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -eq 0; then :
-
-                  PARMETIS_INCLUDE=""
-                  PARMETIS_LIB=""
-                  build_parmetis=no
-                  enableparmetis=no
-                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&5
-$as_echo "<<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&6; }
-
-fi
-
-                                                  if test "x$build_metis" = "xyes" && test $petsc_have_parmetis -gt 0; then :
-
-                  PARMETIS_INCLUDE=""
-                  PARMETIS_LIB=""
-                  build_parmetis=no
-                  enableparmetis=no
-                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&5
-$as_echo "<<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&6; }
-
-fi
-
-                              if test "x$build_metis" != "xpetsc" && test $petsc_have_parmetis -eq 0; then :
-
-                  PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
-                  PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
-                  build_parmetis=yes
-
-$as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
-
-                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with internal Parmetis support >>>" >&5
-$as_echo "<<< Configuring library with internal Parmetis support >>>" >&6; }
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with external Parmetis support >>>" >&5
+$as_echo "<<< Configuring library with external Parmetis support >>>" >&6; }
 
 fi
 
@@ -37740,11 +37779,9 @@ fi
 
 
 
-else
-  enableparmetis=no
-fi
 if test $enableparmetis = yes; then :
   libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_optional_LIBS="$PARMETIS_LIB $libmesh_optional_LIBS"
 fi
  if test x$enableparmetis = xyes; then
   LIBMESH_ENABLE_PARMETIS_TRUE=

@@ -34,7 +34,7 @@ AC_DEFUN([CONFIGURE_METIS],
   dnl If PETSc has its own METIS, default to using that one regardless
   dnl of what the user specified (if anything) in --with-metis.
   AS_IF([test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0],
-        [AC_MSG_RESULT(<<< Disabling internal Metis support to avoid PETSc conflict>>>)
+        [AC_MSG_RESULT(<<< Using PETSc Metis support to avoid PETSc conflict>>>)
          build_metis=petsc])
 
   dnl Conversely, if:

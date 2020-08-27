@@ -127,6 +127,10 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 
   MetisPartitioner mp;
 
+  // Metis and other fallbacks only work in serial, and need to get
+  // handed element ranges from an already-serialized mesh.
+  mesh.allgather();
+
   // Don't just call partition() here; that would end up calling
   // post-element-partitioning work redundantly (and at the moment
   // incorrectly)
