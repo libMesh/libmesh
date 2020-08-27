@@ -108,6 +108,7 @@ unit_tests_sources = \
   solvers/first_order_unsteady_solver_test.C \
   solvers/second_order_unsteady_solver_test.C \
   systems/equation_systems_test.C \
+  systems/periodic_bc_test.C \
   systems/systems_test.C \
   utils/parameters_test.C \
   utils/point_locator_test.C \
