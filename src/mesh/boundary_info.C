@@ -1487,7 +1487,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
           while (p != nullptr)
             {
               const Elem * parent = p->parent();
-              if (!parent->is_child_on_side(parent->which_child_am_i(p), side))
+              if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
                 break;
               p = parent;
             }
@@ -1526,7 +1526,10 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
           // If we're on this external boundary then we share this
           // external boundary id
           if (elem->neighbor_ptr(side) == nullptr)
-            returnval.push_back(side);
+            {
+              returnval.push_back(side);
+              continue;
+            }
 
           // If we're on an internal boundary then we need to be sure
           // it's the same internal boundary as our top_parent
@@ -1537,7 +1540,7 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
           while (p != nullptr)
             {
               const Elem * parent = p->parent();
-              if (!parent->is_child_on_side(parent->which_child_am_i(p), side))
+              if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
                 break;
               p = parent;
             }
