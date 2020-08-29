@@ -2186,15 +2186,10 @@ compute_periodic_constraints (DofConstraints & constraints,
                               // other way around
                               if ((primary_neigh->level() > primary_elem->level()) ||
 
-                                  // For equal-level elements, the one with
-                                  // higher id gets constrained in terms of
-                                  // the one with lower id
-                                  (primary_neigh->level() == primary_elem->level() &&
-                                   primary_neigh->id() > primary_elem->id()) ||
-
-                                  // On a one-element-thick mesh, we compare
+                                  // For equal-level elements (or on a
+                                  // one-element-thick mesh), we compare
                                   // points to see what side gets constrained
-                                  (primary_neigh == primary_elem &&
+                                  (primary_neigh->level() == primary_elem->level() &&
                                    (neigh_pt > primary_pt)))
                                 continue;
 
@@ -2323,6 +2318,14 @@ compute_periodic_constraints (DofConstraints & constraints,
                                   main_pt2 = neigh_pt2;
                                 }
 
+                              // Otherwise:
+                              // Finer elements will get constrained in
+                              // terms of coarser ones, not the other way
+                              // around
+                              if (primary_neigh->level() > primary_elem->level())
+                                continue;
+
+                              // For equal-level elements, or if
                               // If we have a one-element thick mesh,
                               // we'll need to sort our points to get a
                               // consistent ordering rule
@@ -2330,7 +2333,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                               // Use >= in this test to make sure that,
                               // for angular constraints, no node gets
                               // constrained to itself.
-                              if (primary_neigh == primary_elem)
+                              if (primary_neigh->level() == primary_elem->level())
                                 {
                                   if (primary_pt1 > primary_pt2)
                                     std::swap(primary_pt1, primary_pt2);
@@ -2340,19 +2343,6 @@ compute_periodic_constraints (DofConstraints & constraints,
                                   if (neigh_pt2 >= primary_pt2)
                                     continue;
                                 }
-
-                              // Otherwise:
-                              // Finer elements will get constrained in
-                              // terms of coarser ones, not the other way
-                              // around
-                              if ((primary_neigh->level() > primary_elem->level()) ||
-
-                                  // For equal-level elements, the one with
-                                  // higher id gets constrained in terms of
-                                  // the one with lower id
-                                  (primary_neigh->level() == primary_elem->level() &&
-                                   primary_neigh->id() > primary_elem->id()))
-                                continue;
 
                               primary_elem = primary_neigh;
                               primary_pt1 = neigh_pt1;
