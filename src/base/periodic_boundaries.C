@@ -64,10 +64,12 @@ const PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id) c
 const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
                                           const PointLocatorBase & point_locator,
                                           const Elem * e,
-                                          unsigned int side) const
+                                          unsigned int side,
+                                          unsigned int * neigh_side) const
 {
-  // Find a point on that side (and only that side)
+  std::unique_ptr<const Elem> neigh_side_proxy;
 
+  // Find a point on that side (and only that side)
   Point p = e->build_side_ptr(side)->centroid();
 
   const PeriodicBoundaryBase * b = this->boundary(boundary_id);
@@ -83,14 +85,24 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
   const MeshBase & mesh = point_locator.get_mesh();
   for(const Elem * elem_it : candidate_elements)
     {
-      unsigned int s_neigh =
-        mesh.get_boundary_info().side_with_boundary_id(elem_it, b->pairedboundary);
+      std::vector<unsigned int> neigh_sides =
+        mesh.get_boundary_info().sides_with_boundary_id(elem_it, b->pairedboundary);
 
-      // If s_neigh is not invalid then we have found an element that contains
-      // boundary_id, so return this element
-      if(s_neigh != libMesh::invalid_uint)
+      for (auto ns : neigh_sides)
         {
-          return elem_it;
+          if (neigh_side)
+            {
+              elem_it->build_side_ptr(neigh_side_proxy, ns);
+              if (neigh_side_proxy->contains_point(p))
+                {
+                  *neigh_side = ns;
+                  return elem_it;
+                }
+            }
+          else
+            // checking contains_point is too expensive if we don't
+            // definitely need it to find neigh_side
+            return elem_it;
         }
     }
 
@@ -100,6 +112,8 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
   libmesh_assert_msg(!mesh.is_serial() &&
                      (e->processor_id() != mesh.processor_id()),
                      "Periodic boundary neighbor not found");
+  if (neigh_side)
+    *neigh_side = DofObject::invalid_id;
   return remote_elem;
 }
 

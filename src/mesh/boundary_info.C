@@ -1487,7 +1487,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
           while (p != nullptr)
             {
               const Elem * parent = p->parent();
-              if (!parent->is_child_on_side(parent->which_child_am_i(p), side))
+              if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
                 break;
               p = parent;
             }
@@ -1502,6 +1502,58 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
   // the requested boundary id, so return the default value
   return libMesh::invalid_uint;
 }
+
+
+std::vector<unsigned int>
+BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
+                                     const boundary_id_type boundary_id_in) const
+{
+  std::vector<unsigned int> returnval;
+
+  const Elem * searched_elem = elem;
+  if (elem->level() != 0)
+    searched_elem = elem->top_parent();
+
+  // elem may have zero or multiple occurrences
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+    {
+      // if this is true we found the requested boundary_id
+      // of the element and want to return the side
+      if (pr.second.second == boundary_id_in)
+        {
+          unsigned int side = pr.second.first;
+
+          // If we're on this external boundary then we share this
+          // external boundary id
+          if (elem->neighbor_ptr(side) == nullptr)
+            {
+              returnval.push_back(side);
+              continue;
+            }
+
+          // If we're on an internal boundary then we need to be sure
+          // it's the same internal boundary as our top_parent
+          const Elem * p = elem;
+
+#ifdef LIBMESH_ENABLE_AMR
+
+          while (p != nullptr)
+            {
+              const Elem * parent = p->parent();
+              if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
+                break;
+              p = parent;
+            }
+#endif
+          // We're on that side of our top_parent; return it
+          if (!p)
+            returnval.push_back(side);
+        }
+    }
+
+  return returnval;
+}
+
 
 void
 BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> & b_ids) const
