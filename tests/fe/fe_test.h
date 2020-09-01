@@ -252,30 +252,6 @@ public:
 
     FEType fe_type = _sys->variable_type(0);
     _fe = FEBase::build(_dim, fe_type).release();
-    _fe->get_phi();
-    _fe->get_dphi();
-    _fe->get_dphidx();
-#if LIBMESH_DIM > 1
-    _fe->get_dphidy();
-#endif
-#if LIBMESH_DIM > 2
-    _fe->get_dphidz();
-#endif
-
-#if LIBMESH_ENABLE_SECOND_DERIVATIVES
-    _fe->get_d2phi();
-    _fe->get_d2phidx2();
-#if LIBMESH_DIM > 1
-    _fe->get_d2phidxdy();
-    _fe->get_d2phidy2();
-#endif
-#if LIBMESH_DIM > 2
-    _fe->get_d2phidxdz();
-    _fe->get_d2phidydz();
-    _fe->get_d2phidz2();
-#endif
-
-#endif
 
     // Create quadrature rule for use in computing dual shape coefficients
     _qrule = new QGauss(_dim, fe_type.default_quadrature_order());
@@ -297,6 +273,41 @@ public:
     grad_tol = 2 * TOLERANCE * sqrt(TOLERANCE);
 
     hess_tol = sqrt(TOLERANCE); // FIXME: we see some ~1e-5 errors?!?
+
+    // Prerequest everything we'll want to calculate later.
+    _fe->get_phi();
+    _fe->get_dphi();
+    _fe->get_dphidx();
+#if LIBMESH_DIM > 1
+    _fe->get_dphidy();
+#endif
+#if LIBMESH_DIM > 2
+    _fe->get_dphidz();
+#endif
+
+#if LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+    // Clough-Tocher elements still don't work multithreaded
+    if (family == CLOUGH && libMesh::n_threads() > 1)
+      return;
+
+    // Szabab elements don't have second derivatives yet
+    if (family == SZABAB)
+      return;
+
+    _fe->get_d2phi();
+    _fe->get_d2phidx2();
+#if LIBMESH_DIM > 1
+    _fe->get_d2phidxdy();
+    _fe->get_d2phidy2();
+#endif
+#if LIBMESH_DIM > 2
+    _fe->get_d2phidxdz();
+    _fe->get_d2phidydz();
+    _fe->get_d2phidz2();
+#endif
+
+#endif
   }
 
   void tearDown()
