@@ -29,6 +29,19 @@
 #include "libmesh/int_range.h"
 #include "libmesh/auto_ptr.h"
 
+
+namespace {
+  // Put this outside a templated class, so we only get 1 warning
+  // during our unit tests, not 1 warning for each of the zillion FE
+  // specializations we test.
+  void inffe_hessian_warning () {
+    libmesh_warning("Warning: Second derivatives for Infinite elements"
+                    << " are not yet implemented!"
+                    << std::endl);
+  }
+}
+
+
 namespace libMesh
 {
 
@@ -552,9 +565,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
     dphidz.resize  (n_total_approx_shape_functions);
     dphidxi.resize (n_total_approx_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    libmesh_warning("Warning: Second derivatives for Infinite elements"
-                    << " are not yet implemented!"
-                    << std::endl);
+    inffe_hessian_warning();
 
     d2phi.resize     (n_total_approx_shape_functions);
     d2phidx2.resize  (n_total_approx_shape_functions);
