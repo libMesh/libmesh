@@ -699,17 +699,13 @@ public:
   build_shellface_list() const;
 
   /**
-   * Push the boundary element change to the processors that own the element
+   * Synchronize the boundary element side across processors.
+   * This function is needed when boundary info is changed by adding or removing
+   * sides on the fly.
+   * Note: if the side of a ghost element is changed, then you would need to do
+   * do parallel push (see e.g., timpi/parallel_sync.h) and then sync.
    */
-  void sync_push_remove_boundary_side_id(
-    std::unordered_map<processor_id_type, std::vector<std::pair<dof_id_type, unsigned int>>>
-    & elems_to_push
-  );
-
-  /**
-   * Synchronize the boundary element side across processors
-   */
-  void sync_pull_boundary_side_id();
+  void sync_boundary_side_ids();
 
   /**
    * \returns A set of the boundary ids which exist on semilocal parts

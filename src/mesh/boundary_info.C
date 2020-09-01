@@ -1806,24 +1806,7 @@ BoundaryInfo::build_node_list_from_side_list()
      node_bcid_action_functor, datum_type_ex);
 }
 
-void BoundaryInfo::sync_push_remove_boundary_side_id(
-  std::unordered_map<processor_id_type, std::vector<std::pair<dof_id_type, unsigned int>>>
-  & elems_to_push)
-{
-  auto elem_action_functor =
-    [this]
-    (processor_id_type,
-     const std::vector<std::pair<dof_id_type, unsigned int>> & received_elem)
-    {
-      for (const auto & pr : received_elem)
-        this->remove_side(_mesh.elem_ptr(pr.first), pr.second);
-    };
-
-  Parallel::push_parallel_vector_data
-    (this->comm(), elems_to_push, elem_action_functor);
-}
-
-void BoundaryInfo::sync_pull_boundary_side_id()
+void BoundaryInfo::sync_boundary_side_ids()
 {
   // we need BCs for ghost elements.
   std::unordered_map<processor_id_type, std::vector<dof_id_type>>
