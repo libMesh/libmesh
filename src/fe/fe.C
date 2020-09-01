@@ -27,6 +27,16 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/enum_elem_type.h"
 
+namespace {
+  // Put this outside a templated class, so we only get 1 warning
+  // during our unit tests, not 1 warning for each of the zillion FE
+  // specializations we test.
+  void nonlagrange_dual_warning () {
+    libmesh_warning("dual calculations have only been verified for the LAGRANGE family");
+  }
+}
+
+
 namespace libMesh
 {
 
@@ -286,7 +296,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
       if (this->calculate_dual)
       {
         if (T != LAGRANGE)
-          libmesh_warning("dual calculations have only been verified for the LAGRANGE family");
+          nonlagrange_dual_warning();
 
         // In order for the matrices for the biorthogonality condition to be
         // non-singular, the dual basis coefficients must be computed when the
