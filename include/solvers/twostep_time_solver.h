@@ -81,7 +81,7 @@ public:
   /**
    * A method to compute the adjoint refinement error estimate at the current timestep.
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
-   * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * Fills in an ErrorVector that contains the weighted sum of errors from ARefEE::qoi_set() and can be used to guide AMR.
    * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
    * The midpoint rule is used for the numerical integration.
    */

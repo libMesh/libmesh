@@ -1576,7 +1576,10 @@ public:
   std::vector<Number> qoi;
 
   /**
-   * Vector to hold error estimates for qois
+   * Vector to hold error estimates for qois, either from a steady
+   * state calculation, or from a single unsteady solver timestep. Used
+   * by the library after resizing to match the size of the qoi vector.
+   * User code can use this for accumulating error estimates for example.
    */
   std::vector<Number> qoi_error_estimates;
 

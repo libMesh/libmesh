@@ -279,7 +279,8 @@ public:
   virtual Real last_complete_deltat();
 
   /**
-   * Setter and getter for the final time variable
+   * The final_time variable can be set by the user or in another library
+   * function. For use, see documentation of final_time variable.
    */
   void set_final_time(Real set_time)
   {
