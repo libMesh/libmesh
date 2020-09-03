@@ -123,12 +123,8 @@ void TwostepTimeSolver::solve()
       old_deltat = _system.deltat;
       _system.deltat *= 0.5;
 
-      _system.update();
-
       // Attempt the 'half timestep solve'
       core_time_solver->solve();
-
-      _system.update();
 
       // Increment system.time, and save the half solution to solution history
       core_time_solver->advance_timestep();
