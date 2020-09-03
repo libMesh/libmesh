@@ -57,6 +57,8 @@ void FileSolutionHistory::find_stored_entry(Real time, bool storing)
   // Otherwise, get a decremented iterator for the sandwich test
   if(lower_bound_it == stored_solutions.end())
   {
+    // If we are storing and lower_bound_it points to stored_solutions.end(), we assume
+    // that this is a brand new entry in the map. We leave stored_sols unchanged.
     if(storing)
     {
       return;
