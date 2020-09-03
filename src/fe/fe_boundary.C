@@ -401,14 +401,14 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
   // The element type and order to use in
   // the map
   const FEFamily mapping_family = FEMap::map_fe_type(*side);
-  const ElemType mapping_elem_type (side->type());
   const FEType map_fe_type(side->default_order(), mapping_family);
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
+  // Do not use the p_level(), if any, that is inherited by the side.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, side);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -439,14 +439,14 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
     }
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(Dim-1, map_fe_type,mapping_elem_type);
+    FEInterface::shape_function(map_fe_type, side);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(Dim-1, map_fe_type,mapping_elem_type);
+    FEInterface::shape_deriv_function(map_fe_type, side);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
-    FEInterface::shape_second_deriv_function(Dim-1, map_fe_type, mapping_elem_type);
+    FEInterface::shape_second_deriv_function(map_fe_type, side);
 #endif
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
@@ -529,14 +529,14 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
   // The element type and order to use in
   // the map
   const FEFamily mapping_family = FEMap::map_fe_type(*edge);
-  const ElemType mapping_elem_type (edge->type());
   const FEType map_fe_type(edge->default_order(), mapping_family);
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
+  // Do not use the p_level(), if any, that is inherited by the side.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, edge);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -550,14 +550,14 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
 #endif
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(1, map_fe_type, mapping_elem_type);
+    FEInterface::shape_function(map_fe_type, edge);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(1, map_fe_type, mapping_elem_type);
+    FEInterface::shape_deriv_function(map_fe_type, edge);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
-    FEInterface::shape_second_deriv_function(1, map_fe_type, mapping_elem_type);
+    FEInterface::shape_second_deriv_function(map_fe_type, edge);
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
@@ -607,9 +607,10 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
   const FEFamily mapping_family = FEMap::map_fe_type(*side);
   const Order    mapping_order     (side->default_order());
   const FEType map_fe_type(mapping_order, mapping_family);
-  const ElemType mapping_elem_type (side->type());
+
+  // Do not use the p_level(), if any, that is inherited by the side.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(dim, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, side);
 
   switch (dim)
     {
@@ -636,7 +637,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
 
         // We need to look back at the full edge to figure out the normal
         // vector
-        const Elem * elem = side->parent();
+        const Elem * elem = side->interior_parent();
         libmesh_assert (elem);
         if (calculate_dxyz)
           {
@@ -752,7 +753,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                 // For a 2D element living in 3D, there is a second tangent.
                 // For the second tangent, we need to refer to the full
                 // element's (not just the edge's) Jacobian.
-                const Elem * elem = side->parent();
+                const Elem * elem = side->interior_parent();
                 libmesh_assert(elem);
 
                 // Inverse map xyz[p] to a reference point on the parent...

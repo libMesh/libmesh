@@ -424,7 +424,7 @@ public:
                             const Real tolerance = TOLERANCE,
                             const bool secure = true) {
     // libmesh_deprecated(); // soon
-    return FEMap::inverse_map(Dim, elem, p, tolerance, secure);
+    return FEMap::inverse_map(Dim, elem, p, tolerance, secure, secure);
   }
 
   static void inverse_map (const Elem * elem,
@@ -434,7 +434,7 @@ public:
                            const bool secure = true) {
     // libmesh_deprecated(); // soon
     FEMap::inverse_map(Dim, elem, physical_points, reference_points,
-                       tolerance, secure);
+                       tolerance, secure, secure);
   }
 
   /**
@@ -570,6 +570,11 @@ protected:
    */
   virtual void init_shape_functions(const std::vector<Point> & qp,
                                     const Elem * e);
+
+  /**
+   * Init \p dual_phi and potentially \p dual_dphi, \p dual_d2phi
+   */
+  void init_dual_shape_functions(unsigned int n_shapes, unsigned int n_qp);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

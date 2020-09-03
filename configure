@@ -663,6 +663,8 @@ CPPUNIT_CFLAGS
 CPPUNIT_CONFIG
 LIBMESH_ENABLE_FPARSER_FALSE
 LIBMESH_ENABLE_FPARSER_TRUE
+FPARSER_NO_PSABI_FALSE
+FPARSER_NO_PSABI_TRUE
 FPARSER_SUPPORT_JIT_FALSE
 FPARSER_SUPPORT_JIT_TRUE
 FPARSER_SUPPORT_DEBUGGING_FALSE
@@ -1233,6 +1235,8 @@ enable_metis
 with_metis
 with_metis_include
 enable_parmetis
+with_parmetis
+with_parmetis_include
 enable_tetgen
 enable_triangle
 enable_qhull
@@ -2128,6 +2132,10 @@ Optional Packages:
   --with-metis=<internal,PETSc,/some/libdir>
                           internal: build from contrib, PETSc: rely on PETSc
   --with-metis-include=</some/includedir>
+
+  --with-parmetis=<internal,PETSc,/some/libdir>
+                          internal: build from contrib, PETSc: rely on PETSc
+  --with-parmetis-include=</some/includedir>
 
   --with-vtk-include=PATH Specify the path for VTK header files
   --with-vtk-lib=PATH     Specify the path for VTK libs
@@ -3825,7 +3833,7 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Makefile contrib/utils/Make.common tests/Makefile contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc doc/Doxyfile doc/Makefile doc/html/Makefile"
+ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Makefile contrib/utils/Make.common tests/Makefile contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc doc/Doxyfile doc/Makefile doc/html/Makefile"
 
 
 ac_config_files="$ac_config_files contrib/bin/libmesh-config"
@@ -4932,7 +4940,7 @@ elif test -r ${PETSC_DIR}/lib/petsc/conf/petscvariables; then :
                   PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
 fi
 
-                    if test "x$PETSC_MPI" != x; then :
+          if test "x$PETSC_MPI" != x; then :
 
 
 else
@@ -6984,6 +6992,10 @@ fi
 
                   GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
                   case "$GXX_VERSION_STRING" in #(
+  *20.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 20 >>>" >&5
+$as_echo "<<< C++ compiler is Intel(R) icc 20 >>>" >&6; }
+                            GXX_VERSION=intel_icc_v20.x ;; #(
   *19.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 19 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 19 >>>" >&6; }
@@ -8270,7 +8282,7 @@ else
                           PARANOID_FLAGS="$PARANOID_FLAGS -Wwrite-strings"
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         case "$GXX_VERSION" in #(
-  intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x) :
+  intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x | intel_icc_v19.x | intel_icc_v20.x) :
 
                                     PROFILING_FLAGS="-p"
                                     CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
@@ -8698,6 +8710,19 @@ else
 fi
 
 
+ LIBMESH_PC_IN=""
+  # set the configuration input file for libmesh.pc
+  if test x$build_opt = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-opt.pc.in"
+elif test x$build_dbg = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-dbg.pc.in"
+elif test x$build_devel = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-devel.pc.in"
+elif test x$build_prof = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-prof.pc.in"
+elif test x$build_oprof = xyes; then :
+  LIBMESH_PC_IN="contrib/utils/libmesh-oprof.pc.in"
+fi
 
 
 
@@ -8718,6 +8743,10 @@ fi
 
 
 
+
+
+
+ac_config_files="$ac_config_files contrib/utils/libmesh.pc:$LIBMESH_PC_IN"
 
 
 # By default we merely enable some warnings, but we can turn those
@@ -29498,7 +29527,7 @@ fi
 
     AX_MAJOR_VERSION=`echo "$VERSION" | $SED 's/\([^.][^.]*\).*/\1/'`
     AX_MINOR_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.\([^.][^.]*\).*/\1/'`
-    AX_POINT_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.[^.][^.]*.\(.*\)/\1/' | cut -c 1`
+    AX_POINT_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.[^.][^.]*.\(.*\)/\1/'`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking Major version" >&5
 $as_echo_n "checking Major version... " >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AX_MAJOR_VERSION" >&5
@@ -29513,6 +29542,9 @@ $as_echo_n "checking Point version... " >&6; }
 $as_echo "$AX_POINT_VERSION" >&6; }
 
 
+# Strip any '-pre' suffix from version; our code expects a number
+LIBMESH_NUMERIC_POINT_VERSION=`echo "$AX_POINT_VERSION" | $SED 's/-.*//'`
+
 
 cat >>confdefs.h <<_ACEOF
 #define MAJOR_VERSION $AX_MAJOR_VERSION
@@ -29525,7 +29557,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define MICRO_VERSION $AX_POINT_VERSION
+#define MICRO_VERSION $LIBMESH_NUMERIC_POINT_VERSION
 _ACEOF
 
 
@@ -32810,9 +32842,13 @@ libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
-# TIMPI is required
+# TIMPI is required - so we should be able to see our TIMPI submodule.
+# If our version of TIMPI doesn't have AM MAINTAINER MODE set, then we
+# need its autoconf submodule initialized too.
 # --------------------------------------------------------------
-if test -r $top_srcdir/contrib/timpi/README; then :
+if test -r $top_srcdir/contrib/timpi/README &&
+       (test -r $top_srcdir/contrib/timpi/m4/autoconf-submodule/acsm_mpi.m4 ||
+        grep "^AM""_MAINTAINER_MODE" $top_srcdir/contrib/timpi/configure.ac >/dev/null); then :
 
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
@@ -32822,7 +32858,7 @@ if test -r $top_srcdir/contrib/timpi/README; then :
 
 else
 
-  as_fn_error $? "You must run \"git submodule update --init contrib/timpi\" before configuring libmesh" "$LINENO" 5
+  as_fn_error $? "You must run \"git submodule update --init --recursive\" before configuring libmesh" "$LINENO" 5
 
 fi
 
@@ -34310,8 +34346,8 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    LIBS=$tmpCPPFLAGS
-    CPPFLAGS=$tmpLIBS
+    LIBS=$tmpLIBS
+    CPPFLAGS=$tmpCPPFLAGS
 
 else
 
@@ -35641,7 +35677,7 @@ else
   enablenox=no
 fi
 
-          if test "$enablenox" != "xno"; then :
+          if test "x$enablenox" != "xno"; then :
 
                   enablenox=yes
 
@@ -37514,8 +37550,8 @@ fi
 
 
       if test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling internal Metis support to avoid PETSc conflict>>>" >&5
-$as_echo "<<< Disabling internal Metis support to avoid PETSc conflict>>>" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using PETSc Metis support to avoid PETSc conflict>>>" >&5
+$as_echo "<<< Using PETSc Metis support to avoid PETSc conflict>>>" >&6; }
          build_metis=petsc
 fi
 
@@ -37633,7 +37669,6 @@ ac_config_files="$ac_config_files contrib/metis/Makefile"
 # -------------------------------------------------------------
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
-if test $enablemetis = yes; then :
 
   # Check whether --enable-parmetis was given.
 if test "${enable_parmetis+set}" = set; then :
@@ -37650,6 +37685,66 @@ else
 fi
 
 
+
+# Check whether --with-parmetis was given.
+if test "${with_parmetis+set}" = set; then :
+  withval=$with_parmetis; case "${withval}" in #(
+  internal) :
+    build_parmetis=yes ;; #(
+  PETSc) :
+    build_parmetis=petsc ;; #(
+  *) :
+    PARMETIS_LIB="-L${withval} -lparmetis"
+                       build_parmetis=no ;;
+esac
+              enableparmetis=yes
+else
+  build_parmetis=yes
+fi
+
+
+
+# Check whether --with-parmetis-include was given.
+if test "${with_parmetis_include+set}" = set; then :
+  withval=$with_parmetis_include; PARMETIS_INCLUDE="-I${withval}"
+              enableparmetis=yes
+              build_parmetis=no
+fi
+
+
+      if test "x$petsc_have_metis" = "x"; then :
+  petsc_have_metis=0
+fi
+  if test "x$petsc_have_parmetis" = "x"; then :
+  petsc_have_parmetis=0
+fi
+
+        if test $petsc_have_metis -gt 0; then :
+
+         if test $petsc_have_parmetis -gt 0; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using PETSc ParMETIS support to avoid PETSc conflict>>>" >&5
+$as_echo "<<< Using PETSc ParMETIS support to avoid PETSc conflict>>>" >&6; }
+                build_parmetis=petsc
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Disabling ParMETIS support to avoid PETSc conflict>>>" >&5
+$as_echo "<<< Disabling ParMETIS support to avoid PETSc conflict>>>" >&6; }
+                enableparmetis=no
+fi
+
+fi
+
+            if test "$enableparmetis" = "yes" && test "$build_parmetis" = "petsc"; then :
+
+          if test "x$petsc_have_metis" = "x0" &&
+                 test "x$petsc_have_parmetis" = "x0"; then :
+  build_parmetis=yes
+fi
+          if test "$enablepetsc" = "no"; then :
+  build_parmetis=yes
+fi
+
+fi
+
     if test "x$enablempi" = "xno"; then :
   enableparmetis=no
 fi
@@ -37657,49 +37752,27 @@ fi
       if test "x$enableparmetis" = "xyes"; then :
 
 
-                    if test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -gt 0; then :
-
-
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
 
-                  build_parmetis=no
+
+                    if test "$build_parmetis" = "yes"; then :
+
+                  PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
+                  PARMETIS_LIB="" # contrib Parmetis gets lumped into libcontrib
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with internal Parmetis support >>>" >&5
+$as_echo "<<< Configuring library with internal Parmetis support >>>" >&6; }
+
+elif test "$build_parmetis" = "petsc"; then :
+
+                  PARMETIS_INCLUDE=""
+                  PARMETIS_LIB=""
                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with PETSc Parmetis support >>>" >&5
 $as_echo "<<< Configuring library with PETSc Parmetis support >>>" >&6; }
 
-fi
+else
 
-                                        if test "x$build_metis" = "xpetsc" && test $petsc_have_parmetis -eq 0; then :
-
-                  PARMETIS_INCLUDE=""
-                  PARMETIS_LIB=""
-                  build_parmetis=no
-                  enableparmetis=no
-                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&5
-$as_echo "<<< PETSc has METIS but no ParMETIS, configuring library without Parmetis support >>>" >&6; }
-
-fi
-
-                                                  if test "x$build_metis" = "xyes" && test $petsc_have_parmetis -gt 0; then :
-
-                  PARMETIS_INCLUDE=""
-                  PARMETIS_LIB=""
-                  build_parmetis=no
-                  enableparmetis=no
-                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&5
-$as_echo "<<< PETSc has no METIS but it does have ParMETIS, configuring library without Parmetis support >>>" >&6; }
-
-fi
-
-                              if test "x$build_metis" != "xpetsc" && test $petsc_have_parmetis -eq 0; then :
-
-                  PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
-                  PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
-                  build_parmetis=yes
-
-$as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
-
-                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with internal Parmetis support >>>" >&5
-$as_echo "<<< Configuring library with internal Parmetis support >>>" >&6; }
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with external Parmetis support >>>" >&5
+$as_echo "<<< Configuring library with external Parmetis support >>>" >&6; }
 
 fi
 
@@ -37723,11 +37796,9 @@ fi
 
 
 
-else
-  enableparmetis=no
-fi
 if test $enableparmetis = yes; then :
   libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_optional_LIBS="$PARMETIS_LIB $libmesh_optional_LIBS"
 fi
  if test x$enableparmetis = xyes; then
   LIBMESH_ENABLE_PARMETIS_TRUE=
@@ -38447,12 +38518,14 @@ else
                                                    VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                            -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                            -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor \
-                                           -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
+                                           -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor \
+                                           -lvtkCommonExecutionModel-$vtkmajorminor"
 
                                                                     VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                          -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
                                          -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML \
-                                         -lvtkParallelMPI -lvtkParallelCore"
+                                         -lvtkParallelMPI -lvtkParallelCore \
+                                         -lvtkCommonExecutionModel"
 
 fi
 
@@ -40972,6 +41045,14 @@ else
   FPARSER_SUPPORT_JIT_FALSE=
 fi
 
+       if test "$GXX" = "yes" && test "x$REAL_GXX" != "x"; then
+  FPARSER_NO_PSABI_TRUE=
+  FPARSER_NO_PSABI_FALSE='#'
+else
+  FPARSER_NO_PSABI_TRUE='#'
+  FPARSER_NO_PSABI_FALSE=
+fi
+
 
 if test $enablefparser = yes; then :
   libmesh_contrib_INCLUDES="$FPARSER_INCLUDE $libmesh_contrib_INCLUDES"
@@ -41958,6 +42039,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${FPARSER_SUPPORT_JIT_TRUE}" && test -z "${FPARSER_SUPPORT_JIT_FALSE}"; then
   as_fn_error $? "conditional \"FPARSER_SUPPORT_JIT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${FPARSER_NO_PSABI_TRUE}" && test -z "${FPARSER_NO_PSABI_FALSE}"; then
+  as_fn_error $? "conditional \"FPARSER_NO_PSABI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_FPARSER_TRUE}" && test -z "${LIBMESH_ENABLE_FPARSER_FALSE}"; then
@@ -43134,7 +43219,6 @@ do
     "contrib/utils/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/utils/Makefile" ;;
     "contrib/utils/Make.common") CONFIG_FILES="$CONFIG_FILES contrib/utils/Make.common" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
-    "contrib/utils/libmesh.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in" ;;
     "contrib/utils/libmesh-opt.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-opt.pc" ;;
     "contrib/utils/libmesh-dbg.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-dbg.pc" ;;
     "contrib/utils/libmesh-devel.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-devel.pc" ;;
@@ -43150,6 +43234,7 @@ do
     "include/libmesh_config.h.tmp") CONFIG_HEADERS="$CONFIG_HEADERS include/libmesh_config.h.tmp:include/libmesh_config.h.in" ;;
     "include/libmesh_config.h") CONFIG_COMMANDS="$CONFIG_COMMANDS include/libmesh_config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+    "contrib/utils/libmesh.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh.pc:$LIBMESH_PC_IN" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "contrib/boost/include/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/boost/include/Makefile" ;;
     "contrib/laspack/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/laspack/Makefile" ;;
@@ -43923,7 +44008,6 @@ $as_echo X"$ac_prefix_conf_OUT" |
       rm -f "$ac_prefix_conf_OUT"
       mv $tmp/pconfig.h "$ac_prefix_conf_OUT"
     fi
-    cp conftest.prefix _configs.sed
   else
     as_fn_error $? "input file $ac_prefix_conf_INP does not exist - skip generating $ac_prefix_conf_OUT" "$LINENO" 5
   fi
@@ -45247,25 +45331,25 @@ $as_echo
 for method in ${METHODS}; do
      case "${method}" in #(
   opt) :
-    $as_echo "CPPFLAGS...(opt)................... : $CPPFLAGS_OPT $CPPFLAGS"
-                       $as_echo "CXXFLAGS...(opt)................... : $CXXFLAGS_OPT $CXXFLAGS"
-                       $as_echo "CFLAGS.....(opt)................... : $CFLAGS_OPT $CFLAGS" ;; #(
+    $as_echo "CPPFLAGS...(opt)................... : $CPPFLAGS_OPT"
+                       $as_echo "CXXFLAGS...(opt)................... : $CXXFLAGS_OPT"
+                       $as_echo "CFLAGS.....(opt)................... : $CFLAGS_OPT" ;; #(
   devel) :
-    $as_echo "CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL $CPPFLAGS"
-                       $as_echo "CXXFLAGS...(devel)................. : $CXXFLAGS_DEVEL $CXXFLAGS"
-                       $as_echo "CFLAGS.....(devel)................. : $CFLAGS_DEVEL $CFLAGS" ;; #(
+    $as_echo "CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL"
+                       $as_echo "CXXFLAGS...(devel)................. : $CXXFLAGS_DEVEL"
+                       $as_echo "CFLAGS.....(devel)................. : $CFLAGS_DEVEL" ;; #(
   dbg) :
-    $as_echo "CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG $CPPFLAGS"
-                       $as_echo "CXXFLAGS...(dbg)................... : $CXXFLAGS_DBG $CXXFLAGS"
-                       $as_echo "CFLAGS.....(dbg)................... : $CFLAGS_DBG $CFLAGS" ;; #(
+    $as_echo "CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG"
+                       $as_echo "CXXFLAGS...(dbg)................... : $CXXFLAGS_DBG"
+                       $as_echo "CFLAGS.....(dbg)................... : $CFLAGS_DBG" ;; #(
   prof) :
-    $as_echo "CPPFLAGS...(prof).................. : $CPPFLAGS_PROF $CPPFLAGS"
-                       $as_echo "CXXFLAGS...(prof).................. : $CXXFLAGS_PROF $CXXFLAGS"
-                       $as_echo "CFLAGS.....(prof).................. : $CFLAGS_PROF $CFLAGS" ;; #(
+    $as_echo "CPPFLAGS...(prof).................. : $CPPFLAGS_PROF"
+                       $as_echo "CXXFLAGS...(prof).................. : $CXXFLAGS_PROF"
+                       $as_echo "CFLAGS.....(prof).................. : $CFLAGS_PROF" ;; #(
   oprof) :
-    $as_echo "CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF $CPPFLAGS"
-                       $as_echo "CXXFLAGS...(oprof)................. : $CXXFLAGS_OPROF $CXXFLAGS"
-                       $as_echo "CFLAGS.....(oprof)................. : $CFLAGS_OPROF $CFLAGS" ;; #(
+    $as_echo "CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF"
+                       $as_echo "CXXFLAGS...(oprof)................. : $CXXFLAGS_OPROF"
+                       $as_echo "CFLAGS.....(oprof)................. : $CFLAGS_OPROF" ;; #(
   *) :
      ;;
 esac

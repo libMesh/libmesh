@@ -127,6 +127,10 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 
   MetisPartitioner mp;
 
+  // Metis and other fallbacks only work in serial, and need to get
+  // handed element ranges from an already-serialized mesh.
+  mesh.allgather();
+
   // Don't just call partition() here; that would end up calling
   // post-element-partitioning work redundantly (and at the moment
   // incorrectly)
@@ -282,7 +286,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
                            cast_int<std::size_t>(mesh.n_processors()+1));
   libmesh_assert_equal_to (_pmetis->vtxdist[0], 0);
 
-  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+  for (auto pid : make_range(mesh.n_processors()))
     {
       _pmetis->vtxdist[pid+1] = _pmetis->vtxdist[pid] + _n_active_elem_on_proc[pid];
       n_active_elem += _n_active_elem_on_proc[pid];
@@ -328,8 +332,8 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
     // then the number of active elements is not the same as the sum over all
     // processors of the number of active elements per processor, which means
     // there must be some unpartitioned objects out there.
-    if (global_index_map.size() != _global_index_by_pid_map.size())
-      libmesh_error_msg("ERROR:  ParmetisPartitioner cannot handle unpartitioned objects!");
+    libmesh_error_msg_if(global_index_map.size() != _global_index_by_pid_map.size(),
+                         "ERROR:  ParmetisPartitioner cannot handle unpartitioned objects!");
   }
 
   // Finally, we need to initialize the vertex (partition) weights and the initial subdomain
@@ -340,7 +344,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
     const dof_id_type first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
 
-    for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+    for (auto pid : make_range(mesh.n_processors()))
       {
         dof_id_type tgt_subdomain_size = 0;
 

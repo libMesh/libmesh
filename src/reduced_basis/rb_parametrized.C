@@ -62,22 +62,12 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
                                            const std::map<std::string, std::vector<Real>> & discrete_parameter_values)
 {
   // Check that the min/max vectors are valid
-  {
-    const std::string err_string = "Error: Invalid mu_min/mu_max in RBParameters constructor.";
-    bool valid_min_max = (mu_min_in.n_parameters() == mu_max_in.n_parameters());
-    if (!valid_min_max)
-      libmesh_error_msg(err_string);
+  libmesh_error_msg_if(mu_min_in.n_parameters() != mu_max_in.n_parameters(),
+                       "Error: Invalid mu_min/mu_max in RBParameters constructor.");
 
-    else
-      {
-        for (const auto & pr : mu_min_in)
-          {
-            const std::string & param_name = pr.first;
-            if (mu_min_in.get_value(param_name) > mu_max_in.get_value(param_name))
-              libmesh_error_msg(err_string);
-          }
-      }
-  }
+  for (const auto & pr : mu_min_in)
+    libmesh_error_msg_if(mu_min_in.get_value(pr.first) > mu_max_in.get_value(pr.first),
+                         "Error: Invalid mu_min/mu_max in RBParameters constructor.");
 
   parameters_min = mu_min_in;
   parameters_max = mu_max_in;
@@ -85,8 +75,7 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
   // Add in min/max values due to the discrete parameters
     for (const auto & pr : discrete_parameter_values)
       {
-        if (pr.second.empty())
-          libmesh_error_msg("Error: List of discrete parameters for " << pr.first << " is empty.");
+        libmesh_error_msg_if(pr.second.empty(), "Error: List of discrete parameters for " << pr.first << " is empty.");
 
         Real min_val = *std::min_element(pr.second.begin(), pr.second.end());
         Real max_val = *std::max_element(pr.second.begin(), pr.second.end());
@@ -114,8 +103,7 @@ void RBParametrized::initialize_parameters(const RBParametrized & rb_parametrize
 
 unsigned int RBParametrized::get_n_params() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_n_params");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_n_params");
 
   libmesh_assert_equal_to ( parameters_min.n_parameters(), parameters_max.n_parameters() );
 
@@ -124,8 +112,7 @@ unsigned int RBParametrized::get_n_params() const
 
 unsigned int RBParametrized::get_n_continuous_params() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_n_continuous_params");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_n_continuous_params");
 
   libmesh_assert(get_n_params() >= get_n_discrete_params());
 
@@ -134,8 +121,7 @@ unsigned int RBParametrized::get_n_continuous_params() const
 
 unsigned int RBParametrized::get_n_discrete_params() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_n_discrete_params");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_n_discrete_params");
 
   return cast_int<unsigned int>
     (get_discrete_parameter_values().size());
@@ -143,8 +129,7 @@ unsigned int RBParametrized::get_n_discrete_params() const
 
 std::set<std::string> RBParametrized::get_parameter_names() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_parameter_names");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameter_names");
 
   std::set<std::string> parameter_names;
   parameters_min.get_parameter_names(parameter_names);
@@ -154,8 +139,7 @@ std::set<std::string> RBParametrized::get_parameter_names() const
 
 void RBParametrized::set_parameters(const RBParameters & params)
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::set_current_parameters");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::set_current_parameters");
 
   valid_params(params); // Terminates if params has the wrong number of parameters
 
@@ -165,48 +149,42 @@ void RBParametrized::set_parameters(const RBParameters & params)
 
 const RBParameters & RBParametrized::get_parameters() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_current_parameters");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_current_parameters");
 
   return parameters;
 }
 
 const RBParameters & RBParametrized::get_parameters_min() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_parameters_min");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameters_min");
 
   return parameters_min;
 }
 
 const RBParameters & RBParametrized::get_parameters_max() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_parameters_max");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameters_max");
 
   return parameters_max;
 }
 
 Real RBParametrized::get_parameter_min(const std::string & param_name) const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_parameter_min");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameter_min");
 
   return parameters_min.get_value(param_name);
 }
 
 Real RBParametrized::get_parameter_max(const std::string & param_name) const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_parameter_max");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameter_max");
 
   return parameters_max.get_value(param_name);
 }
 
 void RBParametrized::print_parameters() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::print_current_parameters");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::print_current_parameters");
 
   get_parameters().print();
 }
@@ -372,16 +350,14 @@ void RBParametrized::read_discrete_parameter_values_from_file(const std::string 
 
 bool RBParametrized::is_discrete_parameter(const std::string & mu_name) const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::is_discrete_parameter");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::is_discrete_parameter");
 
   return (_discrete_parameter_values.find(mu_name) != _discrete_parameter_values.end());
 }
 
 const std::map<std::string, std::vector<Real>> & RBParametrized::get_discrete_parameter_values() const
 {
-  if (!parameters_initialized)
-    libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_discrete_parameter_values");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_discrete_parameter_values");
 
   return _discrete_parameter_values;
 }
@@ -401,39 +377,34 @@ void RBParametrized::print_discrete_parameter_values() const
 
 bool RBParametrized::valid_params(const RBParameters & params)
 {
-  if (params.n_parameters() != get_n_params())
-    libmesh_error_msg("Error: Number of parameters don't match");
+  libmesh_error_msg_if(params.n_parameters() != get_n_params(), "Error: Number of parameters don't match");
 
-  else
+  bool valid = true;
+  for (const auto & pr : params)
     {
-      bool valid = true;
-      for (const auto & pr : params)
+      const std::string & param_name = pr.first;
+      valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
+                         (params.get_value(param_name) <= get_parameter_max(param_name)) );
+
+      if (is_discrete_parameter(param_name))
         {
-          const std::string & param_name = pr.first;
-          valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
-                             (params.get_value(param_name) <= get_parameter_max(param_name)) );
-
-          if (is_discrete_parameter(param_name))
-            {
-              // make sure params.get_value(param_name) is sufficiently close
-              // to one of the discrete parameter values
-              valid = valid && is_value_in_list(params.get_value(param_name),
-                                                get_discrete_parameter_values().find(param_name)->second,
-                                                TOLERANCE);
-            }
+          // make sure params.get_value(param_name) is sufficiently close
+          // to one of the discrete parameter values
+          valid = valid && is_value_in_list(params.get_value(param_name),
+                                            get_discrete_parameter_values().find(param_name)->second,
+                                            TOLERANCE);
         }
-
-      if (!valid && verbose_mode)
-        libMesh::out << "Warning: parameter is outside parameter range" << std::endl;
-
-      return valid;
     }
+
+  if (!valid && verbose_mode)
+    libMesh::out << "Warning: parameter is outside parameter range" << std::endl;
+
+  return valid;
 }
 
 Real RBParametrized::get_closest_value(Real value, const std::vector<Real> & list_of_values)
 {
-  if (list_of_values.empty())
-    libmesh_error_msg("Error: list_of_values is empty.");
+  libmesh_error_msg_if(list_of_values.empty(), "Error: list_of_values is empty.");
 
   Real min_distance = std::numeric_limits<Real>::max();
   Real closest_val = 0.;

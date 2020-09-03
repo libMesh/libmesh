@@ -15,10 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh/diff_system.h"
 #include "libmesh/newmark_solver.h"
-#include "libmesh/dof_map.h"
+
 #include "libmesh/diff_solver.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {
@@ -148,13 +150,10 @@ void NewmarkSolver::set_initial_accel_avail( bool initial_accel_set )
 void NewmarkSolver::solve ()
 {
   // First, check that the initial accel was set one way or another
-  if (!_initial_accel_set)
-    {
-      std::string error = "ERROR: Must first set initial acceleration using one of:\n";
-      error += "NewmarkSolver::compute_initial_accel()\n";
-      error += "NewmarkSolver::project_initial_accel()\n";
-      libmesh_error_msg(error);
-    }
+  libmesh_error_msg_if(!_initial_accel_set,
+                       "ERROR: Must first set initial acceleration using one of:\n"
+                       "NewmarkSolver::compute_initial_accel()\n"
+                       "NewmarkSolver::project_initial_accel()\n");
 
   // That satisfied, now we can solve
   UnsteadySolver::solve();

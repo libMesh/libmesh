@@ -374,28 +374,8 @@ public:
   /**
    * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
-   *
-   * \deprecated Use the norm() function instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  auto size() const -> decltype(std::norm(T()));
-#endif
-
-  /**
-   * \returns The Frobenius norm of the tensor, i.e. the square-root of
-   * the sum of the elements squared.
    */
   auto norm() const -> decltype(std::norm(T()));
-
-  /**
-   * \returns The Frobenius norm of the tensor squared, i.e. sum of the
-   * element magnitudes squared.
-   *
-   * \deprecated Use the norm_sq() function instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  auto size_sq() const -> decltype(std::norm(T()));
-#endif
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. sum of the
@@ -757,8 +737,8 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 {
 #if LIBMESH_DIM < 3
 
-  if (i >= LIBMESH_DIM || j >= LIBMESH_DIM)
-    libmesh_error_msg("ERROR:  You are assigning to a tensor component that is out of range for the compiled LIBMESH_DIM!");
+  libmesh_error_msg_if(i >= LIBMESH_DIM || j >= LIBMESH_DIM,
+                       "ERROR:  You are assigning to a tensor component that is out of range for the compiled LIBMESH_DIM!");
 
 #endif
 
@@ -1290,18 +1270,6 @@ TypeTensor<T>::contract (const TypeTensor<T2> & t) const
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <typename T>
-inline
-auto TypeTensor<T>::size() const -> decltype(std::norm(T()))
-{
-  libmesh_deprecated();
-  return this->norm();
-}
-#endif
-
-
-
 template <typename T>
 inline
 auto TypeTensor<T>::norm() const -> decltype(std::norm(T()))
@@ -1367,18 +1335,6 @@ void TypeTensor<T>::zero()
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
     _coords[i] = 0.;
 }
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <typename T>
-inline
-auto TypeTensor<T>::size_sq () const -> decltype(std::norm(T()))
-{
-  libmesh_deprecated();
-  return this->norm_sq();
-}
-#endif
 
 
 

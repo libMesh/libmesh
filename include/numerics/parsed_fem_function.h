@@ -483,10 +483,10 @@ ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name)
       fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp.AddConstant("pi", std::acos(Real(-1)));
       fp.AddConstant("e", std::exp(Real(1)));
-      if (fp.Parse(new_subexpression, variables) != -1) // -1 for success
-        libmesh_error_msg
-          ("ERROR: FunctionParser is unable to parse modified expression: "
-           << new_subexpression << '\n' << fp.ErrorMsg());
+      libmesh_error_msg_if
+        (fp.Parse(new_subexpression, variables) != -1, // -1 for success
+         "ERROR: FunctionParser is unable to parse modified expression: "
+         << new_subexpression << '\n' << fp.ErrorMsg());
 
       Output new_var_value = this->eval(fp, new_subexpression, 0);
 #ifdef NDEBUG
@@ -614,8 +614,8 @@ ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
                            std::string::npos : end - nextstart));
 
       // fparser can crash on empty expressions
-      if (_subexpressions.back().empty())
-        libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+      libmesh_error_msg_if(_subexpressions.back().empty(),
+                           "ERROR: FunctionParser is unable to parse empty expression.\n");
 
 
 #ifdef LIBMESH_HAVE_FPARSER
@@ -625,10 +625,10 @@ ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
       fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp.AddConstant("pi", std::acos(Real(-1)));
       fp.AddConstant("e", std::exp(Real(1)));
-      if (fp.Parse(_subexpressions.back(), variables) != -1) // -1 for success
-        libmesh_error_msg
-          ("ERROR: FunctionParser is unable to parse expression: "
-           << _subexpressions.back() << '\n' << fp.ErrorMsg());
+      libmesh_error_msg_if
+        (fp.Parse(_subexpressions.back(), variables) != -1, // -1 for success
+         "ERROR: FunctionParser is unable to parse expression: "
+         << _subexpressions.back() << '\n' << fp.ErrorMsg());
       fp.Optimize();
       parsers.push_back(fp);
 #else

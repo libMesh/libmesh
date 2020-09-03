@@ -135,7 +135,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       libmesh_assert_equal_to (&(_system->get_equation_systems()), _es);
 
       libmesh_assert(_es->n_systems());
-      for (auto i : IntRange<unsigned int>(0, _es->n_systems()))
+      for (auto i : make_range(_es->n_systems()))
         // We have to break the rules here, because we can't refine a const System
         system_list.push_back(const_cast<System *>(&(_es->get_system(i))));
 
@@ -153,7 +153,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
           _error_norms = error_norms.get();
 
-          for (auto i : IntRange<unsigned int>(0, _es->n_systems()))
+          for (auto i : make_range(_es->n_systems()))
             {
               const System & sys = _es->get_system(i);
               unsigned int n_vars = sys.n_vars();
@@ -322,7 +322,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       libmesh_assert (solution_vectors->find(sys) !=
                       solution_vectors->end());
       const NumericVector<Number> * vec = solution_vectors->find(sys)->second;
-      for (auto j : IntRange<unsigned int>(0, sys->n_qois()))
+      for (auto j : make_range(sys->n_qois()))
         {
           std::ostringstream adjoint_name;
           adjoint_name << "adjoint_solution" << j;
@@ -341,7 +341,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
     {
       // Even if we had a decent preconditioner, valid matrix etc. before
       // refinement, we don't any more.
-      for (auto i : IntRange<unsigned int>(0, _es->n_systems()))
+      for (auto i : make_range(_es->n_systems()))
         es.get_system(i).disable_cache();
 
       // No specified vectors == forward solve
@@ -366,7 +366,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
               if (solve_adjoint)
                 {
                   bool found_vec = false;
-                  for (auto j : IntRange<unsigned int>(0, sys->n_qois()))
+                  for (auto j : make_range(sys->n_qois()))
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
@@ -395,7 +395,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
                   libmesh_assert (solution_vectors->find(sys) !=
                                   solution_vectors->end());
                   const NumericVector<Number> * vec = solution_vectors->find(sys)->second;
-                  for (auto j : IntRange<unsigned int>(0, sys->n_qois()))
+                  for (auto j : make_range(sys->n_qois()))
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;

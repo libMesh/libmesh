@@ -71,16 +71,14 @@ void RBSCMEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansi
 
 RBThetaExpansion & RBSCMEvaluation::get_rb_theta_expansion()
 {
-  if (!rb_theta_expansion)
-    libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
+  libmesh_error_msg_if(!rb_theta_expansion, "Error: rb_theta_expansion hasn't been initialized yet");
 
   return *rb_theta_expansion;
 }
 
 void RBSCMEvaluation::set_C_J_stability_constraint(unsigned int j, Real stability_const_in)
 {
-  if (j >= C_J_stability_vector.size())
-    libmesh_error_msg("Error: Input parameter j is too large in set_C_J_stability_constraint.");
+  libmesh_error_msg_if(j >= C_J_stability_vector.size(), "Error: Input parameter j is too large in set_C_J_stability_constraint.");
 
   // we assume that C_J_stability_vector is resized elsewhere
   // to be the same size as C_J.
@@ -91,8 +89,7 @@ void RBSCMEvaluation::set_C_J_stability_constraint(unsigned int j, Real stabilit
 
 Real RBSCMEvaluation::get_C_J_stability_constraint(unsigned int j) const
 {
-  if (j >= C_J_stability_vector.size())
-    libmesh_error_msg("Error: Input parameter j is too large in get_C_J_stability_constraint.");
+  libmesh_error_msg_if(j >= C_J_stability_vector.size(), "Error: Input parameter j is too large in get_C_J_stability_constraint.");
 
   return C_J_stability_vector[j];
 }
@@ -100,12 +97,10 @@ Real RBSCMEvaluation::get_C_J_stability_constraint(unsigned int j) const
 void RBSCMEvaluation::set_SCM_UB_vector(unsigned int j, unsigned int q, Real y_q)
 {
   // First make sure that j <= J
-  if (j >= SCM_UB_vectors.size())
-    libmesh_error_msg("Error: We must have j < J in set_SCM_UB_vector.");
+  libmesh_error_msg_if(j >= SCM_UB_vectors.size(), "Error: We must have j < J in set_SCM_UB_vector.");
 
   // Next make sure that q <= Q_a or Q_a_hat
-  if (q >= SCM_UB_vectors[0].size())
-    libmesh_error_msg("Error: q is too large in set_SCM_UB_vector.");
+  libmesh_error_msg_if(q >= SCM_UB_vectors[0].size(), "Error: q is too large in set_SCM_UB_vector.");
 
   SCM_UB_vectors[j][q] = y_q;
 }
@@ -113,27 +108,22 @@ void RBSCMEvaluation::set_SCM_UB_vector(unsigned int j, unsigned int q, Real y_q
 Real RBSCMEvaluation::get_SCM_UB_vector(unsigned int j, unsigned int q)
 {
   // First make sure that j <= J
-  if (j >= SCM_UB_vectors.size())
-    libmesh_error_msg("Error: We must have j < J in get_SCM_UB_vector.");
-
-  if (q >= SCM_UB_vectors[0].size())
-    libmesh_error_msg("Error: q is too large in get_SCM_UB_vector.");
+  libmesh_error_msg_if(j >= SCM_UB_vectors.size(), "Error: We must have j < J in get_SCM_UB_vector.");
+  libmesh_error_msg_if(q >= SCM_UB_vectors[0].size(), "Error: q is too large in get_SCM_UB_vector.");
 
   return SCM_UB_vectors[j][q];
 }
 
 const RBParameters & RBSCMEvaluation::get_C_J_entry(unsigned int j)
 {
-  if (j >= C_J.size())
-    libmesh_error_msg("Error: Input parameter j is too large in get_C_J.");
+  libmesh_error_msg_if(j >= C_J.size(), "Error: Input parameter j is too large in get_C_J.");
 
   return C_J[j];
 }
 
 Real RBSCMEvaluation::get_B_min(unsigned int q) const
 {
-  if (q >= B_min.size())
-    libmesh_error_msg("Error: q is too large in get_B_min.");
+  libmesh_error_msg_if(q >= B_min.size(), "Error: q is too large in get_B_min.");
 
   return B_min[q];
 }
@@ -141,24 +131,21 @@ Real RBSCMEvaluation::get_B_min(unsigned int q) const
 
 Real RBSCMEvaluation::get_B_max(unsigned int q) const
 {
-  if (q >= B_max.size())
-    libmesh_error_msg("Error: q is too large in get_B_max.");
+  libmesh_error_msg_if(q >= B_max.size(), "Error: q is too large in get_B_max.");
 
   return B_max[q];
 }
 
 void RBSCMEvaluation::set_B_min(unsigned int q, Real B_min_val)
 {
-  if (q >= B_min.size())
-    libmesh_error_msg("Error: q is too large in set_B_min.");
+  libmesh_error_msg_if(q >= B_min.size(), "Error: q is too large in set_B_min.");
 
   B_min[q] = B_min_val;
 }
 
 void RBSCMEvaluation::set_B_max(unsigned int q, Real B_max_val)
 {
-  if (q >= B_max.size())
-    libmesh_error_msg("Error: q is too large in set_B_max.");
+  libmesh_error_msg_if(q >= B_max.size(), "Error: q is too large in set_B_max.");
 
   B_max[q] = B_max_val;
 }
@@ -369,7 +356,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/B_min" << suffix;
       Xdr B_min_out(file_name.str(), mode);
 
-      for (auto i : IntRange<unsigned int>(0, B_min.size()))
+      for (auto i : make_range(B_min.size()))
         {
           Real B_min_i = get_B_min(i);
           B_min_out << B_min_i;
@@ -382,7 +369,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/B_max" << suffix;
       Xdr B_max_out(file_name.str(), mode);
 
-      for (auto i : IntRange<unsigned int>(0, B_max.size()))
+      for (auto i : make_range(B_max.size()))
         {
           Real B_max_i = get_B_max(i);
           B_max_out << B_max_i;
@@ -403,7 +390,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J_stability_vector" << suffix;
       Xdr C_J_stability_vector_out(file_name.str(), mode);
 
-      for (auto i : IntRange<unsigned int>(0, C_J_stability_vector.size()))
+      for (auto i : make_range(C_J_stability_vector.size()))
         {
           Real C_J_stability_constraint_i = get_C_J_stability_constraint(i);
           C_J_stability_vector_out << C_J_stability_constraint_i;
@@ -430,8 +417,8 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/SCM_UB_vectors" << suffix;
       Xdr SCM_UB_vectors_out(file_name.str(), mode);
 
-      for (auto i : IntRange<unsigned int>(0, SCM_UB_vectors.size()))
-        for (auto j : IntRange<unsigned int>(0, rb_theta_expansion->get_n_A_terms()))
+      for (auto i : make_range(SCM_UB_vectors.size()))
+        for (auto j : make_range(rb_theta_expansion->get_n_A_terms()))
           {
             Real SCM_UB_vector_ij = get_SCM_UB_vector(i,j);
             SCM_UB_vectors_out << SCM_UB_vector_ij;

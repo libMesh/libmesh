@@ -64,6 +64,18 @@ const unsigned int InfHex8::edge_nodes_map[InfHex8::num_edges][InfHex8::nodes_pe
     {3, 7}  // Edge 7
   };
 
+const unsigned int InfHex8::edge_sides_map[InfHex8::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {1, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {0, 4}, // Edge 3
+    {1, 4}, // Edge 4
+    {1, 2}, // Edge 5
+    {2, 3}, // Edge 6
+    {3, 4}  // Edge 7
+  };
+
 
 // ------------------------------------------------------------
 // InfHex8 class member functions
@@ -103,6 +115,13 @@ InfHex8::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+InfHex8::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+}
+
 bool InfHex8::is_node_on_edge(const unsigned int n,
                               const unsigned int e) const
 {
@@ -126,20 +145,27 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
 {
   libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> face;
   if (proxy)
     {
       switch (i)
         {
           // base
         case 0:
-          return libmesh_make_unique<Side<Quad4,InfHex8>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Quad4,InfHex8>>(this,i);
+            break;
+          }
 
           // ifem sides
         case 1:
         case 2:
         case 3:
         case 4:
-          return libmesh_make_unique<Side<InfQuad4,InfHex8>>(this,i);
+          {
+            face = libmesh_make_unique<Side<InfQuad4,InfHex8>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -148,9 +174,6 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> face;
-
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
         {
@@ -174,14 +197,18 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(InfHex8::side_nodes_map[i][n]);
-
-      return face;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 

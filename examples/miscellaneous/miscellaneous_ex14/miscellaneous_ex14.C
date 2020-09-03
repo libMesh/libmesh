@@ -137,18 +137,14 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
   // Check for proper usage first.
-  if (argc < 2)
-    libmesh_error_msg("\nUsage: " << argv[0] << " <input-filename>");
+  libmesh_error_msg_if(argc < 2, "\nUsage: " << argv[0] << " <input-filename>");
 
   // Tell the user what we are doing.
-  else
-    {
-      std::cout << "Running " << argv[0];
+  std::cout << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
-      std::cout << std::endl << std::endl;
-    }
+  for (int i=1; i<argc; i++)
+    std::cout << " " << argv[i];
+  std::cout << std::endl << std::endl;
 
   // Skip SLEPc examples on a non-SLEPc libMesh build
 #ifndef LIBMESH_HAVE_SLEPC

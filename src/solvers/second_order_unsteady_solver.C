@@ -19,6 +19,7 @@
 
 #include "libmesh/diff_system.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

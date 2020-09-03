@@ -35,6 +35,7 @@ public:
   bool transient;
   unsigned int deltat_reductions;
   std::string timesolver_core;
+  std::string solution_history_type;
   libMesh::Real end_time, deltat, timesolver_theta,
     timesolver_maxgrowth, timesolver_tolerance,
     timesolver_upper_tolerance, steadystate_tolerance;

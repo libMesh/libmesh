@@ -8,7 +8,6 @@ libmesh_SOURCES =  \
         src/base/ghost_point_neighbors.C \
         src/base/libmesh.C \
         src/base/libmesh_common.C \
-        src/base/libmesh_isnan.c \
         src/base/libmesh_singleton.C \
         src/base/libmesh_version.C \
         src/base/periodic_boundaries.C \
@@ -334,9 +333,11 @@ libmesh_SOURCES =  \
         src/reduced_basis/rb_evaluation.C \
         src/reduced_basis/rb_parameters.C \
         src/reduced_basis/rb_parametrized.C \
+        src/reduced_basis/rb_parametrized_function.C \
         src/reduced_basis/rb_scm_construction.C \
         src/reduced_basis/rb_scm_evaluation.C \
         src/reduced_basis/rb_temporal_discretization.C \
+        src/reduced_basis/rb_theta.C \
         src/reduced_basis/rb_theta_expansion.C \
         src/reduced_basis/transient_rb_assembly_expansion.C \
         src/reduced_basis/transient_rb_construction.C \
@@ -359,6 +360,7 @@ libmesh_SOURCES =  \
         src/solvers/eigen_time_solver.C \
         src/solvers/euler2_solver.C \
         src/solvers/euler_solver.C \
+        src/solvers/file_solution_history.C \
         src/solvers/first_order_unsteady_solver.C \
         src/solvers/laspack_linear_solver.C \
         src/solvers/linear_solver.C \

@@ -82,20 +82,16 @@ int main (int argc, char ** argv)
   GetPot command_line (argc, argv);
 
   // Check for proper calling arguments.
-  if (argc < 3)
-    libmesh_error_msg("Usage:\n" << "\t " << argv[0] << " -n 15");
+  libmesh_error_msg_if(argc < 3, "Usage:\n" << "\t " << argv[0] << " -n 15");
 
   // Brief message to the user regarding the program name
   // and command line arguments.
-  else
-    {
-      libMesh::out << "Running " << argv[0];
+  libMesh::out << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        libMesh::out << " " << argv[i];
+  for (int i=1; i<argc; i++)
+    libMesh::out << " " << argv[i];
 
-      libMesh::out << std::endl << std::endl;
-    }
+  libMesh::out << std::endl << std::endl;
 
   // This is 3D-only problem
   const unsigned int dim = 3;

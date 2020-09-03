@@ -35,8 +35,7 @@ namespace {
 void clough_nodal_soln(const Elem * elem,
                        const Order order,
                        const std::vector<Number> & elem_soln,
-                       std::vector<Number> &       nodal_soln,
-                       unsigned Dim)
+                       std::vector<Number> &       nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -47,7 +46,7 @@ void clough_nodal_soln(const Elem * elem,
   const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(totalorder, CLOUGH);
+  FEType fe_type(order, CLOUGH);
 
   switch (totalorder)
     {
@@ -56,10 +55,8 @@ void clough_nodal_soln(const Elem * elem,
       // Piecewise cubic shape functions
     case THIRD:
       {
-
         const unsigned int n_sf =
-          // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+          FEInterface::n_shape_functions(fe_type, elem);
 
         std::vector<Point> refspace_nodes;
         FEBase::get_refspace_nodes(elem_type,refspace_nodes);
@@ -75,8 +72,7 @@ void clough_nodal_soln(const Elem * elem,
             // u_i = Sum (alpha_i phi_i)
             for (unsigned int i=0; i<n_sf; i++)
               nodal_soln[n] += elem_soln[i] *
-                // FE<Dim,T>::shape(elem, order, i, mapped_point);
-                FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+                FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
           }
 
         return;
@@ -242,28 +238,28 @@ void FE<0,CLOUGH>::nodal_soln(const Elem * elem,
                               const Order order,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln)
-{ clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
+{ clough_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<1,CLOUGH>::nodal_soln(const Elem * elem,
                               const Order order,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln)
-{ clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
+{ clough_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<2,CLOUGH>::nodal_soln(const Elem * elem,
                               const Order order,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln)
-{ clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
+{ clough_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<3,CLOUGH>::nodal_soln(const Elem * elem,
                               const Order order,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln)
-{ clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
+{ clough_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 
 // Full specialization of n_dofs() function for every dimension

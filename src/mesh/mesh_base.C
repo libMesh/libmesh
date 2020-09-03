@@ -66,6 +66,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_noncritical_partitioning(false),
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
+  _skip_find_neighbors(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
   _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
@@ -95,14 +96,35 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #endif
   _skip_noncritical_partitioning(false),
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false),
+  _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
+  _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(true),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
-  _ghosting_functors(other_mesh._ghosting_functors),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {
+   for (const auto & gf : other_mesh._ghosting_functors )
+   {
+     std::shared_ptr<GhostingFunctor> clone_gf = gf->clone();
+     // Some subclasses of GhostingFunctor might not override the
+     // clone function yet. If this is the case, GhostingFunctor will
+     // return nullptr by default. The clone function should be overridden
+     // in all derived classes. This following code ("else") is written
+     // for API upgrade. That will allow users gradually to update their code.
+     // Once the API upgrade is done, we will come back and delete "else."
+     if (clone_gf)
+     {
+       clone_gf->set_mesh(this);
+       add_ghosting_functor(clone_gf);
+     }
+     else
+     {
+       libmesh_deprecated();
+       add_ghosting_functor(*gf);
+     }
+   }
+
   // Make sure we don't accidentally delete the other mesh's default
   // ghosting functor; we'll use our own if that's needed.
   if (other_mesh._ghosting_functors.count(other_mesh._default_ghosting.get()))
@@ -315,7 +337,59 @@ bool MeshBase::has_node_integer(const std::string & name) const
 
 
 
+void MeshBase::remove_orphaned_nodes ()
+{
+  LOG_SCOPE("remove_orphaned_nodes()", "MeshBase");
+
+  // Will hold the set of nodes that are currently connected to elements
+  std::unordered_set<Node *> connected_nodes;
+
+  // Loop over the elements.  Find which nodes are connected to at
+  // least one of them.
+  for (const auto & element : this->element_ptr_range())
+    for (auto & n : element->node_ref_range())
+      connected_nodes.insert(&n);
+
+  for (const auto & node : this->node_ptr_range())
+    if (!connected_nodes.count(node))
+      this->delete_node(node);
+}
+
+
+
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
+{
+  libmesh_deprecated();
+
+  // We only respect the users wish if they tell us to skip renumbering. If they tell us not to
+  // skip renumbering but someone previously called allow_renumbering(false), then the latter takes
+  // precedence
+  if (skip_renumber_nodes_and_elements)
+    this->allow_renumbering(false);
+
+  // We always accept the user's value for skip_find_neighbors, in contrast to skip_renumber
+  const bool old_allow_find_neighbors = this->allow_find_neighbors();
+  this->allow_find_neighbors(!skip_find_neighbors);
+
+  this->prepare_for_use();
+
+  this->allow_find_neighbors(old_allow_find_neighbors);
+}
+
+void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
+{
+  libmesh_deprecated();
+
+  // We only respect the users wish if they tell us to skip renumbering. If they tell us not to
+  // skip renumbering but someone previously called allow_renumbering(false), then the latter takes
+  // precedence
+  if (skip_renumber_nodes_and_elements)
+    this->allow_renumbering(false);
+
+  this->prepare_for_use();
+}
+
+void MeshBase::prepare_for_use ()
 {
   LOG_SCOPE("prepare_for_use()", "MeshBase");
 
@@ -335,30 +409,26 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, _skip_renumber_nodes_and_elements is false.
   //
-  // We may currently change that by passing
-  // skip_renumber_nodes_and_elements==true to this function, but we
-  // should use the allow_renumbering() accessor instead.
-  //
   // Instances where you if prepare_for_use() should not renumber the nodes
   // and elements include reading in e.g. an xda/r or gmv file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
 
-  if (skip_renumber_nodes_and_elements)
-    {
-      libmesh_deprecated();
-      this->allow_renumbering(false);
-    }
 
   // Mesh modification operations might not leave us with consistent
-  // id counts, but our partitioner might need that consistency.
+  // id counts, or might leave us with orphaned nodes we're no longer
+  // using, but our partitioner might need that consistency and/or
+  // might be confused by orphaned nodes.
   if (!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
   else
-    this->update_parallel_id_counts();
+    {
+      this->remove_orphaned_nodes();
+      this->update_parallel_id_counts();
+    }
 
   // Let all the elements find their neighbors
-  if (!skip_find_neighbors)
+  if (!_skip_find_neighbors)
     this->find_neighbors();
 
   // The user may have set boundary conditions.  We require that the
@@ -648,27 +718,6 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-const PointLocatorBase & MeshBase::point_locator () const
-{
-  libmesh_deprecated();
-
-  if (_point_locator.get() == nullptr)
-    {
-      // PointLocator construction may not be safe within threads
-      libmesh_assert(!Threads::in_threads);
-
-      _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
-
-      if (_point_locator_close_to_point_tol > 0.)
-        _point_locator->set_close_to_point_tol(_point_locator_close_to_point_tol);
-    }
-
-  return *_point_locator;
-}
-#endif
-
-
 std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
   // If there's no master point locator, then we need one.
@@ -824,7 +873,7 @@ void MeshBase::detect_interior_parents()
   for (const auto & elem : this->active_element_ptr_range())
     {
       // Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
-      for (auto n : IntRange<unsigned int>(0, elem->n_vertices()))
+      for (auto n : make_range(elem->n_vertices()))
         {
           libmesh_assert_less (elem->id(), this->max_elem_id());
 
@@ -847,7 +896,7 @@ void MeshBase::detect_interior_parents()
 
       bool found_interior_parents = false;
 
-      for (auto n : IntRange<unsigned int>(0, element->n_vertices()))
+      for (auto n : make_range(element->n_vertices()))
         {
           std::vector<dof_id_type> & element_ids = node_to_elem[element->node_id(n)];
           for (const auto & eid : element_ids)
@@ -878,7 +927,7 @@ void MeshBase::detect_interior_parents()
           for (const auto & interior_parent_id : neighbors_0)
             {
               found_interior_parents = false;
-              for (auto n : IntRange<unsigned int>(1, element->n_vertices()))
+              for (auto n : make_range(1u, element->n_vertices()))
                 {
                   if (neighbors[n].find(interior_parent_id)!=neighbors[n].end())
                     {

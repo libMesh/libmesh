@@ -105,7 +105,7 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem & sys)
   DofMap & dofmap = dlm->sys->get_dof_map();
   dlm->varids->clear();
   dlm->varnames->clear();
-  for (auto v : IntRange<unsigned int>(0, dofmap.n_variables())) {
+  for (auto v : make_range(dofmap.n_variables())) {
     std::string vname = dofmap.variable(v).name();
     dlm->varids->insert(std::pair<std::string,unsigned int>(vname,v));
     dlm->varnames->insert(std::pair<unsigned int,std::string>(v,vname));
@@ -597,8 +597,8 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   NonlinearImplicitSystem * _sys;
   ierr = DMlibMeshGetSystem(dm, _sys);CHKERRQ(ierr);
   NonlinearImplicitSystem & sys = *_sys;
-  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.solution.get());
-  PetscVector<Number> & R_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.rhs);
+  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+  PetscVector<Number> & R_sys = *cast_ptr<PetscVector<Number> *>(sys.rhs);
   PetscVector<Number> X_global(x, _sys->comm()), R(r, _sys->comm());
 
   // Use the systems update() to get a good local version of the parallel solution
@@ -615,11 +615,11 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
 
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
-  if (_sys->nonlinear_solver->residual && _sys->nonlinear_solver->residual_object)
-    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Residual!");
+  libmesh_error_msg_if(_sys->nonlinear_solver->residual && _sys->nonlinear_solver->residual_object,
+                       "ERROR: cannot specify both a function and object to compute the Residual!");
 
-  if (_sys->nonlinear_solver->matvec && _sys->nonlinear_solver->residual_and_jacobian_object)
-    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
+  libmesh_error_msg_if(_sys->nonlinear_solver->matvec && _sys->nonlinear_solver->residual_and_jacobian_object,
+                       "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if (_sys->nonlinear_solver->residual != nullptr)
     _sys->nonlinear_solver->residual(*(_sys->current_local_solution.get()), R, *_sys);
@@ -665,8 +665,8 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 
   PetscMatrix<Number> the_pc(pc,sys.comm());
   PetscMatrix<Number> Jac(jac,sys.comm());
-  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.solution.get());
-  PetscMatrix<Number> & Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number> *>(sys.matrix);
+  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+  PetscMatrix<Number> & Jac_sys = *cast_ptr<PetscMatrix<Number> *>(sys.matrix);
   PetscVector<Number> X_global(x, sys.comm());
 
   // Set the dof maps
@@ -687,11 +687,11 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
-  if (sys.nonlinear_solver->jacobian && sys.nonlinear_solver->jacobian_object)
-    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Jacobian!");
+  libmesh_error_msg_if(sys.nonlinear_solver->jacobian && sys.nonlinear_solver->jacobian_object,
+                       "ERROR: cannot specify both a function and object to compute the Jacobian!");
 
-  if (sys.nonlinear_solver->matvec && sys.nonlinear_solver->residual_and_jacobian_object)
-    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
+  libmesh_error_msg_if(sys.nonlinear_solver->matvec && sys.nonlinear_solver->residual_and_jacobian_object,
+                       "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if (sys.nonlinear_solver->jacobian != nullptr)
     sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
@@ -785,7 +785,13 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
   else {
     ierr = VecDuplicate(v,x); CHKERRQ(ierr);
   }
+
+#if PETSC_RELEASE_LESS_THAN(3,13,0)
   ierr = PetscObjectCompose((PetscObject)*x,"DM",(PetscObject)dm); CHKERRQ(ierr);
+#else
+  ierr = VecSetDM(*x, dm);CHKERRQ(ierr);
+#endif
+
   PetscFunctionReturn(0);
 }
 

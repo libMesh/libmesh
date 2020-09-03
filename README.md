@@ -1,7 +1,10 @@
+## IMPORTANT -- READ BEFORE BUILDING!
+Do not download a GitHub-generated "ZIP" archive. These do not contain the required submodules, and therefore cannot be used to build libmesh. Use only git clones or "release" tarballs when following these instructions.
+
 ## Build Instructions
 The default is to build libmesh "out of tree," i.e. within a separate `build` directory, rather than in the source tree itself. This simplifies the process of having multiple, independently-configured builds.
-1. `cd` to location of libmesh clone or extracted tarball.
-1. (Only if using a git clone) `git submodule update --init`
+1. `cd` to location of libmesh clone or extracted release tarball.
+1. (Only if using a git clone) `git submodule update --init --recursive`
 1. `mkdir build`
 1. `cd build`
 1. `../configure --prefix=/path/to/libmesh/install`
@@ -51,10 +54,10 @@ the same source tree by creating a subdirectory for each compiler build:
 
     export LIBMESH_SRC=/local/libmesh
     cd $LIBMESH_SRC
-    module load gcc/6.3
-    cd $LIBMESH_SRC && mkdir gcc-6.3 && cd gcc-6.3 && ../configure && make && make install
-    module swap gcc/6.3 intel/17.0
-    cd $LIBMESH_SRC && mkdir intel-17.0 && cd intel-17.0 && ../configure && make && make install
+    module load gcc/9.3
+    cd $LIBMESH_SRC && mkdir gcc-9.3 && cd gcc-9.3 && ../configure && make && make install
+    module swap gcc/9.3 intel/19.0
+    cd $LIBMESH_SRC && mkdir intel-19.0 && cd intel-19.0 && ../configure && make && make install
 
 
 ## Dependencies

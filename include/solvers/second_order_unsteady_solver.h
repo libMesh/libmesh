@@ -22,6 +22,13 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+template <typename T> class FunctionBase;
+template <typename T> class VectorValue;
+typedef VectorValue<Number> NumberVectorValue;
+typedef NumberVectorValue Gradient;
+
 /**
  * Generic class from which second order UnsteadySolvers should subclass.
  *

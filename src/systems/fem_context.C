@@ -17,17 +17,19 @@
 
 
 
+#include "libmesh/fem_context.h"
+
 #include "libmesh/boundary_info.h"
+#include "libmesh/diff_system.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/fem_context.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
-#include "libmesh/diff_system.h"
 #include "libmesh/time_solver.h"
 #include "libmesh/unsteady_solver.h" // For euler_residual
 
@@ -82,7 +84,7 @@ FEType FEMContext::find_hardest_fe_type()
   const System & sys = this->get_system();
   FEType hardest_fe_type = sys.variable_type(0);
 
-  for (auto i : IntRange<unsigned int>(0, sys.n_vars()))
+  for (auto i : make_range(sys.n_vars()))
     {
       FEType fe_type = sys.variable_type(i);
 
@@ -256,14 +258,6 @@ bool FEMContext::has_side_boundary_id(boundary_id_type id) const
   return _boundary_info.has_boundary_id(&(this->get_elem()), side, id);
 }
 
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
-{
-  libmesh_deprecated();
-  return _boundary_info.boundary_ids(&(this->get_elem()), side);
-}
-#endif
 
 
 void FEMContext::side_boundary_ids(std::vector<boundary_id_type> & vec_to_fill) const
@@ -1719,7 +1713,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;
-    for (auto i : IntRange<unsigned int>(0, sys.n_vars()))
+    for (auto i : make_range(sys.n_vars()))
       {
         if (algebraic_type() == CURRENT ||
             algebraic_type() == DOFS_ONLY)
@@ -1834,7 +1828,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
 
           // Initialize the per-variable data for elem.
           unsigned int sub_dofs = 0;
-          for (auto i : IntRange<unsigned int>(0, sys.n_vars()))
+          for (auto i : make_range(sys.n_vars()))
             {
               const unsigned int n_dofs_var = cast_int<unsigned int>
                 (this->get_dof_indices(i).size());
@@ -2002,7 +1996,9 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
     case -1:
       fe_new->get_phi();
       fe_new->get_dphi();
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       fe_new->get_d2phi();
+#endif
       fe_new->get_curl_phi();
       break;
     case 0:
@@ -2012,7 +2008,12 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
       fe_new->get_dphi();
       break;
     case 2:
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       fe_new->get_d2phi();
+#else
+      // here a different configuration is required.
+      libmesh_not_implemented();
+#endif
       break;
     case 3:
       fe_new->get_curl_phi();

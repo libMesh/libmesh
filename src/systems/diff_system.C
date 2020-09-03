@@ -167,7 +167,9 @@ std::pair<unsigned int, Real> DifferentiableSystem::adjoint_solve (const QoISet 
   // we are solving the adjoint problem
   this->get_time_solver().set_is_adjoint(true);
 
-  return this->ImplicitSystem::adjoint_solve(qoi_indices);
+  return time_solver->adjoint_solve(qoi_indices);
+
+  //return this->ImplicitSystem::adjoint_solve(qoi_indices);
 }
 
 
@@ -277,8 +279,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
               else
                 libmesh_error_msg("Could not find valid boundary function!");
 
-              if (is_time_evolving_bc)
-                libmesh_error_msg("Cannot currently support time-dependent Dirichlet BC for dot variables!");
+              libmesh_error_msg_if(is_time_evolving_bc, "Cannot currently support time-dependent Dirichlet BC for dot variables!");
 
 
               DirichletBoundary * new_dbc;

@@ -65,6 +65,21 @@ const unsigned int Hex8::edge_nodes_map[Hex8::num_edges][Hex8::nodes_per_edge] =
     {4, 7}  // Edge 11
   };
 
+const unsigned int Hex8::edge_sides_map[Hex8::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {0, 4}, // Edge 3
+    {1, 4}, // Edge 4
+    {1, 2}, // Edge 5
+    {2, 3}, // Edge 6
+    {3, 4}, // Edge 7
+    {1, 5}, // Edge 8
+    {2, 5}, // Edge 9
+    {3, 5}, // Edge 10
+    {4, 5}  // Edge 11
+  };
 
 // ------------------------------------------------------------
 // Hex8 class member functions
@@ -98,6 +113,13 @@ Hex8::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+}
+
+std::vector<unsigned>
+Hex8::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 bool Hex8::is_node_on_edge(const unsigned int n,
@@ -139,21 +161,7 @@ Order Hex8::default_order() const
 std::unique_ptr<Elem> Hex8::build_side_ptr (const unsigned int i,
                                             bool proxy)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (proxy)
-    return libmesh_make_unique<Side<Quad4,Hex8>>(this,i);
-
-  else
-    {
-      std::unique_ptr<Elem> face = libmesh_make_unique<Quad4>();
-      face->subdomain_id() = this->subdomain_id();
-
-      for (auto n : face->node_index_range())
-        face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);
-
-      return face;
-    }
+  return this->simple_build_side_ptr<Quad4, Hex8>(i, proxy);
 }
 
 

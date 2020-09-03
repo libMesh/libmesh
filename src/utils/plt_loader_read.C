@@ -36,9 +36,7 @@ void PltLoader::read (const std::string & name)
 {
   std::ifstream in (name.c_str(), std::ios::in|std::ios::binary);
 
-  if (!in.good())
-    libmesh_error_msg("Error reading input file " << name);
-
+  libmesh_error_msg_if(!in.good(), "Error reading input file " << name);
 
   if (this->verbose())
     libMesh::out << std::endl
@@ -189,11 +187,10 @@ void PltLoader::read_header (std::istream & in)
 
 
             // Did we overrun the file?
-            if (!in.good())
-              libmesh_error_msg("ERROR: Unexpected end-of-file!");
+            libmesh_error_msg_if(!in.good(), "ERROR: Unexpected end-of-file!");
 
             // Found a Zone marker
-            else if (f == 299.)
+            if (f == 299.)
               {
                 // Increment the Zone counter
                 nz++;
@@ -387,13 +384,11 @@ void PltLoader::read_header (std::istream & in)
                    (f != 357.) &&
                    in.good());
 
-
             // Did we overrun the file?
-            if (!in.good())
-              libmesh_error_msg("ERROR: Unexpected end-of-file!");
+            libmesh_error_msg_if(!in.good(), "ERROR: Unexpected end-of-file!");
 
             // Found a Zone marker
-            else if (f == 299.)
+            if (f == 299.)
               {
                 // Increment the Zone counter
                 nz++;
@@ -637,8 +632,7 @@ void PltLoader::read_data (std::istream & in)
           while ((f != 299.) && in.good());
 
           // Did we overrun the file?
-          if (!in.good())
-            libmesh_error_msg("ERROR: Unexpected end-of-file!");
+          libmesh_error_msg_if(!in.good(), "ERROR: Unexpected end-of-file!");
 
           // Get the number of repeated vars.
           unsigned int n_rep_vars=0;
@@ -738,8 +732,7 @@ void PltLoader::read_data (std::istream & in)
           while ((f != 299.) && in.good());
 
           // Did we overrun the file?
-          if (!in.good())
-            libmesh_error_msg("ERROR: Unexpected end-of-file!");
+          libmesh_error_msg_if(!in.good(), "ERROR: Unexpected end-of-file!");
 
           // Get the variable data type
           for (unsigned int v=0; v<this->n_vars(); v++)
@@ -768,8 +761,7 @@ void PltLoader::read_data (std::istream & in)
                     std::memcpy  (&sv, buf, LIBMESH_SIZEOF_INT);
                     rb(sv);
 
-                    if (sv != -1)
-                      libmesh_error_msg("ERROR:  I don't understand variable sharing!");
+                    libmesh_error_msg_if(sv != -1, "ERROR:  I don't understand variable sharing!");
                   }
               }
           }
@@ -1002,22 +994,18 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
     in.read ((char *) &rep, LIBMESH_SIZEOF_INT);
     rb(rep);
 
-    if (rep == 1 && this->n_zones() > 1)
-      libmesh_error_msg("ERROR:  Repeated connectivity not supported!");
+    libmesh_error_msg_if(rep == 1 && this->n_zones() > 1, "ERROR:  Repeated connectivity not supported!");
 
     // Read the connectivity
-    else
-      {
-        libmesh_assert_less (zone, _conn.size());
-        libmesh_assert_less (this->kmax(zone), 4);
+    libmesh_assert_less (zone, _conn.size());
+    libmesh_assert_less (this->kmax(zone), 4);
 
-        _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
+    _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
-        in.read (reinterpret_cast<char *>(_conn[zone].data()), LIBMESH_SIZEOF_INT*_conn[zone].size());
+    in.read (reinterpret_cast<char *>(_conn[zone].data()), LIBMESH_SIZEOF_INT*_conn[zone].size());
 
-        for (std::size_t i=0; i<_conn[zone].size(); i++)
-          rb(_conn[zone][i]);
-      }
+    for (std::size_t i=0; i<_conn[zone].size(); i++)
+      rb(_conn[zone][i]);
   }
 }
 
@@ -1077,22 +1065,18 @@ void PltLoader::read_fepoint_data (std::istream & in, const unsigned int zone)
     in.read ((char *) &rep, LIBMESH_SIZEOF_INT);
     rb(rep);
 
-    if (rep == 1)
-      libmesh_error_msg("ERROR:  Repeated connectivity not supported!");
+    libmesh_error_msg_if(rep == 1, "ERROR:  Repeated connectivity not supported!");
 
     // Read the connectivity
-    else
-      {
-        libmesh_assert_less (zone, _conn.size());
-        libmesh_assert_less (this->kmax(zone), 4);
+    libmesh_assert_less (zone, _conn.size());
+    libmesh_assert_less (this->kmax(zone), 4);
 
-        _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
+    _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
-        in.read (reinterpret_cast<char *>(_conn[zone].data()), LIBMESH_SIZEOF_INT*_conn[zone].size());
+    in.read (reinterpret_cast<char *>(_conn[zone].data()), LIBMESH_SIZEOF_INT*_conn[zone].size());
 
-        for (std::size_t i=0; i<_conn[zone].size(); i++)
-          rb(_conn[zone][i]);
-      }
+    for (std::size_t i=0; i<_conn[zone].size(); i++)
+      rb(_conn[zone][i]);
   }
 }
 

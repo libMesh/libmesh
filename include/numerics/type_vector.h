@@ -308,28 +308,8 @@ public:
   /**
    * \returns The magnitude of the vector, i.e. the square-root of the
    * sum of the elements squared.
-   *
-   * \deprecated Use the norm() function instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  auto size() const -> decltype(std::norm(T()));
-#endif
-
-  /**
-   * \returns The magnitude of the vector, i.e. the square-root of the
-   * sum of the elements squared.
    */
   auto norm() const -> decltype(std::norm(T()));
-
-  /**
-   * \returns The magnitude of the vector squared, i.e. the sum of the
-   * element magnitudes squared.
-   *
-   * \deprecated Use the norm_sq() function instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  auto size_sq() const -> decltype(std::norm(T()));
-#endif
 
   /**
    * \returns The magnitude of the vector squared, i.e. the sum of the
@@ -935,18 +915,6 @@ TypeVector<T>::cross(const TypeVector<T2> & p) const
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <typename T>
-inline
-auto TypeVector<T>::size() const -> decltype(std::norm(T()))
-{
-  libmesh_deprecated();
-  return this->norm();
-}
-#endif
-
-
-
 template <typename T>
 inline
 auto TypeVector<T>::norm() const -> decltype(std::norm(T()))
@@ -963,18 +931,6 @@ void TypeVector<T>::zero()
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] = 0.;
 }
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <typename T>
-inline
-auto TypeVector<T>::size_sq() const -> decltype(std::norm(T()))
-{
-  libmesh_deprecated();
-  return this->norm_sq();
-}
-#endif
 
 
 

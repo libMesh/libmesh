@@ -156,8 +156,15 @@ bool Hex::is_edge_on_side(const unsigned int e,
   libmesh_assert_less (e, this->n_edges());
   libmesh_assert_less (s, this->n_sides());
 
-  return (is_node_on_side(Hex8::edge_nodes_map[e][0],s) &&
-          is_node_on_side(Hex8::edge_nodes_map[e][1],s));
+  return (Hex8::edge_sides_map[e][0] == s ||
+          Hex8::edge_sides_map[e][1] == s);
+}
+
+
+
+std::vector<unsigned int> Hex::sides_on_edge(const unsigned int e) const
+{
+  return {Hex8::edge_sides_map[e][0], Hex8::edge_sides_map[e][1]};
 }
 
 

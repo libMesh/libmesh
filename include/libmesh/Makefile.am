@@ -18,7 +18,6 @@ BUILT_SOURCES = \
         ghosting_functor.h \
         id_types.h \
         libmesh.h \
-        libmesh_C_isnan.h \
         libmesh_augment_std_namespace.h \
         libmesh_base.h \
         libmesh_common.h \
@@ -165,6 +164,7 @@ BUILT_SOURCES = \
         ensight_io.h \
         exodusII_io.h \
         exodusII_io_helper.h \
+        exodus_header_info.h \
         fro_io.h \
         gmsh_io.h \
         gmv_io.h \
@@ -352,6 +352,7 @@ BUILT_SOURCES = \
         eigen_time_solver.h \
         euler2_solver.h \
         euler_solver.h \
+        file_solution_history.h \
         first_order_unsteady_solver.h \
         laspack_linear_solver.h \
         linear_solver.h \
@@ -432,6 +433,7 @@ BUILT_SOURCES = \
         compare_types.h \
         enum_to_string.h \
         error_vector.h \
+        hashing.h \
         hashword.h \
         ignore_warnings.h \
         int_range.h \
@@ -582,9 +584,6 @@ id_types.h: $(top_srcdir)/include/base/id_types.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh.h: $(top_srcdir)/include/base/libmesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-libmesh_C_isnan.h: $(top_srcdir)/include/base/libmesh_C_isnan.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_augment_std_namespace.h: $(top_srcdir)/include/base/libmesh_augment_std_namespace.h
@@ -1023,6 +1022,9 @@ exodusII_io.h: $(top_srcdir)/include/mesh/exodusII_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exodusII_io_helper.h: $(top_srcdir)/include/mesh/exodusII_io_helper.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+exodus_header_info.h: $(top_srcdir)/include/mesh/exodus_header_info.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fro_io.h: $(top_srcdir)/include/mesh/fro_io.h
@@ -1586,6 +1588,9 @@ euler2_solver.h: $(top_srcdir)/include/solvers/euler2_solver.h
 euler_solver.h: $(top_srcdir)/include/solvers/euler_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+file_solution_history.h: $(top_srcdir)/include/solvers/file_solution_history.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 first_order_unsteady_solver.h: $(top_srcdir)/include/solvers/first_order_unsteady_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1824,6 +1829,9 @@ enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 error_vector.h: $(top_srcdir)/include/utils/error_vector.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+hashing.h: $(top_srcdir)/include/utils/hashing.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hashword.h: $(top_srcdir)/include/utils/hashword.h

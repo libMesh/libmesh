@@ -191,8 +191,8 @@ template<typename T>
 inline
 void DenseSubMatrix<T>::zero()
 {
-  for (auto i : IntRange<unsigned int>(0, this->m()))
-    for (auto j : IntRange<unsigned int>(0, this->n()))
+  for (auto i : make_range(this->m()))
+    for (auto j : make_range(this->n()))
       _parent_matrix(i + this->i_off(),
                      j + this->j_off()) = 0.;
 }

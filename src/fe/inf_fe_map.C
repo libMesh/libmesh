@@ -260,7 +260,7 @@ Point InfFEMap::inverse_map (const unsigned int dim,
   // Now we have the intersection-point (projection of physical point onto base-element).
   // Lets compute its internal coordinates (being p(0) and p(1)):
   p= FEMap::inverse_map(dim-1, base_elem.get(), intersection,
-                        tolerance, secure);
+                        tolerance, secure, secure);
 
   // 4.
   // Now that we have the local coordinates in the base,

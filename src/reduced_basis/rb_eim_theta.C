@@ -33,27 +33,17 @@ RBEIMTheta::RBEIMTheta(RBEIMEvaluation & rb_eim_eval_in, unsigned int index_in)
 
 Number RBEIMTheta::evaluate(const RBParameters & mu)
 {
-  if (mu.n_parameters() > rb_eim_eval.get_n_params())
-    {
-      // In this case the parameters related to the EIM are a subset of
-      // the parameters from the associated RB problem, hence we need to "pull out"
-      // the parameters related to the EIM
-      RBParameters mu_eim;
-      for (const auto & pr : rb_eim_eval.get_parameters())
-        {
-          const std::string & param_name = pr.first;
-          mu_eim.set_value(param_name, mu.get_value(param_name));
-        }
-      rb_eim_eval.set_parameters(mu_eim);
-    }
-  else
-    {
-      rb_eim_eval.set_parameters(mu);
-    }
+  std::vector<RBParameters> mus {mu};
+  std::vector<Number> values = evaluate_vec(mus);
 
-  rb_eim_eval.rb_solve(rb_eim_eval.get_n_basis_functions());
+  libmesh_error_msg_if(values.size() != 1, "Error: should have one value");
+  return values[0];
+}
 
-  return rb_eim_eval.RB_solution(index);
+std::vector<Number> RBEIMTheta::evaluate_vec(const std::vector<RBParameters> & mus)
+{
+  rb_eim_eval.rb_eim_solves(mus, rb_eim_eval.get_n_basis_functions());
+  return rb_eim_eval.get_rb_eim_solutions_entries(index);
 }
 
 }

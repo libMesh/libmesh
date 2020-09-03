@@ -73,11 +73,11 @@ void TetGenIO::read (const std::string & name)
   std::ifstream node_stream (name_node.c_str());
   std::ifstream ele_stream  (name_ele.c_str());
 
-  if (!node_stream.good() || !ele_stream.good())
-    libmesh_error_msg("Error while opening either "     \
-                      << name_node                      \
-                      << " or "                         \
-                      << name_ele);
+  libmesh_error_msg_if(!node_stream.good() || !ele_stream.good(),
+                       "Error while opening either "
+                       << name_node
+                       << " or "
+                       << name_ele);
 
   libMesh::out<< "TetGenIO found the tetgen files to read " <<std::endl;
 
@@ -203,8 +203,8 @@ void TetGenIO::element_in (std::istream & ele_stream)
   // region it belongs to. Normally, this id matches a value in a
   // corresponding .poly or .smesh file, but here we simply use it to
   // set the subdomain_id of the element in question.
-  if (region_attribute > 1)
-    libmesh_error_msg("Invalid region_attribute " << region_attribute << " specified in .ele file.");
+  libmesh_error_msg_if(region_attribute > 1,
+                       "Invalid region_attribute " << region_attribute << " specified in .ele file.");
 
   // Vector that assigns element nodes to their correct position.
   // TetGen is normally 0-based
@@ -272,8 +272,8 @@ void TetGenIO::write (const std::string & fname)
   // libmesh_assert three dimensions (should be extended later)
   libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().mesh_dimension(), 3);
 
-  if (!(fname.rfind(".poly") < fname.size()))
-    libmesh_error_msg("ERROR: Unrecognized file name: " << fname);
+  libmesh_error_msg_if(!(fname.rfind(".poly") < fname.size()),
+                       "ERROR: Unrecognized file name: " << fname);
 
   // Open the output file stream
   std::ofstream out_stream (fname.c_str());
@@ -292,7 +292,7 @@ void TetGenIO::write (const std::string & fname)
                << mesh.n_nodes() << " 3 0 0\n";
 
     // write the nodes:
-    for (auto v : IntRange<dof_id_type>(0, mesh.n_nodes()))
+    for (auto v : make_range(mesh.n_nodes()))
       out_stream << v << " "
                  << mesh.point(v)(0) << " "
                  << mesh.point(v)(1) << " "

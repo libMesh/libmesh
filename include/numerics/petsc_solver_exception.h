@@ -47,12 +47,18 @@ public:
     SolverException(error_code_in)
   {
     const char * text;
+    char * specific;
     // This is one scenario where we don't catch the error code
     // returned by a PETSc function :)
-    PetscErrorMessage(error_code, &text, nullptr);
+    PetscErrorMessage(error_code, &text, &specific);
 
-    if (text)
-      what_message = text;
+    // Usually the "specific" error message string is more useful than
+    // the generic text corresponding to the error_code, since many
+    // SETERRQ calls just use error_code == 1
+    if (specific)
+      what_message = std::string(specific);
+    else if (text)
+      what_message = std::string(text);
   }
 };
 

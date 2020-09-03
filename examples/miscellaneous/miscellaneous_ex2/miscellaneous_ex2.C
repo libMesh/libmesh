@@ -115,8 +115,7 @@ int main (int argc, char ** argv)
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Check for proper usage. frequency has two terms:
-  if ( argc <4 )
-    libmesh_error_msg("Usage: " << argv[0] << " -f [real_frequency imag_frequency]");
+  libmesh_error_msg_if(argc < 4, "Usage: " << argv[0] << " -f [real_frequency imag_frequency]");
 
   if (init.comm().size() > 1)
     {

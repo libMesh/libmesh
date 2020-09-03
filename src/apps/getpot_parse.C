@@ -28,8 +28,7 @@ int main(int argc, char ** argv)
 {
   using namespace libMesh;
 
-  if (argc < 2)
-    libmesh_error_msg("Usage: " << argv[0] << " inputconfigfile [outputconfigfile]");
+  libmesh_error_msg_if(argc < 2, "Usage: " << argv[0] << " inputconfigfile [outputconfigfile]");
 
   GetPot gp(argv[1]);
 

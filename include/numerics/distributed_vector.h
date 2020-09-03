@@ -358,7 +358,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
-  for (auto p : IntRange<processor_id_type>(0, this->processor_id()))
+  for (auto p : make_range(this->processor_id()))
     _first_local_index += local_sizes[p];
 
 
@@ -367,7 +367,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
   // size, otherwise there is big trouble!
   numeric_index_type dbg_sum=0;
 
-  for (auto p : IntRange<processor_id_type>(0, this->n_processors()))
+  for (auto p : make_range(this->n_processors()))
     dbg_sum += local_sizes[p];
 
   libmesh_assert_equal_to (dbg_sum, n);
@@ -377,8 +377,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 #else
 
   // No other options without MPI!
-  if (n != n_local)
-    libmesh_error_msg("ERROR:  MPI is required for n != n_local!");
+  libmesh_error_msg_if(n != n_local, "ERROR:  MPI is required for n != n_local!");
 
 #endif
 

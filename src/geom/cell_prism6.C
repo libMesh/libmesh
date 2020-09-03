@@ -70,6 +70,18 @@ const unsigned int Prism6::edge_nodes_map[Prism6::num_edges][Prism6::nodes_per_e
     {3, 5}  // Edge 8
   };
 
+const unsigned int Prism6::edge_sides_map[Prism6::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {1, 3}, // Edge 3
+    {1, 2}, // Edge 4
+    {2, 3}, // Edge 5
+    {1, 4}, // Edge 6
+    {2, 4}, // Edge 7
+    {3, 4}  // Edge 8
+  };
 
 // ------------------------------------------------------------
 // Prism6 class member functions
@@ -104,6 +116,13 @@ Prism6::nodes_on_side(const unsigned int s) const
   libmesh_assert_less(s, n_sides());
   auto trim = (s > 0 && s < 4) ? 0 : 1;
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
+}
+
+std::vector<unsigned>
+Prism6::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 bool Prism6::is_node_on_edge(const unsigned int n,
@@ -141,18 +160,25 @@ std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i,
 {
   libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> face;
   if (proxy)
     {
       switch(i)
         {
         case 0:
         case 4:
-          return libmesh_make_unique<Side<Tri3,Prism6>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Tri3,Prism6>>(this,i);
+            break;
+          }
 
         case 1:
         case 2:
         case 3:
-          return libmesh_make_unique<Side<Quad4,Prism6>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Quad4,Prism6>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -161,9 +187,6 @@ std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> face;
-
       switch (i)
         {
         case 0: // the triangular face at z=-1
@@ -183,14 +206,18 @@ std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Prism6::side_nodes_map[i][n]);
-
-      return face;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 

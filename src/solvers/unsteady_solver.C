@@ -16,11 +16,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "libmesh/unsteady_solver.h"
+
 #include "libmesh/diff_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/unsteady_solver.h"
+#include "libmesh/parameter_vector.h"
+#include "libmesh/sensitivity_data.h"
+#include "libmesh/solution_history.h"
 
 namespace libMesh
 {
@@ -151,15 +155,27 @@ void UnsteadySolver::solve ()
 
 void UnsteadySolver::advance_timestep ()
 {
+  // The first access of advance_timestep happens via solve, not user code
+  // It is used here to store any initial conditions data
   if (!first_solve)
     {
-      // Store the solution, does nothing by default
-      // User has to attach appropriate solution_history object for this to
-      // actually store anything anywhere
-      solution_history->store();
-
+      // We call advance_timestep in user code after solve, so any solutions
+      // we will be storing will be for the next time instance
       _system.time += _system.deltat;
     }
+    else
+    {
+      // We are here because of a call to advance_timestep that happens
+      // via solve, the very first solve. All we are doing here is storing
+      // the initial condition. The actual solution computed via this solve
+      // will be stored when we call advance_timestep in the user's timestep loop
+      first_solve = false;
+    }
+
+  // If the user has attached a memory or file solution history object
+  // to the solver, this will store the current solution indexed with
+  // the current time
+  solution_history->store(false, _system.time);
 
   NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
@@ -173,27 +189,38 @@ void UnsteadySolver::advance_timestep ()
      _system.get_dof_map().get_send_list());
 }
 
-
+std::pair<unsigned int, Real> UnsteadySolver::adjoint_solve(const QoISet & qoi_indices)
+{
+  return _system.ImplicitSystem::adjoint_solve(qoi_indices);
+}
 
 void UnsteadySolver::adjoint_advance_timestep ()
 {
-  // On the first call of this function, we dont save the adjoint solution or
-  // decrement the time, we just call the retrieve function below
+  // All calls to adjoint_advance_timestep are made in the user's
+  // code. This first call is made immediately after the adjoint initial conditions
+  // are set. This is in the user code outside the adjoint time loop.
   if (!first_adjoint_step)
     {
-      // Call the store function to store the last adjoint before decrementing the time
-      solution_history->store();
-      // Decrement the system time
+      // The adjoint system has been solved. We need to store the adjoint solution and
+      // load the primal solutions for the next time instance (t - delta_ti).
       _system.time -= _system.deltat;
     }
   else
     {
+      // The first adjoint step simply saves the given adjoint initial condition
+      // So there is a store, but no solve, no actual timestep, so no need to change system time
       first_adjoint_step = false;
     }
 
-  // Retrieve the primal solution vectors at this time using the
-  // solution_history object
-  solution_history->retrieve();
+  // Retrieve the primal solution vectors at this new (or for
+  // first_adjoint_step, initial) time instance. These provide the
+  // data to solve the adjoint problem for the next time instance.
+  solution_history->retrieve(true, _system.time);
+
+  // Call the store function to store the adjoint we have computed (or
+  // for first_adjoint_step, the adjoint initial condition) in this
+  // time step for the time instance.
+  solution_history->store(true, _system.time);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize
@@ -204,12 +231,54 @@ void UnsteadySolver::adjoint_advance_timestep ()
 void UnsteadySolver::retrieve_timestep()
 {
   // Retrieve all the stored vectors at the current time
-  solution_history->retrieve();
+  solution_history->retrieve(false, _system.time);
 
   // Dont forget to localize the old_nonlinear_solution !
   _system.get_vector("_old_nonlinear_solution").localize
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
+}
+
+void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
+{
+  // We are using the midpoint rule to integrate each timestep
+  // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+
+  // Get t_j
+  Real time_left = _system.time;
+
+  // Left side sensitivities to hold f(t_j)
+  SensitivityData sensitivities_left(qois, _system, parameter_vector);
+
+  // Get f(t_j)
+  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_left);
+
+  // Advance to t_j+1
+  _system.time = _system.time + _system.deltat;
+
+  // Get t_j+1
+  Real time_right = _system.time;
+
+  // Right side sensitivities f(t_j+1)
+  SensitivityData sensitivities_right(qois, _system, parameter_vector);
+
+  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+  _system.remove_vector("sensitivity_rhs0");
+
+  // Retrieve the primal and adjoint solutions at the current timestep
+  retrieve_timestep();
+
+  // Get f(t_j+1)
+  _system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities_right);
+
+  // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+  _system.remove_vector("sensitivity_rhs0");
+
+  // Get the contributions for each sensitivity from this timestep
+  for(unsigned int i = 0; i != qois.size(_system); i++)
+    for(unsigned int j = 0; j != parameter_vector.size(); j++)
+     sensitivities[i][j] = ( (sensitivities_left[i][j] + sensitivities_right[i][j])/2. )*(time_right - time_left);
+
 }
 
 

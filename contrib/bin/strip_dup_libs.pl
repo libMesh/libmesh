@@ -6,6 +6,7 @@
 # This perl script removes duplicate libraries from the right to the left and
 # removes duplicate -L library paths from the left to the right
 use strict;
+use warnings;
 
 my @all_libs = @ARGV;
 #
@@ -14,13 +15,13 @@ my @all_libs = @ARGV;
 my @cleaned_up_libs_first;
 foreach( reverse @all_libs ) {
         $_ = remove_rel_paths($_);
-        if( $_=~/-L/ ) {
-                unshift @cleaned_up_libs_first, $_;
-        }
-        else {
+        if( ($_=~/^-l/) ) {
                 if( !entry_exists($_,\@cleaned_up_libs_first) ) {
                         unshift @cleaned_up_libs_first, $_;
                 }
+        }
+        else {
+                unshift @cleaned_up_libs_first, $_;
         }
 }
 
@@ -30,10 +31,12 @@ foreach( reverse @all_libs ) {
 my @cleaned_up_libs_second;
 foreach( @cleaned_up_libs_first ) {
         $_ = remove_rel_paths($_);
-        if( !($_=~/-Wl/) ) {
-                push @cleaned_up_libs_second, $_;
+        if( ($_=~/-Wl/) ) {
+                if ( !entry_exists($_,\@cleaned_up_libs_second) ) {
+                        push @cleaned_up_libs_second, $_;
+                }
         }
-        elsif( !entry_exists($_,\@cleaned_up_libs_second) ) {
+        else {
                 push @cleaned_up_libs_second, $_;
         }
 }
@@ -53,49 +56,59 @@ foreach( @cleaned_up_libs_second ) {
 }
 
 #
-# Move system library paths to the end of the link line.  This way,
-# there should be less risk of libmesh linking against something in
-# /usr/lib by accident.
+# separate system paths (assumed here to be things in /usr/ or /lib/) from
+# non-system paths:
 #
-my @cleaned_up_libs_fourth;
 my @system_lib_paths;
+my @other_lib_paths;
+my @link_libraries;
 foreach( @cleaned_up_libs_third ) {
     $_ = remove_rel_paths($_);
-    # Discard libary paths starting with /usr.  This includes e.g.
-    # /usr/lib and /usr/local/lib, which are assumed to be system
-    # library paths.
-    if( ($_=~/-L\/usr/) )
+    if( ($_=~/^-L\/usr/) )
     {
         push @system_lib_paths, $_;
     }
-    # Discard -Wl,* flags starting with /usr
-    elsif( ($_=~/-Wl,[^\/]*\/usr/) )
+    elsif( ($_=~/^-Wl,[^\/]*\/usr/) )
     {
         push @system_lib_paths, $_;
     }
-    # Discard library paths starting with /lib. This directory is not
-    # even present on OSX and it is typically fairly empty on Linux,
-    # but it may be present on other UNIX systems.
-    elsif( ($_=~/-L\/lib/) )
+    elsif( ($_=~/^-L\/lib/) )
     {
         push @system_lib_paths, $_;
     }
-    # Discard -Wl,* flags starting with /lib
-    elsif( ($_=~/-Wl,[^\/]*\/lib/) )
+    elsif( ($_=~/^-Wl,[^\/]*\/lib/) )
     {
         push @system_lib_paths, $_;
     }
-    # Otherwise, keep the path.
+    elsif( ( $_=~/^-L\// ) )
+    {
+        push @other_lib_paths, $_;
+    }
+    elsif( ( $_=~/^-Wl,[^\/]*\// ) )
+    {
+        push @other_lib_paths, $_;
+    }
     else
     {
-        push @cleaned_up_libs_fourth, $_;
+        push @link_libraries, $_;
     }
 }
 
 #
-# Push system lib paths onto the end of the list
+# Push non-system linker paths, system linker paths, then library link commands:
 #
+my @cleaned_up_libs_fourth;
+foreach( @other_lib_paths )
+{
+    push @cleaned_up_libs_fourth, $_;
+}
+
 foreach( @system_lib_paths )
+{
+    push @cleaned_up_libs_fourth, $_;
+}
+
+foreach( @link_libraries )
 {
     push @cleaned_up_libs_fourth, $_;
 }
@@ -104,7 +117,7 @@ foreach( @system_lib_paths )
 # Print the new list of libraries and paths
 #
 print join( " ", @cleaned_up_libs_fourth );
-
+print "\n";
 
 #
 # Subroutines

@@ -272,7 +272,7 @@ void FEMSystem::set_numerical_jacobian_h_for_var(unsigned int var_num,
   if (_numerical_jacobian_h_for_var.size() <= var_num)
     _numerical_jacobian_h_for_var.resize(var_num+1,Real(0));
 
-  libmesh_assert_greater(new_h, 0);
+  libmesh_assert_greater(new_h, Real(0));
 
   _numerical_jacobian_h_for_var[var_num] = new_h;
 }

@@ -124,42 +124,39 @@ void PointLocatorTree::init (Trees::BuildType build_type)
         {
           LOG_SCOPE("init(no master)", "PointLocatorTree");
 
-          if (this->_mesh.mesh_dimension() == 3)
+          if (LIBMESH_DIM == 1)
+            _tree = new Trees::BinaryTree (this->_mesh, get_target_bin_size(), _build_type);
+          else if (LIBMESH_DIM == 2)
+            _tree = new Trees::QuadTree (this->_mesh, get_target_bin_size(), _build_type);
+          else if (this->_mesh.mesh_dimension() == 3) // && LIBMESH_DIM==3
             _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
           else
             {
-              // A 1D/2D mesh in 3D space needs special consideration.
-              // If the mesh is planar XY, we want to build a QuadTree
-              // to search efficiently.  If the mesh is truly a manifold,
+              // LIBMESH_DIM==3 but we have a mesh with only 1D/2D
+              // elements, which needs special consideration.  If the
+              // mesh is planar XY, we want to build a QuadTree to
+              // search efficiently.  If the mesh is truly a manifold,
               // then we need an octree
-#if LIBMESH_DIM > 2
               bool is_planar_xy = false;
 
               // Build the bounding box for the mesh.  If the delta-z bound is
               // negligibly small then we can use a quadtree.
-              {
-                BoundingBox bbox = MeshTools::create_bounding_box(this->_mesh);
+              BoundingBox bbox = MeshTools::create_bounding_box(this->_mesh);
 
-                const Real
-                  Dx = bbox.second(0) - bbox.first(0),
-                  Dz = bbox.second(2) - bbox.first(2);
+              const Real
+                Dx = bbox.second(0) - bbox.first(0),
+                Dz = bbox.second(2) - bbox.first(2);
 
-                // In order to satisfy is_planar_xy the mesh should be planar and should
-                // also be in the z=0 plane, since otherwise it is incorrect to use a
-                // QuadTree since QuadTrees assume z=0.
-                if ( (std::abs(Dz/(Dx + 1.e-20)) < 1e-10) && (std::abs(bbox.second(2)) < 1.e-10) )
-                  is_planar_xy = true;
-              }
+              // In order to satisfy is_planar_xy the mesh should be planar and should
+              // also be in the z=0 plane, since otherwise it is incorrect to use a
+              // QuadTree since QuadTrees assume z=0.
+              if ( (std::abs(Dz/(Dx + 1.e-20)) < 1e-10) && (std::abs(bbox.second(2)) < 1.e-10) )
+                is_planar_xy = true;
 
-              if (!is_planar_xy)
-                _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
-              else
-#endif
-#if LIBMESH_DIM > 1
+              if (is_planar_xy)
                 _tree = new Trees::QuadTree (this->_mesh, get_target_bin_size(), _build_type);
-#else
-              _tree = new Trees::BinaryTree (this->_mesh, get_target_bin_size(), _build_type);
-#endif
+              else
+                _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
             }
         }
 
@@ -191,8 +188,6 @@ void PointLocatorTree::init (Trees::BuildType build_type)
   this->_initialized = true;
 }
 
-
-
 const Elem * PointLocatorTree::operator() (const Point & p,
                                            const std::set<subdomain_id_type> * allowed_subdomains) const
 {
@@ -203,8 +198,15 @@ const Elem * PointLocatorTree::operator() (const Point & p,
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
   if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = nullptr;
 
+  if (this->_element != nullptr) {
+    if (_use_contains_point_tol && !(this->_element->contains_point(p, _contains_point_tol)))
+      this->_element = nullptr;
+    else if (!(this->_element->contains_point(p)))
+      this->_element = nullptr;
+  }
+
   // First check the element from last time before asking the tree
-  if (this->_element==nullptr || !(this->_element->contains_point(p)))
+  if (this->_element==nullptr)
     {
       // ask the tree
       if (_use_contains_point_tol)

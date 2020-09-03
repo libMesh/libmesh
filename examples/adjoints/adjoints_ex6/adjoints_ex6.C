@@ -230,8 +230,7 @@ int main (int argc, char ** argv)
   // Make sure the general input file exists, and parse it
   {
     std::ifstream i("general.in");
-    if (!i)
-      libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
+    libmesh_error_msg_if(!i, '[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
   GetPot infile("general.in");
 
@@ -282,9 +281,6 @@ int main (int argc, char ** argv)
   libMesh::out << "Initializing systems" << std::endl;
 
   equation_systems.init ();
-
-  // Add an adjoint_solution0 vector to the system
-  system.add_vector("adjoint_solution0", false, GHOSTED);
 
   // Print information about the mesh and system to the screen.
   mesh.print_info();

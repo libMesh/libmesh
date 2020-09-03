@@ -39,17 +39,17 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
                            )
 {
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType mapping_elem_type (elem->type());
   const FEType map_fe_type(elem->default_order(), mapping_family);
 
+  // Note: we explicitly don't consider the elem->p_level() when
+  // computing the number of mapping shape functions.
   const int n_mapping_shape_functions =
-    FEInterface::n_shape_functions (3, map_fe_type,
-                                    mapping_elem_type);
+    FEInterface::n_shape_functions (map_fe_type, /*extra_order=*/0, elem);
 
   static const Point dofpt[2] = {Point(-1,-1,-1), Point(1,1,1)};
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(3, map_fe_type, mapping_elem_type);
+    FEInterface::shape_deriv_function(map_fe_type, elem);
 
   for (int p = 0; p != 2; ++p)
     {
@@ -67,11 +67,11 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & d
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = shape_deriv_ptr
-            (map_fe_type, elem, i, 0, dofpt[p], false);
+            (map_fe_type, elem, i, 0, dofpt[p], /*add_p_level=*/false);
           const Real ddeta = shape_deriv_ptr
-            (map_fe_type, elem, i, 1, dofpt[p], false);
+            (map_fe_type, elem, i, 1, dofpt[p], /*add_p_level=*/false);
           const Real ddzeta = shape_deriv_ptr
-            (map_fe_type, elem, i, 2, dofpt[p], false);
+            (map_fe_type, elem, i, 2, dofpt[p], /*add_p_level=*/false);
 
           // dxdeta, dxdzeta, dydxi, dydzeta, dzdxi, dzdeta should all
           // be 0!

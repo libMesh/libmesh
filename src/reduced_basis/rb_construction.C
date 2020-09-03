@@ -46,7 +46,6 @@
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/utility.h"
-#include "libmesh/int_range.h"
 
 // C++ includes
 #include <sys/types.h>
@@ -72,6 +71,7 @@ RBConstruction::RBConstruction (EquationSystems & es,
     skip_degenerate_sides(true),
     compute_RB_inner_product(false),
     store_non_dirichlet_operators(false),
+    store_untransformed_basis(false),
     use_empty_rb_solve_in_greedy(true),
     Fq_representor_innerprods_computed(false),
     Nmax(0),
@@ -84,7 +84,8 @@ RBConstruction::RBConstruction (EquationSystems & es,
     rel_training_tolerance(1.e-4),
     abs_training_tolerance(1.e-12),
     normalize_rb_bound_in_greedy(false),
-    RB_training_type("Greedy")
+    RB_training_type("Greedy"),
+    _preevaluate_thetas_flag(false)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -175,8 +176,7 @@ void RBConstruction::set_rb_evaluation(RBEvaluation & rb_eval_in)
 
 RBEvaluation & RBConstruction::get_rb_evaluation()
 {
-  if (!rb_eval)
-    libmesh_error_msg("Error: RBEvaluation object hasn't been initialized yet");
+  libmesh_error_msg_if(!rb_eval, "Error: RBEvaluation object hasn't been initialized yet");
 
   return *rb_eval;
 }
@@ -244,7 +244,7 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
 
       unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
       std::vector<Real> vals_for_param(n_vals_for_param);
-      for (auto j : IntRange<unsigned int>(0, vals_for_param.size()))
+      for (auto j : make_range(vals_for_param.size()))
         vals_for_param[j] = infile(param_name, 0., j);
 
       discrete_parameter_values_in[param_name] = vals_for_param;
@@ -378,8 +378,7 @@ void RBConstruction::set_rb_assembly_expansion(RBAssemblyExpansion & rb_assembly
 
 RBAssemblyExpansion & RBConstruction::get_rb_assembly_expansion()
 {
-  if (!rb_assembly_expansion)
-    libmesh_error_msg("Error: RBAssemblyExpansion object hasn't been initialized yet");
+  libmesh_error_msg_if(!rb_assembly_expansion, "Error: RBAssemblyExpansion object hasn't been initialized yet");
 
   return *rb_assembly_expansion;
 }
@@ -392,11 +391,11 @@ void RBConstruction::set_inner_product_assembly(ElemAssembly & inner_product_ass
 
 ElemAssembly & RBConstruction::get_inner_product_assembly()
 {
-  if (use_energy_inner_product)
-    libmesh_error_msg("Error: inner_product_assembly not available since we're using energy inner-product");
+  libmesh_error_msg_if(use_energy_inner_product,
+                       "Error: inner_product_assembly not available since we're using energy inner-product");
 
-  if (!inner_product_assembly)
-    libmesh_error_msg("Error: inner_product_assembly hasn't been initialized yet");
+  libmesh_error_msg_if(!inner_product_assembly,
+                       "Error: inner_product_assembly hasn't been initialized yet");
 
   return *inner_product_assembly;
 }
@@ -422,6 +421,11 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vec
 #endif
 
   vector.close();
+}
+
+bool RBConstruction::check_if_zero_truth_solve()
+{
+  return (solution->l2_norm() == 0.);
 }
 
 void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
@@ -732,9 +736,22 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
             }
         }
 
-      // Do any required user post-processing before symmetrizing
-      // and/or applying constraints. Only do the post processing
-      // if we are applying the dof constraints.
+      // Do any required user post-processing before symmetrizing and/or applying
+      // constraints.
+      //
+      // We only do this if apply_dof_constraints is true because we want to be
+      // able to set apply_dof_constraints=false in order to obtain a matrix
+      // A with no dof constraints or dof transformations, as opposed to C^T A C,
+      // which includes constraints and/or dof transformations. Here C refers to
+      // the matrix that imposes dof constraints and transformations on the
+      // solution u.
+      //
+      // Matrices such as A are what we store in our "non_dirichlet" operators, and
+      // they are useful for computing terms such as (C u_i)^T A (C u_j) (e.g. see
+      // update_RB_system_matrices()),  where C u is the result of a "truth_solve",
+      // which includes calls to both enforce_constraints_exactly() and
+      // post_process_truth_solution(). If we use C^T A C to compute these terms then
+      // we would "double apply" the matrix C, which can give incorrect results.
       if (apply_dof_constraints)
         this->post_process_elem_matrix_and_vector(context);
 
@@ -748,6 +765,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           context.get_elem_jacobian() *= 0.5;
         }
 
+      // As discussed above, we can set apply_dof_constraints=false to
+      // get A instead of C^T A C
       if (apply_dof_constraints)
         {
           // Apply constraints, e.g. Dirichlet and periodic constraints
@@ -869,10 +888,8 @@ void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number> * input_
   }
   else
   {
-    if (energy_inner_product_coeffs.size() != get_rb_theta_expansion().get_n_A_terms())
-      {
-        libmesh_error_msg("Error: invalid number of entries in energy_inner_product_coeffs.");
-      }
+    libmesh_error_msg_if(energy_inner_product_coeffs.size() != get_rb_theta_expansion().get_n_A_terms(),
+                         "Error: invalid number of entries in energy_inner_product_coeffs.");
 
     // We symmetrize below so that we may use the energy inner-product even in cases
     // where the A_q are not symmetric.
@@ -892,8 +909,8 @@ void RBConstruction::assemble_Aq_matrix(unsigned int q,
                                         SparseMatrix<Number> * input_matrix,
                                         bool apply_dof_constraints)
 {
-  if (q >= get_rb_theta_expansion().get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < Q_a in assemble_Aq_matrix.");
+  libmesh_error_msg_if(q >= get_rb_theta_expansion().get_n_A_terms(),
+                       "Error: We must have q < Q_a in assemble_Aq_matrix.");
 
   input_matrix->zero();
 
@@ -912,8 +929,8 @@ void RBConstruction::add_scaled_Aq(Number scalar,
 {
   LOG_SCOPE("add_scaled_Aq()", "RBConstruction");
 
-  if (q_a >= get_rb_theta_expansion().get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < Q_a in add_scaled_Aq.");
+  libmesh_error_msg_if(q_a >= get_rb_theta_expansion().get_n_A_terms(),
+                       "Error: We must have q < Q_a in add_scaled_Aq.");
 
   if (!symmetrize)
     {
@@ -987,8 +1004,8 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
                                         NumericVector<Number> * input_vector,
                                         bool apply_dof_constraints)
 {
-  if (q >= get_rb_theta_expansion().get_n_F_terms())
-    libmesh_error_msg("Error: We must have q < Q_f in assemble_Fq_vector.");
+  libmesh_error_msg_if(q >= get_rb_theta_expansion().get_n_F_terms(),
+                       "Error: We must have q < Q_f in assemble_Fq_vector.");
 
   input_vector->zero();
 
@@ -1089,6 +1106,9 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
       return 0.;
     }
 
+  // Optionally pre-evaluate the theta functions on the entire (local) training parameter set.
+  if (get_preevaluate_thetas_flag())
+    preevaluate_thetas();
 
   if(!skip_residual_in_train_reduced_basis)
     {
@@ -1135,6 +1155,12 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
 
       // Perform an Offline truth solve for the current parameter
       truth_solve(-1);
+
+      if (check_if_zero_truth_solve())
+        {
+          libMesh::out << "Zero basis function encountered hence ending basis enrichment" << std::endl;
+          break;
+        }
 
       // Add orthogonal part of the snapshot to the RB space
       libMesh::out << "Enriching the RB space" << std::endl;
@@ -1225,17 +1251,10 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
 
 void RBConstruction::train_reduced_basis_with_POD()
 {
-  if(!serial_training_set)
-    {
-      // We need to use the same training set on all processes so that
-      // the truth solves below work correctly in parallel.
-      libmesh_error_msg("We must use a serial training set with POD");
-    }
-
-  if(get_rb_evaluation().get_n_basis_functions() > 0)
-    {
-      libmesh_error_msg("Basis should not already be initialized");
-    }
+  // We need to use the same training set on all processes so that
+  // the truth solves below work correctly in parallel.
+  libmesh_error_msg_if(!serial_training_set, "We must use a serial training set with POD");
+  libmesh_error_msg_if(get_rb_evaluation().get_n_basis_functions() > 0, "Basis should not already be initialized");
 
   get_rb_evaluation().initialize_parameters(*this);
   get_rb_evaluation().resize_data_structures(get_Nmax());
@@ -1302,10 +1321,7 @@ void RBConstruction::train_reduced_basis_with_POD()
   DenseMatrix<Number> VT( n_snapshots, n_snapshots );
   correlation_matrix.svd(sigma, U, VT );
 
-  if(sigma(0) == 0.)
-    {
-      libmesh_error_msg("Zero singular value encountered in POD construction");
-    }
+  libmesh_error_msg_if(sigma(0) == 0., "Zero singular value encountered in POD construction");
 
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
@@ -1394,8 +1410,8 @@ void RBConstruction::update_greedy_param_list()
 
 const RBParameters & RBConstruction::get_greedy_parameter(unsigned int i)
 {
-  if (i >= get_rb_evaluation().greedy_param_list.size())
-    libmesh_error_msg("Error: Argument in RBConstruction::get_greedy_parameter is too large.");
+  libmesh_error_msg_if(i >= get_rb_evaluation().greedy_param_list.size(),
+                       "Error: Argument in RBConstruction::get_greedy_parameter is too large.");
 
   return get_rb_evaluation().greedy_param_list[i];
 }
@@ -1403,6 +1419,11 @@ const RBParameters & RBConstruction::get_greedy_parameter(unsigned int i)
 Real RBConstruction::truth_solve(int plot_solution)
 {
   LOG_SCOPE("truth_solve()", "RBConstruction");
+
+  if(store_untransformed_basis && !_untransformed_solution)
+  {
+    _untransformed_solution = solution->zero_clone();
+  }
 
   truth_assembly();
 
@@ -1422,6 +1443,11 @@ Real RBConstruction::truth_solve(int plot_solution)
 
       if (assert_convergence)
         check_convergence(*get_linear_solver());
+    }
+
+  if (store_untransformed_basis)
+    {
+      *_untransformed_solution = *solution;
     }
 
   // Call user-defined post-processing routines on the truth solution.
@@ -1495,9 +1521,14 @@ void RBConstruction::enrich_RB_space()
 {
   LOG_SCOPE("enrich_RB_space()", "RBConstruction");
 
-  auto new_bf = NumericVector<Number>::build(this->comm());
-  new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-  *new_bf = *solution;
+  auto new_bf = solution->clone();
+
+  std::unique_ptr<NumericVector<Number>> new_untransformed_bf;
+  if (store_untransformed_basis)
+    {
+      new_untransformed_bf = _untransformed_solution->clone();
+      libmesh_assert_equal_to(_untransformed_basis_functions.size(), get_rb_evaluation().get_n_basis_functions());
+    }
 
   for (unsigned int index=0; index<get_rb_evaluation().get_n_basis_functions(); index++)
     {
@@ -1506,6 +1537,11 @@ void RBConstruction::enrich_RB_space()
       Number scalar =
         inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(index));
       new_bf->add(-scalar, get_rb_evaluation().get_basis_function(index));
+
+      if (store_untransformed_basis)
+        {
+          new_untransformed_bf->add(-scalar, *_untransformed_basis_functions[index]);
+        }
     }
 
   // Normalize new_bf
@@ -1515,14 +1551,29 @@ void RBConstruction::enrich_RB_space()
   if (new_bf_norm == 0.)
     {
       new_bf->zero(); // avoid potential nan's
+
+      if (store_untransformed_basis)
+        {
+          new_untransformed_bf->zero();
+        }
     }
   else
     {
       new_bf->scale(1./new_bf_norm);
+
+      if (store_untransformed_basis)
+        {
+          new_untransformed_bf->scale(1./new_bf_norm);
+        }
     }
 
   // load the new basis function into the basis_functions vector.
   get_rb_evaluation().basis_functions.emplace_back( std::move(new_bf) );
+
+  if (store_untransformed_basis)
+    {
+      _untransformed_basis_functions.emplace_back( std::move(new_untransformed_bf) );
+    }
 }
 
 void RBConstruction::update_system()
@@ -1535,7 +1586,17 @@ Real RBConstruction::get_RB_error_bound()
 {
   get_rb_evaluation().set_parameters( get_parameters() );
 
-  Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
+  Real error_bound = 0.;
+  if (get_preevaluate_thetas_flag())
+    {
+      // Obtain the pre-evaluated theta functions from the current training parameter index
+      const auto & evaluated_thetas = get_evaluated_thetas(get_current_training_parameter_index());
+      error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions(),
+                                                 &evaluated_thetas);
+    }
+  else
+    error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
+
 
   if (normalize_rb_bound_in_greedy)
     {
@@ -1604,6 +1665,12 @@ Real RBConstruction::compute_max_error_bound()
       // Load training parameter i, this is only loaded
       // locally since the RB solves are local.
       set_params_from_training_set( first_index+i );
+
+      // In case we pre-evaluate the theta functions,
+      // also keep track of the current training parameter index.
+      if (get_preevaluate_thetas_flag())
+        set_current_training_parameter_index(first_index+i);
+
 
       training_error_bounds[i] = get_RB_error_bound();
 
@@ -1718,6 +1785,11 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
+  if (store_untransformed_basis)
+    {
+      libmesh_assert_equal_to(_untransformed_basis_functions.size(), get_rb_evaluation().get_n_basis_functions());
+    }
+
   for (unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
     {
       for (unsigned int i=(RB_size-delta_N); i<RB_size; i++)
@@ -1733,7 +1805,14 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
                          get_rb_evaluation().Aq_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
           rhs->zero();
-          get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
+          if (!store_untransformed_basis)
+            {
+              get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
+            }
+          else
+            {
+              get_Aq(q_a)->vector_mult(*rhs, *_untransformed_basis_functions[i]);
+            }
           rhs->scale(-1.);
 
           if (!is_quiet())
@@ -1981,12 +2060,12 @@ void RBConstruction::load_rb_solution()
 
   solution->zero();
 
-  if (get_rb_evaluation().RB_solution.size() > get_rb_evaluation().get_n_basis_functions())
-    libmesh_error_msg("ERROR: System contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions." \
-                      << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
-                      << " RB_solution in RBConstruction::load_rb_solution is too long!");
+  libmesh_error_msg_if(get_rb_evaluation().RB_solution.size() > get_rb_evaluation().get_n_basis_functions(),
+                       "ERROR: System contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions."
+                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries."
+                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
-  for (auto i : IntRange<unsigned int>(0, get_rb_evaluation().RB_solution.size()))
+  for (auto i : make_range(get_rb_evaluation().RB_solution.size()))
     solution->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
 
   update();
@@ -2008,9 +2087,21 @@ Real RBConstruction::compute_residual_dual_norm_slow(const unsigned int N)
   std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(comm());
   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
+  if (store_untransformed_basis)
+    {
+      libmesh_assert_equal_to(_untransformed_basis_functions.size(), get_rb_evaluation().get_n_basis_functions());
+    }
+
   for (unsigned int i=0; i<N; i++)
   {
-    RB_sol->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
+    if (!store_untransformed_basis)
+      {
+        RB_sol->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
+      }
+    else
+      {
+        RB_sol->add(get_rb_evaluation().RB_solution(i), *_untransformed_basis_functions[i]);
+      }
   }
 
   this->truth_assembly();
@@ -2035,8 +2126,8 @@ SparseMatrix<Number> * RBConstruction::get_inner_product_matrix()
 
 SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix()
 {
-  if (!store_non_dirichlet_operators)
-    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_inner_product_matrix.");
+  libmesh_error_msg_if(!store_non_dirichlet_operators,
+                       "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_inner_product_matrix.");
 
   return non_dirichlet_inner_product_matrix.get();
 }
@@ -2053,19 +2144,19 @@ SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix_if
 
 SparseMatrix<Number> * RBConstruction::get_Aq(unsigned int q)
 {
-  if (q >= get_rb_theta_expansion().get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
+  libmesh_error_msg_if(q >= get_rb_theta_expansion().get_n_A_terms(),
+                       "Error: We must have q < Q_a in get_Aq.");
 
   return Aq_vector[q].get();
 }
 
 SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq(unsigned int q)
 {
-  if (!store_non_dirichlet_operators)
-    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Aq.");
+  libmesh_error_msg_if(!store_non_dirichlet_operators,
+                       "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Aq.");
 
-  if (q >= get_rb_theta_expansion().get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
+  libmesh_error_msg_if(q >= get_rb_theta_expansion().get_n_A_terms(),
+                       "Error: We must have q < Q_a in get_Aq.");
 
   return non_dirichlet_Aq_vector[q].get();
 }
@@ -2082,19 +2173,19 @@ SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq_if_avail(unsigned in
 
 NumericVector<Number> * RBConstruction::get_Fq(unsigned int q)
 {
-  if (q >= get_rb_theta_expansion().get_n_F_terms())
-    libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
+  libmesh_error_msg_if(q >= get_rb_theta_expansion().get_n_F_terms(),
+                       "Error: We must have q < Q_f in get_Fq.");
 
   return Fq_vector[q].get();
 }
 
 NumericVector<Number> * RBConstruction::get_non_dirichlet_Fq(unsigned int q)
 {
-  if (!store_non_dirichlet_operators)
-    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Fq.");
+  libmesh_error_msg_if(!store_non_dirichlet_operators,
+                       "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Fq.");
 
-  if (q >= get_rb_theta_expansion().get_n_F_terms())
-    libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
+  libmesh_error_msg_if(q >= get_rb_theta_expansion().get_n_F_terms(),
+                       "Error: We must have q < Q_f in get_Fq.");
 
   return non_dirichlet_Fq_vector[q].get();
 }
@@ -2111,18 +2202,20 @@ NumericVector<Number> * RBConstruction::get_non_dirichlet_Fq_if_avail(unsigned i
 
 NumericVector<Number> * RBConstruction::get_output_vector(unsigned int n, unsigned int q_l)
 {
-  if ((n >= get_rb_theta_expansion().get_n_outputs()) || (q_l >= get_rb_theta_expansion().get_n_output_terms(n)))
-    libmesh_error_msg("Error: We must have n < n_outputs and "          \
-                      << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_output_vector.");
+  libmesh_error_msg_if((n >= get_rb_theta_expansion().get_n_outputs()) ||
+                       (q_l >= get_rb_theta_expansion().get_n_output_terms(n)),
+                       "Error: We must have n < n_outputs and "
+                       "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_output_vector.");
 
   return outputs_vector[n][q_l].get();
 }
 
 NumericVector<Number> * RBConstruction::get_non_dirichlet_output_vector(unsigned int n, unsigned int q_l)
 {
-  if ((n >= get_rb_theta_expansion().get_n_outputs()) || (q_l >= get_rb_theta_expansion().get_n_output_terms(n)))
-    libmesh_error_msg("Error: We must have n < n_outputs and "          \
-                      << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_non_dirichlet_output_vector.");
+  libmesh_error_msg_if((n >= get_rb_theta_expansion().get_n_outputs()) ||
+                       (q_l >= get_rb_theta_expansion().get_n_output_terms(n)),
+                       "Error: We must have n < n_outputs and "
+                       "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_non_dirichlet_output_vector.");
 
   return non_dirichlet_outputs_vector[n][q_l].get();
 }
@@ -2329,8 +2422,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   // Read in the Fq_representors.  There should be Q_f of these.  FIXME:
   // should we be worried about leaks here?
   for (const auto & rep : Fq_representor)
-    if (rep)
-      libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
+    libmesh_error_msg_if(rep, "Error, must delete existing Fq_representor before reading in from file.");
 
   for (auto i : index_range(Fq_representor))
     {
@@ -2343,8 +2435,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
         {
           int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-          if (stat_result != 0)
-            libmesh_error_msg("File does not exist: " << file_name.str());
+          libmesh_error_msg_if(stat_result != 0, "File does not exist: " << file_name.str());
         }
 
       Xdr fqr_data(file_name.str(),
@@ -2373,8 +2464,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   RBEvaluation & rbe = get_rb_evaluation();
   for (const auto & row : rbe.Aq_representor)
     for (const auto & rep : row)
-      if (rep)
-        libmesh_error_msg("Error, must delete existing Aq_representor before reading in from file.");
+      libmesh_error_msg_if(rep, "Error, must delete existing Aq_representor before reading in from file.");
 
   // Now ready to read them in from file!
   for (auto i : index_range(rbe.Aq_representor))
@@ -2389,8 +2479,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
           {
             int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-            if (stat_result != 0)
-              libmesh_error_msg("File does not exist: " << file_name.str());
+            libmesh_error_msg_if(stat_result != 0, "File does not exist: " << file_name.str());
           }
 
         Xdr aqr_data(file_name.str(), read_binary_residual_representors ? DECODE : READ);
@@ -2412,12 +2501,7 @@ void RBConstruction::check_convergence(LinearSolver<Number> & input_solver)
 
   conv_flag = input_solver.get_converged_reason();
 
-  if (conv_flag < 0)
-    {
-      std::stringstream err_msg;
-      err_msg << "Convergence error. Error id: " << conv_flag;
-      libmesh_error_msg(err_msg.str());
-    }
+  libmesh_error_msg_if(conv_flag < 0, "Convergence error. Error id: " << conv_flag);
 }
 
 bool RBConstruction::get_convergence_assertion_flag() const
@@ -2428,6 +2512,79 @@ bool RBConstruction::get_convergence_assertion_flag() const
 void RBConstruction::set_convergence_assertion_flag(bool flag)
 {
   assert_convergence = flag;
+}
+
+bool RBConstruction::get_preevaluate_thetas_flag() const
+{
+  return _preevaluate_thetas_flag;
+}
+
+void RBConstruction::set_preevaluate_thetas_flag(bool flag)
+{
+  _preevaluate_thetas_flag = flag;
+}
+
+unsigned int RBConstruction::get_current_training_parameter_index() const
+{
+  return _current_training_parameter_index;
+}
+
+void RBConstruction::set_current_training_parameter_index(unsigned int index)
+{
+  _current_training_parameter_index = index;
+}
+
+const std::vector<Number> &
+RBConstruction::get_evaluated_thetas(unsigned int training_parameter_index) const
+{
+  const numeric_index_type first_index = get_first_local_training_index();
+  libmesh_assert(training_parameter_index >= first_index);
+
+  const numeric_index_type local_index = training_parameter_index - first_index;
+  libmesh_assert(local_index < _evaluated_thetas.size());
+
+  return _evaluated_thetas[local_index];
+}
+
+void RBConstruction::preevaluate_thetas()
+{
+  LOG_SCOPE("preevaluate_thetas()", "RBConstruction");
+
+  _evaluated_thetas.resize(get_local_n_training_samples());
+
+  if ( get_local_n_training_samples() == 0 )
+    return;
+
+  auto & rb_theta_expansion = get_rb_evaluation().get_rb_theta_expansion();
+  const unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
+  const unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
+
+  // Collect all training parameters
+  std::vector<RBParameters> mus(get_local_n_training_samples());
+  const numeric_index_type first_index = get_first_local_training_index();
+  for (unsigned int i=0; i<get_local_n_training_samples(); i++)
+    {
+      // Load training parameter i, this is only loaded
+      // locally since the RB solves are local.
+      set_params_from_training_set( first_index+i );
+      mus[i] = get_parameters();
+      _evaluated_thetas[i].resize(n_A_terms + n_F_terms);
+    }
+
+  // Evaluate thetas for all training parameters simultaneously
+  for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
+    {
+      const auto A_vals = rb_theta_expansion.eval_A_theta(q_a, mus);
+      for (auto i : make_range(get_local_n_training_samples()))
+        _evaluated_thetas[i][q_a] = A_vals[i];
+    }
+
+  for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
+    {
+      const auto F_vals = rb_theta_expansion.eval_F_theta(q_f, mus);
+      for (auto i : make_range(get_local_n_training_samples()))
+        _evaluated_thetas[i][n_A_terms + q_f] = F_vals[i];
+    }
 }
 
 } // namespace libMesh

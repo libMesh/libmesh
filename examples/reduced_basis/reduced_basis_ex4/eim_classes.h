@@ -13,9 +13,7 @@
 // Just the bits we're using, since this is a header.
 using libMesh::EquationSystems;
 using libMesh::RBEIMEvaluation;
-#ifndef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
-using libMesh::make_unique;
-#endif
+using libMesh::RBEIMConstruction;
 
 // A simple subclass of RBEIMEvaluation. Overload
 // evaluate_parametrized_function to define the
@@ -27,13 +25,8 @@ public:
   SimpleEIMEvaluation(const libMesh::Parallel::Communicator & comm) :
     RBEIMEvaluation(comm)
   {
-    attach_parametrized_function(&sg);
+    set_parametrized_function(libmesh_make_unique<ShiftedGaussian>());
   }
-
-  /**
-   * Parametrized function that we approximate with EIM
-   */
-  ShiftedGaussian sg;
 };
 
 // A simple subclass of RBEIMConstruction.
@@ -47,14 +40,19 @@ public:
   SimpleEIMConstruction (EquationSystems & es,
                          const std::string & name_in,
                          const unsigned int number_in)
-    : Parent(es, name_in, number_in)
+    : RBEIMConstruction(es, name_in, number_in)
   {
   }
 
   /**
-   * The type of the parent.
+   * Initialize data structures.
    */
-  typedef RBEIMConstruction Parent;
+  virtual void init_data()
+  {
+    this->add_variable ("eim_var", libMesh::FIRST);
+
+    RBEIMConstruction::init_data();
+  }
 
   /**
    * Provide an implementation of build_eim_assembly
@@ -63,62 +61,6 @@ public:
   {
     return libmesh_make_unique<EIM_F>(*this, index);
   }
-
-  /**
-   * Initialize data structures.
-   */
-  virtual void init_data()
-  {
-    Parent::init_data();
-
-    set_inner_product_assembly(ip);
-  }
-
-  /**
-   * Initialize the implicit system that is used to perform L2 projections.
-   */
-  virtual void init_implicit_system()
-  {
-    this->add_variable ("L2_proj_var", libMesh::FIRST);
-  }
-
-  /**
-   * Initialize the explicit system that is used to store the basis functions.
-   */
-  virtual void init_explicit_system()
-  {
-    u_var = get_explicit_system().add_variable ("f_EIM", libMesh::FIRST);
-  }
-
-  /**
-   * Pre-request all relevant element data.
-   */
-  virtual void init_context(FEMContext & c)
-  {
-    // For efficiency, we should prerequest all
-    // the data we will need to build the
-    // linear system before doing an element loop.
-    FEBase * elem_fe = nullptr;
-    c.get_element_fe(u_var, elem_fe);
-
-    elem_fe->get_JxW();
-    elem_fe->get_phi();
-    elem_fe->get_dphi();
-
-    FEBase * side_fe = nullptr;
-    c.get_side_fe(u_var, side_fe);
-    side_fe->get_nothing();
-  }
-
-  /**
-   * Variable number for u.
-   */
-  unsigned int u_var;
-
-  /**
-   * Inner product assembly object
-   */
-  EIM_IP_assembly ip;
 };
 
 #endif

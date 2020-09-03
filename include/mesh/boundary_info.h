@@ -69,9 +69,12 @@ protected:
 
 public:
   /**
-   * Actual copying operation.
+   * Copy assignment operator
    *
-   * \note The copy will have a reference to the same Mesh as the original.
+   * \note \p this will still reference the same MeshBase it was
+   * constructed with.  Boundary data copied from other_boundary_info
+   * will refer to objects in this mesh which have the same
+   * DofObject::id() as the corresponding objects in the other mesh.
    */
   BoundaryInfo & operator=(const BoundaryInfo & other_boundary_info);
 
@@ -368,20 +371,8 @@ public:
                         const boundary_id_type id) const;
 
   /**
-   * \returns The boundary ids associated with \p Node \p node.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> boundary_ids (const Node * node) const;
-#endif
-
-  /**
    * Fills a user-provided std::vector with the boundary ids associated
    * with \p Node \p node.
-   *
-   * This is the non-deprecated version of the function.
    */
   void boundary_ids (const Node * node,
                      std::vector<boundary_id_type> & vec_to_fill) const;
@@ -405,22 +396,6 @@ public:
    * element \p elem.
    *
    * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> edge_boundary_ids (const Elem * const elem,
-                                                   const unsigned short int edge) const;
-#endif
-
-  /**
-   * \returns The list of boundary ids associated with the \p edge edge of
-   * element \p elem.
-   *
-   * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * This is the non-deprecated version of the function.
    */
   void edge_boundary_ids (const Elem * const elem,
                           const unsigned short int edge,
@@ -434,25 +409,6 @@ public:
    * such as a child's inheritance of its ancestors' boundary id.
    *
    * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem * const elem,
-                                                       const unsigned short int edge) const;
-#endif
-
-  /**
-   * \returns The list of raw boundary ids associated with the \p edge
-   * edge of element \p elem.
-   *
-   * These ids are "raw" because they exclude ids which are implicit,
-   * such as a child's inheritance of its ancestors' boundary id.
-   *
-   * \note Edge-based boundary IDs should only be used in 3D.
-   *
-   * This is the non-deprecated version of the function.
    */
   void raw_edge_boundary_ids (const Elem * const elem,
                               const unsigned short int edge,
@@ -499,24 +455,6 @@ public:
                         const boundary_id_type id) const;
 
   /**
-   * \returns The boundary id associated with the \p side side of
-   * element \p elem, or \p invalid_id if the \p side does not have an
-   * associated boundary id.
-   *
-   * \note Only one id per side is allowed, however multiple sides per
-   * element are allowed.
-   *
-   * \deprecated Asking for just one boundary id means your code isn't
-   * safe to use on meshes with overlapping boundary ids.  Try using
-   * BoundaryInfo::boundary_ids() or BoundaryInfo::has_boundary_id()
-   * instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  boundary_id_type boundary_id (const Elem * const elem,
-                                const unsigned short int side) const;
-#endif
-
-  /**
    * \returns The number of boundary ids associated with the \p side
    * side of element \p elem.
    */
@@ -526,20 +464,6 @@ public:
   /**
    * \returns The list of boundary ids associated with the \p side side of
    * element \p elem.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> boundary_ids (const Elem * const elem,
-                                              const unsigned short int side) const;
-#endif
-
-  /**
-   * \returns The list of boundary ids associated with the \p side side of
-   * element \p elem.
-   *
-   * This is the non-deprecated version of the function.
    */
   void boundary_ids (const Elem * const elem,
                      const unsigned short int side,
@@ -551,23 +475,6 @@ public:
    *
    * These ids are "raw" because they exclude ids which are implicit,
    * such as a child's inheritance of its ancestors' boundary id.
-   *
-   * \deprecated Instead, use the version of this function that fills
-   * a std::vector.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  std::vector<boundary_id_type> raw_boundary_ids (const Elem * const elem,
-                                                  const unsigned short int side) const;
-#endif
-
-  /**
-   * \returns The list of raw boundary ids associated with the \p side
-   * side of element \p elem.
-   *
-   * These ids are "raw" because they exclude ids which are implicit,
-   * such as a child's inheritance of its ancestors' boundary id.
-   *
-   * This is the non-deprecated version of the function.
    */
   void raw_boundary_ids (const Elem * const elem,
                          const unsigned short int side,
@@ -591,6 +498,14 @@ public:
    */
   unsigned int side_with_boundary_id(const Elem * const elem,
                                      const boundary_id_type boundary_id) const;
+
+  /**
+   * \returns All sides of element \p elem whose associated boundary id is
+   * \p boundary_id
+   */
+  std::vector<unsigned int>
+  sides_with_boundary_id(const Elem * const elem,
+                         const boundary_id_type boundary_id) const;
 
   /**
    * Builds the list of unique node boundary ids.
@@ -670,11 +585,11 @@ public:
    * The "sort_by" parameter controls how the resulting list of tuples
    * is sorted.  It is possible (but not recommended) to choose
    * UNSORTED, since in that case the resulting vectors will
-   * potentially be in different ordres on different procs.
+   * potentially be in different orders on different procs.
    */
   typedef std::tuple<dof_id_type, boundary_id_type> NodeBCTuple;
-  enum NodeBCTupleSortBy : int {NODE_ID, BOUNDARY_ID, UNSORTED};
-  std::vector<NodeBCTuple> build_node_list(NodeBCTupleSortBy sort_by = NODE_ID) const;
+  enum class NodeBCTupleSortBy {NODE_ID, BOUNDARY_ID, UNSORTED};
+  std::vector<NodeBCTuple> build_node_list(NodeBCTupleSortBy sort_by = NodeBCTupleSortBy::NODE_ID) const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
@@ -708,9 +623,16 @@ public:
    * As above, but the library creates and fills in a vector of
    * (elem-id, side-id, bc-id) triplets and returns it to the user,
    * taking advantage of guaranteed RVO.
+   *
+   * The returned vector is sorted by element id by default, but this
+   * can be changed by passing SIDE_ID, BOUNDARY_ID, or UNSORTED to
+   * this function. Note: choosing UNSORTED is not recommended since
+   * the resulting list will potentially be in different orders on
+   * different processors when running in parallel.
    */
   typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> BCTuple;
-  std::vector<BCTuple> build_side_list() const;
+  enum class BCTupleSortBy {ELEM_ID, SIDE_ID, BOUNDARY_ID, UNSORTED};
+  std::vector<BCTuple> build_side_list(BCTupleSortBy sort_by = BCTupleSortBy::ELEM_ID) const;
 
   /**
    * Creates a list of active element numbers, sides, and ids for those sides.

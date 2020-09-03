@@ -54,6 +54,12 @@ private:
 public:
   void setUp() {
     elem.set_id() = 0;
+#ifdef LIBMESH_ENABLE_AMR
+    // Do tests with an Elem having a non-default p_level to ensure
+    // that sides which are built have a matching p_level. p-refinement
+    // is only avaiable if LIBMESH_ENABLE_AMR is defined.
+    elem.set_p_level(1);
+#endif
     Point dummy;
     for (auto i : elem.node_index_range())
       {
@@ -66,7 +72,7 @@ public:
 
   void testIsNodeOnSide()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
         for (auto n : elem.node_index_range())
@@ -94,7 +100,7 @@ public:
 
   void testNodesOnSide()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
         std::vector<unsigned int> side_nodes = elem.nodes_on_side(s);
@@ -118,7 +124,7 @@ public:
 
   void testSidePtr()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.side_ptr(s);
 
@@ -131,7 +137,7 @@ public:
   {
     std::unique_ptr<Elem> side;
 
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         elem.side_ptr(side, s);
 
@@ -142,11 +148,17 @@ public:
 
   void testBuildSidePtr()
   {
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
 
         CPPUNIT_ASSERT(side->type() == side_type);
+        CPPUNIT_ASSERT(side->subdomain_id() == elem.subdomain_id());
+
+#ifdef LIBMESH_ENABLE_AMR
+        // p-refinement is only avaiable if LIBMESH_ENABLE_AMR is defined.
+        CPPUNIT_ASSERT(side->p_level() == elem.p_level());
+#endif
       }
   }
 
@@ -154,7 +166,7 @@ public:
   {
     std::unique_ptr<Elem> side;
 
-    for (auto s : IntRange<unsigned short>(indexbegin, indexend))
+    for (auto s : make_range(indexbegin, indexend))
       {
         elem.build_side_ptr(side, s);
         std::unique_ptr<Elem> side_new = elem.build_side_ptr(s);

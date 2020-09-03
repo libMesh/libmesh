@@ -134,6 +134,12 @@ Tri6::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+Tri6::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
+}
+
 bool Tri6::has_affine_map() const
 {
   // Make sure edges are straight
@@ -201,22 +207,7 @@ unsigned int Tri6::local_side_node(unsigned int side,
 std::unique_ptr<Elem> Tri6::build_side_ptr (const unsigned int i,
                                             bool proxy)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (proxy)
-    return libmesh_make_unique<Side<Edge3,Tri6>>(this,i);
-
-  else
-    {
-      std::unique_ptr<Elem> edge = libmesh_make_unique<Edge3>();
-      edge->subdomain_id() = this->subdomain_id();
-
-      // Set the nodes
-      for (auto n : edge->node_index_range())
-        edge->set_node(n) = this->node_ptr(Tri6::side_nodes_map[i][n]);
-
-      return edge;
-    }
+  return this->simple_build_side_ptr<Edge3, Tri6>(i, proxy);
 }
 
 

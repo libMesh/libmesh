@@ -530,6 +530,7 @@ public:
    * is vector-valued or not.
    */
   virtual void print_phi(std::ostream & os) const =0;
+  virtual void print_dual_phi(std::ostream & os) const =0;
 
   /**
    * Prints the value of each shape function's derivative
@@ -537,6 +538,7 @@ public:
    * depends on whether the element is vector-valued or not.
    */
   virtual void print_dphi(std::ostream & os) const =0;
+  virtual void print_dual_dphi(std::ostream & os) const =0;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -546,6 +548,7 @@ public:
    * depends on whether the element is vector-valued or not.
    */
   virtual void print_d2phi(std::ostream & os) const =0;
+  virtual void print_dual_d2phi(std::ostream & os) const =0;
 
 #endif
 
@@ -569,11 +572,18 @@ public:
    * request phi calculations
    */
   virtual void request_phi() const = 0;
+  virtual void request_dual_phi() const = 0;
 
   /**
    * request dphi calculations
    */
   virtual void request_dphi() const = 0;
+  virtual void request_dual_dphi() const = 0;
+
+  /**
+   * set calculate_dual as needed
+   */
+  void set_calculate_dual(const bool val){calculate_dual = val; }
 
 protected:
 
@@ -604,6 +614,11 @@ protected:
    * Then all get_* functions should already have been called.
    */
   mutable bool calculations_started;
+
+  /**
+   * Are we calculating dual basis?
+   */
+  mutable bool calculate_dual;
 
   /**
    * Are we potentially deliberately calculating nothing?

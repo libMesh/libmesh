@@ -224,14 +224,14 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
   //-----------------------------------------------------------------------------
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
-  if (nonlinear_solver->jacobian && nonlinear_solver->jacobian_object)
-    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Jacobian!");
+  libmesh_error_msg_if(nonlinear_solver->jacobian && nonlinear_solver->jacobian_object,
+                       "ERROR: cannot specify both a function and object to compute the Jacobian!");
 
-  if (nonlinear_solver->residual && nonlinear_solver->residual_object)
-    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Residual!");
+  libmesh_error_msg_if(nonlinear_solver->residual && nonlinear_solver->residual_object,
+                       "ERROR: cannot specify both a function and object to compute the Residual!");
 
-  if (nonlinear_solver->matvec && nonlinear_solver->residual_and_jacobian_object)
-    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
+  libmesh_error_msg_if(nonlinear_solver->matvec && nonlinear_solver->residual_and_jacobian_object,
+                       "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
 
   if (get_jacobian)

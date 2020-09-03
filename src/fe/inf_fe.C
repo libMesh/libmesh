@@ -31,6 +31,21 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/type_tensor.h"
 
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+namespace {
+  // Put this outside a templated class, so we only get 1 warning
+  // during our unit tests, not 1 warning for each of the zillion FE
+  // specializations we test.
+  void inffe_hessian_warning () {
+    libmesh_warning("Warning: Second derivatives for Infinite elements"
+                    << " are not yet implemented!"
+                    << std::endl);
+  }
+}
+#endif
+
+
 namespace libMesh
 {
 
@@ -318,6 +333,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
     }
 
+  if (this->calculate_dual)
+    libmesh_not_implemented_msg("Dual shape support for infinite elements is "
+                                "not currently implemented");
 }
 
 
@@ -435,13 +453,11 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
     _radial_shape_index.resize(_n_total_approx_sf);
     _base_shape_index.resize(_n_total_approx_sf);
 
-    const ElemType inf_elem_type = inf_elem->type();
-
     // fill the shape index map
     for (unsigned int n=0; n<_n_total_approx_sf; ++n)
       {
         compute_shape_indices (this->fe_type,
-                               inf_elem_type,
+                               inf_elem,
                                n,
                                _base_shape_index[n],
                                _radial_shape_index[n]);
@@ -512,9 +528,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
     dphixr.resize   (_n_total_approx_sf);
     dphixr_sq.resize(_n_total_approx_sf);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    libmesh_warning("Warning: Second derivatives for Infinite elements"
-                    << " are not yet implemented!"
-                    << std::endl);
+    inffe_hessian_warning();
 
     d2phi.resize     (_n_total_approx_sf);
     d2phidx2.resize  (_n_total_approx_sf);

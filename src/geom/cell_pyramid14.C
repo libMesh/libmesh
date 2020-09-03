@@ -61,7 +61,17 @@ const unsigned int Pyramid14::edge_nodes_map[Pyramid14::num_edges][Pyramid14::no
     {3, 4, 12}  // Edge 7
   };
 
-
+const unsigned int Pyramid14::edge_sides_map[Pyramid14::num_edges][2] =
+  {
+    {0, 4}, // Edge 0
+    {1, 4}, // Edge 1
+    {2, 4}, // Edge 2
+    {3, 4}, // Edge 3
+    {0, 3}, // Edge 4
+    {0, 1}, // Edge 5
+    {1, 2}, // Edge 6
+    {2, 3}  // Edge 7
+  };
 
 // ------------------------------------------------------------
 // Pyramid14 class member functions
@@ -110,6 +120,13 @@ Pyramid14::nodes_on_side(const unsigned int s) const
   libmesh_assert_less(s, n_sides());
   auto trim = (s == 4) ? 0 : 3;
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
+}
+
+std::vector<unsigned>
+Pyramid14::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
 bool Pyramid14::is_node_on_edge(const unsigned int n,
@@ -192,6 +209,7 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
 {
   libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> face;
   if (proxy)
     {
       switch (i)
@@ -200,10 +218,16 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
         case 1:
         case 2:
         case 3:
-          return libmesh_make_unique<Side<Tri6,Pyramid14>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Tri6,Pyramid14>>(this,i);
+            break;
+          }
 
         case 4:
-          return libmesh_make_unique<Side<Quad9,Pyramid14>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Quad9,Pyramid14>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -212,9 +236,6 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> face;
-
       switch (i)
         {
         case 0: // triangular face 1
@@ -234,14 +255,18 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Pyramid14::side_nodes_map[i][n]);
-
-      return face;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 

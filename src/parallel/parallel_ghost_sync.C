@@ -61,4 +61,31 @@ void SyncNodalPositions::act_on_data (const std::vector<dof_id_type> & ids,
     } // end for
 } // act_on_data()
 
+
+SyncSubdomainIds::SyncSubdomainIds(MeshBase & m)
+  : mesh(m)
+{}
+
+void SyncSubdomainIds::gather_data (const std::vector<dof_id_type> & ids,
+                                        std::vector<datum> & ids_out) const
+{
+  ids_out.reserve(ids.size());
+
+  for (const auto & id : ids)
+    {
+      Elem & elem = mesh.elem_ref(id);
+      ids_out.push_back(elem.subdomain_id());
+    }
+}
+
+void SyncSubdomainIds::act_on_data (const std::vector<dof_id_type> & ids,
+                              const std::vector<datum> & subdomain_ids) const
+{
+  for (auto i : index_range(ids))
+    {
+      Elem & elem = mesh.elem_ref(ids[i]);
+      elem.subdomain_id()=subdomain_ids[i];
+    }
+}
+
 } // namespace

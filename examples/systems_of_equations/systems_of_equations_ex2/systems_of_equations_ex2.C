@@ -35,12 +35,6 @@
 // a more detailed time history, or compute more timesteps, that is certainly
 // possible by changing the n_timesteps and dt variables below.
 
-// C++ include files that we need
-#include <iostream>
-#include <algorithm>
-#include <sstream>
-#include <math.h>
-
 // Basic include file needed for the mesh functionality.
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
@@ -64,6 +58,13 @@
 #include "libmesh/const_function.h"
 #include "libmesh/parsed_function.h"
 #include "libmesh/enum_solver_package.h"
+
+// C++ includes
+#include <iostream>
+#include <algorithm>
+#include <sstream>
+#include <functional>
+#include <array>
 
 // For systems of equations the DenseSubMatrix
 // and DenseSubVector provide convenient ways for
@@ -311,8 +312,7 @@ int main (int argc, char** argv)
         } // end nonlinear loop
 
       // Don't keep going if we failed to converge.
-      if (!converged)
-        libmesh_error_msg("Error: Newton iterations failed to converge!");
+      libmesh_error_msg_if(!converged, "Error: Newton iterations failed to converge!");
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out every nth timestep to file.
@@ -428,6 +428,16 @@ void assemble_stokes (EquationSystems & es,
     Fv(Fe),
     Fp(Fe);
 
+  // References to momentum equation right hand sides
+  std::reference_wrapper<DenseSubVector<Number>> F[2] = {Fu, Fv};
+
+  // References to velocity-velocity coupling blocks
+  std::reference_wrapper<DenseSubMatrix<Number>> K[2][2] = {{Kuu, Kuv}, {Kvu, Kvv}};
+
+  // References to velocity-pressure coupling blocks
+  std::reference_wrapper<DenseSubMatrix<Number>> B[2] = {Kup, Kvp};
+  std::reference_wrapper<DenseSubMatrix<Number>> BT[2] = {Kpu, Kpv};
+
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
@@ -532,88 +542,69 @@ void assemble_stokes (EquationSystems & es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Values to hold the solution & its gradient at the previous timestep.
-          Number u = 0., u_old = 0.;
-          Number v = 0., v_old = 0.;
+          NumberVectorValue U_old;
+          NumberVectorValue U;
           Number p_old = 0.;
-          Gradient grad_u, grad_u_old;
-          Gradient grad_v, grad_v_old;
+
+          // {grad_u, grad_v}, initialized to zero
+          std::array<Gradient, 2> grad_uv{};
+
+          // {grad_u_old, grad_v_old}, initialized to zero
+          std::array<Gradient, 2> grad_uv_old{};
 
           // Compute the velocity & its gradient from the previous timestep
           // and the old Newton iterate.
           for (unsigned int l=0; l<n_u_dofs; l++)
             {
               // From the old timestep:
-              u_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_u[l]);
-              v_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_v[l]);
-              grad_u_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_u[l]));
-              grad_v_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
+              U_old(0) += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_u[l]);
+              U_old(1) += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_v[l]);
+              grad_uv_old[0].add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_u[l]));
+              grad_uv_old[1].add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
 
               // From the previous Newton iterate:
-              u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]);
-              v += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
-              grad_u.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
-              grad_v.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
+              U(0) += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]);
+              U(1) += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
+              grad_uv[0].add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
+              grad_uv[1].add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
             }
 
           // Compute the old pressure value at this quadrature point.
           for (unsigned int l=0; l<n_p_dofs; l++)
             p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
 
-          // Definitions for convenience.  It is sometimes simpler to do a
-          // dot product if you have the full vector at your disposal.
-          const NumberVectorValue U_old (u_old, v_old);
-          const NumberVectorValue U     (u,     v);
-          const Number u_x = grad_u(0);
-          const Number u_y = grad_u(1);
-          const Number v_x = grad_v(0);
-          const Number v_y = grad_v(1);
-
           // First, an i-loop over the velocity degrees of freedom.
           // We know that n_u_dofs == n_v_dofs so we can compute contributions
           // for both at the same time.
           for (unsigned int i=0; i<n_u_dofs; i++)
             {
-              Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            // mass-matrix term
-                                (1.-theta)*dt*(U_old*grad_u_old)*phi[i][qp] + // convection term
-                                (1.-theta)*dt*p_old*dphi[i][qp](0)  -         // pressure term on rhs
-                                (1.-theta)*dt*nu*(grad_u_old*dphi[i][qp]) +   // diffusion term on rhs
-                                theta*dt*(U*grad_u)*phi[i][qp]);              // Newton term
-
-
-              Fv(i) += JxW[qp]*(v_old*phi[i][qp] -                             // mass-matrix term
-                                (1.-theta)*dt*(U_old*grad_v_old)*phi[i][qp] +  // convection term
-                                (1.-theta)*dt*p_old*dphi[i][qp](1) -           // pressure term on rhs
-                                (1.-theta)*dt*nu*(grad_v_old*dphi[i][qp]) +    // diffusion term on rhs
-                                theta*dt*(U*grad_v)*phi[i][qp]);               // Newton term
-
-
-              // Note that the Fp block is identically zero unless we are using
-              // some kind of artificial compressibility scheme...
+              for (unsigned int k=0; k<2; ++k)
+                F[k](i) += JxW[qp] *
+                  (U_old(k) * phi[i][qp] -                                   // mass-matrix term
+                   (1.-theta) * dt * (U_old * grad_uv_old[k]) * phi[i][qp] + // convection term
+                   (1.-theta) * dt * p_old * dphi[i][qp](k) -                // pressure term on rhs
+                   (1.-theta) * dt * nu * (grad_uv_old[k] * dphi[i][qp]) +   // diffusion term on rhs
+                   theta * dt * (U * grad_uv[k]) * phi[i][qp]);              // Newton term
 
               // Matrix contributions for the uu and vv couplings.
               for (unsigned int j=0; j<n_u_dofs; j++)
-                {
-                  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                  // mass matrix term
-                                       theta*dt*nu*(dphi[i][qp]*dphi[j][qp]) +  // diffusion term
-                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +    // convection term
-                                       theta*dt*u_x*phi[i][qp]*phi[j][qp]);     // Newton term
+                for (unsigned int k=0; k<2; ++k)
+                  for (unsigned int l=0; l<2; ++l)
+                    {
+                      // "Diagonal" contribution
+                      if (k==l)
+                        K[k][k](i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                  // mass matrix term
+                                                 theta*dt*nu*(dphi[i][qp]*dphi[j][qp]) +  // diffusion term
+                                                 theta*dt*(U*dphi[j][qp])*phi[i][qp]);    // convection term
 
-                  Kuv(i,j) += JxW[qp]*theta*dt*u_y*phi[i][qp]*phi[j][qp];       // Newton term
-
-                  Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                  // mass matrix term
-                                       theta*dt*nu*(dphi[i][qp]*dphi[j][qp]) +  // diffusion term
-                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +    // convection term
-                                       theta*dt*v_y*phi[i][qp]*phi[j][qp]);     // Newton term
-
-                  Kvu(i,j) += JxW[qp]*theta*dt*v_x*phi[i][qp]*phi[j][qp];       // Newton term
-                }
+                      // Newton term
+                      K[k][l](i,j) += JxW[qp] * theta * dt * grad_uv[k](l) * phi[i][qp] * phi[j][qp];
+                    }
 
               // Matrix contributions for the up and vp couplings.
               for (unsigned int j=0; j<n_p_dofs; j++)
-                {
-                  Kup(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](0));
-                  Kvp(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](1));
-                }
+                for (unsigned int k=0; k<2; ++k)
+                  B[k](i,j) += JxW[qp] * -theta * dt * psi[j][qp] * dphi[i][qp](k);
             }
 
           // Now an i-loop over the pressure degrees of freedom.  This code computes
@@ -622,10 +613,8 @@ void assemble_stokes (EquationSystems & es,
           // negative one.  Here we do not.
           for (unsigned int i=0; i<n_p_dofs; i++)
             for (unsigned int j=0; j<n_u_dofs; j++)
-              {
-                Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-              }
+              for (unsigned int k=0; k<2; ++k)
+                BT[k](i,j) += JxW[qp] * psi[i][qp] * dphi[j][qp](k);
         } // end of the quadrature point qp-loop
 
 

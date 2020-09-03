@@ -149,6 +149,8 @@ public:
    */
   virtual void side_ptr (std::unique_ptr<Elem> & side, const unsigned int i) override;
 
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
+
 protected:
 
   /**

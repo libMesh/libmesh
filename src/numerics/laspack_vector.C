@@ -204,7 +204,7 @@ void LaspackVector<T>::add (const T a, const NumericVector<T> & v_in)
   libmesh_assert(v);
   libmesh_assert_equal_to (this->size(), v->size());
 
-  for (auto i : IntRange<numeric_index_type>(0, v->size()))
+  for (auto i : make_range(v->size()))
     this->add (i, a*(*v)(i));
 
 #ifndef NDEBUG

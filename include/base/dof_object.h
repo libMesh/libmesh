@@ -146,9 +146,16 @@ public:
   unique_id_type unique_id () const;
 
   /**
-   * \returns The globally \p unique_id for this \p DofObject as a writable reference.
+   * \returns The globally \p unique_id for this \p DofObject as a
+   * writable reference.  Deprecated; use the API taking an input
+   * instead.
    */
   unique_id_type & set_unique_id ();
+
+  /**
+   * Sets the \p unique_id for this \p DofObject
+   */
+  void set_unique_id (unique_id_type new_id);
 
   /**
    * Sets the \p id for this \p DofObject
@@ -468,12 +475,9 @@ public:
    */
   void print_dof_info() const;
 
-  // Deep copy (or almost-copy) of DofObjects is now deprecated in
-  // derived classes; we keep these methods around solely for a couple
+  // Deep copy (or almost-copy) of DofObjects is solely for a couple
   // tricky internal uses.
-#ifndef LIBMESH_ENABLE_DEPRECATED
 private:
-#endif
 
   /**
    * "Copy"-constructor.  Does not copy old_dof_object, but leaves it
@@ -485,8 +489,6 @@ private:
    * Deep-copying assignment operator
    */
   DofObject & operator= (const DofObject & dof_obj);
-
-private:
 
   /**
    * Utility function - for variable \p var in system \p s, figure out what
@@ -693,14 +695,14 @@ void DofObject::invalidate_dofs (const unsigned int sys_num)
   // If the user does not specify the system number...
   if (sys_num >= n_sys)
     {
-      for (auto s : IntRange<unsigned int>(0, n_sys))
-        for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(s)))
+      for (auto s : make_range(n_sys))
+        for (auto vg : make_range(this->n_var_groups(s)))
           if (this->n_comp_group(s,vg))
             this->set_vg_dof_base(s,vg,invalid_id);
     }
   // ...otherwise invalidate the dofs for all systems
   else
-    for (auto vg : IntRange<unsigned int>(0, this->n_var_groups(sys_num)))
+    for (auto vg : make_range(this->n_var_groups(sys_num)))
       if (this->n_comp_group(sys_num,vg))
         this->set_vg_dof_base(sys_num,vg,invalid_id);
 }
@@ -751,7 +753,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 
   // Count all variables
   if (var == libMesh::invalid_uint)
-    for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
+    for (auto v : make_range(this->n_vars(s)))
       num += this->n_comp(s,v);
 
   // Only count specified variable
@@ -797,8 +799,22 @@ inline
 unique_id_type & DofObject::set_unique_id ()
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
+  libmesh_deprecated();
   return _unique_id;
 #else
+  libmesh_not_implemented();
+#endif
+}
+
+
+
+inline
+void DofObject::set_unique_id (unique_id_type new_id)
+{
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _unique_id = new_id;
+#else
+  libmesh_ignore(new_id);
   libmesh_not_implemented();
 #endif
 }
@@ -1139,7 +1155,7 @@ bool DofObject::has_dofs (const unsigned int sys) const
 {
   if (sys == libMesh::invalid_uint)
     {
-      for (auto s : IntRange<unsigned int>(0, this->n_systems()))
+      for (auto s : make_range(this->n_systems()))
         if (this->n_vars(s))
           return true;
     }

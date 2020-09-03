@@ -281,6 +281,22 @@ public:
   virtual void add (const T a, const SparseMatrix<T> & X) = 0;
 
   /**
+   * Compute Y = A*X for matrix \p X.
+   */
+  virtual void matrix_matrix_mult (SparseMatrix<T> & /*X*/, SparseMatrix<T> & /*Y*/)
+  { libmesh_not_implemented(); }
+
+  /**
+   * Add \p scalar* \p spm to the rows and cols of this matrix (A):
+   * A(rows[i], cols[j]) += scalar * spm(i,j)
+   */
+  virtual void add_sparse_matrix (const SparseMatrix<T> & /*spm*/,
+                                  const std::map<numeric_index_type, numeric_index_type> & /*rows*/,
+                                  const std::map<numeric_index_type, numeric_index_type> & /*cols*/,
+                                  const T /*scalar*/)
+  { libmesh_not_implemented(); }
+
+  /**
    * \returns A copy of matrix entry \p (i,j).
    *
    * \note This may be an expensive operation, and you should always

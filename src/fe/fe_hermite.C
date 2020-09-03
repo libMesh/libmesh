@@ -35,8 +35,7 @@ namespace {
 void hermite_nodal_soln(const Elem * elem,
                         const Order order,
                         const std::vector<Number> & elem_soln,
-                        std::vector<Number> &       nodal_soln,
-                        unsigned Dim)
+                        std::vector<Number> & nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -44,14 +43,11 @@ void hermite_nodal_soln(const Elem * elem,
 
   nodal_soln.resize(n_nodes);
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
-
   // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(totalorder, HERMITE);
+  FEType fe_type(order, HERMITE);
 
   const unsigned int n_sf =
-    // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-    FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+    FEInterface::n_shape_functions(fe_type, elem);
 
   std::vector<Point> refspace_nodes;
   FEBase::get_refspace_nodes(elem_type,refspace_nodes);
@@ -67,8 +63,7 @@ void hermite_nodal_soln(const Elem * elem,
       // u_i = Sum (alpha_i phi_i)
       for (unsigned int i=0; i<n_sf; i++)
         nodal_soln[n] += elem_soln[i] *
-          // FE<Dim,T>::shape(elem, order, i, mapped_point);
-          FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+          FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
     }
 } // hermite_nodal_soln()
 
@@ -77,8 +72,7 @@ void hermite_nodal_soln(const Elem * elem,
 unsigned int hermite_n_dofs(const ElemType t, const Order o)
 {
 #ifdef DEBUG
-  if (o < 3)
-    libmesh_error_msg("Error: Hermite elements require order>=3, but you asked for order=" << o);
+  libmesh_error_msg_if(o < 3, "Error: Hermite elements require order>=3, but you asked for order=" << o);
 #endif
 
   // Piecewise (bi/tri)cubic C1 Hermite splines
@@ -289,28 +283,28 @@ void FE<0,HERMITE>::nodal_soln(const Elem * elem,
                                const Order order,
                                const std::vector<Number> & elem_soln,
                                std::vector<Number> & nodal_soln)
-{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
+{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<1,HERMITE>::nodal_soln(const Elem * elem,
                                const Order order,
                                const std::vector<Number> & elem_soln,
                                std::vector<Number> & nodal_soln)
-{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
+{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<2,HERMITE>::nodal_soln(const Elem * elem,
                                const Order order,
                                const std::vector<Number> & elem_soln,
                                std::vector<Number> & nodal_soln)
-{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
+{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<3,HERMITE>::nodal_soln(const Elem * elem,
                                const Order order,
                                const std::vector<Number> & elem_soln,
                                std::vector<Number> & nodal_soln)
-{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
+{ hermite_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 
 

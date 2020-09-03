@@ -15,9 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh/checkpoint_io.h"
-
 // Local includes
+#include "libmesh/checkpoint_io.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
@@ -112,18 +111,18 @@ void make_dir(const std::string & input_name, libMesh::processor_id_type n_procs
 {
   auto ret = libMesh::Utility::mkdir(input_name.c_str());
   // error only if we failed to create dir - don't care if it was already there
-  if (ret != 0 && ret != -1)
-    libmesh_error_msg(
-        "Failed to create mesh split directory '" << input_name << "': " << std::strerror(ret));
+  libmesh_error_msg_if
+    (ret != 0 && ret != -1,
+     "Failed to create mesh split directory '" << input_name << "': " << std::strerror(ret));
 
   auto dir_name = split_dir(input_name, n_procs);
   ret = libMesh::Utility::mkdir(dir_name.c_str());
   if (ret == -1)
     libmesh_warning("In CheckpointIO::write, directory '"
                     << dir_name << "' already exists, overwriting contents.");
-  else if (ret != 0)
-    libmesh_error_msg(
-        "Failed to create mesh split directory '" << dir_name << "': " << std::strerror(ret));
+  else
+    libmesh_error_msg_if
+      (ret != 0, "Failed to create mesh split directory '" << dir_name << "': " << std::strerror(ret));
 }
 
 } // namespace
@@ -201,15 +200,13 @@ processor_id_type CheckpointIO::select_split_config(const std::string & input_na
             auto orig_header_name = header_name;
             header_name = header_file(input_name, 1);
             std::ifstream in2 (header_name.c_str());
-            if (!in2.good())
-              {
-                libmesh_error_msg("ERROR: Neither one of the following files can be located:\n\t'"
-                                  << orig_header_name << "' nor\n\t'" << input_name << "'\n"
-                                  << "If you are running a parallel job, double check that you've "
-                                  << "created a split for " << _my_n_processors << " ranks.\n"
-                                  << "Note: One of paths above may refer to a valid directory on your "
-                                  << "system, however we are attempting to read a valid header file.");
-              }
+            libmesh_error_msg_if(!in2.good(),
+                                 "ERROR: Neither one of the following files can be located:\n\t'"
+                                 << orig_header_name << "' nor\n\t'" << input_name << "'\n"
+                                 << "If you are running a parallel job, double check that you've "
+                                 << "created a split for " << _my_n_processors << " ranks.\n"
+                                 << "Note: One of paths above may refer to a valid directory on your "
+                                 << "system, however we are attempting to read a valid header file.");
           }
       }
 
@@ -838,8 +835,7 @@ void CheckpointIO::read (const std::string & input_name)
           {
             std::ifstream in (file_name.c_str());
 
-            if (!in.good())
-              libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name);
+            libmesh_error_msg_if(!in.good(), "ERROR: cannot locate specified file:\n\t" << file_name);
           }
 
           // Do we expect all our files' remote_elem entries to really
@@ -1098,7 +1094,7 @@ void CheckpointIO::read_nodes (Xdr & io)
             mesh.add_point(p, id, pid);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          node->set_unique_id() = unique_id;
+          node->set_unique_id(unique_id);
 #endif
 
           libmesh_assert_equal_to(n_extra_integers, node->n_extra_integers());
@@ -1241,7 +1237,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
           auto elem = Elem::build(elem_type, parent);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          elem->set_unique_id() = unique_id;
+          elem->set_unique_id(unique_id);
 #endif
 
           if (elem->dim() > highest_elem_dim)

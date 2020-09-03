@@ -691,7 +691,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       elem->processor_id()  = processor_id;
       elem->set_id()        = id;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      elem->set_unique_id() = unique_id;
+      elem->set_unique_id(unique_id);
 #endif
 
       // Assign the connectivity

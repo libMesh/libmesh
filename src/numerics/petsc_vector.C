@@ -674,46 +674,51 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   PetscVector<T> * v_local = cast_ptr<PetscVector<T> *>(&v_local_in);
 
   libmesh_assert(v_local);
+  // v_local_in should be closed
+  libmesh_assert(v_local->closed());
   libmesh_assert_equal_to (v_local->size(), this->size());
+  // 1) v_local_in is a large vector to hold the whole world
+  // 2) v_local_in is a ghosted vector
+  // 3) v_local_in is a parallel vector
+  // Cases 2) and 3) should be scalable
+  libmesh_assert(this->size()==v_local->local_size() || this->local_size()==v_local->local_size());
 
   PetscErrorCode ierr = 0;
-  const PetscInt n = this->size();
 
-  IS is;
-  VecScatter scatter;
+  if (v_local->type() == SERIAL && this->size() == v_local->local_size())
+  {
+    VecScatter scatter;
 
-  // Create idx, idx[i] = i;
-  std::vector<PetscInt> idx(n);
-  std::iota (idx.begin(), idx.end(), 0);
-
-  // Create the index set & scatter object
-  ierr = ISCreateGeneral(this->comm().get(), n, idx.data(), PETSC_USE_POINTER, &is);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = VecScatterCreate(_vec,          is,
-                          v_local->_vec, is,
-                          &scatter);
-  LIBMESH_CHKERR(ierr);
-
-  // Perform the scatter
-  ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
-                         INSERT_VALUES, SCATTER_FORWARD);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = VecScatterEnd  (scatter, _vec, v_local->_vec,
-                         INSERT_VALUES, SCATTER_FORWARD);
-  LIBMESH_CHKERR(ierr);
-
-  // Clean up
-  ierr = ISDestroy (&is);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = VecScatterDestroy(&scatter);
-  LIBMESH_CHKERR(ierr);
+    ierr = VecScatterCreateToAll(_vec,&scatter,NULL);
+    LIBMESH_CHKERR(ierr);
+    ierr = VecScatterBegin(scatter,_vec,v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
+    LIBMESH_CHKERR(ierr);
+    ierr = VecScatterEnd(scatter,_vec,v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
+    LIBMESH_CHKERR(ierr);
+    ierr = VecScatterDestroy(&scatter);
+    LIBMESH_CHKERR(ierr);
+  }
+  // Two vectors have the same size, and we should just do a simple copy.
+  // v_local could be either a parallel or ghosted vector
+  else if (this->local_size() == v_local->local_size())
+  {
+    ierr = VecCopy(_vec,v_local->_vec);
+    LIBMESH_CHKERR(ierr);
+  }
+  else
+  {
+    libmesh_error_msg("Vectors are inconsistent");
+  }
 
   // Make sure ghost dofs are up to date
   if (v_local->type() == GHOSTED)
-    v_local->close();
+  {
+    // We do not call "close" here to save a global reduction
+    ierr = VecGhostUpdateBegin(v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
+    LIBMESH_CHKERR(ierr);
+    ierr = VecGhostUpdateEnd(v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
+    LIBMESH_CHKERR(ierr);
+  }
 }
 
 
@@ -754,7 +759,7 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
 
   for (numeric_index_type i=0; i<n_sl; i++)
     idx[i] = static_cast<PetscInt>(send_list[i]);
-  for (auto i : IntRange<numeric_index_type>(0, this->local_size()))
+  for (auto i : make_range(this->local_size()))
     idx[n_sl+i] = i + this->first_local_index();
 
   // Create the index set & scatter object
@@ -1450,8 +1455,8 @@ void PetscVector<T>::_get_array(bool read_only) const
 template <typename T>
 void PetscVector<T>::_restore_array() const
 {
-  if (_values_manually_retrieved)
-    libmesh_error_msg("PetscVector values were manually retrieved but are being automatically restored!");
+  libmesh_error_msg_if(_values_manually_retrieved,
+                       "PetscVector values were manually retrieved but are being automatically restored!");
 
 #ifdef LIBMESH_HAVE_CXX11_THREAD
   std::atomic_thread_fence(std::memory_order_acquire);

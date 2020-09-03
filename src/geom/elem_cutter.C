@@ -235,7 +235,7 @@ void ElemCutter::cut_2D (const Elem & elem,
   _inside_mesh_2D->clear();
   _outside_mesh_2D->clear();
 
-  for (auto v : IntRange<unsigned int>(0, elem.n_vertices()))
+  for (auto v : make_range(elem.n_vertices()))
     {
       if (vertex_distance_func[v] >= 0.)
         _outside_mesh_2D->add_point (elem.point(v));
@@ -315,7 +315,7 @@ void ElemCutter::cut_3D (const Elem & elem,
   _inside_mesh_3D->clear();
   _outside_mesh_3D->clear();
 
-  for (auto v : IntRange<unsigned int>(0, elem.n_vertices()))
+  for (auto v : make_range(elem.n_vertices()))
     {
       if (vertex_distance_func[v] >= 0.)
         _outside_mesh_3D->add_point (elem.point(v));

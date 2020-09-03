@@ -16,14 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <iomanip>
-#include <fstream>
-#include <vector>
-
-#include <sys/types.h> // getpid
-#include <unistd.h>
-
 // Local includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
@@ -48,8 +40,14 @@
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/enum_xdr_mode.h"
-
 #include "libmesh/parallel.h" // broadcast
+
+// C++ includes
+#include <iomanip>
+#include <fstream>
+#include <vector>
+#include <sys/types.h> // getpid
+#include <unistd.h>
 
 
 namespace libMesh
@@ -87,17 +85,13 @@ void NameBasedIO::read (const std::string & name)
                 << '.' << std::setfill('0') << std::setw(field_width) << mymesh.processor_id();
 
       std::ifstream in (full_name.str().c_str());
-
-      if (!in.good())
-        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << full_name.str());
+      libmesh_error_msg_if(!in.good(), "ERROR: cannot locate specified file:\n\t" << full_name.str());
     }
   else if (name.rfind(".cp")) {} // Do error checking in the reader
   else
     {
       std::ifstream in (name.c_str());
-
-      if (!in.good())
-        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << name);
+      libmesh_error_msg_if(!in.good(), "ERROR: cannot locate specified file:\n\t" << name);
     }
 
   // Look for parallel formats first
@@ -247,24 +241,27 @@ void NameBasedIO::read (const std::string & name)
                                 << "\n   I understand the following:\n\n" \
                                 << "     *.bext -- Bezier files in DYNA format\n" \
                                 << "     *.bxt  -- Bezier files in DYNA format\n" \
+                                << "     *.cpa  -- libMesh Checkpoint ASCII format\n" \
+                                << "     *.cpr  -- libMesh Checkpoint binary format\n" \
                                 << "     *.e    -- Sandia's ExodusII format\n" \
                                 << "     *.exd  -- Sandia's ExodusII format\n" \
                                 << "     *.gmv  -- LANL's General Mesh Viewer format\n" \
+                                << "     *.inp  -- Abaqus .inp format\n" \
                                 << "     *.mat  -- Matlab triangular ASCII file\n" \
                                 << "     *.n    -- Sandia's Nemesis format\n" \
                                 << "     *.nem  -- Sandia's Nemesis format\n" \
                                 << "     *.off  -- OOGL OFF surface format\n" \
+                                << "     *.ogl  -- OOGL OFF surface format\n" \
+                                << "     *.oogl -- OOGL OFF surface format\n" \
                                 << "     *.ucd  -- AVS's ASCII UCD format\n" \
                                 << "     *.unv  -- I-deas Universal format\n" \
                                 << "     *.vtu  -- Paraview VTK format\n" \
-                                << "     *.inp  -- Abaqus .inp format\n" \
                                 << "     *.xda  -- libMesh ASCII format\n" \
                                 << "     *.xdr  -- libMesh binary format\n" \
                                 << "     *.gz   -- any above format gzipped\n" \
                                 << "     *.bz2  -- any above format bzip2'ed\n" \
                                 << "     *.xz   -- any above format xzipped\n" \
-                                << "     *.cpa  -- libMesh Checkpoint ASCII format\n" \
-                                << "     *.cpr  -- libMesh Checkpoint binary format\n");
+                                );
             }
 
           // If we temporarily decompressed a file, remove the
@@ -356,7 +353,8 @@ void NameBasedIO::write (const std::string & name)
               io.write (new_name);
             }
 
-        else if (new_name.rfind(".e") < new_name.size())
+        else if (new_name.rfind(".exd") < new_name.size() ||
+                 new_name.rfind(".e") < new_name.size())
           ExodusII_IO(mymesh).write(new_name);
 
         else if (new_name.rfind(".unv") < new_name.size())
@@ -390,14 +388,12 @@ void NameBasedIO::write (const std::string & name)
               << "     *.fro   -- ACDL's surface triangulation file\n"
               << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
               << "     *.mesh  -- MEdit mesh format\n"
-              << "     *.mgf   -- MGF binary mesh format\n"
               << "     *.msh   -- GMSH ASCII file\n"
               << "     *.n     -- Sandia's Nemesis format\n"
               << "     *.nem   -- Sandia's Nemesis format\n"
               << "     *.plt   -- Tecplot binary file\n"
               << "     *.poly  -- TetGen ASCII file\n"
               << "     *.ucd   -- AVS's ASCII UCD format\n"
-              << "     *.ugrid -- Kelly's DIVA ASCII format\n"
               << "     *.unv   -- I-deas Universal format\n"
               << "     *.vtu   -- VTK (paraview-readable) format\n"
               << "     *.xda   -- libMesh ASCII format\n"
@@ -448,7 +444,8 @@ void NameBasedIO::write_nodal_data (const std::string & name,
   if (name.rfind(".dat") < name.size())
     TecplotIO(mymesh).write_nodal_data (name, v, vn);
 
-  else if (name.rfind(".e") < name.size())
+  else if (name.rfind(".exd") < name.size() ||
+           name.rfind(".e") < name.size())
     ExodusII_IO(mymesh).write_nodal_data(name, v, vn);
 
   else if (name.rfind(".gmv") < name.size())

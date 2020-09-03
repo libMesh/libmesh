@@ -35,7 +35,7 @@ public:
 
   void testSetId()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.set_id(1);
     CPPUNIT_ASSERT_EQUAL( static_cast<dof_id_type>(1) , aobject.id() );
@@ -43,7 +43,7 @@ public:
 
   void testValidId()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.set_id(1);
     CPPUNIT_ASSERT( aobject.valid_id() );
@@ -54,7 +54,7 @@ public:
 
   void testInvalidateId()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.set_id(1);
     aobject.invalidate_id();
@@ -64,7 +64,7 @@ public:
 
   void testSetProcId()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.processor_id(libMesh::global_processor_id());
     CPPUNIT_ASSERT_EQUAL( (processor_id_type)libMesh::global_processor_id() , aobject.processor_id() );
@@ -72,7 +72,7 @@ public:
 
   void testValidProcId()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.processor_id(libMesh::global_processor_id());
     CPPUNIT_ASSERT(aobject.valid_processor_id());
@@ -83,7 +83,7 @@ public:
 
   void testInvalidateProcId()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.processor_id(libMesh::global_processor_id());
     aobject.invalidate_processor_id();
@@ -93,7 +93,7 @@ public:
 
   void testSetNSystems()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.set_n_systems (10);
 
@@ -102,7 +102,7 @@ public:
 
   void testSetNVariableGroups()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.set_n_systems (2);
 
@@ -127,7 +127,7 @@ public:
 
   void testAddExtraData()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.add_extra_integers (9);
 
@@ -174,7 +174,7 @@ public:
 
   void testAddSystemExtraInts()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.add_extra_integers (1);
 
@@ -242,7 +242,7 @@ public:
 
   void testSetNSystemsExtraInts()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.add_extra_integers (5);
 
@@ -291,7 +291,7 @@ public:
 
   void testSetNVariableGroupsExtraInts()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.set_n_systems (2);
 
@@ -331,7 +331,7 @@ public:
 
   void testManualDofCalculation()
   {
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
 
     aobject.set_n_systems (2);
 
@@ -375,7 +375,7 @@ public:
   {
     // For more information on this bug, see the following email thread:
     // https://sourceforge.net/p/libmesh/mailman/libmesh-users/thread/50C8EE7C.8090405@gmail.com/
-    DofObject aobject(*instance);
+    DofObject & aobject(*instance);
     dof_id_type buf0[] = {2, 8, 257, 0, 257, 96, 257, 192, 257, 0};
     aobject.set_buffer(std::vector<dof_id_type>(buf0, buf0+10));
 

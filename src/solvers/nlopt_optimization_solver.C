@@ -123,8 +123,8 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
 
   // We'll use current_local_solution below, so let's ensure that it's consistent
   // with the vector x that was passed in.
-  if (sys.solution->size() != n)
-    libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
+  libmesh_error_msg_if(sys.solution->size() != n,
+                       "Error: Input vector x has different length than sys.solution!");
 
   for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
@@ -203,8 +203,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
 
   // We'll use current_local_solution below, so let's ensure that it's consistent
   // with the vector x that was passed in.
-  if (sys.solution->size() != n)
-    libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
+  libmesh_error_msg_if(sys.solution->size() != n, "Error: Input vector x has different length than sys.solution!");
 
   for (auto i : index_range(*sys.solution))
     sys.solution->set(i, x[i]);
@@ -283,8 +282,8 @@ NloptOptimizationSolver<T>::NloptOptimizationSolver (OptimizationSystem & system
   // is configured to use 64-bit indices. We can detect this at
   // configure time, so it should not be possible to actually reach
   // this error message... it's here just in case.
-  if (sizeof(dof_id_type) != sizeof(unsigned int))
-    libmesh_error_msg("The NloptOptimizationSolver should not be used with dof_id_type != unsigned int.");
+  libmesh_error_msg_if(sizeof(dof_id_type) != sizeof(unsigned int),
+                       "The NloptOptimizationSolver should not be used with dof_id_type != unsigned int.");
 }
 
 
@@ -351,8 +350,7 @@ void NloptOptimizationSolver<T>::solve ()
       nlopt_set_min_objective(_opt,
                               __libmesh_nlopt_objective,
                               this);
-    if (ierr < 0)
-      libmesh_error_msg("NLopt failed to set min objective: " << ierr);
+    libmesh_error_msg_if(ierr < 0, "NLopt failed to set min objective: " << ierr);
   }
 
   if (this->lower_and_upper_bounds_object)
@@ -391,8 +389,7 @@ void NloptOptimizationSolver<T>::solve ()
                                        this,
                                        equality_constraints_tolerances.data());
 
-      if (ierr < 0)
-        libmesh_error_msg("NLopt failed to add equality constraint: " << ierr);
+      libmesh_error_msg_if(ierr < 0, "NLopt failed to add equality constraint: " << ierr);
     }
 
   // If we have an inequality constraints object, tell NLopt about it.

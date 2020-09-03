@@ -30,6 +30,7 @@
 #include "libmesh/transient_rb_evaluation.h"
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_scm_evaluation.h"
+#include "libmesh/rb_parametrized_function.h"
 
 // Cap'n'Proto includes
 #include "capnp/serialize.h"
@@ -72,8 +73,7 @@ RBEvaluationDeserialization::RBEvaluationDeserialization(RBEvaluation & rb_eval)
   _rb_eval(rb_eval)
 {}
 
-RBEvaluationDeserialization::~RBEvaluationDeserialization()
-{}
+RBEvaluationDeserialization::~RBEvaluationDeserialization() = default;
 
 void RBEvaluationDeserialization::read_from_file(const std::string & path,
                                                  bool read_error_bound_data)
@@ -81,8 +81,7 @@ void RBEvaluationDeserialization::read_from_file(const std::string & path,
   LOG_SCOPE("read_from_file()", "RBEvaluationDeserialization");
 
   int fd = open(path.c_str(), O_RDONLY);
-  if (!fd)
-    libmesh_error_msg("Couldn't open the buffer file: " + path);
+  libmesh_error_msg_if(!fd, "Couldn't open the buffer file: " + path);
 
   // Turn off the limit to the amount of data we can read in
   capnp::ReaderOptions reader_options;
@@ -109,8 +108,7 @@ void RBEvaluationDeserialization::read_from_file(const std::string & path,
   load_rb_evaluation_data(_rb_eval, rb_eval_reader, read_error_bound_data);
 
   int error = close(fd);
-  if (error)
-    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
+  libmesh_error_msg_if(error, "Error closing a read-only file descriptor: " + path);
 }
 
 // ---- RBEvaluationDeserialization (END) ----
@@ -123,8 +121,7 @@ TransientRBEvaluationDeserialization(TransientRBEvaluation & trans_rb_eval) :
   _trans_rb_eval(trans_rb_eval)
 {}
 
-TransientRBEvaluationDeserialization::~TransientRBEvaluationDeserialization()
-{}
+TransientRBEvaluationDeserialization::~TransientRBEvaluationDeserialization() = default;
 
 void TransientRBEvaluationDeserialization::read_from_file(const std::string & path,
                                                           bool read_error_bound_data)
@@ -132,8 +129,7 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string & pa
   LOG_SCOPE("read_from_file()", "TransientRBEvaluationDeserialization");
 
   int fd = open(path.c_str(), O_RDONLY);
-  if (!fd)
-    libmesh_error_msg("Couldn't open the buffer file: " + path);
+  libmesh_error_msg_if(!fd, "Couldn't open the buffer file: " + path);
 
   // Turn off the limit to the amount of data we can read in
   capnp::ReaderOptions reader_options;
@@ -167,8 +163,7 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string & pa
                                     read_error_bound_data);
 
   int error = close(fd);
-  if (error)
-    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
+  libmesh_error_msg_if(error, "Error closing a read-only file descriptor: " + path);
 }
 
 // ---- TransientRBEvaluationDeserialization (END) ----
@@ -181,16 +176,14 @@ RBEIMEvaluationDeserialization(RBEIMEvaluation & rb_eim_eval) :
   _rb_eim_eval(rb_eim_eval)
 {}
 
-RBEIMEvaluationDeserialization::~RBEIMEvaluationDeserialization()
-{}
+RBEIMEvaluationDeserialization::~RBEIMEvaluationDeserialization() = default;
 
 void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
 {
   LOG_SCOPE("read_from_file()", "RBEIMEvaluationDeserialization");
 
   int fd = open(path.c_str(), O_RDONLY);
-  if (!fd)
-    libmesh_error_msg("Couldn't open the buffer file: " + path);
+  libmesh_error_msg_if(!fd, "Couldn't open the buffer file: " + path);
 
   // Turn off the limit to the amount of data we can read in
   capnp::ReaderOptions reader_options;
@@ -209,22 +202,16 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   RBData::RBEIMEvaluationReal::Reader rb_eim_eval_reader =
     message->getRoot<RBData::RBEIMEvaluationReal>();
-  RBData::RBEvaluationReal::Reader rb_eval_reader =
-    rb_eim_eval_reader.getRbEvaluation();
 #else
   RBData::RBEIMEvaluationComplex::Reader rb_eim_eval_reader =
     message->getRoot<RBData::RBEIMEvaluationComplex>();
-  RBData::RBEvaluationComplex::Reader rb_eval_reader =
-    rb_eim_eval_reader.getRbEvaluation();
 #endif
 
   load_rb_eim_evaluation_data(_rb_eim_eval,
-                              rb_eval_reader,
                               rb_eim_eval_reader);
 
   int error = close(fd);
-  if (error)
-    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
+  libmesh_error_msg_if(error, "Error closing a read-only file descriptor: " + path);
 }
 
 // ---- RBEIMEvaluationDeserialization (END) ----
@@ -241,16 +228,14 @@ RBSCMEvaluationDeserialization(RBSCMEvaluation & rb_scm_eval) :
   _rb_scm_eval(rb_scm_eval)
 {}
 
-RBSCMEvaluationDeserialization::~RBSCMEvaluationDeserialization()
-{}
+RBSCMEvaluationDeserialization::~RBSCMEvaluationDeserialization() = default;
 
 void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
 {
   LOG_SCOPE("read_from_file()", "RBSCMEvaluationDeserialization");
 
   int fd = open(path.c_str(), O_RDONLY);
-  if (!fd)
-    libmesh_error_msg("Couldn't open the buffer file: " + path);
+  libmesh_error_msg_if(!fd, "Couldn't open the buffer file: " + path);
 
   // Turn off the limit to the amount of data we can read in
   capnp::ReaderOptions reader_options;
@@ -273,8 +258,7 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
                               rb_scm_eval_reader);
 
   int error = close(fd);
-  if (error)
-    libmesh_error_msg("Error closing a read-only file descriptor: " + path);
+  libmesh_error_msg_if(error, "Error closing a read-only file descriptor: " + path);
 }
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
@@ -362,8 +346,8 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
         unsigned int Q_f_hat = n_F_terms*(n_F_terms+1)/2;
 
         auto fq_innerprods_list = rb_evaluation_reader.getFqInnerprods();
-        if (fq_innerprods_list.size() != Q_f_hat)
-          libmesh_error_msg("Size error while reading Fq representor norm data from buffer.");
+        libmesh_error_msg_if(fq_innerprods_list.size() != Q_f_hat,
+                             "Size error while reading Fq representor norm data from buffer.");
 
         for (unsigned int i=0; i < Q_f_hat; ++i)
           rb_evaluation.Fq_representor_innerprods[i] = load_scalar_value(fq_innerprods_list[i]);
@@ -372,8 +356,8 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
       // Fq_Aq representor inner-product data
       {
         auto fq_aq_innerprods_list = rb_evaluation_reader.getFqAqInnerprods();
-        if (fq_aq_innerprods_list.size() != n_F_terms*n_A_terms*n_bfs)
-          libmesh_error_msg("Size error while reading Fq-Aq representor norm data from buffer.");
+        libmesh_error_msg_if(fq_aq_innerprods_list.size() != n_F_terms*n_A_terms*n_bfs,
+                             "Size error while reading Fq-Aq representor norm data from buffer.");
 
         for (unsigned int q_f=0; q_f<n_F_terms; ++q_f)
           for (unsigned int q_a=0; q_a<n_A_terms; ++q_a)
@@ -389,8 +373,8 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
       {
         unsigned int Q_a_hat = n_A_terms*(n_A_terms+1)/2;
         auto aq_aq_innerprods_list = rb_evaluation_reader.getAqAqInnerprods();
-        if (aq_aq_innerprods_list.size() != Q_a_hat*n_bfs*n_bfs)
-          libmesh_error_msg("Size error while reading Aq-Aq representor norm data from buffer.");
+        libmesh_error_msg_if(aq_aq_innerprods_list.size() != Q_a_hat*n_bfs*n_bfs,
+                             "Size error while reading Aq-Aq representor norm data from buffer.");
 
         for (unsigned int i=0; i<Q_a_hat; ++i)
           for (unsigned int j=0; j<n_bfs; ++j)
@@ -407,8 +391,8 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
         unsigned int n_outputs = rb_theta_expansion.get_n_outputs();
         auto output_innerprod_outer = rb_evaluation_reader.getOutputDualInnerprods();
 
-        if (output_innerprod_outer.size() != n_outputs)
-          libmesh_error_msg("Incorrect number of outputs detected in the buffer");
+        libmesh_error_msg_if(output_innerprod_outer.size() != n_outputs,
+                             "Incorrect number of outputs detected in the buffer");
 
         for (unsigned int output_id=0; output_id<n_outputs; ++output_id)
           {
@@ -417,8 +401,8 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
             unsigned int Q_l_hat = n_output_terms*(n_output_terms+1)/2;
             auto output_innerprod_inner = output_innerprod_outer[output_id];
 
-            if (output_innerprod_inner.size() != Q_l_hat)
-              libmesh_error_msg("Incorrect number of output terms detected in the buffer");
+            libmesh_error_msg_if(output_innerprod_inner.size() != Q_l_hat,
+                                 "Incorrect number of output terms detected in the buffer");
 
             for (unsigned int q=0; q<Q_l_hat; ++q)
               {
@@ -434,23 +418,23 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
     unsigned int n_outputs = rb_theta_expansion.get_n_outputs();
     auto output_vector_outer = rb_evaluation_reader.getOutputVectors();
 
-    if (output_vector_outer.size() != n_outputs)
-      libmesh_error_msg("Incorrect number of outputs detected in the buffer");
+    libmesh_error_msg_if(output_vector_outer.size() != n_outputs,
+                         "Incorrect number of outputs detected in the buffer");
 
     for (unsigned int output_id=0; output_id<n_outputs; ++output_id)
       {
         unsigned int n_output_terms = rb_theta_expansion.get_n_output_terms(output_id);
 
         auto output_vector_middle = output_vector_outer[output_id];
-        if (output_vector_middle.size() != n_output_terms)
-          libmesh_error_msg("Incorrect number of output terms detected in the buffer");
+        libmesh_error_msg_if(output_vector_middle.size() != n_output_terms,
+                             "Incorrect number of output terms detected in the buffer");
 
         for (unsigned int q_l=0; q_l<n_output_terms; ++q_l)
           {
             auto output_vectors_inner_list = output_vector_middle[q_l];
 
-            if (output_vectors_inner_list.size() != n_bfs)
-              libmesh_error_msg("Incorrect number of output terms detected in the buffer");
+            libmesh_error_msg_if(output_vectors_inner_list.size() != n_bfs,
+                                 "Incorrect number of output terms detected in the buffer");
 
             for (unsigned int j=0; j<n_bfs; ++j)
               {
@@ -464,14 +448,14 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
   // Fq vectors and Aq matrices
   {
     auto rb_fq_vectors_outer_list = rb_evaluation_reader.getRbFqVectors();
-    if (rb_fq_vectors_outer_list.size() != n_F_terms)
-      libmesh_error_msg("Incorrect number of Fq vectors detected in the buffer");
+    libmesh_error_msg_if(rb_fq_vectors_outer_list.size() != n_F_terms,
+                         "Incorrect number of Fq vectors detected in the buffer");
 
     for (unsigned int q_f=0; q_f<n_F_terms; ++q_f)
       {
         auto rb_fq_vectors_inner_list = rb_fq_vectors_outer_list[q_f];
-        if (rb_fq_vectors_inner_list.size() != n_bfs)
-          libmesh_error_msg("Incorrect Fq vector size detected in the buffer");
+        libmesh_error_msg_if(rb_fq_vectors_inner_list.size() != n_bfs,
+                             "Incorrect Fq vector size detected in the buffer");
 
         for (unsigned int i=0; i < n_bfs; ++i)
           {
@@ -481,14 +465,14 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
       }
 
     auto rb_Aq_matrices_outer_list = rb_evaluation_reader.getRbAqMatrices();
-    if (rb_Aq_matrices_outer_list.size() != n_A_terms)
-      libmesh_error_msg("Incorrect number of Aq matrices detected in the buffer");
+    libmesh_error_msg_if(rb_Aq_matrices_outer_list.size() != n_A_terms,
+                         "Incorrect number of Aq matrices detected in the buffer");
 
     for (unsigned int q_a=0; q_a<n_A_terms; ++q_a)
       {
         auto rb_Aq_matrices_inner_list = rb_Aq_matrices_outer_list[q_a];
-        if (rb_Aq_matrices_inner_list.size() != n_bfs*n_bfs)
-          libmesh_error_msg("Incorrect Aq matrix size detected in the buffer");
+        libmesh_error_msg_if(rb_Aq_matrices_inner_list.size() != n_bfs*n_bfs,
+                             "Incorrect Aq matrix size detected in the buffer");
 
         for (unsigned int i=0; i<n_bfs; ++i)
           for (unsigned int j=0; j<n_bfs; ++j)
@@ -506,8 +490,8 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
       auto rb_inner_product_matrix_list =
         rb_evaluation_reader.getRbInnerProductMatrix();
 
-      if (rb_inner_product_matrix_list.size() != n_bfs*n_bfs)
-        libmesh_error_msg("Size error while reading the inner product matrix.");
+      libmesh_error_msg_if(rb_inner_product_matrix_list.size() != n_bfs*n_bfs,
+                           "Size error while reading the inner product matrix.");
 
       for (unsigned int i=0; i<n_bfs; ++i)
         for (unsigned int j=0; j<n_bfs; ++j)
@@ -547,8 +531,8 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
     auto rb_L2_matrix_list =
       trans_rb_eval_reader.getRbL2Matrix();
 
-    if (rb_L2_matrix_list.size() != n_bfs*n_bfs)
-      libmesh_error_msg("Size error while reading the L2 matrix.");
+    libmesh_error_msg_if(rb_L2_matrix_list.size() != n_bfs*n_bfs,
+                         "Size error while reading the L2 matrix.");
 
     for (unsigned int i=0; i<n_bfs; ++i)
       for (unsigned int j=0; j<n_bfs; ++j)
@@ -563,14 +547,14 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
   {
     auto rb_Mq_matrices_outer_list = trans_rb_eval_reader.getRbMqMatrices();
 
-    if (rb_Mq_matrices_outer_list.size() != n_M_terms)
-      libmesh_error_msg("Incorrect number of Mq matrices detected in the buffer");
+    libmesh_error_msg_if(rb_Mq_matrices_outer_list.size() != n_M_terms,
+                         "Incorrect number of Mq matrices detected in the buffer");
 
     for (unsigned int q_m=0; q_m < n_M_terms; ++q_m)
       {
         auto rb_Mq_matrices_inner_list = rb_Mq_matrices_outer_list[q_m];
-        if (rb_Mq_matrices_inner_list.size() != n_bfs*n_bfs)
-          libmesh_error_msg("Incorrect Mq matrix size detected in the buffer");
+        libmesh_error_msg_if(rb_Mq_matrices_inner_list.size() != n_bfs*n_bfs,
+                             "Incorrect Mq matrix size detected in the buffer");
 
         for (unsigned int i=0; i<n_bfs; ++i)
           for (unsigned int j=0; j<n_bfs; ++j)
@@ -586,13 +570,13 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
   {
     auto initial_l2_errors_reader =
       trans_rb_eval_reader.getInitialL2Errors();
-    if (initial_l2_errors_reader.size() != n_bfs)
-      libmesh_error_msg("Incorrect number of initial L2 error terms detected in the buffer");
+    libmesh_error_msg_if(initial_l2_errors_reader.size() != n_bfs,
+                         "Incorrect number of initial L2 error terms detected in the buffer");
 
     auto initial_conditions_outer_list =
       trans_rb_eval_reader.getInitialConditions();
-    if (initial_conditions_outer_list.size() != n_bfs)
-      libmesh_error_msg("Incorrect number of outer initial conditions detected in the buffer");
+    libmesh_error_msg_if(initial_conditions_outer_list.size() != n_bfs,
+                         "Incorrect number of outer initial conditions detected in the buffer");
 
     for (unsigned int i=0; i<n_bfs; i++)
       {
@@ -600,8 +584,8 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
           initial_l2_errors_reader[i];
 
         auto initial_conditions_inner_list = initial_conditions_outer_list[i];
-        if (initial_conditions_inner_list.size() != (i+1))
-          libmesh_error_msg("Incorrect number of inner initial conditions detected in the buffer");
+        libmesh_error_msg_if(initial_conditions_inner_list.size() != (i+1),
+                             "Incorrect number of inner initial conditions detected in the buffer");
 
         for (unsigned int j=0; j<=i; j++)
           {
@@ -617,8 +601,8 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
       // Fq_Mq data
       {
         auto fq_mq_innerprods_list = trans_rb_eval_reader.getFqMqInnerprods();
-        if (fq_mq_innerprods_list.size() != n_F_terms*n_M_terms*n_bfs)
-          libmesh_error_msg("Size error while reading Fq-Mq representor data from buffer.");
+        libmesh_error_msg_if(fq_mq_innerprods_list.size() != n_F_terms*n_M_terms*n_bfs,
+                             "Size error while reading Fq-Mq representor data from buffer.");
 
         for (unsigned int q_f=0; q_f<n_F_terms; ++q_f)
           for (unsigned int q_m=0; q_m<n_M_terms; ++q_m)
@@ -635,8 +619,8 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
       {
         unsigned int Q_m_hat = n_M_terms*(n_M_terms+1)/2;
         auto mq_mq_innerprods_list = trans_rb_eval_reader.getMqMqInnerprods();
-        if (mq_mq_innerprods_list.size() != Q_m_hat*n_bfs*n_bfs)
-          libmesh_error_msg("Size error while reading Mq-Mq representor data from buffer.");
+        libmesh_error_msg_if(mq_mq_innerprods_list.size() != Q_m_hat*n_bfs*n_bfs,
+                             "Size error while reading Mq-Mq representor data from buffer.");
 
         for (unsigned int i=0; i<Q_m_hat; ++i)
           for (unsigned int j=0; j<n_bfs; ++j)
@@ -652,8 +636,8 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
       {
         auto aq_mq_innerprods_list =
           trans_rb_eval_reader.getAqMqInnerprods();
-        if (aq_mq_innerprods_list.size() != n_A_terms*n_M_terms*n_bfs*n_bfs)
-          libmesh_error_msg("Size error while reading Aq-Mq representor data from buffer.");
+        libmesh_error_msg_if(aq_mq_innerprods_list.size() != n_A_terms*n_M_terms*n_bfs*n_bfs,
+                             "Size error while reading Aq-Mq representor data from buffer.");
 
         for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
           for (unsigned int q_m=0; q_m<n_M_terms; q_m++)
@@ -671,97 +655,156 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
     }
 }
 
-template <typename RBEvaluationReaderNumber, typename RBEIMEvaluationReaderNumber>
+template <typename RBEIMEvaluationReaderNumber>
 void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
-                                 RBEvaluationReaderNumber & rb_evaluation_reader,
                                  RBEIMEvaluationReaderNumber & rb_eim_evaluation_reader)
 {
-  // We use read_error_bound_data=false here, since the RBEvaluation error bound data
-  // is not relevant to EIM.
-  load_rb_evaluation_data(rb_eim_evaluation,
-                          rb_evaluation_reader,
-                          /*read_error_bound_data*/ false);
+  // Set number of basis functions
+  unsigned int n_bfs = rb_eim_evaluation_reader.getNBfs();
+  rb_eim_evaluation.set_n_basis_functions(n_bfs);
 
-  unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
+  rb_eim_evaluation.resize_data_structures(n_bfs);
+
+  auto parameter_ranges =
+    rb_eim_evaluation_reader.getParameterRanges();
+  auto discrete_parameters_list =
+    rb_eim_evaluation_reader.getDiscreteParameters();
+
+  load_parameter_ranges(rb_eim_evaluation,
+                        parameter_ranges,
+                        discrete_parameters_list);
 
   // EIM interpolation matrix
   {
     auto interpolation_matrix_list = rb_eim_evaluation_reader.getInterpolationMatrix();
 
-    if (interpolation_matrix_list.size() != n_bfs*(n_bfs+1)/2)
-      libmesh_error_msg("Size error while reading the eim inner product matrix.");
+    libmesh_error_msg_if(interpolation_matrix_list.size() != n_bfs*(n_bfs+1)/2,
+                         "Size error while reading the eim inner product matrix.");
 
     for (unsigned int i=0; i<n_bfs; ++i)
       for (unsigned int j=0; j<=i; ++j)
         {
           unsigned int offset = i*(i+1)/2 + j;
-          rb_eim_evaluation.interpolation_matrix(i,j) =
-            load_scalar_value(interpolation_matrix_list[offset]);
+          rb_eim_evaluation.set_interpolation_matrix_entry(
+            i,j, load_scalar_value(interpolation_matrix_list[offset]));
         }
   }
 
   // Interpolation points
   {
     auto interpolation_points_list =
-      rb_eim_evaluation_reader.getInterpolationPoints();
+      rb_eim_evaluation_reader.getInterpolationXyz();
 
-    if (interpolation_points_list.size() != n_bfs)
-      libmesh_error_msg("Size error while reading the eim interpolation points.");
-
-    rb_eim_evaluation.interpolation_points.resize(n_bfs);
-    for (unsigned int i=0; i<n_bfs; ++i)
-      {
-        load_point(interpolation_points_list[i],
-                   rb_eim_evaluation.interpolation_points[i]);
-      }
-  }
-
-  // Interpolation points variables
-  {
-    auto interpolation_points_var_list =
-      rb_eim_evaluation_reader.getInterpolationPointsVar();
-    rb_eim_evaluation.interpolation_points_var.resize(n_bfs);
-
-    if (interpolation_points_var_list.size() != n_bfs)
-      libmesh_error_msg("Size error while reading the eim interpolation variables.");
+    libmesh_error_msg_if(interpolation_points_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation points.");
 
     for (unsigned int i=0; i<n_bfs; ++i)
       {
-        rb_eim_evaluation.interpolation_points_var[i] =
-          interpolation_points_var_list[i];
+        Point p;
+        load_point(interpolation_points_list[i], p);
+        rb_eim_evaluation.add_interpolation_points_xyz(p);
       }
   }
 
-  // Interpolation elements
+  // Interpolation points componnents
   {
-    libMesh::dof_id_type elem_id = 0;
-    libMesh::ReplicatedMesh & interpolation_points_mesh =
-      rb_eim_evaluation.get_interpolation_points_mesh();
-    interpolation_points_mesh.clear();
+    auto interpolation_points_comp_list =
+      rb_eim_evaluation_reader.getInterpolationComp();
 
-    auto interpolation_points_elem_list =
-      rb_eim_evaluation_reader.getInterpolationPointsElems();
-    unsigned int n_interpolation_elems = interpolation_points_elem_list.size();
+    libmesh_error_msg_if(interpolation_points_comp_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation components.");
 
-    if (n_interpolation_elems != n_bfs)
-      libmesh_error_msg("The number of elements should match the number of basis functions");
-
-    rb_eim_evaluation.interpolation_points_elem.resize(n_interpolation_elems);
-
-    for (unsigned int i=0; i<n_interpolation_elems; ++i)
+    for (unsigned int i=0; i<n_bfs; ++i)
       {
-        auto mesh_elem_reader = interpolation_points_elem_list[i];
-        std::string elem_type_name = mesh_elem_reader.getType().cStr();
-        libMesh::ElemType elem_type =
-          libMesh::Utility::string_to_enum<libMesh::ElemType>(elem_type_name);
-
-        libMesh::Elem * elem = libMesh::Elem::build(elem_type).release();
-        elem->set_id(elem_id++);
-        load_elem_into_mesh(mesh_elem_reader, elem, interpolation_points_mesh);
-
-        rb_eim_evaluation.interpolation_points_elem[i] = elem;
+        rb_eim_evaluation.add_interpolation_points_comp(interpolation_points_comp_list[i]);
       }
   }
+
+  // Interpolation points subdomain IDs
+  {
+    auto interpolation_points_subdomain_id_list =
+      rb_eim_evaluation_reader.getInterpolationSubdomainId();
+
+    libmesh_error_msg_if(interpolation_points_subdomain_id_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation subdomain IDs.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_subdomain_id(interpolation_points_subdomain_id_list[i]);
+      }
+  }
+
+  // Interpolation points element IDs
+  {
+    auto interpolation_points_elem_id_list =
+      rb_eim_evaluation_reader.getInterpolationElemId();
+
+    libmesh_error_msg_if(interpolation_points_elem_id_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation element IDs.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_elem_id(interpolation_points_elem_id_list[i]);
+      }
+  }
+
+  // Interpolation points quad point indices
+  {
+    auto interpolation_points_qp_list =
+      rb_eim_evaluation_reader.getInterpolationQp();
+
+    libmesh_error_msg_if(interpolation_points_qp_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation qps.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_qp(interpolation_points_qp_list[i]);
+      }
+  }
+
+  // Interpolation points perturbations
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_reader.getInterpolationXyzPerturb();
+
+    libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
+                         "Size error while reading the eim interpolation points.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        auto interpolation_points_list_inner = interpolation_points_list_outer[i];
+
+        std::vector<Point> perturbs(interpolation_points_list_inner.size());
+        for (unsigned int j=0; j<perturbs.size(); j++)
+          {
+            load_point(interpolation_points_list_inner[j], perturbs[j]);
+          }
+        rb_eim_evaluation.add_interpolation_points_xyz_perturbations(perturbs);
+      }
+  }
+
+  // Optionally load EIM rhs values for the training set
+  if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
+    {
+      auto eim_rhs_list_outer =
+        rb_eim_evaluation_reader.getEimSolutionsForTrainingSet();
+
+      std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions;
+      eim_solutions.clear();
+      eim_solutions.resize(eim_rhs_list_outer.size());
+
+      for (auto i : make_range(eim_rhs_list_outer.size()))
+        {
+          auto eim_rhs_list_inner = eim_rhs_list_outer[i];
+
+          DenseVector<Number> values(eim_rhs_list_inner.size());
+          for (auto j : index_range(values))
+            {
+              values(j) = load_scalar_value(eim_rhs_list_inner[j]);
+            }
+          eim_solutions[i] = values;
+        }
+    }
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
@@ -781,8 +824,8 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
   {
     auto b_min_list = rb_scm_evaluation_reader.getBMin();
 
-    if (b_min_list.size() != n_A_terms)
-      libmesh_error_msg("Size error while reading B_min");
+    libmesh_error_msg_if(b_min_list.size() != n_A_terms,
+                         "Size error while reading B_min");
 
     rb_scm_eval.B_min.clear();
     for (unsigned int i=0; i<n_A_terms; i++)
@@ -792,8 +835,8 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
   {
     auto b_max_list = rb_scm_evaluation_reader.getBMax();
 
-    if (b_max_list.size() != n_A_terms)
-      libmesh_error_msg("Size error while reading B_max");
+    libmesh_error_msg_if(b_max_list.size() != n_A_terms,
+                         "Size error while reading B_max");
 
     rb_scm_eval.B_max.clear();
     for (unsigned int i=0; i<n_A_terms; i++)
@@ -835,8 +878,8 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
     // The number of UB vectors is the same as the number of C_J values
     unsigned int n_C_J_values = rb_scm_evaluation_reader.getCJ().size();
 
-    if (scm_ub_vectors.size() != n_C_J_values*n_A_terms)
-      libmesh_error_msg("Size mismatch in SCB UB vectors");
+    libmesh_error_msg_if(scm_ub_vectors.size() != n_C_J_values*n_A_terms,
+                         "Size mismatch in SCB UB vectors");
 
     rb_scm_eval.SCM_UB_vectors.resize( n_C_J_values );
     for (unsigned int i=0; i<n_C_J_values; i++)
@@ -865,33 +908,6 @@ void load_point(RBData::Point3D::Reader point_reader, Point & point)
 
   if (LIBMESH_DIM >= 3)
     point(2) = point_reader.getZ();
-}
-
-
-void load_elem_into_mesh(RBData::MeshElem::Reader mesh_elem_reader,
-                         libMesh::Elem * elem,
-                         libMesh::ReplicatedMesh & mesh)
-{
-  auto mesh_elem_point_list = mesh_elem_reader.getPoints();
-  unsigned int n_points = mesh_elem_point_list.size();
-
-  if (n_points != elem->n_nodes())
-    libmesh_error_msg("Wrong number of nodes for element type");
-
-  for (unsigned int i=0; i < n_points; ++i)
-    {
-      libMesh::Node * node = new libMesh::Node(mesh_elem_point_list[i].getX(),
-                                               mesh_elem_point_list[i].getY(),
-                                               mesh_elem_point_list[i].getZ());
-
-      mesh.add_node(node);
-
-      elem->set_node(i) = node;
-    }
-
-  elem->subdomain_id() = mesh_elem_reader.getSubdomainId();
-
-  mesh.add_elem(elem);
 }
 
 // ---- Helper functions for adding data to capnp Builders (END) ----

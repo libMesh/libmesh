@@ -84,13 +84,12 @@ void clough_compute_coefs(const Elem * elem)
 #endif
 
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const Order mapping_order        (elem->default_order());
-  const ElemType mapping_elem_type (elem->type());
+  const FEType map_fe_type(elem->default_order(), mapping_family);
 
-  const FEType map_fe_type(mapping_order, mapping_family);
-
+  // Note: we explicitly don't consider the elem->p_level() when
+  // computing the number of mapping shape functions.
   const int n_mapping_shape_functions =
-    FEInterface::n_shape_functions(2, map_fe_type, mapping_elem_type);
+    FEInterface::n_shape_functions(map_fe_type, /*extra_order=*/0, elem);
 
   // Degrees of freedom are at vertices and edge midpoints
   std::vector<Point> dofpt;
@@ -106,7 +105,7 @@ void clough_compute_coefs(const Elem * elem)
   std::vector<Real> dxidx(6), detadx(6), dxidy(6), detady(6);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(2, map_fe_type, mapping_elem_type);
+    FEInterface::shape_deriv_function(map_fe_type, elem);
 
   for (int p = 0; p != 6; ++p)
     {
@@ -114,9 +113,9 @@ void clough_compute_coefs(const Elem * elem)
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = shape_deriv_ptr
-            (map_fe_type, elem, i, 0, dofpt[p], false);
+            (map_fe_type, elem, i, 0, dofpt[p], /*add_p_level=*/false);
           const Real ddeta = shape_deriv_ptr
-            (map_fe_type, elem, i, 1, dofpt[p], false);
+            (map_fe_type, elem, i, 1, dofpt[p], /*add_p_level=*/false);
 
           //      libMesh::err << ddxi << ' ';
           //      libMesh::err << ddeta << std::endl;

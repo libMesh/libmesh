@@ -3,7 +3,6 @@
 n_elem_xy = 8
 n_elem_z  = 40
 
-store_basis_functions = true
 online_N = 20
 
 online_curvature = 1.0472 # pi/3

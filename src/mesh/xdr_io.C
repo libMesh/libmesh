@@ -17,10 +17,8 @@
 
 
 
-// Local includes
-#include "libmesh/xdr_io.h"
-
 // libMesh includes
+#include "libmesh/xdr_io.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_xdr_mode.h"
@@ -114,8 +112,7 @@ XdrIO::~XdrIO ()
 
 void XdrIO::write (const std::string & name)
 {
-  if (this->legacy())
-    libmesh_error_msg("We don't support writing parallel files in the legacy format.");
+  libmesh_error_msg_if(this->legacy(), "We don't support writing parallel files in the legacy format.");
 
   Xdr io ((this->processor_id() == 0) ? name : "", this->binary() ? ENCODE : WRITE);
 
@@ -387,7 +384,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
         io.data (n_global_elem_at_level[0], comment.c_str());
       }
 
-      for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+      for (auto pid : make_range(this->n_processors()))
         {
           recv_conn.resize(xfer_buf_sizes[pid]);
           if (pid == 0)
@@ -509,7 +506,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
             io.data (n_global_elem_at_level[level], comment.c_str());
           }
 
-          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto pid : make_range(this->n_processors()))
             {
               recv_conn.resize(xfer_buf_sizes[pid]);
               if (pid == 0)
@@ -728,7 +725,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       // Post the receives -- do this on processor 0 only.
       if (this->processor_id() == 0)
         {
-          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto pid : make_range(this->n_processors()))
             {
               recv_ids[pid].resize(ids_size[pid]);
               recv_coords[pid].resize(ids_size[pid]*LIBMESH_DIM);
@@ -767,7 +764,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           Parallel::wait (coord_request_handles);
 
 #ifndef NDEBUG
-          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto pid : make_range(this->n_processors()))
             libmesh_assert_equal_to(recv_coords[pid].size(),
                                     recv_ids[pid].size()*LIBMESH_DIM);
 #endif
@@ -781,7 +778,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           coords.clear();
           coords.resize (3*tot_id_size, std::numeric_limits<Real>::quiet_NaN());
 
-          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto pid : make_range(this->n_processors()))
             for (auto idx : index_range(recv_ids[pid]))
               {
                 libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
@@ -874,7 +871,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
       // Post the receives -- do this on processor 0 only.
       if (this->processor_id() == 0)
         {
-          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto pid : make_range(this->n_processors()))
             {
               recv_ids[pid].resize(ids_size[pid]);
               recv_unique_ids[pid].resize(ids_size[pid]);
@@ -913,7 +910,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           Parallel::wait (unique_id_request_handles);
 
 #ifndef NDEBUG
-          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto pid : make_range(this->n_processors()))
             libmesh_assert_equal_to
               (recv_ids[pid].size(), recv_unique_ids[pid].size());
 #endif
@@ -925,7 +922,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           unique_ids.clear();
           unique_ids.resize(tot_id_size, unique_id_type(-1));
 
-          for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+          for (auto pid : make_range(this->n_processors()))
             for (auto idx : index_range(recv_ids[pid]))
               {
                 libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
@@ -1045,7 +1042,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
   if (this->processor_id() == 0)
     {
       dof_id_type elem_offset = 0;
-      for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+      for (auto pid : make_range(this->n_processors()))
         {
           recv_bcs.resize(bc_sizes[pid]);
           if (pid == 0)
@@ -1140,7 +1137,7 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const new_header_id_type n_node
   if (this->processor_id() == 0)
     {
       dof_id_type node_offset = 0;
-      for (auto pid : IntRange<processor_id_type>(0, this->n_processors()))
+      for (auto pid : make_range(this->n_processors()))
         {
           recv_bcs.resize(bc_sizes[pid]);
           if (pid == 0)
@@ -1229,8 +1226,7 @@ void XdrIO::read (const std::string & name)
   this->legacy() = !(this->version().find("libMesh") < this->version().size());
 
   // Check for a legacy version format.
-  if (this->legacy())
-    libmesh_error_msg("We no longer support reading files in the legacy format.");
+  libmesh_error_msg_if(this->legacy(), "We no longer support reading files in the legacy format.");
 
   // Read headers with the old id type if they're pre-1.3.0, or with
   // the new id type if they're post-1.3.0
@@ -1564,9 +1560,10 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
         {
           const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          // We are on all processors here, so we can easily assign
-          // consistent unique ids if the file doesn't specify them
-          // later.
+          // We are on all processors here, so the mesh can easily
+          // assign consistent unique ids if the file doesn't specify
+          // them later.  We'll use element ids for elements and start
+          // past those for nodes.
           unique_id_type unique_id = e;
 #endif
           if (read_unique_id)
@@ -1600,7 +1597,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
           elem->set_id() = e;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          elem->set_unique_id() = unique_id;
+          elem->set_unique_id(unique_id);
 #endif
           elem->processor_id() = proc_id;
           elem->subdomain_id() = subdomain_id;
@@ -1621,8 +1618,19 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
               const dof_id_type global_node_number =
                 cast_int<dof_id_type>(*it);
 
-              elem->set_node(n) =
-                mesh.add_point (Point(), global_node_number);
+              Node *node = mesh.query_node_ptr(global_node_number);
+
+              if (node)
+                elem->set_node(n) = node;
+              else
+                {
+                  std::unique_ptr<Node> new_node = Node::build(Point(), global_node_number);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+                  // If we have to overwrite this it'll happen later
+                  new_node->set_unique_id(n_elem + global_node_number);
+#endif
+                  elem->set_node(n) = mesh.add_node(std::move(new_node));
+                }
             }
 
           elems_of_dimension[elem->dim()] = true;
@@ -1636,12 +1644,12 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
       mesh.set_mesh_dimension(i);
 
 #if LIBMESH_DIM < 3
-  if (mesh.mesh_dimension() > LIBMESH_DIM)
-    libmesh_error_msg("Cannot open dimension "              \
-                      << mesh.mesh_dimension()                          \
-                      << " mesh file when configured without "          \
-                      << mesh.mesh_dimension()                          \
-                      << "D support.");
+  libmesh_error_msg_if(mesh.mesh_dimension() > LIBMESH_DIM,
+                       "Cannot open dimension "
+                       << mesh.mesh_dimension()
+                       << " mesh file when configured without "
+                       << mesh.mesh_dimension()
+                       << "D support.");
 #endif
 }
 
@@ -1724,20 +1732,38 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
         }
     }
 
+  // Check for node unique ids
+  unsigned short read_unique_ids = false;
+
   if (version_at_least_0_9_6())
     {
-      // Check for node unique ids
-      unsigned short read_unique_ids;
-
       if (this->processor_id() == 0)
         io.data (read_unique_ids);
 
       this->comm().broadcast (read_unique_ids);
+    }
 
-      // If no unique ids are in the file, we're done.
-      if (!read_unique_ids)
-        return;
-
+  // If no node unique ids are in the file, well, we already
+  // assigned our own ... *but*, our ids might conflict with the
+  // file-assigned element unique ids.  Let's check on that.
+  // Should be easy since we're serialized.
+  if (!read_unique_ids)
+    {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      unique_id_type max_elem_unique_id = 0;
+      for (auto & elem : mesh.element_ptr_range())
+        max_elem_unique_id = std::max(max_elem_unique_id,
+                                      elem->unique_id()+1);
+      if (max_elem_unique_id > mesh.n_elem())
+        {
+          for (auto & node : mesh.node_ptr_range())
+            node->set_unique_id(max_elem_unique_id + node->id());
+        }
+      mesh.set_next_unique_id(max_elem_unique_id + mesh.n_nodes());
+#endif
+    }
+  else
+    {
       std::vector<uint32_t> unique_32;
       std::vector<uint64_t> unique_64;
 
@@ -1783,11 +1809,9 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
                 {
                   libmesh_assert_equal_to (*pos.first, n);
                   if (_field_width == 8)
-                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
-                      = unique_64[idx];
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id(unique_64[idx]);
                   else
-                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
-                      = unique_32[idx];
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id(unique_32[idx]);
                 }
             }
 #endif // LIBMESH_ENABLE_UNIQUE_ID

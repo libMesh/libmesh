@@ -79,7 +79,6 @@ public:
                         const std::string & name_in,
                         const unsigned int number_in)
     : Parent(es, name_in, number_in),
-      ex6_assembly_expansion(*this),
       dirichlet_bc(std::unique_ptr<DirichletBoundary>())
   {}
 

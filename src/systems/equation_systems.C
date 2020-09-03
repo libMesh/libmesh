@@ -38,6 +38,8 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 
+#include <numeric> // std::iota
+
 // Include the systems before this one to avoid
 // overlapping forward declarations.
 #include "libmesh/equation_systems.h"
@@ -424,25 +426,6 @@ System & EquationSystems::add_system (const std::string & sys_type,
 
 
 
-
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void EquationSystems::delete_system (const std::string & name)
-{
-  libmesh_deprecated();
-
-  if (!_systems.count(name))
-    libmesh_error_msg("ERROR: no system named " << name);
-
-  delete _systems[name];
-
-  _systems.erase (name);
-}
-#endif
-
-
-
 void EquationSystems::solve ()
 {
   libmesh_assert (this->n_systems());
@@ -498,7 +481,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
         if (!use_current_system || pos->second->hide_output())
           continue;
 
-        for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+        for (auto vn : make_range(pos->second->n_vars()))
           {
             if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
@@ -533,7 +516,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
       if (!use_current_system || pos->second->hide_output())
         continue;
 
-      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+      for (auto vn : make_range(pos->second->n_vars()))
         {
           const std::string & var_name = pos->second->variable_name(vn);
           const FEType & fe_type = pos->second->variable_type(vn);
@@ -626,7 +609,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         if (!use_current_system || pos->second->hide_output())
           continue;
 
-        for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+        for (auto vn : make_range(pos->second->n_vars()))
           {
             if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
@@ -697,7 +680,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
       //Could this be replaced by a/some convenience methods?[PB]
       unsigned int n_scalar_vars = 0;
       unsigned int n_vector_vars = 0;
-      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+      for (auto vn : make_range(pos->second->n_vars()))
         {
           if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
             n_vector_vars++;
@@ -851,7 +834,7 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
 
   for (; pos != end; ++pos)
     {
-      for (auto vn : IntRange<unsigned int>(0, pos->second->n_vars()))
+      for (auto vn : make_range(pos->second->n_vars()))
         {
           const std::string & var_name = pos->second->variable_name(vn);
 
@@ -909,8 +892,8 @@ EquationSystems::find_variable_numbers
   libmesh_assert (this->n_systems());
 
   // If the names vector has entries, we will only populate the soln vector
-  // with names included in that list.  Note: The names vector may be
-  // reordered upon exiting this function
+  // with names included in that list.  Note: The names vector and var_nums
+  // vector pairs are reordered alphabetically upon exiting this function.
   std::vector<std::pair<unsigned int, unsigned int>> var_nums;
   std::vector<std::string> filter_names = names;
   bool is_filter_names = !filter_names.empty();
@@ -938,8 +921,6 @@ EquationSystems::find_variable_numbers
         }
     }
 
-  std::sort(var_nums.begin(), var_nums.end());
-
   for (const auto & var_num : var_nums)
     {
       const std::string & name =
@@ -948,7 +929,25 @@ EquationSystems::find_variable_numbers
         names.push_back(name);
     }
 
-  return var_nums;
+  // Sort the var_nums vector pairs alphabetically based on the variable name
+  std::vector<unsigned int> sort_index(names.size());
+  std::iota(sort_index.begin(), sort_index.end(), 0);
+  std::sort(sort_index.begin(), sort_index.end(),
+            [&](const unsigned int & lhs, const unsigned  & rhs)
+            {return names[lhs] < names[rhs];});
+
+  std::vector<std::pair<unsigned int, unsigned int>> var_nums_sorted(var_nums.size());
+  for (auto i : index_range(var_nums_sorted))
+    {
+      var_nums_sorted[i].first = var_nums[sort_index[i]].first;
+      var_nums_sorted[i].second = var_nums[sort_index[i]].second;
+    }
+
+  // Also sort the names vector
+  std::sort(names.begin(), names.end());
+
+  // Return the sorted vector pairs
+  return var_nums_sorted;
 }
 
 
@@ -1071,7 +1070,7 @@ EquationSystems::build_discontinuous_solution_vector
 
       // Loop over all variables in this System and check whether we
       // are supposed to use each one.
-      for (auto var_id : IntRange<unsigned int>(0, system->n_vars()))
+      for (auto var_id : make_range(system->n_vars()))
         {
           bool use_current_var = (var_names == nullptr);
           if (!use_current_var)

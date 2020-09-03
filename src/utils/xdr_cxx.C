@@ -736,6 +736,10 @@ void Xdr::do_write(std::vector<T> & a)
   std::size_t length = a.size();
   data(length, "# vector length");
 
+  // Use scientific precision with lots of digits for the original type T.
+  *out << std::scientific
+       << std::setprecision(std::numeric_limits<T>::max_digits10);
+
   for (T & a_i : a)
     {
       libmesh_assert(out.get());
@@ -750,6 +754,10 @@ void Xdr::do_write(std::vector<std::complex<T>> & a)
 {
   std::size_t length=a.size();
   data(length, "# vector length x 2 (complex)");
+
+  // Use scientific precision with lots of digits for the original type T.
+  *out << std::scientific
+       << std::setprecision(std::numeric_limits<T>::max_digits10);
 
   for (std::complex<T> & a_i : a)
     {
@@ -917,7 +925,7 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1015,7 +1023,7 @@ void Xdr::data_stream (double * val, const unsigned int len, const unsigned int 
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1115,7 +1123,7 @@ void Xdr::data_stream (float * val, const unsigned int len, const unsigned int l
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1243,7 +1251,7 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1370,7 +1378,7 @@ void Xdr::data_stream (Real * val, const unsigned int len, const unsigned int li
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1497,7 +1505,7 @@ void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
@@ -1629,7 +1637,7 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<imax; i++)
+                for (unsigned int i=0; (i<imax && cnt<len); i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());

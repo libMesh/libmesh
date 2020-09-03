@@ -116,10 +116,9 @@ void process_cmd_line(int argc,
            */
         case 'm':
           {
-            if (names.empty())
-              names.push_back(optarg);
-            else
-              libmesh_error_msg("ERROR: Mesh file name must precede left file name!");
+            libmesh_error_msg_if(!names.empty(), "ERROR: Mesh file name must precede left file name!");
+
+            names.push_back(optarg);
             break;
           }
 
@@ -137,13 +136,10 @@ void process_cmd_line(int argc,
            */
         case 'l':
           {
-            if (!left_name_set)
-              {
-                names.push_back(optarg);
-                left_name_set = true;
-              }
-            else
-              libmesh_error_msg("ERROR: Mesh file name must precede right file name!");
+            libmesh_error_msg_if(left_name_set, "ERROR: Mesh file name must precede right file name!");
+
+            names.push_back(optarg);
+            left_name_set = true;
             break;
           }
 
@@ -152,10 +148,10 @@ void process_cmd_line(int argc,
            */
         case 'r':
           {
-            if ((!names.empty()) && (left_name_set))
-              names.push_back(optarg);
-            else
-              libmesh_error_msg("ERROR: Mesh file name and left file name must precede right file name!");
+            libmesh_error_msg_if(names.empty() || !left_name_set,
+                                 "ERROR: Mesh file name and left file name must precede right file name!");
+
+            names.push_back(optarg);
             break;
           }
 
@@ -173,13 +169,10 @@ void process_cmd_line(int argc,
            */
         case 'a':
           {
-            if (format_set)
-              libmesh_error_msg("ERROR: Equation system file format already set!");
-            else
-              {
-                format = READ;
-                format_set = true;
-              }
+            libmesh_error_msg_if(format_set, "ERROR: Equation system file format already set!");
+
+            format = READ;
+            format_set = true;
             break;
           }
 
@@ -188,13 +181,10 @@ void process_cmd_line(int argc,
            */
         case 'b':
           {
-            if (format_set)
-              libmesh_error_msg("ERROR: Equation system file format already set!");
-            else
-              {
-                format = DECODE;
-                format_set = true;
-              }
+            libmesh_error_msg_if(format_set, "ERROR: Equation system file format already set!");
+
+            format = DECODE;
+            format_set = true;
             break;
           }
 
@@ -299,12 +289,11 @@ int main (int argc, char ** argv)
                    verbose,
                    quiet);
 
-
-  if (dim == static_cast<unsigned char>(-1))
-    libmesh_error_msg("ERROR:  you must specify the dimension on "      \
-                      << "the command line!\n\n"                        \
-                      << argv[0]                                        \
-                      << " -d 3 ... for example");
+  libmesh_error_msg_if(dim == static_cast<unsigned char>(-1),
+                       "ERROR:  you must specify the dimension on "
+                       << "the command line!\n\n"
+                       << argv[0]
+                       << " -d 3 ... for example");
 
   if (quiet)
     verbose = false;
@@ -350,13 +339,10 @@ int main (int argc, char ** argv)
   EquationSystems left_system  (left_mesh);
   EquationSystems right_system (right_mesh);
 
-  if (names.size() == 3)
-    {
-      left_system.read  (names[1], format);
-      right_system.read (names[2], format);
-    }
-  else
-    libmesh_error_msg("Bad input specified.");
+  libmesh_error_msg_if(names.size() != 3, "Bad input specified.");
+
+  left_system.read  (names[1], format);
+  right_system.read (names[2], format);
 
   are_equal = do_compare (left_system, right_system, threshold, verbose);
 

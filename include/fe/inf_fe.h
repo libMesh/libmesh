@@ -375,34 +375,60 @@ public:
   /**
    * \returns The number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
+   *
+   * \deprecated Call the version of this function that takes a
+   * pointer-to-Elem instead.
    */
   static unsigned int n_shape_functions (const FEType & fet,
                                          const ElemType t)
   { return n_dofs(fet, t); }
+
+  static unsigned int n_shape_functions (const FEType & fet,
+                                         const Elem * inf_elem)
+  { return n_dofs(fet, inf_elem); }
 
   /**
    * \returns The number of shape functions associated with this
    * infinite element.  Currently, we have \p o_radial+1 modes in
    * radial direction, and \code FE<Dim-1,T>::n_dofs(...) \endcode
    * in the base.
+   *
+   * \deprecated Call the version of this function that takes an Elem*
+   * instead for consistency with other FEInterface::n_dofs() methods.
    */
   static unsigned int n_dofs(const FEType & fet,
                              const ElemType inf_elem_type);
 
+  static unsigned int n_dofs(const FEType & fet,
+                             const Elem * inf_elem);
+
   /**
    * \returns The number of dofs at infinite element node \p n
    * (not dof!) for an element of type \p t and order \p o.
+   *
+   * \deprecated Call the version of this function that takes an Elem*
+   * instead for consistency with other FEInterface::n_dofs() methods.
    */
   static unsigned int n_dofs_at_node(const FEType & fet,
                                      const ElemType inf_elem_type,
                                      const unsigned int n);
 
+  static unsigned int n_dofs_at_node(const FEType & fet,
+                                     const Elem * inf_elem,
+                                     const unsigned int n);
+
   /**
    * \returns The number of dofs interior to the element,
    * not associated with any interior nodes.
+   *
+   * \deprecated Call the version of this function that takes an Elem*
+   * instead for consistency with other FEInterface::n_dofs() methods.
    */
   static unsigned int n_dofs_per_elem(const FEType & fet,
                                       const ElemType inf_elem_type);
+
+  static unsigned int n_dofs_per_elem(const FEType & fet,
+                                      const Elem * inf_elem);
 
   /**
    * \returns The continuity of the element.
@@ -889,6 +915,8 @@ protected:
    * in radial direction \p radial_shape (0 in the base, \f$ \ge 1 \f$ further
    * out) associated to the shape with global index \p i of an infinite element
    * of type \p inf_elem_type.
+   *
+   * \deprecated Call the version of this function that takes an Elem * instead.
    */
   static void compute_shape_indices (const FEType & fet,
                                      const ElemType inf_elem_type,
@@ -896,6 +924,11 @@ protected:
                                      unsigned int & base_shape,
                                      unsigned int & radial_shape);
 
+  static void compute_shape_indices (const FEType & fet,
+                                     const Elem * inf_elem,
+                                     const unsigned int i,
+                                     unsigned int & base_shape,
+                                     unsigned int & radial_shape);
 
   /**
    * Physical quadrature points.
@@ -903,11 +936,6 @@ protected:
    * but here FEMap does not know enough to compute it.
    */
   std::vector<Point> xyz;
-
-  /**
-   * the radial distance of the base nodes from the origin
-   */
-  //std::vector<Real> dist;
 
   std::vector<Real> weightxr_sq;
   /**

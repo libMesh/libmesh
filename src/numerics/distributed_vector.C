@@ -258,8 +258,7 @@ void DistributedVector<T>::add (const T a, const NumericVector<T> & v_in)
 
   // Make sure the NumericVector passed in is really a DistributedVector
   const DistributedVector<T> * v = cast_ptr<const DistributedVector<T> *>(&v_in);
-  if (!v)
-    libmesh_error_msg("Cannot add different types of NumericVectors.");
+  libmesh_error_msg_if(!v, "Cannot add different types of NumericVectors.");
 
   for (auto i : index_range(_values))
     _values[i] += a * v->_values[i];

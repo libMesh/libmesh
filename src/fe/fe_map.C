@@ -122,14 +122,14 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   // The element type and order to use in
   // the map
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType mapping_elem_type (elem->type());
   const FEType map_fe_type(elem->default_order(), mapping_family);
 
   // Number of shape functions used to construct the map
   // (Lagrange shape functions are used for mapping)
+  // Do not consider the Elem::p_level(), if any, when computing the
+  // number of shape functions.
   const unsigned int n_mapping_shape_functions =
-    FEInterface::n_shape_functions (Dim, map_fe_type,
-                                    mapping_elem_type);
+    FEInterface::n_shape_functions (map_fe_type, /*extra_order=*/0, elem);
 
   // Maybe we already have correctly-sized data?  Check data sizes,
   // and get ready to break out of a "loop" if all these resize()
@@ -235,14 +235,14 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   bool is_linear = elem->is_linear();
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::shape_function(map_fe_type, elem);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::shape_deriv_function(map_fe_type, elem);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   FEInterface::shape_second_deriv_ptr shape_second_deriv_ptr =
-    FEInterface::shape_second_deriv_function(Dim, map_fe_type, mapping_elem_type);
+    FEInterface::shape_second_deriv_function(map_fe_type, elem);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   switch (Dim)
@@ -1661,12 +1661,20 @@ Point FEMap::inverse_map (const unsigned int dim,
                           const Elem * elem,
                           const Point & physical_point,
                           const Real tolerance,
-                          const bool secure)
+                          const bool secure,
+                          const bool
+                          extra_checks
+                          )
 {
   libmesh_assert(elem);
   libmesh_assert_greater_equal (tolerance, 0.);
 
+  libmesh_ignore(extra_checks);
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  // TODO: possibly use the extra_checks parameter in InfFEMap::inverse_map() as well.
+
   if (elem->infinite())
     return InfFEMap::inverse_map(dim, elem, physical_point, tolerance,
                                  secure);
@@ -2000,10 +2008,10 @@ Point FEMap::inverse_map (const unsigned int dim,
 
 
 
-  //  If we are in debug mode do two sanity checks.
+  //  If we are in debug mode and the user requested it, do two extra sanity checks.
 #ifdef DEBUG
 
-  if (secure)
+  if (extra_checks)
     {
       // Make sure the point \p p on the reference element actually
       // does map to the point \p physical_point within a tolerance.
@@ -2050,14 +2058,16 @@ void FEMap::inverse_map (const unsigned int dim,
                          const std::vector<Point> & physical_points,
                          std::vector<Point> &       reference_points,
                          const Real tolerance,
-                         const bool secure)
+                         const bool secure,
+                         const bool extra_checks)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
     {
-      InfFEMap::inverse_map(dim, elem, physical_points, reference_points, tolerance, secure);
-      return;
-      // libmesh_not_implemented();
+      // TODO: possibly use the extra_checks parameter in InfFEMap::inverse_map() as well.
+      libmesh_ignore(extra_checks);
+
+      return InfFEMap::inverse_map(dim, elem, physical_points, reference_points, tolerance, secure);
     }
 #endif
 
@@ -2073,7 +2083,7 @@ void FEMap::inverse_map (const unsigned int dim,
   // element of each point in physical space
   for (std::size_t p=0; p<n_points; p++)
     reference_points[p] =
-      inverse_map (dim, elem, physical_points[p], tolerance, secure);
+      inverse_map (dim, elem, physical_points[p], tolerance, secure, extra_checks);
 }
 
 
@@ -2083,6 +2093,7 @@ Point FEMap::map (const unsigned int dim,
                   const Point & reference_point)
 {
   libmesh_assert(elem);
+  libmesh_ignore(dim);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
@@ -2092,13 +2103,14 @@ Point FEMap::map (const unsigned int dim,
   Point p;
 
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType type     = elem->type();
   const FEType fe_type (elem->default_order(), mapping_family);
 
-  const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
+  // Do not consider the Elem::p_level(), if any, when computing the
+  // number of shape functions.
+  const unsigned int n_sf = FEInterface::n_shape_functions(fe_type, /*extra_order=*/0, elem);
 
   FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(dim, fe_type, type);
+    FEInterface::shape_function(fe_type, elem);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
@@ -2116,6 +2128,7 @@ Point FEMap::map_deriv (const unsigned int dim,
                         const Point & reference_point)
 {
   libmesh_assert(elem);
+  libmesh_ignore(dim);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
@@ -2125,18 +2138,21 @@ Point FEMap::map_deriv (const unsigned int dim,
   Point p;
 
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const ElemType type     = elem->type();
   const FEType fe_type (elem->default_order(), mapping_family);
-  const unsigned int n_sf = FEInterface::n_shape_functions(dim, fe_type, type);
+
+  // Do not consider the Elem::p_level(), if any, when computing the
+  // number of shape functions.
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(fe_type, /*total_order=*/0, elem);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
-    FEInterface::shape_deriv_function(dim, fe_type, type);
+    FEInterface::shape_deriv_function(fe_type, elem);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
                   shape_deriv_ptr(fe_type, elem, i, j, reference_point,
-                                  false));
+                                  /*add_p_level=*/false));
 
   return p;
 }

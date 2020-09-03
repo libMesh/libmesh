@@ -17,11 +17,6 @@
 
 
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::sqrt
-
-
 // Local includes
 #include "libmesh/mesh_generation.h"
 #include "libmesh/unstructured_mesh.h"
@@ -54,6 +49,13 @@
 #include "libmesh/enum_order.h"
 #include "libmesh/int_range.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_ghost_sync.h"
+
+// C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath> // for std::sqrt
+#include <unordered_set>
+
 
 namespace libMesh
 {
@@ -1406,7 +1408,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use (/*skip_renumber =*/ false);
+  mesh.prepare_for_use ();
 }
 
 
@@ -1536,6 +1538,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     }
 
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+  // Building while distributed is a little more complicated
+  const bool is_replicated = mesh.is_replicated();
 
   // Sphere is centered at origin by default
   const Point cent;
@@ -1866,6 +1871,12 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // Loop over the elements, refine, pop nodes to boundary.
   for (unsigned int r=0; r<nr; r++)
     {
+      // A DistributedMesh needs a little prep before refinement, and
+      // may need us to keep track of ghost node movement.
+      std::unordered_set<dof_id_type> moved_ghost_nodes;
+      if (!is_replicated)
+        mesh.prepare_for_use();
+
       mesh_refinement.uniformly_refine(1);
 
       for (const auto & elem : mesh.active_element_ptr_range())
@@ -1874,12 +1885,57 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
             {
               std::unique_ptr<Elem> side(elem->build_side_ptr(s));
 
-              // Pop each point to the sphere boundary
+              // Pop each point to the sphere boundary.  Keep track of
+              // any points we don't own, so we can push their "moved"
+              // status to their owners.
               for (auto n : side->node_index_range())
-                side->point(n) =
-                  sphere.closest_point(side->point(n));
+                {
+                  Node & side_node = side->node_ref(n);
+                  side_node =
+                    sphere.closest_point(side->point(n));
+
+                  if (!is_replicated &&
+                      side_node.processor_id() != mesh.processor_id())
+                    moved_ghost_nodes.insert(side_node.id());
+                }
             }
+
+      if (!is_replicated)
+        {
+          std::map<processor_id_type, std::vector<dof_id_type>> moved_nodes_map;
+          for (auto id : moved_ghost_nodes)
+            {
+              const Node & node = mesh.node_ref(id);
+              moved_nodes_map[node.processor_id()].push_back(node.id());
+            }
+
+          auto action_functor =
+            [& mesh, & sphere]
+            (processor_id_type /* pid */,
+             const std::vector<dof_id_type> & my_moved_nodes)
+            {
+              for (auto id : my_moved_nodes)
+                {
+                  Node & node = mesh.node_ref(id);
+                  node = sphere.closest_point(node);
+                }
+            };
+
+          // First get new node positions to their owners
+          Parallel::push_parallel_vector_data
+            (mesh.comm(), moved_nodes_map, action_functor);
+
+          // Then get node positions to anyone else with them ghosted
+          SyncNodalPositions sync_object(mesh);
+          Parallel::sync_dofobject_data_by_id
+            (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(),
+             sync_object);
+        }
     }
+
+  // A DistributedMesh needs a little prep before flattening
+  if (is_replicated)
+    mesh.prepare_for_use();
 
   // The mesh now contains a refinement hierarchy due to the refinements
   // used to generate the grid.  In order to call other support functions
@@ -1892,6 +1948,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     {
       if ((type == TRI6) || (type == TRI3))
         {
+          // A DistributedMesh needs a little prep before all_tri()
+          if (is_replicated)
+            mesh.prepare_for_use();
+
           MeshTools::Modification::all_tri(mesh);
         }
     }
@@ -1923,8 +1983,11 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
 
   // The meshes could probably use some smoothing.
-  LaplaceMeshSmoother smoother(mesh);
-  smoother.smooth(n_smooth);
+  if (mesh.mesh_dimension() > 1)
+    {
+      LaplaceMeshSmoother smoother(mesh);
+      smoother.smooth(n_smooth);
+    }
 
   // We'll give the whole sphere surface a boundary id of 0
   for (const auto & elem : mesh.active_element_ptr_range())
@@ -1936,7 +1999,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use(/*skip_renumber =*/ false);
+  mesh.prepare_for_use();
 }
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
@@ -1966,6 +2029,13 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
   const BoundaryInfo & cross_section_boundary_info = cross_section.get_boundary_info();
 
+  // Copy name maps from old to new boundary.  We won't copy the whole
+  // BoundaryInfo because that copies bc ids too, and we need to set
+  // those more carefully.
+  boundary_info.set_sideset_name_map() = cross_section_boundary_info.get_sideset_name_map();
+  boundary_info.set_nodeset_name_map() = cross_section_boundary_info.get_nodeset_name_map();
+  boundary_info.set_edgeset_name_map() = cross_section_boundary_info.get_edgeset_name_map();
+
   // If cross_section is distributed, so is its extrusion
   if (!cross_section.is_serial())
     mesh.delete_remote_elements();
@@ -1989,25 +2059,31 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
     {
       for (unsigned int k=0; k != order*nz+1; ++k)
         {
-          Node * new_node =
-            mesh.add_point(*node +
-                           (extrusion_vector * k / nz / order),
-                           node->id() + (k * orig_nodes),
-                           node->processor_id());
+          const dof_id_type new_node_id = node->id() + k * orig_nodes;
+          Node * my_node = mesh.query_node_ptr(new_node_id);
+          if (!my_node)
+            {
+              std::unique_ptr<Node> new_node = Node::build
+                (*node + (extrusion_vector * k / nz / order),
+                 new_node_id);
+              new_node->processor_id() = node->processor_id();
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          // Let's give the base of the extruded mesh the same
-          // unique_ids as the source mesh, in case anyone finds that
-          // a useful map to preserve.
-          const unique_id_type uid = (k == 0) ?
-            node->unique_id() :
-            orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + node->id();
+              // Let's give the base of the extruded mesh the same
+              // unique_ids as the source mesh, in case anyone finds that
+              // a useful map to preserve.
+              const unique_id_type uid = (k == 0) ?
+                node->unique_id() :
+                orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + node->id();
 
-          new_node->set_unique_id() = uid;
+              new_node->set_unique_id(uid);
 #endif
 
-          cross_section_boundary_info.boundary_ids(node, ids_to_copy);
-          boundary_info.add_node(new_node, ids_to_copy);
+              cross_section_boundary_info.boundary_ids(node, ids_to_copy);
+              boundary_info.add_node(new_node.get(), ids_to_copy);
+
+              mesh.add_node(std::move(new_node));
+            }
         }
     }
 
@@ -2202,7 +2278,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
             elem->unique_id() :
             orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + orig_nodes + elem->id();
 
-          new_elem->set_unique_id() = uid;
+          new_elem->set_unique_id(uid);
 #endif
 
           if (!elem_subdomain)
@@ -2261,7 +2337,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   STOP_LOG("build_extrusion()", "MeshTools::Generation");
 
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use(/*skip_renumber =*/ false);
+  mesh.prepare_for_use();
 }
 
 

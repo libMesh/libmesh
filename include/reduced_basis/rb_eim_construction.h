@@ -24,12 +24,18 @@
 #include "libmesh/rb_construction.h"
 #include "libmesh/rb_assembly_expansion.h"
 #include "libmesh/rb_eim_assembly.h"
+#include "libmesh/rb_eim_evaluation.h"
 
 // libMesh includes
 #include "libmesh/mesh_function.h"
 #include "libmesh/coupling_matrix.h"
 
 // C++ includes
+#include <unordered_map>
+#include <map>
+#include <string>
+#include <memory>
+#include <vector>
 
 namespace libMesh
 {
@@ -39,13 +45,12 @@ namespace libMesh
  *
  * RBEIMConstruction implements the Construction stage of the
  * Empirical Interpolation Method (EIM). This can be used to
- * generate an affine approximation to non-affine
- * operators.
- *
- * \author David J. Knezevic
- * \date 2010
+ * create an approximation to parametrized functions. In the context
+ * of the reduced basis (RB) method, the EIM approximation is typically
+ * used to create an affine approximation to non-affine operators,
+ * so that the standard RB method can be applied in that case.
  */
-class RBEIMConstruction : public RBConstruction
+class RBEIMConstruction : public RBConstructionBase<System>
 {
 public:
 
@@ -60,19 +65,25 @@ public:
                      const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains unique_ptrs, so it can't be default copy
+   *   constructed/assigned.
+   * - The base class (RBConstructionBase) move constructor and move
+   *   assignment operators are (implicitly?) deleted according to
+   *   clang-9.0, therefore it is an error to try and default them
+   *   here.
+   * - The destructor is defaulted out of line.
    */
+  RBEIMConstruction (RBEIMConstruction &&) = delete;
+  RBEIMConstruction (const RBEIMConstruction &) = delete;
+  RBEIMConstruction & operator= (const RBEIMConstruction &) = delete;
+  RBEIMConstruction & operator= (RBEIMConstruction &&) = delete;
   virtual ~RBEIMConstruction ();
 
   /**
-   * The type of system.
+   * Type of the data structure used to map from (elem id) -> [n_vars][n_qp] data.
    */
-  typedef RBEIMConstruction sys_type;
-
-  /**
-   * The type of the parent.
-   */
-  typedef RBConstruction Parent;
+  typedef RBEIMEvaluation::QpDataMap QpDataMap;
 
   /**
    * Clear this object.
@@ -80,10 +91,42 @@ public:
   virtual void clear() override;
 
   /**
+   * Set the RBEIMEvaluation object.
+   */
+  void set_rb_eim_evaluation(RBEIMEvaluation & rb_eim_eval_in);
+
+  /**
+   * Get a reference to the RBEvaluation object.
+   */
+  RBEIMEvaluation & get_rb_eim_evaluation();
+
+  /**
+   * Perform initialization of this object to prepare for running
+   * train_eim_approximation().
+   */
+  void initialize_eim_construction();
+
+  /**
    * Read parameters in from file and set up this system
    * accordingly.
    */
-  virtual void process_parameters_file (const std::string & parameters_filename) override;
+  virtual void process_parameters_file (const std::string & parameters_filename);
+
+  /**
+   * Set the state of this RBConstruction object based on the arguments
+   * to this function.
+   */
+  void set_rb_construction_parameters(unsigned int n_training_samples_in,
+                                      bool deterministic_training_in,
+                                      unsigned int training_parameters_random_seed_in,
+                                      bool quiet_mode_in,
+                                      unsigned int Nmax_in,
+                                      Real rel_training_tolerance_in,
+                                      Real abs_training_tolerance_in,
+                                      RBParameters mu_min_in,
+                                      RBParameters mu_max_in,
+                                      std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
+                                      std::map<std::string,bool> log_scaling);
 
   /**
    * Specify which type of "best fit" we use to guide the EIM
@@ -94,72 +137,13 @@ public:
   /**
    * Print out info that describes the current setup of this RBConstruction.
    */
-  virtual void print_info() override;
+  virtual void print_info();
 
   /**
-   * Initialize this system so that we can perform
-   * the Construction stage of the RB method.
+   * Generate the EIM approximation for the specified parametrized function.
+   * Return the final tolerance from the training algorithm.
    */
-  virtual void initialize_rb_construction(bool skip_matrix_assembly=false,
-                                          bool skip_vector_assembly=false) override;
-
-  /**
-   * Override train_reduced_basis to first initialize _parametrized_functions_in_training_set.
-   */
-  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true) override;
-
-  /**
-   * Load the truth representation of the parametrized function
-   * at the current parameters into the solution vector.
-   * The truth representation is the projection of
-   * parametrized_function into the finite element space.
-   * If \p plot_solution > 0 the solution will be plotted
-   * to an output file.
-   */
-  virtual Real truth_solve(int plot_solution) override;
-
-  /**
-   * We compute the best fit of parametrized_function
-   * into the EIM space and then evaluate the error
-   * in the norm defined by inner_product_matrix.
-   *
-   * \returns The error in the best fit
-   */
-  virtual Real compute_best_fit_error();
-
-  /**
-   * Initialize \p c based on \p sys.
-   */
-  virtual void init_context_with_sys(FEMContext & c, System & sys);
-
-  /**
-   * Add variables to the ExplicitSystem that is used to store
-   * the basis functions.
-   */
-  virtual void init_explicit_system() = 0;
-
-  /**
-   * Add one variable to the ImplicitSystem (i.e. this system) that is
-   * used to perform L2 project solves.
-   */
-  virtual void init_implicit_system() = 0;
-
-  /**
-   * Evaluate the mesh function at the specified point and for the specified variable.
-   */
-  Number evaluate_mesh_function(unsigned int var_number,
-                                Point p);
-
-  /**
-   * Set a point locator tolerance to be used in this class's MeshFunction, and
-   * other operations that require a PointLocator.
-   */
-  void set_point_locator_tol(Real point_locator_tol);
-
-  /**
-   * \returns The point locator tolerance.
-   */
-  Real get_point_locator_tol() const;
+  Real train_eim_approximation();
 
   /**
    * Build a vector of ElemAssembly objects that accesses the basis
@@ -183,138 +167,142 @@ public:
   virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
 
   /**
-   * Get the ExplicitSystem associated with this system.
+   * Pre-request FE data needed for calculations.
    */
-  ExplicitSystem & get_explicit_system();
+  virtual void init_context(FEMContext &);
 
   /**
-   * Load the i^th RB function into the RBConstruction
-   * solution vector.
-   * Override to load the basis function into the ExplicitSystem.
+   * Get/set the relative tolerance for the basis training.
    */
-  virtual void load_basis_function(unsigned int i) override;
+  void set_rel_training_tolerance(Real new_training_tolerance);
+  Real get_rel_training_tolerance();
 
   /**
-   * Load the RB solution from the most recent solve with rb_eval
-   * into this system's solution vector.
-   * Override to load the solution into the ExplicitSystem.
+   * Get/set the absolute tolerance for the basis training.
    */
-  virtual void load_rb_solution() override;
+  void set_abs_training_tolerance(Real new_training_tolerance);
+  Real get_abs_training_tolerance();
 
   /**
-   * Load \p source into the subvector of \p dest corresponding
-   * to var \p var.
+   * Get/set Nmax, the maximum number of RB
+   * functions we are willing to compute.
    */
-  void set_explicit_sys_subvector(NumericVector<Number>& dest,
-                                  unsigned int var,
-                                  NumericVector<Number>& source);
+  unsigned int get_Nmax() const;
+  virtual void set_Nmax(unsigned int Nmax);
 
   /**
-   * Load the subvector of \p localized_source corresponding to variable \p var into
-   * \p dest. We require localized_source to be localized before we call this method.
+   * Get the maximum value (across all processors) from
+   * the parametrized functions in the training set.
    */
-  void get_explicit_sys_subvector(NumericVector<Number>& dest,
-                                  unsigned int var,
-                                  NumericVector<Number>& localized_source);
+  Real get_max_abs_value_in_training_set() const;
 
   /**
-   * Set up the index map between the implicit and explicit systems.
+   * Get the EIM solution vector at all parametrized functions in the training
+   * set. In some cases we want to store this data for future use. For example
+   * this is useful in the case that the parametrized function is defined
+   * based on a look-up table rather than an analytical function, since
+   * if we store the EIM solution data, we can do Online solves without
+   * initializing the look-up table data.
    */
-  void init_dof_map_between_systems();
-
-  /**
-   * Plot all the parameterized functions that we are storing
-   * in _parametrized_functions_in_training_set. \p pathname
-   * provides the path to where the plot data will be saved.
-   */
-  void plot_parametrized_functions_in_training_set(const std::string & pathname);
-
-  //----------- PUBLIC DATA MEMBERS -----------//
+  void store_eim_solutions_for_training_set();
 
   /**
    * Enum that indicates which type of "best fit" algorithm
    * we should use.
    * a) projection: Find the best fit in the inner product
    * b) eim: Use empirical interpolation to find a "best fit"
-   *
-   * \returns The error associated with the "best fit" in the
-   * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
-
-protected:
-
-  /**
-   * Override to initialize the coupling matrix to decouple variables in this system.
-   */
-  virtual void init_data() override;
-
-  /**
-   * Add a new basis function to the RB space. Override
-   * to enrich with the EIM basis functions.
-   */
-  virtual void enrich_RB_space() override;
-
-  /**
-   * Update the system after enriching the RB space; this calls
-   * a series of functions to update the system properly.
-   */
-  virtual void update_system() override;
-
-  /**
-   * Compute the reduced basis matrices for the current basis.
-   * Override to update the inner product matrix that
-   * is used to compute the best fit to parametrized_function.
-   */
-  virtual void update_RB_system_matrices() override;
-
-  /**
-   * Override to return the best fit error. This function is used in
-   * the Greedy algorithm to select the next parameter.
-   */
-  virtual Real get_RB_error_bound() override;
-
-  /**
-   * Pre-request FE data needed for calculations.
-   */
-  virtual void init_context(FEMContext &) override;
-
-  /**
-   * Loop over the training set and compute the parametrized function for each
-   * training index.
-   */
-  void initialize_parametrized_functions_in_training_set();
-
-  /**
-   * Boolean flag to indicate whether or not we have called
-   * compute_parametrized_functions_in_training_set() yet.
-   */
-  bool _parametrized_functions_in_training_set_initialized;
-
-  /**
-   * The libMesh vectors storing the finite element coefficients
-   * of the RB basis functions.
-   */
-  std::vector<std::unique_ptr<NumericVector<Number>>> _parametrized_functions_in_training_set;
 
 private:
 
   /**
-   * A mesh function to interpolate on the mesh.
+   * Find the training sample that has the largest EIM approximation error
+   * based on the current EIM approximation. Return the maximum error, and
+   * the training sample index at which it occured.
    */
-  std::unique_ptr<MeshFunction> _mesh_function;
+  std::pair<Real, unsigned int> compute_max_eim_error();
 
   /**
-   * We also need an extra vector in which we can store a ghosted
-   * copy of the vector that we wish to use MeshFunction on.
+   * Compute the maximum (i.e. l-infinity norm) error of the best fit
+   * of the parametrized function at training index \p training_index
+   * into the EIM approximation space.
    */
-  std::unique_ptr<NumericVector<Number>> _ghosted_meshfunction_vector;
+  Real compute_best_fit_error(unsigned int training_index);
 
   /**
-   * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion,
-   * because this isn't used at all in the EIM.
+   * Compute and store the parametrized function for each
+   * parameter in the training set at all the stored qp locations.
    */
-  RBAssemblyExpansion _empty_rb_assembly_expansion;
+  void initialize_parametrized_functions_in_training_set();
+
+  /**
+   * Initialize the data associated with each quad point (location, JxW, etc.)
+   * so that we can use this in evaluation of the parametrized functions.
+   */
+  void initialize_qp_data();
+
+  /**
+   * Evaluate the inner product of vec1 and vec2 which specify values at
+   * quadrature points. The inner product includes the JxW contributions
+   * stored in _local_quad_point_JxW, so that this is equivalent to
+   * computing w^t M v, where M is the mass matrix.
+   */
+  Number inner_product(const QpDataMap & v, const QpDataMap & w);
+
+  /**
+   * Get the maximum absolute value from a vector stored in the format that we use
+   * for basis functions.
+   */
+  Real get_max_abs_value(const QpDataMap & v) const;
+
+  /**
+   * Add a new basis function to the EIM approximation.
+   */
+  void enrich_eim_approximation(unsigned int training_index);
+
+  /**
+   * Update the matrices used in training the EIM approximation.
+   */
+  void update_eim_matrices();
+
+  /**
+   * We compute the best fit of parametrized_function
+   * into the EIM space and then evaluate the error
+   * in the norm defined by inner_product_matrix.
+   *
+   * \returns The error in the best fit
+   */
+  Real compute_best_fit_error();
+
+  /**
+   * Scale all values in \p pf by \p scaling_factor
+   */
+  static void scale_parametrized_function(
+    QpDataMap & local_pf,
+    Number scaling_factor);
+
+  /**
+   * Maximum number of EIM basis functions we are willing to use.
+   */
+  unsigned int _Nmax;
+
+  /**
+   * Relative and absolute tolerances for training the EIM approximation.
+   */
+  Real _rel_training_tolerance;
+  Real _abs_training_tolerance;
+
+  /**
+   * The matrix we use in order to perform L2 projections of
+   * parametrized functions as part of EIM training.
+   */
+  DenseMatrix<Number> _eim_projection_matrix;
+
+  /**
+   * The RBEIMEvaluation object that we use to perform the EIM training.
+   */
+  RBEIMEvaluation * _rb_eim_eval;
 
   /**
    * The vector of assembly objects that are created to point to
@@ -323,29 +311,47 @@ private:
   std::vector<std::unique_ptr<ElemAssembly>> _rb_eim_assembly_objects;
 
   /**
-   * We use an ExplicitSystem to store the EIM basis functions.
-   * This is because if we have an EIM system with many variables
-   * we need to allocate a large matrix. Better to avoid this
-   * and use an ExplicitSystem instead, and only use the ImplicitSystem
-   * to deal with the per-variable L2 projections.
+   * The parametrized functions that are used for training. We pre-compute and
+   * store all of these functions, rather than recompute them at each iteration
+   * of the training.
+   *
+   * We store values at quadrature points on elements that are local to this processor.
+   * The indexing is as follows:
+   *   basis function index --> element ID --> variable --> quadrature point --> value
+   * We use a map to index the element ID, since the IDs on this processor in
+   * generally will not start at zero.
    */
-  std::string _explicit_system_name;
+  std::vector<QpDataMap> _local_parametrized_functions_for_training;
 
   /**
-   * The index map between the explicit system and the implicit system.
+   * Maximum value in _local_parametrized_functions_for_training across all processors.
+   * This can be used for normalization purposes, for example.
    */
-  std::vector<std::vector<dof_id_type>> _dof_map_between_systems;
+  Real _max_abs_value_in_training_set;
 
   /**
-   * This vector is used to store inner_product_matrix * basis_function[i] for each i,
-   * since we frequently use this data.
+   * The quadrature point locations, quadrature point weights (JxW), and subdomain IDs
+   * on every element local to this processor.
+   *
+   * The indexing is as follows:
+   *   element ID --> quadrature point --> xyz
+   *   element ID --> quadrature point --> JxW
+   *   element ID --> subdomain_id
+   * We use a map to index the element ID, since the IDs on this processor in
+   * generally will not start at zero.
    */
-  std::vector<std::unique_ptr<NumericVector<Number>>> _matrix_times_bfs;
+  std::unordered_map<dof_id_type, std::vector<Point> > _local_quad_point_locations;
+  std::unordered_map<dof_id_type, std::vector<Real> > _local_quad_point_JxW;
+  std::unordered_map<dof_id_type, subdomain_id_type > _local_quad_point_subdomain_ids;
 
   /**
-   * The point locator tolerance.
+   * EIM approximations often arise when applying a geometric mapping to a Reduced Basis
+   * formulation. In this context, we often need to approximate derivates of the mapping
+   * function via EIM. In order to enable this, we also optionally store perturbations
+   * about each point in _local_quad_point_locations to enable finite difference approximation
+   * to the mapping function derivatives.
    */
-  Real _point_locator_tol;
+  std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > _local_quad_point_locations_perturbations;
 };
 
 } // namespace libMesh

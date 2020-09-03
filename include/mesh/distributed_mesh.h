@@ -245,6 +245,7 @@ public:
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   virtual unique_id_type parallel_max_unique_id () const override;
+  virtual void set_next_unique_id(unique_id_type id) override;
 #endif
 
   virtual const Point & point (const dof_id_type i) const override;

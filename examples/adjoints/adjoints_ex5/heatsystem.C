@@ -32,6 +32,7 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/numeric_vector.h"
 
 void HeatSystem::init_data ()
 {
@@ -41,8 +42,7 @@ void HeatSystem::init_data ()
   // Make sure the input file heat.in exists, and parse it.
   {
     std::ifstream i("heat.in");
-    if (!i)
-      libmesh_error_msg('[' << this->processor_id() << "] Can't find heat.in; exiting early.");
+    libmesh_error_msg_if(!i, '[' << this->processor_id() << "] Can't find heat.in; exiting early.");
   }
   GetPot infile("heat.in");
   _k = infile("k", 1.0);
@@ -168,6 +168,9 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
 {
   this->update();
 
+  // Get the timestep size
+  deltat_vector.push_back(this->deltat);
+
   for (std::size_t j=0, Np = parameters_in.size(); j != Np; ++j)
     {
       Number old_parameter = *parameters_in[j];
@@ -181,8 +184,8 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
       std::unique_ptr<NumericVector<Number>> R_minus = this->rhs->clone();
 
       // The contribution at a single time step would be [f(z;p+dp) - <partialu/partialt, z>(p+dp) - <g(u),z>(p+dp)] * dt
-      // But since we compute the residual already scaled by dt, there is no need for the * dt
-      R_minus_dp += -R_minus->dot(this->get_adjoint_solution(0));
+      // dt can vary per timestep, so its stored and multiplied separately during the integration
+      R_minus_dp.push_back(-R_minus->dot(this->get_adjoint_solution(0)));
 
       *parameters_in[j] = old_parameter + dp;
 
@@ -192,7 +195,7 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
 
       std::unique_ptr<NumericVector<Number>> R_plus = this->rhs->clone();
 
-      R_plus_dp += -R_plus->dot(this->get_adjoint_solution(0));
+      R_plus_dp.push_back(-R_plus->dot(this->get_adjoint_solution(0)));
 
       *parameters_in[j] = old_parameter;
     }

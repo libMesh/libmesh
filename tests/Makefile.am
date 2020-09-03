@@ -40,12 +40,14 @@ unit_tests_sources = \
   fe/fe_szabab_test.C \
   fe/fe_test.h \
   fe/fe_xyz_test.C \
+  fe/dual_shape_verification_test.C \
   geom/bbox_test.C \
   geom/elem_test.C \
   geom/node_test.C \
   geom/point_test.C \
   geom/point_test.h \
   geom/side_test.C \
+  geom/volume_test.C \
   geom/which_node_am_i_test.C \
   mesh/all_tri.C \
   mesh/distort.C \
@@ -55,6 +57,7 @@ unit_tests_sources = \
   mesh/checkpoint.C \
   mesh/contains_point.C \
   mesh/extra_integers.C \
+  mesh/mesh_generation_test.C \
   mesh/mesh_input.C \
   mesh/mesh_function.C \
   mesh/mesh_stitch.C \
@@ -105,12 +108,23 @@ unit_tests_sources = \
   solvers/first_order_unsteady_solver_test.C \
   solvers/second_order_unsteady_solver_test.C \
   systems/equation_systems_test.C \
+  systems/periodic_bc_test.C \
   systems/systems_test.C \
   utils/parameters_test.C \
   utils/point_locator_test.C \
-  utils/vectormap_test.C
+  utils/vectormap_test.C \
+  utils/xdr_test.C
 
 #EXTRA_DIST = base/getpot_test_input.in
+
+# Make sure any data goes in "make dist"
+datadir = $(install_dir)
+data = 1_quad.dyn \
+       25_quad.bxt \
+       shark_tooth_tri6.xda.gz
+
+unit_tests_sources += \
+  $(data)
 
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \
@@ -140,6 +154,8 @@ endif
   unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
   unit_tests_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
+  unit_tests_dbgdir       = $(datadir)
+  unit_tests_dbg_DATA     = $(data)
 endif
 endif
 
@@ -151,6 +167,8 @@ if LIBMESH_DEVEL_MODE
   unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
   unit_tests_devel_LDADD    = $(top_builddir)/libmesh_devel.la
+  unit_tests_develdir       = $(datadir)
+  unit_tests_devel_DATA     = $(data)
 endif
 endif
 
@@ -162,6 +180,8 @@ if LIBMESH_PROF_MODE
   unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
   unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
   unit_tests_prof_LDADD    = $(top_builddir)/libmesh_prof.la
+  unit_tests_profdir       = $(datadir)
+  unit_tests_prof_DATA     = $(data)
 endif
 endif
 
@@ -173,6 +193,8 @@ if LIBMESH_OPROF_MODE
   unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
   unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
   unit_tests_oprof_LDADD    = $(top_builddir)/libmesh_oprof.la
+  unit_tests_oprofdir       = $(datadir)
+  unit_tests_oprof_DATA     = $(data)
 endif
 endif
 
@@ -183,6 +205,8 @@ if LIBMESH_OPT_MODE
   unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
   unit_tests_opt_LDADD    = $(top_builddir)/libmesh_opt.la
+  unit_tests_optdir       = $(datadir)
+  unit_tests_opt_DATA     = $(data)
 endif
 endif
 
@@ -228,7 +252,9 @@ CLEANFILES = cube_mesh.xda \
 	     mesh_with_soln.e \
 	     elemental_from_nodal.e \
              write_sideset_data.e \
-             write_edgeset_data.e
+             write_edgeset_data.e \
+             read_header_test.e \
+             output.dat
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
@@ -237,6 +263,7 @@ if LIBMESH_VPATH_BUILD
 .linkstamp:
 	-rm -f 25_quad.bxt && $(LN_S) -f $(srcdir)/25_quad.bxt .
 	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
+	-rm -f shark_tooth_tri6.xda.gz && $(LN_S) -f $(srcdir)/shark_tooth_tri6.xda.gz .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += .linkstamp

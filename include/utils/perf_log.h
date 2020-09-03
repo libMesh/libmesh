@@ -293,21 +293,6 @@ public:
   typedef std::map<std::pair<const char *,
                              const char *>,
                    PerfData> log_type;
-  /**
-   * \returns the raw underlying data structure for the entire performance log.
-   *
-   * \deprecated because encapsulation is good.
-   *
-   * Also probably broken by the switch from string to const char *,
-   * though users who are liberal with "auto" might be safe.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  const log_type & get_log_raw() const
-  {
-    libmesh_deprecated();
-    return log;
-  }
-#endif
 
 private:
 

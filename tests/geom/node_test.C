@@ -11,12 +11,9 @@ class NodeTest : public PointTestBase<Node>, public DofObjectTest<Node> {
 public:
   CPPUNIT_TEST_SUITE( NodeTest );
 
-  // These tests currently use the Node copy constructor, which is marked
-  // as deprecated, so only instantiate them if deprecated code is allowed.
-#ifdef LIBMESH_ENABLE_DEPRECATED
   POINTTEST
+
   DOFOBJECTTEST
-#endif
 
   CPPUNIT_TEST_SUITE_END();
 

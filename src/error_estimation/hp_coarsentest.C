@@ -89,7 +89,7 @@ void HPCoarsenTest::add_projection(const System & system,
   libmesh_assert_equal_to (Uc.size(), phi_coarse->size());
 
   // Loop over the quadrature points
-  for (auto qp : IntRange<unsigned int>(0, qrule->n_points()))
+  for (auto qp : make_range(qrule->n_points()))
     {
       // The solution value at the quadrature point
       Number val = libMesh::zero;
@@ -156,12 +156,12 @@ void HPCoarsenTest::select_refinement (System & system)
   // Check for a valid component_scale
   if (!component_scale.empty())
     {
-      if (component_scale.size() != n_vars)
-        libmesh_error_msg("ERROR: component_scale is the wrong size:\n" \
-                          << " component_scale.size()=" \
-                          << component_scale.size()     \
-                          << "\n n_vars=" \
-                          << n_vars);
+      libmesh_error_msg_if(component_scale.size() != n_vars,
+                           "ERROR: component_scale is the wrong size:\n"
+                           << " component_scale.size()="
+                           << component_scale.size()
+                           << "\n n_vars="
+                           << n_vars);
     }
   else
     {
@@ -318,7 +318,7 @@ void HPCoarsenTest::select_refinement (System & system)
               Fe.zero();
 
               // Loop over the quadrature points
-              for (auto qp : IntRange<unsigned int>(0, qrule->n_points()))
+              for (auto qp : make_range(qrule->n_points()))
                 {
                   // The solution value at the quadrature point
                   Number val = libMesh::zero;
@@ -505,16 +505,14 @@ void HPCoarsenTest::select_refinement (System & system)
 
           // FIXME: we're overestimating the number of DOFs added by h
           // refinement
-          FEType elem_fe_type = fe_type;
-          elem_fe_type.order =
-            static_cast<Order>(fe_type.order + elem->p_level());
-          dofs_per_elem +=
-            FEInterface::n_dofs(dim, elem_fe_type, elem->type());
 
-          elem_fe_type.order =
-            static_cast<Order>(fe_type.order + elem->p_level() + 1);
+          // Compute number of DOFs for elem at current p_level()
+          dofs_per_elem +=
+            FEInterface::n_dofs(fe_type, elem);
+
+          // Compute number of DOFs for elem at current p_level() + 1
           dofs_per_p_elem +=
-            FEInterface::n_dofs(dim, elem_fe_type, elem->type());
+            FEInterface::n_dofs(fe_type, elem->p_level() + 1, elem);
         }
 
       const unsigned int new_h_dofs = dofs_per_elem *

@@ -87,7 +87,7 @@ public:
   /**
    * Fills: num_nodes_global, num_elems_global, num_elem_blks_global,
    * num_node_sets_global, num_side_sets_global
-   * Call after: read_header()
+   * Call after: read_and_store_header_info()
    * Call before: Any other get_* function from this class
    */
   void get_init_global();
@@ -295,6 +295,20 @@ public:
    * also writes global initial data to file.
    */
   virtual void initialize(std::string title, const MeshBase & mesh, bool use_discontinuous=false) override;
+
+  /**
+   * This function uses global communication routines to determine the
+   * number of element blocks across the entire mesh.
+   */
+  void compute_num_global_elem_blocks(const MeshBase & pmesh);
+
+  /**
+   * This function builds the libmesh -> exodus and exodus -> libmesh
+   * node and element maps.  These maps allow us to have a consistent
+   * numbering scheme within an Exodus file, given an existing globally
+   * consistent numbering scheme from LibMesh.
+   */
+  void build_element_and_node_maps(const MeshBase & pmesh);
 
   /**
    * Takes a parallel solution vector containing the node-major
@@ -619,12 +633,6 @@ private:
 
   /**
    * This function uses global communication routines to determine the
-   * number of element blocks across the entire mesh.
-   */
-  void compute_num_global_elem_blocks(const MeshBase & pmesh);
-
-  /**
-   * This function uses global communication routines to determine the
    * number of nodesets across the entire mesh.
    */
   void compute_num_global_nodesets(const MeshBase & pmesh);
@@ -634,14 +642,6 @@ private:
    * number of sidesets across the entire mesh.
    */
   void compute_num_global_sidesets(const MeshBase & pmesh);
-
-  /**
-   * This function builds the libmesh -> exodus and exodus -> libmesh
-   * node and element maps.  These maps allow us to have a consistent
-   * numbering scheme within an Exodus file, given an existing globally
-   * consistent numbering scheme from LibMesh.
-   */
-  void build_element_and_node_maps(const MeshBase & pmesh);
 
   /**
    * This function constructs the set of border node IDs present

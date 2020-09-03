@@ -81,19 +81,6 @@ public:
    */
   std::vector<std::vector<Real>> node_attributes;
 
-  /**
-   * Data structure to hold element attributes read in from file.
-   *
-   * \note This vector is no longer filled or used for anything. If
-   * region attributes are present in the .ele file, they are used to
-   * set the subdomain ids of the elements as they are created.
-   *
-   * \deprecated This member, since it was originally a part of the
-   * public interface, remains for now, but will be removed some time
-   * in the near future.
-   */
-  std::vector<std::vector<Real>> element_attributes;
-
 private:
 
 

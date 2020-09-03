@@ -56,6 +56,7 @@ enum Order : int;
 #include <set>
 #include <vector>
 #include <memory>
+#include <array>
 
 namespace libMesh
 {
@@ -68,6 +69,8 @@ class Elem;
 class PeriodicBoundaries;
 class PointLocatorBase;
 #endif
+template <class SideType, class ParentType>
+class Side;
 
 
 /**
@@ -728,6 +731,16 @@ public:
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int /*s*/) const = 0;
 
   /**
+   * \returns the (local) node numbers on the specified edge
+   */
+  virtual std::vector<unsigned int> nodes_on_edge(const unsigned int /*e*/) const = 0;
+
+  /**
+   * \returns the (local) side numbers that touch the specified edge
+   */
+  virtual std::vector<unsigned int> sides_on_edge(const unsigned int /*e*/) const = 0;
+
+  /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
    */
@@ -1046,7 +1059,7 @@ public:
    * by storing the D-dimensional parent.  This method provides access to that
    * element.
    *
-   * This method is not safe to call if this->dim() == LIBMESH_DIM; in
+   * This method returns nullptr if this->dim() == LIBMESH_DIM; in
    * such cases no data storage for an interior parent pointer has
    * been allocated.
    */
@@ -1705,6 +1718,14 @@ protected:
   /**
    * An implementation for simple (all sides equal) elements
    */
+  template <typename Sideclass, typename Subclass>
+  std::unique_ptr<Elem>
+  simple_build_side_ptr(const unsigned int i,
+                        bool proxy);
+
+  /**
+   * An implementation for simple (all sides equal) elements
+   */
   template <typename Subclass>
   void simple_build_side_ptr(std::unique_ptr<Elem> & side,
                              const unsigned int i,
@@ -2011,7 +2032,7 @@ dof_id_type Elem::node_id (const unsigned int i) const
 inline
 unsigned int Elem::local_node (const dof_id_type i) const
 {
-  for (auto n : IntRange<unsigned int>(0, this->n_nodes()))
+  for (auto n : make_range(this->n_nodes()))
     if (this->node_id(n) == i)
       return n;
 
@@ -2069,7 +2090,7 @@ Node & Elem::node_ref (const unsigned int i)
 inline
 unsigned int Elem::get_node_index (const Node * node_ptr) const
 {
-  for (auto n : IntRange<unsigned int>(0, this->n_nodes()))
+  for (auto n : make_range(this->n_nodes()))
     if (this->_nodes[n] == node_ptr)
       return n;
 
@@ -2269,6 +2290,35 @@ Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
 
 
 
+template <typename Sideclass, typename Subclass>
+inline
+std::unique_ptr<Elem>
+Elem::simple_build_side_ptr (const unsigned int i,
+                             bool proxy)
+{
+  libmesh_assert_less (i, this->n_sides());
+
+  std::unique_ptr<Elem> face;
+  if (proxy)
+    face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+  else
+    {
+      face = libmesh_make_unique<Sideclass>(this);
+      for (auto n : face->node_index_range())
+        face->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+    }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
+}
+
+
+
 template <typename Subclass>
 inline
 void
@@ -2286,7 +2336,9 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
   else
     {
       side->subdomain_id() = this->subdomain_id();
-
+#ifdef LIBMESH_ENABLE_AMR
+      side->set_p_level(this->p_level());
+#endif
       for (auto n : side->node_index_range())
         side->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
     }
@@ -2355,7 +2407,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
       libmesh_assert(eparent);
     }
 
-  for (auto s : IntRange<unsigned int>(0, this->n_sides()))
+  for (auto s : make_range(this->n_sides()))
     if (this->neighbor_ptr(s) == eparent)
       return s;
 
@@ -2727,31 +2779,9 @@ dof_id_type Elem::compute_key (dof_id_type n0,
                                dof_id_type n1,
                                dof_id_type n2)
 {
-  // Order the numbers such that n0 < n1 < n2.
-  // We'll do it in 3 steps like this:
-  //
-  //     n0         n1                n2
-  //     min(n0,n1) max(n0,n1)        n2
-  //     min(n0,n1) min(n2,max(n0,n1) max(n2,max(n0,n1)
-  //           |\   /|                  |
-  //           | \ / |                  |
-  //           |  /  |                  |
-  //           | /  \|                  |
-  //  gb min= min   max              gb max
-
-  // Step 1
-  if (n0 > n1) std::swap (n0, n1);
-
-  // Step 2
-  if (n1 > n2) std::swap (n1, n2);
-
-  // Step 3
-  if (n0 > n1) std::swap (n0, n1);
-
-  libmesh_assert ((n0 < n1) && (n1 < n2));
-
-  dof_id_type array[3] = {n0, n1, n2};
-  return Utility::hashword(array, 3);
+  std::array<dof_id_type, 3> array = {{n0, n1, n2}};
+  std::sort(array.begin(), array.end());
+  return Utility::hashword(array);
 }
 
 
@@ -2762,26 +2792,9 @@ dof_id_type Elem::compute_key (dof_id_type n0,
                                dof_id_type n2,
                                dof_id_type n3)
 {
-  // Sort first
-  // Step 1
-  if (n0 > n1) std::swap (n0, n1);
-
-  // Step 2
-  if (n2 > n3) std::swap (n2, n3);
-
-  // Step 3
-  if (n0 > n2) std::swap (n0, n2);
-
-  // Step 4
-  if (n1 > n3) std::swap (n1, n3);
-
-  // Finally sort step 5
-  if (n1 > n2) std::swap (n1, n2);
-
-  libmesh_assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
-
-  dof_id_type array[4] = {n0, n1, n2, n3};
-  return Utility::hashword(array, 4);
+  std::array<dof_id_type, 4> array = {{n0, n1, n2, n3}};
+  std::sort(array.begin(), array.end());
+  return Utility::hashword(array);
 }
 
 

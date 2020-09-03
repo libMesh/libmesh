@@ -33,12 +33,12 @@ public:
 
   void testGetUniqueTagAuto()
   {
-    // We need to duplicate the communicator first, because the
-    // original might already have tags used by other unit tests
+    // We need to explicitly duplicate the communicator first, because
+    // the original might already have tags used by other unit tests
 
     Parallel::Communicator newcomm;
 
-    TestCommWorld->duplicate(newcomm);
+    newcomm.duplicate(*TestCommWorld);
 
     const int n_vals = 5;
     const int n_vals_in_scope = 3;

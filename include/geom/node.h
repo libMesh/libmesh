@@ -67,14 +67,16 @@ public:
          const dof_id_type id = invalid_id);
 
   /**
-   * Copy-constructor.
+   * "Copy"-constructor: deliberately slices the source Node and only
+   * copies its' Point information, since copying anything else would
+   * likely be a bug.
    *
-   * \deprecated - anyone copying a Node would almost certainly be
-   * better off copying the much cheaper Point or taking a reference
-   * to the Node.
+   * \deprecated - the constructor from Point is what we really want.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
   Node (const Node & n);
+#else
+  Node (const Node & n) = delete;
 #endif
 
   /**
@@ -89,7 +91,7 @@ public:
   template <typename T,
             typename = typename
               boostcopy::enable_if_c<ScalarTraits<T>::value,void>::type>
-  Node (const T x) :
+  explicit Node (const T x) :
     Point (x,0,0)
   { this->set_id() = invalid_id; }
 
@@ -249,21 +251,20 @@ Node::Node (const Real x,
 }
 
 
-
 #ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 Node::Node (const Node & n) :
   Point(n),
-  DofObject(n),
+  DofObject(), // Deliberately slicing!
   ReferenceCountedObject<Node>()
 #ifdef LIBMESH_ENABLE_NODE_VALENCE
   ,
-  _valence(n._valence)
+  _valence(0)
 #endif
 {
-  libmesh_deprecated();
+  libmesh_deprecated(); // Cast to Point first!
 }
-#endif
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

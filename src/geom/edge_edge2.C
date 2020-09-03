@@ -28,7 +28,11 @@ namespace libMesh
 
 // Edge2 class static member initializations
 const int Edge2::num_nodes;
+const int Edge2::num_sides;
+const int Edge2::num_edges;
 const int Edge2::num_children;
+const int Edge2::nodes_per_side;
+const int Edge2::nodes_per_edge;
 
 #ifdef LIBMESH_ENABLE_AMR
 

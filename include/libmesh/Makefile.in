@@ -107,8 +107,16 @@ target_triplet = @target@
 @LIBMESH_ENABLE_CAPNPROTO_TRUE@am__append_12 = rb_data.capnp.h
 subdir = include/libmesh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
-	$(top_srcdir)/m4/all_static.m4 \
+am__aclocal_m4_deps =  \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_control_args.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_summarize_env.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_test_sanitize_flags.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/ax_prefix_config_h.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/ax_split_version.m4 \
+	$(top_srcdir)/m4/ac_cxx_rtti.m4 $(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
@@ -116,14 +124,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_gcc_archflag.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
-	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
 	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/capnproto.m4 \
 	$(top_srcdir)/m4/compiler.m4 \
-	$(top_srcdir)/m4/compiler_control_args.m4 \
-	$(top_srcdir)/m4/config_environment.m4 \
-	$(top_srcdir)/m4/config_summary.m4 \
-	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
+	$(top_srcdir)/m4/config_summary.m4 $(top_srcdir)/m4/cppunit.m4 \
 	$(top_srcdir)/m4/curl.m4 $(top_srcdir)/m4/cxx11.m4 \
 	$(top_srcdir)/m4/cxx17.m4 $(top_srcdir)/m4/demangle.m4 \
 	$(top_srcdir)/m4/dlopen.m4 $(top_srcdir)/m4/eigen.m4 \
@@ -140,13 +144,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/locale.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/mpi.m4 \
-	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
-	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
-	$(top_srcdir)/m4/nlopt.m4 $(top_srcdir)/m4/parmetis.m4 \
-	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/precision.m4 \
-	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
-	$(top_srcdir)/m4/sanitize.m4 $(top_srcdir)/m4/scrape_petsc.m4 \
+	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/namespaces.m4 \
+	$(top_srcdir)/m4/nanoflann.m4 $(top_srcdir)/m4/nemesis.m4 \
+	$(top_srcdir)/m4/netcdf.m4 $(top_srcdir)/m4/nlopt.m4 \
+	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
+	$(top_srcdir)/m4/precision.m4 $(top_srcdir)/m4/qhull.m4 \
 	$(top_srcdir)/m4/sfc.m4 $(top_srcdir)/m4/slepc.m4 \
 	$(top_srcdir)/m4/sstream.m4 $(top_srcdir)/m4/strstream.m4 \
 	$(top_srcdir)/m4/tbb.m4 $(top_srcdir)/m4/tecio.m4 \
@@ -495,13 +497,12 @@ EXTRA_DIST = rebuild_makefile.sh
 BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	dof_map.h dof_object.h factory.h float128_shims.h getpot.h \
 	ghost_point_neighbors.h ghosting_functor.h id_types.h \
-	libmesh.h libmesh_C_isnan.h libmesh_augment_std_namespace.h \
-	libmesh_base.h libmesh_common.h libmesh_documentation.h \
-	libmesh_exceptions.h libmesh_logging.h libmesh_singleton.h \
-	libmesh_version.h multi_predicates.h periodic_boundaries.h \
-	periodic_boundary.h periodic_boundary_base.h \
-	point_neighbor_coupling.h print_trace.h \
-	reference_counted_object.h reference_counter.h \
+	libmesh.h libmesh_augment_std_namespace.h libmesh_base.h \
+	libmesh_common.h libmesh_documentation.h libmesh_exceptions.h \
+	libmesh_logging.h libmesh_singleton.h libmesh_version.h \
+	multi_predicates.h periodic_boundaries.h periodic_boundary.h \
+	periodic_boundary_base.h point_neighbor_coupling.h \
+	print_trace.h reference_counted_object.h reference_counter.h \
 	sibling_coupling.h single_predicates.h sparsity_pattern.h \
 	variable.h variant_filter_iterator.h enum_convergence_flags.h \
 	enum_eigen_solver_type.h enum_elem_quality.h enum_elem_type.h \
@@ -542,20 +543,20 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
 	surface.h abaqus_io.h boundary_info.h boundary_mesh.h \
 	checkpoint_io.h distributed_mesh.h dyna_io.h ensight_io.h \
-	exodusII_io.h exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h \
-	gnuplot_io.h inf_elem_builder.h matlab_io.h medit_io.h mesh.h \
-	mesh_base.h mesh_communication.h mesh_function.h \
-	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
-	mesh_modification.h mesh_output.h mesh_refinement.h \
-	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
-	mesh_smoother_vsmoother.h mesh_subdivision_support.h \
-	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
-	mesh_triangle_holes.h mesh_triangle_interface.h \
-	mesh_triangle_wrapper.h namebased_io.h nemesis_io.h \
-	nemesis_io_helper.h off_io.h parallel_mesh.h patch.h \
-	postscript_io.h replicated_mesh.h serial_mesh.h \
-	sync_refinement_flags.h tecplot_io.h tetgen_io.h ucd_io.h \
-	unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
+	exodusII_io.h exodusII_io_helper.h exodus_header_info.h \
+	fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h inf_elem_builder.h \
+	matlab_io.h medit_io.h mesh.h mesh_base.h mesh_communication.h \
+	mesh_function.h mesh_generation.h mesh_input.h \
+	mesh_inserter_iterator.h mesh_modification.h mesh_output.h \
+	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
+	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
+	mesh_subdivision_support.h mesh_tetgen_interface.h \
+	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
+	mesh_triangle_interface.h mesh_triangle_wrapper.h \
+	namebased_io.h nemesis_io.h nemesis_io_helper.h off_io.h \
+	parallel_mesh.h patch.h postscript_io.h replicated_mesh.h \
+	serial_mesh.h sync_refinement_flags.h tecplot_io.h tetgen_io.h \
+	ucd_io.h unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
 	analytic_function.h composite_fem_function.h \
 	composite_function.h const_fem_function.h const_function.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
@@ -608,11 +609,11 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	radial_basis_interpolation.h solution_transfer.h \
 	adaptive_time_solver.h diff_solver.h eigen_solver.h \
 	eigen_sparse_linear_solver.h eigen_time_solver.h \
-	euler2_solver.h euler_solver.h first_order_unsteady_solver.h \
-	laspack_linear_solver.h linear_solver.h \
-	memory_solution_history.h newmark_solver.h newton_solver.h \
-	nlopt_optimization_solver.h no_solution_history.h \
-	nonlinear_solver.h optimization_solver.h \
+	euler2_solver.h euler_solver.h file_solution_history.h \
+	first_order_unsteady_solver.h laspack_linear_solver.h \
+	linear_solver.h memory_solution_history.h newmark_solver.h \
+	newton_solver.h nlopt_optimization_solver.h \
+	no_solution_history.h nonlinear_solver.h optimization_solver.h \
 	petsc_auto_fieldsplit.h petsc_diff_solver.h petsc_dm_wrapper.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h second_order_unsteady_solver.h \
@@ -639,8 +640,8 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	post_wait_dereference_shared_ptr.h post_wait_dereference_tag.h \
 	post_wait_free_buffer.h post_wait_unpack_buffer.h \
 	post_wait_work.h request.h standard_type.h status.h \
-	compare_types.h enum_to_string.h error_vector.h hashword.h \
-	ignore_warnings.h int_range.h jacobi_polynomials.h \
+	compare_types.h enum_to_string.h error_vector.h hashing.h \
+	hashword.h ignore_warnings.h int_range.h jacobi_polynomials.h \
 	libmesh_nullptr.h location_maps.h mapvector.h \
 	null_output_iterator.h number_lookups.h ostream_proxy.h \
 	parameters.h perf_log.h perfmon.h plt_loader.h \
@@ -924,9 +925,6 @@ id_types.h: $(top_srcdir)/include/base/id_types.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh.h: $(top_srcdir)/include/base/libmesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-libmesh_C_isnan.h: $(top_srcdir)/include/base/libmesh_C_isnan.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_augment_std_namespace.h: $(top_srcdir)/include/base/libmesh_augment_std_namespace.h
@@ -1365,6 +1363,9 @@ exodusII_io.h: $(top_srcdir)/include/mesh/exodusII_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exodusII_io_helper.h: $(top_srcdir)/include/mesh/exodusII_io_helper.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+exodus_header_info.h: $(top_srcdir)/include/mesh/exodus_header_info.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fro_io.h: $(top_srcdir)/include/mesh/fro_io.h
@@ -1928,6 +1929,9 @@ euler2_solver.h: $(top_srcdir)/include/solvers/euler2_solver.h
 euler_solver.h: $(top_srcdir)/include/solvers/euler_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+file_solution_history.h: $(top_srcdir)/include/solvers/file_solution_history.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 first_order_unsteady_solver.h: $(top_srcdir)/include/solvers/first_order_unsteady_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -2166,6 +2170,9 @@ enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 error_vector.h: $(top_srcdir)/include/utils/error_vector.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+hashing.h: $(top_srcdir)/include/utils/hashing.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hashword.h: $(top_srcdir)/include/utils/hashword.h

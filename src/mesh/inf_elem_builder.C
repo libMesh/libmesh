@@ -63,7 +63,7 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
   // when finished with building the Ifems,
   // it remains to prepare the mesh for use:
   // find neighbors (again), partition (if needed)...
-  this->_mesh.prepare_for_use (/*skip_renumber =*/ false);
+  this->_mesh.prepare_for_use ();
 
   return origin;
 }
@@ -259,7 +259,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
   // when finished with building the Ifems,
   // it remains to prepare the mesh for use:
   // find neighbors again, partition (if needed)...
-  this->_mesh.prepare_for_use (/*skip_renumber =*/ false);
+  this->_mesh.prepare_for_use ();
 
   return origin;
 }
@@ -502,13 +502,14 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           // Pick a unique id in parallel
           Node & bnode = _mesh.node_ref(dof);
           dof_id_type new_id = bnode.id() + old_max_node_id;
-          Node * new_node =
-            this->_mesh.add_point(p, new_id,
-                                  bnode.processor_id());
+          std::unique_ptr<Node> new_node = Node::build(p, new_id);
+          new_node->processor_id() = bnode.processor_id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          new_node->set_unique_id() = old_max_unique_id + bnode.id();
+          new_node->set_unique_id(old_max_unique_id + bnode.id());
 #endif
-          outer_nodes[dof] = new_node;
+
+          outer_nodes[dof] =
+            this->_mesh.add_node(std::move(new_node));
         }
     }
 
@@ -593,11 +594,13 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           el->processor_id() = belem.processor_id();
 
           // We'd better not have elements with more than 6 sides
-          libmesh_assert_less_equal(el->n_sides(), 6);
-          el->set_id (belem.id() * 6 + p.second + old_max_elem_id);
+          const unsigned int max_sides = 6;
+          libmesh_assert_less_equal(el->n_sides(), max_sides);
+          el->set_id (belem.id() * max_sides + p.second + old_max_elem_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          el->set_unique_id() = old_max_unique_id + old_max_node_id + belem.id();
+          el->set_unique_id(old_max_unique_id + old_max_node_id +
+                            belem.id() * max_sides + p.second);
 #endif
 
           // If we have a remote neighbor on a boundary element side

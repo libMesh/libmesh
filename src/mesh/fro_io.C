@@ -64,7 +64,7 @@ void FroIO::write (const std::string & fname)
                  << the_mesh.get_boundary_info().n_boundary_ids()  << " 1\n";
 
       // Write the nodes -- 1-based!
-      for (auto n : IntRange<unsigned int>(0, the_mesh.n_nodes()))
+      for (auto n : make_range(the_mesh.n_nodes()))
         out_stream << n+1 << " \t"
                    << std::scientific
                    << std::setprecision(this->ascii_precision())
@@ -77,9 +77,9 @@ void FroIO::write (const std::string & fname)
       for (const auto & elem : the_mesh.active_element_ptr_range())
         {
           // .fro likes TRI3's
-          if (elem->type() != TRI3)
-            libmesh_error_msg("ERROR:  .fro format only valid for triangles!\n" \
-                              << "  writing of " << fname << " aborted.");
+          libmesh_error_msg_if(elem->type() != TRI3,
+                               "ERROR:  .fro format only valid for triangles!\n"
+                               << "  writing of " << fname << " aborted.");
 
           out_stream << ++e << " \t";
 

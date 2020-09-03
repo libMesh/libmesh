@@ -74,6 +74,12 @@ std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
   libmesh_assert_less (i, 2);
   std::unique_ptr<Elem> nodeelem = libmesh_make_unique<NodeElem>(this);
   nodeelem->set_node(0) = this->node_ptr(i);
+
+#ifndef LIBMESH_ENABLE_DEPRECATED
+  nodeelem->set_parent(nullptr);
+#endif
+  nodeelem->set_interior_parent(this);
+
   return nodeelem;
 }
 
@@ -121,6 +127,12 @@ Edge::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, 2);
   return {s};
+}
+
+std::vector<unsigned>
+Edge::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
 }
 
 } // namespace libMesh

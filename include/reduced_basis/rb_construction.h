@@ -471,6 +471,11 @@ public:
    */
   void zero_constrained_dofs_on_vector(NumericVector<Number> & vector);
 
+  /**
+   * @return true if the most recent truth solve gave a zero solution.
+   */
+  virtual bool check_if_zero_truth_solve();
+
 #ifdef LIBMESH_ENABLE_DIRICHLET
   /**
    * It's helpful to be able to generate a DirichletBoundary that stores a ZeroFunction in order
@@ -484,6 +489,13 @@ public:
    * checked after each solve.
    */
   void set_convergence_assertion_flag(bool flag);
+
+  /**
+   * Get/set flag to pre-evaluate the theta functions
+   */
+  bool get_preevaluate_thetas_flag() const;
+  void set_preevaluate_thetas_flag(bool flag);
+
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -591,6 +603,16 @@ public:
    * enforced.
    */
   bool store_non_dirichlet_operators;
+
+  /**
+   * Boolean flag to indicate whether we store a second copy of the
+   * basis without constraints or dof transformations applied to it.
+   * This is necessary when we have dof transformations and need
+   * to calculate the residual R(U) = C^T F - C^T A C U, since we
+   * need to evaluate R(U) using the untransformed basis U rather
+   * than C U to avoid "double applying" dof transformations in C.
+   */
+  bool store_untransformed_basis;
 
   /**
    * A boolean flag to indicate whether or not we initialize the
@@ -790,6 +812,22 @@ protected:
    */
   void check_convergence(LinearSolver<Number> & input_solver);
 
+  /**
+   * Get/set the current training parameter index
+   */
+  unsigned int get_current_training_parameter_index() const;
+  void set_current_training_parameter_index(unsigned int index);
+
+  /**
+   * Return the evaluated theta functions at the given training parameter index.
+   */
+  const std::vector<Number> & get_evaluated_thetas(unsigned int training_parameter_index) const;
+
+  /*
+   * Pre-evaluate the theta functions on the entire (local) training parameter set.
+   */
+  void preevaluate_thetas();
+
   //----------- PROTECTED DATA MEMBERS -----------//
 
   /**
@@ -905,6 +943,37 @@ private:
    */
   std::string RB_training_type;
 
+  /**
+   * In cases where we have dof transformations such as a change of
+   * coordinates at some nodes we need to store an extra set of basis
+   * functions which have not had dof transformations applied to them.
+   * These vectors are required in order to compute the residual in
+   * the error indicator.
+   */
+  std::vector<std::unique_ptr<NumericVector<Number>>> _untransformed_basis_functions;
+
+  /**
+   * We also store a copy of the untransformed solution in order to
+   * create _untransformed_basis_functions.
+   */
+  std::unique_ptr<NumericVector<Number>> _untransformed_solution;
+
+  /**
+   * Flag to indicate if we preevaluate the theta functions
+   */
+  bool _preevaluate_thetas_flag;
+
+  /**
+   * The current training parameter index during reduced basis training.
+   */
+  unsigned int _current_training_parameter_index;
+
+  /**
+   * Storage of evaluated theta functions at a set of parameters. This
+   * can be used to store all of our theta functions at training samples
+   * instead of re-evaluating the same values repeatedly during training.
+   */
+  std::vector<std::vector<Number>> _evaluated_thetas;
 };
 
 } // namespace libMesh

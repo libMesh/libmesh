@@ -549,7 +549,7 @@ unsigned int Elem::which_node_am_i(unsigned int side,
 bool Elem::contains_vertex_of(const Elem * e) const
 {
   // Our vertices are the first numbered nodes
-  for (auto n : IntRange<unsigned int>(0, e->n_vertices()))
+  for (auto n : make_range(e->n_vertices()))
     if (this->contains_point(e->point(n)))
       return true;
   return false;
@@ -562,7 +562,7 @@ bool Elem::contains_edge_of(const Elem * e) const
   unsigned int num_contained_edges = 0;
 
   // Our vertices are the first numbered nodes
-  for (auto n : IntRange<unsigned int>(0, e->n_vertices()))
+  for (auto n : make_range(e->n_vertices()))
     {
       if (this->contains_point(e->point(n)))
         {
@@ -590,6 +590,10 @@ void Elem::find_point_neighbors(const Point & p,
   std::set<const Elem *> untested_set, next_untested_set;
   untested_set.insert(this);
 
+#ifdef LIBMESH_ENABLE_AMR
+  std::vector<const Elem *> active_neighbor_children;
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
   while (!untested_set.empty())
     {
       // Loop over all the elements in the patch that haven't already
@@ -602,34 +606,34 @@ void Elem::find_point_neighbors(const Point & p,
                 {
                   if (current_neighbor->active())                // ... if it is active
                     {
-                      if (current_neighbor->contains_point(p))   // ... and touches p
+                      auto it = neighbor_set.lower_bound(current_neighbor);
+                      if ((it == neighbor_set.end() || *it != current_neighbor) &&
+                          current_neighbor->contains_point(p))   // ... don't have and touches p
                         {
-                          // Make sure we'll test it
-                          if (!neighbor_set.count(current_neighbor))
-                            next_untested_set.insert (current_neighbor);
-
-                          // And add it
-                          neighbor_set.insert (current_neighbor);
+                          // Add it and test it
+                          next_untested_set.insert(current_neighbor);
+                          neighbor_set.emplace_hint(it, current_neighbor);
                         }
                     }
 #ifdef LIBMESH_ENABLE_AMR
                   else                                 // ... the neighbor is *not* active,
                     {                                  // ... so add *all* neighboring
                                                        // active children that touch p
-                      std::vector<const Elem *> active_neighbor_children;
-
+                      active_neighbor_children.clear();
                       current_neighbor->active_family_tree_by_neighbor
                         (active_neighbor_children, elem);
 
                       for (const auto & current_child : active_neighbor_children)
-                          if (current_child->contains_point(p))
+                        {
+                          auto it = neighbor_set.lower_bound(current_child);
+                          if ((it == neighbor_set.end() || *it != current_child) &&
+                              current_child->contains_point(p))
                             {
-                              // Make sure we'll test it
-                              if (!neighbor_set.count(current_child))
-                                next_untested_set.insert (current_child);
-
-                              neighbor_set.insert (current_child);
+                              // Add it and test it
+                              next_untested_set.insert(current_child);
+                              neighbor_set.emplace_hint(it, current_child);
                             }
+                        }
                     }
 #endif // #ifdef LIBMESH_ENABLE_AMR
                 }
@@ -770,7 +774,8 @@ void Elem::find_interior_neighbors(std::set<Elem *> & neighbor_set)
 const Elem * Elem::interior_parent () const
 {
   // interior parents make no sense for full-dimensional elements.
-  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  if (this->dim() >= LIBMESH_DIM)
+      return nullptr;
 
   // they USED TO BE only good for level-0 elements, but we now
   // support keeping interior_parent() valid on refined boundary
@@ -792,11 +797,6 @@ const Elem * Elem::interior_parent () const
                   (interior_p == remote_elem) ||
                   (interior_p->dim() > this->dim()));
 
-  // We require consistency between AMR of interior and of boundary
-  // elements
-  if (interior_p && (interior_p != remote_elem))
-    libmesh_assert_less_equal (interior_p->level(), this->level());
-
   return interior_p;
 }
 
@@ -805,14 +805,14 @@ const Elem * Elem::interior_parent () const
 Elem * Elem::interior_parent ()
 {
   // See the const version for comments
-  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  if (this->dim() >= LIBMESH_DIM)
+      return nullptr;
+
   Elem * interior_p = _elemlinks[1+this->n_sides()];
 
   libmesh_assert (!interior_p ||
                   (interior_p == remote_elem) ||
                   (interior_p->dim() > this->dim()));
-  if (interior_p && (interior_p != remote_elem))
-    libmesh_assert_less_equal (interior_p->level(), this->level());
 
   return interior_p;
 }
@@ -1315,7 +1315,7 @@ void Elem::write_connectivity (std::ostream & out_stream,
         // This connectivity vector will be used repeatedly instead
         // of being reconstructed inside the loop.
         std::vector<dof_id_type> conn;
-        for (auto sc : IntRange<unsigned int>(0, this->n_sub_elem()))
+        for (auto sc : make_range(this->n_sub_elem()))
           {
             this->connectivity(sc, TECPLOT, conn);
 
@@ -2055,7 +2055,7 @@ Elem::bracketing_nodes(unsigned int child,
           // This only doesn't break horribly because we add children
           // and nodes in straightforward + hierarchical orders...
           for (unsigned int c=0; c <= child; ++c)
-            for (auto n : IntRange<unsigned int>(0, this->n_nodes_in_child(c)))
+            for (auto n : make_range(this->n_nodes_in_child(c)))
               {
                 if (c == child && n == child_node)
                   break;
@@ -2207,7 +2207,8 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
                                                 this,
                                                 p,
                                                 0.1*map_tol, // <- this is |dx| tolerance, the Newton residual should be ~ |dx|^2
-                                                /*secure=*/ false);
+                                                /*secure=*/ false,
+                                                /*extra_checks=*/ false);
 
   // Check that the refspace point maps back to p!  This is only necessary
   // for 1D and 2D elements, 3D elements always live in 3D.
@@ -2321,9 +2322,9 @@ std::string Elem::get_info () const
       ;
 
   oss << "   DoFs=";
-  for (auto s : IntRange<unsigned int>(0, this->n_systems()))
-    for (auto v : IntRange<unsigned int>(0, this->n_vars(s)))
-      for (auto c : IntRange<unsigned int>(0, this->n_comp(s,v)))
+  for (auto s : make_range(this->n_systems()))
+    for (auto v : make_range(this->n_vars(s)))
+      for (auto c : make_range(this->n_comp(s,v)))
         oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
 
 

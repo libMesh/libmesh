@@ -306,8 +306,7 @@ int main (int argc, char ** argv)
         } // end nonlinear loop
 
       // Don't keep going if we failed to converge.
-      if (!converged)
-        libmesh_error_msg("Error: Newton iterations failed to converge!");
+      libmesh_error_msg_if(!converged, "Error: Newton iterations failed to converge!");
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out every nth timestep to file.

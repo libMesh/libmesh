@@ -147,7 +147,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
     this->update_base_elem(inf_side);
   else
     // in this case, I need the 2D base
-    this->update_base_elem(inf_side->parent());
+    this->update_base_elem(inf_side->interior_parent());
 
   // Initialize the base quadrature rule
   base_qrule->init(base_elem->type(), inf_side->p_level());

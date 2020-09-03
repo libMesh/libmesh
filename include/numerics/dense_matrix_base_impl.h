@@ -81,14 +81,14 @@ namespace libMesh
 
     // move the known value into the RHS
     // and zero the column
-    for (auto i : IntRange<unsigned int>(0, this->m()))
+    for (auto i : make_range(this->m()))
       {
         rhs.el(i) -= this->el(i,jv)*val;
         this->el(i,jv) = 0.;
       }
 
     // zero the row
-    for (auto j : IntRange<unsigned int>(0, this->n()))
+    for (auto j : make_range(this->n()))
       this->el(iv,j) = 0.;
 
     this->el(iv,jv) = 1.;
@@ -104,9 +104,9 @@ namespace libMesh
     std::ios_base::fmtflags os_flags = os.flags();
 
     // Print the matrix entries.
-    for (auto i : IntRange<unsigned int>(0, this->m()))
+    for (auto i : make_range(this->m()))
       {
-        for (auto j : IntRange<unsigned int>(0, this->n()))
+        for (auto j : make_range(this->n()))
           os << std::setw(15)
              << std::scientific
              << std::setprecision(precision)
@@ -124,9 +124,9 @@ namespace libMesh
   template<typename T>
   void DenseMatrixBase<T>::print (std::ostream & os) const
   {
-    for (auto i : IntRange<unsigned int>(0, this->m()))
+    for (auto i : make_range(this->m()))
       {
-        for (auto j : IntRange<unsigned int>(0, this->n()))
+        for (auto j : make_range(this->n()))
           os << std::setw(8)
              << this->el(i,j) << " ";
 

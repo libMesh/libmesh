@@ -21,6 +21,9 @@
 #include "libmesh/face_tri3.h"
 #include "libmesh/enum_elem_quality.h"
 
+// C++ includes
+#include <array>
+
 namespace libMesh
 {
 
@@ -153,17 +156,55 @@ Real Tri::quality (const ElemQuality q) const
         return 8. * s1 * s2 * s3;
 
       }
+
+      // From: P. Knupp, "Algebraic mesh quality metrics for
+      // unstructured initial meshes," Finite Elements in Analysis
+      // and Design 39, 2003, p. 217-241, Section 3.2.
+    case SHAPE:
+      {
+        // Unlike Quads, the Tri SHAPE metric is independent of the
+        // node at which it is computed, we choose to compute it for
+        // node 0.
+
+        // The nodal Jacobian matrix A is a 3x2 matrix, hence we
+        // represent it by a std:array with 6 entries.
+        Point
+          d01 = point(1) - point(0),
+          d02 = point(2) - point(0);
+
+        std::array<Real, 6> A =
+          {{d01(0), d02(0),
+            d01(1), d02(1),
+            d01(2), d02(2)}};
+
+        // Compute metric tensor entries, T = A^T * A.
+        // This is a symmetric 2x2 matrix so we only
+        // compute one of the off-diagonal entries.
+        // As in the paper, we define lambda_ij := T_ij.
+        Real
+          lambda11 = A[0]*A[0] + A[2]*A[2] + A[4]*A[4],
+          lambda12 = A[0]*A[1] + A[2]*A[3] + A[4]*A[5],
+          lambda22 = A[1]*A[1] + A[3]*A[3] + A[5]*A[5];
+
+        // Compute the denominator of the metric. If it is exactly
+        // zero then return 0 (lowest quality) for this metric.
+        Real den = lambda11 + lambda22 - lambda12;
+        if (den == 0.0)
+          return 0.;
+
+        // Compute the nodal area
+        Real alpha = std::sqrt(lambda11 * lambda22 - lambda12 * lambda12);
+
+        // Finally, compute and return the metric.
+        return std::sqrt(3) * alpha / den;
+      }
+
     default:
       return Elem::quality(q);
     }
 
-  /**
-   * I don't know what to do for this metric.
-   * Maybe the base class knows.  We won't get
-   * here because of the default case above.
-   */
+  // We won't get here.
   return Elem::quality(q);
-
 }
 
 

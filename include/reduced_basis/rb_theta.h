@@ -48,29 +48,28 @@ class RBTheta : public ReferenceCountedObject<RBTheta>
 public:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * Special functions. This class holds no data so everything can be
+   * defaulted.
    */
-  RBTheta () {}
-
-  /**
-   * Move constructor, must be declared noexcept.
-   */
-  RBTheta (RBTheta && other) noexcept
-    : ReferenceCountedObject<RBTheta>(std::move(other))
-  {}
-
-  /**
-   * Destructor.
-   */
-  virtual ~RBTheta () {}
+  RBTheta () = default;
+  RBTheta (RBTheta &&) = default;
+  RBTheta (const RBTheta &) = default;
+  RBTheta & operator= (const RBTheta &) = default;
+  RBTheta & operator= (RBTheta &&) = default;
+  virtual ~RBTheta () = default;
 
   /**
    * Evaluate the functor object for the given parameter.
    * Default implementation is to return 1, override
    * to provide problem dependent behavior.
    */
-  virtual Number evaluate(const RBParameters &) { return 1.; }
+  virtual Number evaluate(const RBParameters &);
+
+  /*
+   * Evaluate the functor object for multiple given parameters simultaneously.
+   * Override to obtain problem-dependent behavior.
+   */
+  virtual std::vector<Number> evaluate_vec(const std::vector<RBParameters> & mus);
 };
 
 }

@@ -666,24 +666,6 @@ public:
 #endif //LIBMESH_ENABLE_AMR
 
   /**
-   * \returns The last dof index that is local to processor \p proc.
-   *
-   * \deprecated This function returns nonsense in the rare case where
-   * \p proc has no local dof indices.  Use end_dof() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  dof_id_type last_dof(const processor_id_type proc) const
-  {
-    libmesh_deprecated();
-    libmesh_assert_less (proc, _end_df.size());
-    return cast_int<dof_id_type>(_end_df[proc] - 1);
-  }
-
-  dof_id_type last_dof() const
-  { return this->last_dof(this->processor_id()); }
-#endif
-
-  /**
    * \returns The first dof index that is after all indices local to
    * processor \p proc.
    *
@@ -1307,6 +1289,16 @@ public:
 
   /**
    * Adds a copy of the specified Dirichlet boundary to the system.
+   *
+   * The constraints implied by DirichletBoundary objects are imposed
+   * in the same order in which DirichletBoundary objects are added to
+   * the DofMap. When multiple DirichletBoundary objects would impose
+   * competing constraints on a given DOF, the *first*
+   * DirichletBoundary to constrain the DOF "wins". This distinction
+   * is important when e.g. two surfaces (sidesets) intersect. The
+   * nodes on the intersection will be constrained according to
+   * whichever sideset's DirichletBoundary object was added to the
+   * DofMap first.
    */
   void add_dirichlet_boundary (const DirichletBoundary & dirichlet_boundary);
 

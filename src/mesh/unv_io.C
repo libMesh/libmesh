@@ -129,8 +129,7 @@ void UNVIO::read_implementation (std::istream & in_stream)
   elems_of_dimension.resize(4, false);
 
   {
-    if (!in_stream.good())
-      libmesh_error_msg("ERROR: Input file not good.");
+    libmesh_error_msg_if(!in_stream.good(), "ERROR: Input file not good.");
 
     // Flags to be set when certain sections are encountered
     bool
@@ -176,8 +175,8 @@ void UNVIO::read_implementation (std::istream & in_stream)
                 // The current implementation requires the nodes to
                 // have been read before reaching the elements
                 // section.
-                if (!found_node)
-                  libmesh_error_msg("ERROR: The Nodes section must come before the Elements section of the UNV file!");
+                libmesh_error_msg_if(!found_node,
+                                     "ERROR: The Nodes section must come before the Elements section of the UNV file!");
 
                 found_elem = true;
                 this->elements_in(in_stream);
@@ -190,8 +189,8 @@ void UNVIO::read_implementation (std::istream & in_stream)
                 // The current implementation requires the nodes and
                 // elements to have already been read before reaching
                 // the groups section.
-                if (!found_node || !found_elem)
-                  libmesh_error_msg("ERROR: The Nodes and Elements sections must come before the Groups section of the UNV file!");
+                libmesh_error_msg_if(!found_node || !found_elem,
+                                     "ERROR: The Nodes and Elements sections must come before the Groups section of the UNV file!");
 
                 found_group = true;
                 this->groups_in(in_stream);
@@ -216,11 +215,8 @@ void UNVIO::read_implementation (std::istream & in_stream)
 
     // By now we better have found the datasets for nodes and elements,
     // otherwise the unv file is bad!
-    if (!found_node)
-      libmesh_error_msg("ERROR: Could not find nodes!");
-
-    if (!found_elem)
-      libmesh_error_msg("ERROR: Could not find elements!");
+    libmesh_error_msg_if(!found_node, "ERROR: Could not find nodes!");
+    libmesh_error_msg_if(!found_elem, "ERROR: Could not find elements!");
   }
 
 
@@ -230,12 +226,12 @@ void UNVIO::read_implementation (std::istream & in_stream)
     MeshInput<MeshBase>::mesh().set_mesh_dimension(max_elem_dimension_seen());
 
 #if LIBMESH_DIM < 3
-    if (MeshInput<MeshBase>::mesh().mesh_dimension() > LIBMESH_DIM)
-      libmesh_error_msg("Cannot open dimension "                        \
-                        << MeshInput<MeshBase>::mesh().mesh_dimension() \
-                        << " mesh file when configured without "        \
-                        << MeshInput<MeshBase>::mesh().mesh_dimension() \
-                        << "D support." );
+    libmesh_error_msg_if(MeshInput<MeshBase>::mesh().mesh_dimension() > LIBMESH_DIM,
+                         "Cannot open dimension "
+                         << MeshInput<MeshBase>::mesh().mesh_dimension()
+                         << " mesh file when configured without "
+                         << MeshInput<MeshBase>::mesh().mesh_dimension()
+                         << "D support." );
 #endif
 
     // Delete any lower-dimensional elements that might have been
@@ -291,8 +287,7 @@ void UNVIO::write (const std::string & file_name)
 
 void UNVIO::write_implementation (std::ostream & out_file)
 {
-  if (!out_file.good())
-    libmesh_error_msg("ERROR: Output file not good.");
+  libmesh_error_msg_if(!out_file.good(), "ERROR: Output file not good.");
 
   // write the nodes, then the elements
   this->nodes_out    (out_file);
@@ -519,9 +514,9 @@ void UNVIO::groups_in (std::istream & in_file)
                     // one dimension lower than the max element
                     // dimension.  Not sure if "edge" BCs in 3D
                     // actually make sense/are required...
-                    if (group_elem->dim()+1 != max_dim)
-                      libmesh_error_msg("ERROR: Expected boundary element of dimension " \
-                                        << max_dim-1 << " but got " << group_elem->dim());
+                    libmesh_error_msg_if(group_elem->dim()+1 != max_dim,
+                                         "ERROR: Expected boundary element of dimension "
+                                         << max_dim-1 << " but got " << group_elem->dim());
 
                     // Set the current group number as the lower-dimensional element's subdomain ID.
                     // We will use this later to set a boundary ID.
@@ -1169,8 +1164,7 @@ void UNVIO::read_dataset(std::string file_name)
 {
   std::ifstream in_stream(file_name.c_str());
 
-  if (!in_stream.good())
-    libmesh_error_msg("Error opening UNV data file.");
+  libmesh_error_msg_if(!in_stream.good(), "Error opening UNV data file.");
 
   std::string olds, news, dummy;
 
@@ -1204,8 +1198,7 @@ void UNVIO::read_dataset(std::string file_name)
           in_stream >> dataset_location;
 
           // Currently only nodal datasets are supported.
-          if (dataset_location != 1)
-            libmesh_error_msg("ERROR: Currently only Data at nodes is supported.");
+          libmesh_error_msg_if(dataset_location != 1, "ERROR: Currently only Data at nodes is supported.");
 
           // Ignore the rest of this line and the next five records.
           for (unsigned int i=0; i<6; i++)

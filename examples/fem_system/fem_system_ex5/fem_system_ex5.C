@@ -17,14 +17,16 @@
 
 
 
-// <h1>FEMSystem Example 3 - Unsteady Linear Elasticity with
-// FEMSystem</h1>
-// \author Paul Bauman
-// \date 2015
+// <h1>FEMSystem Example 5 - Unsteady Linear Elasticity with
+// IsoGeometric Analysis</h1>
+// \author Roy Stogner
+// \date 2019
 //
 // This example shows how to solve the three-dimensional transient
-// linear elasticity equations using the DifferentiableSystem class framework.
-// This is just Systems of Equations Example 6 recast.
+// linear elasticity equations with elements suitable for IsoGeometric
+// Analysis, as read from a DynaIO MeshInput.
+//
+// This is just FEMSystem Example 3 on an IGA mesh.
 
 // C++ includes
 #include <iomanip>
@@ -114,12 +116,14 @@ int main (int argc, char ** argv)
   // Declare a default FEType here to override if needed for IGA later
   FEType fe_type;
 
+  const std::string iga_filename = infile("iga_filename","DIE!");
+
   // Load an IGA pressurized cylinder mesh or build a cantilever mesh
   if (use_iga)
     {
       libMesh::out << "\nReading IGA mesh.\n" << std::endl;
       if (mesh.processor_id() == 0)
-        dyna_io.read("PressurizedCyl_Patch6_256Elem.bxt");
+        dyna_io.read(iga_filename);
       MeshCommunication().broadcast (mesh);
       mesh.prepare_for_use();
 

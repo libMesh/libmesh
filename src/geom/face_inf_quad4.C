@@ -117,6 +117,12 @@ InfQuad4::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+InfQuad4::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
+}
+
 bool InfQuad4::contains_point (const Point & p, Real tol) const
 {
   /*
@@ -184,18 +190,25 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
 {
   // libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> edge;
   if (proxy)
     {
       switch (i)
         {
           // base
         case 0:
-          return libmesh_make_unique<Side<Edge2,InfQuad4>>(this,i);
+          {
+            edge = libmesh_make_unique<Side<Edge2,InfQuad4>>(this,i);
+            break;
+          }
 
           // ifem edges
         case 1:
         case 2:
-          return libmesh_make_unique<Side<InfEdge2,InfQuad4>>(this,i);
+          {
+            edge = libmesh_make_unique<Side<InfEdge2,InfQuad4>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -204,9 +217,6 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> edge;
-
       switch (i)
         {
         case 0:
@@ -227,14 +237,18 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      edge->subdomain_id() = this->subdomain_id();
-
       // Set the nodes
       for (auto n : edge->node_index_range())
         edge->set_node(n) = this->node_ptr(InfQuad4::side_nodes_map[i][n]);
-
-      return edge;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    edge->set_parent(nullptr);
+  edge->set_interior_parent(this);
+
+  return edge;
 }
 
 
@@ -242,43 +256,7 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
 void InfQuad4::build_side_ptr (std::unique_ptr<Elem> & side,
                                const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
-  switch (i)
-    {
-      // the base face
-    case 0:
-      {
-        if (!side.get() || side->type() != EDGE2)
-          {
-            side = this->build_side_ptr(i, false);
-            return;
-          }
-        break;
-      }
-
-      // connecting to another infinite element
-    case 1:
-    case 2:
-      {
-        if (!side.get() || side->type() != INFEDGE2)
-          {
-            side = this->build_side_ptr(i, false);
-            return;
-          }
-        break;
-      }
-
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
-    }
-
-  side->subdomain_id() = this->subdomain_id();
-
-  // Set the nodes
-  for (auto n : side->node_index_range())
-    side->set_node(n) = this->node_ptr(InfQuad4::side_nodes_map[i][n]);
+  this->side_ptr(side, i);
 }
 
 

@@ -4,3 +4,6 @@
 [submodule "contrib/timpi"]
 	path = contrib/timpi
 	url = ../../libMesh/TIMPI
+[submodule "m4/autoconf-submodule"]
+	path = m4/autoconf-submodule
+	url = ../../libMesh/autoconf-submodule

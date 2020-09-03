@@ -21,11 +21,7 @@
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
-#include <algorithm>
-#include <sstream>
-#include <cstdlib> // std::strtol
-#include <unordered_map>
-
+// libMesh includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/elem.h"
@@ -39,6 +35,12 @@
 #ifdef DEBUG
 #include "libmesh/mesh_tools.h"  // for elem_types warning
 #endif
+
+// C++ includes
+#include <algorithm>
+#include <sstream>
+#include <cstdlib> // std::strtol
+#include <unordered_map>
 
 // Anonymous namespace for file local data
 namespace
@@ -102,16 +104,18 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   ParallelObject(parent),
   ex_id(0),
   ex_err(0),
-  num_dim(0),
+  header_info(), // zero-initialize
+  title(header_info.title),
+  num_dim(header_info.num_dim),
+  num_nodes(header_info.num_nodes),
+  num_elem(header_info.num_elem),
+  num_elem_blk(header_info.num_elem_blk),
+  num_edge(header_info.num_edge),
+  num_edge_blk(header_info.num_edge_blk),
+  num_node_sets(header_info.num_node_sets),
+  num_side_sets(header_info.num_side_sets),
   num_global_vars(0),
   num_sideset_vars(0),
-  num_nodes(0),
-  num_elem(0),
-  num_elem_blk(0),
-  num_edge(0),
-  num_edge_blk(0),
-  num_node_sets(0),
-  num_side_sets(0),
   num_elem_this_blk(0),
   num_nodes_per_elem(0),
   num_attr(0),
@@ -529,7 +533,8 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
 
 
 
-void ExodusII_IO_Helper::read_header()
+ExodusHeaderInfo
+ExodusII_IO_Helper::read_header() const
 {
   // Read init params using newer API that reads into a struct.  For
   // backwards compatibility, assign local member values from struct
@@ -537,21 +542,35 @@ void ExodusII_IO_Helper::read_header()
   // read edge and face block/set information if it's present in the
   // file.
   exII::ex_init_params params = {};
-  ex_err = exII::ex_get_init_ext(ex_id, &params);
-  EX_CHECK_ERR(ex_err, "Error retrieving header info.");
+  int err_flag = exII::ex_get_init_ext(ex_id, &params);
+  EX_CHECK_ERR(err_flag, "Error retrieving header info.");
 
-  // "title" has MAX_LINE_LENGTH+1 characters, but the last one is reserved
-  // for null termination so we only copy MAX_LINE_LENGTH chars.
-  title.assign(params.title, params.title + MAX_LINE_LENGTH);
-  num_dim = params.num_dim;
-  num_nodes = params.num_nodes;
-  num_elem = params.num_elem;
-  num_elem_blk = params.num_elem_blk;
-  num_node_sets = params.num_node_sets;
-  num_side_sets = params.num_side_sets;
-  num_edge_blk = params.num_edge_blk;
-  num_edge = params.num_edge;
+  // Extract required data into our struct
+  ExodusHeaderInfo h;
+  h.title.assign(params.title, params.title + MAX_LINE_LENGTH);
+  h.num_dim = params.num_dim;
+  h.num_nodes = params.num_nodes;
+  h.num_elem = params.num_elem;
+  h.num_elem_blk = params.num_elem_blk;
+  h.num_node_sets = params.num_node_sets;
+  h.num_side_sets = params.num_side_sets;
+  h.num_edge_blk = params.num_edge_blk;
+  h.num_edge = params.num_edge;
 
+  // And return it
+  return h;
+}
+
+
+
+void ExodusII_IO_Helper::read_and_store_header_info()
+{
+  // Read header params from file, storing them in this class's
+  // ExodusHeaderInfo struct.  This automatically updates the local
+  // num_dim, num_elem, etc. referenes.
+  this->header_info = this->read_header();
+
+  // Read the number of timesteps which are present in the file
   this->read_num_time_steps();
 
   ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
@@ -1238,6 +1257,11 @@ void ExodusII_IO_Helper::close()
           ex_err = exII::ex_close(ex_id);
           EX_CHECK_ERR(ex_err, "Error closing Exodus file.");
           message("Exodus file closed successfully.");
+
+          // Now that the file is closed, it's no longer opened for
+          // reading or writing.
+          opened_for_writing = false;
+          opened_for_reading = false;
         }
     }
 }
@@ -1956,8 +1980,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         {
           // Make sure the existing data is consistent
           auto & val_pair = check_it->second;
-          if (val_pair.first != edge->type() || val_pair.second != edge->n_nodes())
-            libmesh_error_msg("All edges in a block must have same geometric type.");
+          libmesh_error_msg_if(val_pair.first != edge->type() || val_pair.second != edge->n_nodes(),
+                               "All edges in a block must have same geometric type.");
         }
 
       // Get reference to the connectivity array for this block
@@ -2102,14 +2126,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           // This needs to be more than an assert so we don't fail
           // with a mysterious segfault while trying to write mixed
           // element meshes in optimized mode.
-          if (elem.type() != conv.libmesh_elem_type())
-            libmesh_error_msg("Error: Exodus requires all elements with a given subdomain ID to be the same type.\n" \
-                              << "Can't write both "                  \
-                              << Utility::enum_to_string(elem.type()) \
-                              << " and "                              \
-                              << Utility::enum_to_string(conv.libmesh_elem_type()) \
-                              << " in the same block!");
-
+          libmesh_error_msg_if(elem.type() != conv.libmesh_elem_type(),
+                               "Error: Exodus requires all elements with a given subdomain ID to be the same type.\n"
+                               << "Can't write both "
+                               << Utility::enum_to_string(elem.type())
+                               << " and "
+                               << Utility::enum_to_string(conv.libmesh_elem_type())
+                               << " in the same block!");
 
           for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
             {
@@ -2432,8 +2455,8 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
       for (auto block_id : current_set)
         {
           auto it = std::find(block_ids.begin(), block_ids.end(), block_id);
-          if (it == block_ids.end())
-            libmesh_error_msg("ExodusII_IO_Helper: block id " << block_id << " not found in block_ids.");
+          libmesh_error_msg_if(it == block_ids.end(),
+                               "ExodusII_IO_Helper: block id " << block_id << " not found in block_ids.");
 
           std::size_t block_index =
             std::distance(block_ids.begin(), it);
@@ -2662,9 +2685,9 @@ write_sideset_data(const MeshBase & mesh,
 
               // Sanity check: make sure that the "off by one"
               // assumption we used above to set 'elem_id' is valid.
-              if (libmesh_map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id))
-                  != elem_list[i + offset])
-                libmesh_error_msg("Error mapping Exodus elem id to libmesh elem id.");
+              libmesh_error_msg_if
+                (libmesh_map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id)) != elem_list[i + offset],
+                 "Error mapping Exodus elem id to libmesh elem id.");
 
               // Map from Exodus side ids to libmesh side ids.
               const auto & conv = get_conversion(mesh.elem_ptr(elem_id)->type());
@@ -3017,8 +3040,8 @@ void ExodusII_IO_Helper::write_element_values_element_major
                             var_names_this_sbd.end(),
                             derived_var_names[var_id]);
 
-                if (pos == var_names_this_sbd.end())
-                  libmesh_error_msg("Derived name " << derived_var_names[var_id] << " not found!");
+                libmesh_error_msg_if(pos == var_names_this_sbd.end(),
+                                     "Derived name " << derived_var_names[var_id] << " not found!");
 
                 // Find the current variable's location in the list of all variable
                 // names on the current Elem's subdomain.
@@ -3395,11 +3418,10 @@ char ** ExodusII_IO_Helper::NamesData::get_char_star_star()
 
 char * ExodusII_IO_Helper::NamesData::get_char_star(int i)
 {
-  if (static_cast<unsigned>(i) >= table_size)
-    libmesh_error_msg("Requested char * " << i << " but only have " << table_size << "!");
+  libmesh_error_msg_if(static_cast<unsigned>(i) >= table_size,
+                       "Requested char * " << i << " but only have " << table_size << "!");
 
-  else
-    return data_table[i].data();
+  return data_table[i].data();
 }
 
 

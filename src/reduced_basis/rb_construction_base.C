@@ -34,6 +34,7 @@
 #include "libmesh/condensed_eigen_system.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/int_range.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -109,6 +110,10 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
+
+  if (training_parameters.empty())
+    return 0;
+
   return training_parameters.begin()->second->local_size();
 }
 
@@ -116,6 +121,10 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
+
+  if (training_parameters.empty())
+    return 0;
+
   return training_parameters.begin()->second->first_local_index();
 }
 
@@ -123,6 +132,10 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_last_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
+
+  if (training_parameters.empty())
+    return 0;
+
   return training_parameters.begin()->second->last_local_index();
 }
 
@@ -184,7 +197,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
                                                               std::map<std::string,bool> log_param_scale,
                                                               bool deterministic)
 {
-  if(!is_quiet())
+  if (!is_quiet())
     {
       // Print out some info about the training set initialization
       libMesh::out << "Initializing training parameters with "
@@ -258,12 +271,12 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
 {
   // First, make sure that an initial training set has already been
   // generated
-  if (!training_parameters_initialized)
-    libmesh_error_msg("Error: load_training_set cannot be used to initialize parameters");
+  libmesh_error_msg_if(!training_parameters_initialized,
+                       "Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
-  if (new_training_set.size() != get_n_params())
-    libmesh_error_msg("Error: Incorrect number of parameters in load_training_set.");
+  libmesh_error_msg_if(new_training_set.size() != get_n_params(),
+                       "Error: Incorrect number of parameters in load_training_set.");
 
   // Delete the training set vectors (but don't remove the existing keys!)
   for (auto & pr : training_parameters)
@@ -292,6 +305,26 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
           numeric_index_type index = first_index + i;
           training_vector->set(index, new_training_set[param_name][i]);
         }
+    }
+}
+
+
+template <class Base>
+void RBConstructionBase<Base>::set_training_parameter_values(
+  const std::string & param_name, const std::vector<Number> & values)
+{
+  libmesh_error_msg_if(!training_parameters_initialized,
+    "Training parameters must be initialized before calling set_training_parameter_values");
+  libmesh_error_msg_if(values.size() != get_local_n_training_samples(),
+    "Inconsistent sizes");
+
+  auto & training_vector = libmesh_map_find(training_parameters, param_name);
+
+  numeric_index_type first_index = training_vector->first_local_index();
+  for (auto i : make_range(get_local_n_training_samples()))
+    {
+      numeric_index_type index = first_index + i;
+      training_vector->set(index, values[i]);
     }
 }
 
@@ -385,7 +418,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
       NumericVector<Number> * training_vector = pr.second.get();
 
       numeric_index_type first_index = training_vector->first_local_index();
-      for (auto i : IntRange<numeric_index_type>(0, training_vector->local_size()))
+      for (auto i : make_range(training_vector->local_size()))
         {
           numeric_index_type index = first_index + i;
           Real random_number = static_cast<Real>(std::rand()) / RAND_MAX; // in range [0,1]
@@ -464,18 +497,22 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       count++;
     }
 
-  std::vector<unsigned int> n_training_samples_per_param(num_params);
-  for(unsigned int param=0; param<3; param++)
+  // n_training_samples_per_param has 3 entries, but entries after "num_params"
+  // are unused so we just set their value to 1. We need to set it to 1 (rather
+  // than 0) so that we don't skip the inner part of the triply-nested loop over
+  // n_training_samples_per_param below.
+  std::vector<unsigned int> n_training_samples_per_param(3);
+  for (unsigned int param=0; param<3; param++)
     {
-      if(param < num_params)
-          {
-            n_training_samples_per_param[param] =
-              static_cast<unsigned int>( std::round(std::pow(static_cast<Real>(n_training_samples_in), 1./num_params)) );
-          }
-        else
-          {
-            n_training_samples_per_param[param] = 1;
-          }
+      if (param < num_params)
+        {
+          n_training_samples_per_param[param] =
+            static_cast<unsigned int>( std::round(std::pow(static_cast<Real>(n_training_samples_in), 1./num_params)) );
+        }
+      else
+        {
+          n_training_samples_per_param[param] = 1;
+        }
     }
 
   {
@@ -487,11 +524,12 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       {
         total_samples_check *= n_samples;
       }
-    if (total_samples_check != n_training_samples_in)
-      libmesh_error_msg("Error: Number of training samples = " \
-                        << n_training_samples_in \
-                        << " does not enable a uniform grid of samples with " \
-                        << num_params << " parameters.");
+
+    libmesh_error_msg_if(total_samples_check != n_training_samples_in,
+                         "Error: Number of training samples = "
+                         << n_training_samples_in
+                         << " does not enable a uniform grid of samples with "
+                         << num_params << " parameters.");
   }
 
   // First we make a list of training samples associated with each parameter,
@@ -555,10 +593,8 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
                 unsigned int param_count = 0;
                 for (const std::string & param_name : param_names)
                   {
-                    if (!training_parameters_in.count(param_name))
-                      {
-                        libmesh_error_msg("Invalid parameter name: " + param_name);
-                      }
+                    libmesh_error_msg_if(!training_parameters_in.count(param_name), "Invalid parameter name: " + param_name);
+
                     std::unique_ptr<NumericVector<Number>> & training_vector =
                       training_parameters_in.find(param_name)->second;
 
@@ -622,5 +658,6 @@ template class RBConstructionBase<CondensedEigenSystem>;
 #endif
 
 template class RBConstructionBase<LinearImplicitSystem>;
+template class RBConstructionBase<System>;
 
 } // namespace libMesh

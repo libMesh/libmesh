@@ -1,7 +1,6 @@
 # ========= Main function parameters =========
 
 n_elem = 25
-store_basis_functions = true
 
 parameter_names = 'center_x center_y'
 

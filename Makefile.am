@@ -4,7 +4,7 @@
 SUBDIRS = include #src
 
 AUTOMAKE_OPTIONS = subdir-objects
-ACLOCAL_AMFLAGS  = -I m4
+ACLOCAL_AMFLAGS  = -I m4 -I m4/autoconf-submodule
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_LDFLAGS       = $(libmesh_LDFLAGS)
 
@@ -56,15 +56,37 @@ EXTRA_DIST = reference_elements \
              contrib/bin/strip_dup_incl_paths.pl \
              contrib/bin/strip_dup_libs.pl \
              CITATION \
-             contrib/metaphysicl/README
+             contrib/metaphysicl/README \
+             m4/autoconf-submodule/ax_split_version.m4 \
+             contrib/timpi/m4/autoconf-submodule/ax_split_version.m4 \
+             contrib/metaphysicl/m4/autoconf-submodule/ax_split_version.m4
 
-# If the metaphysicl submodule has not been initialized, throw an
-# error during "make dist". We need the submodule to be properly
-# initalized so that the sources can be copied into the distribution,
-# and trying to do it "on the fly" is too complicated.
+# If our submodules have not all been initialized, throw an
+# error during "make dist". We need the submodules (and their
+# submodules) to be properly initalized so that the sources can be
+# copied into the distribution, and trying to do it "on the fly" is
+# too complicated.
 contrib/metaphysicl/README:
 	@echo ""
-	@echo "Error: You must run git submodule update --init contrib/metaphysicl first"
+	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+m4/autoconf-submodule/ax_split_version.m4:
+	@echo ""
+	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/timpi/m4/autoconf-submodule/ax_split_version.m4:
+	@echo ""
+	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/metaphysicl/m4/autoconf-submodule/ax_split_version.m4:
+	@echo ""
+	@echo "Error: You must run git submodule update --init --recursive first"
 	@echo ""
 	@exit 1
 
@@ -93,21 +115,33 @@ AUX_DIST = build-aux/install-sh \
 # Support for pkgconfig
 pkgconfigdir     = $(libdir)/pkgconfig
 pkgconfig_DATA   = contrib/utils/Make.common \
-                   contrib/utils/libmesh.pc \
-                   contrib/utils/libmesh-opt.pc \
-                   contrib/utils/libmesh-dbg.pc \
-                   contrib/utils/libmesh-devel.pc \
-                   contrib/utils/libmesh-prof.pc \
-                   contrib/utils/libmesh-oprof.pc
+                   contrib/utils/libmesh.pc
 
 configdir        = $(sysconfdir)/libmesh
 config_DATA      = contrib/utils/Make.common \
-                   contrib/utils/libmesh.pc \
-                   contrib/utils/libmesh-opt.pc \
-                   contrib/utils/libmesh-dbg.pc \
-                   contrib/utils/libmesh-devel.pc \
-                   contrib/utils/libmesh-prof.pc \
-                   contrib/utils/libmesh-oprof.pc
+                   contrib/utils/libmesh.pc
+
+# Install pkgconfig files for enabled build modes
+if LIBMESH_OPT_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-opt.pc
+  config_DATA += contrib/utils/libmesh-opt.pc
+endif
+if LIBMESH_DBG_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-dbg.pc
+  config_DATA += contrib/utils/libmesh-dbg.pc
+endif
+if LIBMESH_DEVEL_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-devel.pc
+  config_DATA += contrib/utils/libmesh-devel.pc
+endif
+if LIBMESH_PROF_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-prof.pc
+  config_DATA += contrib/utils/libmesh-prof.pc
+endif
+if LIBMESH_OPROF_MODE
+  pkgconfig_DATA += contrib/utils/libmesh-oprof.pc
+  config_DATA += contrib/utils/libmesh-oprof.pc
+endif
 
 # install the libtool script so that dependent apps can also use it
 contribbindir      = $(prefix)/contrib/bin

@@ -1,5 +1,5 @@
 #include <libmesh/equation_systems.h>
-#include <libmesh/implicit_system.h>
+#include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_communication.h>
 #include <libmesh/mesh_generation.h>
@@ -35,11 +35,12 @@ public:
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
   CPPUNIT_TEST( testExodusCopyElementSolution );
+  CPPUNIT_TEST( testExodusReadHeader );
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   // Eventually this will support complex numbers.
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
-#endif
-#endif
+#endif // LIBMESH_USE_COMPLEX_NUMBERS
+#endif // LIBMESH_HAVE_EXODUS_API
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
 
@@ -58,6 +59,41 @@ public:
   {}
 
 #ifdef LIBMESH_HAVE_EXODUS_API
+  void testExodusReadHeader ()
+  {
+    // first scope: write file
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+      MeshTools::Generation::build_square (mesh, 3, 3, 0., 1., 0., 1.);
+      ExodusII_IO exii(mesh);
+      mesh.write("read_header_test.e");
+    }
+
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
+    // second scope: read header
+    // Note: The header information is read from file on processor 0
+    // and then broadcast to the other procs, so with this test we are
+    // checking both that the header information is read correctly and
+    // that it is correctly communicated to other procs.
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+      ExodusII_IO exii(mesh);
+      ExodusHeaderInfo header_info = exii.read_header("read_header_test.e");
+
+      // Make sure the header information is as expected.
+      CPPUNIT_ASSERT_EQUAL(std::string(header_info.title.data()), std::string("read_header_test.e"));
+      CPPUNIT_ASSERT_EQUAL(header_info.num_dim, 2);
+      CPPUNIT_ASSERT_EQUAL(header_info.num_elem, 9);
+      CPPUNIT_ASSERT_EQUAL(header_info.num_elem_blk, 1);
+      CPPUNIT_ASSERT_EQUAL(header_info.num_node_sets, 0);
+      CPPUNIT_ASSERT_EQUAL(header_info.num_side_sets, 4);
+      CPPUNIT_ASSERT_EQUAL(header_info.num_edge_blk, 0);
+      CPPUNIT_ASSERT_EQUAL(header_info.num_edge, 0);
+    }
+  }
+
   void testExodusCopyElementSolution ()
   {
     {
@@ -318,7 +354,7 @@ public:
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
     // Now test whether we can assign the desired constraint equations
     EquationSystems es(mesh);
-    ImplicitSystem & sys = es.add_system<ImplicitSystem>("test");
+    System & sys = es.add_system<LinearImplicitSystem>("test");
     sys.add_variable("u", SECOND); // to match QUAD9
     es.init();
     dyna.add_spline_constraints(sys.get_dof_map(), 0, 0);

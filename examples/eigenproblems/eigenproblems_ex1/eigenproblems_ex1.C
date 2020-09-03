@@ -70,19 +70,15 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-slepc");
 #else
   // Check for proper usage.
-  if (argc < 3)
-    libmesh_error_msg("\nUsage: " << argv[0] << " -n <number of eigen values>");
+  libmesh_error_msg_if(argc < 3, "\nUsage: " << argv[0] << " -n <number of eigen values>");
 
   // Tell the user what we are doing.
-  else
-    {
-      libMesh::out << "Running " << argv[0];
+  libMesh::out << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        libMesh::out << " " << argv[i];
+  for (int i=1; i<argc; i++)
+    libMesh::out << " " << argv[i];
 
-      libMesh::out << std::endl << std::endl;
-    }
+  libMesh::out << std::endl << std::endl;
 
   // Get the number of eigen values to be computed from argv[2]
   const unsigned int nev = std::atoi(argv[2]);

@@ -112,17 +112,6 @@ public:
   bool intersects (const BoundingBox &, Real abstol) const;
 
   /**
-   * \returns \p true if the other bounding box has a non-empty
-   * intersection with this bounding box.
-   *
-   * \deprecated Use the BoundingBox::intersects() function instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  bool intersect (const BoundingBox & b) const
-  { libmesh_deprecated(); return this->intersects(b); }
-#endif
-
-  /**
    * \returns \p true if the bounding box contains the given point.
    */
   bool contains_point (const Point &) const;
@@ -157,6 +146,63 @@ public:
 
 // ------------------------------------------------------------
 // BoundingBox class member functions
+
+// BoundingBox::intersects() is about 30% faster when inlined, so its definition
+// is here instead of in the source file.
+inline
+bool
+BoundingBox::intersects(const BoundingBox & other_box) const
+{
+  const libMesh::Point & my_lower = this->first;
+  const libMesh::Point & my_upper = this->second;
+
+  const libMesh::Point & other_lower = other_box.first;
+  const libMesh::Point & other_upper = other_box.second;
+
+  // Since boxes are tensor products of line intervals it suffices to check
+  // that the line segments for each coordinate axis overlap.
+  for (unsigned int dir=0; dir<LIBMESH_DIM; ++dir)
+    {
+      // Line segments can intersect in two ways:
+      // 1. They can overlap.
+      // 2. One can be inside the other.
+      //
+      // In the first case we want to see if either end point of the second
+      // line segment lies within the first. In the second case we can simply
+      // check that one end point of the first line segment lies in the second
+      // line segment. Note that we don't need, in the second case, to do two
+      // checks since that case is already covered by the first.
+      if (!((my_lower(dir) <= other_lower(dir) &&
+             other_lower(dir) <= my_upper(dir)) ||
+            (my_lower(dir) <= other_upper(dir) &&
+             other_upper(dir) <= my_upper(dir))) &&
+          !((other_lower(dir) <= my_lower(dir) &&
+             my_lower(dir) <= other_upper(dir))))
+        {
+          return false;
+        }
+    }
+
+  return true;
+}
+
+inline
+bool
+BoundingBox::intersects(const BoundingBox & other_box,
+                        Real abstol) const
+{
+  // If you want to use abstol==0, you need to call the "exact"
+  // comparison version of the intersects() function.
+  libmesh_assert(abstol > 0.);
+
+  BoundingBox expanded_my_box = *this;
+  for (unsigned int dir=0; dir<LIBMESH_DIM; ++dir)
+    {
+      expanded_my_box.first(dir) -= abstol;
+      expanded_my_box.second(dir) += abstol;
+    }
+  return expanded_my_box.intersects(other_box);
+}
 
 inline
 void

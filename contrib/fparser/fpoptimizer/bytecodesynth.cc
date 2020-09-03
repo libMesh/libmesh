@@ -1,5 +1,14 @@
 #include "bytecodesynth.hh"
 
+// There are several case statements in this file where we
+// intentionally want to fall through, so let's not get warned about
+// each one.
+#ifdef __GNUC__
+#if (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+#endif
+
 #ifdef FP_SUPPORT_OPTIMIZER
 
 #include "opcodename.hh"

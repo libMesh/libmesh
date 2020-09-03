@@ -65,7 +65,7 @@ void petsc_auto_fieldsplit (PC my_pc,
 
   if (libMesh::on_command_line("--solver-variable-names"))
     {
-      for (auto v : IntRange<unsigned int>(0, sys.n_vars()))
+      for (auto v : make_range(sys.n_vars()))
         {
           const std::string & var_name = sys.variable_name(v);
 

@@ -95,21 +95,34 @@ target_triplet = @target@
 @FPARSER_SUPPORT_DEBUGGING_TRUE@am__append_1 = -DFUNCTIONPARSER_SUPPORT_DEBUGGING
 noinst_PROGRAMS = $(am__EXEEXT_1)
 @FPARSER_SUPPORT_JIT_TRUE@am__append_2 = -DFPARSER_JIT_COMPILER="\"$(CXX) $(CXXFLAGS)\""
-@FPARSER_DEVEL_TRUE@am__append_3 = fpoptimizer/grammar_data.cc
-@FPARSER_DEVEL_TRUE@am__append_4 = util/tree_grammar_parser \
+
+# For GCC, the -Wno-psabi flag disables the warning:
+# "the ABI of passing structure with complex float member has changed in GCC 4.4"
+# which some fparser source files trigger.
+@FPARSER_NO_PSABI_TRUE@am__append_3 = -Wno-psabi
+@FPARSER_DEVEL_TRUE@am__append_4 = fpoptimizer/grammar_data.cc
+@FPARSER_DEVEL_TRUE@am__append_5 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser
-@FPARSER_DEVEL_TRUE@am__append_5 = $(FPOPTIMIZER_CC_FILES)
-@FPARSER_DEVEL_TRUE@am__append_6 = $(BUILT_SOURCES)
-@FPARSER_DEVEL_FALSE@am__append_7 = fpoptimizer.cc
-@LIBMESH_DBG_MODE_TRUE@am__append_8 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_9 = libdevel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_10 = libopt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_11 = libprof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_12 = liboprof.la
+@FPARSER_DEVEL_TRUE@am__append_6 = $(FPOPTIMIZER_CC_FILES)
+@FPARSER_DEVEL_TRUE@am__append_7 = $(BUILT_SOURCES)
+@FPARSER_DEVEL_FALSE@am__append_8 = fpoptimizer.cc
+@LIBMESH_DBG_MODE_TRUE@am__append_9 = libdbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_10 = libdevel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_11 = libopt.la
+@LIBMESH_PROF_MODE_TRUE@am__append_12 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_13 = liboprof.la
 subdir = contrib/fparser
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
-	$(top_srcdir)/m4/all_static.m4 \
+am__aclocal_m4_deps =  \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_control_args.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_summarize_env.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_test_sanitize_flags.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/ax_prefix_config_h.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/ax_split_version.m4 \
+	$(top_srcdir)/m4/ac_cxx_rtti.m4 $(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
@@ -117,14 +130,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_gcc_archflag.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
-	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
 	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/capnproto.m4 \
 	$(top_srcdir)/m4/compiler.m4 \
-	$(top_srcdir)/m4/compiler_control_args.m4 \
-	$(top_srcdir)/m4/config_environment.m4 \
-	$(top_srcdir)/m4/config_summary.m4 \
-	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
+	$(top_srcdir)/m4/config_summary.m4 $(top_srcdir)/m4/cppunit.m4 \
 	$(top_srcdir)/m4/curl.m4 $(top_srcdir)/m4/cxx11.m4 \
 	$(top_srcdir)/m4/cxx17.m4 $(top_srcdir)/m4/demangle.m4 \
 	$(top_srcdir)/m4/dlopen.m4 $(top_srcdir)/m4/eigen.m4 \
@@ -141,13 +150,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/locale.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/mpi.m4 \
-	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
-	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
-	$(top_srcdir)/m4/nlopt.m4 $(top_srcdir)/m4/parmetis.m4 \
-	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/precision.m4 \
-	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
-	$(top_srcdir)/m4/sanitize.m4 $(top_srcdir)/m4/scrape_petsc.m4 \
+	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/namespaces.m4 \
+	$(top_srcdir)/m4/nanoflann.m4 $(top_srcdir)/m4/nemesis.m4 \
+	$(top_srcdir)/m4/netcdf.m4 $(top_srcdir)/m4/nlopt.m4 \
+	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
+	$(top_srcdir)/m4/precision.m4 $(top_srcdir)/m4/qhull.m4 \
 	$(top_srcdir)/m4/sfc.m4 $(top_srcdir)/m4/slepc.m4 \
 	$(top_srcdir)/m4/sstream.m4 $(top_srcdir)/m4/strstream.m4 \
 	$(top_srcdir)/m4/tbb.m4 $(top_srcdir)/m4/tecio.m4 \
@@ -170,14 +177,15 @@ PROGRAMS = $(noinst_PROGRAMS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdbg_la_DEPENDENCIES =
 am__libdbg_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
-	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
-	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
-	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
-	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
-	fpoptimizer/bytecodesynth.cc fpoptimizer/valuerange.hh \
-	fpoptimizer/rangeestimation.hh fpoptimizer/constantfolding.hh \
-	fpoptimizer/logic_boolgroups.hh \
+	Faddeeva.hh ignore_opcode_warnings.hh \
+	restore_opcode_warnings.hh lib/sha1.cpp lib/crc32.hh \
+	lib/autoptr.hh lib/functional.hh fpoptimizer/hash.hh \
+	fpoptimizer/codetree.hh fpoptimizer/grammar.hh \
+	fpoptimizer/consts.hh fpoptimizer/optimize.hh \
+	fpoptimizer/opcodename.hh fpoptimizer/opcodename.cc \
+	fpoptimizer/bytecodesynth.hh fpoptimizer/bytecodesynth.cc \
+	fpoptimizer/valuerange.hh fpoptimizer/rangeestimation.hh \
+	fpoptimizer/constantfolding.hh fpoptimizer/logic_boolgroups.hh \
 	fpoptimizer/logic_collections.hh \
 	fpoptimizer/logic_ifoperations.hh \
 	fpoptimizer/logic_powoperations.hh \
@@ -227,14 +235,15 @@ libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
 libdevel_la_DEPENDENCIES =
 am__libdevel_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
-	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
-	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
-	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
-	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
-	fpoptimizer/bytecodesynth.cc fpoptimizer/valuerange.hh \
-	fpoptimizer/rangeestimation.hh fpoptimizer/constantfolding.hh \
-	fpoptimizer/logic_boolgroups.hh \
+	Faddeeva.hh ignore_opcode_warnings.hh \
+	restore_opcode_warnings.hh lib/sha1.cpp lib/crc32.hh \
+	lib/autoptr.hh lib/functional.hh fpoptimizer/hash.hh \
+	fpoptimizer/codetree.hh fpoptimizer/grammar.hh \
+	fpoptimizer/consts.hh fpoptimizer/optimize.hh \
+	fpoptimizer/opcodename.hh fpoptimizer/opcodename.cc \
+	fpoptimizer/bytecodesynth.hh fpoptimizer/bytecodesynth.cc \
+	fpoptimizer/valuerange.hh fpoptimizer/rangeestimation.hh \
+	fpoptimizer/constantfolding.hh fpoptimizer/logic_boolgroups.hh \
 	fpoptimizer/logic_collections.hh \
 	fpoptimizer/logic_ifoperations.hh \
 	fpoptimizer/logic_powoperations.hh \
@@ -279,14 +288,15 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
 liboprof_la_DEPENDENCIES =
 am__liboprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
-	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
-	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
-	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
-	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
-	fpoptimizer/bytecodesynth.cc fpoptimizer/valuerange.hh \
-	fpoptimizer/rangeestimation.hh fpoptimizer/constantfolding.hh \
-	fpoptimizer/logic_boolgroups.hh \
+	Faddeeva.hh ignore_opcode_warnings.hh \
+	restore_opcode_warnings.hh lib/sha1.cpp lib/crc32.hh \
+	lib/autoptr.hh lib/functional.hh fpoptimizer/hash.hh \
+	fpoptimizer/codetree.hh fpoptimizer/grammar.hh \
+	fpoptimizer/consts.hh fpoptimizer/optimize.hh \
+	fpoptimizer/opcodename.hh fpoptimizer/opcodename.cc \
+	fpoptimizer/bytecodesynth.hh fpoptimizer/bytecodesynth.cc \
+	fpoptimizer/valuerange.hh fpoptimizer/rangeestimation.hh \
+	fpoptimizer/constantfolding.hh fpoptimizer/logic_boolgroups.hh \
 	fpoptimizer/logic_collections.hh \
 	fpoptimizer/logic_ifoperations.hh \
 	fpoptimizer/logic_powoperations.hh \
@@ -331,14 +341,15 @@ liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
 am__libopt_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
-	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
-	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
-	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
-	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
-	fpoptimizer/bytecodesynth.cc fpoptimizer/valuerange.hh \
-	fpoptimizer/rangeestimation.hh fpoptimizer/constantfolding.hh \
-	fpoptimizer/logic_boolgroups.hh \
+	Faddeeva.hh ignore_opcode_warnings.hh \
+	restore_opcode_warnings.hh lib/sha1.cpp lib/crc32.hh \
+	lib/autoptr.hh lib/functional.hh fpoptimizer/hash.hh \
+	fpoptimizer/codetree.hh fpoptimizer/grammar.hh \
+	fpoptimizer/consts.hh fpoptimizer/optimize.hh \
+	fpoptimizer/opcodename.hh fpoptimizer/opcodename.cc \
+	fpoptimizer/bytecodesynth.hh fpoptimizer/bytecodesynth.cc \
+	fpoptimizer/valuerange.hh fpoptimizer/rangeestimation.hh \
+	fpoptimizer/constantfolding.hh fpoptimizer/logic_boolgroups.hh \
 	fpoptimizer/logic_collections.hh \
 	fpoptimizer/logic_ifoperations.hh \
 	fpoptimizer/logic_powoperations.hh \
@@ -383,14 +394,15 @@ libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
 libprof_la_DEPENDENCIES =
 am__libprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
-	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
-	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
-	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
-	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
-	fpoptimizer/bytecodesynth.cc fpoptimizer/valuerange.hh \
-	fpoptimizer/rangeestimation.hh fpoptimizer/constantfolding.hh \
-	fpoptimizer/logic_boolgroups.hh \
+	Faddeeva.hh ignore_opcode_warnings.hh \
+	restore_opcode_warnings.hh lib/sha1.cpp lib/crc32.hh \
+	lib/autoptr.hh lib/functional.hh fpoptimizer/hash.hh \
+	fpoptimizer/codetree.hh fpoptimizer/grammar.hh \
+	fpoptimizer/consts.hh fpoptimizer/optimize.hh \
+	fpoptimizer/opcodename.hh fpoptimizer/opcodename.cc \
+	fpoptimizer/bytecodesynth.hh fpoptimizer/bytecodesynth.cc \
+	fpoptimizer/valuerange.hh fpoptimizer/rangeestimation.hh \
+	fpoptimizer/constantfolding.hh fpoptimizer/logic_boolgroups.hh \
 	fpoptimizer/logic_collections.hh \
 	fpoptimizer/logic_ifoperations.hh \
 	fpoptimizer/logic_powoperations.hh \
@@ -1060,7 +1072,7 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 pkg_cppflags = -I$(srcdir)/fpoptimizer $(am__append_2) \
-	$(FEATURE_FLAGS)
+	$(FEATURE_FLAGS) $(am__append_3)
 #FEATURE_FLAGS += -DFP_SUPPORT_TR1_MATH_FUNCS
 
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
@@ -1082,13 +1094,13 @@ EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 	fpoptimizer/treerules.dat $(FPOPTIMIZER_CC_FILES) \
 	fpoptimizer/fpoptimizer_header.txt \
 	fpoptimizer/fpoptimizer_footer.txt
-BUILT_SOURCES = extrasrc/fp_opcode_add.inc $(am__append_3)
+BUILT_SOURCES = extrasrc/fp_opcode_add.inc $(am__append_4)
 
 #  util_cpp_compress_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
 #  util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 
 # when doing 'make clean' we need to remove the generated sources
-CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_6)
+CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_7)
 # in case they weren't conditionally cleaned:
 # DISTCLEANFILES += util/cpp_compress
 DISTCLEANFILES = util/bytecoderules_parser util/tree_grammar_parser
@@ -1133,7 +1145,8 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/optimize_main.cc
 
 pkg_sources = fparser.cc fparser_ad.cc Faddeeva.cc Faddeeva.hh \
-	lib/sha1.cpp $(am__append_5) $(am__append_7)
+	ignore_opcode_warnings.hh restore_opcode_warnings.hh \
+	lib/sha1.cpp $(am__append_6) $(am__append_8)
 
 # util/tree_grammar_parser is a utility which is required to build
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
@@ -1197,8 +1210,8 @@ AM_LDFLAGS = $(libmesh_LDFLAGS)
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_8) $(am__append_9) $(am__append_10) \
-	$(am__append_11) $(am__append_12)
+noinst_LTLIBRARIES = $(am__append_9) $(am__append_10) $(am__append_11) \
+	$(am__append_12) $(am__append_13)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)

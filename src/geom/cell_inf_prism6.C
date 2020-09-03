@@ -62,6 +62,15 @@ const unsigned int InfPrism6::edge_nodes_map[InfPrism6::num_edges][InfPrism6::no
     {2, 5}  // Edge 5
   };
 
+const unsigned int InfPrism6::edge_sides_map[InfPrism6::num_edges][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {1, 3}, // Edge 3
+    {1, 2}, // Edge 4
+    {2, 3}  // Edge 5
+  };
 
 // ------------------------------------------------------------
 // InfPrism6 class member functions
@@ -102,6 +111,20 @@ InfPrism6::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
 }
 
+std::vector<unsigned>
+InfPrism6::nodes_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+}
+
+std::vector<unsigned>
+InfPrism6::sides_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_sides_map[e]), std::end(edge_sides_map[e])};
+}
+
 bool InfPrism6::is_node_on_edge(const unsigned int n,
                                 const unsigned int e) const
 {
@@ -125,19 +148,26 @@ std::unique_ptr<Elem> InfPrism6::build_side_ptr (const unsigned int i,
 {
   libmesh_assert_less (i, this->n_sides());
 
+  std::unique_ptr<Elem> face;
   if (proxy)
     {
       switch (i)
         {
           // base
         case 0:
-          return libmesh_make_unique<Side<Tri3,InfPrism6>>(this,i);
+          {
+            face = libmesh_make_unique<Side<Tri3,InfPrism6>>(this,i);
+            break;
+          }
 
           // ifem sides
         case 1:
         case 2:
         case 3:
-          return libmesh_make_unique<Side<InfQuad4,InfPrism6>>(this,i);
+          {
+            face = libmesh_make_unique<Side<InfQuad4,InfPrism6>>(this,i);
+            break;
+          }
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -146,9 +176,6 @@ std::unique_ptr<Elem> InfPrism6::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Return value
-      std::unique_ptr<Elem> face;
-
       switch (i)
         {
         case 0: // the triangular face at z=-1, base face
@@ -169,14 +196,18 @@ std::unique_ptr<Elem> InfPrism6::build_side_ptr (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-
       // Set the nodes
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(InfPrism6::side_nodes_map[i][n]);
-
-      return face;
     }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  if (!proxy) // proxy sides used to leave parent() set
+#endif
+    face->set_parent(nullptr);
+  face->set_interior_parent(this);
+
+  return face;
 }
 
 

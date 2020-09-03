@@ -27,7 +27,11 @@ namespace libMesh
 
 // Edge3 class static member initializations
 const int Edge3::num_nodes;
+const int Edge3::num_sides;
+const int Edge3::num_edges;
 const int Edge3::num_children;
+const int Edge3::nodes_per_side;
+const int Edge3::nodes_per_edge;
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -191,25 +195,36 @@ Real Edge3::volume () const
   const Real c = B.norm_sq();
 
   // Degenerate straight line case
-  if (a < TOLERANCE*TOLERANCE)
+  if (a == 0.)
     return 2. * std::sqrt(c);
 
-  const Real b = 2.*(A*B);
-  const Real ba=b/a;
-  const Real ca=c/a;
+  const Real b = -2.*std::abs(A*B);
 
-  libmesh_assert (1.-ba+ca>0.);
+  const Real sqrt_term1 = a - b + c;
+  const Real sqrt_term2 = a + b + c;
 
-  const Real s1 = std::sqrt(1. - ba + ca);
-  const Real s2 = std::sqrt(1. + ba + ca);
+  // Fall back on straight line case instead of computing nan
+  // Note: b can be positive or negative so we have to check both cases.
+  if (sqrt_term1 < 0. || sqrt_term2 < 0.)
+    return 2. * std::sqrt(c);
 
-  Real log_term = (1. - 0.5*ba + s1) / (-1. - 0.5*ba + s2);
-  libmesh_assert(!libmesh_isnan(log_term) && log_term > 0.);
+  const Real r1 = std::sqrt(sqrt_term1);
+  const Real r2 = std::sqrt(sqrt_term2);
+  const Real rsum = r1 + r2;
+  const Real root_a = std::sqrt(a);
+  const Real b_over_root_a = b / root_a;
 
-  return 0.5*std::sqrt(a)*((1.-0.5*ba)*s1 +
-                           (1.+0.5*ba)*s2 +
-                           (ca - 0.25*ba*ba)*std::log(log_term)
-                           );
+  // Pre-compute the denominator of the log term. If it's zero, fall
+  // back on the straight line case.
+  const Real log_term_denom = -root_a - 0.5*b_over_root_a + r2;
+  if (log_term_denom == 0. || rsum == 0.)
+    return 2. * std::sqrt(c);
+
+  Real log1p_arg = 2*(root_a - b/rsum) / log_term_denom;
+
+  return
+    0.5*(rsum + b_over_root_a*b_over_root_a/rsum +
+        (c-0.25*b_over_root_a*b_over_root_a)*std::log1p(log1p_arg)/root_a);
 }
 
 

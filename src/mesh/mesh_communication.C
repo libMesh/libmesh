@@ -460,7 +460,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
     n_send_node_pairs=0,      n_send_elem_pairs=0,
     n_recv_node_pairs=0,      n_recv_elem_pairs=0;
 
-  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+  for (auto pid : make_range(mesh.n_processors()))
     {
       if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
         {
@@ -601,7 +601,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   // A list of all the processors which *may* contain neighboring elements.
   // (for development simplicity, just make this the identity map)
   std::vector<processor_id_type> adjacent_processors;
-  for (auto pid : IntRange<processor_id_type>(0, mesh.n_processors()))
+  for (auto pid : make_range(mesh.n_processors()))
     if (pid != mesh.processor_id())
       adjacent_processors.push_back (pid);
 
@@ -635,7 +635,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                 {
                   elem->build_side_ptr(side, s);
 
-                  for (auto n : IntRange<unsigned int>(0, side->n_vertices()))
+                  for (auto n : make_range(side->n_vertices()))
                     my_interface_node_set.insert (side->node_id(n));
                 }
           }
@@ -789,7 +789,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             {
               std::size_t n_shared_nodes = 0;
 
-              for (auto n : IntRange<unsigned int>(0, elem->n_vertices()))
+              for (auto n : make_range(elem->n_vertices()))
                 if (std::binary_search (common_interface_node_list.begin(),
                                         common_interface_node_list.end(),
                                         elem->node_id(n)))
@@ -1183,18 +1183,25 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
 
   LOG_SCOPE("(all)gather()", "MeshCommunication");
 
+  // Ensure we don't build too big a buffer at once
+  static const std::size_t approx_total_buffer_size = 1e8;
+  const std::size_t approx_each_buffer_size =
+    approx_total_buffer_size / mesh.comm().size();
+
   (root_id == DofObject::invalid_processor_id) ?
 
     mesh.comm().allgather_packed_range (&mesh,
                                         mesh.nodes_begin(),
                                         mesh.nodes_end(),
-                                        mesh_inserter_iterator<Node>(mesh)) :
+                                        mesh_inserter_iterator<Node>(mesh),
+                                        approx_each_buffer_size) :
 
     mesh.comm().gather_packed_range (root_id,
                                      &mesh,
                                      mesh.nodes_begin(),
                                      mesh.nodes_end(),
-                                     mesh_inserter_iterator<Node>(mesh));
+                                     mesh_inserter_iterator<Node>(mesh),
+                                     approx_each_buffer_size);
 
   // Gather elements from coarsest to finest, so that child
   // elements will see their parents already in place.
@@ -1206,13 +1213,15 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
       mesh.comm().allgather_packed_range (&mesh,
                                           mesh.level_elements_begin(l),
                                           mesh.level_elements_end(l),
-                                          mesh_inserter_iterator<Elem>(mesh)) :
+                                          mesh_inserter_iterator<Elem>(mesh),
+                                          approx_each_buffer_size) :
 
       mesh.comm().gather_packed_range (root_id,
                                        &mesh,
                                        mesh.level_elements_begin(l),
                                        mesh.level_elements_end(l),
-                                       mesh_inserter_iterator<Elem>(mesh));
+                                       mesh_inserter_iterator<Elem>(mesh),
+                                       approx_each_buffer_size);
 
   // If we had a point locator, it's invalid now that there are new
   // elements it can't locate.
@@ -1228,8 +1237,9 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
   // Inform new elements of their neighbors,
   // while resetting all remote_elem links on
   // the ranks which did the gather.
-  mesh.find_neighbors(root_id == DofObject::invalid_processor_id ||
-                      root_id == mesh.processor_id());
+  if (mesh.allow_find_neighbors())
+    mesh.find_neighbors(root_id == DofObject::invalid_processor_id ||
+                        root_id == mesh.processor_id());
 
   // All done, but let's make sure it's done correctly
 
@@ -1447,7 +1457,7 @@ struct SyncUniqueIds
       {
         DofObjSubclass * d = (mesh.*query)(ids[i]);
         libmesh_assert(d);
-        d->set_unique_id() = unique_ids[i];
+        d->set_unique_id(unique_ids[i]);
       }
   }
 };

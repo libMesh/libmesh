@@ -36,7 +36,6 @@ AC_CONFIG_FILES([Makefile
                  contrib/utils/Makefile
                  contrib/utils/Make.common
                  tests/Makefile
-                 contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in
                  contrib/utils/libmesh-opt.pc
                  contrib/utils/libmesh-dbg.pc
                  contrib/utils/libmesh-devel.pc
@@ -125,13 +124,13 @@ AC_SUBST(PERL)
 # Check for whether to enable MPI and PETSc which will influence our
 # choice of compiler
 #--------------------------------------------------------------------
-COMPILER_CONTROL_ARGS
+ACSM_COMPILER_CONTROL_ARGS
 
 #-----------------------------------------------------------------------
 # Scrape PETSc configure information for their CXX, MPI_INCLUDE, MPI_LIB,
 # PETSCLINKLIBS, PETSCINCLUDEDIRS, and other variables
 #-----------------------------------------------------------------------
-SCRAPE_PETSC_CONFIGURE
+ACSM_SCRAPE_PETSC_CONFIGURE
 
 # --------------------------------------------------------------
 # Set our preferred compilers
@@ -230,7 +229,7 @@ LIBMESH_SET_CXX_FLAGS
 # Checks for code coverage
 # this must be done after we look for our own compilers
 #------------------------------------------------------
-AX_CODE_COVERAGE
+ACSM_CODE_COVERAGE
 libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
 libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
 
@@ -238,6 +237,8 @@ libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
 # Set compiler flags for devel, opt, etc. methods
 #-----------------------------------------------------
 LIBMESH_SET_METHODS
+
+AC_CONFIG_FILES([contrib/utils/libmesh.pc:$LIBMESH_PC_IN])
 
 # By default we merely enable some warnings, but we can turn those
 # into errors (for library code only, not contrib or external code)
@@ -443,9 +444,12 @@ AX_ALL_STATIC
 # --------------------------------------------------------------
 AX_SPLIT_VERSION
 
+# Strip any '-pre' suffix from version; our code expects a number
+LIBMESH_NUMERIC_POINT_VERSION=`echo "$AX_POINT_VERSION" | $SED 's/-.*//'`
+
 AC_DEFINE_UNQUOTED(MAJOR_VERSION,            [$AX_MAJOR_VERSION],  [libMesh major version number])
 AC_DEFINE_UNQUOTED(MINOR_VERSION,            [$AX_MINOR_VERSION],  [libMesh minor version number])
-AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$AX_POINT_VERSION],  [libMesh micro version number])
+AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$LIBMESH_NUMERIC_POINT_VERSION],  [libMesh micro version number])
 AC_DEFINE_UNQUOTED(LIB_VERSION,              ["$VERSION"],         [libMesh version number])
 AC_DEFINE_UNQUOTED(LIB_RELEASE,              ["$BUILD_DEVSTATUS"], [libMesh source code version])
 AC_DEFINE_UNQUOTED(CXX,                      ["$CXX"],             [C++ compiler])
@@ -569,7 +573,7 @@ LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 
 
 # Query configuration environment
-AX_SUMMARIZE_ENV
+ACSM_SUMMARIZE_ENV
 
 # Each example gets a makefile
 AS_IF([test "x$enableexamples" = "xyes"],

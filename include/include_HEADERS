@@ -29,7 +29,6 @@ include_HEADERS =  \
         base/ghosting_functor.h \
         base/id_types.h \
         base/libmesh.h \
-        base/libmesh_C_isnan.h \
         base/libmesh_base.h \
         base/libmesh_common.h \
         base/libmesh_documentation.h \
@@ -175,6 +174,7 @@ include_HEADERS =  \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \
         mesh/exodusII_io_helper.h \
+        mesh/exodus_header_info.h \
         mesh/fro_io.h \
         mesh/gmsh_io.h \
         mesh/gmv_io.h \
@@ -356,6 +356,7 @@ include_HEADERS =  \
         solvers/eigen_time_solver.h \
         solvers/euler2_solver.h \
         solvers/euler_solver.h \
+        solvers/file_solution_history.h \
         solvers/first_order_unsteady_solver.h \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
@@ -436,6 +437,7 @@ include_HEADERS =  \
         utils/compare_types.h \
         utils/enum_to_string.h \
         utils/error_vector.h \
+        utils/hashing.h \
         utils/hashword.h \
         utils/ignore_warnings.h \
         utils/int_range.h \

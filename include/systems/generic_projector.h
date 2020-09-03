@@ -534,7 +534,7 @@ public:
   {
     // We'll be queried for components but we'll typically be looking
     // up data by variables, and those indices don't always match
-    for (auto v : IntRange<unsigned int>(0, sys.n_vars()))
+    for (auto v : make_range(sys.n_vars()))
       {
         const unsigned int vcomp = sys.variable_scalar_number(v,0);
         if (vcomp >= component_to_var.size())
@@ -560,7 +560,7 @@ public:
     c.set_algebraic_type(FEMContext::DOFS_ONLY);
 
     // Loop over variables, to prerequest
-    for (auto var : IntRange<unsigned int>(0, sys.n_vars()))
+    for (auto var : make_range(sys.n_vars()))
       {
         FEAbstract * fe = nullptr;
         const std::set<unsigned char> & elem_dims =
@@ -841,9 +841,7 @@ public:
       *elem.parent() : elem;
 
     // If there are any element-based DOF numbers, get them
-    const unsigned int nc = FEInterface::n_dofs_per_elem(elem.dim(),
-                                                         fe_type,
-                                                         elem.type());
+    const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, &elem);
 
     std::vector<dof_id_type> old_dof_indices(nc);
     indices.resize(nc);
@@ -1546,24 +1544,21 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           if (!var.active_on_subdomain(elem->subdomain_id()))
             continue;
           FEType fe_type = var.type();
-          fe_type.order =
-            libMesh::Order (fe_type.order + elem->p_level());
-          const ElemType elem_type = elem->type();
 
-          if (FEInterface::n_dofs_at_node(dim, fe_type, elem_type, 0))
+          if (FEInterface::n_dofs_at_node(fe_type, elem, 0))
             vertex_vars.insert(vertex_vars.end(), v_num);
 
           // The first non-vertex node is always an edge node if those
           // exist.  All edge nodes have the same number of DoFs
           if (has_edge_nodes)
-            if (FEInterface::n_dofs_at_node(dim, fe_type, elem_type, n_vertices))
+            if (FEInterface::n_dofs_at_node(fe_type, elem, n_vertices))
               edge_vars.insert(edge_vars.end(), v_num);
 
           if (has_side_nodes)
             {
               if (dim != 3)
                 {
-                  if (FEInterface::n_dofs_at_node(dim, fe_type, elem_type, n_vertices))
+                  if (FEInterface::n_dofs_at_node(fe_type, elem, n_vertices))
                     side_vars.insert(side_vars.end(), v_num);
                 }
               else
@@ -1571,17 +1566,16 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
                 // DoFs!  We'll loop over all sides to be safe.
                 for (unsigned int n = 0; n != n_nodes; ++n)
                   if (elem->is_face(n))
-                    if (FEInterface::n_dofs_at_node(dim, fe_type,
-                                                    elem_type, n))
+                    if (FEInterface::n_dofs_at_node(fe_type, elem, n))
                       {
                         side_vars.insert(side_vars.end(), v_num);
                         break;
                       }
             }
 
-          if (FEInterface::n_dofs_per_elem(dim, fe_type, elem_type) ||
+          if (FEInterface::n_dofs_per_elem(fe_type, elem) ||
               (has_interior_nodes &&
-               FEInterface::n_dofs_at_node(dim, fe_type, elem_type, n_nodes-1)))
+               FEInterface::n_dofs_at_node(fe_type, elem, n_nodes-1)))
             {
 #ifdef LIBMESH_ENABLE_AMR
               // We may have already just copied constant monomials,
@@ -2201,7 +2195,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                   // shape functions
                   libmesh_assert_equal_to
                     (FEInterface::n_dofs_at_node
-                      (dim, base_fe_type, elem.type(),
+                      (base_fe_type, &elem,
                        elem.get_node_index(&vertex)),
                     (unsigned int)(1 + dim));
                   const FValue val =
@@ -2427,7 +2421,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
       unsigned short node_num = elem.n_vertices()+side_num;
       // In 3D only some sides may have nodes
       if (dim == 3)
-        for (auto n : IntRange<unsigned int>(0, elem.n_nodes()))
+        for (auto n : make_range(elem.n_nodes()))
           {
             if (!elem.is_face(n))
               continue;
@@ -2904,7 +2898,7 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::co
   DenseVector<typename FFunctor::ValuePushType> Uinvolved(n_involved_dofs);
   std::vector<char> dof_is_fixed(n_involved_dofs, false); // bools
 
-  for (auto i : IntRange<unsigned int>(0, n_involved_dofs))
+  for (auto i : make_range(n_involved_dofs))
     {
       const dof_id_type id = dof_indices_var[involved_dofs[i]];
       auto iter = ids_to_save.find(id);

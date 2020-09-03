@@ -15,15 +15,30 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef LIBMESH_HASHING_H
+#define LIBMESH_HASHING_H
 
+#include "libmesh/hashword.h"
 
-#ifndef LIBMESH_LIBMESH_C_ISNAN_H
-#define LIBMESH_LIBMESH_C_ISNAN_H
+#include <functional>
 
-// These functions should never have been called directly, and are
-// also deprecated for internal library use now.
-int libmesh_C_isnan_float(float a);
-int libmesh_C_isnan_double(double a);
-int libmesh_C_isnan_longdouble(long double a);
+namespace libMesh
+{
+namespace boostcopy
+{
 
-#endif // LIBMESH_LIBMESH_C_ISNAN_H
+inline void hash_combine_impl(std::size_t & seed, std::size_t value)
+{
+  seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
+}
+
+template <typename T>
+inline void hash_combine(std::size_t & seed, const T & value)
+{
+  hash_combine_impl(seed, std::hash<T>{}(value));
+}
+
+}
+}
+
+#endif // LIBMESH_HASHING_H

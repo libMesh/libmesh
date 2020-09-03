@@ -15,8 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// Example includes
 #include "elasticity_system.h"
 
+// libMesh includes
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
@@ -27,6 +29,9 @@
 #include "libmesh/unsteady_solver.h"
 #include "libmesh/parallel_implementation.h" // set_union
 #include "libmesh/boundary_info.h"
+
+// C++ includes
+#include <functional> // std::reference_wrapper
 
 using namespace libMesh;
 
@@ -179,20 +184,27 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
   const std::vector<std::vector<Real>> & phi = u_elem_fe->get_phi();
   const std::vector<std::vector<RealGradient>> & grad_phi = u_elem_fe->get_dphi();
 
-  // We set _w_var=_v_var etc in lower dimensions so this is sane:
-  DenseSubVector<Number> & Fu = c.get_elem_residual(u_dot_var);
-  DenseSubVector<Number> & Fv = c.get_elem_residual(v_dot_var);
-  DenseSubVector<Number> & Fw = c.get_elem_residual(w_dot_var);
+  // Get rhs DenseSubVector references
+  // std::reference_wrapper allows us to have a C-style array of
+  // references, which makes the indexing below a bit easier.
+  // We set _w_var=_v_var etc in lower dimensions so this is sane.
+  std::reference_wrapper<DenseSubVector<Number>> F[3] =
+    {
+      c.get_elem_residual(u_dot_var),
+      c.get_elem_residual(v_dot_var),
+      c.get_elem_residual(w_dot_var)
+    };
 
-  DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_dot_var, _u_var);
-  DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_dot_var, _v_var);
-  DenseSubMatrix<Number> & Kww = c.get_elem_jacobian(w_dot_var, _w_var);
-  DenseSubMatrix<Number> & Kuv = c.get_elem_jacobian(u_dot_var, _v_var);
-  DenseSubMatrix<Number> & Kuw = c.get_elem_jacobian(u_dot_var, _w_var);
-  DenseSubMatrix<Number> & Kvu = c.get_elem_jacobian(v_dot_var, _u_var);
-  DenseSubMatrix<Number> & Kvw = c.get_elem_jacobian(v_dot_var, _w_var);
-  DenseSubMatrix<Number> & Kwu = c.get_elem_jacobian(w_dot_var, _u_var);
-  DenseSubMatrix<Number> & Kwv = c.get_elem_jacobian(w_dot_var, _v_var);
+  // Get DenseSubMatrix references
+  // Kuu, Kuv, Kuw
+  // Kvu, Kvv, Kvw
+  // Kwu, Kwv, Kww
+  std::reference_wrapper<DenseSubMatrix<Number>> K[3][3] =
+    {
+      {c.get_elem_jacobian(u_dot_var, _u_var), c.get_elem_jacobian(u_dot_var, _v_var), c.get_elem_jacobian(u_dot_var, _w_var)},
+      {c.get_elem_jacobian(v_dot_var, _u_var), c.get_elem_jacobian(v_dot_var, _v_var), c.get_elem_jacobian(v_dot_var, _w_var)},
+      {c.get_elem_jacobian(w_dot_var, _u_var), c.get_elem_jacobian(w_dot_var, _v_var), c.get_elem_jacobian(w_dot_var, _w_var)}
+    };
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
@@ -221,11 +233,8 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
         {
           for (unsigned int alpha = 0; alpha < _dim; alpha++)
             {
-              Fu(i) += (tau(0,alpha)*grad_phi[i][qp](alpha) - body_force(0)*phi[i][qp])*JxW[qp];
-              if (_dim > 1)
-                Fv(i) += (tau(1,alpha)*grad_phi[i][qp](alpha) - body_force(1)*phi[i][qp])*JxW[qp];
-              if (_dim > 2)
-                Fw(i) += (tau(2,alpha)*grad_phi[i][qp](alpha) - body_force(2)*phi[i][qp])*JxW[qp];
+              for (unsigned int d = 0; d < _dim; ++d)
+                F[d](i) += (tau(d,alpha)*grad_phi[i][qp](alpha) - body_force(d)*phi[i][qp])*JxW[qp];
 
               if (request_jacobian)
                 {
@@ -236,33 +245,10 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
                           // Convenience
                           const Real c0 = grad_phi[j][qp](beta)*c.get_elem_solution_derivative();
 
-                          Real dtau_uu = elasticity_tensor(0, alpha, 0, beta)*c0;
-                          Kuu(i,j) += dtau_uu*grad_phi[i][qp](alpha)*JxW[qp];
-
-                          if (_dim > 1)
-                            {
-                              Real dtau_uv = elasticity_tensor(0, alpha, 1, beta)*c0;
-                              Real dtau_vu = elasticity_tensor(1, alpha, 0, beta)*c0;
-                              Real dtau_vv = elasticity_tensor(1, alpha, 1, beta)*c0;
-
-                              Kuv(i,j) += dtau_uv*grad_phi[i][qp](alpha)*JxW[qp];
-                              Kvu(i,j) += dtau_vu*grad_phi[i][qp](alpha)*JxW[qp];
-                              Kvv(i,j) += dtau_vv*grad_phi[i][qp](alpha)*JxW[qp];
-                            }
-                          if (_dim > 2)
-                            {
-                              Real dtau_uw = elasticity_tensor(0, alpha, 2, beta)*c0;
-                              Real dtau_vw = elasticity_tensor(1, alpha, 2, beta)*c0;
-                              Real dtau_wu = elasticity_tensor(2, alpha, 0, beta)*c0;
-                              Real dtau_wv = elasticity_tensor(2, alpha, 1, beta)*c0;
-                              Real dtau_ww = elasticity_tensor(2, alpha, 2, beta)*c0;
-
-                              Kuw(i,j) += dtau_uw*grad_phi[i][qp](alpha)*JxW[qp];
-                              Kvw(i,j) += dtau_vw*grad_phi[i][qp](alpha)*JxW[qp];
-                              Kwu(i,j) += dtau_wu*grad_phi[i][qp](alpha)*JxW[qp];
-                              Kwv(i,j) += dtau_wv*grad_phi[i][qp](alpha)*JxW[qp];
-                              Kww(i,j) += dtau_ww*grad_phi[i][qp](alpha)*JxW[qp];
-                            }
+                          for (unsigned int k = 0; k < _dim; ++k)
+                            for (unsigned int l = 0; l < _dim; ++l)
+                              K[k][l](i,j) += elasticity_tensor(k, alpha, l, beta) *
+                                c0*grad_phi[i][qp](alpha)*JxW[qp];
                         }
                     }
                 }
@@ -293,6 +279,7 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
       // If we only wanted to use a SecondOrderUnsteadySolver, then this
       // step would be unnecessary and we would just
       // populate the _u_var, etc. blocks of the residual and Jacobian.
+      // We set _w_var=_v_var etc in lower dimensions so this is sane.
       unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
       unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
       unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
@@ -303,10 +290,13 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
       // The number of local degrees of freedom in each variable
       const unsigned int n_u_dofs = c.n_dof_indices(_u_var);
 
-      // We set _w_var=_v_var etc in lower dimensions so this is sane:
-      DenseSubVector<Number> & Fu = c.get_elem_residual(u_dot_var);
-      DenseSubVector<Number> & Fv = c.get_elem_residual(v_dot_var);
-      DenseSubVector<Number> & Fw = c.get_elem_residual(w_dot_var);
+      // Get rhs DenseSubVector references
+      std::reference_wrapper<DenseSubVector<Number>> F[3] =
+        {
+          c.get_elem_residual(u_dot_var),
+          c.get_elem_residual(v_dot_var),
+          c.get_elem_residual(w_dot_var)
+        };
 
       // Element Jacobian * quadrature weights for interior integration
       const std::vector<Real> & JxW = u_side_fe->get_JxW();
@@ -330,13 +320,8 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
             traction = pressure * normals[qp];
 
           for (unsigned int i=0; i != n_u_dofs; i++)
-            {
-              Fu(i) -= traction(0)*phi[i][qp]*JxW[qp];
-              if (_dim > 1)
-                Fv(i) -= traction(1)*phi[i][qp]*JxW[qp];
-              if (_dim > 2)
-                Fw(i) -= traction(2)*phi[i][qp]*JxW[qp];
-            }
+            for (unsigned int d = 0; d < _dim; ++d)
+              F[d](i) -= traction(d)*phi[i][qp]*JxW[qp];
         }
     }
 
@@ -359,6 +344,7 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
   // If we only wanted to use a SecondOrderUnsteadySolver, then this
   // step would be unnecessary and we would just
   // populate the _u_var, etc. blocks of the residual and Jacobian.
+  // We set _w_var=_v_var etc in lower dimensions so this is sane.
   unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
   unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
   unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
@@ -374,15 +360,21 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
 
   const std::vector<std::vector<Real>> & phi = u_elem_fe->get_phi();
 
-  // Residuals that we're populating
-  // We set _w_var=_v_var etc in lower dimensions so this is sane:
-  libMesh::DenseSubVector<libMesh::Number> & Fu = c.get_elem_residual(u_dot_var);
-  libMesh::DenseSubVector<libMesh::Number> & Fv = c.get_elem_residual(v_dot_var);
-  libMesh::DenseSubVector<libMesh::Number> & Fw = c.get_elem_residual(w_dot_var);
+  // Get rhs DenseSubVector references
+  std::reference_wrapper<DenseSubVector<Number>> F[3] =
+    {
+      c.get_elem_residual(u_dot_var),
+      c.get_elem_residual(v_dot_var),
+      c.get_elem_residual(w_dot_var)
+    };
 
-  libMesh::DenseSubMatrix<libMesh::Number> & Kuu = c.get_elem_jacobian(u_dot_var, u_dot_var);
-  libMesh::DenseSubMatrix<libMesh::Number> & Kvv = c.get_elem_jacobian(v_dot_var, v_dot_var);
-  libMesh::DenseSubMatrix<libMesh::Number> & Kww = c.get_elem_jacobian(w_dot_var, w_dot_var);
+  // Get references to stiffness matrix diagonal blocks
+  std::reference_wrapper<DenseSubMatrix<Number>> Kdiag[3] =
+    {
+      c.get_elem_jacobian(u_dot_var, u_dot_var),
+      c.get_elem_jacobian(v_dot_var, v_dot_var),
+      c.get_elem_jacobian(w_dot_var, w_dot_var)
+    };
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
@@ -392,33 +384,28 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
       // then we could actually just use interior rate, but using interior_accel
       // allows this assembly to function for both FirstOrderUnsteadySolvers
       // and SecondOrderUnsteadySolvers
-      libMesh::Number u_ddot, v_ddot, w_ddot;
-      c.interior_accel(u_dot_var, qp, u_ddot);
+      std::vector<Number> accel(3);
+      c.interior_accel(u_dot_var, qp, accel[0]);
       if (_dim > 1)
-        c.interior_accel(v_dot_var, qp, v_ddot);
+        c.interior_accel(v_dot_var, qp, accel[1]);
       if (_dim > 2)
-        c.interior_accel(w_dot_var, qp, w_ddot);
+        c.interior_accel(w_dot_var, qp, accel[2]);
 
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
-          Fu(i) += _rho*u_ddot*phi[i][qp]*JxW[qp];
-          if (_dim > 1)
-            Fv(i) += _rho*v_ddot*phi[i][qp]*JxW[qp];
-          if (_dim > 2)
-            Fw(i) += _rho*w_ddot*phi[i][qp]*JxW[qp];
+          for (unsigned int d = 0; d < _dim; ++d)
+            F[d](i) += _rho*accel[d]*phi[i][qp]*JxW[qp];
 
           if (request_jacobian)
             {
               for (unsigned int j=0; j != n_u_dofs; j++)
                 {
-                  libMesh::Real jac_term = _rho*phi[i][qp]*phi[j][qp]*JxW[qp];
-                  jac_term *= context.get_elem_solution_accel_derivative();
+                  Real jac_term =
+                    context.get_elem_solution_accel_derivative() *
+                    _rho*phi[i][qp]*phi[j][qp]*JxW[qp];
 
-                  Kuu(i,j) += jac_term;
-                  if (_dim > 1)
-                    Kvv(i,j) += jac_term;
-                  if (_dim > 2)
-                    Kww(i,j) += jac_term;
+                  for (unsigned int d = 0; d < _dim; ++d)
+                    Kdiag[d](i,j) += jac_term;
                 }
             }
         }

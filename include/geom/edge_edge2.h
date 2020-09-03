@@ -157,7 +157,11 @@ public:
    * Geometric constants for Edge2.
    */
   static const int num_nodes = 2;
+  static const int num_sides = 2;
+  static const int num_edges = 0;
   static const int num_children = 2;
+  static const int nodes_per_side = 1;
+  static const int nodes_per_edge = invalid_int;
 
 protected:
 

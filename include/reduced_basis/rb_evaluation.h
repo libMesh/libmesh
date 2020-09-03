@@ -109,6 +109,13 @@ public:
   virtual Real rb_solve(unsigned int N);
 
   /**
+   * The same as above, except that we pass in evaluated_thetas
+   * instead of recomputing the theta values.
+   */
+  virtual Real rb_solve(unsigned int N,
+                        const std::vector<Number> * evaluated_thetas);
+
+  /**
    * \returns A scaling factor that we can use to provide a consistent
    * scaling of the RB error bound across different parameter values.
    */
@@ -119,6 +126,13 @@ public:
    * saved in RB_solution_vector.
    */
   virtual Real compute_residual_dual_norm(const unsigned int N);
+
+  /**
+   * The same as above, except that we pass in evaluated thetas
+   * instead of recomputing the theta values.
+   */
+  virtual Real compute_residual_dual_norm(const unsigned int N,
+                                          const std::vector<Number> * evaluated_thetas);
 
   /**
    * Specifies the residual scaling on the denominator to

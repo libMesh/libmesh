@@ -30,6 +30,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/parallel.h"
+#include "libmesh/utility.h"
 
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
@@ -525,8 +526,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
 {
-  if (!this->closed())
-    libmesh_error_msg("Matrix must be closed before it can be cloned!");
+  libmesh_error_msg_if(!this->closed(), "Matrix must be closed before it can be cloned!");
 
   // Copy the nonzero pattern only
   Mat copy;
@@ -548,8 +548,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
 {
-  if (!this->closed())
-    libmesh_error_msg("Matrix must be closed before it can be cloned!");
+  libmesh_error_msg_if(!this->closed(), "Matrix must be closed before it can be cloned!");
 
   // Copy the nonzero pattern and numerical values
   Mat copy;
@@ -760,8 +759,7 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
             int fd = mkstemp(c);
 
             // Check to see that mkstemp did not fail.
-            if (fd == -1)
-              libmesh_error_msg("mkstemp failed in PetscMatrix::print_personal()");
+            libmesh_error_msg_if(fd == -1, "mkstemp failed in PetscMatrix::print_personal()");
 
             // mkstemp returns a file descriptor for an open file,
             // so let's close it before we hand it to PETSc!
@@ -1201,7 +1199,83 @@ void PetscMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 }
 
 
+template <typename T>
+void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out)
+{
+  libmesh_assert (this->initialized());
 
+  // sanity check.
+  libmesh_assert_equal_to (this->n(), X_in.m());
+  libmesh_assert_equal_to (this->m(), Y_out.m());
+  libmesh_assert_equal_to (X_in.n(), Y_out.n());
+
+  const PetscMatrix<T> * X = cast_ptr<const PetscMatrix<T> *> (&X_in);
+  PetscMatrix<T> * Y = cast_ptr<PetscMatrix<T> *> (&Y_out);
+
+  PetscErrorCode ierr = 0;
+
+  // the matrix from which we copy the values has to be assembled/closed
+  libmesh_assert(X->closed());
+
+  semiparallel_only();
+
+  ierr = MatMatMult(_mat, X->_mat, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Y->_mat);
+  LIBMESH_CHKERR(ierr);
+}
+
+template <typename T>
+void
+PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
+                                   const std::map<numeric_index_type, numeric_index_type> & row_ltog,
+                                   const std::map<numeric_index_type, numeric_index_type> & col_ltog,
+                                   const T scalar)
+{
+  libmesh_assert_equal_to(spm.m(), row_ltog.size());
+  libmesh_assert_equal_to(spm.n(), col_ltog.size());
+
+  // make sure matrix has larger size than spm
+  libmesh_assert_greater_equal(this->m(), spm.m());
+  libmesh_assert_greater_equal(this->n(), spm.n());
+
+  if (!this->closed())
+    this->close();
+
+  PetscErrorCode ierr = 0;
+
+  auto pscm = cast_ptr<const PetscMatrix<T> *>(&spm);
+
+  PetscInt ncols = 0;
+
+  const PetscInt * lcols;
+  const PetscScalar * vals;
+
+  std::vector<PetscInt> gcols;
+  std::vector<PetscScalar> values;
+
+  for (auto ltog : row_ltog)
+  {
+    PetscInt grow[] = {static_cast<PetscInt>(ltog.second)}; // global row index
+
+    ierr = MatGetRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals);
+    LIBMESH_CHKERR(ierr);
+
+    // get global indices (gcols) from lcols, increment values = vals*scalar
+    gcols.resize(ncols);
+    values.resize(ncols);
+    for (auto i : index_range(gcols))
+    {
+      gcols[i] = libmesh_map_find(col_ltog, lcols[i]);
+      values[i] = scalar * vals[i];
+    }
+
+    ierr = MatSetValues(_mat, 1, grow, ncols, gcols.data(), values.data(), ADD_VALUES);
+    LIBMESH_CHKERR(ierr);
+    ierr = MatRestoreRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals);
+    LIBMESH_CHKERR(ierr);
+  }
+  // Note: We are not closing the matrix because it is expensive to do so when adding multiple sparse matrices.
+  //       Remember to manually close the matrix once all changes to the matrix have been made.
+}
 
 template <typename T>
 T PetscMatrix<T>::operator () (const numeric_index_type i_in,

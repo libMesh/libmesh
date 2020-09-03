@@ -223,8 +223,8 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 
             // Check to see if not found: this could also indicate the sequential
             // node map is not sorted...
-            if (node_iter == _sequential_to_libmesh_node_map.end())
-              libmesh_error_msg("Global node " << libmesh_node_id << " not found in sequential node map!");
+            libmesh_error_msg_if(node_iter == _sequential_to_libmesh_node_map.end(),
+                                 "Global node " << libmesh_node_id << " not found in sequential node map!");
 
             int sequential_index = cast_int<int>
               (std::distance(_sequential_to_libmesh_node_map.begin(),

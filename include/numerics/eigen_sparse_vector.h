@@ -311,8 +311,7 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
 {
   // Eigen vectors only for serial cases,
   // but can provide a "parallel" vector on one processor.
-  if (n != n_local)
-    libmesh_error_msg("Error: EigenSparseVectors can only be used in serial!");
+  libmesh_error_msg_if(n != n_local, "Error: EigenSparseVectors can only be used in serial!");
 
   this->_type = SERIAL;
 

@@ -49,11 +49,27 @@ public:
   RBEIMTheta(RBEIMEvaluation & rb_eim_eval_in, unsigned int index_in);
 
   /**
+   * Special functions.
+   * This class contains a reference, so it can't be default
+   * copy/move-assigned.
+   */
+  RBEIMTheta (RBEIMTheta &&) = default;
+  RBEIMTheta (const RBEIMTheta &) = default;
+  RBEIMTheta & operator= (const RBEIMTheta &) = delete;
+  RBEIMTheta & operator= (RBEIMTheta &&) = delete;
+  ~RBEIMTheta() = default;
+
+  /**
    * Evaluate this RBEIMTheta object at the parameter \p mu.
    * This entails solving the RB EIM approximation and picking
    * out the appropriate coefficient.
    */
   virtual Number evaluate(const RBParameters & mu) override;
+
+  /**
+   * Evaluate this RBEIMTheta at all parameters in \p mus.
+   */
+  virtual std::vector<Number> evaluate_vec(const std::vector<RBParameters> & mus) override;
 
   /**
    * The RBEIMEvaluation object that this RBEIMTheta is based on.

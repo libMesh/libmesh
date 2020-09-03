@@ -117,8 +117,8 @@ template <typename T>
 void
 LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 {
-  if (this->_is_initialized)
-    libmesh_error_msg("Preconditioner must be attached before the solver is initialized!");
+  libmesh_error_msg_if(this->_is_initialized,
+                       "Preconditioner must be attached before the solver is initialized!");
 
   _preconditioner_type = SHELL_PRECOND;
   _preconditioner = preconditioner;

@@ -699,8 +699,8 @@ public:
     // all the reference values on the last Elem, so that's the one we
     // are using now...
     const Elem * infinite_elem = mesh.elem_ptr(mesh.n_elem() - 1);
-    if (!infinite_elem || !infinite_elem->infinite())
-      libmesh_error_msg("Error setting Elem pointer.");
+    libmesh_error_msg_if(!infinite_elem || !infinite_elem->infinite(),
+                         "Error setting Elem pointer.");
 
     // We will construct FEs, etc. of the same dimension as the mesh elements.
     auto dim = mesh.mesh_dimension();
@@ -768,10 +768,8 @@ public:
       LIBMESH_ASSERT_FP_EQUAL(0., (dphi[t.i][t.qp] - t.grad).norm_sq(), 1.e-4);
 
     // Make sure there are actually reference values
-    if (val_table.empty())
-      libmesh_error_msg("No tabulated values found!");
-    if (grad_table.empty())
-      libmesh_error_msg("No tabulated gradients found!");
+    libmesh_error_msg_if(val_table.empty(), "No tabulated values found!");
+    libmesh_error_msg_if(grad_table.empty(), "No tabulated gradients found!");
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
   }

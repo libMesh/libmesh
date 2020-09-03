@@ -22,6 +22,8 @@ class BoundaryInfoTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( BoundaryInfoTest );
 
+  CPPUNIT_TEST( testNameCopying );
+
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
 # ifdef LIBMESH_ENABLE_DIRICHLET
@@ -240,6 +242,42 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(n_elem), bi.n_edge_conds());
   }
 
+  void testNameCopying()
+  {
+      Mesh mesh(*TestCommWorld);
+      MeshTools::Generation::build_line(mesh,
+                                        8,
+                                        0., 1.,
+                                        EDGE2);
+
+      Mesh mesh2(mesh);
+
+      BoundaryInfo & bi = mesh.get_boundary_info();
+      bi.sideset_name(0) = "zero";
+      bi.sideset_name(1) = "one";
+      bi.sideset_name(2) = "two";
+      bi.sideset_name(3) = "three";
+      bi.nodeset_name(0) = "ZERO";
+      bi.nodeset_name(1) = "ONE";
+
+      BoundaryInfo bi2 {bi};
+      CPPUNIT_ASSERT_EQUAL(bi2.get_sideset_name(0), std::string("zero"));
+      CPPUNIT_ASSERT_EQUAL(bi2.get_sideset_name(1), std::string("one"));
+      CPPUNIT_ASSERT_EQUAL(bi2.get_sideset_name(2), std::string("two"));
+      CPPUNIT_ASSERT_EQUAL(bi2.get_sideset_name(3), std::string("three"));
+      CPPUNIT_ASSERT_EQUAL(bi2.get_nodeset_name(0), std::string("ZERO"));
+      CPPUNIT_ASSERT_EQUAL(bi2.get_nodeset_name(1), std::string("ONE"));
+
+      BoundaryInfo & bi3 = mesh2.get_boundary_info();
+      bi3 = bi;
+      CPPUNIT_ASSERT_EQUAL(bi3.get_sideset_name(0), std::string("zero"));
+      CPPUNIT_ASSERT_EQUAL(bi3.get_sideset_name(1), std::string("one"));
+      CPPUNIT_ASSERT_EQUAL(bi3.get_sideset_name(2), std::string("two"));
+      CPPUNIT_ASSERT_EQUAL(bi3.get_sideset_name(3), std::string("three"));
+      CPPUNIT_ASSERT_EQUAL(bi3.get_nodeset_name(0), std::string("ZERO"));
+      CPPUNIT_ASSERT_EQUAL(bi3.get_nodeset_name(1), std::string("ONE"));
+  }
+
 #ifdef LIBMESH_ENABLE_DIRICHLET
   void testShellFaceConstraints()
   {
@@ -285,7 +323,8 @@ public:
     bi.add_shellface(elem_top, 0, 10);
     bi.add_shellface(elem_bottom, 1, 20);
 
-    mesh.prepare_for_use(false /*skip_renumber*/);
+    mesh.allow_renumbering(true);
+    mesh.prepare_for_use();
 
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), bi.n_shellface_conds());
 

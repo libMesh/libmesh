@@ -135,6 +135,12 @@ public:
   virtual void load_training_set(std::map<std::string, std::vector<Number>> & new_training_set);
 
   /**
+   * Overwrite the local part of the training set for \p param_name using \p values.
+   * This assumes that values.size() matches get_local_n_training_samples().
+   */
+  void set_training_parameter_values(const std::string & param_name, const std::vector<Number> & values);
+
+  /**
    * Broadcasts parameters on processor proc_id
    * to all processors.
    */

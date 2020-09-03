@@ -80,8 +80,7 @@ void RBSCMConstruction::set_rb_scm_evaluation(RBSCMEvaluation & rb_scm_eval_in)
 
 RBSCMEvaluation & RBSCMConstruction::get_rb_scm_evaluation()
 {
-  if (!rb_scm_eval)
-    libmesh_error_msg("Error: RBSCMEvaluation object hasn't been initialized yet");
+  libmesh_error_msg_if(!rb_scm_eval, "Error: RBSCMEvaluation object hasn't been initialized yet");
 
   return *rb_scm_eval;
 }
@@ -411,8 +410,8 @@ Number RBSCMConstruction::Aq_inner_product(unsigned int q,
                                            const NumericVector<Number> & v,
                                            const NumericVector<Number> & w)
 {
-  if (q >= get_rb_theta_expansion().get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < Q_a in Aq_inner_product.");
+  libmesh_error_msg_if(q >= get_rb_theta_expansion().get_n_A_terms(),
+                       "Error: We must have q < Q_a in Aq_inner_product.");
 
   matrix_A->zero();
   add_scaled_symm_Aq(q, 1.);

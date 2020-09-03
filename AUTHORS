@@ -1,67 +1,82 @@
-This is the output of "git shortlog -s | sort -nr", updated periodically.
+This is the output of "git shortlog -ns", updated periodically.
 
-  6471	Roy H. Stogner
-  5418	John W. Peterson
-  2730	Benjamin S. Kirk
-   757	David Knezevic
-   370	Paul T. Bauman
-   271	Derek Gaston
-   145	Cody Permann
-   118	Daniel Dreyer
-   111	Steffen Petersen
-    98	Daniel Schwen
-    71	Truman Ellis
-    51	Alexander Lindsay
-    38	David Andrs
-    29	Hubert Weissmann
-    27	Vikram Garg
-    26	Sylvain Vallaghe
-    24	Dmitry Karpeev
-    16	Fande Kong
-    12	Robert Weidlich
-     9	Jason Hales
-     8	Tim Kroeger
-     8	Robert Carlsen
-     8	Christopher Haynes
-     8	Andrew E Slaughter
-     7	Sebastian Schunert
-     7	Boris Boutkov
-     6	Wout Ruijter
-     6	Brian Alger
-     5	Hannah Rittich
-     5	Dana Christen
-     5	Damon McDougall
-     4	Tim Adowski
-     4	Manav Bhatia
-     3	Ron Rahaman
-     3	Florian Prill
-     2	Yaqi Wang
-     2	Roger Pawlowski
-     2	Miguel Salazar De Troya
-     2	Kevin J. Dugan
-     2	Junchao Zhang
-     2	Julian Andrej
-     2	Jesse Carter
-     2	Jed Brown
-     2	Fabio Cesar Canesin
-     2	Cormac Garvey
-     2	Bill Barth
-     2	Benjamin Spencer
-     2	Antonio Cervone
-     1	Vincent Laboure
-     1	Vasileios Vavourakis
-     1	Sterling Harper
-     1	Robert Blake
-     1	Nick Thompson
-     1	Martin Luethi
-     1	Martin Lesueur
-     1	Markus Elfring
-     1	Kevin Dugan
-     1	Joshua Hansel
-     1	Hailong Chen
-     1	Francesco Ballarin
-     1	Corey M Bryant
-     1	Boyce Griffith
-     1	Ata Mesgarnejad
-     1	Andrew Bauer
-     1	Andreas Buhr
+  7517  Roy H. Stogner
+  6607  John W. Peterson
+  2730  Benjamin S. Kirk
+   792  David Knezevic
+   391  Paul T. Bauman
+   279  Derek Gaston
+   186  Alexander Lindsay
+   157  Cody Permann
+   118  Daniel Dreyer
+   111  Steffen Petersen
+   108  Daniel Schwen
+    71  Truman Ellis
+    67  Hubert Weissmann
+    56  Boris Boutkov
+    43  Vikram Garg
+    41  David Andrs
+    37  Fande Kong
+    26  Sylvain Vallaghe
+    24  Dmitry Karpeev
+    15  Hannah Rittich
+    12  Robert Weidlich
+    12  Yaqi Wang
+    11  Logan Harbour
+     9  Andrew E Slaughter
+     9  Jason Hales
+     9  Robert Carlsen
+     8  Christopher Haynes
+     8  Tim Kroeger
+     7  Sebastian Schunert
+     6  Brian Alger
+     6  Wout Ruijter
+     5  Damon McDougall
+     5  Dana Christen
+     4  Leora Chapuis
+     4  Manav Bhatia
+     4  Tim Adowski
+     3  Benjamin Spencer
+     3  Dewen Yushu
+     3  Florian Prill
+     3  Jonas Ballani
+     3  Patrick Shriwise
+     3  Ron Rahaman
+     2  Antonio Cervone
+     2  Antonio Recuero
+     2  Bill Barth
+     2  Bradley Fromm
+     2  Cormac Garvey
+     2  Fabio Cesar Canesin
+     2  Jed Brown
+     2  Jesse Carter
+     2  Julian Andrej
+     2  Junchao Zhang
+     2  Kevin J. Dugan
+     2  Lynn Munday
+     2  Miguel Salazar De Troya
+     2  Roger Pawlowski
+     2  Yinkai Lei
+     1  Andreas Buhr
+     1  Andrew Bauer
+     1  Ata Mesgarnejad
+     1  Boyce Griffith
+     1  Casey Icenhour
+     1  Christopher Morrison
+     1  Corey M Bryant
+     1  David Wells
+     1  Francesco Ballarin
+     1  Hailong Chen
+     1  Joshua Hansel
+     1  Kevin Dugan
+     1  Markus Elfring
+     1  Martin Lesueur
+     1  Martin Luethi
+     1  Nick Thompson
+     1  Robert Blake
+     1  Sterling Harper
+     1  Tim Vincent
+     1  Vasileios Vavourakis
+     1  Vincent Laboure
+     1  Wen Jiang
+     1  Yuxiang Wang

@@ -294,6 +294,61 @@ Real Quad::quality (const ElemQuality q) const
           }
       }
 
+      // This test returns 0 if a Quad:
+      // 1) Is "twisted" (i.e. has an invalid numbering)
+      // 2) Has nearly parallel adjacent edges
+      // 3) Has a nearly zero length edge
+      // Otherwise, it returns 1.
+    case TWIST:
+      {
+        // Compute the cross product induced by each "corner" of the QUAD
+        // and check that:
+        // 1) None of the cross products are zero (within a tolernace), and
+        // 2) all of the cross products point in the same direction.
+
+        // Corner 0
+        Point vec_01 = point(1) - point(0);
+        Point vec_03 = point(3) - point(0);
+        Point corner_0_vec = vec_01.cross(vec_03);
+
+        // Corner 1
+        Point vec_12 = point(2) - point(1);
+        Point vec_10 = point(0) - point(1);
+        Point corner_1_vec = vec_12.cross(vec_10);
+
+        // Corner 2
+        Point vec_23 = point(3) - point(2);
+        Point vec_21 = point(1) - point(2);
+        Point corner_2_vec = vec_23.cross(vec_21);
+
+        // Corner 3
+        Point vec_30 = point(0) - point(3);
+        Point vec_32 = point(2) - point(3);
+        Point corner_3_vec = vec_30.cross(vec_32);
+
+        // If any of these cross products is nearly zero, then either
+        // we have nearly parallel adjacent edges or a nearly zero
+        // length edge. We return 0 in this case.
+        if ((corner_0_vec.norm() < TOLERANCE*TOLERANCE) ||
+            (corner_1_vec.norm() < TOLERANCE*TOLERANCE) ||
+            (corner_2_vec.norm() < TOLERANCE*TOLERANCE) ||
+            (corner_3_vec.norm() < TOLERANCE*TOLERANCE))
+          {
+            return 0.;
+          }
+
+        // Now check whether the element is twisted.
+        Real dot_01 = corner_0_vec * corner_1_vec;
+        Real dot_02 = corner_0_vec * corner_2_vec;
+        Real dot_03 = corner_0_vec * corner_3_vec;
+
+        if ((dot_01 <= 0.) || (dot_02 <= 0.) || (dot_03 <= 0.))
+          return 0.;
+
+        // If we made it here, then Elem is not twisted.
+        return 1.;
+      }
+
     default:
       return Elem::quality(q);
     }
@@ -365,6 +420,11 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 
     case DISTORTION:
       bounds.first  = 0.6;
+      bounds.second = 1.;
+      break;
+
+    case TWIST:
+      bounds.first  = 0.;
       bounds.second = 1.;
       break;
 

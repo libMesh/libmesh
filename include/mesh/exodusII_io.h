@@ -27,6 +27,7 @@
 #include "libmesh/mesh_output.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/boundary_info.h" // BoundaryInfo::BCTuple
+#include "libmesh/exodus_header_info.h"
 
 namespace libMesh
 {
@@ -77,6 +78,25 @@ public:
   virtual void read (const std::string & name) override;
 
   /**
+   * Read only the header information, instead of the entire
+   * mesh. After the header is read, the file is closed and the
+   * MeshBase object remains unchanged. This capability is useful if
+   * you only need to know the mesh "metadata" and should be faster
+   * than reading in all the nodes and elems.
+   *
+   * The header information currently includes:
+   * .) Title string
+   * .) Mesh spatial dimension
+   * .) Number of nodes
+   * .) Number of elements
+   * .) Number of element blocks
+   * .) Number of node sets
+   * .) Number of side sets
+   * .) Number of edge blocks/edges
+   */
+  ExodusHeaderInfo read_header (const std::string & name);
+
+  /**
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string & fname) override;
@@ -108,17 +128,6 @@ public:
    * open for reading or writing.
    */
   int get_num_time_steps();
-
-  /**
-   * Backward compatibility version of function that takes a single variable name.
-   *
-   * \deprecated Use the version of copy_nodal_solution() that takes two names.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  void copy_nodal_solution(System & system,
-                           std::string var_name,
-                           unsigned int timestep=1);
-#endif
 
   /**
    * If we read in a nodal solution while reading in a mesh, we can attempt

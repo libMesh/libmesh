@@ -322,9 +322,15 @@ public:
   unique_id_type next_unique_id() { return _next_unique_id; }
 
   /**
-   * Sets the next unique id to be used.
+   * Sets the next available unique id to be used.  On a
+   * ReplicatedMesh, or when adding unpartitioned objects to a
+   * DistributedMesh, this must be kept in sync on all processors.
+   *
+   * On a DistributedMesh, other unique_id values (larger than this
+   * one) may be chosen next, to allow unique_id assignment without
+   * communication.
    */
-  void set_next_unique_id(unique_id_type id) { _next_unique_id = id; }
+  virtual void set_next_unique_id(unique_id_type id) = 0;
 #endif
 
   /**
@@ -461,35 +467,6 @@ public:
   }
 
   /**
-   * \returns A constant reference (for reading only) to the
-   * \f$ i^{th} \f$ node, which should be present in this processor's
-   * subset of the mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named node_ref() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual const Node & node (const dof_id_type i) const
-  {
-    libmesh_deprecated();
-    return *this->node_ptr(i);
-  }
-#endif
-
-  /**
-   * \returns A reference to the \f$ i^{th} \f$ node, which should be
-   * present in this processor's subset of the mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named node_ref() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual Node & node (const dof_id_type i)
-  {
-    libmesh_deprecated();
-    return *this->node_ptr(i);
-  }
-#endif
-
-  /**
    * \returns A pointer to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
@@ -545,35 +522,6 @@ public:
   virtual Elem * elem_ptr (const dof_id_type i) = 0;
 
   /**
-   * \returns A pointer to the \f$ i^{th} \f$ element, which should be
-   * present in this processor's subset of the mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual const Elem * elem (const dof_id_type i) const
-  {
-    libmesh_deprecated();
-    return this->elem_ptr(i);
-  }
-#endif
-
-  /**
-   * \returns A writable pointer to the \f$ i^{th} \f$ element, which
-   * should be present in this processor's subset of the mesh data
-   * structure.
-   *
-   * \deprecated Use the less confusingly-named elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual Elem * elem (const dof_id_type i)
-  {
-    libmesh_deprecated();
-    return this->elem_ptr(i);
-  }
-#endif
-
-  /**
    * \returns A pointer to the \f$ i^{th} \f$ element, or nullptr if no
    * such element exists in this processor's mesh data structure.
    */
@@ -584,34 +532,6 @@ public:
    * if no such element exists in this processor's mesh data structure.
    */
   virtual Elem * query_elem_ptr (const dof_id_type i) = 0;
-
-  /**
-   * \returns A pointer to the \f$ i^{th} \f$ element, or nullptr if no
-   * such element exists in this processor's mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named query_elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual const Elem * query_elem (const dof_id_type i) const
-  {
-    libmesh_deprecated();
-    return this->query_elem_ptr(i);
-  }
-#endif
-
-  /**
-   * \returns A writable pointer to the \f$ i^{th} \f$ element, or nullptr
-   * if no such element exists in this processor's mesh data structure.
-   *
-   * \deprecated Use the less confusingly-named query_elem_ptr() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  virtual Elem * query_elem (const dof_id_type i)
-  {
-    libmesh_deprecated();
-    return this->query_elem_ptr(i);
-  }
-#endif
 
   /**
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
@@ -787,6 +707,12 @@ public:
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
                                const bool reset_current_list    = true) = 0;
+
+  /**
+   * Removes any orphaned nodes, nodes not connected to any elements.
+   * Typically done automatically in prepare_for_use
+   */
+  void remove_orphaned_nodes ();
 
   /**
    * After partitioning a mesh it is useful to renumber the nodes and elements
@@ -1016,13 +942,17 @@ public:
    *  4.) call \p cache_elem_dims()
    *
    * The argument to skip renumbering is now deprecated - to prevent a
-   * mesh from being renumbered, set allow_renumbering(false).
+   * mesh from being renumbered, set allow_renumbering(false). The argument to skip
+   * finding neighbors is also deprecated. To prevent find_neighbors, set
+   * allow_find_neighbors(false)
    *
    * If this is a distributed mesh, local copies of remote elements
    * will be deleted here - to keep those elements replicated during
    * preparation, set allow_remote_element_removal(false).
    */
-  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false, const bool skip_find_neighbors=false);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements);
+  void prepare_for_use ();
 
   /**
    * Call the default partitioner (currently \p metis_partition()).
@@ -1064,6 +994,13 @@ public:
    */
   void allow_renumbering(bool allow) { _skip_renumber_nodes_and_elements = !allow; }
   bool allow_renumbering() const { return !_skip_renumber_nodes_and_elements; }
+
+  /**
+   * If \p false is passed then this mesh will no longer work to find element
+   * neighbors when being prepared for use
+   */
+  void allow_find_neighbors(bool allow) { _skip_find_neighbors = !allow; }
+  bool allow_find_neighbors() const { return !_skip_find_neighbors; }
 
   /**
    * If false is passed in then this mesh will no longer have remote
@@ -1278,16 +1215,6 @@ public:
    * this function.
    */
   unsigned int recalculate_n_partitions();
-
-  /**
-   * \returns A pointer to a \p PointLocatorBase object for this
-   * mesh, constructing a master PointLocator first if necessary.
-   *
-   * \deprecated This should never be used in threaded or non-parallel_only code.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  const PointLocatorBase & point_locator () const;
-#endif
 
   /**
    * \returns A pointer to a subordinate \p PointLocatorBase object
@@ -1784,6 +1711,11 @@ protected:
    * This is set when prepare_for_use() is called.
    */
   bool _skip_renumber_nodes_and_elements;
+
+  /**
+   * If this is \p true then we will skip \p find_neighbors in \p prepare_for_use
+   */
+  bool _skip_find_neighbors;
 
   /**
    * If this is false then even on DistributedMesh remote elements

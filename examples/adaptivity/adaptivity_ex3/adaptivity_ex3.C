@@ -508,8 +508,9 @@ int main(int argc, char ** argv)
                   hpselector.singular_points.push_back(Point());
                   hpselector.select_refinement(system);
                 }
-              else if (refine_type != "h")
-                libmesh_error_msg("Unknown refinement_type = " << refine_type);
+              else
+                libmesh_error_msg_if(refine_type != "h",
+                                     "Unknown refinement_type = " << refine_type);
 
               // This call actually refines and coarsens the flagged
               // elements.

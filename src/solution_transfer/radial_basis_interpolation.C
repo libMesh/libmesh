@@ -171,12 +171,12 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
 
   // If we already have field variables, we assume we are appending.
   // that means the names and ordering better be identical!
-  if (this->_names.size() != field_names.size())
-    libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+  libmesh_error_msg_if(this->_names.size() != field_names.size(),
+                       "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
   for (std::size_t v=0; v<this->_names.size(); v++)
-    if (_names[v] != field_names[v])
-      libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+    libmesh_error_msg_if(_names[v] != field_names[v],
+                         "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
 
   RBF rbf(_r_bbox);

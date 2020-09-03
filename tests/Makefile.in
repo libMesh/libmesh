@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -89,8 +90,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-
-#EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = \
 @LIBMESH_ENABLE_FPARSER_TRUE@	fparser/autodiff.C
 
@@ -122,8 +121,16 @@ noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_3) $(am__EXEEXT_4) \
 @CODE_COVERAGE_ENABLED_TRUE@am__append_13 = */*.gcda */*.gcno
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
-	$(top_srcdir)/m4/all_static.m4 \
+am__aclocal_m4_deps =  \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_control_args.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_summarize_env.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_test_sanitize_flags.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/ax_prefix_config_h.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/ax_split_version.m4 \
+	$(top_srcdir)/m4/ac_cxx_rtti.m4 $(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
@@ -131,14 +138,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_gcc_archflag.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
-	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
 	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/capnproto.m4 \
 	$(top_srcdir)/m4/compiler.m4 \
-	$(top_srcdir)/m4/compiler_control_args.m4 \
-	$(top_srcdir)/m4/config_environment.m4 \
-	$(top_srcdir)/m4/config_summary.m4 \
-	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
+	$(top_srcdir)/m4/config_summary.m4 $(top_srcdir)/m4/cppunit.m4 \
 	$(top_srcdir)/m4/curl.m4 $(top_srcdir)/m4/cxx11.m4 \
 	$(top_srcdir)/m4/cxx17.m4 $(top_srcdir)/m4/demangle.m4 \
 	$(top_srcdir)/m4/dlopen.m4 $(top_srcdir)/m4/eigen.m4 \
@@ -155,13 +158,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/locale.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/mpi.m4 \
-	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
-	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
-	$(top_srcdir)/m4/nlopt.m4 $(top_srcdir)/m4/parmetis.m4 \
-	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/precision.m4 \
-	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
-	$(top_srcdir)/m4/sanitize.m4 $(top_srcdir)/m4/scrape_petsc.m4 \
+	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/namespaces.m4 \
+	$(top_srcdir)/m4/nanoflann.m4 $(top_srcdir)/m4/nemesis.m4 \
+	$(top_srcdir)/m4/netcdf.m4 $(top_srcdir)/m4/nlopt.m4 \
+	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
+	$(top_srcdir)/m4/precision.m4 $(top_srcdir)/m4/qhull.m4 \
 	$(top_srcdir)/m4/sfc.m4 $(top_srcdir)/m4/slepc.m4 \
 	$(top_srcdir)/m4/sstream.m4 $(top_srcdir)/m4/strstream.m4 \
 	$(top_srcdir)/m4/tbb.m4 $(top_srcdir)/m4/tecio.m4 \
@@ -195,13 +196,15 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_szabab_test.C \
-	fe/fe_test.h fe/fe_xyz_test.C geom/bbox_test.C \
+	fe/fe_test.h fe/fe_xyz_test.C \
+	fe/dual_shape_verification_test.C geom/bbox_test.C \
 	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/side_test.C geom/which_node_am_i_test.C \
-	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/extra_integers.C mesh/mesh_input.C \
-	mesh/mesh_function.C mesh/mesh_stitch.C \
+	geom/point_test.h geom/side_test.C geom/volume_test.C \
+	geom/which_node_am_i_test.C mesh/all_tri.C mesh/distort.C \
+	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/boundary_points.C mesh/checkpoint.C mesh/contains_point.C \
+	mesh/extra_integers.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_function.C mesh/mesh_stitch.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
@@ -233,12 +236,15 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
-	systems/equation_systems_test.C systems/systems_test.C \
-	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
+	systems/equation_systems_test.C systems/periodic_bc_test.C \
+	systems/systems_test.C utils/parameters_test.C \
+	utils/point_locator_test.C utils/vectormap_test.C \
+	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
+	shark_tooth_tri6.xda.gz fparser/autodiff.C
 am__dirstamp = $(am__leading_dot)dirstamp
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
-am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
+am__objects_1 =
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_2 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
+am__objects_3 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-dof_map_test.$(OBJEXT) \
 	base/unit_tests_dbg-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_dbg-getpot_test.$(OBJEXT) \
@@ -257,11 +263,13 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_rational_test.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_xyz_test.$(OBJEXT) \
+	fe/unit_tests_dbg-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_dbg-bbox_test.$(OBJEXT) \
 	geom/unit_tests_dbg-elem_test.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
 	geom/unit_tests_dbg-side_test.$(OBJEXT) \
+	geom/unit_tests_dbg-volume_test.$(OBJEXT) \
 	geom/unit_tests_dbg-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-all_tri.$(OBJEXT) \
 	mesh/unit_tests_dbg-distort.$(OBJEXT) \
@@ -271,6 +279,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_dbg-contains_point.$(OBJEXT) \
 	mesh/unit_tests_dbg-extra_integers.$(OBJEXT) \
+	mesh/unit_tests_dbg-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_function.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_stitch.$(OBJEXT) \
@@ -317,11 +326,14 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	solvers/unit_tests_dbg-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_dbg-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_dbg-equation_systems_test.$(OBJEXT) \
+	systems/unit_tests_dbg-periodic_bc_test.$(OBJEXT) \
 	systems/unit_tests_dbg-systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-parameters_test.$(OBJEXT) \
 	utils/unit_tests_dbg-point_locator_test.$(OBJEXT) \
-	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
+	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) \
+	utils/unit_tests_dbg-xdr_test.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_3)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -342,13 +354,15 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_szabab_test.C \
-	fe/fe_test.h fe/fe_xyz_test.C geom/bbox_test.C \
+	fe/fe_test.h fe/fe_xyz_test.C \
+	fe/dual_shape_verification_test.C geom/bbox_test.C \
 	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/side_test.C geom/which_node_am_i_test.C \
-	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/extra_integers.C mesh/mesh_input.C \
-	mesh/mesh_function.C mesh/mesh_stitch.C \
+	geom/point_test.h geom/side_test.C geom/volume_test.C \
+	geom/which_node_am_i_test.C mesh/all_tri.C mesh/distort.C \
+	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/boundary_points.C mesh/checkpoint.C mesh/contains_point.C \
+	mesh/extra_integers.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_function.C mesh/mesh_stitch.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
@@ -380,11 +394,13 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
-	systems/equation_systems_test.C systems/systems_test.C \
-	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_3 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
-am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
+	systems/equation_systems_test.C systems/periodic_bc_test.C \
+	systems/systems_test.C utils/parameters_test.C \
+	utils/point_locator_test.C utils/vectormap_test.C \
+	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
+	shark_tooth_tri6.xda.gz fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_4 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
+am__objects_5 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-dof_map_test.$(OBJEXT) \
 	base/unit_tests_devel-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_devel-getpot_test.$(OBJEXT) \
@@ -403,11 +419,13 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	fe/unit_tests_devel-fe_rational_test.$(OBJEXT) \
 	fe/unit_tests_devel-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_devel-fe_xyz_test.$(OBJEXT) \
+	fe/unit_tests_devel-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_devel-bbox_test.$(OBJEXT) \
 	geom/unit_tests_devel-elem_test.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
 	geom/unit_tests_devel-side_test.$(OBJEXT) \
+	geom/unit_tests_devel-volume_test.$(OBJEXT) \
 	geom/unit_tests_devel-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_devel-all_tri.$(OBJEXT) \
 	mesh/unit_tests_devel-distort.$(OBJEXT) \
@@ -417,6 +435,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_devel-contains_point.$(OBJEXT) \
 	mesh/unit_tests_devel-extra_integers.$(OBJEXT) \
+	mesh/unit_tests_devel-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_function.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_stitch.$(OBJEXT) \
@@ -463,12 +482,14 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	solvers/unit_tests_devel-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_devel-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_devel-equation_systems_test.$(OBJEXT) \
+	systems/unit_tests_devel-periodic_bc_test.$(OBJEXT) \
 	systems/unit_tests_devel-systems_test.$(OBJEXT) \
 	utils/unit_tests_devel-parameters_test.$(OBJEXT) \
 	utils/unit_tests_devel-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT) \
-	$(am__objects_3)
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_devel_OBJECTS = $(am__objects_4)
+	utils/unit_tests_devel-xdr_test.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_4)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_devel_OBJECTS = $(am__objects_5)
 unit_tests_devel_OBJECTS = $(am_unit_tests_devel_OBJECTS)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_DEPENDENCIES = $(top_builddir)/libmesh_devel.la
 unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -485,13 +506,15 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_szabab_test.C \
-	fe/fe_test.h fe/fe_xyz_test.C geom/bbox_test.C \
+	fe/fe_test.h fe/fe_xyz_test.C \
+	fe/dual_shape_verification_test.C geom/bbox_test.C \
 	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/side_test.C geom/which_node_am_i_test.C \
-	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/extra_integers.C mesh/mesh_input.C \
-	mesh/mesh_function.C mesh/mesh_stitch.C \
+	geom/point_test.h geom/side_test.C geom/volume_test.C \
+	geom/which_node_am_i_test.C mesh/all_tri.C mesh/distort.C \
+	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/boundary_points.C mesh/checkpoint.C mesh/contains_point.C \
+	mesh/extra_integers.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_function.C mesh/mesh_stitch.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
@@ -523,11 +546,13 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
-	systems/equation_systems_test.C systems/systems_test.C \
-	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_5 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
-am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
+	systems/equation_systems_test.C systems/periodic_bc_test.C \
+	systems/systems_test.C utils/parameters_test.C \
+	utils/point_locator_test.C utils/vectormap_test.C \
+	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
+	shark_tooth_tri6.xda.gz fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_6 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
+am__objects_7 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-dof_map_test.$(OBJEXT) \
 	base/unit_tests_oprof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
@@ -546,11 +571,13 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_rational_test.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_xyz_test.$(OBJEXT) \
+	fe/unit_tests_oprof-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_oprof-bbox_test.$(OBJEXT) \
 	geom/unit_tests_oprof-elem_test.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
 	geom/unit_tests_oprof-side_test.$(OBJEXT) \
+	geom/unit_tests_oprof-volume_test.$(OBJEXT) \
 	geom/unit_tests_oprof-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-all_tri.$(OBJEXT) \
 	mesh/unit_tests_oprof-distort.$(OBJEXT) \
@@ -560,6 +587,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_oprof-contains_point.$(OBJEXT) \
 	mesh/unit_tests_oprof-extra_integers.$(OBJEXT) \
+	mesh/unit_tests_oprof-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_function.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_stitch.$(OBJEXT) \
@@ -606,12 +634,14 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	solvers/unit_tests_oprof-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_oprof-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_oprof-equation_systems_test.$(OBJEXT) \
+	systems/unit_tests_oprof-periodic_bc_test.$(OBJEXT) \
 	systems/unit_tests_oprof-systems_test.$(OBJEXT) \
 	utils/unit_tests_oprof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_oprof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT) \
-	$(am__objects_5)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS = $(am__objects_6)
+	utils/unit_tests_oprof-xdr_test.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_6)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS = $(am__objects_7)
 unit_tests_oprof_OBJECTS = $(am_unit_tests_oprof_OBJECTS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_DEPENDENCIES = $(top_builddir)/libmesh_oprof.la
 unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -628,13 +658,15 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_szabab_test.C \
-	fe/fe_test.h fe/fe_xyz_test.C geom/bbox_test.C \
+	fe/fe_test.h fe/fe_xyz_test.C \
+	fe/dual_shape_verification_test.C geom/bbox_test.C \
 	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/side_test.C geom/which_node_am_i_test.C \
-	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/extra_integers.C mesh/mesh_input.C \
-	mesh/mesh_function.C mesh/mesh_stitch.C \
+	geom/point_test.h geom/side_test.C geom/volume_test.C \
+	geom/which_node_am_i_test.C mesh/all_tri.C mesh/distort.C \
+	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/boundary_points.C mesh/checkpoint.C mesh/contains_point.C \
+	mesh/extra_integers.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_function.C mesh/mesh_stitch.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
@@ -666,11 +698,13 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
-	systems/equation_systems_test.C systems/systems_test.C \
-	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_7 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
-am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
+	systems/equation_systems_test.C systems/periodic_bc_test.C \
+	systems/systems_test.C utils/parameters_test.C \
+	utils/point_locator_test.C utils/vectormap_test.C \
+	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
+	shark_tooth_tri6.xda.gz fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_8 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
+am__objects_9 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-dof_map_test.$(OBJEXT) \
 	base/unit_tests_opt-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_opt-getpot_test.$(OBJEXT) \
@@ -689,11 +723,13 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	fe/unit_tests_opt-fe_rational_test.$(OBJEXT) \
 	fe/unit_tests_opt-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_opt-fe_xyz_test.$(OBJEXT) \
+	fe/unit_tests_opt-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_opt-bbox_test.$(OBJEXT) \
 	geom/unit_tests_opt-elem_test.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
 	geom/unit_tests_opt-side_test.$(OBJEXT) \
+	geom/unit_tests_opt-volume_test.$(OBJEXT) \
 	geom/unit_tests_opt-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_opt-all_tri.$(OBJEXT) \
 	mesh/unit_tests_opt-distort.$(OBJEXT) \
@@ -703,6 +739,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_opt-contains_point.$(OBJEXT) \
 	mesh/unit_tests_opt-extra_integers.$(OBJEXT) \
+	mesh/unit_tests_opt-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_function.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_stitch.$(OBJEXT) \
@@ -749,11 +786,14 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	solvers/unit_tests_opt-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_opt-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_opt-equation_systems_test.$(OBJEXT) \
+	systems/unit_tests_opt-periodic_bc_test.$(OBJEXT) \
 	systems/unit_tests_opt-systems_test.$(OBJEXT) \
 	utils/unit_tests_opt-parameters_test.$(OBJEXT) \
 	utils/unit_tests_opt-point_locator_test.$(OBJEXT) \
-	utils/unit_tests_opt-vectormap_test.$(OBJEXT) $(am__objects_7)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_8)
+	utils/unit_tests_opt-vectormap_test.$(OBJEXT) \
+	utils/unit_tests_opt-xdr_test.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_8)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_9)
 unit_tests_opt_OBJECTS = $(am_unit_tests_opt_OBJECTS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DEPENDENCIES = $(top_builddir)/libmesh_opt.la
 unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -770,13 +810,15 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_szabab_test.C \
-	fe/fe_test.h fe/fe_xyz_test.C geom/bbox_test.C \
+	fe/fe_test.h fe/fe_xyz_test.C \
+	fe/dual_shape_verification_test.C geom/bbox_test.C \
 	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/side_test.C geom/which_node_am_i_test.C \
-	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/extra_integers.C mesh/mesh_input.C \
-	mesh/mesh_function.C mesh/mesh_stitch.C \
+	geom/point_test.h geom/side_test.C geom/volume_test.C \
+	geom/which_node_am_i_test.C mesh/all_tri.C mesh/distort.C \
+	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/boundary_points.C mesh/checkpoint.C mesh/contains_point.C \
+	mesh/extra_integers.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_function.C mesh/mesh_stitch.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
@@ -808,11 +850,13 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
-	systems/equation_systems_test.C systems/systems_test.C \
-	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
-@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_9 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
-am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
+	systems/equation_systems_test.C systems/periodic_bc_test.C \
+	systems/systems_test.C utils/parameters_test.C \
+	utils/point_locator_test.C utils/vectormap_test.C \
+	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
+	shark_tooth_tri6.xda.gz fparser/autodiff.C
+@LIBMESH_ENABLE_FPARSER_TRUE@am__objects_10 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
+am__objects_11 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-dof_map_test.$(OBJEXT) \
 	base/unit_tests_prof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_prof-getpot_test.$(OBJEXT) \
@@ -831,11 +875,13 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	fe/unit_tests_prof-fe_rational_test.$(OBJEXT) \
 	fe/unit_tests_prof-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_prof-fe_xyz_test.$(OBJEXT) \
+	fe/unit_tests_prof-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_prof-bbox_test.$(OBJEXT) \
 	geom/unit_tests_prof-elem_test.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
 	geom/unit_tests_prof-side_test.$(OBJEXT) \
+	geom/unit_tests_prof-volume_test.$(OBJEXT) \
 	geom/unit_tests_prof-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_prof-all_tri.$(OBJEXT) \
 	mesh/unit_tests_prof-distort.$(OBJEXT) \
@@ -845,6 +891,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_prof-contains_point.$(OBJEXT) \
 	mesh/unit_tests_prof-extra_integers.$(OBJEXT) \
+	mesh/unit_tests_prof-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_function.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_stitch.$(OBJEXT) \
@@ -891,12 +938,14 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	solvers/unit_tests_prof-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_prof-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_prof-equation_systems_test.$(OBJEXT) \
+	systems/unit_tests_prof-periodic_bc_test.$(OBJEXT) \
 	systems/unit_tests_prof-systems_test.$(OBJEXT) \
 	utils/unit_tests_prof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_prof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT) \
-	$(am__objects_9)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_10)
+	utils/unit_tests_prof-xdr_test.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_10)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_11)
 unit_tests_prof_OBJECTS = $(am_unit_tests_prof_OBJECTS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DEPENDENCIES = $(top_builddir)/libmesh_prof.la
 unit_tests_prof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -948,6 +997,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	base/$(DEPDIR)/unit_tests_prof-getpot_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po \
+	fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po \
 	fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po \
 	fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po \
 	fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po \
@@ -961,6 +1011,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Po \
 	fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Po \
 	fe/$(DEPDIR)/unit_tests_dbg-inf_fe_radial_test.Po \
+	fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Po \
 	fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Po \
 	fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Po \
 	fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Po \
@@ -974,6 +1025,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Po \
 	fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Po \
 	fe/$(DEPDIR)/unit_tests_devel-inf_fe_radial_test.Po \
+	fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Po \
 	fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Po \
 	fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Po \
 	fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Po \
@@ -987,6 +1039,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Po \
 	fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Po \
 	fe/$(DEPDIR)/unit_tests_oprof-inf_fe_radial_test.Po \
+	fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Po \
 	fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Po \
 	fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Po \
 	fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Po \
@@ -1000,6 +1053,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Po \
 	fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Po \
 	fe/$(DEPDIR)/unit_tests_opt-inf_fe_radial_test.Po \
+	fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Po \
 	fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Po \
 	fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Po \
 	fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Po \
@@ -1023,30 +1077,35 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-side_test.Po \
+	geom/$(DEPDIR)/unit_tests_dbg-volume_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-elem_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-side_test.Po \
+	geom/$(DEPDIR)/unit_tests_devel-volume_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-side_test.Po \
+	geom/$(DEPDIR)/unit_tests_oprof-volume_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-elem_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-side_test.Po \
+	geom/$(DEPDIR)/unit_tests_opt-volume_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-elem_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-side_test.Po \
+	geom/$(DEPDIR)/unit_tests_prof-volume_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-which_node_am_i_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-all_second_order.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po \
@@ -1061,6 +1120,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po \
+	mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po \
@@ -1083,6 +1143,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po \
+	mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po \
@@ -1105,6 +1166,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po \
+	mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po \
@@ -1127,6 +1189,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po \
+	mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po \
@@ -1149,6 +1212,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po \
+	mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po \
@@ -1314,30 +1378,40 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po \
 	solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po \
+	systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po \
+	systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po \
+	systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po \
+	systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po \
+	systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-systems_test.Po \
 	utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po \
 	utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po \
+	utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po \
 	utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po \
+	utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po \
 	utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po \
+	utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po \
 	utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po \
+	utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po \
-	utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po
+	utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po \
+	utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -1388,6 +1462,41 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(unit_tests_dbgdir)" \
+	"$(DESTDIR)$(unit_tests_develdir)" \
+	"$(DESTDIR)$(unit_tests_oprofdir)" \
+	"$(DESTDIR)$(unit_tests_optdir)" \
+	"$(DESTDIR)$(unit_tests_profdir)"
+DATA = $(unit_tests_dbg_DATA) $(unit_tests_devel_DATA) \
+	$(unit_tests_oprof_DATA) $(unit_tests_opt_DATA) \
+	$(unit_tests_prof_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -1678,7 +1787,11 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
-datadir = @datadir@
+
+#EXTRA_DIST = base/getpot_test_input.in
+
+# Make sure any data goes in "make dist"
+datadir = $(install_dir)
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
@@ -1759,13 +1872,15 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_szabab_test.C \
-	fe/fe_test.h fe/fe_xyz_test.C geom/bbox_test.C \
+	fe/fe_test.h fe/fe_xyz_test.C \
+	fe/dual_shape_verification_test.C geom/bbox_test.C \
 	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/side_test.C geom/which_node_am_i_test.C \
-	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/extra_integers.C mesh/mesh_input.C \
-	mesh/mesh_function.C mesh/mesh_stitch.C \
+	geom/point_test.h geom/side_test.C geom/volume_test.C \
+	geom/which_node_am_i_test.C mesh/all_tri.C mesh/distort.C \
+	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/boundary_points.C mesh/checkpoint.C mesh/contains_point.C \
+	mesh/extra_integers.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_function.C mesh/mesh_stitch.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
@@ -1797,33 +1912,49 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
-	systems/equation_systems_test.C systems/systems_test.C \
-	utils/parameters_test.C utils/point_locator_test.C \
-	utils/vectormap_test.C $(am__append_1)
+	systems/equation_systems_test.C systems/periodic_bc_test.C \
+	systems/systems_test.C utils/parameters_test.C \
+	utils/point_locator_test.C utils/vectormap_test.C \
+	utils/xdr_test.C $(data) $(am__append_1)
+data = 1_quad.dyn \
+       25_quad.bxt \
+       shark_tooth_tri6.xda.gz
+
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbgdir = $(datadir)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_DATA = $(data)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_SOURCES = $(unit_tests_sources)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_LDADD = $(top_builddir)/libmesh_devel.la
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_develdir = $(datadir)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_SOURCES = $(unit_tests_sources)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_LDADD = $(top_builddir)/libmesh_prof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_profdir = $(datadir)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_SOURCES = $(unit_tests_sources)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprofdir = $(datadir)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_optdir = $(datadir)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
-	write_edgeset_data.e $(am__append_12) $(am__append_13)
+	write_edgeset_data.e read_header_test.e output.dat \
+	$(am__append_12) $(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -1929,6 +2060,8 @@ fe/unit_tests_dbg-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_dbg-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-dual_shape_verification_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
 geom/$(am__dirstamp):
 	@$(MKDIR_P) geom
 	@: > geom/$(am__dirstamp)
@@ -1944,6 +2077,8 @@ geom/unit_tests_dbg-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 geom/unit_tests_dbg-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-side_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_dbg-volume_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-which_node_am_i_test.$(OBJEXT):  \
 	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
@@ -1969,6 +2104,8 @@ mesh/unit_tests_dbg-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-extra_integers.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-mesh_generation_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mesh_function.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -2105,6 +2242,8 @@ systems/$(DEPDIR)/$(am__dirstamp):
 	@: > systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_dbg-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_dbg-periodic_bc_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_dbg-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 utils/$(am__dirstamp):
@@ -2118,6 +2257,8 @@ utils/unit_tests_dbg-parameters_test.$(OBJEXT): utils/$(am__dirstamp) \
 utils/unit_tests_dbg-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_dbg-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_dbg-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/$(am__dirstamp):
 	@$(MKDIR_P) fparser
@@ -2167,6 +2308,8 @@ fe/unit_tests_devel-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_devel-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-dual_shape_verification_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -2176,6 +2319,8 @@ geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-side_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_devel-volume_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-which_node_am_i_test.$(OBJEXT):  \
 	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
@@ -2195,6 +2340,8 @@ mesh/unit_tests_devel-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-extra_integers.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-mesh_generation_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mesh_function.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -2295,6 +2442,8 @@ solvers/unit_tests_devel-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_devel-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_devel-periodic_bc_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_devel-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_devel-parameters_test.$(OBJEXT):  \
@@ -2303,6 +2452,8 @@ utils/unit_tests_devel-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_devel-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_devel-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
@@ -2345,6 +2496,8 @@ fe/unit_tests_oprof-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_oprof-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-dual_shape_verification_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -2354,6 +2507,8 @@ geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-side_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_oprof-volume_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-which_node_am_i_test.$(OBJEXT):  \
 	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
@@ -2373,6 +2528,8 @@ mesh/unit_tests_oprof-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-extra_integers.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-mesh_generation_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mesh_function.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -2473,6 +2630,8 @@ solvers/unit_tests_oprof-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_oprof-periodic_bc_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_oprof-parameters_test.$(OBJEXT):  \
@@ -2481,6 +2640,8 @@ utils/unit_tests_oprof-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_oprof-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_oprof-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_oprof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
@@ -2523,6 +2684,8 @@ fe/unit_tests_opt-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_opt-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-dual_shape_verification_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -2532,6 +2695,8 @@ geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-side_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_opt-volume_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-which_node_am_i_test.$(OBJEXT):  \
 	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
@@ -2551,6 +2716,8 @@ mesh/unit_tests_opt-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-extra_integers.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-mesh_generation_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mesh_function.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -2651,6 +2818,8 @@ solvers/unit_tests_opt-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_opt-periodic_bc_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_opt-parameters_test.$(OBJEXT): utils/$(am__dirstamp) \
@@ -2658,6 +2827,8 @@ utils/unit_tests_opt-parameters_test.$(OBJEXT): utils/$(am__dirstamp) \
 utils/unit_tests_opt-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_opt-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_opt-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_opt-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
@@ -2701,6 +2872,8 @@ fe/unit_tests_prof-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_prof-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-dual_shape_verification_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -2710,6 +2883,8 @@ geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-side_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_prof-volume_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-which_node_am_i_test.$(OBJEXT):  \
 	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
@@ -2729,6 +2904,8 @@ mesh/unit_tests_prof-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-extra_integers.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-mesh_generation_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mesh_function.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -2829,6 +3006,8 @@ solvers/unit_tests_prof-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_prof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_prof-periodic_bc_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_prof-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_prof-parameters_test.$(OBJEXT):  \
@@ -2836,6 +3015,8 @@ utils/unit_tests_prof-parameters_test.$(OBJEXT):  \
 utils/unit_tests_prof-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_prof-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_prof-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_prof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
@@ -2892,6 +3073,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-getpot_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po@am__quote@ # am--include-marker
@@ -2905,6 +3087,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-inf_fe_radial_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Po@am__quote@ # am--include-marker
@@ -2918,6 +3101,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-inf_fe_radial_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Po@am__quote@ # am--include-marker
@@ -2931,6 +3115,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-inf_fe_radial_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Po@am__quote@ # am--include-marker
@@ -2944,6 +3129,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-inf_fe_radial_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Po@am__quote@ # am--include-marker
@@ -2967,30 +3153,35 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-side_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-volume_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-elem_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-side_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-volume_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-side_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-volume_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-elem_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-side_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-volume_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-elem_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-side_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-volume_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-all_second_order.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po@am__quote@ # am--include-marker
@@ -3005,6 +3196,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
@@ -3027,6 +3219,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
@@ -3049,6 +3242,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
@@ -3071,6 +3265,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
@@ -3093,6 +3288,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
@@ -3258,30 +3454,40 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -3579,6 +3785,20 @@ fe/unit_tests_dbg-fe_xyz_test.obj: fe/fe_xyz_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
+fe/unit_tests_dbg-dual_shape_verification_test.o: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-dual_shape_verification_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Tpo -c -o fe/unit_tests_dbg-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_dbg-dual_shape_verification_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+
+fe/unit_tests_dbg-dual_shape_verification_test.obj: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-dual_shape_verification_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Tpo -c -o fe/unit_tests_dbg-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_dbg-dual_shape_verification_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+
 geom/unit_tests_dbg-bbox_test.o: geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-bbox_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-bbox_test.Tpo -c -o geom/unit_tests_dbg-bbox_test.o `test -f 'geom/bbox_test.C' || echo '$(srcdir)/'`geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-bbox_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-bbox_test.Po
@@ -3648,6 +3868,20 @@ geom/unit_tests_dbg-side_test.obj: geom/side_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/side_test.C' object='geom/unit_tests_dbg-side_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-side_test.obj `if test -f 'geom/side_test.C'; then $(CYGPATH_W) 'geom/side_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/side_test.C'; fi`
+
+geom/unit_tests_dbg-volume_test.o: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-volume_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-volume_test.Tpo -c -o geom/unit_tests_dbg-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-volume_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_dbg-volume_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+
+geom/unit_tests_dbg-volume_test.obj: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-volume_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-volume_test.Tpo -c -o geom/unit_tests_dbg-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-volume_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_dbg-volume_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
 
 geom/unit_tests_dbg-which_node_am_i_test.o: geom/which_node_am_i_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-which_node_am_i_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Tpo -c -o geom/unit_tests_dbg-which_node_am_i_test.o `test -f 'geom/which_node_am_i_test.C' || echo '$(srcdir)/'`geom/which_node_am_i_test.C
@@ -3774,6 +4008,20 @@ mesh/unit_tests_dbg-extra_integers.obj: mesh/extra_integers.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/extra_integers.C' object='mesh/unit_tests_dbg-extra_integers.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-extra_integers.obj `if test -f 'mesh/extra_integers.C'; then $(CYGPATH_W) 'mesh/extra_integers.C'; else $(CYGPATH_W) '$(srcdir)/mesh/extra_integers.C'; fi`
+
+mesh/unit_tests_dbg-mesh_generation_test.o: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_generation_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Tpo -c -o mesh/unit_tests_dbg-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_dbg-mesh_generation_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+
+mesh/unit_tests_dbg-mesh_generation_test.obj: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_generation_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Tpo -c -o mesh/unit_tests_dbg-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_dbg-mesh_generation_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
 
 mesh/unit_tests_dbg-mesh_input.o: mesh/mesh_input.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Tpo -c -o mesh/unit_tests_dbg-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
@@ -4419,6 +4667,20 @@ systems/unit_tests_dbg-equation_systems_test.obj: systems/equation_systems_test.
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-equation_systems_test.obj `if test -f 'systems/equation_systems_test.C'; then $(CYGPATH_W) 'systems/equation_systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/equation_systems_test.C'; fi`
 
+systems/unit_tests_dbg-periodic_bc_test.o: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-periodic_bc_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Tpo -c -o systems/unit_tests_dbg-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_dbg-periodic_bc_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+
+systems/unit_tests_dbg-periodic_bc_test.obj: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-periodic_bc_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Tpo -c -o systems/unit_tests_dbg-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_dbg-periodic_bc_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+
 systems/unit_tests_dbg-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-systems_test.Tpo -c -o systems/unit_tests_dbg-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-systems_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po
@@ -4474,6 +4736,20 @@ utils/unit_tests_dbg-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_dbg-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
+utils/unit_tests_dbg-xdr_test.o: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-xdr_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Tpo -c -o utils/unit_tests_dbg-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_dbg-xdr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+
+utils/unit_tests_dbg-xdr_test.obj: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-xdr_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Tpo -c -o utils/unit_tests_dbg-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_dbg-xdr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
 
 fparser/unit_tests_dbg-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_dbg-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_dbg-autodiff.Tpo -c -o fparser/unit_tests_dbg-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
@@ -4755,6 +5031,20 @@ fe/unit_tests_devel-fe_xyz_test.obj: fe/fe_xyz_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
+fe/unit_tests_devel-dual_shape_verification_test.o: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-dual_shape_verification_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Tpo -c -o fe/unit_tests_devel-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_devel-dual_shape_verification_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+
+fe/unit_tests_devel-dual_shape_verification_test.obj: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-dual_shape_verification_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Tpo -c -o fe/unit_tests_devel-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_devel-dual_shape_verification_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+
 geom/unit_tests_devel-bbox_test.o: geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-bbox_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-bbox_test.Tpo -c -o geom/unit_tests_devel-bbox_test.o `test -f 'geom/bbox_test.C' || echo '$(srcdir)/'`geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-bbox_test.Tpo geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po
@@ -4824,6 +5114,20 @@ geom/unit_tests_devel-side_test.obj: geom/side_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/side_test.C' object='geom/unit_tests_devel-side_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-side_test.obj `if test -f 'geom/side_test.C'; then $(CYGPATH_W) 'geom/side_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/side_test.C'; fi`
+
+geom/unit_tests_devel-volume_test.o: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-volume_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-volume_test.Tpo -c -o geom/unit_tests_devel-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-volume_test.Tpo geom/$(DEPDIR)/unit_tests_devel-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_devel-volume_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+
+geom/unit_tests_devel-volume_test.obj: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-volume_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-volume_test.Tpo -c -o geom/unit_tests_devel-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-volume_test.Tpo geom/$(DEPDIR)/unit_tests_devel-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_devel-volume_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
 
 geom/unit_tests_devel-which_node_am_i_test.o: geom/which_node_am_i_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-which_node_am_i_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Tpo -c -o geom/unit_tests_devel-which_node_am_i_test.o `test -f 'geom/which_node_am_i_test.C' || echo '$(srcdir)/'`geom/which_node_am_i_test.C
@@ -4950,6 +5254,20 @@ mesh/unit_tests_devel-extra_integers.obj: mesh/extra_integers.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/extra_integers.C' object='mesh/unit_tests_devel-extra_integers.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-extra_integers.obj `if test -f 'mesh/extra_integers.C'; then $(CYGPATH_W) 'mesh/extra_integers.C'; else $(CYGPATH_W) '$(srcdir)/mesh/extra_integers.C'; fi`
+
+mesh/unit_tests_devel-mesh_generation_test.o: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_generation_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Tpo -c -o mesh/unit_tests_devel-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_devel-mesh_generation_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+
+mesh/unit_tests_devel-mesh_generation_test.obj: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_generation_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Tpo -c -o mesh/unit_tests_devel-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_devel-mesh_generation_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
 
 mesh/unit_tests_devel-mesh_input.o: mesh/mesh_input.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Tpo -c -o mesh/unit_tests_devel-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
@@ -5595,6 +5913,20 @@ systems/unit_tests_devel-equation_systems_test.obj: systems/equation_systems_tes
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-equation_systems_test.obj `if test -f 'systems/equation_systems_test.C'; then $(CYGPATH_W) 'systems/equation_systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/equation_systems_test.C'; fi`
 
+systems/unit_tests_devel-periodic_bc_test.o: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-periodic_bc_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Tpo -c -o systems/unit_tests_devel-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_devel-periodic_bc_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+
+systems/unit_tests_devel-periodic_bc_test.obj: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-periodic_bc_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Tpo -c -o systems/unit_tests_devel-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_devel-periodic_bc_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+
 systems/unit_tests_devel-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-systems_test.Tpo -c -o systems/unit_tests_devel-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-systems_test.Tpo systems/$(DEPDIR)/unit_tests_devel-systems_test.Po
@@ -5650,6 +5982,20 @@ utils/unit_tests_devel-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_devel-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
+utils/unit_tests_devel-xdr_test.o: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-xdr_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-xdr_test.Tpo -c -o utils/unit_tests_devel-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_devel-xdr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+
+utils/unit_tests_devel-xdr_test.obj: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-xdr_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-xdr_test.Tpo -c -o utils/unit_tests_devel-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_devel-xdr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
 
 fparser/unit_tests_devel-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_devel-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_devel-autodiff.Tpo -c -o fparser/unit_tests_devel-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
@@ -5931,6 +6277,20 @@ fe/unit_tests_oprof-fe_xyz_test.obj: fe/fe_xyz_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
+fe/unit_tests_oprof-dual_shape_verification_test.o: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-dual_shape_verification_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Tpo -c -o fe/unit_tests_oprof-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_oprof-dual_shape_verification_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+
+fe/unit_tests_oprof-dual_shape_verification_test.obj: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-dual_shape_verification_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Tpo -c -o fe/unit_tests_oprof-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_oprof-dual_shape_verification_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+
 geom/unit_tests_oprof-bbox_test.o: geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-bbox_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Tpo -c -o geom/unit_tests_oprof-bbox_test.o `test -f 'geom/bbox_test.C' || echo '$(srcdir)/'`geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po
@@ -6000,6 +6360,20 @@ geom/unit_tests_oprof-side_test.obj: geom/side_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/side_test.C' object='geom/unit_tests_oprof-side_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-side_test.obj `if test -f 'geom/side_test.C'; then $(CYGPATH_W) 'geom/side_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/side_test.C'; fi`
+
+geom/unit_tests_oprof-volume_test.o: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-volume_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-volume_test.Tpo -c -o geom/unit_tests_oprof-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-volume_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_oprof-volume_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+
+geom/unit_tests_oprof-volume_test.obj: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-volume_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-volume_test.Tpo -c -o geom/unit_tests_oprof-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-volume_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_oprof-volume_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
 
 geom/unit_tests_oprof-which_node_am_i_test.o: geom/which_node_am_i_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-which_node_am_i_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Tpo -c -o geom/unit_tests_oprof-which_node_am_i_test.o `test -f 'geom/which_node_am_i_test.C' || echo '$(srcdir)/'`geom/which_node_am_i_test.C
@@ -6126,6 +6500,20 @@ mesh/unit_tests_oprof-extra_integers.obj: mesh/extra_integers.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/extra_integers.C' object='mesh/unit_tests_oprof-extra_integers.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-extra_integers.obj `if test -f 'mesh/extra_integers.C'; then $(CYGPATH_W) 'mesh/extra_integers.C'; else $(CYGPATH_W) '$(srcdir)/mesh/extra_integers.C'; fi`
+
+mesh/unit_tests_oprof-mesh_generation_test.o: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_generation_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Tpo -c -o mesh/unit_tests_oprof-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_oprof-mesh_generation_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+
+mesh/unit_tests_oprof-mesh_generation_test.obj: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_generation_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Tpo -c -o mesh/unit_tests_oprof-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_oprof-mesh_generation_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
 
 mesh/unit_tests_oprof-mesh_input.o: mesh/mesh_input.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Tpo -c -o mesh/unit_tests_oprof-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
@@ -6771,6 +7159,20 @@ systems/unit_tests_oprof-equation_systems_test.obj: systems/equation_systems_tes
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-equation_systems_test.obj `if test -f 'systems/equation_systems_test.C'; then $(CYGPATH_W) 'systems/equation_systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/equation_systems_test.C'; fi`
 
+systems/unit_tests_oprof-periodic_bc_test.o: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-periodic_bc_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Tpo -c -o systems/unit_tests_oprof-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_oprof-periodic_bc_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+
+systems/unit_tests_oprof-periodic_bc_test.obj: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-periodic_bc_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Tpo -c -o systems/unit_tests_oprof-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_oprof-periodic_bc_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+
 systems/unit_tests_oprof-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-systems_test.Tpo -c -o systems/unit_tests_oprof-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-systems_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po
@@ -6826,6 +7228,20 @@ utils/unit_tests_oprof-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_oprof-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
+utils/unit_tests_oprof-xdr_test.o: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-xdr_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Tpo -c -o utils/unit_tests_oprof-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_oprof-xdr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+
+utils/unit_tests_oprof-xdr_test.obj: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-xdr_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Tpo -c -o utils/unit_tests_oprof-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_oprof-xdr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
 
 fparser/unit_tests_oprof-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_oprof-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_oprof-autodiff.Tpo -c -o fparser/unit_tests_oprof-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
@@ -7107,6 +7523,20 @@ fe/unit_tests_opt-fe_xyz_test.obj: fe/fe_xyz_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
+fe/unit_tests_opt-dual_shape_verification_test.o: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-dual_shape_verification_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Tpo -c -o fe/unit_tests_opt-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_opt-dual_shape_verification_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+
+fe/unit_tests_opt-dual_shape_verification_test.obj: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-dual_shape_verification_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Tpo -c -o fe/unit_tests_opt-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_opt-dual_shape_verification_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+
 geom/unit_tests_opt-bbox_test.o: geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-bbox_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-bbox_test.Tpo -c -o geom/unit_tests_opt-bbox_test.o `test -f 'geom/bbox_test.C' || echo '$(srcdir)/'`geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-bbox_test.Tpo geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po
@@ -7176,6 +7606,20 @@ geom/unit_tests_opt-side_test.obj: geom/side_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/side_test.C' object='geom/unit_tests_opt-side_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-side_test.obj `if test -f 'geom/side_test.C'; then $(CYGPATH_W) 'geom/side_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/side_test.C'; fi`
+
+geom/unit_tests_opt-volume_test.o: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-volume_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-volume_test.Tpo -c -o geom/unit_tests_opt-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-volume_test.Tpo geom/$(DEPDIR)/unit_tests_opt-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_opt-volume_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+
+geom/unit_tests_opt-volume_test.obj: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-volume_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-volume_test.Tpo -c -o geom/unit_tests_opt-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-volume_test.Tpo geom/$(DEPDIR)/unit_tests_opt-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_opt-volume_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
 
 geom/unit_tests_opt-which_node_am_i_test.o: geom/which_node_am_i_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-which_node_am_i_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Tpo -c -o geom/unit_tests_opt-which_node_am_i_test.o `test -f 'geom/which_node_am_i_test.C' || echo '$(srcdir)/'`geom/which_node_am_i_test.C
@@ -7302,6 +7746,20 @@ mesh/unit_tests_opt-extra_integers.obj: mesh/extra_integers.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/extra_integers.C' object='mesh/unit_tests_opt-extra_integers.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-extra_integers.obj `if test -f 'mesh/extra_integers.C'; then $(CYGPATH_W) 'mesh/extra_integers.C'; else $(CYGPATH_W) '$(srcdir)/mesh/extra_integers.C'; fi`
+
+mesh/unit_tests_opt-mesh_generation_test.o: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_generation_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Tpo -c -o mesh/unit_tests_opt-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_opt-mesh_generation_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+
+mesh/unit_tests_opt-mesh_generation_test.obj: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_generation_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Tpo -c -o mesh/unit_tests_opt-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_opt-mesh_generation_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
 
 mesh/unit_tests_opt-mesh_input.o: mesh/mesh_input.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Tpo -c -o mesh/unit_tests_opt-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
@@ -7947,6 +8405,20 @@ systems/unit_tests_opt-equation_systems_test.obj: systems/equation_systems_test.
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-equation_systems_test.obj `if test -f 'systems/equation_systems_test.C'; then $(CYGPATH_W) 'systems/equation_systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/equation_systems_test.C'; fi`
 
+systems/unit_tests_opt-periodic_bc_test.o: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-periodic_bc_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Tpo -c -o systems/unit_tests_opt-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_opt-periodic_bc_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+
+systems/unit_tests_opt-periodic_bc_test.obj: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-periodic_bc_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Tpo -c -o systems/unit_tests_opt-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_opt-periodic_bc_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+
 systems/unit_tests_opt-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-systems_test.Tpo -c -o systems/unit_tests_opt-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-systems_test.Tpo systems/$(DEPDIR)/unit_tests_opt-systems_test.Po
@@ -8002,6 +8474,20 @@ utils/unit_tests_opt-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_opt-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
+utils/unit_tests_opt-xdr_test.o: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-xdr_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-xdr_test.Tpo -c -o utils/unit_tests_opt-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_opt-xdr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+
+utils/unit_tests_opt-xdr_test.obj: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-xdr_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-xdr_test.Tpo -c -o utils/unit_tests_opt-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_opt-xdr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
 
 fparser/unit_tests_opt-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_opt-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_opt-autodiff.Tpo -c -o fparser/unit_tests_opt-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
@@ -8283,6 +8769,20 @@ fe/unit_tests_prof-fe_xyz_test.obj: fe/fe_xyz_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
+fe/unit_tests_prof-dual_shape_verification_test.o: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-dual_shape_verification_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Tpo -c -o fe/unit_tests_prof-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_prof-dual_shape_verification_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-dual_shape_verification_test.o `test -f 'fe/dual_shape_verification_test.C' || echo '$(srcdir)/'`fe/dual_shape_verification_test.C
+
+fe/unit_tests_prof-dual_shape_verification_test.obj: fe/dual_shape_verification_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-dual_shape_verification_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Tpo -c -o fe/unit_tests_prof-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Tpo fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/dual_shape_verification_test.C' object='fe/unit_tests_prof-dual_shape_verification_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-dual_shape_verification_test.obj `if test -f 'fe/dual_shape_verification_test.C'; then $(CYGPATH_W) 'fe/dual_shape_verification_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/dual_shape_verification_test.C'; fi`
+
 geom/unit_tests_prof-bbox_test.o: geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-bbox_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-bbox_test.Tpo -c -o geom/unit_tests_prof-bbox_test.o `test -f 'geom/bbox_test.C' || echo '$(srcdir)/'`geom/bbox_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-bbox_test.Tpo geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po
@@ -8352,6 +8852,20 @@ geom/unit_tests_prof-side_test.obj: geom/side_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/side_test.C' object='geom/unit_tests_prof-side_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-side_test.obj `if test -f 'geom/side_test.C'; then $(CYGPATH_W) 'geom/side_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/side_test.C'; fi`
+
+geom/unit_tests_prof-volume_test.o: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-volume_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-volume_test.Tpo -c -o geom/unit_tests_prof-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-volume_test.Tpo geom/$(DEPDIR)/unit_tests_prof-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_prof-volume_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-volume_test.o `test -f 'geom/volume_test.C' || echo '$(srcdir)/'`geom/volume_test.C
+
+geom/unit_tests_prof-volume_test.obj: geom/volume_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-volume_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-volume_test.Tpo -c -o geom/unit_tests_prof-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-volume_test.Tpo geom/$(DEPDIR)/unit_tests_prof-volume_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/volume_test.C' object='geom/unit_tests_prof-volume_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-volume_test.obj `if test -f 'geom/volume_test.C'; then $(CYGPATH_W) 'geom/volume_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/volume_test.C'; fi`
 
 geom/unit_tests_prof-which_node_am_i_test.o: geom/which_node_am_i_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-which_node_am_i_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-which_node_am_i_test.Tpo -c -o geom/unit_tests_prof-which_node_am_i_test.o `test -f 'geom/which_node_am_i_test.C' || echo '$(srcdir)/'`geom/which_node_am_i_test.C
@@ -8478,6 +8992,20 @@ mesh/unit_tests_prof-extra_integers.obj: mesh/extra_integers.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/extra_integers.C' object='mesh/unit_tests_prof-extra_integers.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-extra_integers.obj `if test -f 'mesh/extra_integers.C'; then $(CYGPATH_W) 'mesh/extra_integers.C'; else $(CYGPATH_W) '$(srcdir)/mesh/extra_integers.C'; fi`
+
+mesh/unit_tests_prof-mesh_generation_test.o: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_generation_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Tpo -c -o mesh/unit_tests_prof-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_prof-mesh_generation_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_generation_test.o `test -f 'mesh/mesh_generation_test.C' || echo '$(srcdir)/'`mesh/mesh_generation_test.C
+
+mesh/unit_tests_prof-mesh_generation_test.obj: mesh/mesh_generation_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_generation_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Tpo -c -o mesh/unit_tests_prof-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_generation_test.C' object='mesh/unit_tests_prof-mesh_generation_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_generation_test.obj `if test -f 'mesh/mesh_generation_test.C'; then $(CYGPATH_W) 'mesh/mesh_generation_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_generation_test.C'; fi`
 
 mesh/unit_tests_prof-mesh_input.o: mesh/mesh_input.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Tpo -c -o mesh/unit_tests_prof-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
@@ -9123,6 +9651,20 @@ systems/unit_tests_prof-equation_systems_test.obj: systems/equation_systems_test
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-equation_systems_test.obj `if test -f 'systems/equation_systems_test.C'; then $(CYGPATH_W) 'systems/equation_systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/equation_systems_test.C'; fi`
 
+systems/unit_tests_prof-periodic_bc_test.o: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-periodic_bc_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Tpo -c -o systems/unit_tests_prof-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_prof-periodic_bc_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-periodic_bc_test.o `test -f 'systems/periodic_bc_test.C' || echo '$(srcdir)/'`systems/periodic_bc_test.C
+
+systems/unit_tests_prof-periodic_bc_test.obj: systems/periodic_bc_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-periodic_bc_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Tpo -c -o systems/unit_tests_prof-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Tpo systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/periodic_bc_test.C' object='systems/unit_tests_prof-periodic_bc_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
+
 systems/unit_tests_prof-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-systems_test.Tpo -c -o systems/unit_tests_prof-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-systems_test.Tpo systems/$(DEPDIR)/unit_tests_prof-systems_test.Po
@@ -9179,6 +9721,20 @@ utils/unit_tests_prof-vectormap_test.obj: utils/vectormap_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
 
+utils/unit_tests_prof-xdr_test.o: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-xdr_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-xdr_test.Tpo -c -o utils/unit_tests_prof-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_prof-xdr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-xdr_test.o `test -f 'utils/xdr_test.C' || echo '$(srcdir)/'`utils/xdr_test.C
+
+utils/unit_tests_prof-xdr_test.obj: utils/xdr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-xdr_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-xdr_test.Tpo -c -o utils/unit_tests_prof-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-xdr_test.Tpo utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/xdr_test.C' object='utils/unit_tests_prof-xdr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-xdr_test.obj `if test -f 'utils/xdr_test.C'; then $(CYGPATH_W) 'utils/xdr_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/xdr_test.C'; fi`
+
 fparser/unit_tests_prof-autodiff.o: fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fparser/unit_tests_prof-autodiff.o -MD -MP -MF fparser/$(DEPDIR)/unit_tests_prof-autodiff.Tpo -c -o fparser/unit_tests_prof-autodiff.o `test -f 'fparser/autodiff.C' || echo '$(srcdir)/'`fparser/autodiff.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fparser/$(DEPDIR)/unit_tests_prof-autodiff.Tpo fparser/$(DEPDIR)/unit_tests_prof-autodiff.Po
@@ -9198,6 +9754,111 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-unit_tests_dbgDATA: $(unit_tests_dbg_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_dbg_DATA)'; test -n "$(unit_tests_dbgdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_dbgdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_dbgdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_dbgdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_dbgdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_dbgDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_dbg_DATA)'; test -n "$(unit_tests_dbgdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_dbgdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_develDATA: $(unit_tests_devel_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_devel_DATA)'; test -n "$(unit_tests_develdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_develdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_develdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_develdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_develdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_develDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_devel_DATA)'; test -n "$(unit_tests_develdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_develdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_oprofDATA: $(unit_tests_oprof_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_oprof_DATA)'; test -n "$(unit_tests_oprofdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_oprofdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_oprofdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_oprofdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_oprofdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_oprofDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_oprof_DATA)'; test -n "$(unit_tests_oprofdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_oprofdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_optDATA: $(unit_tests_opt_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_opt_DATA)'; test -n "$(unit_tests_optdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_optdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_optdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_optdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_optdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_optDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_opt_DATA)'; test -n "$(unit_tests_optdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_optdir)'; $(am__uninstall_files_from_dir)
+install-unit_tests_profDATA: $(unit_tests_prof_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(unit_tests_prof_DATA)'; test -n "$(unit_tests_profdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(unit_tests_profdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(unit_tests_profdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(unit_tests_profdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(unit_tests_profdir)" || exit $$?; \
+	done
+
+uninstall-unit_tests_profDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(unit_tests_prof_DATA)'; test -n "$(unit_tests_profdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(unit_tests_profdir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -9382,8 +10043,11 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(PROGRAMS) $(DATA)
 installdirs:
+	for dir in "$(DESTDIR)$(unit_tests_dbgdir)" "$(DESTDIR)$(unit_tests_develdir)" "$(DESTDIR)$(unit_tests_oprofdir)" "$(DESTDIR)$(unit_tests_optdir)" "$(DESTDIR)$(unit_tests_profdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
@@ -9477,6 +10141,7 @@ distclean: distclean-am
 	-rm -f base/$(DEPDIR)/unit_tests_prof-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po
@@ -9490,6 +10155,7 @@ distclean: distclean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Po
@@ -9503,6 +10169,7 @@ distclean: distclean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Po
@@ -9516,6 +10183,7 @@ distclean: distclean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Po
@@ -9529,6 +10197,7 @@ distclean: distclean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Po
@@ -9552,30 +10221,35 @@ distclean: distclean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_dbg-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_devel-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_oprof-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_opt-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_prof-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-which_node_am_i_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-all_second_order.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po
@@ -9590,6 +10264,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po
@@ -9612,6 +10287,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po
@@ -9634,6 +10310,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po
@@ -9656,6 +10333,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po
@@ -9678,6 +10356,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po
@@ -9843,30 +10522,40 @@ distclean: distclean-am
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-systems_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -9883,7 +10572,9 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-unit_tests_dbgDATA \
+	install-unit_tests_develDATA install-unit_tests_oprofDATA \
+	install-unit_tests_optDATA install-unit_tests_profDATA
 
 install-dvi: install-dvi-am
 
@@ -9942,6 +10633,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f base/$(DEPDIR)/unit_tests_prof-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po
@@ -9955,6 +10647,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_devel-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Po
@@ -9968,6 +10661,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_devel-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_oprof-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Po
@@ -9981,6 +10675,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_oprof-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_opt-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Po
@@ -9994,6 +10689,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_opt-inf_fe_radial_test.Po
+	-rm -f fe/$(DEPDIR)/unit_tests_prof-dual_shape_verification_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Po
@@ -10017,30 +10713,35 @@ maintainer-clean: maintainer-clean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_dbg-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_devel-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_oprof-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_opt-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-elem_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-side_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_prof-volume_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-which_node_am_i_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-all_second_order.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po
@@ -10055,6 +10756,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po
@@ -10077,6 +10779,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po
@@ -10099,6 +10802,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po
@@ -10121,6 +10825,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po
@@ -10143,6 +10848,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po
@@ -10308,30 +11014,40 @@ maintainer-clean: maintainer-clean-am
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-systems_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -10348,7 +11064,9 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-unit_tests_dbgDATA \
+	uninstall-unit_tests_develDATA uninstall-unit_tests_oprofDATA \
+	uninstall-unit_tests_optDATA uninstall-unit_tests_profDATA
 
 .MAKE: all check check-am install install-am install-strip
 
@@ -10361,11 +11079,16 @@ uninstall-am:
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am
+	install-ps install-ps-am install-strip \
+	install-unit_tests_dbgDATA install-unit_tests_develDATA \
+	install-unit_tests_oprofDATA install-unit_tests_optDATA \
+	install-unit_tests_profDATA installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-unit_tests_dbgDATA \
+	uninstall-unit_tests_develDATA uninstall-unit_tests_oprofDATA \
+	uninstall-unit_tests_optDATA uninstall-unit_tests_profDATA
 
 .PRECIOUS: Makefile
 
@@ -10403,6 +11126,7 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f 25_quad.bxt && $(LN_S) -f $(srcdir)/25_quad.bxt .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f shark_tooth_tri6.xda.gz && $(LN_S) -f $(srcdir)/shark_tooth_tri6.xda.gz .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # CLEANFILES only applies to files, handle directories separately

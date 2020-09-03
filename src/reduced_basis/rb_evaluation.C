@@ -51,7 +51,6 @@ RBEvaluation::RBEvaluation (const Parallel::Communicator & comm_in)
   compute_RB_inner_product(false),
   rb_theta_expansion(nullptr)
 {
-
 }
 
 RBEvaluation::~RBEvaluation()
@@ -87,8 +86,8 @@ void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_
 
 RBThetaExpansion & RBEvaluation::get_rb_theta_expansion()
 {
-  if (!is_rb_theta_expansion_initialized())
-    libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
+  libmesh_error_msg_if(!is_rb_theta_expansion_initialized(),
+                       "Error: rb_theta_expansion hasn't been initialized yet");
 
   return *rb_theta_expansion;
 }
@@ -110,8 +109,8 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
 {
   LOG_SCOPE("resize_data_structures()", "RBEvaluation");
 
-  if (Nmax < this->get_n_basis_functions())
-    libmesh_error_msg("Error: Cannot set Nmax to be less than the current number of basis functions.");
+  libmesh_error_msg_if(Nmax < this->get_n_basis_functions(),
+                       "Error: Cannot set Nmax to be less than the current number of basis functions.");
 
   // Resize/clear inner product matrix
   if (compute_RB_inner_product)
@@ -208,10 +207,21 @@ NumericVector<Number> & RBEvaluation::get_basis_function(unsigned int i)
 
 Real RBEvaluation::rb_solve(unsigned int N)
 {
+  return rb_solve(N, nullptr);
+}
+
+Real RBEvaluation::rb_solve(unsigned int N,
+                            const std::vector<Number> * evaluated_thetas)
+{
   LOG_SCOPE("rb_solve()", "RBEvaluation");
 
-  if (N > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+  libmesh_error_msg_if(N > get_n_basis_functions(),
+                       "ERROR: N cannot be larger than the number of basis functions in rb_solve");
+
+  // In case the theta functions have been pre-evaluated, first check the size for consistency
+  libmesh_error_msg_if(evaluated_thetas &&
+                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
+                       "ERROR: Evaluated thetas have wrong size");
 
   const RBParameters & mu = get_parameters();
 
@@ -227,7 +237,10 @@ Real RBEvaluation::rb_solve(unsigned int N)
     {
       RB_Aq_vector[q_a].get_principal_submatrix(N, RB_Aq_a);
 
-      RB_system_matrix.add(rb_theta_expansion->eval_A_theta(q_a, mu), RB_Aq_a);
+      if (evaluated_thetas)
+        RB_system_matrix.add((*evaluated_thetas)[q_a], RB_Aq_a);
+      else
+        RB_system_matrix.add(rb_theta_expansion->eval_A_theta(q_a, mu), RB_Aq_a);
     }
 
   // Assemble the RB rhs
@@ -239,7 +252,10 @@ Real RBEvaluation::rb_solve(unsigned int N)
     {
       RB_Fq_vector[q_f].get_principal_subvector(N, RB_Fq_f);
 
-      RB_rhs.add(rb_theta_expansion->eval_F_theta(q_f, mu), RB_Fq_f);
+      if (evaluated_thetas)
+        RB_rhs.add((*evaluated_thetas)[q_f+rb_theta_expansion->get_n_A_terms()], RB_Fq_f);
+      else
+        RB_rhs.add(rb_theta_expansion->eval_F_theta(q_f, mu), RB_Fq_f);
     }
 
   // Solve the linear system
@@ -263,7 +279,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
   if (evaluate_RB_error_bound) // Calculate the error bounds
     {
       // Evaluate the dual norm of the residual for RB_solution_vector
-      Real epsilon_N = compute_residual_dual_norm(N);
+      Real epsilon_N = compute_residual_dual_norm(N, evaluated_thetas);
 
       // Get lower bound for coercivity constant
       const Real alpha_LB = get_stability_lower_bound();
@@ -301,48 +317,77 @@ Real RBEvaluation::get_error_bound_normalization()
 
 Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
+  return compute_residual_dual_norm(N, nullptr);
+}
+
+Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
+                                              const std::vector<Number> * evaluated_thetas)
+{
   LOG_SCOPE("compute_residual_dual_norm()", "RBEvaluation");
 
+  // In case the theta functions have been pre-evaluated, first check the size for consistency
+  libmesh_error_msg_if(evaluated_thetas &&
+                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
+                       "ERROR: Evaluated thetas have wrong size");
+
   const RBParameters & mu = get_parameters();
+
+  const unsigned int n_A_terms = rb_theta_expansion->get_n_A_terms();
+  const unsigned int n_F_terms = rb_theta_expansion->get_n_F_terms();
 
   // Use the stored representor inner product values
   // to evaluate the residual norm
   Number residual_norm_sq = 0.;
 
   unsigned int q=0;
-  for (unsigned int q_f1=0; q_f1<rb_theta_expansion->get_n_F_terms(); q_f1++)
+  for (unsigned int q_f1=0; q_f1<n_F_terms; q_f1++)
     {
-      for (unsigned int q_f2=q_f1; q_f2<rb_theta_expansion->get_n_F_terms(); q_f2++)
+      const Number val_q_f1 = (evaluated_thetas) ? (*evaluated_thetas)[q_f1 + n_A_terms]
+                                                 : rb_theta_expansion->eval_F_theta(q_f1, mu);
+
+      for (unsigned int q_f2=q_f1; q_f2<n_F_terms; q_f2++)
         {
+          const Number val_q_f2 = (evaluated_thetas) ? (*evaluated_thetas)[q_f2 + n_A_terms]
+                                                     : rb_theta_expansion->eval_F_theta(q_f2, mu);
+
           Real delta = (q_f1==q_f2) ? 1. : 2.;
-          residual_norm_sq += delta * libmesh_real(
-                                                   rb_theta_expansion->eval_F_theta(q_f1, mu)
-                                                   * libmesh_conj(rb_theta_expansion->eval_F_theta(q_f2, mu)) * Fq_representor_innerprods[q] );
+          residual_norm_sq += delta * libmesh_real(val_q_f1 * libmesh_conj(val_q_f2) * Fq_representor_innerprods[q] );
 
           q++;
         }
     }
 
-  for (unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
+  for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
     {
-      for (unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
+      const Number val_q_f = (evaluated_thetas) ? (*evaluated_thetas)[q_f + n_A_terms]
+                                                : rb_theta_expansion->eval_F_theta(q_f, mu);
+
+      for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
         {
+          const Number val_q_a = (evaluated_thetas) ? (*evaluated_thetas)[q_a]
+                                                    : rb_theta_expansion->eval_A_theta(q_a, mu);
+
           for (unsigned int i=0; i<N; i++)
             {
               Real delta = 2.;
               residual_norm_sq +=
-                delta * libmesh_real( rb_theta_expansion->eval_F_theta(q_f, mu) *
-                                      libmesh_conj(rb_theta_expansion->eval_A_theta(q_a, mu)) *
+                delta * libmesh_real( val_q_f * libmesh_conj(val_q_a) *
                                       libmesh_conj(RB_solution(i)) * Fq_Aq_representor_innerprods[q_f][q_a][i] );
             }
         }
     }
 
   q=0;
-  for (unsigned int q_a1=0; q_a1<rb_theta_expansion->get_n_A_terms(); q_a1++)
+  for (unsigned int q_a1=0; q_a1<n_A_terms; q_a1++)
     {
-      for (unsigned int q_a2=q_a1; q_a2<rb_theta_expansion->get_n_A_terms(); q_a2++)
+      const Number val_q_a1 = (evaluated_thetas) ? (*evaluated_thetas)[q_a1]
+                                                 : rb_theta_expansion->eval_A_theta(q_a1, mu);
+
+      for (unsigned int q_a2=q_a1; q_a2<n_A_terms; q_a2++)
         {
+          const Number val_q_a2 = (evaluated_thetas) ? (*evaluated_thetas)[q_a2]
+                                                     : rb_theta_expansion->eval_A_theta(q_a2, mu);
+
           Real delta = (q_a1==q_a2) ? 1. : 2.;
 
           for (unsigned int i=0; i<N; i++)
@@ -350,8 +395,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
               for (unsigned int j=0; j<N; j++)
                 {
                   residual_norm_sq +=
-                    delta * libmesh_real( libmesh_conj(rb_theta_expansion->eval_A_theta(q_a1, mu)) *
-                                          rb_theta_expansion->eval_A_theta(q_a2, mu) *
+                    delta * libmesh_real( libmesh_conj(val_q_a1) * val_q_a2 *
                                           libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_innerprods[q][i][j] );
                 }
             }
@@ -873,8 +917,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
 
 void RBEvaluation::assert_file_exists(const std::string & file_name)
 {
-  if (!std::ifstream(file_name.c_str()))
-    libmesh_error_msg("File missing: " + file_name);
+  libmesh_error_msg_if(!std::ifstream(file_name.c_str()), "File missing: " << file_name);
 }
 
 void RBEvaluation::write_out_basis_functions(System & sys,
@@ -1025,8 +1068,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
         {
           // vectors should all be nullptr, otherwise we get a memory leak when
           // we create the new vectors in RBEvaluation::read_in_vectors.
-          if (vec)
-            libmesh_error_msg("Non-nullptr vector passed to read_in_vectors_from_multiple_files");
+          libmesh_error_msg_if(vec, "Non-nullptr vector passed to read_in_vectors_from_multiple_files");
 
           vec = NumericVector<Number>::build(sys.comm());
 
@@ -1047,8 +1089,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
           struct stat stat_info;
           int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-          if (stat_result != 0)
-            libmesh_error_msg("File does not exist: " << file_name.str());
+          libmesh_error_msg_if(stat_result != 0, "File does not exist: " << file_name.str());
         }
 
       assert_file_exists(file_name.str());
@@ -1062,8 +1103,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
         const std::string libMesh_label = "libMesh-";
         std::string::size_type lm_pos = version.find(libMesh_label);
-        if (lm_pos==std::string::npos)
-          libmesh_error_msg("version info missing in Xdr header");
+        libmesh_error_msg_if(lm_pos == std::string::npos, "version info missing in Xdr header");
 
         std::istringstream iss(version.substr(lm_pos + libMesh_label.size()));
         int ver_major = 0, ver_minor = 0, ver_patch = 0;

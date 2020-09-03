@@ -110,6 +110,7 @@ pub_2019 = [
   '2020-01-01', 119, # new year
   '2020-02-01', 123,
   '2020-03-01', 133,
+  '2020-04-01', 132,
 ]
 
 # 2020 monthly publication totals (first of each month)
@@ -122,6 +123,12 @@ pub_2020 = [
   '2020-01-01', 17, # new year
   '2020-02-01', 34,
   '2020-03-01', 44,
+  '2020-04-01', 57,
+  '2020-05-01', 75,
+  '2020-06-01', 96,
+  '2020-07-01', 111,
+  '2020-08-01', 122,
+  '2020-09-01', 139,
 ]
 
 """
@@ -131,7 +138,7 @@ def plot_one_year(year, data, color):
     x = []
     y = []
     start_date = datetime.datetime.strptime(str(year) + '-01-01', '%Y-%m-%d')
-    for i in xrange(0, len(data), 2):
+    for i in range(0, len(data), 2):
         end_date = datetime.datetime.strptime(data[i], '%Y-%m-%d')
         # Compute the number of months between two dates:
         num_months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
@@ -161,4 +168,4 @@ ax1.set_xticklabels(['Year Start', 'Year End'])
 # Axis labels
 ax1.set_ylabel('N. Publications')
 ax1.legend(loc='upper left', prop=fontP)
-plt.savefig('libmesh_publications_monthly.pdf', format='pdf')
+plt.savefig('libmesh_citations_monthly.pdf', format='pdf')

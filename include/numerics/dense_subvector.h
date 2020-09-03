@@ -221,7 +221,7 @@ Real DenseSubVector<T>::min () const
   libmesh_assert (this->size());
   Real my_min = libmesh_real(_parent_vector (this->i_off()));
 
-  for (auto i : IntRange<unsigned int>(1, this->size()))
+  for (auto i : make_range(1u, this->size()))
     {
       Real current = libmesh_real(_parent_vector (i + this->i_off()));
       my_min = (my_min < current? my_min : current);
@@ -238,7 +238,7 @@ Real DenseSubVector<T>::max () const
   libmesh_assert (this->size());
   Real my_max = libmesh_real(_parent_vector (this->i_off()));
 
-  for (auto i : IntRange<unsigned int>(1, this->size()))
+  for (auto i : make_range(1u, this->size()))
     {
       Real current = libmesh_real(_parent_vector (i + this->i_off()));
       my_max = (my_max > current? my_max : current);
@@ -284,7 +284,7 @@ Real DenseSubVector<T>::linfty_norm () const
     return 0.;
   Real my_norm = TensorTools::norm_sq(_parent_vector (this->i_off()));
 
-  for (auto i : IntRange<unsigned int>(1, this->size()))
+  for (auto i : make_range(1u, this->size()))
     {
       Real current = TensorTools::norm_sq(_parent_vector (i + this->i_off()));
       my_norm = (my_norm > current? my_norm : current);

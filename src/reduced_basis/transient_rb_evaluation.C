@@ -93,7 +93,7 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
 
   // Initialize the initial condition storage
   RB_initial_condition_all_N.resize(Nmax);
-  for (auto i : IntRange<unsigned int>(0, RB_initial_condition_all_N.size()))
+  for (auto i : make_range(RB_initial_condition_all_N.size()))
     {
       // The i^th row holds a vector of lenght i+1
       RB_initial_condition_all_N[i].resize(i+1);
@@ -155,8 +155,8 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
 {
   LOG_SCOPE("rb_solve()", "TransientRBEvaluation");
 
-  if (N > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+  libmesh_error_msg_if(N > get_n_basis_functions(),
+                       "ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
   const RBParameters & mu = get_parameters();
 

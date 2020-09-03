@@ -101,10 +101,10 @@ public:
   virtual void renumber_nodes_and_elements () override;
 
   virtual dof_id_type n_nodes () const override
-  { return cast_int<dof_id_type>(_nodes.size()); }
+  { return _n_nodes; }
 
   virtual dof_id_type parallel_n_nodes () const override
-  { return cast_int<dof_id_type>(_nodes.size()); }
+  { return _n_nodes; }
 
   virtual dof_id_type max_node_id () const override
   { return cast_int<dof_id_type>(_nodes.size()); }
@@ -113,10 +113,10 @@ public:
   { _nodes.reserve (nn); }
 
   virtual dof_id_type n_elem () const override
-  { return cast_int<dof_id_type>(_elements.size()); }
+  { return _n_elem; }
 
   virtual dof_id_type parallel_n_elem () const override
-  { return cast_int<dof_id_type>(_elements.size()); }
+  { return _n_elem; }
 
   virtual dof_id_type n_active_elem () const override;
 
@@ -125,6 +125,7 @@ public:
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   virtual unique_id_type parallel_max_unique_id () const override;
+  virtual void set_next_unique_id(unique_id_type id) override;
 #endif
 
   virtual void reserve_elem (const dof_id_type ne) override
@@ -510,10 +511,14 @@ protected:
    */
   std::vector<Node *> _nodes;
 
+  dof_id_type _n_nodes;
+
   /**
    * The elements in the mesh.
    */
   std::vector<Elem *> _elements;
+
+  dof_id_type _n_elem;
 
 private:
 

@@ -3,8 +3,8 @@
 AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 [
 dnl We need to make sure that we've done AC_ARG_ENABLE(optional), AC_ARG_ENABLE(mpi), AC_ARG_WITH(mpi),
-dnl and AC_ARG_ENABLE(petsc) which all occur in COMPILER_CONTROL_ARGS
-AC_REQUIRE([COMPILER_CONTROL_ARGS])
+dnl and AC_ARG_ENABLE(petsc) which all occur in ACSM_COMPILER_CONTROL_ARGS
+AC_REQUIRE([ACSM_COMPILER_CONTROL_ARGS])
 
 dnl We also need to ensure that we've set our compilers, which is where query for a valid
 dnl PETSc configuration
@@ -38,9 +38,13 @@ libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
-# TIMPI is required
+# TIMPI is required - so we should be able to see our TIMPI submodule.
+# If our version of TIMPI doesn't have AM MAINTAINER MODE set, then we
+# need its autoconf submodule initialized too.
 # --------------------------------------------------------------
-AS_IF([test -r $top_srcdir/contrib/timpi/README],
+AS_IF([test -r $top_srcdir/contrib/timpi/README &&
+       (test -r $top_srcdir/contrib/timpi/m4/autoconf-submodule/acsm_mpi.m4 ||
+        grep "^AM""_MAINTAINER_MODE" $top_srcdir/contrib/timpi/configure.ac >/dev/null)],
 [
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/algorithms/include $libmesh_contrib_INCLUDES"
   libmesh_contrib_INCLUDES="-I\$(top_srcdir)/contrib/timpi/src/parallel/include $libmesh_contrib_INCLUDES"
@@ -49,7 +53,7 @@ AS_IF([test -r $top_srcdir/contrib/timpi/README],
   libmesh_contrib_INCLUDES="-I\$(top_builddir)/contrib/timpi/src/utilities/include $libmesh_contrib_INCLUDES"
 ],
 [
-  AC_MSG_ERROR([You must run "git submodule update --init contrib/timpi" before configuring libmesh])
+  AC_MSG_ERROR([You must run "git submodule update --init --recursive" before configuring libmesh])
 ])
 
 
@@ -153,7 +157,7 @@ AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # -------------------------------------------------------------
 AS_IF([test "x$enablempi" = xyes],
       [
-        ACX_MPI
+        ACSM_MPI
         AS_IF([test "x$enablempi" = xyes],
               [
                 AS_IF([test x"$MPI_INCLUDES" = x],,[libmesh_optional_INCLUDES="$MPI_INCLUDES $libmesh_optional_INCLUDES"])
@@ -411,11 +415,10 @@ AC_CONFIG_FILES([contrib/metis/Makefile])
 # -------------------------------------------------------------
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
-AS_IF([test $enablemetis = yes],
-      [CONFIGURE_PARMETIS],
-      [enableparmetis=no])
+CONFIGURE_PARMETIS
 AS_IF([test $enableparmetis = yes],
-      [libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"])
+      [libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_optional_LIBS="$PARMETIS_LIB $libmesh_optional_LIBS"])
 AM_CONDITIONAL(LIBMESH_ENABLE_PARMETIS, test x$enableparmetis = xyes)
 AC_CONFIG_FILES([contrib/parmetis/Makefile])
 # -------------------------------------------------------------

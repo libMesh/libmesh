@@ -262,7 +262,7 @@ void DofMap::add_variable_group (const VariableGroup & var_group)
 
   VariableGroup & new_var_group = _variable_groups.back();
 
-  for (auto var : IntRange<unsigned int>(0, new_var_group.n_variables()))
+  for (auto var : make_range(new_var_group.n_variables()))
     {
       _variables.push_back (new_var_group(var));
       _variable_group_numbers.push_back (vg);
@@ -377,7 +377,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         requested_ids[obj->processor_id()].push_back(obj->id());
     }
 #ifdef DEBUG
-  for (auto p : IntRange<processor_id_type>(0, this->n_processors()))
+  for (auto p : make_range(this->n_processors()))
     {
       if (ghost_objects_from_proc.count(p))
         libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
@@ -611,7 +611,6 @@ void DofMap::reinit(MeshBase & mesh)
             continue;
 
           const ElemType type = elem->type();
-          const unsigned int dim = elem->dim();
 
           FEType fe_type = base_fe_type;
 
@@ -646,9 +645,6 @@ void DofMap::reinit(MeshBase & mesh)
             }
 #endif
 
-          fe_type.order = static_cast<Order>(fe_type.order +
-                                             elem->p_level());
-
           // Allocate the vertex DOFs
           for (auto n : elem->node_index_range())
             {
@@ -660,8 +656,7 @@ void DofMap::reinit(MeshBase & mesh)
                     node.n_comp_group(sys_num, vg);
 
                   const unsigned int vertex_dofs =
-                    std::max(FEInterface::n_dofs_at_node(dim, fe_type,
-                                                         type, n),
+                    std::max(FEInterface::n_dofs_at_node(fe_type, elem, n),
                              old_node_dofs);
 
                   // Some discontinuous FEs have no vertex dofs
@@ -699,13 +694,6 @@ void DofMap::reinit(MeshBase & mesh)
           if (!vg_description.active_on_subdomain(elem->subdomain_id()))
             continue;
 
-          const ElemType type = elem->type();
-          const unsigned int dim = elem->dim();
-
-          FEType fe_type = base_fe_type;
-          fe_type.order = static_cast<Order>(fe_type.order +
-                                             elem->p_level());
-
           // Allocate the edge and face DOFs
           for (auto n : elem->node_index_range())
             {
@@ -718,7 +706,7 @@ void DofMap::reinit(MeshBase & mesh)
                 cast_int<unsigned int>(node.vg_dof_base (sys_num,vg)):0;
 
               const unsigned int new_node_dofs =
-                FEInterface::n_dofs_at_node(dim, fe_type, type, n);
+                FEInterface::n_dofs_at_node(base_fe_type, elem, n);
 
               // We've already allocated vertex DOFs
               if (elem->is_vertex(n))
@@ -796,8 +784,7 @@ void DofMap::reinit(MeshBase & mesh)
             }
           // Allocate the element DOFs
           const unsigned int dofs_per_elem =
-            FEInterface::n_dofs_per_elem(dim, fe_type,
-                                         type);
+            FEInterface::n_dofs_per_elem(base_fe_type, elem);
 
           elem->set_n_comp_group(sys_num, vg, dofs_per_elem);
 
@@ -1009,8 +996,8 @@ void DofMap::distribute_dofs (MeshBase & mesh)
         DofObject const * const dofobj = node;
         const processor_id_type obj_proc_id = dofobj->processor_id();
 
-        for (auto v : IntRange<unsigned int>(0, dofobj->n_vars(sys_num)))
-          for (auto c : IntRange<unsigned int>(0, dofobj->n_comp(sys_num,v)))
+        for (auto v : make_range(dofobj->n_vars(sys_num)))
+          for (auto c : make_range(dofobj->n_comp(sys_num,v)))
             {
               const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
               libmesh_assert_greater_equal (dofid, this->first_dof(obj_proc_id));
@@ -1023,8 +1010,8 @@ void DofMap::distribute_dofs (MeshBase & mesh)
         DofObject const * const dofobj = elem;
         const processor_id_type obj_proc_id = dofobj->processor_id();
 
-        for (auto v : IntRange<unsigned int>(0, dofobj->n_vars(sys_num)))
-          for (auto c : IntRange<unsigned int>(0, dofobj->n_comp(sys_num,v)))
+        for (auto v : make_range(dofobj->n_vars(sys_num)))
+          for (auto c : make_range(dofobj->n_comp(sys_num,v)))
             {
               const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
               libmesh_assert_greater_equal (dofid, this->first_dof(obj_proc_id));
@@ -1049,7 +1036,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
   // This is an O(N_vars) calculation so we want to do it once per
   // renumbering rather than once per SCALAR_dof_indices() call
 
-  for (auto v : IntRange<unsigned int>(0, this->n_variables()))
+  for (auto v : make_range(this->n_variables()))
     if (this->variable(v).type().family == SCALAR)
       {
         _first_scalar_df[v] = current_SCALAR_dof_index;
@@ -1750,7 +1737,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
   {
     bool all_discontinuous_dofs = true;
 
-    for (auto var : IntRange<unsigned int>(0, this->n_variables()))
+    for (auto var : make_range(this->n_variables()))
       if (FEAbstract::build (mesh.mesh_dimension(),
                              this->variable_type(var))->get_continuity() !=  DISCONTINUOUS)
         all_discontinuous_dofs = false;
@@ -1838,6 +1825,7 @@ DofMap::add_coupling_functor(GhostingFunctor & coupling_functor,
                              bool to_mesh)
 {
   _coupling_functors.insert(&coupling_functor);
+  coupling_functor.set_mesh(&_mesh);
   if (to_mesh)
     _mesh.add_ghosting_functor(coupling_functor);
 }
@@ -1862,6 +1850,7 @@ DofMap::add_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor,
                                        bool to_mesh)
 {
   _algebraic_ghosting_functors.insert(&evaluable_functor);
+  evaluable_functor.set_mesh(&_mesh);
   if (to_mesh)
     _mesh.add_ghosting_functor(evaluable_functor);
 }
@@ -2281,9 +2270,6 @@ void DofMap::_node_dof_indices (const Elem & elem,
 
   LOG_SCOPE("_node_dof_indices()", "DofMap");
 
-  const ElemType type = elem.type();
-  const unsigned int dim = elem.dim();
-
   const unsigned int sys_num = this->sys_number();
   const std::pair<unsigned int, unsigned int>
     vg_and_offset = obj.var_to_vg_and_offset(sys_num,vn);
@@ -2293,8 +2279,6 @@ void DofMap::_node_dof_indices (const Elem & elem,
 
   const VariableGroup & var = this->variable_group(vg);
   FEType fe_type = var.type();
-  fe_type.order = static_cast<Order>(fe_type.order +
-                                     elem.p_level());
   const bool extra_hanging_dofs =
     FEInterface::extra_hanging_dofs(fe_type);
 
@@ -2303,7 +2287,7 @@ void DofMap::_node_dof_indices (const Elem & elem,
   // it can falsely identify a DOF at the mid-edge node. This is why
   // we go through FEInterface instead of obj->n_comp() directly.
   const unsigned int nc =
-    FEInterface::n_dofs_at_node(dim, fe_type, type, n);
+    FEInterface::n_dofs_at_node(fe_type, &elem, n);
 
   // If this is a non-vertex on a hanging node with extra
   // degrees of freedom, we use the non-vertex dofs (which
@@ -2365,28 +2349,30 @@ void DofMap::_dof_indices (const Elem & elem,
     {
       const ElemType type        = elem.type();
       const unsigned int sys_num = this->sys_number();
-      const unsigned int dim     = elem.dim();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       const bool is_inf          = elem.infinite();
 #endif
 
-      // Increase the polynomial order on p refined elements
-      FEType fe_type = var.type();
-      fe_type.order = static_cast<Order>(fe_type.order + p_level);
-
       const bool extra_hanging_dofs =
-        FEInterface::extra_hanging_dofs(fe_type);
+        FEInterface::extra_hanging_dofs(var.type());
+
+      FEType fe_type = var.type();
 
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
-      if (fe_type.family == SUBDIVISION)
+      if (var.type().family == SUBDIVISION)
         tot_size += n_nodes;
       else
-        tot_size += FEInterface::n_dofs(dim,fe_type,type);
+        // FIXME: Is the passed-in p_level just elem.p_level()? If so,
+        // this seems redundant.
+        tot_size += FEInterface::n_dofs(fe_type, p_level, &elem);
 #endif
 
+      // The total Order is not required when getting the function
+      // pointer, it is only needed when the function is called (see
+      // below).
       const FEInterface::n_dofs_at_node_ptr ndan =
-        FEInterface::n_dofs_at_node_function(dim, fe_type);
+        FEInterface::n_dofs_at_node_function(fe_type, &elem);
 
       // Get the node-based DOF numbers
       for (unsigned int n=0; n != n_nodes; n++)
@@ -2410,9 +2396,9 @@ void DofMap::_dof_indices (const Elem & elem,
           const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
             is_inf ?
-            FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
+            FEInterface::n_dofs_at_node(fe_type, p_level, &elem, n) :
 #endif
-            ndan (type, fe_type.order, n);
+            ndan (type, static_cast<Order>(fe_type.order + p_level), n);
 
           // If this is a non-vertex on a hanging node with extra
           // degrees of freedom, we use the non-vertex dofs (which
@@ -2453,9 +2439,8 @@ void DofMap::_dof_indices (const Elem & elem,
         }
 
       // If there are any element-based DOF numbers, get them
-      const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
-                                                           fe_type,
-                                                           type);
+      const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, p_level, &elem);
+
       // We should never have fewer dofs than necessary on an
       // element unless we're getting indices on a parent element,
       // and we should never need those indices
@@ -2581,7 +2566,6 @@ void DofMap::old_dof_indices (const Elem * const elem,
   const ElemType type              = elem->type();
   const unsigned int sys_num       = this->sys_number();
   const unsigned int n_var_groups  = this->n_variable_groups();
-  const unsigned int dim           = elem->dim();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   const bool is_inf                = elem->infinite();
 #endif
@@ -2653,16 +2637,17 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       {
                         p_adjustment = 1;
                       }
+
+                    // Compute the net amount of "extra" order, including Elem::p_level()
+                    int extra_order = elem->p_level() + p_adjustment;
+
                     FEType fe_type = var.type();
-                    fe_type.order = static_cast<Order>(fe_type.order +
-                                                       elem->p_level() +
-                                                       p_adjustment);
 
                     const bool extra_hanging_dofs =
                       FEInterface::extra_hanging_dofs(fe_type);
 
                     const FEInterface::n_dofs_at_node_ptr ndan =
-                      FEInterface::n_dofs_at_node_function(dim, fe_type);
+                      FEInterface::n_dofs_at_node_function(fe_type, elem);
 
                     // Get the node-based DOF numbers
                     for (unsigned int n=0; n<n_nodes; n++)
@@ -2678,9 +2663,9 @@ void DofMap::old_dof_indices (const Elem * const elem,
                         const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                           is_inf ?
-                          FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
+                          FEInterface::n_dofs_at_node(var.type(), extra_order, elem, n) :
 #endif
-                          ndan (type, fe_type.order, n);
+                          ndan (type, static_cast<Order>(var.type().order + extra_order), n);
 
                         const int n_comp = old_dof_obj->n_comp_group(sys_num,vg);
 
@@ -2724,9 +2709,8 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       }
 
                     // If there are any element-based DOF numbers, get them
-                    const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
-                                                                         fe_type,
-                                                                         type);
+                    const unsigned int nc =
+                      FEInterface::n_dofs_per_elem(fe_type, extra_order, elem);
 
                     // We should never have fewer dofs than necessary on an
                     // element unless we're getting indices on a parent element

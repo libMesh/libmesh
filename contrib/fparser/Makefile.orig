@@ -95,6 +95,7 @@ CPPFLAGS=$(FEATURE_FLAGS) -I$(LIBMESH_DIR)/include/libmesh
 CXXFLAGS=-Wall -W -pedantic -ansi $(OPTIMIZATION)
 #CXXFLAGS += -Wunreachable-code
 #CXXFLAGS += -std=c++0x
+CXXFLAGS += -std=c++11
 
 #CXXFLAGS += -Weffc++
 

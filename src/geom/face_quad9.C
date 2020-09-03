@@ -151,6 +151,12 @@ Quad9::nodes_on_side(const unsigned int s) const
   return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
+std::vector<unsigned>
+Quad9::nodes_on_edge(const unsigned int e) const
+{
+  return nodes_on_side(e);
+}
+
 bool Quad9::has_affine_map() const
 {
   // make sure corners form a parallelogram
@@ -235,22 +241,7 @@ unsigned int Quad9::local_side_node(unsigned int side,
 std::unique_ptr<Elem> Quad9::build_side_ptr (const unsigned int i,
                                              bool proxy)
 {
-  libmesh_assert_less (i, this->n_sides());
-
-  if (proxy)
-    return libmesh_make_unique<Side<Edge3,Quad9>>(this,i);
-
-  else
-    {
-      std::unique_ptr<Elem> edge = libmesh_make_unique<Edge3>();
-      edge->subdomain_id() = this->subdomain_id();
-
-      // Set the nodes
-      for (auto n : edge->node_index_range())
-        edge->set_node(n) = this->node_ptr(Quad9::side_nodes_map[i][n]);
-
-      return edge;
-    }
+  return this->simple_build_side_ptr<Edge3, Quad9>(i, proxy);
 }
 
 

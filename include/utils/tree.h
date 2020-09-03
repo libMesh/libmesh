@@ -49,7 +49,7 @@ public:
    */
   Tree (const MeshBase & m,
         unsigned int target_bin_size,
-        Trees::BuildType bt=Trees::NODES);
+        Trees::BuildType bt = Trees::NODES);
 
   /**
    * Copy-constructor.  Not currently implemented.
@@ -59,7 +59,7 @@ public:
   /**
    * Destructor.
    */
-  ~Tree() {}
+  ~Tree() = default;
 
   /**
    * Prints the nodes.

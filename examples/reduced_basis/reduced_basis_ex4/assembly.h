@@ -12,11 +12,15 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/elem.h"
+#include "libmesh/utility.h"
 
 // rbOOmit includes
 #include "libmesh/rb_assembly_expansion.h"
 #include "libmesh/rb_eim_theta.h"
 #include "libmesh/rb_parametrized_function.h"
+
+// C++ includes
+#include <cmath>
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
@@ -35,16 +39,25 @@ using libMesh::Real;
 using libMesh::RealGradient;
 using libMesh::Elem;
 using libMesh::FEBase;
+using libMesh::subdomain_id_type;
+using libMesh::Utility::pow;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {
-  virtual Number evaluate(const RBParameters & mu,
-                          const Point & p,
-                          const Elem &)
+  unsigned int get_n_components() const
+  {
+    return 1;
+  }
+
+  virtual std::vector<Number>
+  evaluate(const RBParameters & mu,
+           const Point & p,
+           subdomain_id_type /*subdomain_id*/,
+           const std::vector<Point> & /*p_perturb*/) override
   {
     Real center_x = mu.get_value("center_x");
     Real center_y = mu.get_value("center_y");
-    return exp(-2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)));
+    return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };
   }
 };
 
@@ -133,9 +146,8 @@ struct EIM_F : RBEIMAssembly
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     std::vector<Number> eim_values;
-    evaluate_basis_function(eim_var,
-                            c.get_elem(),
-                            c.get_element_qrule().get_points(),
+    evaluate_basis_function(c.get_elem().id(),
+                            eim_var,
                             eim_values);
 
     for (unsigned int qp=0; qp != c.get_element_qrule().n_points(); qp++)

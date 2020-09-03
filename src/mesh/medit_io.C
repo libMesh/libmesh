@@ -91,7 +91,7 @@ void MEDITIO::write_ascii (const std::string & fname,
     out_stream << "Vertices\n";
     out_stream << the_mesh.n_nodes() << "\n";
 
-    for (auto v : IntRange<unsigned int>(0, the_mesh.n_nodes()))
+    for (auto v : make_range(the_mesh.n_nodes()))
       out_stream << the_mesh.point(v)(0) << " " << the_mesh.point(v)(1) << " " << the_mesh.point(v)(2) << " 0\n";
   }
 
@@ -189,7 +189,7 @@ void MEDITIO::write_ascii (const std::string & fname,
       // Header: 3: 3D mesh, 1: scalar output, 2: node-indexed
       const std::size_t n_vars = solution_names->size();
       bbout << "3 1 " << the_mesh.n_nodes() << " 2\n";
-      for (auto n : IntRange<dof_id_type>(0, the_mesh.n_nodes()))
+      for (auto n : make_range(the_mesh.n_nodes()))
         bbout << std::setprecision(this->ascii_precision()) << (*vec)[n*n_vars + scalar_idx] << " ";
       bbout << "\n";
     } // endif

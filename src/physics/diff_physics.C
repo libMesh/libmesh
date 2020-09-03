@@ -46,8 +46,7 @@ void DifferentiablePhysics::init_physics (const System & sys)
 void DifferentiablePhysics::time_evolving (unsigned int var,
                                            unsigned int order)
 {
-  if (order != 1 && order != 2)
-    libmesh_error_msg("Input order must be 1 or 2!");
+  libmesh_error_msg_if(order != 1 && order != 2, "Input order must be 1 or 2!");
 
   if (_time_evolving.size() <= var)
     _time_evolving.resize(var+1, 0);
@@ -65,7 +64,7 @@ bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
 {
   FEMContext & context = cast_ref<FEMContext &>(c);
 
-  for (auto var : IntRange<unsigned int>(0, context.n_vars()))
+  for (auto var : make_range(context.n_vars()))
     {
       if (!this->is_time_evolving(var))
         continue;

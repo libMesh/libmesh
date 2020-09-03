@@ -80,12 +80,12 @@ void MeshfreeInterpolation::add_field_data (const std::vector<std::string> & fie
   // that means the names and ordering better be identical!
   if (!_names.empty())
     {
-      if (_names.size() != field_names.size())
-        libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+      libmesh_error_msg_if(_names.size() != field_names.size(),
+                           "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
       for (std::size_t v=0; v<_names.size(); v++)
-        if (_names[v] != field_names[v])
-          libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+        libmesh_error_msg_if(_names[v] != field_names[v],
+                             "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
     }
 
   // otherwise copy the names
@@ -206,12 +206,12 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
 
   // If we already have field variables, we assume we are appending.
   // that means the names and ordering better be identical!
-  if (_names.size() != field_names.size())
-    libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+  libmesh_error_msg_if(_names.size() != field_names.size(),
+                       "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
   for (std::size_t v=0; v<_names.size(); v++)
-    if (_names[v] != field_names[v])
-      libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+    libmesh_error_msg_if(_names[v] != field_names[v],
+                         "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
   tgt_vals.resize (tgt_pts.size()*this->n_field_variables());
 
@@ -266,8 +266,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
 
       for (auto i : src_dist_sqr)
         {
-          if (i < min_dist)
-            libmesh_error_msg(i << " was less than min_dist = " << min_dist);
+          libmesh_error_msg_if(i < min_dist, i << " was less than min_dist = " << min_dist);
 
           min_dist = i;
         }

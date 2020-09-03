@@ -409,7 +409,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+          for (auto var : make_range(this->n_vars()))
             if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
@@ -435,7 +435,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
-      for (auto i : IntRange<dof_id_type>(0, dist_v->size()))
+      for (auto i : make_range(dist_v->size()))
         if (new_vector(i) != 0.0)
           dist_v->set(i, new_vector(i));
 
@@ -455,12 +455,20 @@ void System::project_vector (const NumericVector<Number> & old_v,
       new_v.close();
     }
 
-  if (is_adjoint == -1)
-    this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
-  else if (is_adjoint >= 0)
-    this->get_dof_map().enforce_adjoint_constraints_exactly(new_v,
-                                                            is_adjoint);
 
+  // Apply constraints only if we we are asked to
+  if(this->project_with_constraints)
+  {
+    if (is_adjoint == -1)
+    {
+      this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
+    }
+    else if (is_adjoint >= 0)
+    {
+      this->get_dof_map().enforce_adjoint_constraints_exactly(new_v,
+                                                            is_adjoint);
+    }
+  }
 #else
 
   // AMR is disabled: simply copy the vector
@@ -623,9 +631,8 @@ public:
       *elem.parent() : elem;
 
     // If there are any element-based DOF numbers, get them
-    const unsigned int nc = FEInterface::n_dofs_per_elem(elem.dim(),
-                                                         fe_type,
-                                                         elem.type());
+    const unsigned int nc =
+      FEInterface::n_dofs_per_elem(fe_type, &elem);
 
     std::vector<dof_id_type> old_dof_indices(nc);
     indices.resize(nc);
@@ -980,7 +987,7 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+          for (auto var : make_range(this->n_vars()))
             if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
@@ -1138,7 +1145,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
       FEMContext context( *this );
 
       const DofMap & dof_map = this->get_dof_map();
-      for (auto var : IntRange<unsigned int>(0, this->n_vars()))
+      for (auto var : make_range(this->n_vars()))
         if (this->variable(var).type().family == SCALAR)
           {
             // FIXME: We reinit with an arbitrary element in case the user
@@ -1430,7 +1437,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
 
   // Loop over all the variables we've been requested to project
-  for (auto v : IntRange<std::size_t>(0, variables.size()))
+  for (auto v : make_range(variables.size()))
     {
       const unsigned int var = variables[v];
 
@@ -1570,9 +1577,6 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
           std::vector<char> dof_is_fixed(n_dofs, false); // bools
           std::vector<int> free_dof(n_dofs, 0);
 
-          // The element type
-          const ElemType elem_type = elem->type();
-
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
@@ -1588,9 +1592,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
             {
               // FIXME: this should go through the DofMap,
               // not duplicate dof_indices code badly!
+
+              // This call takes into account elem->p_level() internally.
               const unsigned int nc =
-                FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
-                                             n);
+                FEInterface::n_dofs_at_node (fe_type, elem, n);
+
               if ((!elem->is_vertex(n) || !is_boundary_node[n]) &&
                   !is_boundary_nodeset[n])
                 {
@@ -1759,7 +1765,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
                 // Some edge dofs are on nodes and already
                 // fixed, others are free to calculate
                 unsigned int free_dofs = 0;
-                for (auto i : IntRange<unsigned int>(0, n_side_dofs))
+                for (auto i : make_range(n_side_dofs))
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
 

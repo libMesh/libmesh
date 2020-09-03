@@ -68,8 +68,15 @@ public:
   RBEvaluationDeserialization(RBEvaluation & rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEvaluationDeserialization (RBEvaluationDeserialization &&) = default;
+  RBEvaluationDeserialization (const RBEvaluationDeserialization &) = default;
+  RBEvaluationDeserialization & operator= (const RBEvaluationDeserialization &) = delete;
+  RBEvaluationDeserialization & operator= (RBEvaluationDeserialization &&) = delete;
   virtual ~RBEvaluationDeserialization();
 
   /**
@@ -83,8 +90,9 @@ private:
    * The RBEvaluation object that we will read into.
    */
   RBEvaluation & _rb_eval;
-
 };
+
+
 
 /**
  * This class de-serializes a TransientRBEvaluation object
@@ -101,8 +109,15 @@ public:
   TransientRBEvaluationDeserialization(TransientRBEvaluation & trans_rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  TransientRBEvaluationDeserialization (TransientRBEvaluationDeserialization &&) = default;
+  TransientRBEvaluationDeserialization (const TransientRBEvaluationDeserialization &) = default;
+  TransientRBEvaluationDeserialization & operator= (const TransientRBEvaluationDeserialization &) = delete;
+  TransientRBEvaluationDeserialization & operator= (TransientRBEvaluationDeserialization &&) = delete;
   virtual ~TransientRBEvaluationDeserialization();
 
   /**
@@ -116,8 +131,9 @@ private:
    * The TransientRBEvaluation object that we will read into.
    */
   TransientRBEvaluation & _trans_rb_eval;
-
 };
+
+
 
 /**
  * This class de-serializes a RBEIMEvaluation object
@@ -134,8 +150,15 @@ public:
   RBEIMEvaluationDeserialization(RBEIMEvaluation & trans_rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEIMEvaluationDeserialization (RBEIMEvaluationDeserialization &&) = default;
+  RBEIMEvaluationDeserialization (const RBEIMEvaluationDeserialization &) = default;
+  RBEIMEvaluationDeserialization & operator= (const RBEIMEvaluationDeserialization &) = delete;
+  RBEIMEvaluationDeserialization & operator= (RBEIMEvaluationDeserialization &&) = delete;
   virtual ~RBEIMEvaluationDeserialization();
 
   /**
@@ -149,8 +172,9 @@ private:
    * The RBEIMEvaluation object we will read into.
    */
   RBEIMEvaluation & _rb_eim_eval;
-
 };
+
+
 
 // RBSCMEvaluation should only be available
 // if SLEPc and GLPK support is enabled.
@@ -171,8 +195,15 @@ public:
   RBSCMEvaluationDeserialization(RBSCMEvaluation & trans_rb_eval);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a reference, so it can't be default
+   *   copy/move-assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBSCMEvaluationDeserialization (RBSCMEvaluationDeserialization &&) = default;
+  RBSCMEvaluationDeserialization (const RBSCMEvaluationDeserialization &) = default;
+  RBSCMEvaluationDeserialization & operator= (const RBSCMEvaluationDeserialization &) = delete;
+  RBSCMEvaluationDeserialization & operator= (RBSCMEvaluationDeserialization &&) = delete;
   virtual ~RBSCMEvaluationDeserialization();
 
   /**
@@ -186,8 +217,8 @@ private:
    * The RBSCMEvaluation object we will read into.
    */
   RBSCMEvaluation & _rb_scm_eval;
-
 };
+
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 /**
@@ -220,9 +251,8 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
  * Load an EIM RB evaluation from a corresponding reader structure in the buffer.
  * Templated to deal with both Real and Complex numbers.
  */
-template <typename RBEvaluationReaderNumber, typename RBEIMEvaluationReaderNumber>
+template <typename RBEIMEvaluationReaderNumber>
 void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_eval,
-                                 RBEvaluationReaderNumber & rb_evaluation_reader,
                                  RBEIMEvaluationReaderNumber & rb_eim_eval_reader);
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
@@ -241,13 +271,6 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
  * Helper function that loads point data.
  */
 void load_point(RBData::Point3D::Reader point_reader, Point & point);
-
-/**
- * Helper function that loads element data.
- */
-void load_elem_into_mesh(RBData::MeshElem::Reader mesh_elem_reader,
-                         libMesh::Elem * elem,
-                         libMesh::ReplicatedMesh & mesh);
 
 } // namespace RBDataDeserialization
 

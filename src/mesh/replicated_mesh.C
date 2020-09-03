@@ -84,7 +84,8 @@ public:
 // ReplicatedMesh class member functions
 ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
                                 unsigned char d) :
-  UnstructuredMesh (comm_in,d)
+  UnstructuredMesh (comm_in,d),
+  _n_nodes(0), _n_elem(0)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   // In serial we just need to reset the next unique id to zero
@@ -106,7 +107,8 @@ ReplicatedMesh::~ReplicatedMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
-  UnstructuredMesh (other_mesh)
+  UnstructuredMesh (other_mesh),
+  _n_nodes(0), _n_elem(0) // copy_* will increment this
 {
   this->copy_nodes_and_elements(other_mesh, true);
 
@@ -141,7 +143,8 @@ ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
 
 
 ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
-  UnstructuredMesh (other_mesh)
+  UnstructuredMesh (other_mesh),
+  _n_nodes(0), _n_elem(0) // copy_* will increment this
 {
   this->copy_nodes_and_elements(other_mesh, true);
 
@@ -181,7 +184,7 @@ const Point & ReplicatedMesh::point (const dof_id_type i) const
 
 const Node * ReplicatedMesh::node_ptr (const dof_id_type i) const
 {
-  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert_less (i, this->max_node_id());
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
@@ -193,7 +196,7 @@ const Node * ReplicatedMesh::node_ptr (const dof_id_type i) const
 
 Node * ReplicatedMesh::node_ptr (const dof_id_type i)
 {
-  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert_less (i, this->max_node_id());
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
@@ -205,7 +208,7 @@ Node * ReplicatedMesh::node_ptr (const dof_id_type i)
 
 const Node * ReplicatedMesh::query_node_ptr (const dof_id_type i) const
 {
-  if (i >= this->n_nodes())
+  if (i >= this->max_node_id())
     return nullptr;
   libmesh_assert (_nodes[i] == nullptr ||
                   _nodes[i]->id() == i); // This will change soon
@@ -218,7 +221,7 @@ const Node * ReplicatedMesh::query_node_ptr (const dof_id_type i) const
 
 Node * ReplicatedMesh::query_node_ptr (const dof_id_type i)
 {
-  if (i >= this->n_nodes())
+  if (i >= this->max_node_id())
     return nullptr;
   libmesh_assert (_nodes[i] == nullptr ||
                   _nodes[i]->id() == i); // This will change soon
@@ -231,7 +234,7 @@ Node * ReplicatedMesh::query_node_ptr (const dof_id_type i)
 
 const Elem * ReplicatedMesh::elem_ptr (const dof_id_type i) const
 {
-  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert_less (i, this->max_elem_id());
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
@@ -243,7 +246,7 @@ const Elem * ReplicatedMesh::elem_ptr (const dof_id_type i) const
 
 Elem * ReplicatedMesh::elem_ptr (const dof_id_type i)
 {
-  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert_less (i, this->max_elem_id());
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
@@ -255,7 +258,7 @@ Elem * ReplicatedMesh::elem_ptr (const dof_id_type i)
 
 const Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i) const
 {
-  if (i >= this->n_elem())
+  if (i >= this->max_elem_id())
     return nullptr;
   libmesh_assert (_elements[i] == nullptr ||
                   _elements[i]->id() == i); // This will change soon
@@ -268,7 +271,7 @@ const Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i) const
 
 Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i)
 {
-  if (i >= this->n_elem())
+  if (i >= this->max_elem_id())
     return nullptr;
   libmesh_assert (_elements[i] == nullptr ||
                   _elements[i]->id() == i); // This will change soon
@@ -293,7 +296,7 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!e->valid_unique_id())
-    e->set_unique_id() = _next_unique_id++;
+    e->set_unique_id(_next_unique_id++);
   else
    _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
 #endif
@@ -310,6 +313,7 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
       _elements.resize(id+1, nullptr);
     }
 
+  ++_n_elem;
   _elements[id] = e;
 
   // Make sure any new element is given space for any extra integers
@@ -337,7 +341,9 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!e->valid_unique_id())
-    e->set_unique_id() = _next_unique_id++;
+    e->set_unique_id(_next_unique_id++);
+  else
+   _next_unique_id = std::max(_next_unique_id, e->unique_id()+1);
 #endif
 
   dof_id_type eid = e->id();
@@ -350,7 +356,8 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
       this->delete_elem(oldelem);
     }
 
-  _elements[e->id()] = e;
+  ++_n_elem;
+  _elements[eid] = e;
 
   // Make sure any new element is given space for any extra integers
   // we've requested
@@ -407,6 +414,7 @@ void ReplicatedMesh::delete_elem(Elem * e)
   this->get_boundary_info().remove(e);
 
   // delete the element
+  --_n_elem;
   delete e;
 
   // explicitly zero the pointer
@@ -434,12 +442,6 @@ Node * ReplicatedMesh::add_point (const Point & p,
                                   const dof_id_type id,
                                   const processor_id_type proc_id)
 {
-  //   // We only append points with ReplicatedMesh
-  //   libmesh_assert(id == DofObject::invalid_id || id == _nodes.size());
-  //   Node *n = Node::build(p, _nodes.size()).release();
-  //   n->processor_id() = proc_id;
-  //   _nodes.push_back (n);
-
   Node * n = nullptr;
 
   // If the user requests a valid id, either
@@ -468,9 +470,12 @@ Node * ReplicatedMesh::add_point (const Point & p,
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       if (!n->valid_unique_id())
-        n->set_unique_id() = _next_unique_id++;
+        n->set_unique_id(_next_unique_id++);
+      else
+       _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
 
+      ++_n_nodes;
       if (id == DofObject::invalid_id)
         _nodes.back() = n;
       else
@@ -488,19 +493,35 @@ Node * ReplicatedMesh::add_point (const Point & p,
 Node * ReplicatedMesh::add_node (Node * n)
 {
   libmesh_assert(n);
-  // We only append points with ReplicatedMesh
-  libmesh_assert(!n->valid_id() || n->id() == _nodes.size());
 
-  n->set_id (cast_int<dof_id_type>(_nodes.size()));
+  // If the user requests a valid id, either set the existing
+  // container entry or resize the container to fit the new node.
+  if (n->valid_id())
+    {
+      const dof_id_type id = n->id();
+      if (id < _nodes.size())
+        libmesh_assert(!_nodes[id]);
+      else
+        _nodes.resize(id+1); // default nullptr
+
+      _nodes[id] = n;
+    }
+  else
+    {
+      n->set_id (cast_int<dof_id_type>(_nodes.size()));
+      _nodes.push_back(n);
+    }
+
+  ++_n_nodes;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!n->valid_unique_id())
-    n->set_unique_id() = _next_unique_id++;
+    n->set_unique_id(_next_unique_id++);
+  else
+   _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
 
   n->add_extra_integers(_node_integer_names.size());
-
-  _nodes.push_back(n);
 
   return n;
 }
@@ -517,11 +538,8 @@ Node * ReplicatedMesh::add_node (std::unique_ptr<Node> n)
 
 Node * ReplicatedMesh::insert_node(Node * n)
 {
-  if (!n)
-    libmesh_error_msg("Error, attempting to insert nullptr node.");
-
-  if (n->id() == DofObject::invalid_id)
-    libmesh_error_msg("Error, cannot insert node with invalid id.");
+  libmesh_error_msg_if(!n, "Error, attempting to insert nullptr node.");
+  libmesh_error_msg_if(n->id() == DofObject::invalid_id, "Error, cannot insert node with invalid id.");
 
   if (n->id() < _nodes.size())
     {
@@ -531,8 +549,8 @@ Node * ReplicatedMesh::insert_node(Node * n)
       // redundant insert is done, but when that happens we ought to
       // always be able to make the code more efficient by avoiding
       // the redundant insert, so let's keep screaming "Error" here.
-      if (_nodes[ n->id() ] != nullptr)
-        libmesh_error_msg("Error, cannot insert node on top of existing node.");
+      libmesh_error_msg_if(_nodes[ n->id() ] != nullptr,
+                           "Error, cannot insert node on top of existing node.");
     }
   else
     {
@@ -544,13 +562,16 @@ Node * ReplicatedMesh::insert_node(Node * n)
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!n->valid_unique_id())
-    n->set_unique_id() = _next_unique_id++;
+    n->set_unique_id(_next_unique_id++);
+  else
+   _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
 
   n->add_extra_integers(_node_integer_names.size());
 
   // We have enough space and this spot isn't already occupied by
   // another node, so go ahead and add it.
+  ++_n_nodes;
   _nodes[ n->id() ] = n;
 
   // If we made it this far, we just inserted the node the user handed
@@ -598,6 +619,7 @@ void ReplicatedMesh::delete_node(Node * n)
   this->get_boundary_info().remove(n);
 
   // delete the node
+  --_n_nodes;
   delete n;
 
   // explicitly zero the pointer
@@ -633,6 +655,7 @@ void ReplicatedMesh::clear ()
   for (auto & elem : _elements)
     delete elem;
 
+  _n_elem = 0;
   _elements.clear();
 
   // clear the nodes data structure
@@ -642,6 +665,7 @@ void ReplicatedMesh::clear ()
   for (auto & node : _nodes)
     delete node;
 
+  _n_nodes = 0;
   _nodes.clear();
 }
 
@@ -665,6 +689,13 @@ unique_id_type ReplicatedMesh::parallel_max_unique_id() const
   unique_id_type max_local = _next_unique_id;
   this->comm().max(max_local);
   return max_local;
+}
+
+
+
+void ReplicatedMesh::set_next_unique_id(unique_id_type id)
+{
+  _next_unique_id = id;
 }
 #endif
 
@@ -777,6 +808,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
                 this->get_boundary_info().remove (nd);
 
                 // delete the node
+                --_n_nodes;
                 delete nd;
                 nd = nullptr;
               }
@@ -810,6 +842,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
             this->get_boundary_info().remove (node);
 
             // delete the node
+            --_n_nodes;
             delete node;
             node = nullptr;
           }
@@ -1060,9 +1093,9 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       // nodes on the surfaces being stitched, and we don't currently support that case.
       // (It might be possible to support, but getting it exactly right would be tricky
       // and probably not worth the extra complications to the "normal" case.)
-      if (h_min < std::numeric_limits<Real>::epsilon())
-        libmesh_error_msg("Coincident nodes detected on source and/or target "
-                          "surface, stitching meshes is not possible.");
+      libmesh_error_msg_if(h_min < std::numeric_limits<Real>::epsilon(),
+                           "Coincident nodes detected on source and/or target "
+                           "surface, stitching meshes is not possible.");
 
       // We require nanoflann for the "binary search" (really kd-tree)
       // option to work. If it's not available, turn that option off,
@@ -1118,8 +1151,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           // If the 2 maps don't have the same size, it means we have overwritten a value in node_to_node_map
           // It means one node in this mesh is the nearest neighbor of several nodes in other mesh.
           // Not possible !
-          if (node_to_node_map.size() != other_to_this_node_map.size())
-            libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
+          libmesh_error_msg_if(node_to_node_map.size() != other_to_this_node_map.size(),
+                               "Error: Found multiple matching nodes in stitch_meshes");
 #endif
         }
         else
@@ -1155,8 +1188,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
               if (node_distance < tol*h_min)
               {
                 // Make sure we didn't already find a matching node!
-                if (found_matching_nodes)
-                  libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
+                libmesh_error_msg_if(found_matching_nodes,
+                                     "Error: Found multiple matching nodes in stitch_meshes");
 
                 node_to_node_map[this_node_id] = other_node_id;
                 other_to_this_node_map[other_node_id] = this_node_id;
@@ -1203,8 +1236,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           std::size_t n_matching_nodes = node_to_node_map.size();
           std::size_t this_mesh_n_nodes = this_boundary_node_ids.size();
           std::size_t other_mesh_n_nodes = other_boundary_node_ids.size();
-          if ((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes))
-            libmesh_error_msg("Error: We expected the number of nodes to match.");
+          libmesh_error_msg_if((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes),
+                               "Error: We expected the number of nodes to match.");
         }
     }
   else
@@ -1428,7 +1461,10 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
         }
     }
 
-  this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false, skip_find_neighbors);
+  const bool old_allow_find_neighbors = this->allow_find_neighbors();
+  this->allow_find_neighbors(!skip_find_neighbors);
+  this->prepare_for_use();
+  this->allow_find_neighbors(old_allow_find_neighbors);
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh
@@ -1536,8 +1572,8 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
 std::unordered_map<dof_id_type, std::vector<std::vector<Point>>>
 ReplicatedMesh::get_boundary_points() const
 {
-  if (mesh_dimension() != 2)
-    libmesh_error_msg("Error: get_boundary_points only works for 2D now");
+  libmesh_error_msg_if(mesh_dimension() != 2,
+                       "Error: get_boundary_points only works for 2D now");
 
   // find number of disconnected subdomains
   // subdomains will hold the IDs of disconnected subdomains for all elements.
@@ -1636,8 +1672,8 @@ ReplicatedMesh::get_boundary_points() const
         if (found)
           break;
       }
-      if (!found)
-        libmesh_error_msg("ERROR: mesh topology error on visiting boundary sides");
+
+      libmesh_error_msg_if(!found, "ERROR: mesh topology error on visiting boundary sides");
 
       // exit if we reach the starting point
       if (elem == eseed && s == sseed)
