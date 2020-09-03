@@ -1806,7 +1806,7 @@ BoundaryInfo::build_node_list_from_side_list()
      node_bcid_action_functor, datum_type_ex);
 }
 
-void BoundaryInfo::sync_boundary_side_ids()
+void BoundaryInfo::parallel_sync_side_ids()
 {
   // we need BCs for ghost elements.
   std::unordered_map<processor_id_type, std::vector<dof_id_type>>
@@ -1862,7 +1862,62 @@ void BoundaryInfo::sync_boundary_side_ids()
      elem_id_action_functor, datum_type_ex);
 }
 
+void BoundaryInfo::parallel_sync_node_ids()
+{
+  // we need BCs for ghost nodes.
+  std::unordered_map<processor_id_type, std::vector<dof_id_type>>
+    node_ids_requested;
 
+  // Determine what nodes we need to request
+  for (const auto & node : _mesh.node_ptr_range())
+  {
+    const processor_id_type pid = node->processor_id();
+    if (pid != this->processor_id())
+      node_ids_requested[pid].push_back(node->id());
+  }
+
+  typedef std::vector<boundary_id_type> datum_type;
+
+  // gather the node ID and boundary_id_type for the ghost nodes
+  auto node_id_gather_functor =
+  [this]
+  (processor_id_type,
+    const std::vector<dof_id_type> & ids,
+    std::vector<datum_type> & data)
+    {
+      data.resize(ids.size());
+      for (auto i : index_range(ids))
+      {
+        Node * node = _mesh.node_ptr(ids[i]);
+        for (const auto & pr : as_range(_boundary_node_id.equal_range(node)))
+        data[i].push_back(pr.second);
+      }
+    };
+
+    // update the _boundary_node_id on this processor
+    auto node_id_action_functor =
+      [this]
+      (processor_id_type,
+       const std::vector<dof_id_type> & ids,
+       std::vector<datum_type> & data)
+    {
+        for (auto i : index_range(ids))
+        {
+          Node * node = _mesh.node_ptr(ids[i]);
+          //clear boundary node
+          _boundary_node_id.erase(node);
+          // update boundary node
+          for (const auto & pr : data[i])
+            _boundary_node_id.insert(std::make_pair(node, pr));
+        }
+    };
+
+
+    datum_type * datum_type_ex = nullptr;
+    Parallel::pull_parallel_vector_data
+      (this->comm(), node_ids_requested, node_id_gather_functor,
+       node_id_action_functor, datum_type_ex);
+}
 
 void BoundaryInfo::build_side_list_from_node_list()
 {
