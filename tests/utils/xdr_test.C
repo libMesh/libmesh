@@ -35,6 +35,12 @@ public:
   {
     std::vector<Real> vec = {libMesh::pi, 2*libMesh::pi, 3*libMesh::pi};
 
+    // There was once a weird bug mutating our TestCommWorld in
+    // a previous unit test, which turned *this* test into a race
+    // condition.  Let's make sure that never happens again.
+    CPPUNIT_ASSERT_EQUAL(TestCommWorld->rank(),
+                         libMesh::global_processor_id());
+
     // Test reading/writing on 1 processor
     if (TestCommWorld->rank() == 0)
       {
