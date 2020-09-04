@@ -204,9 +204,14 @@ protected:
 private:
 
   /**
-   * A pointer to a vector to hold the adjoint solution at the last time step
+   * A vector of pointers to vectors holding the adjoint solution at the current time step
    */
-  std::unique_ptr<NumericVector<Number>> old_adjoint;
+  std::vector< NumericVector<Number>* > current_adjoints;
+
+  /**
+   * A vector of pointers to vectors holding the adjoint solution at the last time step
+   */
+  std::vector< std::unique_ptr<NumericVector<Number>> > old_adjoints;
 
   /**
    * We will need to move the system.time around to ensure that residuals

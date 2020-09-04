@@ -37,9 +37,19 @@ UnsteadySolver::UnsteadySolver (sys_type & s)
   : TimeSolver(s),
     old_local_nonlinear_solution (NumericVector<Number>::build(s.comm())),
     first_solve                  (true),
-    first_adjoint_step (true),
-    old_adjoint (NumericVector<Number>::build(s.comm()))
+    first_adjoint_step (true)
 {
+  old_adjoints.resize(s.n_qois());
+  current_adjoints.resize(s.n_qois());
+
+  // Set the old and current adjoint pointers to nullptrs
+  // We will use this nullness to skip the initial time instant,
+  // when there is no older adjoint.
+  for(auto j : make_range(s.n_qois()))
+  {
+    old_adjoints[j] = nullptr;
+    current_adjoints[j] = nullptr;
+  }
 }
 
 
@@ -298,7 +308,7 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
 {
   // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
   if(_system.qoi_error_estimates.size() != _system.qoi.size())
-      _system.qoi_error_estimates.resize(_system.qoi.size());
+    _system.qoi_error_estimates.resize(_system.qoi.size());
 
   // There are two possibilities regarding the integration rule we need to use for time integration.
   // If we have a instantaneous QoI, then we need to use a left sided Riemann sum, otherwise the trapezoidal rule for temporally smooth QoIs.
@@ -312,12 +322,11 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
 
   // Get f(t_j)
   ErrorVector QoI_elementwise_error_left;
-  std::map<int, Real> global_spatial_errors_left;
 
   // If we are at the very initial step, the error contribution is zero,
   // otherwise the old ajoint vector has been filled and we are the left end
   // of a subsequent timestep or sub-timestep
-  if((*old_adjoint).initialized())
+  if(old_adjoints[0] != nullptr)
   {
     // For evaluating the residual, we need to use the deltat that was used
     // to get us to this solution, so we save the current deltat as next_step_deltat
@@ -327,10 +336,13 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
 
     // The adjoint error estimate expression for a backwards facing step
     // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
-    NumericVector<Number> & current_adjoint = _system.get_adjoint_solution(0);
+    for (auto j : make_range(_system.n_qois()))
+    {
+      current_adjoints[j] = & _system.get_adjoint_solution(j);
 
-    // Swap for residual weighting
-    current_adjoint.swap(*old_adjoint);
+      // Swap for residual weighting
+      current_adjoints[j]->swap(*old_adjoints[j]);
+    }
 
     _system.update();
 
@@ -343,7 +355,10 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
     _system.time = _system.time + last_step_deltat;
 
     // Swap back the current and old adjoints
-    current_adjoint.swap(*old_adjoint);
+    for (auto j : make_range(_system.n_qois()))
+    {
+      current_adjoints[j]->swap(*old_adjoints[j]);
+    }
 
     // Set the system deltat back to what it should be to march to the next time
     _system.deltat = next_step_deltat;
@@ -365,12 +380,10 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
       if(std::abs(_system.time) > TOLERANCE*sqrt(TOLERANCE))
       {
         qoi_error_estimates_left[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
-        //global_spatial_errors_left.insert( std::pair<int, Real>(j, ) );
       }
       else
       {
         qoi_error_estimates_left[j] = 0.0;
-        //global_spatial_errors_left.insert( std::pair<int, Real>(j, 0.0) );
       }
     }
   }
@@ -386,14 +399,21 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
 
   // The adjoint error estimate expression for a backwards facing step
   // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
-  NumericVector<Number> & current_adjoint = _system.get_adjoint_solution(0);
-  old_adjoint = current_adjoint.clone();
+  for (auto j : make_range(_system.n_qois()))
+  {
+    current_adjoints[j] = & _system.get_adjoint_solution(j);
+
+    old_adjoints[j] = current_adjoints[j]->clone();
+  }
 
   // Retrieve the state and adjoint vectors for the next time instant
   retrieve_timestep();
 
   // Swap for residual weighting
-  current_adjoint.swap(*old_adjoint);
+  for (auto j : make_range(_system.n_qois()))
+  {
+   current_adjoints[j]->swap(*old_adjoints[j]);
+  }
 
   // Swap out the deltats as we did for the left side
   next_step_deltat = _system.deltat;
@@ -401,7 +421,6 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
 
   // Get f(t_j+1)
   ErrorVector QoI_elementwise_error_right;
-  std::map<int, Real> global_spatial_errors_right;
 
   _system.update();
 
@@ -417,7 +436,10 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
   _system.deltat = next_step_deltat;
 
   // Swap back now that the residual weighting is done
-  current_adjoint.swap(*old_adjoint);
+  for (auto j : make_range(_system.n_qois()))
+  {
+   current_adjoints[j]->swap(*old_adjoints[j]);
+  }
 
   // Also get the right side contributions for the spatially integrated errors for all the QoIs in the QoI set
   for (auto j : make_range(_system.n_qois()))
