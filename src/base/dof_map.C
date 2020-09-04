@@ -1589,8 +1589,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
               // Insert the remote DOF indices into the send list
               for (auto d : di)
-                if (!this->local_index(d))
-                  _send_list.push_back(d);
+                if (d != DofObject::invalid_id &&
+                    !this->local_index(d))
+                  {
+                    libmesh_assert_less(d, this->n_dofs());
+                    _send_list.push_back(d);
+                  }
             }
         }
       else
@@ -1600,8 +1604,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
           // Insert the remote DOF indices into the send list
           for (const auto & dof : di)
-            if (!this->local_index(dof))
-              _send_list.push_back(dof);
+            if (dof != DofObject::invalid_id &&
+                !this->local_index(dof))
+              {
+                libmesh_assert_less(dof, this->n_dofs());
+                _send_list.push_back(dof);
+              }
         }
 
     }
@@ -1627,8 +1635,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
       // Insert the remote DOF indices into the send list
       for (const auto & dof : di)
-        if (!this->local_index(dof))
-          _send_list.push_back(dof);
+        if (dof != DofObject::invalid_id &&
+            !this->local_index(dof))
+          {
+            libmesh_assert_less(dof, this->n_dofs());
+            _send_list.push_back(dof);
+          }
     }
 }
 
@@ -1671,6 +1683,9 @@ void DofMap::prepare_send_list ()
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
   std::vector<dof_id_type> (_send_list.begin(), new_end).swap (_send_list);
+
+  // Make sure the send list has nothing invalid in it.
+  libmesh_assert(_send_list.empty() || _send_list.back() < this->n_dofs());
 }
 
 void DofMap::reinit_send_list (MeshBase & mesh)
@@ -2316,15 +2331,23 @@ void DofMap::_node_dof_indices (const Elem & elem,
     }
   // If this is a vertex or an element without extra hanging
   // dofs, our dofs come in forward order coming from the
-  // beginning
+  // beginning.  But we still might not have all those dofs, in cases
+  // where a subdomain-restricted variable just had its subdomain
+  // expanded.
   else
-    for (unsigned int i=0; i<nc; i++)
-      {
-        const dof_id_type d =
-          obj.dof_number(sys_num, vg, vig, i, n_comp);
-        libmesh_assert_not_equal_to (d, DofObject::invalid_id);
-        di.push_back(d);
-      }
+    {
+      const unsigned int good_nc =
+        std::min(static_cast<unsigned int>(n_comp), nc);
+      for (unsigned int i=0; i != good_nc; ++i)
+        {
+          const dof_id_type d =
+            obj.dof_number(sys_num, vg, vig, i, n_comp);
+          libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+          di.push_back(d);
+        }
+      for (unsigned int i=good_nc; i != nc; ++i)
+        di.push_back(DofObject::invalid_id);
+    }
 }
 
 
@@ -2429,21 +2452,37 @@ void DofMap::_dof_indices (const Elem & elem,
           // dofs, our dofs come in forward order coming from the
           // beginning
           else
-            for (unsigned int i=0; i<nc; i++)
-              {
-                const dof_id_type d =
-                  node.dof_number(sys_num, vg, vig, i, n_comp);
-                libmesh_assert_not_equal_to (d, DofObject::invalid_id);
-                di.push_back(d);
-              }
+            {
+              // We have a good component index only if it's being
+              // used on this FE type (nc) *and* it's available on
+              // this DofObject (n_comp).
+              const unsigned int good_nc = std::min(n_comp, nc);
+              for (unsigned int i=0; i!=good_nc; ++i)
+                {
+                  const dof_id_type d =
+                    node.dof_number(sys_num, vg, vig, i, n_comp);
+                  libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+                  libmesh_assert_less (d, this->n_dofs());
+                  di.push_back(d);
+                }
+
+              // With fewer good component indices than we need, e.g.
+              // due to subdomain expansion, the remaining expected
+              // indices are marked invalid.
+              if (n_comp < nc)
+                for (unsigned int i=n_comp; i!=nc; ++i)
+                  di.push_back(DofObject::invalid_id);
+            }
         }
 
       // If there are any element-based DOF numbers, get them
       const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, p_level, &elem);
 
       // We should never have fewer dofs than necessary on an
-      // element unless we're getting indices on a parent element,
-      // and we should never need those indices
+      // element unless we're getting indices on a parent element
+      // (and we should never need those indices) or off-domain for a
+      // subdomain-restricted variable (where invalid_id is the
+      // correct thing to return)
       if (nc != 0)
         {
           const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
@@ -2691,30 +2730,44 @@ void DofMap::old_dof_indices (const Elem * const elem,
                                 {
                                   const dof_id_type d =
                                     old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
-                                  libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
+                                  // On a newly-expanded subdomain, we
+                                  // may have some DoFs that didn't
+                                  // exist in the old system, in which
+                                  // case we can't assert this:
+                                  // libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
                                   di.push_back(d);
                                 }
                           }
                         // If this is a vertex or an element without extra hanging
                         // dofs, our dofs come in forward order coming from the
-                        // beginning
+                        // beginning.  But we still might not have all
+                        // those dofs on the old_dof_obj, in cases
+                        // where a subdomain-restricted variable just
+                        // had its subdomain expanded.
                         else
-                          for (unsigned int i=0; i<nc; i++)
-                            {
-                              const dof_id_type d =
-                                old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
-                              libmesh_assert_not_equal_to (d, DofObject::invalid_id);
-                              di.push_back(d);
-                            }
+                          {
+                            const unsigned int old_nc =
+                              std::min(static_cast<unsigned int>(n_comp), nc);
+                            for (unsigned int i=0; i != old_nc; ++i)
+                              {
+                                const dof_id_type d =
+                                  old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
+
+                                libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
+                                di.push_back(d);
+                              }
+                            for (unsigned int i=old_nc; i != nc; ++i)
+                              di.push_back(DofObject::invalid_id);
+                          }
                       }
 
                     // If there are any element-based DOF numbers, get them
                     const unsigned int nc =
                       FEInterface::n_dofs_per_elem(fe_type, extra_order, elem);
 
-                    // We should never have fewer dofs than necessary on an
-                    // element unless we're getting indices on a parent element
-                    // or a just-coarsened element
                     if (nc != 0)
                       {
                         const DofObject * old_dof_obj = elem->old_dof_object;
@@ -2737,8 +2790,14 @@ void DofMap::old_dof_indices (const Elem * const elem,
                           }
                         else
                           {
-                            libmesh_assert(!elem->active() || fe_type.family == LAGRANGE ||
-                                           elem->refinement_flag() == Elem::JUST_COARSENED);
+                            // We should never have fewer dofs than
+                            // necessary on an element unless we're
+                            // getting indices on a parent element, a
+                            // just-coarsened element ... or a
+                            // subdomain-restricted variable with a
+                            // just-expanded subdomain
+                            // libmesh_assert(!elem->active() || fe_type.family == LAGRANGE ||
+                            //                 elem->refinement_flag() == Elem::JUST_COARSENED);
                             di.resize(di.size() + nc, DofObject::invalid_id);
                           }
                       }
