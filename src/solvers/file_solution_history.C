@@ -28,6 +28,26 @@
 namespace libMesh
 {
 
+/**
+   * Constructor, reference to system to be passed by user, set the
+   * stored_sols iterator to some initial value
+   */
+  FileSolutionHistory::FileSolutionHistory(System & system_)
+  : stored_sols(stored_solutions.end()),
+  _system(system_), localTimestamp(0),
+  timeTotimestamp()
+  {
+    dual_solution_copies.resize(system_.n_qois());
+
+    for(auto j : make_range(system_.n_qois()))
+    {
+      dual_solution_copies[j] = nullptr;
+    }
+
+    libmesh_experimental();
+  }
+
+
 FileSolutionHistory::~FileSolutionHistory ()
 {
 }
@@ -255,13 +275,19 @@ void FileSolutionHistory::retrieve(bool is_adjoint_solve, Real time)
   {
     // Reading in the primal xdas overwrites the adjoint solution with zero
     // So swap to retain the old adjoint solution
-    std::unique_ptr<NumericVector<Number>> dual_solution_copy = _system.get_adjoint_solution(0).clone();
+    for (auto j : make_range(_system.n_qois()))
+    {
+      dual_solution_copies[j] = _system.get_adjoint_solution(j).clone();
+    }
 
     // Read in the primal solution stored at the current recovery time from the disk
     _system.get_equation_systems().read (stored_sols->second, READ, EquationSystems::READ_DATA | EquationSystems::READ_ADDITIONAL_DATA);
 
     // Swap back the copy of the last adjoint solution back in place
-    _system.get_adjoint_solution(0).swap(*dual_solution_copy);
+    for (auto j : make_range(_system.n_qois()))
+    {
+      (_system.get_adjoint_solution(j)).swap(*dual_solution_copies[j]);
+    }
   }
   else
   {
