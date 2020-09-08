@@ -2114,7 +2114,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                           if (!elem->is_node_on_side(n,new_s))
                             continue;
 
-                          mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
+                          mesh.get_boundary_info().boundary_ids (elem, new_s, new_bc_ids);
 
                           for (const auto & new_boundary_id : new_bc_ids)
                             {
@@ -2252,7 +2252,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                             continue;
 
                           // We're reusing the new_bc_ids vector created outside the loop over nodes.
-                          mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
+                          mesh.get_boundary_info().boundary_ids (elem, new_s, new_bc_ids);
 
                           for (const auto & new_boundary_id : new_bc_ids)
                             {
