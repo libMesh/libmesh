@@ -22,16 +22,18 @@
 #include <sstream>
 
 // Libmesh headers
-#include "libmesh/dof_map.h"
-#include "libmesh/equation_systems.h"
 #include "libmesh/nemesis_io_helper.h"
-#include "libmesh/node.h"
-#include "libmesh/elem.h"
+
 #include "libmesh/boundary_info.h"
-#include "libmesh/parallel.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/numeric_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/int_range.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/node.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parallel.h"
 #include "libmesh/utility.h"
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
@@ -2425,6 +2427,9 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
 {
   const MeshBase & mesh = es.get_mesh();
 
+  // FIXME - half this code might be replaceable with a call to
+  // EquationSystems::build_parallel_solution_vector()...
+
   for (auto & var_num : var_nums)
     {
       const unsigned int sys_num = var_num.first;
@@ -2448,6 +2453,10 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
       // Fill up a std::vector with the dofs for the current variable
       std::vector<numeric_index_type> required_indices(this->num_nodes);
 
+      // Get the dof values required to write just our local part of
+      // the solution vector.
+      std::vector<Number> local_soln;
+
       const FEType type = sys.variable_type(var);
       if (type.family == SCALAR)
         {
@@ -2455,18 +2464,70 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
           sys.get_dof_map().SCALAR_dof_indices(scalar_indices, var);
           for (int i=0; i<this->num_nodes; i++)
             required_indices[i] = scalar_indices[0];
+          sys.current_local_solution->get(required_indices, local_soln);
         }
       else
-        for (int i=0; i<this->num_nodes; i++)
-          {
-            const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]-1);
-            required_indices[i] = node.dof_number(sys_num, var, 0);
-          }
+        {
+          // If we have DoFs at all nodes, e.g. for isoparametric
+          // elements, this is easy:
+          bool found_all_indices = true;
+          for (int i=0; i<this->num_nodes; i++)
+            {
+              const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]-1);
+              if (node.n_comp(sys_num, var))
+                required_indices[i] = node.dof_number(sys_num, var, 0);
+              else
+                {
+                  found_all_indices = false;
+                  break;
+                }
+            }
 
-      // Get the dof values required to write just our local part of
-      // the solution vector.
-      std::vector<Number> local_soln;
-      sys.current_local_solution->get(required_indices, local_soln);
+          if (found_all_indices)
+            sys.current_local_solution->get(required_indices, local_soln);
+          // Fine, we'll do it the hard way
+          if (!found_all_indices)
+            {
+              local_soln.resize(num_nodes);
+
+              const Variable & var_description = sys.variable(var);
+              const DofMap & dof_map           = sys.get_dof_map();
+
+              NumericVector<Number> & sys_soln(*sys.current_local_solution);
+              std::vector<Number>      elem_soln;   // The finite element solution
+              std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
+              std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
+
+              for (const auto & elem : mesh.active_local_element_ptr_range())
+                if (var_description.active_on_subdomain(elem->subdomain_id()))
+                  {
+                    dof_map.dof_indices (elem, dof_indices, var);
+                    elem_soln.resize(dof_indices.size());
+
+                    for (auto i : index_range(dof_indices))
+                      elem_soln[i] = sys_soln(dof_indices[i]);
+
+                    FEInterface::nodal_soln (elem->dim(),
+                                             type,
+                                             elem,
+                                             elem_soln,
+                                             nodal_soln);
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+                    // infinite elements should be skipped...
+                    if (!elem->infinite())
+#endif
+                      for (auto n : elem->node_index_range())
+                        {
+                          const std::size_t exodus_num =
+                            libmesh_node_num_to_exodus[elem->node_id(n)];
+                          libmesh_assert_greater(exodus_num, 0);
+                          libmesh_assert_less(exodus_num-1, local_soln.size());
+                          local_soln[exodus_num-1] = nodal_soln[n];
+                        }
+                  }
+            }
+        }
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
       // Call the ExodusII_IO_Helper function to write the data.
