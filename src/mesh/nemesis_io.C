@@ -1156,13 +1156,17 @@ void Nemesis_IO::read (const std::string & base_filename)
   MeshCommunication().make_node_unique_ids_parallel_consistent(mesh);
   mesh.delete_remote_elements();
 
-  // And if that didn't work, then we're actually reading into a
-  // ReplicatedMesh, so forget about gathering neighboring elements
+  // If that didn't work, then we're actually reading into a
+  // ReplicatedMesh, so we want to gather *all* elements
   if (mesh.is_serial())
-    libmesh_not_implemented();
-
-  // Gather neighboring elements so that the mesh has the proper "ghost" neighbor information.
-  MeshCommunication().gather_neighboring_elements(cast_ref<DistributedMesh &>(mesh));
+    // Don't just use mesh.allgather(); that's a no-op, since
+    // ReplicatedMesh didn't expect to be distributed in the first
+    // place!
+    MeshCommunication().allgather(mesh);
+  else
+    // Gather neighboring elements so that a distributed mesh has the
+    // proper "ghost" neighbor information.
+    MeshCommunication().gather_neighboring_elements(cast_ref<DistributedMesh &>(mesh));
 }
 
 #else
