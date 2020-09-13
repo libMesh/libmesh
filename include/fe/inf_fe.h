@@ -733,6 +733,17 @@ public:
   { calculate_map = true; return dzetadz_map;}
 
   /**
+   * \returns The multiplicative weight at each quadrature point.
+   * This weight is used for certain infinite element weak
+   * formulations, so that weighted Sobolev spaces are
+   * used for the trial function space.  This renders the
+   * variational form easily computable.
+   */
+  const std::vector<Real> & get_Sobolev_weight() const override
+  { calculate_map = true; return weight; }
+
+
+  /**
    * \returns The tangent vectors for face integration.
    */
   const std::vector<std::vector<Point>> & get_tangents() const override
@@ -754,31 +765,24 @@ public:
   { calculate_map = true; libmesh_not_implemented();}
 #endif
 
-
   /**
-   * \returns The multiplicative weight at each quadrature point.
-   * This weight is used for certain infinite element weak
-   * formulations, so that weighted Sobolev spaces are
-   * used for the trial function space.  This renders the
-   * variational form easily computable.
+   * \returns The multiplicative weight (see \p get_Sobolev_weight())
+   * but weighted with the radial coordinate square.
+   *
    */
   const std::vector<Real> & get_Sobolev_weightxR_sq() const override
   { calculate_map = true; return weightxr_sq; }
 
 
   /**
-   * \returns The multiplicative weight (see \p get_Sobolev_weight())
+   * \returns The first global derivative of the multiplicative
+   * weight (see \p get_Sobolev_weight())
    * but weighted with the radial coordinate square.
    *
    */
   const std::vector<RealGradient> & get_Sobolev_dweightxR_sq() const override
   { calculate_map = true; return dweightxr_sq; }
 
-  /**
-   * \returns The first global derivative of the multiplicative
-   * weight at each quadrature point. See \p get_Sobolev_weight()
-   * for details.  In case of \p FE initialized to all zero.
-   */
 protected:
 
   mutable bool calculate_dxyz;
