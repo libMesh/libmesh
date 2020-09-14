@@ -305,6 +305,12 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
 
   if (id < _elements.size())
     {
+      // This should *almost* never happen, but we rely on it when
+      // using allgather to replicate a not-yet-actually-replicated
+      // ReplicatedMesh under construction in parallel.
+      if (e == _elements[id])
+        return e;
+
       // Overwriting existing elements is still probably a mistake.
       libmesh_assert(!_elements[id]);
     }
