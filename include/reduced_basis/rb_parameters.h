@@ -106,11 +106,21 @@ public:
 
   /**
    * Fill \p param_names with the names of the parameters.
+   *
+   * \deprecated to avoid making it too easy to create copies that in
+   * most circumstances aren't needed.  If this functionality really
+   * is required, call get_parameters_map() and loop over the keys
+   * directly.
    */
   void get_parameter_names(std::set<std::string> & param_names) const;
 
   /**
    * Fill \p param_names with the names of the extra parameters.
+   *
+   * \deprecated to avoid making it too easy to create copies that in
+   * most circumstances aren't needed.  If this functionality really
+   * is required, call get_parameters_map() and loop over the keys
+   * directly.
    */
   void get_extra_parameter_names(std::set<std::string> & param_names) const;
 
