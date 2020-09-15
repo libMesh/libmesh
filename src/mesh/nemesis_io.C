@@ -146,6 +146,40 @@ void Nemesis_IO::set_output_variables(const std::vector<std::string> & output_va
 
 
 
+void Nemesis_IO::assert_symmetric_cmaps()
+{
+#ifndef NDEBUG
+  // We expect the communication maps to be symmetric - e.g. if processor i thinks it
+  // communicates with processor j, then processor j should also be expecting to
+  // communicate with i.  We can assert that here easily enough with an alltoall,
+  // but let's only do it when not in optimized mode to limit unnecessary communication.
+  {
+    std::vector<unsigned char> pid_send_partner (this->n_processors(), 0);
+
+    // strictly speaking, we should expect to communicate with ourself...
+    pid_send_partner[this->processor_id()] = 1;
+
+    // mark each processor id we reference with a node cmap
+    for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
+      {
+        libmesh_assert_less (nemhelper->node_cmap_ids[cmap], this->n_processors());
+
+        pid_send_partner[nemhelper->node_cmap_ids[cmap]] = 1;
+      }
+
+    // Copy the send pairing so we can catch the receive paring and
+    // test for equality
+    const std::vector<unsigned char> pid_recv_partner (pid_send_partner);
+
+    this->comm().alltoall (pid_send_partner);
+
+    libmesh_assert (pid_send_partner == pid_recv_partner);
+  }
+#endif
+}
+
+
+
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 void Nemesis_IO::read (const std::string & base_filename)
 {
@@ -257,34 +291,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   libmesh_assert_equal_to (to_uint(nemhelper->num_node_cmaps), nemhelper->node_cmap_node_ids.size());
   libmesh_assert_equal_to (to_uint(nemhelper->num_node_cmaps), nemhelper->node_cmap_proc_ids.size());
 
-#ifndef NDEBUG
-  // We expect the communication maps to be symmetric - e.g. if processor i thinks it
-  // communicates with processor j, then processor j should also be expecting to
-  // communicate with i.  We can assert that here easily enough with an alltoall,
-  // but let's only do it when not in optimized mode to limit unnecessary communication.
-  {
-    std::vector<unsigned char> pid_send_partner (this->n_processors(), 0);
-
-    // strictly speaking, we should expect to communicate with ourself...
-    pid_send_partner[this->processor_id()] = 1;
-
-    // mark each processor id we reference with a node cmap
-    for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
-      {
-        libmesh_assert_less (nemhelper->node_cmap_ids[cmap], this->n_processors());
-
-        pid_send_partner[nemhelper->node_cmap_ids[cmap]] = 1;
-      }
-
-    // Copy the send pairing so we can catch the receive paring and
-    // test for equality
-    const std::vector<unsigned char> pid_recv_partner (pid_send_partner);
-
-    this->comm().alltoall (pid_send_partner);
-
-    libmesh_assert (pid_send_partner == pid_recv_partner);
-  }
-#endif
+  this->assert_symmetric_cmaps();
 
   // We now have enough information to infer node ownership.  We start by assuming
   // we own all the nodes on this processor.  We will then interrogate the
@@ -1206,6 +1213,10 @@ void Nemesis_IO::write (const std::string & base_filename)
   // communication maps, to file.
   nemhelper->initialize(nemesis_filename,mesh);
 
+  // Make sure we're writing communication maps we can reuse as
+  // expected when reading
+  this->assert_symmetric_cmaps();
+
   // Call the Nemesis-specialized version of write_nodal_coordinates() to write
   // the nodal coordinates.
   nemhelper->write_nodal_coordinates(mesh);
@@ -1301,6 +1312,11 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
         {
           nemhelper->create(nemesis_filename);
           nemhelper->initialize(nemesis_filename,mesh);
+
+          // Make sure we're writing communication maps we can reuse
+          // as expected when reading
+          this->assert_symmetric_cmaps();
+
           nemhelper->write_nodal_coordinates(mesh);
           nemhelper->write_elements(mesh);
           nemhelper->write_nodesets(mesh);

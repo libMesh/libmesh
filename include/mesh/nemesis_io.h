@@ -152,6 +152,15 @@ public:
   void append(bool val);
 
 private:
+
+  /*
+   * A helper function for use in debug and devel modes, for asserting
+   * that we get symmetric communication maps from a file we read
+   * and/or that we're writing them out in a symmetric fashion
+   * ourselves.
+   */
+  void assert_symmetric_cmaps();
+
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   std::unique_ptr<Nemesis_IO_Helper> nemhelper;
 
