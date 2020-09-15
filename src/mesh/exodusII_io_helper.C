@@ -1470,6 +1470,11 @@ ExodusII_IO_Helper::write_var_names_impl(const char * var_type,
   ex_err = exII::ex_put_var_param(ex_id, var_type, count);
   EX_CHECK_ERR(ex_err, "Error setting number of vars.");
 
+  // Nemesis doesn't like trying to write nodal variable names in
+  // files with no nodes.
+  if (!this->num_nodes)
+    return;
+
   if (count > 0)
     {
       NamesData names_table(count, MAX_STR_LENGTH);
