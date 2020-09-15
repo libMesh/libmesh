@@ -210,11 +210,13 @@ void UnsteadySolver::advance_timestep ()
 
 std::pair<unsigned int, Real> UnsteadySolver::adjoint_solve(const QoISet & qoi_indices)
 {
-  // Record the deltat we are about to use for this adjoint timestep, determined completely
+  std::pair<unsigned int, Real> adjoint_output = _system.ImplicitSystem::adjoint_solve(qoi_indices);
+
+  // Record the deltat we used for this adjoint timestep. This was determined completely
   // by SolutionHistory::retrieve methods. The adjoint_solve methods should never change deltat.
   last_deltat = _system.deltat;
 
-  return _system.ImplicitSystem::adjoint_solve(qoi_indices);
+  return adjoint_output;
 }
 
 void UnsteadySolver::adjoint_advance_timestep ()
@@ -262,9 +264,66 @@ void UnsteadySolver::retrieve_timestep()
      _system.get_dof_map().get_send_list());
 }
 
+void UnsteadySolver::integrate_qoi_timestep()
+{
+  // We are using the trapezoidal rule to integrate each timestep
+  // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+
+  // Zero out the system.qoi vector
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = 0.0;
+  }
+
+  // Left and right side contributions
+  std::vector<Number> left_contribution(_system.qoi.size(), 0.0);
+  Number time_left = 0.0;
+  std::vector<Number> right_contribution(_system.qoi.size(), 0.0);
+  Number time_right = 0.0;
+
+  time_left = _system.time;
+
+  // Base class assumes a direct steady evaluation
+  this->_system.assemble_qoi();
+
+  // Also get the spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+  {
+    left_contribution[j] = (_system.qoi)[j];
+  }
+
+  // Advance to t_j+1
+  _system.time = _system.time + _system.deltat;
+
+  time_right = _system.time;
+
+  // Load the solution at the next timestep
+  retrieve_timestep();
+
+  // Zero out the system.qoi vector
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = 0.0;
+  }
+
+  // Base class assumes a direct steady evaluation
+  this->_system.assemble_qoi();
+
+  for(auto j : make_range(_system.n_qois()))
+  {
+    right_contribution[j] = (_system.qoi)[j];
+  }
+
+  // Combine the left and right side contributions as per the trapezoidal rule
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = ((left_contribution[j] + right_contribution[j])/2.0)*(time_right - time_left);
+  }
+}
+
 void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
 {
-  // We are using the midpoint rule to integrate each timestep
+  // We are using the trapezoidal rule to integrate each timestep
   // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
 
   // Get t_j
@@ -463,7 +522,7 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
     {
       if(QoI_time_instant[j] == NULL)
       {
-        (_system.qoi_error_estimates)[j] = ((qoi_error_estimates_left[j] + qoi_error_estimates_right[j])/2.)*(time_right - time_left);
+        (_system.qoi_error_estimates)[j] = qoi_error_estimates_right[j];
       }
       else if(time_right <= *(QoI_time_instant[j]) + TOLERANCE)
       {
