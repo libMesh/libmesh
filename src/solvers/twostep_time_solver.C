@@ -212,7 +212,8 @@ void TwostepTimeSolver::solve()
 
   // We ended up taking two half steps of size system.deltat to
   // march our last time step.
-  this->completedtimestep_deltat = 2.0*_system.deltat;
+  this->last_deltat = _system.deltat;
+  this->completed_timestep_size = 2.0*_system.deltat;
 
   // TimeSolver::solve methods should leave system.time unchanged
   _system.time = old_time;
@@ -300,14 +301,21 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
   // Take the first adjoint 'half timestep'
   core_time_solver->adjoint_solve(qoi_indices);
 
+  // Record the sub step deltat we used for the last adjoint solve.
+  last_deltat = _system.deltat;
+
   // Adjoint advance the timestep
   core_time_solver->adjoint_advance_timestep();
 
   // The second half timestep
   std::pair<unsigned int, Real> full_adjoint_output = core_time_solver->adjoint_solve(qoi_indices);
 
-  // Tell our timesolver the combined deltat before adjoint advance timestep updates it
-  this->completedtimestep_deltat = 2.0*_system.deltat;
+  // Record the sub step deltat we used for the last adjoint solve.
+  last_deltat = _system.deltat;
+
+  // Record the total size of the last timestep, for a 2StepTS, this is
+  // simply twice the deltat for each sub(half) step.
+  this->completed_timestep_size = 2.0*_system.deltat;
 
   // Reset the system.time
   _system.time = old_time;
@@ -315,9 +323,45 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
   return full_adjoint_output;
 }
 
+void TwostepTimeSolver::integrate_qoi_timestep()
+{
+  // Vectors to hold qoi contributions from the first and second half timesteps
+  std::vector<Number> qois_first_half(_system.qoi.size(), 0.0);
+  std::vector<Number> qois_second_half(_system.qoi.size(), 0.0);
+
+  // First half contribution
+  core_time_solver->integrate_qoi_timestep();
+
+  for (auto j : make_range(_system.n_qois()))
+  {
+    qois_first_half[j] = (_system.qoi)[j];
+  }
+
+  // Second half contribution
+  core_time_solver->integrate_qoi_timestep();
+
+  for (auto j : make_range(_system.n_qois()))
+  {
+    qois_second_half[j] = (_system.qoi)[j];
+  }
+
+  // Zero out the system.qoi vector
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = 0.0;
+  }
+
+  // Add the contributions from the two halftimesteps to get the full QoI
+  // contribution from this timestep
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = qois_first_half[j] + qois_second_half[j];
+  }
+}
+
 void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
 {
-  // We are using the midpoint rule to integrate each timestep
+  // We are using the trapezoidal rule to integrate each timestep, and then pooling the contributions here.
   // (f(t_j) + f(t_j+1/2))/2 (t_j+1/2 - t_j) + (f(t_j+1/2) + f(t_j+1))/2 (t_j+1 - t_j+1/2)
 
   // First half timestep

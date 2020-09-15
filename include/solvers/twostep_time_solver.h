@@ -72,6 +72,11 @@ public:
   virtual std::pair<unsigned int, Real> adjoint_solve (const QoISet & qoi_indices) override;
 
   /**
+   * A method to integrate the system::QoI functionals.
+   */
+  virtual void integrate_qoi_timestep() override;
+
+  /**
    * A method to integrate the adjoint sensitivity w.r.t a given parameter
    * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
    * The midpoint rule is used to integrate each substep
