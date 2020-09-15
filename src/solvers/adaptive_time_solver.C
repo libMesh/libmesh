@@ -34,7 +34,7 @@ AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type & s)
     max_deltat(0.),
     min_deltat(0.),
     max_growth(0.),
-    completedtimestep_deltat(1.),
+    completed_timestep_size(1.),
     global_tolerance(true)
 {
   // the child class must populate core_time_solver
@@ -103,7 +103,7 @@ void AdaptiveTimeSolver::advance_timestep ()
   // It is used here to store any initial conditions data
   if (!first_solve)
     {
-      _system.time += this->completedtimestep_deltat;
+      _system.time += this->completed_timestep_size;
     }
   else
     {
@@ -142,7 +142,7 @@ void AdaptiveTimeSolver::adjoint_advance_timestep ()
     {
       // The adjoint system has been solved. We need to store the adjoint solution and
       // load the primal solutions for the next time instance (t - delta_ti).
-      _system.time -= this->completedtimestep_deltat;
+      _system.time -= this->completed_timestep_size;
     }
   else
     {
@@ -156,9 +156,6 @@ void AdaptiveTimeSolver::adjoint_advance_timestep ()
   // Retrieve the primal solution for the next adjoint calculation,
   // by using the core time solver's solution history object.
   core_time_solver->get_solution_history().retrieve(true, _system.time);
-
-  // We need to update the completed timestep deltat with the newly read in deltat
-  this->completedtimestep_deltat = 2*_system.deltat;
 
   // Store the computed full step adjoint solution for future use (sub steps are handled internally by the core time solver)
   core_time_solver->get_solution_history().store(true, _system.time);
@@ -177,9 +174,6 @@ void AdaptiveTimeSolver::retrieve_timestep ()
   // Ask the core time solver to retrieve all the stored vectors
   // at the current time
   core_time_solver->retrieve_timestep();
-
-  // We need to update the completed timestep deltat with the newly read in deltat
-  this->completedtimestep_deltat = 2*_system.deltat;
 }
 
 Real AdaptiveTimeSolver::error_order () const
