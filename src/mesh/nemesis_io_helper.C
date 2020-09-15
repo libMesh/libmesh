@@ -597,7 +597,6 @@ void Nemesis_IO_Helper::put_cmap_params(std::vector<int> & node_cmap_ids_in,
 void Nemesis_IO_Helper::put_node_cmap(std::vector<std::vector<int>> & node_cmap_node_ids_in,
                                       std::vector<std::vector<int>> & node_cmap_proc_ids_in)
 {
-
   // Print to screen what we are about to print to Nemesis file
   if (verbose)
     {
@@ -1777,17 +1776,6 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
           set_p.insert(elem->node_id(node));
       }
 
-    // The number of node communication maps is the number of other processors
-    // with which we share nodes. (I think.) This is just the size of the map we just
-    // created, minus 1 unless this processor has no nodes of its own.
-    this->num_node_cmaps =
-      cast_int<int>(proc_nodes_touched.size() -
-                    proc_nodes_touched.count(this->processor_id()));
-
-    // We can't be connecting to more processors than exist outside
-    // ourselves
-    libmesh_assert_less (this->num_node_cmaps, this->n_processors());
-
     if (verbose)
       {
         libMesh::out << "[" << this->processor_id()
@@ -1807,20 +1795,26 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
 
     // Loop over all the sets we just created and compute intersections with the
     // this processor's set.  Obviously, don't intersect with ourself.
+    this->proc_nodes_touched_intersections.clear();
     for (auto & pr : proc_nodes_touched)
       {
         // Don't compute intersections with ourself
         if (pr.first == this->processor_id())
           continue;
 
+        std::set<unsigned int> this_intersection;
+
         // Otherwise, compute intersection with other processor and ourself
         std::set<unsigned> & my_set = proc_nodes_touched[this->processor_id()];
         std::set<unsigned> & other_set = pr.second;
-        std::set<unsigned> & result_set = this->proc_nodes_touched_intersections[pr.first]; // created if does not exist
 
         std::set_intersection(my_set.begin(), my_set.end(),
                               other_set.begin(), other_set.end(),
-                              std::inserter(result_set, result_set.end()));
+                              std::inserter(this_intersection, this_intersection.end()));
+
+        if (!this_intersection.empty())
+          this->proc_nodes_touched_intersections.emplace
+            (pr.first, std::move(this_intersection));
       }
 
     if (verbose)
@@ -1832,6 +1826,15 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
                        << " entries."
                        << std::endl;
       }
+
+    // The number of node communication maps is the number of other processors
+    // with which we share nodes.
+    this->num_node_cmaps =
+      cast_int<int>(proc_nodes_touched_intersections.size());
+
+    // We can't be connecting to more processors than exist outside
+    // ourselves
+    libmesh_assert_less (this->num_node_cmaps, this->n_processors());
 
     // Compute the set_union of all the preceding intersections.  This will be the set of
     // border node IDs for this processor.
