@@ -135,6 +135,11 @@ public:
   virtual void retrieve_timestep();
 
   /**
+   * A method to integrate the system::QoI functionals
+   */
+  virtual void integrate_qoi_timestep();
+
+  /**
    * A method to integrate the adjoint sensitivity w.r.t a given parameter
    * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
    */
@@ -272,11 +277,18 @@ public:
   { _is_adjoint = _is_adjoint_value; }
 
   /**
-   * Function to return 'last_deltat()', returns system.deltat if
-   * fixed timestep solver is used, completed_deltat if the adaptive
+   * Returns system.deltat if fixed timestep solver is used,
+   * the complete timestep size (sum of all substeps) if the adaptive
    * time solver is used.
    */
-  virtual Real last_complete_deltat();
+  virtual Real last_completed_timestep_size();
+
+  /**
+   * Returns the system.deltat timestep used to get to the current time.
+   * For a uniform timestepper, it will simply return the last used system.deltat, for an
+   * adaptive time solver, it will return the last used substep size.
+   */
+  virtual Real last_completed_deltat();
 
   /**
    * The final_time variable can be set by the user or in another library

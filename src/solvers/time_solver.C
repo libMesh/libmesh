@@ -120,6 +120,13 @@ std::pair<unsigned int, Real> TimeSolver::adjoint_solve (const QoISet & qoi_indi
   return this->_system.ImplicitSystem::adjoint_solve(qoi_indices);
 }
 
+void TimeSolver::integrate_qoi_timestep()
+{
+  // Base class assumes a direct steady evaluation
+  this->_system.assemble_qoi();
+
+}
+
 void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
 {
   // Base class assumes a direct steady state sensitivity calculation
@@ -153,7 +160,12 @@ void TimeSolver::integrate_adjoint_refinement_error_estimate
   return;
 }
 
-Real TimeSolver::last_complete_deltat()
+Real TimeSolver::last_completed_timestep_size()
+{
+  return last_deltat;
+}
+
+Real TimeSolver::last_completed_deltat()
 {
   return last_deltat;
 }
