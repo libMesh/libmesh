@@ -90,6 +90,11 @@ public:
 
   /**
    * Get a set that stores the parameter names.
+   *
+   * \deprecated to avoid making it too easy to create copies that in
+   * most circumstances aren't needed.  If this functionality really
+   * is required, call get_parameters_min().get_parameters_map() and
+   * loop over the keys directly.
    */
   std::set<std::string> get_parameter_names() const;
 

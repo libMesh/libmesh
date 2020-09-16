@@ -78,20 +78,18 @@ unsigned int RBParameters::n_parameters() const
 
 void RBParameters::get_parameter_names(std::set<std::string> & param_names) const
 {
-  param_names.clear();
+  libmesh_deprecated();
 
-  const_iterator it     = _parameters.begin();
-  const_iterator it_end = _parameters.end();
-  for ( ; it != it_end; ++it)
-    {
-      param_names.insert( it->first );
-    }
+  param_names.clear();
+  for (const auto & pr : _parameters)
+    param_names.insert(pr.first);
 }
 
 void RBParameters::get_extra_parameter_names(std::set<std::string> & param_names) const
 {
-  param_names.clear();
+  libmesh_deprecated();
 
+  param_names.clear();
   for (const auto & pr : _extra_parameters)
     param_names.insert(pr.first);
 }

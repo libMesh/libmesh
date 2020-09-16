@@ -251,22 +251,19 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
     auto mins = parameter_ranges_list.initMinValues(n_continuous_parameters);
     auto maxs = parameter_ranges_list.initMaxValues(n_continuous_parameters);
 
-    std::set<std::string> parameter_names = rb_evaluation.get_parameter_names();
     const RBParameters & parameters_min = rb_evaluation.get_parameters_min();
     const RBParameters & parameters_max = rb_evaluation.get_parameters_max();
 
+    // We could loop over either parameters_min or parameters_max, they should have the same keys.
     unsigned int count = 0;
-    for (const auto & parameter_name : parameter_names)
-      {
-        if (!rb_evaluation.is_discrete_parameter(parameter_name))
-          {
-            names.set(count, parameter_name);
-            mins.set(count, parameters_min.get_value(parameter_name));
-            maxs.set(count, parameters_max.get_value(parameter_name));
-
-            ++count;
-          }
-      }
+    for (const auto & pr : parameters_min.get_parameters_map())
+      if (!rb_evaluation.is_discrete_parameter(pr.first))
+        {
+          names.set(count, pr.first);
+          mins.set(count, pr.second);
+          maxs.set(count, parameters_max.get_value(pr.first));
+          ++count;
+        }
 
     libmesh_error_msg_if(count != n_continuous_parameters, "Mismatch in number of continuous parameters");
   }

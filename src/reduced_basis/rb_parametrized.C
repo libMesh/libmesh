@@ -129,10 +129,13 @@ unsigned int RBParametrized::get_n_discrete_params() const
 
 std::set<std::string> RBParametrized::get_parameter_names() const
 {
+  libmesh_deprecated();
   libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameter_names");
 
   std::set<std::string> parameter_names;
-  parameters_min.get_parameter_names(parameter_names);
+  const auto & params_map = parameters_min.get_parameters_map();
+  for (const auto & pr : params_map)
+    parameter_names.insert(pr.first);
 
   return parameter_names;
 }
