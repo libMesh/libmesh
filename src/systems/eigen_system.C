@@ -372,6 +372,11 @@ std::pair<Real, Real> EigenSystem::get_eigenvalue (dof_id_type i)
   return eigen_solver->get_eigenvalue (i);
 }
 
+void EigenSystem::set_initial_space (NumericVector<Number> & initial_space_in)
+{
+  eigen_solver->set_initial_space (initial_space_in);
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC
