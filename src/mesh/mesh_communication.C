@@ -155,6 +155,7 @@ void query_ghosting_functors(const MeshBase & mesh,
         {
           const Elem * elem = pr.first;
           libmesh_assert(elem != remote_elem);
+          libmesh_assert(mesh.elem_ptr(elem->id()) == elem);
           connected_elements.insert(elem);
         }
     }
