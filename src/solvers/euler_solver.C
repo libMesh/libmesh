@@ -19,6 +19,10 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/euler_solver.h"
 
+#include "libmesh/error_vector.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/adjoint_refinement_estimator.h"
+
 namespace libMesh
 {
 
@@ -190,5 +194,232 @@ bool EulerSolver::_general_residual (bool request_jacobian,
   return jacobian_computed;
 }
 
+void EulerSolver::integrate_qoi_timestep()
+{
+  // We are using the trapezoidal rule to integrate each timestep
+  // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+
+  // Zero out the system.qoi vector
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = 0.0;
+  }
+
+  // Left and right side contributions
+  std::vector<Number> left_contribution(_system.qoi.size(), 0.0);
+  Number time_left = 0.0;
+  std::vector<Number> right_contribution(_system.qoi.size(), 0.0);
+  Number time_right = 0.0;
+
+  time_left = _system.time;
+
+  // Base class assumes a direct steady evaluation
+  this->_system.assemble_qoi();
+
+  // Also get the spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+  {
+    left_contribution[j] = (_system.qoi)[j];
+  }
+
+  // Advance to t_j+1
+  _system.time = _system.time + _system.deltat;
+
+  time_right = _system.time;
+
+  // Load the solution at the next timestep
+  retrieve_timestep();
+
+  // Zero out the system.qoi vector
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = 0.0;
+  }
+
+  // Base class assumes a direct steady evaluation
+  this->_system.assemble_qoi();
+
+  for(auto j : make_range(_system.n_qois()))
+  {
+    right_contribution[j] = (_system.qoi)[j];
+  }
+
+  // Combine the left and right side contributions as per the specified theta
+  // theta = 0.5 (Crank-Nicholson) gives the trapezoidal rule.
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = ( ((1.0 - theta)*left_contribution[j]) + (theta*right_contribution[j]) )*(time_right - time_left);
+  }
+}
+
+void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant)
+{
+  // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
+  if(_system.qoi_error_estimates.size() != _system.qoi.size())
+    _system.qoi_error_estimates.resize(_system.qoi.size());
+
+  // There are two possibilities regarding the integration rule we need to use for time integration.
+  // If we have a instantaneous QoI, then we need to use a left sided Riemann sum, otherwise the trapezoidal rule for temporally smooth QoIs.
+
+  // Create left and right error estimate vectors of the right size
+  std::vector<Number> qoi_error_estimates_left(_system.qoi.size());
+  std::vector<Number> qoi_error_estimates_right(_system.qoi.size());
+
+  // Get t_j
+  Real time_left = _system.time;
+
+  // Get f(t_j)
+  ErrorVector QoI_elementwise_error_left;
+
+  // If we are at the very initial step, the error contribution is zero,
+  // otherwise the old ajoint vector has been filled and we are the left end
+  // of a subsequent timestep or sub-timestep
+  if(old_adjoints[0] != nullptr)
+  {
+    // For evaluating the residual, we need to use the deltat that was used
+    // to get us to this solution, so we save the current deltat as next_step_deltat
+    // and set _system.deltat to the last completed deltat.
+    next_step_deltat = _system.deltat;
+    _system.deltat = last_step_deltat;
+
+    // The adjoint error estimate expression for a backwards facing step
+    // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
+    for (auto j : make_range(_system.n_qois()))
+    {
+      // Swap for residual weighting
+      _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
+    }
+
+    _system.update();
+
+    // The residual has to be evaluated at the last time
+    _system.time = _system.time - last_step_deltat;
+
+    adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error_left);
+
+    // Shift the time back
+    _system.time = _system.time + last_step_deltat;
+
+    // Swap back the current and old adjoints
+    for (auto j : make_range(_system.n_qois()))
+    {
+      _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
+    }
+
+    // Set the system deltat back to what it should be to march to the next time
+    _system.deltat = next_step_deltat;
+
+  }
+  else
+  {
+    for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
+      QoI_elementwise_error_left[i] = 0.0;
+  }
+
+  // Also get the left side contributions for the spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+  {
+    // Skip this QoI if not in the QoI Set
+    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+    {
+      // If we are at the initial time, the error contribution is zero
+      if(std::abs(_system.time) > TOLERANCE*sqrt(TOLERANCE))
+      {
+        qoi_error_estimates_left[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
+      }
+      else
+      {
+        qoi_error_estimates_left[j] = 0.0;
+      }
+    }
+  }
+
+  // Advance to t_j+1
+  _system.time = _system.time + _system.deltat;
+
+  // Get t_j+1
+  Real time_right = _system.time;
+
+  // We will need to use the last step deltat for the weighted residual evaluation
+  last_step_deltat = _system.deltat;
+
+  // The adjoint error estimate expression for a backwards facing step
+  // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
+  for (auto j : make_range(_system.n_qois()))
+  {
+    old_adjoints[j] = _system.get_adjoint_solution(j).clone();
+  }
+
+  // Retrieve the state and adjoint vectors for the next time instant
+  retrieve_timestep();
+
+  // Swap for residual weighting
+  for (auto j : make_range(_system.n_qois()))
+  {
+   _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
+  }
+
+  // Swap out the deltats as we did for the left side
+  next_step_deltat = _system.deltat;
+  _system.deltat = last_step_deltat;
+
+  // Get f(t_j+1)
+  ErrorVector QoI_elementwise_error_right;
+
+  _system.update();
+
+  // The residual has to be evaluated at the last time
+  _system.time = _system.time - last_step_deltat;
+
+  adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error_right);
+
+  // Shift the time back
+  _system.time = _system.time + last_step_deltat;
+
+  // Set the system deltat back to what it needs to be able to march to the next time
+  _system.deltat = next_step_deltat;
+
+  // Swap back now that the residual weighting is done
+  for (auto j : make_range(_system.n_qois()))
+  {
+   _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
+  }
+
+  // Also get the right side contributions for the spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+  {
+    // Skip this QoI if not in the QoI Set
+    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+    {
+      qoi_error_estimates_right[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
+    }
+  }
+
+  // Error contribution from this timestep
+  for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
+    QoI_elementwise_error[i] = ((QoI_elementwise_error_right[i] + QoI_elementwise_error_left[i])/2.)*(time_right - time_left);
+
+  // QoI set spatially integrated errors contribution from this timestep
+  for (auto j : make_range(_system.n_qois()))
+  {
+    // Skip this QoI if not in the QoI Set
+    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+    {
+      if(QoI_time_instant[j] == NULL)
+      {
+        (_system.qoi_error_estimates)[j] = ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat;
+      }
+      else if(time_right <= *(QoI_time_instant[j]) + TOLERANCE)
+      {
+        (_system.qoi_error_estimates)[j] = ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat;
+      }
+      else
+      {
+        (_system.qoi_error_estimates)[j] = 0.0;
+      }
+    }
+  }
+
+}
 
 } // namespace libMesh

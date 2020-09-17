@@ -71,6 +71,21 @@ public:
   virtual Real error_order() const override;
 
   /**
+   * A method to integrate the system::QoI functionals.
+   */
+  virtual void integrate_qoi_timestep() override;
+
+  /**
+   * A method to compute the adjoint refinement error estimate at the current timestep.
+   * int_{tstep_start}^{tstep_end} R(u^h,z) dt
+   * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
+   * The trapezoidal rule (for temporally smooth QoI) or left Riemann sum (for an instantaneous QoI) is used
+   * for the numerical integration depending on the nature of the QoI.
+   */
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>()) override;
+
+  /**
    * This method uses the DifferentiablePhysics'
    * element_time_derivative() and element_constraint()
    * to build a full residual on an element.  What combination

@@ -137,7 +137,7 @@ public:
    * The trapezoidal rule (for temporally smooth QoI) or left Riemann sum (for an instantaneous QoI) is used
    * for the numerical integration depending on the nature of the QoI.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>()) override;
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & /*adjoint_refinement_error_estimator*/, ErrorVector & /*QoI_elementwise_error*/, std::vector<Real *> /*QoI_time_instant = std::vector<Real *>()*/) override;
 
   /**
    * This method should return the expected convergence order of the
@@ -205,8 +205,6 @@ protected:
    * (when the primal solution is to be used to set adjoint boundary conditions) and false thereafter
    */
   bool first_adjoint_step;
-
-private:
 
   /**
    * A vector of pointers to vectors holding the adjoint solution at the last time step

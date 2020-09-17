@@ -39,11 +39,6 @@ namespace libMesh
   {
     dual_solution_copies.resize(system_.n_qois());
 
-    for(auto j : make_range(system_.n_qois()))
-    {
-      dual_solution_copies[j] = nullptr;
-    }
-
     libmesh_experimental();
   }
 
