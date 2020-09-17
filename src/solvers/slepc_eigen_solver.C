@@ -989,14 +989,9 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
 #if SLEPC_VERSION_LESS_THAN(3,1,0)
   libmesh_error_msg("SLEPc 3.1 is required to call EigenSolver::set_initial_space()");
 #else
-  // Make sure the input vector is actually a PetscVector
-  PetscVector<T> * initial_space_petsc_vec =
-  dynamic_cast<PetscVector<T> *>(&initial_space_in);
-
-  libmesh_error_msg_if(!initial_space_petsc_vec, "Error attaching initial space: input vector must be a PetscVector.");
-
-  // The vector is owned by caller
-  _initial_space = initial_space_petsc_vec;
+  // Make sure the input vector (which is still owned by caller) is
+  // actually a PetscVector
+  _initial_space = cast_ptr<PetscVector<T> *>(&initial_space_in);
 #endif
 }
 
