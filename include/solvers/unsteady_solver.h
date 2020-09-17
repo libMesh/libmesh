@@ -209,11 +209,6 @@ protected:
 private:
 
   /**
-   * A vector of pointers to vectors holding the adjoint solution at the current time step
-   */
-  std::vector< NumericVector<Number>* > current_adjoints;
-
-  /**
    * A vector of pointers to vectors holding the adjoint solution at the last time step
    */
   std::vector< std::unique_ptr<NumericVector<Number>> > old_adjoints;

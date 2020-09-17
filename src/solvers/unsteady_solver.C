@@ -40,15 +40,13 @@ UnsteadySolver::UnsteadySolver (sys_type & s)
     first_adjoint_step (true)
 {
   old_adjoints.resize(s.n_qois());
-  current_adjoints.resize(s.n_qois());
 
-  // Set the old and current adjoint pointers to nullptrs
+  // Set the old adjoint pointers to nullptrs
   // We will use this nullness to skip the initial time instant,
   // when there is no older adjoint.
   for(auto j : make_range(s.n_qois()))
   {
     old_adjoints[j] = nullptr;
-    current_adjoints[j] = nullptr;
   }
 }
 
@@ -397,10 +395,8 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
     // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
     for (auto j : make_range(_system.n_qois()))
     {
-      current_adjoints[j] = & _system.get_adjoint_solution(j);
-
       // Swap for residual weighting
-      current_adjoints[j]->swap(*old_adjoints[j]);
+      _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
     }
 
     _system.update();
@@ -416,7 +412,7 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
     // Swap back the current and old adjoints
     for (auto j : make_range(_system.n_qois()))
     {
-      current_adjoints[j]->swap(*old_adjoints[j]);
+      _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
     }
 
     // Set the system deltat back to what it should be to march to the next time
@@ -460,9 +456,7 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
   // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
   for (auto j : make_range(_system.n_qois()))
   {
-    current_adjoints[j] = & _system.get_adjoint_solution(j);
-
-    old_adjoints[j] = current_adjoints[j]->clone();
+    old_adjoints[j] = _system.get_adjoint_solution(j).clone();
   }
 
   // Retrieve the state and adjoint vectors for the next time instant
@@ -471,7 +465,7 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
   // Swap for residual weighting
   for (auto j : make_range(_system.n_qois()))
   {
-   current_adjoints[j]->swap(*old_adjoints[j]);
+   _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
   }
 
   // Swap out the deltats as we did for the left side
@@ -497,7 +491,7 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
   // Swap back now that the residual weighting is done
   for (auto j : make_range(_system.n_qois()))
   {
-   current_adjoints[j]->swap(*old_adjoints[j]);
+   _system.get_adjoint_solution(j).swap(*old_adjoints[j]);
   }
 
   // Also get the right side contributions for the spatially integrated errors for all the QoIs in the QoI set
@@ -531,7 +525,6 @@ void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefineme
       else
       {
         (_system.qoi_error_estimates)[j] = 0.0;
-        libmesh_warning("Error estimate contribution for a time instant past the instantaneous QoI evaluation time has been set to zero.");
       }
     }
   }
