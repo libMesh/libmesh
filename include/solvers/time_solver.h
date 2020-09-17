@@ -148,7 +148,10 @@ public:
   /**
    * A method to compute the adjoint refinement error estimate at the current timestep.
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
+   * The user provides an initialized ARefEE object.
    * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * As an option, the user can also supply a QoI_time_instant vector where non-null pointers imply an instantaneous
+   * QoI evaluation at the time held by the pointer.
    * Also fills in a map that links QoI indices to spatially integrated error estimates for the current timestep.
    * ONLY SUPPORTED for Backward Euler.
    */
@@ -292,7 +295,8 @@ public:
 
   /**
    * The final_time variable can be set by the user or in another library
-   * function. For use, see documentation of final_time variable.
+   * function. By default the final_time variable is set to be std::nan("1").
+   * If set to a finite value, final time is useful for adjoint time stepping and QoI postprocessing.
    */
   void set_final_time(Real set_time)
   {
@@ -351,7 +355,7 @@ private:
 
   /**
    * The final time at the completion of the timestepping, useful for adjoint
-   * time stepping and QoI postprocessing
+   * time stepping and QoI postprocessing. By default the final_time variable is set to be std::nan("1").
    */
   Real final_time;
 

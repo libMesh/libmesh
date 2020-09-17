@@ -98,6 +98,9 @@ private:
   // A helper function to locate entries at a given time
   // Behaviour depends on whether we are calling this function
   // while storing or retrieving/erasing entries.
+  // While storing, if no entry in our map matches our time key,
+  // we will create a new entry in the map. If we are not storing,
+  // not matching a given time key implies an error.
   void find_stored_entry(Real time, bool storing = false);
 
   // A system reference
