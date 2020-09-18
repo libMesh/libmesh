@@ -189,6 +189,9 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         el->set_unique_id(old->unique_id() + unique_id_offset);
 #endif
 
+        el->set_mapping_type(old->mapping_type());
+        el->set_mapping_data(old->mapping_data());
+
         //Hold onto it
         if (!skip_find_neighbors)
           {
@@ -751,6 +754,9 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
       for (unsigned int i = 0; i != n_elem_ints; ++i)
         uelem->set_extra_integer(i, old_elem->get_extra_integer(i));
 
+      uelem->set_mapping_type(old_elem->mapping_type());
+      uelem->set_mapping_data(old_elem->mapping_data());
+
       Elem * new_elem = new_mesh.add_elem(std::move(uelem));
 
       libmesh_assert(new_elem);
@@ -972,6 +978,16 @@ void UnstructuredMesh::all_first_order ()
 #endif
       lo_elem->processor_id() = so_elem->processor_id();
       lo_elem->subdomain_id() = so_elem->subdomain_id();
+
+      const unsigned int nei = so_elem->n_extra_integers();
+      lo_elem->add_extra_integers(nei);
+      for (unsigned int i=0; i != nei; ++i)
+        lo_elem->set_extra_integer(i, so_elem->get_extra_integer(i));
+
+      // This is probably moot but shouldn't hurt
+      lo_elem->set_mapping_type(so_elem->mapping_type());
+      lo_elem->set_mapping_data(so_elem->mapping_data());
+
       this->insert_elem(std::move(lo_elem));
     }
 
@@ -1336,6 +1352,16 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 #endif
       so_elem->processor_id() = lo_pid;
       so_elem->subdomain_id() = lo_elem->subdomain_id();
+
+      const unsigned int nei = so_elem->n_extra_integers();
+      so_elem->add_extra_integers(nei);
+      for (unsigned int i=0; i != nei; ++i)
+        so_elem->set_extra_integer(i, lo_elem->get_extra_integer(i));
+
+      // This might not help anything but shouldn't hurt.
+      so_elem->set_mapping_type(lo_elem->mapping_type());
+      so_elem->set_mapping_data(lo_elem->mapping_data());
+
       this->insert_elem(std::move(so_elem));
     }
 
