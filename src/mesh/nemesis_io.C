@@ -481,9 +481,8 @@ void Nemesis_IO::read (const std::string & base_filename)
                        << ", but we wanted ID " << my_next_node << std::endl;
         }
 
-      // update the local->global index map, when we are done
-      // it will be 0-based.
-      nemhelper->node_num_map[local_node_idx] = my_next_node++;
+      // update the local->global index map, keeping it 1-based
+      nemhelper->node_num_map[local_node_idx] = my_next_node++ + 1;
     }
 
   // Now, for the boundary nodes...  We may very well own some of them,
@@ -530,9 +529,8 @@ void Nemesis_IO::read (const std::string & base_filename)
                            << ", but we wanted ID " << my_next_node << std::endl;
             }
 
-          // update the local->global index map, when we are done
-          // it will be 0-based.
-          nemhelper->node_num_map[local_node_idx] = my_next_node++;
+          // update the local->global index map, keeping it 1-based
+          nemhelper->node_num_map[local_node_idx] = my_next_node++ + 1;
         }
     }
   // That should cover numbering all the nodes which belong to us...
@@ -678,9 +676,8 @@ void Nemesis_IO::read (const std::string & base_filename)
                                    << ", but we wanted ID " << global_node_idx << std::endl;
                     }
 
-                  // update the local->global index map, when we are done
-                  // it will be 0-based.
-                  nemhelper->node_num_map[local_node_idx] = global_node_idx;
+                  // update the local->global index map, keeping it 1-based
+                  nemhelper->node_num_map[local_node_idx] = global_node_idx + 1;
 
                   // we are not really going to use my_next_node again, but we can
                   // keep incrementing it to track how many nodes we have added
@@ -694,8 +691,8 @@ void Nemesis_IO::read (const std::string & base_filename)
   // we had better have added all the nodes we need to!
   libmesh_assert_equal_to ((my_next_node - my_node_offset), to_uint(nemhelper->num_nodes));
 
-  // After all that, we should be done with all node-related arrays *except* the
-  // node_num_map, which we have transformed to use our new numbering...
+  // After all that, we should be done with all node-related arrays
+  // *except* the node_num_map.
   // So let's clean up the arrays we are done with.
   {
     Utility::deallocate (nemhelper->node_mapi);
@@ -889,7 +886,7 @@ void Nemesis_IO::read (const std::string & base_filename)
                 gi              = (j*nemhelper->num_nodes_per_elem +       // index into connectivity array
                                    conv.get_node_map(k)),
                 local_node_idx  = nemhelper->connect[gi]-1,                // local node index
-                global_node_idx = nemhelper->node_num_map[local_node_idx]; // new global node index
+                global_node_idx = nemhelper->node_num_map[local_node_idx]-1; // new global node index
 
               // Set node number
               elem->set_node(k) = mesh.node_ptr(global_node_idx);
@@ -1127,7 +1124,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
           // We should be able to use the node_num_map data structure set up previously to determine
           // the proper global node index.
-          unsigned global_node_id = nemhelper->node_num_map[ nemhelper->node_list[node]-1 /*Exodus is 1-based!*/ ];
+          unsigned global_node_id = nemhelper->node_num_map[ nemhelper->node_list[node]-1 /*Exodus is 1-based!*/ ]-1;
 
           if (_verbose)
             {
