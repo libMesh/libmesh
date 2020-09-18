@@ -1667,4 +1667,39 @@ const std::vector<std::string> & Nemesis_IO::get_nodal_var_names()
 
 
 
+void Nemesis_IO::copy_nodal_solution(System & system,
+                                     std::string system_var_name,
+                                     std::string exodus_var_name,
+                                     unsigned int timestep)
+{
+  libmesh_error_msg_if(!nemhelper->opened_for_reading,
+                       "ERROR, Nemesis file must be opened for reading before copying a nodal solution!");
+
+  nemhelper->read_nodal_var_values(exodus_var_name, timestep);
+
+  const unsigned int var_num = system.variable_number(system_var_name);
+
+  for (auto p : nemhelper->nodal_var_values)
+    {
+      dof_id_type i = p.first;
+      const Node * node = MeshInput<MeshBase>::mesh().node_ptr(i);
+
+      if (node && node->n_comp(system.number(), var_num) > 0)
+        {
+          dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
+
+          // If the dof_index is local to this processor, set the value
+          if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
+            system.solution->set (dof_index, p.second);
+        }
+    }
+
+  system.solution->close();
+  system.update();
+}
+
+
+
+
+
 } // namespace libMesh

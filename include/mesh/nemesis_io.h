@@ -34,6 +34,7 @@ namespace libMesh
 
 // Forward declarations
 class Nemesis_IO_Helper;
+class System;
 
 /**
  * The \p Nemesis_IO class implements reading parallel meshes in the
@@ -155,6 +156,15 @@ public:
    * Return list of the nodal variable names
    */
   const std::vector<std::string> & get_nodal_var_names();
+
+  /**
+   * If we read in a nodal solution while reading in a mesh, we can attempt
+   * to copy that nodal solution into an EquationSystems object.
+   */
+  void copy_nodal_solution(System & system,
+                           std::string system_var_name,
+                           std::string exodus_var_name,
+                           unsigned int timestep=1);
 
 private:
 
