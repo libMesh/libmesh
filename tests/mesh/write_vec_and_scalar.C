@@ -25,15 +25,14 @@ public:
   CPPUNIT_TEST_SUITE(WriteVecAndScalar);
 
 #if LIBMESH_DIM > 1
-  CPPUNIT_TEST(testWrite);
+  CPPUNIT_TEST(testWriteExodus);
+  CPPUNIT_TEST(testWriteNemesis);
 #endif
 
   CPPUNIT_TEST_SUITE_END();
 
-  void testWrite()
+  void setupTests(Mesh & mesh, EquationSystems & equation_systems)
   {
-    Mesh mesh(*TestCommWorld);
-
     // We set our initial conditions based on build_square node ids
     mesh.allow_renumbering(false);
 
@@ -42,9 +41,6 @@ public:
                                         -1., 1.,
                                         -1., 1.,
                                         Utility::string_to_enum<ElemType>("TRI6"));
-
-    // Create an equation systems object.
-    EquationSystems equation_systems(mesh);
 
     ExplicitSystem & system = equation_systems.add_system<ExplicitSystem>("Tester");
     system.add_variable("u", FIRST, NEDELEC_ONE);
@@ -77,10 +73,84 @@ public:
           CPPUNIT_ASSERT_EQUAL(initial_vector[node->id()], dof_id*Real(2));
       }
     sys_solution.close();
+  }
+
+
+  void testSolution (const MeshBase & read_mesh, const System & sys2)
+  {
+    // VariableGroup optimization means that DoFs iterate over each of
+    // the 3 variables on each node before proceeding to the next
+    // node.
+    //                                     u_x, u_y, v
+    const std::vector<Real> gold_vector = {-1,  3,   10,
+                                           0,   1,   12,
+                                           2,   0,   14,
+                                           0,   1.5, 11,
+                                           0.5, 1,   13,
+                                           0.5, 1.5, 12,
+                                           3,   4,   16,
+                                           3,   1.5, 15,
+                                           0.5, 4,   13};
+
+    // Translation from node id to dof indexing order as gets done in
+    // serial
+    const std::vector<dof_id_type>
+      node_reordering({0, 3, 1, 8, 5, 4, 6, 7, 2});
+
+    Real tol = 1e-12;
+    NumericVector<Number> & sys2_soln(*sys2.solution);
+    for (const auto & node : read_mesh.node_ptr_range())
+      {
+        if (node->processor_id() != read_mesh.processor_id())
+          continue;
+
+        // We write out real, imaginary, and magnitude for complex
+        // numbers
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+        const unsigned int v2 = 3;
+#else
+        const unsigned int v2 = 1;
+#endif
+        CPPUNIT_ASSERT_EQUAL(node->n_vars(0), 3*v2);
+
+        const dof_id_type gold_i_ux = node_reordering[node->id()] * 3;
+        const dof_id_type gold_i_uy = gold_i_ux + 1;
+        const dof_id_type gold_i_v  = gold_i_uy + 1;
+
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,0,0))),
+                                gold_vector[gold_i_ux], tol);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,v2,0))),
+                                gold_vector[gold_i_uy], tol);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2*v2,0))),
+                                gold_vector[gold_i_v], tol);
+
+        // Let's check imaginary parts and magnitude for good measure
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,1,0))),
+                                0.0, tol);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2,0))),
+                                std::abs(gold_vector[gold_i_ux]), tol);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,4,0))),
+                                0.0, tol);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,5,0))),
+                                std::abs(gold_vector[gold_i_uy]), tol);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,7,0))),
+                                0.0, tol);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,8,0))),
+                                std::abs(gold_vector[gold_i_v]), tol);
+#endif
+      }
+  }
+
+
+  void testWriteExodus()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems equation_systems(mesh);
+
+    setupTests(mesh, equation_systems);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    {
-
     // We write the file in the ExodusII format.
     ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
 
@@ -106,75 +176,20 @@ public:
     for (const auto & var_name : nodal_vars)
       exio.copy_nodal_solution(sys2, var_name, var_name, 1);
 
-    // VariableGroup optimization means that DoFs iterate over each of
-    // the 3 variables on each node before proceeding to the next
-    // node.
-    //                                     u_x, u_y, v
-    const std::vector<Real> gold_vector = {-1,  3,   10,
-                                           0,   1,   12,
-                                           2,   0,   14,
-                                           0,   1.5, 11,
-                                           0.5, 1,   13,
-                                           0.5, 1.5, 12,
-                                           3,   4,   16,
-                                           3,   1.5, 15,
-                                           0.5, 4,   13};
+    testSolution(read_mesh, sys2);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+  }
 
-    // Translation from node id to dof indexing order as gets done in
-    // serial
-    const std::vector<dof_id_type>
-      node_reordering({0, 3, 1, 8, 5, 4, 6, 7, 2});
 
-    Real tol = 1e-12;
-    NumericVector<Number> & sys2_soln(*sys2.solution);
-    for (const auto & node : read_mesh.node_ptr_range())
-      {
-        if (node->processor_id() != mesh.processor_id())
-          continue;
+  void testWriteNemesis()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems equation_systems(mesh);
 
-        // We write out real, imaginary, and magnitude for complex
-        // numbers
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-        const unsigned int v2 = 3;
-#else
-        const unsigned int v2 = 1;
-#endif
-        CPPUNIT_ASSERT_EQUAL(node->n_vars(0), 3*v2);
-
-        const dof_id_type gold_i_ux = node_reordering[node->id()] * 3;
-        const dof_id_type gold_i_uy = gold_i_ux + 1;
-        const dof_id_type gold_i_v  = gold_i_uy + 1;
-
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,0,0))),
-                                gold_vector[gold_i_ux], tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,v2,0))),
-                                gold_vector[gold_i_uy], tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2*v2,0))),
-                                gold_vector[gold_i_v], tol);
-
-        // Let's check imaginary parts and magnitude for good measure
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,1,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2,0))),
-                                std::abs(gold_vector[gold_i_ux]), tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,4,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,5,0))),
-                                std::abs(gold_vector[gold_i_uy]), tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,7,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,8,0))),
-                                std::abs(gold_vector[gold_i_v]), tol);
-#endif
-      }
-    }
-
+    setupTests(mesh, equation_systems);
 
 #ifdef LIBMESH_HAVE_NEMESIS_API
-
-    {
-    // We write the file in the ExodusII format.
+    // We write the file in the Nemesis format.
     Nemesis_IO(mesh).write_equation_systems("out.nem", equation_systems);
 
     // Make sure that the writing is done before the reading starts.
@@ -187,7 +202,6 @@ public:
 
     read_mesh.prepare_for_use();
     EquationSystems es2(read_mesh);
-    /*
     ExplicitSystem & sys2 = es2.add_system<ExplicitSystem>("Test");
 
     const std::vector<std::string> & nodal_vars(nemio.get_nodal_var_names());
@@ -200,73 +214,9 @@ public:
     for (const auto & var_name : nodal_vars)
       nemio.copy_nodal_solution(sys2, var_name, var_name, 1);
 
-    // VariableGroup optimization means that DoFs iterate over each of
-    // the 3 variables on each node before proceeding to the next
-    // node.
-    //                                     u_x, u_y, v
-    const std::vector<Real> gold_vector = {-1,  3,   10,
-                                           0,   1,   12,
-                                           2,   0,   14,
-                                           0,   1.5, 11,
-                                           0.5, 1,   13,
-                                           0.5, 1.5, 12,
-                                           3,   4,   16,
-                                           3,   1.5, 15,
-                                           0.5, 4,   13};
-
-    // Translation from node id to dof indexing order as gets done in
-    // serial
-    const std::vector<dof_id_type>
-      node_reordering({0, 3, 1, 8, 5, 4, 6, 7, 2});
-
-    Real tol = 1e-12;
-    NumericVector<Number> & sys2_soln(*sys2.solution);
-    for (const auto & node : read_mesh.node_ptr_range())
-      {
-        if (node->processor_id() != mesh.processor_id())
-          continue;
-
-        // We write out real, imaginary, and magnitude for complex
-        // numbers
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-        const unsigned int v2 = 3;
-#else
-        const unsigned int v2 = 1;
-#endif
-        CPPUNIT_ASSERT_EQUAL(node->n_vars(0), 3*v2);
-
-        const dof_id_type gold_i_ux = node_reordering[node->id()] * 3;
-        const dof_id_type gold_i_uy = gold_i_ux + 1;
-        const dof_id_type gold_i_v  = gold_i_uy + 1;
-
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,0,0))),
-                                gold_vector[gold_i_ux], tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,v2,0))),
-                                gold_vector[gold_i_uy], tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2*v2,0))),
-                                gold_vector[gold_i_v], tol);
-
-        // Let's check imaginary parts and magnitude for good measure
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,1,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2,0))),
-                                std::abs(gold_vector[gold_i_ux]), tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,4,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,5,0))),
-                                std::abs(gold_vector[gold_i_uy]), tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,7,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,8,0))),
-                                std::abs(gold_vector[gold_i_v]), tol);
-#endif
-      }
-    */
+    // FIXME - Nemesis still needs work for vector-valued variables
+    // testSolution(read_mesh, sys2);
 #endif // #ifdef LIBMESH_HAVE_NEMESIS_API
-    }
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
-
   }
 };
 
