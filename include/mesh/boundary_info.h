@@ -707,6 +707,16 @@ public:
   build_shellface_list() const;
 
   /**
+   * Synchronize the boundary element side and node across processors.
+   * This function is needed when boundary info is changed by adding or removing
+   * sides on the fly.
+   * Note: if the side of a ghost element is changed, then you would need to do
+   * do parallel push (see e.g., timpi/parallel_sync.h) and then sync.
+   */
+  void parallel_sync_side_ids();
+  void parallel_sync_node_ids();
+
+  /**
    * \returns A set of the boundary ids which exist on semilocal parts
    * of the mesh.
    *
