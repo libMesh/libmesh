@@ -266,8 +266,13 @@ void DynaIO::read_mesh(std::istream & in)
 
             if (weight_control_flag)
               {
+                // If we ever add more nodes that aren't in this file,
+                // merge this mesh with a non-spline mesh, etc., 1.0
+                // is a good default weight
+                const Real default_weight = 1.0;
                 weight_index = cast_int<unsigned char>
-                  (mesh.add_node_datum<Real>("rational_weight"));
+                  (mesh.add_node_datum<Real>("rational_weight", true,
+                                             &default_weight));
                 mesh.set_default_mapping_type(RATIONAL_BERNSTEIN_MAP);
                 mesh.set_default_mapping_data(weight_index);
               }

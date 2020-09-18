@@ -35,11 +35,18 @@ void GhostPointNeighbors::operator()
    GhostPointNeighbors::map_type & coupled_elements)
 {
   libmesh_assert(_mesh);
-  // Using the connected_nodes set rather than point_neighbors() gives
-  // us correct results even in corner cases, such as where two
-  // elements meet only at a corner.  ;-)
 
-  std::unordered_set<const Node *> connected_nodes;
+  // Using a connected_nodes set rather than point_neighbors() would
+  // give us correct results even in corner cases, such as where two
+  // elements meet only at a corner.  ;-)
+  //
+  // std::unordered_set<const Node *> connected_nodes;
+  //
+  // Unfortunately, it's not a *fast* enough test to use on a
+  // ReplicatedMesh (where it's O(Nprocs) times slower), or as a
+  // coupling functor (where it's O(Nelem/Nprocs) times slower), or as
+  // a coupling functor on a ReplicatedMesh (where you might as well
+  // just give up now)
 
   // Links between boundary and interior elements on mixed
   // dimensional meshes also give us correct ghosting in this way.
@@ -66,68 +73,24 @@ void GhostPointNeighbors::operator()
       if (elem->processor_id() != p)
         coupled_elements.emplace(elem, nullcm);
 
-      for (auto neigh : elem->neighbor_ptr_range())
-        {
-          if (neigh && neigh != remote_elem)
-            {
-#ifdef LIBMESH_ENABLE_AMR
-              if (!neigh->active())
-                {
-                  std::vector<const Elem*> family;
-                  neigh->active_family_tree_by_neighbor(family, elem);
+      std::set<const Elem *> elem_point_neighbors;
+      elem->find_point_neighbors(elem_point_neighbors);
 
-                  for (const Elem * f : family)
-                    if (f->processor_id() != p)
-                      coupled_elements.emplace(f, nullcm);
-                }
-              else
-#endif
-                if (neigh->processor_id() != p)
-                  coupled_elements.emplace(neigh, nullcm);
-            }
-        }
+      for (const auto & neigh : elem_point_neighbors)
+        coupled_elements.emplace(neigh, nullcm);
 
-      // It is possible that a refined boundary element will not
-      // touch any nodes of its interior_parent, in TRI3/TET4 and in
-      // non-level-one rule cases.  So we can't just rely on node
-      // connections to preserve interior_parent().  However, trying
-      // to preserve interior_parent() manually only works if it's on
+      // An interior_parent isn't on the same manifold so won't be
+      // found as a point neighbor, and it may not share nodes so we
+      // can't use a connected_nodes test.
+      //
+      // Trying to preserve interior_parent() only works if it's on
       // the same Mesh, which is *not* guaranteed!  So we'll
-      // double-check later to make sure our interior parents are in
-      // the mesh before we connect them.
-      if (elem->dim() < LIBMESH_DIM &&
-          elem->interior_parent() &&
-          elem->interior_parent()->processor_id() != p)
-        interior_parents.insert (elem->interior_parent());
-
-      // Add nodes connected to active local elements
-      for (auto n : elem->node_index_range())
-        connected_nodes.insert (elem->node_ptr(n));
+      // double-check.
+      const Elem * ip = elem->interior_parent();
+      if (ip && ip->processor_id() != p &&
+          _mesh->query_elem_ptr(ip->id()) == ip)
+        coupled_elements.emplace(ip, nullcm);
     }
-
-  // Connect any interior_parents who are really in our mesh
-  for (const auto & elem : _mesh->element_ptr_range())
-    {
-      std::unordered_set<const Elem *>::iterator ip_it =
-        interior_parents.find(elem);
-
-      if (ip_it != interior_parents.end())
-        {
-          coupled_elements.emplace(elem, nullcm);
-
-          // Shrink the set ASAP to speed up subsequent searches
-          interior_parents.erase(ip_it);
-        }
-    }
-
-  // Connect any active elements which are connected to our range's
-  // elements' nodes by addin elements connected to nodes on active
-  // local elements.
-  for (const auto & elem : _mesh->active_element_ptr_range())
-    if (elem->processor_id() != p)
-      for (auto & n : elem->node_ref_range())
-        if (connected_nodes.count(&n))
-          coupled_elements.emplace(elem, nullcm);
 }
 
 } // namespace libMesh

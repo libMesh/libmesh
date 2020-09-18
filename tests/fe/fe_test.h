@@ -184,8 +184,13 @@ public:
       {
         // Make sure we can handle non-zero weight indices
         _mesh->add_node_integer("buffer integer");
+
+        // Default weight to 1.0 so we don't get NaN from contains_point
+        // checks with a default GhostPointNeighbors ghosting
+        const Real default_weight = 1.0;
         weight_index = cast_int<unsigned char>
-          (_mesh->add_node_datum<Real>("rational_weight"));
+          (_mesh->add_node_datum<Real>("rational_weight", true,
+                                       &default_weight));
         libmesh_assert_not_equal_to(weight_index, 0);
 
         // Set mapping data but not type, since here we're testing

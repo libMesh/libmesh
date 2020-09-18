@@ -196,13 +196,21 @@ void MeshBase::set_spatial_dimension(unsigned char d)
 
 
 unsigned int MeshBase::add_elem_integer(const std::string & name,
-                                        bool allocate_data)
+                                        bool allocate_data,
+                                        dof_id_type default_value)
 {
   for (auto i : index_range(_elem_integer_names))
     if (_elem_integer_names[i] == name)
-      return i;
+      {
+        libmesh_assert_less(i, _elem_integer_default_values.size());
+        _elem_integer_default_values[i] = default_value;
+        return i;
+      }
 
+  libmesh_assert_equal_to(_elem_integer_names.size(),
+                          _elem_integer_default_values.size());
   _elem_integer_names.push_back(name);
+  _elem_integer_default_values.push_back(default_value);
   if (allocate_data)
     this->size_elem_extra_integers();
   return _elem_integer_names.size()-1;
@@ -211,8 +219,12 @@ unsigned int MeshBase::add_elem_integer(const std::string & name,
 
 
 std::vector<unsigned int> MeshBase::add_elem_integers(const std::vector<std::string> & names,
-                                                      bool allocate_data)
+                                                      bool allocate_data,
+                                                      const std::vector<dof_id_type> * default_values)
 {
+  libmesh_assert(!default_values || default_values->size() == names.size());
+  libmesh_assert_equal_to(_elem_integer_names.size(), _elem_integer_default_values.size());
+
   std::unordered_map<std::string, std::size_t> name_indices;
   for (auto i : index_range(_elem_integer_names))
     name_indices[_elem_integer_names[i]] = i;
@@ -225,12 +237,18 @@ std::vector<unsigned int> MeshBase::add_elem_integers(const std::vector<std::str
       const std::string & name = names[i];
       auto it = name_indices.find(name);
       if (it != name_indices.end())
-        returnval[i] = it->second;
+        {
+          returnval[i] = it->second;
+          _elem_integer_default_values[it->second] =
+            default_values ? (*default_values)[i] : DofObject::invalid_id;
+        }
       else
         {
           returnval[i] = _elem_integer_names.size();
           name_indices[name] = returnval[i];
           _elem_integer_names.push_back(name);
+          _elem_integer_default_values.push_back
+            (default_values ? (*default_values)[i] : DofObject::invalid_id);
           added_an_integer = true;
         }
     }
@@ -267,13 +285,21 @@ bool MeshBase::has_elem_integer(const std::string & name) const
 
 
 unsigned int MeshBase::add_node_integer(const std::string & name,
-                                        bool allocate_data)
+                                        bool allocate_data,
+                                        dof_id_type default_value)
 {
   for (auto i : index_range(_node_integer_names))
     if (_node_integer_names[i] == name)
-      return i;
+      {
+        libmesh_assert_less(i, _node_integer_default_values.size());
+        _node_integer_default_values[i] = default_value;
+        return i;
+      }
 
+  libmesh_assert_equal_to(_node_integer_names.size(),
+                          _node_integer_default_values.size());
   _node_integer_names.push_back(name);
+  _node_integer_default_values.push_back(default_value);
   if (allocate_data)
     this->size_node_extra_integers();
   return _node_integer_names.size()-1;
@@ -282,8 +308,12 @@ unsigned int MeshBase::add_node_integer(const std::string & name,
 
 
 std::vector<unsigned int> MeshBase::add_node_integers(const std::vector<std::string> & names,
-                                                      bool allocate_data)
+                                                      bool allocate_data,
+                                                      const std::vector<dof_id_type> * default_values)
 {
+  libmesh_assert(!default_values || default_values->size() == names.size());
+  libmesh_assert_equal_to(_node_integer_names.size(), _node_integer_default_values.size());
+
   std::unordered_map<std::string, std::size_t> name_indices;
   for (auto i : index_range(_node_integer_names))
     name_indices[_node_integer_names[i]] = i;
@@ -296,12 +326,18 @@ std::vector<unsigned int> MeshBase::add_node_integers(const std::vector<std::str
       const std::string & name = names[i];
       auto it = name_indices.find(name);
       if (it != name_indices.end())
-        returnval[i] = it->second;
+        {
+          returnval[i] = it->second;
+          _node_integer_default_values[it->second] =
+            default_values ? (*default_values)[i] : DofObject::invalid_id;
+        }
       else
         {
           returnval[i] = _node_integer_names.size();
           name_indices[name] = returnval[i];
           _node_integer_names.push_back(name);
+          _node_integer_default_values.push_back
+            (default_values ? (*default_values)[i] : DofObject::invalid_id);
           added_an_integer = true;
         }
     }
@@ -976,7 +1012,7 @@ void MeshBase::size_elem_extra_integers()
 {
   const std::size_t new_size = _elem_integer_names.size();
   for (auto elem : this->element_ptr_range())
-    elem->add_extra_integers(new_size);
+    elem->add_extra_integers(new_size, _elem_integer_default_values);
 }
 
 
@@ -985,7 +1021,7 @@ void MeshBase::size_node_extra_integers()
 {
   const std::size_t new_size = _node_integer_names.size();
   for (auto node : this->node_ptr_range())
-    node->add_extra_integers(new_size);
+    node->add_extra_integers(new_size, _node_integer_default_values);
 }
 
 
@@ -993,8 +1029,8 @@ std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
 MeshBase::merge_extra_integer_names(const MeshBase & other)
 {
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>> returnval;
-  returnval.first = this->add_elem_integers(other._elem_integer_names);
-  returnval.second = this->add_node_integers(other._node_integer_names);
+  returnval.first = this->add_elem_integers(other._elem_integer_names, true, &other._elem_integer_default_values);
+  returnval.second = this->add_node_integers(other._node_integer_names, true, &other._node_integer_default_values);
   return returnval;
 }
 

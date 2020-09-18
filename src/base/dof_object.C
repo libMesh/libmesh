@@ -551,6 +551,25 @@ DofObject::add_extra_integers (const unsigned int n_integers)
 
 
 
+void
+DofObject::add_extra_integers (const unsigned int n_integers,
+                               const std::vector<dof_id_type> & default_values)
+{
+  libmesh_assert_equal_to(n_integers, default_values.size());
+
+  const unsigned int n_old_integers = this->n_extra_integers();
+  this->add_extra_integers(n_integers);
+  if (n_integers > n_old_integers)
+    {
+      const unsigned int n_more_integers = n_integers - n_old_integers;
+      std::copy(default_values.begin()+n_old_integers,
+                default_values.end(),
+                _idx_buf.end()-n_more_integers);
+    }
+}
+
+
+
 unsigned int DofObject::packed_indexing_size() const
 {
   return

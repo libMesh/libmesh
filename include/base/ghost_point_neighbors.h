@@ -28,8 +28,9 @@ namespace libMesh
 {
 
 /**
- * This class implements the default geometry ghosting in libMesh:
- * point neighbors and interior_parent elements are ghosted.
+ * This class implements the original default geometry ghosting
+ * requirements in libMesh: point neighbors on the same manifold, and
+ * interior_parent elements.
  *
  * \author Roy H. Stogner
  * \date 2016
