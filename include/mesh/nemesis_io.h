@@ -151,6 +151,11 @@ public:
    */
   void append(bool val);
 
+  /**
+   * Return list of the nodal variable names
+   */
+  const std::vector<std::string> & get_nodal_var_names();
+
 private:
 
   /*
