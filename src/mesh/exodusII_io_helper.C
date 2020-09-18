@@ -2691,7 +2691,8 @@ write_sideset_data(const MeshBase & mesh,
               // Sanity check: make sure that the "off by one"
               // assumption we used above to set 'elem_id' is valid.
               libmesh_error_msg_if
-                (libmesh_map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id)) != elem_list[i + offset],
+                (libmesh_map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id)) !=
+                 cast_int<dof_id_type>(elem_list[i + offset]),
                  "Error mapping Exodus elem id to libmesh elem id.");
 
               // Map from Exodus side ids to libmesh side ids.
