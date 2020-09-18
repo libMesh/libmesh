@@ -242,12 +242,6 @@ public:
   void read_sideset(int id, int offset);
 
   /**
-   * Reads information about nodeset \p id and inserts it into the
-   * global nodeset array at the position \p offset.
-   */
-  void read_nodeset(int id);
-
-  /**
    * New API that reads all nodesets simultaneously. This may be slightly
    * faster than reading them one at a time. Calls ex_get_concat_node_sets()
    * under the hood.
@@ -623,9 +617,6 @@ public:
 
   // Side (face/edge) number actually on the boundary
   std::vector<int> side_list;
-
-  // Node number actually on the boundary
-  std::vector<int> node_list;
 
   // Side (face/edge) id number
   std::vector<int> id_list;

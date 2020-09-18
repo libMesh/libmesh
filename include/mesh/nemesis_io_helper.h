@@ -85,6 +85,16 @@ public:
    */
 
   /**
+   * Reads the node ids of nodeset \p id and stores them in the \p
+   * node_list member of this class.
+   *
+   * \note This used to be an ExodusII_IO_Helper function but it use
+   * was completely replaced by read_all_nodesets(). For now, it is
+   * still used by the Nemesis reader so we have moved it here.
+   */
+  void read_nodeset(int id);
+
+  /**
    * Fills: num_nodes_global, num_elems_global, num_elem_blks_global,
    * num_node_sets_global, num_side_sets_global
    * Call after: read_and_store_header_info()
@@ -407,6 +417,9 @@ public:
    * To be used with Nemesis::ne_get_init_info().
    */
   char ftype;
+
+  // Stores node ids read in by the read_nodeset() function
+  std::vector<int> node_list;
 
   /**
    * Containers for reading global sideset (boundary conditions) information.  Each vector will
