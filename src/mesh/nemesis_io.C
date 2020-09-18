@@ -183,20 +183,6 @@ void Nemesis_IO::assert_symmetric_cmaps()
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 void Nemesis_IO::read (const std::string & base_filename)
 {
-  // On one processor, Nemesis and ExodusII should be equivalent, so
-  // let's cowardly defer to that implementation...
-  if (this->n_processors() == 1)
-    {
-      // We can do this in one line but if the verbose flag was set in this
-      // object, it will no longer be set... thus no extra print-outs for serial runs.
-      // ExodusII_IO(this->mesh()).read (base_filename); // ambiguous when Nemesis_IO is multiply-inherited
-
-      std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
-      MeshBase & mesh = MeshInput<MeshBase>::mesh();
-      ExodusII_IO(mesh).read (nemesis_filename);
-      return;
-    }
-
   LOG_SCOPE ("read()","Nemesis_IO");
 
   // This function must be run on all processors at once
