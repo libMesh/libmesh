@@ -481,6 +481,13 @@ void Nemesis_IO::read (const std::string & base_filename)
                        << ", but we wanted ID " << my_next_node << std::endl;
         }
 
+      // Set a unique_id ourselves since ReplicatedMesh can't handle
+      // distributed unique_id generation.  Make sure it doesn't
+      // overlap element unique_id() values either.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      added_node->set_unique_id(added_node->id() + nemhelper->num_elems_global);
+#endif
+
       // update the local->global index map, keeping it 1-based
       nemhelper->node_num_map[local_node_idx] = my_next_node++ + 1;
     }
@@ -528,6 +535,13 @@ void Nemesis_IO::read (const std::string & base_filename)
               libMesh::err << "Error, node added with ID " << added_node->id()
                            << ", but we wanted ID " << my_next_node << std::endl;
             }
+
+          // Set a unique_id ourselves since ReplicatedMesh can't handle
+          // distributed unique_id generation.  Make sure it doesn't
+          // overlap element unique_id() values either.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          added_node->set_unique_id(added_node->id() + nemhelper->num_elems_global);
+#endif
 
           // update the local->global index map, keeping it 1-based
           nemhelper->node_num_map[local_node_idx] = my_next_node++ + 1;
@@ -675,6 +689,13 @@ void Nemesis_IO::read (const std::string & base_filename)
                       libMesh::err << "Error, node added with ID " << added_node->id()
                                    << ", but we wanted ID " << global_node_idx << std::endl;
                     }
+
+                  // Set a unique_id ourselves since ReplicatedMesh can't handle
+                  // distributed unique_id generation.  Make sure it doesn't
+                  // overlap element unique_id() values either.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+                  added_node->set_unique_id(added_node->id() + nemhelper->num_elems_global);
+#endif
 
                   // update the local->global index map, keeping it 1-based
                   nemhelper->node_num_map[local_node_idx] = global_node_idx + 1;
@@ -853,9 +874,12 @@ void Nemesis_IO::read (const std::string & base_filename)
           uelem->processor_id() = this->processor_id();
           uelem->set_id()       = my_next_elem++;
 
-          // Leave unique_id numbering up to the mesh; with each
-          // element pre-partitioned our automatic assignment won't
-          // create any conflicts.
+          // Handle unique_id numbering, just in case we're using a
+          // ReplicatedMesh that doesn't know how to handle it in
+          // parallel.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          uelem->set_unique_id(uelem->id());
+#endif
 
           // Mark that we have seen an element of the current element's
           // dimension.
@@ -1171,6 +1195,10 @@ void Nemesis_IO::read (const std::string & base_filename)
     // Gather neighboring elements so that a distributed mesh has the
     // proper "ghost" neighbor information.
     MeshCommunication().gather_neighboring_elements(cast_ref<DistributedMesh &>(mesh));
+
+  // We've been setting unique_ids by hand; let's make sure that later
+  // ones are consistent with them.
+  mesh.set_next_unique_id(mesh.parallel_max_unique_id()+1);
 }
 
 #else
