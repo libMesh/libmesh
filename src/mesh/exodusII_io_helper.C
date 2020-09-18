@@ -2836,16 +2836,9 @@ read_nodeset_data (int timestep,
                    std::vector<std::set<boundary_id_type>> & node_boundary_ids,
                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
-  libMesh::out << "Called ExodusII_IO_Helper::read_nodeset_data()" << std::endl;
-
   // This reads the sideset variable names into the local
   // sideset_var_names data structure.
   this->read_var_names(NODESET);
-
-  // Debugging
-  libMesh::out << "nodeset_var_names = " << std::endl;
-  for (const auto & name : nodeset_var_names)
-    libMesh::out << name << std::endl;
 
   if (num_nodeset_vars)
     {
@@ -2858,14 +2851,6 @@ read_nodeset_data (int timestep,
          nset_var_tab.data());
       EX_CHECK_ERR(ex_err, "Error reading nodeset variable truth table.");
 
-      // Debugging
-      for (int i=0; i<num_node_sets; ++i)
-        {
-          for (int j=0; j<num_nodeset_vars; ++j)
-            libMesh::out << nset_var_tab[num_nodeset_vars*i + j] << std::endl;
-          libMesh::out << std::endl;
-        }
-
       // Set up/allocate space in incoming data structures.
       var_names = nodeset_var_names;
       node_boundary_ids.resize(num_nodeset_vars);
@@ -2876,8 +2861,8 @@ read_nodeset_data (int timestep,
       // Note: we assume that the functions
       // 1.) this->read_nodeset_info() and
       // 2.) this->read_all_nodesets()
-      // have already been called for each nodeset, so that we already
-      // know e.g. how many nodes are in each set, their ids, etc.
+      // have already been called, so that we already know e.g. how
+      // many nodes are in each set, their ids, etc.
       //
       // TODO: As a future optimization, we could read only the values
       // requested by the user by looking at the input parameter
@@ -2886,10 +2871,6 @@ read_nodeset_data (int timestep,
       int offset=0;
       for (int ns=0; ns<num_node_sets; ++ns)
         {
-          // Debugging
-          libMesh::out << "Reading nodeset vars for nodeset " << ns << std::endl;
-          libMesh::out << "offset = " << offset << std::endl;
-
           offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
           for (int var=0; var<num_nodeset_vars; ++var)
             {
@@ -2913,14 +2894,6 @@ read_nodeset_data (int timestep,
                      MappedInputVector(nset_var_vals, _single_precision).data());
                   EX_CHECK_ERR(ex_err, "Error reading nodeset variable.");
 
-                  // Debugging:
-                  libMesh::out << "Variable " << nodeset_var_names[var]
-                               << " is defined on nodeset " << nodeset_ids[ns]
-                               << " and has values: " << std::endl;
-                  for (int i=0; i<num_nodes_per_set[ns]; ++i)
-                    libMesh::out << nset_var_vals[i] << " ";
-                  libMesh::out << std::endl;
-
                   for (int i=0; i<num_nodes_per_set[ns]; ++i)
                     {
                       // The read_all_nodesets() function now reads all the node ids into the
@@ -2935,12 +2908,6 @@ read_nodeset_data (int timestep,
                       // but it apparently is never set up, so just
                       // subtract 1 from the Exodus node id.
                       dof_id_type converted_node_id = exodus_node_id - 1;
-
-                      // Debugging
-                      // libMesh::out << "exodus_node_id = " << exodus_node_id
-                      //              << "\n"
-                      //              << "converted_node_id = " << converted_node_id
-                      //              << std::endl;
 
                       // Make a NodeBCTuple key from the converted information.
                       BoundaryInfo::NodeBCTuple key = std::make_tuple
