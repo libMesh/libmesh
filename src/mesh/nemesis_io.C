@@ -960,7 +960,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
   // Read *local* sideset info the same way it is done in
   // exodusII_io_helper.  May be called any time after
-  // nem_helper->read_and_store_header_info(); This sets num_side_sets and resizes
+  // nemhelper->read_and_store_header_info(); This sets num_side_sets and resizes
   // elem_list, side_list, and id_list to num_elem_all_sidesets.  Note
   // that there appears to be the same number of sidesets in each file
   // but they all have different numbers of entries (some are empty).
