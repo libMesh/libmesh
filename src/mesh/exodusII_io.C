@@ -557,11 +557,10 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
   const unsigned int var_num = system.variable_number(system_var_name);
 
-  for (dof_id_type i=0,
-       n_nodal = cast_int<dof_id_type>(exio_helper->nodal_var_values.size());
-       i != n_nodal; ++i)
+  for (auto p : exio_helper->nodal_var_values)
     {
-      const Node * node = MeshInput<MeshBase>::mesh().query_node_ptr(i);
+      dof_id_type i = p.first;
+      const Node * node = MeshInput<MeshBase>::mesh().node_ptr(i);
 
       if (node && node->n_comp(system.number(), var_num) > 0)
         {
@@ -569,7 +568,7 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
           // If the dof_index is local to this processor, set the value
           if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-            system.solution->set (dof_index, exio_helper->nodal_var_values[i]);
+            system.solution->set (dof_index, p.second);
         }
     }
 

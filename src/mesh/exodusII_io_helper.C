@@ -1338,8 +1338,8 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
       libmesh_error_msg("Unable to locate variable named: " << nodal_var_name);
     }
 
-  // Allocate enough space to store the nodal variable values
-  nodal_var_values.resize(num_nodes);
+  // Clear out any previously read nodal variable values
+  nodal_var_values.clear();
 
   std::vector<Real> unmapped_nodal_var_values(num_nodes);
 
@@ -1354,9 +1354,13 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
 
   for (unsigned i=0; i<static_cast<unsigned>(num_nodes); i++)
     {
+      libmesh_assert_less(i, this->node_num_map.size());
+
       // Use the node_num_map to obtain the ID of this node in the Exodus file,
       // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
-      unsigned mapped_node_id = this->node_num_map[i] - 1;
+      const unsigned mapped_node_id = this->node_num_map[i] - 1;
+
+      libmesh_assert_less(i, unmapped_nodal_var_values.size());
 
       // Store the nodal value in the map.
       nodal_var_values[mapped_node_id] = unmapped_nodal_var_values[i];

@@ -658,8 +658,10 @@ public:
   // The names of the nodal variables stored in the Exodus file
   std::vector<std::string> nodal_var_names;
 
-  // Holds the nodal variable values for a given variable, one value per node
-  std::vector<Real> nodal_var_values;
+  // Holds the nodal variable values for a given variable, one value
+  // per node, indexed by libMesh node id.
+  // This is a map so it can handle Nemesis files as well.
+  std::map<dof_id_type, Real> nodal_var_values;
 
   // The number of elemental variables in the Exodus file
   int num_elem_vars;
