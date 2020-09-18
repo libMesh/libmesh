@@ -1381,6 +1381,9 @@ void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
     case SIDESET:
       this->read_var_names_impl("s", num_sideset_vars, sideset_var_names);
       break;
+    case NODESET:
+      this->read_var_names_impl("m", num_nodeset_vars, nodeset_var_names);
+      break;
     default:
       libmesh_error_msg("Unrecognized ExodusVarType " << type);
     }
@@ -2856,6 +2859,133 @@ read_sideset_data(const MeshBase & mesh,
             } // end for (var)
         } // end for (ss)
     } // end if (num_sideset_vars)
+}
+
+
+
+void ExodusII_IO_Helper::
+read_nodeset_data (int timestep,
+                   std::vector<std::string> & var_names,
+                   std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                   std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
+{
+  libMesh::out << "Called ExodusII_IO_Helper::read_nodeset_data()" << std::endl;
+
+  // This reads the sideset variable names into the local
+  // sideset_var_names data structure.
+  this->read_var_names(NODESET);
+
+  // Debugging
+  libMesh::out << "nodeset_var_names = " << std::endl;
+  for (const auto & name : nodeset_var_names)
+    libMesh::out << name << std::endl;
+
+  if (num_nodeset_vars)
+    {
+      // Read the nodeset data truth table
+      std::vector<int> nset_var_tab(num_node_sets * num_nodeset_vars);
+      ex_err = exII::ex_get_nset_var_tab
+        (ex_id,
+         num_node_sets,
+         num_nodeset_vars,
+         nset_var_tab.data());
+      EX_CHECK_ERR(ex_err, "Error reading nodeset variable truth table.");
+
+      // Debugging
+      for (int i=0; i<num_node_sets; ++i)
+        {
+          for (int j=0; j<num_nodeset_vars; ++j)
+            libMesh::out << nset_var_tab[num_nodeset_vars*i + j] << std::endl;
+          libMesh::out << std::endl;
+        }
+
+      // Set up/allocate space in incoming data structures.
+      var_names = nodeset_var_names;
+      node_boundary_ids.resize(num_nodeset_vars);
+      bc_vals.resize(num_nodeset_vars);
+
+      // Read the nodeset data.
+      //
+      // Note: we assume that the functions
+      // 1.) this->read_nodeset_info() and
+      // 2.) this->read_all_nodesets()
+      // have already been called for each nodeset, so that we already
+      // know e.g. how many nodes are in each set, their ids, etc.
+      //
+      // TODO: As a future optimization, we could read only the values
+      // requested by the user by looking at the input parameter
+      // var_names and checking whether it already has entries in
+      // it.
+      int offset=0;
+      for (int ns=0; ns<num_node_sets; ++ns)
+        {
+          // Debugging
+          libMesh::out << "Reading nodeset vars for nodeset " << ns << std::endl;
+          libMesh::out << "offset = " << offset << std::endl;
+
+          offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
+          for (int var=0; var<num_nodeset_vars; ++var)
+            {
+              int is_present = nset_var_tab[num_nodeset_vars*ns + var];
+
+              if (is_present)
+                {
+                  // Record the fact that this variable is defined on this nodeset.
+                  node_boundary_ids[var].insert(nodeset_ids[ns]);
+
+                  // Note: the assumption here is that a previous call
+                  // to this->read_nodeset_info() has already set the
+                  // values of num_nodes_per_set, so we just use those values here.
+                  std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
+                  ex_err = exII::ex_get_nset_var
+                    (ex_id,
+                     timestep,
+                     var + 1, // 1-based nodeset variable index!
+                     nodeset_ids[ns],
+                     num_nodes_per_set[ns],
+                     MappedInputVector(nset_var_vals, _single_precision).data());
+                  EX_CHECK_ERR(ex_err, "Error reading nodeset variable.");
+
+                  // Debugging:
+                  libMesh::out << "Variable " << nodeset_var_names[var]
+                               << " is defined on nodeset " << nodeset_ids[ns]
+                               << " and has values: " << std::endl;
+                  for (int i=0; i<num_nodes_per_set[ns]; ++i)
+                    libMesh::out << nset_var_vals[i] << " ";
+                  libMesh::out << std::endl;
+
+                  for (int i=0; i<num_nodes_per_set[ns]; ++i)
+                    {
+                      // The read_all_nodesets() function now reads all the node ids into the
+                      // node_sets_node_list vector, which is of length "total_nodes_in_all_sets"
+                      // The old read_nodset() function is no longer called as far as I can tell,
+                      // and should probably be removed? The "offset" that we are using only
+                      // depends on the current nodeset index and the num_nodes_per_set vector,
+                      // which gets filled in by the call to read_all_nodesets().
+                      dof_id_type exodus_node_id = node_sets_node_list[i + offset];
+
+                      // FIXME: We should use exodus_node_num_to_libmesh for this,
+                      // but it apparently is never set up, so just
+                      // subtract 1 from the Exodus node id.
+                      dof_id_type converted_node_id = exodus_node_id - 1;
+
+                      // Debugging
+                      // libMesh::out << "exodus_node_id = " << exodus_node_id
+                      //              << "\n"
+                      //              << "converted_node_id = " << converted_node_id
+                      //              << std::endl;
+
+                      // Make a NodeBCTuple key from the converted information.
+                      BoundaryInfo::NodeBCTuple key = std::make_tuple
+                        (converted_node_id, nodeset_ids[ns]);
+
+                      // Store (node, b_id) tuples in bc_vals[var]
+                      bc_vals[var].emplace(key, nset_var_vals[i]);
+                    } // end for (i)
+                } // end if (present)
+            } // end for (var)
+        } // end for (ns)
+    } // end if (num_nodeset_vars)
 }
 
 

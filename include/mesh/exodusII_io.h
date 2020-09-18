@@ -313,6 +313,17 @@ public:
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
+   * Read all the nodeset data at a particular timestep. TODO:
+   * currently _all_ the nodeset variables are read, but we might want
+   * to change this to only read the requested ones.
+   */
+  void
+  read_nodeset_data (int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                     std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
+
+  /**
    * Set the elemental variables in the Exodus file to be read into extra
    * element integers. The names of these elemental variables will be used to
    * name the extra element integers.
