@@ -275,7 +275,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
                        "Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
-  libmesh_error_msg_if(new_training_set.size() >= get_n_params(),
+  libmesh_error_msg_if(new_training_set.size() > get_n_params(),
                        "Error: new_training_set should not have more than get_n_params() parameters.");
 
   if (new_training_set.size() == get_n_params())
