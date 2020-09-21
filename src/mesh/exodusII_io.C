@@ -1410,6 +1410,18 @@ read_sideset_data(int timestep,
 
 
 
+void
+ExodusII_IO::
+read_nodeset_data (int timestep,
+                   std::vector<std::string> & var_names,
+                   std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                   std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
+{
+  exio_helper->read_nodeset_data(timestep, var_names, node_boundary_ids, bc_vals);
+}
+
+
+
 
 void ExodusII_IO::write (const std::string & fname)
 {

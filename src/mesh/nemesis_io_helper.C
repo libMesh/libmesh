@@ -85,6 +85,39 @@ Nemesis_IO_Helper::~Nemesis_IO_Helper()
 
 
 
+void Nemesis_IO_Helper::read_nodeset(int id)
+{
+  libmesh_assert_less (id, nodeset_ids.size());
+  libmesh_assert_less (id, num_nodes_per_set.size());
+  libmesh_assert_less (id, num_node_df_per_set.size());
+
+  ex_err = exII::ex_get_set_param(ex_id,
+                                  exII::EX_NODE_SET,
+                                  nodeset_ids[id],
+                                  &num_nodes_per_set[id],
+                                  &num_node_df_per_set[id]);
+  EX_CHECK_ERR(ex_err, "Error retrieving nodeset parameters.");
+  message("Parameters retrieved successfully for nodeset: ", id);
+
+  node_list.resize(num_nodes_per_set[id]);
+
+  // Don't call ex_get_set unless there are actually nodes there to get.
+  // Exodus prints an annoying warning message in DEBUG mode otherwise...
+  if (num_nodes_per_set[id] > 0)
+    {
+      ex_err = exII::ex_get_set(ex_id,
+                                exII::EX_NODE_SET,
+                                nodeset_ids[id],
+                                node_list.data(),
+                                nullptr); // set_extra_list, ignored for node sets
+
+      EX_CHECK_ERR(ex_err, "Error retrieving nodeset data.");
+      message("Data retrieved successfully for nodeset: ", id);
+    }
+}
+
+
+
 void Nemesis_IO_Helper::get_init_global()
 {
   nemesis_err_flag =
