@@ -286,7 +286,8 @@ void RBConstruction::set_rb_construction_parameters(
                                                     RBParameters mu_min_in,
                                                     RBParameters mu_max_in,
                                                     std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
-                                                    std::map<std::string,bool> log_scaling_in)
+                                                    std::map<std::string,bool> log_scaling_in,
+                                                    std::map<std::string, std::vector<Number>> * training_sample_list)
 {
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -314,6 +315,13 @@ void RBConstruction::set_rb_construction_parameters(
                                  n_training_samples_in,
                                  log_scaling_in,
                                  deterministic_training_in);   // use deterministic parameters
+
+  if (training_sample_list)
+    {
+      // Note that we must call initialize_training_parameters() before
+      // load_training_set() in order to initialize the parameter vectors.
+      load_training_set(*training_sample_list);
+    }
 }
 
 void RBConstruction::print_info()
