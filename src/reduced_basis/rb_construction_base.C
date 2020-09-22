@@ -319,10 +319,6 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
       // parameters from new_training_set. Note that we repeatedly loop over new_training_set
       // to fill up the entire length of training_vector.
 
-      // Get the number of local and global training parameters
-      numeric_index_type n_local_training_samples  =
-        cast_int<numeric_index_type>(new_training_set.begin()->second.size());
-
       for (auto & pr : training_parameters)
         {
           const std::string & param_name = pr.first;
@@ -331,9 +327,10 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
               NumericVector<Number> * training_vector = pr.second.get();
 
               numeric_index_type first_index = training_vector->first_local_index();
-              for (numeric_index_type i=0; i<n_local_training_samples; i++)
+              for (numeric_index_type i=0; i<training_vector->local_size(); i++)
                 {
                   unsigned int new_training_set_index = i % new_training_set[param_name].size();
+
                   numeric_index_type index = first_index + i;
                   training_vector->set(index, new_training_set[param_name][new_training_set_index]);
                 }
