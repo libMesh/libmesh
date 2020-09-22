@@ -275,35 +275,66 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
                        "Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
-  libmesh_error_msg_if(new_training_set.size() != get_n_params(),
-                       "Error: Incorrect number of parameters in load_training_set.");
+  libmesh_error_msg_if(new_training_set.size() > get_n_params(),
+                       "Error: new_training_set should not have more than get_n_params() parameters.");
 
-  // Delete the training set vectors (but don't remove the existing keys!)
-  for (auto & pr : training_parameters)
-    pr.second.reset(nullptr);
-
-  // Get the number of local and global training parameters
-  numeric_index_type n_local_training_samples  =
-    cast_int<numeric_index_type>(new_training_set.begin()->second.size());
-  numeric_index_type n_global_training_samples = n_local_training_samples;
-  this->comm().sum(n_global_training_samples);
-
-  for (auto & pr : training_parameters)
+  if (new_training_set.size() == get_n_params())
     {
-      pr.second = NumericVector<Number>::build(this->comm());
-      pr.second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
-    }
+      // If new_training_set stores values for all parameters, then we overwrite training_parameters
+      // with new_training_set.
 
-  for (auto & pr : training_parameters)
-    {
-      const std::string & param_name = pr.first;
-      NumericVector<Number> * training_vector = pr.second.get();
+      // Delete the training set vectors (but don't remove the existing keys!)
+      for (auto & pr : training_parameters)
+        pr.second.reset(nullptr);
 
-      numeric_index_type first_index = training_vector->first_local_index();
-      for (numeric_index_type i=0; i<n_local_training_samples; i++)
+      // Get the number of local and global training parameters
+      numeric_index_type n_local_training_samples  =
+        cast_int<numeric_index_type>(new_training_set.begin()->second.size());
+      numeric_index_type n_global_training_samples = n_local_training_samples;
+      this->comm().sum(n_global_training_samples);
+
+      for (auto & pr : training_parameters)
         {
-          numeric_index_type index = first_index + i;
-          training_vector->set(index, new_training_set[param_name][i]);
+          pr.second = NumericVector<Number>::build(this->comm());
+          pr.second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
+        }
+
+      for (auto & pr : training_parameters)
+        {
+          const std::string & param_name = pr.first;
+          NumericVector<Number> * training_vector = pr.second.get();
+
+          numeric_index_type first_index = training_vector->first_local_index();
+          for (numeric_index_type i=0; i<n_local_training_samples; i++)
+            {
+              numeric_index_type index = first_index + i;
+              training_vector->set(index, new_training_set[param_name][i]);
+            }
+        }
+    }
+  else
+    {
+      // If new_training_set stores values for a subset of the parameters, then we keep the
+      // length of training_parameters unchanged and overwrite the entries of the specified
+      // parameters from new_training_set. Note that we repeatedly loop over new_training_set
+      // to fill up the entire length of training_vector.
+
+      for (auto & pr : training_parameters)
+        {
+          const std::string & param_name = pr.first;
+          if (new_training_set.count(param_name))
+            {
+              NumericVector<Number> * training_vector = pr.second.get();
+
+              numeric_index_type first_index = training_vector->first_local_index();
+              for (numeric_index_type i=0; i<training_vector->local_size(); i++)
+                {
+                  unsigned int new_training_set_index = i % new_training_set[param_name].size();
+
+                  numeric_index_type index = first_index + i;
+                  training_vector->set(index, new_training_set[param_name][new_training_set_index]);
+                }
+            }
         }
     }
 }
