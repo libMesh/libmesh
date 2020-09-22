@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/type_vector.h"
+#include "libmesh/compare_types.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/raw_type.h"
@@ -220,6 +221,29 @@ VectorValue<T>::VectorValue (const TypeVector<Real> & p_re,
 }
 #endif
 
+template <typename T>
+struct CompareTypes<VectorValue<T>, VectorValue<T>>
+{
+  typedef VectorValue<T> supertype;
+};
+
+template <typename T, typename T2>
+struct CompareTypes<VectorValue<T>, VectorValue<T2>>
+{
+  typedef VectorValue<typename CompareTypes<T,T2>::supertype> supertype;
+};
+
+template <typename T, typename T2>
+struct CompareTypes<VectorValue<T>, TypeVector<T2>>
+{
+  typedef VectorValue<typename CompareTypes<T,T2>::supertype> supertype;
+};
+
+template <typename T, typename T2>
+struct CompareTypes<TypeVector<T>, VectorValue<T2>>
+{
+  typedef VectorValue<typename CompareTypes<T,T2>::supertype> supertype;
+};
 
 } // namespace libMesh
 

@@ -1131,6 +1131,18 @@ TypeVector<T> TypeVector<T>::unit() const
 #endif
 
 }
+
+template <typename T>
+struct CompareTypes<TypeTensor<T>, TypeTensor<T>>
+{
+  typedef TypeTensor<T> supertype;
+};
+
+template <typename T, typename T2>
+struct CompareTypes<TypeTensor<T>, TypeTensor<T2>>
+{
+  typedef TypeTensor<typename CompareTypes<T,T2>::supertype> supertype;
+};
 } // namespace libMesh
 
 namespace std
