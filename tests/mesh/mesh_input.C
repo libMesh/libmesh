@@ -46,7 +46,7 @@ public:
 #endif // LIBMESH_HAVE_EXODUS_API
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  // CPPUNIT_TEST( testNemesisReadReplicated ); // Not yet implemented
+  CPPUNIT_TEST( testNemesisReadReplicated ); // Not yet implemented
   CPPUNIT_TEST( testNemesisReadDistributed );
 #endif
 
