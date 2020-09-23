@@ -2032,7 +2032,7 @@ std::vector<unsigned int> MeshBase::add_elem_data(const std::vector<std::string>
                                                   bool allocate_data,
                                                   const std::vector<T> * default_values)
 {
-  libmesh_assert(!default_values || default_values.size() == names.size());
+  libmesh_assert(!default_values || default_values->size() == names.size());
 
   std::vector<unsigned int> returnval(names.size());
 
@@ -2081,7 +2081,7 @@ std::vector<unsigned int> MeshBase::add_node_data(const std::vector<std::string>
                                                   bool allocate_data,
                                                   const std::vector<T> * default_values)
 {
-  libmesh_assert(!default_values || default_values.size() == names.size());
+  libmesh_assert(!default_values || default_values->size() == names.size());
 
   std::vector<unsigned int> returnval(names.size());
 
