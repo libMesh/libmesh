@@ -1,12 +1,13 @@
 // Basic include files
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/explicit_system.h"
-#include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/nemesis_io.h"
 #include "libmesh/node.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/string_to_enum.h"
 
 #include "test_comm.h"
@@ -25,13 +26,15 @@ public:
   CPPUNIT_TEST_SUITE(WriteVecAndScalar);
 
 #if LIBMESH_DIM > 1
-  CPPUNIT_TEST(testWriteExodus);
-  CPPUNIT_TEST(testWriteNemesis);
+  CPPUNIT_TEST(testWriteExodusDistributed);
+  CPPUNIT_TEST(testWriteExodusReplicated);
+  CPPUNIT_TEST(testWriteNemesisDistributed);
+  CPPUNIT_TEST(testWriteNemesisReplicated);
 #endif
 
   CPPUNIT_TEST_SUITE_END();
 
-  void setupTests(Mesh & mesh, EquationSystems & equation_systems)
+  void setupTests(UnstructuredMesh & mesh, EquationSystems & equation_systems)
   {
     // We set our initial conditions based on build_square node ids
     mesh.allow_renumbering(false);
@@ -143,24 +146,28 @@ public:
   }
 
 
-  void testWriteExodus()
+  template <typename MeshType>
+  void testWriteExodus(const std::string & filename)
   {
-    Mesh mesh(*TestCommWorld);
+    MeshType mesh(*TestCommWorld);
     EquationSystems equation_systems(mesh);
 
     setupTests(mesh, equation_systems);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
+    // Make sure any previous reads are done before the writing starts
+    TestCommWorld->barrier();
+
     // We write the file in the ExodusII format.
-    ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
+    ExodusII_IO(mesh).write_equation_systems(filename, equation_systems);
 
     // Make sure that the writing is done before the reading starts.
     TestCommWorld->barrier();
 
     // Now read it back in
-    Mesh read_mesh(*TestCommWorld);
+    MeshType read_mesh(*TestCommWorld);
     ExodusII_IO exio(read_mesh);
-    exio.read("out.e");
+    exio.read(filename);
 
     read_mesh.prepare_for_use();
     EquationSystems es2(read_mesh);
@@ -181,24 +188,32 @@ public:
   }
 
 
-  void testWriteNemesis()
+  void testWriteExodusReplicated() { testWriteExodus<ReplicatedMesh>("rep.e"); }
+  void testWriteExodusDistributed() { testWriteExodus<DistributedMesh>("dist.e"); }
+
+
+  template <typename MeshType>
+  void testWriteNemesis(const std::string & filename)
   {
-    Mesh mesh(*TestCommWorld);
+    MeshType mesh(*TestCommWorld);
     EquationSystems equation_systems(mesh);
 
     setupTests(mesh, equation_systems);
 
 #ifdef LIBMESH_HAVE_NEMESIS_API
+    // Make sure any previous reads are done before the writing starts
+    TestCommWorld->barrier();
+
     // We write the file in the Nemesis format.
-    Nemesis_IO(mesh).write_equation_systems("out.nem", equation_systems);
+    Nemesis_IO(mesh).write_equation_systems(filename, equation_systems);
 
     // Make sure that the writing is done before the reading starts.
     TestCommWorld->barrier();
 
     // Now read it back in
-    Mesh read_mesh(*TestCommWorld);
+    MeshType read_mesh(*TestCommWorld);
     Nemesis_IO nemio(read_mesh);
-    nemio.read("out.nem");
+    nemio.read(filename);
 
     read_mesh.prepare_for_use();
     EquationSystems es2(read_mesh);
@@ -218,6 +233,10 @@ public:
     // testSolution(read_mesh, sys2);
 #endif // #ifdef LIBMESH_HAVE_NEMESIS_API
   }
+
+  void testWriteNemesisReplicated() { testWriteNemesis<ReplicatedMesh>("rep.nem"); }
+  void testWriteNemesisDistributed() { testWriteNemesis<DistributedMesh>("dist.nem"); }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WriteVecAndScalar);
