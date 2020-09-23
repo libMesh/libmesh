@@ -35,6 +35,9 @@
 #include "libmesh/utility.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
+// TIMPI includes
+#include "timpi/parallel_sync.h"
+
 // C++ includes
 #include <fstream>
 #include <cstring>
@@ -550,25 +553,87 @@ void ExodusII_IO::copy_nodal_solution(System & system,
                                       std::string exodus_var_name,
                                       unsigned int timestep)
 {
-  libmesh_error_msg_if(!exio_helper->opened_for_reading,
-                       "ERROR, ExodusII file must be opened for reading before copying a nodal solution!");
-
-  exio_helper->read_nodal_var_values(exodus_var_name, timestep);
-
   const unsigned int var_num = system.variable_number(system_var_name);
 
+  const MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  // With Exodus files we only open them on processor 0, so that's the
+  // where we have to do the data read too.
+  if (system.comm().rank() == 0)
+    {
+      libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                           "ERROR, ExodusII file must be opened for reading before copying a nodal solution!");
+
+      exio_helper->read_nodal_var_values(exodus_var_name, timestep);
+    }
+
+  auto & node_var_value_map = exio_helper->nodal_var_values;
+
+  const bool serial_on_zero = !mesh.is_serial_on_zero();
+
+  // If our mesh isn't serial, then non-root processors need to
+  // request the data for their parts of the mesh and insert it
+  // themselves.
+  if (!serial_on_zero)
+    {
+      std::unordered_map<processor_id_type, std::vector<dof_id_type>> node_ids_to_request;
+      if (this->processor_id() != 0)
+        {
+          std::vector<dof_id_type> & node_ids = node_ids_to_request[0];
+          for (auto & node : mesh.local_node_ptr_range())
+            node_ids.push_back(node->id());
+        }
+
+      auto value_gather_functor =
+        [& node_var_value_map]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         std::vector<Real> & values)
+        {
+          const std::size_t query_size = ids.size();
+          values.resize(query_size);
+          for (std::size_t i=0; i != query_size; ++i)
+            {
+              const auto it = node_var_value_map.find(ids[i]);
+              libmesh_assert(it != node_var_value_map.end());
+              values[i] = it->second;
+              node_var_value_map.erase(it);
+            }
+        };
+
+      auto value_action_functor =
+        [& node_var_value_map]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         const std::vector<Real> & values)
+        {
+          const std::size_t query_size = ids.size();
+          for (std::size_t i=0; i != query_size; ++i)
+            node_var_value_map[ids[i]] = values[i];
+        };
+
+      Real * value_ex = nullptr;
+      Parallel::pull_parallel_vector_data
+        (system.comm(), node_ids_to_request, value_gather_functor,
+         value_action_functor, value_ex);
+    }
+
+  // Everybody inserts the data they've received.  If we're
+  // serial_on_zero then proc 0 inserts everybody's data and other
+  // procs have empty map ranges.
   for (auto p : exio_helper->nodal_var_values)
     {
       dof_id_type i = p.first;
-      const Node * node = MeshInput<MeshBase>::mesh().node_ptr(i);
+      const Node * node = MeshInput<MeshBase>::mesh().query_node_ptr(i);
 
-      if (node && node->n_comp(system.number(), var_num) > 0)
+      if (node &&
+          (serial_on_zero || node->processor_id() == system.processor_id()) &&
+          node->n_comp(system.number(), var_num) > 0)
         {
           dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
 
           // If the dof_index is local to this processor, set the value
-          if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-            system.solution->set (dof_index, p.second);
+          system.solution->set (dof_index, p.second);
         }
     }
 
@@ -583,36 +648,95 @@ void ExodusII_IO::copy_elemental_solution(System & system,
                                           std::string exodus_var_name,
                                           unsigned int timestep)
 {
+  const unsigned int var_num = system.variable_number(system_var_name);
+  libmesh_error_msg_if(system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL),
+                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
+
+  const MeshBase & mesh = MeshInput<MeshBase>::mesh();
+  const DofMap & dof_map = system.get_dof_map();
+
+  // Map from element ID to elemental variable value.  We need to use
+  // a map here rather than a vector (e.g. elem_var_values) since the
+  // libmesh element numbering can contain "holes".  This is the case
+  // if we are reading elemental var values from an adaptively refined
+  // mesh that has not been sequentially renumbered.
+  std::map<dof_id_type, Real> elem_var_value_map;
+
+  // With Exodus files we only open them on processor 0, so that's the
+  // where we have to do the data read too.
   if (system.comm().rank() == 0)
     {
       libmesh_error_msg_if(!exio_helper->opened_for_reading,
                            "ERROR, ExodusII file must be opened for reading before copying an elemental solution!");
 
-      // Map from element ID to elemental variable value.  We need to use
-      // a map here rather than a vector (e.g. elem_var_values) since the
-      // libmesh element numbering can contain "holes".  This is the case
-      // if we are reading elemental var values from an adaptively refined
-      // mesh that has not been sequentially renumbered.
-      std::map<dof_id_type, Real> elem_var_value_map;
       exio_helper->read_elemental_var_values(exodus_var_name, timestep, elem_var_value_map);
+    }
 
-      const unsigned int var_num = system.variable_number(system_var_name);
-      libmesh_error_msg_if(system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL),
-                           "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
+  const bool serial_on_zero = !mesh.is_serial_on_zero();
 
-      std::map<dof_id_type, Real>::iterator
-        it = elem_var_value_map.begin(),
-        end = elem_var_value_map.end();
-
-      for (; it!=end; ++it)
+  // If our mesh isn't serial, then non-root processors need to
+  // request the data for their parts of the mesh and insert it
+  // themselves.
+  if (!serial_on_zero)
+    {
+      std::unordered_map<processor_id_type, std::vector<dof_id_type>> elem_ids_to_request;
+      if (this->processor_id() != 0)
         {
-          const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
+          std::vector<dof_id_type> & elem_ids = elem_ids_to_request[0];
+          for (auto & elem : mesh.active_local_element_ptr_range())
+            elem_ids.push_back(elem->id());
+        }
 
-          if (elem && elem->n_comp(system.number(), var_num) > 0)
+      auto value_gather_functor =
+        [& elem_var_value_map]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         std::vector<Real> & values)
+        {
+          const std::size_t query_size = ids.size();
+          values.resize(query_size);
+          for (std::size_t i=0; i != query_size; ++i)
             {
-              dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
-              system.solution->set (dof_index, it->second);
+              const auto it = elem_var_value_map.find(ids[i]);
+              libmesh_assert(it != elem_var_value_map.end());
+              values[i] = it->second;
+              elem_var_value_map.erase(it);
             }
+        };
+
+      auto value_action_functor =
+        [& elem_var_value_map]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         const std::vector<Real> & values)
+        {
+          const std::size_t query_size = ids.size();
+          for (std::size_t i=0; i != query_size; ++i)
+            elem_var_value_map[ids[i]] = values[i];
+        };
+
+      Real * value_ex = nullptr;
+      Parallel::pull_parallel_vector_data
+        (system.comm(), elem_ids_to_request, value_gather_functor,
+         value_action_functor, value_ex);
+    }
+
+  std::map<dof_id_type, Real>::iterator
+    it = elem_var_value_map.begin(),
+    end = elem_var_value_map.end();
+
+  // Everybody inserts the data they've received.  If we're
+  // serial_on_zero then proc 0 inserts everybody's data and other
+  // procs have empty map ranges.
+  for (; it!=end; ++it)
+    {
+      const Elem * elem = mesh.query_elem_ptr(it->first);
+
+      if (elem && elem->n_comp(system.number(), var_num) > 0)
+        {
+          dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
+          if (serial_on_zero || dof_map.local_index(dof_index ))
+            system.solution->set (dof_index, it->second);
         }
     }
 
