@@ -50,9 +50,7 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
   _vector              (vec),
   _dof_map             (dof_map),
   _system_vars         (vars),
-  _point_locator       (nullptr),
-  _out_of_mesh_mode    (false),
-  _out_of_mesh_value   ()
+  _out_of_mesh_mode    (false)
 {
 }
 
@@ -69,26 +67,13 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
   _vector              (vec),
   _dof_map             (dof_map),
   _system_vars         (1,var),
-  _point_locator       (nullptr),
-  _out_of_mesh_mode    (false),
-  _out_of_mesh_value   ()
+  _out_of_mesh_mode    (false)
 {
-  //   std::vector<unsigned int> buf (1);
-  //   buf[0] = var;
-  //   _system_vars (buf);
 }
 
 
 
-
-
-
-
-MeshFunction::~MeshFunction ()
-{
-  delete this->_point_locator;
-}
-
+MeshFunction::~MeshFunction () = default;
 
 
 
@@ -100,7 +85,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
   // Don't do twice...
   if (this->_initialized)
     {
-      libmesh_assert(this->_point_locator);
+      libmesh_assert(_point_locator);
       return;
     }
 
@@ -110,7 +95,8 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
    */
   const MeshBase & mesh = this->_eqn_systems.get_mesh();
 
-  this->_point_locator = mesh.sub_point_locator().release();
+  // Take ownership
+  _point_locator = std::move(mesh.sub_point_locator());
 
   // ready for use
   this->_initialized = true;
@@ -121,11 +107,9 @@ void
 MeshFunction::clear ()
 {
   // only delete the point locator when we are the master
-  if ((this->_point_locator != nullptr) && (this->_master == nullptr))
-    {
-      delete this->_point_locator;
-      this->_point_locator = nullptr;
-    }
+  if (_point_locator && !_master)
+    _point_locator.reset();
+
   this->_initialized = false;
 }
 
@@ -717,7 +701,7 @@ const Elem * MeshFunction::find_element(const Point & p,
 #endif
 
   // locate the point in the other mesh
-  const Elem * element = this->_point_locator->operator()(p,subdomain_ids);
+  const Elem * element = (*_point_locator)(p, subdomain_ids);
 
   // If we have an element, but it's not a local element, then we
   // either need to have a serialized vector or we need to find a
@@ -763,7 +747,7 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
   // locate the point in the other mesh
   std::set<const Elem *> candidate_elements;
   std::set<const Elem *> final_candidate_elements;
-  this->_point_locator->operator()(p,candidate_elements,subdomain_ids);
+  (*_point_locator)(p, candidate_elements, subdomain_ids);
   for (const auto & element : candidate_elements)
     {
       // If we have an element, but it's not a local element, then we
@@ -790,7 +774,7 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
   return final_candidate_elements;
 }
 
-const PointLocatorBase & MeshFunction::get_point_locator (void) const
+const PointLocatorBase & MeshFunction::get_point_locator () const
 {
   libmesh_assert (this->initialized());
   return *_point_locator;
@@ -811,7 +795,7 @@ void MeshFunction::enable_out_of_mesh_mode(const Number & value)
   this->enable_out_of_mesh_mode(v);
 }
 
-void MeshFunction::disable_out_of_mesh_mode(void)
+void MeshFunction::disable_out_of_mesh_mode()
 {
   libmesh_assert (this->initialized());
   _point_locator->disable_out_of_mesh_mode();
