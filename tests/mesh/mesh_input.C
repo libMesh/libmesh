@@ -37,6 +37,7 @@ public:
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
+  CPPUNIT_TEST( testExodusCopyNodalSolution );
   CPPUNIT_TEST( testExodusCopyElementSolution );
   CPPUNIT_TEST( testExodusReadHeader );
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
@@ -102,6 +103,69 @@ public:
       CPPUNIT_ASSERT_EQUAL(header_info.num_edge, 0);
     }
   }
+
+
+  void testExodusCopyNodalSolution ()
+  {
+    {
+      Mesh mesh(*TestCommWorld);
+
+      EquationSystems es(mesh);
+      System &sys = es.add_system<System> ("SimpleSystem");
+      sys.add_variable("n", FIRST, LAGRANGE);
+
+      MeshTools::Generation::build_square (mesh,
+                                           3, 3,
+                                           0., 1., 0., 1.);
+
+      es.init();
+      sys.project_solution(x_plus_y, nullptr, es.parameters);
+
+      ExodusII_IO exii(mesh);
+
+      exii.write_equation_systems("mesh_with_nodal_soln.e", es);
+    }
+
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+
+      EquationSystems es(mesh);
+      System &sys = es.add_system<System> ("SimpleSystem");
+      sys.add_variable("testn", FIRST, LAGRANGE);
+
+      ExodusII_IO exii(mesh);
+
+      if (mesh.processor_id() == 0)
+        exii.read("mesh_with_nodal_soln.e");
+      MeshCommunication().broadcast(mesh);
+      mesh.prepare_for_use();
+
+      es.init();
+
+      // Read the solution e into variable teste.
+      //
+      // With complex numbers, we'll only bother reading the real
+      // part.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      exii.copy_nodal_solution(sys, "testn", "r_n");
+#else
+      exii.copy_nodal_solution(sys, "testn", "n");
+#endif
+
+      // Exodus only handles double precision
+      Real exotol = std::max(TOLERANCE*TOLERANCE, Real(1e-12));
+
+      for (Real x = 0; x < 1 + TOLERANCE; x += Real(1.L/3.L))
+        for (Real y = 0; y < 1 + TOLERANCE; y += Real(1.L/3.L))
+          {
+            Point p(x,y);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                    libmesh_real(x+y),
+                                    exotol);
+          }
+    }
+  }
+
 
   void testExodusCopyElementSolution ()
   {
