@@ -31,23 +31,14 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// RBParameters implementation
-
 RBParametrized::RBParametrized()
   :
   verbose_mode(false),
   parameters_initialized(false)
 {
-  parameters.clear();
-  parameters_min.clear();
-  parameters_max.clear();
 }
 
-RBParametrized::~RBParametrized()
-{
-  this->clear();
-}
+RBParametrized::~RBParametrized() = default;
 
 void RBParametrized::clear()
 {

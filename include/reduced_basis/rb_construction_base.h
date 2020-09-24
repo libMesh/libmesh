@@ -64,8 +64,14 @@ public:
                       const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains a unique_ptr so it can't be copy assigned/constructed.
+   * - Destructor is defaulted out-of-line.
    */
+  RBConstructionBase (RBConstructionBase &&) = default;
+  RBConstructionBase & operator= (RBConstructionBase &&) = default;
+  RBConstructionBase (const RBConstructionBase &) = delete;
+  RBConstructionBase & operator= (const RBConstructionBase &) = delete;
   virtual ~RBConstructionBase ();
 
   /**
@@ -280,7 +286,6 @@ private:
    * number generator seed.
    */
   int training_parameters_random_seed;
-
 };
 
 } // namespace libMesh

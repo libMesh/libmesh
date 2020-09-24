@@ -53,14 +53,10 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems & es,
     training_parameters_initialized(false),
     training_parameters_random_seed(-1) // by default, use std::time to seed RNG
 {
-  training_parameters.clear();
 }
 
 template <class Base>
-RBConstructionBase<Base>::~RBConstructionBase ()
-{
-  this->clear();
-}
+RBConstructionBase<Base>::~RBConstructionBase () = default;
 
 template <class Base>
 void RBConstructionBase<Base>::clear ()
