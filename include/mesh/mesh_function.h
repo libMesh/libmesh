@@ -31,6 +31,7 @@
 // C++ includes
 #include <cstddef>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -84,16 +85,13 @@ public:
                 const FunctionBase<Number> * master=nullptr);
 
   /**
-   * This class is sometimes responsible for cleaning up the
-   * _point_locator, so it can't be default (shallow) copy constructed
-   * or move constructed.
+   * Special functions.
+   * - This class conains a unique_ptr so it can't be default copy constructed.
+   * - This class contains const references so it can't be default copy/move assigned.
+   * - The destructor is defaulted out-of-line.
    */
-  MeshFunction (MeshFunction &&) = delete;
   MeshFunction (const MeshFunction &) = delete;
-
-  /**
-   * This class contains const references so it can't be assigned.
-   */
+  MeshFunction (MeshFunction &&) = default;
   MeshFunction & operator= (const MeshFunction &) = delete;
   MeshFunction & operator= (MeshFunction &&) = delete;
 
@@ -260,7 +258,7 @@ public:
    * \note The \p MeshFunction object must be initialized before this
    * is called.
    */
-  const PointLocatorBase & get_point_locator (void) const;
+  const PointLocatorBase & get_point_locator () const;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked for a point
@@ -289,7 +287,7 @@ public:
   /**
    * Disables out-of-mesh mode.  This is also the default.
    */
-  void disable_out_of_mesh_mode(void);
+  void disable_out_of_mesh_mode();
 
   /**
    * We may want to specify a tolerance for the PointLocator to use,
@@ -348,7 +346,7 @@ protected:
    * A point locator is needed to locate the
    * points in the mesh.
    */
-  PointLocatorBase * _point_locator;
+  std::unique_ptr<PointLocatorBase> _point_locator;
 
   /**
    * \p true if out-of-mesh mode is enabled.  See \p
@@ -362,12 +360,6 @@ protected:
    */
   DenseVector<Number> _out_of_mesh_value;
 };
-
-
-
-
-// ------------------------------------------------------------
-// MeshFunction inline methods
 
 
 } // namespace libMesh
