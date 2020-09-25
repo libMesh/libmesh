@@ -52,6 +52,9 @@ public:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   CPPUNIT_TEST( testNemesisReadReplicated );
   CPPUNIT_TEST( testNemesisReadDistributed );
+
+  CPPUNIT_TEST( testNemesisCopyNodalSolutionDistributed );
+  CPPUNIT_TEST( testNemesisCopyNodalSolutionReplicated );
 #endif
 
   CPPUNIT_TEST( testDynaReadElem );
@@ -133,15 +136,19 @@ public:
     {
       MeshType mesh(*TestCommWorld);
 
+      // Avoid getting Nemesis solution values mixed up
+      mesh.allow_renumbering(false);
+
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("testn", FIRST, LAGRANGE);
 
       IOType meshinput(mesh);
 
-      if (mesh.processor_id() == 0)
+      if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
         meshinput.read(filename);
-      MeshCommunication().broadcast(mesh);
+      if (!meshinput.is_parallel_format())
+        MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
       es.init();
@@ -176,6 +183,14 @@ public:
 
   void testExodusCopyNodalSolutionDistributed ()
   { testCopyNodalSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_nodal_soln.e"); }
+
+#if defined(LIBMESH_HAVE_NEMESIS_API)
+  void testNemesisCopyNodalSolutionReplicated ()
+  { testCopyNodalSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_nodal_soln.nem"); }
+
+  void testNemesisCopyNodalSolutionDistributed ()
+  { testCopyNodalSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_nodal_soln.nem"); }
+#endif
 
 
   template <typename MeshType, typename IOType>
@@ -214,9 +229,10 @@ public:
 
       IOType meshinput(mesh);
 
-      if (mesh.processor_id() == 0)
+      if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
         meshinput.read(filename);
-      MeshCommunication().broadcast(mesh);
+      if (!meshinput.is_parallel_format())
+        MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
       es.init();
