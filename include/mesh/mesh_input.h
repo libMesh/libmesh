@@ -72,9 +72,19 @@ public:
 
   /**
    * This method implements reading a mesh from a specified file.
+   *
+   * This should typically be called in parallel if
+   * is_parallel_format(), but should be called only on processor 0
+   * (after which a mesh broadcast() is called) otherwise.
    */
   virtual void read (const std::string &) = 0;
 
+  /**
+   * Returns true iff this mesh file format and input class are
+   * parallelized, so that all processors can read their share of the
+   * data at once.
+   */
+  bool is_parallel_format () const { return this->_is_parallel_format; }
 
 protected:
 
@@ -102,7 +112,6 @@ protected:
    */
   void skip_comment_lines (std::istream & in,
                            const char comment_start);
-
 
 private:
 
