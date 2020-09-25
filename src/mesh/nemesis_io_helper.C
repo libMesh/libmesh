@@ -2660,6 +2660,34 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
 
 
 
+void Nemesis_IO_Helper::read_var_names_impl(const char * var_type,
+                                            int & count,
+                                            std::vector<std::string> & result)
+{
+  // Most of what we need to do is the same as for Exodus
+  this->ExodusII_IO_Helper::read_var_names_impl(var_type, count, result);
+
+  // But with tests where we have more processors than elements,
+  // Nemesis doesn't let us put variable names in files written by
+  // processors owning no nodes, but we may still *need* those
+  // variable names on every processor, so let's sync them up...
+  processor_id_type pid_broadcasting_names = this->processor_id();
+  const std::size_t n_names = this->nodal_var_names.size();
+  if (!n_names)
+    pid_broadcasting_names = DofObject::invalid_processor_id;
+
+  libmesh_assert(this->comm().semiverify
+                 (n_names ? nullptr : &n_names));
+
+  this->comm().min(pid_broadcasting_names);
+
+  if (pid_broadcasting_names != DofObject::invalid_processor_id)
+    this->comm().broadcast(this->nodal_var_names,
+                           pid_broadcasting_names);
+}
+
+
+
 std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string & base_filename)
 {
   // Build a filename for this processor.  This code is cut-n-pasted from the read function

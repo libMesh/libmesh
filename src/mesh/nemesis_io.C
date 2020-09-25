@@ -1643,25 +1643,6 @@ void Nemesis_IO::write_information_records ( const std::vector<std::string> & )
 const std::vector<std::string> & Nemesis_IO::get_nodal_var_names()
 {
   nemhelper->read_var_names(ExodusII_IO_Helper::NODAL);
-
-  // With tests where we have more processors than
-  // elements, Nemesis doesn't let us put variable names in files
-  // written by processors owning no nodes, but we may still *need*
-  // those variable names on every processor, so let's sync them up...
-  processor_id_type pid_broadcasting_names = this->processor_id();
-  const std::size_t n_names = nemhelper->nodal_var_names.size();
-  if (!n_names)
-    pid_broadcasting_names = DofObject::invalid_processor_id;
-
-  libmesh_assert(this->comm().semiverify
-                 (n_names ? nullptr : &n_names));
-
-  this->comm().min(pid_broadcasting_names);
-
-  if (pid_broadcasting_names != DofObject::invalid_processor_id)
-    this->comm().broadcast(nemhelper->nodal_var_names,
-                           pid_broadcasting_names);
-
   return nemhelper->nodal_var_names;
 }
 

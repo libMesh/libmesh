@@ -818,14 +818,17 @@ protected:
   };
 
 
-private:
+protected:
 
   /**
-   * read_var_names() dispatches to this function.
+   * read_var_names() dispatches to this function.  We need to
+   * override it slightly for Nemesis.
    */
-  void read_var_names_impl(const char * var_type,
-                           int & count,
-                           std::vector<std::string> & result);
+  virtual void read_var_names_impl(const char * var_type,
+                                   int & count,
+                                   std::vector<std::string> & result);
+
+private:
 
   /**
    * write_var_names() dispatches to this function.
