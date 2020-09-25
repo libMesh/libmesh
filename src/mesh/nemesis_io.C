@@ -1636,8 +1636,6 @@ void Nemesis_IO::write_information_records ( const std::vector<std::string> & )
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }
 
-#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-
 
 
 const std::vector<std::string> & Nemesis_IO::get_nodal_var_names()
@@ -1680,6 +1678,8 @@ void Nemesis_IO::copy_nodal_solution(System & system,
 }
 
 
+
+#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
 
 
