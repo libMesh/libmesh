@@ -4416,11 +4416,6 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       libmesh_assert_equal_to
         (ids_offsets.size(), keys_vals.size());
 
-      if (!mesh.is_serial())
-        this->comm().receive_packed_range
-          (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
-           (Node**)nullptr, range_tag);
-
       // Add the node constraints that I've been sent
       for (auto i : index_range(ids_offsets))
         {
