@@ -37,8 +37,11 @@ public:
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
-  CPPUNIT_TEST( testExodusCopyNodalSolution );
-  CPPUNIT_TEST( testExodusCopyElementSolution );
+  // Still not yet working?
+  // CPPUNIT_TEST( testExodusCopyNodalSolutionDistributed );
+  // CPPUNIT_TEST( testExodusCopyElementSolutionDistributed );
+  CPPUNIT_TEST( testExodusCopyNodalSolutionReplicated );
+  CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   // Eventually this will support complex numbers.
@@ -105,10 +108,11 @@ public:
   }
 
 
-  void testExodusCopyNodalSolution ()
+  template <typename MeshType, typename IOType>
+  void testCopyNodalSolutionImpl (const std::string & filename)
   {
     {
-      Mesh mesh(*TestCommWorld);
+      MeshType mesh(*TestCommWorld);
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
@@ -121,22 +125,22 @@ public:
       es.init();
       sys.project_solution(x_plus_y, nullptr, es.parameters);
 
-      ExodusII_IO exii(mesh);
+      IOType meshoutput(mesh);
 
-      exii.write_equation_systems("mesh_with_nodal_soln.e", es);
+      meshoutput.write_equation_systems(filename, es);
     }
 
     {
-      ReplicatedMesh mesh(*TestCommWorld);
+      MeshType mesh(*TestCommWorld);
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("testn", FIRST, LAGRANGE);
 
-      ExodusII_IO exii(mesh);
+      IOType meshinput(mesh);
 
       if (mesh.processor_id() == 0)
-        exii.read("mesh_with_nodal_soln.e");
+        meshinput.read(filename);
       MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
@@ -147,9 +151,9 @@ public:
       // With complex numbers, we'll only bother reading the real
       // part.
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      exii.copy_nodal_solution(sys, "testn", "r_n");
+      meshinput.copy_nodal_solution(sys, "testn", "r_n");
 #else
-      exii.copy_nodal_solution(sys, "testn", "n");
+      meshinput.copy_nodal_solution(sys, "testn", "n");
 #endif
 
       // Exodus only handles double precision
@@ -167,10 +171,18 @@ public:
   }
 
 
-  void testExodusCopyElementSolution ()
+  void testExodusCopyNodalSolutionReplicated ()
+  { testCopyNodalSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_nodal_soln.e"); }
+
+  void testExodusCopyNodalSolutionDistributed ()
+  { testCopyNodalSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_nodal_soln.e"); }
+
+
+  template <typename MeshType, typename IOType>
+  void testCopyElementSolutionImpl (const std::string & filename)
   {
     {
-      Mesh mesh(*TestCommWorld);
+      MeshType mesh(*TestCommWorld);
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
@@ -183,28 +195,27 @@ public:
       es.init();
       sys.project_solution(x_plus_y, nullptr, es.parameters);
 
-      ExodusII_IO exii(mesh);
+      IOType meshinput(mesh);
 
       // Don't try to write element data as nodal data
       std::set<std::string> sys_list;
-      exii.write_equation_systems("mesh_with_soln.e", es, &sys_list);
+      meshinput.write_equation_systems(filename, es, &sys_list);
 
       // Just write it as element data
-      exii.write_element_data(es);
+      meshinput.write_element_data(es);
     }
 
-    // copy_elemental_solution currently requires ReplicatedMesh
     {
-      ReplicatedMesh mesh(*TestCommWorld);
+      MeshType mesh(*TestCommWorld);
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("teste", CONSTANT, MONOMIAL);
 
-      ExodusII_IO exii(mesh);
+      IOType meshinput(mesh);
 
       if (mesh.processor_id() == 0)
-        exii.read("mesh_with_soln.e");
+        meshinput.read(filename);
       MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
@@ -215,9 +226,9 @@ public:
       // With complex numbers, we'll only bother reading the real
       // part.
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      exii.copy_elemental_solution(sys, "teste", "r_e");
+      meshinput.copy_elemental_solution(sys, "teste", "r_e");
 #else
-      exii.copy_elemental_solution(sys, "teste", "e");
+      meshinput.copy_elemental_solution(sys, "teste", "e");
 #endif
 
       // Exodus only handles double precision
@@ -233,6 +244,13 @@ public:
           }
     }
   }
+
+
+  void testExodusCopyElementSolutionReplicated ()
+  { testCopyElementSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_elem_soln.e"); }
+
+  void testExodusCopyElementSolutionDistributed ()
+  { testCopyElementSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_soln.e"); }
 
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
