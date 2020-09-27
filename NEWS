@@ -1,3 +1,223 @@
+1.5.1 -> 1.6.0
+  * Exodus/Nemesis
+    - Add MappedOutputVector/MappedInputVector classes for single-precision I/O
+    - Add support for reading edgesets
+    - Improve ElementMaps and reduce copy/paste bolierplate
+    - Call newer exII::ex_put_concat_all_blocks(), ex_get_block(), ex_get_ids(), etc. APIs
+    - Avoid unnecessary localize in Nemesis write_nodal_data()
+    - Better error message when invalid node id is found in nodeset
+    - Handle complex variables in write_element_data_from_discontinuous_nodal_data()
+    - Make writing the complex modulus optional
+    - Add capability to load elemental variables into element IDs
+    - Add ExodusII_IO::read_header() and unit test
+    - Respect empty output names in NemesisIO
+    - Fixes for appending to Nemesis files
+    - Preserve ordering of nodal variables in NemesisIO
+    - Explicitly delete copy/move assignment operators in ExodusII_IO_Helper
+    - Add support for reading nodeset variables
+  * Add DiagonalMatrix, a SparseMatrix which uses a NumericVector for storage
+  * FEMap
+    - Put mapping methods into mapping classes
+    - Move MappingType out of Elem
+    - Add first rational mapping unit test
+    - Respect non-LAGRANGE maps with C1 elements
+  * FE
+    - Remove some explicit instantiations and related macros
+    - Refactor/optimize 1D Lagrange shape(), shape_deriv(), shape_second_deriv() calls
+    - Add second derivatives for Bernstein FEs
+    - Add some FE tests at fourth order
+    - Allow GenericProjector to work with vector finite elements
+    - InfFE: Add new shape()-API; Change API for shape_ptr and its derivs
+    - Skip redundant resize in init_shape_functions
+    - Add FE::shape_derivs(), shapes(), all_shapes() APIs
+    - Extend FEMap optimizations to 0D+1D+2D
+    - Explicitly use FEAbstract::get_nothing() to avoid all FE computations
+    - Add 'extra_checks' parameter to FEMap::inverse_map()
+    - Add dual shape functions (dual_phi, dual_dphi, and dual_d2phi) in FEBase
+    - Add new FEInterface::n_dofs() APIs taking Elem pointers
+    - Add new FEInterface::n_dofs_at_node() APIs taking Elem pointers
+    - Add new FEInterface::n_dofs_per_elem() APIs taking Elem pointers
+    - Add new FEInterface::n_shape_functions() APIs taking Elem pointers
+    - Add new FEInterface::shape() APIs taking Elem pointers
+    - Add new FEInterface::ifem_ APIs taking Elem pointers
+  * Add unit tests for !contains_point()
+  * Add/use libmesh_map_find() macro
+  * Add/use libmesh_vector_at() macro
+  * DynaIO
+    - Add mesh reader for BEXT files
+    - Add unit test of reading 25-element patch file
+    - Add DynaIO::add_spline_constraints() and unit test
+  * Add/set SNES divergence tolerance
+  * Separate headers string_to_enum.h and enum_to_string.h
+  * Reduced Basis
+    - Added an option to use the energy inner-product
+    - Updates for reduced_basis_ex7
+    - Uncomment RBConstruction::compute_residual_dual_norm_slow() for debugging
+    - Added extra error checking in rb_data_deserialization.C
+    - RBConstruction: Add post processing callbacks
+    - Skip enrichment if RHS norm is exactly 0
+    - Add support for POD training in RBConstruction
+    - Update RBConstructionBase<Base>::generate_training_parameters_deterministic()
+    - Update TransientRBConstruction to not use lapack calls directly
+    - RBEIMConstruction: Move FE getter calls outside elem loop
+    - Skip NODEELEMs in assembly
+    - Add RBEIMConstruction::init_context() override
+    - Update to post_process_elem_matrix_and_vector() in RBConstruction
+    - RBConstruction update to store an untransformed basis
+    - Optionally pre-evalaute theta functions for efficiency
+    - Fix wrong function call syntax in rb_data_deserialization.C
+    - Evaluate theta functions at multiple parameters simultaneously
+    - Early return when there are no training samples
+    - Major refresh of the EIM framework
+    - Add support for defining RBParametrizedFunctions based on a look-up table
+    - Deprecate {RBParameters,RBParametrized}::get_parameter_names()
+  * Xdr
+    - Efficiency improvments: restrict iteration, handle ids while parsing
+    - Reset stream precision after writing an integral value
+    - Add unit test of Xdr::data(vector)
+    - Fix access past end of vector in data_stream() implementations
+  * Update Tetgen to version 1.5.1
+  * Mesh
+    - Additional options for adding extra integers+data
+    - Merge extra integers during copies+submeshes
+    - Add MeshBase::add_elem(std::unique_ptr<Elem>)
+    - Add MeshRefinement::add_elem(unique_ptr)
+    - Add MeshBase::insert_elem(std::unique_ptr<Elem>)
+    - Add MeshBase::add_node(std::unique_ptr<Node>)
+    - Add MeshBase::insert_node(std::unique_ptr<Node>)
+    - Add MeshBase::remove_orphaned_nodes()
+    - Unit tests for MeshTools::Generation::build_cube()
+    - Reset ReplicatedMesh::_n_* during clear()
+    - Many DistributedMesh unique id fixes
+    - MeshGeneration::build_sphere() DistributedMesh fixes and unit tests
+    - Use max_node_id to size vectors indexed by node id
+    - Updates to allow_find_neighbors(true) in prepare_for_use(), find_neighbors()
+    - allgather() before falling back on Metis
+    - Preserve extra ints and mapping data in flatten(), all_second_order(), create_submesh(), etc.
+  * AbaqusIO
+    - Read .inp files with *Surface sections referring to element sets
+    - Add string_to_num(), strip_ws() helper functions
+    - Add support for "MASS" elements and "NODE" sidesets
+  * TIMPI
+    - Move parallel* files into contrib/TIMPI submodule
+    - Use push_parallel_packed_range() in scatter_constraints
+    - Use TIMPI::communicator to merge LibMeshInit APIs
+    - Use Communicator::duplicate() correctly
+  * Allow adaptivity_ex3 to run with more variables
+  * Misc. bugfixes
+    - Fixes for compilation with PETSc enabled, MPI disabled
+    - Copy point locator tolerance in MeshFunction::clone()
+    - Threading: OverlappingCouplingFunctor, MeshFunction, Clough-Tocher, etc.
+    - Sync nodes after all_second_order if not replicated
+    - Add missing PYRAMID cases to l2_lagrange_n_dofs()
+    - Fixes for --disable-second and other less common build configurations
+    - Fix all_second_order() for DistributedMesh
+    - Don't try to enable ParMETIS without METIS
+    - Add check for nearly coincident nodes when stitching
+    - Call enforce_constraints_on_residual() using local solution
+    - Do GHOSTED localizes to ghosted vectors
+    - Split scraping of PETSc configure and testing the PETSc installation for viability
+    - Fixes for DistributedMesh unique_id generation
+    - Fix reverse iterator usage bug in adjoint AMR constraints
+    - DofMap::add_constraint_row(): assert there is no diagonal entry
+    - Fix parallel_ghost_sync.h for N->M operations
+    - Switch boost includes from -I to -isystem to ignore warnings
+    - Fix valgrind issue with VecSetDM
+    - Non-proxy sides now have same p_level() as Elem they are built from
+    - Use std::stable_sort in CentroidPartitioner
+    - parmetis.m4: Fix potential uninitialized variable
+    - Avoid calling DofObject::id() when id can be invalid
+    - Bugfix for sparse QoI constraint cases
+    - Associate a mesh when adding GhostingFunctor to DofMap
+    - PeriodicBoundaries fixes for "sharktooth" meshes
+    - Disambiguating Node constructor should be marked explicit
+    - Fix subdomain expansion with element DoFs
+    - Fix indexing in EquationSystems::get_vars_active_subdomains()
+  * pkgconfig
+    - Remove extra flags from pkgconfig Cflags
+    - Conditionally add libmesh-*.pc files based on METHODS
+  * VTK
+    - Fix mesh reference in VTKIO write
+    - Try linking to VTK CommonExecutionModel too
+    - Set data mode to binary when _compress is true
+  * BoundaryInfo
+    - Add BoundaryInfo::remove_node(node, id)
+    - Fix outdated docs
+    - Add BoundaryInfo::erase_if() helper function
+    - Add BoundaryInfo::NodeBCTuple typedef
+    - Control sorting method used in build_node_list(), build_side_list()
+    - add_elements(): Add flag controlling setting of parent side ids
+    - Copy name maps in BoundaryInfo::operator=
+    - Clear BoundaryInfo set names during clear()
+    - Add methods to synchronize side boundary ids on the fly
+  * PETSc/SLEPc
+    - Add support for shell matrices in SLEPc eigenvalue solver
+    - Use MAT_INPLACE_MATRIX in newer PETSc versions
+    - Remove support for PETSc < 3.5.x
+    - Additional PETSc install variant detection
+    - Allow third-party non-PETSc METIS
+    - PetscSolverException: use specific error message if available
+    - Updates to support PETSC 3.13
+    - Add API to retrieve only eigenvalue when eigenvector is not needed
+    - Add support for shell preconditioning matrix in EigenSystem
+    - Add sparse matrix-matrix multiplication and addition
+    - Check whether nonlinear residual vector and base vector pointers are equal
+    - Improve EigenSolver initial guess setup
+  * Add ExactSolution::set_excluded_subdomains() API
+  * C++ modernization
+    - Add configure test for and use std::make_shared in library
+    - Replace more calls to "new" with std::make_shared, libmesh_make_unique
+    - IntRange helper functions: index_range(), make_range()
+    - Use range-based for-loops wherever possible
+    - Add/use vectormap::emplace()
+    - Add configure tests for std container emplace functions
+    - Prefer emplace() to insert() for std containers
+    - Add configure tests for std container emplace_hint()
+    - Use std::reference_wrapper in several examples
+  * Use lower-order quadrature in JumpErrorEstimator
+  * Tree::find_elements() optimizations
+  * FParser
+    - Refactor and make JIT code modular
+    - Update diagnostic pragmas
+    - eval_mixed_derivatives, eval_at_point skip_context
+    - Fix JIT disabling
+    - Disable derivative caching
+    - Refactor compiled function pointer and pImmed update
+    - Fix value return in JIT function
+  * PointLocator: Add tolerance for finding elements
+  * Add ParallelType to ImplicitSystem::add_matrix() API
+  * Add fem_system_ex5 demonstrating IGA
+  * DenseMatrix: Use helper struct to determine whether to use blas_lapack
+  * Elem
+    - Copy Elem interior parents during copy construction
+    - Add Elem::local_side_node()
+    - Add Elem::local_edge_node()
+    - Add edge to side map for all Cell-derived types
+    - Make Edge3::volume() calculation more robust and add unit tests
+    - Add Quad::quality(TWIST) unit test
+    - Add Tri::quality(SHAPE) metric
+    - Elem::simple_build_side_ptr() returning unique_ptr
+    - Quad4::build_side_ptr() should call simple_build_side_ptr()
+    - Optimize Elem::find_point_neighbors()
+    - Add geometric constants for Edge-derived elems
+  * Add SparseMatrix::clone(), zero_clone() and derived class implementations
+  * PointLocator: fix BoundingBox intersection test for QuadTree
+  * Add FileSolutionHistory and test in existing example
+  * Add DirichletBoundary copy assignment operator
+  * Add multi-file support to meshtool app
+  * QGaussLobatto: add fallback on regular Gauss quadrature
+  * Move some m4 files into an autoconf-submodule for sharing between different projects
+  * Make "NumericVector localize()" scalable when possible
+  * Add Lagrange-specific code path to ConstrainDirichlet
+  * Clean up of deprecated code, support for --disable-deprecated builds
+  * Clean up strip_dup_libs.pl script which sorts/modifies the list of linker libraries
+  * TwoStepTimeSolver: add adjoint support
+  * Add/use libmesh_error_msg_if() macro
+  * Inline a more efficient implementation of BoundingBox::intersects()
+  * Add html documentation for several of the newer examples
+  * Fixes for node balancing algorithms during partitioning
+  * GhostPointNeighbors optimizations
+
 1.5.0 -> 1.5.1
   * Fix compilation with --enable-petsc --disable-mpi
   * Fix multithreading bugs in MeshFunction, GenericProjector, tests
