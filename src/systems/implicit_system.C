@@ -1241,4 +1241,22 @@ void ImplicitSystem::release_linear_solver(LinearSolver<Number> * s) const
   delete s;
 }
 
+
+
+const SparseMatrix<Number> & ImplicitSystem::get_system_matrix() const
+{
+  libmesh_assert(matrix);
+  libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
+  return *matrix;
+}
+
+
+
+SparseMatrix<Number> & ImplicitSystem::get_system_matrix()
+{
+  libmesh_assert(matrix);
+  libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
+  return *matrix;
+}
+
 } // namespace libMesh

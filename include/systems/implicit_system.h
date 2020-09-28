@@ -296,22 +296,12 @@ public:
   /**
    * \returns A const reference to the system's primary matrix.
    */
-  inline const SparseMatrix<Number> & get_system_matrix() const
-    {
-      libmesh_assert(matrix);
-      libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
-      return *matrix;
-    }
+  const SparseMatrix<Number> & get_system_matrix() const;
 
   /**
    * \returns A referemce to the system's primary matrix.
    */
-  inline SparseMatrix<Number> & get_system_matrix()
-    {
-      libmesh_assert(matrix);
-      libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
-      return *matrix;
-    }
+  SparseMatrix<Number> & get_system_matrix();
 
   /**
    * The system matrix.  Implicit systems are characterized by

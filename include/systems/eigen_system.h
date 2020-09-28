@@ -176,26 +176,15 @@ public:
    * This matrix should only be available (and therefore this should only be called)
    * if !_use_shell_matrices.
    */
-  inline const SparseMatrix<Number> & get_matrix_A() const
-    {
-      libmesh_assert(matrix_A);
-      libmesh_assert(!_use_shell_matrices);
-      libmesh_assert(has_matrix_A());
-      return *matrix_A;
-    }
+  const SparseMatrix<Number> & get_matrix_A() const;
+
   /**
    * \returns A reference to the system matrix used for standard eigenvalue problems.
    *
    * This matrix should only be available (and therefore this should only be called)
    * if !_use_shell_matrices.
    */
-  inline SparseMatrix<Number> & get_matrix_A()
-    {
-      libmesh_assert(matrix_A);
-      libmesh_assert(!_use_shell_matrices);
-      libmesh_assert(has_matrix_A());
-      return *matrix_A;
-    }
+  SparseMatrix<Number> & get_matrix_A();
 
   /**
    * \returns A const reference to the system matrix used for generalized eigenvalue problems
@@ -203,28 +192,15 @@ public:
    * This matrix should only be available (and therefore this should only be called)
    * if !_use_shell_matrices and generalized().
    */
-  inline const SparseMatrix<Number> & get_matrix_B() const
-    {
-      libmesh_assert(matrix_B);
-      libmesh_assert(!_use_shell_matrices);
-      libmesh_assert(generalized());
-      libmesh_assert(has_matrix_B());
-      return *matrix_B;
-    }
+  const SparseMatrix<Number> & get_matrix_B() const;
+
   /**
    * \returns A const reference to the system matrix used for generalized eigenvalue problems
    *
    * This matrix should only be available (and therefore this should only be called)
    * if !_use_shell_matrices and generalized().
    */
-  inline SparseMatrix<Number> & get_matrix_B()
-    {
-      libmesh_assert(matrix_B);
-      libmesh_assert(!_use_shell_matrices);
-      libmesh_assert(generalized());
-      libmesh_assert(has_matrix_B());
-      return *matrix_B;
-    }
+  SparseMatrix<Number> & get_matrix_B();
 
   /**
    * \returns A const reference to the preconditioning matrix.
@@ -232,28 +208,15 @@ public:
    * This matrix should only be available (and therefore this should only be called)
    * if !_use_shell_matrices.
    */
-  inline const SparseMatrix<Number> & get_precond_matrix() const
-    {
-      libmesh_assert(precond_matrix);
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(!_use_shell_precond_matrix);
-      libmesh_assert(has_precond_matrix());
-      return *precond_matrix;
-    }
+  const SparseMatrix<Number> & get_precond_matrix() const;
+
   /**
    * \returns A reference to the preconditioning matrix.
    *
    * This matrix should only be available (and therefore this should only be called)
    * if !_use_shell_matrices.
    */
-  inline SparseMatrix<Number> & get_precond_matrix()
-    {
-      libmesh_assert(precond_matrix);
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(!_use_shell_precond_matrix);
-      libmesh_assert(has_precond_matrix());
-      return *precond_matrix;
-    }
+  SparseMatrix<Number> & get_precond_matrix();
 
   /**
    * \returns A const reference to the system shell matrix used for standard eigenvalue problems.
@@ -261,24 +224,15 @@ public:
    * This matrix should only be available (and therefore this should only be called)
    * if _use_shell_matrices.
    */
-  inline const ShellMatrix<Number> & get_shell_matrix_A() const
-    {
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(has_shell_matrix_A());
-      return *shell_matrix_A;
-    }
+  const ShellMatrix<Number> & get_shell_matrix_A() const;
+
   /**
    * \returns A reference to the system shell matrix used for standard eigenvalue problems.
    *
    * This matrix should only be available (and therefore this should only be called)
    * if _use_shell_matrices.
    */
-  inline ShellMatrix<Number> & get_shell_matrix_A()
-    {
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(has_shell_matrix_A());
-      return *shell_matrix_A;
-    }
+  ShellMatrix<Number> & get_shell_matrix_A();
 
   /**
    * \returns A const reference to the system shell matrix used for generalized eigenvalue problems.
@@ -286,47 +240,25 @@ public:
    * This matrix should only be available (and therefore this should only be called)
    * if _use_shell_matrices and generalized().
    */
-  inline const ShellMatrix<Number> & get_shell_matrix_B() const
-    {
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(generalized());
-      libmesh_assert(has_shell_matrix_B());
-      return *shell_matrix_B;
-    }
+  const ShellMatrix<Number> & get_shell_matrix_B() const;
+
   /**
    * \returns A reference to the system shell matrix used for generalized eigenvalue problems.
    *
    * This matrix should only be available (and therefore this should only be called)
    * if _use_shell_matrices and generalized().
    */
-  inline ShellMatrix<Number> & get_shell_matrix_B()
-    {
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(generalized());
-      libmesh_assert(has_shell_matrix_B());
-      return *shell_matrix_B;
-    }
+  ShellMatrix<Number> & get_shell_matrix_B();
 
   /**
    * \returns A const reference to the system shell matrix used for preconditioning.
    */
-  inline const ShellMatrix<Number> & get_shell_precond_matrix() const
-    {
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(_use_shell_precond_matrix);
-      libmesh_assert(has_shell_precond_matrix());
-      return *shell_precond_matrix;
-    }
+  const ShellMatrix<Number> & get_shell_precond_matrix() const;
+
   /**
    * \returns A reference to the system shell matrix used for preconditioning.
    */
-  inline ShellMatrix<Number> & get_shell_precond_matrix()
-    {
-      libmesh_assert(_use_shell_matrices);
-      libmesh_assert(_use_shell_precond_matrix);
-      libmesh_assert(has_shell_precond_matrix());
-      return *shell_precond_matrix;
-    }
+  ShellMatrix<Number> & get_shell_precond_matrix();
 
   /**
    * \returns A const reference to the EigenSolver.
@@ -348,53 +280,32 @@ public:
   /**
    * \returns Whether or not the system has matrix A
    */
-  inline bool has_matrix_A() const
-    {
-      libmesh_assert_equal_to(request_matrix("Eigen Matrix A"), matrix_A);
-      return matrix_A;
-    }
+  bool has_matrix_A() const;
 
   /**
    * \returns Whether or not the system has matrix B
    */
-  inline bool has_matrix_B() const
-    {
-      libmesh_assert_equal_to(request_matrix("Eigen Matrix B"), matrix_B);
-      return matrix_B;
-    }
+  bool has_matrix_B() const;
 
   /**
    * \returns Whether or not the system has the non-shell preconditioning matrix
    */
-  inline bool has_precond_matrix() const
-    {
-      libmesh_assert_equal_to(request_matrix("Eigen Preconditioner"), precond_matrix);
-      return precond_matrix;
-    }
+  bool has_precond_matrix() const;
 
   /**
    * \returns Whether or not the system has the shell matrix A
    */
-  inline bool has_shell_matrix_A() const
-    {
-      return shell_matrix_A.get();
-    }
+  bool has_shell_matrix_A() const;
 
   /**
    * \returns Whether or not the system has the shell matrix B
    */
-  inline bool has_shell_matrix_B() const
-    {
-      return shell_matrix_B.get();
-    }
+  bool has_shell_matrix_B() const;
 
   /**
    * \returns Whether or not the system has the shell preconditioning matrix
    */
-  inline bool has_shell_precond_matrix() const
-    {
-      return shell_precond_matrix.get();
-    }
+  bool has_shell_precond_matrix() const;
 
   /**
    * The system matrix for standard eigenvalue problems.

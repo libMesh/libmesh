@@ -109,21 +109,12 @@ public:
   /**
    * \returns The system matrix used for standard eigenvalue problems
    */
-  inline SparseMatrix<Number> & get_condensed_matrix_A() const
-    {
-      libmesh_assert(condensed_matrix_A);
-      libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix A"), condensed_matrix_A);
-      return *condensed_matrix_A;
-    }
+  SparseMatrix<Number> & get_condensed_matrix_A() const;
+
   /**
    * \returns The second system matrix used for generalized eigenvalue problems.
    */
-  inline SparseMatrix<Number> & get_condensed_matrix_B() const
-    {
-      libmesh_assert(condensed_matrix_B);
-      libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix B"), condensed_matrix_B);
-      return *condensed_matrix_B;
-    }
+  SparseMatrix<Number> & get_condensed_matrix_B() const;
 
   /**
    * The (condensed) system matrix for standard eigenvalue problems.

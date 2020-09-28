@@ -309,6 +309,156 @@ bool EigenSystem::generalized () const
 }
 
 
+const SparseMatrix<Number> & EigenSystem::get_matrix_A() const
+{
+  libmesh_assert(matrix_A);
+  libmesh_assert(!_use_shell_matrices);
+  libmesh_assert(has_matrix_A());
+  return *matrix_A;
+}
+
+
+SparseMatrix<Number> & EigenSystem::get_matrix_A()
+{
+  libmesh_assert(matrix_A);
+  libmesh_assert(!_use_shell_matrices);
+  libmesh_assert(has_matrix_A());
+  return *matrix_A;
+}
+
+
+const SparseMatrix<Number> & EigenSystem::get_matrix_B() const
+{
+  libmesh_assert(matrix_B);
+  libmesh_assert(!_use_shell_matrices);
+  libmesh_assert(generalized());
+  libmesh_assert(has_matrix_B());
+  return *matrix_B;
+}
+
+
+SparseMatrix<Number> & EigenSystem::get_matrix_B()
+{
+  libmesh_assert(matrix_B);
+  libmesh_assert(!_use_shell_matrices);
+  libmesh_assert(generalized());
+  libmesh_assert(has_matrix_B());
+  return *matrix_B;
+}
+
+
+const SparseMatrix<Number> & EigenSystem::get_precond_matrix() const
+{
+  libmesh_assert(precond_matrix);
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(!_use_shell_precond_matrix);
+  libmesh_assert(has_precond_matrix());
+  return *precond_matrix;
+}
+
+
+SparseMatrix<Number> & EigenSystem::get_precond_matrix()
+{
+  libmesh_assert(precond_matrix);
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(!_use_shell_precond_matrix);
+  libmesh_assert(has_precond_matrix());
+  return *precond_matrix;
+}
+
+
+const ShellMatrix<Number> & EigenSystem::get_shell_matrix_A() const
+{
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(has_shell_matrix_A());
+  return *shell_matrix_A;
+}
+
+
+ShellMatrix<Number> & EigenSystem::get_shell_matrix_A()
+{
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(has_shell_matrix_A());
+  return *shell_matrix_A;
+}
+
+
+const ShellMatrix<Number> & EigenSystem::get_shell_matrix_B() const
+{
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(generalized());
+  libmesh_assert(has_shell_matrix_B());
+  return *shell_matrix_B;
+}
+
+
+ShellMatrix<Number> & EigenSystem::get_shell_matrix_B()
+{
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(generalized());
+  libmesh_assert(has_shell_matrix_B());
+  return *shell_matrix_B;
+}
+
+
+const ShellMatrix<Number> & EigenSystem::get_shell_precond_matrix() const
+{
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(_use_shell_precond_matrix);
+  libmesh_assert(has_shell_precond_matrix());
+  return *shell_precond_matrix;
+}
+
+
+ShellMatrix<Number> & EigenSystem::get_shell_precond_matrix()
+{
+  libmesh_assert(_use_shell_matrices);
+  libmesh_assert(_use_shell_precond_matrix);
+  libmesh_assert(has_shell_precond_matrix());
+  return *shell_precond_matrix;
+}
+
+
+bool EigenSystem::has_matrix_A() const
+{
+  libmesh_assert_equal_to(request_matrix("Eigen Matrix A"), matrix_A);
+  return matrix_A;
+}
+
+
+bool EigenSystem::has_matrix_B() const
+{
+  libmesh_assert_equal_to(request_matrix("Eigen Matrix B"), matrix_B);
+  return matrix_B;
+}
+
+
+bool EigenSystem::has_precond_matrix() const
+{
+  libmesh_assert_equal_to(request_matrix("Eigen Preconditioner"), precond_matrix);
+  return precond_matrix;
+}
+
+
+bool EigenSystem::has_shell_matrix_A() const
+{
+  return shell_matrix_A.get();
+}
+
+
+bool EigenSystem::has_shell_matrix_B() const
+{
+  return shell_matrix_B.get();
+}
+
+
+bool EigenSystem::has_shell_precond_matrix() const
+{
+  return shell_precond_matrix.get();
+}
+
+
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC
