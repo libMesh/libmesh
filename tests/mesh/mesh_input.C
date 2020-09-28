@@ -19,15 +19,15 @@
 using namespace libMesh;
 
 
-Number x_plus_y (const Point& p,
-                 const Parameters&,
-                 const std::string&,
-                 const std::string&)
+Number six_x_plus_sixty_y (const Point& p,
+                           const Parameters&,
+                           const std::string&,
+                           const std::string&)
 {
   const Real & x = p(0);
   const Real & y = p(1);
 
-  return x + y;
+  return 6*x + 60*y;
 }
 
 
@@ -126,7 +126,7 @@ public:
                                            0., 1., 0., 1.);
 
       es.init();
-      sys.project_solution(x_plus_y, nullptr, es.parameters);
+      sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
 
       IOType meshoutput(mesh);
 
@@ -171,7 +171,7 @@ public:
           {
             Point p(x,y);
             LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                    libmesh_real(x+y),
+                                    libmesh_real(6*x+60*y),
                                     exotol);
           }
     }
@@ -208,7 +208,7 @@ public:
                                            0., 1., 0., 1.);
 
       es.init();
-      sys.project_solution(x_plus_y, nullptr, es.parameters);
+      sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
 
       IOType meshinput(mesh);
 
@@ -255,7 +255,7 @@ public:
           {
             Point p(x,y);
             LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                    libmesh_real(x+y),
+                                    libmesh_real(6*x+60*y),
                                     exotol);
           }
     }
