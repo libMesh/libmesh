@@ -113,7 +113,7 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
                      (e->processor_id() != mesh.processor_id()),
                      "Periodic boundary neighbor not found");
   if (neigh_side)
-    *neigh_side = DofObject::invalid_id;
+    *neigh_side = libMesh::invalid_uint;
   return remote_elem;
 }
 
