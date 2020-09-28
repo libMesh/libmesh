@@ -135,15 +135,18 @@ public:
 
     {
       MeshType mesh(*TestCommWorld);
+      IOType meshinput(mesh);
 
       // Avoid getting Nemesis solution values mixed up
-      mesh.allow_renumbering(false);
+      if (meshinput.is_parallel_format())
+        {
+          mesh.allow_renumbering(false);
+          mesh.skip_noncritical_partitioning(true);
+        }
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("testn", FIRST, LAGRANGE);
-
-      IOType meshinput(mesh);
 
       if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
         meshinput.read(filename);
@@ -222,12 +225,18 @@ public:
 
     {
       MeshType mesh(*TestCommWorld);
+      IOType meshinput(mesh);
+
+      // Avoid getting Nemesis solution values mixed up
+      if (meshinput.is_parallel_format())
+        {
+          mesh.allow_renumbering(false);
+          mesh.skip_noncritical_partitioning(true);
+        }
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("teste", CONSTANT, MONOMIAL);
-
-      IOType meshinput(mesh);
 
       if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
         meshinput.read(filename);
