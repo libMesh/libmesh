@@ -294,17 +294,12 @@ public:
                                                     SensitivityData & product) override;
 
   /**
-   * \returns The name used for registration and access of the system matrix.
-   */
-  static std::string system_matrix_name() { return "System Matrix"; }
-
-  /**
    * \returns A const reference to the system's primary matrix.
    */
   inline const SparseMatrix<Number> & get_system_matrix() const
     {
       libmesh_assert(matrix);
-      libmesh_assert_equal_to(&get_matrix(system_matrix_name()), matrix);
+      libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
       return *matrix;
     }
 
@@ -314,7 +309,7 @@ public:
   inline SparseMatrix<Number> & get_system_matrix()
     {
       libmesh_assert(matrix);
-      libmesh_assert_equal_to(&get_matrix(system_matrix_name()), matrix);
+      libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
       return *matrix;
     }
 

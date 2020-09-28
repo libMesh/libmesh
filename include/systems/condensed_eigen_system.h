@@ -107,21 +107,12 @@ public:
   virtual std::pair<Real, Real> get_eigenpair(dof_id_type i) override;
 
   /**
-   * \returns The name used for registration and access of the condensed A matrix.
-   */
-  static std::string condensed_matrix_A_name() { return "Condensed Eigen Matrix A"; }
-  /**
-   * \returns The name used for registration and access of the condensed B matrix.
-   */
-  static std::string condensed_matrix_B_name() { return "Condensed Eigen Matrix B"; }
-
-  /**
    * \returns The system matrix used for standard eigenvalue problems
    */
   inline SparseMatrix<Number> & get_condensed_matrix_A() const
     {
       libmesh_assert(condensed_matrix_A);
-      libmesh_assert_equal_to(&get_matrix(condensed_matrix_A_name()), condensed_matrix_A);
+      libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix A"), condensed_matrix_A);
       return *condensed_matrix_A;
     }
   /**
@@ -130,7 +121,7 @@ public:
   inline SparseMatrix<Number> & get_condensed_matrix_B() const
     {
       libmesh_assert(condensed_matrix_B);
-      libmesh_assert_equal_to(&get_matrix(condensed_matrix_B_name()), condensed_matrix_B);
+      libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix B"), condensed_matrix_B);
       return *condensed_matrix_B;
     }
 

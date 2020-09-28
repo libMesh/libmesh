@@ -147,15 +147,15 @@ void EigenSystem::add_matrices ()
           shell_precond_matrix = ShellMatrix<Number>::build(this->comm());
       }
     else if (!precond_matrix)
-      precond_matrix = &(this->add_matrix(precond_matrix_name()));
+      precond_matrix = &(this->add_matrix("Eigen Preconditioner"));
   }
   else
   {
     if (!matrix_A)
-      matrix_A = &(this->add_matrix(matrix_A_name()));
+      matrix_A = &(this->add_matrix("Eigen Matrix A"));
 
     if (generalized() && !matrix_B)
-      matrix_B = &(this->add_matrix(matrix_B_name()));
+      matrix_B = &(this->add_matrix("Eigen Matrix B"));
   }
 }
 

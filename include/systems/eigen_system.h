@@ -171,19 +171,6 @@ public:
   void use_shell_precond_matrix(bool use_shell_precond_matrix) { _use_shell_precond_matrix = use_shell_precond_matrix; }
 
   /**
-   * \returns The name used for registration and access of the A matrix.
-   */
-  static std::string matrix_A_name() { return "Eigen Matrix A"; }
-  /**
-   * \returns The name used for registration and access of the B matrix.
-   */
-  static std::string matrix_B_name() { return "Eigen Matrix B"; }
-  /**
-   * \returns The name used for registration of the preconditioning matrix.
-   */
-  static std::string precond_matrix_name() { return "Eigen Preconditioner"; }
-
-  /**
    * \returns A const reference to the system matrix used for standard eigenvalue problems.
    *
    * This matrix should only be available (and therefore this should only be called)
@@ -363,7 +350,7 @@ public:
    */
   inline bool has_matrix_A() const
     {
-      libmesh_assert_equal_to(request_matrix(matrix_A_name()), matrix_A);
+      libmesh_assert_equal_to(request_matrix("Eigen Matrix A"), matrix_A);
       return matrix_A;
     }
 
@@ -372,7 +359,7 @@ public:
    */
   inline bool has_matrix_B() const
     {
-      libmesh_assert_equal_to(request_matrix(matrix_B_name()), matrix_B);
+      libmesh_assert_equal_to(request_matrix("Eigen Matrix B"), matrix_B);
       return matrix_B;
     }
 
@@ -381,7 +368,7 @@ public:
    */
   inline bool has_precond_matrix() const
     {
-      libmesh_assert_equal_to(request_matrix(precond_matrix_name()), precond_matrix);
+      libmesh_assert_equal_to(request_matrix("Eigen Preconditioner"), precond_matrix);
       return precond_matrix;
     }
 

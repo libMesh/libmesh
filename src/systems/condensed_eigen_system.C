@@ -37,8 +37,8 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
                                             const std::string & name_in,
                                             const unsigned int number_in)
   : Parent(es, name_in, number_in),
-    condensed_matrix_A(&this->add_matrix(condensed_matrix_A_name())),
-    condensed_matrix_B(&this->add_matrix(condensed_matrix_B_name())),
+    condensed_matrix_A(&this->add_matrix("Condensed Eigen Matrix A")),
+    condensed_matrix_B(&this->add_matrix("Condensed Eigen Matrix B")),
     condensed_dofs_initialized(false)
 {
 }
