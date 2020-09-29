@@ -21,6 +21,7 @@
 
 // LibMesh includes
 #include "libmesh/distributed_mesh.h"
+#include "libmesh/dof_map.h" // local_index
 #include "libmesh/elem.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/libmesh_logging.h"
@@ -776,19 +777,6 @@ void Nemesis_IO::read (const std::string & base_filename)
   // parallel communication.
   elems_of_dimension.resize(4, false); // will use 1-based
 
-  // Compute my_elem_offset, the amount by which to offset the local elem numbering
-  // on my processor.
-  unsigned int my_next_elem = 0;
-  for (auto pid : make_range(this->processor_id()))
-    my_next_elem += (all_loadbal_data[8*pid + 3]+  // num_internal_elems, proc pid
-                     all_loadbal_data[8*pid + 4]); // num_border_elems, proc pid
-  const unsigned int my_elem_offset = my_next_elem;
-
-  if (_verbose)
-    libMesh::out << "[" << this->processor_id() << "] "
-                 << "my_elem_offset=" << my_elem_offset << std::endl;
-
-
   // Fills in the:
   // global_elem_blk_ids[] and
   // global_elem_blk_cnts[] arrays.
@@ -814,9 +802,13 @@ void Nemesis_IO::read (const std::string & base_filename)
   // (read in the array nemhelper->block_ids[])
   nemhelper->read_block_info();
 
-  // Reads the nemhelper->elem_num_map array, elem_num_map[i] is the global element number for
-  // local element number i.
+  // Reads the nemhelper->elem_num_map array.
+  // elem_num_map[i] is the exodus element number for local element
+  // number i, which makes elem_num_map[i]-1 the libMesh element
+  // number.
   nemhelper->read_elem_num_map();
+
+  std::size_t local_elem_num = 0;
 
   // Read in the element connectivity for each block by
   // looping over all the blocks.
@@ -858,7 +850,7 @@ void Nemesis_IO::read (const std::string & base_filename)
           // numbering in Exodus is also 1-based.
           uelem->subdomain_id() = subdomain_id;
           uelem->processor_id() = this->processor_id();
-          uelem->set_id()       = my_next_elem++;
+          uelem->set_id()       = nemhelper->elem_num_map[local_elem_num++]-1;
 
           // Handle unique_id numbering, just in case we're using a
           // ReplicatedMesh that doesn't know how to handle it in
@@ -876,14 +868,10 @@ void Nemesis_IO::read (const std::string & base_filename)
           Elem * elem = mesh.add_elem(std::move(uelem));
 
           // We are expecting the element "thrown back" by libmesh to have the ID we specified for it...
-          // Check to see that really is the case.  Note that my_next_elem was post-incremented, so
+          // Check to see that really is the case.  Note that local_elem_num was post-incremented, so
           // subtract 1 when performing the check.
-          libmesh_error_msg_if(elem->id() != my_next_elem-1,
-                               "Unexpected ID "
-                               << elem->id()
-                               << " set by parallel mesh. (expecting "
-                               << my_next_elem-1
-                               << ").");
+          libmesh_assert_equal_to(elem->id(),
+                                  cast_int<dof_id_type>(nemhelper->elem_num_map[local_elem_num-1]-1));
 
           // Set all the nodes for this element
           if (_verbose)
@@ -903,8 +891,6 @@ void Nemesis_IO::read (const std::string & base_filename)
             }
         } // for (unsigned int j=0; j<nemhelper->num_elem_this_blk; j++)
     } // end for (unsigned int i=0; i<nemhelper->num_elem_blk; i++)
-
-  libmesh_assert_equal_to ((my_next_elem - my_elem_offset), to_uint(nemhelper->num_elem));
 
   if (_verbose)
     {
@@ -1019,8 +1005,8 @@ void Nemesis_IO::read (const std::string & base_filename)
   // in the BoundaryInfo object of our Mesh object.  This is slightly different in parallel...
   // For example, I think the IDs in each of the split Exodus files are numbered locally,
   // and we have to know the appropriate ID for this processor to be able to set the
-  // entry in BoundaryInfo.  This offset should be given by my_elem_offset determined in
-  // this function...
+  // entry in BoundaryInfo.  This id should be given by
+  // elem_num_map[i]-1 for the local index i
 
   // Debugging:
   // Print entries of elem_list
@@ -1042,17 +1028,11 @@ void Nemesis_IO::read (const std::string & base_filename)
   // Mesh data structure, and assign the appropriate side to the BoundaryInfo object.
   for (auto e : index_range(nemhelper->elem_list))
     {
-      // Calling mesh.elem_ptr() is an error if no element with that
-      // id exists on this processor...
-      //
-      // Perhaps we should iterate over elements and look them up in
-      // the elem list instead?  Note that the IDs in elem_list are
-      // not necessarily in order, so if we did instead loop over the
-      // mesh, we would have to search the (unsorted) elem_list vector
-      // for each entry!  We'll settle for doing some error checking instead.
-      Elem * elem = mesh.elem_ptr
-        (my_elem_offset +
-         (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
+      // Exodus numbering is 1-based
+      const std::size_t local_id = nemhelper->elem_list[e]-1;
+      const dof_id_type elem_id = nemhelper->elem_num_map[local_id]-1;
+
+      Elem * elem = mesh.elem_ptr(elem_id);
 
       // The side numberings in libmesh and exodus are not 1:1, so we need to map
       // whatever side number is stored in Exodus into a libmesh side number using
@@ -1668,7 +1648,7 @@ void Nemesis_IO::copy_nodal_solution(System & system,
           dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
 
           // If the dof_index is local to this processor, set the value
-          if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
+          if (system.get_dof_map().local_index(dof_index))
             system.solution->set (dof_index, p.second);
         }
     }
