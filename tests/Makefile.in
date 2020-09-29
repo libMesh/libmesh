@@ -1953,7 +1953,7 @@ data = 1_quad.dyn \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
-	write_edgeset_data.e read_header_test.e output.dat \
+	write_edgeset_data.e read_header_test.e output.dat periodic.e \
 	$(am__append_12) $(am__append_13)
 
 # need to link any data files for VPATH builds
