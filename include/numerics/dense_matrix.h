@@ -93,6 +93,11 @@ public:
   DenseMatrix & operator= (DenseMatrix &&) = default;
   virtual ~DenseMatrix() = default;
 
+  /**
+   * Sets all elements of the matrix to 0 and resets any decomposition
+   * flag which may have been previously set.  This allows e.g. a new
+   * LU decomposition to be computed while reusing the same storage.
+   */
   virtual void zero() override;
 
   /**
@@ -234,8 +239,11 @@ public:
   void swap(DenseMatrix<T> & other_matrix);
 
   /**
-   * Resize the matrix.  Will never free memory, but may
-   * allocate more.  Sets all elements to 0.
+   * Resizes the matrix to the specified size and calls zero().  Will
+   * never free memory, but may allocate more. Note: when the matrix
+   * is zero()'d, any decomposition (LU, Cholesky, etc.) is also
+   * cleared, forcing a new decomposition to be computed the next time
+   * e.g. lu_solve() is called.
    */
   void resize(const unsigned int new_m,
               const unsigned int new_n);
@@ -389,6 +397,15 @@ public:
    * Solve the system Ax=b given the input vector b.  Partial pivoting
    * is performed by default in order to keep the algorithm stable to
    * the effects of round-off error.
+   *
+   * Important note: once you call lu_solve(), you must _not_ modify
+   * the entries of the matrix via calls to operator(i,j) and call
+   * lu_solve() again without first calling either zero() or resize(),
+   * otherwise the code will skip computing the decomposition of the
+   * matrix and go directly to the back substitution step. This is
+   * done on purpose for efficiency, so that the same LU decomposition
+   * can be used with multiple right-hand sides, but it does also make
+   * it possible to "shoot yourself in the foot", so be careful!
    */
   void lu_solve (const DenseVector<T> & b,
                  DenseVector<T> & x);
@@ -400,6 +417,16 @@ public:
    * that the matrix is SPD.  If the matrix is not SPD, an error is generated.
    * One nice property of Cholesky decompositions is that they do not require
    * pivoting for stability.
+   *
+   * Important note: once you call cholesky_solve(), you must _not_
+   * modify the entries of the matrix via calls to operator(i,j) and
+   * call cholesky_solve() again without first calling either zero()
+   * or resize(), otherwise the code will skip computing the
+   * decomposition of the matrix and go directly to the back
+   * substitution step. This is done on purpose for efficiency, so
+   * that the same decomposition can be used with multiple right-hand
+   * sides, but it does also make it possible to "shoot yourself in
+   * the foot", so be careful!
    *
    * \note This method may also be used when A is real-valued and x
    * and b are complex-valued.
