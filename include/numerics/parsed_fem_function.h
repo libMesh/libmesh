@@ -38,6 +38,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -66,21 +67,16 @@ public:
                      const std::vector<Output> * initial_vals=nullptr);
 
   /**
-   * This class contains a const reference so it can't be copy or move-assigned.
+   * Constructors
+   * - This class contains a const reference so it can't be default
+   *   copy or move-assigned.  We manually implement the former
+   * - This class contains unique_ptrs so it can't be default copy
+   *   constructed or assigned.
+   * - It can still be default moved and deleted.
    */
-  ParsedFEMFunction & operator= (const ParsedFEMFunction &) = delete;
+  ParsedFEMFunction & operator= (const ParsedFEMFunction &);
   ParsedFEMFunction & operator= (ParsedFEMFunction &&) = delete;
-
-  /**
-   * The remaining 5 special functions can be safely defaulted.
-   *
-   * \note The underlying FunctionParserBase class has a copy
-   * constructor, so this class should be default-constructible.  And,
-   * although FunctionParserBase's move constructor is deleted, _this_
-   * class should still be move-constructible because
-   * FunctionParserBase only appears in a vector.
-   */
-  ParsedFEMFunction (const ParsedFEMFunction &) = default;
+  ParsedFEMFunction (const ParsedFEMFunction &);
   ParsedFEMFunction (ParsedFEMFunction &&) = default;
   virtual ~ParsedFEMFunction () = default;
 
@@ -166,9 +162,9 @@ private:
     _n_requested_hess_components;
   bool _requested_normals;
 #ifdef LIBMESH_HAVE_FPARSER
-  std::vector<FunctionParserBase<Output>> parsers;
+  std::vector<std::unique_ptr<FunctionParserBase<Output>>> parsers;
 #else
-  std::vector<char> parsers;
+  std::vector<char*> parsers;
 #endif
   std::vector<Output> _spacetime;
 
@@ -217,6 +213,47 @@ ParsedFEMFunction<Output>::ParsedFEMFunction (const System & sys,
   _initial_vals (initial_vals ? *initial_vals : std::vector<Output>())
 {
   this->reparse(expression);
+}
+
+
+template <typename Output>
+inline
+ParsedFEMFunction<Output>::ParsedFEMFunction (const ParsedFEMFunction<Output> & other) :
+  FEMFunctionBase<Output>(other),
+  _sys(other._sys),
+  _expression(other._expression),
+  _subexpressions(other._subexpressions),
+  _n_vars(other._n_vars),
+  _n_requested_vars(other._n_requested_vars),
+  _n_requested_grad_components(other._n_requested_grad_components),
+  _n_requested_hess_components(other._n_requested_hess_components),
+  _requested_normals(other._requested_normals),
+  _spacetime(other._spacetime),
+  _need_var(other._need_var),
+  _need_var_grad(other._need_var_grad),
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  _need_var_hess(other._need_var_hess),
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+  variables(other.variables),
+  _additional_vars(other._additional_vars),
+  _initial_vals(other._initial_vals)
+{
+  this->reparse(_expression);
+}
+
+
+template <typename Output>
+inline
+ParsedFEMFunction<Output> &
+ParsedFEMFunction<Output>::operator= (const ParsedFEMFunction<Output> & other)
+{
+  // We can only be assigned another ParsedFEMFunction defined on the same System
+  libmesh_assert(&_sys == &other._sys);
+
+  // Use copy-and-swap idiom
+  ParsedFEMFunction<Output> tmp(other);
+  std::swap(tmp, *this);
+  return *this;
 }
 
 
@@ -399,7 +436,7 @@ ParsedFEMFunction<Output>::operator() (const FEMContext & c,
 {
   eval_args(c, p, time);
 
-  return eval(parsers[0], "f", 0);
+  return eval(*parsers[0], "f", 0);
 }
 
 
@@ -419,7 +456,7 @@ ParsedFEMFunction<Output>::operator() (const FEMContext & c,
   libmesh_assert_equal_to (size, parsers.size());
 
   for (unsigned int i=0; i != size; ++i)
-    output(i) = eval(parsers[i], "f", i);
+    output(i) = eval(*parsers[i], "f", i);
 }
 
 
@@ -434,7 +471,7 @@ ParsedFEMFunction<Output>::component (const FEMContext & c,
   eval_args(c, p, time);
 
   libmesh_assert_less (i, parsers.size());
-  return eval(parsers[i], "f", i);
+  return eval(*parsers[i], "f", i);
 }
 
 template <typename Output>
@@ -478,16 +515,16 @@ ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name)
 #ifdef LIBMESH_HAVE_FPARSER
       // Parse and evaluate the new subexpression.
       // Add the same constants as we used originally.
-      FunctionParserBase<Output> fp;
-      fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-      fp.AddConstant("pi", std::acos(Real(-1)));
-      fp.AddConstant("e", std::exp(Real(1)));
-      if (fp.Parse(new_subexpression, variables) != -1) // -1 for success
+      auto fp = libmesh_make_unique<FunctionParserBase<Output>>();
+      fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+      fp->AddConstant("pi", std::acos(Real(-1)));
+      fp->AddConstant("e", std::exp(Real(1)));
+      if (fp->Parse(new_subexpression, variables) != -1) // -1 for success
         libmesh_error_msg
           ("ERROR: FunctionParser is unable to parse modified expression: "
-           << new_subexpression << '\n' << fp.ErrorMsg());
+           << new_subexpression << '\n' << fp->ErrorMsg());
 
-      Output new_var_value = this->eval(fp, new_subexpression, 0);
+      Output new_var_value = this->eval(*fp, new_subexpression, 0);
 #ifdef NDEBUG
       return new_var_value;
 #else
@@ -620,16 +657,16 @@ ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
 #ifdef LIBMESH_HAVE_FPARSER
       // Parse (and optimize if possible) the subexpression.
       // Add some basic constants, to Real precision.
-      FunctionParserBase<Output> fp;
-      fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-      fp.AddConstant("pi", std::acos(Real(-1)));
-      fp.AddConstant("e", std::exp(Real(1)));
-      if (fp.Parse(_subexpressions.back(), variables) != -1) // -1 for success
+      auto fp = libmesh_make_unique<FunctionParserBase<Output>>();
+      fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+      fp->AddConstant("pi", std::acos(Real(-1)));
+      fp->AddConstant("e", std::exp(Real(1)));
+      if (fp->Parse(_subexpressions.back(), variables) != -1) // -1 for success
         libmesh_error_msg
           ("ERROR: FunctionParser is unable to parse expression: "
-           << _subexpressions.back() << '\n' << fp.ErrorMsg());
-      fp.Optimize();
-      parsers.push_back(fp);
+           << _subexpressions.back() << '\n' << fp->ErrorMsg());
+      fp->Optimize();
+      parsers.push_back(std::move(fp));
 #else
       libmesh_error_msg("ERROR: This functionality requires fparser!");
 #endif
