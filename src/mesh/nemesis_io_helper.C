@@ -2669,10 +2669,11 @@ void Nemesis_IO_Helper::read_var_names_impl(const char * var_type,
 
   // But with tests where we have more processors than elements,
   // Nemesis doesn't let us put variable names in files written by
-  // processors owning no nodes, but we may still *need* those
+  // processors owning nothing, but we may still *need* those
   // variable names on every processor, so let's sync them up...
+
   processor_id_type pid_broadcasting_names = this->processor_id();
-  const std::size_t n_names = this->nodal_var_names.size();
+  const std::size_t n_names = result.size();
   if (!n_names)
     pid_broadcasting_names = DofObject::invalid_processor_id;
 
@@ -2682,8 +2683,7 @@ void Nemesis_IO_Helper::read_var_names_impl(const char * var_type,
   this->comm().min(pid_broadcasting_names);
 
   if (pid_broadcasting_names != DofObject::invalid_processor_id)
-    this->comm().broadcast(this->nodal_var_names,
-                           pid_broadcasting_names);
+    this->comm().broadcast(result, pid_broadcasting_names);
 }
 
 
