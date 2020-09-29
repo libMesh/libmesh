@@ -1609,15 +1609,6 @@ void Nemesis_IO::write_information_records (const std::vector<std::string> & rec
 }
 
 
-#else
-
-void Nemesis_IO::write_information_records ( const std::vector<std::string> & )
-{
-  libmesh_error_msg("ERROR, Nemesis API is not defined.");
-}
-
-
-
 const std::vector<std::string> & Nemesis_IO::get_nodal_var_names()
 {
   nemhelper->read_var_names(ExodusII_IO_Helper::NODAL);
@@ -1657,6 +1648,129 @@ void Nemesis_IO::copy_nodal_solution(System & system,
   system.update();
 }
 
+
+
+void Nemesis_IO::copy_elemental_solution(System & system,
+                                         std::string system_var_name,
+                                         std::string exodus_var_name,
+                                         unsigned int timestep)
+{
+  parallel_object_only();
+
+  const unsigned int var_num = system.variable_number(system_var_name);
+  libmesh_error_msg_if(system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL),
+                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
+
+  const MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  // Map from element ID to elemental variable value.  We need to use
+  // a map here rather than a vector (e.g. elem_var_values) since the
+  // libmesh element numbering can contain "holes".  This is the case
+  // if we are reading elemental var values from an adaptively refined
+  // mesh that has not been sequentially renumbered.
+  std::map<dof_id_type, Real> elem_var_value_map;
+
+  libmesh_error_msg_if(!nemhelper->opened_for_reading,
+                       "ERROR, Nemesis file must be opened for reading before copying an elemental solution!");
+
+  nemhelper->read_elemental_var_values(exodus_var_name, timestep, elem_var_value_map);
+
+  std::map<dof_id_type, Real>::iterator
+    it = elem_var_value_map.begin(),
+    end = elem_var_value_map.end();
+
+  for (; it!=end; ++it)
+    {
+      const Elem * elem = mesh.query_elem_ptr(it->first);
+
+      if (elem && elem->n_comp(system.number(), var_num) > 0)
+        {
+          dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
+          libmesh_assert(system.get_dof_map().local_index(dof_index));
+          system.solution->set (dof_index, it->second);
+        }
+    }
+
+  system.solution->close();
+  system.update();
+
+  parallel_object_only();
+}
+
+
+
+void Nemesis_IO::copy_scalar_solution(System & system,
+                                      std::vector<std::string> system_var_names,
+                                      std::vector<std::string> exodus_var_names,
+                                      unsigned int timestep)
+{
+  libmesh_error_msg_if(!nemhelper->opened_for_reading,
+                       "ERROR, Nemesis file must be opened for reading before copying a scalar solution!");
+
+  libmesh_error_msg_if(system_var_names.size() != exodus_var_names.size(),
+                       "ERROR, the number of system_var_names must match exodus_var_names.");
+
+  std::vector<Real> values_from_exodus;
+  read_global_variable(exodus_var_names, timestep, values_from_exodus);
+
+  if (system.processor_id() == (system.n_processors()-1))
+  {
+    const DofMap & dof_map = system.get_dof_map();
+
+    for (auto i : index_range(system_var_names))
+    {
+      const unsigned int var_num = system.variable_scalar_number(system_var_names[i], 0);
+
+      std::vector<dof_id_type> SCALAR_dofs;
+      dof_map.SCALAR_dof_indices(SCALAR_dofs, var_num);
+
+      system.solution->set (SCALAR_dofs[0], values_from_exodus[i]);
+    }
+  }
+
+  system.solution->close();
+  system.update();
+}
+
+
+void Nemesis_IO::read_global_variable(std::vector<std::string> global_var_names,
+                                       unsigned int timestep,
+                                       std::vector<Real> & global_values)
+{
+  std::size_t size = global_var_names.size();
+  libmesh_error_msg_if(size == 0, "ERROR, empty list of global variables to read from the Nemesis file.");
+
+  // read the values for all global variables
+  std::vector<Real> values_from_exodus;
+  nemhelper->read_var_names(ExodusII_IO_Helper::GLOBAL);
+  nemhelper->read_global_values(values_from_exodus, timestep);
+  std::vector<std::string> global_var_names_exodus = nemhelper->global_var_names;
+
+  if (values_from_exodus.size() == 0)
+    return;   // This will happen in parallel on procs that are not 0
+
+  global_values.clear();
+  for (std::size_t i = 0; i != size; ++i)
+    {
+      // for each global variable in global_var_names, look the corresponding one in global_var_names_from_exodus
+      // and fill global_values accordingly
+      auto it = find(global_var_names_exodus.begin(), global_var_names_exodus.end(), global_var_names[i]);
+      if (it != global_var_names_exodus.end())
+        global_values.push_back(values_from_exodus[it - global_var_names_exodus.begin()]);
+      else
+        libmesh_error_msg("ERROR, Global variable " << global_var_names[i] << \
+                          " not found in Nemesis file.");
+    }
+}
+
+
+
+#else
+
+void Nemesis_IO::write_information_records ( const std::vector<std::string> & )
+{
+  libmesh_error_msg("ERROR, Nemesis API is not defined.");
+}
 
 
 #endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
