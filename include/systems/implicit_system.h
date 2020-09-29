@@ -299,7 +299,7 @@ public:
   const SparseMatrix<Number> & get_system_matrix() const;
 
   /**
-   * \returns A referemce to the system's primary matrix.
+   * \returns A reference to the system's primary matrix.
    */
   SparseMatrix<Number> & get_system_matrix();
 
