@@ -254,7 +254,8 @@ CLEANFILES = cube_mesh.xda \
              write_sideset_data.e \
              write_edgeset_data.e \
              read_header_test.e \
-             output.dat
+             output.dat \
+             periodic.e
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
