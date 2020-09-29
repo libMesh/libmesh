@@ -458,6 +458,19 @@ bool EigenSystem::has_shell_precond_matrix() const
 }
 
 
+const EigenSolver<Number> & EigenSystem::get_eigen_solver() const
+{
+  libmesh_assert(eigen_solver);
+  return *eigen_solver;
+}
+
+
+EigenSolver<Number> & EigenSystem::get_eigen_solver()
+{
+  libmesh_assert(eigen_solver);
+  return *eigen_solver;
+}
+
 
 } // namespace libMesh
 

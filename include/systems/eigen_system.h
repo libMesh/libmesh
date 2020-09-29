@@ -263,19 +263,11 @@ public:
   /**
    * \returns A const reference to the EigenSolver.
    */
-  inline const EigenSolver<Number> & get_eigen_solver() const
-    {
-      libmesh_assert(eigen_solver);
-      return *eigen_solver;
-    }
+  const EigenSolver<Number> & get_eigen_solver() const;
   /**
    * \returns A reference to the EigenSolver.
    */
-  inline EigenSolver<Number> & get_eigen_solver()
-    {
-      libmesh_assert(eigen_solver);
-      return *eigen_solver;
-    }
+  EigenSolver<Number> & get_eigen_solver();
 
   /**
    * \returns Whether or not the system has matrix A
