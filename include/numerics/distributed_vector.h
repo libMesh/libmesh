@@ -572,7 +572,11 @@ void DistributedVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert_less (i-first_local_index(), local_size());
 
   _values[i - _first_local_index] = value;
+
+
+  this->_is_closed = false;
 }
+
 
 
 
@@ -587,6 +591,9 @@ void DistributedVector<T>::add (const numeric_index_type i, const T value)
   libmesh_assert_less (i-first_local_index(), local_size());
 
   _values[i - _first_local_index] += value;
+
+
+  this->_is_closed = false;
 }
 
 
