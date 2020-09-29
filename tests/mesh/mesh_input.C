@@ -55,6 +55,8 @@ public:
 
   CPPUNIT_TEST( testNemesisCopyNodalSolutionDistributed );
   CPPUNIT_TEST( testNemesisCopyNodalSolutionReplicated );
+  CPPUNIT_TEST( testNemesisCopyElementSolutionDistributed );
+  CPPUNIT_TEST( testNemesisCopyElementSolutionReplicated );
 #endif
 
   CPPUNIT_TEST( testDynaReadElem );
@@ -276,6 +278,14 @@ public:
 
   void testExodusCopyElementSolutionDistributed ()
   { testCopyElementSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_soln.e"); }
+
+#if defined(LIBMESH_HAVE_NEMESIS_API)
+  void testNemesisCopyElementSolutionReplicated ()
+  { testCopyElementSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_elem_soln.nem"); }
+
+  void testNemesisCopyElementSolutionDistributed ()
+  { testCopyElementSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_soln.nem"); }
+#endif
 
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
