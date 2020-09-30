@@ -433,14 +433,14 @@ template <typename T>
 inline
 TypeVector<T>::TypeVector ()
 {
-  _coords[0] = 0;
+  _coords[0] = {};
 
 #if LIBMESH_DIM > 1
-  _coords[1] = 0;
+  _coords[1] = {};
 #endif
 
 #if LIBMESH_DIM > 2
-  _coords[2] = 0;
+  _coords[2] = {};
 #endif
 }
 

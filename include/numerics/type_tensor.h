@@ -519,20 +519,20 @@ template <typename T>
 inline
 TypeTensor<T>::TypeTensor ()
 {
-  _coords[0] = 0;
+  _coords[0] = {};
 
 #if LIBMESH_DIM > 1
-  _coords[1] = 0;
-  _coords[2] = 0;
-  _coords[3] = 0;
+  _coords[1] = {};
+  _coords[2] = {};
+  _coords[3] = {};
 #endif
 
 #if LIBMESH_DIM > 2
-  _coords[4] = 0;
-  _coords[5] = 0;
-  _coords[6] = 0;
-  _coords[7] = 0;
-  _coords[8] = 0;
+  _coords[4] = {};
+  _coords[5] = {};
+  _coords[6] = {};
+  _coords[7] = {};
+  _coords[8] = {};
 #endif
 }
 
