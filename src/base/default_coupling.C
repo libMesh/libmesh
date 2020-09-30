@@ -132,19 +132,9 @@ void DefaultCoupling::operator()
             {
               const Elem * neigh = elem->neighbor_ptr(s);
 
-              // If we have a neighbor here
-              if (neigh)
-                {
-                  // Mesh ghosting might ask us about what we want to
-                  // distribute along with non-local elements, and those
-                  // non-local elements might have remote neighbors, and
-                  // if they do then we can't say anything about them.
-                  if (neigh == remote_elem)
-                    continue;
-                }
 #ifdef LIBMESH_ENABLE_PERIODIC
               // We might still have a periodic neighbor here
-              else if (check_periodic_bcs)
+              if (!neigh && check_periodic_bcs)
                 {
                   libmesh_assert(_mesh);
 
@@ -154,8 +144,11 @@ void DefaultCoupling::operator()
 #endif
 
               // With no regular *or* periodic neighbors we have nothing
-              // to do.
-              if (!neigh)
+              // to do. *Or* Mesh ghosting might ask us about what we want to
+              // distribute along with non-local elements, and those
+              // non-local elements might have remote neighbors, and
+              // if they do then we can't say anything about them.
+              if (!neigh || neigh == remote_elem)
                 continue;
 
               // With any kind of neighbor, we need to couple to all the
