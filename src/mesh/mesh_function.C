@@ -96,7 +96,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
   const MeshBase & mesh = this->_eqn_systems.get_mesh();
 
   // Take ownership
-  _point_locator = std::move(mesh.sub_point_locator());
+  _point_locator = mesh.sub_point_locator();
 
   // ready for use
   this->_initialized = true;
