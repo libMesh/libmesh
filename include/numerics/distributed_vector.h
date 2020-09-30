@@ -331,6 +331,9 @@ void DistributedVector<T>::init (const numeric_index_type n,
       else
         this->_type = PARALLEL;
     }
+  else if (ptype == GHOSTED &&
+           n == n_local) // We can support GHOSTED with no ghosts...
+    this->_type = SERIAL;
   else
     this->_type = ptype;
 
