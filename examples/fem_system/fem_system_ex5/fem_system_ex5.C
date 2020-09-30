@@ -44,6 +44,7 @@
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/numeric_vector.h"
 
 // The systems and solvers we may use
 #include "elasticity_system.h"
