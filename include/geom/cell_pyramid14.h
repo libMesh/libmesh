@@ -37,6 +37,7 @@ namespace libMesh
  * with it outside the library...
  *
  * The node numbering for the pyramid14 is given below:
+ *
  * \verbatim
  *   PYRAMID14:
  *                       o 4
@@ -61,8 +62,12 @@ namespace libMesh
  *    o--------o---------o
  *    0        5         1
  * \endverbatim
- * (xi, eta, zeta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta, zeta): { zeta-1 <= xi   <= 1-zeta
+ *                  { zeta-1 <= eta  <= 1-zeta
+ *                  {      0 <= zeta <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author John W. Peterson
  * \date 2013

@@ -34,6 +34,7 @@ namespace libMesh
  * quadratic pyramids.  Paraview should support 13-node pyramids...
  *
  * The node numbering for the pyramid13 is given below:
+ *
  * \verbatim
  *   PYRAMID13:
  *                       o 4
@@ -58,8 +59,12 @@ namespace libMesh
  *    o--------o---------o
  *    0        5         1
  * \endverbatim
- * (xi, eta, zeta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta, zeta): { zeta-1 <= xi   <= 1-zeta
+ *                  { zeta-1 <= eta  <= 1-zeta
+ *                  {      0 <= zeta <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author John W. Peterson
  * \date 2014

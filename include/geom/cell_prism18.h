@@ -29,6 +29,7 @@ namespace libMesh
 /**
  * The \p Prism18 is an element in 3D composed of 18 nodes.
  * It is numbered like this:
+ *
  * \verbatim
  *   PRISM18:
  *               5
@@ -59,8 +60,13 @@ namespace libMesh
  *     o---------o---------o
  *     0         6         1
  * \endverbatim
- * (xi, eta, zeta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta, zeta): { 0  <= xi   <= 1
+ *                  { 0  <= eta  <= 1
+ *                  { -1 <= zeta <= 1
+ *                  { xi + eta   <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2003

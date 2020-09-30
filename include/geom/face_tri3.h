@@ -32,8 +32,9 @@ namespace libMesh
 {
 
 /**
- * The \p Tri3 is an element in 2D composed of 3 nodes.
- * It is numbered like this:
+ * The \p Tri3 is an element in 2D composed of 3 nodes.  It is
+ * numbered like this:
+ *
  * \verbatim
  *   TRI3:
  *    2
@@ -46,8 +47,12 @@ namespace libMesh
  *    o-----o
  *    0      1
  * \endverbatim
- * (xi, eta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta): { 0 <= xi  <= 1
+ *            { 0 <= eta <= 1
+ *            { xi + eta <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

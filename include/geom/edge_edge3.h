@@ -32,9 +32,12 @@ namespace libMesh
  * like this:
  *
  * \verbatim
- *   EGDE3: o----o----o
+ *   EGDE3: o----o----o        o---> xi
  *          0    2    1
  * \endverbatim
+ *
+ * xi in [-1,1] is the reference element coordinate associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

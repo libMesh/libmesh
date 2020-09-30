@@ -33,9 +33,12 @@ namespace libMesh
  * It is numbered like this:
  *
  * \verbatim
- *   EGDE4: o----o----o----o
+ *   EGDE4: o----o----o----o        o---> xi
  *          0    2    3    1
  * \endverbatim
+ *
+ * xi in [-1,1] is the reference element coordinate associated with
+ * the given numbering.
  *
  * \author David Knezevic
  * \date 2005

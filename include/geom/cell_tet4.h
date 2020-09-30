@@ -27,8 +27,9 @@ namespace libMesh
 {
 
 /**
- * The \p Tet4 is an element in 3D composed of 4 nodes.
- * It is numbered like this:
+ * The \p Tet4 is an element in 3D composed of 4 nodes.  It is
+ * numbered like this:
+ *
  * \verbatim
  *   TET4:
  *         3
@@ -43,8 +44,13 @@ namespace libMesh
  *         o
  *         1
  * \endverbatim
- * (xi, eta, zeta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta, zeta): { 0 <= xi   <= 1
+ *                  { 0 <= eta  <= 1
+ *                  { 0 <= zeta <= 1
+ *                  { xi + eta + zeta <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

@@ -41,7 +41,7 @@ namespace libMesh
  *          o-----o-----o
  *          0     4     1
  * \endverbatim
- * (xi, eta) are the reference element coordinates associated with
+ * (xi, eta) in [-1,1]^2 are the reference element coordinates associated with
  * the given numbering.
  *
  * \author Benjamin S. Kirk

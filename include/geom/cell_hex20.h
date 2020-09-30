@@ -27,8 +27,9 @@ namespace libMesh
 {
 
 /**
- * The \p Hex20 is an element in 3D composed of 20 nodes.
- * It is numbered like this:
+ * The \p Hex20 is an element in 3D composed of 20 nodes.  It is
+ * numbered like this:
+ *
  * \verbatim
  *   HEX20:      7              18             6
  *               o--------------o--------------o
@@ -58,8 +59,9 @@ namespace libMesh
  *     o--------------o--------------o
  *     0              8              1
  * \endverbatim
- * (xi, eta, zeta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta, zeta) in [-1,1]^3 are the reference element coordinates
+ * associated with the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

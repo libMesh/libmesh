@@ -30,6 +30,7 @@ namespace libMesh
 /**
  * The \p QUAD4 is an element in 2D composed of 4 nodes.
  * It is numbered like this:
+ *
  * \verbatim
  *          3           2
  *   QUAD4: o-----------o
@@ -41,7 +42,8 @@ namespace libMesh
  *          o-----------o
  *          0           1
  * \endverbatim
- * (xi, eta) are the reference element coordinates associated with
+ *
+ * (xi, eta) in [-1,1]^2 are the reference element coordinates associated with
  * the given numbering.
  *
  * \author Benjamin S. Kirk

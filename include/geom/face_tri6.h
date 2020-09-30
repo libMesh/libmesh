@@ -28,8 +28,9 @@ namespace libMesh
 {
 
 /**
- * The \p Tri6 is an element in 2D composed of 6 nodes.
- * It is numbered like this:
+ * The \p Tri6 is an element in 2D composed of 6 nodes.  It is
+ * numbered like this:
+ *
  * \verbatim
  *   TRI6:
  *    2
@@ -46,8 +47,12 @@ namespace libMesh
  *    o----o----o
  *    0    3    1
  * \endverbatim
- * (xi, eta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta): { 0 <= xi  <= 1
+ *            { 0 <= eta <= 1
+ *            { xi + eta <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

@@ -27,8 +27,9 @@ namespace libMesh
 {
 
 /**
- * The \p Pyramid5 is an element in 3D composed of 5 nodes.
- * It is numbered with a counter-clockwise base like this:
+ * The \p Pyramid5 is an element in 3D composed of 5 nodes.  It is
+ * numbered with a counter-clockwise base like this:
+ *
  * \verbatim
  *   PYRAMID5:
  *             o 4
@@ -42,8 +43,12 @@ namespace libMesh
  *    o--------o
  *    0        1
  * \endverbatim
- * (xi, eta, zeta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta, zeta): { zeta-1 <= xi   <= 1-zeta
+ *                  { zeta-1 <= eta  <= 1-zeta
+ *                  {      0 <= zeta <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

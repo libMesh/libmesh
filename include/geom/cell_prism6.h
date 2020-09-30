@@ -27,8 +27,9 @@ namespace libMesh
 {
 
 /**
- * The \p Prism6 is an element in 3D composed of 6 nodes.
- * It is numbered like this:
+ * The \p Prism6 is an element in 3D composed of 6 nodes.  It is
+ * numbered like this:
+ *
  * \verbatim
  *   PRISM6:
  *           5
@@ -42,8 +43,13 @@ namespace libMesh
  *       o-------o
  *       0       1
  * \endverbatim
- * (xi, eta, zeta) are the reference element coordinates associated with
- * the given numbering.
+ *
+ * (xi, eta, zeta): { 0  <= xi   <= 1
+ *                  { 0  <= eta  <= 1
+ *                  { -1 <= zeta <= 1
+ *                  { xi + eta   <= 1
+ * are the reference element coordinates associated with the given
+ * numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002
