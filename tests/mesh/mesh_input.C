@@ -351,6 +351,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(n_neighbors, n_neighbors_expected);
       }
 
+#ifdef LIBMESH_HAVE_SOLVER
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
     // Now test whether we can assign the desired constraint equations
     EquationSystems es(mesh);
@@ -362,6 +363,7 @@ public:
     // We should have a constraint on every FE dof
     CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), dof_id_type(121));
 #endif // LIBMESH_ENABLE_CONSTRAINTS
+#endif // LIBMESH_HAVE_SOLVER
   }
 
 
