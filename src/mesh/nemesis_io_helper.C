@@ -65,7 +65,8 @@ Nemesis_IO_Helper::Nemesis_IO_Helper(const ParallelObject & parent,
   num_internal_elems(0),
   num_border_elems(0),
   num_node_cmaps(0),
-  num_elem_cmaps(0)
+  num_elem_cmaps(0),
+  write_complex_abs(true)
 {
   // Warn about using untested code!
   libmesh_experimental();
@@ -2642,6 +2643,42 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
               // collective.
               if (local_soln.size())
                 {
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+                  int stride = write_complex_abs ? 3 : 2;
+                  std::vector<Real> local_soln_buffer(local_soln.size());
+                  std::transform(local_soln.begin(), local_soln.end(),
+                                 local_soln_buffer.begin(), [](Number n) { return n.real(); });
+                  ex_err = exII::ex_put_elem_var(ex_id,
+                                                 timestep,
+                                                 static_cast<int>(stride*v+1),
+                                                 static_cast<int>(sbd_id),
+                                                 static_cast<int>(local_soln.size()),
+                                                 local_soln_buffer.data());
+                  EX_CHECK_ERR(ex_err, "Error writing element real values.");
+
+                  std::transform(local_soln.begin(), local_soln.end(),
+                                 local_soln_buffer.begin(), [](Number n) { return n.imag(); });
+                  ex_err = exII::ex_put_elem_var(ex_id,
+                                                 timestep,
+                                                 static_cast<int>(stride*v+2),
+                                                 static_cast<int>(sbd_id),
+                                                 static_cast<int>(local_soln.size()),
+                                                 local_soln_buffer.data());
+                  EX_CHECK_ERR(ex_err, "Error writing element imaginary values.");
+
+                  if (write_complex_abs)
+                    {
+                      std::transform(local_soln.begin(), local_soln.end(),
+                                     local_soln_buffer.begin(), [](Number n) { return std::abs(n); });
+                      ex_err = exII::ex_put_elem_var(ex_id,
+                                                     timestep,
+                                                     static_cast<int>(stride*v+2),
+                                                     static_cast<int>(sbd_id),
+                                                     static_cast<int>(local_soln.size()),
+                                                     local_soln_buffer.data());
+                      EX_CHECK_ERR(ex_err, "Error writing element magnitudes.");
+                    }
+#else // LIBMESH_USE_COMPLEX_NUMBERS
                   ex_err = exII::ex_put_elem_var(ex_id,
                                                  timestep,
                                                  static_cast<int>(v+1),
@@ -2649,6 +2686,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                  static_cast<int>(local_soln.size()),
                                                  local_soln.data());
                   EX_CHECK_ERR(ex_err, "Error writing element values.");
+#endif // LIBMESH_USE_COMPLEX_NUMBERS
                 }
             }
         }

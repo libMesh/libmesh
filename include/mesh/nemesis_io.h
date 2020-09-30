@@ -135,6 +135,13 @@ public:
   void verbose (bool set_verbosity);
 
   /**
+   * Set the flag indicating whether the complex modulus should be
+   * written when complex numbers are enabled. By default this flag
+   * is set to true.
+   */
+  void write_complex_magnitude (bool val);
+
+  /**
    * Write out global variables.
    */
   void write_global_data (const std::vector<Number> &,

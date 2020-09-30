@@ -131,6 +131,13 @@ void Nemesis_IO::verbose (bool set_verbosity)
 
 
 
+void Nemesis_IO::write_complex_magnitude (bool val)
+{
+  nemhelper->write_complex_abs = val;
+}
+
+
+
 void Nemesis_IO::append(bool val)
 {
   _append = val;
@@ -1325,7 +1332,7 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
   // flag the first time it is called.
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   std::vector<std::string> complex_names =
-    nemhelper->get_complex_names(names, /*_write_complex_abs=*/true);
+    nemhelper->get_complex_names(names, nemhelper->write_complex_abs);
   nemhelper->initialize_nodal_variables(complex_names);
 #else
   nemhelper->initialize_nodal_variables(names);
@@ -1468,6 +1475,29 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
   es.get_vars_active_subdomains(names, vars_active_subdomains);
 
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  std::vector<std::string> complex_names =
+    nemhelper->get_complex_names(names, nemhelper->write_complex_abs);
+
+  std::vector<std::set<subdomain_id_type>>
+    complex_vars_active_subdomains =
+    nemhelper->get_complex_vars_active_subdomains(vars_active_subdomains,
+                                                  nemhelper->write_complex_abs);
+  nemhelper->initialize_element_variables(complex_names, complex_vars_active_subdomains);
+
+  // Call (non-virtual) function to write the elemental data in
+  // parallel.  This function is named similarly to the corresponding
+  // function in the Exodus helper, but it has a different calling
+  // sequence and is not virtual or an override.
+  nemhelper->write_element_values(mesh,
+                                  es,
+                                  var_nums,
+                                  _timestep,
+                                  complex_vars_active_subdomains);
+
+#else
   // Call the Nemesis version of initialize_element_variables().
   //
   // The Exodus helper version of this function writes an incorrect
@@ -1481,12 +1511,12 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // parallel.  This function is named similarly to the corresponding
   // function in the Exodus helper, but it has a different calling
   // sequence and is not virtual or an override.
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   nemhelper->write_element_values(mesh,
                                   es,
                                   var_nums,
                                   _timestep,
                                   vars_active_subdomains);
+#endif
 }
 
 #else
@@ -1538,7 +1568,7 @@ void Nemesis_IO::write_global_data (const std::vector<Number> & soln,
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   std::vector<std::string> complex_names =
-    nemhelper->get_complex_names(names, /*_write_complex_abs=*/true);
+    nemhelper->get_complex_names(names, nemhelper->write_complex_abs);
 
   nemhelper->initialize_global_variables(complex_names);
 
@@ -1548,7 +1578,7 @@ void Nemesis_IO::write_global_data (const std::vector<Number> & soln,
 
   // This will contain the real and imaginary parts and the magnitude
   // of the values in soln
-  int nco = 3; // _write_complex_abs ? 3 : 2;
+  int nco = nemhelper->write_complex_abs ? 3 : 2;
   std::vector<Real> complex_soln(nco * num_values);
 
   for (unsigned i=0; i<num_vars; ++i)
@@ -1563,7 +1593,7 @@ void Nemesis_IO::write_global_data (const std::vector<Number> & soln,
           Number value = soln[i*num_vars + j];
           complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
         }
-      if (true/*_write_complex_abs*/)
+      if (nemhelper->write_complex_abs)
         {
           for (unsigned int j=0; j<num_elems; ++j)
             {

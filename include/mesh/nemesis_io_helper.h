@@ -80,6 +80,13 @@ public:
   virtual ~Nemesis_IO_Helper();
 
   /**
+   * Set the flag indicating whether the complex modulus should be
+   * written when complex numbers are enabled. By default this flag
+   * is set to true.
+   */
+  void write_complex_magnitude (bool val);
+
+  /**
    * Reading functions.  These just allocate memory for you and call the Nemesis
    * routines of the same name.  They also handle error checking for the Nemesis
    * return value.  Be careful calling these at random, some depend on others
@@ -564,6 +571,17 @@ public:
   std::vector<std::vector<int>> elem_cmap_elem_ids;
   std::vector<std::vector<int>> elem_cmap_side_ids;
   std::vector<std::vector<int>> elem_cmap_proc_ids;
+
+  /**
+   * By default, when complex numbers are enabled, for each variable
+   * we write out three values: the real part, "r_u" the imaginary
+   * part, "i_u", and the complex modulus, a_u := sqrt(r_u*r_u +
+   * i_u*i_u), which is also the value returned by
+   * std::abs(std::complex).  Since the modulus is not an independent
+   * quantity, we can set this flag to false and save some file space
+   * by not writing out.
+   */
+  bool write_complex_abs;
 
 protected:
   /**
