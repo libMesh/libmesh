@@ -142,13 +142,6 @@ private:
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
         ParsedFEMFunction<Number> x2(*sys, "x2");
-
-        // Test that copy constructor works
-        ParsedFEMFunction<Number> x2_copy(x2);
-
-        LIBMESH_ASSERT_FP_EQUAL
-          (1.0, libmesh_real(x2_copy(*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
-
         ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
 
         // Test that move constructor works
