@@ -1305,8 +1305,8 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
       libmesh_error_msg("Unable to locate variable named: " << nodal_var_name);
     }
 
-  // Allocate enough space to store the nodal variable values
-  nodal_var_values.resize(num_nodes);
+  // Clear out any previously read nodal variable values
+  nodal_var_values.clear();
 
   std::vector<Real> unmapped_nodal_var_values(num_nodes);
 
@@ -1321,9 +1321,13 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
 
   for (unsigned i=0; i<static_cast<unsigned>(num_nodes); i++)
     {
+      libmesh_assert_less(i, this->node_num_map.size());
+
       // Use the node_num_map to obtain the ID of this node in the Exodus file,
       // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
-      unsigned mapped_node_id = this->node_num_map[i] - 1;
+      const unsigned mapped_node_id = this->node_num_map[i] - 1;
+
+      libmesh_assert_less(i, unmapped_nodal_var_values.size());
 
       // Store the nodal value in the map.
       nodal_var_values[mapped_node_id] = unmapped_nodal_var_values[i];
@@ -1439,6 +1443,11 @@ ExodusII_IO_Helper::write_var_names_impl(const char * var_type,
   // Write that number of variables to the file.
   ex_err = exII::ex_put_var_param(ex_id, var_type, count);
   EX_CHECK_ERR(ex_err, "Error setting number of vars.");
+
+  // Nemesis doesn't like trying to write nodal variable names in
+  // files with no nodes.
+  if (!this->num_nodes)
+    return;
 
   if (count > 0)
     {
@@ -1590,7 +1599,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 
       ex_id = exII::ex_create(filename.c_str(), mode, &comp_ws, &io_ws);
 
-      EX_CHECK_ERR(ex_id, "Error creating ExodusII mesh file.");
+      EX_CHECK_ERR(ex_id, "Error creating ExodusII/Nemesis mesh file.");
 
       if (verbose)
         libMesh::out << "File created successfully." << std::endl;
@@ -2656,7 +2665,8 @@ write_sideset_data(const MeshBase & mesh,
               // Sanity check: make sure that the "off by one"
               // assumption we used above to set 'elem_id' is valid.
               libmesh_error_msg_if
-                (libmesh_map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id)) != elem_list[i + offset],
+                (libmesh_map_find(libmesh_elem_num_to_exodus, cast_int<int>(elem_id)) !=
+                 cast_int<dof_id_type>(elem_list[i + offset]),
                  "Error mapping Exodus elem id to libmesh elem id.");
 
               // Map from Exodus side ids to libmesh side ids.

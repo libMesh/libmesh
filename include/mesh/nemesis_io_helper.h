@@ -60,7 +60,9 @@ extern "C" {
  * the same file format.
  *
  * \author John W. Peterson
+ * \author Roy Stogner
  * \date 2008
+ * \date 2020
  */
 class Nemesis_IO_Helper : public ExodusII_IO_Helper
 {
@@ -76,6 +78,13 @@ public:
    * Destructor.
    */
   virtual ~Nemesis_IO_Helper();
+
+  /**
+   * Set the flag indicating whether the complex modulus should be
+   * written when complex numbers are enabled. By default this flag
+   * is set to true.
+   */
+  void write_complex_magnitude (bool val);
 
   /**
    * Reading functions.  These just allocate memory for you and call the Nemesis
@@ -263,17 +272,6 @@ public:
                     std::vector<int> & elem_mapb);
 
   /**
-   * Writes the specified number of coordinate values starting at the specified
-   * index.
-   */
-  void put_n_coord(unsigned start_node_num,
-                   unsigned num_nodes,
-                   std::vector<Real> & x_coor,
-                   std::vector<Real> & y_coor,
-                   std::vector<Real> & z_coor);
-
-
-  /**
    * This function is specialized from ExodusII_IO_Helper to write only the
    * nodal coordinates stored on the local piece of the Mesh.
    */
@@ -293,12 +291,6 @@ public:
    * Writes the nodesets for this processor.
    */
   virtual void write_nodesets(const MeshBase & mesh) override;
-
-  /**
-   * This function is specialized from ExodusII_IO_Helper to create the
-   * nodal coordinates stored on the local piece of the Mesh.
-   */
-  virtual void create(std::string filename) override;
 
   /**
    * Specialization of the initialize function from ExodusII_IO_Helper that
@@ -593,6 +585,25 @@ public:
   std::vector<std::vector<int>> elem_cmap_side_ids;
   std::vector<std::vector<int>> elem_cmap_proc_ids;
 
+  /**
+   * By default, when complex numbers are enabled, for each variable
+   * we write out three values: the real part, "r_u" the imaginary
+   * part, "i_u", and the complex modulus, a_u := sqrt(r_u*r_u +
+   * i_u*i_u), which is also the value returned by
+   * std::abs(std::complex).  Since the modulus is not an independent
+   * quantity, we can set this flag to false and save some file space
+   * by not writing out.
+   */
+  bool write_complex_abs;
+
+protected:
+  /**
+   * read_var_names() dispatches to this function.  We need to
+   * override it slightly for Nemesis.
+   */
+  virtual void read_var_names_impl(const char * var_type,
+                                   int & count,
+                                   std::vector<std::string> & result);
 
 private:
   /**

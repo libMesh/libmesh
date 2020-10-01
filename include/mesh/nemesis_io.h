@@ -34,6 +34,7 @@ namespace libMesh
 
 // Forward declarations
 class Nemesis_IO_Helper;
+class System;
 
 /**
  * The \p Nemesis_IO class implements reading parallel meshes in the
@@ -134,6 +135,13 @@ public:
   void verbose (bool set_verbosity);
 
   /**
+   * Set the flag indicating whether the complex modulus should be
+   * written when complex numbers are enabled. By default this flag
+   * is set to true.
+   */
+  void write_complex_magnitude (bool val);
+
+  /**
    * Write out global variables.
    */
   void write_global_data (const std::vector<Number> &,
@@ -151,7 +159,59 @@ public:
    */
   void append(bool val);
 
+  /**
+   * Return list of the nodal variable names
+   */
+  const std::vector<std::string> & get_nodal_var_names();
+
+  /**
+   * If we read in a nodal solution while reading in a mesh, we can attempt
+   * to copy that nodal solution into an EquationSystems object.
+   */
+  void copy_nodal_solution(System & system,
+                           std::string system_var_name,
+                           std::string exodus_var_name,
+                           unsigned int timestep=1);
+
+  /**
+   * If we read in a elemental solution while reading in a mesh, we can attempt
+   * to copy that elemental solution into an EquationSystems object.
+   */
+  void copy_elemental_solution(System & system,
+                               std::string system_var_name,
+                               std::string exodus_var_name,
+                               unsigned int timestep=1);
+
+  /**
+   * Copy global variables into scalar variables of a System object.
+   */
+  void copy_scalar_solution(System & system,
+                            std::vector<std::string> system_var_names,
+                            std::vector<std::string> exodus_var_names,
+                            unsigned int timestep=1);
+
+  /**
+   * Given a vector of global variables and a time step, returns the values
+   * of the global variable at the corresponding time step index.
+   * \param global_var_names Vector of names of global variables
+   * \param timestep The corresponding time step index
+   * \param global_values The vector to be filled
+   */
+  void read_global_variable(std::vector<std::string> global_var_names,
+                            unsigned int timestep,
+                            std::vector<Real> & global_values);
+
+
 private:
+
+  /*
+   * A helper function for use in debug and devel modes, for asserting
+   * that we get symmetric communication maps from a file we read
+   * and/or that we're writing them out in a symmetric fashion
+   * ourselves.
+   */
+  void assert_symmetric_cmaps();
+
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   std::unique_ptr<Nemesis_IO_Helper> nemhelper;
 

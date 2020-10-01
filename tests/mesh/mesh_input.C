@@ -1,3 +1,5 @@
+#include <libmesh/distributed_mesh.h>
+#include <libmesh/dof_map.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh.h>
@@ -5,9 +7,10 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/replicated_mesh.h>
+
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
-#include <libmesh/dof_map.h>
+#include <libmesh/nemesis_io.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -16,15 +19,15 @@
 using namespace libMesh;
 
 
-Number x_plus_y (const Point& p,
-                 const Parameters&,
-                 const std::string&,
-                 const std::string&)
+Number six_x_plus_sixty_y (const Point& p,
+                           const Parameters&,
+                           const std::string&,
+                           const std::string&)
 {
   const Real & x = p(0);
   const Real & y = p(1);
 
-  return x + y;
+  return 6*x + 60*y;
 }
 
 
@@ -34,13 +37,28 @@ public:
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
-  CPPUNIT_TEST( testExodusCopyElementSolution );
+  // Still not yet working?
+  // CPPUNIT_TEST( testExodusCopyNodalSolutionDistributed );
+  // CPPUNIT_TEST( testExodusCopyElementSolutionDistributed );
+  CPPUNIT_TEST( testExodusCopyNodalSolutionReplicated );
+  CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   // Eventually this will support complex numbers.
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif // LIBMESH_USE_COMPLEX_NUMBERS
 #endif // LIBMESH_HAVE_EXODUS_API
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  CPPUNIT_TEST( testNemesisReadReplicated );
+  CPPUNIT_TEST( testNemesisReadDistributed );
+
+  CPPUNIT_TEST( testNemesisCopyNodalSolutionDistributed );
+  CPPUNIT_TEST( testNemesisCopyNodalSolutionReplicated );
+  CPPUNIT_TEST( testNemesisCopyElementSolutionDistributed );
+  CPPUNIT_TEST( testNemesisCopyElementSolutionReplicated );
+#endif
+
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
 
@@ -94,10 +112,97 @@ public:
     }
   }
 
-  void testExodusCopyElementSolution ()
+
+  template <typename MeshType, typename IOType>
+  void testCopyNodalSolutionImpl (const std::string & filename)
   {
     {
-      Mesh mesh(*TestCommWorld);
+      MeshType mesh(*TestCommWorld);
+
+      EquationSystems es(mesh);
+      System &sys = es.add_system<System> ("SimpleSystem");
+      sys.add_variable("n", FIRST, LAGRANGE);
+
+      MeshTools::Generation::build_square (mesh,
+                                           3, 3,
+                                           0., 1., 0., 1.);
+
+      es.init();
+      sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
+
+      IOType meshoutput(mesh);
+
+      meshoutput.write_equation_systems(filename, es);
+    }
+
+    {
+      MeshType mesh(*TestCommWorld);
+      IOType meshinput(mesh);
+
+      // Avoid getting Nemesis solution values mixed up
+      if (meshinput.is_parallel_format())
+        {
+          mesh.allow_renumbering(false);
+          mesh.skip_noncritical_partitioning(true);
+        }
+
+      EquationSystems es(mesh);
+      System &sys = es.add_system<System> ("SimpleSystem");
+      sys.add_variable("testn", FIRST, LAGRANGE);
+
+      if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
+        meshinput.read(filename);
+      if (!meshinput.is_parallel_format())
+        MeshCommunication().broadcast(mesh);
+      mesh.prepare_for_use();
+
+      es.init();
+
+      // Read the solution e into variable teste.
+      //
+      // With complex numbers, we'll only bother reading the real
+      // part.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      meshinput.copy_nodal_solution(sys, "testn", "r_n");
+#else
+      meshinput.copy_nodal_solution(sys, "testn", "n");
+#endif
+
+      // Exodus only handles double precision
+      Real exotol = std::max(TOLERANCE*TOLERANCE, Real(1e-12));
+
+      for (Real x = 0; x < 1 + TOLERANCE; x += Real(1.L/3.L))
+        for (Real y = 0; y < 1 + TOLERANCE; y += Real(1.L/3.L))
+          {
+            Point p(x,y);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                    libmesh_real(6*x+60*y),
+                                    exotol);
+          }
+    }
+  }
+
+
+  void testExodusCopyNodalSolutionReplicated ()
+  { testCopyNodalSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_nodal_soln.e"); }
+
+  void testExodusCopyNodalSolutionDistributed ()
+  { testCopyNodalSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_nodal_soln.e"); }
+
+#if defined(LIBMESH_HAVE_NEMESIS_API)
+  void testNemesisCopyNodalSolutionReplicated ()
+  { testCopyNodalSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_nodal_soln.nem"); }
+
+  void testNemesisCopyNodalSolutionDistributed ()
+  { testCopyNodalSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_nodal_soln.nem"); }
+#endif
+
+
+  template <typename MeshType, typename IOType>
+  void testCopyElementSolutionImpl (const std::string & filename)
+  {
+    {
+      MeshType mesh(*TestCommWorld);
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
@@ -108,31 +213,37 @@ public:
                                            0., 1., 0., 1.);
 
       es.init();
-      sys.project_solution(x_plus_y, nullptr, es.parameters);
+      sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
 
-      ExodusII_IO exii(mesh);
+      IOType meshinput(mesh);
 
       // Don't try to write element data as nodal data
       std::set<std::string> sys_list;
-      exii.write_equation_systems("mesh_with_soln.e", es, &sys_list);
+      meshinput.write_equation_systems(filename, es, &sys_list);
 
       // Just write it as element data
-      exii.write_element_data(es);
+      meshinput.write_element_data(es);
     }
 
-    // copy_elemental_solution currently requires ReplicatedMesh
     {
-      ReplicatedMesh mesh(*TestCommWorld);
+      MeshType mesh(*TestCommWorld);
+      IOType meshinput(mesh);
+
+      // Avoid getting Nemesis solution values mixed up
+      if (meshinput.is_parallel_format())
+        {
+          mesh.allow_renumbering(false);
+          mesh.skip_noncritical_partitioning(true);
+        }
 
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("teste", CONSTANT, MONOMIAL);
 
-      ExodusII_IO exii(mesh);
-
-      if (mesh.processor_id() == 0)
-        exii.read("mesh_with_soln.e");
-      MeshCommunication().broadcast(mesh);
+      if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
+        meshinput.read(filename);
+      if (!meshinput.is_parallel_format())
+        MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
       es.init();
@@ -142,9 +253,9 @@ public:
       // With complex numbers, we'll only bother reading the real
       // part.
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      exii.copy_elemental_solution(sys, "teste", "r_e");
+      meshinput.copy_elemental_solution(sys, "teste", "r_e");
 #else
-      exii.copy_elemental_solution(sys, "teste", "e");
+      meshinput.copy_elemental_solution(sys, "teste", "e");
 #endif
 
       // Exodus only handles double precision
@@ -155,11 +266,26 @@ public:
           {
             Point p(x,y);
             LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                    libmesh_real(x+y),
+                                    libmesh_real(6*x+60*y),
                                     exotol);
           }
     }
   }
+
+
+  void testExodusCopyElementSolutionReplicated ()
+  { testCopyElementSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_elem_soln.e"); }
+
+  void testExodusCopyElementSolutionDistributed ()
+  { testCopyElementSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_soln.e"); }
+
+#if defined(LIBMESH_HAVE_NEMESIS_API)
+  void testNemesisCopyElementSolutionReplicated ()
+  { testCopyElementSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_elem_soln.nem"); }
+
+  void testNemesisCopyElementSolutionDistributed ()
+  { testCopyElementSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_soln.nem"); }
+#endif
 
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
@@ -246,6 +372,41 @@ public:
 
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 #endif // LIBMESH_HAVE_EXODUS_API
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  template <typename MeshType>
+  void testNemesisReadImpl ()
+  {
+    // first scope: write file
+    {
+      MeshType mesh(*TestCommWorld);
+      MeshTools::Generation::build_square (mesh, 3, 3, 0., 1., 0., 1.);
+      mesh.write("test_nemesis_read.nem");
+    }
+
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
+    // second scope: read file
+    {
+      MeshType mesh(*TestCommWorld);
+      Nemesis_IO nem(mesh);
+
+      nem.read("test_nemesis_read.nem");
+      mesh.prepare_for_use();
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  dof_id_type(9));
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(16));
+    }
+  }
+
+  void testNemesisReadReplicated ()
+  { testNemesisReadImpl<ReplicatedMesh>(); }
+
+  void testNemesisReadDistributed ()
+  { testNemesisReadImpl<DistributedMesh>(); }
+#endif
+
 
   void testDynaReadElem ()
   {

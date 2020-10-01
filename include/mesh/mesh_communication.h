@@ -122,7 +122,7 @@ public:
    * case of \p root_id equal to \p DofObject::invalid_processor_id
    * this function performs an allgather.
    */
-  void gather (const processor_id_type root_id, DistributedMesh &) const;
+  void gather (const processor_id_type root_id, MeshBase &) const;
 
   /**
    * This method takes an input \p DistributedMesh which may be
@@ -132,7 +132,7 @@ public:
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
-  void allgather (DistributedMesh & mesh) const
+  void allgather (MeshBase & mesh) const
   { MeshCommunication::gather(DofObject::invalid_processor_id, mesh); }
 
   /**

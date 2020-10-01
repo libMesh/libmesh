@@ -305,6 +305,12 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
 
   if (id < _elements.size())
     {
+      // This should *almost* never happen, but we rely on it when
+      // using allgather to replicate a not-yet-actually-replicated
+      // ReplicatedMesh under construction in parallel.
+      if (e == _elements[id])
+        return e;
+
       // Overwriting existing elements is still probably a mistake.
       libmesh_assert(!_elements[id]);
     }
@@ -547,14 +553,16 @@ Node * ReplicatedMesh::insert_node(Node * n)
 
   if (n->id() < _nodes.size())
     {
-      // Don't allow inserting on top of an existing Node.
+      // Trying to add an existing node is a no-op.  This lets us use
+      // a straightforward MeshCommunication::allgather() to fix a
+      // not-actually-replicated-yet ReplicatedMesh, as occurs when
+      // reading Nemesis files.
+      if (n->valid_id() && _nodes[n->id()] == n)
+        return n;
 
-      // Doing so doesn't have to be *error*, in the case where a
-      // redundant insert is done, but when that happens we ought to
-      // always be able to make the code more efficient by avoiding
-      // the redundant insert, so let's keep screaming "Error" here.
+      // Don't allow anything else to replace an existing Node.
       libmesh_error_msg_if(_nodes[ n->id() ] != nullptr,
-                           "Error, cannot insert node on top of existing node.");
+                           "Error, cannot insert new node on top of existing node.");
     }
   else
     {

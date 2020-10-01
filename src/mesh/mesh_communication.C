@@ -1168,14 +1168,14 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-void MeshCommunication::gather (const processor_id_type, DistributedMesh &) const
+void MeshCommunication::gather (const processor_id_type, MeshBase &) const
 {
   // no MPI == one processor, no need for this method...
   return;
 }
 #else
 // ------------------------------------------------------------
-void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh & mesh) const
+void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh) const
 {
   // Check for quick return
   if (mesh.n_processors() == 1)

@@ -641,12 +641,12 @@ public:
 
   // Maps libMesh element numbers to Exodus element numbers
   // gets filled in when write_elements gets called
-  std::map<int, int> libmesh_elem_num_to_exodus;
+  std::map<dof_id_type, dof_id_type> libmesh_elem_num_to_exodus;
   std::vector<int> exodus_elem_num_to_libmesh;
 
   // Map of all node numbers connected to local node numbers to their exodus numbering.
   // The exodus numbers are stored in here starting with 1
-  std::map<int, int> libmesh_node_num_to_exodus;
+  std::map<dof_id_type, dof_id_type> libmesh_node_num_to_exodus;
   std::vector<int> exodus_node_num_to_libmesh;
 
   // The number of timesteps in the file, as returned by ex_inquire
@@ -661,8 +661,10 @@ public:
   // The names of the nodal variables stored in the Exodus file
   std::vector<std::string> nodal_var_names;
 
-  // Holds the nodal variable values for a given variable, one value per node
-  std::vector<Real> nodal_var_values;
+  // Holds the nodal variable values for a given variable, one value
+  // per node, indexed by libMesh node id.
+  // This is a map so it can handle Nemesis files as well.
+  std::map<dof_id_type, Real> nodal_var_values;
 
   // The number of elemental variables in the Exodus file
   int num_elem_vars;
@@ -823,14 +825,17 @@ protected:
   };
 
 
-private:
+protected:
 
   /**
-   * read_var_names() dispatches to this function.
+   * read_var_names() dispatches to this function.  We need to
+   * override it slightly for Nemesis.
    */
-  void read_var_names_impl(const char * var_type,
-                           int & count,
-                           std::vector<std::string> & result);
+  virtual void read_var_names_impl(const char * var_type,
+                                   int & count,
+                                   std::vector<std::string> & result);
+
+private:
 
   /**
    * write_var_names() dispatches to this function.
