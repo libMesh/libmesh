@@ -419,7 +419,7 @@ public:
     mesh.allow_remote_element_removal(false);
 
     if (mesh.processor_id() == 0)
-      dyna.read("1_quad.dyn");
+      dyna.read("meshes/1_quad.bxt");
     MeshCommunication().broadcast (mesh);
 
     mesh.prepare_for_use();
@@ -472,7 +472,7 @@ public:
 
     DynaIO dyna(mesh);
     if (mesh.processor_id() == 0)
-      dyna.read("25_quad.bxt");
+      dyna.read("meshes/25_quad.bxt");
     MeshCommunication().broadcast (mesh);
 
     mesh.prepare_for_use();

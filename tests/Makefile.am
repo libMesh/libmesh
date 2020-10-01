@@ -119,9 +119,9 @@ unit_tests_sources = \
 
 # Make sure any data goes in "make dist"
 datadir = $(install_dir)
-data = 1_quad.dyn \
-       25_quad.bxt \
-       shark_tooth_tri6.xda.gz
+data = meshes/1_quad.bxt \
+       meshes/25_quad.bxt \
+       meshes/shark_tooth_tri6.xda.gz
 
 unit_tests_sources += \
   $(data)
@@ -262,9 +262,7 @@ if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 
 .linkstamp:
-	-rm -f 25_quad.bxt && $(LN_S) -f $(srcdir)/25_quad.bxt .
-	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
-	-rm -f shark_tooth_tri6.xda.gz && $(LN_S) -f $(srcdir)/shark_tooth_tri6.xda.gz .
+	-rm -f meshes && $(LN_S) -f $(srcdir)/meshes .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += .linkstamp
