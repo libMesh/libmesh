@@ -366,6 +366,9 @@ void assemble_helmholtz(EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = f_system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh, and compute
   // the element matrix and right-hand-side contributions.
   for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -491,7 +494,7 @@ void assemble_helmholtz(EquationSystems & es,
       // For the overall matrix, explicitly zero the entries where
       // we added values in the other ones, so that we have
       // identical sparsity footprints.
-      f_system.matrix->add_matrix(zero_matrix, dof_indices);
+      matrix.add_matrix(zero_matrix, dof_indices);
     } // end loop over elements
 }
 

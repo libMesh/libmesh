@@ -433,6 +433,9 @@ void assemble_stokes (EquationSystems & es,
   std::vector<dof_id_type> dof_indices_p;
   std::vector<dof_id_type> dof_indices_alpha;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = navier_stokes_system.get_system_matrix();
+
   // Find out what the timestep size parameter is from the system, and
   // the value of theta for the theta method.  We use implicit Euler (theta=1)
   // for this simulation even though it is only first-order accurate in time.
@@ -639,7 +642,7 @@ void assemble_stokes (EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The SparseMatrix::add_matrix()
       // and NumericVector::add_vector() members do this for us.
-      navier_stokes_system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix                       (Ke, dof_indices);
       navier_stokes_system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
 

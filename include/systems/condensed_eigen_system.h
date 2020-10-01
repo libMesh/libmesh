@@ -107,14 +107,30 @@ public:
   virtual std::pair<Real, Real> get_eigenpair(dof_id_type i) override;
 
   /**
-   * The (condensed) system matrix for standard eigenvalue problems.
+   * \returns The system matrix used for standard eigenvalue problems
    */
-  std::unique_ptr<SparseMatrix<Number>> condensed_matrix_A;
+  SparseMatrix<Number> & get_condensed_matrix_A() const;
+
+  /**
+   * \returns The second system matrix used for generalized eigenvalue problems.
+   */
+  SparseMatrix<Number> & get_condensed_matrix_B() const;
+
+  /**
+   * The (condensed) system matrix for standard eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_condensed_matrix_A() instead.
+   */
+  SparseMatrix<Number> * condensed_matrix_A;
 
   /**
    * A second (condensed) system matrix for generalized eigenvalue problems.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_condensed_matrix_B() instead.
    */
-  std::unique_ptr<SparseMatrix<Number>> condensed_matrix_B;
+  SparseMatrix<Number> * condensed_matrix_B;
 
   /**
    * Vector storing the local dof indices that will not be condensed.

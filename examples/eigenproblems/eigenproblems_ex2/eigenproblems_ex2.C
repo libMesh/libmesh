@@ -143,7 +143,7 @@ int main (int argc, char ** argv)
   // point in using SLEPc with Arpack.
   // ARNOLDI     = default in SLEPc 2.3.1 and earlier
   // KRYLOVSCHUR default in SLEPc 2.3.2 and later
-  // eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
+  // eigen_system.get_eigen_solver().set_eigensolver_type(KRYLOVSCHUR);
 
   // Set the solver tolerance and the maximum number of iterations.
   equation_systems.parameters.set<Real>("linear solver tolerance") = pow(TOLERANCE, 5./3.);
@@ -155,7 +155,7 @@ int main (int argc, char ** argv)
 
   // Set the eigenvalues to be computed. Note that not
   // all solvers in SLEPc support this capability.
-  eigen_system.eigen_solver->set_position_of_spectrum(2.3);
+  eigen_system.get_eigen_solver().set_position_of_spectrum(2.3);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -168,10 +168,10 @@ int main (int argc, char ** argv)
 #else
   // Get the SLEPc solver object and set initial guess for one basis vector
   // this has to be done _after_ the EquationSystems object is initialized
-  std::unique_ptr<EigenSolver<Number>> & slepc_eps = eigen_system.eigen_solver;
+  EigenSolver<Number> & slepc_eps = eigen_system.get_eigen_solver();
   NumericVector<Number> & initial_space = eigen_system.add_vector("initial_space");
   initial_space.add(1.0);
-  slepc_eps->set_initial_space(initial_space);
+  slepc_eps.set_initial_space(initial_space);
 #endif
 
   // Solve the system "Eigensystem".
@@ -232,8 +232,8 @@ void assemble_mass(EquationSystems & es,
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the two system matrices
-  SparseMatrix<Number> & matrix_A = *eigen_system.matrix_A;
-  SparseMatrix<Number> & matrix_B = *eigen_system.matrix_B;
+  SparseMatrix<Number> & matrix_A = eigen_system.get_matrix_A();
+  SparseMatrix<Number> & matrix_B = eigen_system.get_matrix_B();
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will

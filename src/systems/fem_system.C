@@ -246,7 +246,7 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
     }
 }
 
-void add_element_system(const FEMSystem & _sys,
+void add_element_system(FEMSystem & _sys,
                         const bool _get_residual,
                         const bool _get_jacobian,
                         const bool _constrain_heterogeneously,
@@ -336,8 +336,8 @@ void add_element_system(const FEMSystem & _sys,
     femsystem_mutex::scoped_lock lock(assembly_mutex);
 
     if (_get_jacobian)
-      _sys.matrix->add_matrix (_femcontext.get_elem_jacobian(),
-                               _femcontext.get_dof_indices());
+      _sys.get_system_matrix().add_matrix (_femcontext.get_elem_jacobian(),
+                                           _femcontext.get_dof_indices());
     if (_get_residual)
       _sys.rhs->add_vector (_femcontext.get_elem_residual(),
                             _femcontext.get_dof_indices());

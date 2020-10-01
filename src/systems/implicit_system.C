@@ -31,6 +31,7 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/diagonal_matrix.h"
 #include "libmesh/utility.h"
 
 namespace libMesh
@@ -44,11 +45,8 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
 
   Parent            (es, name_in, number_in),
   matrix            (nullptr),
-  zero_out_matrix_and_rhs(true),
-  _can_add_matrices (true)
+  zero_out_matrix_and_rhs(true)
 {
-  // Add the system matrix.
-  this->add_system_matrix ();
 }
 
 
@@ -57,8 +55,6 @@ ImplicitSystem::~ImplicitSystem ()
 {
   // Clear data
   this->clear();
-
-  remove_matrix("System Matrix");
 }
 
 
@@ -68,114 +64,8 @@ void ImplicitSystem::clear ()
   // clear the parent data
   Parent::clear();
 
-  // clear any user-added matrices
-  {
-    for (auto & pr : _matrices)
-      {
-        pr.second->clear ();
-        delete pr.second;
-        pr.second = nullptr;
-      }
-
-    _matrices.clear();
-    _can_add_matrices = true;
-  }
-
   // Restore us to a "basic" state
-  this->add_system_matrix ();
-}
-
-
-
-void ImplicitSystem::init_data ()
-{
-  // initialize parent data
-  Parent::init_data();
-
-  // Clear any existing matrices
-  for (auto & pr : _matrices)
-    pr.second->clear();
-
-  // Initialize the matrices for the system
-  this->init_matrices ();
-}
-
-
-
-void ImplicitSystem::init_matrices ()
-{
-  libmesh_assert(matrix);
-
-  // Check for quick return in case the system matrix
-  // (and by extension all the matrices) has already
-  // been initialized
-  if (matrix->initialized())
-    return;
-
-  // Get a reference to the DofMap
-  DofMap & dof_map = this->get_dof_map();
-
-  // no chance to add other matrices
-  _can_add_matrices = false;
-
-  // Tell the matrices about the dof map, and vice versa
-  for (auto & pr : _matrices)
-    {
-      SparseMatrix<Number> & m = *(pr.second);
-      libmesh_assert (!m.initialized());
-
-      // We want to allow repeated init() on systems, but we don't
-      // want to attach the same matrix to the DofMap twice
-      if (!dof_map.is_attached(m))
-        dof_map.attach_matrix (m);
-    }
-
-  // Compute the sparsity pattern for the current
-  // mesh and DOF distribution.  This also updates
-  // additional matrices, \p DofMap now knows them
-  dof_map.compute_sparsity (this->get_mesh());
-
-  // Initialize matrices
-  for (auto & pr : _matrices)
-    pr.second->init (_matrix_types[pr.first]);
-
-  // Set the additional matrices to 0.
-  for (auto & pr : _matrices)
-    pr.second->zero ();
-}
-
-
-
-void ImplicitSystem::reinit ()
-{
-  // initialize parent data
-  Parent::reinit();
-
-  // Get a reference to the DofMap
-  DofMap & dof_map = this->get_dof_map();
-
-  // Clear the matrices
-  for (auto & pr : _matrices)
-    {
-      pr.second->clear();
-      pr.second->attach_dof_map (dof_map);
-    }
-
-  // Clear the sparsity pattern
-  this->get_dof_map().clear_sparsity();
-
-  // Compute the sparsity pattern for the current
-  // mesh and DOF distribution.  This also updates
-  // additional matrices, \p DofMap now knows them
-  dof_map.compute_sparsity (this->get_mesh());
-
-  // Initialize matrices
-  for (auto & pr : _matrices)
-    pr.second->init ();
-
-  // Set the additional matrices to 0.
-  for (auto & pr : _matrices)
-    pr.second->zero ();
+  matrix = nullptr;
 }
 
 
@@ -199,87 +89,13 @@ void ImplicitSystem::assemble ()
 
 
 
-SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name,
-                                                   const ParallelType type)
+void ImplicitSystem::add_matrices ()
 {
-  // only add matrices before initializing...
-  libmesh_error_msg_if(!_can_add_matrices,
-                       "ERROR: Too late.  Cannot add matrices to the system after initialization"
-                       "\n any more.  You should have done this earlier.");
+  Parent::add_matrices();
 
-  // Return the matrix if it is already there.
-  if (this->have_matrix(mat_name))
-    return *(_matrices[mat_name]);
-
-  // Otherwise build the matrix and return it.
-  SparseMatrix<Number> * buf = SparseMatrix<Number>::build(this->comm()).release();
-  _matrices.emplace(mat_name, buf);
-  _matrix_types.emplace(mat_name, type);
-
-  return *buf;
-}
-
-
-void ImplicitSystem::remove_matrix (const std::string & mat_name)
-{
-  matrices_iterator pos = _matrices.find (mat_name);
-
-  //Return if the matrix does not exist
-  if (pos == _matrices.end())
-    return;
-
-  delete pos->second;
-
-  _matrices.erase(pos);
-}
-
-
-
-const SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string & mat_name) const
-{
-  // Make sure the matrix exists
-  const_matrices_iterator pos = _matrices.find (mat_name);
-
-  if (pos == _matrices.end())
-    return nullptr;
-
-  return pos->second;
-}
-
-
-
-SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string & mat_name)
-{
-  // Make sure the matrix exists
-  matrices_iterator pos = _matrices.find (mat_name);
-
-  if (pos == _matrices.end())
-    return nullptr;
-
-  return pos->second;
-}
-
-
-
-const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string & mat_name) const
-{
-  return *(libmesh_map_find(_matrices, mat_name));
-}
-
-
-
-SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string & mat_name)
-{
-  return *(libmesh_map_find(_matrices, mat_name));
-}
-
-
-
-void ImplicitSystem::add_system_matrix ()
-{
   // Possible that we cleared the _matrices but
   // forgot to update the matrix pointer?
-  if (_matrices.empty())
+  if (this->n_matrices() == 0)
     matrix = nullptr;
 
   // Only need to add the matrix if it isn't there
@@ -1423,6 +1239,24 @@ void ImplicitSystem::release_linear_solver(LinearSolver<Number> * s) const
   libmesh_deprecated();
 
   delete s;
+}
+
+
+
+const SparseMatrix<Number> & ImplicitSystem::get_system_matrix() const
+{
+  libmesh_assert(matrix);
+  libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
+  return *matrix;
+}
+
+
+
+SparseMatrix<Number> & ImplicitSystem::get_system_matrix()
+{
+  libmesh_assert(matrix);
+  libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
+  return *matrix;
 }
 
 } // namespace libMesh

@@ -171,6 +171,8 @@ void assemble(EquationSystems & es,
 
   Real vol=0., area=0.;
 
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       // recompute the element-specific data for the current element
@@ -247,8 +249,8 @@ void assemble(EquationSystems & es,
       system.rhs->add_vector(Fu, dof_indices_U);
       system.rhs->add_vector(Fv, dof_indices_V);
 
-      system.matrix->add_matrix(Kuu, dof_indices_U);
-      system.matrix->add_matrix(Kvv, dof_indices_V);
+      matrix.add_matrix(Kuu, dof_indices_U);
+      matrix.add_matrix(Kvv, dof_indices_V);
     }
 
   libMesh::out << "Vol="  << vol << std::endl;

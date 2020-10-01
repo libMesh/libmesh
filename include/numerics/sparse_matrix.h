@@ -24,10 +24,11 @@
 // Local includes
 #include "libmesh/libmesh.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/id_types.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/enum_parallel_type.h"
+#include "libmesh/enum_matrix_build_type.h"
 
 // C++ includes
 #include <cstddef>
@@ -95,7 +96,8 @@ public:
    */
   static std::unique_ptr<SparseMatrix<T>>
   build(const Parallel::Communicator & comm,
-        const SolverPackage solver_package = libMesh::default_solver_package());
+        const SolverPackage solver_package = libMesh::default_solver_package(),
+        const MatrixBuildType matrix_build_type = MatrixBuildType::AUTOMATIC);
 
   /**
    * \returns \p true if the matrix has been initialized,

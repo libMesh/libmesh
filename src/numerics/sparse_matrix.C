@@ -22,6 +22,7 @@
 // Local Includes
 #include "libmesh/dof_map.h"
 #include "libmesh/dense_matrix.h"
+#include "libmesh/diagonal_matrix.h"
 #include "libmesh/laspack_matrix.h"
 #include "libmesh/eigen_sparse_matrix.h"
 #include "libmesh/parallel.h"
@@ -128,10 +129,14 @@ void SparseMatrix<Complex>::print(std::ostream & os, const bool sparse) const
 template <typename T>
 std::unique_ptr<SparseMatrix<T>>
 SparseMatrix<T>::build(const Parallel::Communicator & comm,
-                       const SolverPackage solver_package)
+                       const SolverPackage solver_package,
+                       const MatrixBuildType matrix_build_type /* = AUTOMATIC */)
 {
   // Avoid unused parameter warnings when no solver packages are enabled.
   libmesh_ignore(comm);
+
+  if (matrix_build_type == MatrixBuildType::DIAGONAL)
+    return libmesh_make_unique<DiagonalMatrix<T>>(comm);
 
   // Build the appropriate vector
   switch (solver_package)

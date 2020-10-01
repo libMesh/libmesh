@@ -231,6 +231,9 @@ void assemble_ellipticdg(EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = ellipticdg_system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh.  We will
   // compute first the element interior matrix and right-hand-side contribution
   // and then the element and neighbors boundary matrix contributions.
@@ -469,10 +472,10 @@ void assemble_ellipticdg(EquationSystems & es,
                   // The element and neighbor boundary matrix are now built
                   // for this side.  Add them to the global matrix
                   // The SparseMatrix::add_matrix() members do this for us.
-                  ellipticdg_system.matrix->add_matrix(Kne, neighbor_dof_indices, dof_indices);
-                  ellipticdg_system.matrix->add_matrix(Ken, dof_indices, neighbor_dof_indices);
-                  ellipticdg_system.matrix->add_matrix(Kee, dof_indices);
-                  ellipticdg_system.matrix->add_matrix(Knn, neighbor_dof_indices);
+                  matrix.add_matrix(Kne, neighbor_dof_indices, dof_indices);
+                  matrix.add_matrix(Ken, dof_indices, neighbor_dof_indices);
+                  matrix.add_matrix(Kee, dof_indices);
+                  matrix.add_matrix(Knn, neighbor_dof_indices);
                 }
             }
         }
@@ -480,7 +483,7 @@ void assemble_ellipticdg(EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The SparseMatrix::add_matrix()
       // and NumericVector::add_vector() members do this for us.
-      ellipticdg_system.matrix->add_matrix(Ke, dof_indices);
+      matrix.add_matrix(Ke, dof_indices);
       ellipticdg_system.rhs->add_vector(Fe, dof_indices);
     }
 

@@ -757,6 +757,9 @@ void assemble_laplace(EquationSystems & es,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
+  // The global system matrix
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh.  We will
   // compute the element matrix and right-hand-side contribution.  See
   // example 3 for a discussion of the element iterators.  Here we use
@@ -858,7 +861,7 @@ void assemble_laplace(EquationSystems & es,
       // Use heterogenously here to handle Dirichlet as well as AMR
       // constraints.
       dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
 

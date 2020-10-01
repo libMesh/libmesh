@@ -235,6 +235,8 @@ void assemble_stokes (EquationSystems & es,
   std::vector<dof_id_type> dof_indices_v;
   std::vector<dof_id_type> dof_indices_p;
 
+  SparseMatrix<Number> & matrix = system.get_system_matrix();
+
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
   // matrix and right-hand-side contribution.  In case users later
@@ -405,7 +407,7 @@ void assemble_stokes (EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The NumericMatrix::add_matrix()
       // and NumericVector::add_vector() members do this for us.
-      system.matrix->add_matrix (Ke, dof_indices);
+      matrix.add_matrix         (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
 }

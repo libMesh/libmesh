@@ -32,7 +32,6 @@ namespace libMesh
 
 // Forward declarations
 template <typename T> class LinearSolver;
-template <typename T> class SparseMatrix;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, coefficient
@@ -91,12 +90,6 @@ public:
    * the system.
    */
   virtual void clear () override;
-
-  /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void reinit () override;
 
   /**
    * Prepares \p matrix and \p rhs for system assembly, then calls
@@ -301,99 +294,22 @@ public:
                                                     SensitivityData & product) override;
 
   /**
-   * Matrix iterator typedefs.
+   * \returns A const reference to the system's primary matrix.
    */
-  typedef std::map<std::string, SparseMatrix<Number> *>::iterator        matrices_iterator;
-  typedef std::map<std::string, SparseMatrix<Number> *>::const_iterator  const_matrices_iterator;
+  const SparseMatrix<Number> & get_system_matrix() const;
 
   /**
-   * Adds the additional matrix \p mat_name to this system.  Only
-   * allowed prior to \p assemble().  All additional matrices
-   * have the same sparsity pattern as the matrix used during
-   * solution.  When not \p System but the user wants to
-   * initialize the mayor matrix, then all the additional matrices,
-   * if existent, have to be initialized by the user, too.
-   *
-   * This non-template method will add a derived matrix type corresponding to
-   * the solver package. If the user wishes to specify the matrix type to add,
-   * use the templated \p add_matrix method instead
-   *
-   * @param type The serial/parallel/ghosted type of the matrix
-   *
+   * \returns A reference to the system's primary matrix.
    */
-  SparseMatrix<Number> & add_matrix (const std::string & mat_name, ParallelType type = PARALLEL);
-
-  /**
-   * Adds the additional matrix \p mat_name to this system.  Only
-   * allowed prior to \p assemble().  All additional matrices
-   * have the same sparsity pattern as the matrix used during
-   * solution.  When not \p System but the user wants to
-   * initialize the mayor matrix, then all the additional matrices,
-   * if existent, have to be initialized by the user, too.
-   *
-   * This method will create add a derived matrix of type
-   * \p MatrixType<Number>. One can use the non-templated \p add_matrix method to
-   * add a matrix corresponding to the default solver package
-   *
-   * @param type The serial/parallel/ghosted type of the matrix
-   */
-  template <template <typename> class>
-  SparseMatrix<Number> & add_matrix (const std::string & mat_name, ParallelType = PARALLEL);
-
-  /**
-   * Removes the additional matrix \p mat_name from this system
-   */
-  void remove_matrix(const std::string & mat_name);
-
-  /**
-   * \returns \p true if this \p System has a matrix associated with the
-   * given name, \p false otherwise.
-   */
-  bool have_matrix (const std::string & mat_name) const;
-
-  /**
-   * \returns A const pointer to this system's additional matrix
-   * named \p mat_name, or \p nullptr if no matrix by that name
-   * exists.
-   */
-  const SparseMatrix<Number> * request_matrix (const std::string & mat_name) const;
-
-  /**
-   * \returns A writable pointer to this system's additional matrix
-   * named \p mat_name, or \p nullptr if no matrix by that name
-   * exists.
-   */
-  SparseMatrix<Number> * request_matrix (const std::string & mat_name);
-
-  /**
-   * \returns A const reference to this system's additional matrix
-   * named \p mat_name.
-   *
-   * None of these matrices is involved in the solution process.
-   * Access is only granted when the matrix is already properly
-   * initialized.
-   */
-  const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
-
-  /**
-   * \returns A writable reference to this system's additional matrix
-   * named \p mat_name.
-   *
-   * None of these matrices is involved in the solution process.
-   * Access is only granted when the matrix is already properly
-   * initialized.
-   */
-  SparseMatrix<Number> & get_matrix (const std::string & mat_name);
-
-  /**
-   * \returns The number of matrices handled by this system
-   */
-  virtual unsigned int n_matrices () const override;
+  SparseMatrix<Number> & get_system_matrix();
 
   /**
    * The system matrix.  Implicit systems are characterized by
    * the need to solve the linear system Ax=b.  This is the
    * system matrix A.
+   *
+   * Public access to this member variable will be deprecated in
+   * the future! Use get_system_matrix() instead.
    */
   SparseMatrix<Number> * matrix;
 
@@ -405,81 +321,12 @@ public:
   bool zero_out_matrix_and_rhs;
 
 protected:
-
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * Adds the system matrix
    */
-  virtual void init_data () override;
-
-  /**
-   * Initializes the matrices associated with this system.
-   */
-  virtual void init_matrices ();
-
-private:
-
-  /**
-   * Add the system matrix to the \p _matrices data structure.
-   * Useful in initialization.
-   */
-  void add_system_matrix ();
-
-  /**
-   * Some systems need an arbitrary number of matrices.
-   */
-  std::map<std::string, SparseMatrix<Number> *> _matrices;
-
-  /**
-   * Holds the types of the matrices
-   */
-  std::map<std::string, ParallelType> _matrix_types;
-
-  /**
-   * \p true when additional matrices may still be added, \p false otherwise.
-   */
-  bool _can_add_matrices;
+  virtual void add_matrices() override;
 };
 
-
-
-// ------------------------------------------------------------
-// ImplicitSystem inline methods
-inline
-bool ImplicitSystem::have_matrix (const std::string & mat_name) const
-{
-  return (_matrices.count(mat_name));
-}
-
-
-inline
-unsigned int ImplicitSystem::n_matrices () const
-{
-  return cast_int<unsigned int>(_matrices.size());
-}
-
-template <template <typename> class MatrixType>
-inline
-SparseMatrix<Number> &
-ImplicitSystem::add_matrix (const std::string & mat_name,
-                            const ParallelType type)
-{
-  // only add matrices before initializing...
-  libmesh_error_msg_if(!_can_add_matrices,
-                       "ERROR: Too late.  Cannot add matrices to the system after initialization"
-                       "\n any more.  You should have done this earlier.");
-
-  // Return the matrix if it is already there.
-  if (this->have_matrix(mat_name))
-    return *(_matrices[mat_name]);
-
-  // Otherwise build the matrix and return it.
-  SparseMatrix<Number> * buf = libmesh_make_unique<MatrixType<Number>>(this->comm()).release();
-  _matrices.emplace(mat_name, buf);
-  _matrix_types.emplace(mat_name, type);
-
-  return *buf;
-}
 
 } // namespace libMesh
 

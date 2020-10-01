@@ -690,7 +690,7 @@ private:
 
     // Now that we've recomputed the sparsity pattern, we need
     // to reinitialize the system matrix.
-    libMesh::SparseMatrix<libMesh::Number> & matrix = system.get_matrix("System Matrix");
+    SparseMatrix<Number> & matrix = system.get_system_matrix();
     libmesh_assert(dof_map.is_attached(matrix));
     matrix.init();
 
@@ -723,7 +723,7 @@ private:
                    1);
 
         // Insert the Jacobian for the dofs for this element
-        system.matrix->add_matrix( subdomain_one_context.get_elem_jacobian(), rows );
+        matrix.add_matrix( subdomain_one_context.get_elem_jacobian(), rows );
       }
 
     for (const auto & elem : _mesh->active_local_subdomain_elements_ptr_range(2))
@@ -746,7 +746,7 @@ private:
                    1);
 
         // Insert the Jacobian for the normally coupled dofs for this element
-        system.matrix->add_matrix( subdomain_two_context.get_elem_jacobian(), rows );
+        matrix.add_matrix( subdomain_two_context.get_elem_jacobian(), rows );
 
         std::set<subdomain_id_type> allowed_subdomains;
         allowed_subdomains.insert(1);
@@ -777,19 +777,19 @@ private:
             // Now adding this local matrix to the global would trip a PETSc
             // malloc error if the sparsity pattern hasn't been correctly
             // built to include the overlapping coupling.
-            system.matrix->add_matrix (K21, rows, columns);
+            matrix.add_matrix (K21, rows, columns);
 
             // Now add the other part of the overlapping coupling
             K12.resize(v_indices.size(), rows.size());
             std::fill(K12.get_values().begin(), K12.get_values().end(), 1);
-            system.matrix->add_matrix(K12,v_indices,rows);
+            matrix.add_matrix(K12,v_indices,rows);
           }
       } // end element loop
 
     // We need to make sure to close the matrix for this test. There could still
     // be PETSc malloc errors tripped here if we didn't allocate the off-processor
     // part of the sparsity pattern correctly.
-    system.matrix->close();
+    matrix.close();
   }
 
 };

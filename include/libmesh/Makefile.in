@@ -507,11 +507,11 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	variable.h variant_filter_iterator.h enum_convergence_flags.h \
 	enum_eigen_solver_type.h enum_elem_quality.h enum_elem_type.h \
 	enum_error_estimator_type.h enum_fe_family.h \
-	enum_inf_map_type.h enum_io_package.h enum_norm_type.h \
-	enum_order.h enum_parallel_type.h enum_point_locator_type.h \
-	enum_preconditioner_type.h enum_quadrature_type.h \
-	enum_solver_package.h enum_solver_type.h \
-	enum_subset_solve_mode.h enum_xdr_mode.h \
+	enum_inf_map_type.h enum_io_package.h enum_matrix_build_type.h \
+	enum_norm_type.h enum_order.h enum_parallel_type.h \
+	enum_point_locator_type.h enum_preconditioner_type.h \
+	enum_quadrature_type.h enum_solver_package.h \
+	enum_solver_type.h enum_subset_solve_mode.h enum_xdr_mode.h \
 	adjoint_refinement_estimator.h \
 	adjoint_residual_error_estimator.h discontinuity_measure.h \
 	error_estimator.h exact_error_estimator.h exact_solution.h \
@@ -1012,6 +1012,9 @@ enum_inf_map_type.h: $(top_srcdir)/include/enums/enum_inf_map_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_io_package.h: $(top_srcdir)/include/enums/enum_io_package.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+enum_matrix_build_type.h: $(top_srcdir)/include/enums/enum_matrix_build_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_norm_type.h: $(top_srcdir)/include/enums/enum_norm_type.h

@@ -94,7 +94,7 @@ void EigenTimeSolver::solve ()
   // Assemble the spatial part (matrix A) of the operator
   if (!this->quiet)
     libMesh::out << "Assembling matrix A." << std::endl;
-  _system.matrix =   &( _system.get_matrix ("System Matrix") );
+  _system.matrix =   &( _system.get_system_matrix() );
   this->now_assembling = Matrix_A;
   _system.assembly(true, true);
   //_system.matrix->print_matlab("matrix_A.m");
@@ -112,7 +112,7 @@ void EigenTimeSolver::solve ()
   if (!this->quiet)
     libMesh::out << "Calling the EigenSolver." << std::endl;
   std::pair<unsigned int, unsigned int> solve_data =
-    eigen_solver->solve_generalized (_system.get_matrix ("System Matrix"),
+    eigen_solver->solve_generalized (_system.get_system_matrix(),
                                      _system.get_matrix ("B"),
                                      n_eigenpairs_to_compute,
                                      n_basis_vectors_to_use,

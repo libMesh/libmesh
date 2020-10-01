@@ -208,7 +208,7 @@ int main (int argc, char ** argv)
   eigen_system.set_eigenproblem_type(GHEP);
 
   // Set the target eigenvalue
-  eigen_system.eigen_solver->set_position_of_spectrum(0., TARGET_REAL);
+  eigen_system.get_eigen_solver().set_position_of_spectrum(0., TARGET_REAL);
 
   {
     std::set<boundary_id_type> boundary_ids;
@@ -312,8 +312,8 @@ void assemble_matrices(EquationSystems & es,
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the two system matrices
-  SparseMatrix<Number> & matrix_A = *eigen_system.matrix_A;
-  SparseMatrix<Number> & matrix_B = *eigen_system.matrix_B;
+  SparseMatrix<Number> & matrix_A = eigen_system.get_matrix_A();
+  SparseMatrix<Number> & matrix_B = eigen_system.get_matrix_B();
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will

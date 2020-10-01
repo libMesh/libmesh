@@ -146,7 +146,7 @@ class Elem;
  * For coupling ghosting, the user will also need to recompute the sparsity
  * pattern via DofMap::clear_sparsity() and then DofMap::compute_sparsity() and
  * then reinitialize any SparseMatrix objects attached to the System, e.g.
- * the system.get_matrix("System Matrix").
+ * the system.get_system_matrix().
  *
  * \author Roy H. Stogner
  * \date 2016

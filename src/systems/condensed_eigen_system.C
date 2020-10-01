@@ -37,8 +37,8 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
                                             const std::string & name_in,
                                             const unsigned int number_in)
   : Parent(es, name_in, number_in),
-    condensed_matrix_A(SparseMatrix<Number>::build(es.comm())),
-    condensed_matrix_B(SparseMatrix<Number>::build(es.comm())),
+    condensed_matrix_A(&this->add_matrix("Condensed Eigen Matrix A")),
+    condensed_matrix_B(&this->add_matrix("Condensed Eigen Matrix B")),
     condensed_dofs_initialized(false)
 {
 }
@@ -211,6 +211,23 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
   return eval;
 }
 
+
+
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_A() const
+{
+  libmesh_assert(condensed_matrix_A);
+  libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix A"), condensed_matrix_A);
+  return *condensed_matrix_A;
+}
+
+
+
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_B() const
+{
+  libmesh_assert(condensed_matrix_B);
+  libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix B"), condensed_matrix_B);
+  return *condensed_matrix_B;
+}
 
 
 
