@@ -382,8 +382,7 @@ void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const
 
 void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant)
 {
-  // We are using the midpoint rule or right sided Riemman rule to integrate each timestep
-  // (f(t_j) + f(t_j+1/2))/2 (t_j+1/2 - t_j) + (f(t_j+1/2) + f(t_j+1))/2 (t_j+1 - t_j+1/2)
+  // We use a numerical integration scheme consistent with the theta used for the timesolver.
 
   // Create first and second half error estimate vectors of the right size
   std::vector<Number> qoi_error_estimates_first_half(_system.qoi.size());

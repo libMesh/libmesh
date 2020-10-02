@@ -501,7 +501,7 @@ int main (int argc, char ** argv)
 
           // Output the H1 norm of the computed solution
           libMesh::out << "|U("
-                      << system.time + system.time_solver->last_completed_deltat()
+                      << system.time + system.time_solver->last_completed_timestep_size()
                       << ")|= "
                       << system.calculate_norm(*system.solution, 0, H1)
                       << std::endl;
@@ -581,7 +581,7 @@ int main (int argc, char ** argv)
                        << std::endl;
 
           libMesh::out << "|U("
-                         << system.time - (system.time_solver->last_completed_deltat())/((param.timesolver_tolerance) ? 2.0 : 1.0)
+                         << system.time - (system.time_solver->last_completed_timestep_size())/((param.timesolver_tolerance) ? 2.0 : 1.0)
                          << ")|= "
                          << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
                          << std::endl;

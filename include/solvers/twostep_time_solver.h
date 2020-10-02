@@ -86,9 +86,11 @@ public:
   /**
    * A method to compute the adjoint refinement error estimate at the current timestep.
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
-   * Fills in an ErrorVector that contains the weighted sum of errors from ARefEE::qoi_set() and can be used to guide AMR.
-   * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
-   * The midpoint rule is used for the numerical integration.
+   * The user provides an initialized ARefEE object.
+   * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * As an option, the user can also supply a QoI_time_instant vector where non-null pointers imply an instantaneous
+   * QoI evaluation at the time held by the pointer.
+   * ONLY CURRENTLY SUPPORTED for Backward Euler.
    */
   virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>()) override;
 

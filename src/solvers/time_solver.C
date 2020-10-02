@@ -36,8 +36,9 @@ TimeSolver::TimeSolver (sys_type & s)
     _linear_solver (),
     _system (s),
     solution_history(libmesh_make_unique<NoSolutionHistory>()),
+    last_deltat (s.deltat),
     _is_adjoint (false),
-    final_time (std::nan("1"))
+    final_time (std::numeric_limits<Real>::max())
 {
 }
 
@@ -139,11 +140,6 @@ void TimeSolver::integrate_adjoint_refinement_error_estimate
 }
 
 Real TimeSolver::last_completed_timestep_size()
-{
-  return last_deltat;
-}
-
-Real TimeSolver::last_completed_deltat()
 {
   return last_deltat;
 }

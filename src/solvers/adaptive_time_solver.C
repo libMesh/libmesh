@@ -34,7 +34,7 @@ AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type & s)
     max_deltat(0.),
     min_deltat(0.),
     max_growth(0.),
-    completed_timestep_size(1.),
+    completed_timestep_size(s.deltat),
     global_tolerance(true)
 {
   // the child class must populate core_time_solver

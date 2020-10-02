@@ -284,21 +284,15 @@ public:
    * time solver is used.
    * Returns the change in system.time, deltat, for the last timestep which was successfully completed.
    * This only returns the outermost step size in the case of nested time solvers.
-   * If no time step has yet been successfully completed, then returns X
+   * If no time step has yet been successfully completed, then returns system.deltat.
    */
   virtual Real last_completed_timestep_size();
 
   /**
-   * Returns the system.deltat timestep used to get to the current time.
-   * For a uniform timestepper, it will simply return the last used system.deltat, for an
-   * adaptive time solver, it will return the last used substep size.
-   */
-  virtual Real last_completed_deltat();
-
-  /**
    * The final_time variable can be set by the user or in another library
-   * function. By default the final_time variable is set to be std::nan("1").
-   * If set to a finite value, final time is useful for adjoint time stepping and QoI postprocessing.
+   * function. By default the final_time variable is set to be numeric_limits<Real>::max().
+   * Once set, final time can be used for adjoint time stepping and QoI postprocessing, if needed.
+   * An example is if one has a final time (temporally non-smooth) QoI.
    */
   void set_final_time(Real set_time)
   {
