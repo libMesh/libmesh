@@ -28,6 +28,13 @@
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
 
+// gzstream for reading compressed files as a stream
+#ifdef LIBMESH_HAVE_GZSTREAM
+# include "libmesh/ignore_warnings.h" // shadowing in gzstream.h
+# include "gzstream.h"
+# include "libmesh/restore_warnings.h"
+#endif
+
 // C++ includes
 #include <array>
 #include <cstddef>
@@ -129,8 +136,38 @@ DynaIO::DynaIO (MeshBase & mesh) :
 
 void DynaIO::read (const std::string & name)
 {
-  std::ifstream in (name.c_str());
-  this->read_mesh (in);
+  const bool gzipped_file = (name.size() - name.rfind(".gz")  == 3);
+  // These will be handled in unzip_file:
+  // const bool bzipped_file = (name.size() - name.rfind(".bz2") == 4);
+  // const bool xzipped_file = (name.size() - name.rfind(".xz") == 3);
+
+  std::unique_ptr<std::istream> in;
+
+  if (gzipped_file)
+    {
+#ifdef LIBMESH_HAVE_GZSTREAM
+      igzstream * inf = new igzstream;
+      libmesh_assert(inf);
+      in.reset(inf);
+      inf->open(name.c_str(), std::ios::in);
+#else
+      libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
+#endif
+    }
+  else
+    {
+      std::ifstream * inf = new std::ifstream;
+      libmesh_assert(inf);
+      in.reset(inf);
+
+      std::string new_name = Utility::unzip_file(name);
+
+      inf->open(new_name.c_str(), std::ios::in);
+    }
+
+  libmesh_assert(in.get());
+
+  this->read_mesh (*in);
 }
 
 
