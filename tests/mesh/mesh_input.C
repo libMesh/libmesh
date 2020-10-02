@@ -420,6 +420,16 @@ public:
       {
         Point master_pt = {}; // center, for tensor product elements
 
+        // But perturb it to try and trigger any mapping weirdness
+        if (elem->dim() > 0)
+          master_pt(0) = 0.25;
+
+        if (elem->dim() > 1)
+          master_pt(1) = -0.25;
+
+        if (elem->dim() > 2)
+          master_pt(2) = 0.75;
+
         FEMap fe_map;
 
         Point physical_pt = fe_map.map(elem->dim(), elem, master_pt);
@@ -427,7 +437,7 @@ public:
         Point inverse_pt = fe_map.inverse_map(elem->dim(), elem,
                                               physical_pt);
 
-        CPPUNIT_ASSERT(inverse_pt.norm() < TOLERANCE);
+        CPPUNIT_ASSERT((inverse_pt-master_pt).norm() < TOLERANCE);
 
         CPPUNIT_ASSERT(elem->contains_point(physical_pt));
 
