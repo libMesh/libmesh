@@ -21,9 +21,15 @@
 
 #include "libmesh/elem.h"
 #include "libmesh/remote_elem.h"
+#ifdef LIBMESH_ENABLE_PERIODIC
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/boundary_info.h"
+#endif
 
 // C++ Includes
 #include <unordered_set>
+#include <set>
+#include <vector>
 
 namespace libMesh
 {
@@ -35,6 +41,19 @@ void GhostPointNeighbors::operator()
    GhostPointNeighbors::map_type & coupled_elements)
 {
   libmesh_assert(_mesh);
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  bool check_periodic_bcs =
+    (_periodic_bcs && !_periodic_bcs->empty());
+
+  std::unique_ptr<PointLocatorBase> point_locator;
+  if (check_periodic_bcs)
+      point_locator = _mesh->sub_point_locator();
+
+  std::set<const Elem *> periodic_elems_examined;
+  const BoundaryInfo & binfo = _mesh->get_boundary_info();
+  std::vector<boundary_id_type> ppn_bcids;
+#endif
 
   // Using a connected_nodes set rather than point_neighbors() would
   // give us correct results even in corner cases, such as where two
@@ -90,7 +109,74 @@ void GhostPointNeighbors::operator()
       if (ip && ip->processor_id() != p &&
           _mesh->query_elem_ptr(ip->id()) == ip)
         coupled_elements.emplace(ip, nullcm);
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+      if (check_periodic_bcs)
+        {
+          for (const auto s : elem->side_index_range())
+            {
+              if (elem->neighbor_ptr(s))
+                continue;
+
+              const Elem * const periodic_neigh = elem->topological_neighbor
+                (s, *_mesh, *point_locator, _periodic_bcs);
+
+              if (periodic_neigh && periodic_neigh != remote_elem)
+                {
+                  std::set <const Elem *> periodic_point_neighbors;
+
+                  // This fills point neighbors *including* periodic_neigh
+                  periodic_neigh->find_point_neighbors(periodic_point_neighbors);
+
+                  for (const Elem * const ppn : periodic_point_neighbors)
+                    {
+                      // Don't need to ghost RemoteElem or an element we already own or an
+                      // element we've already examined
+                      if (ppn == remote_elem || ppn->processor_id() == _mesh->processor_id() ||
+                          periodic_elems_examined.count(ppn))
+                        continue;
+
+                      // We only need to keep point neighbors that are along the periodic boundaries
+                      bool on_periodic_boundary = false;
+                      for (const auto ppn_s : ppn->side_index_range())
+                        {
+                          binfo.boundary_ids(ppn, ppn_s, ppn_bcids);
+                          for (const auto ppn_bcid : ppn_bcids)
+                            if (_periodic_bcs->find(ppn_bcid) != _periodic_bcs->end())
+                              {
+                                on_periodic_boundary = true;
+                                goto jump;
+                              }
+                        }
+                    jump:
+                      if (on_periodic_boundary)
+                        coupled_elements.emplace(ppn, nullcm);
+
+                      periodic_elems_examined.insert(ppn);
+                    }
+                }
+            }
+        }
+#endif // LIBMESH_ENABLE_PERIODIC
     }
+}
+
+void GhostPointNeighbors::mesh_reinit()
+{
+  // Unless we have periodic boundary conditions, we don't need
+  // anything precomputed.
+#ifdef LIBMESH_ENABLE_PERIODIC
+  if (!_periodic_bcs || _periodic_bcs->empty())
+    return;
+#endif
+
+  // If we do have periodic boundary conditions, we'll need a master
+  // point locator, so we'd better have a mesh to build it on.
+  libmesh_assert(_mesh);
+
+  // Make sure an up-to-date master point locator has been
+  // constructed; we'll need to grab sub-locators soon.
+  _mesh->sub_point_locator();
 }
 
 } // namespace libMesh
