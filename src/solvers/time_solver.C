@@ -122,42 +122,20 @@ std::pair<unsigned int, Real> TimeSolver::adjoint_solve (const QoISet & qoi_indi
 
 void TimeSolver::integrate_qoi_timestep()
 {
-  // Base class assumes a direct steady evaluation
-  this->_system.assemble_qoi();
-
+  libmesh_not_implemented();
 }
 
-void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
+void TimeSolver::integrate_adjoint_sensitivity(const QoISet & /* qois */, const ParameterVector & /* parameter_vector */, SensitivityData & /* sensitivities */)
 {
-  // Base class assumes a direct steady state sensitivity calculation
-  this->_system.ImplicitSystem::adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities);
-
-  return;
+  libmesh_not_implemented();
 }
 
 void TimeSolver::integrate_adjoint_refinement_error_estimate
-  (AdjointRefinementEstimator & adjoint_refinement_error_estimator,
-   ErrorVector & QoI_elementwise_error,
+  (AdjointRefinementEstimator & /* adjoint_refinement_error_estimator */,
+   ErrorVector & /* QoI_elementwise_error */,
    std::vector<Real *> /* QoI_time_instant */)
 {
-  // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
-  if(_system.qoi_error_estimates.size() != _system.qoi.size())
-      _system.qoi_error_estimates.resize(_system.qoi.size());
-
-  // Base class assumes a direct steady state error estimate
-  adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error);
-
-  // Also get the spatially integrated errors for all the QoIs in the QoI set
-  for (auto j : make_range(_system.n_qois()))
-  {
-    // Skip this QoI if not in the QoI Set
-    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
-    {
-      (_system.qoi_error_estimates)[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
-    }
-  }
-
-  return;
+  libmesh_not_implemented();
 }
 
 Real TimeSolver::last_completed_timestep_size()

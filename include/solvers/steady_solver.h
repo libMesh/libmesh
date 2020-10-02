@@ -111,6 +111,28 @@ public:
    */
   virtual bool is_steady() const override { return true; }
 
+  /**
+   * A method to integrate the system::QoI functionals.
+   */
+  virtual void integrate_qoi_timestep() override;
+
+  /**
+   * A method to integrate the adjoint sensitivity w.r.t a given parameter
+   * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
+   */
+  virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override;
+
+  /**
+   * A method to compute the adjoint refinement error estimate at the current timestep.
+   * int_{tstep_start}^{tstep_end} R(u^h,z) dt
+   * The user provides an initialized ARefEE object.
+   * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * As an option, the user can also supply a QoI_time_instant vector where non-null pointers imply an instantaneous
+   * QoI evaluation at the time held by the pointer.
+   * ONLY CURRENTLY SUPPORTED for Backward Euler.
+   */
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>());
+
 protected:
 
   /**
