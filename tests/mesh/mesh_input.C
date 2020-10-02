@@ -61,6 +61,7 @@ public:
 
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
+  CPPUNIT_TEST( testDynaFileMappingsFEMEx5);
 
   CPPUNIT_TEST( testMeshMoveConstructor );
 #endif // LIBMESH_DIM > 1
@@ -563,6 +564,34 @@ public:
     CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), dof_id_type(121));
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 #endif // LIBMESH_HAVE_SOLVER
+  }
+
+
+  void testDynaFileMappings (const std::string & filename)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    mesh.allow_renumbering(false);
+    mesh.allow_remote_element_removal(false);
+
+    DynaIO dyna(mesh);
+    if (mesh.processor_id() == 0)
+      dyna.read(filename);
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
+                         RATIONAL_BERNSTEIN_MAP);
+
+    testMasterCenters(mesh);
+  }
+
+
+  void testDynaFileMappingsFEMEx5 ()
+  {
+    testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz");
   }
 
 
