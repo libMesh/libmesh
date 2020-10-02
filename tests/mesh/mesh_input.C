@@ -412,6 +412,9 @@ public:
   {
     auto locator = mesh.sub_point_locator();
 
+    const std::set<subdomain_id_type> manifold_subdomain { 0 };
+    const std::set<subdomain_id_type> nodeelem_subdomain { 1 };
+
     for (auto & elem : mesh.element_ptr_range())
       {
         Point master_pt = {}; // center, for tensor product elements
@@ -427,7 +430,11 @@ public:
 
         CPPUNIT_ASSERT(elem->contains_point(physical_pt));
 
-        const Elem * located_elem = (*locator)(physical_pt);
+        const std::set<subdomain_id_type> * sbd_set =
+          (elem->type() == NODEELEM) ?
+          &nodeelem_subdomain : &manifold_subdomain;
+
+        const Elem * located_elem = (*locator)(physical_pt, sbd_set);
 
         CPPUNIT_ASSERT(located_elem == elem);
       }
