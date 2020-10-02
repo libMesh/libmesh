@@ -104,39 +104,39 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {
-   for (const auto & gf : other_mesh._ghosting_functors )
-   {
-     std::shared_ptr<GhostingFunctor> clone_gf = gf->clone();
-     // Some subclasses of GhostingFunctor might not override the
-     // clone function yet. If this is the case, GhostingFunctor will
-     // return nullptr by default. The clone function should be overridden
-     // in all derived classes. This following code ("else") is written
-     // for API upgrade. That will allow users gradually to update their code.
-     // Once the API upgrade is done, we will come back and delete "else."
-     if (clone_gf)
-     {
-       clone_gf->set_mesh(this);
-       add_ghosting_functor(clone_gf);
-     }
-     else
-     {
-       libmesh_deprecated();
-       add_ghosting_functor(*gf);
-     }
-   }
+  const GhostingFunctor * const other_default_ghosting = other_mesh._default_ghosting.get();
 
-  // Make sure we don't accidentally delete the other mesh's default
-  // ghosting functor; we'll use our own if that's needed.
-  if (other_mesh._ghosting_functors.count(other_mesh._default_ghosting.get()))
+  for (GhostingFunctor * const gf : other_mesh._ghosting_functors)
     {
-      _ghosting_functors.erase(other_mesh._default_ghosting.get());
-      _ghosting_functors.insert(_default_ghosting.get());
+      // If the other mesh is using default ghosting, then we will use our own
+      // default ghosting
+      if (gf == other_default_ghosting)
+        {
+          _ghosting_functors.insert(_default_ghosting.get());
+          continue;
+        }
+
+      std::shared_ptr<GhostingFunctor> clone_gf = gf->clone();
+      // Some subclasses of GhostingFunctor might not override the
+      // clone function yet. If this is the case, GhostingFunctor will
+      // return nullptr by default. The clone function should be overridden
+      // in all derived classes. This following code ("else") is written
+      // for API upgrade. That will allow users gradually to update their code.
+      // Once the API upgrade is done, we will come back and delete "else."
+      if (clone_gf)
+        {
+          clone_gf->set_mesh(this);
+          add_ghosting_functor(clone_gf);
+        }
+      else
+        {
+          libmesh_deprecated();
+          add_ghosting_functor(*gf);
+        }
     }
 
   if (other_mesh._partitioner.get())
-    {
-      _partitioner = other_mesh._partitioner->clone();
-    }
+    _partitioner = other_mesh._partitioner->clone();
 }
 
 
