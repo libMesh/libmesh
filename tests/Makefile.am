@@ -119,8 +119,8 @@ unit_tests_sources = \
 
 # Make sure any data goes in "make dist"
 datadir = $(install_dir)
-data = meshes/1_quad.bxt \
-       meshes/25_quad.bxt \
+data = meshes/1_quad.bxt.gz \
+       meshes/25_quad.bxt.gz \
        meshes/shark_tooth_tri6.xda.gz
 
 unit_tests_sources += \
