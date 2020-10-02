@@ -60,7 +60,10 @@ public:
       GhostingFunctor(other)
 #ifdef LIBMESH_ENABLE_PERIODIC
         ,
-      _periodic_bcs(other._periodic_bcs)
+      // We do not simply want to copy over the other's periodic bcs because
+      // they may very well correspond to periodic bcs from a \p DofMap entirely
+      // unrelated to any \p DofMaps that depend on this objects ghosting
+      _periodic_bcs(nullptr)
 #endif
     {}
 
