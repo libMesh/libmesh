@@ -408,6 +408,33 @@ public:
 #endif
 
 
+  void testMasterCenters (const MeshBase & mesh)
+  {
+    auto locator = mesh.sub_point_locator();
+
+    for (auto & elem : mesh.element_ptr_range())
+      {
+        Point master_pt = {}; // center, for tensor product elements
+
+        FEMap fe_map;
+
+        Point physical_pt = fe_map.map(elem->dim(), elem, master_pt);
+
+        Point inverse_pt = fe_map.inverse_map(elem->dim(), elem,
+                                              physical_pt);
+
+        CPPUNIT_ASSERT(inverse_pt.norm() < TOLERANCE);
+
+        CPPUNIT_ASSERT(elem->contains_point(physical_pt));
+
+        const Elem * located_elem = (*locator)(physical_pt);
+
+        CPPUNIT_ASSERT(located_elem == elem);
+      }
+  }
+
+
+
   void testDynaReadElem ()
   {
     Mesh mesh(*TestCommWorld);
@@ -459,6 +486,8 @@ public:
           CPPUNIT_ASSERT_EQUAL(elem->point(v)(2), Real(0));
 #endif
       }
+
+    testMasterCenters(mesh);
   }
 
 
@@ -511,6 +540,8 @@ public:
 
         CPPUNIT_ASSERT_EQUAL(n_neighbors, n_neighbors_expected);
       }
+
+    testMasterCenters(mesh);
 
 #ifdef LIBMESH_HAVE_SOLVER
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
