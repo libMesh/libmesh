@@ -52,7 +52,8 @@ void GhostPointNeighbors::operator()
 
   std::set<const Elem *> periodic_elems_examined;
   const BoundaryInfo & binfo = _mesh->get_boundary_info();
-  std::vector<boundary_id_type> ppn_bcids;
+  std::vector<boundary_id_type> appn_bcids;
+  std::vector<const Elem *> active_periodic_neighbors;
 #endif
 
   // Using a connected_nodes set rather than point_neighbors() would
@@ -118,41 +119,54 @@ void GhostPointNeighbors::operator()
               if (elem->neighbor_ptr(s))
                 continue;
 
-              const Elem * const periodic_neigh = elem->topological_neighbor
+              const Elem * const equal_level_periodic_neigh = elem->topological_neighbor
                 (s, *_mesh, *point_locator, _periodic_bcs);
 
-              if (periodic_neigh && periodic_neigh != remote_elem)
+              if (!equal_level_periodic_neigh || equal_level_periodic_neigh == remote_elem)
+                continue;
+
+              equal_level_periodic_neigh->active_family_tree_by_topological_neighbor(
+                active_periodic_neighbors,
+                elem,
+                *_mesh,
+                *point_locator,
+                _periodic_bcs,
+                /*reset=*/true);
+
+              for (const Elem * const active_periodic_neigh : active_periodic_neighbors)
                 {
-                  std::set <const Elem *> periodic_point_neighbors;
+                  std::set <const Elem *> active_periodic_point_neighbors;
 
-                  // This fills point neighbors *including* periodic_neigh
-                  periodic_neigh->find_point_neighbors(periodic_point_neighbors);
+                  // This fills point neighbors *including*
+                  // active_periodic_neigh. The documentation for this method
+                  // states that this will return *active* point neighbors
+                  active_periodic_neigh->find_point_neighbors(active_periodic_point_neighbors);
 
-                  for (const Elem * const ppn : periodic_point_neighbors)
+                  for (const Elem * const appn : active_periodic_point_neighbors)
                     {
                       // Don't need to ghost RemoteElem or an element we already own or an
                       // element we've already examined
-                      if (ppn == remote_elem || ppn->processor_id() == _mesh->processor_id() ||
-                          periodic_elems_examined.count(ppn))
+                      if (appn == remote_elem || appn->processor_id() == _mesh->processor_id() ||
+                          periodic_elems_examined.count(appn))
                         continue;
 
                       // We only need to keep point neighbors that are along the periodic boundaries
                       bool on_periodic_boundary = false;
-                      for (const auto ppn_s : ppn->side_index_range())
+                      for (const auto appn_s : appn->side_index_range())
                         {
-                          binfo.boundary_ids(ppn, ppn_s, ppn_bcids);
-                          for (const auto ppn_bcid : ppn_bcids)
-                            if (_periodic_bcs->find(ppn_bcid) != _periodic_bcs->end())
+                          binfo.boundary_ids(appn, appn_s, appn_bcids);
+                          for (const auto appn_bcid : appn_bcids)
+                            if (_periodic_bcs->find(appn_bcid) != _periodic_bcs->end())
                               {
                                 on_periodic_boundary = true;
                                 goto jump;
                               }
                         }
-                    jump:
-                      if (on_periodic_boundary)
-                        coupled_elements.emplace(ppn, nullcm);
+                      jump:
+                        if (on_periodic_boundary)
+                          coupled_elements.emplace(appn, nullcm);
 
-                      periodic_elems_examined.insert(ppn);
+                        periodic_elems_examined.insert(appn);
                     }
                 }
             }
