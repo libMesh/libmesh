@@ -37,8 +37,7 @@ TimeSolver::TimeSolver (sys_type & s)
     _system (s),
     solution_history(libmesh_make_unique<NoSolutionHistory>()),
     last_deltat (s.deltat),
-    _is_adjoint (false),
-    final_time (std::numeric_limits<Real>::max())
+    _is_adjoint (false)
 {
 }
 
@@ -133,8 +132,7 @@ void TimeSolver::integrate_adjoint_sensitivity(const QoISet & /* qois */, const 
 
 void TimeSolver::integrate_adjoint_refinement_error_estimate
   (AdjointRefinementEstimator & /* adjoint_refinement_error_estimator */,
-   ErrorVector & /* QoI_elementwise_error */,
-   std::vector<Real *> /* QoI_time_instant */)
+   ErrorVector & /* QoI_elementwise_error */)
 {
   libmesh_not_implemented();
 }

@@ -77,13 +77,13 @@ public:
 
   /**
    * A method to compute the adjoint refinement error estimate at the current timestep.
-   * int_{tstep_start}^{tstep_end} R(u^h,z) dt
+   * int_{tstep_start}^{tstep_end} R(u^h,z) dt.
+   * The user provides an initialized ARefEE object.
    * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
-   * Also fills in a map that links QoI indices to spatially integrated error estimates for the QoI with that index.
-   * The trapezoidal rule (for temporally smooth QoI) or left Riemann sum (for an instantaneous QoI) is used
-   * for the numerical integration depending on the nature of the QoI.
+   * The integration scheme used is consistent with the theta used for the unsteady solution.
+   * CURRENTLY ONLY SUPPORTED for Backward Euler.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>()) override;
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override;
 
   /**
    * This method uses the DifferentiablePhysics'

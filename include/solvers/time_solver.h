@@ -150,11 +150,9 @@ public:
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
    * The user provides an initialized ARefEE object.
    * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
-   * As an option, the user can also supply a QoI_time_instant vector where non-null pointers imply an instantaneous
-   * QoI evaluation at the time held by the pointer.
-   * ONLY CURRENTLY SUPPORTED for Backward Euler.
+   * CURRENTLY ONLY SUPPORTED for Backward Euler.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>());
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error);
 
   /**
    * This method uses the DifferentiablePhysics
@@ -288,22 +286,6 @@ public:
    */
   virtual Real last_completed_timestep_size();
 
-  /**
-   * The final_time variable can be set by the user or in another library
-   * function. By default the final_time variable is set to be numeric_limits<Real>::max().
-   * Once set, final time can be used for adjoint time stepping and QoI postprocessing, if needed.
-   * An example is if one has a final time (temporally non-smooth) QoI.
-   */
-  void set_final_time(Real set_time)
-  {
-    final_time = set_time;
-  }
-
-  Real get_final_time()
-  {
-    return final_time;
-  }
-
 protected:
 
   /**
@@ -348,12 +330,6 @@ private:
    * adjoint problem
    */
   bool _is_adjoint;
-
-  /**
-   * The final time at the completion of the timestepping, useful for adjoint
-   * time stepping and QoI postprocessing. By default the final_time variable is set to be std::nan("1").
-   */
-  Real final_time;
 
 };
 

@@ -39,10 +39,13 @@ public:
       _fe_family("LAGRANGE"),
       _fe_order(1),
       _analytic_jacobians(true)
-  { qoi.resize(2); }
+  { qoi.resize(2); QoI_time_instant.resize(2);}
 
   Real & k() { return _k; }
   bool & analytic_jacobians() { return _analytic_jacobians; }
+
+  // A vector to specify which QoIs are instantaneous and what time instant they are evaluated at
+  std::vector<Real> QoI_time_instant;
 
 protected:
   // System initialization
@@ -82,4 +85,5 @@ protected:
 
   // Use averaged model
   bool _averaged_model;
+
 };

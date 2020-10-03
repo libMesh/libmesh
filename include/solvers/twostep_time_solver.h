@@ -88,11 +88,9 @@ public:
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
    * The user provides an initialized ARefEE object.
    * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
-   * As an option, the user can also supply a QoI_time_instant vector where non-null pointers imply an instantaneous
-   * QoI evaluation at the time held by the pointer.
-   * ONLY CURRENTLY SUPPORTED for Backward Euler.
+   * CURRENTLY ONLY SUPPORTED for Backward Euler.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant = std::vector<Real *>()) override;
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override;
 
 };
 

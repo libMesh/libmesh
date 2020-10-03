@@ -264,8 +264,11 @@ void UnsteadySolver::retrieve_timestep()
 
 void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
 {
-  // We are using the trapezoidal rule to integrate each timestep
+  // CURRENTLY using the trapezoidal rule to integrate each timestep
   // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+  // Fix me: This function needs to be moved to the EulerSolver classes like the
+  // other integrate_timestep functions, and use an integration rule consistent with
+  // the theta method used for the time integration.
 
   // Get t_j
   Real time_left = _system.time;
@@ -309,7 +312,7 @@ void UnsteadySolver::integrate_qoi_timestep()
   libmesh_not_implemented();
 }
 
-void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & /*adjoint_refinement_error_estimator*/, ErrorVector & /*QoI_elementwise_error*/, std::vector<Real *> /*QoI_time_instant*/)
+void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & /*adjoint_refinement_error_estimator*/, ErrorVector & /*QoI_elementwise_error*/)
 {
   libmesh_not_implemented();
 }

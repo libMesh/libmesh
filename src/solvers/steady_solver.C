@@ -111,8 +111,7 @@ void SteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const Para
 
 void SteadySolver::integrate_adjoint_refinement_error_estimate
   (AdjointRefinementEstimator & adjoint_refinement_error_estimator,
-   ErrorVector & QoI_elementwise_error,
-   std::vector<Real *> /* QoI_time_instant */)
+   ErrorVector & QoI_elementwise_error)
 {
   // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
   if(_system.qoi_error_estimates.size() != _system.qoi.size())

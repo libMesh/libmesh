@@ -380,7 +380,7 @@ void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const
      sensitivities[i][j] = sensitivities_first_half[i][j] + sensitivities_second_half[i][j];
 }
 
-void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant)
+void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error)
 {
   // We use a numerical integration scheme consistent with the theta used for the timesolver.
 
@@ -391,7 +391,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
   // First half timestep
   ErrorVector QoI_elementwise_error_first_half;
 
-  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_first_half, QoI_time_instant);
+  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_first_half);
 
   // Also get the first 'half step' spatially integrated errors for all the QoIs in the QoI set
   for (auto j : make_range(_system.n_qois()))
@@ -406,7 +406,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
   // Second half timestep
   ErrorVector QoI_elementwise_error_second_half;
 
-  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_second_half, QoI_time_instant);
+  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_second_half);
 
   // Also get the second 'half step' spatially integrated errors for all the QoIs in the QoI set
   for (auto j : make_range(_system.n_qois()))

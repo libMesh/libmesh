@@ -33,14 +33,11 @@
 // We are interested in estimating the effect of using K = 0.01 on 2 QoIs.
 
 // We specify our Quantity of Interest (QoI) as
-// Q0(u) = int_{domain} u(x,y;tf) 1.0 dx dy
-// Q1(u) = int_{0}^{tf} int_{domain} u(x,y;t) 1.0 dx dy dt
+// Q0(u) = int_{domain} u(x,y;tf) 1.0 dx dy (A temporally non-smooth QoI evaluated at the final time)
+// Q1(u) = int_{0}^{tf} int_{domain} u(x,y;t) 1.0 dx dy dt (A temporally smooth QoI)
 
 // We verify the adjoint identity,
 // Q(u_true) - Q(u_coarse) = R(u_true, z)
-
-// For QoI 1, the goal functionals are defined to reproduce errors for a trapezoidal
-// time integration approach. See element_qoi_derivative.C for more information.
 
 // Local includes
 #include "initial.h"
@@ -507,16 +504,8 @@ int main (int argc, char ** argv)
         }
       // End timestep loop
 
-      // Set the final time
-      std::vector<Real *> final_time(2, NULL);
-      final_time[0] = new Real;
-      *(final_time[0]) = system.time;
-      system.time_solver->set_final_time(system.time);
-
-      // Now that we have set the final time, we can evaluate the final time QoI
-      system.assemble_qoi();
-
-      std::cout<< "The computed QoI 0 is " << std::setprecision(17) << (system.qoi)[0] << std::endl;
+      // Set the time instant for the evaluation of the non-smooth QoI 0
+      (dynamic_cast<HeatSystem &>(system).QoI_time_instant)[0] = system.time;
 
       // Now loop over the timesteps again to get the QoIs
 
@@ -535,6 +524,7 @@ int main (int argc, char ** argv)
           QoI_1_accumulated += (system.qoi)[1];
         }
 
+      std::cout<< "The computed QoI 0 is " << std::setprecision(17) << (system.qoi)[0] << std::endl;
       std::cout<< "The computed QoI 1 is " << std::setprecision(17) << QoI_1_accumulated << std::endl;
 
       ///////////////// Now for the Adjoint Solution //////////////////////////////////////
@@ -709,12 +699,13 @@ int main (int argc, char ** argv)
         }
       // End adjoint timestep loop
 
-      // Now that we have computed both the primal and adjoint solutions, we compute the sensitivities to the parameter p
-      // dQ/dp = int_{0}^{T} partialQ/partialp - partialR/partialp(u,z;p) dt
-      // The quantity partialQ/partialp - partialR/partialp(u,z;p) is evaluated internally by the ImplicitSystem::adjoint_qoi_parameter_sensitivity function.
-      // This sensitivity evaluation is called internally by an overloaded TimeSolver::integrate_adjoint_sensitivity method which we call below.
-
-      // Prepare the quantities we need to pass to TimeSolver::integrate_adjoint_sensitivity
+      // Now that we have computed both the primal and adjoint solutions, we can compute the goal-oriented error estimates.
+      // For this, we will need to build a ARefEE error estimator object, and supply a pointer to the 'true physics' object,
+      // as we did for the adjoint solve. This object will now define the residual for the dual weighted error evaluation at
+      // each timestep.
+      // For adjoint consistency, it is important that we maintain the same integration method for the error estimation integral
+      // as we did for the primal and QoI integration. This is ensured within the library, but is currently ONLY supported for
+      // the Backward-Euler (theta = 0.5) time integration method.
       QoISet qois;
 
       std::vector<unsigned int> qoi_indices;
@@ -776,7 +767,7 @@ int main (int argc, char ** argv)
       for (unsigned int t_step=param.initial_timestep;
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
-          system.time_solver->integrate_adjoint_refinement_error_estimate(*adjoint_refinement_error_estimator, QoI_elementwise_error, final_time);
+          system.time_solver->integrate_adjoint_refinement_error_estimate(*adjoint_refinement_error_estimator, QoI_elementwise_error);
 
           // A pretty update message
           libMesh::out << "Retrieved, "

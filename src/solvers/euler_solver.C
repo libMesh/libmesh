@@ -196,8 +196,7 @@ bool EulerSolver::_general_residual (bool request_jacobian,
 
 void EulerSolver::integrate_qoi_timestep()
 {
-  // We are using the trapezoidal rule to integrate each timestep
-  // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+  // We use a numerical integration scheme consistent with the theta used for the timesolver.
 
   // Zero out the system.qoi vector
   for (auto j : make_range(_system.n_qois()))
@@ -252,8 +251,12 @@ void EulerSolver::integrate_qoi_timestep()
   }
 }
 
-void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error, std::vector<Real *> QoI_time_instant)
+void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error)
 {
+  // Currently, we only support this functionality when Backward-Euler time integration is used.
+  if (theta != 1.0)
+  libmesh_not_implemented();
+
   // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
   if(_system.qoi_error_estimates.size() != _system.qoi.size())
     _system.qoi_error_estimates.resize(_system.qoi.size());
@@ -405,18 +408,7 @@ void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementE
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      if(QoI_time_instant[j] == NULL)
-      {
-        (_system.qoi_error_estimates)[j] = ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat;
-      }
-      else if(time_right <= *(QoI_time_instant[j]) + TOLERANCE)
-      {
-        (_system.qoi_error_estimates)[j] = ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat;
-      }
-      else
-      {
-        (_system.qoi_error_estimates)[j] = 0.0;
-      }
+      (_system.qoi_error_estimates)[j] = ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat;
     }
   }
 

@@ -43,12 +43,9 @@ void HeatSystem::element_qoi (DiffContext & context, const QoISet & /* qois */)
     Number u = c.interior_value(0, qp);
 
     // The final time QoI
-    if(!std::isnan(dynamic_cast<const HeatSystem &>(sys).time_solver->get_final_time()))
+    if(std::abs(sys.time - (dynamic_cast<const HeatSystem &>(sys).QoI_time_instant)[0]) < TOLERANCE)
     {
-      if(std::abs(sys.time - dynamic_cast<const HeatSystem &>(sys).time_solver->get_final_time()) < TOLERANCE)
-      {
-        dQoI_0 += JxW[qp] * ( u * 1.0 );
-      }
+      dQoI_0 += JxW[qp] * ( u * 1.0 );
     }
 
     // Smooth QoI contribution
