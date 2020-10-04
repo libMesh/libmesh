@@ -133,7 +133,9 @@ void Nemesis_IO::verbose (bool set_verbosity)
 
 void Nemesis_IO::write_complex_magnitude (bool val)
 {
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper->write_complex_abs = val;
+#endif
 }
 
 
@@ -157,6 +159,7 @@ void Nemesis_IO::set_output_variables(const std::vector<std::string> & output_va
 void Nemesis_IO::assert_symmetric_cmaps()
 {
 #ifndef NDEBUG
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   // We expect the communication maps to be symmetric - e.g. if processor i thinks it
   // communicates with processor j, then processor j should also be expecting to
   // communicate with i.  We can assert that here easily enough with an alltoall,
@@ -183,6 +186,7 @@ void Nemesis_IO::assert_symmetric_cmaps()
 
     libmesh_assert (pid_send_partner == pid_recv_partner);
   }
+#endif
 #endif
 }
 
