@@ -146,7 +146,7 @@ void GhostPointNeighbors::operator()
                     {
                       // Don't need to ghost RemoteElem or an element we already own or an
                       // element we've already examined
-                      if (appn == remote_elem || appn->processor_id() == _mesh->processor_id() ||
+                      if (appn == remote_elem || appn->processor_id() == p ||
                           periodic_elems_examined.count(appn))
                         continue;
 
