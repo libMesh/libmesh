@@ -1169,9 +1169,11 @@ void Nemesis_IO::read (const std::string & base_filename)
     // proper "ghost" neighbor information.
     MeshCommunication().gather_neighboring_elements(cast_ref<DistributedMesh &>(mesh));
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   // We've been setting unique_ids by hand; let's make sure that later
   // ones are consistent with them.
   mesh.set_next_unique_id(mesh.parallel_max_unique_id()+1);
+#endif
 }
 
 #else
