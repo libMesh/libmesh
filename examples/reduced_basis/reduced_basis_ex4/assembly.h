@@ -44,7 +44,7 @@ using libMesh::Utility::pow;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {
-  unsigned int get_n_components() const
+  unsigned int get_n_components() const override
   {
     return 1;
   }

@@ -328,10 +328,11 @@ void assemble_wave(EquationSystems & es,
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
 
-  // Copy the speed of sound and fluid density
-  // to a local variable.
+  // Copy the speed of sound to a local variable.
   const Real speed = es.parameters.get<Real>("speed");
-  const Real rho   = es.parameters.get<Real>("fluid density");
+
+  // If we added Neumann conditions we would need density too
+  // const Real rho   = es.parameters.get<Real>("fluid density");
 
   // Get a reference to our system, as before.
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
@@ -455,9 +456,9 @@ void assemble_wave(EquationSystems & es,
         // be extended.
         //
         // don't do this for any side
+#if 0
         for (auto side : elem->side_index_range())
-          if (!true)
-            // if (elem->neighbor_ptr(side) == nullptr)
+          if (elem->neighbor_ptr(side) == nullptr)
             {
               // Declare a special finite element object for
               // boundary integration.
@@ -500,6 +501,7 @@ void assemble_wave(EquationSystems & es,
                     }
                 } // end face quadrature point loop
             } // end if (elem->neighbor_ptr(side) == nullptr)
+#endif // 0
 
         // In this example the Dirichlet boundary conditions will be
         // imposed via penalty method after the
