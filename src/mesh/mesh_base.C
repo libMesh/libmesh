@@ -139,43 +139,6 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
     _partitioner = other_mesh._partitioner->clone();
 }
 
-
-
-MeshBase::MeshBase(MeshBase && other_mesh) :
-    ParallelObject (other_mesh),
-    boundary_info (new BoundaryInfo(*this)),
-    _n_parts       (other_mesh._n_parts),
-    _default_mapping_type(other_mesh._default_mapping_type),
-    _default_mapping_data(other_mesh._default_mapping_data),
-    _is_prepared   (other_mesh._is_prepared),
-    _point_locator (std::move(other_mesh._point_locator)),
-    _count_lower_dim_elems_in_point_locator(other_mesh._count_lower_dim_elems_in_point_locator),
-    _partitioner   (std::move(other_mesh._partitioner)),
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-    _next_unique_id(other_mesh._next_unique_id),
-#endif
-    _skip_noncritical_partitioning(other_mesh._skip_noncritical_partitioning),
-    _skip_all_partitioning(other_mesh._skip_all_partitioning),
-    _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
-    _skip_find_neighbors(other_mesh._skip_find_neighbors),
-    _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
-    _block_id_to_name(std::move(other_mesh._block_id_to_name)),
-    _elem_dims(std::move(other_mesh._elem_dims)),
-    _spatial_dimension(other_mesh._spatial_dimension),
-    _elem_integer_names(std::move(other_mesh._elem_integer_names)),
-    _elem_integer_default_values(std::move(other_mesh._elem_integer_default_values)),
-    _node_integer_names(std::move(other_mesh._node_integer_names)),
-    _node_integer_default_values(std::move(other_mesh._node_integer_default_values)),
-    _default_ghosting(std::move(other_mesh._default_ghosting)),
-    _ghosting_functors(std::move(other_mesh._ghosting_functors)),
-    _shared_functors(std::move(other_mesh._shared_functors)),
-    _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
-{
-}
-
-
-
-
 MeshBase::~MeshBase()
 {
   this->clear();
