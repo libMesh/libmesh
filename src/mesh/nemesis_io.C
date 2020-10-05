@@ -1175,7 +1175,9 @@ void Nemesis_IO::read (const std::string & base_filename)
 
   // We've been setting unique_ids by hand; let's make sure that later
   // ones are consistent with them.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   mesh.set_next_unique_id(mesh.parallel_max_unique_id()+1);
+#endif
 }
 
 #else
