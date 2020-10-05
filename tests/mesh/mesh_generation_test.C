@@ -50,12 +50,21 @@ public:
   CPPUNIT_TEST( buildCubePrism6 );
   CPPUNIT_TEST( buildCubePrism15 );
   CPPUNIT_TEST( buildCubePrism18 );
+
+  // These tests throw an exception from contains_point() calls, and
+  // this simply aborts() when exceptions are not enabled.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   CPPUNIT_TEST( buildCubePyramid5 );
   CPPUNIT_TEST( buildCubePyramid13 );
   CPPUNIT_TEST( buildCubePyramid14 );
+
+#ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( buildSphereHex27 );
+#endif
+#endif
+
 #  ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( buildSphereHex8 );
-  CPPUNIT_TEST( buildSphereHex27 );
 #  endif
 #endif
 
@@ -251,9 +260,14 @@ public:
   void buildCubePrism6 ()    { tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
   void buildCubePrism15 ()   { tester(&MeshGenerationTest::testBuildCube, 2, PRISM15); }
   void buildCubePrism18 ()   { tester(&MeshGenerationTest::testBuildCube, 2, PRISM18); }
+
+  // These tests throw an exception from contains_point() calls, and
+  // this simply aborts() when exceptions are not enabled.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   void buildCubePyramid5 ()  { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID5); }
   void buildCubePyramid13 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID13); }
   void buildCubePyramid14 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID14); }
+#endif
 
   void buildSphereHex8 ()     { testBuildSphere(2, HEX8); }
   void buildSphereHex27 ()     { testBuildSphere(2, HEX27); }
