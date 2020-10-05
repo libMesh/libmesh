@@ -69,13 +69,16 @@ public:
                      const std::vector<Output> * initial_vals=nullptr);
 
   /**
-   * Special functions
-   * - This class contains a const reference so it can't be copy or move-assigned.
-   * - This class contains unique_ptrs so it can't be default copy constructed.
+   * Constructors
+   * - This class contains a const reference so it can't be default
+   *   copy or move-assigned.  We manually implement the former
+   * - This class contains unique_ptrs so it can't be default copy
+   *   constructed or assigned.
+   * - It can still be default moved and deleted.
    */
-  ParsedFEMFunction & operator= (const ParsedFEMFunction &) = delete;
+  ParsedFEMFunction & operator= (const ParsedFEMFunction &);
   ParsedFEMFunction & operator= (ParsedFEMFunction &&) = delete;
-  ParsedFEMFunction (const ParsedFEMFunction &) = delete;
+  ParsedFEMFunction (const ParsedFEMFunction &);
   ParsedFEMFunction (ParsedFEMFunction &&) = default;
   virtual ~ParsedFEMFunction () = default;
 
@@ -212,6 +215,44 @@ ParsedFEMFunction<Output>::ParsedFEMFunction (const System & sys,
   _initial_vals (initial_vals ? *initial_vals : std::vector<Output>())
 {
   this->reparse(expression);
+}
+
+
+template <typename Output>
+inline
+ParsedFEMFunction<Output>::ParsedFEMFunction (const ParsedFEMFunction<Output> & other) :
+  FEMFunctionBase<Output>(),
+  _sys(other._sys)
+{
+  *this = other;
+}
+
+
+template <typename Output>
+inline
+ParsedFEMFunction<Output> &
+ParsedFEMFunction<Output>::operator= (const ParsedFEMFunction<Output> & other)
+{
+  libmesh_assert(&_sys == &other._sys);
+
+  this->_expression = other._expression;
+  this->_n_vars = other._n_vars;
+  this->_n_requested_vars = other._n_requested_vars;
+  this->_n_requested_grad_components = other._n_requested_grad_components;
+  this->_n_requested_hess_components = other._n_requested_hess_components;
+  this->_requested_normals = other._requested_normals;
+  this->_need_var = other._need_var;
+  this->_need_var_grad = other._need_var_grad;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  this->_need_var_hess = other._need_var_hess;
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+  this->_additional_vars = other._additional_vars;
+  this->_initial_vals = other._initial_vals;
+
+  // parsers can be generated from scratch by reparsing expression
+  this->reparse(_expression);
+
+  return *this;
 }
 
 
