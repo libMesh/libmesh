@@ -139,12 +139,6 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
     }
 }
 
-
-
-MeshBase::MeshBase(MeshBase &&) = default;
-
-
-
 MeshBase::~MeshBase()
 {
   this->clear();

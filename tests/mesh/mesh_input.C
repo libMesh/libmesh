@@ -43,8 +43,6 @@ public:
 #endif // LIBMESH_HAVE_EXODUS_API
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
-
-  CPPUNIT_TEST( testMeshMoveConstructor );
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
@@ -367,27 +365,6 @@ public:
   }
 
 
-  void testMeshMoveConstructor ()
-  {
-    Mesh mesh(*TestCommWorld);
-    MeshTools::Generation::build_square (mesh,
-                                         3, 3,
-                                         0., 1., 0., 1.);
-
-    // Construct mesh2, stealing the resources of the original.
-    Mesh mesh2(std::move(mesh));
-
-    // Make sure mesh2 now has the 9 elements.
-    CPPUNIT_ASSERT_EQUAL(mesh2.n_elem(),
-                         static_cast<dof_id_type>(9));
-
-    // Verify that the moved-from mesh's Partitioner and BoundaryInfo
-    // objects were successfully stolen.  Note: moved-from unique_ptrs
-    // are guaranteed to compare equal to nullptr, see e.g. Section
-    // 20.8.1/4 of the standard.
-    // https://stackoverflow.com/questions/24061767/is-unique-ptr-guaranteed-to-store-nullptr-after-move
-    CPPUNIT_ASSERT(!mesh.partitioner());
-    CPPUNIT_ASSERT(!mesh.boundary_info);
   }
 };
 
