@@ -328,10 +328,11 @@ void assemble_wave(EquationSystems & es,
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
 
-  // Copy the speed of sound and fluid density
-  // to a local variable.
+  // Copy the speed of sound to a local variable.
   const Real speed = es.parameters.get<Real>("speed");
-  const Real rho   = es.parameters.get<Real>("fluid density");
+
+  // If we added Neumann conditions we would need density too
+  // const Real rho   = es.parameters.get<Real>("fluid density");
 
   // Get a reference to our system, as before.
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
