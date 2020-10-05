@@ -66,12 +66,14 @@ public:
                   const std::vector<Output> * initial_vals=nullptr);
 
   /**
-   * Special functions
-   * - This class contains unique_ptrs so it can't be default copy constructed or assigned.
+   * Constructors
+   * - This class contains unique_ptrs so it can't be default copy
+   *   constructed or assigned, only default moved and deleted.
    */
-  ParsedFunction (const ParsedFunction &) = delete;
+  ParsedFunction (const ParsedFunction &);
+  ParsedFunction & operator= (const ParsedFunction &);
+
   ParsedFunction (ParsedFunction &&) = default;
-  ParsedFunction & operator= (const ParsedFunction &) = delete;
   ParsedFunction & operator= (ParsedFunction &&) = default;
   virtual ~ParsedFunction () = default;
 
@@ -206,6 +208,36 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string & expre
   // time-dependence established in reparse function
   this->reparse(expression);
   this->_initialized = true;
+}
+
+
+template <typename Output, typename OutputGradient>
+inline
+ParsedFunction<Output,OutputGradient>::ParsedFunction (const ParsedFunction<Output,OutputGradient> & other) :
+  FunctionBase<Output>()
+{
+  *this = other;
+}
+
+
+
+template <typename Output, typename OutputGradient>
+inline
+ParsedFunction<Output,OutputGradient> &
+ParsedFunction<Output,OutputGradient>::operator= (const ParsedFunction<Output,OutputGradient> & other)
+{
+  this->_master = other._master;
+  this->_expression = other._expression;
+  this->_spacetime = other._spacetime;
+  this->_valid_derivatives = other._valid_derivatives;
+  this->_additional_vars = other._additional_vars;
+  this->_initial_vals = other._initial_vals;
+
+  // parsers can be generated from scratch by reparsing expression
+  this->reparse(this->_expression);
+  this->_initialized = true;
+
+  return *this;
 }
 
 
