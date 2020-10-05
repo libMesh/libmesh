@@ -136,6 +136,7 @@ void Nemesis_IO::write_complex_magnitude (bool val)
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper->write_complex_abs = val;
 #endif
+  libmesh_ignore(val);
 }
 
 
