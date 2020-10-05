@@ -47,7 +47,7 @@ using libMesh::subdomain_id_type;
 // The function we're approximating with EIM
 struct Gxyz : public RBParametrizedFunction
 {
-  unsigned int get_n_components() const
+  unsigned int get_n_components() const override
   {
     return 3;
   }
