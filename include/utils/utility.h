@@ -427,6 +427,16 @@ int mkdir(const char* pathname);
 
 
 /**
+ * Create an unzipped copy of a bz2 or xz file, returning the name of
+ * the now-unzipped file that can be directly opened.
+ *
+ * This is a hack because we don't have a neat bz2/xz equivalent to
+ * gzstreams.
+ */
+std::string unzip_file (const std::string & name);
+
+
+/**
  * This Functor simply takes an object and reverses its byte
  * representation.  This is useful for changing endian-ness
  * for file IO.  This class has been tested on x86 architectures

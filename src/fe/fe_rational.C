@@ -192,12 +192,12 @@ void FE<3,RATIONAL_BERNSTEIN>::compute_constraints (DofConstraints & constraints
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 // Bernstein shapes need reinit only for approximation orders >= 3,
-// and at the moment we're only supporting equal-order shapes due to
-// the need for nodal weights.
-template <> bool FE<0,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return false; }
-template <> bool FE<1,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return false; }
-template <> bool FE<2,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return false; }
-template <> bool FE<3,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return false; }
+// but for *RATIONAL* shapes we could need reinit anywhere because our
+// nodal weights can change from element to element.
+template <> bool FE<0,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return true; }
+template <> bool FE<1,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return true; }
+template <> bool FE<2,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return true; }
+template <> bool FE<3,RATIONAL_BERNSTEIN>::shapes_need_reinit() const { return true; }
 
 } // namespace libMesh
 

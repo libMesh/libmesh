@@ -61,6 +61,7 @@ public:
 
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
+  CPPUNIT_TEST( testDynaFileMappingsFEMEx5);
 
   CPPUNIT_TEST( testMeshMoveConstructor );
 #endif // LIBMESH_DIM > 1
@@ -408,6 +409,50 @@ public:
 #endif
 
 
+  void testMasterCenters (const MeshBase & mesh)
+  {
+    auto locator = mesh.sub_point_locator();
+
+    const std::set<subdomain_id_type> manifold_subdomain { 0 };
+    const std::set<subdomain_id_type> nodeelem_subdomain { 1 };
+
+    for (auto & elem : mesh.element_ptr_range())
+      {
+        Point master_pt = {}; // center, for tensor product elements
+
+        // But perturb it to try and trigger any mapping weirdness
+        if (elem->dim() > 0)
+          master_pt(0) = 0.25;
+
+        if (elem->dim() > 1)
+          master_pt(1) = -0.25;
+
+        if (elem->dim() > 2)
+          master_pt(2) = 0.75;
+
+        FEMap fe_map;
+
+        Point physical_pt = fe_map.map(elem->dim(), elem, master_pt);
+
+        Point inverse_pt = fe_map.inverse_map(elem->dim(), elem,
+                                              physical_pt);
+
+        CPPUNIT_ASSERT((inverse_pt-master_pt).norm() < TOLERANCE);
+
+        CPPUNIT_ASSERT(elem->contains_point(physical_pt));
+
+        const std::set<subdomain_id_type> * sbd_set =
+          (elem->type() == NODEELEM) ?
+          &nodeelem_subdomain : &manifold_subdomain;
+
+        const Elem * located_elem = (*locator)(physical_pt, sbd_set);
+
+        CPPUNIT_ASSERT(located_elem == elem);
+      }
+  }
+
+
+
   void testDynaReadElem ()
   {
     Mesh mesh(*TestCommWorld);
@@ -419,7 +464,7 @@ public:
     mesh.allow_remote_element_removal(false);
 
     if (mesh.processor_id() == 0)
-      dyna.read("1_quad.dyn");
+      dyna.read("meshes/1_quad.bxt.gz");
     MeshCommunication().broadcast (mesh);
 
     mesh.prepare_for_use();
@@ -459,6 +504,8 @@ public:
           CPPUNIT_ASSERT_EQUAL(elem->point(v)(2), Real(0));
 #endif
       }
+
+    testMasterCenters(mesh);
   }
 
 
@@ -472,7 +519,7 @@ public:
 
     DynaIO dyna(mesh);
     if (mesh.processor_id() == 0)
-      dyna.read("25_quad.bxt");
+      dyna.read("meshes/25_quad.bxt.gz");
     MeshCommunication().broadcast (mesh);
 
     mesh.prepare_for_use();
@@ -512,6 +559,8 @@ public:
         CPPUNIT_ASSERT_EQUAL(n_neighbors, n_neighbors_expected);
       }
 
+    testMasterCenters(mesh);
+
 #ifdef LIBMESH_HAVE_SOLVER
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
     // Now test whether we can assign the desired constraint equations
@@ -525,6 +574,34 @@ public:
     CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), dof_id_type(121));
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 #endif // LIBMESH_HAVE_SOLVER
+  }
+
+
+  void testDynaFileMappings (const std::string & filename)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    mesh.allow_renumbering(false);
+    mesh.allow_remote_element_removal(false);
+
+    DynaIO dyna(mesh);
+    if (mesh.processor_id() == 0)
+      dyna.read(filename);
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
+                         RATIONAL_BERNSTEIN_MAP);
+
+    testMasterCenters(mesh);
+  }
+
+
+  void testDynaFileMappingsFEMEx5 ()
+  {
+    testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz");
   }
 
 

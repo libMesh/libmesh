@@ -239,8 +239,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
-	shark_tooth_tri6.xda.gz fparser/autodiff.C
+	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
+	meshes/shark_tooth_tri6.xda.gz fparser/autodiff.C
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 =
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_2 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
@@ -397,8 +397,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
-	shark_tooth_tri6.xda.gz fparser/autodiff.C
+	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
+	meshes/shark_tooth_tri6.xda.gz fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_4 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
 am__objects_5 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-dof_map_test.$(OBJEXT) \
@@ -549,8 +549,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
-	shark_tooth_tri6.xda.gz fparser/autodiff.C
+	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
+	meshes/shark_tooth_tri6.xda.gz fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_6 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
 am__objects_7 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-dof_map_test.$(OBJEXT) \
@@ -701,8 +701,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
-	shark_tooth_tri6.xda.gz fparser/autodiff.C
+	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
+	meshes/shark_tooth_tri6.xda.gz fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_8 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
 am__objects_9 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-dof_map_test.$(OBJEXT) \
@@ -853,8 +853,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C 1_quad.dyn 25_quad.bxt \
-	shark_tooth_tri6.xda.gz fparser/autodiff.C
+	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
+	meshes/shark_tooth_tri6.xda.gz fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_10 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
 am__objects_11 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-dof_map_test.$(OBJEXT) \
@@ -1916,9 +1916,9 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	systems/systems_test.C utils/parameters_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
 	utils/xdr_test.C $(data) $(am__append_1)
-data = 1_quad.dyn \
-       25_quad.bxt \
-       shark_tooth_tri6.xda.gz
+data = meshes/1_quad.bxt.gz \
+       meshes/25_quad.bxt.gz \
+       meshes/shark_tooth_tri6.xda.gz
 
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
@@ -11124,9 +11124,7 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f 25_quad.bxt && $(LN_S) -f $(srcdir)/25_quad.bxt .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f 1_quad.dyn && $(LN_S) -f $(srcdir)/1_quad.dyn .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f shark_tooth_tri6.xda.gz && $(LN_S) -f $(srcdir)/shark_tooth_tri6.xda.gz .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f meshes && $(LN_S) -f $(srcdir)/meshes .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # CLEANFILES only applies to files, handle directories separately

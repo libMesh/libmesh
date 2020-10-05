@@ -163,7 +163,7 @@ public:
   CPPUNIT_TEST_SUITE( PeriodicBCTest );
 
 #if LIBMESH_DIM > 1
-#if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API)
+#if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_GZSTREAM)
   CPPUNIT_TEST( testPeriodicLagrange2 );
 #endif
 #endif // LIBMESH_DIM > 1
@@ -184,7 +184,7 @@ private:
     // We need to change around BCIDs and set up the periodic BC first
     mesh.allow_remote_element_removal(false);
 
-    mesh.read("shark_tooth_tri6.xda.gz");
+    mesh.read("meshes/shark_tooth_tri6.xda.gz");
 
     // Add some BCIDs on top and bottom for our periodic boundary
     for (const Elem * elem : mesh.active_element_ptr_range())

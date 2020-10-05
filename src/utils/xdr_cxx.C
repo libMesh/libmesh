@@ -34,6 +34,7 @@
 # include "libmesh/restore_warnings.h"
 #endif
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/utility.h" // unzip_file
 
 // Anonymous namespace for implementation details.
 namespace {
@@ -51,43 +52,6 @@ void bzip_file (const std::string & unzipped_name)
 #else
   libmesh_error_msg("ERROR: need bzip2/bunzip2 to create " << unzipped_name << ".bz2");
 #endif
-}
-
-std::string unzip_file (const std::string & name)
-{
-  std::ostringstream pid_suffix;
-  pid_suffix << '_' << getpid();
-
-  std::string new_name = name;
-  if (name.size() - name.rfind(".bz2") == 4)
-    {
-#ifdef LIBMESH_HAVE_BZIP
-      new_name.erase(new_name.end() - 4, new_name.end());
-      new_name += pid_suffix.str();
-      LOG_SCOPE("system(bunzip2)", "XdrIO");
-      std::string system_string = "bunzip2 -f -k -c ";
-      system_string += name + " > " + new_name;
-      if (std::system(system_string.c_str()))
-        libmesh_file_error(system_string);
-#else
-      libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
-#endif
-    }
-  else if (name.size() - name.rfind(".xz") == 3)
-    {
-#ifdef LIBMESH_HAVE_XZ
-      new_name.erase(new_name.end() - 3, new_name.end());
-      new_name += pid_suffix.str();
-      LOG_SCOPE("system(xz -d)", "XdrIO");
-      std::string system_string = "xz -f -d -k -c ";
-      system_string += name + " > " + new_name;
-      if (std::system(system_string.c_str()))
-        libmesh_file_error(system_string);
-#else
-      libmesh_error_msg("ERROR: need xz to open .xz file " << name);
-#endif
-    }
-  return new_name;
 }
 
 void xzip_file (const std::string & unzipped_name)
@@ -212,7 +176,7 @@ void Xdr::open (const std::string & name)
             libmesh_assert(inf);
             in.reset(inf);
 
-            std::string new_name = unzip_file(name);
+            std::string new_name = Utility::unzip_file(name);
 
             inf->open(new_name.c_str(), std::ios::in);
           }
