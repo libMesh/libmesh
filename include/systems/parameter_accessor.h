@@ -100,6 +100,11 @@ public:
     : _accessor(accessor) {}
 
   /**
+   * Default Copy Constructor works
+   */
+  ParameterProxy (const ParameterProxy<T> & accessor) = default;
+
+  /**
    * Setter: change the value of the parameter we access.
    */
   ParameterProxy & operator = (const T & new_value) { _accessor.set(new_value); return *this; }
