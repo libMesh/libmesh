@@ -163,7 +163,7 @@ public:
   CPPUNIT_TEST_SUITE( PeriodicBCTest );
 
 #if LIBMESH_DIM > 1
-#ifdef LIBMESH_HAVE_SOLVER
+#if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API)
   CPPUNIT_TEST( testPeriodicLagrange2 );
 #endif
 #endif // LIBMESH_DIM > 1
