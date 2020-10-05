@@ -828,120 +828,120 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
    // Node balancing algorithm will response to assign owned nodes.
    // We still need to sync PIDs
-    {
-      // For inactive elements, we will have already gotten most of
-      // these nodes, *except* for the case of a parent with a subset
-      // of active descendants which are remote elements.  In that
-      // case some of the parent nodes will not have been properly
-      // handled yet on our processor.
-      //
-      // We don't want to inadvertently give one of them an incorrect
-      // processor id, but if we're not in serial then we have to
-      // assign them temporary pids to make querying work, so we'll
-      // save our *valid* pids before assigning temporaries.
-      //
-      // Even in serial we'll want to check and make sure we're not
-      // overwriting valid active node pids with pids from subactive
-      // elements.
-      std::unordered_set<dof_id_type> bad_pids;
+  {
+    // For inactive elements, we will have already gotten most of
+    // these nodes, *except* for the case of a parent with a subset
+    // of active descendants which are remote elements.  In that
+    // case some of the parent nodes will not have been properly
+    // handled yet on our processor.
+    //
+    // We don't want to inadvertently give one of them an incorrect
+    // processor id, but if we're not in serial then we have to
+    // assign them temporary pids to make querying work, so we'll
+    // save our *valid* pids before assigning temporaries.
+    //
+    // Even in serial we'll want to check and make sure we're not
+    // overwriting valid active node pids with pids from subactive
+    // elements.
+    std::unordered_set<dof_id_type> bad_pids;
 
-      for (auto & node : mesh.node_ptr_range())
-        if (node->processor_id() == DofObject::invalid_processor_id)
-          bad_pids.insert(node->id());
+    for (auto & node : mesh.node_ptr_range())
+      if (node->processor_id() == DofObject::invalid_processor_id)
+        bad_pids.insert(node->id());
 
-      // If we assign our temporary ids by looping from finer elements
-      // to coarser elements, we'll always get an id from the finest
-      // ghost element we can see, which will usually be "closer" to
-      // the true processor we want to query and so will reduce query
-      // cycles that don't reach that processor.
+    // If we assign our temporary ids by looping from finer elements
+    // to coarser elements, we'll always get an id from the finest
+    // ghost element we can see, which will usually be "closer" to
+    // the true processor we want to query and so will reduce query
+    // cycles that don't reach that processor.
 
-      // But we can still end up with a query cycle that dead-ends, so
-      // we need to prepare a "push" communication step here.
+    // But we can still end up with a query cycle that dead-ends, so
+    // we need to prepare a "push" communication step here.
 
-      const bool is_serial = mesh.is_serial();
-      std::unordered_map
-        <processor_id_type,
-         std::unordered_map<dof_id_type, processor_id_type>>
-        potential_pids;
+    const bool is_serial = mesh.is_serial();
+    std::unordered_map
+      <processor_id_type,
+       std::unordered_map<dof_id_type, processor_id_type>>
+      potential_pids;
 
-      const unsigned int n_levels = MeshTools::n_levels(mesh);
-      for (unsigned int level = n_levels; level > 0; --level)
-        {
-          for (auto & elem : as_range(mesh.level_elements_begin(level-1),
-                                      mesh.level_elements_end(level-1)))
-            {
-              libmesh_assert_not_equal_to (elem->processor_id(),
-                                           DofObject::invalid_processor_id);
+    const unsigned int n_levels = MeshTools::n_levels(mesh);
+    for (unsigned int level = n_levels; level > 0; --level)
+      {
+        for (auto & elem : as_range(mesh.level_elements_begin(level-1),
+                                    mesh.level_elements_end(level-1)))
+          {
+            libmesh_assert_not_equal_to (elem->processor_id(),
+                                         DofObject::invalid_processor_id);
 
-              const processor_id_type elem_pid = elem->processor_id();
+            const processor_id_type elem_pid = elem->processor_id();
 
-              // Consider updating the processor id on this element's nodes
-              for (Node & node : elem->node_ref_range())
-                {
-                  processor_id_type & pid = node.processor_id();
-                  if (bad_pids.count(node.id()))
-                    pid = node.choose_processor_id(pid, elem_pid);
-                  else if (!is_serial)
-                    potential_pids[elem_pid][node.id()] = pid;
-                }
-            }
-        }
+            // Consider updating the processor id on this element's nodes
+            for (Node & node : elem->node_ref_range())
+              {
+                processor_id_type & pid = node.processor_id();
+                if (bad_pids.count(node.id()))
+                  pid = node.choose_processor_id(pid, elem_pid);
+                else if (!is_serial)
+                  potential_pids[elem_pid][node.id()] = pid;
+              }
+          }
+      }
 
-      if (!is_serial)
-        {
-          std::unordered_map
-            <processor_id_type,
-             std::vector<std::pair<dof_id_type, processor_id_type>>>
-            potential_pids_vecs;
+    if (!is_serial)
+      {
+        std::unordered_map
+          <processor_id_type,
+           std::vector<std::pair<dof_id_type, processor_id_type>>>
+          potential_pids_vecs;
 
-          for (auto & pair : potential_pids)
-            potential_pids_vecs[pair.first].assign(pair.second.begin(), pair.second.end());
+        for (auto & pair : potential_pids)
+          potential_pids_vecs[pair.first].assign(pair.second.begin(), pair.second.end());
 
-          auto pids_action_functor =
-            [& mesh, & bad_pids]
-            (processor_id_type /* src_pid */,
-             const std::vector<std::pair<dof_id_type, processor_id_type>> & data)
-            {
-              for (auto pair : data)
-                {
-                  Node & node = mesh.node_ref(pair.first);
-                  processor_id_type & pid = node.processor_id();
-                  auto it = bad_pids.find(pair.first);
-                  if (it != bad_pids.end())
-                    {
-                      pid = pair.second;
-                      bad_pids.erase(it);
-                    }
-                  else
-                    pid = node.choose_processor_id(pid, pair.second);
-                }
-            };
+        auto pids_action_functor =
+          [& mesh, & bad_pids]
+          (processor_id_type /* src_pid */,
+           const std::vector<std::pair<dof_id_type, processor_id_type>> & data)
+          {
+            for (auto pair : data)
+              {
+                Node & node = mesh.node_ref(pair.first);
+                processor_id_type & pid = node.processor_id();
+                auto it = bad_pids.find(pair.first);
+                if (it != bad_pids.end())
+                  {
+                    pid = pair.second;
+                    bad_pids.erase(it);
+                  }
+                else
+                  pid = node.choose_processor_id(pid, pair.second);
+              }
+          };
 
-          Parallel::push_parallel_vector_data
-            (mesh.comm(), potential_pids_vecs, pids_action_functor);
+        Parallel::push_parallel_vector_data
+          (mesh.comm(), potential_pids_vecs, pids_action_functor);
 
-          // Using default libMesh options, we'll just need to sync
-          // between processors now.  The catch here is that we can't
-          // initially trust Node::choose_processor_id() because some
-          // of those node processor ids are the temporary ones.
-          CorrectProcIds correct_pids(mesh, bad_pids);
-          Parallel::sync_node_data_by_element_id
-            (mesh, mesh.elements_begin(), mesh.elements_end(),
-             Parallel::SyncEverything(), Parallel::SyncEverything(),
-             correct_pids);
+        // Using default libMesh options, we'll just need to sync
+        // between processors now.  The catch here is that we can't
+        // initially trust Node::choose_processor_id() because some
+        // of those node processor ids are the temporary ones.
+        CorrectProcIds correct_pids(mesh, bad_pids);
+        Parallel::sync_node_data_by_element_id
+          (mesh, mesh.elements_begin(), mesh.elements_end(),
+           Parallel::SyncEverything(), Parallel::SyncEverything(),
+           correct_pids);
 
-          // But once we've got all the non-temporary pids synced, we
-          // may need to sync again to get any pids on nodes only
-          // connected to subactive elements, for which *only*
-          // "temporary" pids are possible.
-          bad_pids.clear();
-          Parallel::sync_node_data_by_element_id
-            (mesh,
-             mesh.elements_begin(), mesh.elements_end(),
-             Parallel::SyncEverything(), Parallel::SyncEverything(),
-             correct_pids);
-        }
-    }
+        // But once we've got all the non-temporary pids synced, we
+        // may need to sync again to get any pids on nodes only
+        // connected to subactive elements, for which *only*
+        // "temporary" pids are possible.
+        bad_pids.clear();
+        Parallel::sync_node_data_by_element_id
+          (mesh,
+           mesh.elements_begin(), mesh.elements_end(),
+           Parallel::SyncEverything(), Parallel::SyncEverything(),
+           correct_pids);
+      }
+  }
 
   // We can't assert that all nodes are connected to elements, because
   // a DistributedMesh with NodeConstraints might have pulled in some
