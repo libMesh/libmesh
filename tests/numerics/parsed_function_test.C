@@ -39,13 +39,22 @@ private:
 
   void testValues()
   {
-    ParsedFunction<Number> xy8("x*y*8");
+    // Test that we can copy these into vectors
+    std::vector<ParsedFunction<Number>> pfvec;
 
-    // Test that the move ctor works
-    ParsedFunction<Number> xy8_stolen(std::move(xy8));
+    {
+      ParsedFunction<Number> xy8("x*y*8");
 
+      // Test that the move ctor works
+      ParsedFunction<Number> xy8_stolen(std::move(xy8));
+
+      pfvec.push_back(xy8_stolen);
+
+      LIBMESH_ASSERT_FP_EQUAL
+        (6.0, libmesh_real(xy8_stolen(Point(0.5,1.5,2.5))), TOLERANCE*TOLERANCE);
+    }
     LIBMESH_ASSERT_FP_EQUAL
-      (6.0, libmesh_real(xy8_stolen(Point(0.5,1.5,2.5))), TOLERANCE*TOLERANCE);
+      (6.0, libmesh_real(pfvec[0](Point(0.5,1.5,2.5))), TOLERANCE*TOLERANCE);
   }
 
   void testInlineGetter()
