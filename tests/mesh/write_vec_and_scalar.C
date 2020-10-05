@@ -26,10 +26,12 @@ public:
   CPPUNIT_TEST_SUITE(WriteVecAndScalar);
 
 #if LIBMESH_DIM > 1
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   CPPUNIT_TEST(testWriteExodusDistributed);
   CPPUNIT_TEST(testWriteExodusReplicated);
   CPPUNIT_TEST(testWriteNemesisDistributed);
   CPPUNIT_TEST(testWriteNemesisReplicated);
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
