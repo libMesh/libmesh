@@ -39,14 +39,6 @@ private:
 
   void testValues()
   {
-    ParsedFunction<Number> x2("x*2");
-
-    // Test that the copy constructor works
-    ParsedFunction<Number> x2_copy(x2);
-
-    LIBMESH_ASSERT_FP_EQUAL
-      (1.0, libmesh_real(x2_copy(Point(0.5,1.5,2.5))), TOLERANCE*TOLERANCE);
-
     ParsedFunction<Number> xy8("x*y*8");
 
     // Test that the move ctor works
