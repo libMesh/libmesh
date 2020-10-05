@@ -26,6 +26,9 @@
 
 namespace libMesh
 {
+#ifdef LIBMESH_ENABLE_PERIODIC
+class PeriodicBoundaries;
+#endif
 
 /**
  * This class implements the original default geometry ghosting
@@ -42,12 +45,27 @@ public:
   /**
    * Constructor.
    */
-  GhostPointNeighbors(const MeshBase & mesh) : GhostingFunctor(mesh) {}
+  GhostPointNeighbors(const MeshBase & mesh) :
+      GhostingFunctor(mesh)
+#ifdef LIBMESH_ENABLE_PERIODIC
+      ,
+      _periodic_bcs(nullptr)
+#endif
+    {}
 
   /**
    * Constructor.
    */
-  GhostPointNeighbors(const GhostPointNeighbors & other) : GhostingFunctor(other){}
+  GhostPointNeighbors(const GhostPointNeighbors & other) :
+      GhostingFunctor(other)
+#ifdef LIBMESH_ENABLE_PERIODIC
+        ,
+      // We do not simply want to copy over the other's periodic bcs because
+      // they may very well correspond to periodic bcs from a \p DofMap entirely
+      // unrelated to any \p DofMaps that depend on this objects ghosting
+      _periodic_bcs(nullptr)
+#endif
+    {}
 
   /**
    * A clone() is needed because GhostingFunctor can not be shared between
@@ -55,6 +73,24 @@ public:
    */
   virtual std::unique_ptr<GhostingFunctor> clone () const override
   { return libmesh_make_unique<GhostPointNeighbors>(*this); }
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Set PeriodicBoundaries to couple
+  void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs) override
+  { _periodic_bcs = periodic_bcs; }
+#endif
+
+  /**
+   * If we have periodic boundaries, then we'll need the mesh to have
+   * an updated point locator whenever we're about to query them.
+   */
+  virtual void mesh_reinit () override;
+
+  virtual void redistribute () override
+  { this->mesh_reinit(); }
+
+  virtual void delete_remote_elements() override
+  { this->mesh_reinit(); }
 
   /**
    * For the specified range of active elements, find their point
@@ -65,6 +101,11 @@ public:
                            const MeshBase::const_element_iterator & range_end,
                            processor_id_type p,
                            map_type & coupled_elements) override;
+
+private:
+#ifdef LIBMESH_ENABLE_PERIODIC
+  const PeriodicBoundaries * _periodic_bcs;
+#endif
 };
 
 } // namespace libMesh

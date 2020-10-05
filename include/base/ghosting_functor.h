@@ -36,7 +36,9 @@ namespace libMesh
 // Forward Declarations
 class CouplingMatrix;
 class Elem;
-
+#ifdef LIBMESH_ENABLE_PERIODIC
+class PeriodicBoundaries;
+#endif
 
 /**
  * This abstract base class defines the interface by which library
@@ -193,6 +195,11 @@ public:
    * Ghosting functor is mesh dependent
    */
   virtual void set_mesh(const MeshBase * mesh) { _mesh = mesh; }
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Set PeriodicBoundaries to couple
+  virtual void set_periodic_boundaries(const PeriodicBoundaries *) {}
+#endif
 
   /**
    *  Return the mesh associated with ghosting functor

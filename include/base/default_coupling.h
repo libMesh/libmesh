@@ -86,7 +86,7 @@ public:
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   // Set PeriodicBoundaries to couple
-  void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs)
+  void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs) override
   { _periodic_bcs = periodic_bcs; }
 #endif
 
