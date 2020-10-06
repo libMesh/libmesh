@@ -141,14 +141,24 @@ private:
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
-        ParsedFEMFunction<Number> x2(*sys, "x2");
-        ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
+        // Test that we can copy these into vectors
+        std::vector<ParsedFEMFunction<Number>> pfvec;
 
-        // Test that move constructor works
-        ParsedFEMFunction<Number> xy8_stolen(std::move(xy8));
+        {
+          ParsedFEMFunction<Number> x2(*sys, "x2");
+          ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
+
+          // Test that move constructor works
+          ParsedFEMFunction<Number> xy8_stolen(std::move(xy8));
+
+          pfvec.push_back(xy8_stolen);
+
+          LIBMESH_ASSERT_FP_EQUAL
+            (2.0, libmesh_real(xy8_stolen(*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
+        }
 
         LIBMESH_ASSERT_FP_EQUAL
-          (2.0, libmesh_real(xy8_stolen(*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
+          (2.0, libmesh_real(pfvec[0](*c,Point(0.5,0.5,0.5))), TOLERANCE*TOLERANCE);
       }
   }
 

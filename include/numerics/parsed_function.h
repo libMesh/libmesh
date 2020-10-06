@@ -66,27 +66,13 @@ public:
                   const std::vector<Output> * initial_vals=nullptr);
 
   /**
-   * This class cannot be (default) copy assigned because the
-   * underlying FunctionParserADBase class does not define a custom
-   * copy assignment operator, and manually manages memory.
+   * Constructors
+   * - This class contains unique_ptrs so it can't be default copy
+   *   constructed or assigned, only default moved and deleted.
    */
-  ParsedFunction & operator= (const ParsedFunction &) = delete;
+  ParsedFunction (const ParsedFunction &);
+  ParsedFunction & operator= (const ParsedFunction &);
 
-  /**
-   * The remaining special functions can be defaulted for this class.
-   *
-   * \note Despite the fact that the underlying FunctionParserADBase
-   * class is not move-assignable or move-constructible, it is still
-   * possible for _this_ class to be move-assigned and
-   * move-constructed, because FunctionParserADBase objects only
-   * appear within std::vectors in this class, and std::vectors can
-   * generally still be move-assigned and move-constructed even when
-   * their contents cannot. There are some allocator-specific
-   * exceptions to this, but it should be guaranteed to work for
-   * std::allocator in C++14 and beyond. See also:
-   * https://stackoverflow.com/q/42051917/659433
-   */
-  ParsedFunction (const ParsedFunction &) = default;
   ParsedFunction (ParsedFunction &&) = default;
   ParsedFunction & operator= (ParsedFunction &&) = default;
   virtual ~ParsedFunction () = default;
@@ -183,18 +169,18 @@ private:
 
   std::string _expression;
   std::vector<std::string> _subexpressions;
-  std::vector<FunctionParserADBase<Output>> parsers;
+  std::vector<std::unique_ptr<FunctionParserADBase<Output>>> parsers;
   std::vector<Output> _spacetime;
 
   // derivative functions
-  std::vector<FunctionParserADBase<Output>> dx_parsers;
+  std::vector<std::unique_ptr<FunctionParserADBase<Output>>> dx_parsers;
 #if LIBMESH_DIM > 1
-  std::vector<FunctionParserADBase<Output>> dy_parsers;
+  std::vector<std::unique_ptr<FunctionParserADBase<Output>>> dy_parsers;
 #endif
 #if LIBMESH_DIM > 2
-  std::vector<FunctionParserADBase<Output>> dz_parsers;
+  std::vector<std::unique_ptr<FunctionParserADBase<Output>>> dz_parsers;
 #endif
-  std::vector<FunctionParserADBase<Output>> dt_parsers;
+  std::vector<std::unique_ptr<FunctionParserADBase<Output>>> dt_parsers;
   bool _valid_derivatives;
 
   // Variables/values that can be parsed and handled by the function parser
@@ -222,6 +208,37 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string & expre
   // time-dependence established in reparse function
   this->reparse(expression);
   this->_initialized = true;
+}
+
+
+template <typename Output, typename OutputGradient>
+inline
+ParsedFunction<Output,OutputGradient>::ParsedFunction (const ParsedFunction<Output,OutputGradient> & other) :
+  FunctionBase<Output>(other),
+  _expression(other._expression),
+  _subexpressions(other._subexpressions),
+  _spacetime(other._spacetime),
+  _valid_derivatives(other._valid_derivatives),
+  variables(other.variables),
+  _additional_vars(other._additional_vars),
+  _initial_vals(other._initial_vals)
+{
+  // parsers can be generated from scratch by reparsing expression
+  this->reparse(this->_expression);
+  this->_initialized = true;
+}
+
+
+
+template <typename Output, typename OutputGradient>
+inline
+ParsedFunction<Output,OutputGradient> &
+ParsedFunction<Output,OutputGradient>::operator= (const ParsedFunction<Output,OutputGradient> & other)
+{
+  // Use copy-and-swap idiom
+  ParsedFunction<Output,OutputGradient> tmp(other);
+  std::swap(tmp, *this);
+  return *this;
 }
 
 
@@ -262,7 +279,7 @@ Output
 ParsedFunction<Output,OutputGradient>::operator() (const Point & p, const Real time)
 {
   set_spacetime(p, time);
-  return eval(parsers[0], "f", 0);
+  return eval(*parsers[0], "f", 0);
 }
 
 template <typename Output, typename OutputGradient>
@@ -271,7 +288,7 @@ Output
 ParsedFunction<Output,OutputGradient>::dot (const Point & p, const Real time)
 {
   set_spacetime(p, time);
-  return eval(dt_parsers[0], "df/dt", 0);
+  return eval(*dt_parsers[0], "df/dt", 0);
 }
 
 template <typename Output, typename OutputGradient>
@@ -282,12 +299,12 @@ ParsedFunction<Output,OutputGradient>::gradient (const Point & p, const Real tim
   OutputGradient grad;
   set_spacetime(p, time);
 
-  grad(0) = eval(dx_parsers[0], "df/dx", 0);
+  grad(0) = eval(*dx_parsers[0], "df/dx", 0);
 #if LIBMESH_DIM > 1
-  grad(1) = eval(dy_parsers[0], "df/dy", 0);
+  grad(1) = eval(*dy_parsers[0], "df/dy", 0);
 #endif
 #if LIBMESH_DIM > 2
-  grad(2) = eval(dz_parsers[0], "df/dz", 0);
+  grad(2) = eval(*dz_parsers[0], "df/dz", 0);
 #endif
 
   return grad;
@@ -310,7 +327,7 @@ ParsedFunction<Output,OutputGradient>::operator()
   // The remaining locations in _spacetime are currently fixed at construction
   // but could potentially be made dynamic
   for (unsigned int i=0; i != size; ++i)
-    output(i) = eval(parsers[i], "f", i);
+    output(i) = eval(*parsers[i], "f", i);
 }
 
 /**
@@ -330,7 +347,7 @@ ParsedFunction<Output,OutputGradient>::component (unsigned int i,
   // The remaining locations in _spacetime are currently fixed at construction
   // but could potentially be made dynamic
   libmesh_assert_less(i, parsers.size());
-  return eval(parsers[i], "f", i);
+  return eval(*parsers[i], "f", i);
 }
 
 /**
@@ -541,51 +558,53 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
 
       // Parse (and optimize if possible) the subexpression.
       // Add some basic constants, to Real precision.
-      FunctionParserADBase<Output> fp;
-      fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-      fp.AddConstant("pi", std::acos(Real(-1)));
-      fp.AddConstant("e", std::exp(Real(1)));
+      auto fp = libmesh_make_unique<FunctionParserADBase<Output>>();
+      fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+      fp->AddConstant("pi", std::acos(Real(-1)));
+      fp->AddConstant("e", std::exp(Real(1)));
       libmesh_error_msg_if
-        (fp.Parse(_subexpressions.back(), variables) != -1, // -1 for success
+        (fp->Parse(_subexpressions.back(), variables) != -1, // -1 for success
          "ERROR: FunctionParser is unable to parse expression: "
-         << _subexpressions.back() << '\n' << fp.ErrorMsg());
+         << _subexpressions.back() << '\n' << fp->ErrorMsg());
 
       // use of derivatives is optional. suppress error output on the console
       // use the has_derivatives() method to check if AutoDiff was successful.
       // also enable immediate optimization
-      fp.SetADFlags(FunctionParserADBase<Output>::ADSilenceErrors |
+      fp->SetADFlags(FunctionParserADBase<Output>::ADSilenceErrors |
                     FunctionParserADBase<Output>::ADAutoOptimize);
 
       // optimize original function
-      fp.Optimize();
-      parsers.push_back(fp);
+      fp->Optimize();
 
       // generate derivatives through automatic differentiation
-      FunctionParserADBase<Output> dx_fp(fp);
-      if (dx_fp.AutoDiff("x") != -1) // -1 for success
+      auto dx_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      if (dx_fp->AutoDiff("x") != -1) // -1 for success
         _valid_derivatives = false;
-      dx_parsers.push_back(dx_fp);
+      dx_parsers.push_back(std::move(dx_fp));
 #if LIBMESH_DIM > 1
-      FunctionParserADBase<Output> dy_fp(fp);
-      if (dy_fp.AutoDiff("y") != -1) // -1 for success
+      auto dy_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      if (dy_fp->AutoDiff("y") != -1) // -1 for success
         _valid_derivatives = false;
-      dy_parsers.push_back(dy_fp);
+      dy_parsers.push_back(std::move(dy_fp));
 #endif
 #if LIBMESH_DIM > 2
-      FunctionParserADBase<Output> dz_fp(fp);
-      if (dz_fp.AutoDiff("z") != -1) // -1 for success
+      auto dz_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      if (dz_fp->AutoDiff("z") != -1) // -1 for success
         _valid_derivatives = false;
-      dz_parsers.push_back(dz_fp);
+      dz_parsers.push_back(std::move(dz_fp));
 #endif
-      FunctionParserADBase<Output> dt_fp(fp);
-      if (dt_fp.AutoDiff("t") != -1) // -1 for success
+      auto dt_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      if (dt_fp->AutoDiff("t") != -1) // -1 for success
         _valid_derivatives = false;
-      dt_parsers.push_back(dt_fp);
+      dt_parsers.push_back(std::move(dt_fp));
 
       // If at end, use nextstart=maxSize.  Else start at next
       // character.
       nextstart = (end == std::string::npos) ?
         std::string::npos : end + 1;
+
+      // Store fp for later use
+      parsers.push_back(std::move(fp));
     }
 }
 
