@@ -98,7 +98,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
-  _allow_remote_element_removal(true),
+  _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
