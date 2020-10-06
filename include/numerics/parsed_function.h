@@ -214,9 +214,18 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string & expre
 template <typename Output, typename OutputGradient>
 inline
 ParsedFunction<Output,OutputGradient>::ParsedFunction (const ParsedFunction<Output,OutputGradient> & other) :
-  FunctionBase<Output>()
+  FunctionBase<Output>(other),
+  _expression(other._expression),
+  _subexpressions(other._subexpressions),
+  _spacetime(other._spacetime),
+  _valid_derivatives(other._valid_derivatives),
+  variables(other.variables),
+  _additional_vars(other._additional_vars),
+  _initial_vals(other._initial_vals)
 {
-  *this = other;
+  // parsers can be generated from scratch by reparsing expression
+  this->reparse(this->_expression);
+  this->_initialized = true;
 }
 
 
@@ -226,17 +235,9 @@ inline
 ParsedFunction<Output,OutputGradient> &
 ParsedFunction<Output,OutputGradient>::operator= (const ParsedFunction<Output,OutputGradient> & other)
 {
-  this->_master = other._master;
-  this->_expression = other._expression;
-  this->_spacetime = other._spacetime;
-  this->_valid_derivatives = other._valid_derivatives;
-  this->_additional_vars = other._additional_vars;
-  this->_initial_vals = other._initial_vals;
-
-  // parsers can be generated from scratch by reparsing expression
-  this->reparse(this->_expression);
-  this->_initialized = true;
-
+  // Use copy-and-swap idiom
+  ParsedFunction<Output,OutputGradient> tmp(other);
+  std::swap(tmp, *this);
   return *this;
 }
 
