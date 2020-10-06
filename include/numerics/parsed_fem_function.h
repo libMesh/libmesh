@@ -221,10 +221,26 @@ ParsedFEMFunction<Output>::ParsedFEMFunction (const System & sys,
 template <typename Output>
 inline
 ParsedFEMFunction<Output>::ParsedFEMFunction (const ParsedFEMFunction<Output> & other) :
-  FEMFunctionBase<Output>(),
-  _sys(other._sys)
+  FEMFunctionBase<Output>(other),
+  _sys(other._sys),
+  _expression(other._expression),
+  _subexpressions(other._subexpressions),
+  _n_vars(other._n_vars),
+  _n_requested_vars(other._n_requested_vars),
+  _n_requested_grad_components(other._n_requested_grad_components),
+  _n_requested_hess_components(other._n_requested_hess_components),
+  _requested_normals(other._requested_normals),
+  _spacetime(other._spacetime),
+  _need_var(other._need_var),
+  _need_var_grad(other._need_var_grad),
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  _need_var_hess(other._need_var_hess),
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+  variables(other.variables),
+  _additional_vars(other._additional_vars),
+  _initial_vals(other._initial_vals)
 {
-  *this = other;
+  this->reparse(_expression);
 }
 
 
@@ -233,25 +249,12 @@ inline
 ParsedFEMFunction<Output> &
 ParsedFEMFunction<Output>::operator= (const ParsedFEMFunction<Output> & other)
 {
+  // We can only be assigned another ParsedFEMFunction defined on the same System
   libmesh_assert(&_sys == &other._sys);
 
-  this->_expression = other._expression;
-  this->_n_vars = other._n_vars;
-  this->_n_requested_vars = other._n_requested_vars;
-  this->_n_requested_grad_components = other._n_requested_grad_components;
-  this->_n_requested_hess_components = other._n_requested_hess_components;
-  this->_requested_normals = other._requested_normals;
-  this->_need_var = other._need_var;
-  this->_need_var_grad = other._need_var_grad;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  this->_need_var_hess = other._need_var_hess;
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-  this->_additional_vars = other._additional_vars;
-  this->_initial_vals = other._initial_vals;
-
-  // parsers can be generated from scratch by reparsing expression
-  this->reparse(_expression);
-
+  // Use copy-and-swap idiom
+  ParsedFEMFunction<Output> tmp(other);
+  std::swap(tmp, *this);
   return *this;
 }
 
