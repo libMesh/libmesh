@@ -73,9 +73,9 @@ public:
   DistributedMesh (const DistributedMesh & other_mesh);
 
   /**
-   * Move-constructor.
+   * Move-constructor deleted in MeshBase.
    */
-  DistributedMesh(DistributedMesh &&) = default;
+  DistributedMesh(DistributedMesh &&) = delete;
 
   /**
    * Copy and move assignment are not allowed.
