@@ -139,12 +139,6 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
     _partitioner = other_mesh._partitioner->clone();
 }
 
-
-
-MeshBase::MeshBase(MeshBase &&) = default;
-
-
-
 MeshBase::~MeshBase()
 {
   this->clear();

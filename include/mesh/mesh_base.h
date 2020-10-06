@@ -93,10 +93,11 @@ public:
   MeshBase (const MeshBase & other_mesh);
 
   /**
-   * Move-constructor - this function is defaulted out-of-line (in the
-   * C file) to play nicely with our forward declarations.
+   * Move-constructor - deleted because after a theoretical move-construction
+   * and then destruction of the moved-from object, the moved \p BoundaryInfo
+   * would hold an invalid reference to the moved-from mesh
    */
-  MeshBase(MeshBase &&);
+  MeshBase(MeshBase &&) = delete;
 
   /**
    * Copy and move assignment are not allowed because MeshBase
