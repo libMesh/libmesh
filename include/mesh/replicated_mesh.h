@@ -69,9 +69,9 @@ public:
   ReplicatedMesh (const ReplicatedMesh & other_mesh);
 
   /**
-   * Move-constructor.
+   * Move-constructor deleted in MeshBase.
    */
-  ReplicatedMesh(ReplicatedMesh &&) = default;
+  ReplicatedMesh(ReplicatedMesh &&) = delete;
 
   /**
    * Copy and move assignment are not allowed.
