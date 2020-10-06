@@ -35,6 +35,7 @@
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/node.h"
 #include "libmesh/replicated_mesh.h"
+#include "libmesh/utility.h" // libmesh_map_find()
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
