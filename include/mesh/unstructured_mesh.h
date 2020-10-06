@@ -64,9 +64,9 @@ public:
   UnstructuredMesh(const UnstructuredMesh &) = default;
 
   /**
-   * Move-constructor.
+   * Move-constructor deleted in MeshBase.
    */
-  UnstructuredMesh(UnstructuredMesh &&) = default;
+  UnstructuredMesh(UnstructuredMesh &&) = delete;
 
   /**
    * Copy and move assignment are not allowed.
