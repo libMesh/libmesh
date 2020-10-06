@@ -363,9 +363,6 @@ public:
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 #endif // LIBMESH_HAVE_SOLVER
   }
-
-
-  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshInputTest );
