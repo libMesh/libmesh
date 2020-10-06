@@ -92,12 +92,7 @@ RBConstruction::RBConstruction (EquationSystems & es,
   assemble_before_solve = false;
 }
 
-
-RBConstruction::~RBConstruction ()
-{
-  this->clear();
-}
-
+RBConstruction::~RBConstruction () = default;
 
 void RBConstruction::clear()
 {
