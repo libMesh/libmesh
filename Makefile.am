@@ -168,14 +168,14 @@ install-data-hook:
             echo " *** in generated file $$genfile" ; \
             echo " " ; \
             cd $(DESTDIR)$(prefix) && cat $$genfile | $(SED) "s,$$oldprefix,$$newprefix,g" > $$genfile.replaced ; \
-            cd $(DESTDIR)$(prefix) && mv $$genfile.replaced $$genfile ; \
+            cd $(DESTDIR)$(prefix) && mv -f $$genfile.replaced $$genfile ; \
           done ; \
         fi
 	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) -f etc/libmesh/Make.common Make.common
 	cat $(DESTDIR)$(libmesh_configdir)/libmesh-config | $(SED) "s/has_been_installed=no/has_been_installed=yes/g" > $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed
-	mv $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config && chmod +x $(DESTDIR)$(libmesh_configdir)/libmesh-config
+	mv -f $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config && chmod +x $(DESTDIR)$(libmesh_configdir)/libmesh-config
 	cat $(DESTDIR)$(prefix)/contrib/bin/libtool | $(SED) "s/-l //g" > $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed
-	mv $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed $(DESTDIR)$(prefix)/contrib/bin/libtool && chmod +x $(DESTDIR)$(prefix)/contrib/bin/libtool
+	mv -f $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed $(DESTDIR)$(prefix)/contrib/bin/libtool && chmod +x $(DESTDIR)$(prefix)/contrib/bin/libtool
 
 
 # this rule invokes emacs on each source file to remove trailing whitespace.
@@ -677,7 +677,7 @@ lcov-report:
 	$(lcov_bin)/lcov --list-full-path -l $(lcov_dir)/lcov.info | grep -v "`cd -P $(top_srcdir)/src && pwd`" | cut -d\| -f1 > $(lcov_dir)/remove
 	$(lcov_bin)/lcov -q -r $(lcov_dir)/lcov.info `cat $(lcov_dir)/remove` > $(lcov_dir)/lcov.cleaned.info
 	@rm $(lcov_dir)/remove
-	@mv $(lcov_dir)/lcov.cleaned.info $(lcov_dir)/lcov.info
+	@mv -f $(lcov_dir)/lcov.cleaned.info $(lcov_dir)/lcov.info
 	$(lcov_bin)/genhtml -t "libMesh" -o $(lcov_dir) $(lcov_dir)/lcov.info
 
 lcov-reset:
