@@ -59,9 +59,11 @@ public:
   CPPUNIT_TEST( testNemesisCopyElementSolutionReplicated );
 #endif
 
+#ifdef LIBMESH_HAVE_GZSTREAM
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
   CPPUNIT_TEST( testDynaFileMappingsFEMEx5);
+#endif // LIBMESH_HAVE_GZSTREAM
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
