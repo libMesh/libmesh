@@ -63,6 +63,9 @@ public:
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
   CPPUNIT_TEST( testDynaFileMappingsFEMEx5);
+  CPPUNIT_TEST( testDynaFileMappingsBlockWithHole);
+  CPPUNIT_TEST( testDynaFileMappingsPlateWithHole);
+  CPPUNIT_TEST( testDynaFileMappingsCyl3d);
 #endif // LIBMESH_HAVE_GZSTREAM
 #endif // LIBMESH_DIM > 1
 
@@ -598,10 +601,24 @@ public:
     testMasterCenters(mesh);
   }
 
-
   void testDynaFileMappingsFEMEx5 ()
   {
     testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz");
+  }
+
+  void testDynaFileMappingsBlockWithHole ()
+  {
+    testDynaFileMappings("meshes/BlockWithHole_Patch9.bxt.gz");
+  }
+
+  void testDynaFileMappingsPlateWithHole ()
+  {
+    testDynaFileMappings("meshes/PlateWithHole_Patch8.bxt.gz");
+  }
+
+  void testDynaFileMappingsCyl3d ()
+  {
+    testDynaFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz");
   }
 };
 
