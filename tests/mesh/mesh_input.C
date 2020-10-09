@@ -579,6 +579,25 @@ public:
 #endif // LIBMESH_HAVE_SOLVER
   }
 
+  void testProjectionRegression(MeshBase & mesh, DynaIO & dyna)
+  {
+    int order = 0;
+    for (const auto elem : mesh.element_ptr_range())
+      order = std::max(order, int(elem->default_order()));
+    TestCommWorld->max(order);
+    CPPUNIT_ASSERT (order > 0);
+
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+    unsigned int n_var =
+      sys.add_variable("n", Order(order), RATIONAL_BERNSTEIN);
+
+    es.init();
+    dyna.add_spline_constraints(sys.get_dof_map(), sys.number(), n_var);
+    sys.reinit_constraints();
+
+    sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
+  }
 
   void testDynaFileMappings (const std::string & filename)
   {
@@ -599,6 +618,8 @@ public:
                          RATIONAL_BERNSTEIN_MAP);
 
     testMasterCenters(mesh);
+
+    testProjectionRegression(mesh, dyna);
   }
 
   void testDynaFileMappingsFEMEx5 ()
