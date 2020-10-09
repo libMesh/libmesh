@@ -86,6 +86,8 @@ public:
 
   virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override = 0;
 
+  virtual Real last_completed_timestep_size() override { return completed_timestep_size; };
+
   /**
    * This method is passed on to the core_time_solver
    */
