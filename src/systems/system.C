@@ -100,49 +100,11 @@ System::System (EquationSystems & es,
 
 
 
-// No copy construction of System objects!
-System::System (const System & other) :
-  ReferenceCountedObject<System>(),
-  ParallelObject(other),
-  _equation_systems(other._equation_systems),
-  _mesh(other._mesh),
-  _sys_number(other._sys_number)
-{
-  libmesh_not_implemented();
-}
-
-
-
-System & System::operator= (const System &)
-{
-  libmesh_not_implemented();
-}
-
-
 System::~System ()
 {
-  // Null-out the function pointers.  Since this
-  // class is getting destructed it is pointless,
-  // but a good habit.
-  _init_system_function =
-    _assemble_system_function =
-    _constrain_system_function = nullptr;
-
-  _qoi_evaluate_function = nullptr;
-  _qoi_evaluate_derivative_function =  nullptr;
-
-  // nullptr-out user-provided objects.
-  _init_system_object             = nullptr;
-  _assemble_system_object         = nullptr;
-  _constrain_system_object        = nullptr;
-  _qoi_evaluate_object            = nullptr;
-  _qoi_evaluate_derivative_object = nullptr;
-
-  // Clear data
-  // Note: although clear() is virtual, C++ only calls
-  // the clear() of the base class in the destructor.
-  // Thus we add System namespace to make it clear.
-  System::clear ();
+  // This class does manual memory management of the _vectors map, so
+  // we need to be sure and free that in the destructor.
+  System::clear();
 
   libmesh_exceptionless_assert (!libMesh::closed());
 }

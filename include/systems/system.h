@@ -114,6 +114,23 @@ public:
           const unsigned int number);
 
   /**
+   * Special functions.
+   * - The copy constructor and assignment operator were previously
+   *   declared as private libmesh_not_implemented() functions, this
+   *   is the C++11 way of achieving the same effect.
+   * - The System holds references to Mesh and EquationSystems
+   *   objects, therefore it can't be default move-assigned.
+   * - This class manages memory in the _vectors member, so we can't
+   *   default the move constructor.
+   * - The destructor is responsible for cleaning up the _vectors member.
+   */
+  System (const System &) = delete;
+  System & operator= (const System &) = delete;
+  System (System &&) = delete;
+  System & operator= (System &&) = delete;
+  virtual ~System ();
+
+  /**
    * Abstract base class to be used for system initialization.
    * A user class derived from this class may be used to
    * initialize the system values by attaching an object
@@ -232,13 +249,6 @@ public:
                                  bool include_liftfunc,
                                  bool apply_constraints) = 0;
   };
-
-
-
-  /**
-   * Destructor.
-   */
-  virtual ~System ();
 
   /**
    * The type of system.
@@ -1871,22 +1881,6 @@ protected:
                        int is_adjoint = -1) const;
 
 private:
-  /**
-   * This isn't a copyable object, so let's make sure nobody tries.
-   *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
-   */
-  System (const System &);
-
-  /**
-   * This isn't a copyable object, so let's make sure nobody tries.
-   *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
-   */
-  System & operator=(const System &);
-
   /**
    * Finds the discrete norm for the entries in the vector
    * corresponding to Dofs associated with var.
