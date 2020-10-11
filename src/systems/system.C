@@ -1908,9 +1908,7 @@ void System::attach_init_function (void fptr(EquationSystems & es,
 
   if (_init_system_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both initialization function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both initialization function and object!");
 
       _init_system_object = nullptr;
     }
@@ -1924,9 +1922,7 @@ void System::attach_init_object (System::Initialization & init_in)
 {
   if (_init_system_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both initialization object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both initialization object and function!");
 
       _init_system_function = nullptr;
     }
@@ -1943,9 +1939,7 @@ void System::attach_assemble_function (void fptr(EquationSystems & es,
 
   if (_assemble_system_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both assembly function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both assembly function and object!");
 
       _assemble_system_object = nullptr;
     }
@@ -1959,9 +1953,7 @@ void System::attach_assemble_object (System::Assembly & assemble_in)
 {
   if (_assemble_system_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both assembly object and function!");
 
       _assemble_system_function = nullptr;
     }
@@ -1978,9 +1970,7 @@ void System::attach_constraint_function(void fptr(EquationSystems & es,
 
   if (_constrain_system_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both constraint function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both constraint function and object!");
 
       _constrain_system_object = nullptr;
     }
@@ -1994,9 +1984,7 @@ void System::attach_constraint_object (System::Constraint & constrain)
 {
   if (_constrain_system_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both constraint object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both constraint object and function!");
 
       _constrain_system_function = nullptr;
     }
@@ -2014,9 +2002,7 @@ void System::attach_QOI_function(void fptr(EquationSystems &,
 
   if (_qoi_evaluate_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI function and object!");
 
       _qoi_evaluate_object = nullptr;
     }
@@ -2030,9 +2016,7 @@ void System::attach_QOI_object (QOI & qoi_in)
 {
   if (_qoi_evaluate_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI object and function!");
 
       _qoi_evaluate_function = nullptr;
     }
@@ -2049,9 +2033,7 @@ void System::attach_QOI_derivative(void fptr(EquationSystems &, const std::strin
 
   if (_qoi_evaluate_derivative_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI derivative function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI derivative function and object!");
 
       _qoi_evaluate_derivative_object = nullptr;
     }
@@ -2065,9 +2047,7 @@ void System::attach_QOI_derivative_object (QOIDerivative & qoi_derivative)
 {
   if (_qoi_evaluate_derivative_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI derivative object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI derivative object and function!");
 
       _qoi_evaluate_derivative_function = nullptr;
     }
