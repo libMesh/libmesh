@@ -139,6 +139,8 @@
     - Rational function shapes_need_reinit is true!
     - Delete MeshBase and derived class' move constructors
     - Fixes for unit tests in non-standard configurations
+    - Fix "make install" issue where it was possible to get interactive mv questions
+    - Move BERNSTEIN HEX27 interior DoFs to node
   * pkgconfig
     - Remove extra flags from pkgconfig Cflags
     - Conditionally add libmesh-*.pc files based on METHODS
