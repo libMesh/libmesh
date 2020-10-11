@@ -59,9 +59,14 @@ public:
   CPPUNIT_TEST( testNemesisCopyElementSolutionReplicated );
 #endif
 
+#ifdef LIBMESH_HAVE_GZSTREAM
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaReadPatch );
   CPPUNIT_TEST( testDynaFileMappingsFEMEx5);
+  CPPUNIT_TEST( testDynaFileMappingsBlockWithHole);
+  CPPUNIT_TEST( testDynaFileMappingsPlateWithHole);
+  CPPUNIT_TEST( testDynaFileMappingsCyl3d);
+#endif // LIBMESH_HAVE_GZSTREAM
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
@@ -574,6 +579,25 @@ public:
 #endif // LIBMESH_HAVE_SOLVER
   }
 
+  void testProjectionRegression(MeshBase & mesh, DynaIO & dyna)
+  {
+    int order = 0;
+    for (const auto elem : mesh.element_ptr_range())
+      order = std::max(order, int(elem->default_order()));
+    TestCommWorld->max(order);
+    CPPUNIT_ASSERT (order > 0);
+
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+    unsigned int n_var =
+      sys.add_variable("n", Order(order), RATIONAL_BERNSTEIN);
+
+    es.init();
+    dyna.add_spline_constraints(sys.get_dof_map(), sys.number(), n_var);
+    sys.reinit_constraints();
+
+    sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
+  }
 
   void testDynaFileMappings (const std::string & filename)
   {
@@ -594,12 +618,28 @@ public:
                          RATIONAL_BERNSTEIN_MAP);
 
     testMasterCenters(mesh);
-  }
 
+    testProjectionRegression(mesh, dyna);
+  }
 
   void testDynaFileMappingsFEMEx5 ()
   {
     testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz");
+  }
+
+  void testDynaFileMappingsBlockWithHole ()
+  {
+    testDynaFileMappings("meshes/BlockWithHole_Patch9.bxt.gz");
+  }
+
+  void testDynaFileMappingsPlateWithHole ()
+  {
+    testDynaFileMappings("meshes/PlateWithHole_Patch8.bxt.gz");
+  }
+
+  void testDynaFileMappingsCyl3d ()
+  {
+    testDynaFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz");
   }
 };
 

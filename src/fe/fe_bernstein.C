@@ -286,9 +286,8 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
         case 25:
           return ((o-1)*(o-1));
 
-          // Internal DoFs are associated with the elem, not its nodes
         case 26:
-          return 0;
+          return ((o-1)*(o-1)*(o-1));
 
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX27!");
@@ -353,12 +352,12 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
       return 0;
     case HEX8:
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough();
+      return 0;
     case HEX20:
       libmesh_assert_less (o, 3);
       return 0;
     case HEX27:
-      return ((o-1)*(o-1)*(o-1));
+      return 0;
     case TET4:
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
