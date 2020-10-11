@@ -80,13 +80,7 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems & es,
   exit_on_repeated_greedy_parameters = false;
 }
 
-
-
-TransientRBConstruction::~TransientRBConstruction ()
-{
-  this->clear();
-}
-
+TransientRBConstruction::~TransientRBConstruction () = default;
 
 void TransientRBConstruction::clear()
 {

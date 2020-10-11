@@ -53,10 +53,7 @@ RBEvaluation::RBEvaluation (const Parallel::Communicator & comm_in)
 {
 }
 
-RBEvaluation::~RBEvaluation()
-{
-  this->clear();
-}
+RBEvaluation::~RBEvaluation() = default;
 
 void RBEvaluation::clear()
 {

@@ -62,11 +62,7 @@ RBSCMConstruction::RBSCMConstruction (EquationSystems & es,
 
 }
 
-RBSCMConstruction::~RBSCMConstruction ()
-{
-  this->clear();
-}
-
+RBSCMConstruction::~RBSCMConstruction () = default;
 
 void RBSCMConstruction::clear()
 {
