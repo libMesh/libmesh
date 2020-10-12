@@ -100,50 +100,8 @@ System::System (EquationSystems & es,
 
 
 
-// No copy construction of System objects!
-System::System (const System & other) :
-  ReferenceCountedObject<System>(),
-  ParallelObject(other),
-  _equation_systems(other._equation_systems),
-  _mesh(other._mesh),
-  _sys_number(other._sys_number)
-{
-  libmesh_not_implemented();
-}
-
-
-
-System & System::operator= (const System &)
-{
-  libmesh_not_implemented();
-}
-
-
 System::~System ()
 {
-  // Null-out the function pointers.  Since this
-  // class is getting destructed it is pointless,
-  // but a good habit.
-  _init_system_function =
-    _assemble_system_function =
-    _constrain_system_function = nullptr;
-
-  _qoi_evaluate_function = nullptr;
-  _qoi_evaluate_derivative_function =  nullptr;
-
-  // nullptr-out user-provided objects.
-  _init_system_object             = nullptr;
-  _assemble_system_object         = nullptr;
-  _constrain_system_object        = nullptr;
-  _qoi_evaluate_object            = nullptr;
-  _qoi_evaluate_derivative_object = nullptr;
-
-  // Clear data
-  // Note: although clear() is virtual, C++ only calls
-  // the clear() of the base class in the destructor.
-  // Thus we add System namespace to make it clear.
-  System::clear ();
-
   libmesh_exceptionless_assert (!libMesh::closed());
 }
 
@@ -207,30 +165,17 @@ Number System::current_solution (const dof_id_type global_dof_number) const
 void System::clear ()
 {
   _variables.clear();
-
   _variable_numbers.clear();
-
   _dof_map->clear ();
-
   solution->clear ();
-
   current_local_solution->clear ();
 
   // clear any user-added vectors
-  {
-    for (auto & pr : _vectors)
-      {
-        pr.second->clear ();
-        delete pr.second;
-        pr.second = nullptr;
-      }
-
-    _vectors.clear();
-    _vector_projections.clear();
-    _vector_is_adjoint.clear();
-    _vector_types.clear();
-    _is_initialized = false;
-  }
+  _vectors.clear();
+  _vector_projections.clear();
+  _vector_is_adjoint.clear();
+  _vector_types.clear();
+  _is_initialized = false;
 
   // clear any user-added matrices
   _matrices.clear();
@@ -384,7 +329,7 @@ void System::restrict_vectors ()
   // Restrict the _vectors on the coarsened cells
   for (auto & pr : _vectors)
     {
-      NumericVector<Number> * v = pr.second;
+      NumericVector<Number> * v = pr.second.get();
 
       if (_vector_projections[pr.first])
         {
@@ -749,8 +694,8 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
     return *(_vectors[vec_name]);
 
   // Otherwise build the vector
-  NumericVector<Number> * buf = NumericVector<Number>::build(this->comm()).release();
-  _vectors.emplace(vec_name, buf);
+  auto pr = _vectors.emplace(vec_name, NumericVector<Number>::build(this->comm()));
+  auto buf = pr.first->second.get();
   _vector_projections.emplace(vec_name, projections);
   _vector_types.emplace(vec_name, type);
 
@@ -785,10 +730,7 @@ void System::remove_vector (const std::string & vec_name)
   if (pos == _vectors.end())
     return;
 
-  delete pos->second;
-
   _vectors.erase(pos);
-
   _vector_projections.erase(vec_name);
   _vector_is_adjoint.erase(vec_name);
   _vector_types.erase(vec_name);
@@ -801,7 +743,7 @@ const NumericVector<Number> * System::request_vector (const std::string & vec_na
   if (pos == _vectors.end())
     return nullptr;
 
-  return pos->second;
+  return pos->second.get();
 }
 
 
@@ -813,41 +755,35 @@ NumericVector<Number> * System::request_vector (const std::string & vec_name)
   if (pos == _vectors.end())
     return nullptr;
 
-  return pos->second;
+  return pos->second.get();
 }
 
 
 
 const NumericVector<Number> * System::request_vector (const unsigned int vec_num) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  if (v==v_end)
+  // If we don't have that many vectors, return nullptr
+  if (vec_num >= _vectors.size())
     return nullptr;
-  return v->second;
+
+  // Otherwise return a pointer to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return it->second.get();
 }
 
 
 
 NumericVector<Number> * System::request_vector (const unsigned int vec_num)
 {
-  vectors_iterator v = vectors_begin();
-  vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  if (v==v_end)
+  // If we don't have that many vectors, return nullptr
+  if (vec_num >= _vectors.size())
     return nullptr;
-  return v->second;
+
+  // Otherwise return a pointer to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return it->second.get();
 }
 
 
@@ -868,67 +804,53 @@ NumericVector<Number> & System::get_vector (const std::string & vec_name)
 
 const NumericVector<Number> & System::get_vector (const unsigned int vec_num) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  libmesh_assert (v != v_end);
-  return *(v->second);
+  // If we don't have that many vectors, throw an error
+  libmesh_assert_less(vec_num, _vectors.size());
+
+  // Otherwise return a reference to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return *(it->second);
 }
 
 
 
 NumericVector<Number> & System::get_vector (const unsigned int vec_num)
 {
-  vectors_iterator v = vectors_begin();
-  vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  libmesh_assert (v != v_end);
-  return *(v->second);
+  // If we don't have that many vectors, throw an error
+  libmesh_assert_less(vec_num, _vectors.size());
+
+  // Otherwise return a reference to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return *(it->second);
 }
 
 
 
 const std::string & System::vector_name (const unsigned int vec_num) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  libmesh_assert (v != v_end);
-  return v->first;
+  // If we don't have that many vectors, throw an error
+  libmesh_assert_less(vec_num, _vectors.size());
+
+  // Otherwise return a reference to the vec_num'th vector name
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return it->first;
 }
 
 const std::string & System::vector_name (const NumericVector<Number> & vec_reference) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-
-  for (; v != v_end; ++v)
-    {
-      // Check if the current vector is the one whose name we want
-      if (&vec_reference == v->second)
-        break; // exit loop if it is
-    }
+  // Linear search for a vector whose pointer matches vec_reference
+  auto it = std::find_if(vectors_begin(), vectors_end(),
+                         [&vec_reference](const decltype(_vectors)::value_type & pr)
+                         { return &vec_reference == pr.second.get(); });
 
   // Before returning, make sure we didnt loop till the end and not find any match
-  libmesh_assert (v != v_end);
+  libmesh_assert (it != vectors_end());
 
   // Return the string associated with the current vector
-  return v->first;
+  return it->first;
 }
 
 
@@ -946,16 +868,16 @@ SparseMatrix<Number> & System::add_matrix (const std::string & mat_name,
   if (this->have_matrix(mat_name))
     return *(_matrices[mat_name]);
 
-  // Otherwise build the matrix and return it.
-  std::unique_ptr<SparseMatrix<Number>> buf = SparseMatrix<Number>::build(this->comm(),
-                                                                          libMesh::default_solver_package(),
-                                                                          mat_build_type);
-  SparseMatrix<Number> & mat = *buf;
+  // Otherwise build the matrix and return a reference to it.
+  auto pr = _matrices.emplace
+    (mat_name,
+     SparseMatrix<Number>::build(this->comm(),
+                                 libMesh::default_solver_package(),
+                                 mat_build_type));
 
-  _matrices.emplace(mat_name, std::move(buf));
   _matrix_types.emplace(mat_name, type);
 
-  return mat;
+  return *(pr.first->second);
 }
 
 
@@ -968,8 +890,7 @@ void System::remove_matrix (const std::string & mat_name)
   if (pos == _matrices.end())
     return;
 
-  pos->second.reset();
-  _matrices.erase(pos);
+  _matrices.erase(pos); // erase()'d entries are destroyed
 }
 
 
@@ -1946,9 +1867,7 @@ void System::attach_init_function (void fptr(EquationSystems & es,
 
   if (_init_system_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both initialization function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both initialization function and object!");
 
       _init_system_object = nullptr;
     }
@@ -1962,9 +1881,7 @@ void System::attach_init_object (System::Initialization & init_in)
 {
   if (_init_system_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both initialization object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both initialization object and function!");
 
       _init_system_function = nullptr;
     }
@@ -1981,9 +1898,7 @@ void System::attach_assemble_function (void fptr(EquationSystems & es,
 
   if (_assemble_system_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both assembly function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both assembly function and object!");
 
       _assemble_system_object = nullptr;
     }
@@ -1997,9 +1912,7 @@ void System::attach_assemble_object (System::Assembly & assemble_in)
 {
   if (_assemble_system_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both assembly object and function!");
 
       _assemble_system_function = nullptr;
     }
@@ -2016,9 +1929,7 @@ void System::attach_constraint_function(void fptr(EquationSystems & es,
 
   if (_constrain_system_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both constraint function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both constraint function and object!");
 
       _constrain_system_object = nullptr;
     }
@@ -2032,9 +1943,7 @@ void System::attach_constraint_object (System::Constraint & constrain)
 {
   if (_constrain_system_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both constraint object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both constraint object and function!");
 
       _constrain_system_function = nullptr;
     }
@@ -2052,9 +1961,7 @@ void System::attach_QOI_function(void fptr(EquationSystems &,
 
   if (_qoi_evaluate_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI function and object!");
 
       _qoi_evaluate_object = nullptr;
     }
@@ -2068,9 +1975,7 @@ void System::attach_QOI_object (QOI & qoi_in)
 {
   if (_qoi_evaluate_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI object and function!");
 
       _qoi_evaluate_function = nullptr;
     }
@@ -2087,9 +1992,7 @@ void System::attach_QOI_derivative(void fptr(EquationSystems &, const std::strin
 
   if (_qoi_evaluate_derivative_object != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI derivative function and object!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI derivative function and object!");
 
       _qoi_evaluate_derivative_object = nullptr;
     }
@@ -2103,9 +2006,7 @@ void System::attach_QOI_derivative_object (QOIDerivative & qoi_derivative)
 {
   if (_qoi_evaluate_derivative_function != nullptr)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI derivative object and function!"
-                   << std::endl;
+      libmesh_warning("WARNING:  Cannot specify both QOI derivative object and function!");
 
       _qoi_evaluate_derivative_function = nullptr;
     }

@@ -45,10 +45,7 @@ TransientRBEvaluation::TransientRBEvaluation(const Parallel::Communicator & comm
   compute_RB_inner_product = true;
 }
 
-TransientRBEvaluation::~TransientRBEvaluation ()
-{
-  clear();
-}
+TransientRBEvaluation::~TransientRBEvaluation () = default;
 
 void TransientRBEvaluation::clear()
 {

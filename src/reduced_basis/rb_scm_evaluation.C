@@ -60,9 +60,7 @@ RBSCMEvaluation::RBSCMEvaluation (const Parallel::Communicator & comm_in) :
   SCM_UB_vectors.clear();
 }
 
-RBSCMEvaluation::~RBSCMEvaluation ()
-{
-}
+RBSCMEvaluation::~RBSCMEvaluation () = default;
 
 void RBSCMEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_in)
 {

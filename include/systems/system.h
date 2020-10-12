@@ -114,6 +114,22 @@ public:
           const unsigned int number);
 
   /**
+   * Special functions.
+   * - The copy constructor and assignment operator were previously
+   *   declared as private libmesh_not_implemented() functions, this
+   *   is the C++11 way of achieving the same effect.
+   * - The System holds references to Mesh and EquationSystems
+   *   objects, therefore it can't be default move-assigned.
+   * - This class _can_ be default move constructed.
+   * - The destructor throws an error if libMesh::closed()
+   */
+  System (const System &) = delete;
+  System & operator= (const System &) = delete;
+  System (System &&) = default;
+  System & operator= (System &&) = delete;
+  virtual ~System ();
+
+  /**
    * Abstract base class to be used for system initialization.
    * A user class derived from this class may be used to
    * initialize the system values by attaching an object
@@ -232,13 +248,6 @@ public:
                                  bool include_liftfunc,
                                  bool apply_constraints) = 0;
   };
-
-
-
-  /**
-   * Destructor.
-   */
-  virtual ~System ();
 
   /**
    * The type of system.
@@ -756,8 +765,8 @@ public:
   /**
    * Vector iterator typedefs.
    */
-  typedef std::map<std::string, NumericVector<Number> *>::iterator       vectors_iterator;
-  typedef std::map<std::string, NumericVector<Number> *>::const_iterator const_vectors_iterator;
+  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator       vectors_iterator;
+  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator const_vectors_iterator;
 
   /**
    * Beginning of vectors container
@@ -1872,22 +1881,6 @@ protected:
 
 private:
   /**
-   * This isn't a copyable object, so let's make sure nobody tries.
-   *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
-   */
-  System (const System &);
-
-  /**
-   * This isn't a copyable object, so let's make sure nobody tries.
-   *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
-   */
-  System & operator=(const System &);
-
-  /**
    * Finds the discrete norm for the entries in the vector
    * corresponding to Dofs associated with var.
    */
@@ -2095,7 +2088,7 @@ private:
    * vectors.  All the vectors in this map will be distributed
    * in the same way as the solution vector.
    */
-  std::map<std::string, NumericVector<Number> * > _vectors;
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>> _vectors;
 
   /**
    * Holds true if a vector by that name should be projected
@@ -2547,12 +2540,10 @@ System::add_matrix (const std::string & mat_name,
     return *(_matrices[mat_name]);
 
   // Otherwise build the matrix and return it.
-  std::unique_ptr<SparseMatrix<Number>> buf = libmesh_make_unique<MatrixType<Number>>(this->comm());
-  SparseMatrix<Number> & mat = *buf;
-  _matrices.emplace(mat_name, std::move(buf));
+  auto pr = _matrices.emplace(mat_name, libmesh_make_unique<MatrixType<Number>>(this->comm()));
   _matrix_types.emplace(mat_name, type);
 
-  return mat;
+  return *(pr.first->second);
 }
 
 

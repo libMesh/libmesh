@@ -63,8 +63,14 @@ public:
                   const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains unique_ptrs so it can't be default copy assigned/constructed
+   * - Destructor is defaulted out-of-line
    */
+  RBConstruction (RBConstruction &&) = default;
+  RBConstruction (const RBConstruction &) = delete;
+  RBConstruction & operator= (const RBConstruction &) = delete;
+  RBConstruction & operator= (RBConstruction &&) = default;
   virtual ~RBConstruction ();
 
   /**

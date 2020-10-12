@@ -403,8 +403,7 @@ void System::read_legacy_data (Xdr & io,
         libmesh_error_msg
           ("Additional vectors in file do not match system");
 
-      std::map<std::string, NumericVector<Number> *>::iterator
-        pos = this->_vectors.begin();
+      auto pos = this->_vectors.begin();
 
       for (std::size_t i = 0; i != this->_additional_data_written; ++i)
         {
@@ -630,8 +629,7 @@ void System::read_parallel_data (Xdr & io,
         libmesh_error_msg
           ("Additional vectors in file do not match system");
 
-      std::map<std::string, NumericVector<Number> *>::const_iterator
-        pos = _vectors.begin();
+      auto pos = _vectors.begin();
 
       for (std::size_t i = 0; i != this->_additional_data_written; ++i)
         {
@@ -769,8 +767,7 @@ void System::read_serialized_data (Xdr & io,
         libmesh_error_msg
           ("Additional vectors in file do not match system");
 
-      std::map<std::string, NumericVector<Number> *>::const_iterator
-        pos = _vectors.begin();
+      auto pos = _vectors.begin();
 
       for (std::size_t i = 0; i != this->_additional_data_written; ++i)
         {
@@ -779,7 +776,7 @@ void System::read_serialized_data (Xdr & io,
 
           // total_read_size +=
           this->read_serialized_vector<InValType>
-            (io, (read_additional_data && nvecs) ? pos->second : nullptr);
+            (io, (read_additional_data && nvecs) ? pos->second.get() : nullptr);
 
           // get the comment
           if (this->processor_id() == 0)
