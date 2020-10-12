@@ -17,70 +17,34 @@
 
 
 
-// Adjoints Example 5 - SolutionHistory (both Memory and File), General Localized Vectors and Unsteady Adjoints.
+// Adjoints Example 7 - Unsteady Adjoint Refinement Error Estimator for Model Error Estimation.
 // \author Vikram Garg
 // \date 2020
 //
-// This example showcases the solution storage and retrival capabilities of libMesh, in the context of
-// unsteady adjoints. The primary motivation is adjoint sensitivity analysis for unsteady
-// problems. The PDE we are interested in is the simple 2-d heat
+// This example illustrates the use of the AdjointRefinementErrorEstimator in an unsteady setting. It also
+// illustrates adjoint estimation of model error.
+// The PDE we are interested in is the simple 2-d heat
 // equation:
-// partial(T)/partial(t) - K Laplacian(T) = 0
+// partial(T)/partial(t) - K(x) Laplacian(T) = 1.0
 // with initial condition:
-// T(x,y;0) = sin(pi*x) sin(pi*y) and boundary conditions:
-// T(boundary;t) = 0
-
-// For these initial and boundary conditions, the exact solution
-// u = exp(-K 2*pi^2 t) * sin(pi*x) * sin(pi*y)
+// T(x,y;0) = 1.0 and boundary conditions:
+// T(boundary;t) = 1.0
+// with K(x) = 0.001 + x for the true model, and K = 0.01 for the coarse model.
+// We are interested in estimating the effect of using K = 0.01 on 2 QoIs.
 
 // We specify our Quantity of Interest (QoI) as
-// Q(u) = int_{domain} u(x,y;1) sin(pi*x) sin(pi*y) dx dy, and
-// are interested in computing the sensitivity dQ/dK
+// Q0(u) = int_{domain} u(x,y;tf) 1.0 dx dy (A temporally non-smooth QoI evaluated at the final time)
+// Q1(u) = int_{0}^{tf} int_{domain} u(x,y;t) 1.0 dx dy dt (A temporally smooth QoI)
 
-// The exact value of this sensitivity is:
-// dQ/dK = int_{domain} du/dK sin(pi*x) sin(pi*y) dx dy
-// = int_{domain} (-2*pi^2 * exp(-K pi^2) ) sin^2(pi*x) sin^2(pi*y) dx dy
-// = (-2*pi^2 * exp(-K 2*pi^2) )/4 = -4.9022 (K = 1.0e-3)
-
-// For this QoI, the continuous adjoint problem reads,
-// -partial(z)/partial(t) - K Laplacian(z) = 0
-// with initial condition:
-// T(x,y;1) = sin(pi*x) sin(pi*y)
-// and boundary condition:
-// T(boundary;t) = 0
-
-// which has the exact solution,
-// z = exp(-K 2*pi^2 (1 - t)) * sin(pi*x) * sin(pi*y)
-// which is the mirror image in time of the forward solution
-
-// For an adjoint consistent space-time formulation, the discrete
-// adjoint can be obtained by marching backwards from the adjoint
-// initial condition and solving the transpose of the discrete primal
-// problem at the last nonlinear solve of the corresponding primal
-// timestep. This necessitates the storage of the primal solution at
-// all timesteps, which is accomplished here using either a
-// MemorySolutionHistory or a FileSolutionHistory object. As the name suggests, this object
-// simply stores the primal solution (and other vectors we may choose
-// to save) in memory or disk, so that we can retrieve them later, whenever necessary.
-
-// The discrete adjoint system for implicit time steppers requires the
-// localization of vectors other than system.solution, which is
-// accomplished using the localize_vectors method. In this particular
-// example, we use the localized adjoint solution to assemble the
-// residual contribution for the current adjoint timestep from the last
-// computed adjoint timestep.
-
-// Finally, The adjoint_advance_timestep method, the backwards time
-// analog of advance_timestep prepares the time solver for solving the
-// adjoint system, while the retrieve_timestep method retrieves the
-// saved solutions at the current system.time, so that the adjoint
-// sensitivity contribution for the current time can be computed.
+// We verify the adjoint identity,
+// Q(u_true) - Q(u_coarse) = R(u_true, z)
 
 // Local includes
 #include "initial.h"
 #include "adjoint_initial.h"
 #include "femparameters.h"
 #include "heatsystem.h"
+#include "sigma_physics.h"
 
 // Libmesh includes
 #include "libmesh/equation_systems.h"
@@ -106,7 +70,8 @@
 #include "libmesh/gmv_io.h"
 #include "libmesh/exodusII_io.h"
 
-#include "libmesh/sensitivity_data.h"
+#include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/error_vector.h"
 
 // SolutionHistory Includes
 #include "libmesh/solution_history.h"
@@ -177,10 +142,6 @@ void write_output(EquationSystems & es,
 
 void set_system_parameters(HeatSystem &system, FEMParameters &param)
 {
-  // Use the prescribed FE type
-  system.fe_family() = param.fe_family[0];
-  system.fe_order() = param.fe_order[0];
-
   // Use analytical jacobians?
   system.analytic_jacobians() = param.analytic_jacobians;
 
@@ -351,6 +312,28 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
     }
 }
 
+UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet &qois, FEMPhysics* supplied_physics, FEMParameters &/*param*/)
+{
+  std::cout<<"Computing the error estimate using the Adjoint Refinement Error Estimator"<<std::endl<<std::endl;
+
+  AdjointRefinementEstimator *adjoint_refinement_estimator = new AdjointRefinementEstimator;
+
+  adjoint_refinement_estimator->qoi_set() = qois;
+
+  // Set the residual evaluation physics pointer that belongs to the Adjoint Refinement
+  // Error Estimator class to the residual_physics pointer passed by the user
+  adjoint_refinement_estimator->set_residual_evaluation_physics(supplied_physics);
+
+  // Also set the adjoint evaluation physics pointer to the same pointer
+  adjoint_refinement_estimator->set_adjoint_evaluation_physics(supplied_physics);
+
+  // We enrich the FE space for the dual problem by doing a uniform h refinements
+  // Since we are dealing with model error, 0 h refinements are legal.
+  adjoint_refinement_estimator->number_h_refinements = 0;
+
+  return UniquePtr<AdjointRefinementEstimator>(adjoint_refinement_estimator);
+}
+
 // The main program.
 int main (int argc, char ** argv)
 {
@@ -421,6 +404,10 @@ int main (int argc, char ** argv)
 
   set_system_parameters(system, param);
 
+  // Also build an FEMPhysics to provide the residual definition for the adjoint activities
+  SigmaPhysics* sigma_physics = new SigmaPhysics();
+  sigma_physics->init_data(system);
+
   libMesh::out << "Initializing systems" << std::endl;
 
   // Initialize the system
@@ -435,8 +422,6 @@ int main (int argc, char ** argv)
 
   libMesh::out << "Setting primal initial conditions" << std::endl;
 
-  read_initial_parameters();
-
   system.project_solution(initial_value, initial_grad,
                           equation_systems.parameters);
 
@@ -448,26 +433,28 @@ int main (int argc, char ** argv)
                << std::endl
                << std::endl;
 
-  // Add an adjoint vector, this will be computed after the forward
-  // time stepping is complete
+  // Add two adjoint vectors, these will be computed after the forward
+  // and QoI calculation time stepping loops are complete
   //
   // Tell the library not to save adjoint solutions during the forward
   // solve
   //
   // Tell the library not to project this vector, and hence, memory/file
-  // solution history to not save it.
+  // solution history to not save it during the forward run.
   //
   // Make this vector ghosted so we can localize it to each element
   // later.
-  const std::string & adjoint_solution_name = "adjoint_solution0";
+  const std::string & adjoint_solution_name0 = "adjoint_solution0";
+  const std::string & adjoint_solution_name1 = "adjoint_solution1";
   system.add_vector("adjoint_solution0", false, GHOSTED);
+  system.add_vector("adjoint_solution1", false, GHOSTED);
 
   // To keep the number of vectors consistent between the primal and adjoint
   // loops, we will also pre-add the adjoint rhs vector
+  const std::string & adjoint_rhs_name0 = "adjoint_rhs0";
+  const std::string & adjoint_rhs_name1 = "adjoint_rhs1";
   system.add_vector("adjoint_rhs0", false, GHOSTED);
-
-  // Close up any resources initial.C needed
-  finish_initialization();
+  system.add_vector("adjoint_rhs1", false, GHOSTED);
 
   // Plot the initial conditions
   write_output(equation_systems, 0, "primal", param);
@@ -475,6 +462,9 @@ int main (int argc, char ** argv)
   // Print information about the mesh and system to the screen.
   mesh.print_info();
   equation_systems.print_info();
+
+  // Accumulated integrated QoIs
+  Number QoI_1_accumulated = 0.0;
 
   // In optimized mode we catch any solver errors, so that we can
   // write the proper footers before closing.  In debug mode we just
@@ -498,7 +488,6 @@ int main (int argc, char ** argv)
           // Solve the forward problem at time t, to obtain the solution at time t + dt
           system.solve();
 
-
           // Output the H1 norm of the computed solution
           libMesh::out << "|U("
                       << system.time + system.time_solver->last_completed_timestep_size()
@@ -515,17 +504,41 @@ int main (int argc, char ** argv)
         }
       // End timestep loop
 
+      // Set the time instant for the evaluation of the non-smooth QoI 0
+      (dynamic_cast<HeatSystem &>(system).QoI_time_instant)[0] = system.time;
+
+      // Now loop over the timesteps again to get the QoIs
+
+      // Reset the initial time
+      system.time = 0.0;
+
+      system.time_solver->retrieve_timestep();
+
+      QoI_1_accumulated = 0.0;
+
+      for (unsigned int t_step=param.initial_timestep;
+           t_step != param.initial_timestep + param.n_timesteps; ++t_step)
+        {
+          system.time_solver->integrate_qoi_timestep();
+
+          QoI_1_accumulated += (system.qoi)[1];
+        }
+
+      std::cout<< "The computed QoI 0 is " << std::setprecision(17) << (system.qoi)[0] << std::endl;
+      std::cout<< "The computed QoI 1 is " << std::setprecision(17) << QoI_1_accumulated << std::endl;
+
       ///////////////// Now for the Adjoint Solution //////////////////////////////////////
 
       // Now we will solve the backwards in time adjoint problem
-      libMesh::out << std::endl << "Solving the adjoint problem" << std::endl;
+      libMesh::out << std::endl << "Solving the adjoint problems." << std::endl;
 
       // We need to tell the library that it needs to project the adjoint, so
       // MemorySolutionHistory knows it has to save it
 
-      // Tell the library to project the adjoint vector, and hence, memory solution history to
-      // save it
-      system.set_vector_preservation(adjoint_solution_name, true);
+      // Tell the library to project the adjoint vectors, and hence, solution history to
+      // save them.
+      system.set_vector_preservation(adjoint_solution_name0, true);
+      system.set_vector_preservation(adjoint_solution_name1, true);
 
       libMesh::out << "Setting adjoint initial conditions Z("
                    << system.time
@@ -535,20 +548,29 @@ int main (int argc, char ** argv)
       // The first thing we have to do is to apply the adjoint initial
       // condition. The user should supply these. Here they are specified
       // in the functions adjoint_initial_value and adjoint_initial_gradient
-      system.project_vector(adjoint_initial_value,
-                            adjoint_initial_grad,
+      system.project_vector(adjoint_initial_value0,
+                            adjoint_initial_grad0,
                             equation_systems.parameters,
                             system.get_adjoint_solution(0));
+
+      // The initial condition for adjoint 1 is zero, which is the default.
 
       // Since we have specified an adjoint solution for the current
       // time (T), set the adjoint_already_solved boolean to true, so
       // we dont solve unnecessarily in the adjoint sensitivity method
       system.set_adjoint_already_solved(true);
 
-      libMesh::out << "|Z("
+      libMesh::out << "|Z0("
                    << system.time
                    << ")|= "
-                   << system.calculate_norm(system.get_adjoint_solution(), 0, H1)
+                   << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
+                   << std::endl
+                   << std::endl;
+
+      libMesh::out << "|Z1("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_adjoint_solution(1), 0, H1)
                    << std::endl
                    << std::endl;
 
@@ -556,7 +578,32 @@ int main (int argc, char ** argv)
       // initial conditions to disk
       system.time_solver->adjoint_advance_timestep();
 
-      write_output(equation_systems, param.n_timesteps, "dual", param);
+      // Write out adjoint solutions for visualization.
+
+      // Get a pointer to the primal solution vector
+      NumericVector<Number> & primal_solution = *system.solution;
+
+      // Get a pointer to the solution vector of the adjoint problem for QoI 0
+      NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
+
+      // Swap the primal and dual solutions so we can write out the adjoint solution
+      primal_solution.swap(dual_solution_0);
+
+      write_output(equation_systems, param.n_timesteps, "dual0", param);
+
+      // Swap back
+      primal_solution.swap(dual_solution_0);
+
+      // Get a pointer to the solution vector of the adjoint problem for QoI 0
+      NumericVector<Number> & dual_solution_1 = system.get_adjoint_solution(1);
+
+      // Swap the primal and dual solutions so we can write out the adjoint solution
+      primal_solution.swap(dual_solution_1);
+
+      write_output(equation_systems, param.n_timesteps, "dual1", param);
+
+      // Swap back
+      primal_solution.swap(dual_solution_1);
 
       // Now that the adjoint initial condition is set, we will start the
       // backwards in time adjoint integration
@@ -588,7 +635,14 @@ int main (int argc, char ** argv)
 
           system.set_adjoint_already_solved(false);
 
+          // Swap in the physics we want to be used for the adjoint evaluation
+          DifferentiablePhysics * adjoint_evaluation_physics = dynamic_cast<DifferentiablePhysics *>(sigma_physics);
+          dynamic_cast<DifferentiableSystem &>(system).swap_physics(adjoint_evaluation_physics);
+
           system.adjoint_solve();
+
+          // Swap back the physics
+          dynamic_cast<DifferentiableSystem &>(system).swap_physics(adjoint_evaluation_physics);
 
           // Now that we have solved the adjoint, set the
           // adjoint_already_solved boolean to true, so we dont solve
@@ -604,47 +658,74 @@ int main (int argc, char ** argv)
           // values at the current time instance.
           system.time_solver->adjoint_advance_timestep();
 
-          libMesh::out << "|Z("
+          libMesh::out << "|Z0("
                        << system.time
                        << ")|= "
-                       << system.calculate_norm(system.get_adjoint_solution(), 0, H1)
+                       << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
+                       << std::endl
+                       << std::endl;
+
+          libMesh::out << "|Z1("
+                       << system.time
+                       << ")|= "
+                       << system.calculate_norm(system.get_adjoint_solution(1), 0, H1)
                        << std::endl
                        << std::endl;
 
           // Get a pointer to the primal solution vector
-          NumericVector<Number> & primal_solution = *system.solution;
+          primal_solution = *system.solution;
 
           // Get a pointer to the solution vector of the adjoint problem for QoI 0
-          NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
+          dual_solution_0 = system.get_adjoint_solution(0);
 
           // Swap the primal and dual solutions so we can write out the adjoint solution
           primal_solution.swap(dual_solution_0);
 
-          write_output(equation_systems, param.n_timesteps - (t_step + 1), "dual", param);
+          write_output(equation_systems, param.n_timesteps - (t_step + 1), "dual0", param);
 
           // Swap back
           primal_solution.swap(dual_solution_0);
+
+          // Get a pointer to the solution vector of the adjoint problem for QoI 1
+          dual_solution_1 = system.get_adjoint_solution(1);
+
+          // Swap the primal and dual solutions so we can write out the adjoint solution
+          primal_solution.swap(dual_solution_1);
+
+          write_output(equation_systems, param.n_timesteps - (t_step + 1), "dual1", param);
+
+          // Swap back
+          primal_solution.swap(dual_solution_1);
         }
       // End adjoint timestep loop
 
-      // Now that we have computed both the primal and adjoint solutions, we compute the sensitivities to the parameter p
-      // dQ/dp = int_{0}^{T} partialQ/partialp - partialR/partialp(u,z;p) dt
-      // The quantity partialQ/partialp - partialR/partialp(u,z;p) is evaluated internally by the ImplicitSystem::adjoint_qoi_parameter_sensitivity function.
-      // This sensitivity evaluation is called internally by an overloaded TimeSolver::integrate_adjoint_sensitivity method which we call below.
-
-      // Prepare the quantities we need to pass to TimeSolver::integrate_adjoint_sensitivity
+      // Now that we have computed both the primal and adjoint solutions, we can compute the goal-oriented error estimates.
+      // For this, we will need to build a ARefEE error estimator object, and supply a pointer to the 'true physics' object,
+      // as we did for the adjoint solve. This object will now define the residual for the dual weighted error evaluation at
+      // each timestep.
+      // For adjoint consistency, it is important that we maintain the same integration method for the error estimation integral
+      // as we did for the primal and QoI integration. This is ensured within the library, but is currently ONLY supported for
+      // the Backward-Euler (theta = 0.5) time integration method.
       QoISet qois;
 
       std::vector<unsigned int> qoi_indices;
       qoi_indices.push_back(0);
+      qoi_indices.push_back(1);
       qois.add_indices(qoi_indices);
-      qois.set_weight(0, 1.0);
+      qois.set_weight(0, 0.5);
+      qois.set_weight(1, 0.5);
 
-      // A SensitivityData object
-      SensitivityData sensitivities(qois, system, system.get_parameter_vector());
+      // The adjoint refinement error estimator object (which also computed model error)
+      UniquePtr<AdjointRefinementEstimator> adjoint_refinement_error_estimator =
+      build_adjoint_refinement_error_estimator(qois, dynamic_cast<FEMPhysics *>(sigma_physics), param);
 
-      // Accumulator for the time integrated total sensitivity
-      Number total_sensitivity = 0.0;
+      // Error Vector to be filled by the error estimator at each timestep
+      ErrorVector QoI_elementwise_error;
+      std::vector<Number> QoI_spatially_integrated_error(system.n_qois());
+
+      // Error Vector to hold the total accumulated error
+      ErrorVector accumulated_QoI_elementwise_error;
+      std::vector<Number> accumulated_QoI_spatially_integrated_error(system.n_qois());
 
       // Retrieve the primal and adjoint solutions at the current timestep
       system.time_solver->retrieve_timestep();
@@ -667,10 +748,17 @@ int main (int argc, char ** argv)
                    << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
                    << std::endl;
 
-      libMesh::out << "|Z("
+      libMesh::out << "|Z0("
                    << system.time
                    << ")|= "
                    << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
+                   << std::endl
+                   << std::endl;
+
+      libMesh::out << "|Z1("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_adjoint_solution(1), 0, H1)
                    << std::endl
                    << std::endl;
 
@@ -679,9 +767,7 @@ int main (int argc, char ** argv)
       for (unsigned int t_step=param.initial_timestep;
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
-          // Call the postprocess function which we have overloaded to compute
-          // accumulate the perturbed residuals
-          system.time_solver->integrate_adjoint_sensitivity(qois, system.get_parameter_vector(), sensitivities);
+          system.time_solver->integrate_adjoint_refinement_error_estimate(*adjoint_refinement_error_estimator, QoI_elementwise_error);
 
           // A pretty update message
           libMesh::out << "Retrieved, "
@@ -701,21 +787,37 @@ int main (int argc, char ** argv)
                    << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
                    << std::endl;
 
-          libMesh::out << "|Z("
+          libMesh::out << "|Z0("
                    << system.time
                    << ")|= "
                    << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
                    << std::endl
                    << std::endl;
 
-          // Add the contribution of the current timestep to the total sensitivity
-          total_sensitivity += sensitivities[0][0];
+          libMesh::out << "|Z1("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_adjoint_solution(1), 0, H1)
+                   << std::endl
+                   << std::endl;
+
+          // Error contribution from this timestep
+          for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
+            accumulated_QoI_elementwise_error[i] += QoI_elementwise_error[i];
+
+          // QoI wise error contribution from this timestep
+          for (auto j : make_range(system.n_qois()))
+          {
+            // Skip this QoI if not in the QoI Set
+            if ((adjoint_refinement_error_estimator->qoi_set()).has_index(j))
+            {
+              accumulated_QoI_spatially_integrated_error[j] += (system.qoi_error_estimates)[j];
+            }
+          }
         }
 
-      // Print it out
-      libMesh::out << "Sensitivity of QoI 0 w.r.t parameter 0 is: "
-                   << total_sensitivity
-                   << std::endl;
+      std::cout<<"Time integrated error estimate for QoI 0: "<<std::setprecision(17)<<accumulated_QoI_spatially_integrated_error[0]<<std::endl;
+      std::cout<<"Time integrated error estimate for QoI 1: "<<std::setprecision(17)<<accumulated_QoI_spatially_integrated_error[1]<<std::endl;
 
       // Hard coded test to ensure that the actual numbers we are
       // getting are what they should be
@@ -723,16 +825,22 @@ int main (int argc, char ** argv)
       // 32-bit floats
       if(param.timesolver_tolerance)
       {
-        libmesh_error_msg_if(std::abs(system.time - (1.0089)) >= 2.e-4,
+        libmesh_error_msg_if(std::abs(system.time - (1.7548735069535084)) >= 2.e-4,
                              "Mismatch in end time reached by adaptive timestepper!");
 
-        libmesh_error_msg_if(std::abs(total_sensitivity - 4.87767) >= 2.e-4,
-                             "Mismatch in sensitivity gold value!");
+        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[0] - (-0.75139371165754232)) >= 2.e-4,
+                             "Error Estimator identity not satisfied!");
+
+        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[1] - (-0.70905030091469889)) >= 2.e-4,
+                             "Error Estimator identity not satisfied!");
       }
       else
       {
-        libmesh_error_msg_if(std::abs(total_sensitivity - 4.83551) >= 2.e-4,
-                             "Mismatch in sensitivity gold value!");
+        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[0] - (-0.44809323880671958)) >= 2.e-4,
+                             "Error Estimator identity not satisfied!");
+
+        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[1] - (-0.23895256319278346)) >= 2.e-4,
+                             "Error Estimator identity not satisfied!");
       }
 #ifdef NDEBUG
     }

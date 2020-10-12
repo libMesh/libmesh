@@ -27,6 +27,9 @@
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/solution_history.h"
 
+#include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/error_vector.h"
+
 namespace libMesh
 {
 
@@ -126,8 +129,6 @@ void TwostepTimeSolver::solve()
       // Increment system.time, and save the half solution to solution history
       core_time_solver->advance_timestep();
 
-      // Attempt the second half timestep solve, solution history for this solution
-      // comes into play only if we match the tolerance, so outside the while loop
       core_time_solver->solve();
 
       single_norm = calculate_norm(_system, *_system.solution);
@@ -143,7 +144,7 @@ void TwostepTimeSolver::solve()
       // Find the relative error
       *double_solution -= *(_system.solution);
       error_norm  = calculate_norm(_system, *double_solution);
-      relative_error = error_norm / _system.deltat /
+      relative_error = error_norm / old_deltat /
         std::max(double_norm, single_norm);
 
       // If the relative error makes no sense, we're done
@@ -158,7 +159,7 @@ void TwostepTimeSolver::solve()
                            std::max(double_norm, single_norm))
                        << std::endl;
           libMesh::out << "Global relative error = "
-                       << (error_norm / _system.deltat /
+                       << (error_norm / old_deltat /
                            std::max(double_norm, single_norm))
                        << std::endl;
           libMesh::out << "old delta t = " << old_deltat << std::endl;
@@ -186,6 +187,9 @@ void TwostepTimeSolver::solve()
           _system.time = old_time;
           _system.deltat = old_deltat;
 
+          // Update to localize the old nonlinear solution
+          core_time_solver->update();
+
           // Reset the initial guess for our next try
           *(_system.solution) =
             _system.get_vector("_old_nonlinear_solution");
@@ -206,13 +210,10 @@ void TwostepTimeSolver::solve()
 
     }
 
-  // Now that we have the converged full timestep solution, advance the time step
-  // and store it
-  core_time_solver->advance_timestep();
-
   // We ended up taking two half steps of size system.deltat to
   // march our last time step.
-  this->completedtimestep_deltat = 2.0*_system.deltat;
+  this->last_deltat = _system.deltat;
+  this->completed_timestep_size = 2.0*_system.deltat;
 
   // TimeSolver::solve methods should leave system.time unchanged
   _system.time = old_time;
@@ -300,17 +301,21 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
   // Take the first adjoint 'half timestep'
   core_time_solver->adjoint_solve(qoi_indices);
 
+  // Record the sub step deltat we used for the last adjoint solve.
+  last_deltat = _system.deltat;
+
   // Adjoint advance the timestep
   core_time_solver->adjoint_advance_timestep();
 
   // The second half timestep
   std::pair<unsigned int, Real> full_adjoint_output = core_time_solver->adjoint_solve(qoi_indices);
 
-  // Tell our timesolver the combined deltat before adjoint advance timestep updates it
-  this->completedtimestep_deltat = 2.0*_system.deltat;
+  // Record the sub step deltat we used for the last adjoint solve.
+  last_deltat = _system.deltat;
 
-  // Adjoint advance again so solution history saves the adjoint
-  core_time_solver->adjoint_advance_timestep();
+  // Record the total size of the last timestep, for a 2StepTS, this is
+  // simply twice the deltat for each sub(half) step.
+  this->completed_timestep_size = 2.0*_system.deltat;
 
   // Reset the system.time
   _system.time = old_time;
@@ -318,9 +323,45 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
   return full_adjoint_output;
 }
 
+void TwostepTimeSolver::integrate_qoi_timestep()
+{
+  // Vectors to hold qoi contributions from the first and second half timesteps
+  std::vector<Number> qois_first_half(_system.qoi.size(), 0.0);
+  std::vector<Number> qois_second_half(_system.qoi.size(), 0.0);
+
+  // First half contribution
+  core_time_solver->integrate_qoi_timestep();
+
+  for (auto j : make_range(_system.n_qois()))
+  {
+    qois_first_half[j] = (_system.qoi)[j];
+  }
+
+  // Second half contribution
+  core_time_solver->integrate_qoi_timestep();
+
+  for (auto j : make_range(_system.n_qois()))
+  {
+    qois_second_half[j] = (_system.qoi)[j];
+  }
+
+  // Zero out the system.qoi vector
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = 0.0;
+  }
+
+  // Add the contributions from the two halftimesteps to get the full QoI
+  // contribution from this timestep
+  for (auto j : make_range(_system.n_qois()))
+  {
+    (_system.qoi)[j] = qois_first_half[j] + qois_second_half[j];
+  }
+}
+
 void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
 {
-  // We are using the midpoint rule to integrate each timestep
+  // We are using the trapezoidal rule to integrate each timestep, and then pooling the contributions here.
   // (f(t_j) + f(t_j+1/2))/2 (t_j+1/2 - t_j) + (f(t_j+1/2) + f(t_j+1))/2 (t_j+1 - t_j+1/2)
 
   // First half timestep
@@ -337,6 +378,58 @@ void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const
   for(unsigned int i = 0; i != qois.size(_system); i++)
     for(unsigned int j = 0; j != parameter_vector.size(); j++)
      sensitivities[i][j] = sensitivities_first_half[i][j] + sensitivities_second_half[i][j];
+}
+
+void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error)
+{
+  // We use a numerical integration scheme consistent with the theta used for the timesolver.
+
+  // Create first and second half error estimate vectors of the right size
+  std::vector<Number> qoi_error_estimates_first_half(_system.qoi.size());
+  std::vector<Number> qoi_error_estimates_second_half(_system.qoi.size());
+
+  // First half timestep
+  ErrorVector QoI_elementwise_error_first_half;
+
+  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_first_half);
+
+  // Also get the first 'half step' spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+  {
+    // Skip this QoI if not in the QoI Set
+    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+    {
+      qoi_error_estimates_first_half[j] = (_system.qoi_error_estimates)[j];
+    }
+  }
+
+  // Second half timestep
+  ErrorVector QoI_elementwise_error_second_half;
+
+  core_time_solver->integrate_adjoint_refinement_error_estimate(adjoint_refinement_error_estimator, QoI_elementwise_error_second_half);
+
+  // Also get the second 'half step' spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+  {
+    // Skip this QoI if not in the QoI Set
+    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+    {
+      qoi_error_estimates_second_half[j] = (_system.qoi_error_estimates)[j];
+    }
+  }
+
+  // Error contribution from this timestep
+  for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
+    QoI_elementwise_error[i] = QoI_elementwise_error_first_half[i] + QoI_elementwise_error_second_half[i];
+
+  for (auto j : make_range(_system.n_qois()))
+  {
+    // Skip this QoI if not in the QoI Set
+    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+    {
+      (_system.qoi_error_estimates)[j] = qoi_error_estimates_first_half[j] + qoi_error_estimates_second_half[j];
+    }
+  }
 }
 
 } // namespace libMesh

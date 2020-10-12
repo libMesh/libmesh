@@ -96,6 +96,8 @@ public:
    */
   virtual void advance_timestep () override;
 
+  void update();
+
   /**
    * This method solves for the adjoint solution at the next adjoint timestep
    * (or a steady state adjoint solve)
@@ -116,11 +118,25 @@ public:
   virtual void retrieve_timestep () override;
 
   /**
+   * A method to integrate the system::QoI functionals.
+   */
+  virtual void integrate_qoi_timestep() override;
+
+  /**
    * A method to integrate the adjoint sensitivity w.r.t a given parameter
    * vector. int_{tstep_start}^{tstep_end} dQ/dp dt = int_{tstep_start}^{tstep_end} (\partialQ / \partial p) - ( \partial R (u,z) / \partial p ) dt
-   * The midpoint rule is used to numerically integrate the timestep
+   * The trapezoidal rule is used to numerically integrate the timestep.
    */
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override;
+
+  /**
+   * A method to compute the adjoint refinement error estimate at the current timestep.
+   * int_{tstep_start}^{tstep_end} R(u^h,z) dt
+   * The user provides an initialized ARefEE object.
+   * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
+   * CURRENTLY ONLY SUPPORTED for Backward Euler.
+   */
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & /*adjoint_refinement_error_estimator*/, ErrorVector & /*QoI_elementwise_error*/) override;
 
   /**
    * This method should return the expected convergence order of the
@@ -188,6 +204,18 @@ protected:
    * (when the primal solution is to be used to set adjoint boundary conditions) and false thereafter
    */
   bool first_adjoint_step;
+
+  /**
+   * A vector of pointers to vectors holding the adjoint solution at the last time step
+   */
+  std::vector< std::unique_ptr<NumericVector<Number>> > old_adjoints;
+
+  /**
+   * We will need to move the system.time around to ensure that residuals
+   * are built with the right deltat and the right time.
+   */
+  Real last_step_deltat;
+  Real next_step_deltat;
 };
 
 

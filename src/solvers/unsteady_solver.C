@@ -25,6 +25,8 @@
 #include "libmesh/parameter_vector.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/solution_history.h"
+#include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/error_vector.h"
 
 namespace libMesh
 {
@@ -37,6 +39,15 @@ UnsteadySolver::UnsteadySolver (sys_type & s)
     first_solve                  (true),
     first_adjoint_step (true)
 {
+  old_adjoints.resize(s.n_qois());
+
+  // Set the old adjoint pointers to nullptrs
+  // We will use this nullness to skip the initial time instant,
+  // when there is no older adjoint.
+  for(auto j : make_range(s.n_qois()))
+  {
+    old_adjoints[j] = nullptr;
+  }
 }
 
 
@@ -134,6 +145,9 @@ void UnsteadySolver::solve ()
 
               if (!backtracking_still_failed && !backtracking_max_iterations)
                 {
+                  // Set the successful deltat as the last deltat
+                  last_deltat = _system.deltat;
+
                   if (!quiet)
                     libMesh::out << "Reduced dt solve succeeded." << std::endl;
                   return;
@@ -149,6 +163,9 @@ void UnsteadySolver::solve ()
 
         } // end if (backtracking_failed || max_iterations)
     } // end if (reduce_deltat_on_diffsolver_failure)
+
+  // Set the successful deltat as the last deltat
+  last_deltat = _system.deltat;
 }
 
 
@@ -191,7 +208,13 @@ void UnsteadySolver::advance_timestep ()
 
 std::pair<unsigned int, Real> UnsteadySolver::adjoint_solve(const QoISet & qoi_indices)
 {
-  return _system.ImplicitSystem::adjoint_solve(qoi_indices);
+  std::pair<unsigned int, Real> adjoint_output = _system.ImplicitSystem::adjoint_solve(qoi_indices);
+
+  // Record the deltat we used for this adjoint timestep. This was determined completely
+  // by SolutionHistory::retrieve methods. The adjoint_solve methods should never change deltat.
+  last_deltat = _system.deltat;
+
+  return adjoint_output;
 }
 
 void UnsteadySolver::adjoint_advance_timestep ()
@@ -241,8 +264,11 @@ void UnsteadySolver::retrieve_timestep()
 
 void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
 {
-  // We are using the midpoint rule to integrate each timestep
+  // CURRENTLY using the trapezoidal rule to integrate each timestep
   // (f(t_j) + f(t_j+1))/2 (t_j+1 - t_j)
+  // Fix me: This function needs to be moved to the EulerSolver classes like the
+  // other integrate_timestep functions, and use an integration rule consistent with
+  // the theta method used for the time integration.
 
   // Get t_j
   Real time_left = _system.time;
@@ -281,6 +307,15 @@ void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const Pa
 
 }
 
+void UnsteadySolver::integrate_qoi_timestep()
+{
+  libmesh_not_implemented();
+}
+
+void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & /*adjoint_refinement_error_estimator*/, ErrorVector & /*QoI_elementwise_error*/)
+{
+  libmesh_not_implemented();
+}
 
 Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_number)
   const
@@ -304,6 +339,14 @@ Real UnsteadySolver::du(const SystemNorm & norm) const
   solution_copy->close();
 
   return _system.calculate_norm(*solution_copy, norm);
+}
+
+void UnsteadySolver::update()
+{
+  // Dont forget to localize the old_nonlinear_solution !
+  _system.get_vector("_old_nonlinear_solution").localize
+    (*old_local_nonlinear_solution,
+     _system.get_dof_map().get_send_list());
 }
 
 } // namespace libMesh

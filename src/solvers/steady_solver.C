@@ -20,6 +20,9 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/steady_solver.h"
 
+#include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/error_vector.h"
+
 namespace libMesh
 {
 
@@ -92,5 +95,42 @@ bool SteadySolver::_general_residual(bool request_jacobian,
   return jacobian_computed2;
 }
 
+void SteadySolver::integrate_qoi_timestep()
+{
+  this->_system.assemble_qoi();
+
+  return;
+}
+
+void SteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
+{
+  this->_system.ImplicitSystem::adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities);
+
+  return;
+}
+
+void SteadySolver::integrate_adjoint_refinement_error_estimate
+  (AdjointRefinementEstimator & adjoint_refinement_error_estimator,
+   ErrorVector & QoI_elementwise_error)
+{
+  // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
+  if(_system.qoi_error_estimates.size() != _system.qoi.size())
+      _system.qoi_error_estimates.resize(_system.qoi.size());
+
+  // Base class assumes a direct steady state error estimate
+  adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error);
+
+  // Also get the spatially integrated errors for all the QoIs in the QoI set
+  for (auto j : make_range(_system.n_qois()))
+  {
+    // Skip this QoI if not in the QoI Set
+    if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
+    {
+      (_system.qoi_error_estimates)[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
+    }
+  }
+
+  return;
+}
 
 } // namespace libMesh

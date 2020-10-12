@@ -1,0 +1,3 @@
+analytic_jacobians = true
+k = 1.e-03
+averaged_model = true

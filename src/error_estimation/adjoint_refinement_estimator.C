@@ -75,6 +75,7 @@ AdjointRefinementEstimator::AdjointRefinementEstimator() :
   number_h_refinements(1),
   number_p_refinements(0),
   _residual_evaluation_physics(nullptr),
+  _adjoint_evaluation_physics(nullptr),
   _qoi_set(QoISet())
 {
   // We're not actually going to use error_norm; our norms are
@@ -111,8 +112,25 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // Solve the adjoint problem(s) on the coarse FE space
   // Only if the user didn't already solve it for us
+  // If _adjoint_evaluation_physics pointer is not null, swap
+  // the current physics with the one held by _adjoint_evaluation_physics
+  // before assembling the adjoint problem
   if (!system.is_adjoint_already_solved())
-    system.adjoint_solve(_qoi_set);
+  {
+    // Swap the physics if needed, note that the current physics pointer
+    // held by the system will be pointed to by _adjoint_evalation_physics after swapping
+    const bool swapping_adjoint_physics = _adjoint_evaluation_physics;
+    if (swapping_adjoint_physics)
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
+
+    // Solve the adjoint problem, remember physics swap also resets the cache, so
+    // we will assemble again, otherwise we just take the transpose
+    (dynamic_cast<ImplicitSystem &>(system)).adjoint_solve(_qoi_set);
+
+    // Swap back if needed, recall that _adjoint_evaluation_physics now holds the pointer to the pre-swap physics
+    if (swapping_adjoint_physics)
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
+  }
 
   // Loop over all the adjoint problems and, if any have heterogenous
   // Dirichlet conditions, get the corresponding coarse lift
@@ -135,8 +153,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           // If the residual physics pointer is not null, use it when
           // evaluating here.
           {
-            const bool swapping_physics = _residual_evaluation_physics;
-            if (swapping_physics)
+            const bool swapping_primal_physics = _residual_evaluation_physics;
+            if (swapping_primal_physics)
               dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
             // Assemble without applying constraints, to capture the solution values on the boundary
@@ -163,7 +181,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
             std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl<<std::endl;
 
             // Swap back if needed
-            if (swapping_physics)
+            if (swapping_primal_physics)
               dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
           }
         } // End if QoI in set and flux/dirichlet boundary QoI
@@ -259,7 +277,13 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Uniformly refine the mesh
   MeshRefinement mesh_refinement(mesh);
 
-  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  // We only need to worry about Galerkin orthogonality if we
+  // are estimating discretization error in a single model setting
+  {
+    const bool swapping_adjoint_physics = _adjoint_evaluation_physics;
+    if(!swapping_adjoint_physics)
+      libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  }
 
   // FIXME: this may break if there is more than one System
   // on this mesh but estimate_error was still called instead of
@@ -303,23 +327,35 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // If the residual physics pointer is not null, use it when
   // evaluating here.
   {
-    const bool swapping_physics = _residual_evaluation_physics;
-    if (swapping_physics)
+    const bool swapping_primal_physics = _residual_evaluation_physics;
+    if (swapping_primal_physics)
       dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
     // Rebuild the rhs with the projected primal solution, do not apply constraints
     (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
 
     // Swap back if needed
-    if (swapping_physics)
+    if (swapping_primal_physics)
       dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
   }
 
   NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
   projected_residual.close();
 
+  const bool swapping_adjoint_physics = _adjoint_evaluation_physics;
+  if (swapping_adjoint_physics)
+    dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
+
   // Solve the adjoint problem(s) on the refined FE space
-  system.adjoint_solve(_qoi_set);
+  // The matrix will be reassembled again because we have refined the mesh
+  // If we have no h or p refinements, no need to solve for a fine adjoint
+  if(number_h_refinements > 0 || number_p_refinements > 0)
+    (dynamic_cast<ImplicitSystem &>(system)).adjoint_solve(_qoi_set);
+
+  // Swap back if needed, recall that _adjoint_evaluation_physics now holds the pointer
+  // to the pre-swap physics
+  if (swapping_adjoint_physics)
+    dynamic_cast<DifferentiableSystem &>(system).swap_physics(_adjoint_evaluation_physics);
 
   // Now that we have the refined adjoint solution and the projected primal solution,
   // we first compute the global QoI error estimate
@@ -364,6 +400,26 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
               computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
             }
 
+        }
+    }
+
+  // We are all done with Dirichlet lift vectors and they should be removed, lest we run into I/O issues later
+  for (auto j : make_range(system.n_qois()))
+    {
+      // Skip this QoI if not in the QoI Set
+      if (_qoi_set.has_index(j))
+        {
+          // Lifts are created only for adjoint dirichlet QoIs
+          if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+            {
+              // Need to create a string with current loop index to retrieve
+              // the correct vector from the liftvectors map
+              std::ostringstream liftfunc_name;
+              liftfunc_name << "adjoint_lift_function" << j;
+
+              // Remove the lift vector from system since we did not write it to file and it cannot be retrieved
+              system.remove_vector(liftfunc_name.str());
+            }
         }
     }
 
@@ -551,7 +607,10 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   system.project_solution_on_reinit() = false;
 
   // Uniformly coarsen the mesh, without projecting the solution
-  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  // Only need to do this if we are estimating discretization error
+  // with a single physics residual
+  if(!swapping_adjoint_physics)
+    libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
 
   for (unsigned int i = 0; i != number_h_refinements; ++i)
     {

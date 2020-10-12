@@ -28,6 +28,21 @@
 namespace libMesh
 {
 
+/**
+   * Constructor, reference to system to be passed by user, set the
+   * stored_sols iterator to some initial value
+   */
+  FileSolutionHistory::FileSolutionHistory(System & system_)
+  : stored_sols(stored_solutions.end()),
+  _system(system_), localTimestamp(0),
+  timeTotimestamp()
+  {
+    dual_solution_copies.resize(system_.n_qois());
+
+    libmesh_experimental();
+  }
+
+
 FileSolutionHistory::~FileSolutionHistory ()
 {
 }
@@ -35,7 +50,7 @@ FileSolutionHistory::~FileSolutionHistory ()
 // This function finds, if it can, the entry where we're supposed to
 // be storing data, leaves stored_sols unchanged if it cant find an entry
 // with the key corresponding to time.
-void FileSolutionHistory::find_stored_entry(Real time)
+void FileSolutionHistory::find_stored_entry(Real time, bool storing)
 {
   if (stored_solutions.begin() == stored_solutions.end())
     return;
@@ -53,10 +68,23 @@ void FileSolutionHistory::find_stored_entry(Real time)
   // For the key right before the lower bound
   stored_solutions_iterator lower_bound_it_decremented;
 
-  // If we are at end, we are creating a new entry, nothing more to do
+  // If we are at end, we could be creating a new entry (depends on the storing bool), return
+  // Otherwise, get a decremented iterator for the sandwich test
   if(lower_bound_it == stored_solutions.end())
   {
-    return;
+    // If we are storing and lower_bound_it points to stored_solutions.end(), we assume
+    // that this is a brand new entry in the map. We leave stored_sols unchanged.
+    if(storing)
+    {
+      return;
+    }
+    else
+    {
+      // We are trying to retrieve and none of the keys was an upper bound.
+      // We could have a situation in which the time is greatest key + FPE.
+      // So we can check the key before the end and see if it matches time, else we have an error.
+      lower_bound_it = std::prev(lower_bound_it);
+    }
   }
   else if(lower_bound_it == stored_solutions.begin()) // At the beginning, so we cant go back any further
   {
@@ -77,9 +105,16 @@ void FileSolutionHistory::find_stored_entry(Real time)
   {
     stored_sols = lower_bound_it_decremented;
   }
-  else
+  else // Neither of the two candidate keys matched our time
   {
-    libmesh_error_msg("Failed to set stored solutions iterator to a valid value.");
+    if(storing) // If we are storing, this is fine, we need to create a new entry, so just return
+    {
+      return;
+    }
+    else // If we are not storing, then we expected to find something but didnt, so we have a problem
+    {
+      libmesh_error_msg("Failed to set stored solutions iterator to a valid value.");
+    }
   }
 
 
@@ -89,7 +124,7 @@ void FileSolutionHistory::find_stored_entry(Real time)
 void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
 {
   // This will map the stored_sols iterator to the current time
-  this->find_stored_entry(time);
+  this->find_stored_entry(time, true);
 
   // In an empty history we create the first entry
   if (stored_solutions.begin() == stored_solutions.end())
@@ -161,7 +196,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
 
 void FileSolutionHistory::retrieve(bool is_adjoint_solve, Real time)
 {
-  this->find_stored_entry(time);
+  this->find_stored_entry(time, false);
 
   // To set the deltat while using adaptive timestepping, we will utilize
   // consecutive time entries in the stored solutions iterator
@@ -235,13 +270,19 @@ void FileSolutionHistory::retrieve(bool is_adjoint_solve, Real time)
   {
     // Reading in the primal xdas overwrites the adjoint solution with zero
     // So swap to retain the old adjoint solution
-    std::unique_ptr<NumericVector<Number>> dual_solution_copy = _system.get_adjoint_solution(0).clone();
+    for (auto j : make_range(_system.n_qois()))
+    {
+      dual_solution_copies[j] = _system.get_adjoint_solution(j).clone();
+    }
 
     // Read in the primal solution stored at the current recovery time from the disk
     _system.get_equation_systems().read (stored_sols->second, READ, EquationSystems::READ_DATA | EquationSystems::READ_ADDITIONAL_DATA);
 
     // Swap back the copy of the last adjoint solution back in place
-    _system.get_adjoint_solution(0).swap(*dual_solution_copy);
+    for (auto j : make_range(_system.n_qois()))
+    {
+      (_system.get_adjoint_solution(j)).swap(*dual_solution_copies[j]);
+    }
   }
   else
   {
@@ -262,7 +303,7 @@ void FileSolutionHistory::erase(Real time)
   stored_solutions_iterator stored_sols_last = stored_sols;
 
   // This will map the stored_sols iterator to the current time
-  this->find_stored_entry(time);
+  this->find_stored_entry(time, false);
 
   // map::erase behaviour is undefined if the iterator is pointing
   // to a non-existent element.

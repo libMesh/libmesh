@@ -23,6 +23,9 @@
 #include "libmesh/no_solution_history.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
+#include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/error_vector.h"
+
 namespace libMesh
 {
 
@@ -33,6 +36,7 @@ TimeSolver::TimeSolver (sys_type & s)
     _linear_solver (),
     _system (s),
     solution_history(libmesh_make_unique<NoSolutionHistory>()),
+    last_deltat (s.deltat),
     _is_adjoint (false)
 {
 }
@@ -116,17 +120,26 @@ std::pair<unsigned int, Real> TimeSolver::adjoint_solve (const QoISet & qoi_indi
   return this->_system.ImplicitSystem::adjoint_solve(qoi_indices);
 }
 
-void TimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities)
+void TimeSolver::integrate_qoi_timestep()
 {
-  // Base class assumes a direct steady state sensitivity calculation
-  this->_system.ImplicitSystem::adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivities);
-
-  return;
+  libmesh_not_implemented();
 }
 
-Real TimeSolver::last_complete_deltat()
+void TimeSolver::integrate_adjoint_sensitivity(const QoISet & /* qois */, const ParameterVector & /* parameter_vector */, SensitivityData & /* sensitivities */)
 {
-  return _system.deltat;
+  libmesh_not_implemented();
+}
+
+void TimeSolver::integrate_adjoint_refinement_error_estimate
+  (AdjointRefinementEstimator & /* adjoint_refinement_error_estimator */,
+   ErrorVector & /* QoI_elementwise_error */)
+{
+  libmesh_not_implemented();
+}
+
+Real TimeSolver::last_completed_timestep_size()
+{
+  return last_deltat;
 }
 
 void TimeSolver::adjoint_advance_timestep ()

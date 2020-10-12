@@ -32,7 +32,7 @@ MemorySolutionHistory::~MemorySolutionHistory ()
 
 // This function finds, if it can, the entry where we're supposed to
 // be storing data
-void MemorySolutionHistory::find_stored_entry(Real time)
+void MemorySolutionHistory::find_stored_entry(Real time, bool storing)
 {
   if (stored_solutions.begin() == stored_solutions.end())
     return;
@@ -53,7 +53,19 @@ void MemorySolutionHistory::find_stored_entry(Real time)
   // If we are at end, we are creating a new entry, nothing more to do
   if(lower_bound_it == stored_solutions.end())
   {
-    return;
+    // If we are storing and lower_bound_it points to stored_solutions.end(), we assume
+    // that this is a brand new entry in the map. We leave stored_sols unchanged.
+    if(storing)
+    {
+      return;
+    }
+    else
+    {
+      // We are trying to retrieve and none of the keys was an upper bound.
+      // We could have a situation in which the time is greatest key + FPE.
+      // So we can check the key before the end and see if it matches time, else we have an error.
+      lower_bound_it = std::prev(lower_bound_it);
+    }
   }
   else if(lower_bound_it == stored_solutions.begin()) // At the beginning, so we cant go back any further
   {
@@ -76,7 +88,14 @@ void MemorySolutionHistory::find_stored_entry(Real time)
   }
   else
   {
-    libmesh_error_msg("Failed to set stored solutions iterator to a valid value.");
+    if(storing) // If we are storing, this is fine, we need to create a new entry, so just return
+    {
+      return;
+    }
+    else // If we are not storing, then we expected to find something but didnt, so we have a problem
+    {
+      libmesh_error_msg("Failed to set stored solutions iterator to a valid value.");
+    }
   }
 
 }
@@ -85,7 +104,7 @@ void MemorySolutionHistory::find_stored_entry(Real time)
 // future use
 void MemorySolutionHistory::store(bool /* is_adjoint_solve */, Real time)
 {
-  this->find_stored_entry(time);
+  this->find_stored_entry(time, true);
 
   // In an empty history we create the first entry
   if (stored_solutions.begin() == stored_solutions.end())
@@ -149,7 +168,7 @@ void MemorySolutionHistory::store(bool /* is_adjoint_solve */, Real time)
 
 void MemorySolutionHistory::retrieve(bool is_adjoint_solve, Real time)
 {
-  this->find_stored_entry(time);
+  this->find_stored_entry(time, false);
 
   // To set the deltat while using adaptive timestepping, we will utilize
   // consecutive time entries in the stored solutions iterator
@@ -253,7 +272,7 @@ void MemorySolutionHistory::erase(Real time)
   stored_solutions_iterator stored_sols_last = stored_sols;
 
   // This will map the stored_sols iterator to the current time
-  this->find_stored_entry(time);
+  this->find_stored_entry(time, false);
 
   // map::erase behaviour is undefined if the iterator is pointing
   // to a non-existent element.

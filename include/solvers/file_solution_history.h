@@ -50,9 +50,7 @@ public:
    * Constructor, reference to system to be passed by user, set the
    * stored_sols iterator to some initial value
    */
-  FileSolutionHistory(System & system_) : stored_sols(stored_solutions.end()), _system(system_), localTimestamp(0), timeTotimestamp()
-  { libmesh_experimental(); }
-
+  FileSolutionHistory(System & system_);
   /**
    * Destructor
    */
@@ -97,7 +95,12 @@ private:
   stored_solutions_iterator stored_sols;
 
   // A helper function to locate entries at a given time
-  void find_stored_entry(Real time);
+  // Behaviour depends on whether we are calling this function
+  // while storing or retrieving/erasing entries.
+  // While storing, if no entry in our map matches our time key,
+  // we will create a new entry in the map. If we are not storing,
+  // not matching a given time key implies an error.
+  void find_stored_entry(Real time, bool storing = false);
 
   // A system reference
   System & _system ;
@@ -112,6 +115,11 @@ private:
   // An iterator for the timeTotimestamp map, will help member functions distinguish
   // between primal and adjoint time loops
   std::map<Real, unsigned int>::iterator timeTotimestamp_iterator;
+
+  /**
+   * A vector of pointers to vectors holding the adjoint solution at the last time step
+   */
+  std::vector< std::unique_ptr<NumericVector<Number>> > dual_solution_copies;
 };
 
 } // end namespace libMesh

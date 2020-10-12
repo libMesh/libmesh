@@ -80,9 +80,13 @@ public:
 
   virtual void retrieve_timestep() override;
 
+  virtual void integrate_qoi_timestep() override = 0;
+
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override = 0;
 
-  virtual Real last_complete_deltat() override { return completedtimestep_deltat; }
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override = 0;
+
+  virtual Real last_completed_timestep_size() override { return completed_timestep_size; };
 
   /**
    * This method is passed on to the core_time_solver
@@ -194,9 +198,9 @@ public:
    * The adaptive time solver's have two notions of deltat. The deltat the solver
    * ended up using for the completed timestep. And the deltat the solver determined
    * would be workable for the coming timestep. The latter gets set as system.deltat.
-   * We need a variable to save the deltat used for the completed timesteo.
+   * We need a variable to save the deltat used for the completed timestep.
    * */
-  Real completedtimestep_deltat;
+  Real completed_timestep_size;
 
   /**
    * This flag, which is true by default, grows (shrinks) the timestep
@@ -216,13 +220,6 @@ public:
   bool global_tolerance;
 
 protected:
-
-  /**
-   * We need to store the value of the last deltat used, so
-   * that advance_timestep() will increment the system time
-   * correctly.
-   */
-  Real last_deltat;
 
   /**
    * A helper function to calculate error norms
