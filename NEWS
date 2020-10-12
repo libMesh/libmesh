@@ -1,3 +1,8 @@
+1.4.1 -> 1.4.2
+  * Cherry-pick following commit from 1.6.0 branch and fix merge conflicts
+    d25f5ad57 Combination of MoveInsertable fixes (#2170)
+  * Cherry-pick b3e1c10d6 to fix compilation with recent versions of PETSc
+
 1.4.0 -> 1.4.1
   * This is a bugfix release for 1.4.0.
   * Correctly identify automake 1.15 as too old
