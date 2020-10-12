@@ -121,7 +121,7 @@ public:
    * - The System holds references to Mesh and EquationSystems
    *   objects, therefore it can't be default move-assigned.
    * - This class _can_ be default move constructed.
-   * - The destructor throws an error if libMesh::closed()
+   * - The destructor dies with an error in dbg/devel modes if libMesh::closed()
    */
   System (const System &) = delete;
   System & operator= (const System &) = delete;
