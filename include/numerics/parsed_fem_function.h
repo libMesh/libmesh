@@ -26,6 +26,7 @@
 #include "libmesh/fem_function_base.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 // FParser includes
