@@ -120,13 +120,12 @@ public:
    *   is the C++11 way of achieving the same effect.
    * - The System holds references to Mesh and EquationSystems
    *   objects, therefore it can't be default move-assigned.
-   * - This class manages memory in the _vectors member, so we can't
-   *   default the move constructor.
-   * - The destructor is responsible for cleaning up the _vectors member.
+   * - This class _can_ be default move constructed.
+   * - The destructor throws an error if libMesh::closed()
    */
   System (const System &) = delete;
   System & operator= (const System &) = delete;
-  System (System &&) = delete;
+  System (System &&) = default;
   System & operator= (System &&) = delete;
   virtual ~System ();
 
@@ -766,8 +765,8 @@ public:
   /**
    * Vector iterator typedefs.
    */
-  typedef std::map<std::string, NumericVector<Number> *>::iterator       vectors_iterator;
-  typedef std::map<std::string, NumericVector<Number> *>::const_iterator const_vectors_iterator;
+  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator       vectors_iterator;
+  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator const_vectors_iterator;
 
   /**
    * Beginning of vectors container
@@ -2089,7 +2088,7 @@ private:
    * vectors.  All the vectors in this map will be distributed
    * in the same way as the solution vector.
    */
-  std::map<std::string, NumericVector<Number> * > _vectors;
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>> _vectors;
 
   /**
    * Holds true if a vector by that name should be projected
@@ -2541,12 +2540,10 @@ System::add_matrix (const std::string & mat_name,
     return *(_matrices[mat_name]);
 
   // Otherwise build the matrix and return it.
-  std::unique_ptr<SparseMatrix<Number>> buf = libmesh_make_unique<MatrixType<Number>>(this->comm());
-  SparseMatrix<Number> & mat = *buf;
-  _matrices.emplace(mat_name, std::move(buf));
+  auto pr = _matrices.emplace(mat_name, libmesh_make_unique<MatrixType<Number>>(this->comm()));
   _matrix_types.emplace(mat_name, type);
 
-  return mat;
+  return *(pr.first->second);
 }
 
 

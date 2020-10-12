@@ -102,10 +102,6 @@ System::System (EquationSystems & es,
 
 System::~System ()
 {
-  // This class does manual memory management of the _vectors map, so
-  // we need to be sure and free that in the destructor.
-  System::clear();
-
   libmesh_exceptionless_assert (!libMesh::closed());
 }
 
@@ -169,30 +165,17 @@ Number System::current_solution (const dof_id_type global_dof_number) const
 void System::clear ()
 {
   _variables.clear();
-
   _variable_numbers.clear();
-
   _dof_map->clear ();
-
   solution->clear ();
-
   current_local_solution->clear ();
 
   // clear any user-added vectors
-  {
-    for (auto & pr : _vectors)
-      {
-        pr.second->clear ();
-        delete pr.second;
-        pr.second = nullptr;
-      }
-
-    _vectors.clear();
-    _vector_projections.clear();
-    _vector_is_adjoint.clear();
-    _vector_types.clear();
-    _is_initialized = false;
-  }
+  _vectors.clear();
+  _vector_projections.clear();
+  _vector_is_adjoint.clear();
+  _vector_types.clear();
+  _is_initialized = false;
 
   // clear any user-added matrices
   _matrices.clear();
@@ -346,7 +329,7 @@ void System::restrict_vectors ()
   // Restrict the _vectors on the coarsened cells
   for (auto & pr : _vectors)
     {
-      NumericVector<Number> * v = pr.second;
+      NumericVector<Number> * v = pr.second.get();
 
       if (_vector_projections[pr.first])
         {
@@ -711,8 +694,8 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
     return *(_vectors[vec_name]);
 
   // Otherwise build the vector
-  NumericVector<Number> * buf = NumericVector<Number>::build(this->comm()).release();
-  _vectors.emplace(vec_name, buf);
+  auto pr = _vectors.emplace(vec_name, NumericVector<Number>::build(this->comm()));
+  auto buf = pr.first->second.get();
   _vector_projections.emplace(vec_name, projections);
   _vector_types.emplace(vec_name, type);
 
@@ -747,10 +730,7 @@ void System::remove_vector (const std::string & vec_name)
   if (pos == _vectors.end())
     return;
 
-  delete pos->second;
-
   _vectors.erase(pos);
-
   _vector_projections.erase(vec_name);
   _vector_is_adjoint.erase(vec_name);
   _vector_types.erase(vec_name);
@@ -763,7 +743,7 @@ const NumericVector<Number> * System::request_vector (const std::string & vec_na
   if (pos == _vectors.end())
     return nullptr;
 
-  return pos->second;
+  return pos->second.get();
 }
 
 
@@ -775,7 +755,7 @@ NumericVector<Number> * System::request_vector (const std::string & vec_name)
   if (pos == _vectors.end())
     return nullptr;
 
-  return pos->second;
+  return pos->second.get();
 }
 
 
@@ -792,7 +772,7 @@ const NumericVector<Number> * System::request_vector (const unsigned int vec_num
     }
   if (v==v_end)
     return nullptr;
-  return v->second;
+  return v->second.get();
 }
 
 
@@ -809,7 +789,7 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
     }
   if (v==v_end)
     return nullptr;
-  return v->second;
+  return v->second.get();
 }
 
 
@@ -881,8 +861,8 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 
   for (; v != v_end; ++v)
     {
-      // Check if the current vector is the one whose name we want
-      if (&vec_reference == v->second)
+      // Compare pointers to see if the current vector is the one whose name we want
+      if (&vec_reference == v->second.get())
         break; // exit loop if it is
     }
 
@@ -908,16 +888,16 @@ SparseMatrix<Number> & System::add_matrix (const std::string & mat_name,
   if (this->have_matrix(mat_name))
     return *(_matrices[mat_name]);
 
-  // Otherwise build the matrix and return it.
-  std::unique_ptr<SparseMatrix<Number>> buf = SparseMatrix<Number>::build(this->comm(),
-                                                                          libMesh::default_solver_package(),
-                                                                          mat_build_type);
-  SparseMatrix<Number> & mat = *buf;
+  // Otherwise build the matrix and return a reference to it.
+  auto pr = _matrices.emplace
+    (mat_name,
+     SparseMatrix<Number>::build(this->comm(),
+                                 libMesh::default_solver_package(),
+                                 mat_build_type));
 
-  _matrices.emplace(mat_name, std::move(buf));
   _matrix_types.emplace(mat_name, type);
 
-  return mat;
+  return *(pr.first->second);
 }
 
 
