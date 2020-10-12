@@ -895,8 +895,7 @@ void System::remove_matrix (const std::string & mat_name)
   if (pos == _matrices.end())
     return;
 
-  pos->second.reset();
-  _matrices.erase(pos);
+  _matrices.erase(pos); // erase()'d entries are destroyed
 }
 
 
