@@ -762,34 +762,28 @@ NumericVector<Number> * System::request_vector (const std::string & vec_name)
 
 const NumericVector<Number> * System::request_vector (const unsigned int vec_num) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  if (v==v_end)
+  // If we don't have that many vectors, return nullptr
+  if (vec_num >= _vectors.size())
     return nullptr;
-  return v->second.get();
+
+  // Otherwise return a pointer to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return it->second.get();
 }
 
 
 
 NumericVector<Number> * System::request_vector (const unsigned int vec_num)
 {
-  vectors_iterator v = vectors_begin();
-  vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  if (v==v_end)
+  // If we don't have that many vectors, return nullptr
+  if (vec_num >= _vectors.size())
     return nullptr;
-  return v->second.get();
+
+  // Otherwise return a pointer to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return it->second.get();
 }
 
 
@@ -810,48 +804,39 @@ NumericVector<Number> & System::get_vector (const std::string & vec_name)
 
 const NumericVector<Number> & System::get_vector (const unsigned int vec_num) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  libmesh_assert (v != v_end);
-  return *(v->second);
+  // If we don't have that many vectors, throw an error
+  libmesh_assert_less(vec_num, _vectors.size());
+
+  // Otherwise return a reference to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return *(it->second);
 }
 
 
 
 NumericVector<Number> & System::get_vector (const unsigned int vec_num)
 {
-  vectors_iterator v = vectors_begin();
-  vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  libmesh_assert (v != v_end);
-  return *(v->second);
+  // If we don't have that many vectors, throw an error
+  libmesh_assert_less(vec_num, _vectors.size());
+
+  // Otherwise return a reference to the vec_num'th vector
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return *(it->second);
 }
 
 
 
 const std::string & System::vector_name (const unsigned int vec_num) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while ((num<vec_num) && (v!=v_end))
-    {
-      num++;
-      ++v;
-    }
-  libmesh_assert (v != v_end);
-  return v->first;
+  // If we don't have that many vectors, throw an error
+  libmesh_assert_less(vec_num, _vectors.size());
+
+  // Otherwise return a reference to the vec_num'th vector name
+  auto it = vectors_begin();
+  std::advance(it, vec_num);
+  return it->first;
 }
 
 const std::string & System::vector_name (const NumericVector<Number> & vec_reference) const
