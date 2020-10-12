@@ -841,21 +841,16 @@ const std::string & System::vector_name (const unsigned int vec_num) const
 
 const std::string & System::vector_name (const NumericVector<Number> & vec_reference) const
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-
-  for (; v != v_end; ++v)
-    {
-      // Compare pointers to see if the current vector is the one whose name we want
-      if (&vec_reference == v->second.get())
-        break; // exit loop if it is
-    }
+  // Linear search for a vector whose pointer matches vec_reference
+  auto it = std::find_if(vectors_begin(), vectors_end(),
+                         [&vec_reference](const decltype(_vectors)::value_type & pr)
+                         { return &vec_reference == pr.second.get(); });
 
   // Before returning, make sure we didnt loop till the end and not find any match
-  libmesh_assert (v != v_end);
+  libmesh_assert (it != vectors_end());
 
   // Return the string associated with the current vector
-  return v->first;
+  return it->first;
 }
 
 
