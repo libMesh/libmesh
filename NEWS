@@ -1,3 +1,6 @@
+1.5.2 -> 1.5.3
+  * Fix standalone header bug introduced in 1.5.2
+
 1.5.1 -> 1.5.2
   * Cherry-pick following commit from 1.6.0 branch and fix merge conflicts
     d25f5ad57 Combination of MoveInsertable fixes (#2170)
