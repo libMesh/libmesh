@@ -44200,6 +44200,7 @@ $as_echo "#define DEFAULT_SINGLE_PRECISION 1" >>confdefs.h
 
 $as_echo "#define DEFAULT_SCALAR_TYPE float" >>confdefs.h
 
+                enablerealprecision=float
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is single precision (float) >>>" >&5
 $as_echo "<<< Default floating point is single precision (float) >>>" >&6; }
 
@@ -44217,6 +44218,7 @@ $as_echo "#define DEFAULT_TRIPLE_PRECISION 1" >>confdefs.h
 
 $as_echo "#define DEFAULT_SCALAR_TYPE long double" >>confdefs.h
 
+                enablerealprecision="long double"
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is triple precision (long double) >>>" >&5
 $as_echo "<<< Default floating point is triple precision (long double) >>>" >&6; }
 
@@ -44230,6 +44232,7 @@ $as_echo "#define DEFAULT_QUADRUPLE_PRECISION 1" >>confdefs.h
 
 $as_echo "#define DEFAULT_SCALAR_TYPE boost::multiprecision::float128" >>confdefs.h
 
+        enablerealprecision="boost::multiprecision::float128"
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is quadruple precision (boost::multiprecision::float128) >>>" >&5
 $as_echo "<<< Default floating point is quadruple precision (boost::multiprecision::float128) >>>" >&6; }
 
@@ -44307,6 +44310,7 @@ $as_echo "#define DEFAULT_DOUBLE_PRECISION 1" >>confdefs.h
 
 $as_echo "#define DEFAULT_SCALAR_TYPE double" >>confdefs.h
 
+        enablerealprecision="double"
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is double precision (double) >>>" >&5
 $as_echo "<<< Default floating point is double precision (double) >>>" >&6; }
 
@@ -60261,6 +60265,7 @@ $as_echo "  node constraints................. : $enablenodeconstraint"
 $as_echo "  parallel mesh.................... : $enableparmesh"
 $as_echo "  performance logging.............. : $enableperflog"
 $as_echo "  periodic boundary conditions..... : $enableperiodic"
+$as_echo "  real number type................. : $enablerealprecision"
 $as_echo "  reference counting............... : $enablerefct"
 $as_echo "  shape function 2nd derivatives... : $enablesecond"
 $as_echo "  stack trace files................ : $enabletracefiles"
