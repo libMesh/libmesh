@@ -31,6 +31,7 @@ AS_IF([test "x$enablesingleprecision" != "xno"],
               [
                 AC_DEFINE(DEFAULT_SINGLE_PRECISION, 1, [Flag indicating if single-precision (float) should be used for most floating-point calculations])
                 AC_DEFINE(DEFAULT_SCALAR_TYPE, float, [Data type to be used for most floating-point calculations])
+                enablerealprecision=float
                 AC_MSG_RESULT(<<< Default floating point is single precision (float) >>>)
               ])
       ],
@@ -41,6 +42,7 @@ AS_IF([test "x$enablesingleprecision" != "xno"],
               [
                 AC_DEFINE(DEFAULT_TRIPLE_PRECISION, 1, [Flag indicating if triple-precision (long double) should be used for most floating-point calculations])
                 AC_DEFINE(DEFAULT_SCALAR_TYPE, [long double], [Data type to be used for most floating-point calculations])
+                enablerealprecision="long double"
                 AC_MSG_RESULT(<<< Default floating point is triple precision (long double) >>>)
               ])
       ],
@@ -48,6 +50,7 @@ AS_IF([test "x$enablesingleprecision" != "xno"],
       [
         AC_DEFINE(DEFAULT_QUADRUPLE_PRECISION, 1, [Flag indicating if quadruple-precision (boost::multiprecision::float128) should be used for most floating-point calculations])
         AC_DEFINE(DEFAULT_SCALAR_TYPE, [boost::multiprecision::float128], [Data type to be used for most floating-point calculations])
+        enablerealprecision="boost::multiprecision::float128"
         AC_MSG_RESULT(<<< Default floating point is quadruple precision (boost::multiprecision::float128) >>>)
 
         AC_MSG_CHECKING(whether we can build a trivial quad precision program)
@@ -93,6 +96,7 @@ AS_IF([test "x$enablesingleprecision" != "xno"],
       [
         AC_DEFINE(DEFAULT_DOUBLE_PRECISION, 1, [Flag indicating if double-precision (double) should be used for most floating-point calculations])
         AC_DEFINE(DEFAULT_SCALAR_TYPE, double, [Data type to be used for most floating-point calculations])
+        enablerealprecision="double"
         AC_MSG_RESULT(<<< Default floating point is double precision (double) >>>)
       ])
 
