@@ -139,8 +139,8 @@ void CondensedEigenSystem::solve()
   // Get the tolerance for the solver and the maximum
   // number of iterations. Here, we simply adopt the linear solver
   // specific parameters.
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
+  const double tol          =
+    double(es.parameters.get<Real>("linear solver tolerance"));
 
   const unsigned int maxits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
