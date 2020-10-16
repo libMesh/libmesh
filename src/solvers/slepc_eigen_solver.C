@@ -868,7 +868,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 #if !SLEPC_VERSION_LESS_THAN(3,1,0)
     case TARGET_MAGNITUDE:
       {
-        ierr = EPSSetTarget(_eps, this->_target_val);
+        ierr = EPSSetTarget(_eps, PS(this->_target_val));
         LIBMESH_CHKERR(ierr);
         ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_MAGNITUDE);
         LIBMESH_CHKERR(ierr);
@@ -876,7 +876,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
       }
     case TARGET_REAL:
       {
-        ierr = EPSSetTarget(_eps, this->_target_val);
+        ierr = EPSSetTarget(_eps, PS(this->_target_val));
         LIBMESH_CHKERR(ierr);
         ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_REAL);
         LIBMESH_CHKERR(ierr);
@@ -884,7 +884,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
       }
     case TARGET_IMAGINARY:
       {
-        ierr = EPSSetTarget(_eps, this->_target_val);
+        ierr = EPSSetTarget(_eps, PS(this->_target_val));
         LIBMESH_CHKERR(ierr);
         ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_IMAGINARY);
         LIBMESH_CHKERR(ierr);
