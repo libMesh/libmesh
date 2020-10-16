@@ -454,11 +454,21 @@ MappedOutputVector(const std::vector<Real> & our_data_in,
   if (single_precision)
     {
       if (sizeof(Real) != sizeof(float))
-        float_vec.assign(our_data.begin(), our_data.end());
+        {
+          float_vec.resize(our_data.size());
+          // boost float128 demands explicit downconversions
+          for (std::size_t i : index_range(our_data))
+            float_vec[i] = float(our_data[i]);
+        }
     }
 
   else if (sizeof(Real) != sizeof(double))
-    double_vec.assign(our_data.begin(), our_data.end());
+    {
+      double_vec.resize(our_data.size());
+      // boost float128 demands explicit downconversions
+      for (std::size_t i : index_range(our_data))
+        double_vec[i] = double(our_data[i]);
+    }
 }
 
 void *
