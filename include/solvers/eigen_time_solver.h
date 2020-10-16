@@ -158,7 +158,7 @@ public:
    * The linear solver tolerance to be used when solving the
    * eigenvalue problem. FIXME: need more info...
    */
-  Real tol;
+  double tol;
 
   /**
    * The maximum number of iterations allowed to solve the problem.
