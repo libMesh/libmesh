@@ -763,9 +763,9 @@ public:
     // Test whether the computed values match the tabulated values to
     // the specified accuracy.
     for (const auto & t : val_table)
-      LIBMESH_ASSERT_FP_EQUAL(t.val, phi[t.i][t.qp], 1.e-4);
+      LIBMESH_ASSERT_FP_EQUAL(t.val, phi[t.i][t.qp], TOLERANCE);
     for (const auto & t : grad_table)
-      LIBMESH_ASSERT_FP_EQUAL(0., (dphi[t.i][t.qp] - t.grad).norm_sq(), 1.e-4);
+      LIBMESH_ASSERT_FP_EQUAL(0., (dphi[t.i][t.qp] - t.grad).norm_sq(), 1e-10);
 
     // Make sure there are actually reference values
     libmesh_error_msg_if(val_table.empty(), "No tabulated values found!");
@@ -1008,7 +1008,7 @@ public:
         {16,3,Point(-0.0476508,0.012768,0.771323)},
         {17,10,Point(0.333487,-0.333487,1.01421)},
         {18,14,Point(0,0,0)},
-        {19,27,Point(-0.00698362,0.00187126,-0.00228396)},
+        {19,27,Point(-0.00698362,0.00187126,0.000667664)},
       };
   }
 
