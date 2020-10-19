@@ -70,10 +70,8 @@ public:
   /**
    * \returns The first (local) derivative of the
    * decay in radial direction of the infinite element.
-   *
-   * This is only valid for 3D!
    */
-  static Real decay_deriv (const Real) { return -.5; }
+  static Real decay_deriv (const unsigned int dim, const Real);
 
   /**
    * \returns The radial weight D, used as an additional weight
@@ -1183,6 +1181,34 @@ Real InfFERadial::decay(const unsigned int dim, const Real v)
 
     case 1:
       return 1.;
+
+    default:
+      libmesh_error_msg("Invalid dim = " << dim);
+    }
+}
+
+inline
+Real InfFERadial::decay_deriv (const unsigned int dim, const Real v)
+{
+  switch (dim)
+    {
+    case 3:
+      return -0.5;
+
+    case 2:
+      // according to P. Bettess "Infinite Elements",
+      // the 2D case is rather tricky:
+      //  - the sqrt() requires special integration rules
+      //    if not both trial- and test function are involved
+      //  - the analytic solutions contain not only the sqrt, but
+      //    also a polynomial with rather many terms, so convergence
+      //    might be bad.
+
+      libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+      return -0.25/sqrt(1.-v);
+
+    case 1:
+      return 0.;
 
     default:
       libmesh_error_msg("Invalid dim = " << dim);

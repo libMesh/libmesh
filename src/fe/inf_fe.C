@@ -36,11 +36,13 @@ namespace {
   // Put this outside a templated class, so we only get 1 warning
   // during our unit tests, not 1 warning for each of the zillion FE
   // specializations we test.
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   void inffe_hessian_warning () {
     libmesh_warning("Warning: Second derivatives for Infinite elements"
                     << " are not yet implemented!"
                     << std::endl);
   }
+#endif
 }
 
 
@@ -164,6 +166,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           init_shape_functions_required=true;
         }
 
+
       bool update_base_elem_required=true;
 
       // update the type in accordance to the current cell
@@ -179,12 +182,10 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           // remember whether it has to be updated (see below).
           elem_type = inf_elem->type();
           this->update_base_elem(inf_elem);
-
           update_base_elem_required=false;
 
           // initialize the base quadrature rule for the new element
           base_qrule->init(base_elem->type());
-
           init_shape_functions_required=true;
 
         }
@@ -382,7 +383,7 @@ init_radial_shape_functions(const Elem * libmesh_dbg_var(inf_elem),
   for (std::size_t p=0; p<n_radial_qp; ++p)
     {
       som[p] = InfFERadial::decay (Dim, radial_qp[p](0));
-      dsomdv[p] = InfFERadial::decay_deriv (radial_qp[p](0));
+      dsomdv[p] = InfFERadial::decay_deriv (Dim, radial_qp[p](0));
     }
 
 
@@ -921,7 +922,6 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
       libmesh_error_msg("Unsupported dim = " << dim);
     }
 }
-
 
 
 
