@@ -27,10 +27,10 @@
 #include "libmesh/inf_fe_macro.h"
 #include "libmesh/libmesh_logging.h"
 
+#include "libmesh/type_tensor.h"
+
 namespace libMesh
 {
-
-
 
 // ------------------------------------------------------------
 // InfFE static class members concerned with coordinate
@@ -67,6 +67,13 @@ Point InfFEMap::map (const unsigned int dim,
       break;
     }
 
+  // This is the same as the algorithm used below,
+  // but is more explicit in the actual form in the end.
+  //
+  // NOTE: the form used below can be implemented to yield
+  // more general/flexible mappings, but the current form is
+  // used e.g. for \p inverse_map() and \p reinit() explicitly.
+  return (base_point-inf_elem->origin())*2./(1.-v)+inf_elem->origin();
 
   // map in the outer node face not necessary. Simply
   // compute the outer_point = base_point + (base_point-origin)
@@ -80,8 +87,6 @@ Point InfFEMap::map (const unsigned int dim,
 
   return p;
 }
-
-
 
 
 
@@ -133,48 +138,13 @@ Point InfFEMap::inverse_map (const unsigned int dim,
 
     case 3:
       {
-        // references to the nodal points of the base element
-        const Point & p0 = base_elem->point(0);
-        const Point & p1 = base_elem->point(1);
-        const Point & p2 = base_elem->point(2);
+        const Point xi ( base_elem->point(1) - base_elem->point(0));
+        const Point eta( base_elem->point(2) - base_elem->point(0));
+        const Point zeta( physical_point - o);
 
-        // a reference to the physical point
-        const Point & fp = physical_point;
-
-        // The intersection of the plane and the line is given by
-        // can be computed solving a linear 3x3 system
-        // a*({p1}-{p0})+b*({p2}-{p0})-c*({fp}-{o})={fp}-{p0}.
-        const Real c_factor = -(p1(0)*fp(1)*p0(2)-p1(0)*fp(2)*p0(1)
-                                +fp(0)*p1(2)*p0(1)-p0(0)*fp(1)*p1(2)
-                                +p0(0)*fp(2)*p1(1)+p2(0)*fp(2)*p0(1)
-                                -p2(0)*fp(1)*p0(2)-fp(0)*p2(2)*p0(1)
-                                +fp(0)*p0(2)*p2(1)+p0(0)*fp(1)*p2(2)
-                                -p0(0)*fp(2)*p2(1)-fp(0)*p0(2)*p1(1)
-                                +p0(2)*p2(0)*p1(1)-p0(1)*p2(0)*p1(2)
-                                -fp(0)*p1(2)*p2(1)+p2(1)*p0(0)*p1(2)
-                                -p2(0)*fp(2)*p1(1)-p1(0)*fp(1)*p2(2)
-                                +p2(2)*p1(0)*p0(1)+p1(0)*fp(2)*p2(1)
-                                -p0(2)*p1(0)*p2(1)-p2(2)*p0(0)*p1(1)
-                                +fp(0)*p2(2)*p1(1)+p2(0)*fp(1)*p1(2))/
-          (fp(0)*p1(2)*p0(1)-p1(0)*fp(2)*p0(1)
-           +p1(0)*fp(1)*p0(2)-p1(0)*o(1)*p0(2)
-           +o(0)*p2(2)*p0(1)-p0(0)*fp(2)*p2(1)
-           +p1(0)*o(1)*p2(2)+fp(0)*p0(2)*p2(1)
-           -fp(0)*p1(2)*p2(1)-p0(0)*o(1)*p2(2)
-           +p0(0)*fp(1)*p2(2)-o(0)*p0(2)*p2(1)
-           +o(0)*p1(2)*p2(1)-p2(0)*fp(2)*p1(1)
-           +fp(0)*p2(2)*p1(1)-p2(0)*fp(1)*p0(2)
-           -o(2)*p0(0)*p1(1)-fp(0)*p0(2)*p1(1)
-           +p0(0)*o(1)*p1(2)+p0(0)*fp(2)*p1(1)
-           -p0(0)*fp(1)*p1(2)-o(0)*p1(2)*p0(1)
-           -p2(0)*o(1)*p1(2)-o(2)*p2(0)*p0(1)
-           -o(2)*p1(0)*p2(1)+o(2)*p0(0)*p2(1)
-           -fp(0)*p2(2)*p0(1)+o(2)*p2(0)*p1(1)
-           +p2(0)*o(1)*p0(2)+p2(0)*fp(1)*p1(2)
-           +p2(0)*fp(2)*p0(1)-p1(0)*fp(1)*p2(2)
-           +p1(0)*fp(2)*p2(1)-o(0)*p2(2)*p1(1)
-           +o(2)*p1(0)*p0(1)+o(0)*p0(2)*p1(1));
-
+        // normal vector of the base elements plane
+        Point n(xi.cross(eta));
+        Real c_factor = (base_elem->point(0) - o)*n/(zeta*n) - 1.;
 
         // Check whether the above system is ill-posed.  It should
         // only happen when \p physical_point is not in \p
@@ -183,19 +153,96 @@ Point InfFEMap::inverse_map (const unsigned int dim,
         if (libmesh_isinf(c_factor))
           return p;
 
-        // The intersection should always be between the origin and the physical point.
-        // It can become positive close to the border, but should
-        // be only very small.
-        //  So as in the case above, we can be sufficiently sure here
-        // that \p fp is not in this element:
-        if (c_factor > 0.01)
-          return p;
-
         // Compute the intersection with
-        // {intersection} = {fp} + c*({fp}-{o}).
-        intersection.add_scaled(fp,1.+c_factor);
+        // {intersection} = {physical_point} + c*({physical_point}-{o}).
+        intersection.add_scaled(physical_point,1.+c_factor);
         intersection.add_scaled(o,-c_factor);
 
+        // For non-planar elements, the intersecting point is obtained via Newton-iteration
+        if (!base_elem->has_affine_map())
+          {
+            unsigned int iter_max = 20;
+
+            // the number of shape functions needed for the base_elem
+            unsigned int n_sf = FE<2,LAGRANGE>::n_shape_functions(base_elem->type(),base_elem->default_order());
+
+            // guess base element coordinates: p=xi,eta,0
+            // in first iteration, never run with 'secure' to avoid false warnings.
+            Point ref_point= FEMap::inverse_map(dim-1, base_elem.get(), intersection,
+                                                tolerance, false);
+
+            // Newton iteration
+            for(unsigned int it=0; it<iter_max; ++it)
+              {
+                // Get the shape function and derivative values at the reference coordinate
+                // phi.size() == dphi.size()
+                Point dxyz_dxi;
+                Point dxyz_deta;
+
+                Point intersection_guess;
+                for(unsigned int i=0; i<n_sf; ++i)
+                  {
+
+                    intersection_guess += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape(base_elem->type(),
+                                                                                         base_elem->default_order(),
+                                                                                         i,
+                                                                                         ref_point);
+
+                    dxyz_dxi += base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                                                                                     base_elem->default_order(),
+                                                                                     i,
+                                                                                     0, // d()/dxi
+                                                                                     ref_point);
+
+                    dxyz_deta+= base_elem->node_ref(i) * FE<2,LAGRANGE>::shape_deriv(base_elem->type(),
+                                                                                     base_elem->default_order(),
+                                                                                     i,
+                                                                                     1, // d()/deta
+                                                                                     ref_point);
+                  } // for i
+
+                TypeVector<Real> F(physical_point + c_factor*(physical_point-o) - intersection_guess);
+
+                TypeTensor<Real> J;
+                J(0,0) = (physical_point-o)(0);
+                J(0,1) = -dxyz_dxi(0);
+                J(0,2) = -dxyz_deta(0);
+                J(1,0) = (physical_point-o)(1);
+                J(1,1) = -dxyz_dxi(1);
+                J(1,2) = -dxyz_deta(1);
+                J(2,0) = (physical_point-o)(2);
+                J(2,1) = -dxyz_dxi(2);
+                J(2,2) = -dxyz_deta(2);
+
+                // delta will be the newton step
+                TypeVector<Real> delta;
+                J.solve(F,delta);
+
+                // check for convergence
+                Real tol = std::min( TOLERANCE*0.01, TOLERANCE*base_elem->hmax() );
+                if ( delta.norm() < tol )
+                  {
+                    // newton solver converged, now make sure it converged to a point on the base_elem
+                    if (base_elem->contains_point(intersection_guess,TOLERANCE*0.1))
+                      {
+                        intersection = intersection_guess;
+                      }
+                    //else
+                    //  {
+                    //     err<<" Error: inverse_map failed!"<<std::endl;
+                    //  }
+                    break; // break out of 'for it'
+                  }
+                else
+                  {
+                    c_factor     -= delta(0);
+                    ref_point(0) -= delta(1);
+                    ref_point(1) -= delta(2);
+                  }
+
+              }
+
+          }
         break;
       }
 
@@ -244,17 +291,11 @@ Point InfFEMap::inverse_map (const unsigned int dim,
   // else
   //   libmesh_not_implemented();
 
-  // do not put the point back into the element, otherwise the contains_point-function
-  // gives false positives!
-  //if (v <= -1.-1e-5)
-  //  v=-1.;
-  //if (v >= 1.)
-  //  v=1.-1e-5;
 
   p(dim-1)=v;
 #ifdef DEBUG
   // first check whether we are in the reference-element:
-  if (-1.-1.e-5 < v && v < 1.)
+  if ((-1.-1.e-5 < v && v < 1.) || secure)
     {
       const Point check = map (dim, inf_elem, p);
       const Point diff  = physical_point - check;

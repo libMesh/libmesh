@@ -250,6 +250,7 @@ public:
    * \returns The curl of the shape function at the quadrature
    * points.
    */
+  virtual_for_inffe
   const std::vector<std::vector<OutputShape>> & get_curl_phi() const
   { libmesh_assert(!calculations_started || calculate_curl_phi);
     calculate_curl_phi = calculate_dphiref = true; return curl_phi; }
@@ -258,6 +259,7 @@ public:
    * \returns The divergence of the shape function at the quadrature
    * points.
    */
+  virtual_for_inffe
   const std::vector<std::vector<OutputDivergence>> & get_div_phi() const
   { libmesh_assert(!calculations_started || calculate_div_phi);
     calculate_div_phi = calculate_dphiref = true; return div_phi; }
@@ -450,7 +452,7 @@ public:
    * formulation for an infinite element produces correct element
    * matrices for a mesh using both finite and infinite elements.
    */
-  const std::vector<Real> & get_Sobolev_weight() const
+  virtual const std::vector<Real> & get_Sobolev_weight() const
   { return weight; }
 
   /**
@@ -458,11 +460,60 @@ public:
    * weight at each quadrature point. See \p get_Sobolev_weight()
    * for details.  In case of \p FE initialized to all zero.
    */
-  const std::vector<RealGradient> & get_Sobolev_dweight() const
+  virtual const std::vector<RealGradient> & get_Sobolev_dweight() const
   { return dweight; }
 
-#endif
+  /**
+   * \returns The multiplicative weight (see \p get_Sobolev_weight)
+   * but weighted with the radial coordinate square.
+   *
+   * In finite elements, this gives just 1, similar to \p get_Sobolev_Weight()
+   */
+  virtual const std::vector<Real> & get_Sobolev_weightxR_sq() const
+  { return weight; }
 
+  /**
+   * \returns The first global derivative of the multiplicative weight
+   * (see \p dget_Sobolev_weight) but weighted with the square of the
+   * radial coordinate.
+   *
+   * In finite elements, this is 0.
+   */
+  virtual const std::vector<RealGradient> & get_Sobolev_dweightxR_sq() const
+  { return dweight; }
+
+  /**
+   * \returns The shape function \p phi (for FE) and \p phi weighted by r/decay
+   *  for InfFE.
+   *
+   * To compensate for the decay function applied to the Jacobian (see \p get_JxWxdecay_sq),
+   * the wave function \p phi should be divided by  this function.
+   *
+   * The factor r must be compensated for by the Sobolev \p weight.
+   * (i.e. by using \p get_Sobolev_weightxR_sq())
+   **/
+  virtual const std::vector<std::vector<OutputShape>> & get_phi_over_decayxR () const
+  { return get_phi();}
+
+  /**
+   * \returns the gradient of the shape function (see \p get_dphi()),
+   * but in case of \p InfFE, weighted with r/decay.
+   * See \p  get_phi_over_decayxR() for details.
+   */
+  virtual const std::vector<std::vector<OutputGradient>> & get_dphi_over_decayxR () const
+  { return get_dphi();}
+
+  /**
+   * \returns the gradient of the shape function (see \p get_dphi()),
+   * but in case of \p InfFE, weighted with 1/decay.
+   *
+   * In contrast to the shape function, its gradient stays finite
+   * when divided by the decay function.
+   */
+  virtual const std::vector<std::vector<OutputGradient>> & get_dphi_over_decay () const
+  { return get_dphi();}
+
+#endif
 
   /**
    * Prints the value of each shape function at each quadrature point.
@@ -528,7 +579,7 @@ protected:
 
   /**
    * After having updated the jacobian and the transformation
-   * from local to global coordinates in \p FEAbstract::compute_map(),
+   * from local to global coordinates in \p FEMap::compute_map(),
    * the first derivatives of the shape functions are
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx, \p dphidy, and \p dphidz. This method

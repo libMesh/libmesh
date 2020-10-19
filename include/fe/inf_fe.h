@@ -70,21 +70,25 @@ public:
   /**
    * \returns The first (local) derivative of the
    * decay in radial direction of the infinite element.
-   *
-   * This is only valid for 3D?? - RHS
    */
-  static Real decay_deriv (const Real) { return -.5; }
+  static Real decay_deriv (const unsigned int dim, const Real);
 
   /**
    * \returns The radial weight D, used as an additional weight
    * for the test function, evaluated at local radial coordinate \p v.
+   * FIXME: This is only valid for 3D!!
+   * And also makes assumptions on the mapping
    */
   static Real D (const Real v) { return (1.-v)*(1.-v)/4.; }
 
+  static Real Dxr_sq (const Real /*v*/) { return 1.; }
+
   /**
    * \returns The first (local) radial derivative of the radial weight D.
+   * FIXME: this is valid only in 3D.
    */
   static Real D_deriv (const Real v) { return (v-1.)/2.; }
+
 
   /**
    * \returns The Order of the mapping functions
@@ -484,7 +488,7 @@ public:
    * new element in the mesh.  Reinitializes all the physical
    * element-dependent data based on the current element
    * \p elem.
-   * \note: pts need to be in reference space coordinates, not physical ones.
+   * \note pts need to be in reference space coordinates, not physical ones.
    */
   virtual void reinit (const Elem * elem,
                        const std::vector<Point> * const pts = nullptr,
@@ -554,7 +558,232 @@ public:
   { libmesh_assert(radial_qrule); return _n_total_qp; }
 
 
+
+  const std::vector<Point> & get_xyz () const override
+  { calculate_map = true; return xyz; }
+
+  /**
+   * Please use \p get_JxWxdecay_sq() instead!
+   *
+   * The Jacobian cannot be computed for Infinite elements!
+   *
+   */
+  const std::vector<Real> & get_JxW () const override
+  {
+      //libmesh_not_implemented();
+      return this->JxW;
+  }
+
+  /**
+   * \returns Jacobian times quadrature weight times square of the
+   *  decaying function \f$ decay= r^{-\frac{dim+1}{2}}\f$
+   *
+   * This function is the variant of \p get_JxW() for \p InfFE.
+   * Since J diverges there, a respectize decay-function must be
+   * applied to obtain well-defined quantities.
+   */
+  const std::vector<Real> & get_JxWxdecay_sq () const override
+  { calculate_map = true; return this->JxWxdecay;}
+
+
+  /**
+   * \returns The shape function \p phi weighted by r/decay
+   * where \f$ decay = r^{-\frac{dim+1}{2}} \f$
+   *
+   * To compensate for the decay function applied to the Jacobian (see \p get_JxWxdecay_sq),
+   * the wave function \p phi should be divided by  this function.
+   *
+   * The factor r must be compensated for by the Sobolev \p weight.
+   * (i.e. by using \p get_Sobolev_weightxR_sq())
+   **/
+  const std::vector<std::vector<OutputShape>> & get_phi_over_decayxR () const override
+  { libmesh_assert(!calculations_started || calculate_phi);
+    calculate_phi = true; return phixr; }
+
+
+  /**
+   * \returns the gradient of the shape function (see \p get_dphi()),
+   * but in case of \p InfFE, weighted with r/decay.
+   * See \p  get_phi_over_decayxR() for details.
+   */
+  const std::vector<std::vector<OutputGradient>> & get_dphi_over_decayxR () const override
+  { libmesh_assert(!calculations_started || calculate_dphi);
+    calculate_dphi = calculate_dphiref = true; return dphixr; }
+
+
+  /**
+   * \returns the gradient of the shape function (see \p get_dphi()),
+   * but in case of \p InfFE, weighted with 1/decay.
+   *
+   * In contrast to the shape function, its gradient stays finite
+   * when divided by the decay function.
+   */
+  const std::vector<std::vector<OutputGradient>> & get_dphi_over_decay () const override
+  { libmesh_assert(!calculations_started || calculate_dphi);
+    calculate_dphi = calculate_dphiref = true; return dphixr_sq; }
+
+
+  /**
+   * \returns The element tangents in xi-direction at the quadrature
+   * points.
+   */
+  const std::vector<RealGradient> & get_dxyzdxi() const override
+  { calculate_map = true; libmesh_not_implemented();}
+  /**
+   * \returns The element tangents in eta-direction at the quadrature
+   * points.
+   */
+  const std::vector<RealGradient> & get_dxyzdeta() const override
+  { calculate_map = true; libmesh_not_implemented();}
+  /**
+   * \returns The element tangents in zeta-direction at the quadrature
+   * points.
+   */
+  const std::vector<RealGradient> & get_dxyzdzeta() const override
+  { calculate_map = true; libmesh_not_implemented();}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  /**
+   * \returns The second partial derivatives in xi.
+   */
+  const std::vector<RealGradient> & get_d2xyzdxi2() const override
+  { calculate_map = true; libmesh_not_implemented();}
+  /**
+   * \returns The second partial derivatives in eta.
+   */
+  const std::vector<RealGradient> & get_d2xyzdeta2() const override
+  { calculate_map = true; libmesh_not_implemented();}
+  /**
+   * \returns The second partial derivatives in zeta.
+   */
+  const std::vector<RealGradient> & get_d2xyzdzeta2() const override
+  { calculate_map = true; libmesh_not_implemented();}
+  /**
+   * \returns The second partial derivatives in xi-eta.
+   */
+  const std::vector<RealGradient> & get_d2xyzdxideta() const override
+  { calculate_map = true; libmesh_not_implemented();}
+  /**
+   * \returns The second partial derivatives in xi-zeta.
+   */
+  const std::vector<RealGradient> & get_d2xyzdxidzeta() const override
+  { calculate_map = true; libmesh_not_implemented();}
+  /**
+   * \returns The second partial derivatives in eta-zeta.
+   */
+  const std::vector<RealGradient> & get_d2xyzdetadzeta() const override
+  { calculate_map = true; libmesh_not_implemented();}
+#endif
+
+  /**
+   * \returns The dxi/dx entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_dxidx() const override
+  { calculate_map = true; return dxidx_map;}
+  /**
+   * \returns The dxi/dy entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_dxidy() const override
+  { calculate_map = true; return dxidy_map;}
+  /**
+   * \returns The dxi/dz entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_dxidz() const override
+  { calculate_map = true; return dxidz_map;}
+  /**
+   * \returns The deta/dx entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_detadx() const override
+  { calculate_map = true; return detadx_map;}
+  /**
+   * \returns The deta/dy entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_detady() const override
+  { calculate_map = true; return detady_map;}
+  /**
+   * \returns The deta/dx entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_detadz() const override
+  { calculate_map = true; return detadz_map;}
+  /**
+   * \returns The dzeta/dx entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_dzetadx() const override
+  { calculate_map = true; return dzetadx_map;}
+  /**
+   * \returns The dzeta/dy entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_dzetady() const override
+  { calculate_map = true; return dzetady_map;}
+  /**
+   * \returns The dzeta/dz entry in the transformation
+   * matrix from physical to local coordinates.
+   */
+  const std::vector<Real> & get_dzetadz() const override
+  { calculate_map = true; return dzetadz_map;}
+
+  /**
+   * \returns The multiplicative weight at each quadrature point.
+   * This weight is used for certain infinite element weak
+   * formulations, so that weighted Sobolev spaces are
+   * used for the trial function space.  This renders the
+   * variational form easily computable.
+   */
+  const std::vector<Real> & get_Sobolev_weight() const override
+  { calculate_map = true; return weight; }
+
+
+  /**
+   * \returns The tangent vectors for face integration.
+   */
+  const std::vector<std::vector<Point>> & get_tangents() const override
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return tangents; }
+
+  /**
+   * \returns The outward pointing normal vectors for face integration.
+   */
+  const std::vector<Point> & get_normals() const override
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return normals; }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  /**
+   * \returns The curvatures for use in face integration.
+   */
+  const std::vector<Real> & get_curvatures() const override
+  { calculate_map = true; libmesh_not_implemented();}
+#endif
+
+  /**
+   * \returns The multiplicative weight (see \p get_Sobolev_weight())
+   * but weighted with the radial coordinate square.
+   *
+   */
+  const std::vector<Real> & get_Sobolev_weightxR_sq() const override
+  { calculate_map = true; return weightxr_sq; }
+
+
+  /**
+   * \returns The first global derivative of the multiplicative
+   * weight (see \p get_Sobolev_weight())
+   * but weighted with the radial coordinate square.
+   *
+   */
+  const std::vector<RealGradient> & get_Sobolev_dweightxR_sq() const override
+  { calculate_map = true; return dweightxr_sq; }
+
 protected:
+
+  mutable bool calculate_dxyz;
 
   // static members used by the workhorses
 
@@ -630,16 +859,6 @@ protected:
                                   const Elem * inf_side);
 
   /**
-   * Combines the shape functions, which were formed in
-   * \p init_shape_functions(Elem *), with geometric data.
-   * Has to be called every time the geometric configuration
-   * changes.  Afterward, the fields are ready to be used
-   * to compute global derivatives, the jacobian etc, see
-   * \p FEAbstract::compute_map().
-   */
-  void combine_base_radial(const Elem * inf_elem);
-
-  /**
    * After having updated the jacobian and the transformation
    * from local to global coordinates in FEAbstract::compute_map(),
    * the first derivatives of the shape functions are
@@ -649,8 +868,22 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions(const Elem *, const std::vector<Point> &) override;
+   void compute_shape_functions(const Elem * inf_elem,
+                                const std::vector<Point> & base_qp,
+                                const std::vector<Point> & radial_qp);
 
+   void compute_face_functions();
+
+  /**
+   * Use \p compute_shape_functions(const Elem*, const std::vector<Point> &, const std::vector<Point> &)
+   * instead.
+   */
+  void compute_shape_functions(const Elem *, const std::vector<Point> & ) override
+  {
+     //FIXME: it seems this function cannot be left out because
+     // it is pure virtual in \p FEBase
+     libmesh_not_implemented();
+  }
 
 
   // Miscellaneous static members
@@ -700,10 +933,13 @@ protected:
                                      unsigned int & radial_shape);
 
   /**
-   * the radial distance of the base nodes from the origin
+   * Physical quadrature points.
+   * Usually, this is obtained from the \p FEMap class,
+   * but here FEMap does not know enough to compute it.
    */
-  std::vector<Real> dist;
+  std::vector<Point> xyz;
 
+  std::vector<Real> weightxr_sq;
   /**
    * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
    * over all quadrature points. The weight does not vary in base
@@ -711,6 +947,8 @@ protected:
    * outside, this data field is expanded to all quadrature points.
    */
   std::vector<Real> dweightdv;
+
+  std::vector<RealGradient> dweightxr_sq;
 
   /**
    * the radial decay \f$ 1/r \f$ in local coordinates.  Needed when
@@ -738,40 +976,45 @@ protected:
    */
   std::vector<std::vector<Real>> dmodedv;
 
-  /**
-   * the radial mapping shapes in local coordinates
-   */
-  std::vector<std::vector<Real>> radial_map;
+  // mapping of reference element to physical element
+  // These vectors usually belong to \p this->fe_map
+  // but for infinite elements, \p FEMap cannot
+  // compute them.
+  std::vector<Real> dxidx_map;
+  std::vector<Real> dxidy_map;
+  std::vector<Real> dxidz_map;
+  std::vector<Real> detadx_map;
+  std::vector<Real> detady_map;
+  std::vector<Real> detadz_map;
+  std::vector<Real> dzetadx_map;
+  std::vector<Real> dzetady_map;
+  std::vector<Real> dzetadz_map;
+
+  // scaled mapping: Similar to the above
+  // vectors, but scaled by radial (infinite) coordinate.
+  std::vector<Real> dxidx_map_scaled;
+  std::vector<Real> dxidy_map_scaled;
+  std::vector<Real> dxidz_map_scaled;
+  std::vector<Real> detadx_map_scaled;
+  std::vector<Real> detady_map_scaled;
+  std::vector<Real> detadz_map_scaled;
+  std::vector<Real> dzetadx_map_scaled;
+  std::vector<Real> dzetady_map_scaled;
+  std::vector<Real> dzetadz_map_scaled;
 
 
-  /**
-   * the first local derivative of the radial mapping shapes
-   */
-  std::vector<std::vector<Real>> dradialdv_map;
+  // respectively weighted shape functions.
+  //FIXME: these names are correct only in 3D
+  //      but avoid long and clumbsy names...
+  std::vector<std::vector<Real>> phixr;
+  std::vector<std::vector<RealGradient>> dphixr;
+  std::vector<std::vector<RealGradient>> dphixr_sq;
 
-  /**
-   * the first local derivative (for 3D, the first in the base)
-   * of the phase term in local coordinates.
-   * Needed in the overall weak form of infinite element formulations.
-   */
-  std::vector<Real> dphasedxi;
+  std::vector<Real> JxWxdecay;
+  std::vector<Real> JxW;
 
-  /**
-   * the second local derivative (for 3D, the second in the base)
-   * of the phase term in local coordinates.
-   * Needed in the overall weak form of infinite element formulations.
-   */
-  std::vector<Real> dphasedeta;
-
-  /**
-   * the third local derivative (for 3D, the derivative in radial
-   * direction) of the phase term in local coordinates.
-   * Needed in the overall weak form of infinite element formulations.
-   */
-  std::vector<Real> dphasedzeta;
-
-
-
+  std::vector<Point> normals;
+  std::vector<std::vector<Point>> tangents;
 
   // numbering scheme maps
 
@@ -814,9 +1057,6 @@ protected:
    * dof in the base \p FE.
    */
   std::vector<unsigned int> _base_shape_index;
-
-
-
 
   // some more protected members
 
@@ -917,17 +1157,55 @@ private:
 
 
 // InfFERadial class inline members
+// FIXME: decay in 3D is a/r
+//   thus, this function fixes the mapping v<->r explicitly.
+//   This is consistent with the current InfFEMap, which, however, is
+//   written such that more general mappings can be implemented.
 inline
 Real InfFERadial::decay(const unsigned int dim, const Real v)
 {
   switch (dim)
-    //TODO:[DD] What decay do i have in 2D and 1D?
     {
     case 3:
       return (1.-v)/2.;
 
     case 2:
-      return 0.;
+      // according to P. Bettess "Infinite Elements",
+      // the 2D case is rather tricky:
+      //  - the sqrt() requires special integration rules
+      //    if not both trial- and test function are involved
+      //  - the analytic solutions contain not only the sqrt, but
+      //    also a polynomial with rather many terms, so convergence
+      //    might be bad.
+      return sqrt((1.-v)/2.);
+
+    case 1:
+      return 1.;
+
+    default:
+      libmesh_error_msg("Invalid dim = " << dim);
+    }
+}
+
+inline
+Real InfFERadial::decay_deriv (const unsigned int dim, const Real v)
+{
+  switch (dim)
+    {
+    case 3:
+      return -0.5;
+
+    case 2:
+      // according to P. Bettess "Infinite Elements",
+      // the 2D case is rather tricky:
+      //  - the sqrt() requires special integration rules
+      //    if not both trial- and test function are involved
+      //  - the analytic solutions contain not only the sqrt, but
+      //    also a polynomial with rather many terms, so convergence
+      //    might be bad.
+
+      libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+      return -0.25/sqrt(1.-v);
 
     case 1:
       return 0.;

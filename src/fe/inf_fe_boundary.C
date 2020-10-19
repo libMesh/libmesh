@@ -36,7 +36,7 @@ namespace libMesh
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
                                         const unsigned int s,
-                                        const Real tolerance,
+                                        const Real /*tolerance*/,
                                         const std::vector<Point> * const pts,
                                         const std::vector<Real> * const weights)
 {
@@ -52,10 +52,6 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   libmesh_assert(inf_elem);
   libmesh_assert(qrule);
 
-  // We need to allow this as well...
-  // libmesh_assert_not_equal_to (s, 0);
-
-
   // Build the side of interest
   const std::unique_ptr<const Elem> side(inf_elem->build_side_ptr(s));
 
@@ -70,6 +66,12 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   // when we enter for the first time.
   if (s == 0)
     current_fe_type.radial_order = 0;
+  else
+    /**
+     * After the recent larger changes, this case was not tested.
+     * It might work, but maybe it gives wrong results.
+     */
+    libmesh_not_implemented();
 
   if (current_fe_type.radial_order != fe_type.radial_order)
     {
@@ -87,11 +89,10 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
           //the base_qrule is set up with dim-1, but apparently we need dim, so we replace it:
           base_qrule=QBase::build(qrule->type(), side->dim(), qrule->get_order());
 
-          //FIXME: Do I have to care about the order of my neighbours element?
-          //unsigned int side_p_level = elem->p_level();
-          //if (elem->neighbor_ptr(s) != nullptr)
-          //  side_p_level = std::max(side_p_level, elem->neighbor_ptr(s)->p_level());
-          base_qrule->init(side->type(), side->p_level());
+          unsigned int side_p_level = inf_elem->p_level();
+          if (inf_elem->neighbor_ptr(s) != nullptr)
+            side_p_level = std::max(side_p_level, inf_elem->neighbor_ptr(s)->p_level());
+          base_qrule->init(side->type(), side_p_level);
         }
       radial_qrule_initialized = true;
     }
@@ -102,35 +103,10 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
       radial_qrule_initialized)
     this->init_face_shape_functions (qrule->get_points(), side.get());
 
-
-  // compute the face map
-  this->_fe_map->compute_face_map(this->dim, _total_qrule_weights, side.get());
-
-  // make a copy of the Jacobian for integration
-  const std::vector<Real> JxW_int(this->_fe_map->get_JxW());
-
-  // Find where the integration points are located on the
-  // full element.
-  std::vector<Point> qp;
-  this->inverse_map (inf_elem, this->_fe_map->get_xyz(), qp, tolerance);
-
-  // just to ensure that we are working on the base and not, for numeric reasons,
-  // somewhere else...
-  if (s==0)
-    {
-      for (auto & p : qp)
-        {
-          p(Dim-1)=-1.;
-        }
-    }
-
-  // compute the shape function and derivative values
-  // at the points qp
-  this->reinit  (inf_elem, &qp);
-
-  // copy back old data
-  this->_fe_map->get_JxW() = JxW_int;
-
+  // The reinit() function computes all what we want except for
+  //  - normal, tangents: They are not considered
+  // This is done below:
+  compute_face_functions();
 }
 
 
@@ -163,7 +139,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   // Currently, this makes only sense in 3-D!
   libmesh_assert_equal_to (Dim, 3);
 
-  // Initialize the radial shape functions
+  // Initialize the radial shape functions (in particular som)
   this->init_radial_shape_functions(inf_side);
 
   // Initialize the base shape functions
@@ -180,8 +156,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   // so update the fe_base.
   if (inf_side->infinite())
     {
-      libmesh_assert_equal_to (Dim, 3);
-      base_fe = FEBase::build(Dim-2, this->fe_type);
+      base_fe = FEBase::build(1, this->fe_type);
       base_fe->attach_quadrature_rule(base_qrule.get());
     }
   else
@@ -204,134 +179,27 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   const unsigned int n_base_qp   = base_qrule->n_points();
   const unsigned int n_total_qp  = n_radial_qp * n_base_qp;
 
+#ifdef DEBUG
+  // when evaluating the base side, there should be only one radial point.
+  if (!inf_side->infinite())
+    libmesh_assert_equal_to (n_radial_qp, 1);
+#endif
+
   // the quadrature weights
   _total_qrule_weights.resize(n_total_qp);
-
-  // now init the shapes for boundary work
-  {
-
-    // The element type and order to use in the base map
-    const Order    base_mapping_order     ( base_elem->default_order() );
-
-    // the number of mapping shape functions. For base side it is 1.
-    // (Lagrange shape functions are used for mapping in the base)
-    const unsigned int n_radial_mapping_sf =
-      inf_side->infinite() ? cast_int<unsigned int>(radial_map.size()) : 1;
-
-    const unsigned int n_base_mapping_shape_functions =
-      InfFEBase::n_base_mapping_sf(*base_elem, base_mapping_order);
-
-    const unsigned int n_total_mapping_shape_functions =
-      n_radial_mapping_sf * n_base_mapping_shape_functions;
-
-
-    // initialize the node and shape numbering maps
-    _radial_node_index.resize    (n_total_mapping_shape_functions);
-    _base_node_index.resize      (n_total_mapping_shape_functions);
-
-    if (inf_side->infinite())
-      {
-        const ElemType inf_face_elem_type (inf_side->type());
-
-        // fill the node index map
-        for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
-          {
-            compute_node_indices (inf_face_elem_type,
-                                  n,
-                                  _base_node_index[n],
-                                  _radial_node_index[n]);
-
-            libmesh_assert_less (_base_node_index[n], n_base_mapping_shape_functions);
-            libmesh_assert_less (_radial_node_index[n], n_radial_mapping_sf);
-          }
-      }
-    else
-      {
-        for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
-          {
-            _base_node_index[n] = n;
-            _radial_node_index[n] = 0;
-          }
-      }
-
-    // resize map data fields
-    std::vector<std::vector<Real>> & psi_map = this->_fe_map->get_psi();
-    std::vector<std::vector<Real>> & dpsidxi_map = this->_fe_map->get_dpsidxi();
-    std::vector<std::vector<Real>> & dpsideta_map = this->_fe_map->get_dpsideta();
-    psi_map.resize          (n_total_mapping_shape_functions);
-    dpsidxi_map.resize      (n_total_mapping_shape_functions);
-    dpsideta_map.resize     (n_total_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    std::vector<std::vector<Real>> & d2psidxi2_map = this->_fe_map->get_d2psidxi2();
-    std::vector<std::vector<Real>> & d2psidxideta_map = this->_fe_map->get_d2psidxideta();
-    std::vector<std::vector<Real>> & d2psideta2_map = this->_fe_map->get_d2psideta2();
-    d2psidxi2_map.resize    (n_total_mapping_shape_functions);
-    d2psidxideta_map.resize (n_total_mapping_shape_functions);
-    d2psideta2_map.resize   (n_total_mapping_shape_functions);
-#endif
-
-    for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
-      {
-        psi_map[i].resize         (n_total_qp);
-        dpsidxi_map[i].resize     (n_total_qp);
-        dpsideta_map[i].resize    (n_total_qp);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        d2psidxi2_map[i].resize   (n_total_qp);
-        d2psidxideta_map[i].resize(n_total_qp);
-        d2psideta2_map[i].resize  (n_total_qp);
-#endif
-      }
-
-    // compute shape maps
-    if (inf_side->infinite())
-      {
-        const std::vector<std::vector<Real>> & S_map  = (base_fe->get_fe_map()).get_phi_map();
-        const std::vector<std::vector<Real>> & Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
-
-        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qps
-          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qps
-            for (unsigned int ti=0; ti<n_total_mapping_shape_functions; ti++)  // over all mapping shapes
-              {
-                // let the index vectors take care of selecting the appropriate base/radial mapping shape
-                const unsigned int bi = _base_node_index  [ti];
-                const unsigned int ri = _radial_node_index[ti];
-                psi_map          [ti][bp+rp*n_base_qp] = S_map [bi][bp] * radial_map   [ri][rp];
-                dpsidxi_map      [ti][bp+rp*n_base_qp] = Ss_map[bi][bp] * radial_map   [ri][rp];
-                dpsideta_map     [ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
-
-                // second derivatives are not implemented for infinite elements
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                d2psidxi2_map    [ti][bp+rp*n_base_qp] = 0.;
-                d2psidxideta_map [ti][bp+rp*n_base_qp] = 0.;
-                d2psideta2_map   [ti][bp+rp*n_base_qp] = 0.;
-#endif
-              }
-
-      }
-    else
-      {
-        const std::vector<std::vector<Real>> & S_map  = (base_fe->get_fe_map()).get_phi_map();
-        const std::vector<std::vector<Real>> & Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
-        const std::vector<std::vector<Real>> & St_map = (base_fe->get_fe_map()).get_dphideta_map();
-        for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qps
-          for (unsigned int ti=0; ti<n_total_mapping_shape_functions; ti++)  // over all mapping shapes
-            {
-              psi_map      [ti][bp] = S_map[ti][bp] ;
-              dpsidxi_map  [ti][bp] = Ss_map[ti][bp] ;
-              dpsideta_map [ti][bp] = St_map[ti][bp] ;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              d2psidxi2_map    [ti][bp] = 0.;
-              d2psidxideta_map [ti][bp] = 0.;
-              d2psideta2_map   [ti][bp] = 0.;
-#endif
-            }
-      }
-  }
+  std::vector<Point> qp(n_total_qp);
 
   // quadrature rule weights
+  if (Dim < 3)
+    {
+      // the quadrature points must be assembled differently for lower dims.
+      libmesh_not_implemented();
+    }
   {
     const std::vector<Real> & radial_qw = radial_qrule->get_weights();
     const std::vector<Real> & base_qw   = base_qrule->get_weights();
+    const std::vector<Point> & radial_qp = radial_qrule->get_points();
+    const std::vector<Point> & base_qp   = base_qrule->get_points();
 
     libmesh_assert_equal_to (radial_qw.size(), n_radial_qp);
     libmesh_assert_equal_to (base_qw.size(), n_base_qp);
@@ -340,11 +208,128 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
       for (unsigned int bp=0; bp<n_base_qp; bp++)
         {
           _total_qrule_weights[bp + rp*n_base_qp] = radial_qw[rp] * base_qw[bp];
+          // initialize the quadrature-points for the 2D side element
+          // - either the base element or it has a 1D base + radial direction.
+          if (inf_side->infinite())
+            qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
+                                        0.,
+                                        radial_qp[rp](0));
+          else
+            qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
+                                        base_qp[bp](1),
+                                        -1.);
         }
   }
 
+  this->reinit(inf_side->parent(), &qp);
+
 }
 
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
+void InfFE<Dim,T_radial,T_base>::compute_face_functions()
+{
+
+  const unsigned int n_qp = cast_int<unsigned int>(_total_qrule_weights.size());
+  if (calculate_dxyz)
+    {
+      this->normals.resize(n_qp);
+
+      if (Dim > 1)
+        {
+          this->tangents.resize(n_qp);
+          for (unsigned int p=0; p<n_qp; ++p)
+            this->tangents[p].resize(LIBMESH_DIM-1);
+        }
+      else
+        {
+          libMesh::err << "tangents have no sense in 1-dimensional elements!"<<std::endl;
+          libmesh_error_msg("Exiting...");
+        }
+    }
+
+  // If we have no quadrature points, there's nothing else to do
+  if (!n_qp)
+    return;
+
+  switch(Dim)
+    {
+    case 1:
+    case 2:
+      {
+        libmesh_not_implemented();
+        break;
+      }
+    case 3:
+      {
+        for (unsigned int p=0; p<n_qp; ++p)
+          {
+
+            if (calculate_dxyz)
+              {
+                //
+                // seeking dxyzdx, dxyzdeta means to compute
+                //        / dx/dxi    dy/dxi   dz/dxi \.
+                // J^-1= |                             |
+                //       \ dx/deta  dy/deta   dz/deta /.
+                // which is the psudo-inverse of J, i.e.
+                //
+                // J^-1 = (J^T J)^-1 J^T
+                //
+                // where J^T T is the 2x2 matrix 'g' used to compute the
+                // Jacobian determinant; thus
+                //
+                // J^-1 = ________1________   / g22  -g21 \  / dxi/dx  dxi/dy   dxi/dz \.
+                //        g11*g22 - g21*g12   \-g12  g11  /  \ deta/dx deta/dy deta/dz /.
+                const std::vector<Real> & base_dxidx = base_fe->get_dxidx();
+                const std::vector<Real> & base_dxidy = base_fe->get_dxidy();
+                const std::vector<Real> & base_dxidz = base_fe->get_dxidz();
+                const std::vector<Real> & base_detadx = base_fe->get_detadx();
+                const std::vector<Real> & base_detady = base_fe->get_detady();
+                const std::vector<Real> & base_detadz = base_fe->get_detadz();
+
+                const Real g11 = (base_dxidx[p]*base_dxidx[p] +
+                                  base_dxidy[p]*base_dxidy[p] +
+                                  base_dxidz[p]*base_dxidz[p]);
+                const Real g12 = (base_dxidx[p]*base_detadx[p] +
+                                  base_dxidy[p]*base_detady[p] +
+                                  base_dxidz[p]*base_detadz[p]);
+                const Real g21 = g12;
+                const Real g22 = (base_detadx[p]*base_detadx[p] +
+                                  base_detady[p]*base_detady[p] +
+                                  base_detadz[p]*base_detadz[p]);
+
+                // det is scaled by r^6
+                const Real det = (g11*g22 - g12*g21);
+
+                // scaled by r^-3
+                Point dxyzdxi_map((g22*base_dxidx[p]-g21*base_detadx[p])/det,
+                                  (g22*base_dxidy[p]-g21*base_detady[p])/det,
+                                  (g22*base_dxidz[p]-g21*base_detadz[p])/det);
+
+                Point dxyzdeta_map((g11*base_detadx[p] - g12*base_dxidx[p])/det,
+                                   (g11*base_detady[p] - g12*base_dxidy[p])/det,
+                                   (g11*base_detadz[p] - g12*base_dxidz[p])/det);
+                // scaled by r^-2
+
+                this->tangents[p][0] = dxyzdxi_map.unit();
+
+                this->tangents[p][1] = (dxyzdeta_map - (dxyzdeta_map*tangents[p][0])*tangents[p][0] ).unit();
+
+                this->normals[p]     = tangents[p][0].cross(tangents[p][1]).unit();
+                // recompute JxW using the 2D Jacobian:
+                this->JxWxdecay[p] = _total_qrule_weights[p]/std::sqrt(det);
+                this->JxW[p] = JxWxdecay[p];
+              }
+
+
+          }
+        break;
+      }
+    default:
+      libmesh_error_msg("Unsupported dim = " << dim);
+    }
+
+}
 
 
 
@@ -362,6 +347,9 @@ INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, edge_reinit(const Elem *, const unsi
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, init_face_shape_functions(const std::vector<Point> &, const Elem *));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, init_face_shape_functions(const std::vector<Point> &, const Elem *));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, init_face_shape_functions(const std::vector<Point> &, const Elem *));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_face_functions());
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_face_functions());
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_face_functions());
 
 } // namespace libMesh
 

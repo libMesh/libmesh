@@ -94,9 +94,6 @@ int main (int argc, char ** argv)
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
-  // Tell the user what we are doing.
-  libMesh::out << "Running ex6 with dim = 3" << std::endl << std::endl;
-
   // Create a serialized mesh, distributed across the default MPI
   // communicator.
   Mesh mesh(init.comm());
@@ -358,15 +355,30 @@ void assemble_wave(EquationSystems & es,
       // initialize the constant references to the data fields
       // each time again, when a new element is processed.
       //
+      // Due to infinite extent of the element, the 'pure' Jacobian is divergent
+      // and we must use a re-scaled one. As re-scaling, a 'decay'-function
+      // is used (in 3D this is \f$ r^{-2} \f$).
+      //
+      // To account for this extra weight, \p phi, \p dphi and \p weight are
+      // re-scaled as well:
+      //  * J      --> J x decay^2
+      //  * phi    --> phi/decay x r
+      //  * dphi   --> dphi/decay x r
+      //  * weight --> weight / r^2
+      // With this, the product of Jacobian, test and trial functions (and their derivatives)
+      // can be used as normal since the extra weights cancel.
+      //
       // The element Jacobian * quadrature weight at each integration point.
-      const std::vector<Real> & JxW = cfe->get_JxW();
+      const std::vector<Real> & JxW = cfe->get_JxWxdecay_sq();
 
       // The element shape functions evaluated at the quadrature points.
-      const std::vector<std::vector<Real>> & phi = cfe->get_phi();
+      const std::vector<std::vector<Real>> & phi = cfe->get_phi_over_decayxR();
+      //const std::vector<std::vector<Real>> & phi = cfe->get_phi();
 
       // The element shape function gradients evaluated at the quadrature
-      // points.
-      const std::vector<std::vector<RealGradient>> & dphi = cfe->get_dphi();
+      // points, devided by weight x rad
+      const std::vector<std::vector<RealGradient>> & dphi = cfe->get_dphi_over_decayxR();
+      //const std::vector<std::vector<RealGradient>> & dphi = cfe->get_dphi();
 
       // The infinite elements need more data fields than conventional FE.
       // These are the gradients of the phase term dphase, an additional
@@ -377,8 +389,8 @@ void assemble_wave(EquationSystems & es,
       // the FE method, so that the weak form (below) is valid for @e both
       // finite and infinite elements.
       const std::vector<RealGradient> & dphase  = cfe->get_dphase();
-      const std::vector<Real> &         weight  = cfe->get_Sobolev_weight();
-      const std::vector<RealGradient> & dweight = cfe->get_Sobolev_dweight();
+      const std::vector<Real> &         weight  = cfe->get_Sobolev_weightxR_sq();
+      const std::vector<RealGradient> & dweight = cfe->get_Sobolev_dweightxR_sq();
 
       // Now this is all independent of whether we use an FE
       // or an InfFE.  Nice, hm? ;-)
