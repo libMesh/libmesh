@@ -2602,9 +2602,6 @@ write_sideset_data(const MeshBase & mesh,
   // .) ss_ids
   this->read_sideset_info();
 
-  // Debugging:
-  // libMesh::out << "File has " << num_side_sets << " side sets." << std::endl;
-
   // Write "truth" table for sideset variables.  The function
   // exII::ex_put_var_param() must be called before
   // exII::ex_put_sset_var_tab(). For us, this happens during the call
@@ -2624,12 +2621,6 @@ write_sideset_data(const MeshBase & mesh,
       // this class.
       offset += (ss > 0 ? num_sides_per_set[ss-1] : 0);
       this->read_sideset(ss, offset);
-
-      // Debugging:
-      // libMesh::out << "Sideset " << ss_ids[ss]
-      //              << " has " << num_sides_per_set[ss]
-      //              << " entries."
-      //              << std::endl;
 
       // For each variable in var_names, write the values for the
       // current sideset, if any.
@@ -2679,11 +2670,6 @@ write_sideset_data(const MeshBase & mesh,
 
               // Map from Exodus side ids to libmesh side ids.
               unsigned int converted_side_id = conv.get_side_map(side_id);
-
-              // Debugging:
-              // libMesh::out << "side_id=" << side_id
-              //              << ", converted_side_id=" << converted_side_id
-              //              << std::endl;
 
               // Construct a key so we can quickly see whether there is any
               // data for this variable in the map.
@@ -2791,14 +2777,6 @@ read_sideset_data(const MeshBase & mesh,
                      MappedInputVector(sset_var_vals, _single_precision).data());
                   EX_CHECK_ERR(ex_err, "Error reading sideset variable.");
 
-                  // Debugging:
-                  // libMesh::out << "Variable " << sideset_var_names[var]
-                  //              << " is defined on side set " << ss_ids[ss]
-                  //              << " and has values: " << std::endl;
-                  // for (int i=0; i<num_sides_per_set[ss]; ++i)
-                  //   libMesh::out << sset_var_vals[i] << " ";
-                  // libMesh::out << std::endl;
-
                   for (int i=0; i<num_sides_per_set[ss]; ++i)
                     {
                       dof_id_type exodus_elem_id = elem_list[i + offset];
@@ -2817,16 +2795,6 @@ read_sideset_data(const MeshBase & mesh,
                       // Note: the mapping is defined on 0-based indices, so subtract
                       // 1 before doing the mapping.
                       unsigned int converted_side_id = conv.get_side_map(exodus_side_id - 1);
-
-                      // Debugging:
-                      // libMesh::out << "exodus_elem_id = " << exodus_elem_id
-                      //              << "\n"
-                      //              << "converted_elem_id = " << converted_elem_id
-                      //              << "\n\n"
-                      //              << "exodus_side_id = " << exodus_side_id
-                      //              << "\n"
-                      //              << "converted_side_id = " << converted_side_id
-                      //              << std::endl;
 
                       // Make a BCTuple key from the converted information.
                       BoundaryInfo::BCTuple key = std::make_tuple
@@ -2869,13 +2837,6 @@ write_nodeset_data (int timestep,
   // Note: we need these arrays so that we know what data to write
   this->read_all_nodesets();
 
-  // Debugging
-  // libMesh::out << "num_node_sets = " << this->num_node_sets << std::endl;
-  // libMesh::out << "nodset_ids = ";
-  // for (const auto & id : nodeset_ids)
-  //   libMesh::out << id << " ";
-  // libMesh::out << std::endl;
-
   // The "truth" table for nodeset variables. nset_var_tab is a
   // logically (num_node_sets x num_nset_var) integer array of 0s and
   // 1s indicating which nodesets a given nodeset variable is defined
@@ -2884,9 +2845,6 @@ write_nodeset_data (int timestep,
 
   for (int ns=0; ns<num_node_sets; ++ns)
   {
-    // Debugging:
-    // libMesh::out << "Writing data for nodeset " << ns << std::endl;
-
     // The offset into the node_sets_node_list for the current nodeset
     int offset = node_sets_node_index[ns];
 
@@ -2916,9 +2874,6 @@ write_nodeset_data (int timestep,
             // I don't think it is set up at the time when
             // write_nodeset_data() would normally be called.
             dof_id_type libmesh_node_id = node_sets_node_list[i + offset] - 1;
-
-            // Debugging
-            // libMesh::out << "libmesh_node_id=" << libmesh_node_id << std::endl;
 
             // Construct a key to look up values in data_map.
             BoundaryInfo::NodeBCTuple key =
