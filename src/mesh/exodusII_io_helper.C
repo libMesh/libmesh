@@ -2316,15 +2316,18 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   // build_node_list() builds a sorted list of (node-id, bc-id) tuples
   // that is sorted by node-id, but we actually want it to be sorted
   // by bc-id, i.e. the second argument of the tuple.
-  typedef std::tuple<dof_id_type, boundary_id_type> tuple_t;
-  std::vector<tuple_t> bc_tuples =
+  auto bc_tuples =
     mesh.get_boundary_info().build_node_list();
 
-  // We use std::stable_sort so that the entries within a single
-  // nodeset remain in whatever order they were previously in.
+  // We use std::stable_sort() here so that the entries within a
+  // single nodeset remain sorted in node-id order, but now the
+  // smallest boundary id's nodes appear first in the list, followed
+  // by the second smallest, etc. That is, we are purposely doing two
+  // different sorts here, with the first one being within the
+  // build_node_list() call itself.
   std::stable_sort(bc_tuples.begin(), bc_tuples.end(),
-                   [](const tuple_t & t1,
-                      const tuple_t & t2)
+                   [](const BoundaryInfo::NodeBCTuple & t1,
+                      const BoundaryInfo::NodeBCTuple & t2)
                    { return std::get<1>(t1) < std::get<1>(t2); });
 
   std::vector<boundary_id_type> node_boundary_ids;
