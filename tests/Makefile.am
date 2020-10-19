@@ -69,6 +69,7 @@ unit_tests_sources = \
   mesh/mapped_subdomain_partitioner_test.C \
   mesh/mesh_function_dfem.C \
   mesh/write_sideset_data.C \
+  mesh/write_nodeset_data.C \
   mesh/write_edgeset_data.C \
   mesh/write_vec_and_scalar.C \
   mesh/all_second_order.C \
@@ -252,6 +253,7 @@ CLEANFILES = cube_mesh.xda \
 	     mesh_with_soln.e \
 	     elemental_from_nodal.e \
              write_sideset_data.e \
+             write_nodeset_data.e \
              write_edgeset_data.e \
              read_header_test.e \
              output.dat \
