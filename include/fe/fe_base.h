@@ -250,10 +250,7 @@ public:
    * \returns The curl of the shape function at the quadrature
    * points.
    */
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  virtual
-#endif
+  virtual_for_inffe
   const std::vector<std::vector<OutputShape>> & get_curl_phi() const
   { libmesh_assert(!calculations_started || calculate_curl_phi);
     calculate_curl_phi = calculate_dphiref = true; return curl_phi; }
@@ -262,9 +259,7 @@ public:
    * \returns The divergence of the shape function at the quadrature
    * points.
    */
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  virtual
-#endif
+  virtual_for_inffe
   const std::vector<std::vector<OutputDivergence>> & get_div_phi() const
   { libmesh_assert(!calculations_started || calculate_div_phi);
     calculate_div_phi = calculate_dphiref = true; return div_phi; }
