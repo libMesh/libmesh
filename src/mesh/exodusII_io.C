@@ -1535,6 +1535,22 @@ read_sideset_data(int timestep,
 
 void
 ExodusII_IO::
+write_nodeset_data (int timestep,
+                    const std::vector<std::string> & var_names,
+                    std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_writing,
+                       "ERROR, ExodusII file must be opened for writing "
+                       "before calling ExodusII_IO::write_nodeset_data()!");
+
+  exio_helper->write_nodeset_data(timestep, var_names, node_boundary_ids, bc_vals);
+}
+
+
+
+void
+ExodusII_IO::
 read_nodeset_data (int timestep,
                    std::vector<std::string> & var_names,
                    std::vector<std::set<boundary_id_type>> & node_boundary_ids,

@@ -1425,6 +1425,11 @@ ExodusII_IO_Helper::write_var_names(ExodusVarType type,
         this->write_var_names_impl("s", num_sideset_vars, names);
         break;
       }
+    case NODESET:
+      {
+        this->write_var_names_impl("m", num_nodeset_vars, names);
+        break;
+      }
     default:
       libmesh_error_msg("Unrecognized ExodusVarType " << type);
     }
@@ -2311,15 +2316,18 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   // build_node_list() builds a sorted list of (node-id, bc-id) tuples
   // that is sorted by node-id, but we actually want it to be sorted
   // by bc-id, i.e. the second argument of the tuple.
-  typedef std::tuple<dof_id_type, boundary_id_type> tuple_t;
-  std::vector<tuple_t> bc_tuples =
+  auto bc_tuples =
     mesh.get_boundary_info().build_node_list();
 
-  // We use std::stable_sort so that the entries within a single
-  // nodeset remain in whatever order they were previously in.
+  // We use std::stable_sort() here so that the entries within a
+  // single nodeset remain sorted in node-id order, but now the
+  // smallest boundary id's nodes appear first in the list, followed
+  // by the second smallest, etc. That is, we are purposely doing two
+  // different sorts here, with the first one being within the
+  // build_node_list() call itself.
   std::stable_sort(bc_tuples.begin(), bc_tuples.end(),
-                   [](const tuple_t & t1,
-                      const tuple_t & t2)
+                   [](const BoundaryInfo::NodeBCTuple & t1,
+                      const BoundaryInfo::NodeBCTuple & t2)
                    { return std::get<1>(t1) < std::get<1>(t2); });
 
   std::vector<boundary_id_type> node_boundary_ids;
@@ -2597,9 +2605,6 @@ write_sideset_data(const MeshBase & mesh,
   // .) ss_ids
   this->read_sideset_info();
 
-  // Debugging:
-  // libMesh::out << "File has " << num_side_sets << " side sets." << std::endl;
-
   // Write "truth" table for sideset variables.  The function
   // exII::ex_put_var_param() must be called before
   // exII::ex_put_sset_var_tab(). For us, this happens during the call
@@ -2619,12 +2624,6 @@ write_sideset_data(const MeshBase & mesh,
       // this class.
       offset += (ss > 0 ? num_sides_per_set[ss-1] : 0);
       this->read_sideset(ss, offset);
-
-      // Debugging:
-      // libMesh::out << "Sideset " << ss_ids[ss]
-      //              << " has " << num_sides_per_set[ss]
-      //              << " entries."
-      //              << std::endl;
 
       // For each variable in var_names, write the values for the
       // current sideset, if any.
@@ -2674,11 +2673,6 @@ write_sideset_data(const MeshBase & mesh,
 
               // Map from Exodus side ids to libmesh side ids.
               unsigned int converted_side_id = conv.get_side_map(side_id);
-
-              // Debugging:
-              // libMesh::out << "side_id=" << side_id
-              //              << ", converted_side_id=" << converted_side_id
-              //              << std::endl;
 
               // Construct a key so we can quickly see whether there is any
               // data for this variable in the map.
@@ -2786,14 +2780,6 @@ read_sideset_data(const MeshBase & mesh,
                      MappedInputVector(sset_var_vals, _single_precision).data());
                   EX_CHECK_ERR(ex_err, "Error reading sideset variable.");
 
-                  // Debugging:
-                  // libMesh::out << "Variable " << sideset_var_names[var]
-                  //              << " is defined on side set " << ss_ids[ss]
-                  //              << " and has values: " << std::endl;
-                  // for (int i=0; i<num_sides_per_set[ss]; ++i)
-                  //   libMesh::out << sset_var_vals[i] << " ";
-                  // libMesh::out << std::endl;
-
                   for (int i=0; i<num_sides_per_set[ss]; ++i)
                     {
                       dof_id_type exodus_elem_id = elem_list[i + offset];
@@ -2813,16 +2799,6 @@ read_sideset_data(const MeshBase & mesh,
                       // 1 before doing the mapping.
                       unsigned int converted_side_id = conv.get_side_map(exodus_side_id - 1);
 
-                      // Debugging:
-                      // libMesh::out << "exodus_elem_id = " << exodus_elem_id
-                      //              << "\n"
-                      //              << "converted_elem_id = " << converted_elem_id
-                      //              << "\n\n"
-                      //              << "exodus_side_id = " << exodus_side_id
-                      //              << "\n"
-                      //              << "converted_side_id = " << converted_side_id
-                      //              << std::endl;
-
                       // Make a BCTuple key from the converted information.
                       BoundaryInfo::BCTuple key = std::make_tuple
                         (converted_elem_id,
@@ -2836,6 +2812,106 @@ read_sideset_data(const MeshBase & mesh,
             } // end for (var)
         } // end for (ss)
     } // end if (num_sideset_vars)
+}
+
+
+
+void ExodusII_IO_Helper::
+write_nodeset_data (int timestep,
+                    const std::vector<std::string> & var_names,
+                    const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
+{
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // Write the nodeset variable names to file. This function should
+  // only be called once for NODESET variables, repeated calls to
+  // write_var_names() overwrites/changes the order of names that were
+  // there previously, and will mess up any data that has already been
+  // written.
+  this->write_var_names(NODESET, var_names);
+
+  // For all nodesets, reads and fills in the arrays:
+  // nodeset_ids
+  // num_nodes_per_set
+  // node_sets_node_index - starting index for each nodeset in the node_sets_node_list vector
+  // node_sets_node_list
+  // Note: we need these arrays so that we know what data to write
+  this->read_all_nodesets();
+
+  // The "truth" table for nodeset variables. nset_var_tab is a
+  // logically (num_node_sets x num_nset_var) integer array of 0s and
+  // 1s indicating which nodesets a given nodeset variable is defined
+  // on.
+  std::vector<int> nset_var_tab(num_node_sets * var_names.size());
+
+  for (int ns=0; ns<num_node_sets; ++ns)
+  {
+    // The offset into the node_sets_node_list for the current nodeset
+    int offset = node_sets_node_index[ns];
+
+    // For each variable in var_names, write the values for the
+    // current nodeset, if any.
+    for (auto var : index_range(var_names))
+      {
+        // If this var has no values on this nodeset, go to the next one.
+        if (!node_boundary_ids[var].count(nodeset_ids[ns]))
+          continue;
+
+        // Otherwise, fill in this entry of the nodeset truth table.
+        nset_var_tab[ns*var_names.size() + var] = 1;
+
+        // Data vector that will eventually be passed to exII::ex_put_nset_var().
+        std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
+
+        // Get reference to the NodeBCTuple -> Real map for this variable.
+        const auto & data_map = bc_vals[var];
+
+        // Loop over entries in current nodeset.
+        for (int i=0; i<num_nodes_per_set[ns]; ++i)
+          {
+            // Here we convert Exodus node ids to libMesh node ids by
+            // subtracting 1.  We should probably use the
+            // exodus_node_num_to_libmesh data structure for this, but
+            // I don't think it is set up at the time when
+            // write_nodeset_data() would normally be called.
+            dof_id_type libmesh_node_id = node_sets_node_list[i + offset] - 1;
+
+            // Construct a key to look up values in data_map.
+            BoundaryInfo::NodeBCTuple key =
+              std::make_tuple(libmesh_node_id, nodeset_ids[ns]);
+
+            // We require that the user provided either no values for
+            // this (var, nodeset) combination (in which case we don't
+            // reach this point) or a value for _every_ node in this
+            // nodeset for this var, so we use the libmesh_map_find()
+            // macro to check for this.
+            nset_var_vals[i] = libmesh_map_find(data_map, key);
+          } // end for (node in nodeset[ns])
+
+        // Write nodeset values to Exodus file
+        if (nset_var_vals.size() > 0)
+          {
+            ex_err = exII::ex_put_nset_var
+              (ex_id,
+               timestep,
+               var + 1, // 1-based variable index of current variable
+               nodeset_ids[ns],
+               num_nodes_per_set[ns],
+               MappedOutputVector(nset_var_vals, _single_precision).data());
+            EX_CHECK_ERR(ex_err, "Error writing nodeset vars.");
+          }
+      } // end for (var in var_names)
+  } // end for (ns)
+
+  // Finally, write the nodeset truth table.
+  ex_err =
+    exII::ex_put_nset_var_tab(ex_id,
+                              num_node_sets,
+                              cast_int<int>(var_names.size()),
+                              nset_var_tab.data());
+  EX_CHECK_ERR(ex_err, "Error writing nodeset var truth table.");
 }
 
 

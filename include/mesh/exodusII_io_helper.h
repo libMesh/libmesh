@@ -356,6 +356,15 @@ public:
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
+   * Write nodeset data for the requested timestep.
+   */
+  void
+  write_nodeset_data (int timestep,
+                      const std::vector<std::string> & var_names,
+                      const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                      std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
+
+  /**
    * Read nodeset variables, if any, into the provided data structures.
    */
   void
