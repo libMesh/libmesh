@@ -313,6 +313,26 @@ public:
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
+   * The Exodus format can also store values on nodesets. This can be
+   * thought of as an alternative to defining a nodal variable
+   * field on lower-dimensional elements making up a part of the
+   * boundary. The inputs to the function are:
+   * .) var_names[i] is the name of the ith sideset variable to be written to file.
+   * .) node_boundary_ids[i] is a set of node_ids where var_names[i] is active.
+   * .) bc_vals[i] is a map from (node-id, boundary-id) NodeBCTuple objects to the
+   *    corresponding real-valued data.
+   *
+   * \note You must have already written the mesh by calling
+   * e.g. write() before calling this function, because it uses the
+   * existing ordering of the Exodus nodesets.
+   */
+  void
+  write_nodeset_data (int timestep,
+                      const std::vector<std::string> & var_names,
+                      std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                      std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
+
+  /**
    * Read all the nodeset data at a particular timestep. TODO:
    * currently _all_ the nodeset variables are read, but we might want
    * to change this to only read the requested ones.
