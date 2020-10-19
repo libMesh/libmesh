@@ -361,7 +361,7 @@ void assemble_wave(EquationSystems & es,
       //
       // To account for this extra weight, \p phi, \p dphi and \p weight are
       // re-scaled as well:
-      //  * J      --> Jxd^2
+      //  * J      --> J x decay^2
       //  * phi    --> phi/decay x r
       //  * dphi   --> dphi/decay x r
       //  * weight --> weight / r^2
