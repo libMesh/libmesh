@@ -84,14 +84,18 @@ public:
 
   /**
    * Initialize with a NumericVector \p other, e.g. duplicate the storage
-   * allocation of \p other. This in general DOES NOT copy the vector entires
+   * allocation of \p other. This function DOES NOT copy the vector entries.
+   * If you set fast = false, the initialized entries are explicitly zeroed,
+   * otherwise their values are indeterminate.
    */
   virtual void init(const NumericVector<T> & other, const bool fast = false);
 
   /**
    * Initialize with DiagonalMatrix \p other, e.g. duplicate the storage
-   * allocation of the underlying NumericVector in \p other. This in general
-   * DOES NOT copy the vector entires
+   * allocation of the underlying NumericVector in \p other. This function
+   * DOES NOT copy the vector entries. If you set fast = false, the
+   * initialized entries are explicitly zeroed, otherwise their values
+   * are indeterminate.
    */
   virtual void init(const DiagonalMatrix<T> & other, const bool fast = false);
 
