@@ -21,7 +21,6 @@
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 #include "libmesh/periodic_boundaries.h"
-
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
@@ -32,11 +31,7 @@
 namespace libMesh
 {
 
-PeriodicBoundaries::~PeriodicBoundaries()
-{
-  for (auto & pr : *this)
-    delete pr.second;
-}
+PeriodicBoundaries::~PeriodicBoundaries() = default;
 
 
 
@@ -45,7 +40,7 @@ PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id)
   iterator i = this->find(id);
   if (i == this->end())
     return nullptr;
-  return i->second;
+  return i->second.get();
 }
 
 
@@ -55,7 +50,7 @@ const PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id) c
   const_iterator i = this->find(id);
   if (i == this->end())
     return nullptr;
-  return i->second;
+  return i->second.get();
 }
 
 
