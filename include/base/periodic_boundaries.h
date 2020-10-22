@@ -28,6 +28,7 @@
 
 // C++ Includes
 #include <map>
+#include <memory>
 
 namespace libMesh
 {
@@ -41,21 +42,18 @@ class PointLocatorBase;
  * We're using a class instead of a typedef to allow forward
  * declarations and future flexibility.
  *
- * \note \p std::map has no virtual destructor, so downcasting here
- * would be dangerous.
- *
  * \author Roy Stogner
  * \date 2010
  * \brief Maps between boundary ids and PeriodicBoundaryBase objects.
  */
-class PeriodicBoundaries : public std::map<boundary_id_type, PeriodicBoundaryBase *>
+class PeriodicBoundaries : public std::map<boundary_id_type, std::unique_ptr<PeriodicBoundaryBase>>
 {
 public:
   PeriodicBoundaryBase * boundary(boundary_id_type id);
 
   const PeriodicBoundaryBase * boundary(boundary_id_type id) const;
 
-  PeriodicBoundaries() {}
+  PeriodicBoundaries() = default;
 
   ~PeriodicBoundaries();
 

@@ -38,6 +38,7 @@
 #include "libmesh/mesh_subdivision_support.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/periodic_boundary_base.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"

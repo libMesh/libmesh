@@ -5076,15 +5076,12 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & periodic_bounda
   // See if we already have a periodic boundary associated myboundary...
   PeriodicBoundaryBase * existing_boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
 
-  if (existing_boundary == nullptr)
+  if (!existing_boundary)
     {
       // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
-      PeriodicBoundaryBase * boundary = periodic_boundary.clone().release();
-      PeriodicBoundaryBase * inverse_boundary = periodic_boundary.clone(PeriodicBoundaryBase::INVERSE).release();
-
-      // _periodic_boundaries takes ownership of the pointers
-      _periodic_boundaries->emplace(boundary->myboundary, boundary);
-      _periodic_boundaries->emplace(inverse_boundary->myboundary, inverse_boundary);
+      // Pass the pairedboundary of the original as the boundary id of the inverse clone.
+      _periodic_boundaries->emplace(periodic_boundary.myboundary, periodic_boundary.clone());
+      _periodic_boundaries->emplace(periodic_boundary.pairedboundary, periodic_boundary.clone(PeriodicBoundaryBase::INVERSE));
     }
   else
     {
@@ -5107,23 +5104,10 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
   libmesh_assert_equal_to (boundary.myboundary, inverse_boundary.pairedboundary);
   libmesh_assert_equal_to (boundary.pairedboundary, inverse_boundary.myboundary);
 
-  // Allocate copies on the heap.  The _periodic_boundaries object will manage this memory.
-  // Note: this also means that the copy constructor for the PeriodicBoundary (or user class
-  // derived therefrom) must be implemented!
-  // PeriodicBoundary * p_boundary = new PeriodicBoundary(boundary);
-  // PeriodicBoundary * p_inverse_boundary = new PeriodicBoundary(inverse_boundary);
-
-  // We can't use normal copy construction since this leads to slicing with derived classes.
-  // Use clone() "virtual constructor" instead.  But, this *requires* user to override the clone()
-  // method.  Note also that clone() allocates memory.  In this case, the _periodic_boundaries object
-  // takes responsibility for cleanup.
-  PeriodicBoundaryBase * p_boundary = boundary.clone().release();
-  PeriodicBoundaryBase * p_inverse_boundary = inverse_boundary.clone().release();
-
-  // Add the periodic boundary and its inverse to the PeriodicBoundaries data structure.  The
-  // PeriodicBoundaries data structure takes ownership of the pointers.
-  _periodic_boundaries->emplace(p_boundary->myboundary, p_boundary);
-  _periodic_boundaries->emplace(p_inverse_boundary->myboundary, p_inverse_boundary);
+  // Store clones of the passed-in objects. These will be cleaned up
+  // automatically in the _periodic_boundaries destructor.
+  _periodic_boundaries->emplace(boundary.myboundary, boundary.clone());
+  _periodic_boundaries->emplace(inverse_boundary.myboundary, inverse_boundary.clone());
 }
 
 
