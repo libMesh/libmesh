@@ -1201,26 +1201,11 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
 
 LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
 {
-  // This function allocates memory and hands it back to the user as a
-  // naked pointer.  This makes it too easy to leak memory, and
-  // therefore this function is deprecated.  After a period of
-  // deprecation, this function will eventually be marked with a
-  // libmesh_error_msg().
-  libmesh_deprecated();
-  // libmesh_error_msg("This function should be overridden by derived classes. "
-  //                   "It does not contain a valid LinearSolver to hand back to "
-  //                   "the user, so it creates one, opening up the possibility "
-  //                   "of a memory leak.");
+  libmesh_error_msg("get_linear_solver() should be overridden by derived classes, "
+                    "the base ImplicitSystem class does not contain a valid LinearSolver.");
 
-  LinearSolver<Number> * new_solver =
-    LinearSolver<Number>::build(this->comm()).release();
-
-  if (libMesh::on_command_line("--solver-system-names"))
-    new_solver->init((this->name()+"_").c_str());
-  else
-    new_solver->init();
-
-  return new_solver;
+  // Avoid compiler warnings
+  return nullptr;
 }
 
 

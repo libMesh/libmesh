@@ -114,15 +114,9 @@ public:
    * \returns A pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    *
-   * This function must be overridden in derived classes, since this
-   * base class does not have a valid LinearSolver to hand back a
-   * pointer to.
-   *
-   * \deprecated This function's current behavior, i.e. allocating a
-   * LinearSolver and handing it back to the user, makes it very easy
-   * to leak memory, and probably won't have the intended effect,
-   * i.e. of setting some parameters on a LinearSolver that the System
-   * would later use internally.
+   * This function must be overridden in derived classes. Since this
+   * class does not have a valid LinearSolver to hand back a pointer
+   * to, it is implemented as an error here.
    */
   virtual LinearSolver<Number> * get_linear_solver() const;
 
