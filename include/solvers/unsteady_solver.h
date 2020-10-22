@@ -164,8 +164,10 @@ public:
 
   /**
    * Serial vector of _system.get_vector("_old_nonlinear_solution")
+   * This is a shared_ptr so that it can be shared between different
+   * derived class instances, as in e.g. AdaptiveTimeSolver.
    */
-  std::unique_ptr<NumericVector<Number>> old_local_nonlinear_solution;
+  std::shared_ptr<NumericVector<Number>> old_local_nonlinear_solution;
 
   /**
    * Computes the size of ||u^{n+1} - u^{n}|| in some norm.

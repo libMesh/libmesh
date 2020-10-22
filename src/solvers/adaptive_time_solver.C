@@ -39,22 +39,11 @@ AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type & s)
 {
   // the child class must populate core_time_solver
   // with whatever actual time solver is to be used
-
-  // As an UnsteadySolver, we have an old_local_nonlinear_solution, but we're
-  // going to drop it and use our core time solver's instead.
-  old_local_nonlinear_solution.reset();
 }
 
 
 
-AdaptiveTimeSolver::~AdaptiveTimeSolver ()
-{
-  // As an UnsteadySolver, we have an old_local_nonlinear_solution, but it
-  // is being managed by our core_time_solver.  Make sure we don't delete
-  // it out from under them, in case the user wants to keep using the core
-  // solver after they're done with us.
-  old_local_nonlinear_solution.release();
-}
+AdaptiveTimeSolver::~AdaptiveTimeSolver () = default;
 
 
 
@@ -78,11 +67,7 @@ void AdaptiveTimeSolver::init()
 
   // As an UnsteadySolver, we have an old_local_nonlinear_solution, but it
   // isn't pointing to the right place - fix it
-  //
-  // This leaves us with two std::unique_ptrs holding the same pointer - dangerous
-  // for future use.  Replace with shared_ptr?
-  old_local_nonlinear_solution =
-    std::unique_ptr<NumericVector<Number>>(core_time_solver->old_local_nonlinear_solution.get());
+  old_local_nonlinear_solution = core_time_solver->old_local_nonlinear_solution;
 }
 
 
