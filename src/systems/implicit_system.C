@@ -135,7 +135,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
     }
 
   // The sensitivity problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   // Our iteration counts and residuals will be sums of the individual
   // results
@@ -148,11 +148,11 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
   for (auto p : make_range(parameters.size()))
     {
       std::pair<unsigned int, Real> rval =
-        linear_solver->solve (*matrix, pc,
-                              this->add_sensitivity_solution(p),
-                              this->get_sensitivity_rhs(p),
-                              double(solver_params.second),
-                              solver_params.first);
+        solver->solve (*matrix, pc,
+                       this->add_sensitivity_solution(p),
+                       this->get_sensitivity_rhs(p),
+                       double(solver_params.second),
+                       solver_params.first);
 
       totalrval.first  += rval.first;
       totalrval.second += rval.second;
@@ -183,7 +183,7 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
                     /* get_jacobian = */ true);
 
   // The adjoint problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   // Reset and build the RHS from the QOI derivative
   this->assemble_qoi_derivative(qoi_indices,
@@ -200,10 +200,10 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
-          linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
-                                        this->get_adjoint_rhs(i),
-                                        double(solver_params.second),
-                                        solver_params.first);
+          solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
+                                 this->get_adjoint_rhs(i),
+                                 double(solver_params.second),
+                                 solver_params.first);
 
         totalrval.first  += rval.first;
         totalrval.second += rval.second;
@@ -333,7 +333,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   }
 
   // The weighted adjoint-adjoint problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   // Our iteration counts and residuals will be sums of the individual
   // results
@@ -345,10 +345,10 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
-          linear_solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
-                                *(temprhs[i]),
-                                double(solver_params.second),
-                                solver_params.first);
+          solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
+                         *(temprhs[i]),
+                         double(solver_params.second),
+                         solver_params.first);
 
         totalrval.first  += rval.first;
         totalrval.second += rval.second;
@@ -427,16 +427,16 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
   this->matrix->close();
 
   // The weighted sensitivity problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   std::pair<unsigned int, Real> solver_params =
     this->get_linear_solve_parameters();
 
   const std::pair<unsigned int, Real> rval =
-    linear_solver->solve (*matrix, this->add_weighted_sensitivity_solution(),
-                          *temprhs,
-                          double(solver_params.second),
-                          solver_params.first);
+    solver->solve (*matrix, this->add_weighted_sensitivity_solution(),
+                   *temprhs,
+                   double(solver_params.second),
+                   solver_params.first);
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
