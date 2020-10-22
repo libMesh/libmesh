@@ -39,22 +39,21 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
                                             const unsigned int number_in) :
 
   Parent                 (es, name_in, number_in),
-  linear_solver          (LinearSolver<Number>::build(es.comm())),
   _n_linear_iterations   (0),
   _final_linear_residual (1.e20),
   _shell_matrix(nullptr),
   _subset(nullptr),
   _subset_solve_mode(SUBSET_ZERO)
 {
+  // linear_solver is now in the ImplicitSystem base class, but we are
+  // going to keep using it basically the way we did before it was
+  // moved.
+  linear_solver = LinearSolver<Number>::build(es.comm());
 }
 
 
 
-LinearImplicitSystem::~LinearImplicitSystem ()
-{
-  // Clear data
-  this->clear();
-}
+LinearImplicitSystem::~LinearImplicitSystem () = default;
 
 
 
@@ -353,12 +352,6 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
 LinearSolver<Number> * LinearImplicitSystem::get_linear_solver() const
 {
   return linear_solver.get();
-}
-
-
-
-void LinearImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
-{
 }
 
 

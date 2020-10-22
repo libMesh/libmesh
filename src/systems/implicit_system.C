@@ -166,8 +166,6 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
        /* homogeneous = */ true);
 #endif
 
-  this->release_linear_solver(linear_solver);
-
   return totalrval;
 }
 
@@ -210,8 +208,6 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
         totalrval.first  += rval.first;
         totalrval.second += rval.second;
       }
-
-  this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -358,8 +354,6 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
         totalrval.second += rval.second;
       }
 
-  this->release_linear_solver(linear_solver);
-
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (auto i : make_range(this->n_qois()))
@@ -443,8 +437,6 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
                           *temprhs,
                           double(solver_params.second),
                           solver_params.first);
-
-  this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -1201,11 +1193,20 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
 
 LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
 {
-  libmesh_error_msg("get_linear_solver() should be overridden by derived classes, "
-                    "the base ImplicitSystem class does not contain a valid LinearSolver.");
+  // Note: we always start "from scratch" to mimic the original
+  // behavior of this function. The goal is not to reuse the
+  // LinearSolver object, but to manage its lifetime in a more
+  // consistent manner.
+  linear_solver.reset();
 
-  // Avoid compiler warnings
-  return nullptr;
+  linear_solver = LinearSolver<Number>::build(this->comm());
+
+  if (libMesh::on_command_line("--solver-system-names"))
+    linear_solver->init((this->name() + "_").c_str());
+  else
+    linear_solver->init();
+
+  return linear_solver.get();
 }
 
 
@@ -1218,12 +1219,14 @@ std::pair<unsigned int, Real> ImplicitSystem::get_linear_solve_parameters() cons
 
 
 
-void ImplicitSystem::release_linear_solver(LinearSolver<Number> * s) const
+void ImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
 {
-  // This is the counterpart of the get_linear_solver() function, which is now deprecated.
+  // This function was originally paired with get_linear_solver()
+  // calls when that returned a dumb pointer which needed to be
+  // cleaned up. Since get_linear_solver() now just returns a pointer
+  // to a LinearSolver object managed by this class, this function no
+  // longer needs to do any cleanup.
   libmesh_deprecated();
-
-  delete s;
 }
 
 

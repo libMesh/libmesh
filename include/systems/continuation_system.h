@@ -370,13 +370,6 @@ private:
   NumericVector<Number> * delta_u;
 
   /**
-   * We maintain our own linear solver interface, for solving
-   * custom systems of equations and/or things which do not require
-   * a full-blown NewtonSolver.
-   */
-  std::unique_ptr<LinearSolver<Number>> linear_solver;
-
-  /**
    * False until initialize_tangent() is called
    */
   bool tangent_initialized;
